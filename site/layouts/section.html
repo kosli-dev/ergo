@@ -1,6 +1,5 @@
 {{ define "main" }}
 <div class="wrap docs-index">
-  <p class="eyebrow">[docs]</p>
   <h1 class="display-m">Docs</h1>
   <ul class="doc-cards">
     {{ range .Pages.ByWeight }}<li><a class="doc-card" href="{{ .RelPermalink }}"><span class="mono">{{ printf "%02d" .Weight }}</span><span class="doc-card__title">{{ .Title }}</span><span aria-hidden="true">→</span></a></li>{{ end }}

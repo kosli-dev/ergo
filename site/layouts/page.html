@@ -15,7 +15,6 @@
     {{ end }}
   </aside>
   <article class="prose">
-    <p class="eyebrow">[{{ printf "%02d" .Weight }}] docs</p>
     <h1>{{ .Title }}</h1>
     {{ .Content }}
     <p class="docs__source mono">Source: <a href="{{ site.Params.repo }}/blob/main/{{ if eq .Weight 1 }}README.md{{ else }}REFERENCE.md{{ end }}">{{ if eq .Weight 1 }}README.md{{ else }}REFERENCE.md{{ end }}</a>. Edit it there, and this page follows.</p>

@@ -33,7 +33,6 @@
 {{/* 01 — The problem */}}
 <section class="section">
   <div class="wrap">
-    <p class="eyebrow">[01] the working</p>
     <h2 class="display-m">Rego gives you the answer.<br><span class="muted">ERGO gives you the working.</span></h2>
     <div class="split">
       <div class="split__col">
@@ -68,7 +67,6 @@
 {{/* 02 — Declaration */}}
 <section class="section section--panel">
   <div class="wrap">
-    <p class="eyebrow">[02] a control is data</p>
     <h2 class="display-m">Write the control.<br><span class="muted">Not the machinery.</span></h2>
     <div class="declare">
 <pre class="code code--lg"><code><span class="kw">package</span> deploy
@@ -100,7 +98,6 @@ report := ergo.report(input, requirements)</code></pre>
 {{/* 03 — One shape */}}
 <section class="section">
   <div class="wrap">
-    <p class="eyebrow">[03] one report shape</p>
     <h2 class="display-m">One report shape.<br><span class="muted">Every control.</span></h2>
     <p class="lede narrow">A deployment control. A code-review control. A vulnerability control. Different policy, same evidence: one row per subject and check. Passing and failing rows have the same fields.</p>
     <ol class="fields">
@@ -118,7 +115,6 @@ report := ergo.report(input, requirements)</code></pre>
 {{/* 04 — Causes */}}
 <section class="section section--panel">
   <div class="wrap">
-    <p class="eyebrow">[04] causes</p>
     <h2 class="display-m">Failure isn't one state.</h2>
     <p class="lede narrow">A missing field, a field set to <code>null</code> and a selector that matched nothing all read as <code>null</code>. They're different problems with different fixes. The <code>cause</code> tells them apart.</p>
     <ul class="causes">
@@ -149,7 +145,6 @@ report := ergo.report(input, requirements)</code></pre>
 {{/* 05 — Manifesto */}}
 <section class="section manifesto">
   <div class="wrap">
-    <p class="eyebrow">[05] fail closed</p>
     <ul class="manifesto__lines">
       <li>Nothing disappears.</li>
       <li>Nothing is implied.</li>
@@ -172,7 +167,6 @@ report := ergo.report(input, requirements)</code></pre>
 {{/* 06 — Architecture */}}
 <section class="section section--panel">
   <div class="wrap">
-    <p class="eyebrow">[06] how it fits</p>
     <h2 class="display-m">Rego underneath.<br><span class="muted">ERGO on top.</span></h2>
     <p class="lede narrow">ERGO doesn't replace OPA. It's a single Rego file you copy into your policies. The control is expressed as data, and ERGO provides one evaluation and reporting model for all of them.</p>
     <ol class="flow" aria-label="From input to conclusion">
@@ -189,7 +183,6 @@ report := ergo.report(input, requirements)</code></pre>
 {{/* 07 — Vocabulary */}}
 <section class="section">
   <div class="wrap">
-    <p class="eyebrow">[07] vocabulary</p>
     <h2 class="display-m">Readable by machines.<br><span class="muted">Legible to people.</span></h2>
     <p class="lede narrow">The vocabulary is small on purpose. A control reads like a statement of intent. Because the structure is predictable, tools can validate it, diff it and test it.</p>
     <ul class="ops">
@@ -202,7 +195,6 @@ report := ergo.report(input, requirements)</code></pre>
 {{/* 08 — Get started */}}
 <section class="section section--panel" id="start">
   <div class="wrap">
-    <p class="eyebrow">[08] get started</p>
     <h2 class="display-m">One file. Three steps.</h2>
     <ol class="steps">
       <li>
@@ -238,7 +230,6 @@ report := ergo.report(input, requirements)</code></pre>
   <div class="wrap name__grid">
     <div class="name__glyph">{{ partial "therefore.html" . }}</div>
     <div>
-      <p class="eyebrow">[09] the name</p>
       <h2 class="display-m">ergo <span class="muted">/ˈɜː.ɡəʊ/</span></h2>
       <p class="lede">Therefore. As a result. A conclusion that comes with its premises.</p>
       <p>Not <em>computer says no</em>. Here is the decision, and here is what produced it.</p>
