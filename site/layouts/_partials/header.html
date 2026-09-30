@@ -1,6 +1,6 @@
 <header class="site-header">
   <div class="wrap site-header__inner">
-    <a class="lockup" href="{{ "/" | relURL }}" aria-label="ERGO home">{{ partial "wordmark.html" . }}</a>
+    <a class="lockup" href="{{ "/" | relURL }}" aria-label="ergo home">{{ partial "wordmark.html" . }}</a>
     <nav class="site-nav" aria-label="Main">
       <a href="{{ "docs/getting-started/" | relURL }}"{{ if eq .RelPermalink ("docs/getting-started/" | relURL) }} aria-current="page"{{ end }}>Get started</a>
       <a href="{{ "docs/reference/" | relURL }}"{{ if eq .RelPermalink ("docs/reference/" | relURL) }} aria-current="page"{{ end }}>Reference</a>

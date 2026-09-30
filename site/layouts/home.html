@@ -4,15 +4,15 @@
 <section class="hero">
   <div class="wrap hero__grid">
     <div class="hero__copy">
-      <h1 class="hero__title"><strong>Make Rego legible.</strong><span>Controls that show their work.</span></h1>
-      <p class="hero__lede"><em class="hl">ERGO</em> is an <em class="hl">open-source</em> control language and library that turns Rego policy evaluation into structured evidence of decisions that you can inspect, report and audit.</p>
+      <h1 class="hero__title"><strong>Rego says no. <span class="ergo-mark">ergo</span> says why.</strong><span>Controls that show their work.</span></h1>
+      <p class="hero__lede"><span class="ergo-mark">ergo</span> is a standard format for explainable controls. You write the control as data, and every Rego decision comes back with a report of what was checked, what was read, and why it passed or failed.</p>
       <div class="actions">
         <a class="btn btn--primary" href="{{ "docs/getting-started/" | relURL }}">Get started <span aria-hidden="true">→</span></a>
         <a class="btn btn--outline" href="{{ site.Params.fork }}">Fork on GitHub</a>
       </div>
     </div>
 
-    <figure class="term" aria-label="An ERGO report for three deployments">
+    <figure class="term" aria-label="An ergo report for three deployments">
       <div class="term__bar"><span></span><span></span><span></span><code>opa eval 'data.deploy.report'</code></div>
       <div class="report" data-evaluate>
         <div class="report__head"><span>subject</span><span>check</span><span>value read</span><span>passed</span><span>cause</span></div>
@@ -32,15 +32,15 @@
 {{/* 01 — The problem */}}
 <section class="section">
   <div class="wrap">
-    <h2 class="display-m">Rego gives you the answer.<br><span class="muted">ERGO gives you the working.</span></h2>
+    <h2 class="display-m">A decision nobody can check<br><span class="muted">isn't a control.</span></h2>
     <div class="split">
       <div class="split__col">
-        <p class="lede">Rego is good at one narrow question: <em>should this be allowed?</em> For admission control, that can be enough. For governance and audit, it often isn't.</p>
-        <p>A pass tells you almost nothing about what was evaluated. A failure might come with a useful string. Reconstructing the decision later still means finding the policy, finding the input and working out how the two met.</p>
+        <p class="lede">Rego enforces. It doesn't keep records. You can block a deployment, but you can't show later why it was blocked, or why the others weren't.</p>
+        <p>In regulated work, someone else has to be able to check that a control behaved as it should. A yes or no can't be checked. You don't just tell the auditor the balance. You hand over the books.</p>
       </div>
       <div class="compare">
         <div class="compare__card">
-          <p class="compare__label mono">without ergo</p>
+          <p class="compare__label mono">Rego on its own</p>
 <pre class="code"><code>{
   <span class="k">"allow"</span>: <span class="f">false</span>,
   <span class="k">"violations"</span>: [
@@ -50,13 +50,12 @@
           <p class="compare__note">Useful. But what about d-1? And d-3?</p>
         </div>
         <div class="compare__card compare__card--ergo">
-          <p class="compare__label mono">with ergo</p>
-<pre class="code"><code><span class="k">"subject"</span>: { <span class="k">"type"</span>: <span class="s">"deployment"</span>, <span class="k">"id"</span>: <span class="s">"d-2"</span> },
-<span class="k">"check"</span>: <span class="s">"approved"</span>,
-<span class="k">"inputs"</span>: [{ <span class="k">"name"</span>: <span class="s">"approved_by"</span>, <span class="k">"value"</span>: <span class="n">null</span> }],
-<span class="k">"passed"</span>: <span class="f">false</span>,
-<span class="k">"cause"</span>: <span class="s">"absent"</span></code></pre>
-          <p class="compare__note">Same verdict. Now you can see <strong>why</strong>, and every row that passed too.</p>
+          <p class="compare__label mono">with <span class="ergo-mark">ergo</span></p>
+<pre class="code"><code><span class="n">subject  check      value read               passed  cause</span>
+d-1      approved   approved_by = "alice"    <span class="t">true</span>    <span class="t">satisfied</span>
+d-2      approved   approved_by = <span class="n">null</span>       <span class="f">false</span>   <span class="f">absent</span>
+d-3      <span class="k">$applies</span>   environment = "staging"  <span class="f">false</span>   value <span class="n">(out of scope, recorded)</span></code></pre>
+          <p class="compare__note">Same decision. Now you can see why.</p>
         </div>
       </div>
     </div>
@@ -88,7 +87,7 @@ report := ergo.report(input, requirements)</code></pre>
       <ol class="notes">
         <li><span class="notes__n mono">1</span><div><h3>What you're judging</h3><p><code>subject_type</code>, <code>from</code> and <code>id</code> say what the subjects are and where to find them.</p></div></li>
         <li><span class="notes__n mono">2</span><div><h3>What's in scope</h3><p><code>applies_to</code> keeps only the subjects this control is about. The rest are recorded, not dropped.</p></div></li>
-        <li><span class="notes__n mono">3</span><div><h3>What must hold</h3><p><code>checks</code> are the rules each subject must pass. ERGO does the looping, the evaluation and the report.</p></div></li>
+        <li><span class="notes__n mono">3</span><div><h3>What must hold</h3><p><code>checks</code> are the rules each subject must pass. <span class="ergo-mark">ergo</span> does the looping, the evaluation and the report.</p></div></li>
       </ol>
     </div>
   </div>
@@ -150,10 +149,10 @@ report := ergo.report(input, requirements)</code></pre>
       <li>Nothing is decorative.</li>
       <li>Everything has a reason.</li>
       <li>Everything has a state.</li>
-      <li class="hl">Everything leaves evidence.</li>
+      <li class="hl">{{ partial "therefore.html" . }} <span class="ergo-mark">ergo</span>.</li>
     </ul>
     <div class="sys-checks">
-      <p class="sys-checks__intro">You didn't write the checks that start with <code class="sys">$</code>. ERGO adds them, so that whenever a requirement isn't met, at least one row explains why.</p>
+      <p class="sys-checks__intro">You didn't write the checks that start with <code class="sys">$</code>. <span class="ergo-mark">ergo</span> adds them, so that whenever a requirement isn't met, at least one row explains why.</p>
       <dl>
         <div><dt class="sys mono">$well_formed</dt><dd>The requirement itself makes sense: it has at least one check and a valid <code>require</code>.</dd></div>
         <div><dt class="sys mono">$min_subjects</dt><dd>At least one subject was found. A typo in <code>from</code> fails, instead of passing with nothing checked.</dd></div>
@@ -166,8 +165,8 @@ report := ergo.report(input, requirements)</code></pre>
 {{/* 06 — Architecture */}}
 <section class="section section--panel">
   <div class="wrap">
-    <h2 class="display-m">Rego underneath.<br><span class="muted">ERGO on top.</span></h2>
-    <p class="lede narrow">ERGO doesn't replace OPA. It's a single Rego file you copy into your policies. The control is expressed as data, and ERGO provides one evaluation and reporting model for all of them.</p>
+    <h2 class="display-m">Rego underneath.<br><span class="muted"><span class="ergo-mark">ergo</span> on top.</span></h2>
+    <p class="lede narrow"><span class="ergo-mark">ergo</span> doesn't replace OPA. It's a single Rego file you copy into your policies. The control is expressed as data, and <span class="ergo-mark">ergo</span> provides one evaluation and reporting model for all of them.</p>
     <ol class="flow" aria-label="From input to conclusion">
       <li><span class="flow__k mono">input</span><span class="flow__v">deployments.json</span></li>
       <li><span class="flow__k mono">control</span><span class="flow__v">requirements</span></li>
@@ -182,8 +181,8 @@ report := ergo.report(input, requirements)</code></pre>
 {{/* 07 — Vocabulary */}}
 <section class="section">
   <div class="wrap">
-    <h2 class="display-m">Readable by machines.<br><span class="muted">Legible to people.</span></h2>
-    <p class="lede narrow">The vocabulary is small on purpose. A control reads like a statement of intent. Because the structure is predictable, tools can validate it, diff it and test it.</p>
+    <h2 class="display-m">Readable by machines.<br><span class="muted">Readable by people.</span></h2>
+    <p class="lede narrow">The vocabulary is small on purpose. Every check gets a plain-language expression, like <code>approved_by is a non-empty string</code>, rendered from the requirement itself. Controls are data, so they can be validated, diffed and tested like code.</p>
     <ul class="ops">
       {{ range slice "equals" "present" "non_empty_string" "matches_any" "not_matches_any" "range" "includes" "excludes" "compare" "compare_time" "all" "any" "any_of" }}<li><a href="{{ "docs/reference/#operators" | relURL }}">{{ . }}</a></li>{{ end }}
     </ul>
@@ -194,12 +193,12 @@ report := ergo.report(input, requirements)</code></pre>
 {{/* 08 — Get started */}}
 <section class="section section--panel" id="start">
   <div class="wrap">
-    <h2 class="display-m">One file. Three steps.</h2>
+    <h2 class="display-m">One file. No lock-in.</h2>
     <ol class="steps">
       <li>
         <span class="steps__n mono">01</span>
         <h3>Copy the library</h3>
-        <p>Put <code>ergo.rego</code> next to your policies. No dependencies.</p>
+        <p>Copy <code>ergo.rego</code> next to your policies. That's the install.</p>
         <pre class="code"><code>policy/
   ergo.rego</code></pre>
       </li>
@@ -211,7 +210,7 @@ report := ergo.report(input, requirements)</code></pre>
       </li>
       <li>
         <span class="steps__n mono">03</span>
-        <h3>Read the evidence</h3>
+        <h3>Read the report</h3>
         <p>Ask OPA for the report, or just the violations.</p>
         <pre class="code"><code>opa eval -d policy -i deployments.json \
   'data.deploy.report'</code></pre>
@@ -229,7 +228,7 @@ report := ergo.report(input, requirements)</code></pre>
   <div class="wrap name__grid">
     <div class="name__glyph">{{ partial "therefore.html" . }}</div>
     <div>
-      <h2 class="display-m">ergo <span class="muted">/ˈɜː.ɡəʊ/</span></h2>
+      <h2 class="display-m"><span class="ergo-mark">ergo</span> <span class="muted">/ˈɜː.ɡəʊ/</span></h2>
       <p class="lede">Therefore. As a result. A conclusion that comes with its premises.</p>
       <p>Not <em>computer says no</em>. Here is the decision, and here is what produced it.</p>
     </div>
@@ -239,9 +238,9 @@ report := ergo.report(input, requirements)</code></pre>
 {{/* 10 — Close */}}
 <section class="cta">
   <div class="wrap cta__inner">
-    <h2 class="cta__title"><strong>Make Rego legible.</strong><span>Everything leaves evidence.</span></h2>
+    <h2 class="cta__title"><strong>Show the working.</strong></h2>
     <div class="actions">
-      <a class="btn btn--dark" href="{{ site.Params.fork }}">Fork ERGO</a>
+      <a class="btn btn--dark" href="{{ site.Params.fork }}">Fork ergo</a>
       <a class="btn btn--dark-outline" href="{{ "docs/getting-started/" | relURL }}">Get started <span aria-hidden="true">→</span></a>
     </div>
   </div>

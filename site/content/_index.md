@@ -1,3 +1,3 @@
 ---
-title: "ERGO: make Rego legible"
+title: "ergo - Rego says no. ergo says why."
 ---
