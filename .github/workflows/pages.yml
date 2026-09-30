@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      pages: read
     env:
       HUGO_VERSION: 0.157.0
     steps:
