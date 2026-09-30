@@ -30,7 +30,7 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
       - id: pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
       - name: Build
         shell: bash
         run: hugo --source site --gc --minify --baseURL "${{ steps.pages.outputs.base_url }}/"
