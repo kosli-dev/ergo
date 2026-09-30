@@ -9,6 +9,8 @@ updates:
       interval: "weekly"
       day: "tuesday"
       time: "11:00"
+    commit-message:
+      prefix: "ci"
     # Group minor and patch updates
     groups:
       github-actions-dependencies:
