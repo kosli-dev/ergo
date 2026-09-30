@@ -248,21 +248,33 @@ Two rules:
 
 ```json
 {
-  "satisfied": false,
-  "require": "every",
-  "subjects": { "total": 3, "matching": 2 },
   "checks": {
+    "$applies": {
+      "description": "subject is in scope as a deployment under this requirement's applies_to filter; out-of-scope subjects are recorded but not evaluated, and a subject whose filter can't be read fails",
+      "expression": "environment == prod"
+    },
+    "$min_subjects": {
+      "description": "at least 1 matching deployment subject(s) required",
+      "expression": "count(matching(deployments)) >= 1"
+    },
+    "$well_formed": {
+      "description": "the requirement declares at least one check and a recognised \"require\" value; lacking either, it asserts nothing that could ever be satisfied",
+      "expression": "count(checks) >= 1 and require in {every, some}"
+    },
     "approved": {
       "description": "Someone approved the deployment",
+      "expression": "approved_by is a non-empty string",
       "op": "non_empty_string",
-      "path": ["approved_by"],
-      "expression": "approved_by is a non-empty string"
+      "path": ["approved_by"]
     }
-  }
+  },
+  "require": "every",
+  "satisfied": false,
+  "subjects": { "matching": 2, "total": 3 }
 }
 ```
 
-`subjects.total` counts every subject found at `from`, and `subjects.matching` counts the ones left after `applies_to`. `checks` holds each check as you wrote it, plus the `expression` ergo rendered from it. If you write your own `expression`, yours is used.
+`subjects.total` counts every subject found at `from`, and `subjects.matching` counts the ones left after `applies_to`. `checks` holds each check as you wrote it, plus the `expression` ergo rendered from it. If you write your own `expression`, yours is used. It also holds the [checks ergo adds](#checks-ergo-adds), each with a `description` and an `expression`.
 
 `results` has one row for each subject and check:
 
