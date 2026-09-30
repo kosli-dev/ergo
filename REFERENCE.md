@@ -109,7 +109,7 @@ Some things worth knowing:
 - `compare_time` never converts between formats, so a number against a string fails. With numbers, ergo can't tell seconds from milliseconds, so make sure both sides use the same unit.
 - Patterns in `matches_any` and `not_matches_any` aren't anchored: `svc_` matches `my_svc_account`. Use `^` and `$` when you need a full match. A pattern that isn't a string makes `not_matches_any` fail, and `matches_any` ignores it. With an empty `patterns` list, `matches_any` fails and `not_matches_any` passes.
 
-These two are useful in `applies_to`, for example to leave bot accounts out of a review rule. Be careful though: in a filter, failing means "out of scope". If the author field is missing, the subject is quietly left out rather than failed. When that matters, check the field in `checks` as well, so missing data shows up as a failure somewhere.
+These two are useful in `applies_to`, for example to leave bot accounts out of a review rule. If the author field is missing, ergo can't tell whether the subject is in scope, so the requirement fails. See [Checks ergo adds](#checks-ergo-adds).
 
 ### `all` and `any`
 
@@ -291,6 +291,10 @@ ergo adds three checks of its own. They start with `$`, so they can't clash with
 
 A subject that fails `$applies` gets no other rows, since it was never checked. But its `$applies` row stays, so you can see what was left out and why.
 
+A subject is only out of scope when ergo read a filter's fields and the values didn't match, so the row's cause is `value`. When a filter fails because a field it reads is missing, `null` or can't be found by a selector, ergo can't tell whether the subject is in scope. Its `$applies` row then fails with that cause, the requirement isn't met, and the row shows up in the violations. This holds with `min_subjects: 0` too, so a missing field can't quietly make a requirement pass.
+
+With several filters, one that clearly rules the subject out is enough, even if another can't be read. A substitute that isn't there doesn't count as unreadable, because substitutes are usually missing.
+
 Together, these make sure that whenever a requirement isn't met, at least one row explains why.
 
 ### Row order
@@ -322,7 +326,7 @@ When a check reads several fields, the row shows the first cause in this table's
 
 - For `all` and `any`, the cause is about the list itself. A problem inside one item shows up as `value`. So does an empty list, since it was read fine and just has nothing in it.
 - For a custom operator, the cause is worked out from its `inputs`, or from its `path` if it has no `inputs`. With neither, the cause is always `value`.
-- `$well_formed` and `$min_subjects` don't read the subject, so their cause is `satisfied` or `value`. `$applies` reports the state of the fields the filter read. For example, a subject left out because the filter field is missing says `absent`.
+- `$well_formed` and `$min_subjects` don't read the subject, so their cause is `satisfied` or `value`. `$applies` reports the state of the fields read by the filters that failed. For example, a subject whose filter field is missing says `absent`, and that fails the requirement.
 
 ## Violations
 
@@ -345,7 +349,7 @@ When a check reads several fields, the row shows the first cause in this table's
 It leaves out:
 
 - rows that passed
-- `$applies` rows, since being out of scope isn't a problem
+- `$applies` rows with the cause `value`, since being out of scope isn't a problem. An `$applies` row that failed because its filter couldn't be read is kept.
 - every row of a requirement that was met. Under `require: "some"`, other subjects can fail while the requirement still passes, and those failures aren't problems.
 
 It keeps `$min_subjects` failures, because finding nothing to check is a problem, and `$well_formed` failures, because they mean the policy itself is broken.
@@ -362,5 +366,6 @@ ergo fails a check whenever it can't be sure, instead of letting it pass. Rego d
 - `compare` needs both sides to exist and have the same type. In plain Rego, `null < 5` is true, so a missing field would otherwise pass a `lt` check.
 - `all`, `any` and `each` need non-empty lists.
 - `min_subjects` is 1 unless you say otherwise, so finding nothing fails.
+- A subject whose `applies_to` filter can't be read fails the requirement instead of being left out.
 - A policy with no requirements, and a requirement with no checks, are never met.
 - A malformed timestamp fails `compare_time` rather than stopping the whole evaluation with an error.

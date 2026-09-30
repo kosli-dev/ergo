@@ -1625,7 +1625,7 @@ test_violations_include_min_subjects_failures if {
 	v[0].description == "at least 1 matching thing subject(s) required"
 }
 
-test_violations_exclude_applies_rows if {
+test_violations_exclude_subjects_that_are_out_of_scope if {
 	doc := {"items": [
 		{"id": "a", "state": "MERGED"},
 		{"id": "b", "state": "CLOSED"},
@@ -1962,4 +1962,115 @@ test_a_custom_op_inside_all_fails_closed if {
 
 test_a_custom_op_inside_any_of_fails_closed if {
 	verdict({"n": 2}, {"op": "any_of", "options": {"only": [even]}}) == false
+}
+
+degraded_only := {"degraded": {"op": "equals", "path": ["degraded"], "value": true}}
+
+degraded_req(req_kind) := {"s": {
+	"subject_type": "round",
+	"from": ["rounds"],
+	"id": ["id"],
+	"require": req_kind,
+	"min_subjects": 0,
+	"applies_to": degraded_only,
+	"checks": {"c": {"op": "equals", "path": ["signed"], "value": true}},
+}}
+
+test_a_missing_filter_field_fails_the_requirement_even_with_min_subjects_zero if {
+	rep := ergo.report({"rounds": [{"id": "r1"}]}, degraded_req("every"))
+	rep.requirements.s.satisfied == false
+	rows_for(rep, "s", "$applies")[0].cause == "absent"
+}
+
+test_a_null_filter_field_fails_the_requirement if {
+	rep := ergo.report({"rounds": [{"id": "r1", "degraded": null}]}, degraded_req("every"))
+	rep.requirements.s.satisfied == false
+	rows_for(rep, "s", "$applies")[0].cause == "null"
+}
+
+test_a_filter_selector_that_matches_nothing_fails_the_requirement if {
+	req := {"s": object.union(degraded_req("every").s, {"applies_to": {"pr": {
+		"op": "equals",
+		"path": ["attestations", {"where": {"type": "pr"}}, "degraded"],
+		"value": true,
+	}}})}
+	rep := ergo.report({"rounds": [{"id": "r1", "attestations": [{"type": "jira"}]}]}, req)
+	rep.requirements.s.satisfied == false
+	rows_for(rep, "s", "$applies")[0].cause == "unmatched"
+}
+
+test_an_unreadable_filter_fails_a_some_requirement_that_another_subject_meets if {
+	doc := {"rounds": [{"id": "r1", "degraded": true, "signed": true}, {"id": "r2"}]}
+	ergo.report(doc, degraded_req("some")).requirements.s.satisfied == false
+}
+
+test_an_unreadable_filter_fails_a_some_requirement_with_nothing_in_scope if {
+	ergo.report({"rounds": [{"id": "r1"}]}, degraded_req("some")).requirements.s.satisfied == false
+}
+
+test_an_unreadable_filter_makes_the_policy_not_compliant if {
+	ergo.report({"rounds": [{"id": "r1"}]}, degraded_req("every")).compliant == false
+}
+
+test_an_unreadable_filter_is_reported_as_a_violation if {
+	rep := ergo.report({"rounds": [{"id": "r1"}]}, degraded_req("every"))
+	[[v.subject.id, v.check, v.cause] | some v in ergo.violations(rep)] == [["r1", "$applies", "absent"]]
+}
+
+test_a_subject_with_an_unreadable_filter_still_gets_no_check_rows if {
+	rep := ergo.report({"rounds": [{"id": "r1"}]}, degraded_req("every"))
+	rows_for(rep, "s", "c") == []
+}
+
+test_a_filter_that_reads_a_value_that_does_not_match_leaves_the_subject_out_of_scope if {
+	rep := ergo.report({"rounds": [{"id": "r1", "degraded": false}]}, degraded_req("every"))
+	rep.requirements.s.satisfied == true
+	rows_for(rep, "s", "$applies")[0].cause == "value"
+}
+
+test_a_filter_value_of_the_wrong_type_leaves_the_subject_out_of_scope if {
+	rep := ergo.report({"rounds": [{"id": "r1", "degraded": "yes"}]}, degraded_req("every"))
+	rep.requirements.s.satisfied == true
+	rows_for(rep, "s", "$applies")[0].cause == "value"
+}
+
+test_a_subject_ruled_out_by_one_filter_stays_out_of_scope_when_another_filter_cannot_be_read if {
+	req := {"s": object.union(degraded_req("every").s, {"applies_to": object.union(degraded_only, merged_only)})}
+	rep := ergo.report({"rounds": [{"id": "r1", "state": "CLOSED"}]}, req)
+	rep.requirements.s.satisfied == true
+	rows_for(rep, "s", "$applies")[0].cause == "value"
+	ergo.violations(rep) == []
+}
+
+test_a_subject_whose_filter_fails_on_an_unreadable_field_is_not_ruled_out_by_a_passing_filter if {
+	req := {"s": object.union(degraded_req("every").s, {"applies_to": object.union(degraded_only, merged_only)})}
+	rep := ergo.report({"rounds": [{"id": "r1", "state": "MERGED"}]}, req)
+	rep.requirements.s.satisfied == false
+	rows_for(rep, "s", "$applies")[0].cause == "absent"
+}
+
+test_a_missing_substitute_does_not_make_an_out_of_scope_subject_unreadable if {
+	req := {"s": object.union(degraded_req("every").s, {"applies_to": {"in_scope": object.union(
+		degraded_only.degraded,
+		{"substitute": {"op": "equals", "path": ["forced"], "value": true}},
+	)}})}
+	rep := ergo.report({"rounds": [{"id": "r1", "degraded": false}]}, req)
+	rep.requirements.s.satisfied == true
+	rows_for(rep, "s", "$applies")[0].cause == "value"
+}
+
+test_a_custom_op_filter_without_inputs_rules_a_subject_out if {
+	req := {"s": object.union(degraded_req("every").s, {"applies_to": {"is_even": {"op": "even", "path": ["n"], "expression": "n is even"}}})}
+	ergo.report({"rounds": [{"id": "r1", "n": 3}]}, req).requirements.s.satisfied == true
+}
+
+test_a_failing_custom_op_filter_that_declares_no_reads_rules_a_subject_out if {
+	req := {"s": object.union(degraded_req("every").s, {"applies_to": {"both": {
+		"op": "both_present",
+		"paths": [["a"], ["b"]],
+		"expression": "a and b are present",
+	}}})}
+	rep := ergo.report({"rounds": [{"id": "r1", "a": 1}]}, req)
+	rep.requirements.s.satisfied == true
+	rows_for(rep, "s", "$applies")[0].cause == "value"
 }

@@ -107,7 +107,7 @@ You didn't write the checks starting with `$`. ergo adds them for you:
 
 - `$well_formed` makes sure the requirement itself makes sense, for example that it has at least one check.
 - `$min_subjects` makes sure at least one subject was found. If `from` points to nothing, this check fails, so the policy can't pass without checking anything.
-- `$applies` records whether each subject passed the `applies_to` filter. `d-3` didn't, and the report says so rather than leaving it out.
+- `$applies` records whether each subject passed the `applies_to` filter. `d-3` didn't, and the report says so rather than leaving it out. A deployment with no `environment` at all would fail `$applies` with the cause `absent`, and the requirement would fail with it, because ergo can't tell whether it's a production deployment.
 
 When a check fails, `cause` tells you why. `d-2` failed with `absent` because it has no `approved_by` field at all: no approval was ever recorded. Had `approved_by` been `""`, the cause would be `value` instead, since an approval was recorded but it's empty. Both fail, but they're different problems and you'd fix them differently.
 
