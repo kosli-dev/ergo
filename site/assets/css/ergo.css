@@ -268,7 +268,10 @@ code.sys { color: var(--violet-text); }
 .site-footer__nav a { text-decoration: none; color: var(--muted); font-weight: 500; }
 .site-footer__nav a:hover { color: var(--paper); }
 .site-footer__by { grid-column: 1 / -1; margin: 0; padding-top: 24px; border-top: 1px solid var(--line); font-size: 13px; color: var(--faint); }
-.site-footer__by a { color: var(--muted); }
+.site-footer__by { display: flex; align-items: center; gap: 14px; }
+.site-footer__kosli { display: inline-flex; opacity: .9; transition: opacity .15s ease; }
+.site-footer__kosli:hover { opacity: 1; }
+.site-footer__kosli img { height: 26px; width: auto; }
 
 /* ——— Docs ——— */
 .docs { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: clamp(32px, 5vw, 72px); padding-top: 56px; padding-bottom: 96px; }
