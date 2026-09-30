@@ -1,0 +1,8 @@
+# The site lives in site/ and reads README.md and REFERENCE.md from the repo root.
+[build]
+  base = "site"
+  command = "hugo --gc --minify"
+  publish = "public"
+
+[build.environment]
+  HUGO_VERSION = "0.157.0"

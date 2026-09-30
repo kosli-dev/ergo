@@ -1,0 +1,42 @@
+baseURL = "https://ergo.kosli.com/"
+languageCode = "en-gb"
+title = "ERGO"
+disableKinds = ["taxonomy", "term", "rss"]
+
+[params]
+  description = "ERGO is an open-source control language and library that turns Rego policy evaluation into structured evidence of decisions that you can inspect, report and audit."
+  repo = "https://github.com/kosli-dev/ergo"
+  fork = "https://github.com/kosli-dev/ergo/fork"
+  opaVersion = "1.19"
+  # Shown as a thin bar above the header. Clear it once the repo is public and licensed.
+  status = "Early release. The repo is not public and has no licence yet."
+
+[markup.goldmark.renderer]
+  unsafe = true
+[markup.highlight]
+  noClasses = false
+[markup.tableOfContents]
+  startLevel = 2
+  endLevel = 3
+
+# The docs are read straight from the repo's own README.md and REFERENCE.md,
+# so the site can never drift from the library.
+[module]
+  [[module.mounts]]
+    source = "content"
+    target = "content"
+  [[module.mounts]]
+    source = "layouts"
+    target = "layouts"
+  [[module.mounts]]
+    source = "assets"
+    target = "assets"
+  [[module.mounts]]
+    source = "static"
+    target = "static"
+  [[module.mounts]]
+    source = "../README.md"
+    target = "assets/repo/README.md"
+  [[module.mounts]]
+    source = "../REFERENCE.md"
+    target = "assets/repo/REFERENCE.md"

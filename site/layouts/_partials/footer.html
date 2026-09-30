@@ -1,0 +1,15 @@
+<footer class="site-footer">
+  <div class="wrap site-footer__inner">
+    <div>
+      <a class="lockup lockup--sm" href="{{ "/" | relURL }}" aria-label="ERGO home">{{ partial "mark.html" . }}<span class="lockup__word">ergo</span></a>
+      <p class="site-footer__line">Everything leaves evidence.</p>
+    </div>
+    <nav class="site-footer__nav" aria-label="Footer">
+      <a href="{{ "docs/getting-started/" | relURL }}">Get started</a>
+      <a href="{{ "docs/reference/" | relURL }}">Reference</a>
+      <a href="{{ site.Params.repo }}">Source</a>
+      <a href="{{ site.Params.fork }}">Fork</a>
+    </nav>
+    <p class="site-footer__by mono">A project by <a href="https://www.kosli.com/">Kosli</a></p>
+  </div>
+</footer>
