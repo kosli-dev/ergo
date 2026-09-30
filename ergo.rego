@@ -685,25 +685,25 @@ violations(report) := [{
 	"requirement": row.requirement,
 	"subject": row.subject,
 	"check": row.check,
-	"description": definition_field(report, row, "description"),
-	"expression": definition_field(report, row, "expression"),
+	"description": definition_field(report.requirements, row, "description"),
+	"expression": definition_field(report.requirements, row, "expression"),
 	"inputs": row.inputs,
 	"cause": row.cause,
 } |
 	some row in report.results
-	is_violation(report, row)
+	is_violation(report.requirements, row)
 ]
 
 default is_violation(_, _) := false
 
-is_violation(report, row) if {
+is_violation(requirements, row) if {
 	row.passed == false
 	row.check != "$applies"
-	not report.requirements[row.requirement].satisfied
+	not requirements[row.requirement].satisfied
 }
 
-definition_field(report, row, key) := object.get(
-	report.requirements,
+definition_field(requirements, row, key) := object.get(
+	requirements,
 	[row.requirement, "checks", row.check, key],
 	"",
 )
