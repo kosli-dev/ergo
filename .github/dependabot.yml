@@ -20,5 +20,6 @@ updates:
           - "minor"
           - "patch"
     labels:
+      - "dependabot"
       - "dependencies"
       - "github-actions"
