@@ -1,10 +1,10 @@
 baseURL = "https://ergo.kosli.com/"
 languageCode = "en-gb"
-title = "ERGO"
+title = "ergo"
 disableKinds = ["taxonomy", "term", "rss"]
 
 [params]
-  description = "ERGO is an open-source control language and library that turns Rego policy evaluation into structured evidence of decisions that you can inspect, report and audit."
+  description = "ergo is a standard format for explainable controls. You write the control as data, and every Rego decision comes back with a report of what was checked, what was read, and why it passed or failed."
   repo = "https://github.com/kosli-dev/ergo"
   fork = "https://github.com/kosli-dev/ergo/fork"
   opaVersion = "1.19"
