@@ -25,7 +25,9 @@ Then open http://localhost:1313.
 
 ## Deploy
 
-`netlify.toml` at the repo root builds `site/` and publishes `site/public`. Point a Netlify site at this repo and it needs no other settings.
+GitHub Pages serves the site at https://ergo.kosli.com. `.github/workflows/pages.yml` builds `site/` and deploys it on every push to `main`. You can also run it by hand from the Actions tab.
+
+The custom domain is set in the repo's **Settings → Pages**, with a DNS `CNAME` record pointing `ergo` at `kosli-dev.github.io`.
 
 ## Colour is syntax
 
