@@ -118,7 +118,7 @@ p code, li code, dd code, td code {
 /* ——— Hero ——— */
 .hero { padding: clamp(56px, 8vw, 104px) 0 clamp(72px, 9vw, 120px); }
 .hero__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: clamp(40px, 5vw, 72px); align-items: center; }
-.hero__title { margin: 0 0 28px; font: 400 clamp(42px, 6.4vw, 80px)/1.02 var(--sans); letter-spacing: -.035em; }
+.hero__title { margin: 0 0 28px; font: 400 clamp(40px, 5vw, 64px)/1.04 var(--sans); letter-spacing: -.03em; }
 .hero__title strong { display: block; font-weight: 700; }
 .hero__title span { display: block; color: var(--paper); }
 .hero__lede { font-size: clamp(18px, 1.8vw, 21px); line-height: 1.55; color: var(--muted); max-width: 560px; margin: 0; }
