@@ -53,6 +53,8 @@ code, pre, .mono { font-family: var(--mono); }
 .sys { color: var(--violet-text); }
 .muted { color: var(--muted); }
 em.hl { font-style: normal; }
+/* The name, marked like a highlighter: lime plate, ink text, as in the logo. */
+.ergo-mark { background: var(--lime); color: var(--ink); padding: 0 .06em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 
 /* ——— Status bar ——— */
 .status {
@@ -121,6 +123,7 @@ p code, li code, dd code, td code {
 .hero__title { margin: 0 0 28px; font: 400 clamp(40px, 5vw, 64px)/1.04 var(--sans); letter-spacing: -.03em; }
 .hero__title strong { display: block; font-weight: 700; }
 .hero__title span { display: block; color: var(--paper); }
+.hero__title .ergo-mark { display: inline; color: var(--ink); }
 .hero__lede { font-size: clamp(18px, 1.8vw, 21px); line-height: 1.55; color: var(--muted); max-width: 560px; margin: 0; }
 .hero__lede .hl { color: var(--lime); }
 
