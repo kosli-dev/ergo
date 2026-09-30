@@ -50,7 +50,7 @@
           <p class="compare__note">Useful. But what about d-1? And d-3?</p>
         </div>
         <div class="compare__card compare__card--ergo">
-          <p class="compare__label mono">with ergo</p>
+          <p class="compare__label mono">with <span class="ergo-mark">ergo</span></p>
 <pre class="code"><code><span class="n">subject  check      value read               passed  cause</span>
 d-1      approved   approved_by = "alice"    <span class="t">true</span>    <span class="t">satisfied</span>
 d-2      approved   approved_by = <span class="n">null</span>       <span class="f">false</span>   <span class="f">absent</span>
@@ -87,7 +87,7 @@ report := ergo.report(input, requirements)</code></pre>
       <ol class="notes">
         <li><span class="notes__n mono">1</span><div><h3>What you're judging</h3><p><code>subject_type</code>, <code>from</code> and <code>id</code> say what the subjects are and where to find them.</p></div></li>
         <li><span class="notes__n mono">2</span><div><h3>What's in scope</h3><p><code>applies_to</code> keeps only the subjects this control is about. The rest are recorded, not dropped.</p></div></li>
-        <li><span class="notes__n mono">3</span><div><h3>What must hold</h3><p><code>checks</code> are the rules each subject must pass. ergo does the looping, the evaluation and the report.</p></div></li>
+        <li><span class="notes__n mono">3</span><div><h3>What must hold</h3><p><code>checks</code> are the rules each subject must pass. <span class="ergo-mark">ergo</span> does the looping, the evaluation and the report.</p></div></li>
       </ol>
     </div>
   </div>
@@ -149,10 +149,10 @@ report := ergo.report(input, requirements)</code></pre>
       <li>Nothing is decorative.</li>
       <li>Everything has a reason.</li>
       <li>Everything has a state.</li>
-      <li class="hl">{{ partial "therefore.html" . }} ergo.</li>
+      <li class="hl">{{ partial "therefore.html" . }} <span class="ergo-mark">ergo</span>.</li>
     </ul>
     <div class="sys-checks">
-      <p class="sys-checks__intro">You didn't write the checks that start with <code class="sys">$</code>. ergo adds them, so that whenever a requirement isn't met, at least one row explains why.</p>
+      <p class="sys-checks__intro">You didn't write the checks that start with <code class="sys">$</code>. <span class="ergo-mark">ergo</span> adds them, so that whenever a requirement isn't met, at least one row explains why.</p>
       <dl>
         <div><dt class="sys mono">$well_formed</dt><dd>The requirement itself makes sense: it has at least one check and a valid <code>require</code>.</dd></div>
         <div><dt class="sys mono">$min_subjects</dt><dd>At least one subject was found. A typo in <code>from</code> fails, instead of passing with nothing checked.</dd></div>
@@ -165,8 +165,8 @@ report := ergo.report(input, requirements)</code></pre>
 {{/* 06 — Architecture */}}
 <section class="section section--panel">
   <div class="wrap">
-    <h2 class="display-m">Rego underneath.<br><span class="muted">ergo on top.</span></h2>
-    <p class="lede narrow">ergo doesn't replace OPA. It's a single Rego file you copy into your policies. The control is expressed as data, and ergo provides one evaluation and reporting model for all of them.</p>
+    <h2 class="display-m">Rego underneath.<br><span class="muted"><span class="ergo-mark">ergo</span> on top.</span></h2>
+    <p class="lede narrow"><span class="ergo-mark">ergo</span> doesn't replace OPA. It's a single Rego file you copy into your policies. The control is expressed as data, and <span class="ergo-mark">ergo</span> provides one evaluation and reporting model for all of them.</p>
     <ol class="flow" aria-label="From input to conclusion">
       <li><span class="flow__k mono">input</span><span class="flow__v">deployments.json</span></li>
       <li><span class="flow__k mono">control</span><span class="flow__v">requirements</span></li>
@@ -228,7 +228,7 @@ report := ergo.report(input, requirements)</code></pre>
   <div class="wrap name__grid">
     <div class="name__glyph">{{ partial "therefore.html" . }}</div>
     <div>
-      <h2 class="display-m">ergo <span class="muted">/ˈɜː.ɡəʊ/</span></h2>
+      <h2 class="display-m"><span class="ergo-mark">ergo</span> <span class="muted">/ˈɜː.ɡəʊ/</span></h2>
       <p class="lede">Therefore. As a result. A conclusion that comes with its premises.</p>
       <p>Not <em>computer says no</em>. Here is the decision, and here is what produced it.</p>
     </div>

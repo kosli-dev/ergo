@@ -54,7 +54,13 @@ code, pre, .mono { font-family: var(--mono); }
 .muted { color: var(--muted); }
 em.hl { font-style: normal; }
 /* The name, marked like a highlighter: lime plate, ink text, as in the logo. */
-.ergo-mark { background: var(--lime); color: var(--ink); padding: 0 .06em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+/* The plate starts just above the lowercase letters (ergo has no ascenders), so it never
+   covers descenders on the line above, even in tight headlines. It still covers the g's tail. */
+.ergo-mark {
+  background: linear-gradient(to bottom, transparent 21%, var(--lime) 21%, var(--lime) 97%, transparent 97%);
+  color: var(--ink); padding: 0 .06em; text-transform: none;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
 
 /* ——— Status bar ——— */
 .status {
@@ -120,7 +126,7 @@ p code, li code, dd code, td code {
 /* ——— Hero ——— */
 .hero { padding: clamp(56px, 8vw, 104px) 0 clamp(72px, 9vw, 120px); }
 .hero__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: clamp(40px, 5vw, 72px); align-items: center; }
-.hero__title { margin: 0 0 28px; font: 400 clamp(40px, 5vw, 64px)/1.04 var(--sans); letter-spacing: -.03em; }
+.hero__title { margin: 0 0 28px; font: 400 clamp(40px, 5vw, 64px)/1.1 var(--sans); letter-spacing: -.03em; }
 .hero__title strong { display: block; font-weight: 700; }
 .hero__title span { display: block; color: var(--paper); }
 .hero__title .ergo-mark { display: inline; color: var(--ink); }
