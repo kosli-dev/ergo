@@ -1,0 +1,23 @@
+{{ define "main" }}
+<div class="wrap docs">
+  <aside class="docs__side">
+    <nav class="docs__nav" aria-label="Docs">
+      <p class="docs__label mono">docs/</p>
+      {{ range (site.GetPage "/docs").Pages.ByWeight }}
+        <a href="{{ .RelPermalink }}"{{ if eq .RelPermalink $.RelPermalink }} aria-current="page"{{ end }}>{{ .Title }}</a>
+      {{ end }}
+    </nav>
+    {{ if .TableOfContents }}
+    <details class="docs__toc" open>
+      <summary class="docs__label mono">on this page</summary>
+      {{ .TableOfContents }}
+    </details>
+    {{ end }}
+  </aside>
+  <article class="prose">
+    <h1>{{ .Title }}</h1>
+    {{ .Content }}
+    <p class="docs__source mono">Source: <a href="{{ site.Params.repo }}/blob/main/{{ if eq .Weight 1 }}README.md{{ else }}REFERENCE.md{{ end }}">{{ if eq .Weight 1 }}README.md{{ else }}REFERENCE.md{{ end }}</a>. Edit it there, and this page follows.</p>
+  </article>
+</div>
+{{ end }}

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="{{ site.LanguageCode }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ if .IsHome }}{{ .Title }}{{ else }}{{ .Title }} · ERGO{{ end }}</title>
+  <meta name="description" content="{{ site.Params.description }}">
+  <meta property="og:title" content="{{ .Title }}">
+  <meta property="og:description" content="{{ site.Params.description }}">
+  <meta name="theme-color" content="#080F1A">
+  <link rel="icon" href="{{ "favicon.svg" | relURL }}" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap">
+  {{ with resources.Get "css/ergo.css" | minify | fingerprint }}<link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}">{{ end }}
+  <script>document.documentElement.classList.add('js')</script>
+</head>
+<body class="{{ if .IsHome }}is-home{{ else }}is-docs{{ end }}">
+  {{ with site.Params.status }}<div class="status"><span class="status__dot" aria-hidden="true"></span>{{ . }}</div>{{ end }}
+  {{ partial "header.html" . }}
+  <main id="main">{{ block "main" . }}{{ end }}</main>
+  {{ partial "footer.html" . }}
+  {{ with resources.Get "js/ergo.js" | minify | fingerprint }}<script src="{{ .RelPermalink }}" defer></script>{{ end }}
+</body>
+</html>

@@ -1,0 +1,22 @@
+{{/* Builds the docs pages from the repo's README.md and REFERENCE.md. */}}
+{{ $docs := slice
+  (dict "file" "repo/README.md" "path" "getting-started" "title" "Getting started" "weight" 1)
+  (dict "file" "repo/REFERENCE.md" "path" "reference" "title" "Reference" "weight" 2)
+}}
+{{ range $docs }}
+  {{ $doc := . }}
+  {{ with resources.Get $doc.file }}
+    {{ $md := .Content }}
+    {{ $md = replaceRE `^# [^\n]*\n+` "" $md 1 }}
+    {{ $md = replaceRE `^## Getting started\n+` "" $md 1 }}
+    {{ $md = replace $md "(REFERENCE.md)" "(../reference/)" }}
+    {{ $md = replace $md "(README.md)" "(../getting-started/)" }}
+    {{ $.AddPage (dict
+      "path" $doc.path
+      "title" $doc.title
+      "weight" $doc.weight
+      "kind" "page"
+      "content" (dict "mediaType" "text/markdown" "value" $md)
+    ) }}
+  {{ end }}
+{{ end }}
