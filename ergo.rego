@@ -378,12 +378,33 @@ verdict_cause(passed) := "value" if not passed
 
 applies_cause(subj, req) := "satisfied" if subject_matches(subj, req)
 
-applies_cause(subj, req) := worst_read(subj, filter_paths(req)) if not subject_matches(subj, req)
+applies_cause(subj, req) := "value" if ruled_out(subj, req)
 
-filter_paths(req) := [p |
-	some name in applies_to_names(req)
-	some p in read_paths(applies_to_of(req)[name])
-]
+applies_cause(subj, req) := cause_precedence[i] if {
+	scope_unreadable(subj, req)
+	i := min([j |
+		some j, c in cause_precedence
+		c in failed_filter_causes(subj, req)
+	])
+}
+
+failed_filter_causes(subj, req) := {row_cause(check, subj) |
+	some check in applies_to_of(req)
+	not check_passed(check, subj)
+}
+
+ruled_out(subj, req) if "value" in failed_filter_causes(subj, req)
+
+scope_unreadable(subj, req) if {
+	not subject_matches(subj, req)
+	not ruled_out(subj, req)
+}
+
+scope_readable(doc, req) if {
+	every subj in raw_subjects(doc, req) {
+		not scope_unreadable(subj, req)
+	}
+}
 
 default leaf_describe(_) := ""
 
@@ -545,7 +566,7 @@ well_formed(req) if {
 }
 
 applies_def(req) := {"$applies": {
-	"description": sprintf("subject is in scope as a %s under this requirement's applies_to filter; out-of-scope subjects are recorded but not evaluated", [subject_type_of(req)]),
+	"description": sprintf("subject is in scope as a %s under this requirement's applies_to filter; out-of-scope subjects are recorded but not evaluated, and a subject whose filter can't be read fails", [subject_type_of(req)]),
 	"expression": concat(" and ", [expression_of(applies_to_of(req)[name]) | some name in applies_to_names(req)]),
 }} if count(applies_to_of(req)) > 0
 
@@ -626,6 +647,7 @@ default requirement_satisfied(_, _) := false
 requirement_satisfied(doc, req) if {
 	count(checks_of(req)) > 0
 	require_of(req) == "every"
+	scope_readable(doc, req)
 	count(matching_subjects(doc, req)) >= min_subjects_of(req)
 	every subj in matching_subjects(doc, req) {
 		subject_passed(req, subj)
@@ -635,6 +657,7 @@ requirement_satisfied(doc, req) if {
 requirement_satisfied(doc, req) if {
 	count(checks_of(req)) > 0
 	require_of(req) == "some"
+	scope_readable(doc, req)
 	count(matching_subjects(doc, req)) >= min_subjects_of(req)
 	some subj in matching_subjects(doc, req)
 	subject_passed(req, subj)
@@ -643,6 +666,7 @@ requirement_satisfied(doc, req) if {
 requirement_satisfied(doc, req) if {
 	count(checks_of(req)) > 0
 	require_of(req) == "some"
+	scope_readable(doc, req)
 	min_subjects_of(req) == 0
 	count(matching_subjects(doc, req)) == 0
 }
@@ -698,8 +722,13 @@ default is_violation(_, _) := false
 
 is_violation(requirements, row) if {
 	row.passed == false
-	row.check != "$applies"
+	not out_of_scope_row(row)
 	not requirements[row.requirement].satisfied
+}
+
+out_of_scope_row(row) if {
+	row.check == "$applies"
+	row.cause == "value"
 }
 
 definition_field(requirements, row, key) := object.get(
