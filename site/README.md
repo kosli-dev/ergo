@@ -20,7 +20,7 @@ Then open http://localhost:1313.
 | Docs page shell | `layouts/page.html` |
 | How the docs are read from the repo | `content/docs/_content.gotmpl` and `[module]` in `hugo.toml` |
 | Styles and colour tokens | `assets/css/ergo.css` |
-| Logo mark | `layouts/_partials/mark.html`, `static/favicon.svg` |
+| Logo | `static/brand/ergo-wordmark-white.svg` (master), inlined in `layouts/_partials/wordmark.html` and `mark.html`; `static/favicon.svg` |
 | Site settings (repo links, status bar) | `hugo.toml` |
 
 ## Deploy

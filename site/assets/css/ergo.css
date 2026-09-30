@@ -65,15 +65,12 @@ em.hl { font-style: normal; }
 }
 .status__dot { width: 8px; height: 8px; border-radius: 2px; background: var(--signal); flex: none; }
 
-/* ——— Mark + lockup ——— */
-.mark { width: 36px; height: 36px; }
-.mark__bracket { fill: var(--paper); }
-.mark__plate { fill: var(--lime); }
-.mark__dots { fill: var(--ink); }
-.lockup { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
-.lockup__word { font: 700 30px/1 var(--sans); letter-spacing: -.04em; padding-bottom: 5px; }
-.lockup--sm .mark { width: 28px; height: 28px; }
-.lockup--sm .lockup__word { font-size: 24px; }
+/* ——— Wordmark ——— */
+.wm, .mark { height: 34px; width: auto; }
+.wm__bracket, .wm__word { fill: var(--paper); }
+.wm__plate { fill: var(--lime); }
+.lockup { display: inline-flex; align-items: center; text-decoration: none; }
+.lockup--sm .wm { height: 28px; }
 
 /* ——— Header ——— */
 .site-header { position: sticky; top: 0; z-index: 10; background: rgba(8, 15, 26, .86); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
