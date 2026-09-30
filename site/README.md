@@ -25,7 +25,9 @@ Then open http://localhost:1313.
 
 ## Deploy
 
-GitHub Pages serves the site at https://ergo.kosli.com. `.github/workflows/pages.yml` builds `site/` and deploys it on every push to `main`. You can also run it by hand from the Actions tab.
+GitHub Pages serves the site at https://ergo.kosli.com. `.github/workflows/pages.yml` builds `site/` and deploys it each time the `test` workflow passes on `main`. You can also run it by hand from the Actions tab.
+
+The Pages workflow must not share any top-level keys with `test.yml` (for example `name`, `permissions` or `on.push`). `opa check .` loads every YAML file in the repo as data, and clashing keys fail the tests with a "merge error".
 
 The custom domain is set in the repo's **Settings → Pages**, with a DNS `CNAME` record pointing `ergo` at `kosli-dev.github.io`.
 
