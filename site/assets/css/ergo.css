@@ -97,6 +97,7 @@ em.hl { font-style: normal; }
 }
 .btn:hover { transform: translateY(-1px); }
 .btn--sm { height: 36px; padding: 0 16px; font-size: 14px; }
+.btn .icon-github { flex: none; width: 1.1em; height: 1.1em; }
 .btn--primary { background: var(--lime); color: var(--ink); }
 .btn--outline { border-color: var(--line-2); color: var(--paper); }
 .btn--outline:hover { border-color: var(--paper); }
