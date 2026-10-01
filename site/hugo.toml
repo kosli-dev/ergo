@@ -8,8 +8,8 @@ disableKinds = ["taxonomy", "term", "rss"]
   repo = "https://github.com/kosli-dev/ergo"
   fork = "https://github.com/kosli-dev/ergo/fork"
   opaVersion = "1.19"
-  # Shown as a thin bar above the header. Clear it once the repo is public.
-  status = "Early release. The repo is not public yet."
+  # Shown as a thin bar above the header.
+  status = "Early release."
 
 [markup.goldmark.renderer]
   unsafe = true

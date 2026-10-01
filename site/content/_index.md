@@ -95,7 +95,7 @@ start:
         opa eval -d policy -i deployments.json \
           'data.deploy.report'
   primary: Read the walkthrough
-  secondary: View ergo.rego
+  secondary: GitHub
 
 name:
   lede: Therefore. As a result. A conclusion that comes with its premises.
@@ -103,6 +103,6 @@ name:
 
 close:
   title: Show the working.
-  primary: Fork ergo
+  primary: GitHub
   secondary: Get started
 ---
