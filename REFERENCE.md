@@ -61,6 +61,7 @@ A policy with no requirements is never compliant: it doesn't check anything, so 
 | `subject_type` | A name for the kind of thing being checked. It appears in every row.                                  | `"subject"`       |
 | `from`         | The [path](#paths) to the subjects in the input.                                                      | the whole input   |
 | `id`           | The path, inside one subject, to the value that identifies it.                                        | the whole subject |
+| `keys`         | The keys of the object at `from` that are subjects, each identified by its key. See [Subjects by key](#subjects-by-key). | not used |
 | `require`      | `"every"`: every subject must pass every check. `"some"`: at least one subject must pass every check. | `"every"`         |
 | `min_subjects` | How many subjects must be left after `applies_to` for the requirement to be met.                      | `1`               |
 | `applies_to`   | Named checks that pick which subjects the requirement is about. A subject must pass all of them.      | no filter         |
@@ -74,6 +75,68 @@ A few details:
 - `min_subjects` defaults to 1 so that a typo in `from` fails the requirement instead of quietly passing it. Set it to `0` when you mean "if there are any, they must pass; if there are none, that's fine". It means the same under `every` and `some`.
 - Under `some`, one subject has to pass all the checks by itself. Two subjects that each pass half of them don't count.
 - A requirement with no checks, or with a `require` other than `every` or `some`, is never met. The `$well_formed` row says so.
+
+### Subjects by key
+
+Sometimes the things you need to check sit in an object keyed by name, and the policy says which names must be there. Say a build records each kind of test run it did:
+
+```json
+{
+  "build": {
+    "test_runs": {
+      "unit-test": { "result": "passed", "report_url": "https://ci.example.com/r/101" },
+      "integration-test": { "result": "passed", "report_url": "https://ci.example.com/r/102" },
+      "smoke-test": { "result": "passed", "report_url": "https://ci.example.com/r/103" }
+    }
+  }
+}
+```
+
+and you need a passing unit test, integration test and system test run. `from` alone can't say that, because it treats the whole object as one subject. List the keys instead:
+
+```rego
+"tests_passed": {
+	"subject_type": "test run",
+	"from": ["build", "test_runs"],
+	"keys": ["unit-test", "integration-test", "system-test"],
+	"checks": {
+		"passed": {"description": "The tests passed", "op": "equals", "path": ["result"], "value": "passed"},
+		"report": {"description": "The test report is attached", "op": "present", "path": ["report_url"]},
+	},
+}
+```
+
+Each key is a subject, and its id is the key. The checks are written once and read paths inside that key's entry. A key the object doesn't have is still a subject, so its checks fail as `absent` under its own name. The smoke test run doesn't count towards anything, because only the listed keys are subjects:
+
+```json
+[
+  {
+    "requirement": "tests_passed",
+    "subject": { "type": "test run", "id": "system-test" },
+    "check": "passed",
+    "description": "The tests passed",
+    "expression": "result == passed",
+    "inputs": [{ "name": "result", "value": null }],
+    "cause": "absent"
+  },
+  {
+    "requirement": "tests_passed",
+    "subject": { "type": "test run", "id": "system-test" },
+    "check": "report",
+    "description": "The test report is attached",
+    "expression": "report_url is present",
+    "inputs": [{ "name": "report_url", "value": null }],
+    "cause": "absent"
+  }
+]
+```
+
+The keys usually come from the policy's own data, such as a list of required test runs passed in as a parameter.
+
+- Keys are sorted and duplicates dropped, so the order you list them in doesn't change the report.
+- If `from` doesn't lead to an object, every key is still a subject, and every check fails as `absent`.
+- An empty `keys` list gives no subjects, so `$min_subjects` fails.
+- `keys` must be a list, and the requirement can't also have an `id`, because the key is the id. Otherwise `$well_formed` fails and the requirement is never met, even with `min_subjects: 0`.
 
 ## Paths
 
@@ -309,7 +372,7 @@ ergo adds three checks of its own. They start with `$`, so they can't clash with
 
 | Check           | One row per | Passes when                                                                                                                            |
 | --------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `$well_formed`  | requirement | the requirement has at least one check and a valid `require`. This depends only on how the requirement is written, never on the input. |
+| `$well_formed`  | requirement | the requirement has at least one check and a valid `require`, and if it has `keys`, they're a list and there's no `id`. This depends only on how the requirement is written, never on the input. |
 | `$min_subjects` | requirement | at least `min_subjects` subjects are left after `applies_to`.                                                                          |
 | `$applies`      | subject     | the subject passes the `applies_to` filter. These rows only exist when the requirement has a filter.                                   |
 
@@ -327,7 +390,7 @@ Rows always come in the same order, whatever order you wrote the policy in:
 
 1. all the `$well_formed` rows, then all the `$min_subjects` rows, then all the `$applies` rows, then your own checks
 2. within each group, requirements in name order
-3. within a requirement, subjects in the order they appear in the input
+3. within a requirement, subjects in the order they appear in the input, or in key order for a requirement with `keys`
 4. within a subject, checks in name order
 
 Patterns, options and selector fields are sorted in rendered expressions too. So the same policy and the same input always produce exactly the same report, byte for byte, which means you can hash it and compare hashes.
@@ -390,6 +453,7 @@ ergo fails a check whenever it can't be sure, instead of letting it pass. Rego d
 - `compare` needs both sides to exist and have the same type. In plain Rego, `null < 5` is true, so a missing field would otherwise pass a `lt` check.
 - `all`, `any` and `each` need non-empty lists.
 - `min_subjects` is 1 unless you say otherwise, so finding nothing fails.
+- A key listed in `keys` that the input doesn't have is still a subject, so it fails instead of being skipped.
 - A subject whose `applies_to` filter can't be read fails the requirement instead of being left out.
 - A policy with no requirements, and a requirement with no checks, are never met.
 - A malformed timestamp fails `compare_time` rather than stopping the whole evaluation with an error.

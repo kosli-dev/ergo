@@ -81,6 +81,157 @@ test_subject_id_is_read_from_the_declared_path if {
 	row.subject == {"type": "thing", "id": "abc"}
 }
 
+keyed_req(keys) := {"s": {
+	"subject_type": "test run",
+	"from": ["runs"],
+	"keys": keys,
+	"checks": {"passed": {"op": "equals", "path": ["passed"], "value": true}},
+}}
+
+three_kinds := ["unit-test", "integration-test", "system-test"]
+
+all_runs_passed := {"runs": {
+	"unit-test": {"passed": true},
+	"integration-test": {"passed": true},
+	"system-test": {"passed": true},
+}}
+
+keyed_rows(rep) := [[r.subject.id, r.passed, r.cause] | some r in rep.results; r.check == "passed"]
+
+test_keys_make_one_subject_per_key_with_the_key_as_its_id if {
+	rep := ergo.report(all_runs_passed, keyed_req(three_kinds))
+	rep.compliant == true
+	rep.requirements.s.subjects == {"total": 3, "matching": 3}
+	keyed_rows(rep) == [
+		["integration-test", true, "satisfied"],
+		["system-test", true, "satisfied"],
+		["unit-test", true, "satisfied"],
+	]
+}
+
+test_a_key_missing_from_the_object_is_still_a_subject_and_fails_as_absent if {
+	doc := {"runs": {"unit-test": {"passed": true}, "integration-test": {"passed": true}}}
+	rep := ergo.report(doc, keyed_req(three_kinds))
+	rep.compliant == false
+	["system-test", false, "absent"] in keyed_rows(rep)
+	v := ergo.violations(rep)
+	[[x.subject.id, x.check, x.cause] | some x in v] == [["system-test", "passed", "absent"]]
+}
+
+test_entries_under_other_keys_do_not_stand_in_for_a_missing_key if {
+	doc := {"runs": {
+		"unit-test": {"passed": true},
+		"integration-test": {"passed": true},
+		"smoke-test": {"passed": true},
+	}}
+	rep := ergo.report(doc, keyed_req(three_kinds))
+	rep.compliant == false
+	rep.requirements.s.subjects == {"total": 3, "matching": 3}
+	["system-test", false, "absent"] in keyed_rows(rep)
+	not "smoke-test" in {r.subject.id | some r in rep.results}
+}
+
+test_keys_report_the_same_whatever_order_they_are_written_in if {
+	a := ergo.report(all_runs_passed, keyed_req(three_kinds))
+	b := ergo.report(all_runs_passed, keyed_req(["system-test", "unit-test", "integration-test", "unit-test"]))
+	a.results == b.results
+}
+
+test_a_key_set_to_null_keeps_its_rows_and_fails if {
+	rep := ergo.report({"runs": {"unit-test": null}}, keyed_req(["unit-test"]))
+	rep.compliant == false
+	keyed_rows(rep) == [["unit-test", false, "absent"]]
+}
+
+test_a_key_that_is_not_a_string_is_looked_up_and_fails_when_absent if {
+	rep := ergo.report(all_runs_passed, keyed_req([7]))
+	keyed_rows(rep) == [[7, false, "absent"]]
+}
+
+test_every_key_fails_when_from_leads_nowhere if {
+	rep := ergo.report({}, keyed_req(three_kinds))
+	rep.compliant == false
+	keyed_rows(rep) == [
+		["integration-test", false, "absent"],
+		["system-test", false, "absent"],
+		["unit-test", false, "absent"],
+	]
+}
+
+test_every_key_fails_when_from_leads_to_a_list if {
+	rep := ergo.report({"runs": [{"passed": true}]}, keyed_req(["unit-test"]))
+	rep.compliant == false
+	keyed_rows(rep) == [["unit-test", false, "absent"]]
+}
+
+test_empty_keys_find_no_subjects_and_fail_min_subjects if {
+	rep := ergo.report(all_runs_passed, keyed_req([]))
+	rep.compliant == false
+	rows_for(rep, "s", "$min_subjects")[0].passed == false
+}
+
+test_keys_that_are_not_a_list_are_not_well_formed if {
+	rep := ergo.report(all_runs_passed, keyed_req("unit-test"))
+	rows_for(rep, "s", "$well_formed")[0].passed == false
+	rep.compliant == false
+}
+
+test_keys_that_are_not_a_list_are_not_met_even_with_min_subjects_zero if {
+	req := {"s": object.union(keyed_req(null).s, {"min_subjects": 0})}
+	rep := ergo.report(all_runs_passed, req)
+	rep.requirements.s.satisfied == false
+}
+
+test_keys_with_an_id_are_not_well_formed if {
+	req := {"s": object.union(keyed_req(three_kinds).s, {"id": ["name"], "min_subjects": 0})}
+	rep := ergo.report(all_runs_passed, req)
+	rows_for(rep, "s", "$well_formed")[0].passed == false
+	rep.requirements.s.satisfied == false
+}
+
+test_keys_with_an_id_are_not_met_under_some if {
+	req := {"s": object.union(keyed_req(three_kinds).s, {"id": ["name"], "require": "some"})}
+	rep := ergo.report(all_runs_passed, req)
+	rep.requirements.s.satisfied == false
+}
+
+test_well_formed_echoes_keys_that_are_not_a_list_as_written if {
+	rep := ergo.report(all_runs_passed, keyed_req("unit-test"))
+	{"name": "keys", "value": "unit-test"} in rows_for(rep, "s", "$well_formed")[0].inputs
+}
+
+test_keys_with_an_id_are_not_met_under_some_with_no_subjects if {
+	req := {"s": object.union(keyed_req([]).s, {"id": ["name"], "require": "some", "min_subjects": 0})}
+	rep := ergo.report(all_runs_passed, req)
+	rep.requirements.s.satisfied == false
+}
+
+test_well_formed_echoes_the_keys_and_id_it_read if {
+	rep := ergo.report(all_runs_passed, keyed_req(three_kinds))
+	rows_for(rep, "s", "$well_formed")[0].inputs == [
+		{"name": "count(checks)", "value": 1},
+		{"name": "require", "value": "every"},
+		{"name": "keys", "value": ["integration-test", "system-test", "unit-test"]},
+		{"name": "id", "value": null},
+	]
+	rep.requirements.s.checks["$well_formed"].expression == "count(checks) >= 1 and require in {every, some} and keys is a list and id is not set"
+}
+
+test_applies_to_filters_keyed_subjects_and_reports_them_by_key if {
+	req := {"s": object.union(keyed_req(three_kinds).s, {"applies_to": {"required": {"op": "equals", "path": ["required"], "value": true}}})}
+	doc := {"runs": {
+		"unit-test": {"required": true, "passed": true},
+		"integration-test": {"required": false, "passed": false},
+		"system-test": {"required": true, "passed": true},
+	}}
+	rep := ergo.report(doc, req)
+	rep.compliant == true
+	rep.requirements.s.subjects == {"total": 3, "matching": 2}
+	{[r.subject.id, r.passed] | some r in rep.results; r.check == "$applies"} == {
+		["integration-test", false], ["system-test", true], ["unit-test", true],
+	}
+}
+
 scoped_req(applies_to) := {"s": {
 	"subject_type": "thing",
 	"from": ["items"],

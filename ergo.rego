@@ -17,25 +17,52 @@ min_subjects_of(req) := object.get(req, "min_subjects", 1)
 
 require_of(req) := object.get(req, "require", "every")
 
-raw_subjects(doc, req) := coll if {
+has_keys(req) if "keys" in object.keys(req)
+
+listed_subjects(doc, req) := coll if {
 	coll := object.get(doc, from_of(req), null)
 	is_array(coll)
 }
 
-raw_subjects(doc, req) := [coll] if {
+listed_subjects(doc, req) := [coll] if {
 	coll := object.get(doc, from_of(req), null)
 	is_object(coll)
 }
 
-raw_subjects(doc, req) := [] if {
+listed_subjects(doc, req) := [] if {
 	not is_array(object.get(doc, from_of(req), null))
 	not is_object(object.get(doc, from_of(req), null))
 }
 
-matching_subjects(doc, req) := [subj |
-	some subj in raw_subjects(doc, req)
-	subject_matches(subj, req)
+keyed_object(doc, req) := coll if {
+	coll := object.get(doc, from_of(req), null)
+	is_object(coll)
+}
+
+keyed_object(doc, req) := {} if not is_object(object.get(doc, from_of(req), null))
+
+raw_entries(doc, req) := [{"subject": subj} | some subj in listed_subjects(doc, req)] if not has_keys(req)
+
+raw_entries(doc, req) := [{"key": key, "subject": object.get(keyed_object(doc, req), [key], null)} |
+	some key in keys_read(req.keys)
+] if {
+	has_keys(req)
+	is_array(req.keys)
+}
+
+raw_entries(_, req) := [] if {
+	has_keys(req)
+	not is_array(req.keys)
+}
+
+raw_subjects(doc, req) := [entry.subject | some entry in raw_entries(doc, req)]
+
+matching_entries(doc, req) := [entry |
+	some entry in raw_entries(doc, req)
+	subject_matches(entry.subject, req)
 ]
+
+matching_subjects(doc, req) := [entry.subject | some entry in matching_entries(doc, req)]
 
 default subject_matches(_, _) := false
 
@@ -49,6 +76,10 @@ subject_ref(subj, req) := {
 	"type": subject_type_of(req),
 	"id": object.get(subj, object.get(req, "id", []), null),
 }
+
+entry_ref(entry, req) := {"type": subject_type_of(req), "id": entry.key} if "key" in object.keys(entry)
+
+entry_ref(entry, req) := subject_ref(entry.subject, req) if not "key" in object.keys(entry)
 
 absent := {"ergo/absent": true}
 
@@ -556,17 +587,46 @@ min_subjects_def(req) := {"$min_subjects": {
 	"expression": sprintf("%s >= %d", [matching_count_name(req), min_subjects_of(req)]),
 }}
 
-well_formed_def(_) := {"$well_formed": {
+well_formed_def(req) := {"$well_formed": {
 	"description": "the requirement declares at least one check and a recognised \"require\" value; lacking either, it asserts nothing that could ever be satisfied",
 	"expression": "count(checks) >= 1 and require in {every, some}",
-}}
+}} if not has_keys(req)
+
+well_formed_def(req) := {"$well_formed": {
+	"description": "the requirement declares at least one check, a recognised \"require\" value, and its keys as a list with no id, because each subject's id is its key",
+	"expression": "count(checks) >= 1 and require in {every, some} and keys is a list and id is not set",
+}} if has_keys(req)
 
 default well_formed(_) := false
 
 well_formed(req) if {
 	count(checks_of(req)) > 0
 	require_of(req) in {"every", "some"}
+	keys_well_formed(req)
 }
+
+keys_read(keys) := sort({k | some k in keys}) if is_array(keys)
+
+keys_read(keys) := keys if not is_array(keys)
+
+keys_well_formed(req) if not has_keys(req)
+
+keys_well_formed(req) if {
+	is_array(req.keys)
+	not "id" in object.keys(req)
+}
+
+well_formed_inputs(req) := [
+	{"name": "count(checks)", "value": count(checks_of(req))},
+	{"name": "require", "value": require_of(req)},
+] if not has_keys(req)
+
+well_formed_inputs(req) := [
+	{"name": "count(checks)", "value": count(checks_of(req))},
+	{"name": "require", "value": require_of(req)},
+	{"name": "keys", "value": keys_read(req.keys)},
+	{"name": "id", "value": object.get(req, "id", null)},
+] if has_keys(req)
 
 applies_def(req) := {"$applies": {
 	"description": sprintf("subject is in scope as a %s under this requirement's applies_to filter; out-of-scope subjects are recorded but not evaluated, and a subject whose filter can't be read fails", [subject_type_of(req)]),
@@ -592,11 +652,12 @@ subject_passed(req, subj) if {
 }
 
 subject_rows(doc, req, req_name) := [row |
-	some subj in matching_subjects(doc, req)
+	some entry in matching_entries(doc, req)
+	subj := entry.subject
 	some check_name, check in checks_of(req)
 	row := {
 		"requirement": req_name,
-		"subject": subject_ref(subj, req),
+		"subject": entry_ref(entry, req),
 		"check": check_name,
 		"inputs": row_inputs(subj, check),
 		"passed": check_passed(check, subj),
@@ -608,10 +669,7 @@ well_formed_row(req, req_name) := {
 	"requirement": req_name,
 	"subject": {"type": subject_type_of(req), "id": null},
 	"check": "$well_formed",
-	"inputs": [
-		{"name": "count(checks)", "value": count(checks_of(req))},
-		{"name": "require", "value": require_of(req)},
-	],
+	"inputs": well_formed_inputs(req),
 	"passed": well_formed(req),
 	"cause": verdict_cause(well_formed(req)),
 }
@@ -627,13 +685,13 @@ min_subjects_row(doc, req, req_name) := {
 
 applies_rows(doc, req, req_name) := [{
 	"requirement": req_name,
-	"subject": subject_ref(subj, req),
+	"subject": entry_ref(entry, req),
 	"check": "$applies",
-	"inputs": applies_inputs(subj, req),
-	"passed": subject_matches(subj, req),
-	"cause": applies_cause(subj, req),
+	"inputs": applies_inputs(entry.subject, req),
+	"passed": subject_matches(entry.subject, req),
+	"cause": applies_cause(entry.subject, req),
 } |
-	some subj in raw_subjects(doc, req)
+	some entry in raw_entries(doc, req)
 ] if {
 	count(applies_to_of(req)) > 0
 }
@@ -649,6 +707,7 @@ default requirement_satisfied(_, _) := false
 
 requirement_satisfied(doc, req) if {
 	count(checks_of(req)) > 0
+	keys_well_formed(req)
 	require_of(req) == "every"
 	scope_readable(doc, req)
 	count(matching_subjects(doc, req)) >= min_subjects_of(req)
@@ -659,6 +718,7 @@ requirement_satisfied(doc, req) if {
 
 requirement_satisfied(doc, req) if {
 	count(checks_of(req)) > 0
+	keys_well_formed(req)
 	require_of(req) == "some"
 	scope_readable(doc, req)
 	count(matching_subjects(doc, req)) >= min_subjects_of(req)
@@ -668,6 +728,7 @@ requirement_satisfied(doc, req) if {
 
 requirement_satisfied(doc, req) if {
 	count(checks_of(req)) > 0
+	keys_well_formed(req)
 	require_of(req) == "some"
 	scope_readable(doc, req)
 	min_subjects_of(req) == 0
