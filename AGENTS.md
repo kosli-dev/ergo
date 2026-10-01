@@ -9,6 +9,7 @@ ergo is a Rego library that turns policy evaluation into a structured report. Us
 - `custom_op_test.rego` defines custom operators that only the tests use.
 - `README.md` walks a new user through a first policy.
 - `REFERENCE.md` describes every field, operator, cause and report entry.
+- `packages/report/report.html` shows a report in a browser. Like `ergo.rego`, it's one file with no dependencies. `report_test.mjs` next to it tests it with Node's built-in test runner, so only the tests need Node.
 
 ## Checks
 
@@ -18,6 +19,7 @@ Run these before saying a change is done:
 opa check --strict . --ignore .github
 opa fmt --list .
 opa test . --ignore .github
+node --test packages/report/report_test.mjs
 ```
 
 `opa fmt --list .` should print nothing. If it prints file names, run `opa fmt -w .`.
@@ -82,6 +84,7 @@ The first line names the part of the repo that changed, then says what the chang
 - `docs:` `README.md`, `REFERENCE.md` and `AGENTS.md`
 - `site:` the website in `site/`
 - `ci:` workflows and Dependabot
+- `report:` the report viewer in `packages/report`
 
 For example, `core: fail compare when either side is missing`.
 

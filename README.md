@@ -153,6 +153,14 @@ When a check fails, `cause` tells you why. `d-2` failed with `absent` because it
 
 Whatever the policy, the report always has the same shape. You can store it, compare it, or hand it to someone who doesn't read Rego, and they'll still see what was checked, what was found, and what passed.
 
+To read it in a browser, save it with `--format=raw` and open it in [`report.html`](packages/report/report.html):
+
+```sh
+opa eval -d policy -i deployments.json --format=raw 'data.deploy.report' > report.json
+```
+
+[Viewing the report](REFERENCE.md#viewing-the-report) shows how to turn it into a single page you can send to someone.
+
 ### 4. Get the violations
 
 Because the report has everything, it gets long. When all you want is to tell someone what went wrong, ask for the violations instead:
