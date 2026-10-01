@@ -8,6 +8,7 @@
   <meta property="og:title" content="{{ .Title }}">
   <meta property="og:description" content="{{ site.Params.description }}">
   <meta name="theme-color" content="#080F1A">
+  {{ with .Params.robots }}<meta name="robots" content="{{ . }}">{{ end }}
   <link rel="icon" href="{{ "favicon.svg" | relURL }}" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
