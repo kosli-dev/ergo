@@ -6,18 +6,18 @@ hero:
   lede: ==ergo== is an open source language for defining explainable controls. Instead of a binary result, every decision returns an audit report of what was checked, and why it passed or failed.
   primary: Get started
   secondary: GitHub
-  verdict: d-2 was never approved. d-3 is out of scope, and the report says so.
+  verdict: d-3 is out of scope. d-2 was never approved ...and the report says so.
 
 problem:
-  title: A decision nobody can check
+  title: A decision nobody can inspect
   muted: isn't a control.
-  lede: Rego enforces. It doesn't keep records. You can block a deployment, but you can't show later why it was blocked, or why the others weren't.
-  body: In regulated work, someone else has to be able to check that a control behaved as it should. A yes or no can't be checked. You don't just tell the auditor the balance. You hand over the books.
+  lede: With rego you can block a deployment, but you can't show later why. When you define controls with ==ergo== you have records of why it was blocked, or why the others weren't.
+  body: In regulated settings, someone else has to be able to check that a control behaved as it should. A yes or no can't be validated. You don't just tell the auditor the decision. You hand over the workings.
   without:
-    label: Rego on its own
-    note: Useful. But what about d-1? And d-3?
+    label: Rego provides decisions
+    note: Useful. But why was it false?
   with:
-    label: with ==ergo==
+    label: With ==ergo== you get explanations
     note: Same decision. Now you can see why.
 
 declaration:
