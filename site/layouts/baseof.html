@@ -21,6 +21,7 @@
   {{ partial "header.html" . }}
   <main id="main">{{ block "main" . }}{{ end }}</main>
   {{ partial "footer.html" . }}
+  {{ with resources.Get "js/ergo-mark.js" | minify | fingerprint }}<script src="{{ .RelPermalink }}" defer></script>{{ end }}
   {{ with resources.Get "js/ergo.js" | minify | fingerprint }}<script src="{{ .RelPermalink }}" defer></script>{{ end }}
 </body>
 </html>

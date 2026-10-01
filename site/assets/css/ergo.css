@@ -273,7 +273,9 @@ p code, li code, dd code, td code {
 /* ——— Name ——— */
 .name__grid { display: grid; grid-template-columns: auto 1fr; gap: clamp(32px, 6vw, 96px); align-items: center; }
 .name__glyph { color: var(--lime); }
-.name__glyph .therefore { width: clamp(120px, 18vw, 240px); height: auto; }
+/* The animated mark; its light-DOM child is the static mark, shown only if the component never loads. */
+.name__glyph ergo-mark { display: block; width: clamp(140px, 20vw, 260px); }
+.name__glyph ergo-mark .mark { width: 100%; height: auto; }
 .name p:not(.eyebrow):not(.lede) { color: var(--muted); }
 .name em { font-style: normal; color: var(--paper); }
 
@@ -414,7 +416,7 @@ p code, li code, dd code, td code {
   .flow__group ul { grid-auto-flow: row; }
   .flow > li:not(:last-child)::after { bottom: -26px; }
   .name__grid { grid-template-columns: minmax(0, 1fr); }
-  .name__glyph .therefore { width: 96px; }
+  .name__glyph ergo-mark { width: 120px; }
   .btn { height: 48px; padding: 0 22px; }
 }
 
