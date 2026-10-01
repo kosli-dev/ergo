@@ -165,6 +165,17 @@ p code, li code, dd code, td code {
 }
 .js .report[data-evaluate] .report__row:not(.is-resolved) { background: none; box-shadow: none; }
 
+/* Code blocks resolve the same way, line by line and faster, as they scroll in. */
+.js .code-line { transition: color .2s ease; }
+.js .code-line:not(.is-resolved):not(:empty) {
+  background-image: radial-gradient(rgba(247, 247, 239, .28) 1px, transparent 1.4px);
+  background-size: 4px 4px;
+  border-radius: 2px;
+}
+.js .code-line:not(.is-resolved), .js .code-line:not(.is-resolved) * { color: transparent !important; }
+.js .code-line:not(.is-resolved) [data-note]::after { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .js .code-line { transition: none; } }
+
 /* ——— Split / compare ——— */
 .split { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: clamp(32px, 5vw, 72px); margin-top: 16px; }
 .split__col p:not(.lede) { color: var(--muted); }

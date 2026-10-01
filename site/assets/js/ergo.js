@@ -1,4 +1,34 @@
 (function () {
+  var blocks = document.querySelectorAll('pre.code > code');
+  if (!blocks.length) return;
+  var lines = function (code) {
+    var parts = code.innerHTML.split('\n');
+    var balanced = parts.every(function (p) {
+      return (p.match(/<span\b/g) || []).length === (p.match(/<\/span>/g) || []).length;
+    });
+    if (!balanced) return null;
+    code.innerHTML = parts.map(function (p) { return '<span class="code-line">' + p + '</span>'; }).join('\n');
+    return code.querySelectorAll('.code-line');
+  };
+  var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window);
+  var io = still ? null : new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      io.unobserve(entry.target);
+      entry.target.querySelectorAll('.code-line').forEach(function (line, i) {
+        setTimeout(function () { line.classList.add('is-resolved'); }, 150 + i * 90);
+      });
+    });
+  }, { threshold: 0.3 });
+  blocks.forEach(function (code) {
+    var ls = lines(code);
+    if (!ls) return;
+    if (still) { ls.forEach(function (l) { l.classList.add('is-resolved'); }); return; }
+    io.observe(code);
+  });
+})();
+
+(function () {
   var report = document.querySelector('.report[data-evaluate]');
   if (!report) return;
   var rows = report.querySelectorAll('.report__row');
