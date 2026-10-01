@@ -47,8 +47,12 @@ subject_matches(subj, req) if {
 
 subject_ref(subj, req) := {
 	"type": subject_type_of(req),
-	"id": object.get(subj, object.get(req, "id", []), null),
+	"id": subject_id(subj, req),
 }
+
+subject_id(subj, req) := value_at(subj, object.get(req, "id", [])) if is_object(subj)
+
+subject_id(subj, _) := subj if not is_object(subj)
 
 absent := {"ergo/absent": true}
 
@@ -323,6 +327,8 @@ input_spec_path(spec) := object.get(spec, "path", []) if is_object(spec)
 
 default read_state(_, _) := "absent"
 
+read_state(subj, _) := "not_an_object" if not is_object(subj)
+
 read_state(subj, path) := "ambiguous" if count(selector_candidates(subj, path)) > 1
 
 read_state(subj, path) := "unmatched" if count(selector_candidates(subj, path)) == 0
@@ -354,7 +360,7 @@ is_collection(v) if is_array(v)
 
 is_collection(v) if is_object(v)
 
-cause_precedence := ["ambiguous", "unmatched", "absent", "null"]
+cause_precedence := ["not_an_object", "ambiguous", "unmatched", "absent", "null"]
 
 default worst_read(_, _) := "value"
 
