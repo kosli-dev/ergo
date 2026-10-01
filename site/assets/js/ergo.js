@@ -17,3 +17,30 @@
   }, { threshold: 0.3 });
   io.observe(report);
 })();
+
+(function () {
+  var langs = document.querySelector('[data-langs]');
+  if (!langs) return;
+  var tabs = Array.prototype.slice.call(langs.querySelectorAll('[role="tab"]'));
+  var select = function (tab) {
+    langs.classList.add('is-live');
+    tabs.forEach(function (t) {
+      var on = t === tab;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute('aria-controls')).classList.toggle('is-active', on);
+    });
+  };
+  tabs.forEach(function (tab, i) {
+    tab.addEventListener('click', function () { select(tab); });
+    tab.addEventListener('keydown', function (e) {
+      var step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!step) return;
+      e.preventDefault();
+      var next = tabs[(i + step + tabs.length) % tabs.length];
+      select(next);
+      next.focus();
+    });
+  });
+  langs.classList.add('is-ready');
+})();

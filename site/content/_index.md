@@ -11,7 +11,7 @@ hero:
 problem:
   title: A decision nobody can inspect
   muted: isn't a control.
-  lede: With Rego you can block a deployment, but you can't show later why. When you define controls with ==ergo== you have records of why it was blocked, or why the others weren't.
+  lede: With Rego you can block a deployment, but you can't show later why. When you define controls with ==ergo== you have records of why decisions were made.
   body: In regulated settings, someone else has to be able to check that a control behaved as it should. A yes or no can't be validated. You don't just tell the auditor the decision. You hand over the workings.
   without:
     label: Rego provides decisions
@@ -23,6 +23,14 @@ problem:
 declaration:
   title: Write the control.
   muted: Not the sorcery.
+  switch: Show the requirement as
+  formats:
+    - key: yaml
+      label: YAML
+    - key: rego
+      label: Rego
+  notes_title: Defined in YAML or Rego
+  notes_intro: Write the requirement as a YAML file or as a Rego object. ==ergo== reads both the same way and gives the same report.
   notes:
     - title: Define the subjects
       body: "`subject_type`, `from` and `id` say what the subjects are and where to find them."
