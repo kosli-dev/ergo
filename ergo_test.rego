@@ -2640,3 +2640,42 @@ test_a_literal_works_wherever_a_value_goes if {
 test_a_readable_ref_leaves_the_cause_to_the_subject if {
 	row_in(licence_params, {"id": 1, "licence": null}, licence_in_allowed).cause == "null"
 }
+
+test_range_fails_closed_on_bounds_that_are_not_numbers if {
+	row_in({}, {"id": 1, "n": 5}, {"op": "range", "path": ["n"], "min": 1, "max": "3"}).passed == false
+	row_in({}, {"id": 1, "n": 5}, {"op": "range", "path": ["n"], "min": "1", "max": 10}).passed == false
+	row_in({"params": {"hi": "3"}}, {"id": 1, "n": 5}, {"op": "range", "path": ["n"], "min": 1, "max": {"ref": ["$$input", "params", "hi"]}}).passed == false
+}
+
+test_an_object_with_ref_and_another_key_fails_closed if {
+	check := {"op": "excludes", "path": ["labels"], "value": {"ref": ["$$input", "params", "label"], "note": "x"}}
+	r := row_in({"params": {"label": "wip"}}, {"id": 1, "labels": ["ready"]}, check)
+	[r.passed, r.cause] == [false, "absent"]
+	r.inputs == [{"name": "labels", "value": ["ready"]}, {"name": "<invalid ref>", "value": null}]
+	expression_in({}, {"id": 1}, check) == "not contains(labels, <invalid ref>)"
+}
+
+test_an_object_with_literal_and_another_key_fails_closed if {
+	check := {"op": "excludes", "path": ["labels"], "value": {"literal": "wip", "note": "x"}}
+	r := row_in({}, {"id": 1, "labels": ["ready"]}, check)
+	[r.passed, r.cause] == [false, "absent"]
+}
+
+test_a_malformed_ref_in_patterns_or_values_reads_as_invalid if {
+	bad := {"ref": ["$$input", "p"], "x": 1}
+	expression_in({}, {"id": 1}, {"op": "not_matches_any", "path": ["a"], "patterns": bad}) == "a matches none of <invalid ref>"
+	expression_in({}, {"id": 1}, {"op": "in", "path": ["a"], "values": bad}) == "a in <invalid ref>"
+	row_in({}, {"id": 1, "a": "x"}, {"op": "not_matches_any", "path": ["a"], "patterns": bad}).passed == false
+}
+
+test_a_ref_that_is_not_a_path_from_input_reads_as_invalid if {
+	string_ref := {"op": "equals", "path": ["b"], "value": {"ref": "params"}}
+	expression_in({}, {"id": 1}, string_ref) == "b == <invalid ref>"
+	row_in({}, {"id": 1, "b": "x"}, string_ref).inputs == [{"name": "b", "value": "x"}, {"name": "<invalid ref>", "value": null}]
+	expression_in({}, {"id": 1}, {"op": "equals", "path": ["b"], "value": {"ref": ["licence"]}}) == "b == <invalid ref>"
+}
+
+test_an_input_path_inside_all_is_shown_once_under_its_own_name if {
+	check := {"op": "all", "path": ["xs"], "check": {"op": "equals", "path": ["$$input", "mode"], "value": "strict"}}
+	row_in({"mode": "strict"}, {"id": 1, "xs": [1, 2]}, check).inputs == [{"name": "$$input.mode", "value": "strict"}]
+}

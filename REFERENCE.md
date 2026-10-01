@@ -154,8 +154,11 @@ The expression says where the value comes from, and `inputs` show what it was, o
 Some things worth knowing:
 
 - A ref that leads nowhere, or to `null`, fails the check, with cause `absent` or `null`. That cause wins over anything the subject's own fields would give, because the check can't mean anything without the value. ergo has no defaults, so put a default in the policy or the params.
-- A ref must start with `$$input`, and it can't contain a selector. Either fails the check with cause `absent`.
+- A ref must be a list that starts with `$$input`, and it can't contain a selector. Anything else fails the check with cause `absent`, and the expression and `inputs` show `<invalid ref>`.
+- An object with a `ref` or `literal` key and any other key is a mistake, not a value, so it fails the check the same way. Otherwise a typo like `{"ref": [...], "note": "..."}` would be compared as an object, and `excludes` would pass.
 - A value that is an object with a single `ref` or `literal` key would be read as one. Wrap it in `{"literal": ...}` to take it as written. Nothing inside a `literal` is read, so `{"literal": {"literal": 1}}` is the object `{"literal": 1}`.
+- `from` already starts at the top of the input, so it doesn't take `$$input`. `"from": ["$$input", "packages"]` looks for a key called `$$input`, finds no subjects, and fails `$min_subjects`.
+- Some tools treat `$$` as an escape for `$`, like docker-compose and Make. A policy that passes through one of them reaches ergo as `$input`, which is read as an ordinary key.
 
 ## Operators
 
@@ -184,6 +187,7 @@ These read one or two fields of a subject.
 Some things worth knowing:
 
 - `equals` with `"value": null` only passes when the field is there and set to `null`. A missing field doesn't count.
+- `range` needs `min` and `max` to be numbers. A string like `"3"` fails the check, because Rego puts every number before every string, so `5 <= "3"` would be true.
 - `in` fails when the field is missing or `null`, even if `values` contains `null`. To check that a field is `null`, use `equals` with `"value": null`. `values` can be a list or, from Rego, a set. `in` also fails when `values` is empty, missing, or not a list or set. In those last two cases, the expression shows `id in <invalid values>` rather than a list.
 - `compare` and `compare_time` compare two fields of the same subject. To compare a field with a fixed number, use `range`.
 - `compare_time` never converts between formats, so a number against a string fails. With numbers, ergo can't tell seconds from milliseconds, so make sure both sides use the same unit.

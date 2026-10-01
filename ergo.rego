@@ -117,11 +117,21 @@ arg(x) := v if {
 
 ref_read(path) := object.get(start_of(null, path), keys_of(path), absent)
 
-ref_name(path) := concat(".", [sprintf("%v", [unliteral(seg)]) | some seg in path])
+ref_name(path) := concat(".", [sprintf("%v", [unliteral(seg)]) | some seg in path]) if named(path)
+
+ref_name(path) := "<invalid ref>" if not named(path)
 
 arg(x) := x if {
 	not is_ref(x)
 	not is_literal(x)
+	not malformed(x)
+}
+
+malformed(x) if {
+	is_object(x)
+	some k in {"ref", "literal"}
+	k in object.keys(x)
+	count(x) > 1
 }
 
 written(x) := x.literal if is_literal(x)
@@ -129,6 +139,7 @@ written(x) := x.literal if is_literal(x)
 written(x) := x if {
 	not is_ref(x)
 	not is_literal(x)
+	not malformed(x)
 }
 
 selector_index(path) := min([i | some i, seg in path; is_object(seg)])
@@ -170,7 +181,12 @@ segment_name(p) := sprintf("[%s]", [concat(" and ", sort([sprintf("%v==%s", [k, 
 
 value_text(x) := ref_name(x.ref) if is_ref(x)
 
-value_text(x) := sprintf("%v", [written(x)]) if not is_ref(x)
+value_text(x) := sprintf("%v", [written(x)]) if {
+	not is_ref(x)
+	not malformed(x)
+}
+
+value_text(x) := "<invalid ref>" if malformed(x)
 
 default leaf_passed(_, _) := false
 
@@ -180,6 +196,8 @@ leaf_passed(check, subj) if {
 	is_number(v)
 	lo := arg(check.min)
 	hi := arg(check.max)
+	is_number(lo)
+	is_number(hi)
 	v >= lo
 	v <= hi
 }
@@ -488,6 +506,10 @@ check_refs(check) := {x.ref |
 	walk(check, [p, x])
 	is_ref(x)
 	not under_literal(check, p)
+} | {"<invalid ref>" |
+	walk(check, [p, x])
+	malformed(x)
+	not under_literal(check, p)
 }
 
 under_literal(check, p) if {
@@ -581,9 +603,15 @@ leaf_describe(check, item) := sprintf("%s in %s", [item_path_name(item, check.pa
 	is_ref(check.values)
 }
 
+leaf_describe(check, item) := sprintf("%s in <invalid ref>", [item_path_name(item, check.path)]) if {
+	check.op == "in"
+	malformed(check.values)
+}
+
 leaf_describe(check, item) := sprintf("%s in <invalid values>", [item_path_name(item, check.path)]) if {
 	check.op == "in"
 	not is_ref(object.get(check, "values", null))
+	not malformed(object.get(check, "values", null))
 	not value_list(written(object.get(check, "values", null)))
 }
 
@@ -597,9 +625,14 @@ leaf_describe(check, item) := sprintf("%s matches one of %s", [item_path_name(it
 
 leaf_describe(check, item) := sprintf("%s matches none of %s", [item_path_name(item, check.path), pattern_list(check)]) if check.op == "not_matches_any"
 
-pattern_list(check) := sprintf("[%s]", [concat(", ", sort([sprintf("%v", [p]) | some p in written(check.patterns)]))]) if not is_ref(check.patterns)
+pattern_list(check) := sprintf("[%s]", [concat(", ", sort([sprintf("%v", [p]) | some p in written(check.patterns)]))]) if {
+	not is_ref(check.patterns)
+	not malformed(check.patterns)
+}
 
 pattern_list(check) := ref_name(check.patterns.ref) if is_ref(check.patterns)
+
+pattern_list(check) := "<invalid ref>" if malformed(check.patterns)
 
 leaf_describe(check, item) := sprintf("%s %s %s", [item_path_name(item, check.left), check.cmp, item_path_name(item, check.right)]) if check.op in {"compare", "compare_time"}
 
@@ -669,8 +702,17 @@ check_inputs(subj, check, _) := [{"name": nm, "value": vals}] if {
 	not check.inputs
 	quantified(check)
 	not check.each
+	not named(object.get(check.check, "path", []))
 	vals := [value_at(elem, object.get(check.check, "path", [])) | some elem in value_at(subj, check.path)]
 	nm := projection_name(check.path, object.get(check.check, "path", []))
+}
+
+check_inputs(subj, check, _) := [{"name": path_name(inner), "value": value_at(subj, inner)}] if {
+	not check.inputs
+	quantified(check)
+	not check.each
+	inner := object.get(check.check, "path", [])
+	named(inner)
 }
 
 check_inputs(subj, check, _) := [{"name": collection_name(check), "value": vals}] if {
