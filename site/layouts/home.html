@@ -149,69 +149,48 @@ report := ergo.report(input, requirements)</code></pre>
   </div>
 </section>
 
-{{/* 04 — Causes */}}
-<section class="section section--panel">
-  <div class="wrap">
-    <h2 class="display-m">{{ $c.causes.title }}</h2>
-    <p class="lede narrow">{{ partial "copy.html" $c.causes.lede }}</p>
-    <ul class="causes">
-      {{- range $c.causes.items }}
-      <li class="cause cause--{{ cond (.passes | default false) "pass" "fail" }}"><code>{{ .name }}</code><p>{{ partial "copy.html" .body }}</p></li>
-      {{- end }}
-    </ul>
-    <div class="versus">
-      <div class="versus__card">
-        <pre class="code"><code>approved_by = <span class="n">null</span>
-<span class="k">cause</span>: <span class="f">absent</span></code></pre>
-        <p><strong>{{ $c.causes.absent }}</strong></p>
-      </div>
-      <div class="versus__card">
-        <pre class="code"><code>approved_by = <span class="s">""</span>
-<span class="k">cause</span>: <span class="f">value</span></code></pre>
-        <p><strong>{{ $c.causes.value }}</strong></p>
-      </div>
-      <p class="versus__tag mono">{{ $c.causes.tag }}</p>
-    </div>
-  </div>
-</section>
-
-{{/* 05 — Manifesto */}}
+{{/* 04 — Manifesto */}}
 <section class="section manifesto">
   <div class="wrap">
     <ul class="manifesto__lines">
-      {{- range $c.manifesto.lines }}
+      {{- range $c.manifesto.muted }}
+      <li class="is-muted">{{ . }}</li>
+      {{- end }}
+      {{- range $c.manifesto.bright }}
       <li>{{ . }}</li>
       {{- end }}
       <li class="hl">{{ partial "therefore.html" . }} <span class="ergo-mark">ergo</span>.</li>
     </ul>
-    <div class="sys-checks">
-      <p class="sys-checks__intro">{{ partial "copy.html" $c.manifesto.intro }}</p>
-      <dl>
-        {{- range $c.manifesto.checks }}
-        <div><dt class="sys mono">{{ .name }}</dt><dd>{{ partial "copy.html" .body }}</dd></div>
-        {{- end }}
-      </dl>
-    </div>
   </div>
 </section>
 
-{{/* 06 — Architecture */}}
+{{/* 05 — Architecture */}}
 <section class="section section--panel">
   <div class="wrap">
     <h2 class="display-m">{{ $c.architecture.title }}<br><span class="muted">{{ partial "copy.html" $c.architecture.muted }}</span></h2>
     <p class="lede narrow">{{ partial "copy.html" $c.architecture.lede }}</p>
-    <ol class="flow" aria-label="From input to conclusion">
-      <li><span class="flow__k mono">input</span><span class="flow__v">deployments.json</span></li>
-      <li><span class="flow__k mono">control</span><span class="flow__v">requirements</span></li>
-      <li class="flow__engine"><span class="flow__k mono">library</span><span class="flow__v">ergo.rego</span></li>
-      <li><span class="flow__k mono">engine</span><span class="flow__v">OPA {{ site.Params.opaVersion }}</span></li>
-      <li><span class="flow__k mono">evidence</span><span class="flow__v">report</span></li>
-      <li class="flow__end"><span class="flow__k">{{ partial "therefore.html" . }}</span><span class="flow__v">compliant</span></li>
+    <ol class="flow" aria-label="From inputs to conclusion">
+      <li class="flow__group">
+        <span class="flow__label mono">inputs</span>
+        <ul>
+          <li class="flow__card"><span class="flow__k mono">input</span><span class="flow__v">deployments.json</span></li>
+          <li class="flow__card"><span class="flow__k mono">control</span><span class="flow__v">requirements.yaml</span></li>
+          <li class="flow__card flow__card--ergo"><span class="flow__k mono">library</span><span class="flow__v">ergo.rego</span></li>
+        </ul>
+      </li>
+      <li class="flow__card"><span class="flow__k mono">engine</span><span class="flow__v">OPA {{ site.Params.opaVersion }}</span></li>
+      <li class="flow__group">
+        <span class="flow__label mono">outputs</span>
+        <ul>
+          <li class="flow__card flow__end"><span class="flow__k mono">decision</span><span class="flow__v">{{ partial "therefore.html" . }} compliant</span></li>
+          <li class="flow__card flow__card--ergo flow__report"><span class="flow__k mono">evidence</span><span class="flow__v">{{ partial "mark.html" . }}<span>report</span></span></li>
+        </ul>
+      </li>
     </ol>
   </div>
 </section>
 
-{{/* 07 — Vocabulary */}}
+{{/* 06 — Vocabulary */}}
 <section class="section">
   <div class="wrap">
     <h2 class="display-m">{{ $c.vocabulary.title }}<br><span class="muted">{{ $c.vocabulary.muted }}</span></h2>
@@ -223,7 +202,7 @@ report := ergo.report(input, requirements)</code></pre>
   </div>
 </section>
 
-{{/* 08 — Get started */}}
+{{/* 07 — Get started */}}
 <section class="section section--panel" id="start">
   <div class="wrap">
     <h2 class="display-m">{{ $c.start.title }}</h2>
@@ -244,7 +223,7 @@ report := ergo.report(input, requirements)</code></pre>
   </div>
 </section>
 
-{{/* 09 — Name */}}
+{{/* 08 — Name */}}
 <section class="section name">
   <div class="wrap name__grid">
     <div class="name__glyph">{{ partial "therefore.html" . }}</div>
@@ -256,7 +235,7 @@ report := ergo.report(input, requirements)</code></pre>
   </div>
 </section>
 
-{{/* 10 — Close */}}
+{{/* 09 — Close */}}
 <section class="cta">
   <div class="wrap cta__inner">
     <h2 class="cta__title"><strong>{{ $c.close.title }}</strong></h2>

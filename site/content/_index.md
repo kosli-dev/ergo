@@ -40,7 +40,7 @@ declaration:
       body: "`checks` are the rules each subject must pass. ==ergo== does the looping, the evaluation and the report."
 
 shape:
-  title: One report shape.
+  title: One report format.
   muted: Every control.
   lede: "A deployment control. A code-review control. A vulnerability control. Different policy, same evidence: one row per subject and check. Passing and failing rows have the same fields."
   fields:
@@ -59,50 +59,18 @@ shape:
       body: Why it reached that result.
   aside: Same policy + same input = the same report, byte for byte. Hash it. Diff it. Store it.
 
-causes:
-  title: Failure isn't one state.
-  lede: A missing field, a field set to `null` and a selector that matched nothing all read as `null`. They're different problems with different fixes. The `cause` tells them apart.
-  items:
-    - name: satisfied
-      passes: true
-      body: The check passed.
-    - name: substituted
-      passes: true
-      body: The check failed, but its substitute passed.
-    - name: ambiguous
-      body: A selector matched more than one item.
-    - name: unmatched
-      body: A selector matched nothing, although the list was there.
-    - name: absent
-      body: A field the check reads isn't there.
-    - name: "null"
-      body: The field is there, but `null`.
-    - name: value
-      body: Everything was read fine. The values just don't pass.
-  absent: The evidence was never recorded.
-  value: The evidence exists, and it says no.
-  tag: Different problem. Different owner. Different fix.
-
 manifesto:
-  lines:
+  muted:
     - Nothing disappears.
     - Nothing is implied.
-    - Nothing is decorative.
+  bright:
+    - Everything is reproducible.
     - Everything has a reason.
-    - Everything has a state.
-  intro: You didn't write the checks that start with <code class="sys">$</code>. ==ergo== adds them, so that whenever a requirement isn't met, at least one row explains why.
-  checks:
-    - name: $well_formed
-      body: "The requirement itself makes sense: it has at least one check and a valid `require`."
-    - name: $min_subjects
-      body: At least one subject was found. A typo in `from` fails, instead of passing with nothing checked.
-    - name: $applies
-      body: Whether each subject was in scope. Out-of-scope subjects stay in the report, with the reason.
 
 architecture:
-  title: Rego underneath.
-  muted: ==ergo== on top.
-  lede: ==ergo== doesn't replace OPA. It's a single Rego file you copy into your policies. The control is expressed as data, and ==ergo== provides one evaluation and reporting model for all of them.
+  title: OPA is the engine.
+  muted: ==ergo== _is_ rego.
+  lede: ==ergo== doesn't replace OPA. Copy a single rego file  into your policies. The control is expressed as yaml or rego and ==ergo== provides a single evaluation and reporting model.
 
 vocabulary:
   title: Readable by machines.
