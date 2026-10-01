@@ -16,12 +16,19 @@ Then open http://localhost:1313.
 
 | What | Where |
 | --- | --- |
-| Landing page | `layouts/home.html` |
+| Landing page copy | front matter in `content/_index.md` |
+| Landing page layout | `layouts/home.html` |
 | Docs page shell | `layouts/page.html` |
 | How the docs are read from the repo | `content/docs/_content.gotmpl` and `[module]` in `hugo.toml` |
 | Styles and colour tokens | `assets/css/ergo.css` |
 | Logo | `static/brand/ergo-wordmark-white.svg` (master), inlined in `layouts/_partials/wordmark.html` and `mark.html`; `static/favicon.svg` |
 | Site settings (repo links, status bar) | `hugo.toml` |
+
+## Edit the landing page copy
+
+The words on the landing page live in the front matter of `content/_index.md`, one block per section. The code samples and the example report stay in `layouts/home.html`.
+
+Most text is Markdown, so `` `code` ``, `*emphasis*` and `**bold**` work. Write `==ergo==` to get the highlighted name. Headings, labels and button text are plain text.
 
 ## Deploy
 

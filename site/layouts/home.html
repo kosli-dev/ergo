@@ -1,14 +1,15 @@
 {{ define "main" }}
+{{- $c := .Params }}
 
 {{/* 00 — Hero */}}
 <section class="hero">
   <div class="wrap hero__grid">
     <div class="hero__copy">
-      <h1 class="hero__title"><strong>Explainable controls that run on Open Policy Agent and Rego.</strong></h1>
-      <p class="hero__lede"><span class="ergo-mark">ergo</span> is an open source language for defining explainable controls. Instead of a binary result, every decision returns an audit report of what was checked, and why it passed or failed.</p>
+      <h1 class="hero__title"><strong>{{ $c.hero.title }}</strong></h1>
+      <p class="hero__lede">{{ partial "copy.html" $c.hero.lede }}</p>
       <div class="actions">
-        <a class="btn btn--primary" href="{{ "docs/getting-started/" | relURL }}">Get started <span aria-hidden="true">→</span></a>
-        <a class="btn btn--outline" href="{{ site.Params.repo }}">GitHub</a>
+        <a class="btn btn--primary" href="{{ "docs/getting-started/" | relURL }}">{{ $c.hero.primary }} <span aria-hidden="true">→</span></a>
+        <a class="btn btn--outline" href="{{ site.Params.repo }}">{{ $c.hero.secondary }}</a>
       </div>
     </div>
 
@@ -24,7 +25,7 @@
         <div class="report__row"><span>d-1</span><span>approved</span><span>approved_by = "alice"</span><span class="t">true</span><span>satisfied</span></div>
         <div class="report__row is-fail"><span>d-2</span><span>approved</span><span>approved_by = null</span><span class="f">false</span><span class="f">absent</span></div>
       </div>
-      <figcaption class="term__foot">{{ partial "therefore.html" . }} compliant: <span class="f">false</span> <span class="term__why">d-2 was never approved. d-3 is out of scope, and the report says so.</span></figcaption>
+      <figcaption class="term__foot">{{ partial "therefore.html" . }} compliant: <span class="f">false</span> <span class="term__why">{{ $c.hero.verdict }}</span></figcaption>
     </figure>
   </div>
 </section>
@@ -32,30 +33,30 @@
 {{/* 01 — The problem */}}
 <section class="section">
   <div class="wrap">
-    <h2 class="display-m">A decision nobody can check<br><span class="muted">isn't a control.</span></h2>
+    <h2 class="display-m">{{ $c.problem.title }}<br><span class="muted">{{ $c.problem.muted }}</span></h2>
     <div class="split">
       <div class="split__col">
-        <p class="lede">Rego enforces. It doesn't keep records. You can block a deployment, but you can't show later why it was blocked, or why the others weren't.</p>
-        <p>In regulated work, someone else has to be able to check that a control behaved as it should. A yes or no can't be checked. You don't just tell the auditor the balance. You hand over the books.</p>
+        <p class="lede">{{ partial "copy.html" $c.problem.lede }}</p>
+        <p>{{ partial "copy.html" $c.problem.body }}</p>
       </div>
       <div class="compare">
         <div class="compare__card">
-          <p class="compare__label mono">Rego on its own</p>
+          <p class="compare__label mono">{{ partial "copy.html" $c.problem.without.label }}</p>
 <pre class="code"><code>{
   <span class="k">"allow"</span>: <span class="f">false</span>,
   <span class="k">"violations"</span>: [
     <span class="s">"d-2: no approval"</span>
   ]
 }</code></pre>
-          <p class="compare__note">Useful. But what about d-1? And d-3?</p>
+          <p class="compare__note">{{ partial "copy.html" $c.problem.without.note }}</p>
         </div>
         <div class="compare__card compare__card--ergo">
-          <p class="compare__label mono">with <span class="ergo-mark">ergo</span></p>
+          <p class="compare__label mono">{{ partial "copy.html" $c.problem.with.label }}</p>
 <pre class="code"><code><span class="n">subject  check      value read               passed  cause</span>
 d-1      approved   approved_by = "alice"    <span class="t">true</span>    <span class="t">satisfied</span>
 d-2      approved   approved_by = <span class="n">null</span>       <span class="f">false</span>   <span class="f">absent</span>
 d-3      <span class="k">$applies</span>   environment = "staging"  <span class="f">false</span>   value <span class="n">(out of scope, recorded)</span></code></pre>
-          <p class="compare__note">Same decision. Now you can see why.</p>
+          <p class="compare__note">{{ partial "copy.html" $c.problem.with.note }}</p>
         </div>
       </div>
     </div>
@@ -65,7 +66,7 @@ d-3      <span class="k">$applies</span>   environment = "staging"  <span class=
 {{/* 02 — Declaration */}}
 <section class="section section--panel">
   <div class="wrap">
-    <h2 class="display-m">Write the control.<br><span class="muted">Not the machinery.</span></h2>
+    <h2 class="display-m">{{ $c.declaration.title }}<br><span class="muted">{{ $c.declaration.muted }}</span></h2>
     <div class="declare">
 <pre class="code code--lg"><code><span class="kw">package</span> deploy
 
@@ -85,9 +86,9 @@ requirements := {<span class="s">"prod_deploy"</span>: {
 
 report := ergo.report(input, requirements)</code></pre>
       <ol class="notes">
-        <li><span class="notes__n mono">1</span><div><h3>What you're judging</h3><p><code>subject_type</code>, <code>from</code> and <code>id</code> say what the subjects are and where to find them.</p></div></li>
-        <li><span class="notes__n mono">2</span><div><h3>What's in scope</h3><p><code>applies_to</code> keeps only the subjects this control is about. The rest are recorded, not dropped.</p></div></li>
-        <li><span class="notes__n mono">3</span><div><h3>What must hold</h3><p><code>checks</code> are the rules each subject must pass. <span class="ergo-mark">ergo</span> does the looping, the evaluation and the report.</p></div></li>
+        {{- range $i, $n := $c.declaration.notes }}
+        <li><span class="notes__n mono">{{ add $i 1 }}</span><div><h3>{{ $n.title }}</h3><p>{{ partial "copy.html" $n.body }}</p></div></li>
+        {{- end }}
       </ol>
     </div>
   </div>
@@ -96,46 +97,39 @@ report := ergo.report(input, requirements)</code></pre>
 {{/* 03 — One shape */}}
 <section class="section">
   <div class="wrap">
-    <h2 class="display-m">One report shape.<br><span class="muted">Every control.</span></h2>
-    <p class="lede narrow">A deployment control. A code-review control. A vulnerability control. Different policy, same evidence: one row per subject and check. Passing and failing rows have the same fields.</p>
+    <h2 class="display-m">{{ $c.shape.title }}<br><span class="muted">{{ $c.shape.muted }}</span></h2>
+    <p class="lede narrow">{{ partial "copy.html" $c.shape.lede }}</p>
     <ol class="fields">
-      <li><span class="mono">requirement</span><p>Which control produced the row.</p></li>
-      <li><span class="mono">subject</span><p>The thing that was judged, with its type and id.</p></li>
-      <li><span class="mono">check</span><p>The rule that ran.</p></li>
-      <li><span class="mono">inputs</span><p>The values the check actually read.</p></li>
-      <li><span class="mono t">passed</span><p>The result. Always <code>true</code> or <code>false</code>.</p></li>
-      <li><span class="mono">cause</span><p>Why it reached that result.</p></li>
+      {{- range $c.shape.fields }}
+      <li><span class="mono{{ with .class }} {{ . }}{{ end }}">{{ .name }}</span><p>{{ partial "copy.html" .body }}</p></li>
+      {{- end }}
     </ol>
-    <p class="aside mono">Same policy + same input = the same report, byte for byte. Hash it. Diff it. Store it.</p>
+    <p class="aside mono">{{ partial "copy.html" $c.shape.aside }}</p>
   </div>
 </section>
 
 {{/* 04 — Causes */}}
 <section class="section section--panel">
   <div class="wrap">
-    <h2 class="display-m">Failure isn't one state.</h2>
-    <p class="lede narrow">A missing field, a field set to <code>null</code> and a selector that matched nothing all read as <code>null</code>. They're different problems with different fixes. The <code>cause</code> tells them apart.</p>
+    <h2 class="display-m">{{ $c.causes.title }}</h2>
+    <p class="lede narrow">{{ partial "copy.html" $c.causes.lede }}</p>
     <ul class="causes">
-      <li class="cause cause--pass"><code>satisfied</code><p>The check passed.</p></li>
-      <li class="cause cause--pass"><code>substituted</code><p>The check failed, but its substitute passed.</p></li>
-      <li class="cause cause--fail"><code>ambiguous</code><p>A selector matched more than one item.</p></li>
-      <li class="cause cause--fail"><code>unmatched</code><p>A selector matched nothing, although the list was there.</p></li>
-      <li class="cause cause--fail"><code>absent</code><p>A field the check reads isn't there.</p></li>
-      <li class="cause cause--fail"><code>null</code><p>The field is there, but <code>null</code>.</p></li>
-      <li class="cause cause--fail"><code>value</code><p>Everything was read fine. The values just don't pass.</p></li>
+      {{- range $c.causes.items }}
+      <li class="cause cause--{{ cond (.passes | default false) "pass" "fail" }}"><code>{{ .name }}</code><p>{{ partial "copy.html" .body }}</p></li>
+      {{- end }}
     </ul>
     <div class="versus">
       <div class="versus__card">
         <pre class="code"><code>approved_by = <span class="n">null</span>
 <span class="k">cause</span>: <span class="f">absent</span></code></pre>
-        <p><strong>The evidence was never recorded.</strong></p>
+        <p><strong>{{ $c.causes.absent }}</strong></p>
       </div>
       <div class="versus__card">
         <pre class="code"><code>approved_by = <span class="s">""</span>
 <span class="k">cause</span>: <span class="f">value</span></code></pre>
-        <p><strong>The evidence exists, and it says no.</strong></p>
+        <p><strong>{{ $c.causes.value }}</strong></p>
       </div>
-      <p class="versus__tag mono">Different problem. Different owner. Different fix.</p>
+      <p class="versus__tag mono">{{ $c.causes.tag }}</p>
     </div>
   </div>
 </section>
@@ -144,19 +138,17 @@ report := ergo.report(input, requirements)</code></pre>
 <section class="section manifesto">
   <div class="wrap">
     <ul class="manifesto__lines">
-      <li>Nothing disappears.</li>
-      <li>Nothing is implied.</li>
-      <li>Nothing is decorative.</li>
-      <li>Everything has a reason.</li>
-      <li>Everything has a state.</li>
+      {{- range $c.manifesto.lines }}
+      <li>{{ . }}</li>
+      {{- end }}
       <li class="hl">{{ partial "therefore.html" . }} <span class="ergo-mark">ergo</span>.</li>
     </ul>
     <div class="sys-checks">
-      <p class="sys-checks__intro">You didn't write the checks that start with <code class="sys">$</code>. <span class="ergo-mark">ergo</span> adds them, so that whenever a requirement isn't met, at least one row explains why.</p>
+      <p class="sys-checks__intro">{{ partial "copy.html" $c.manifesto.intro }}</p>
       <dl>
-        <div><dt class="sys mono">$well_formed</dt><dd>The requirement itself makes sense: it has at least one check and a valid <code>require</code>.</dd></div>
-        <div><dt class="sys mono">$min_subjects</dt><dd>At least one subject was found. A typo in <code>from</code> fails, instead of passing with nothing checked.</dd></div>
-        <div><dt class="sys mono">$applies</dt><dd>Whether each subject was in scope. Out-of-scope subjects stay in the report, with the reason.</dd></div>
+        {{- range $c.manifesto.checks }}
+        <div><dt class="sys mono">{{ .name }}</dt><dd>{{ partial "copy.html" .body }}</dd></div>
+        {{- end }}
       </dl>
     </div>
   </div>
@@ -165,8 +157,8 @@ report := ergo.report(input, requirements)</code></pre>
 {{/* 06 — Architecture */}}
 <section class="section section--panel">
   <div class="wrap">
-    <h2 class="display-m">Rego underneath.<br><span class="muted"><span class="ergo-mark">ergo</span> on top.</span></h2>
-    <p class="lede narrow"><span class="ergo-mark">ergo</span> doesn't replace OPA. It's a single Rego file you copy into your policies. The control is expressed as data, and <span class="ergo-mark">ergo</span> provides one evaluation and reporting model for all of them.</p>
+    <h2 class="display-m">{{ $c.architecture.title }}<br><span class="muted">{{ partial "copy.html" $c.architecture.muted }}</span></h2>
+    <p class="lede narrow">{{ partial "copy.html" $c.architecture.lede }}</p>
     <ol class="flow" aria-label="From input to conclusion">
       <li><span class="flow__k mono">input</span><span class="flow__v">deployments.json</span></li>
       <li><span class="flow__k mono">control</span><span class="flow__v">requirements</span></li>
@@ -181,44 +173,32 @@ report := ergo.report(input, requirements)</code></pre>
 {{/* 07 — Vocabulary */}}
 <section class="section">
   <div class="wrap">
-    <h2 class="display-m">Readable by machines.<br><span class="muted">Readable by people.</span></h2>
-    <p class="lede narrow">The vocabulary is small on purpose. Every check gets a plain-language expression, like <code>approved_by is a non-empty string</code>, rendered from the requirement itself. Controls are data, so they can be validated, diffed and tested like code.</p>
+    <h2 class="display-m">{{ $c.vocabulary.title }}<br><span class="muted">{{ $c.vocabulary.muted }}</span></h2>
+    <p class="lede narrow">{{ partial "copy.html" $c.vocabulary.lede }}</p>
     <ul class="ops">
       {{ range slice "equals" "present" "non_empty_string" "matches_any" "not_matches_any" "range" "includes" "excludes" "compare" "compare_time" "all" "any" "any_of" }}<li><a href="{{ "docs/reference/#operators" | relURL }}">{{ . }}</a></li>{{ end }}
     </ul>
-    <p><a class="link" href="{{ "docs/reference/" | relURL }}">Every field, operator and cause <span aria-hidden="true">→</span></a></p>
+    <p><a class="link" href="{{ "docs/reference/" | relURL }}">{{ $c.vocabulary.link }} <span aria-hidden="true">→</span></a></p>
   </div>
 </section>
 
 {{/* 08 — Get started */}}
 <section class="section section--panel" id="start">
   <div class="wrap">
-    <h2 class="display-m">One file. No lock-in.</h2>
+    <h2 class="display-m">{{ $c.start.title }}</h2>
     <ol class="steps">
+      {{- range $i, $st := $c.start.steps }}
       <li>
-        <span class="steps__n mono">01</span>
-        <h3>Copy the library</h3>
-        <p>Copy <code>ergo.rego</code> next to your policies. That's the install.</p>
-        <pre class="code"><code>policy/
-  ergo.rego</code></pre>
+        <span class="steps__n mono">{{ printf "%02d" (add $i 1) }}</span>
+        <h3>{{ $st.title }}</h3>
+        <p>{{ partial "copy.html" $st.body }}</p>
+        <pre class="code"><code>{{ $st.code }}</code></pre>
       </li>
-      <li>
-        <span class="steps__n mono">02</span>
-        <h3>Write a requirement</h3>
-        <p>Say what you're judging, what's in scope and what must hold.</p>
-        <pre class="code"><code>report := ergo.report(input, requirements)</code></pre>
-      </li>
-      <li>
-        <span class="steps__n mono">03</span>
-        <h3>Read the report</h3>
-        <p>Ask OPA for the report, or just the violations.</p>
-        <pre class="code"><code>opa eval -d policy -i deployments.json \
-  'data.deploy.report'</code></pre>
-      </li>
+      {{- end }}
     </ol>
     <div class="actions">
-      <a class="btn btn--primary" href="{{ "docs/getting-started/" | relURL }}">Read the walkthrough <span aria-hidden="true">→</span></a>
-      <a class="btn btn--outline" href="{{ site.Params.repo }}/blob/main/ergo.rego">View ergo.rego</a>
+      <a class="btn btn--primary" href="{{ "docs/getting-started/" | relURL }}">{{ $c.start.primary }} <span aria-hidden="true">→</span></a>
+      <a class="btn btn--outline" href="{{ site.Params.repo }}/blob/main/ergo.rego">{{ $c.start.secondary }}</a>
     </div>
   </div>
 </section>
@@ -229,8 +209,8 @@ report := ergo.report(input, requirements)</code></pre>
     <div class="name__glyph">{{ partial "therefore.html" . }}</div>
     <div>
       <h2 class="display-m"><span class="ergo-mark">ergo</span> <span class="muted">/ˈɜː.ɡəʊ/</span></h2>
-      <p class="lede">Therefore. As a result. A conclusion that comes with its premises.</p>
-      <p>Not <em>computer says no</em>. Here is the decision, and here is what produced it.</p>
+      <p class="lede">{{ partial "copy.html" $c.name.lede }}</p>
+      <p>{{ partial "copy.html" $c.name.body }}</p>
     </div>
   </div>
 </section>
@@ -238,10 +218,10 @@ report := ergo.report(input, requirements)</code></pre>
 {{/* 10 — Close */}}
 <section class="cta">
   <div class="wrap cta__inner">
-    <h2 class="cta__title"><strong>Show the working.</strong></h2>
+    <h2 class="cta__title"><strong>{{ $c.close.title }}</strong></h2>
     <div class="actions">
-      <a class="btn btn--dark" href="{{ site.Params.fork }}">Fork ergo</a>
-      <a class="btn btn--dark-outline" href="{{ "docs/getting-started/" | relURL }}">Get started <span aria-hidden="true">→</span></a>
+      <a class="btn btn--dark" href="{{ site.Params.fork }}">{{ $c.close.primary }}</a>
+      <a class="btn btn--dark-outline" href="{{ "docs/getting-started/" | relURL }}">{{ $c.close.secondary }} <span aria-hidden="true">→</span></a>
     </div>
   </div>
 </section>
