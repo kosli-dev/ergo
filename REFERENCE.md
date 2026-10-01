@@ -103,6 +103,7 @@ These read one or two fields of a subject.
 | `op`               | Parameters             | Passes when                                                                                                          |
 | ------------------ | ---------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | `equals`           | `path`, `value`        | the field equals `value`. The type must match too, so `"1"` doesn't equal `1`.                                       |
+| `in`               | `path`, `values`       | the field is one of `values`. The type must match too, as for `equals`.                                              |
 | `present`          | `path`                 | the field exists and isn't `null`. An empty string or `false` still counts as present.                               |
 | `non_empty_string` | `path`                 | the field is a string, and not `""`.                                                                                 |
 | `matches_any`      | `path`, `patterns`     | the field is a string that matches at least one of the regular expressions.                                          |
@@ -118,6 +119,7 @@ These read one or two fields of a subject.
 Some things worth knowing:
 
 - `equals` with `"value": null` only passes when the field is there and set to `null`. A missing field doesn't count.
+- `in` fails when the field is missing or `null`, even if `values` contains `null`. To check that a field is `null`, use `equals` with `"value": null`. `values` can be a list or, from Rego, a set. `in` also fails when `values` is empty, missing, or not a list or set. In those last two cases, the expression shows `id in <invalid values>` rather than a list.
 - `compare` and `compare_time` compare two fields of the same subject. To compare a field with a fixed number, use `range`.
 - `compare_time` never converts between formats, so a number against a string fails. With numbers, ergo can't tell seconds from milliseconds, so make sure both sides use the same unit.
 - Patterns in `matches_any` and `not_matches_any` aren't anchored: `svc_` matches `my_svc_account`. Use `^` and `$` when you need a full match. A pattern that isn't a string makes `not_matches_any` fail, and `matches_any` ignores it. With an empty `patterns` list, `matches_any` fails and `not_matches_any` passes.
