@@ -588,12 +588,12 @@ subject_passed(req, subj) if {
 	}
 }
 
-subject_rows(doc, policy, req_name) := [row |
-	some subj in matching_subjects(doc, policy[req_name])
-	some check_name, check in checks_of(policy[req_name])
+subject_rows(doc, req, req_name) := [row |
+	some subj in matching_subjects(doc, req)
+	some check_name, check in checks_of(req)
 	row := {
 		"requirement": req_name,
-		"subject": subject_ref(subj, policy[req_name]),
+		"subject": subject_ref(subj, req),
 		"check": check_name,
 		"inputs": row_inputs(subj, check),
 		"passed": check_passed(check, subj),
@@ -601,41 +601,41 @@ subject_rows(doc, policy, req_name) := [row |
 	}
 ]
 
-well_formed_row(policy, req_name) := {
+well_formed_row(req, req_name) := {
 	"requirement": req_name,
-	"subject": {"type": subject_type_of(policy[req_name]), "id": null},
+	"subject": {"type": subject_type_of(req), "id": null},
 	"check": "$well_formed",
 	"inputs": [
-		{"name": "count(checks)", "value": count(checks_of(policy[req_name]))},
-		{"name": "require", "value": require_of(policy[req_name])},
+		{"name": "count(checks)", "value": count(checks_of(req))},
+		{"name": "require", "value": require_of(req)},
 	],
-	"passed": well_formed(policy[req_name]),
-	"cause": verdict_cause(well_formed(policy[req_name])),
+	"passed": well_formed(req),
+	"cause": verdict_cause(well_formed(req)),
 }
 
-min_subjects_row(doc, policy, req_name) := {
+min_subjects_row(doc, req, req_name) := {
 	"requirement": req_name,
-	"subject": {"type": subject_type_of(policy[req_name]), "id": null},
+	"subject": {"type": subject_type_of(req), "id": null},
 	"check": "$min_subjects",
-	"inputs": [{"name": matching_count_name(policy[req_name]), "value": count(matching_subjects(doc, policy[req_name]))}],
-	"passed": count(matching_subjects(doc, policy[req_name])) >= min_subjects_of(policy[req_name]),
-	"cause": verdict_cause(count(matching_subjects(doc, policy[req_name])) >= min_subjects_of(policy[req_name])),
+	"inputs": [{"name": matching_count_name(req), "value": count(matching_subjects(doc, req))}],
+	"passed": count(matching_subjects(doc, req)) >= min_subjects_of(req),
+	"cause": verdict_cause(count(matching_subjects(doc, req)) >= min_subjects_of(req)),
 }
 
-applies_rows(doc, policy, req_name) := [{
+applies_rows(doc, req, req_name) := [{
 	"requirement": req_name,
-	"subject": subject_ref(subj, policy[req_name]),
+	"subject": subject_ref(subj, req),
 	"check": "$applies",
-	"inputs": applies_inputs(subj, policy[req_name]),
-	"passed": subject_matches(subj, policy[req_name]),
-	"cause": applies_cause(subj, policy[req_name]),
+	"inputs": applies_inputs(subj, req),
+	"passed": subject_matches(subj, req),
+	"cause": applies_cause(subj, req),
 } |
-	some subj in raw_subjects(doc, policy[req_name])
+	some subj in raw_subjects(doc, req)
 ] if {
-	count(applies_to_of(policy[req_name])) > 0
+	count(applies_to_of(req)) > 0
 }
 
-applies_rows(_, policy, req_name) := [] if count(applies_to_of(policy[req_name])) == 0
+applies_rows(_, req, _) := [] if count(applies_to_of(req)) == 0
 
 applies_inputs(subj, req) := [inp |
 	some name in applies_to_names(req)
@@ -683,12 +683,12 @@ all_satisfied(doc, policy) if {
 
 results(doc, policy) := array.concat(
 	array.concat(
-		[well_formed_row(policy, name) | some name, _ in policy],
-		[min_subjects_row(doc, policy, name) | some name, _ in policy],
+		[well_formed_row(req, name) | some name, req in policy],
+		[min_subjects_row(doc, req, name) | some name, req in policy],
 	),
 	array.concat(
-		[row | some name, _ in policy; some row in applies_rows(doc, policy, name)],
-		[row | some name, _ in policy; some row in subject_rows(doc, policy, name)],
+		[row | some name, req in policy; some row in applies_rows(doc, req, name)],
+		[row | some name, req in policy; some row in subject_rows(doc, req, name)],
 	),
 )
 
