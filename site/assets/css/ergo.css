@@ -232,7 +232,9 @@ p code, li code, dd code, td code {
 .manifesto__lines { list-style: none; margin: 0; padding: 0; font: 500 clamp(36px, 6vw, 76px)/1.08 var(--sans); letter-spacing: -.035em; }
 .manifesto__lines li { color: var(--paper); }
 .manifesto__lines li.is-muted { color: var(--faint); }
-.manifesto__lines li.hl { color: var(--lime); }
+/* The manifesto ends on the logo itself: the premises, then the conclusion. */
+.manifesto__mark { margin-top: .28em; }
+.manifesto__mark .wm { height: .9em; width: auto; }
 
 /* ——— Flow ——— */
 .flow { list-style: none; margin: 48px 0 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1.2fr); gap: 36px; align-items: center; }
