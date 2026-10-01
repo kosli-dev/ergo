@@ -181,6 +181,8 @@ opa eval -d policy -i deployments.json --format=pretty 'data.deploy.violations'
 
 The [reference](REFERENCE.md) covers every field, operator and cause, including the ones this example doesn't use.
 
+To write policies in Markdown instead of Rego, see [`packages/markdown`](packages/markdown/README.md).
+
 ### Updating
 
 Copy the new `ergo.rego` over the old one and run your policy's tests.

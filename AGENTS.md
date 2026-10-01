@@ -9,27 +9,38 @@ ergo is a Rego library that turns policy evaluation into a structured report. Us
 - `custom_op_test.rego` defines custom operators that only the tests use.
 - `README.md` walks a new user through a first policy.
 - `REFERENCE.md` describes every field, operator, cause and report entry.
+- `packages/` holds Node tools that build on ergo, in one pnpm workspace. Someone who only copies `ergo.rego` never needs them.
+- `packages/markdown/` compiles policies written in Markdown into requirements objects. Its README covers how to write one.
 
 ## Checks
 
 Run these before saying a change is done:
 
 ```sh
-opa check --strict . --ignore .github
+opa check --strict . --ignore .github --ignore packages
 opa fmt --list .
-opa test . --ignore .github
+opa test . --ignore .github --ignore packages
 ```
 
 `opa fmt --list .` should print nothing. If it prints file names, run `opa fmt -w .`.
 
-OPA loads every JSON and YAML file it finds as data. The workflow files under `.github` clash with each other, so the checks ignore that folder.
+OPA loads every JSON and YAML file it finds as data. The workflow files under `.github` clash with each other, and so do the workspace's files under `packages`, so the checks ignore both folders.
 
-CI runs these checks on pull requests and on pushes to `main` (`.github/workflows/test.yml`), using the OPA version the README names. When you change that version, change it in both places.
-
-CI also fails when a line of Rego isn't reached by any test. To list those lines yourself:
+When you change anything under `packages/`, run these too:
 
 ```sh
-opa test . --ignore .github --coverage | jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' | sort -u
+cd packages
+pnpm install
+pnpm check
+pnpm test
+```
+
+CI runs all of these on pull requests and on pushes to `main` (`.github/workflows/test.yml`), using the OPA version the README names. When you change that version, change it in the README and in both CI jobs.
+
+CI also fails when a line of Rego, or of TypeScript under `packages/markdown/src`, isn't reached by any test. `pnpm test` checks the TypeScript. To list the Rego lines yourself:
+
+```sh
+opa test . --ignore .github --ignore packages --coverage | jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' | sort -u
 ```
 
 ## Tests
@@ -82,6 +93,7 @@ The first line names the part of the repo that changed, then says what the chang
 - `docs:` `README.md`, `REFERENCE.md` and `AGENTS.md`
 - `site:` the website in `site/`
 - `ci:` workflows and Dependabot
+- `markdown:` the Markdown compiler in `packages/markdown`, its examples and its README
 
 For example, `core: fail compare when either side is missing`.
 
