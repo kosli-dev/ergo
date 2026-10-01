@@ -26,6 +26,18 @@ requirements := {
 report := ergo.report(input, requirements)
 ```
 
+A policy is plain data, so it can also live in a YAML or JSON file that OPA loads. A file in the policy directory with a top-level `requirements` key is read as `data.requirements`:
+
+```yaml
+requirements:
+  approved_deploy: { ... }
+  signed_commits: { ... }
+```
+
+```rego
+report := ergo.report(input, data.requirements)
+```
+
 Because each name is an object key, two requirements can't share a name, and every row in the report points back to exactly one requirement.
 
 A policy with no requirements is never compliant: it doesn't check anything, so it can't vouch for anything either.

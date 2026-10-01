@@ -57,6 +57,46 @@ And finally we define the actual checks for this policy:
 
 - `checks` are the rules each subject must pass. Here, `approved_by` must be a non-empty string.
 
+#### Or write the requirements in YAML
+
+Requirements are plain data, so you can keep them in a YAML file instead. OPA reads every YAML and JSON file in the directory you pass with `-d`, so this file becomes `data.requirements`.
+
+`policy/requirements.yaml`:
+
+```yaml
+requirements:
+  prod_deploy:
+    subject_type: deployment
+    from: [deployments]
+    id: [id]
+    applies_to:
+      is_prod:
+        op: equals
+        path: [environment]
+        value: prod
+    checks:
+      approved:
+        description: Someone approved the deployment
+        op: non_empty_string
+        path: [approved_by]
+```
+
+The Rego file then only has to hand them to ergo:
+
+`policy/deploy.rego`:
+
+```rego
+package deploy
+
+import data.ergo
+
+report := ergo.report(input, data.requirements)
+
+violations := ergo.violations(report)
+```
+
+The report and the violations below come out the same either way.
+
 ### 3. Get the report
 
 With the following `deployments.json` input:
