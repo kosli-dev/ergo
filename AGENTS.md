@@ -91,6 +91,6 @@ One area per commit. A `core:` change that updates `REFERENCE.md` with it stays 
 
 When a `core:` change alters the report for an existing policy, say so in the body, on a line starting with `Changes the report:`.
 
-Add a body when the reason isn't obvious from the first line. PR titles follow the same rules, because they become the commit on `main`.
+Add a body when the reason isn't obvious from the first line. PR titles follow the same rules, because they become the commit on `main`. Issue titles do too, so an issue reads like the change that will fix it.
 
 CI checks every PR title against the areas listed above, so a new area only needs adding to that list.
