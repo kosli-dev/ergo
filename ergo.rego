@@ -1,6 +1,3 @@
-# Copyright 2026 Kosli, Inc
-# SPDX-License-Identifier: Apache-2.0
-
 package ergo
 
 import rego.v1
