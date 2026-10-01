@@ -1,0 +1,25 @@
+name: pr-title
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  title:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check the title follows the commit rules in AGENTS.md
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          areas=$(sed -n '/^## Commits/,/^## /p' AGENTS.md | grep -oE '^- `[a-z]+:`' | grep -oE '[a-z]+' | paste -sd'|' -)
+          if ! printf '%s\n' "$TITLE" | grep -Eq "^($areas): [a-z0-9]"; then
+            echo "This title doesn't follow the commit rules in AGENTS.md: $TITLE"
+            echo "It should start with one of: ${areas//|/, }, then a colon and a lowercase summary."
+            echo "For example: core: fail compare when either side is missing"
+            exit 1
+          fi
