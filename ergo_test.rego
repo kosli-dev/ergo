@@ -283,12 +283,35 @@ test_in_fails_closed_without_values if verdict({"id": "MIT"}, {"op": "in", "path
 
 test_in_fails_closed_on_null_values if verdict({"id": "MIT"}, {"op": "in", "path": ["id"], "values": null}) == false
 
-test_in_fails_closed_when_values_is_not_a_list if {
+test_in_fails_closed_when_values_is_not_a_list_or_set if {
 	verdict({"id": "MIT"}, {"op": "in", "path": ["id"], "values": "MIT"}) == false
 	verdict({"id": "MIT"}, {"op": "in", "path": ["id"], "values": {"licence": "MIT"}}) == false
 }
 
 test_in_fails_closed_on_empty_values if verdict({"id": "MIT"}, {"op": "in", "path": ["id"], "values": []}) == false
+
+test_in_fails_closed_on_an_empty_set if verdict({"id": "MIT"}, {"op": "in", "path": ["id"], "values": set()}) == false
+
+test_in_accepts_a_set_of_values if {
+	check := {"op": "in", "path": ["id"], "values": {"MIT", "Apache-2.0"}}
+	verdict({"id": "MIT"}, check) == true
+	verdict({"id": "GPL-3.0"}, check) == false
+}
+
+licences_allowed := {"op": "all", "path": ["licences"], "check": allowed_licence}
+
+test_in_checks_every_item_of_a_list if {
+	verdict({"licences": [{"id": "MIT"}, {"id": "Apache-2.0"}]}, licences_allowed) == true
+	verdict({"licences": [{"id": "MIT"}, {"id": "GPL-3.0"}]}, licences_allowed) == false
+}
+
+test_in_inside_all_shows_every_item_in_inputs if {
+	inputs_of({"licences": [{"id": "MIT"}, {"id": "GPL-3.0"}]}, licences_allowed) == [{"name": "licences[].id", "value": ["MIT", "GPL-3.0"]}]
+}
+
+test_expression_for_in_inside_all if {
+	rendered({"licences": []}, licences_allowed) == "every licences: id in [Apache-2.0, MIT]"
+}
 
 test_in_shows_the_field_value_in_inputs if {
 	inputs_of({"id": "GPL-3.0"}, allowed_licence) == [{"name": "id", "value": "GPL-3.0"}]
@@ -1155,6 +1178,17 @@ test_expression_for_excludes if rendered({"labels": []}, no_wip) == "not contain
 test_expression_for_includes if rendered({"labels": []}, has_approved) == "contains(labels, approved)"
 
 test_expression_for_in_sorts_the_values if rendered({"id": "MIT"}, allowed_licence) == "id in [Apache-2.0, MIT]"
+
+test_expression_for_in_sorts_a_set_of_values if {
+	rendered({"id": "MIT"}, {"op": "in", "path": ["id"], "values": {"MIT", "Apache-2.0"}}) == "id in [Apache-2.0, MIT]"
+}
+
+test_expression_for_in_does_not_list_values_it_will_not_match if {
+	rendered({"id": "MIT"}, {"op": "in", "path": ["id"], "values": {"licence": "MIT"}}) == "id in <invalid values>"
+	rendered({"id": "MIT"}, {"op": "in", "path": ["id"], "values": "MIT"}) == "id in <invalid values>"
+	rendered({"id": "MIT"}, {"op": "in", "path": ["id"], "values": null}) == "id in <invalid values>"
+	rendered({"id": "MIT"}, {"op": "in", "path": ["id"]}) == "id in <invalid values>"
+}
 
 test_expression_for_equals if rendered({}, is_merged) == "state == MERGED"
 

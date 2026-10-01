@@ -130,7 +130,7 @@ leaf_passed(check, subj) if {
 	check.op == "in"
 	v := value_at(subj, check.path)
 	v != null
-	is_array(check.values)
+	value_list(check.values)
 	some want in check.values
 	want == v
 }
@@ -196,6 +196,10 @@ leaf_passed(check, subj) if {
 	is_number(r)
 	cmp(check.cmp, l, r)
 }
+
+value_list(v) if is_array(v)
+
+value_list(v) if is_set(v)
 
 comparable(l, r) if {
 	l != null
@@ -435,7 +439,15 @@ leaf_describe(check) := sprintf("not contains(%s, %v)", [path_name(check.path), 
 
 leaf_describe(check) := sprintf("contains(%s, %v)", [path_name(check.path), check.value]) if check.op == "includes"
 
-leaf_describe(check) := sprintf("%s in [%s]", [path_name(check.path), concat(", ", sort([sprintf("%v", [v]) | some v in check.values]))]) if check.op == "in"
+leaf_describe(check) := sprintf("%s in [%s]", [path_name(check.path), concat(", ", sort([sprintf("%v", [v]) | some v in check.values]))]) if {
+	check.op == "in"
+	value_list(check.values)
+}
+
+leaf_describe(check) := sprintf("%s in <invalid values>", [path_name(check.path)]) if {
+	check.op == "in"
+	not value_list(object.get(check, "values", null))
+}
 
 leaf_describe(check) := sprintf("%s == %v", [path_name(check.path), check.value]) if check.op == "equals"
 
