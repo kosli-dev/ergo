@@ -5,6 +5,7 @@ This page describes everything ergo accepts and everything it returns. If you ha
 - [Policies](#policies)
 - [Requirements](#requirements)
 - [Paths](#paths)
+- [Reading from the input](#reading-from-the-input)
 - [Operators](#operators)
 - [Substitutes](#substitutes)
 - [Custom operators](#custom-operators)
@@ -106,6 +107,59 @@ This reads the `state` of the attestation whose `type` is `pull_request`, and it
 
 A selector must match exactly one item. If it matches none, or more than one, the check fails, and the row's cause says which (`unmatched` or `ambiguous`). An empty `where` matches nothing. A path can contain only one selector.
 
+## Reading from the input
+
+A path normally starts inside the subject. A path that starts with `$$input` starts at the top of the document given to `ergo.report` instead:
+
+```rego
+"path": ["$$input", "settings", "mode"]
+```
+
+Every subject reads the same value. `$$input` only means this as the first step of a path, and any other first step starting with `$$` is reserved: it fails the check with cause `absent`. To read a key that really is called `$$input`, write it as `{"literal": "$$input"}`.
+
+A check's fixed values can be read from the input too. Write `{"ref": path}` in place of the value, where the path starts with `$$input`. This works for `value`, `values`, `patterns`, `min`, `max` and the values in a selector's `where`. It's how a policy takes params: put them in the document beside the evidence, and read them from there.
+
+```rego
+ergo.report({"params": params, "packages": packages}, {"licences": {
+	"subject_type": "package",
+	"from": ["packages"],
+	"id": ["name"],
+	"checks": {"approved": {
+		"op": "any",
+		"path": ["licences"],
+		"check": {"op": "in", "path": [], "values": {"ref": ["$$input", "params", "allowed_licences"]}},
+	}},
+}})
+```
+
+With `allowed_licences` set to `["MIT", "Apache-2.0"]`, a package licensed `GPL-3.0` gives this violation:
+
+```json
+{
+  "requirement": "licences",
+  "subject": { "type": "package", "id": "gpl-lib" },
+  "check": "approved",
+  "description": "",
+  "expression": "some licences: licences[] in $$input.params.allowed_licences",
+  "inputs": [
+    { "name": "licences[]", "value": ["GPL-3.0"] },
+    { "name": "$$input.params.allowed_licences", "value": ["MIT", "Apache-2.0"] }
+  ],
+  "cause": "value"
+}
+```
+
+The expression says where the value comes from. What it was goes in the check's definition in the report, under `$refs`, once for the whole report and sorted by name, beside the literals the check compares against. The rows' `inputs` only hold what the check reads, like `licences[]` here, and `violations` adds the `$refs` back to each violation's `inputs`, as above. That keeps a record of what was compared, even when the params change between runs, without copying it into every row. A path that starts with `$$input` is something the check reads, so its value stays in the row.
+
+Some things worth knowing:
+
+- A ref that leads nowhere, or to `null`, fails the check, with cause `absent` or `null`. That cause wins over anything the subject's own fields would give, because the check can't mean anything without the value. ergo has no defaults, so put a default in the policy or the params.
+- A ref must be a list that starts with `$$input`, and it can't contain a selector. Anything else fails the check with cause `absent`, and the expression and `inputs` show `<invalid ref>`.
+- An object with a `ref` or `literal` key and any other key is a mistake, not a value, so it fails the check the same way. Otherwise a typo like `{"ref": [...], "note": "..."}` would be compared as an object, and `excludes` would pass.
+- A value that is an object with a single `ref` or `literal` key would be read as one. Wrap it in `{"literal": ...}` to take it as written. Nothing inside a `literal` is read, so `{"literal": {"literal": 1}}` is the object `{"literal": 1}`.
+- `from` already starts at the top of the input, so it doesn't take `$$input`. `"from": ["$$input", "packages"]` looks for a key called `$$input`, finds no subjects, and fails `$min_subjects`.
+- Some tools treat `$$` as an escape for `$`, like docker-compose and Make. A policy that passes through one of them reaches ergo as `$input`, which is read as an ordinary key.
+
 ## Operators
 
 Every check has an `op` and the parameters that operator needs.
@@ -133,6 +187,7 @@ These read one or two fields of a subject.
 Some things worth knowing:
 
 - `equals` with `"value": null` only passes when the field is there and set to `null`. A missing field doesn't count.
+- `range` needs `min` and `max` to be numbers. A string like `"3"` fails the check, because Rego puts every number before every string, so `5 <= "3"` would be true.
 - `in` fails when the field is missing or `null`, even if `values` contains `null`. To check that a field is `null`, use `equals` with `"value": null`. `values` can be a list or, from Rego, a set. `in` also fails when `values` is empty, missing, or not a list or set. In those last two cases, the expression shows `id in <invalid values>` rather than a list.
 - `compare` and `compare_time` compare two fields of the same subject. To compare a field with a fixed number, use `range`.
 - `compare_time` never converts between formats, so a number against a string fails. With numbers, ergo can't tell seconds from milliseconds, so make sure both sides use the same unit.
@@ -252,12 +307,31 @@ Then use it like any other operator. ergo can't work out what your operator read
 
 Each entry in `inputs` is a path, or `{"path": [...], "each": [...]}` to read one field from every item of a list. The row shows those values, and its cause is worked out from them.
 
+If your operator takes its own parameters, read each one with `arg`, so a policy can pass it a [`ref`](#reading-from-the-input) or a `literal`. `arg` gives back the value to use, and is undefined when a ref can't be read, so the check fails:
+
+```rego
+op_passed(check, subj) if {
+	check.op == "multiple_of"
+	n := value_at(subj, check.path)
+	by := arg(check.by)
+	is_number(n)
+	is_number(by)
+	n % by == 0
+}
+```
+
+```rego
+"even_batches": {"op": "multiple_of", "path": ["n"], "by": {"ref": ["$$input", "params", "batch"]}, "expression": "n is a multiple of the batch size", "inputs": [["n"]]}
+```
+
+ergo finds the refs in your check by itself, so they appear under `$refs` and decide the cause when they can't be read, as for built-in operators.
+
 A custom operator works in `checks`, in `applies_to`, and on either side of a substitute. It doesn't work as the inner check of `all` or `any`, or inside an `any_of` option: there, it fails.
 
 Two rules:
 
 - **Fail when you can't read the data.** Check that fields are there and have the right type before you compare them. A rule that doesn't hold fails the check, which is what you want. Be careful with `not`, which turns an error into a pass.
-- **Only call ergo's lower-level rules**, like `value_at` and `leaf_passed`. Calling `op_passed`, `check_passed` or `report` from your operator creates a loop, which Rego rejects, and the errors will point at `ergo.rego` rather than your file.
+- **Only call ergo's lower-level rules**, like `value_at`, `arg` and `leaf_passed`. Calling `op_passed`, `check_passed` or `report` from your operator creates a loop, which Rego rejects, and the errors will point at `ergo.rego` rather than your file.
 
 ## The report
 
@@ -303,7 +377,7 @@ Two rules:
 }
 ```
 
-`subjects.total` counts every subject found at `from`, and `subjects.matching` counts the ones left after `applies_to`. `checks` holds each check as you wrote it, plus the `expression` ergo rendered from it. If you write your own `expression`, yours is used. It also holds the [checks ergo adds](#checks-ergo-adds), each with a `description` and an `expression`.
+`subjects.total` counts every subject found at `from`, and `subjects.matching` counts the ones left after `applies_to`. `checks` holds each check as you wrote it, plus the `expression` ergo rendered from it. If you write your own `expression`, yours is used. A check that uses a [`ref`](#reading-from-the-input) also gets `$refs`: the name and value of each one, as read for this report. The `$` marks it as ergo's, so it can't be mixed up with a field of your own. It also holds the [checks ergo adds](#checks-ergo-adds), each with a `description` and an `expression`.
 
 `results` has one row for each subject and check:
 
@@ -374,7 +448,7 @@ When a check reads several fields, the row shows the first cause in this table's
 
 ## Violations
 
-`ergo.violations(report)` returns the rows that are real problems, each with its check's `description` and `expression` added:
+`ergo.violations(report)` returns the rows that are real problems, each with its check's `description` and `expression` added, and its `$refs` added to the end of `inputs`:
 
 ```json
 [
@@ -411,5 +485,6 @@ ergo fails a check whenever it can't be sure, instead of letting it pass. Rego d
 - `all`, `any` and `each` need non-empty lists.
 - `min_subjects` is 1 unless you say otherwise, so finding nothing fails.
 - A subject whose `applies_to` filter can't be read fails the requirement instead of being left out.
+- A `ref` that can't be read fails the check, even for operators like `excludes` or `not_matches_any` that would pass on an empty value.
 - A policy with no requirements, and a requirement with no checks, are never met.
 - A malformed timestamp fails `compare_time` rather than stopping the whole evaluation with an error.

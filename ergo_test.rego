@@ -2400,3 +2400,344 @@ test_a_failing_custom_op_filter_that_declares_no_reads_rules_a_subject_out if {
 	rep.requirements.s.satisfied == true
 	rows_for(rep, "s", "$applies")[0].cause == "value"
 }
+
+in_doc(top, subj, check) := ergo.report(object.union(top, {"items": [subj]}), {"s": {
+	"subject_type": "thing",
+	"from": ["items"],
+	"id": ["id"],
+	"checks": {"c": check},
+}})
+
+row_in(top, subj, check) := r if {
+	some r in in_doc(top, subj, check).results
+	r.check == "c"
+}
+
+expression_in(top, subj, check) := in_doc(top, subj, check).requirements.s.checks.c.expression
+
+refs_in(top, subj, check) := object.get(in_doc(top, subj, check).requirements.s.checks.c, "$refs", [])
+
+violation_in(top, subj, check) := v if {
+	some v in ergo.violations(in_doc(top, subj, check))
+	v.check == "c"
+}
+
+test_an_input_path_reads_from_the_top_of_the_document if {
+	r := row_in({"mode": "strict"}, {"id": 1}, {"op": "equals", "path": ["$$input", "mode"], "value": "strict"})
+	[r.passed, r.cause, r.inputs] == [true, "satisfied", [{"name": "$$input.mode", "value": "strict"}]]
+}
+
+test_an_input_path_fails_closed_when_it_leads_nowhere if {
+	check := {"op": "equals", "path": ["$$input", "mode"], "value": "strict"}
+	[row_in({}, {"id": 1}, check).passed, row_in({}, {"id": 1}, check).cause] == [false, "absent"]
+	[row_in({"mode": null}, {"id": 1}, check).passed, row_in({"mode": null}, {"id": 1}, check).cause] == [false, "null"]
+}
+
+test_an_input_path_can_use_a_selector if {
+	check := {"op": "equals", "path": ["$$input", "teams", {"where": {"name": "core"}}, "lead"], "value": "ann"}
+	row_in({"teams": [{"name": "core", "lead": "ann"}]}, {"id": 1}, check).passed == true
+	row_in({"teams": [{"name": "web", "lead": "bo"}]}, {"id": 1}, check).cause == "unmatched"
+}
+
+test_an_input_path_reads_from_the_top_inside_all if {
+	check := {"op": "all", "path": ["xs"], "check": {"op": "equals", "path": ["$$input", "mode"], "value": "strict"}}
+	row_in({"mode": "strict"}, {"id": 1, "xs": [1, 2]}, check).passed == true
+	row_in({"mode": "loose"}, {"id": 1, "xs": [1, 2]}, check).passed == false
+}
+
+test_an_input_path_reads_from_the_top_for_a_subject_that_is_not_an_object if {
+	r := row_in({"mode": "strict"}, "a", {"op": "equals", "path": ["$$input", "mode"], "value": "strict"})
+	[r.passed, r.cause] == [true, "satisfied"]
+}
+
+test_an_unknown_built_in_name_fails_closed if {
+	r := row_in({"mode": "strict"}, {"id": 1}, {"op": "equals", "path": ["$$inptu", "mode"], "value": "strict"})
+	[r.passed, r.cause] == [false, "absent"]
+}
+
+test_input_is_only_a_name_at_the_start_of_a_path if {
+	row_in({}, {"id": 1, "a": {"$$input": "x"}}, {"op": "equals", "path": ["a", "$$input"], "value": "x"}).passed == true
+}
+
+test_a_literal_path_step_reads_a_key_that_looks_like_a_name if {
+	r := row_in({"$$input": "top"}, {"id": 1, "$$input": "x"}, {"op": "equals", "path": [{"literal": "$$input"}], "value": "x"})
+	[r.passed, r.inputs] == [true, [{"name": "$$input", "value": "x"}]]
+}
+
+licence_params := {"params": {"allowed": ["MIT", "Apache-2.0"]}}
+
+allowed_ref := {"ref": ["$$input", "params", "allowed"]}
+
+licence_in_allowed := {"op": "in", "path": ["licence"], "values": allowed_ref}
+
+test_a_ref_reads_the_values_of_in if {
+	row_in(licence_params, {"id": 1, "licence": "MIT"}, licence_in_allowed).passed == true
+	r := row_in(licence_params, {"id": 1, "licence": "GPL-3.0"}, licence_in_allowed)
+	[r.passed, r.cause] == [false, "value"]
+}
+
+test_a_ref_reads_the_value_of_equals if {
+	check := {"op": "equals", "path": ["branch"], "value": {"ref": ["$$input", "params", "branch"]}}
+	row_in({"params": {"branch": "main"}}, {"id": 1, "branch": "main"}, check).passed == true
+	row_in({"params": {"branch": "main"}}, {"id": 1, "branch": "dev"}, check).passed == false
+}
+
+test_a_ref_reads_the_value_of_includes_and_excludes if {
+	top := {"params": {"label": "approved"}}
+	label := {"ref": ["$$input", "params", "label"]}
+	row_in(top, {"id": 1, "labels": ["approved"]}, {"op": "includes", "path": ["labels"], "value": label}).passed == true
+	row_in(top, {"id": 1, "labels": ["approved"]}, {"op": "excludes", "path": ["labels"], "value": label}).passed == false
+}
+
+test_a_ref_reads_the_patterns if {
+	top := {"params": {"bots": ["\\[bot\\]$"]}}
+	bots := {"ref": ["$$input", "params", "bots"]}
+	row_in(top, {"id": 1, "author": "dependabot[bot]"}, {"op": "matches_any", "path": ["author"], "patterns": bots}).passed == true
+	row_in(top, {"id": 1, "author": "dependabot[bot]"}, {"op": "not_matches_any", "path": ["author"], "patterns": bots}).passed == false
+}
+
+test_a_ref_reads_min_and_max if {
+	top := {"params": {"lo": 1, "hi": 3}}
+	check := {"op": "range", "path": ["n"], "min": {"ref": ["$$input", "params", "lo"]}, "max": {"ref": ["$$input", "params", "hi"]}}
+	row_in(top, {"id": 1, "n": 2}, check).passed == true
+	row_in(top, {"id": 1, "n": 4}, check).passed == false
+}
+
+test_a_ref_reads_a_selector_value if {
+	check := {"op": "equals", "path": ["atts", {"where": {"type": {"ref": ["$$input", "params", "kind"]}}}, "state"], "value": "done"}
+	row_in({"params": {"kind": "scan"}}, {"id": 1, "atts": [{"type": "pr", "state": "open"}, {"type": "scan", "state": "done"}]}, check).passed == true
+}
+
+missing_ref := {"ref": ["$$input", "params", "missing"]}
+
+test_a_missing_ref_fails_every_op_closed if {
+	subj := {"id": 1, "v": "x", "n": 2, "labels": ["x"]}
+	checks := [
+		{"op": "equals", "path": ["v"], "value": missing_ref},
+		{"op": "in", "path": ["v"], "values": missing_ref},
+		{"op": "includes", "path": ["labels"], "value": missing_ref},
+		{"op": "excludes", "path": ["labels"], "value": missing_ref},
+		{"op": "matches_any", "path": ["v"], "patterns": missing_ref},
+		{"op": "not_matches_any", "path": ["v"], "patterns": missing_ref},
+		{"op": "range", "path": ["n"], "min": missing_ref, "max": 3},
+		{"op": "range", "path": ["n"], "min": 1, "max": missing_ref},
+		{"op": "equals", "path": ["labels", {"where": {"k": missing_ref}}], "value": "x"},
+	]
+	[[r.passed, r.cause] | some check in checks; r := row_in({}, subj, check)] == [[false, "absent"] | some _ in checks]
+}
+
+test_a_ref_cannot_use_a_selector if {
+	check := {"op": "equals", "path": ["v"], "value": {"ref": ["$$input", "params", {"where": {"k": "a"}}, "v"]}}
+	r := row_in({"params": [{"k": "a", "v": "x"}]}, {"id": 1, "v": "x"}, check)
+	[r.passed, r.cause] == [false, "absent"]
+}
+
+test_a_null_ref_fails_closed_with_cause_null if {
+	check := {"op": "equals", "path": ["v"], "value": {"ref": ["$$input", "params", "v"]}}
+	r := row_in({"params": {"v": null}}, {"id": 1, "v": null}, check)
+	[r.passed, r.cause] == [false, "null"]
+}
+
+test_a_ref_must_start_with_input if {
+	r := row_in({}, {"id": 1, "licence": "MIT"}, {"op": "equals", "path": ["licence"], "value": {"ref": ["licence"]}})
+	[r.passed, r.cause] == [false, "absent"]
+}
+
+test_a_ref_value_is_recorded_once_in_the_check_definition if {
+	subj := {"id": 1, "licence": "GPL-3.0"}
+	row_in(licence_params, subj, licence_in_allowed).inputs == [{"name": "licence", "value": "GPL-3.0"}]
+	refs_in(licence_params, subj, licence_in_allowed) == [{"name": "$$input.params.allowed", "value": ["MIT", "Apache-2.0"]}]
+}
+
+test_a_violation_shows_the_ref_values_beside_what_the_check_read if {
+	violation_in(licence_params, {"id": 1, "licence": "GPL-3.0"}, licence_in_allowed).inputs == [
+		{"name": "licence", "value": "GPL-3.0"},
+		{"name": "$$input.params.allowed", "value": ["MIT", "Apache-2.0"]},
+	]
+}
+
+test_a_check_without_refs_has_no_refs_in_its_definition if {
+	not "$refs" in object.keys(in_doc({}, {"id": 1}, {"op": "present", "path": ["id"]}).requirements.s.checks.c)
+}
+
+test_a_missing_ref_is_recorded_as_null if {
+	refs_in({}, {"id": 1, "licence": "MIT"}, licence_in_allowed) == [{"name": "$$input.params.allowed", "value": null}]
+	violation_in({}, {"id": 1, "licence": "MIT"}, licence_in_allowed).inputs == [
+		{"name": "licence", "value": "MIT"},
+		{"name": "$$input.params.allowed", "value": null},
+	]
+}
+
+test_a_ref_shows_its_path_in_the_expression if {
+	expression_in({}, {"id": 1}, licence_in_allowed) == "licence in $$input.params.allowed"
+	expression_in({}, {"id": 1}, {"op": "equals", "path": ["v"], "value": missing_ref}) == "v == $$input.params.missing"
+	expression_in({}, {"id": 1}, {"op": "includes", "path": ["l"], "value": missing_ref}) == "contains(l, $$input.params.missing)"
+	expression_in({}, {"id": 1}, {"op": "excludes", "path": ["l"], "value": missing_ref}) == "not contains(l, $$input.params.missing)"
+	expression_in({}, {"id": 1}, {"op": "matches_any", "path": ["a"], "patterns": missing_ref}) == "a matches one of $$input.params.missing"
+	expression_in({}, {"id": 1}, {"op": "not_matches_any", "path": ["a"], "patterns": missing_ref}) == "a matches none of $$input.params.missing"
+	expression_in({}, {"id": 1}, {"op": "range", "path": ["n"], "min": missing_ref, "max": 3}) == "n >= $$input.params.missing and n <= 3"
+	expression_in({}, {"id": 1}, {"op": "present", "path": ["atts", {"where": {"type": missing_ref}}]}) == "atts.[type==$$input.params.missing] is present"
+}
+
+any_allowed_licence := {"op": "any", "path": ["licences"], "check": {"op": "in", "path": [], "values": allowed_ref}}
+
+test_a_ref_inside_any_is_read_once_and_shown_once if {
+	r := row_in(licence_params, {"id": 1, "licences": ["GPL-3.0"]}, any_allowed_licence)
+	[r.passed, r.cause] == [false, "value"]
+	r.inputs == [{"name": "licences[]", "value": ["GPL-3.0"]}]
+	refs_in(licence_params, {"id": 1}, any_allowed_licence) == [{"name": "$$input.params.allowed", "value": ["MIT", "Apache-2.0"]}]
+	expression_in(licence_params, {"id": 1}, any_allowed_licence) == "some licences: licences[] in $$input.params.allowed"
+	row_in(licence_params, {"id": 1, "licences": ["GPL-3.0", "MIT"]}, any_allowed_licence).passed == true
+}
+
+test_a_missing_ref_inside_any_fails_with_its_own_cause if {
+	r := row_in({}, {"id": 1, "licences": ["MIT"]}, any_allowed_licence)
+	[r.passed, r.cause] == [false, "absent"]
+}
+
+test_a_ref_inside_any_of_is_read if {
+	check := {"op": "any_of", "options": {"allowed": [licence_in_allowed]}}
+	r := row_in(licence_params, {"id": 1, "licence": "MIT"}, check)
+	[r.passed, r.inputs] == [true, [{"name": "licence", "value": "MIT"}]]
+	refs_in(licence_params, {"id": 1}, check) == [{"name": "$$input.params.allowed", "value": ["MIT", "Apache-2.0"]}]
+	row_in({}, {"id": 1, "licence": "MIT"}, check).cause == "absent"
+}
+
+test_a_ref_in_a_check_and_its_substitute_is_shown_once if {
+	check := object.union(licence_in_allowed, {"substitute": {"op": "in", "path": ["fallback"], "values": allowed_ref}})
+	r := row_in(licence_params, {"id": 1, "licence": "GPL-3.0", "fallback": "MIT"}, check)
+	[r.passed, r.cause] == [true, "substituted"]
+	r.inputs == [{"name": "licence", "value": "GPL-3.0"}, {"name": "fallback", "value": "MIT"}]
+	refs_in(licence_params, {"id": 1}, check) == [{"name": "$$input.params.allowed", "value": ["MIT", "Apache-2.0"]}]
+}
+
+test_ref_inputs_are_sorted_by_name if {
+	check := {"op": "range", "path": ["n"], "min": {"ref": ["$$input", "params", "lo"]}, "max": {"ref": ["$$input", "params", "hi"]}}
+	[i.name | some i in refs_in({"params": {"lo": 1, "hi": 3}}, {"id": 1, "n": 2}, check)] == ["$$input.params.hi", "$$input.params.lo"]
+}
+
+test_a_ref_in_an_applies_to_filter_is_read_and_shown if {
+	req := {"s": {
+		"from": ["items"],
+		"id": ["id"],
+		"min_subjects": 0,
+		"applies_to": {"kind": {"op": "equals", "path": ["kind"], "value": {"ref": ["$$input", "params", "kind"]}}},
+		"checks": {"c": {"op": "present", "path": ["id"]}},
+	}}
+	rep := ergo.report({"params": {"kind": "lib"}, "items": [{"id": 1, "kind": "lib"}, {"id": 2, "kind": "app"}]}, req)
+	[[r.subject.id, r.passed, r.cause, r.inputs] | some r in rows_for(rep, "s", "$applies")] == [
+		[1, true, "satisfied", [{"name": "kind", "value": "lib"}]],
+		[2, false, "value", [{"name": "kind", "value": "app"}]],
+	]
+	rep.requirements.s.checks["$applies"]["$refs"] == [{"name": "$$input.params.kind", "value": "lib"}]
+	unreadable := ergo.report({"items": [{"id": 1, "kind": "lib"}]}, req)
+	unreadable.requirements.s.satisfied == false
+	[r.cause | some r in rows_for(unreadable, "s", "$applies")] == ["absent"]
+	[v.inputs | some v in ergo.violations(unreadable); v.check == "$applies"] == [[{"name": "kind", "value": "lib"}, {"name": "$$input.params.kind", "value": null}]]
+}
+
+test_a_literal_value_is_taken_as_written if {
+	check := {"op": "equals", "path": ["config"], "value": {"literal": {"ref": ["main"]}}}
+	r := row_in({}, {"id": 1, "config": {"ref": ["main"]}}, check)
+	[r.passed, r.inputs] == [true, [{"name": "config", "value": {"ref": ["main"]}}]]
+}
+
+test_a_literal_can_hold_a_literal if {
+	check := {"op": "equals", "path": ["config"], "value": {"literal": {"literal": {"ref": ["main"]}}}}
+	row_in({}, {"id": 1, "config": {"literal": {"ref": ["main"]}}}, check).passed == true
+}
+
+test_a_literal_works_wherever_a_value_goes if {
+	row_in({}, {"id": 1, "licence": "MIT"}, {"op": "in", "path": ["licence"], "values": {"literal": ["MIT"]}}).passed == true
+	expression_in({}, {"id": 1}, {"op": "in", "path": ["licence"], "values": {"literal": ["MIT"]}}) == "licence in [MIT]"
+	expression_in({}, {"id": 1}, {"op": "equals", "path": ["c"], "value": {"literal": "x"}}) == "c == x"
+}
+
+test_a_readable_ref_leaves_the_cause_to_the_subject if {
+	row_in(licence_params, {"id": 1, "licence": null}, licence_in_allowed).cause == "null"
+}
+
+test_range_fails_closed_on_bounds_that_are_not_numbers if {
+	row_in({}, {"id": 1, "n": 5}, {"op": "range", "path": ["n"], "min": 1, "max": "3"}).passed == false
+	row_in({}, {"id": 1, "n": 5}, {"op": "range", "path": ["n"], "min": "1", "max": 10}).passed == false
+	row_in({"params": {"hi": "3"}}, {"id": 1, "n": 5}, {"op": "range", "path": ["n"], "min": 1, "max": {"ref": ["$$input", "params", "hi"]}}).passed == false
+}
+
+test_an_object_with_ref_and_another_key_fails_closed if {
+	check := {"op": "excludes", "path": ["labels"], "value": {"ref": ["$$input", "params", "label"], "note": "x"}}
+	r := row_in({"params": {"label": "wip"}}, {"id": 1, "labels": ["ready"]}, check)
+	[r.passed, r.cause] == [false, "absent"]
+	r.inputs == [{"name": "labels", "value": ["ready"]}]
+	refs_in({}, {"id": 1}, check) == [{"name": "<invalid ref>", "value": null}]
+	expression_in({}, {"id": 1}, check) == "not contains(labels, <invalid ref>)"
+}
+
+test_an_object_with_literal_and_another_key_fails_closed if {
+	check := {"op": "excludes", "path": ["labels"], "value": {"literal": "wip", "note": "x"}}
+	r := row_in({}, {"id": 1, "labels": ["ready"]}, check)
+	[r.passed, r.cause] == [false, "absent"]
+}
+
+test_a_malformed_ref_in_patterns_or_values_reads_as_invalid if {
+	bad := {"ref": ["$$input", "p"], "x": 1}
+	expression_in({}, {"id": 1}, {"op": "not_matches_any", "path": ["a"], "patterns": bad}) == "a matches none of <invalid ref>"
+	expression_in({}, {"id": 1}, {"op": "in", "path": ["a"], "values": bad}) == "a in <invalid ref>"
+	row_in({}, {"id": 1, "a": "x"}, {"op": "not_matches_any", "path": ["a"], "patterns": bad}).passed == false
+}
+
+test_a_ref_that_is_not_a_path_from_input_reads_as_invalid if {
+	string_ref := {"op": "equals", "path": ["b"], "value": {"ref": "params"}}
+	expression_in({}, {"id": 1}, string_ref) == "b == <invalid ref>"
+	refs_in({}, {"id": 1, "b": "x"}, string_ref) == [{"name": "<invalid ref>", "value": null}]
+	expression_in({}, {"id": 1}, {"op": "equals", "path": ["b"], "value": {"ref": ["licence"]}}) == "b == <invalid ref>"
+}
+
+test_an_input_path_inside_all_is_shown_once_under_its_own_name if {
+	check := {"op": "all", "path": ["xs"], "check": {"op": "equals", "path": ["$$input", "mode"], "value": "strict"}}
+	row_in({"mode": "strict"}, {"id": 1, "xs": [1, 2]}, check).inputs == [{"name": "$$input.mode", "value": "strict"}]
+}
+
+test_a_check_field_called_refs_is_the_users_own if {
+	check := {"op": "even", "path": ["n"], "refs": "my-param", "expression": "n is even"}
+	in_doc({}, {"id": 1, "n": 3}, check).requirements.s.checks.c.refs == "my-param"
+	violation_in({}, {"id": 1, "n": 3}, check).inputs == [{"name": "n", "value": 3}]
+}
+
+test_a_check_field_called_dollar_refs_cannot_drop_a_violation if {
+	check := {"op": "even", "path": ["n"], "$refs": "my-param", "expression": "n is even"}
+	violation_in({}, {"id": 1, "n": 3}, check).inputs == [{"name": "n", "value": 3}]
+}
+
+test_a_custom_op_reads_a_ref_with_arg if {
+	check := {"op": "multiple_of", "path": ["n"], "by": {"ref": ["$$input", "params", "m"]}, "expression": "n is a multiple"}
+	row_in({"params": {"m": 2}}, {"id": 1, "n": 4}, check).passed == true
+	row_in({"params": {"m": 3}}, {"id": 1, "n": 4}, check).passed == false
+	r := row_in({}, {"id": 1, "n": 4}, check)
+	[r.passed, r.cause] == [false, "absent"]
+	refs_in({"params": {"m": 2}}, {"id": 1, "n": 4}, check) == [{"name": "$$input.params.m", "value": 2}]
+}
+
+test_a_path_written_as_a_string_reads_that_one_key if {
+	row_in({}, {"id": 1}, {"op": "present", "path": "state"}).passed == false
+	row_in({}, {"id": 1}, {"op": "present", "path": "state"}).cause == "absent"
+	row_in({}, {"id": 1, "state": "OPEN"}, {"op": "equals", "path": "state", "value": "OPEN"}).passed == true
+	row_in({}, {"id": 1}, {"op": "present", "path": 3}).passed == false
+}
+
+test_a_path_written_as_an_object_reads_nothing if {
+	r := row_in({}, {"id": 1, "a": 1}, {"op": "present", "path": {"a": 1}})
+	[r.passed, r.cause] == [false, "absent"]
+}
+
+test_an_id_written_as_a_string_reads_that_one_key if {
+	rep := ergo.report({"items": [{"id": 1, "name": "x"}]}, {"s": {"from": ["items"], "id": "name", "checks": {"c": {"op": "present", "path": ["id"]}}}})
+	[r.subject.id | some r in rows_for(rep, "s", "c")] == ["x"]
+}
+
+test_a_string_that_starts_with_two_dollars_is_not_a_name_when_it_is_the_whole_path if {
+	row_in({"mode": "strict"}, {"id": 1, "$$input": "own"}, {"op": "equals", "path": "$$input", "value": "own"}).passed == true
+}
+
+test_a_path_written_as_an_object_on_a_subject_that_is_not_an_object_is_not_an_object if {
+	row_in({}, "str", {"op": "present", "path": {"a": 1}}).cause == "not_an_object"
+}

@@ -68,16 +68,88 @@ field(subj, path) := v if {
 	v != absent
 }
 
-resolved(subj, path) := object.get(subj, path, absent) if not selector_index(path)
+resolved(subj, path) := read_from(start_of(subj, path), keys_of(path))
 
-resolved(subj, []) := subj
+read_from(start, keys) := object.get(start, keys, absent) if not selector_index(keys)
 
-resolved(subj, path) := v if {
-	i := selector_index(path)
-	base := object.get(subj, array.slice(path, 0, i), absent)
+read_from(start, []) := start
+
+read_from(start, keys) := v if {
+	i := selector_index(keys)
+	base := object.get(start, array.slice(keys, 0, i), absent)
 	base != absent
-	elem := selected(base, path[i])
-	v := object.get(elem, array.slice(path, i + 1, count(path)), absent)
+	elem := selected(base, keys[i])
+	v := object.get(elem, array.slice(keys, i + 1, count(keys)), absent)
+}
+
+named(path) if {
+	is_array(path)
+	startswith(path[0], "$$")
+}
+
+start_of(subj, path) := subj if not named(path)
+
+start_of(_, path) := data.ergo_document if path[0] == "$$input"
+
+keys_of(path) := [unliteral(seg) | some seg in path] if {
+	is_array(path)
+	not named(path)
+}
+
+keys_of(path) := [path] if is_string(path)
+
+keys_of(path) := [path] if is_number(path)
+
+keys_of(path) := [unliteral(seg) | some seg in array.slice(path, 1, count(path))] if named(path)
+
+unliteral(seg) := seg.literal if is_literal(seg)
+
+unliteral(seg) := seg if not is_literal(seg)
+
+is_ref(x) if {
+	is_object(x)
+	object.keys(x) == {"ref"}
+}
+
+is_literal(x) if {
+	is_object(x)
+	object.keys(x) == {"literal"}
+}
+
+arg(x) := x.literal if is_literal(x)
+
+arg(x) := v if {
+	is_ref(x)
+	v := ref_read(x.ref)
+	v != absent
+	v != null
+}
+
+arg(x) := x if {
+	not is_ref(x)
+	not is_literal(x)
+	not malformed(x)
+}
+
+ref_read(path) := object.get(start_of(null, path), keys_of(path), absent)
+
+ref_name(path) := concat(".", [sprintf("%v", [unliteral(seg)]) | some seg in path]) if named(path)
+
+ref_name(path) := "<invalid ref>" if not named(path)
+
+malformed(x) if {
+	is_object(x)
+	some k in {"ref", "literal"}
+	k in object.keys(x)
+	count(x) > 1
+}
+
+written(x) := x.literal if is_literal(x)
+
+written(x) := x if {
+	not is_ref(x)
+	not is_literal(x)
+	not malformed(x)
 }
 
 selector_index(path) := min([i | some i, seg in path; is_object(seg)])
@@ -94,7 +166,7 @@ selector_matches(v, sel) if {
 	is_object(v)
 	count(sel.where) > 0
 	every k, want in sel.where {
-		object.get(v, [k], absent) == want
+		object.get(v, [k], absent) == arg(want)
 	}
 }
 
@@ -110,7 +182,21 @@ projection_name(path, each) := sprintf("%s[].%s", [path_name(path), path_name(ea
 
 segment_name(p) := sprintf("%v", [p]) if not is_object(p)
 
-segment_name(p) := sprintf("[%s]", [concat(" and ", sort([sprintf("%v==%v", [k, v]) | some k, v in p.where]))]) if is_object(p)
+segment_name(p) := sprintf("%v", [p.literal]) if is_literal(p)
+
+segment_name(p) := sprintf("[%s]", [concat(" and ", sort([sprintf("%v==%s", [k, value_text(v)]) | some k, v in p.where]))]) if {
+	is_object(p)
+	not is_literal(p)
+}
+
+value_text(x) := ref_name(x.ref) if is_ref(x)
+
+value_text(x) := sprintf("%v", [written(x)]) if {
+	not is_ref(x)
+	not malformed(x)
+}
+
+value_text(x) := "<invalid ref>" if malformed(x)
 
 default leaf_passed(_, _) := false
 
@@ -118,36 +204,43 @@ leaf_passed(check, subj) if {
 	check.op == "range"
 	v := value_at(subj, check.path)
 	is_number(v)
-	v >= check.min
-	v <= check.max
+	lo := arg(check.min)
+	hi := arg(check.max)
+	is_number(lo)
+	is_number(hi)
+	v >= lo
+	v <= hi
 }
 
 leaf_passed(check, subj) if {
 	check.op == "excludes"
 	v := value_at(subj, check.path)
 	is_array(v)
-	not check.value in v
+	want := arg(check.value)
+	not want in v
 }
 
 leaf_passed(check, subj) if {
 	check.op == "includes"
 	v := value_at(subj, check.path)
 	is_array(v)
-	check.value in v
+	want := arg(check.value)
+	want in v
 }
 
 leaf_passed(check, subj) if {
 	check.op == "in"
 	v := value_at(subj, check.path)
 	v != null
-	value_list(check.values)
-	some want in check.values
+	vals := arg(check.values)
+	value_list(vals)
+	some want in vals
 	want == v
 }
 
 leaf_passed(check, subj) if {
 	check.op == "equals"
-	field(subj, check.path) == check.value
+	field(subj, check.path) == arg(check.value)
 }
 
 leaf_passed(check, subj) if {
@@ -166,7 +259,8 @@ leaf_passed(check, subj) if {
 	check.op == "matches_any"
 	v := value_at(subj, check.path)
 	is_string(v)
-	some pattern in check.patterns
+	patterns := arg(check.patterns)
+	some pattern in patterns
 	is_string(pattern)
 	regex.match(pattern, v)
 }
@@ -175,7 +269,8 @@ leaf_passed(check, subj) if {
 	check.op == "not_matches_any"
 	v := value_at(subj, check.path)
 	is_string(v)
-	every pattern in check.patterns {
+	patterns := arg(check.patterns)
+	every pattern in patterns {
 		is_string(pattern)
 		not regex.match(pattern, v)
 	}
@@ -351,9 +446,12 @@ input_spec_path(spec) := object.get(spec, "path", []) if is_object(spec)
 default read_state(_, _) := "absent"
 
 read_state(subj, path) := "not_an_object" if {
-	not is_object(subj)
-	path != []
+	start := start_of(subj, path)
+	not is_object(start)
+	not reads_itself(path)
 }
+
+reads_itself(path) if keys_of(path) == []
 
 read_state(subj, path) := "ambiguous" if count(selector_candidates(subj, path)) > 1
 
@@ -368,16 +466,17 @@ read_state(subj, path) := "value" if {
 }
 
 selector_candidates(subj, path) := candidates if {
-	base := base_collection(subj, path)
+	keys := keys_of(path)
+	base := base_collection(start_of(subj, path), keys)
 	candidates := [v |
 		some v in base
-		selector_matches(v, path[selector_index(path)])
+		selector_matches(v, keys[selector_index(keys)])
 	]
 }
 
-base_collection(subj, path) := base if {
-	i := selector_index(path)
-	base := object.get(subj, array.slice(path, 0, i), absent)
+base_collection(start, keys) := base if {
+	i := selector_index(keys)
+	base := object.get(start, array.slice(keys, 0, i), absent)
 	base != absent
 	is_collection(base)
 }
@@ -390,8 +489,16 @@ cause_precedence := ["not_an_object", "ambiguous", "unmatched", "absent", "null"
 
 default worst_read(_, _) := "value"
 
-worst_read(subj, paths) := cause_precedence[i] if {
-	states := {read_state(subj, p) | some p in paths}
+worst_read(subj, check) := worst_of({read_state(subj, p) | some p in read_paths(check)}) if not unreadable_ref(check)
+
+worst_read(_, check) := worst_of({ref_state(r) | some r in check_refs(check)}) if unreadable_ref(check)
+
+unreadable_ref(check) if {
+	some r in check_refs(check)
+	ref_state(r) != "value"
+}
+
+worst_of(states) := cause_precedence[i] if {
 	i := min([j |
 		some j, c in cause_precedence
 		c in states
@@ -405,7 +512,44 @@ row_cause(check, subj) := "substituted" if {
 	op_passed(substitute_of(check), subj)
 }
 
-row_cause(check, subj) := worst_read(subj, read_paths(check)) if not check_passed(check, subj)
+row_cause(check, subj) := worst_read(subj, check) if not check_passed(check, subj)
+
+check_refs(check) := {x.ref |
+	walk(check, [p, x])
+	is_ref(x)
+	not under_literal(check, p)
+} | {"<invalid ref>" |
+	walk(check, [p, x])
+	malformed(x)
+	not under_literal(check, p)
+}
+
+under_literal(check, p) if {
+	some i, seg in p
+	seg == "literal"
+	walk(check, [q, w])
+	q == array.slice(p, 0, i)
+	is_literal(w)
+}
+
+default ref_state(_) := "absent"
+
+ref_state(r) := "null" if ref_read(r) == null
+
+ref_state(r) := "value" if {
+	v := ref_read(r)
+	v != absent
+	v != null
+}
+
+default ref_shown(_) := null
+
+ref_shown(r) := v if {
+	v := ref_read(r)
+	v != absent
+}
+
+ref_inputs(check) := [{"name": pair[0], "value": pair[1]} | some pair in sort({[ref_name(r), ref_shown(r)] | some r in check_refs(check)})]
 
 verdict_cause(passed) := "satisfied" if passed
 
@@ -452,36 +596,55 @@ scope_readable(doc, req) if {
 
 default leaf_describe(_, _) := ""
 
-leaf_describe(check, item) := sprintf("%s >= %v and %s <= %v", [n, check.min, n, check.max]) if {
+leaf_describe(check, item) := sprintf("%s >= %s and %s <= %s", [n, value_text(check.min), n, value_text(check.max)]) if {
 	check.op == "range"
 	n := item_path_name(item, check.path)
 }
 
-leaf_describe(check, item) := sprintf("not contains(%s, %v)", [item_path_name(item, check.path), check.value]) if check.op == "excludes"
+leaf_describe(check, item) := sprintf("not contains(%s, %s)", [item_path_name(item, check.path), value_text(check.value)]) if check.op == "excludes"
 
-leaf_describe(check, item) := sprintf("contains(%s, %v)", [item_path_name(item, check.path), check.value]) if check.op == "includes"
+leaf_describe(check, item) := sprintf("contains(%s, %s)", [item_path_name(item, check.path), value_text(check.value)]) if check.op == "includes"
 
-leaf_describe(check, item) := sprintf("%s in [%s]", [item_path_name(item, check.path), concat(", ", sort([sprintf("%v", [v]) | some v in check.values]))]) if {
+leaf_describe(check, item) := sprintf("%s in [%s]", [item_path_name(item, check.path), concat(", ", sort([sprintf("%v", [v]) | some v in written(check.values)]))]) if {
 	check.op == "in"
-	value_list(check.values)
+	value_list(written(check.values))
+}
+
+leaf_describe(check, item) := sprintf("%s in %s", [item_path_name(item, check.path), ref_name(check.values.ref)]) if {
+	check.op == "in"
+	is_ref(check.values)
+}
+
+leaf_describe(check, item) := sprintf("%s in <invalid ref>", [item_path_name(item, check.path)]) if {
+	check.op == "in"
+	malformed(check.values)
 }
 
 leaf_describe(check, item) := sprintf("%s in <invalid values>", [item_path_name(item, check.path)]) if {
 	check.op == "in"
-	not value_list(object.get(check, "values", null))
+	not is_ref(object.get(check, "values", null))
+	not malformed(object.get(check, "values", null))
+	not value_list(written(object.get(check, "values", null)))
 }
 
-leaf_describe(check, item) := sprintf("%s == %v", [item_path_name(item, check.path), check.value]) if check.op == "equals"
+leaf_describe(check, item) := sprintf("%s == %s", [item_path_name(item, check.path), value_text(check.value)]) if check.op == "equals"
 
 leaf_describe(check, item) := sprintf("%s is present", [item_path_name(item, check.path)]) if check.op == "present"
 
 leaf_describe(check, item) := sprintf("%s is a non-empty string", [item_path_name(item, check.path)]) if check.op == "non_empty_string"
 
-leaf_describe(check, item) := sprintf("%s matches one of [%s]", [item_path_name(item, check.path), pattern_list(check)]) if check.op == "matches_any"
+leaf_describe(check, item) := sprintf("%s matches one of %s", [item_path_name(item, check.path), pattern_list(check)]) if check.op == "matches_any"
 
-leaf_describe(check, item) := sprintf("%s matches none of [%s]", [item_path_name(item, check.path), pattern_list(check)]) if check.op == "not_matches_any"
+leaf_describe(check, item) := sprintf("%s matches none of %s", [item_path_name(item, check.path), pattern_list(check)]) if check.op == "not_matches_any"
 
-pattern_list(check) := concat(", ", sort([sprintf("%v", [p]) | some p in check.patterns]))
+pattern_list(check) := sprintf("[%s]", [concat(", ", sort([sprintf("%v", [p]) | some p in written(check.patterns)]))]) if {
+	not is_ref(check.patterns)
+	not malformed(check.patterns)
+}
+
+pattern_list(check) := ref_name(check.patterns.ref) if is_ref(check.patterns)
+
+pattern_list(check) := "<invalid ref>" if malformed(check.patterns)
 
 leaf_describe(check, item) := sprintf("%s %s %s", [item_path_name(item, check.left), check.cmp, item_path_name(item, check.right)]) if check.op in {"compare", "compare_time"}
 
@@ -551,8 +714,17 @@ check_inputs(subj, check, _) := [{"name": nm, "value": vals}] if {
 	not check.inputs
 	quantified(check)
 	not check.each
+	not named(object.get(check.check, "path", []))
 	vals := [value_at(elem, object.get(check.check, "path", [])) | some elem in value_at(subj, check.path)]
 	nm := projection_name(check.path, object.get(check.check, "path", []))
+}
+
+check_inputs(subj, check, _) := [{"name": path_name(inner), "value": value_at(subj, inner)}] if {
+	not check.inputs
+	quantified(check)
+	not check.each
+	inner := object.get(check.check, "path", [])
+	named(inner)
 }
 
 check_inputs(subj, check, _) := [{"name": collection_name(check), "value": vals}] if {
@@ -595,9 +767,15 @@ row_inputs(subj, check, item) := array.concat(
 	check_inputs(subj, check.substitute, item),
 ) if check.substitute
 
-check_def(check, item) := object.union(check, {"expression": expression_of(check, item)}) if not check.substitute
+check_def(check, item) := with_refs(described(check, item), check)
 
-check_def(check, item) := object.union(check, {"expression": sprintf(
+with_refs(def, checked) := object.union(def, {"$refs": ref_inputs(checked)}) if count(check_refs(checked)) > 0
+
+with_refs(def, checked) := def if count(check_refs(checked)) == 0
+
+described(check, item) := object.union(check, {"expression": expression_of(check, item)}) if not check.substitute
+
+described(check, item) := object.union(check, {"expression": sprintf(
 	"%s, or substitute: %s",
 	[expression_of(check, item), expression_of(check.substitute, item)],
 )}) if check.substitute
@@ -625,10 +803,13 @@ well_formed(req) if {
 	require_of(req) in {"every", "some"}
 }
 
-applies_def(req) := {"$applies": {
-	"description": sprintf("subject is in scope as a %s under this requirement's applies_to filter; out-of-scope subjects are recorded but not evaluated, and a subject whose filter can't be read fails", [subject_type_of(req)]),
-	"expression": concat(" and ", [expression_of(applies_to_of(req)[name], subject_item_name(req)) | some name in applies_to_names(req)]),
-}} if count(applies_to_of(req)) > 0
+applies_def(req) := {"$applies": with_refs(
+	{
+		"description": sprintf("subject is in scope as a %s under this requirement's applies_to filter; out-of-scope subjects are recorded but not evaluated, and a subject whose filter can't be read fails", [subject_type_of(req)]),
+		"expression": concat(" and ", [expression_of(applies_to_of(req)[name], subject_item_name(req)) | some name in applies_to_names(req)]),
+	},
+	applies_to_of(req),
+)} if count(applies_to_of(req)) > 0
 
 applies_def(req) := {} if count(applies_to_of(req)) == 0
 
@@ -752,7 +933,11 @@ results(doc, policy) := array.concat(
 	),
 )
 
-report(doc, policy) := {
+report(doc, policy) := r if {
+	r := report_of(doc, policy) with data.ergo_document as doc
+}
+
+report_of(doc, policy) := {
 	"compliant": all_satisfied(doc, policy),
 	"requirements": {name: {
 		"require": require_of(req),
@@ -771,12 +956,19 @@ violations(report) := [{
 	"check": row.check,
 	"description": definition_field(report.requirements, row, "description"),
 	"expression": definition_field(report.requirements, row, "expression"),
-	"inputs": row.inputs,
+	"inputs": array.concat(row.inputs, recorded_refs(report.requirements, row)),
 	"cause": row.cause,
 } |
 	some row in report.results
 	is_violation(report.requirements, row)
 ]
+
+default recorded_refs(_, _) := []
+
+recorded_refs(requirements, row) := refs if {
+	refs := requirements[row.requirement].checks[row.check]["$refs"]
+	is_array(refs)
+}
 
 default is_violation(_, _) := false
 

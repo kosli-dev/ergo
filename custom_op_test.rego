@@ -13,3 +13,12 @@ op_passed(check, subj) if {
 		leaf_passed({"op": "present", "path": path}, subj)
 	}
 }
+
+op_passed(check, subj) if {
+	check.op == "multiple_of"
+	n := value_at(subj, check.path)
+	by := arg(check.by)
+	is_number(n)
+	is_number(by)
+	n % by == 0
+}
