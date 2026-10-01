@@ -70,6 +70,8 @@ field(subj, path) := v if {
 
 resolved(subj, path) := object.get(subj, path, absent) if not selector_index(path)
 
+resolved(subj, []) := subj
+
 resolved(subj, path) := v if {
 	i := selector_index(path)
 	base := object.get(subj, array.slice(path, 0, i), absent)
@@ -97,6 +99,14 @@ selector_matches(v, sel) if {
 }
 
 path_name(path) := concat(".", [segment_name(p) | some p in path])
+
+item_path_name(item, []) := item
+
+item_path_name(_, path) := path_name(path) if path != []
+
+projection_name(path, []) := sprintf("%s[]", [path_name(path)])
+
+projection_name(path, each) := sprintf("%s[].%s", [path_name(path), path_name(each)]) if each != []
 
 segment_name(p) := sprintf("%v", [p]) if not is_object(p)
 
@@ -340,7 +350,10 @@ input_spec_path(spec) := object.get(spec, "path", []) if is_object(spec)
 
 default read_state(_, _) := "absent"
 
-read_state(subj, _) := "not_an_object" if not is_object(subj)
+read_state(subj, path) := "not_an_object" if {
+	not is_object(subj)
+	path != []
+}
 
 read_state(subj, path) := "ambiguous" if count(selector_candidates(subj, path)) > 1
 
@@ -428,130 +441,132 @@ scope_readable(doc, req) if {
 	}
 }
 
-default leaf_describe(_) := ""
+default leaf_describe(_, _) := ""
 
-leaf_describe(check) := sprintf("%s >= %v and %s <= %v", [n, check.min, n, check.max]) if {
+leaf_describe(check, item) := sprintf("%s >= %v and %s <= %v", [n, check.min, n, check.max]) if {
 	check.op == "range"
-	n := path_name(check.path)
+	n := item_path_name(item, check.path)
 }
 
-leaf_describe(check) := sprintf("not contains(%s, %v)", [path_name(check.path), check.value]) if check.op == "excludes"
+leaf_describe(check, item) := sprintf("not contains(%s, %v)", [item_path_name(item, check.path), check.value]) if check.op == "excludes"
 
-leaf_describe(check) := sprintf("contains(%s, %v)", [path_name(check.path), check.value]) if check.op == "includes"
+leaf_describe(check, item) := sprintf("contains(%s, %v)", [item_path_name(item, check.path), check.value]) if check.op == "includes"
 
-leaf_describe(check) := sprintf("%s in [%s]", [path_name(check.path), concat(", ", sort([sprintf("%v", [v]) | some v in check.values]))]) if {
+leaf_describe(check, item) := sprintf("%s in [%s]", [item_path_name(item, check.path), concat(", ", sort([sprintf("%v", [v]) | some v in check.values]))]) if {
 	check.op == "in"
 	value_list(check.values)
 }
 
-leaf_describe(check) := sprintf("%s in <invalid values>", [path_name(check.path)]) if {
+leaf_describe(check, item) := sprintf("%s in <invalid values>", [item_path_name(item, check.path)]) if {
 	check.op == "in"
 	not value_list(object.get(check, "values", null))
 }
 
-leaf_describe(check) := sprintf("%s == %v", [path_name(check.path), check.value]) if check.op == "equals"
+leaf_describe(check, item) := sprintf("%s == %v", [item_path_name(item, check.path), check.value]) if check.op == "equals"
 
-leaf_describe(check) := sprintf("%s is present", [path_name(check.path)]) if check.op == "present"
+leaf_describe(check, item) := sprintf("%s is present", [item_path_name(item, check.path)]) if check.op == "present"
 
-leaf_describe(check) := sprintf("%s is a non-empty string", [path_name(check.path)]) if check.op == "non_empty_string"
+leaf_describe(check, item) := sprintf("%s is a non-empty string", [item_path_name(item, check.path)]) if check.op == "non_empty_string"
 
-leaf_describe(check) := sprintf("%s matches one of [%s]", [path_name(check.path), pattern_list(check)]) if check.op == "matches_any"
+leaf_describe(check, item) := sprintf("%s matches one of [%s]", [item_path_name(item, check.path), pattern_list(check)]) if check.op == "matches_any"
 
-leaf_describe(check) := sprintf("%s matches none of [%s]", [path_name(check.path), pattern_list(check)]) if check.op == "not_matches_any"
+leaf_describe(check, item) := sprintf("%s matches none of [%s]", [item_path_name(item, check.path), pattern_list(check)]) if check.op == "not_matches_any"
 
 pattern_list(check) := concat(", ", sort([sprintf("%v", [p]) | some p in check.patterns]))
 
-leaf_describe(check) := sprintf("%s %s %s", [path_name(check.left), check.cmp, path_name(check.right)]) if check.op in {"compare", "compare_time"}
+leaf_describe(check, item) := sprintf("%s %s %s", [item_path_name(item, check.left), check.cmp, item_path_name(item, check.right)]) if check.op in {"compare", "compare_time"}
 
-default expression_of(_) := ""
+default expression_of(_, _) := ""
 
-expression_of(check) := check.expression
+expression_of(check, _) := check.expression
 
-expression_of(check) := leaf_describe(check) if {
+expression_of(check, item) := leaf_describe(check, item) if {
 	not check.expression
 	not quantified(check)
 	not combinator(check)
 }
 
-expression_of(check) := sprintf("every %s: %s", [collection_name(check), element_describe(check.check)]) if {
+expression_of(check, _) := sprintf("every %s: %s", [collection_name(check), element_describe(check.check, item_name(check))]) if {
 	not check.expression
 	check.op == "all"
 }
 
-expression_of(check) := sprintf("some %s: %s", [collection_name(check), element_describe(check.check)]) if {
+expression_of(check, _) := sprintf("some %s: %s", [collection_name(check), element_describe(check.check, item_name(check))]) if {
 	not check.expression
 	check.op == "any"
 }
 
-expression_of(check) := any_of_describe(check) if {
+expression_of(check, item) := any_of_describe(check, item) if {
 	not check.expression
 	check.op == "any_of"
 }
 
 collection_name(check) := path_name(check.path) if not check.each
 
-collection_name(check) := sprintf("%s[].%s", [path_name(check.path), path_name(check.each)]) if check.each
+collection_name(check) := projection_name(check.path, check.each) if check.each
 
-element_describe(check) := leaf_describe(check) if not combinator(check)
+item_name(check) := sprintf("%s[]", [collection_name(check)])
 
-element_describe(check) := any_of_describe(check) if combinator(check)
+element_describe(check, item) := leaf_describe(check, item) if not combinator(check)
 
-any_of_describe(check) := sprintf("one of: %s", [concat(" | ", sort([variant_describe(nm, group) | some nm, group in check.options]))])
+element_describe(check, item) := any_of_describe(check, item) if combinator(check)
 
-variant_describe(nm, group) := sprintf("%v(%s)", [nm, concat(" and ", [leaf_describe(leaf) | some leaf in group])])
+any_of_describe(check, item) := sprintf("one of: %s", [concat(" | ", sort([variant_describe(nm, group, item) | some nm, group in check.options]))])
+
+variant_describe(nm, group, item) := sprintf("%v(%s)", [nm, concat(" and ", [leaf_describe(leaf, item) | some leaf in group])])
 
 two_sided(check) if check.op in {"compare", "compare_time"}
 
-default check_inputs(_, _) := []
+default check_inputs(_, _, _) := []
 
-check_inputs(subj, check) := [echoed(subj, spec) | some spec in check.inputs] if {
+check_inputs(subj, check, item) := [echoed(subj, spec, item) | some spec in check.inputs] if {
 	check.inputs
 }
 
-echoed(subj, spec) := {"name": path_name(spec), "value": value_at(subj, spec)} if is_array(spec)
+echoed(subj, spec, item) := {"name": item_path_name(item, spec), "value": value_at(subj, spec)} if is_array(spec)
 
-echoed(subj, spec) := {
-	"name": sprintf("%s[].%s", [path_name(object.get(spec, "path", [])), path_name(object.get(spec, "each", []))]),
+echoed(subj, spec, _) := {
+	"name": projection_name(object.get(spec, "path", []), object.get(spec, "each", [])),
 	"value": [value_at(elem, object.get(spec, "each", [])) | some elem in value_at(subj, object.get(spec, "path", []))],
 } if is_object(spec)
 
-check_inputs(subj, check) := [
-	{"name": path_name(check.left), "value": value_at(subj, check.left)},
-	{"name": path_name(check.right), "value": value_at(subj, check.right)},
+check_inputs(subj, check, item) := [
+	{"name": item_path_name(item, check.left), "value": value_at(subj, check.left)},
+	{"name": item_path_name(item, check.right), "value": value_at(subj, check.right)},
 ] if {
 	not check.inputs
 	two_sided(check)
 }
 
-check_inputs(subj, check) := [{"name": nm, "value": vals}] if {
+check_inputs(subj, check, _) := [{"name": nm, "value": vals}] if {
 	not check.inputs
 	quantified(check)
 	not check.each
 	vals := [value_at(elem, object.get(check.check, "path", [])) | some elem in value_at(subj, check.path)]
-	nm := sprintf("%s[].%s", [path_name(check.path), path_name(object.get(check.check, "path", []))])
+	nm := projection_name(check.path, object.get(check.check, "path", []))
 }
 
-check_inputs(subj, check) := [{"name": collection_name(check), "value": vals}] if {
+check_inputs(subj, check, _) := [{"name": collection_name(check), "value": vals}] if {
 	not check.inputs
 	quantified(check)
 	check.each
 	vals := [value_at(elem, check.each) | some elem in value_at(subj, check.path)]
 }
 
-check_inputs(subj, check) := [{"name": path_name(check.path), "value": value_at(subj, check.path)}] if {
+check_inputs(subj, check, item) := [{"name": item_path_name(item, check.path), "value": value_at(subj, check.path)}] if {
 	not check.inputs
 	not two_sided(check)
 	not quantified(check)
 	check.path
 }
 
-check_inputs(subj, check) := [{"name": nm, "value": reads[nm]} | some nm in sort(object.keys(reads))] if {
+check_inputs(subj, check, item) := [{"name": nm, "value": reads[nm]} | some nm in sort(object.keys(reads))] if {
 	not check.inputs
 	check.op == "any_of"
-	reads := any_of_reads(subj, check)
+	reads := any_of_reads(subj, check, item)
 }
 
-any_of_reads(subj, check) := {path_name(p): value_at(subj, p) |
+any_of_reads(subj, check, item) := {item_path_name(item, p): value_at(subj, p) |
 	some group in check.options
 	some leaf in group
 	some p in leaf_paths(leaf)
@@ -564,19 +579,23 @@ leaf_paths(leaf) := [leaf.path] if {
 	leaf.path
 }
 
-row_inputs(subj, check) := check_inputs(subj, check) if not check.substitute
+row_inputs(subj, check, item) := check_inputs(subj, check, item) if not check.substitute
 
-row_inputs(subj, check) := array.concat(
-	check_inputs(subj, check),
-	check_inputs(subj, check.substitute),
+row_inputs(subj, check, item) := array.concat(
+	check_inputs(subj, check, item),
+	check_inputs(subj, check.substitute, item),
 ) if check.substitute
 
-check_def(check) := object.union(check, {"expression": expression_of(check)}) if not check.substitute
+check_def(check, item) := object.union(check, {"expression": expression_of(check, item)}) if not check.substitute
 
-check_def(check) := object.union(check, {"expression": sprintf(
+check_def(check, item) := object.union(check, {"expression": sprintf(
 	"%s, or substitute: %s",
-	[expression_of(check), expression_of(check.substitute)],
+	[expression_of(check, item), expression_of(check.substitute, item)],
 )}) if check.substitute
+
+subject_item_name(req) := sprintf("%s[]", [path_name(from_of(req))]) if from_of(req) != []
+
+subject_item_name(req) := "input" if from_of(req) == []
 
 matching_count_name(req) := sprintf("count(matching(%s))", [path_name(from_of(req))])
 
@@ -599,7 +618,7 @@ well_formed(req) if {
 
 applies_def(req) := {"$applies": {
 	"description": sprintf("subject is in scope as a %s under this requirement's applies_to filter; out-of-scope subjects are recorded but not evaluated, and a subject whose filter can't be read fails", [subject_type_of(req)]),
-	"expression": concat(" and ", [expression_of(applies_to_of(req)[name]) | some name in applies_to_names(req)]),
+	"expression": concat(" and ", [expression_of(applies_to_of(req)[name], subject_item_name(req)) | some name in applies_to_names(req)]),
 }} if count(applies_to_of(req)) > 0
 
 applies_def(req) := {} if count(applies_to_of(req)) == 0
@@ -608,7 +627,7 @@ applies_to_names(req) := sort(object.keys(applies_to_of(req)))
 
 requirement_check_defs(req) := object.union(
 	object.union(
-		{name: check_def(check) | some name, check in checks_of(req)},
+		{name: check_def(check, subject_item_name(req)) | some name, check in checks_of(req)},
 		min_subjects_def(req),
 	),
 	object.union(applies_def(req), well_formed_def(req)),
@@ -627,7 +646,7 @@ subject_rows(doc, req, req_name) := [row |
 		"requirement": req_name,
 		"subject": subject_ref(subj, req),
 		"check": check_name,
-		"inputs": row_inputs(subj, check),
+		"inputs": row_inputs(subj, check, subject_item_name(req)),
 		"passed": check_passed(check, subj),
 		"cause": row_cause(check, subj),
 	}
@@ -671,7 +690,7 @@ applies_rows(_, req, _) := [] if count(applies_to_of(req)) == 0
 
 applies_inputs(subj, req) := [inp |
 	some name in applies_to_names(req)
-	some inp in row_inputs(subj, applies_to_of(req)[name])
+	some inp in row_inputs(subj, applies_to_of(req)[name], subject_item_name(req))
 ]
 
 default requirement_satisfied(_, _) := false

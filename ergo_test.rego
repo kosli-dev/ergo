@@ -813,6 +813,155 @@ test_each_echoes_the_inner_collections if {
 	}]
 }
 
+release_branches := {
+	"op": "all",
+	"path": ["branches"],
+	"check": {"op": "matches_any", "path": [], "patterns": ["^main$", "^release/"]},
+}
+
+test_an_empty_path_reads_a_string_item_itself if {
+	verdict({"branches": ["main", "release/1"]}, release_branches) == true
+	verdict({"branches": ["main", "feature"]}, release_branches) == false
+}
+
+test_an_empty_path_reads_a_number_item_itself if {
+	verdict({"ns": [1, 2]}, {"op": "any", "path": ["ns"], "check": {"op": "equals", "path": [], "value": 2}}) == true
+}
+
+test_an_empty_path_reads_a_list_item_itself if {
+	check := {"op": "all", "path": ["groups"], "check": {"op": "includes", "path": [], "value": "a"}}
+	verdict({"groups": [["a"], ["a", "b"]]}, check) == true
+	verdict({"groups": [["a"], ["b"]]}, check) == false
+}
+
+test_an_empty_path_still_reads_an_object_item_whole if {
+	check := {"op": "all", "path": ["items"], "check": {"op": "equals", "path": [], "value": {"a": 1}}}
+	verdict({"items": [{"a": 1}]}, check) == true
+}
+
+test_an_empty_path_fails_closed_on_a_null_item if {
+	verdict({"branches": ["main", null]}, release_branches) == false
+	verdict({"branches": [null]}, {"op": "all", "path": ["branches"], "check": {"op": "present", "path": []}}) == false
+}
+
+test_an_empty_path_names_the_item_after_its_list_in_inputs if {
+	inputs_of({"branches": ["main", "feature"]}, release_branches) == [{"name": "branches[]", "value": ["main", "feature"]}]
+}
+
+test_an_empty_path_names_the_item_after_its_list_in_the_expression if {
+	rendered({"branches": []}, release_branches) == "every branches: branches[] matches one of [^main$, ^release/]"
+}
+
+test_an_empty_path_names_the_item_inside_an_any_of if {
+	rendered({"branches": []}, {"op": "all", "path": ["branches"], "check": {"op": "any_of", "options": {
+		"main": [{"op": "equals", "path": [], "value": "main"}],
+		"release": [{"op": "matches_any", "path": [], "patterns": ["^release/"]}],
+	}}}) == "every branches: one of: main(branches[] == main) | release(branches[] matches one of [^release/])"
+}
+
+test_an_empty_path_names_the_item_of_a_compare if {
+	rendered({"pairs": []}, {"op": "all", "path": ["pairs"], "check": {"op": "compare", "cmp": "eq", "left": [], "right": [0]}}) == "every pairs: pairs[] eq 0"
+}
+
+test_an_inner_check_without_a_path_names_the_item_after_its_list if {
+	check := {"op": "all", "path": ["pairs"], "check": {"op": "compare", "cmp": "eq", "left": ["a"], "right": ["b"]}}
+	inputs_of({"pairs": [{"a": 1, "b": 1}]}, check) == [{"name": "pairs[]", "value": [{"a": 1, "b": 1}]}]
+}
+
+branch_req(check) := {"s": {"from": ["branches"], "checks": {"c": check}}}
+
+on_main := {"op": "matches_any", "path": [], "patterns": ["^main$"]}
+
+branch_rows(check) := [[r.subject.id, r.passed, r.cause] |
+	some r in rows_for(ergo.report({"branches": ["main", "feature", null]}, branch_req(check)), "s", "c")
+]
+
+test_an_empty_path_reads_a_subject_that_is_not_an_object if {
+	branch_rows(on_main) == [["main", true, "satisfied"], ["feature", false, "value"], [null, false, "null"]]
+}
+
+test_a_field_path_on_a_subject_that_is_not_an_object_is_still_not_an_object if {
+	branch_rows({"op": "present", "path": ["name"]}) == [
+		["main", false, "not_an_object"],
+		["feature", false, "not_an_object"],
+		[null, false, "not_an_object"],
+	]
+}
+
+test_an_empty_path_on_a_subject_is_named_after_from if {
+	rep := ergo.report({"branches": ["main"]}, branch_req(on_main))
+	rep.requirements.s.checks.c.expression == "branches[] matches one of [^main$]"
+	[r.inputs | some r in rows_for(rep, "s", "c")] == [[{"name": "branches[]", "value": "main"}]]
+}
+
+test_an_empty_path_on_the_whole_input_is_named_input if {
+	rep := ergo.report({"state": "ok"}, {"s": {"checks": {"c": {"op": "present", "path": []}}}})
+	rep.requirements.s.checks.c.expression == "input is present"
+	[r.inputs | some r in rows_for(rep, "s", "c")] == [[{"name": "input", "value": {"state": "ok"}}]]
+}
+
+test_an_empty_path_on_a_subject_is_named_after_from_in_every_kind_of_check if {
+	rep := ergo.report({"branches": ["main"]}, {"s": {
+		"from": ["branches"],
+		"applies_to": {"named": {"op": "non_empty_string", "path": []}},
+		"checks": {
+			"either": {"op": "any_of", "options": {"main": [{"op": "equals", "path": [], "value": "main"}]}},
+			"same": {"op": "compare", "cmp": "eq", "left": [], "right": []},
+			"custom": {"op": "bespoke", "inputs": [[]], "expression": "bespoke"},
+			"backed": {"op": "equals", "path": [], "value": "x", "substitute": {"op": "present", "path": []}},
+		},
+	}})
+	rep.requirements.s.checks["$applies"].expression == "branches[] is a non-empty string"
+	rep.requirements.s.checks.either.expression == "one of: main(branches[] == main)"
+	rep.requirements.s.checks.same.expression == "branches[] eq branches[]"
+	rep.requirements.s.checks.backed.expression == "branches[] == x, or substitute: branches[] is present"
+	{r.check: r.inputs | some r in rep.results; r.subject.id == "main"} == {
+		"$applies": [{"name": "branches[]", "value": "main"}],
+		"either": [{"name": "branches[]", "value": "main"}],
+		"same": [{"name": "branches[]", "value": "main"}, {"name": "branches[]", "value": "main"}],
+		"custom": [{"name": "branches[]", "value": "main"}],
+		"backed": [{"name": "branches[]", "value": "main"}, {"name": "branches[]", "value": "main"}],
+	}
+}
+
+plain_licences := {"op": "all", "path": ["licences"], "check": {"op": "in", "path": [], "values": ["MIT", "Apache-2.0"]}}
+
+test_in_checks_a_list_of_plain_strings if {
+	verdict({"licences": ["MIT", "Apache-2.0"]}, plain_licences) == true
+	verdict({"licences": ["MIT", "GPL-3.0"]}, plain_licences) == false
+	rendered({"licences": []}, plain_licences) == "every licences: licences[] in [Apache-2.0, MIT]"
+}
+
+test_in_checks_subjects_that_are_plain_strings if {
+	branch_rows({"op": "in", "path": [], "values": ["main", "develop"]}) == [
+		["main", true, "satisfied"],
+		["feature", false, "value"],
+		[null, false, "null"],
+	]
+}
+
+nested_branches := {
+	"op": "all",
+	"path": ["repos"],
+	"each": [],
+	"check": {"op": "equals", "path": [], "value": "main"},
+}
+
+test_an_empty_each_reads_lists_of_lists if {
+	verdict({"repos": [["main"], ["main", "main"]]}, nested_branches) == true
+	verdict({"repos": [["main"], ["feature"]]}, nested_branches) == false
+}
+
+test_an_empty_each_is_named_after_its_list if {
+	rendered({"repos": []}, nested_branches) == "every repos[]: repos[][] == main"
+	inputs_of({"repos": [["main"]]}, nested_branches) == [{"name": "repos[]", "value": [["main"]]}]
+}
+
+test_a_custom_input_with_an_empty_each_reads_every_item if {
+	check := {"op": "bespoke", "inputs": [{"path": ["tags"], "each": []}]}
+	inputs_of({"tags": ["a", "b"]}, check) == [{"name": "tags[]", "value": ["a", "b"]}]
+}
+
 flavoured := {
 	"op": "any_of",
 	"options": {

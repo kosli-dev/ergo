@@ -82,6 +82,20 @@ A path is a list of keys that ergo follows one step at a time. `["release", "app
 
 `from` is a path into the input. Every other path (`id`, a check's `path`, `left` and `right`) is a path into one subject.
 
+An empty path, `[]`, reads the item itself. Use it inside `all` or `any` when the list holds plain values like strings, not objects:
+
+```rego
+"release_branches": {
+	"op": "all",
+	"path": ["branches"],
+	"check": {"op": "matches_any", "path": [], "patterns": ["^main$", "^release/"]},
+}
+```
+
+ergo names the item after its list, so this renders as `every branches: branches[] matches one of [^main$, ^release/]`, and the row's input is `branches[]`. An empty `each` works the same way, for a list of lists.
+
+An empty path also reads a subject that isn't an object, like each string of `"from": ["branches"]`. There, the item is named after `from` (`branches[]`), or `input` when there's no `from`. Any other path on such a subject fails with cause `not_an_object`.
+
 One step in a path can be a **selector** instead of a key. It picks the single item in a list (or an object's values) whose fields match:
 
 ```rego
