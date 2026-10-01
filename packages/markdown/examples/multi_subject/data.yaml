@@ -1,0 +1,48 @@
+requirements:
+  artifact_identified:
+    subject_type: artifact
+    from:
+      - artifacts
+    id:
+      - fingerprint
+    checks:
+      fingerprint_recorded:
+        op: non_empty_string
+        path:
+          - fingerprint
+        description: The artifact carries a fingerprint that review can be linked to
+      build_recorded:
+        op: non_empty_string
+        path:
+          - build_url
+        description: The build that produced the artifact is recorded
+  change_reviewed:
+    subject_type: pull request
+    from:
+      - pull_requests
+    id:
+      - url
+    min_subjects: 1
+    applies_to:
+      merged:
+        op: equals
+        path:
+          - state
+        value: MERGED
+    checks:
+      protected_branch:
+        op: equals
+        path:
+          - base_ref
+        value: main
+        description: Merged into the protected branch
+      commits_signed:
+        op: all
+        path:
+          - commits
+        check:
+          op: equals
+          path:
+            - verified
+          value: true
+        description: Every commit in the pull request carries a verified signature
