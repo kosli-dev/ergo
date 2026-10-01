@@ -2716,3 +2716,24 @@ test_a_custom_op_reads_a_ref_with_arg if {
 	[r.passed, r.cause] == [false, "absent"]
 	refs_in({"params": {"m": 2}}, {"id": 1, "n": 4}, check) == [{"name": "$$input.params.m", "value": 2}]
 }
+
+test_a_path_written_as_a_string_reads_that_one_key if {
+	row_in({}, {"id": 1}, {"op": "present", "path": "state"}).passed == false
+	row_in({}, {"id": 1}, {"op": "present", "path": "state"}).cause == "absent"
+	row_in({}, {"id": 1, "state": "OPEN"}, {"op": "equals", "path": "state", "value": "OPEN"}).passed == true
+	row_in({}, {"id": 1}, {"op": "present", "path": 3}).passed == false
+}
+
+test_a_path_written_as_an_object_reads_nothing if {
+	r := row_in({}, {"id": 1, "a": 1}, {"op": "present", "path": {"a": 1}})
+	[r.passed, r.cause] == [false, "absent"]
+}
+
+test_an_id_written_as_a_string_reads_that_one_key if {
+	rep := ergo.report({"items": [{"id": 1, "name": "x"}]}, {"s": {"from": ["items"], "id": "name", "checks": {"c": {"op": "present", "path": ["id"]}}}})
+	[r.subject.id | some r in rows_for(rep, "s", "c")] == ["x"]
+}
+
+test_a_string_that_starts_with_two_dollars_is_not_a_name_when_it_is_the_whole_path if {
+	row_in({"mode": "strict"}, {"id": 1, "$$input": "own"}, {"op": "equals", "path": "$$input", "value": "own"}).passed == true
+}

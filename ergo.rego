@@ -82,13 +82,23 @@ read_from(start, keys) := v if {
 	v := object.get(elem, array.slice(keys, i + 1, count(keys)), absent)
 }
 
-named(path) if startswith(path[0], "$$")
+named(path) if {
+	is_array(path)
+	startswith(path[0], "$$")
+}
 
 start_of(subj, path) := subj if not named(path)
 
 start_of(_, path) := data.ergo_document if path[0] == "$$input"
 
-keys_of(path) := [unliteral(seg) | some seg in path] if not named(path)
+keys_of(path) := [unliteral(seg) | some seg in path] if {
+	is_array(path)
+	not named(path)
+}
+
+keys_of(path) := [path] if is_string(path)
+
+keys_of(path) := [path] if is_number(path)
 
 keys_of(path) := [unliteral(seg) | some seg in array.slice(path, 1, count(path))] if named(path)
 
