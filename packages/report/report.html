@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ergo report</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --fg: #1f2328;
+        --muted: #59636e;
+        --line: #d1d9e0;
+        --soft: #f6f8fa;
+        --ok: #1a7f37;
+        --ok-bg: #dafbe1;
+        --bad: #cf222e;
+        --bad-bg: #ffebe9;
+        --off: #59636e;
+        --off-bg: #eff2f5;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0d1117;
+          --fg: #e6edf3;
+          --muted: #9198a1;
+          --line: #3d444d;
+          --soft: #151b23;
+          --ok: #3fb950;
+          --ok-bg: #12261e;
+          --bad: #f85149;
+          --bad-bg: #2d1214;
+          --off: #9198a1;
+          --off-bg: #212830;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font:
+          15px/1.5 system-ui,
+          -apple-system,
+          "Segoe UI",
+          sans-serif;
+      }
+      main {
+        max-width: 72rem;
+        margin: 0 auto;
+        padding: 2rem 1rem 4rem;
+      }
+      h1,
+      h2 {
+        margin: 0;
+        line-height: 1.25;
+      }
+      code {
+        font:
+          0.85em/1.4 ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          monospace;
+      }
+      .verdict,
+      .error,
+      .picker {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 2rem;
+      }
+      .verdict.ok {
+        background: var(--ok-bg);
+        border-color: var(--ok);
+      }
+      .verdict.bad,
+      .error {
+        background: var(--bad-bg);
+        border-color: var(--bad);
+      }
+      .verdict p,
+      .error p {
+        margin: 0.25rem 0 0;
+      }
+      .picker {
+        background: var(--soft);
+        border-style: dashed;
+        text-align: center;
+        padding: 3rem 1.5rem;
+      }
+      .req {
+        margin-bottom: 2.5rem;
+      }
+      .req h2 {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .meta {
+        color: var(--muted);
+        margin: 0.25rem 0 0.75rem;
+      }
+      .table {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        text-align: left;
+        vertical-align: top;
+        padding: 0.5rem 0.75rem;
+        border-bottom: 1px solid var(--line);
+      }
+      th {
+        background: var(--soft);
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      td small {
+        display: block;
+        color: var(--muted);
+      }
+      .badge {
+        display: inline-block;
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 0.1rem 0.5rem;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+      .passed {
+        color: var(--ok);
+        background: var(--ok-bg);
+      }
+      .failed {
+        color: var(--bad);
+        background: var(--bad-bg);
+      }
+      .out {
+        color: var(--off);
+        background: var(--off-bg);
+      }
+    </style>
+  </head>
+  <body>
+    <main id="app">
+      <div class="picker">
+        <h1>ergo report</h1>
+        <p>Open a report made with <code>opa eval --format=raw 'data.&lt;package&gt;.report'</code>, or drop it on this page.</p>
+        <input type="file" accept=".json,application/json" />
+      </div>
+    </main>
+    <script type="application/json" id="ergo-report">
+    </script>
+    <script id="ergo-viewer">
+      function esc(value) {
+        return String(value).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+      }
+
+      function isObject(value) {
+        return typeof value === "object" && value !== null && !Array.isArray(value);
+      }
+
+      function problems(report) {
+        if (!isObject(report)) return ["The report isn't a JSON object."];
+        const found = [];
+        if (typeof report.compliant !== "boolean") found.push("compliant isn't true or false.");
+        if (!isObject(report.requirements)) found.push("requirements isn't an object.");
+        if (!Array.isArray(report.results)) found.push("results isn't a list.");
+        if (found.length) return found;
+
+        const names = Object.keys(report.requirements).sort();
+        for (const name of names) {
+          const req = report.requirements[name];
+          const where = `Requirement "${name}"`;
+          if (!isObject(req)) {
+            found.push(`${where} isn't an object.`);
+            continue;
+          }
+          if (typeof req.satisfied !== "boolean") found.push(`${where} has no satisfied value.`);
+          if (!isObject(req.checks)) found.push(`${where} has no checks.`);
+          if (!isObject(req.subjects) || typeof req.subjects.matching !== "number" || typeof req.subjects.total !== "number") found.push(`${where} has no subject counts.`);
+          if (!report.results.some((row) => isObject(row) && row.requirement === name)) found.push(`${where} has no rows in results.`);
+        }
+
+        report.results.forEach((row, i) => {
+          const where = `results[${i}]`;
+          if (!isObject(row)) return found.push(`${where} isn't an object.`);
+          const req = Object.hasOwn(report.requirements, row.requirement) ? report.requirements[row.requirement] : null;
+          if (!isObject(req)) return found.push(`${where} names requirement ${JSON.stringify(row.requirement)}, which isn't in requirements.`);
+          if (!isObject(req.checks) || !Object.hasOwn(req.checks, row.check) || !isObject(req.checks[row.check])) found.push(`${where} names check ${JSON.stringify(row.check)}, which requirement "${row.requirement}" doesn't have.`);
+          if (typeof row.passed !== "boolean") found.push(`${where} has no passed value.`);
+          if (typeof row.cause !== "string") found.push(`${where} has no cause.`);
+          if (!isObject(row.subject) || typeof row.subject.type !== "string" || !("id" in row.subject)) found.push(`${where} has no subject.`);
+          if (!Array.isArray(row.inputs) || !row.inputs.every((input) => isObject(input) && typeof input.name === "string" && "value" in input)) found.push(`${where} has unreadable inputs.`);
+        });
+
+        if (report.compliant && names.length === 0) found.push("The report says compliant, but it has no requirements.");
+        if (report.compliant) for (const name of names) if (!(isObject(report.requirements[name]) && report.requirements[name].satisfied === true)) found.push(`The report says compliant, but requirement "${name}" isn't met.`);
+        return found;
+      }
+
+      function errorPage(found) {
+        return `<div class="error"><h1>This report can't be shown</h1><p>Nothing in it can be trusted until these are fixed:</p><ul>${found.map((p) => `<li>${esc(p)}</li>`).join("")}</ul><p>Make the report with <code>opa eval --format=raw 'data.&lt;package&gt;.report'</code>.</p></div>`;
+      }
+
+      function status(row) {
+        if (row.passed === true) return `<span class="badge passed">Passed</span>`;
+        if (row.check === "$applies" && row.cause === "value") return `<span class="badge out">Out of scope</span>`;
+        return `<span class="badge failed">Failed</span>`;
+      }
+
+      function rowHtml(row, check) {
+        const subject = row.subject.id === null ? "" : typeof row.subject.id === "string" ? row.subject.id : JSON.stringify(row.subject.id);
+        const inputs = row.inputs.map((input) => `<code>${esc(input.name)} = ${esc(JSON.stringify(input.value))}</code>`).join("<br>");
+        const description = typeof check.description === "string" && check.description !== "" ? esc(check.description) : `<code>${esc(row.check)}</code>`;
+        const expression = typeof check.expression === "string" ? `<small><code>${esc(check.expression)}</code></small>` : "";
+        return `<tr><td>${esc(subject)}</td><td>${description}${expression}</td><td>${inputs}</td><td>${status(row)}</td><td><code>${esc(row.cause)}</code></td></tr>`;
+      }
+
+      function requirementHtml(report, name) {
+        const req = report.requirements[name];
+        const rows = report.results.filter((row) => row.requirement === name);
+        const badge = req.satisfied ? `<span class="badge passed">Met</span>` : `<span class="badge failed">Not met</span>`;
+        const require = typeof req.require === "string" ? ` · require ${esc(req.require)}` : "";
+        const meta = `${esc(req.subjects.matching)} of ${esc(req.subjects.total)} ${esc(rows[0].subject.type)} subjects in scope${require}`;
+        return `<section class="req"><h2>${badge}<span>${esc(name)}</span></h2><p class="meta">${meta}</p><div class="table"><table><thead><tr><th>Subject</th><th>Check</th><th>Value read</th><th>Result</th><th>Cause</th></tr></thead><tbody>${rows.map((row) => rowHtml(row, req.checks[row.check])).join("")}</tbody></table></div></section>`;
+      }
+
+      function render(report) {
+        const found = problems(report);
+        if (found.length) return errorPage(found);
+        const names = Object.keys(report.requirements).sort();
+        const met = names.filter((name) => report.requirements[name].satisfied).length;
+        const verdict = report.compliant ? `<div class="verdict ok"><h1>Compliant</h1>` : `<div class="verdict bad"><h1>Not compliant</h1>`;
+        return `${verdict}<p>${met} of ${names.length} requirements met</p></div>${names.map((name) => requirementHtml(report, name)).join("")}`;
+      }
+
+      function page(text) {
+        let report;
+        try {
+          report = JSON.parse(text);
+        } catch (e) {
+          return errorPage([`It isn't valid JSON: ${e.message}`]);
+        }
+        return render(report);
+      }
+
+      function display(text) {
+        document.getElementById("app").innerHTML = page(text);
+      }
+
+      function boot() {
+        const embedded = document.getElementById("ergo-report").textContent.trim();
+        if (embedded) return display(embedded);
+        const picker = document.querySelector(".picker input");
+        picker.addEventListener("change", () => picker.files[0] && picker.files[0].text().then(display));
+        document.addEventListener("dragover", (e) => e.preventDefault());
+        document.addEventListener("drop", (e) => {
+          e.preventDefault();
+          const file = e.dataTransfer.files[0];
+          if (file) file.text().then(display);
+        });
+      }
+
+      window.addEventListener("DOMContentLoaded", boot);
+    </script>
+  </body>
+</html>

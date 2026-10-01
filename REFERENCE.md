@@ -11,6 +11,7 @@ This page describes everything ergo accepts and everything it returns. If you ha
 - [The report](#the-report)
 - [Causes](#causes)
 - [Violations](#violations)
+- [Viewing the report](#viewing-the-report)
 - [Failing closed](#failing-closed)
 
 ## Policies
@@ -381,6 +382,25 @@ It keeps `$min_subjects` failures, because finding nothing to check is a problem
 It only reads the report, never the input or the policy. It returns a list in the same order as `results`, so two failures that look the same are both kept. And it returns data, not text, so you decide how to word your messages. A missing `description` or `expression` comes back as `""`.
 
 To decide whether to allow something, use `report.compliant`, not whether `violations` is empty. The two are worked out separately, so a mistake in how you use violations can't let something through.
+
+## Viewing the report
+
+[`packages/report/report.html`](packages/report/report.html) shows a report as a page people can read. Like `ergo.rego`, it's one file with no dependencies, so copy it wherever you need it. It works offline, and the report never leaves the browser.
+
+Open it and pick or drop a report saved with `--format=raw`. OPA's default output wraps the report in `result` and `expressions`, and the page won't read that.
+
+To send a report to someone, embed it in a copy of the page. They only need to open that one file:
+
+```sh
+opa eval -d policy -i deployments.json --format=raw 'data.deploy.report' | sed 's/</\\u003c/g' > report.json
+sed '/id="ergo-report"/r report.json' report.html > deploy-report.html
+```
+
+The first `sed` escapes every `<`, so a value like `</script>` in the input can't break the page. The JSON still means the same thing.
+
+The page shows one table per requirement, in name order, with its rows in report order. Each row shows the subject, the check's description and expression, the values read, the result and the cause. An `$applies` row with the cause `value` shows as "Out of scope" and not as a failure.
+
+It refuses to show a report it can't trust and lists what's wrong instead. That happens when a field is missing or has the wrong type, when a row names a requirement or check that isn't in `requirements`, when a requirement has no rows, or when the report says it's compliant but a requirement isn't met or there are none.
 
 ## Failing closed
 
