@@ -70,6 +70,7 @@ A few details:
 
 - If `from` leads to a list, each item is a subject. If it leads to a single object, that object is the only subject. Anything else (nothing, a string, a number) gives no subjects at all, and `$min_subjects` fails.
 - If `id` doesn't lead anywhere, the subject's id is `null`. Its rows are still there.
+- An item of the list that isn't an object, like a string or a `null`, is still a subject. It has no fields to read, so its id is `null` and its checks fail with cause `absent`.
 - Leaving out `from` or `id` is allowed, but rarely what you want. Without `from`, the whole input is checked as one subject. Without `id`, each row repeats the whole subject as its id.
 - `min_subjects` defaults to 1 so that a typo in `from` fails the requirement instead of quietly passing it. Set it to `0` when you mean "if there are any, they must pass; if there are none, that's fine". It means the same under `every` and `some`.
 - Under `some`, one subject has to pass all the checks by itself. Two subjects that each pass half of them don't count.

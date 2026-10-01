@@ -47,7 +47,7 @@ subject_matches(subj, req) if {
 
 subject_ref(subj, req) := {
 	"type": subject_type_of(req),
-	"id": object.get(subj, object.get(req, "id", []), null),
+	"id": value_at(subj, object.get(req, "id", [])),
 }
 
 absent := {"ergo/absent": true}

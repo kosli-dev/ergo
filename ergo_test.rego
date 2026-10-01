@@ -57,6 +57,45 @@ test_missing_from_yields_no_subjects if {
 	subject_counts({"other": [{"id": "a"}]}, ["items"]) == {"total": 0, "matching": 0}
 }
 
+mixed_subjects := {"items": [{"id": "x", "n": "a"}, "b", null, 3]}
+
+mixed_req := {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["n"]}}}}
+
+test_a_subject_that_is_not_an_object_keeps_its_rows if {
+	rows := rows_for(ergo.report(mixed_subjects, mixed_req), "s", "c")
+	[[r.subject.id, r.passed, r.cause] | some r in rows] == [
+		["x", true, "satisfied"],
+		[null, false, "absent"],
+		[null, false, "absent"],
+		[null, false, "absent"],
+	]
+}
+
+test_a_subject_that_is_not_an_object_shows_up_as_a_violation if {
+	count(ergo.violations(ergo.report(mixed_subjects, mixed_req))) == 3
+}
+
+test_a_subject_that_is_not_an_object_keeps_its_applies_row if {
+	req := {"s": {
+		"from": ["items"],
+		"id": ["id"],
+		"applies_to": {"kind": {"op": "equals", "path": ["kind"], "value": "lib"}},
+		"checks": {"c": {"op": "present", "path": ["n"]}},
+	}}
+	rep := ergo.report({"items": ["b"]}, req)
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "$applies")] == [[false, "absent"]]
+	{v.check | some v in ergo.violations(rep)} == {"$applies", "$min_subjects"}
+}
+
+test_an_id_path_can_use_a_selector if {
+	req := {"s": {
+		"from": ["items"],
+		"id": ["tags", {"where": {"k": "name"}}, "v"],
+		"checks": {"c": {"op": "present", "path": ["tags"]}},
+	}}
+	[r.subject.id | some r in rows_for(ergo.report({"items": [{"tags": [{"k": "name", "v": "web"}]}]}, req), "s", "c")] == ["web"]
+}
+
 test_scalar_from_yields_no_subjects if {
 	subject_counts({"items": "not-a-collection"}, ["items"]) == {"total": 0, "matching": 0}
 }
