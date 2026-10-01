@@ -1,0 +1,26 @@
+{
+  "name": "@kosli/ergo-markdown",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Write ergo policies in Markdown",
+  "bin": {
+    "ergo": "./src/cli.ts"
+  },
+  "scripts": {
+    "ergo": "node src/cli.ts",
+    "check": "tsc --noEmit && node src/cli.ts check examples/prod_deploy/policy.ergo.md && node src/cli.ts check examples/multi_subject/policy.ergo.md && node src/cli.ts check examples/four_eyes/policy.ergo.md --ops examples/four_eyes/custom_ops.json",
+    "test": "node --test --experimental-test-coverage --test-coverage-include='src/**' --test-coverage-lines=100 'test/**/*.test.ts' && opa check --strict ../../ergo.rego examples --ignore '*.json' && opa test ../../ergo.rego examples --ignore '*.json'"
+  },
+  "dependencies": {
+    "mdast-util-from-markdown": "^2.0.3",
+    "mdast-util-gfm-table": "^2.0.0",
+    "micromark-extension-gfm-table": "^2.1.2",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@types/mdast": "^4.0.4",
+    "@types/node": "^24.19.0",
+    "typescript": "^7.0.2"
+  }
+}

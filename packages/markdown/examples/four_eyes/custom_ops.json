@@ -1,0 +1,12 @@
+{
+  "identities_resolved": {
+    "phrase": "have its identities resolved",
+    "expression": "some pull_request: (every commit: author_username resolves or author is web-flow) or (every approver: username resolves)",
+    "inputs": [{"each": ["commits"]}, {"each": ["approvers"]}]
+  },
+  "independently_approved": {
+    "phrase": "be independently approved",
+    "expression": "some pull_request: every author: some approver != author where state == APPROVED and timestamp > max(commits[].timestamp)",
+    "inputs": [{"subject": ["name"]}, {"each": ["approvers"]}, {"each": ["commits"]}]
+  }
+}

@@ -16,13 +16,13 @@ jobs:
       - uses: open-policy-agent/setup-opa@v2
         with:
           version: 1.19.0
-      - run: opa check --strict . --ignore .github
+      - run: opa check --strict . --ignore .github --ignore packages
       - run: opa fmt --list --fail .
-      - run: opa test . --ignore .github --verbose
+      - run: opa test . --ignore .github --ignore packages --verbose
       - name: Check every line is tested
         shell: bash
         run: |
-          opa test . --ignore .github --coverage > "$RUNNER_TEMP/coverage.json"
+          opa test . --ignore .github --ignore packages --coverage > "$RUNNER_TEMP/coverage.json"
           jq -e '.files["ergo.rego"]' "$RUNNER_TEMP/coverage.json" > /dev/null
           uncovered=$(jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' "$RUNNER_TEMP/coverage.json" | sort -u)
           if [ -n "$uncovered" ]; then
@@ -30,3 +30,25 @@ jobs:
             echo "$uncovered"
             exit 1
           fi
+
+  markdown:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages
+    steps:
+      - uses: actions/checkout@v7
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.19.0
+      - uses: pnpm/action-setup@v6
+        with:
+          package_json_file: packages/package.json
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: packages/.nvmrc
+          cache: pnpm
+          cache-dependency-path: packages/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm test

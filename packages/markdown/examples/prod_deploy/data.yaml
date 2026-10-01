@@ -1,0 +1,29 @@
+requirements:
+  prod_deploy:
+    subject_type: deployment
+    from:
+      - deployments
+    id:
+      - name
+    applies_to:
+      is_prod:
+        op: equals
+        path:
+          - environment
+        value: prod
+    checks:
+      approved:
+        op: non_empty_string
+        path:
+          - approved_by
+        description: A named approver signed off on the deployment
+      ci_green:
+        op: all
+        path:
+          - ci_checks
+        check:
+          op: equals
+          path:
+            - conclusion
+          value: success
+        description: Every CI check on the deployment passed
