@@ -9,8 +9,8 @@
   },
   "scripts": {
     "ergo": "node src/cli.ts",
-    "check": "tsc --noEmit && node src/cli.ts check examples/prod_deploy/policy.ergo.md && node src/cli.ts check examples/multi_subject/policy.ergo.md",
-    "test": "node --test --experimental-test-coverage --test-coverage-include='src/**' --test-coverage-lines=100 'test/**/*.test.ts' && opa check --strict ../../ergo.rego examples && opa test ../../ergo.rego examples"
+    "check": "tsc --noEmit && node src/cli.ts check examples/prod_deploy/policy.ergo.md && node src/cli.ts check examples/multi_subject/policy.ergo.md && node src/cli.ts check examples/four_eyes/policy.ergo.md --ops examples/four_eyes/custom_ops.json",
+    "test": "node --test --experimental-test-coverage --test-coverage-include='src/**' --test-coverage-lines=100 'test/**/*.test.ts' && opa check --strict ../../ergo.rego examples --ignore '*.json' && opa test ../../ergo.rego examples --ignore '*.json'"
   },
   "dependencies": {
     "mdast-util-from-markdown": "^2.0.3",

@@ -1,0 +1,86 @@
+requirements:
+  commits_present:
+    subject_type: commit
+    from: &a1
+      - trails
+    id: &a2
+      - name
+    min_subjects: 1
+    checks:
+      commit_identified:
+        op: non_empty_string
+        path:
+          - name
+        description: The trail names the commit it covers
+  commit_reviewed:
+    subject_type: commit
+    from: *a1
+    id: *a2
+    min_subjects: 0
+    checks:
+      pr_attestation_present:
+        op: present
+        path:
+          - compliance_status
+          - attestations_statuses
+          - where:
+              attestation_type: pull_request
+        substitute: &a3
+          op: equals
+          path:
+            - compliance_status
+            - attestations_statuses
+            - where:
+                attestation_type: custom:initial-commit
+            - is_compliant
+          value: true
+          description: A compliant initial-commit attestation stands in for the pull request a first commit can't have
+        description: Pull request review data was collected for this commit
+      pull_request_found:
+        op: any
+        path: &a4
+          - compliance_status
+          - attestations_statuses
+          - where:
+              attestation_type: pull_request
+          - pull_requests
+        check:
+          op: present
+          path: []
+        substitute: *a3
+        inputs:
+          - path: *a4
+            each:
+              - url
+        description: The commit is associated with at least one pull request
+      identities_resolved:
+        op: identities_resolved
+        expression: "some pull_request: (every commit: author_username resolves or author is web-flow) or (every approver: username resolves)"
+        path: *a4
+        substitute: *a3
+        patterns: &a5
+          - ^.*?\[bot\] <[^>]+>$
+          - ^GitHub <noreply@github.com>$
+        inputs:
+          - path: *a4
+            each:
+              - commits
+          - path: *a4
+            each:
+              - approvers
+        description: Some pull request has every commit linked to a GitHub account or explained as a web-flow commit, or else has every one of its approvers resolved
+      independently_approved:
+        op: independently_approved
+        expression: "some pull_request: every author: some approver != author where state == APPROVED and timestamp > max(commits[].timestamp)"
+        path: *a4
+        substitute: *a3
+        patterns: *a5
+        inputs:
+          - - name
+          - path: *a4
+            each:
+              - approvers
+          - path: *a4
+            each:
+              - commits
+        description: Some pull request has an approval from someone other than each of its authors, after its latest commit

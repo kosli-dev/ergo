@@ -334,7 +334,7 @@ const seeds = Number(process.env['FUZZ_SEEDS'] ?? 30)
 
 test(`${steps} random edits from each of ${seeds} seeds keep every policy compiling and its prose intact`, () => {
 	const failures = new Map<string, {where: string; detail: string}>()
-	for (const file of EXAMPLES) {
+	for (const {file, ops} of EXAMPLES) {
 		const source = read(file)
 		for (let seed = 1; seed <= seeds; seed++) {
 			const r = rng(seed * 7919)
@@ -342,7 +342,7 @@ test(`${steps} random edits from each of ${seeds} seeds keep every policy compil
 			const trail: string[] = []
 
 			for (let step = 0; step < steps; step++) {
-				const before = analyze(doc)
+				const before = analyze(doc, {customOps: ops})
 				if (!before.ok) break
 				const spec = clone(before.requirements) as Spec
 				const order = [...MOVES].sort(() => r() - 0.5)
@@ -362,10 +362,10 @@ test(`${steps} random edits from each of ${seeds} seeds keep every policy compil
 					const hand = pick(r, HANDS)
 					const edited = hand.go(doc, r)
 					if (edited) {
-						const now = analyze(edited)
+						const now = analyze(edited, {customOps: ops})
 						const key = `${hand.name}: by hand`
 						if (!now.ok) failures.set(key, {where: `${file} seed ${seed} step ${step + 1}`, detail: now.diagnostics.filter((d) => d.severity === 'error').map((d) => d.message).join('; ')})
-						else if (yamlOf(now.requirements) !== yamlOf(analyze(doc).requirements))
+						else if (yamlOf(now.requirements) !== yamlOf(analyze(doc, {customOps: ops}).requirements))
 							failures.set(key, {where: `${file} seed ${seed} step ${step + 1}`, detail: 'the object changed'})
 						else {
 							doc = edited
@@ -375,7 +375,7 @@ test(`${steps} random edits from each of ${seeds} seeds keep every policy compil
 				}
 
 				const was = doc
-				const res = applyYaml(doc, yamlOf(spec))
+				const res = applyYaml(doc, yamlOf(spec), ops)
 				const say = (kind: string, detail: string): void => {
 					const key = `${move!.name}: ${kind}`
 					if (!failures.has(key)) failures.set(key, {where: `${file} seed ${seed} step ${step + 1}`, detail: `${detail}      after: ${trail.join(' -> ')}`})
@@ -384,19 +384,19 @@ test(`${steps} random edits from each of ${seeds} seeds keep every policy compil
 				const expected = move.mayRefuse && res.refusals.length && res.refusals.every((x) => move.mayRefuse!.test(x))
 				if (res.error) say('yaml did not parse', res.error)
 				else if (expected) {
-					const still = analyze(doc)
+					const still = analyze(doc, {customOps: ops})
 					if (!still.ok) say('refused but broke the document', res.refusals.join('; '))
 				} else if (res.refusals.length) say('refused', res.refusals.join('; '))
 				else if (res.drift.length) say('drift', res.drift.join(', '))
 				else {
-					const after = analyze(res.markdown)
+					const after = analyze(res.markdown, {customOps: ops})
 					if (!after.ok) say('document no longer compiles', after.diagnostics.filter((d) => d.severity === 'error').map((d) => `L${d.line} ${d.message}`).join('; '))
 					else {
 						if (!move.destructive) {
-							const lost = proseOf(was).filter((p) => !res.markdown.includes(p))
+							const lost = proseOf(was, ops).filter((p) => !res.markdown.includes(p))
 							if (lost.length) say('prose lost', `"${lost[0]!.slice(0, 70)}…"`)
 						}
-						const again = applyYaml(res.markdown, yamlOf(after.requirements))
+						const again = applyYaml(res.markdown, yamlOf(after.requirements), ops)
 						if (again.markdown !== res.markdown || again.changes.length) say('not idempotent', `re-applying its own YAML changed ${again.changes.length} thing(s)`)
 					}
 					doc = res.markdown

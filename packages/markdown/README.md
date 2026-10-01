@@ -187,6 +187,8 @@ A custom operator gets a phrase of its own, described in a JSON file you pass wi
 
 Then "some **pull request** must be independently approved" compiles to that operator, with its `expression` and `inputs`. Add `, treating **constant** as explained` to pass a constant's patterns to it. The operator itself is Rego, as the [reference](../../REFERENCE.md#custom-operators) describes.
 
+[`examples/four_eyes`](examples/four_eyes) shows a full one: a four-eyes review rule with two custom operators, a constant and a substitute.
+
 ## Commands
 
 | Command                                     | What it does                                                                 |

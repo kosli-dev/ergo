@@ -7,9 +7,13 @@ import type {CustomOpRegistry} from '../src/core/types.ts'
 
 export const PACKAGE = join(dirname(fileURLToPath(import.meta.url)), '..')
 
-export const EXAMPLES = ['examples/prod_deploy/policy.ergo.md', 'examples/multi_subject/policy.ergo.md']
-
 export const read = (file: string): string => readFileSync(join(PACKAGE, file), 'utf8')
+
+export const EXAMPLES: Array<{file: string; ops: CustomOpRegistry}> = [
+	{file: 'examples/prod_deploy/policy.ergo.md', ops: {}},
+	{file: 'examples/multi_subject/policy.ergo.md', ops: {}},
+	{file: 'examples/four_eyes/policy.ergo.md', ops: JSON.parse(read('examples/four_eyes/custom_ops.json')) as CustomOpRegistry},
+]
 
 export const yamlOf = (requirements: unknown): string => toYaml({requirements}, {lineWidth: 0})
 

@@ -6,16 +6,16 @@ import {EXAMPLES, clone, proseOf, read, yamlOf} from './helpers.ts'
 
 type Spec = Record<string, Record<string, Record<string, Record<string, unknown>>>>
 
-for (const file of EXAMPLES) {
+for (const {file, ops} of EXAMPLES) {
 	const markdown = read(file)
-	const analysis = analyze(markdown)
+	const analysis = analyze(markdown, {customOps: ops})
 
 	test(`${file} compiles`, () => {
 		assert.deepEqual(analysis.diagnostics, [])
 	})
 
 	test(`${file}: applying its own requirements changes nothing`, () => {
-		const identity = applyYaml(markdown, yamlOf(analysis.requirements))
+		const identity = applyYaml(markdown, yamlOf(analysis.requirements), ops)
 		assert.equal(identity.markdown, markdown)
 		assert.deepEqual(identity.changes, [])
 		assert.deepEqual(identity.refusals, [])
@@ -27,7 +27,7 @@ for (const file of EXAMPLES) {
 		for (const req of Object.values(target))
 			for (const field of ['checks', 'applies_to'])
 				for (const check of Object.values(req[field] ?? {})) check['description'] = `rewritten by the round trip ${++touched}`
-		const rewritten = applyYaml(markdown, yamlOf(target))
+		const rewritten = applyYaml(markdown, yamlOf(target), ops)
 		assert.deepEqual(rewritten.refusals, [])
 		assert.deepEqual(rewritten.drift, [])
 		assert.equal(rewritten.changes.length, touched)
@@ -35,7 +35,7 @@ for (const file of EXAMPLES) {
 		const bold = (text: string): string[] => (text.match(/\*\*[^*]+\*\*/g) ?? []).sort()
 		assert.deepEqual(bold(rewritten.markdown), bold(markdown))
 		assert.deepEqual(
-			proseOf(markdown).filter((p) => !rewritten.markdown.includes(p)),
+			proseOf(markdown, ops).filter((p) => !rewritten.markdown.includes(p)),
 			[],
 		)
 	})
@@ -44,12 +44,12 @@ for (const file of EXAMPLES) {
 		const grown = clone(analysis.requirements) as Record<string, {checks: Record<string, unknown>}>
 		const host = Object.keys(grown)[0]!
 		grown[host]!.checks['round_trip_probe'] = {op: 'non_empty_string', path: ['probe', 'undeclared_field'], description: 'A field nobody named in the table'}
-		const added = applyYaml(markdown, yamlOf(grown))
+		const added = applyYaml(markdown, yamlOf(grown), ops)
 		assert.deepEqual(added.refusals, [])
 		assert.deepEqual(added.drift, [])
 		assert.match(added.markdown, /\|\s*`probe\.undeclared_field`\s*\|/)
 		assert.deepEqual(
-			proseOf(markdown).filter((p) => !added.markdown.includes(p)),
+			proseOf(markdown, ops).filter((p) => !added.markdown.includes(p)),
 			[],
 		)
 	})
@@ -64,10 +64,10 @@ for (const file of EXAMPLES) {
 		const [req, check] = spot
 		let doc = markdown
 		for (const suffix of ['z', 'zz', '_2']) {
-			const spec = clone(analyze(doc).requirements) as Record<string, {checks: Record<string, {path: string[]}>}>
+			const spec = clone(analyze(doc, {customOps: ops}).requirements) as Record<string, {checks: Record<string, {path: string[]}>}>
 			const path = spec[req]!.checks[check]!.path
 			path[path.length - 1] = String(path[path.length - 1]).replace(/(z|zz|_2)$/, '') + suffix
-			const step = applyYaml(doc, yamlOf(spec))
+			const step = applyYaml(doc, yamlOf(spec), ops)
 			assert.ok(step.ok, [...step.refusals, ...step.drift].join('; '))
 			doc = step.markdown
 		}
@@ -83,26 +83,26 @@ for (const file of EXAMPLES) {
 		table[`${was}_renamed`] = table[was]
 		delete table[was]
 		const order = (text: string): string[] => (text.match(/^\s*- `[\w-]+`/gm) ?? []).map((l) => l.trim())
-		const renamed = applyYaml(markdown, yamlOf(renaming))
+		const renamed = applyYaml(markdown, yamlOf(renaming), ops)
 		assert.deepEqual([...renamed.refusals, ...renamed.drift], [])
 		assert.equal(order(renamed.markdown).length, order(markdown).length)
 		assert.equal(order(renamed.markdown).indexOf(`- \`${was}_renamed\``), order(markdown).indexOf(`- \`${was}\``))
 		assert.deepEqual(
-			proseOf(markdown).filter((p) => !renamed.markdown.includes(p)),
+			proseOf(markdown, ops).filter((p) => !renamed.markdown.includes(p)),
 			[],
 		)
 	})
 
 	test(`${file}: removing a check removes its bullet and no prose`, () => {
-		const first = Object.keys(analysis.requirements)[0]!
+		const first = Object.keys(analysis.requirements).find((r) => Object.keys((analysis.requirements[r] as {checks: object}).checks).length > 1)!
 		const cut = clone(analysis.requirements) as Record<string, {checks: Record<string, unknown>}>
 		const names = Object.keys(cut[first]!.checks)
 		delete cut[first]!.checks[names[names.length - 1]!]
-		const removed = applyYaml(markdown, yamlOf(cut))
+		const removed = applyYaml(markdown, yamlOf(cut), ops)
 		assert.deepEqual(removed.drift, [])
 		assert.doesNotMatch(removed.markdown, new RegExp(`- \`${names[names.length - 1]}\``))
 		assert.deepEqual(
-			proseOf(markdown).filter((p) => !removed.markdown.includes(p)),
+			proseOf(markdown, ops).filter((p) => !removed.markdown.includes(p)),
 			[],
 		)
 	})
