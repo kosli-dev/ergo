@@ -187,4 +187,4 @@ Copy the new `ergo.rego` over the old one and run your policy's tests.
 
 ## License
 
-ergo is at a very early stage and doesn't have a license yet. We'll add one soon. Until then, the code is here to read and try out, but not licensed for use in your own projects.
+ergo is licensed under the [Apache License 2.0](LICENSE).
