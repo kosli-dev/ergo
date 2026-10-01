@@ -748,18 +748,22 @@ leaf_paths(leaf) := [leaf.path] if {
 	leaf.path
 }
 
-row_inputs(subj, check, item) := array.concat(read_inputs(subj, check, item), ref_inputs(check))
+row_inputs(subj, check, item) := check_inputs(subj, check, item) if not check.substitute
 
-read_inputs(subj, check, item) := check_inputs(subj, check, item) if not check.substitute
-
-read_inputs(subj, check, item) := array.concat(
+row_inputs(subj, check, item) := array.concat(
 	check_inputs(subj, check, item),
 	check_inputs(subj, check.substitute, item),
 ) if check.substitute
 
-check_def(check, item) := object.union(check, {"expression": expression_of(check, item)}) if not check.substitute
+check_def(check, item) := with_refs(described(check, item), check)
 
-check_def(check, item) := object.union(check, {"expression": sprintf(
+with_refs(def, checked) := object.union(def, {"refs": ref_inputs(checked)}) if count(check_refs(checked)) > 0
+
+with_refs(def, checked) := def if count(check_refs(checked)) == 0
+
+described(check, item) := object.union(check, {"expression": expression_of(check, item)}) if not check.substitute
+
+described(check, item) := object.union(check, {"expression": sprintf(
 	"%s, or substitute: %s",
 	[expression_of(check, item), expression_of(check.substitute, item)],
 )}) if check.substitute
@@ -787,10 +791,13 @@ well_formed(req) if {
 	require_of(req) in {"every", "some"}
 }
 
-applies_def(req) := {"$applies": {
-	"description": sprintf("subject is in scope as a %s under this requirement's applies_to filter; out-of-scope subjects are recorded but not evaluated, and a subject whose filter can't be read fails", [subject_type_of(req)]),
-	"expression": concat(" and ", [expression_of(applies_to_of(req)[name], subject_item_name(req)) | some name in applies_to_names(req)]),
-}} if count(applies_to_of(req)) > 0
+applies_def(req) := {"$applies": with_refs(
+	{
+		"description": sprintf("subject is in scope as a %s under this requirement's applies_to filter; out-of-scope subjects are recorded but not evaluated, and a subject whose filter can't be read fails", [subject_type_of(req)]),
+		"expression": concat(" and ", [expression_of(applies_to_of(req)[name], subject_item_name(req)) | some name in applies_to_names(req)]),
+	},
+	applies_to_of(req),
+)} if count(applies_to_of(req)) > 0
 
 applies_def(req) := {} if count(applies_to_of(req)) == 0
 
@@ -937,7 +944,7 @@ violations(report) := [{
 	"check": row.check,
 	"description": definition_field(report.requirements, row, "description"),
 	"expression": definition_field(report.requirements, row, "expression"),
-	"inputs": row.inputs,
+	"inputs": array.concat(row.inputs, object.get(report.requirements, [row.requirement, "checks", row.check, "refs"], [])),
 	"cause": row.cause,
 } |
 	some row in report.results

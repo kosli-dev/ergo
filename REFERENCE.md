@@ -149,7 +149,7 @@ With `allowed_licences` set to `["MIT", "Apache-2.0"]`, a package licensed `GPL-
 }
 ```
 
-The expression says where the value comes from, and `inputs` show what it was, once per row, sorted by name. That keeps a record of what was compared, even when the params change between runs.
+The expression says where the value comes from. What it was goes in the check's definition in the report, under `refs`, once for the whole report and sorted by name, beside the literals the check compares against. The rows' `inputs` only hold what the check reads, like `licences[]` here, and `violations` adds the `refs` back to each violation's `inputs`, as above. That keeps a record of what was compared, even when the params change between runs, without copying it into every row. A path that starts with `$$input` is something the check reads, so its value stays in the row.
 
 Some things worth knowing:
 
@@ -358,7 +358,7 @@ Two rules:
 }
 ```
 
-`subjects.total` counts every subject found at `from`, and `subjects.matching` counts the ones left after `applies_to`. `checks` holds each check as you wrote it, plus the `expression` ergo rendered from it. If you write your own `expression`, yours is used. It also holds the [checks ergo adds](#checks-ergo-adds), each with a `description` and an `expression`.
+`subjects.total` counts every subject found at `from`, and `subjects.matching` counts the ones left after `applies_to`. `checks` holds each check as you wrote it, plus the `expression` ergo rendered from it. If you write your own `expression`, yours is used. A check that uses a [`ref`](#reading-from-the-input) also gets `refs`: the name and value of each one, as read for this report. It also holds the [checks ergo adds](#checks-ergo-adds), each with a `description` and an `expression`.
 
 `results` has one row for each subject and check:
 
@@ -429,7 +429,7 @@ When a check reads several fields, the row shows the first cause in this table's
 
 ## Violations
 
-`ergo.violations(report)` returns the rows that are real problems, each with its check's `description` and `expression` added:
+`ergo.violations(report)` returns the rows that are real problems, each with its check's `description` and `expression` added, and its `refs` added to the end of `inputs`:
 
 ```json
 [
