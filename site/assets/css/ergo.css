@@ -168,7 +168,7 @@ p code, li code, dd code, td code {
 .split { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: clamp(32px, 5vw, 72px); margin-top: 16px; }
 .split__col p:not(.lede) { color: var(--muted); }
 /* Examples on the left, heading and copy on the right. The copy stays first in the markup, so it leads on phones. */
-.split--text-right { grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr); align-items: start; margin-top: 0; }
+.split--text-right { grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr); align-items: center; margin-top: 0; }
 .split--text-right .split__col { grid-column: 2; grid-row: 1; }
 .split--text-right .compare { grid-column: 1; grid-row: 1; min-width: 0; }
 .split--text-right .compare__card { min-width: 0; }
