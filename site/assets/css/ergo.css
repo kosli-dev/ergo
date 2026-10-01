@@ -194,24 +194,7 @@ p code, li code, dd code, td code {
 
 /* ——— Declaration ——— */
 .declare { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, .65fr); gap: clamp(28px, 4vw, 56px); align-items: start; }
-.langs { min-width: 0; }
-.langs__tabs { display: none; }
-.langs__panels, .langs__panel { display: grid; gap: 16px; min-width: 0; }
-.langs.is-ready .langs__tabs { display: flex; gap: 4px; width: fit-content; margin-bottom: 14px; padding: 4px; border: 1px solid var(--line); border-radius: 999px; }
-.langs__tab {
-  display: inline-flex; align-items: center; height: 32px; padding: 0 16px;
-  border: 0; border-radius: 999px; cursor: pointer;
-  background: transparent; color: var(--muted); font-size: 13px; letter-spacing: .02em;
-  transition: background-color .2s ease, color .2s ease;
-}
-.langs__tab:hover { color: var(--paper); }
-.langs__tab[aria-selected="true"] { background: var(--lime); color: var(--ink); }
-.langs__tab:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
-.langs.is-ready .langs__panels { gap: 0; }
-.langs.is-ready .langs__panel { grid-area: 1 / 1; align-self: start; opacity: 0; transform: translateY(10px); visibility: hidden; }
-.langs.is-ready .langs__panel.is-active { opacity: 1; transform: none; visibility: visible; }
-.langs.is-live .langs__panel { transition: opacity .32s ease, transform .32s ease, visibility 0s linear .32s; }
-.langs.is-live .langs__panel.is-active { transition: opacity .32s ease .08s, transform .32s ease .08s, visibility 0s; }
+.declare__code { min-width: 0; }
 .declare__head { margin: 0 0 8px; font: 500 14px/1.4 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--paper); }
 .declare__intro { margin: 0 0 28px; color: var(--muted); font-size: 16px; }
 .notes { list-style: none; margin: 0; padding: 0; display: grid; gap: 28px; }
@@ -393,6 +376,5 @@ p code, li code, dd code, td code {
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .btn, .report__row > span, .langs__tab, .langs__panel { transition: none !important; }
-  .langs__panel { transform: none !important; }
+  .btn, .report__row > span { transition: none !important; }
 }
