@@ -11,6 +11,7 @@
     {{ $md = replaceRE `^## Getting started\n+` "" $md 1 }}
     {{ $md = replace $md "(REFERENCE.md)" "(../reference/)" }}
     {{ $md = replace $md "(README.md)" "(../getting-started/)" }}
+    {{ $md = replace $md "(LICENSE)" (printf "(%s/blob/main/LICENSE)" site.Params.repo) }}
     {{ $.AddPage (dict
       "path" $doc.path
       "title" $doc.title
