@@ -5,6 +5,7 @@ This page describes everything ergo accepts and everything it returns. If you ha
 - [Policies](#policies)
 - [Requirements](#requirements)
 - [Paths](#paths)
+- [Reading from the input](#reading-from-the-input)
 - [Operators](#operators)
 - [Substitutes](#substitutes)
 - [Custom operators](#custom-operators)
@@ -105,6 +106,56 @@ One step in a path can be a **selector** instead of a key. It picks the single i
 This reads the `state` of the attestation whose `type` is `pull_request`, and it works the same whether `attestations` is a list or an object keyed by name.
 
 A selector must match exactly one item. If it matches none, or more than one, the check fails, and the row's cause says which (`unmatched` or `ambiguous`). An empty `where` matches nothing. A path can contain only one selector.
+
+## Reading from the input
+
+A path normally starts inside the subject. A path that starts with `$$input` starts at the top of the document given to `ergo.report` instead:
+
+```rego
+"path": ["$$input", "settings", "mode"]
+```
+
+Every subject reads the same value. `$$input` only means this as the first step of a path, and any other first step starting with `$$` is reserved: it fails the check with cause `absent`. To read a key that really is called `$$input`, write it as `{"literal": "$$input"}`.
+
+A check's fixed values can be read from the input too. Write `{"ref": path}` in place of the value, where the path starts with `$$input`. This works for `value`, `values`, `patterns`, `min`, `max` and the values in a selector's `where`. It's how a policy takes params: put them in the document beside the evidence, and read them from there.
+
+```rego
+ergo.report({"params": params, "packages": packages}, {"licences": {
+	"subject_type": "package",
+	"from": ["packages"],
+	"id": ["name"],
+	"checks": {"approved": {
+		"op": "any",
+		"path": ["licences"],
+		"check": {"op": "in", "path": [], "values": {"ref": ["$$input", "params", "allowed_licences"]}},
+	}},
+}})
+```
+
+With `allowed_licences` set to `["MIT", "Apache-2.0"]`, a package licensed `GPL-3.0` gives this violation:
+
+```json
+{
+  "requirement": "licences",
+  "subject": { "type": "package", "id": "gpl-lib" },
+  "check": "approved",
+  "description": "",
+  "expression": "some licences: licences[] in $$input.params.allowed_licences",
+  "inputs": [
+    { "name": "licences[]", "value": ["GPL-3.0"] },
+    { "name": "$$input.params.allowed_licences", "value": ["MIT", "Apache-2.0"] }
+  ],
+  "cause": "value"
+}
+```
+
+The expression says where the value comes from, and `inputs` show what it was, once per row, sorted by name. That keeps a record of what was compared, even when the params change between runs.
+
+Some things worth knowing:
+
+- A ref that leads nowhere, or to `null`, fails the check, with cause `absent` or `null`. That cause wins over anything the subject's own fields would give, because the check can't mean anything without the value. ergo has no defaults, so put a default in the policy or the params.
+- A ref must start with `$$input`, and it can't contain a selector. Either fails the check with cause `absent`.
+- A value that is an object with a single `ref` or `literal` key would be read as one. Wrap it in `{"literal": ...}` to take it as written. Nothing inside a `literal` is read, so `{"literal": {"literal": 1}}` is the object `{"literal": 1}`.
 
 ## Operators
 
@@ -411,5 +462,6 @@ ergo fails a check whenever it can't be sure, instead of letting it pass. Rego d
 - `all`, `any` and `each` need non-empty lists.
 - `min_subjects` is 1 unless you say otherwise, so finding nothing fails.
 - A subject whose `applies_to` filter can't be read fails the requirement instead of being left out.
+- A `ref` that can't be read fails the check, even for operators like `excludes` or `not_matches_any` that would pass on an empty value.
 - A policy with no requirements, and a requirement with no checks, are never met.
 - A malformed timestamp fails `compare_time` rather than stopping the whole evaluation with an error.
