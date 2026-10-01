@@ -2737,3 +2737,7 @@ test_an_id_written_as_a_string_reads_that_one_key if {
 test_a_string_that_starts_with_two_dollars_is_not_a_name_when_it_is_the_whole_path if {
 	row_in({"mode": "strict"}, {"id": 1, "$$input": "own"}, {"op": "equals", "path": "$$input", "value": "own"}).passed == true
 }
+
+test_a_path_written_as_an_object_on_a_subject_that_is_not_an_object_is_not_an_object if {
+	row_in({}, "str", {"op": "present", "path": {"a": 1}}).cause == "not_an_object"
+}

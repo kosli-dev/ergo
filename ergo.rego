@@ -448,8 +448,10 @@ default read_state(_, _) := "absent"
 read_state(subj, path) := "not_an_object" if {
 	start := start_of(subj, path)
 	not is_object(start)
-	keys_of(path) != []
+	not reads_itself(path)
 }
+
+reads_itself(path) if keys_of(path) == []
 
 read_state(subj, path) := "ambiguous" if count(selector_candidates(subj, path)) > 1
 
