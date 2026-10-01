@@ -23,3 +23,24 @@ updates:
       - "dependabot"
       - "dependencies"
       - "github-actions"
+
+  # Node packages under packages/
+  - package-ecosystem: "npm"
+    open-pull-requests-limit: 10
+    directory: "/packages"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "11:00"
+    commit-message:
+      prefix: "markdown"
+    groups:
+      npm-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    labels:
+      - "dependabot"
+      - "dependencies"
