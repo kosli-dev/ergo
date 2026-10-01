@@ -1,5 +1,5 @@
 ---
-title: "ergo - Rego says no. ergo says why."
+title: "ergo - Explainable controls that run on Open Policy Agent and Rego."
 
 hero:
   title: Explainable controls that run on Open Policy Agent and Rego.
