@@ -86,6 +86,7 @@ em.hl { font-style: normal; }
 .site-nav { display: flex; align-items: center; gap: clamp(12px, 3vw, 28px); font-size: 15px; font-weight: 500; }
 .site-nav a:not(.btn) { text-decoration: none; color: var(--muted); }
 .site-nav a:not(.btn):hover, .site-nav a[aria-current] { color: var(--paper); }
+.menu-toggle { display: none; }
 
 /* ——— Buttons (full pill) ——— */
 .btn {
@@ -371,7 +372,25 @@ p code, li code, dd code, td code {
 }
 @media (max-width: 640px) {
   body { font-size: 16px; }
-  .site-nav a:not(.btn):nth-child(2) { display: none; }
+  /* Without JavaScript the nav stays inline, so drop Reference to make room. */
+  html:not(.js) .site-nav a:not(.btn):nth-child(2) { display: none; }
+  /* With JavaScript: a burger button opens the nav as a panel under the header. */
+  .js .menu-toggle {
+    display: grid; place-content: center; gap: 5px; width: 44px; height: 44px; margin-right: -10px;
+    background: none; border: 0; border-radius: 10px; color: var(--paper); cursor: pointer;
+  }
+  .js .menu-toggle span { display: block; width: 22px; height: 2px; background: currentColor; border-radius: 2px; transition: transform .2s ease, opacity .2s ease; }
+  .js .site-header.is-open .menu-toggle span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .js .site-header.is-open .menu-toggle span:nth-child(2) { opacity: 0; }
+  .js .site-header.is-open .menu-toggle span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  .js .site-nav {
+    display: none; position: absolute; top: 100%; left: 0; right: 0;
+    flex-direction: column; align-items: stretch; gap: 0;
+    padding: 8px var(--gutter) 20px; background: var(--ink); border-bottom: 1px solid var(--line); font-size: 18px;
+  }
+  .js .site-header.is-open .site-nav { display: flex; }
+  .js .site-nav a:not(.btn) { padding: 14px 0; border-bottom: 1px solid var(--line); color: var(--paper); }
+  .js .site-nav .btn { margin-top: 16px; height: 48px; justify-content: center; font-size: 16px; }
   .fields { grid-template-columns: minmax(0, 1fr); }
   .fields li { border-left: 0 !important; border-top: 1px solid var(--line); }
   .fields li:first-child { border-top: 0; }
@@ -385,5 +404,5 @@ p code, li code, dd code, td code {
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .btn, .report__row > span { transition: none !important; }
+  .btn, .report__row > span, .menu-toggle span { transition: none !important; }
 }
