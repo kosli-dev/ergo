@@ -380,6 +380,210 @@ test_selector_value_is_echoed_in_the_row if {
 	}]
 }
 
+pr_labelled := {"where": {"attestation_type": "pull_request"}, "labels": {"evidence_id": ["id"]}}
+
+labelled_attestations := {"attestations": [
+	{"id": "a-1", "attestation_type": "unit_test", "payload": "wrong"},
+	{"id": "a-2", "attestation_type": "pull_request", "payload": "right", "url": "https://example.com/a-2"},
+]}
+
+labelled_payload := {"op": "equals", "path": ["attestations", pr_labelled, "payload"], "value": "right"}
+
+labelled_name := "attestations.[attestation_type==pull_request].payload"
+
+test_selector_labels_tag_a_value_with_fields_of_the_element_it_was_read_from if {
+	inputs_of(labelled_attestations, labelled_payload) == [{"name": labelled_name, "value": "right", "labels": {"evidence_id": "a-2"}}]
+}
+
+test_selector_labels_work_on_a_map if {
+	doc := {"attestations": {
+		"unit": {"id": "a-1", "attestation_type": "unit_test", "payload": "wrong"},
+		"pr": {"id": "a-2", "attestation_type": "pull_request", "payload": "right"},
+	}}
+	inputs_of(doc, labelled_payload) == [{"name": labelled_name, "value": "right", "labels": {"evidence_id": "a-2"}}]
+}
+
+test_selector_labels_are_null_when_nothing_matches if {
+	doc := {"attestations": [{"id": "a-1", "attestation_type": "unit_test", "payload": "right"}]}
+	inputs_of(doc, labelled_payload) == [{"name": labelled_name, "value": null, "labels": {"evidence_id": null}}]
+}
+
+test_selector_labels_are_null_when_two_elements_match if {
+	doc := {"attestations": [
+		{"id": "a-1", "attestation_type": "pull_request", "payload": "right"},
+		{"id": "a-2", "attestation_type": "pull_request", "payload": "right"},
+	]}
+	inputs_of(doc, labelled_payload) == [{"name": labelled_name, "value": null, "labels": {"evidence_id": null}}]
+}
+
+test_selector_labels_are_null_when_the_collection_is_missing if {
+	inputs_of({}, labelled_payload) == [{"name": labelled_name, "value": null, "labels": {"evidence_id": null}}]
+}
+
+test_a_label_is_null_when_its_field_is_missing if {
+	doc := {"attestations": [{"attestation_type": "pull_request", "payload": "right"}]}
+	inputs_of(doc, labelled_payload) == [{"name": labelled_name, "value": "right", "labels": {"evidence_id": null}}]
+}
+
+test_a_label_is_null_when_its_field_is_null if {
+	doc := {"attestations": [{"id": null, "attestation_type": "pull_request", "payload": "right"}]}
+	inputs_of(doc, labelled_payload) == [{"name": labelled_name, "value": "right", "labels": {"evidence_id": null}}]
+}
+
+test_a_label_is_null_when_its_path_is_not_a_path if {
+	sel := {"where": {"attestation_type": "pull_request"}, "labels": {"evidence_id": 7}}
+	check := object.union(labelled_payload, {"path": ["attestations", sel, "payload"]})
+	inputs_of(labelled_attestations, check) == [{"name": labelled_name, "value": "right", "labels": {"evidence_id": null}}]
+}
+
+test_a_label_can_be_any_value_not_just_a_string if {
+	doc := {"attestations": [{"id": {"n": 1}, "attestation_type": "pull_request", "payload": "right"}]}
+	inputs_of(doc, labelled_payload) == [{"name": labelled_name, "value": "right", "labels": {"evidence_id": {"n": 1}}}]
+}
+
+test_an_unreadable_label_does_not_fail_a_check_because_it_is_not_evidence if {
+	doc := {"attestations": [{"attestation_type": "pull_request", "payload": "right"}]}
+	verdict(doc, labelled_payload) == true
+	cause_of(doc, labelled_payload) == "satisfied"
+}
+
+test_readable_labels_do_not_pass_a_failing_check if {
+	check := object.union(labelled_payload, {"value": "other"})
+	verdict(labelled_attestations, check) == false
+	cause_of(labelled_attestations, check) == "value"
+}
+
+test_selector_labels_do_not_change_the_expression if {
+	rendered(labelled_attestations, labelled_payload) == rendered(attestations_array, pr_payload)
+}
+
+test_each_side_of_a_comparison_has_its_own_labels if {
+	doc := {"attestations": [
+		{"id": "a-1", "attestation_type": "build", "at": 1},
+		{"id": "a-2", "attestation_type": "deploy", "at": 2},
+	]}
+	check := {
+		"op": "compare",
+		"cmp": "lt",
+		"left": ["attestations", {"where": {"attestation_type": "build"}, "labels": {"evidence_id": ["id"]}}, "at"],
+		"right": ["attestations", {"where": {"attestation_type": "deploy"}, "labels": {"evidence_id": ["id"]}}, "at"],
+	}
+	inputs_of(doc, check) == [
+		{"name": "attestations.[attestation_type==build].at", "value": 1, "labels": {"evidence_id": "a-1"}},
+		{"name": "attestations.[attestation_type==deploy].at", "value": 2, "labels": {"evidence_id": "a-2"}},
+	]
+}
+
+test_any_of_gives_each_read_its_own_labels if {
+	doc := {"attestations": [
+		{"id": "a-1", "attestation_type": "jira", "key": "J-1"},
+		{"id": "a-2", "attestation_type": "pull_request", "payload": "right"},
+	]}
+	check := {"op": "any_of", "options": {
+		"pr": [labelled_payload],
+		"ticket": [{"op": "present", "path": ["attestations", {"where": {"attestation_type": "jira"}, "labels": {"evidence_id": ["id"]}}, "key"]}],
+		"plain": [{"op": "present", "path": ["note"]}],
+	}}
+	inputs_of(doc, check) == [
+		{"name": "attestations.[attestation_type==jira].key", "value": "J-1", "labels": {"evidence_id": "a-1"}},
+		{"name": labelled_name, "value": "right", "labels": {"evidence_id": "a-2"}},
+		{"name": "note", "value": null},
+	]
+}
+
+test_a_substitute_read_has_its_own_labels if {
+	check := {"op": "present", "path": ["approval"], "substitute": labelled_payload}
+	inputs_of(labelled_attestations, check) == [
+		{"name": "approval", "value": null},
+		{"name": labelled_name, "value": "right", "labels": {"evidence_id": "a-2"}},
+	]
+}
+
+test_explicit_inputs_carry_labels if {
+	check := object.union(labelled_payload, {"inputs": [
+		["attestations", pr_labelled, "payload"],
+		{"path": ["attestations", pr_labelled, "files"], "each": ["name"]},
+	]})
+	doc := {"attestations": [{
+		"id": "a-2",
+		"attestation_type": "pull_request",
+		"payload": "right",
+		"files": [{"name": "x"}, {"name": "y"}],
+	}]}
+	inputs_of(doc, check) == [
+		{"name": labelled_name, "value": "right", "labels": {"evidence_id": "a-2"}},
+		{"name": "attestations.[attestation_type==pull_request].files[].name", "value": ["x", "y"], "labels": {"evidence_id": "a-2"}},
+	]
+}
+
+test_a_quantified_check_carries_the_labels_of_its_collection if {
+	doc := {"attestations": [{
+		"id": "a-2",
+		"attestation_type": "pull_request",
+		"reviews": [{"state": "APPROVED", "files": ["x"]}],
+	}]}
+	every_review := {
+		"op": "all",
+		"path": ["attestations", pr_labelled, "reviews"],
+		"check": {"op": "equals", "path": ["state"], "value": "APPROVED"},
+	}
+	every_file := {
+		"op": "all",
+		"path": ["attestations", pr_labelled, "reviews"],
+		"each": ["files"],
+		"check": {"op": "non_empty_string", "path": []},
+	}
+	inputs_of(doc, every_review) == [{
+		"name": "attestations.[attestation_type==pull_request].reviews[].state",
+		"value": ["APPROVED"],
+		"labels": {"evidence_id": "a-2"},
+	}]
+	inputs_of(doc, every_file) == [{
+		"name": "attestations.[attestation_type==pull_request].reviews[].files",
+		"value": [["x"]],
+		"labels": {"evidence_id": "a-2"},
+	}]
+}
+
+test_an_applies_to_row_carries_labels if {
+	req := {"s": {
+		"from": ["items"],
+		"id": ["id"],
+		"applies_to": {"has_pr": labelled_payload},
+		"checks": {"c": {"op": "present", "path": ["id"]}},
+	}}
+	rep := ergo.report({"items": [object.union(labelled_attestations, {"id": "i-1"})]}, req)
+	[r.inputs | some r in rows_for(rep, "s", "$applies")] == [[{"name": labelled_name, "value": "right", "labels": {"evidence_id": "a-2"}}]]
+}
+
+test_selector_labels_read_every_named_path if {
+	sel := {"where": {"attestation_type": "pull_request"}, "labels": {
+		"evidence_id": ["id"],
+		"url": ["url"],
+		"missing": ["nope"],
+	}}
+	check := object.union(labelled_payload, {"path": ["attestations", sel, "payload"]})
+	inputs_of(labelled_attestations, check) == [{
+		"name": labelled_name,
+		"value": "right",
+		"labels": {"evidence_id": "a-2", "missing": null, "url": "https://example.com/a-2"},
+	}]
+}
+
+test_empty_selector_labels_give_an_empty_object if {
+	sel := {"where": {"attestation_type": "pull_request"}, "labels": {}}
+	check := object.union(labelled_payload, {"path": ["attestations", sel, "payload"]})
+	inputs_of(labelled_attestations, check) == [{"name": labelled_name, "value": "right", "labels": {}}]
+}
+
+test_selector_labels_are_null_when_they_are_not_an_object if {
+	every bad in [null, ["id"], "id", 7] {
+		sel := {"where": {"attestation_type": "pull_request"}, "labels": bad}
+		check := object.union(labelled_payload, {"path": ["attestations", sel, "payload"]})
+		inputs_of(labelled_attestations, check) == [{"name": labelled_name, "value": "right", "labels": null}]
+	}
+}
+
 service_accounts := {"svc_.*", `.*\[bot\]`, `noreply@github\.com`}
 
 matches(op) := {"op": op, "path": ["author"], "patterns": service_accounts}

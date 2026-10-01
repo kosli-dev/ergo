@@ -91,6 +91,80 @@ This reads the `state` of the attestation whose `type` is `pull_request`, and it
 
 A selector must match exactly one item. If it matches none, or more than one, the check fails, and the row's cause says which (`unmatched` or `ambiguous`). An empty `where` matches nothing. A path can contain only one selector.
 
+A selector can also define `labels`: names mapped to paths inside the item it picked. Every value a row reads through the selector is then tagged with those fields of the item, so you can trace it back to where it came from.
+
+With this input:
+
+```json
+{
+  "artifacts": [
+    {
+      "name": "web",
+      "attestations": [
+        {
+          "id": "a1b2c3",
+          "type": "pull_request",
+          "state": "MERGED",
+          "url": "https://example.com/prs/42"
+        },
+        {
+          "id": "d4e5f6",
+          "type": "unit_test",
+          "state": "PASSED",
+          "url": "https://example.com/tests/7"
+        }
+      ]
+    }
+  ]
+}
+```
+
+and this requirement:
+
+```rego
+"reviewed": {
+	"subject_type": "artifact",
+	"from": ["artifacts"],
+	"id": ["name"],
+	"checks": {"merged": {
+		"op": "equals",
+		"path": ["attestations", {
+			"where": {"type": "pull_request"},
+			"labels": {"evidence_id": ["id"], "url": ["url"]},
+		}, "state"],
+		"value": "MERGED",
+	}},
+}
+```
+
+the `merged` row in `results` is:
+
+```json
+{
+  "requirement": "reviewed",
+  "subject": { "type": "artifact", "id": "web" },
+  "check": "merged",
+  "inputs": [
+    {
+      "name": "attestations.[type==pull_request].state",
+      "value": "MERGED",
+      "labels": {
+        "evidence_id": "a1b2c3",
+        "url": "https://example.com/prs/42"
+      }
+    }
+  ],
+  "passed": true,
+  "cause": "satisfied"
+}
+```
+
+The labels come from the pull request attestation, the one the selector picked, and not from the unit test one.
+
+Labels are only there for tracing. They don't change whether a check passes or what its cause is, and they don't appear in the expression. If the selector matches nothing or more than one item, every label is `null`, and so is a label whose path leads nowhere in the item. If `labels` isn't an object, the input's `labels` is `null`. To make sure a label is actually there, add a `present` check for it. A path whose selector has no `labels` gives inputs without a `labels` field.
+
+The labels go on each input, not on the row, because one row can read through several selectors. So the two sides of a `compare`, the reads of an `any_of` and a substitute's reads each get their own. For `all` and `any`, the labels come from the selector in the check's `path`, and selectors in the element check don't add any.
+
 ## Operators
 
 Every check has an `op` and the parameters that operator needs.
@@ -301,7 +375,7 @@ Two rules:
 }
 ```
 
-Passing and failing rows have the same fields. To find a row's description and expression, look up `requirements[row.requirement].checks[row.check]`. Look it up through the requirement, because two requirements can use the same check name for different things.
+Passing and failing rows have the same fields. An input read through a selector that defines [`labels`](#paths) has a `labels` field too. To find a row's description and expression, look up `requirements[row.requirement].checks[row.check]`. Look it up through the requirement, because two requirements can use the same check name for different things.
 
 ### Checks ergo adds
 

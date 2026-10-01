@@ -65,10 +65,15 @@ resolved(subj, path) := object.get(subj, path, absent) if not selector_index(pat
 
 resolved(subj, path) := v if {
 	i := selector_index(path)
+	elem := selected_element(subj, path)
+	v := object.get(elem, array.slice(path, i + 1, count(path)), absent)
+}
+
+selected_element(subj, path) := elem if {
+	i := selector_index(path)
 	base := object.get(subj, array.slice(path, 0, i), absent)
 	base != absent
 	elem := selected(base, path[i])
-	v := object.get(elem, array.slice(path, i + 1, count(path)), absent)
 }
 
 selector_index(path) := min([i | some i, seg in path; is_object(seg)])
@@ -476,22 +481,26 @@ check_inputs(subj, check) := [echoed(subj, spec) | some spec in check.inputs] if
 	check.inputs
 }
 
-echoed(subj, spec) := {"name": path_name(spec), "value": value_at(subj, spec)} if is_array(spec)
+echoed(subj, spec) := with_labels({"name": path_name(spec), "value": value_at(subj, spec)}, subj, spec) if is_array(spec)
 
-echoed(subj, spec) := {
-	"name": sprintf("%s[].%s", [path_name(object.get(spec, "path", [])), path_name(object.get(spec, "each", []))]),
-	"value": [value_at(elem, object.get(spec, "each", [])) | some elem in value_at(subj, object.get(spec, "path", []))],
-} if is_object(spec)
+echoed(subj, spec) := with_labels(
+	{
+		"name": sprintf("%s[].%s", [path_name(object.get(spec, "path", [])), path_name(object.get(spec, "each", []))]),
+		"value": [value_at(elem, object.get(spec, "each", [])) | some elem in value_at(subj, object.get(spec, "path", []))],
+	},
+	subj,
+	object.get(spec, "path", []),
+) if is_object(spec)
 
 check_inputs(subj, check) := [
-	{"name": path_name(check.left), "value": value_at(subj, check.left)},
-	{"name": path_name(check.right), "value": value_at(subj, check.right)},
+	with_labels({"name": path_name(check.left), "value": value_at(subj, check.left)}, subj, check.left),
+	with_labels({"name": path_name(check.right), "value": value_at(subj, check.right)}, subj, check.right),
 ] if {
 	not check.inputs
 	two_sided(check)
 }
 
-check_inputs(subj, check) := [{"name": nm, "value": vals}] if {
+check_inputs(subj, check) := [with_labels({"name": nm, "value": vals}, subj, check.path)] if {
 	not check.inputs
 	quantified(check)
 	not check.each
@@ -499,31 +508,49 @@ check_inputs(subj, check) := [{"name": nm, "value": vals}] if {
 	nm := sprintf("%s[].%s", [path_name(check.path), path_name(object.get(check.check, "path", []))])
 }
 
-check_inputs(subj, check) := [{"name": collection_name(check), "value": vals}] if {
+check_inputs(subj, check) := [with_labels({"name": collection_name(check), "value": vals}, subj, check.path)] if {
 	not check.inputs
 	quantified(check)
 	check.each
 	vals := [value_at(elem, check.each) | some elem in value_at(subj, check.path)]
 }
 
-check_inputs(subj, check) := [{"name": path_name(check.path), "value": value_at(subj, check.path)}] if {
+check_inputs(subj, check) := [with_labels({"name": path_name(check.path), "value": value_at(subj, check.path)}, subj, check.path)] if {
 	not check.inputs
 	not two_sided(check)
 	not quantified(check)
 	check.path
 }
 
-check_inputs(subj, check) := [{"name": nm, "value": reads[nm]} | some nm in sort(object.keys(reads))] if {
+check_inputs(subj, check) := [reads[nm] | some nm in sort(object.keys(reads))] if {
 	not check.inputs
 	check.op == "any_of"
 	reads := any_of_reads(subj, check)
 }
 
-any_of_reads(subj, check) := {path_name(p): value_at(subj, p) |
+any_of_reads(subj, check) := {path_name(p): with_labels({"name": path_name(p), "value": value_at(subj, p)}, subj, p) |
 	some group in check.options
 	some leaf in group
 	some p in leaf_paths(leaf)
 }
+
+with_labels(entry, _, path) := entry if not has_labels(path)
+
+with_labels(entry, subj, path) := object.union(entry, {"labels": read_labels(subj, path)}) if has_labels(path)
+
+selector_of(path) := path[selector_index(path)]
+
+has_labels(path) if "labels" in object.keys(selector_of(path))
+
+read_labels(_, path) := null if not is_object(selector_of(path).labels)
+
+read_labels(subj, path) := {k: label_value(subj, path, p) | some k, p in selector_of(path).labels} if {
+	is_object(selector_of(path).labels)
+}
+
+default label_value(_, _, _) := null
+
+label_value(subj, path, label_path) := value_at(selected_element(subj, path), label_path)
 
 leaf_paths(leaf) := [leaf.left, leaf.right] if two_sided(leaf)
 
