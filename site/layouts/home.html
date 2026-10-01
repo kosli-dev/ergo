@@ -238,7 +238,7 @@ report := ergo.report(input, requirements)</code></pre>
 {{/* 09 — Close */}}
 <section class="cta">
   <div class="wrap cta__inner">
-    <h2 class="cta__title"><strong>{{ $c.close.title }}</strong></h2>
+    <h2 class="cta__title"><span class="cta__lead">{{ partial "copy.html" $c.close.lead }}</span><strong>{{ $c.close.title }}</strong></h2>
     <div class="actions">
       <a class="btn btn--dark" href="{{ site.Params.repo }}">{{ partial "github-icon.html" . }}{{ $c.close.primary }}</a>
       <a class="btn btn--dark-outline" href="{{ "docs/getting-started/" | relURL }}">{{ $c.close.secondary }} <span aria-hidden="true">→</span></a>

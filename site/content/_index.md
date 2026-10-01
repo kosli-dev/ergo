@@ -102,6 +102,7 @@ name:
   body: Not *computer says no*. Here is the decision, and here is what produced it.
 
 close:
+  lead: Rego says no. ==ergo== says why.
   title: Show the working.
   primary: GitHub
   secondary: Get started

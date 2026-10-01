@@ -278,6 +278,8 @@ p code, li code, dd code, td code {
 .cta__title { margin: 0; font: 400 clamp(32px, 4.6vw, 56px)/1.08 var(--sans); letter-spacing: -.03em; }
 .cta__title strong, .cta__title span { display: block; }
 .cta__title strong { font-weight: 700; }
+/* On the lime banner the name's plate flips: ink plate, lime text. */
+.cta__title .ergo-mark { display: inline; color: var(--lime); background: linear-gradient(to bottom, transparent 21%, var(--ink) 21%, var(--ink) 97%, transparent 97%); }
 .cta .actions { margin-top: 0; }
 
 /* ——— Footer ——— */
