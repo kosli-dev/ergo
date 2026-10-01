@@ -423,9 +423,18 @@ applies_cause(subj, req) := cause_precedence[i] if {
 	])
 }
 
-failed_filter_causes(subj, req) := {row_cause(check, subj) |
+failed_filter_causes(subj, req) := {filter_cause(check, subj) |
 	some check in applies_to_of(req)
 	not check_passed(check, subj)
+}
+
+filter_cause(check, subj) := "value" if answers_presence(check, subj)
+
+filter_cause(check, subj) := row_cause(check, subj) if not answers_presence(check, subj)
+
+answers_presence(check, subj) if {
+	check.op == "present"
+	row_cause(check, subj) in {"absent", "null"}
 }
 
 ruled_out(subj, req) if "value" in failed_filter_causes(subj, req)

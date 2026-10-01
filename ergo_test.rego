@@ -2334,6 +2334,57 @@ test_a_missing_substitute_does_not_make_an_out_of_scope_subject_unreadable if {
 	rows_for(rep, "s", "$applies")[0].cause == "value"
 }
 
+locked_req(filter_path) := {"s": {
+	"from": ["packages"],
+	"id": ["id"],
+	"min_subjects": 0,
+	"applies_to": {"locked": {"op": "present", "path": filter_path}},
+	"checks": {"c": {"op": "equals", "path": ["signed"], "value": true}},
+}}
+
+test_a_present_filter_rules_out_a_subject_whose_field_is_missing if {
+	rep := ergo.report({"packages": [{"id": "a"}]}, locked_req(["lock"]))
+	rep.requirements.s.satisfied == true
+	rep.requirements.s.subjects == {"total": 1, "matching": 0}
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "$applies")] == [[false, "value"]]
+	ergo.violations(rep) == []
+}
+
+test_a_present_filter_rules_out_a_subject_whose_field_is_null if {
+	rep := ergo.report({"packages": [{"id": "a", "lock": null}]}, locked_req(["lock"]))
+	rep.requirements.s.satisfied == true
+	[r.cause | some r in rows_for(rep, "s", "$applies")] == ["value"]
+}
+
+test_a_present_filter_still_fails_when_its_selector_matches_nothing if {
+	rep := ergo.report({"packages": [{"id": "a", "atts": [{"type": "scan"}]}]}, locked_req(["atts", {"where": {"type": "lock"}}]))
+	rep.requirements.s.satisfied == false
+	[r.cause | some r in rows_for(rep, "s", "$applies")] == ["unmatched"]
+}
+
+test_a_present_filter_still_fails_when_its_selector_matches_several_items if {
+	rep := ergo.report({"packages": [{"id": "a", "atts": [{"type": "lock"}, {"type": "lock"}]}]}, locked_req(["atts", {"where": {"type": "lock"}}]))
+	rep.requirements.s.satisfied == false
+	[r.cause | some r in rows_for(rep, "s", "$applies")] == ["ambiguous"]
+}
+
+test_a_present_filter_still_fails_on_a_subject_that_is_not_an_object if {
+	rep := ergo.report({"packages": ["a"]}, locked_req(["lock"]))
+	rep.requirements.s.satisfied == false
+	[r.cause | some r in rows_for(rep, "s", "$applies")] == ["not_an_object"]
+}
+
+test_a_present_check_on_a_missing_field_still_says_absent if {
+	cause_of({}, {"op": "present", "path": ["lock"]}) == "absent"
+}
+
+test_only_a_present_filter_rules_out_a_subject_whose_field_is_missing if {
+	req := {"s": object.union(locked_req(["lock"]).s, {"applies_to": {"locked": {"op": "non_empty_string", "path": ["lock"]}}})}
+	rep := ergo.report({"packages": [{"id": "a"}]}, req)
+	rep.requirements.s.satisfied == false
+	[r.cause | some r in rows_for(rep, "s", "$applies")] == ["absent"]
+}
+
 test_a_custom_op_filter_without_inputs_rules_a_subject_out if {
 	req := {"s": object.union(degraded_req("every").s, {"applies_to": {"is_even": {"op": "even", "path": ["n"], "expression": "n is even"}}})}
 	ergo.report({"rounds": [{"id": "r1", "n": 3}]}, req).requirements.s.satisfied == true
