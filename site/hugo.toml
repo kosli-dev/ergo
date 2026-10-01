@@ -4,7 +4,7 @@ title = "ergo"
 disableKinds = ["taxonomy", "term", "rss"]
 
 [params]
-  description = "ergo is a standard format for explainable controls. You write the control as data, and every Rego decision comes back with a report of what was checked, what was read, and why it passed or failed."
+  description = "ergo is an open source language for defining explainable controls. Instead of a binary result, every decision returns an audit report of what was checked, and why it passed or failed."
   repo = "https://github.com/kosli-dev/ergo"
   fork = "https://github.com/kosli-dev/ergo/fork"
   opaVersion = "1.19"
