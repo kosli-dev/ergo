@@ -253,6 +253,47 @@ test_includes_rejects_non_array if verdict({"labels": "approved"}, has_approved)
 
 test_includes_rejects_missing_field if verdict({}, has_approved) == false
 
+allowed_licence := {"op": "in", "path": ["id"], "values": ["MIT", "Apache-2.0"]}
+
+test_in_when_field_is_one_of_the_values if verdict({"id": "Apache-2.0"}, allowed_licence) == true
+
+test_in_when_field_is_none_of_the_values if verdict({"id": "GPL-3.0"}, allowed_licence) == false
+
+test_in_is_type_sensitive if verdict({"n": "1"}, {"op": "in", "path": ["n"], "values": [1, 2]}) == false
+
+test_in_matches_numbers if verdict({"n": 2}, {"op": "in", "path": ["n"], "values": [1, 2]}) == true
+
+test_in_fails_closed_on_a_missing_field if {
+	verdict({}, allowed_licence) == false
+	cause_of({}, allowed_licence) == "absent"
+}
+
+test_in_fails_closed_on_a_null_field if {
+	verdict({"id": null}, allowed_licence) == false
+	cause_of({"id": null}, allowed_licence) == "null"
+}
+
+test_in_does_not_match_a_null_field_against_null_in_values if {
+	verdict({"id": null}, {"op": "in", "path": ["id"], "values": [null, "MIT"]}) == false
+}
+
+test_in_fails_closed_on_a_wrong_typed_field if verdict({"id": ["MIT"]}, allowed_licence) == false
+
+test_in_fails_closed_without_values if verdict({"id": "MIT"}, {"op": "in", "path": ["id"]}) == false
+
+test_in_fails_closed_on_null_values if verdict({"id": "MIT"}, {"op": "in", "path": ["id"], "values": null}) == false
+
+test_in_fails_closed_when_values_is_not_a_list if {
+	verdict({"id": "MIT"}, {"op": "in", "path": ["id"], "values": "MIT"}) == false
+	verdict({"id": "MIT"}, {"op": "in", "path": ["id"], "values": {"licence": "MIT"}}) == false
+}
+
+test_in_fails_closed_on_empty_values if verdict({"id": "MIT"}, {"op": "in", "path": ["id"], "values": []}) == false
+
+test_in_shows_the_field_value_in_inputs if {
+	inputs_of({"id": "GPL-3.0"}, allowed_licence) == [{"name": "id", "value": "GPL-3.0"}]
+}
+
 is_merged := {"op": "equals", "path": ["state"], "value": "MERGED"}
 
 test_equals_on_match if verdict({"state": "MERGED"}, is_merged) == true
@@ -1112,6 +1153,8 @@ test_expression_for_range if rendered({"temp_c": 5}, in_range) == "temp_c >= 0 a
 test_expression_for_excludes if rendered({"labels": []}, no_wip) == "not contains(labels, wip)"
 
 test_expression_for_includes if rendered({"labels": []}, has_approved) == "contains(labels, approved)"
+
+test_expression_for_in_sorts_the_values if rendered({"id": "MIT"}, allowed_licence) == "id in [Apache-2.0, MIT]"
 
 test_expression_for_equals if rendered({}, is_merged) == "state == MERGED"
 
