@@ -378,6 +378,7 @@ p code, li code, dd code, td code {
   .docs__label { cursor: pointer; }
 }
 @media (max-width: 640px) {
+  .site-footer__inner { grid-template-columns: minmax(0, 1fr); gap: 24px; }
   body { font-size: 16px; }
   .site-nav a:not(.btn):nth-child(2) { display: none; }
   .fields { grid-template-columns: minmax(0, 1fr); }
