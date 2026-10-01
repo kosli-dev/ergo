@@ -19,6 +19,7 @@ jobs:
       - run: opa check --strict . --ignore .github
       - run: opa fmt --list --fail .
       - run: opa test . --ignore .github --verbose
+      - run: node --test packages/report/report_test.mjs
       - name: Check every line is tested
         shell: bash
         run: |
