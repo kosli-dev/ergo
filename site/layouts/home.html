@@ -63,16 +63,18 @@ d-3      <span class="k">$applies</span>   environment = "staging"  <span class=
 {{/* 02 — Declaration */}}
 <section class="section section--panel">
   <div class="wrap">
-    <h2 class="display-m">{{ $c.declaration.title }}<br><span class="muted">{{ $c.declaration.muted }}</span></h2>
     <div class="declare">
-<div class="langs" data-langs>
-      <div class="langs__tabs" role="tablist" aria-label="{{ $c.declaration.switch }}">
-        {{- range $i, $f := $c.declaration.formats }}
-        <button class="langs__tab mono" type="button" role="tab" id="lang-tab-{{ $f.key }}" aria-controls="lang-{{ $f.key }}" aria-selected="{{ cond (eq $i 0) "true" "false" }}"{{ if ne $i 0 }} tabindex="-1"{{ end }}>{{ $f.label }}</button>
-        {{- end }}
+      <div class="declare__notes">
+        <h2 class="display-m">{{ $c.declaration.title }}<br><span class="muted">{{ $c.declaration.muted }}</span></h2>
+        <h3 class="declare__head">{{ $c.declaration.notes_title }}</h3>
+        <p class="declare__intro">{{ partial "copy.html" $c.declaration.notes_intro }}</p>
+        <ol class="notes">
+          {{- range $i, $n := $c.declaration.notes }}
+          <li><span class="notes__n mono">{{ add $i 1 }}</span><div><h4>{{ $n.title }}</h4><p>{{ partial "copy.html" $n.body }}</p></div></li>
+          {{- end }}
+        </ol>
       </div>
-      <div class="langs__panels">
-        <div class="langs__panel is-active" role="tabpanel" id="lang-yaml" aria-labelledby="lang-tab-yaml">
+      <div class="declare__code">
 <pre class="code code--lg"><code><span class="n"># policy/requirements.yaml</span>
 <span class="k">requirements</span>:
   <span class="k">prod_deploy</span>:
@@ -89,47 +91,6 @@ d-3      <span class="k">$applies</span>   environment = "staging"  <span class=
         <span class="k">description</span>: <span class="s">Someone approved the deployment</span>
         <span class="k">op</span>: <span class="s">non_empty_string</span>
         <span class="k">path</span>: [<span class="s">approved_by</span>]</code></pre>
-<pre class="code code--lg"><code><span class="n"># policy/deploy.rego</span>
-<span class="kw">package</span> deploy
-
-<span class="kw">import</span> data.ergo
-
-report := ergo.report(input, data.requirements)</code></pre>
-        </div>
-        <div class="langs__panel" role="tabpanel" id="lang-rego" aria-labelledby="lang-tab-rego">
-<pre class="code code--lg"><code><span class="n"># policy/deploy.rego</span>
-<span class="kw">package</span> deploy
-
-<span class="kw">import</span> data.ergo
-
-requirements := {<span class="s">"prod_deploy"</span>: {
-	<span class="k" data-note="1">"subject_type"</span>: <span class="s">"deployment"</span>,
-	<span class="k" data-note="1">"from"</span>: [<span class="s">"deployments"</span>],
-	<span class="k" data-note="1">"id"</span>: [<span class="s">"id"</span>],
-	<span class="k" data-note="2">"applies_to"</span>: {<span class="s">"is_prod"</span>: {
-		<span class="k">"op"</span>: <span class="s">"equals"</span>,
-		<span class="k">"path"</span>: [<span class="s">"environment"</span>],
-		<span class="k">"value"</span>: <span class="s">"prod"</span>,
-	}},
-	<span class="k" data-note="3">"checks"</span>: {<span class="s">"approved"</span>: {
-		<span class="k">"description"</span>: <span class="s">"Someone approved the deployment"</span>,
-		<span class="k">"op"</span>: <span class="s">"non_empty_string"</span>,
-		<span class="k">"path"</span>: [<span class="s">"approved_by"</span>],
-	}},
-}}
-
-report := ergo.report(input, requirements)</code></pre>
-        </div>
-      </div>
-    </div>
-      <div class="declare__notes">
-        <h3 class="declare__head">{{ $c.declaration.notes_title }}</h3>
-        <p class="declare__intro">{{ partial "copy.html" $c.declaration.notes_intro }}</p>
-        <ol class="notes">
-          {{- range $i, $n := $c.declaration.notes }}
-          <li><span class="notes__n mono">{{ add $i 1 }}</span><div><h4>{{ $n.title }}</h4><p>{{ partial "copy.html" $n.body }}</p></div></li>
-          {{- end }}
-        </ol>
       </div>
     </div>
   </div>

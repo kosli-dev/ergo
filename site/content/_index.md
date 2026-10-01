@@ -23,12 +23,6 @@ problem:
 declaration:
   title: Write the control.
   muted: Not the sorcery.
-  switch: Show the requirement as
-  formats:
-    - key: yaml
-      label: YAML
-    - key: rego
-      label: Rego
   notes_title: Defined in YAML or Rego
   notes_intro: Write the requirement as a YAML file or as a Rego object. ==ergo== reads both the same way and gives the same report.
   notes:
