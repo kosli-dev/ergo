@@ -193,7 +193,9 @@ p code, li code, dd code, td code {
 }
 
 /* ——— Declaration ——— */
-.declare { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, .65fr); gap: clamp(28px, 4vw, 56px); align-items: start; }
+/* Heading and notes on the left, the YAML on the right, centred on each other. */
+.declare { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: clamp(32px, 5vw, 72px); align-items: center; }
+.declare__notes .display-m { margin-bottom: 32px; }
 .declare__code { min-width: 0; }
 .declare__head { margin: 0 0 8px; font: 500 14px/1.4 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--paper); }
 .declare__intro { margin: 0 0 28px; color: var(--muted); font-size: 16px; }

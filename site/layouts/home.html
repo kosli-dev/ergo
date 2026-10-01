@@ -63,9 +63,18 @@ d-3      <span class="k">$applies</span>   environment = "staging"  <span class=
 {{/* 02 — Declaration */}}
 <section class="section section--panel">
   <div class="wrap">
-    <h2 class="display-m">{{ $c.declaration.title }}<br><span class="muted">{{ $c.declaration.muted }}</span></h2>
     <div class="declare">
-<div class="declare__code">
+      <div class="declare__notes">
+        <h2 class="display-m">{{ $c.declaration.title }}<br><span class="muted">{{ $c.declaration.muted }}</span></h2>
+        <h3 class="declare__head">{{ $c.declaration.notes_title }}</h3>
+        <p class="declare__intro">{{ partial "copy.html" $c.declaration.notes_intro }}</p>
+        <ol class="notes">
+          {{- range $i, $n := $c.declaration.notes }}
+          <li><span class="notes__n mono">{{ add $i 1 }}</span><div><h4>{{ $n.title }}</h4><p>{{ partial "copy.html" $n.body }}</p></div></li>
+          {{- end }}
+        </ol>
+      </div>
+      <div class="declare__code">
 <pre class="code code--lg"><code><span class="n"># policy/requirements.yaml</span>
 <span class="k">requirements</span>:
   <span class="k">prod_deploy</span>:
@@ -82,15 +91,6 @@ d-3      <span class="k">$applies</span>   environment = "staging"  <span class=
         <span class="k">description</span>: <span class="s">Someone approved the deployment</span>
         <span class="k">op</span>: <span class="s">non_empty_string</span>
         <span class="k">path</span>: [<span class="s">approved_by</span>]</code></pre>
-    </div>
-      <div class="declare__notes">
-        <h3 class="declare__head">{{ $c.declaration.notes_title }}</h3>
-        <p class="declare__intro">{{ partial "copy.html" $c.declaration.notes_intro }}</p>
-        <ol class="notes">
-          {{- range $i, $n := $c.declaration.notes }}
-          <li><span class="notes__n mono">{{ add $i 1 }}</span><div><h4>{{ $n.title }}</h4><p>{{ partial "copy.html" $n.body }}</p></div></li>
-          {{- end }}
-        </ol>
       </div>
     </div>
   </div>
