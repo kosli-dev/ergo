@@ -149,7 +149,7 @@ With `allowed_licences` set to `["MIT", "Apache-2.0"]`, a package licensed `GPL-
 }
 ```
 
-The expression says where the value comes from. What it was goes in the check's definition in the report, under `refs`, once for the whole report and sorted by name, beside the literals the check compares against. The rows' `inputs` only hold what the check reads, like `licences[]` here, and `violations` adds the `refs` back to each violation's `inputs`, as above. That keeps a record of what was compared, even when the params change between runs, without copying it into every row. A path that starts with `$$input` is something the check reads, so its value stays in the row.
+The expression says where the value comes from. What it was goes in the check's definition in the report, under `$refs`, once for the whole report and sorted by name, beside the literals the check compares against. The rows' `inputs` only hold what the check reads, like `licences[]` here, and `violations` adds the `$refs` back to each violation's `inputs`, as above. That keeps a record of what was compared, even when the params change between runs, without copying it into every row. A path that starts with `$$input` is something the check reads, so its value stays in the row.
 
 Some things worth knowing:
 
@@ -307,12 +307,31 @@ Then use it like any other operator. ergo can't work out what your operator read
 
 Each entry in `inputs` is a path, or `{"path": [...], "each": [...]}` to read one field from every item of a list. The row shows those values, and its cause is worked out from them.
 
+If your operator takes its own parameters, read each one with `arg`, so a policy can pass it a [`ref`](#reading-from-the-input) or a `literal`. `arg` gives back the value to use, and is undefined when a ref can't be read, so the check fails:
+
+```rego
+op_passed(check, subj) if {
+	check.op == "multiple_of"
+	n := value_at(subj, check.path)
+	by := arg(check.by)
+	is_number(n)
+	is_number(by)
+	n % by == 0
+}
+```
+
+```rego
+"even_batches": {"op": "multiple_of", "path": ["n"], "by": {"ref": ["$$input", "params", "batch"]}, "expression": "n is a multiple of the batch size", "inputs": [["n"]]}
+```
+
+ergo finds the refs in your check by itself, so they appear under `$refs` and decide the cause when they can't be read, as for built-in operators.
+
 A custom operator works in `checks`, in `applies_to`, and on either side of a substitute. It doesn't work as the inner check of `all` or `any`, or inside an `any_of` option: there, it fails.
 
 Two rules:
 
 - **Fail when you can't read the data.** Check that fields are there and have the right type before you compare them. A rule that doesn't hold fails the check, which is what you want. Be careful with `not`, which turns an error into a pass.
-- **Only call ergo's lower-level rules**, like `value_at` and `leaf_passed`. Calling `op_passed`, `check_passed` or `report` from your operator creates a loop, which Rego rejects, and the errors will point at `ergo.rego` rather than your file.
+- **Only call ergo's lower-level rules**, like `value_at`, `arg` and `leaf_passed`. Calling `op_passed`, `check_passed` or `report` from your operator creates a loop, which Rego rejects, and the errors will point at `ergo.rego` rather than your file.
 
 ## The report
 
@@ -358,7 +377,7 @@ Two rules:
 }
 ```
 
-`subjects.total` counts every subject found at `from`, and `subjects.matching` counts the ones left after `applies_to`. `checks` holds each check as you wrote it, plus the `expression` ergo rendered from it. If you write your own `expression`, yours is used. A check that uses a [`ref`](#reading-from-the-input) also gets `refs`: the name and value of each one, as read for this report. It also holds the [checks ergo adds](#checks-ergo-adds), each with a `description` and an `expression`.
+`subjects.total` counts every subject found at `from`, and `subjects.matching` counts the ones left after `applies_to`. `checks` holds each check as you wrote it, plus the `expression` ergo rendered from it. If you write your own `expression`, yours is used. A check that uses a [`ref`](#reading-from-the-input) also gets `$refs`: the name and value of each one, as read for this report. The `$` marks it as ergo's, so it can't be mixed up with a field of your own. It also holds the [checks ergo adds](#checks-ergo-adds), each with a `description` and an `expression`.
 
 `results` has one row for each subject and check:
 
@@ -429,7 +448,7 @@ When a check reads several fields, the row shows the first cause in this table's
 
 ## Violations
 
-`ergo.violations(report)` returns the rows that are real problems, each with its check's `description` and `expression` added, and its `refs` added to the end of `inputs`:
+`ergo.violations(report)` returns the rows that are real problems, each with its check's `description` and `expression` added, and its `$refs` added to the end of `inputs`:
 
 ```json
 [

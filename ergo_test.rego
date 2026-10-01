@@ -2415,7 +2415,7 @@ row_in(top, subj, check) := r if {
 
 expression_in(top, subj, check) := in_doc(top, subj, check).requirements.s.checks.c.expression
 
-refs_in(top, subj, check) := object.get(in_doc(top, subj, check).requirements.s.checks.c, "refs", [])
+refs_in(top, subj, check) := object.get(in_doc(top, subj, check).requirements.s.checks.c, "$refs", [])
 
 violation_in(top, subj, check) := v if {
 	some v in ergo.violations(in_doc(top, subj, check))
@@ -2557,7 +2557,7 @@ test_a_violation_shows_the_ref_values_beside_what_the_check_read if {
 }
 
 test_a_check_without_refs_has_no_refs_in_its_definition if {
-	not "refs" in object.keys(in_doc({}, {"id": 1}, {"op": "present", "path": ["id"]}).requirements.s.checks.c)
+	not "$refs" in object.keys(in_doc({}, {"id": 1}, {"op": "present", "path": ["id"]}).requirements.s.checks.c)
 }
 
 test_a_missing_ref_is_recorded_as_null if {
@@ -2629,7 +2629,7 @@ test_a_ref_in_an_applies_to_filter_is_read_and_shown if {
 		[1, true, "satisfied", [{"name": "kind", "value": "lib"}]],
 		[2, false, "value", [{"name": "kind", "value": "app"}]],
 	]
-	rep.requirements.s.checks["$applies"].refs == [{"name": "$$input.params.kind", "value": "lib"}]
+	rep.requirements.s.checks["$applies"]["$refs"] == [{"name": "$$input.params.kind", "value": "lib"}]
 	unreadable := ergo.report({"items": [{"id": 1, "kind": "lib"}]}, req)
 	unreadable.requirements.s.satisfied == false
 	[r.cause | some r in rows_for(unreadable, "s", "$applies")] == ["absent"]
@@ -2695,4 +2695,24 @@ test_a_ref_that_is_not_a_path_from_input_reads_as_invalid if {
 test_an_input_path_inside_all_is_shown_once_under_its_own_name if {
 	check := {"op": "all", "path": ["xs"], "check": {"op": "equals", "path": ["$$input", "mode"], "value": "strict"}}
 	row_in({"mode": "strict"}, {"id": 1, "xs": [1, 2]}, check).inputs == [{"name": "$$input.mode", "value": "strict"}]
+}
+
+test_a_check_field_called_refs_is_the_users_own if {
+	check := {"op": "even", "path": ["n"], "refs": "my-param", "expression": "n is even"}
+	in_doc({}, {"id": 1, "n": 3}, check).requirements.s.checks.c.refs == "my-param"
+	violation_in({}, {"id": 1, "n": 3}, check).inputs == [{"name": "n", "value": 3}]
+}
+
+test_a_check_field_called_dollar_refs_cannot_drop_a_violation if {
+	check := {"op": "even", "path": ["n"], "$refs": "my-param", "expression": "n is even"}
+	violation_in({}, {"id": 1, "n": 3}, check).inputs == [{"name": "n", "value": 3}]
+}
+
+test_a_custom_op_reads_a_ref_with_arg if {
+	check := {"op": "multiple_of", "path": ["n"], "by": {"ref": ["$$input", "params", "m"]}, "expression": "n is a multiple"}
+	row_in({"params": {"m": 2}}, {"id": 1, "n": 4}, check).passed == true
+	row_in({"params": {"m": 3}}, {"id": 1, "n": 4}, check).passed == false
+	r := row_in({}, {"id": 1, "n": 4}, check)
+	[r.passed, r.cause] == [false, "absent"]
+	refs_in({"params": {"m": 2}}, {"id": 1, "n": 4}, check) == [{"name": "$$input.params.m", "value": 2}]
 }

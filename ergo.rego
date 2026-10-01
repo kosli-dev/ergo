@@ -115,17 +115,17 @@ arg(x) := v if {
 	v != null
 }
 
-ref_read(path) := object.get(start_of(null, path), keys_of(path), absent)
-
-ref_name(path) := concat(".", [sprintf("%v", [unliteral(seg)]) | some seg in path]) if named(path)
-
-ref_name(path) := "<invalid ref>" if not named(path)
-
 arg(x) := x if {
 	not is_ref(x)
 	not is_literal(x)
 	not malformed(x)
 }
+
+ref_read(path) := object.get(start_of(null, path), keys_of(path), absent)
+
+ref_name(path) := concat(".", [sprintf("%v", [unliteral(seg)]) | some seg in path]) if named(path)
+
+ref_name(path) := "<invalid ref>" if not named(path)
 
 malformed(x) if {
 	is_object(x)
@@ -757,7 +757,7 @@ row_inputs(subj, check, item) := array.concat(
 
 check_def(check, item) := with_refs(described(check, item), check)
 
-with_refs(def, checked) := object.union(def, {"refs": ref_inputs(checked)}) if count(check_refs(checked)) > 0
+with_refs(def, checked) := object.union(def, {"$refs": ref_inputs(checked)}) if count(check_refs(checked)) > 0
 
 with_refs(def, checked) := def if count(check_refs(checked)) == 0
 
@@ -944,12 +944,19 @@ violations(report) := [{
 	"check": row.check,
 	"description": definition_field(report.requirements, row, "description"),
 	"expression": definition_field(report.requirements, row, "expression"),
-	"inputs": array.concat(row.inputs, object.get(report.requirements, [row.requirement, "checks", row.check, "refs"], [])),
+	"inputs": array.concat(row.inputs, recorded_refs(report.requirements, row)),
 	"cause": row.cause,
 } |
 	some row in report.results
 	is_violation(report.requirements, row)
 ]
+
+default recorded_refs(_, _) := []
+
+recorded_refs(requirements, row) := refs if {
+	refs := requirements[row.requirement].checks[row.check]["$refs"]
+	is_array(refs)
+}
 
 default is_violation(_, _) := false
 
