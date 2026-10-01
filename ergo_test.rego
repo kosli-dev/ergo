@@ -65,9 +65,9 @@ test_a_subject_that_is_not_an_object_keeps_its_rows if {
 	rows := rows_for(ergo.report(mixed_subjects, mixed_req), "s", "c")
 	[[r.subject.id, r.passed, r.cause] | some r in rows] == [
 		["x", true, "satisfied"],
-		[null, false, "absent"],
-		[null, false, "absent"],
-		[null, false, "absent"],
+		["b", false, "not_an_object"],
+		[null, false, "not_an_object"],
+		[3, false, "not_an_object"],
 	]
 }
 
@@ -83,8 +83,18 @@ test_a_subject_that_is_not_an_object_keeps_its_applies_row if {
 		"checks": {"c": {"op": "present", "path": ["n"]}},
 	}}
 	rep := ergo.report({"items": ["b"]}, req)
-	[[r.passed, r.cause] | some r in rows_for(rep, "s", "$applies")] == [[false, "absent"]]
+	[[r.subject.id, r.passed, r.cause] | some r in rows_for(rep, "s", "$applies")] == [["b", false, "not_an_object"]]
 	{v.check | some v in ergo.violations(rep)} == {"$applies", "$min_subjects"}
+}
+
+test_a_subject_that_is_not_an_object_is_not_mistaken_for_one_missing_its_fields if {
+	causes := {r.subject.id: r.cause | some r in rows_for(ergo.report({"items": [{"id": "x"}, "b"]}, mixed_req), "s", "c")}
+	causes == {"x": "absent", "b": "not_an_object"}
+}
+
+test_a_subject_that_is_not_an_object_fails_a_quantified_check_as_not_an_object if {
+	req := {"s": {"from": ["items"], "checks": {"c": {"op": "all", "path": ["commits"], "check": {"op": "present", "path": ["sha"]}}}}}
+	[r.cause | some r in rows_for(ergo.report({"items": ["b"]}, req), "s", "c")] == ["not_an_object"]
 }
 
 test_an_id_path_can_use_a_selector if {

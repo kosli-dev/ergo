@@ -70,7 +70,7 @@ A few details:
 
 - If `from` leads to a list, each item is a subject. If it leads to a single object, that object is the only subject. Anything else (nothing, a string, a number) gives no subjects at all, and `$min_subjects` fails.
 - If `id` doesn't lead anywhere, the subject's id is `null`. Its rows are still there.
-- An item of the list that isn't an object, like a string or a `null`, is still a subject. It has no fields to read, so its id is `null` and its checks fail with cause `absent`.
+- An item of the list that isn't an object, like a string or a `null`, is still a subject. Its id is the item itself, and its checks fail with cause `not_an_object`.
 - Leaving out `from` or `id` is allowed, but rarely what you want. Without `from`, the whole input is checked as one subject. Without `id`, each row repeats the whole subject as its id.
 - `min_subjects` defaults to 1 so that a typo in `from` fails the requirement instead of quietly passing it. Set it to `0` when you mean "if there are any, they must pass; if there are none, that's fine". It means the same under `every` and `some`.
 - Under `some`, one subject has to pass all the checks by itself. Two subjects that each pass half of them don't count.
@@ -337,15 +337,16 @@ Patterns, options and selector fields are sorted in rendered expressions too. So
 
 Every row has a `cause`. A missing field, a field set to `null`, and a selector that matched nothing all show up as `null` in `inputs`, but they're different problems with different fixes. The cause tells them apart.
 
-| `cause`       | Meaning                                                  |
-| ------------- | -------------------------------------------------------- |
-| `satisfied`   | The check passed.                                        |
-| `substituted` | The check failed, but its substitute passed.             |
-| `ambiguous`   | A selector matched more than one item.                   |
-| `unmatched`   | A selector matched nothing, although the list was there. |
-| `absent`      | A field the check reads isn't there.                     |
-| `null`        | A field the check reads is there, but `null`.            |
-| `value`       | Everything was read fine. The values just don't pass.    |
+| `cause`         | Meaning                                                  |
+| --------------- | -------------------------------------------------------- |
+| `satisfied`     | The check passed.                                        |
+| `substituted`   | The check failed, but its substitute passed.             |
+| `not_an_object` | The subject isn't an object, so it has no fields.        |
+| `ambiguous`     | A selector matched more than one item.                   |
+| `unmatched`     | A selector matched nothing, although the list was there. |
+| `absent`        | A field the check reads isn't there.                     |
+| `null`          | A field the check reads is there, but `null`.            |
+| `value`         | Everything was read fine. The values just don't pass.    |
 
 When a check reads several fields, the row shows the first cause in this table's order. An ambiguous selector matters more than any value, because it means the policy can't even tell what it's looking at.
 
