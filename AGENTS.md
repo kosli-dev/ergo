@@ -15,19 +15,21 @@ ergo is a Rego library that turns policy evaluation into a structured report. Us
 Run these before saying a change is done:
 
 ```sh
-opa check --strict .
+opa check --strict . --ignore .github
 opa fmt --list .
-opa test .
+opa test . --ignore .github
 ```
 
 `opa fmt --list .` should print nothing. If it prints file names, run `opa fmt -w .`.
+
+OPA loads every JSON and YAML file it finds as data. The workflow files under `.github` clash with each other, so the checks ignore that folder.
 
 CI runs these checks on pull requests and on pushes to `main` (`.github/workflows/test.yml`), using the OPA version the README names. When you change that version, change it in both places.
 
 CI also fails when a line of Rego isn't reached by any test. To list those lines yourself:
 
 ```sh
-opa test . --coverage | jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' | sort -u
+opa test . --ignore .github --coverage | jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' | sort -u
 ```
 
 ## Tests
@@ -88,3 +90,5 @@ One area per commit. A `core:` change that updates `REFERENCE.md` with it stays 
 When a `core:` change alters the report for an existing policy, say so in the body, on a line starting with `Changes the report:`.
 
 Add a body when the reason isn't obvious from the first line. PR titles follow the same rules, because they become the commit on `main`.
+
+CI checks every PR title against the areas listed above, so a new area only needs adding to that list.
