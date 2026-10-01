@@ -69,8 +69,8 @@ manifesto:
 
 architecture:
   title: OPA is the engine.
-  muted: ==ergo== _is_ rego.
-  lede: ==ergo== doesn't replace OPA. Copy a single rego file  into your policies. The control is expressed as yaml or rego and ==ergo== provides a single evaluation and reporting model.
+  muted: ==ergo== is a rego library.
+  lede: ==ergo== doesn't replace OPA. Copy a single rego file into your policies. The control is expressed as yaml, JSON or rego and ==ergo== provides a single evaluation and reporting model.
 
 vocabulary:
   title: Readable by machines.
