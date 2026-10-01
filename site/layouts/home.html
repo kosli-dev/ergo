@@ -33,9 +33,9 @@
 {{/* 01 — The problem */}}
 <section class="section">
   <div class="wrap">
-    <h2 class="display-m">{{ $c.problem.title }}<br><span class="muted">{{ $c.problem.muted }}</span></h2>
-    <div class="split">
+    <div class="split split--text-right">
       <div class="split__col">
+        <h2 class="display-m">{{ $c.problem.title }}<br><span class="muted">{{ $c.problem.muted }}</span></h2>
         <p class="lede">{{ partial "copy.html" $c.problem.lede }}</p>
         <p>{{ partial "copy.html" $c.problem.body }}</p>
       </div>

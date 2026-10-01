@@ -167,6 +167,12 @@ p code, li code, dd code, td code {
 /* ——— Split / compare ——— */
 .split { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: clamp(32px, 5vw, 72px); margin-top: 16px; }
 .split__col p:not(.lede) { color: var(--muted); }
+/* Examples on the left, heading and copy on the right. The copy stays first in the markup, so it leads on phones. */
+.split--text-right { grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr); align-items: center; margin-top: 0; }
+.split--text-right .split__col { grid-column: 2; grid-row: 1; }
+.split--text-right .compare { grid-column: 1; grid-row: 1; min-width: 0; }
+.split--text-right .compare__card { min-width: 0; }
+.split--text-right .code { font-size: 12px; }
 .compare { display: grid; gap: 16px; }
 .compare__card { background: var(--ink-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
 .compare__card--ergo { border-color: rgba(214, 255, 77, .35); }
@@ -357,6 +363,7 @@ p code, li code, dd code, td code {
 }
 @media (max-width: 920px) {
   .hero__grid, .split, .declare, .docs, .side { grid-template-columns: minmax(0, 1fr); }
+  .split--text-right .split__col, .split--text-right .compare { grid-column: auto; grid-row: auto; }
   .steps { grid-template-columns: minmax(0, 1fr); }
   .docs__side { position: static; max-height: none; overflow: visible; padding: 0; }
   .docs__toc:not([open]) { margin-bottom: 0; }
