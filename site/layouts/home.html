@@ -157,7 +157,7 @@ d-3      <span class="k">$applies</span>   environment = "staging"  <span class=
     <h2 class="display-m">{{ $c.vocabulary.title }}<br><span class="muted">{{ $c.vocabulary.muted }}</span></h2>
     <p class="lede narrow">{{ partial "copy.html" $c.vocabulary.lede }}</p>
     <ul class="ops">
-      {{ range slice "equals" "present" "non_empty_string" "matches_any" "not_matches_any" "range" "includes" "excludes" "compare" "compare_time" "all" "any" "any_of" }}<li><a href="{{ "docs/reference/#operators" | relURL }}">{{ . }}</a></li>{{ end }}
+      {{ range slice "equals" "in" "present" "non_empty_string" "matches_any" "not_matches_any" "range" "includes" "excludes" "compare" "compare_time" "all" "any" "any_of" }}<li><a href="{{ "docs/reference/#operators" | relURL }}">{{ . }}</a></li>{{ end }}
     </ul>
     <p><a class="link" href="{{ "docs/reference/" | relURL }}">{{ $c.vocabulary.link }} <span aria-hidden="true">→</span></a></p>
   </div>
