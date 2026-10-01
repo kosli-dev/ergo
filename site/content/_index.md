@@ -6,12 +6,12 @@ hero:
   lede: ==ergo== is an open source language for defining explainable controls. Instead of a binary result, every decision returns an audit report of what was checked, and why it passed or failed.
   primary: Get started
   secondary: GitHub
-  verdict: d-3 is out of scope. d-2 was never approved ...and the report says so.
+  verdict: d-3 is out of scope. d-2 was never approved... and the report says so.
 
 problem:
   title: A decision nobody can inspect
   muted: isn't a control.
-  lede: With rego you can block a deployment, but you can't show later why. When you define controls with ==ergo== you have records of why it was blocked, or why the others weren't.
+  lede: With Rego you can block a deployment, but you can't show later why. When you define controls with ==ergo== you have records of why it was blocked, or why the others weren't.
   body: In regulated settings, someone else has to be able to check that a control behaved as it should. A yes or no can't be validated. You don't just tell the auditor the decision. You hand over the workings.
   without:
     label: Rego provides decisions
