@@ -65,23 +65,30 @@ d-3      <span class="k">$applies</span>   environment = "staging"  <span class=
   <div class="wrap">
     <h2 class="display-m">{{ $c.declaration.title }}<br><span class="muted">{{ $c.declaration.muted }}</span></h2>
     <div class="declare">
-<pre class="code code--lg"><code><span class="kw">package</span> deploy
+<div class="declare__files">
+<pre class="code code--lg"><code><span class="n"># policy/requirements.yaml</span>
+<span class="k">requirements</span>:
+  <span class="k">prod_deploy</span>:
+    <span class="k" data-note="1">subject_type</span>: <span class="s">deployment</span>
+    <span class="k" data-note="1">from</span>: [<span class="s">deployments</span>]
+    <span class="k" data-note="1">id</span>: [<span class="s">id</span>]
+    <span class="k" data-note="2">applies_to</span>:
+      <span class="k">is_prod</span>:
+        <span class="k">op</span>: <span class="s">equals</span>
+        <span class="k">path</span>: [<span class="s">environment</span>]
+        <span class="k">value</span>: <span class="s">prod</span>
+    <span class="k" data-note="3">checks</span>:
+      <span class="k">approved</span>:
+        <span class="k">description</span>: <span class="s">Someone approved the deployment</span>
+        <span class="k">op</span>: <span class="s">non_empty_string</span>
+        <span class="k">path</span>: [<span class="s">approved_by</span>]</code></pre>
+<pre class="code code--lg"><code><span class="n"># policy/deploy.rego</span>
+<span class="kw">package</span> deploy
 
 <span class="kw">import</span> data.ergo
 
-requirements := {<span class="s">"prod_deploy"</span>: {
-	<span class="k" data-note="1">"subject_type"</span>: <span class="s">"deployment"</span>,
-	<span class="k" data-note="1">"from"</span>: [<span class="s">"deployments"</span>],
-	<span class="k" data-note="1">"id"</span>: [<span class="s">"id"</span>],
-	<span class="k" data-note="2">"applies_to"</span>: {<span class="s">"is_prod"</span>: {<span class="k">"op"</span>: <span class="s">"equals"</span>, <span class="k">"path"</span>: [<span class="s">"environment"</span>], <span class="k">"value"</span>: <span class="s">"prod"</span>}},
-	<span class="k" data-note="3">"checks"</span>: {<span class="s">"approved"</span>: {
-		<span class="k">"description"</span>: <span class="s">"Someone approved the deployment"</span>,
-		<span class="k">"op"</span>: <span class="s">"non_empty_string"</span>,
-		<span class="k">"path"</span>: [<span class="s">"approved_by"</span>],
-	}},
-}}
-
-report := ergo.report(input, requirements)</code></pre>
+report := ergo.report(input, data.requirements)</code></pre>
+</div>
       <ol class="notes">
         {{- range $i, $n := $c.declaration.notes }}
         <li><span class="notes__n mono">{{ add $i 1 }}</span><div><h3>{{ $n.title }}</h3><p>{{ partial "copy.html" $n.body }}</p></div></li>

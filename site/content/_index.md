@@ -22,13 +22,13 @@ problem:
 
 declaration:
   title: Write the control.
-  muted: Not the machinery.
+  muted: Not the sorcery.
   notes:
-    - title: What you're judging
+    - title: Define the subjects
       body: "`subject_type`, `from` and `id` say what the subjects are and where to find them."
-    - title: What's in scope
+    - title: Filter the scope
       body: "`applies_to` keeps only the subjects this control is about. The rest are recorded, not dropped."
-    - title: What must hold
+    - title: Test the values
       body: "`checks` are the rules each subject must pass. ==ergo== does the looping, the evaluation and the report."
 
 shape:
@@ -112,7 +112,7 @@ start:
           ergo.rego
     - title: Write a requirement
       body: Say what you're judging, what's in scope and what must hold.
-      code: report := ergo.report(input, requirements)
+      code: report := ergo.report(input, data.requirements)
     - title: Read the report
       body: Ask OPA for the report, or just the violations.
       code: |-

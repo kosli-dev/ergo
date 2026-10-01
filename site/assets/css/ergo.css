@@ -193,6 +193,7 @@ p code, li code, dd code, td code {
 
 /* ——— Declaration ——— */
 .declare { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, .65fr); gap: clamp(28px, 4vw, 56px); align-items: start; }
+.declare__files { display: grid; gap: 16px; }
 .notes { list-style: none; margin: 0; padding: 0; display: grid; gap: 28px; }
 .notes li { display: grid; grid-template-columns: 28px 1fr; gap: 14px; }
 .notes__n { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--lime); color: var(--ink); font-size: 13px; font-weight: 500; }
