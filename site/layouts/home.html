@@ -9,7 +9,7 @@
       <p class="hero__lede">{{ partial "copy.html" $c.hero.lede }}</p>
       <div class="actions">
         <a class="btn btn--primary" href="{{ "docs/getting-started/" | relURL }}">{{ $c.hero.primary }} <span aria-hidden="true">→</span></a>
-        <a class="btn btn--outline" href="{{ site.Params.repo }}">{{ $c.hero.secondary }}</a>
+        <a class="btn btn--outline" href="{{ site.Params.repo }}">{{ partial "github-icon.html" . }}{{ $c.hero.secondary }}</a>
       </div>
     </div>
 
@@ -202,7 +202,7 @@ report := ergo.report(input, data.requirements)</code></pre>
     </ol>
     <div class="actions">
       <a class="btn btn--primary" href="{{ "docs/getting-started/" | relURL }}">{{ $c.start.primary }} <span aria-hidden="true">→</span></a>
-      <a class="btn btn--outline" href="{{ site.Params.repo }}/blob/main/ergo.rego">{{ $c.start.secondary }}</a>
+      <a class="btn btn--outline" href="{{ site.Params.repo }}/blob/main/ergo.rego">{{ partial "github-icon.html" . }}{{ $c.start.secondary }}</a>
     </div>
   </div>
 </section>
@@ -224,7 +224,7 @@ report := ergo.report(input, data.requirements)</code></pre>
   <div class="wrap cta__inner">
     <h2 class="cta__title"><strong>{{ $c.close.title }}</strong></h2>
     <div class="actions">
-      <a class="btn btn--dark" href="{{ site.Params.fork }}">{{ $c.close.primary }}</a>
+      <a class="btn btn--dark" href="{{ site.Params.fork }}">{{ partial "github-icon.html" . }}{{ $c.close.primary }}</a>
       <a class="btn btn--dark-outline" href="{{ "docs/getting-started/" | relURL }}">{{ $c.close.secondary }} <span aria-hidden="true">→</span></a>
     </div>
   </div>

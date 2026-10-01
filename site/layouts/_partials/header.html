@@ -4,7 +4,7 @@
     <nav class="site-nav" aria-label="Main">
       <a href="{{ "docs/getting-started/" | relURL }}"{{ if eq .RelPermalink ("docs/getting-started/" | relURL) }} aria-current="page"{{ end }}>Get started</a>
       <a href="{{ "docs/reference/" | relURL }}"{{ if eq .RelPermalink ("docs/reference/" | relURL) }} aria-current="page"{{ end }}>Reference</a>
-      <a class="btn btn--sm btn--ghost" href="{{ site.Params.repo }}">GitHub</a>
+      <a class="btn btn--sm btn--ghost" href="{{ site.Params.repo }}">{{ partial "github-icon.html" . }}GitHub</a>
     </nav>
   </div>
 </header>
