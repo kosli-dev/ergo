@@ -117,21 +117,27 @@ d-3      <span class="k">$applies</span>   environment = "staging"  <span class=
   <div class="wrap">
     <h2 class="display-m">{{ $c.architecture.title }}<br><span class="muted">{{ partial "copy.html" $c.architecture.muted }}</span></h2>
     <p class="lede narrow">{{ partial "copy.html" $c.architecture.lede }}</p>
-    <ol class="flow" aria-label="From inputs to conclusion">
+    <ol class="flow" data-sequence aria-label="From inputs to conclusion">
       <li class="flow__group">
         <span class="flow__label mono">inputs</span>
         <ul>
           <li class="flow__card"><span class="flow__k mono">input</span><span class="flow__v">deployments.json</span></li>
           <li class="flow__card"><span class="flow__k mono">control</span><span class="flow__v">requirements.yaml</span></li>
-          <li class="flow__card flow__card--ergo"><span class="flow__k mono">library</span><span class="flow__v">ergo.rego</span></li>
+          <li class="flow__card"><span class="flow__k mono">library</span><span class="flow__v">{{ partial "mark.html" . }}<span class="flow__v--ergo">ergo.rego</span></span></li>
         </ul>
       </li>
-      <li class="flow__card"><span class="flow__k mono">engine</span><span class="flow__v">OPA {{ site.Params.opaVersion }}</span></li>
-      <li class="flow__group">
+      <li class="flow__group flow__group--live">
+        <svg class="flow__ants" aria-hidden="true" focusable="false"><rect></rect></svg>
+        <span class="flow__label mono">evaluation</span>
+        <ul>
+          <li class="flow__card"><span class="flow__k mono">engine</span><span class="flow__v">OPA {{ site.Params.opaVersion }}</span></li>
+        </ul>
+      </li>
+      <li class="flow__group flow__group--out">
         <span class="flow__label mono">outputs</span>
         <ul>
-          <li class="flow__card flow__end"><span class="flow__k mono">decision</span><span class="flow__v">{{ partial "therefore.html" . }} compliant</span></li>
-          <li class="flow__card flow__card--ergo flow__report"><span class="flow__k mono">evidence</span><span class="flow__v">{{ partial "mark.html" . }}<span>report</span></span></li>
+          <li class="flow__card"><span class="flow__k mono">decision</span><span class="flow__v">compliant</span></li>
+          <li class="flow__card flow__report"><span class="flow__k mono">evidence</span><span class="flow__v">{{ partial "mark.html" . }}<span class="flow__v--ergo">report</span></span></li>
         </ul>
       </li>
     </ol>

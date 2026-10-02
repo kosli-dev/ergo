@@ -1,4 +1,32 @@
 (function () {
+  var flow = document.querySelector('.flow[data-sequence]');
+  if (!flow) return;
+  var steps = [];
+  [].slice.call(flow.children).forEach(function (zone, i, zones) {
+    if (zone.classList.contains('flow__group')) {
+      steps.push([zone, 'is-in', 220]);
+      zone.querySelectorAll('.flow__card').forEach(function (card) { steps.push([card, 'is-resolved', 170]); });
+    } else {
+      steps.push([zone, 'is-resolved', 220]);
+    }
+    if (i < zones.length - 1) steps.push([zone, 'is-arrow', 260]);
+  });
+  var showAll = function () { steps.forEach(function (s) { s[0].classList.add(s[1]); }); };
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) { showAll(); return; }
+  var run = function () {
+    var t = 0;
+    steps.forEach(function (s) {
+      t += s[2];
+      setTimeout(function () { s[0].classList.add(s[1]); }, t);
+    });
+  };
+  var io = new IntersectionObserver(function (entries) {
+    if (entries[0].isIntersecting) { io.disconnect(); run(); }
+  }, { threshold: 0.35 });
+  io.observe(flow);
+})();
+
+(function () {
   var fig = document.querySelector('[data-fromto]');
   if (!fig) return;
   var views = [].slice.call(fig.querySelectorAll('.ft__view'));
