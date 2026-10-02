@@ -49,6 +49,12 @@ There are no comments in the code or the tests, and it should stay that way.
 
 The one exception is the license header at the top of `ergo.rego`. Users copy that file on its own, so the header keeps the license with it.
 
+CI fails on any other comment in a `.rego` file. It asks `opa parse` for each file's comments, so a `#` inside a string doesn't count. To list them yourself:
+
+```sh
+git ls-files '*.rego' | while read -r f; do opa parse "$f" --format json --json-include comments,locations | jq -r --arg f "$f" '.comments[]? | .Location.row as $r | select(($f == "ergo.rego" and $r <= 2) | not) | "\($f):\($r)"'; done
+```
+
 When something in the code looks like it could be simplified but mustn't be, a test says so instead of a comment. Give the test a name that explains the reason, like `test_out_of_scope_subject_is_recorded_as_evidence`. If you're about to write a comment, write a test.
 
 Before removing or simplifying code, run the tests. Many of them exist to stop "obvious" simplifications that would let a check pass when it should fail.
