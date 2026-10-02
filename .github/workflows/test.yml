@@ -16,9 +16,14 @@ jobs:
       - uses: open-policy-agent/setup-opa@v2
         with:
           version: 1.19.0
+      - uses: open-policy-agent/setup-regal@v2.0.0
+        with:
+          version: 0.43.0
       - run: opa check --strict . --ignore .github
       - run: opa fmt --list --fail .
       - run: opa test . --ignore .github --timeout 30s --verbose
+      - name: Lint for likely bugs
+        run: regal lint --format github --disable-all --enable-category bugs --disable redundant-existence-check --ignore-files '.github/**' .
       - name: Check the tests give the same results with --strict-builtin-errors
         run: opa eval --strict-builtin-errors --ignore .github -d . --format raw 'count(data) > 0'
       - name: Check every line is tested
