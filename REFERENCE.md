@@ -216,7 +216,7 @@ Each key is a subject. A key the object doesn't have is still a subject, so its 
 ]
 ```
 
-The name matters inside `all` and `any`, where paths start at each item of the list. `$name` reaches back to the subject, so an item can be compared with it:
+The name matters inside `all` and `any`, where paths start at each item of the list. `$name` reaches back to the subject, so an item can be compared with it. `as` names the items of a list the same way (see [Nesting](#nesting)):
 
 ```rego
 "peer_reviewed": {
@@ -300,10 +300,10 @@ These two are useful in `applies_to`, for example to leave bot accounts out of a
 
 These apply a check to each item of a list inside the subject.
 
-| `op`  | Parameters                         | Passes when                                                |
-| ----- | ---------------------------------- | ---------------------------------------------------------- |
-| `all` | `path`, `check`, `each` (optional) | the list isn't empty and every item passes `check`.        |
-| `any` | `path`, `check`, `each` (optional) | the list isn't empty and at least one item passes `check`. |
+| `op`  | Parameters                                         | Passes when                                                |
+| ----- | -------------------------------------------------- | ---------------------------------------------------------- |
+| `all` | `path`, `check`, `each` (optional), `as` (optional) | the list isn't empty and every item passes `check`.        |
+| `any` | `path`, `check`, `each` (optional), `as` (optional) | the list isn't empty and at least one item passes `check`. |
 
 ```rego
 "signed": {
@@ -328,9 +328,74 @@ An empty list fails. No commits isn't proof that every commit is signed.
 
 This reads as "every commit of every pull request is signed" (ergo renders it as `every pull_requests[].commits: signed == true`). Every inner list must exist and have at least one item. If one pull request has no `commits`, the check fails, rather than being decided by the other pull requests alone.
 
-Two levels is as deep as it goes, because Rego doesn't allow recursion.
+The inner `check` can be a basic operator, an `any_of`, or another `all` or `any`.
 
-The inner `check` can be a basic operator or an `any_of`.
+#### Nesting
+
+An `all` or `any` inside another one checks a list for each item of the outer list. `as` names the outer item, so the inner check can still reach it once its paths start somewhere else. Say a pull request needs an approval given after its last commit:
+
+```json
+{
+  "number": 42,
+  "author": "ann",
+  "commits": [
+    { "sha": "c1", "timestamp": "2026-10-01T10:00:00Z" },
+    { "sha": "c2", "timestamp": "2026-10-01T12:00:00Z" }
+  ],
+  "approvers": [{ "username": "bob", "timestamp": "2026-10-01T11:00:00Z" }]
+}
+```
+
+That's "some approver, such that every commit is earlier than their approval":
+
+```rego
+"approved_after_last_commit": {
+	"subject_type": "pull request",
+	"from": ["pull_requests", {"each_as": "pr"}],
+	"id": ["number"],
+	"checks": {"after_commits": {
+		"description": "Someone approved it after its last commit",
+		"op": "any",
+		"path": ["approvers"],
+		"as": "approver",
+		"check": {
+			"op": "all",
+			"path": ["$pr", "commits"],
+			"check": {"op": "compare_time", "left": ["$approver", "timestamp"], "right": ["timestamp"], "cmp": "gt"},
+		},
+	}},
+}
+```
+
+The inner paths start at each commit, so `["timestamp"]` is the commit's. `$approver` is the approver being tried, and `$pr` is the pull request. Bob approved before `c2`, so this fails:
+
+```json
+{
+  "requirement": "approved_after_last_commit",
+  "subject": { "type": "pull request", "id": 42 },
+  "check": "after_commits",
+  "description": "Someone approved it after its last commit",
+  "expression": "some approvers as $approver: every $pr.commits: $approver.timestamp gt timestamp",
+  "inputs": [
+    { "name": "approvers[]", "value": [{ "username": "bob", "timestamp": "2026-10-01T11:00:00Z" }] },
+    { "name": "$pr.commits", "value": [
+      { "sha": "c1", "timestamp": "2026-10-01T10:00:00Z" },
+      { "sha": "c2", "timestamp": "2026-10-01T12:00:00Z" }
+    ] }
+  ],
+  "cause": "value"
+}
+```
+
+The row shows the lists the check read, but not which approver failed or why. A commit with no timestamp fails the check too, because nothing proves the approval came after it.
+
+Some things worth knowing:
+
+- `as` takes the same names as a [naming step](#naming-subjects): a string that doesn't start with `$`. Without `each`, `$approver` reads the same as a path inside the item, so `as` only matters for a check nested inside. With `each`, it names the inner item.
+- A name can only be given once along a chain of checks. `as` with a name that `from` or an outer check already gave, or a name that's badly written, fails the check, and a badly written one shows as `<invalid name>`. Two separate checks can use the same name.
+- A name given by `as` belongs to one item, so the row doesn't read it, and it doesn't decide the cause. Paths that start with it are shown as paths inside the item, like `approvers[].timestamp`.
+- Inner lists follow the same rules as outer ones. If an approver is tried against an empty or missing list of commits, that try fails.
+- One level of nesting is as deep as it goes, because Rego doesn't allow recursion. A third `all` or `any` fails the check, and its expression shows `<nested too deep>`.
 
 ### `any_of`
 
@@ -584,7 +649,8 @@ ergo fails a check whenever it can't be sure, instead of letting it pass. Rego d
 
 - A missing, `null` or wrong-typed field fails every operator.
 - `compare` needs both sides to exist and have the same type. In plain Rego, `null < 5` is true, so a missing field would otherwise pass a `lt` check.
-- `all`, `any` and `each` need non-empty lists.
+- `all`, `any` and `each` need non-empty lists, inner lists of nested checks included.
+- A name given twice, or badly written, fails the check, so an inner name can't quietly hide an outer one.
 - `min_subjects` is 1 unless you say otherwise, so finding nothing fails.
 - A key listed in `keys` that the input doesn't have is still a subject, so it fails instead of being skipped.
 - A subject whose `applies_to` filter can't be read fails the requirement instead of being left out.
