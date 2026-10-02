@@ -126,7 +126,12 @@ d-3      <span class="k">$applies</span>   environment = "staging"  <span class=
           <li class="flow__card"><span class="flow__k mono">library</span><span class="flow__v">{{ partial "mark.html" . }}<span class="flow__v--ergo">ergo.rego</span></span></li>
         </ul>
       </li>
-      <li class="flow__card"><span class="flow__k mono">engine</span><span class="flow__v">OPA {{ site.Params.opaVersion }}</span></li>
+      <li class="flow__group">
+        <span class="flow__label mono">evaluation</span>
+        <ul>
+          <li class="flow__card"><span class="flow__k mono">engine</span><span class="flow__v">OPA {{ site.Params.opaVersion }}</span></li>
+        </ul>
+      </li>
       <li class="flow__group">
         <span class="flow__label mono">outputs</span>
         <ul>
