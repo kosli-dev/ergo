@@ -123,7 +123,7 @@ d-3      <span class="k">$applies</span>   environment = "staging"  <span class=
         <ul>
           <li class="flow__card"><span class="flow__k mono">input</span><span class="flow__v">deployments.json</span></li>
           <li class="flow__card"><span class="flow__k mono">control</span><span class="flow__v">requirements.yaml</span></li>
-          <li class="flow__card"><span class="flow__k mono">library</span><span class="flow__v flow__v--ergo">ergo.rego</span></li>
+          <li class="flow__card"><span class="flow__k mono">library</span><span class="flow__v">{{ partial "mark.html" . }}<span class="flow__v--ergo">ergo.rego</span></span></li>
         </ul>
       </li>
       <li class="flow__card"><span class="flow__k mono">engine</span><span class="flow__v">OPA {{ site.Params.opaVersion }}</span></li>

@@ -298,7 +298,7 @@ p code, li code, dd code, td code {
 .js .flow[data-sequence] > li:not(.is-arrow)::after { visibility: hidden; }
 /* What ergo itself contributes is named in lime and bold: the library and the report. */
 .flow__v--ergo { color: var(--lime); font-weight: 700; }
-.flow__report .mark { height: 26px; }
+.flow__card .mark { height: 26px; width: auto; }
 
 /* ——— Ops ——— */
 .ops { list-style: none; margin: 40px 0 32px; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
