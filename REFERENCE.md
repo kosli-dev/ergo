@@ -733,3 +733,4 @@ ergo fails a check whenever it can't be sure, instead of letting it pass. Rego d
 - A `ref` that can't be read fails the check, even for operators like `excludes` or `not_matches_any` that would pass on an empty value.
 - A policy with no requirements, and a requirement with no checks, are never met.
 - A malformed timestamp fails `compare_time` rather than stopping the whole evaluation with an error.
+- Running OPA with `--strict-builtin-errors` gives the same report as running without it. A built-in that gets a value of the wrong type fails the check instead of stopping the whole evaluation with an error.

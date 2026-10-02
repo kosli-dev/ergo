@@ -5,17 +5,25 @@ package ergo
 
 import rego.v1
 
-checks_of(req) := object.get(req, "checks", {})
+checks_of(req) := object.get(req, "checks", {}) if is_object(req)
 
-applies_to_of(req) := object.get(req, "applies_to", {})
+applies_to_of(req) := object.get(req, "applies_to", {}) if is_object(req)
 
-from_of(req) := object.get(req, "from", [])
+from_of(req) := object.get(req, "from", []) if is_object(req)
 
-subject_type_of(req) := object.get(req, "subject_type", "subject")
+subject_type_of(req) := object.get(req, "subject_type", "subject") if is_object(req)
 
-min_subjects_of(req) := object.get(req, "min_subjects", 1)
+min_subjects_of(req) := object.get(req, "min_subjects", 1) if is_object(req)
 
-require_of(req) := object.get(req, "require", "every")
+require_of(req) := object.get(req, "require", "every") if is_object(req)
+
+size(x) := count(x) if type_name(x) in {"array", "object", "set", "string"}
+
+joined(sep, xs) := concat(sep, xs) if {
+	every x in xs {
+		is_string(x)
+	}
+}
 
 from_path(req) := array.slice(from_of(req), 0, count(from_of(req)) - 1) if each_step(req)
 
@@ -95,7 +103,7 @@ listed_keys(step) := v if {
 	is_array(v)
 }
 
-target(doc, req) := object.get(doc, from_keys(req), null)
+target(doc, req) := object.get(doc, from_keys(req), null) if is_object(doc)
 
 from_keys(req) := ks if {
 	p := from_path(req)
@@ -283,25 +291,32 @@ field(subj, path) := v if {
 
 resolved(subj, path) := read_from(start_of(subj, path), keys_of(path))
 
-read_from(start, keys) := object.get(start, keys, absent) if not selector_index(keys)
+read_from(start, keys) := object.get(start, keys, absent) if {
+	is_object(start)
+	not selector_index(keys)
+}
 
 read_from(start, []) := start
 
 read_from(start, keys) := v if {
+	is_object(start)
 	i := selector_index(keys)
 	base := object.get(start, array.slice(keys, 0, i), absent)
 	base != absent
 	elem := selected(base, keys[i])
+	is_object(elem)
 	v := object.get(elem, array.slice(keys, i + 1, count(keys)), absent)
 }
 
 named(path) if {
 	is_array(path)
+	is_string(path[0])
 	startswith(path[0], "$")
 }
 
 builtin(path) if {
 	is_array(path)
+	is_string(path[0])
 	startswith(path[0], "$$")
 }
 
@@ -381,7 +396,11 @@ arg(x) := x if {
 	not malformed(x)
 }
 
-ref_read(path) := object.get(start_of(null, path), [unliteral(seg) | some seg in array.slice(path, 1, count(path))], absent) if builtin(path)
+ref_read(path) := object.get(start, [unliteral(seg) | some seg in array.slice(path, 1, count(path))], absent) if {
+	builtin(path)
+	start := start_of(null, path)
+	is_object(start)
+}
 
 ref_name(path) := concat(".", [sprintf("%v", [unliteral(seg)]) | some seg in path]) if builtin(path)
 
@@ -1034,6 +1053,7 @@ selector_candidates(subj, path) := candidates if {
 }
 
 base_collection(start, keys) := base if {
+	is_object(start)
 	i := selector_index(keys)
 	base := object.get(start, array.slice(keys, 0, i), absent)
 	base != absent
@@ -1372,7 +1392,7 @@ quantifier(check) := "every" if check.op == "all"
 
 quantifier(check) := "some" if check.op == "any"
 
-expression_of(check, item) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%v(%s)", [nm, concat(" and ", [top_option_describe(leaf, item) | some leaf in group])]) | some nm, group in check.options]))]) if {
+expression_of(check, item) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%v(%s)", [nm, joined(" and ", [top_option_describe(leaf, item) | some leaf in group])]) | some nm, group in check.options]))]) if {
 	not check.expression
 	check.op == "any_of"
 }
@@ -1402,7 +1422,7 @@ element_describe(check, item, _) := nested_describe(check, item) if {
 	not quantified(check)
 }
 
-element_describe(check, item, given) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%v(%s)", [nm, concat(" and ", [element_option_describe(leaf, item, given) | some leaf in group])]) | some nm, group in check.options]))]) if combinator(check)
+element_describe(check, item, given) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%v(%s)", [nm, joined(" and ", [element_option_describe(leaf, item, given) | some leaf in group])]) | some nm, group in check.options]))]) if combinator(check)
 
 element_describe(check, item, given) := element_list_describe(check, item, given) if quantified(check)
 
@@ -1428,7 +1448,7 @@ inner_describe(check, _) := "<nested too deep>" if quantified(check)
 
 any_of_describe(check, item) := sprintf("one of: %s", [concat(" | ", sort([variant_describe(nm, group, item) | some nm, group in check.options]))])
 
-variant_describe(nm, group, item) := sprintf("%v(%s)", [nm, concat(" and ", [inner_option_describe(leaf, item) | some leaf in group])])
+variant_describe(nm, group, item) := sprintf("%v(%s)", [nm, joined(" and ", [inner_option_describe(leaf, item) | some leaf in group])])
 
 inner_option_describe(leaf, item) := nested_describe(leaf, item) if not quantified(leaf)
 
@@ -1464,7 +1484,9 @@ check_inputs(subj, check, _) := array.concat(quantified_inputs(subj, check), nam
 
 name_inputs(subj, check) := [{"name": path_name(p), "value": value_at(subj, p)} | some p in element_name_paths(check)]
 
-element_name_paths(check) := [p | some p in element_name_reads(check); p != object.get(check.check, "path", [])]
+element_name_paths(check) := [p | some p in element_name_reads(check); p != inner_path(check)]
+
+inner_path(check) := object.get(check.check, "path", []) if is_object(check.check)
 
 element_name_reads(check) := sort({p |
 	some read in scoped_reads(check)
@@ -1514,7 +1536,7 @@ reads_item(check, p) if {
 
 quantified_inputs(subj, check) := [{"name": nm, "value": vals}] if {
 	not check.each
-	inner := object.get(check.check, "path", [])
+	inner := inner_path(check)
 	not outer_named(check, inner)
 	rel := relative_path(check, inner)
 	vals := [value_at(elem, rel) | some elem in value_at(subj, check.path)]
@@ -1526,7 +1548,7 @@ quantified_inputs(subj, check) := [
 	{"name": path_name(inner), "value": value_at(subj, inner)},
 ] if {
 	not check.each
-	inner := object.get(check.check, "path", [])
+	inner := inner_path(check)
 	outer_named(check, inner)
 }
 
@@ -1574,7 +1596,10 @@ with_refs(def, checked) := object.union(def, {"$refs": ref_inputs(checked)}) if 
 
 with_refs(def, checked) := def if count(check_refs(checked)) == 0
 
-described(check, item) := object.union(check, {"expression": expression_of(check, item)}) if not check.substitute
+described(check, item) := object.union(check, {"expression": expression_of(check, item)}) if {
+	is_object(check)
+	not check.substitute
+}
 
 described(check, item) := {"expression": expression_of(check, item)} if not is_object(check)
 
@@ -1625,18 +1650,18 @@ well_formed_def(req) := {"$well_formed": {
 default well_formed(_) := false
 
 well_formed(req) if {
-	count(checks_of(req)) > 0
+	size(checks_of(req)) > 0
 	require_of(req) in {"every", "some"}
 	from_well_formed(req)
 }
 
 well_formed_inputs(req) := [
-	{"name": "count(checks)", "value": count(checks_of(req))},
+	{"name": "count(checks)", "value": size(checks_of(req))},
 	{"name": "require", "value": require_of(req)},
 ] if not stepped(req)
 
 well_formed_inputs(req) := [
-	{"name": "count(checks)", "value": count(checks_of(req))},
+	{"name": "count(checks)", "value": size(checks_of(req))},
 	{"name": "require", "value": require_of(req)},
 	{"name": "from", "value": from_of(req)},
 ] if stepped(req)
@@ -1644,14 +1669,14 @@ well_formed_inputs(req) := [
 applies_def(req) := {"$applies": with_refs(
 	{
 		"description": sprintf("subject is in scope as a %s under this requirement's applies_to filter; out-of-scope subjects are recorded but not evaluated, and a subject whose filter can't be read fails", [subject_type_of(req)]),
-		"expression": concat(" and ", [expression_of(applies_to_of(req)[name], subject_item_name(req)) | some name in applies_to_names(req)]),
+		"expression": joined(" and ", [expression_of(applies_to_of(req)[name], subject_item_name(req)) | some name in applies_to_names(req)]),
 	},
 	applies_to_of(req),
-)} if count(applies_to_of(req)) > 0
+)} if size(applies_to_of(req)) > 0
 
-applies_def(req) := {} if count(applies_to_of(req)) == 0
+applies_def(req) := {} if size(applies_to_of(req)) == 0
 
-applies_to_names(req) := sort(object.keys(applies_to_of(req)))
+applies_to_names(req) := sort(object.keys(applies_to_of(req))) if is_object(applies_to_of(req))
 
 requirement_check_defs(req) := object.union(
 	object.union(
@@ -1719,10 +1744,10 @@ applies_rows(doc, req, req_name) := [{
 } |
 	some entry in raw_entries(doc, req)
 ] if {
-	count(applies_to_of(req)) > 0
+	size(applies_to_of(req)) > 0
 }
 
-applies_rows(_, req, _) := [] if count(applies_to_of(req)) == 0
+applies_rows(_, req, _) := [] if size(applies_to_of(req)) == 0
 
 applies_inputs(subj, req) := [inp |
 	some name in applies_to_names(req)
