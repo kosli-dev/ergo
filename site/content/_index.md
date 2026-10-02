@@ -7,6 +7,22 @@ hero:
   primary: Get started
   secondary: GitHub
   verdict: d-3 is out of scope. d-2 was never approved... and the report says so.
+  fromto:
+    label: The same control written in Rego and in ergo, and what each returns
+    steps: [Rego policy, Rego result, control, evaluation, report]
+    # Set to true to bring back the Rego policy and Rego result steps.
+    show_rego: false
+    examples:
+      - key: deploy
+        label: Deploy approval
+        input_caption: Three deployments. d-2 has no approved_by field at all, and d-3 is in staging.
+        rego_caption: Rego says no. Nothing about d-1, or why d-3 was skipped.
+        ergo_caption: d-3 is out of scope. d-2 was never approved... and the report says so.
+      - key: review
+        label: Four eyes
+        input_caption: Three pull requests. PR 2 was approved only by its author, and PR 3 has no author recorded.
+        rego_caption: Two failures, one message. Which is which?
+        ergo_caption: PR 2 was only approved by its author. PR 3 has no author recorded. Different problems, different fixes.
 
 problem:
   title: A decision nobody can inspect
@@ -14,10 +30,10 @@ problem:
   lede: With Rego you can block a deployment, but you can't show later why. When you define controls with ==ergo== you have records of why decisions were made.
   body: In regulated settings, someone else has to be able to check that a control behaved as it should. A yes or no can't be validated. You don't just tell the auditor the decision. You hand over the workings.
   without:
-    label: Rego provides decisions
+    label: "**Rego** provides decisions"
     note: Useful. But why was it false?
   with:
-    label: With ==ergo== you get explanations
+    label: With **ergo** you get explanations
     note: Same decision. Now you can see why.
 
 declaration:

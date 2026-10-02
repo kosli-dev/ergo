@@ -13,20 +13,7 @@
       </div>
     </div>
 
-    <figure class="term" aria-label="An ergo report for three deployments">
-      <div class="term__bar"><span></span><span></span><span></span><code>opa eval ... data.deploy.report</code></div>
-      <div class="report" data-evaluate>
-        <div class="report__head"><span>subject</span><span>check</span><span>value read</span><span>passed</span><span>cause</span></div>
-        <div class="report__row is-sys"><span></span><span class="sys">$well_formed</span><span>count(checks) = 1</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row is-sys"><span></span><span class="sys">$min_subjects</span><span>count(matching) = 2</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row"><span>d-1</span><span class="sys">$applies</span><span>environment = "prod"</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row"><span>d-2</span><span class="sys">$applies</span><span>environment = "prod"</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row is-scope"><span>d-3</span><span class="sys">$applies</span><span>environment = "staging"</span><span class="f">false</span><span>value</span></div>
-        <div class="report__row"><span>d-1</span><span>approved</span><span>approved_by = "alice"</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row is-fail"><span>d-2</span><span>approved</span><span>approved_by = null</span><span class="f">false</span><span class="f">absent</span></div>
-      </div>
-      <figcaption class="term__foot">{{ partial "therefore.html" . }} compliant: <span class="f">false</span> <span class="term__why">{{ $c.hero.verdict }}</span></figcaption>
-    </figure>
+    {{ partial "hero-fromto.html" . }}
   </div>
 </section>
 

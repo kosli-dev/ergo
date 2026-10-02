@@ -142,8 +142,8 @@ p code, li code, dd code, td code {
 .term__bar code { margin-left: 10px; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .report { padding: 10px 0; font: 400 12.5px/1.5 var(--mono); overflow-x: auto; }
 .report__head, .report__row {
-  display: grid; grid-template-columns: 44px 112px minmax(170px, 1fr) 52px 76px; gap: 12px;
-  padding: 7px 18px; min-width: 520px;
+  display: grid; grid-template-columns: 62px 112px minmax(170px, 1fr) 52px 76px; gap: 12px;
+  padding: 7px 18px; min-width: 538px;
 }
 .report__head { color: var(--faint); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
 .report__row { border-top: 1px dashed var(--line); }
@@ -154,16 +154,48 @@ p code, li code, dd code, td code {
 .term__why { flex-basis: 100%; font-family: var(--sans); font-weight: 400; color: var(--muted); font-size: 14px; }
 
 /* Evaluation: rows start as dithered noise and resolve into evidence. */
-.js .report[data-evaluate] .report__row > span {
+.js .report[data-evaluate] .report__row > span, .js .ft__report .report__row > span {
   transition: color .25s ease, background-color .25s ease;
 }
-.js .report[data-evaluate] .report__row:not(.is-resolved) > span:not(:empty) {
+.js .report[data-evaluate] .report__row:not(.is-resolved) > span:not(:empty), .js .ft__report .report__row:not(.is-resolved) > span:not(:empty) {
   color: transparent;
   background-image: radial-gradient(rgba(247, 247, 239, .28) 1px, transparent 1.4px);
   background-size: 4px 4px;
   border-radius: 2px;
 }
-.js .report[data-evaluate] .report__row:not(.is-resolved) { background: none; box-shadow: none; }
+.js .report[data-evaluate] .report__row:not(.is-resolved), .js .ft__report .report__row:not(.is-resolved) { background: none; box-shadow: none; }
+
+/* Hero from → to: each example steps Rego policy → Rego result → ergo control → ergo report. */
+.ft__bar { flex-wrap: wrap; row-gap: 10px; }
+.ft__file { flex: 1 1 auto; min-width: 0; }
+.ft__tabs { display: flex; gap: 4px; margin-left: auto; padding: 3px; border: 1px solid var(--line); border-radius: 999px; }
+.ft__tab { padding: 5px 11px; border: 0; border-radius: 999px; background: none; color: var(--muted); font: 500 12px/1 var(--mono); cursor: pointer; }
+.ft__tab:hover { color: var(--paper); }
+.ft__tab[aria-pressed="true"] { background: var(--lime); color: var(--ink); }
+.ft__views { display: grid; padding: 18px 18px 8px; }
+.ft__view { min-width: 0; }
+.ft--instant .code-line, .ft--instant .report__row > span { transition: none !important; }
+.js .ft__view { grid-area: 1 / 1; visibility: hidden; }
+.js .ft__view.is-active { visibility: visible; }
+.ft__label { display: flex; gap: 8px; margin: 0 0 10px; font-size: 12px; letter-spacing: .02em; color: var(--faint); }
+.ft__who { color: var(--paper); }
+.ft__who--ergo { color: var(--lime); }
+.ft__code { font-size: 12.5px; line-height: 1.6; padding: 14px 16px; }
+.ft__report { padding: 4px 0; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--ink); }
+.ft__report .report__row > span { line-height: 1.45; }
+.ft__caption { margin: 12px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+.ft__foot { padding-top: 12px; padding-bottom: 12px; }
+/* Step toggles: pick one to take over from the auto-play. Rego steps carry a violet square, ergo steps the therefore sign. */
+.ft__steps { display: flex; flex-wrap: wrap; gap: 4px; width: fit-content; max-width: 100%; padding: 3px; border: 1px solid var(--line); border-radius: 999px; }
+.ft__step { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border: 0; border-radius: 999px; background: none; color: var(--muted); font: 500 12px/1 var(--mono); cursor: pointer; }
+.ft__step:hover { color: var(--paper); background: rgba(247, 247, 239, .06); }
+.ft__step[aria-pressed="true"] { background: var(--paper); color: var(--ink); }
+.ft__mark { flex: none; display: inline-grid; place-items: center; width: 10px; height: 10px; }
+.ft__mark--rego { width: 8px; height: 8px; border-radius: 2px; background: var(--violet); }
+.ft__mark--ergo { color: var(--lime); }
+.ft__mark--ergo .therefore { width: 10px; height: 10px; }
+.ft__step[aria-pressed="true"] .ft__mark--ergo { color: var(--ink); }
+@media (max-width: 640px) { .ft__file { display: none; } .ft__tabs { margin-left: 0; } .ft__steps { border-radius: 18px; } }
 
 /* Code blocks resolve the same way, line by line and faster, as they scroll in. */
 .js .code-line { transition: color .2s ease; }
@@ -190,6 +222,10 @@ p code, li code, dd code, td code {
 .compare__card--ergo { border-color: rgba(214, 255, 77, .35); }
 .compare__label { margin: 0 0 12px; font-size: 12px; color: var(--faint); text-transform: uppercase; letter-spacing: .08em; }
 .compare__card--ergo .compare__label { color: var(--lime); }
+/* The problem cards use sentence case, with the engine and the library named in bold. */
+.compare .compare__label { text-transform: none; letter-spacing: .02em; font-size: 13px; }
+.compare .compare__label strong { font-weight: 700; color: var(--paper); }
+.compare__card--ergo .compare__label strong { color: var(--lime); }
 .compare__note { margin: 14px 0 0; color: var(--muted); font-size: 15px; }
 .compare__note strong { color: var(--paper); }
 
