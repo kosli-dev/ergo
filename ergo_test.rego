@@ -4184,6 +4184,7 @@ test_a_filter_ordering_objects_cannot_rule_subjects_out if {
 		{"op": "compare", "left": ["a"], "right": ["b"], "cmp": "lt"},
 		{"op": "any_of", "options": {"o": [{"op": "compare", "left": ["xs"], "right": ["ys"], "cmp": "lt"}]}},
 		{"op": "equals", "path": ["n"], "value": 5, "substitute": {"op": "compare", "left": ["a"], "right": ["b"], "cmp": "lt"}},
+		{"op": "present", "path": ["missing"], "substitute": {"op": "compare", "left": ["a"], "right": ["b"], "cmp": "lt"}},
 	] {
 		rep := ergo.report({"items": [ordering_doc]}, {"s": {
 			"from": ["items"],
@@ -4195,4 +4196,16 @@ test_a_filter_ordering_objects_cannot_rule_subjects_out if {
 		rep.requirements.s.satisfied == false
 		[r.cause | some r in rows_for(rep, "s", "$applies")] == ["absent"]
 	}
+}
+
+test_a_present_filter_with_a_substitute_ordering_numbers_still_rules_subjects_out if {
+	rep := ergo.report({"items": [ordering_doc]}, {"s": {
+		"from": ["items"],
+		"id": ["id"],
+		"min_subjects": 0,
+		"applies_to": {"f": {"op": "present", "path": ["missing"], "substitute": {"op": "compare", "left": ["n"], "right": ["m"], "cmp": "gt"}}},
+		"checks": {"c": {"op": "equals", "path": ["n"], "value": 999}},
+	}})
+	rep.requirements.s.satisfied == true
+	[r.cause | some r in rows_for(rep, "s", "$applies")] == ["value"]
 }

@@ -1227,6 +1227,7 @@ answers_presence(check, subj) if {
 	_ := start_of(subj, check.path)
 	not unreadable_ref(check)
 	not broken_row(check)
+	unordered_reads(subj, check) == set()
 	row_cause(check, subj) in {"absent", "null"}
 }
 
