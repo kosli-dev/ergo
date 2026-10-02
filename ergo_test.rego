@@ -3990,6 +3990,7 @@ badly_written := [
 	{"op": "all", "path": ["xs"], "check": {"op": "all", "path": [], "check": {"op": "any_of", "options": {"o": [{"op": "all", "path": [], "check": {"op": "present", "path": []}}]}}}},
 	{"op": "all", "path": ["xs"], "check": {"op": "all", "path": [], "check": {"op": "any_of", "options": {"o": [{"op": "in", "path": [], "values": 1}]}}}},
 	{"op": "all", "path": ["xs"], "check": {"op": "any_of", "options": {"o": [{"op": "all", "path": [], "check": {"op": "any_of", "options": {"p": [{"op": "in", "path": [], "values": 1}]}}}]}}},
+	{"op": "any_of", "options": {"o": [{"op": "all", "path": ["xs"], "check": {"op": "any_of", "options": {"p": [{"op": "all", "path": [], "check": {"op": "any_of", "options": {"q": [{"op": "compare", "left": [], "right": [], "cmp": "bad"}]}}}]}}}]}},
 ]
 
 test_a_badly_written_filter_cannot_rule_subjects_out if {

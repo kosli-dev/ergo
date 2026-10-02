@@ -542,6 +542,8 @@ Each entry in `inputs` is a path, or `{"path": [...], "each": [...]}` to read on
 If your operator takes its own parameters, read each one with `arg`, so a policy can pass it a [`ref`](#reading-from-the-input) or a `literal`. `arg` gives back the value to use, and is undefined when a ref can't be read, so the check fails:
 
 ```rego
+operators contains "multiple_of"
+
 op_passed(check, subj) if {
 	check.op == "multiple_of"
 	n := value_at(subj, check.path)

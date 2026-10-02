@@ -628,7 +628,8 @@ check_nodes(check) := nodes if {
 	l2 := descend(l1)
 	l3 := descend(l2)
 	l4 := descend(l3)
-	nodes := array.concat(array.concat(l0, l1), array.concat(l2, array.concat(l3, l4)))
+	l5 := descend(l4)
+	nodes := array.concat(array.concat(array.concat(l0, l1), array.concat(l2, l3)), array.concat(l4, l5))
 }
 
 descend(level) := [[child[0], array.concat(node[1], [child[1]])] |
