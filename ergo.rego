@@ -1094,15 +1094,28 @@ name_inputs(subj, check) := [{"name": path_name(p), "value": value_at(subj, p)} 
 element_name_paths(check) := [p | some p in element_name_reads(check); p != object.get(check.check, "path", [])]
 
 element_name_reads(check) := sort({p |
-	some p in element_reads(check.check)
-	outer_named(check, p)
+	some read in scoped_reads(check)
+	p := read[0]
+	named(p)
+	not substring(p[0], 1, -1) in read[1]
 })
 
-element_reads(check) := [p | some leaf in element_leaves(check); some p in nested_reads(leaf)]
+scoped_reads(check) := [read |
+	given := names_of(check)
+	some leaf in element_leaves(check.check)
+	some read in leaf_reads(leaf, given)
+]
 
-nested_reads(leaf) := leaf_paths(leaf) if not quantified(leaf)
+leaf_reads(leaf, given) := [[p, given] | some p in leaf_paths(leaf)] if not quantified(leaf)
 
-nested_reads(leaf) := array.concat([leaf.path], [p | some l in element_leaves(leaf.check); some p in leaf_paths(l)]) if quantified(leaf)
+leaf_reads(leaf, given) := array.concat([[leaf.path, given]], [[p, given | names_of(leaf)] |
+	some l in element_leaves(leaf.check)
+	some p in leaf_paths(l)
+]) if quantified(leaf)
+
+names_of(check) := {check.as} if "as" in object.keys(check)
+
+names_of(check) := set() if not "as" in object.keys(check)
 
 check_reads(leaf) := leaf_paths(leaf) if not quantified(leaf)
 
@@ -1112,14 +1125,9 @@ element_leaves(check) := [check] if not combinator(check)
 
 element_leaves(check) := [leaf | some group in check.options; some leaf in group] if combinator(check)
 
-item_names(check) := {c.as |
-	some chain in list_chains(object.get(check, "check", {}))
-	some c in chain
-} | {check.as | "as" in object.keys(check)}
-
 outer_named(check, p) if {
 	named(p)
-	not substring(p[0], 1, -1) in item_names(check)
+	not substring(p[0], 1, -1) in names_of(check)
 }
 
 relative_path(check, p) := array.slice(p, 1, count(p)) if reads_item(check, p)

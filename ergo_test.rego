@@ -3465,3 +3465,38 @@ test_a_list_check_inside_an_any_of_inside_a_list_check_reads_names_for_its_row i
 	[r.passed, r.cause] == [false, "absent"]
 	r.inputs == [{"name": "as[]", "value": [{"xs": [1, 2]}]}, {"name": "$$input.lim", "value": null}]
 }
+
+test_a_name_read_outside_the_list_check_that_gives_it_fails_as_absent if {
+	inside := {"op": "all", "path": ["xs"], "check": {"op": "any_of", "options": {
+		"a": [{"op": "all", "path": ["ys"], "as": "x", "check": {"op": "present", "path": []}}],
+		"b": [{"op": "equals", "path": ["$x", "v"], "value": 1}],
+	}}}
+	r := row_in({}, {"id": 1, "xs": [{"ys": []}]}, inside)
+	[r.passed, r.cause] == [false, "absent"]
+	top := {"op": "any_of", "options": {
+		"a": [{"op": "all", "path": ["ys"], "as": "x", "check": {"op": "present", "path": []}}],
+		"b": [{"op": "equals", "path": ["$x", "v"], "value": 1}],
+	}}
+	t := row_in({}, {"id": 1, "ys": []}, top)
+	[t.passed, t.cause] == [false, "absent"]
+	beside := {"op": "all", "path": ["xs"], "as": "o", "check": {"op": "any_of", "options": {"a": [
+		{"op": "all", "path": ["ys"], "as": "y", "check": {"op": "present", "path": []}},
+		{"op": "equals", "path": ["$y"], "value": 1},
+	]}}}
+	b := row_in({}, {"id": 1, "xs": [{"ys": [1]}]}, beside)
+	[b.passed, b.cause] == [false, "absent"]
+}
+
+test_a_filter_reading_a_name_outside_the_list_check_that_gives_it_cannot_rule_subjects_out if {
+	rep := ergo.report({"items": [{"id": 1, "xs": [{"ys": []}]}]}, {"s": {
+		"from": ["items"],
+		"id": ["id"],
+		"min_subjects": 0,
+		"applies_to": {"f": {"op": "all", "path": ["xs"], "check": {"op": "any_of", "options": {
+			"a": [{"op": "all", "path": ["ys"], "as": "x", "check": {"op": "present", "path": []}}],
+			"b": [{"op": "equals", "path": ["$x", "v"], "value": 1}],
+		}}}},
+		"checks": {"c": {"op": "equals", "path": ["id"], "value": 0}},
+	}})
+	rep.requirements.s.satisfied == false
+}
