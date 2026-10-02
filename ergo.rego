@@ -436,7 +436,7 @@ projection_name(path, each) := sprintf("%s[].%s", [path_name(path), path_name(ea
 
 segment_name(_, p) := key_name(p) if not is_object(p)
 
-segment_name(i, p) := json_string(p.literal) if {
+segment_name(i, p) := json_text(p.literal) if {
 	is_literal(p)
 	first_dollar_key(i, p.literal)
 }
@@ -461,7 +461,7 @@ first_dollar_key(0, k) if startswith(k, "$")
 
 key_name(k) := k if plain_key(k)
 
-key_name(k) := json_string(k) if {
+key_name(k) := json_text(k) if {
 	is_string(k)
 	not plain_key(k)
 }
@@ -470,12 +470,52 @@ key_name(k) := sprintf("%v", [k]) if not is_string(k)
 
 plain_key(k) if regex.match(`^[A-Za-z_$][A-Za-z0-9_$-]*$`, k)
 
-json_string(s) := sprintf(`"%s"`, [strings.replace_n(json_escapes, s)])
+json_text(v) := concat("", [json_token(t) | some t in regex.find_n(`"(?:[^"\\]|\\.)*"|-?[0-9][0-9.eE+-]*|[^"0-9-]+`, json.marshal(v), -1)])
 
-json_escapes := object.union(
-	{json.unmarshal(sprintf(`"\u%04x"`, [c])): sprintf(`\u%04x`, [c]) | some c in numbers.range(0, 31)},
-	{`\`: `\\`, `"`: `\"`, "\b": `\b`, "\f": `\f`, "\n": `\n`, "\r": `\r`, "\t": `\t`},
-)
+json_token(t) := concat("", [object.get(standard_escapes, e, e) | some e in regex.find_n(`\\u[0-9a-f]{4}|\\.|[^\\]+`, t, -1)]) if startswith(t, `"`)
+
+json_token(t) := number_text(t) if regex.match(`^-?[0-9]`, t)
+
+json_token(t) := strings.replace_n({",": ", ", ":": ": "}, t) if {
+	not startswith(t, `"`)
+	not regex.match(`^-?[0-9]`, t)
+}
+
+standard_escapes := {`\u003c`: "<", `\u003e`: ">", `\u0026`: "&", `\u2028`: "\u2028", `\u2029`: "\u2029", `\u0008`: `\b`, `\u000c`: `\f`}
+
+number_text(t) := signed(m[1], decimal(concat("", [m[2], m[3]]), count(m[2]) + exponent(m[4]))) if {
+	m := regex.find_all_string_submatch_n(`^(-?)([0-9]+)(?:\.([0-9]*))?(?:[eE]([+-]?[0-9]+))?$`, t, 1)[0]
+}
+
+exponent("") := 0
+
+exponent(e) := to_number(e) if e != ""
+
+decimal(digits, point) := decimal_text(whole, frac) if {
+	left := max([0, 1 - point])
+	padded := concat("", [zeros(left), digits, zeros(point - count(digits))])
+	whole := trim_left(substring(padded, 0, point + left), "0")
+	frac := trim_right(substring(padded, point + left, -1), "0")
+}
+
+decimal_text("", "") := "0"
+
+decimal_text(whole, "") := whole if whole != ""
+
+decimal_text("", frac) := concat("", ["0.", frac]) if frac != ""
+
+decimal_text(whole, frac) := concat(".", [whole, frac]) if {
+	whole != ""
+	frac != ""
+}
+
+signed(_, "0") := "0"
+
+signed(sign, n) := concat("", [sign, n]) if n != "0"
+
+zeros(n) := concat("", ["0" | some _ in numbers.range(1, n)]) if n > 0
+
+zeros(n) := "" if n <= 0
 
 value_text(x) := ref_name(x.ref) if is_ref(x)
 
@@ -486,9 +526,7 @@ value_text(x) := literal_text(written(x)) if {
 
 value_text(x) := "<invalid ref>" if malformed(x)
 
-literal_text(v) := json_string(v) if is_string(v)
-
-literal_text(v) := sprintf("%v", [v]) if not is_string(v)
+literal_text(v) := json_text(v)
 
 default leaf_passed(_, _) := false
 
@@ -1642,7 +1680,7 @@ matching_count_name(req) := "count(matching(<invalid from>))" if not from_well_f
 min_subjects_def(req) := {"$min_subjects": with_refs(
 	{
 		"description": sprintf("at least %d matching %s subject(s) required", [min_subjects_of(req), subject_type_of(req)]),
-		"expression": sprintf("%s >= %d", [matching_count_name(req), min_subjects_of(req)]),
+		"expression": sprintf("%s >= %s", [matching_count_name(req), literal_text(min_subjects_of(req))]),
 	},
 	{"from": from_of(req)},
 )}

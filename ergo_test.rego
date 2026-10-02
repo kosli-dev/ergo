@@ -1421,6 +1421,39 @@ test_a_string_value_is_escaped_as_in_standard_json if {
 	rendered({}, {"op": "equals", "path": ["x"], "value": "a \"b\" \\ <c> & d\n\t\u0001"}) == `x == "a \"b\" \\ <c> & d\n\t\u0001"`
 }
 
+test_a_number_value_is_written_the_same_however_the_policy_wrote_it if {
+	[rendered({}, {"op": "equals", "path": ["n"], "value": v}) | some v in [1, 1.0, 1.50, 1e2, 2.5e-3, -0.0, 1.23e-7]] == [
+		"n == 1", "n == 1", "n == 1.5", "n == 100", "n == 0.0025", "n == 0", "n == 0.000000123",
+	]
+}
+
+test_a_large_number_value_is_written_in_full if {
+	rendered({}, {"op": "equals", "path": ["n"], "value": 1e21}) == "n == 1000000000000000000000"
+	rendered({}, {"op": "equals", "path": ["n"], "value": 123456789012345678901234567890}) == "n == 123456789012345678901234567890"
+}
+
+test_a_list_or_object_value_is_written_as_json_with_sorted_keys if {
+	rendered({}, {"op": "equals", "path": ["x"], "value": ["a", 1.50, {"b": [true, null], "a": "x,y:z"}]}) == `x == ["a", 1.5, {"a": "x,y:z", "b": [true, null]}]`
+	rendered({}, {"op": "equals", "path": ["x"], "value": {}}) == "x == {}"
+}
+
+test_a_string_inside_a_list_value_is_escaped_as_in_standard_json if {
+	rendered({}, {"op": "equals", "path": ["x"], "value": ["a<b&c", "\u0001\b"]}) == `x == ["a<b&c", "\u0001\b"]`
+}
+
+test_text_that_looks_like_an_escape_is_kept_as_written if {
+	rendered({}, {"op": "equals", "path": ["x"], "value": `\u003c`}) == `x == "\\u003c"`
+}
+
+test_a_range_writes_its_bounds_as_numbers if {
+	rendered({}, {"op": "range", "path": ["t"], "min": 175.0, "max": 2e2}) == "t >= 175 and t <= 200"
+}
+
+test_min_subjects_is_written_like_any_number if {
+	rep := ergo.report({"xs": []}, {"s": {"from": ["xs"], "min_subjects": 2.0, "checks": {"c": {"op": "present", "path": ["x"]}}}})
+	rep.requirements.s.checks["$min_subjects"].expression == "count(matching(xs)) >= 2"
+}
+
 test_a_key_is_escaped_as_in_standard_json if {
 	rendered({}, {"op": "present", "path": ["a<b"]}) == `"a<b" is present`
 }

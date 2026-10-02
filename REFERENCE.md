@@ -623,7 +623,14 @@ Two rules:
 
 `subjects.total` counts every subject found at `from`, and `subjects.matching` counts the ones left after `applies_to`. `checks` holds each check as you wrote it, plus the `expression` ergo rendered from it. If you write your own `expression`, yours is used. A check that uses a [`ref`](#reading-from-the-input) also gets `$refs`: the name and value of each one, as read for this report. The `$` marks it as ergo's, so it can't be mixed up with a field of your own. It also holds the [checks ergo adds](#checks-ergo-adds), each with a `description` and an `expression`.
 
-In an expression, a string written in the policy is shown as a JSON string, so it is always in quotes: `state == "MERGED"`, `n == "1"` and `x == ""` compare against strings, and `n == 1`, `ok == true` and `x == null` don't. A ref is shown without quotes, as `$$params.x`, so it can't be mistaken for the string `"$$params.x"`. Strings are escaped as in standard JSON: `"` becomes `\"`, `\` becomes `\\`, and control characters become `\n`, `\t` or `\u0001` and so on. Nothing else is escaped, so `"a<b"` stays as it is. Keys in paths are only quoted when needed, as described in [Paths](#paths), and quoting uses the same escapes.
+In an expression, a value written in the policy is shown as JSON, written the same way whatever the policy looked like, so anyone can produce the same text:
+
+- A string is always in quotes: `state == "MERGED"`, `n == "1"` and `x == ""` compare against strings, and `n == 1`, `ok == true` and `x == null` don't. Only `"`, `\` and control characters are escaped, as `\"`, `\\`, `\b`, `\f`, `\n`, `\r`, `\t` or `\u0001` and so on, so `"a<b"` stays as it is.
+- A number is a plain decimal, with no exponent and no trailing zeros: `1.0`, `1.50`, `1e2` and `2.5e-3` are shown as `1`, `1.5`, `100` and `0.0025`, and `-0` as `0`.
+- A list or object has one space after each comma and colon, and its keys are sorted: `["a", 1.5, {"a": "x", "b": [true, null]}]`.
+- A ref is shown without quotes, as `$$params.x`, so it can't be mistaken for the string `"$$params.x"`.
+
+Keys in paths are only quoted when needed, as described in [Paths](#paths), and are escaped the same way.
 
 `results` has one row for each subject and check:
 
