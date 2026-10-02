@@ -1,0 +1,16 @@
+{{- $out := slice -}}
+{{- range $line := split (transform.Highlight .content .lang "") "\n" -}}
+{{- range $i, $mark := $.marks -}}
+{{- $parts := split $mark "|" -}}
+{{- if in $line (index $parts 0) -}}
+{{- $n := add $i 1 -}}
+{{- if gt (len $parts) 2 -}}{{- with index $parts 2 -}}{{- $n = . -}}{{- end -}}{{- end -}}
+{{- $line = printf `%s<span data-note="%v"></span>` $line $n -}}
+{{- if gt (len $parts) 1 -}}{{- with index $parts 1 -}}
+{{- $line = printf `%s<span class="code-label">%s</span>` $line (htmlEscape .) -}}
+{{- end -}}{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- $out = $out | append $line -}}
+{{- end -}}
+{{- delimit $out "\n" | safeHTML -}}

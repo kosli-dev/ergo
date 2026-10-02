@@ -1,0 +1,1 @@
+{{ partial "marked-code.html" (dict "content" (trim .Inner "\n") "lang" (.Get 0) "marks" (after 1 .Params)) }}

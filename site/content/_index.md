@@ -83,10 +83,10 @@ architecture:
   lede: ==ergo== doesn't replace OPA. Copy a single rego file into your policies. The control is expressed as yaml, JSON or rego and ==ergo== provides a single evaluation and reporting model.
 
 vocabulary:
-  title: Readable by machines.
-  muted: Readable by people.
-  lede: The vocabulary is small on purpose. Every check gets a plain-language expression, like `approved_by is a non-empty string`, rendered from the requirement itself. Controls are data, so they can be validated, diffed and tested like code.
-  link: Every field, operator and cause
+  title: Auditor says why
+  muted: Computer says ==ergo==
+  lede: "Learn how to write self-explaining automated policies in this tutorial:"
+  link: The bakery example
 
 start:
   title: One file. No lock-in.

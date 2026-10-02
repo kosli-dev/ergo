@@ -5,7 +5,7 @@
 <section class="hero">
   <div class="wrap hero__grid">
     <div class="hero__copy">
-      <h1 class="hero__title"><strong>{{ $c.hero.title }}</strong></h1>
+      <h1 class="hero__title"><strong>{{ partial "copy.html" $c.hero.title }}</strong></h1>
       <p class="hero__lede">{{ partial "copy.html" $c.hero.lede }}</p>
       <div class="actions">
         <a class="btn btn--primary" href="{{ "docs/getting-started/" | relURL }}">{{ $c.hero.primary }} <span aria-hidden="true">→</span></a>
@@ -22,7 +22,7 @@
   <div class="wrap">
     <div class="split split--text-right">
       <div class="split__col">
-        <h2 class="display-m">{{ $c.problem.title }}<br><span class="muted">{{ $c.problem.muted }}</span></h2>
+        <h2 class="display-m">{{ partial "copy.html" $c.problem.title }}<br><span class="muted">{{ partial "copy.html" $c.problem.muted }}</span></h2>
         <p class="lede">{{ partial "copy.html" $c.problem.lede }}</p>
         <p>{{ partial "copy.html" $c.problem.body }}</p>
       </div>
@@ -52,8 +52,8 @@ d-3      <span class="k">$applies</span>   environment = "staging"  <span class=
   <div class="wrap">
     <div class="declare">
       <div class="declare__notes">
-        <h2 class="display-m">{{ $c.declaration.title }}<br><span class="muted">{{ $c.declaration.muted }}</span></h2>
-        <h3 class="declare__head">{{ $c.declaration.notes_title }}</h3>
+        <h2 class="display-m">{{ partial "copy.html" $c.declaration.title }}<br><span class="muted">{{ partial "copy.html" $c.declaration.muted }}</span></h2>
+        <h3 class="declare__head">{{ partial "copy.html" $c.declaration.notes_title }}</h3>
         <p class="declare__intro">{{ partial "copy.html" $c.declaration.notes_intro }}</p>
         <ol class="notes">
           {{- range $i, $n := $c.declaration.notes }}
@@ -86,7 +86,7 @@ d-3      <span class="k">$applies</span>   environment = "staging"  <span class=
 {{/* 03 — One shape */}}
 <section class="section">
   <div class="wrap">
-    <h2 class="display-m">{{ $c.shape.title }}<br><span class="muted">{{ $c.shape.muted }}</span></h2>
+    <h2 class="display-m">{{ partial "copy.html" $c.shape.title }}<br><span class="muted">{{ partial "copy.html" $c.shape.muted }}</span></h2>
     <p class="lede narrow">{{ partial "copy.html" $c.shape.lede }}</p>
     <ol class="fields">
       {{- range $c.shape.fields }}
@@ -115,7 +115,7 @@ d-3      <span class="k">$applies</span>   environment = "staging"  <span class=
 {{/* 05 — Architecture */}}
 <section class="section section--panel">
   <div class="wrap">
-    <h2 class="display-m">{{ $c.architecture.title }}<br><span class="muted">{{ partial "copy.html" $c.architecture.muted }}</span></h2>
+    <h2 class="display-m">{{ partial "copy.html" $c.architecture.title }}<br><span class="muted">{{ partial "copy.html" $c.architecture.muted }}</span></h2>
     <p class="lede narrow">{{ partial "copy.html" $c.architecture.lede }}</p>
     <ol class="flow" data-sequence aria-label="From inputs to conclusion">
       <li class="flow__group">
@@ -147,19 +147,16 @@ d-3      <span class="k">$applies</span>   environment = "staging"  <span class=
 {{/* 06 — Vocabulary */}}
 <section class="section">
   <div class="wrap">
-    <h2 class="display-m">{{ $c.vocabulary.title }}<br><span class="muted">{{ $c.vocabulary.muted }}</span></h2>
+    <h2 class="display-m">{{ partial "copy.html" $c.vocabulary.title }}<br><span class="muted">{{ partial "copy.html" $c.vocabulary.muted }}</span></h2>
     <p class="lede narrow">{{ partial "copy.html" $c.vocabulary.lede }}</p>
-    <ul class="ops">
-      {{ range slice "equals" "in" "present" "non_empty_string" "matches_any" "not_matches_any" "range" "includes" "excludes" "compare" "compare_time" "all" "any" "any_of" }}<li><a href="{{ "docs/reference/#operators" | relURL }}">{{ . }}</a></li>{{ end }}
-    </ul>
-    <p><a class="link" href="{{ "docs/reference/" | relURL }}">{{ $c.vocabulary.link }} <span aria-hidden="true">→</span></a></p>
+    <p><a class="link" href="{{ "bakery/" | relURL }}">{{ $c.vocabulary.link }} <span aria-hidden="true">→</span></a></p>
   </div>
 </section>
 
 {{/* 07 — Get started */}}
 <section class="section section--panel" id="start">
   <div class="wrap">
-    <h2 class="display-m">{{ $c.start.title }}</h2>
+    <h2 class="display-m">{{ partial "copy.html" $c.start.title }}</h2>
     <ol class="steps">
       {{- range $i, $st := $c.start.steps }}
       <li>
@@ -192,7 +189,7 @@ d-3      <span class="k">$applies</span>   environment = "staging"  <span class=
 {{/* 09 — Close */}}
 <section class="cta">
   <div class="wrap cta__inner">
-    <h2 class="cta__title"><span class="cta__lead">{{ partial "copy.html" $c.close.lead }}</span><strong>{{ $c.close.title }}</strong></h2>
+    <h2 class="cta__title"><span class="cta__lead">{{ partial "copy.html" $c.close.lead }}</span><strong>{{ partial "copy.html" $c.close.title }}</strong></h2>
     <div class="actions">
       <a class="btn btn--dark" href="{{ site.Params.repo }}">{{ partial "github-icon.html" . }}{{ $c.close.primary }}</a>
       <a class="btn btn--dark-outline" href="{{ "docs/getting-started/" | relURL }}">{{ $c.close.secondary }} <span aria-hidden="true">→</span></a>
