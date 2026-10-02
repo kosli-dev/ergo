@@ -221,6 +221,10 @@ p code, li code, dd code, td code {
 .compare__card--ergo { border-color: rgba(214, 255, 77, .35); }
 .compare__label { margin: 0 0 12px; font-size: 12px; color: var(--faint); text-transform: uppercase; letter-spacing: .08em; }
 .compare__card--ergo .compare__label { color: var(--lime); }
+/* The problem cards use sentence case, with the engine and the library named in bold. */
+.compare .compare__label { text-transform: none; letter-spacing: .02em; font-size: 13px; }
+.compare .compare__label strong { font-weight: 700; color: var(--paper); }
+.compare__card--ergo .compare__label strong { color: var(--lime); }
 .compare__note { margin: 14px 0 0; color: var(--muted); font-size: 15px; }
 .compare__note strong { color: var(--paper); }
 

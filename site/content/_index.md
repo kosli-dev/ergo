@@ -26,10 +26,10 @@ problem:
   lede: With Rego you can block a deployment, but you can't show later why. When you define controls with ==ergo== you have records of why decisions were made.
   body: In regulated settings, someone else has to be able to check that a control behaved as it should. A yes or no can't be validated. You don't just tell the auditor the decision. You hand over the workings.
   without:
-    label: Rego provides decisions
+    label: "**Rego** provides decisions"
     note: Useful. But why was it false?
   with:
-    label: With ==ergo== you get explanations
+    label: With **ergo** you get explanations
     note: Same decision. Now you can see why.
 
 declaration:
