@@ -589,7 +589,7 @@ test_rfc3339_gate_accepts_valid_timestamps if {
 		"2024-06-30T12:00:00+02:00",
 		"2024-06-30T12:00:00-05:30",
 	] {
-		ergo.rfc3339_shaped(ts)
+		ergo._rfc3339_shaped(ts)
 	}
 }
 
@@ -612,7 +612,7 @@ test_rfc3339_gate_rejects_everything_else if {
 		true,
 		["2024-01-01T00:00:00Z"],
 	] {
-		not ergo.rfc3339_shaped(ts)
+		not ergo._rfc3339_shaped(ts)
 	}
 }
 
@@ -2210,14 +2210,14 @@ test_is_violation_reads_only_the_requirements_so_violations_stay_linear_in_subje
 	)
 	some row in rep.results
 	row.passed == false
-	not ergo.is_violation(rep.requirements, row)
+	not ergo._is_violation(rep.requirements, row)
 }
 
 test_definition_field_reads_only_the_requirements_so_violations_stay_linear_in_subjects if {
 	rep := ergo.report({"items": [{"id": "a", "signed": true}]}, violating_req)
 	some row in rep.results
 	row.check == "reviewed"
-	ergo.definition_field(rep.requirements, row, "description") == "Reviewed"
+	ergo._definition_field(rep.requirements, row, "description") == "Reviewed"
 }
 
 test_violations_span_multiple_requirements if {

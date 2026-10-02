@@ -573,11 +573,11 @@ ergo finds the refs in your check by itself, so they appear under `$refs` and de
 
 A custom operator works in `checks`, in `applies_to`, and on either side of a substitute. It doesn't work as the inner check of `all` or `any`, or inside an `any_of` option: there, it fails with cause `absent`.
 
-Two rules:
+Three rules:
 
 - **Fail when you can't read the data.** Check that fields are there and have the right type before you compare them. A rule that doesn't hold fails the check, which is what you want. Be careful with `not`, which turns an error into a pass.
 - **Read the document with `value_at` and `$$input`, and params with `$$params` or `arg`, not with `input` or `data.params`.** While ergo checks a subject, `input` holds ergo's own [names](#naming-subjects), not your input, and `data.params` may not be the params the report was given.
-- **Only call ergo's lower-level rules**, like `value_at`, `arg` and `leaf_passed`. Calling `op_passed`, `check_passed` or `report` from your operator creates a loop, which Rego rejects, and the errors will point at `ergo.rego` rather than your file.
+- **Only call `value_at`, `arg` and `leaf_passed`.** `value_at(subj, path)` reads a path, `arg(value)` reads one of your parameters, and `leaf_passed(check, subj)` runs a built-in check like `{"op": "present", "path": ["approved_by"]}` (but not `all`, `any` or `any_of`). Calling `op_passed` or `report` from your operator creates a loop, which Rego rejects, and the errors will point at `ergo.rego` rather than your file. Every other rule in `ergo.rego` starts with `_` and can change or disappear in any release.
 
 ## The report
 
