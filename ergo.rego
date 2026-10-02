@@ -582,6 +582,12 @@ unordered(subj, leaf) if {
 	not orderable(leaf.cmp, l)
 }
 
+unordered_reads(subj, check) := {"absent" |
+	some c in [check, object.get(check, "substitute", {})]
+	some leaf in element_leaves(c)
+	unordered(subj, leaf)
+}
+
 rfc3339_shaped(v) if {
 	is_string(v)
 	regex.match(`^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])[Tt]([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\.[0-9]+)?([Zz]|[+-]([01][0-9]|2[0-3]):[0-5][0-9])$`, v)
@@ -1042,7 +1048,7 @@ cause_precedence := ["not_an_object", "ambiguous", "unmatched", "absent", "null"
 
 default worst_read(_, _) := "value"
 
-worst_read(subj, check) := worst_of({read_state(subj, p) | some p in read_paths(check)} | {"absent" | some leaf in element_leaves(check); unordered(subj, leaf)}) if {
+worst_read(subj, check) := worst_of({read_state(subj, p) | some p in read_paths(check)} | unordered_reads(subj, check)) if {
 	not unreadable_ref(check)
 	not broken_row(check)
 }
