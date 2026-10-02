@@ -44,6 +44,8 @@ Because each name is an object key, two requirements can't share a name, and eve
 
 A policy with no requirements is never compliant: it doesn't check anything, so it can't vouch for anything either.
 
+From your own policies, call only `ergo.report`, `ergo.report_with_params` and `ergo.violations`. Rules whose names start with `_`, like `ergo._row_cause`, are ergo's own and can change or disappear in any release. If you lint with [Regal](https://www.openpolicyagent.org/projects/regal), its `leaked-internal-reference` rule flags a call to one.
+
 ## Requirements
 
 ```rego
