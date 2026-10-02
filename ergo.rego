@@ -586,6 +586,155 @@ cmp("lt", l, r) if l < r
 
 cmp("lte", l, r) if l <= r
 
+leaf_ops := {"range", "excludes", "includes", "in", "equals", "present", "non_empty_string", "matches_any", "not_matches_any", "compare", "compare_time"}
+
+operators contains op if some op in (leaf_ops | {"all", "any", "any_of"})
+
+required_fields := {
+	"range": {"path", "min", "max"},
+	"excludes": {"path", "value"},
+	"includes": {"path", "value"},
+	"in": {"path", "values"},
+	"equals": {"path", "value"},
+	"present": {"path"},
+	"non_empty_string": {"path"},
+	"matches_any": {"path", "patterns"},
+	"not_matches_any": {"path", "patterns"},
+	"compare": {"left", "right", "cmp"},
+	"compare_time": {"left", "right", "cmp"},
+	"all": {"path", "check"},
+	"any": {"path", "check"},
+	"any_of": {"options"},
+}
+
+broken_row(check) if broken_check(check)
+
+broken_row(check) if {
+	is_object(check)
+	"substitute" in object.keys(check)
+	broken_check(check.substitute)
+}
+
+broken_check(check) if broken_list_check(check)
+
+broken_check(check) if {
+	some node in check_nodes(check)
+	node_broken(node[0], node[1])
+}
+
+check_nodes(check) := nodes if {
+	l0 := [[check, []]]
+	l1 := descend(l0)
+	l2 := descend(l1)
+	l3 := descend(l2)
+	l4 := descend(l3)
+	nodes := array.concat(array.concat(l0, l1), array.concat(l2, array.concat(l3, l4)))
+}
+
+descend(level) := [[child[0], array.concat(node[1], [child[1]])] |
+	some node in level
+	some child in children(node[0])
+]
+
+children(node) := array.concat(inner_child(node), option_children(node))
+
+default inner_child(_) := []
+
+inner_child(node) := [[node.check, "check"]] if quantified(node)
+
+default option_children(_) := []
+
+option_children(node) := [[leaf, "option"] | some group in node.options; is_array(group); some leaf in group] if {
+	combinator(node)
+	option_list(node.options)
+}
+
+node_broken(node, _) if not is_object(node)
+
+node_broken(node, kinds) if {
+	is_object(node)
+	not object.get(node, "op", null) in allowed_ops(kinds)
+}
+
+node_broken(node, _) if fields_broken(node)
+
+allowed_ops(kinds) := operators if kinds == []
+
+allowed_ops(kinds) := object.get(nested_ops, [kinds[count(kinds) - 1], count([k | some k in kinds; k == "check"])], set()) if kinds != []
+
+nested_ops := {
+	"option": [leaf_ops | {"all", "any"}, leaf_ops | {"all", "any"}, leaf_ops],
+	"check": [set(), leaf_ops | {"all", "any", "any_of"}, leaf_ops | {"any_of"}],
+}
+
+fields_broken(node) if {
+	some f in object.get(required_fields, node.op, set())
+	not f in object.keys(node)
+}
+
+fields_broken(node) if {
+	node.op == "range"
+	some f in ["min", "max"]
+	v := arg(node[f])
+	not is_number(v)
+}
+
+fields_broken(node) if {
+	node.op == "in"
+	v := arg(node.values)
+	not value_list(v)
+}
+
+fields_broken(node) if {
+	node.op in {"matches_any", "not_matches_any"}
+	v := arg(node.patterns)
+	not value_list(v)
+}
+
+fields_broken(node) if {
+	node.op in {"matches_any", "not_matches_any"}
+	v := arg(node.patterns)
+	value_list(v)
+	some p in v
+	not valid_pattern(p)
+}
+
+fields_broken(node) if {
+	two_sided(node)
+	not node.cmp in {"eq", "ne", "gt", "gte", "lt", "lte"}
+}
+
+fields_broken(node) if {
+	combinator(node)
+	not option_list(node.options)
+}
+
+fields_broken(node) if {
+	combinator(node)
+	count(node.options) == 0
+}
+
+fields_broken(node) if {
+	combinator(node)
+	option_list(node.options)
+	some group in node.options
+	not filled_list(group)
+}
+
+option_list(options) if is_object(options)
+
+option_list(options) if is_array(options)
+
+filled_list(group) if {
+	is_array(group)
+	count(group) > 0
+}
+
+valid_pattern(p) if {
+	is_string(p)
+	regex.is_valid(p)
+}
+
 quantified(check) if check.op in {"all", "any"}
 
 combinator(check) if check.op == "any_of"
@@ -753,9 +902,15 @@ any_of_passed(check, subj) if {
 
 default check_passed(_, _) := false
 
-check_passed(check, subj) if op_passed(check, subj)
+check_passed(check, subj) if {
+	not broken_row(check)
+	op_passed(check, subj)
+}
 
-check_passed(check, subj) if op_passed(substitute_of(check), subj)
+check_passed(check, subj) if {
+	not broken_row(check)
+	op_passed(substitute_of(check), subj)
+}
 
 substitute_of(check) := object.get(check, "substitute", {})
 
@@ -848,15 +1003,15 @@ default worst_read(_, _) := "value"
 
 worst_read(subj, check) := worst_of({read_state(subj, p) | some p in read_paths(check)}) if {
 	not unreadable_ref(check)
-	not broken_list_check(check)
+	not broken_row(check)
 }
 
 worst_read(_, check) := worst_of({used_ref_state(check, r) | some r in check_refs(check)}) if {
 	unreadable_ref(check)
-	not broken_list_check(check)
+	not broken_row(check)
 }
 
-worst_read(_, check) := "absent" if broken_list_check(check)
+worst_read(_, check) := "absent" if broken_row(check)
 
 broken_list_check(check) if {
 	some chain in list_chains(check)
@@ -917,9 +1072,13 @@ worst_of(states) := cause_precedence[i] if {
 	])
 }
 
-row_cause(check, subj) := "satisfied" if op_passed(check, subj)
+row_cause(check, subj) := "satisfied" if {
+	not broken_row(check)
+	op_passed(check, subj)
+}
 
 row_cause(check, subj) := "substituted" if {
+	not broken_row(check)
 	not op_passed(check, subj)
 	op_passed(substitute_of(check), subj)
 }
@@ -1018,7 +1177,9 @@ filter_cause(check, subj) := row_cause(check, subj) if not answers_presence(chec
 answers_presence(check, subj) if {
 	check.op == "present"
 	keys_of(check.path)
+	_ := start_of(subj, check.path)
 	not unreadable_ref(check)
+	not broken_row(check)
 	row_cause(check, subj) in {"absent", "null"}
 }
 

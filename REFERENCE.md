@@ -329,12 +329,13 @@ These read one or two fields of a subject.
 
 Some things worth knowing:
 
+- A check that's written wrong fails with cause `absent`, whatever the subject holds. That covers an `op` ergo doesn't know, a missing parameter, a `cmp` that isn't in the list above, `values` that isn't a list, a `min` or `max` that isn't a number, and `patterns` that isn't a list of valid regular expressions. It holds for a value read with a [`ref`](#reading-from-the-input) too, so `"values": {"ref": ["$$params", "allowed"]}` fails when `allowed` is a string. The cause isn't `value`, so a filter written like this fails the requirement rather than ruling every subject out.
 - `equals` with `"value": null` only passes when the field is there and set to `null`. A missing field doesn't count.
 - `range` needs `min` and `max` to be numbers. A string like `"3"` fails the check, because Rego puts every number before every string, so `5 <= "3"` would be true.
 - `in` fails when the field is missing or `null`, even if `values` contains `null`. To check that a field is `null`, use `equals` with `"value": null`. `values` can be a list or, from Rego, a set. `in` also fails when `values` is empty, missing, or not a list or set. In those last two cases, the expression shows `id in <invalid values>` rather than a list.
 - `compare` and `compare_time` compare two fields of the same subject. To compare a field with a fixed number, use `range`.
 - `compare_time` never converts between formats, so a number against a string fails. With numbers, ergo can't tell seconds from milliseconds, so make sure both sides use the same unit.
-- Patterns in `matches_any` and `not_matches_any` aren't anchored: `svc_` matches `my_svc_account`. Use `^` and `$` when you need a full match. A pattern that isn't a string makes `not_matches_any` fail, and `matches_any` ignores it. With an empty `patterns` list, `matches_any` fails and `not_matches_any` passes.
+- Patterns in `matches_any` and `not_matches_any` aren't anchored: `svc_` matches `my_svc_account`. Use `^` and `$` when you need a full match. A pattern that isn't a string, or isn't a valid regular expression, fails either operator, even when another pattern matches. With an empty `patterns` list, `matches_any` fails and `not_matches_any` passes.
 
 These two are useful in `applies_to`, for example to leave bot accounts out of a review rule. If the author field is missing, ergo can't tell whether the subject is in scope, so the requirement fails. See [Checks ergo adds](#checks-ergo-adds).
 
@@ -475,7 +476,7 @@ This is the only way to say that two fields must agree with each other. Two sepa
 
 - Name your options. The names show up in the rendered expression: `one of: safe(type == Chore) | standard(type == Story and state == Done)`. A list of options works too, and they're shown by position.
 - Options can hold basic checks and `all` or `any`, but not another `any_of`, because Rego doesn't allow recursion. An `all` or `any` in an option counts as being where the `any_of` is, so it can nest as deep as it could there (see [Nesting](#nesting)).
-- An empty `options` fails, and so does an empty option. An option written as an object instead of a list also fails.
+- An empty `options` fails with cause `absent`, and so does an empty option, an option written as an object instead of a list, or an `any_of` inside an option.
 - The row shows every field any option read, once each, sorted by name. For an `all` or `any` in an option, that's its list and any names it reads.
 
 ## Substitutes
@@ -522,6 +523,14 @@ op_passed(check, subj) if {
 }
 ```
 
+Declare its name in the same file, so ergo can tell it from a typo:
+
+```rego
+operators contains "even"
+```
+
+An `op` that isn't built in or declared fails with cause `absent`, even if an `op_passed` rule passes it. So a misspelt operator in `applies_to` fails the requirement instead of ruling every subject out.
+
 Then use it like any other operator. ergo can't work out what your operator reads or how to describe it, so give the check an `expression` and a list of `inputs`:
 
 ```rego
@@ -549,7 +558,7 @@ op_passed(check, subj) if {
 
 ergo finds the refs in your check by itself, so they appear under `$refs` and decide the cause when they can't be read, as for built-in operators.
 
-A custom operator works in `checks`, in `applies_to`, and on either side of a substitute. It doesn't work as the inner check of `all` or `any`, or inside an `any_of` option: there, it fails.
+A custom operator works in `checks`, in `applies_to`, and on either side of a substitute. It doesn't work as the inner check of `all` or `any`, or inside an `any_of` option: there, it fails with cause `absent`.
 
 Two rules:
 
@@ -632,7 +641,7 @@ A subject that fails `$applies` gets no other rows, since it was never checked. 
 
 A subject is only out of scope when ergo read a filter's fields and the values didn't match, so the row's cause is `value`. When a filter fails because a field it reads is missing, `null` or can't be found by a selector, ergo can't tell whether the subject is in scope. Its `$applies` row then fails with that cause, the requirement isn't met, and the row shows up in the violations. This holds with `min_subjects: 0` too, so a missing field can't quietly make a requirement pass.
 
-`present` is the exception, because a missing or `null` field is exactly what it checks for. A `present` filter that finds one rules the subject out, so `{"op": "present", "path": ["lock_release"]}` leaves out a package with no `lock_release`. A selector in its path that matches nothing or more than one item still fails the requirement, as does a subject that isn't an object.
+`present` is the exception, because a missing or `null` field is exactly what it checks for. A `present` filter that finds one rules the subject out, so `{"op": "present", "path": ["lock_release"]}` leaves out a package with no `lock_release`. A selector in its path that matches nothing or more than one item still fails the requirement, as does a subject that isn't an object, or a path that starts with a name nothing gave, like `["$p", "author"]` when `from` gave `$pr`.
 
 With several filters, one that clearly rules the subject out is enough, even if another can't be read. A substitute that isn't there doesn't count as unreadable, because substitutes are usually missing.
 
@@ -653,16 +662,16 @@ Patterns, options and selector fields are sorted in rendered expressions too. So
 
 Every row has a `cause`. A missing field, a field set to `null`, and a selector that matched nothing all show up as `null` in `inputs`, but they're different problems with different fixes. The cause tells them apart.
 
-| `cause`         | Meaning                                                  |
-| --------------- | -------------------------------------------------------- |
-| `satisfied`     | The check passed.                                        |
-| `substituted`   | The check failed, but its substitute passed.             |
-| `not_an_object` | The subject isn't an object, so it has no fields.        |
-| `ambiguous`     | A selector matched more than one item.                   |
-| `unmatched`     | A selector matched nothing, although the list was there. |
-| `absent`        | A field the check reads isn't there.                     |
-| `null`          | A field the check reads is there, but `null`.            |
-| `value`         | Everything was read fine. The values just don't pass.    |
+| `cause`         | Meaning                                                             |
+| --------------- | ------------------------------------------------------------------- |
+| `satisfied`     | The check passed.                                                   |
+| `substituted`   | The check failed, but its substitute passed.                        |
+| `not_an_object` | The subject isn't an object, so it has no fields.                   |
+| `ambiguous`     | A selector matched more than one item.                              |
+| `unmatched`     | A selector matched nothing, although the list was there.            |
+| `absent`        | A field the check reads isn't there, or the check is written wrong. |
+| `null`          | A field the check reads is there, but `null`.                       |
+| `value`         | Everything was read fine. The values just don't pass.               |
 
 When a check reads several fields, the row shows the first cause in this table's order. An ambiguous selector matters more than any value, because it means the policy can't even tell what it's looking at.
 
@@ -708,6 +717,7 @@ ergo fails a check whenever it can't be sure, instead of letting it pass. Rego d
 - `compare` needs both sides to exist and have the same type. In plain Rego, `null < 5` is true, so a missing field would otherwise pass a `lt` check.
 - `all`, `any` and `each` need non-empty lists, inner lists of nested checks included.
 - A name given twice, or badly written, fails the check, so an inner name can't quietly hide an outer one.
+- A check that's written wrong, like an unknown `op` or `cmp`, fails with cause `absent`, so a mistake in `applies_to` can't rule every subject out.
 - `min_subjects` is 1 unless you say otherwise, so finding nothing fails.
 - A key listed in `keys` that the input doesn't have is still a subject, so it fails instead of being skipped.
 - A subject whose `applies_to` filter can't be read fails the requirement instead of being left out.

@@ -533,10 +533,10 @@ test_not_matches_any_fails_closed_on_a_non_string_pattern if {
 	verdict({"author": "Alice <alice@example.com>"}, check) == false
 }
 
-test_matches_any_ignores_a_non_string_pattern_but_still_matches if {
+test_matches_any_fails_on_a_non_string_pattern_even_when_another_matches if {
 	check := {"op": "matches_any", "path": ["author"], "patterns": {"svc_.*", 42}}
-	verdict({"author": "svc_bot"}, check) == true
-	verdict({"author": "Alice"}, check) == false
+	verdict({"author": "svc_bot"}, check) == false
+	cause_of({"author": "svc_bot"}, check) == "absent"
 }
 
 test_matching_with_no_patterns if {
@@ -2203,6 +2203,12 @@ test_a_custom_op_echoes_its_declared_inputs if {
 
 test_a_custom_op_without_inputs_takes_its_cause_from_its_path if {
 	cause_of({"n": null}, {"op": "even", "path": ["n"]}) == "null"
+}
+
+test_a_custom_op_takes_its_cause_from_a_projected_input if {
+	check := {"op": "even", "path": ["n"], "inputs": [{"path": ["ns"], "each": []}]}
+	cause_of({"n": 3, "ns": [1]}, check) == "value"
+	cause_of({"n": 3}, check) == "absent"
 }
 
 test_a_custom_op_can_call_the_built_in_operators if {
@@ -3925,4 +3931,159 @@ test_a_badly_written_ref_inside_a_list_of_keys_is_not_well_formed if {
 test_ref_shaped_values_in_params_are_data_not_refs if {
 	rep := ergo.report({"o": {"a": {}}}, {"s": {"from": ["o", {"each_as": "k", "keys": {"ref": ["$$params", "list"]}}], "checks": {"c": {"op": "present", "path": []}}}}) with data.params as {"list": [{"ref": ["$$params", "s"]}], "s": "a"}
 	[[r.subject.id, r.passed] | some r in rows_for(rep, "s", "c")] == [[{"ref": ["$$params", "s"]}, false]]
+}
+
+typo_doc := {"params": {"word": "x", "none": null}, "items": [{"id": 1, "n": 1, "s": "a", "xs": [1], "t": "2026-01-01T00:00:00Z"}]}
+
+typo_req(filter) := {"s": {
+	"from": ["items"],
+	"id": ["id"],
+	"min_subjects": 0,
+	"applies_to": {"f": filter},
+	"checks": {"c": {"op": "equals", "path": ["n"], "value": 999}},
+}}
+
+badly_written := [
+	{"op": "nope", "path": ["n"]},
+	{"op": "undeclared", "path": ["n"]},
+	{"path": ["n"]},
+	{"op": 3, "path": ["n"]},
+	{"op": "compare", "left": ["n"], "right": ["n"], "cmp": "bad"},
+	{"op": "compare", "left": ["n"], "right": ["n"]},
+	{"op": "compare_time", "left": ["t"], "right": ["t"], "cmp": "before"},
+	{"op": "compare", "left": ["n"], "cmp": "eq"},
+	{"op": "in", "path": ["n"], "values": "notalist"},
+	{"op": "in", "path": ["n"], "values": {"literal": "notalist"}},
+	{"op": "in", "path": ["n"], "values": {"ref": ["$$input", "params", "word"]}},
+	{"op": "in", "path": ["n"]},
+	{"op": "range", "path": ["n"], "min": "a", "max": 5},
+	{"op": "range", "path": ["n"], "min": 0, "max": {"ref": ["$$input", "params", "word"]}},
+	{"op": "range", "path": ["n"], "min": 0},
+	{"op": "equals", "path": ["n"]},
+	{"op": "includes", "path": ["xs"]},
+	{"op": "excludes", "path": ["xs"]},
+	{"op": "present"},
+	{"op": "non_empty_string"},
+	{"op": "matches_any", "path": ["s"], "patterns": "a"},
+	{"op": "matches_any", "path": ["s"], "patterns": [3]},
+	{"op": "matches_any", "path": ["s"], "patterns": ["("]},
+	{"op": "not_matches_any", "path": ["s"], "patterns": ["b", "("]},
+	{"op": "not_matches_any", "path": ["s"]},
+	{"op": "all", "path": ["xs"]},
+	{"op": "any", "path": ["xs"], "check": "present"},
+	{"op": "any", "check": {"op": "present", "path": []}},
+	{"op": "all", "path": ["xs"], "check": {"op": "nope", "path": []}},
+	{"op": "all", "path": ["xs"], "check": {"op": "even", "path": []}},
+	{"op": "all", "path": ["xs"], "check": {"op": "equals", "path": []}},
+	{"op": "any_of", "options": {"o": [{"op": "any_of", "options": {"p": [{"op": "present", "path": ["id"]}]}}]}},
+	{"op": "any_of", "options": {"o": [{"op": "even", "path": ["n"]}]}},
+	{"op": "any_of", "options": {"o": [{"op": "compare", "left": ["n"], "right": ["n"], "cmp": "bad"}]}},
+	{"op": "any_of", "options": {"o": ["present"]}},
+	{"op": "any_of", "options": {"o": []}},
+	{"op": "any_of", "options": {"o": {"op": "present", "path": ["n"]}}},
+	{"op": "any_of", "options": {}},
+	{"op": "any_of", "options": [[{"op": "present", "path": ["n"]}], []]},
+	{"op": "any_of", "options": "o"},
+	{"op": "any_of"},
+	{"op": "all", "path": ["xs"], "check": {"op": "any_of", "options": {"o": [{"op": "any_of", "options": {"p": [{"op": "present", "path": []}]}}]}}},
+	{"op": "all", "path": ["xs"], "check": {"op": "any_of", "options": {"o": [{"op": "all", "path": [], "check": {"op": "range", "path": [], "min": "a", "max": 1}}]}}},
+	{"op": "all", "path": ["xs"], "check": {"op": "all", "path": [], "check": {"op": "any_of", "options": {"o": [{"op": "all", "path": [], "check": {"op": "present", "path": []}}]}}}},
+	{"op": "all", "path": ["xs"], "check": {"op": "all", "path": [], "check": {"op": "any_of", "options": {"o": [{"op": "in", "path": [], "values": 1}]}}}},
+	{"op": "all", "path": ["xs"], "check": {"op": "any_of", "options": {"o": [{"op": "all", "path": [], "check": {"op": "any_of", "options": {"p": [{"op": "in", "path": [], "values": 1}]}}}]}}},
+]
+
+test_a_badly_written_filter_cannot_rule_subjects_out if {
+	every filter in badly_written {
+		rep := ergo.report(typo_doc, typo_req(filter))
+		rep.requirements.s.satisfied == false
+		[r.cause | some r in rows_for(rep, "s", "$applies")] == ["absent"]
+	}
+}
+
+test_a_badly_written_check_fails_as_absent if {
+	every check in badly_written {
+		rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
+		[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "absent"]]
+	}
+}
+
+test_an_operator_that_is_not_declared_fails_even_when_a_rule_passes_it if {
+	ergo.op_passed({"op": "undeclared", "path": ["n"]}, {"n": 1})
+	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "undeclared", "path": ["n"]}}}})
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "absent"]]
+}
+
+test_a_badly_written_option_fails_an_any_of_even_when_another_option_passes if {
+	check := {"op": "any_of", "options": {"good": [{"op": "present", "path": ["n"]}], "bad": [{"op": "compare", "left": ["n"], "right": ["n"], "cmp": "bad"}]}}
+	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "absent"]]
+}
+
+test_a_badly_written_substitute_fails_the_check_even_when_the_check_passes if {
+	check := {"op": "present", "path": ["n"], "substitute": {"op": "nope", "path": ["n"]}}
+	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "absent"]]
+}
+
+test_a_bound_that_reads_null_keeps_the_cause_of_its_ref if {
+	check := {"op": "range", "path": ["n"], "min": {"ref": ["$$input", "params", "none"]}, "max": 5}
+	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "null"]]
+}
+
+test_a_well_written_filter_that_fails_still_rules_subjects_out if {
+	every filter in [
+		{"op": "compare", "left": ["n"], "right": ["n"], "cmp": "ne"},
+		{"op": "in", "path": ["n"], "values": [2, 3]},
+		{"op": "range", "path": ["n"], "min": 5, "max": 9},
+		{"op": "matches_any", "path": ["s"], "patterns": ["^b"]},
+		{"op": "any_of", "options": {"o": [{"op": "equals", "path": ["n"], "value": 2}]}},
+		{"op": "even", "path": ["n"]},
+	] {
+		rep := ergo.report(typo_doc, typo_req(filter))
+		rep.requirements.s.satisfied == true
+		[r.cause | some r in rows_for(rep, "s", "$applies")] == ["value"]
+	}
+}
+
+test_a_present_filter_on_a_name_nothing_gives_cannot_rule_subjects_out if {
+	every path in [["$p", "n"], ["$$nope", "n"]] {
+		rep := ergo.report({"items": [{"id": 1, "n": 1}]}, {"s": {
+			"from": ["items", {"each_as": "item"}],
+			"id": ["id"],
+			"min_subjects": 0,
+			"applies_to": {"f": {"op": "present", "path": path}},
+			"checks": {"c": {"op": "equals", "path": ["n"], "value": 999}},
+		}})
+		rep.requirements.s.satisfied == false
+		[r.cause | some r in rows_for(rep, "s", "$applies")] == ["absent"]
+	}
+}
+
+test_a_present_filter_on_a_given_name_still_rules_subjects_out if {
+	rep := ergo.report({"items": [{"id": 1}]}, {"s": {
+		"from": ["items", {"each_as": "item"}],
+		"id": ["id"],
+		"min_subjects": 0,
+		"applies_to": {"f": {"op": "present", "path": ["$item", "n"]}},
+		"checks": {"c": {"op": "equals", "path": ["n"], "value": 999}},
+	}})
+	rep.requirements.s.satisfied == true
+	[r.cause | some r in rows_for(rep, "s", "$applies")] == ["value"]
+}
+
+test_a_check_fails_when_its_substitute_passes_but_one_side_is_badly_written if {
+	every check in [
+		{"op": "equals", "path": ["n"], "value": 999, "substitute": {"op": "undeclared", "path": ["n"]}},
+		{"op": "nope", "path": ["n"], "substitute": {"op": "present", "path": ["n"]}},
+	] {
+		rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
+		[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "absent"]]
+	}
+}
+
+test_a_present_filter_with_a_badly_written_substitute_cannot_rule_subjects_out if {
+	rep := ergo.report(typo_doc, typo_req({"op": "present", "path": ["missing"], "substitute": {"op": "nope", "path": ["n"]}}))
+	rep.requirements.s.satisfied == false
+	[r.cause | some r in rows_for(rep, "s", "$applies")] == ["absent"]
 }
