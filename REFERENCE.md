@@ -6,6 +6,7 @@ This page describes everything ergo accepts and everything it returns. If you ha
 - [Requirements](#requirements)
 - [Paths](#paths)
 - [Reading from the input](#reading-from-the-input)
+- [Naming subjects](#naming-subjects)
 - [Operators](#operators)
 - [Substitutes](#substitutes)
 - [Custom operators](#custom-operators)
@@ -60,7 +61,7 @@ A policy with no requirements is never compliant: it doesn't check anything, so 
 | Field          | Meaning                                                                                               | Default           |
 | -------------- | ----------------------------------------------------------------------------------------------------- | ----------------- |
 | `subject_type` | A name for the kind of thing being checked. It appears in every row.                                  | `"subject"`       |
-| `from`         | The [path](#paths) to the subjects in the input.                                                      | the whole input   |
+| `from`         | The [path](#paths) to the subjects in the input. It can end with a [naming step](#naming-subjects).   | the whole input   |
 | `id`           | The path, inside one subject, to the value that identifies it.                                        | the whole subject |
 | `require`      | `"every"`: every subject must pass every check. `"some"`: at least one subject must pass every check. | `"every"`         |
 | `min_subjects` | How many subjects must be left after `applies_to` for the requirement to be met.                      | `1`               |
@@ -75,13 +76,13 @@ A few details:
 - Leaving out `from` or `id` is allowed, but rarely what you want. Without `from`, the whole input is checked as one subject. Without `id`, each row repeats the whole subject as its id.
 - `min_subjects` defaults to 1 so that a typo in `from` fails the requirement instead of quietly passing it. Set it to `0` when you mean "if there are any, they must pass; if there are none, that's fine". It means the same under `every` and `some`.
 - Under `some`, one subject has to pass all the checks by itself. Two subjects that each pass half of them don't count.
-- A requirement with no checks, or with a `require` other than `every` or `some`, is never met. The `$well_formed` row says so.
+- A requirement with no checks, a `require` other than `every` or `some`, or a badly written [naming step](#naming-subjects), is never met. The `$well_formed` row says so.
 
 ## Paths
 
 A path is a list of keys that ergo follows one step at a time. `["release", "approver", "email"]` reads `release.approver.email`.
 
-`from` is a path into the input. Every other path (`id`, a check's `path`, `left` and `right`) is a path into one subject.
+`from` is a path into the input. Every other path (`id`, a check's `path`, `left` and `right`) is a path into one subject, unless it starts with [`$$input`](#reading-from-the-input) or a [name](#naming-subjects).
 
 An empty path, `[]`, reads the item itself. Use it inside `all` or `any` when the list holds plain values like strings, not objects:
 
@@ -158,7 +159,106 @@ Some things worth knowing:
 - An object with a `ref` or `literal` key and any other key is a mistake, not a value, so it fails the check the same way. Otherwise a typo like `{"ref": [...], "note": "..."}` would be compared as an object, and `excludes` would pass.
 - A value that is an object with a single `ref` or `literal` key would be read as one. Wrap it in `{"literal": ...}` to take it as written. Nothing inside a `literal` is read, so `{"literal": {"literal": 1}}` is the object `{"literal": 1}`.
 - `from` already starts at the top of the input, so it doesn't take `$$input`. `"from": ["$$input", "packages"]` looks for a key called `$$input`, finds no subjects, and fails `$min_subjects`.
-- Some tools treat `$$` as an escape for `$`, like docker-compose and Make. A policy that passes through one of them reaches ergo as `$input`, which is read as an ordinary key.
+- Some tools treat `$$` as an escape for `$`, like docker-compose and Make. A policy that passes through one of them reaches ergo as `$input`, which is read as a [name](#naming-subjects). No subject is called `input`, so the check fails with cause `absent`.
+
+## Naming subjects
+
+`from` can end with a step that names each subject: `{"each": "name"}`. A path that starts with `$name` then reads that subject.
+
+If `from` leads to an object, the step makes every entry a subject, identified by its key and sorted by key. Without it, the whole object is one subject. If `from` leads to a list, every item is a subject, as without the step.
+
+`keys` says which entries must be there. Say a build records each kind of test run it did:
+
+```json
+{
+  "build": {
+    "test_runs": {
+      "unit-test": { "result": "passed", "report_url": "https://ci.example.com/r/101" },
+      "integration-test": { "result": "failed", "report_url": "https://ci.example.com/r/102" },
+      "smoke-test": { "result": "passed", "report_url": "https://ci.example.com/r/103" }
+    }
+  }
+}
+```
+
+and you need a passing unit test, integration test and system test run:
+
+```rego
+"tests_passed": {
+	"subject_type": "test run",
+	"from": ["build", "test_runs", {"each": "run", "keys": ["unit-test", "integration-test", "system-test"]}],
+	"checks": {"passed": {"description": "The tests passed", "op": "equals", "path": ["result"], "value": "passed"}},
+}
+```
+
+Each key is a subject. A key the object doesn't have is still a subject, so its checks fail as `absent`, and the smoke test run isn't checked at all:
+
+```json
+[
+  {
+    "requirement": "tests_passed",
+    "subject": { "type": "test run", "id": "integration-test" },
+    "check": "passed",
+    "description": "The tests passed",
+    "expression": "result == passed",
+    "inputs": [{ "name": "result", "value": "failed" }],
+    "cause": "value"
+  },
+  {
+    "requirement": "tests_passed",
+    "subject": { "type": "test run", "id": "system-test" },
+    "check": "passed",
+    "description": "The tests passed",
+    "expression": "result == passed",
+    "inputs": [{ "name": "result", "value": null }],
+    "cause": "absent"
+  }
+]
+```
+
+The name matters inside `all` and `any`, where paths start at each item of the list. `$name` reaches back to the subject, so an item can be compared with it:
+
+```rego
+"peer_reviewed": {
+	"subject_type": "pull request",
+	"from": ["pull_requests", {"each": "pr"}],
+	"id": ["number"],
+	"checks": {"peer": {
+		"description": "Someone other than the author approved it",
+		"op": "any",
+		"path": ["approvers"],
+		"check": {"op": "compare", "left": ["username"], "right": ["$pr", "author"], "cmp": "ne"},
+	}},
+}
+```
+
+A pull request that only its author approved gives this violation. The row shows the value read through `$pr` beside the list:
+
+```json
+{
+  "requirement": "peer_reviewed",
+  "subject": { "type": "pull request", "id": 42 },
+  "check": "peer",
+  "description": "Someone other than the author approved it",
+  "expression": "some approvers: username ne $pr.author",
+  "inputs": [
+    { "name": "approvers[]", "value": [{ "username": "ann" }] },
+    { "name": "$pr.author", "value": "ann" }
+  ],
+  "cause": "value"
+}
+```
+
+If `author` were missing, the cause would be `absent`.
+
+Some things worth knowing:
+
+- The step must be the last one in `from`, and there can only be one. The name must be a string that doesn't start with `$`. `keys` must be a list. A step with any other field, or one that breaks these rules, fails `$well_formed` and gives no subjects, so the requirement is never met, even with `min_subjects: 0`.
+- Keys are sorted and duplicates dropped, so the order you list them in doesn't change the report. If `from` doesn't lead to an object, every key is still a subject, and its checks fail as `absent`. An empty `keys` list gives no subjects, so `$min_subjects` fails.
+- A subject from an object is identified by its key, even if the requirement has an `id`.
+- An empty path is named after the subject's name (`$run`), not after `from`.
+- A path that starts with a name nobody gave, like `["$runs", "result"]`, fails the check with cause `absent`. To read a key that really starts with `$`, write it as `{"literal": "$schema"}`.
+- A `ref` can't start with a name yet, only with `$$input`. `{"ref": ["$pr", "author"]}` fails the check and shows `<invalid ref>`.
 
 ## Operators
 
@@ -400,7 +500,7 @@ ergo adds three checks of its own. They start with `$`, so they can't clash with
 
 | Check           | One row per | Passes when                                                                                                                            |
 | --------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `$well_formed`  | requirement | the requirement has at least one check and a valid `require`. This depends only on how the requirement is written, never on the input. |
+| `$well_formed`  | requirement | the requirement has at least one check, a valid `require`, and a well written naming step if `from` has one. This depends only on how the requirement is written, never on the input. |
 | `$min_subjects` | requirement | at least `min_subjects` subjects are left after `applies_to`.                                                                          |
 | `$applies`      | subject     | the subject passes the `applies_to` filter. These rows only exist when the requirement has a filter.                                   |
 
@@ -420,7 +520,7 @@ Rows always come in the same order, whatever order you wrote the policy in:
 
 1. all the `$well_formed` rows, then all the `$min_subjects` rows, then all the `$applies` rows, then your own checks
 2. within each group, requirements in name order
-3. within a requirement, subjects in the order they appear in the input
+3. within a requirement, subjects in the order they appear in the input, or in key order when a [naming step](#naming-subjects) reads an object
 4. within a subject, checks in name order
 
 Patterns, options and selector fields are sorted in rendered expressions too. So the same policy and the same input always produce exactly the same report, byte for byte, which means you can hash it and compare hashes.
@@ -484,6 +584,7 @@ ergo fails a check whenever it can't be sure, instead of letting it pass. Rego d
 - `compare` needs both sides to exist and have the same type. In plain Rego, `null < 5` is true, so a missing field would otherwise pass a `lt` check.
 - `all`, `any` and `each` need non-empty lists.
 - `min_subjects` is 1 unless you say otherwise, so finding nothing fails.
+- A key listed in `keys` that the input doesn't have is still a subject, so it fails instead of being skipped.
 - A subject whose `applies_to` filter can't be read fails the requirement instead of being left out.
 - A `ref` that can't be read fails the check, even for operators like `excludes` or `not_matches_any` that would pass on an empty value.
 - A policy with no requirements, and a requirement with no checks, are never met.

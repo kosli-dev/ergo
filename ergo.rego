@@ -17,33 +17,141 @@ min_subjects_of(req) := object.get(req, "min_subjects", 1)
 
 require_of(req) := object.get(req, "require", "every")
 
-raw_subjects(doc, req) := coll if {
-	coll := object.get(doc, from_of(req), null)
+from_path(req) := array.slice(from_of(req), 0, count(from_of(req)) - 1) if each_step(req)
+
+from_path(req) := from_of(req) if not each_step(req)
+
+each_step(req) := step if {
+	f := from_of(req)
+	is_array(f)
+	count(f) > 0
+	step := f[count(f) - 1]
+	is_object(step)
+}
+
+stepped(req) if {
+	f := from_of(req)
+	is_array(f)
+	some seg in f
+	is_object(seg)
+}
+
+default from_well_formed(_) := false
+
+from_well_formed(req) if not stepped(req)
+
+from_well_formed(req) if {
+	step := each_step(req)
+	every seg in from_path(req) {
+		not is_object(seg)
+	}
+	object.keys(step) - {"each", "keys"} == set()
+	is_string(step.each)
+	step.each != ""
+	not startswith(step.each, "$")
+	keys_well_formed(step)
+}
+
+keys_well_formed(step) if not "keys" in object.keys(step)
+
+keys_well_formed(step) if is_array(step.keys)
+
+target(doc, req) := object.get(doc, from_path(req), null)
+
+listed_subjects(doc, req) := coll if {
+	coll := target(doc, req)
 	is_array(coll)
 }
 
-raw_subjects(doc, req) := [coll] if {
-	coll := object.get(doc, from_of(req), null)
+listed_subjects(doc, req) := [coll] if {
+	coll := target(doc, req)
 	is_object(coll)
 }
 
-raw_subjects(doc, req) := [] if {
-	not is_array(object.get(doc, from_of(req), null))
-	not is_object(object.get(doc, from_of(req), null))
+listed_subjects(doc, req) := [] if {
+	not is_array(target(doc, req))
+	not is_object(target(doc, req))
 }
 
-matching_subjects(doc, req) := [subj |
-	some subj in raw_subjects(doc, req)
-	subject_matches(subj, req)
+raw_entries(doc, req) := [{"subject": subj} | some subj in listed_subjects(doc, req)] if not stepped(req)
+
+raw_entries(_, req) := [] if {
+	stepped(req)
+	not from_well_formed(req)
+}
+
+raw_entries(doc, req) := [{"subject": subj} | some subj in coll] if {
+	from_well_formed(req)
+	not "keys" in object.keys(each_step(req))
+	coll := target(doc, req)
+	is_array(coll)
+}
+
+raw_entries(doc, req) := [{"key": k, "subject": coll[k]} | some k in sort(object.keys(coll))] if {
+	from_well_formed(req)
+	not "keys" in object.keys(each_step(req))
+	coll := target(doc, req)
+	is_object(coll)
+}
+
+raw_entries(doc, req) := [] if {
+	from_well_formed(req)
+	not "keys" in object.keys(each_step(req))
+	not is_array(target(doc, req))
+	not is_object(target(doc, req))
+}
+
+raw_entries(doc, req) := [{"key": k, "subject": object.get(keyed(doc, req), [k], absent)} | some k in sort({k | some k in each_step(req).keys})] if {
+	from_well_formed(req)
+	"keys" in object.keys(each_step(req))
+}
+
+keyed(doc, req) := coll if {
+	coll := target(doc, req)
+	is_object(coll)
+}
+
+keyed(doc, req) := {} if not is_object(target(doc, req))
+
+raw_subjects(doc, req) := [entry.subject | some entry in raw_entries(doc, req)]
+
+matching_entries(doc, req) := [entry |
+	some entry in raw_entries(doc, req)
+	subject_matches(entry.subject, req)
 ]
+
+matching_subjects(doc, req) := [entry.subject | some entry in matching_entries(doc, req)]
+
+default scope_of(_, _) := {}
+
+scope_of(req, subj) := {each_step(req).each: subj} if from_well_formed(req)
+
+passes(req, check, subj) := v if {
+	s := scope_of(req, subj)
+	v := check_passed(check, subj) with data.ergo_scope as s
+}
+
+cause_in(req, check, subj) := c if {
+	s := scope_of(req, subj)
+	c := row_cause(check, subj) with data.ergo_scope as s
+}
+
+inputs_in(req, check, subj) := i if {
+	s := scope_of(req, subj)
+	i := row_inputs(subj, check, subject_item_name(req)) with data.ergo_scope as s
+}
 
 default subject_matches(_, _) := false
 
 subject_matches(subj, req) if {
 	every _, check in applies_to_of(req) {
-		check_passed(check, subj)
+		passes(req, check, subj)
 	}
 }
+
+entry_ref(entry, req) := {"type": subject_type_of(req), "id": entry.key} if "key" in object.keys(entry)
+
+entry_ref(entry, req) := subject_ref(entry.subject, req) if not "key" in object.keys(entry)
 
 subject_ref(subj, req) := {
 	"type": subject_type_of(req),
@@ -84,12 +192,22 @@ read_from(start, keys) := v if {
 
 named(path) if {
 	is_array(path)
+	startswith(path[0], "$")
+}
+
+builtin(path) if {
+	is_array(path)
 	startswith(path[0], "$$")
 }
 
 start_of(subj, path) := subj if not named(path)
 
 start_of(_, path) := data.ergo_document if path[0] == "$$input"
+
+start_of(_, path) := data.ergo_scope[substring(path[0], 1, -1)] if {
+	named(path)
+	not builtin(path)
+}
 
 keys_of(path) := [unliteral(seg) | some seg in path] if {
 	is_array(path)
@@ -131,11 +249,11 @@ arg(x) := x if {
 	not malformed(x)
 }
 
-ref_read(path) := object.get(start_of(null, path), keys_of(path), absent)
+ref_read(path) := object.get(start_of(null, path), keys_of(path), absent) if builtin(path)
 
-ref_name(path) := concat(".", [sprintf("%v", [unliteral(seg)]) | some seg in path]) if named(path)
+ref_name(path) := concat(".", [sprintf("%v", [unliteral(seg)]) | some seg in path]) if builtin(path)
 
-ref_name(path) := "<invalid ref>" if not named(path)
+ref_name(path) := "<invalid ref>" if not builtin(path)
 
 malformed(x) if {
 	is_object(x)
@@ -417,7 +535,7 @@ read_paths(check) := [check.left, check.right] if {
 	two_sided(check)
 }
 
-read_paths(check) := [check.path] if {
+read_paths(check) := array.concat([check.path], element_name_paths(check)) if {
 	not check.inputs
 	quantified(check)
 }
@@ -567,9 +685,12 @@ applies_cause(subj, req) := cause_precedence[i] if {
 	])
 }
 
-failed_filter_causes(subj, req) := {filter_cause(check, subj) |
-	some check in applies_to_of(req)
-	not check_passed(check, subj)
+failed_filter_causes(subj, req) := causes if {
+	s := scope_of(req, subj)
+	causes := {filter_cause(check, subj) |
+		some check in applies_to_of(req)
+		not check_passed(check, subj)
+	} with data.ergo_scope as s
 }
 
 filter_cause(check, subj) := "value" if answers_presence(check, subj)
@@ -710,26 +831,38 @@ check_inputs(subj, check, item) := [
 	two_sided(check)
 }
 
-check_inputs(subj, check, _) := [{"name": nm, "value": vals}] if {
+check_inputs(subj, check, _) := array.concat(quantified_inputs(subj, check), name_inputs(subj, check)) if {
 	not check.inputs
 	quantified(check)
+}
+
+name_inputs(subj, check) := [{"name": path_name(p), "value": value_at(subj, p)} | some p in element_name_paths(check)]
+
+element_name_paths(check) := sort({p |
+	some leaf in element_leaves(check.check)
+	some p in leaf_paths(leaf)
+	named(p)
+	p != object.get(check.check, "path", [])
+})
+
+element_leaves(check) := [check] if not combinator(check)
+
+element_leaves(check) := [leaf | some group in check.options; some leaf in group] if combinator(check)
+
+quantified_inputs(subj, check) := [{"name": nm, "value": vals}] if {
 	not check.each
 	not named(object.get(check.check, "path", []))
 	vals := [value_at(elem, object.get(check.check, "path", [])) | some elem in value_at(subj, check.path)]
 	nm := projection_name(check.path, object.get(check.check, "path", []))
 }
 
-check_inputs(subj, check, _) := [{"name": path_name(inner), "value": value_at(subj, inner)}] if {
-	not check.inputs
-	quantified(check)
+quantified_inputs(subj, check) := [{"name": path_name(inner), "value": value_at(subj, inner)}] if {
 	not check.each
 	inner := object.get(check.check, "path", [])
 	named(inner)
 }
 
-check_inputs(subj, check, _) := [{"name": collection_name(check), "value": vals}] if {
-	not check.inputs
-	quantified(check)
+quantified_inputs(subj, check) := [{"name": collection_name(check), "value": vals}] if {
 	check.each
 	vals := [value_at(elem, check.each) | some elem in value_at(subj, check.path)]
 }
@@ -780,28 +913,58 @@ described(check, item) := object.union(check, {"expression": sprintf(
 	[expression_of(check, item), expression_of(check.substitute, item)],
 )}) if check.substitute
 
-subject_item_name(req) := sprintf("%s[]", [path_name(from_of(req))]) if from_of(req) != []
+subject_item_name(req) := sprintf("$%s", [each_step(req).each]) if from_well_formed(req)
 
-subject_item_name(req) := "input" if from_of(req) == []
+subject_item_name(req) := sprintf("%s[]", [path_name(from_of(req))]) if {
+	not stepped(req)
+	from_of(req) != []
+}
 
-matching_count_name(req) := sprintf("count(matching(%s))", [path_name(from_of(req))])
+subject_item_name(req) := "input" if {
+	not stepped(req)
+	from_of(req) == []
+}
+
+subject_item_name(req) := "<invalid from>" if {
+	stepped(req)
+	not from_well_formed(req)
+}
+
+matching_count_name(req) := sprintf("count(matching(%s))", [path_name(from_path(req))])
 
 min_subjects_def(req) := {"$min_subjects": {
 	"description": sprintf("at least %d matching %s subject(s) required", [min_subjects_of(req), subject_type_of(req)]),
 	"expression": sprintf("%s >= %d", [matching_count_name(req), min_subjects_of(req)]),
 }}
 
-well_formed_def(_) := {"$well_formed": {
+well_formed_def(req) := {"$well_formed": {
 	"description": "the requirement declares at least one check and a recognised \"require\" value; lacking either, it asserts nothing that could ever be satisfied",
 	"expression": "count(checks) >= 1 and require in {every, some}",
-}}
+}} if not stepped(req)
+
+well_formed_def(req) := {"$well_formed": {
+	"description": "the requirement declares at least one check, a recognised \"require\" value, and a from whose only step is its last, with a name and keys given as a list",
+	"expression": "count(checks) >= 1 and require in {every, some} and from is well formed",
+}} if stepped(req)
 
 default well_formed(_) := false
 
 well_formed(req) if {
 	count(checks_of(req)) > 0
 	require_of(req) in {"every", "some"}
+	from_well_formed(req)
 }
+
+well_formed_inputs(req) := [
+	{"name": "count(checks)", "value": count(checks_of(req))},
+	{"name": "require", "value": require_of(req)},
+] if not stepped(req)
+
+well_formed_inputs(req) := [
+	{"name": "count(checks)", "value": count(checks_of(req))},
+	{"name": "require", "value": require_of(req)},
+	{"name": "from", "value": from_of(req)},
+] if stepped(req)
 
 applies_def(req) := {"$applies": with_refs(
 	{
@@ -825,20 +988,20 @@ requirement_check_defs(req) := object.union(
 
 subject_passed(req, subj) if {
 	every _, check in checks_of(req) {
-		check_passed(check, subj)
+		passes(req, check, subj)
 	}
 }
 
 subject_rows(doc, req, req_name) := [row |
-	some subj in matching_subjects(doc, req)
+	some entry in matching_entries(doc, req)
 	some check_name, check in checks_of(req)
 	row := {
 		"requirement": req_name,
-		"subject": subject_ref(subj, req),
+		"subject": entry_ref(entry, req),
 		"check": check_name,
-		"inputs": row_inputs(subj, check, subject_item_name(req)),
-		"passed": check_passed(check, subj),
-		"cause": row_cause(check, subj),
+		"inputs": inputs_in(req, check, entry.subject),
+		"passed": passes(req, check, entry.subject),
+		"cause": cause_in(req, check, entry.subject),
 	}
 ]
 
@@ -846,10 +1009,7 @@ well_formed_row(req, req_name) := {
 	"requirement": req_name,
 	"subject": {"type": subject_type_of(req), "id": null},
 	"check": "$well_formed",
-	"inputs": [
-		{"name": "count(checks)", "value": count(checks_of(req))},
-		{"name": "require", "value": require_of(req)},
-	],
+	"inputs": well_formed_inputs(req),
 	"passed": well_formed(req),
 	"cause": verdict_cause(well_formed(req)),
 }
@@ -865,13 +1025,13 @@ min_subjects_row(doc, req, req_name) := {
 
 applies_rows(doc, req, req_name) := [{
 	"requirement": req_name,
-	"subject": subject_ref(subj, req),
+	"subject": entry_ref(entry, req),
 	"check": "$applies",
-	"inputs": applies_inputs(subj, req),
-	"passed": subject_matches(subj, req),
-	"cause": applies_cause(subj, req),
+	"inputs": applies_inputs(entry.subject, req),
+	"passed": subject_matches(entry.subject, req),
+	"cause": applies_cause(entry.subject, req),
 } |
-	some subj in raw_subjects(doc, req)
+	some entry in raw_entries(doc, req)
 ] if {
 	count(applies_to_of(req)) > 0
 }
@@ -880,13 +1040,13 @@ applies_rows(_, req, _) := [] if count(applies_to_of(req)) == 0
 
 applies_inputs(subj, req) := [inp |
 	some name in applies_to_names(req)
-	some inp in row_inputs(subj, applies_to_of(req)[name], subject_item_name(req))
+	some inp in inputs_in(req, applies_to_of(req)[name], subj)
 ]
 
 default requirement_satisfied(_, _) := false
 
 requirement_satisfied(doc, req) if {
-	count(checks_of(req)) > 0
+	well_formed(req)
 	require_of(req) == "every"
 	scope_readable(doc, req)
 	count(matching_subjects(doc, req)) >= min_subjects_of(req)
@@ -896,7 +1056,7 @@ requirement_satisfied(doc, req) if {
 }
 
 requirement_satisfied(doc, req) if {
-	count(checks_of(req)) > 0
+	well_formed(req)
 	require_of(req) == "some"
 	scope_readable(doc, req)
 	count(matching_subjects(doc, req)) >= min_subjects_of(req)
@@ -905,7 +1065,7 @@ requirement_satisfied(doc, req) if {
 }
 
 requirement_satisfied(doc, req) if {
-	count(checks_of(req)) > 0
+	well_formed(req)
 	require_of(req) == "some"
 	scope_readable(doc, req)
 	min_subjects_of(req) == 0
