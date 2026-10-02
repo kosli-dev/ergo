@@ -4100,3 +4100,15 @@ test_an_unknown_op_shows_in_the_expression if {
 test_a_written_expression_wins_over_the_unknown_op_text if {
 	rendered({}, {"op": "nope", "path": ["n"], "expression": "n is fine"}) == "n is fine"
 }
+
+test_an_empty_list_in_a_filter_rules_subjects_out_because_nobody_can_be_meant if {
+	every filter in [
+		{"op": "in", "path": ["n"], "values": []},
+		{"op": "in", "path": ["n"], "values": {"ref": ["$$input", "params", "nobody"]}},
+		{"op": "matches_any", "path": ["s"], "patterns": []},
+	] {
+		rep := ergo.report(object.union(typo_doc, {"params": {"nobody": []}}), typo_req(filter))
+		rep.requirements.s.satisfied == true
+		[r.cause | some r in rows_for(rep, "s", "$applies")] == ["value"]
+	}
+}
