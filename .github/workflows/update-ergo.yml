@@ -1,0 +1,97 @@
+name: update-ergo
+
+on:
+  workflow_call:
+    inputs:
+      path:
+        description: Path of the caller's copy of ergo.rego
+        required: true
+        type: string
+      base-branch:
+        description: Branch the PR targets, the caller's default branch if empty
+        required: false
+        type: string
+      app-id:
+        description: GitHub App that opens the PR. A PR opened with github.token doesn't trigger the caller's workflows.
+        required: false
+        type: string
+    secrets:
+      app-private-key:
+        required: false
+    outputs:
+      pr-url:
+        description: The open PR, empty when the copy is up to date
+        value: ${{ jobs.update.outputs.pr-url }}
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      pr-url: ${{ steps.pr.outputs.url }}
+    steps:
+      - name: Generate app token
+        id: app
+        if: inputs.app-id != ''
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ inputs.app-id }}
+          private-key: ${{ secrets.app-private-key }}
+
+      - name: Open or refresh a PR when the copy is behind ergo main
+        id: pr
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token || github.token }}
+          REPO: ${{ github.repository }}
+          TARGET: ${{ inputs.path }}
+          BASE: ${{ inputs.base-branch }}
+        run: |
+          set -euo pipefail
+          base=${BASE:-$(gh api "repos/$REPO" --jq .default_branch)}
+          branch=update-ergo
+
+          ergo_sha=$(gh api repos/kosli-dev/ergo/commits/main --jq .sha)
+          short=${ergo_sha:0:7}
+          ergo_blob=$(gh api "repos/kosli-dev/ergo/contents/ergo.rego?ref=$ergo_sha" --jq .sha)
+
+          # Equal blob SHAs mean equal content, in any repo.
+          base_blob=$(gh api "repos/$REPO/contents/$TARGET?ref=$base" --jq .sha)
+          if [ "$base_blob" = "$ergo_blob" ]; then
+            echo "$TARGET on $base matches ergo $short."
+            exit 0
+          fi
+
+          pr=$(gh pr list -R "$REPO" --head "$branch" --base "$base" --state open --json url --jq '.[0].url // ""')
+          if [ -n "$pr" ] && [ "$(gh api "repos/$REPO/contents/$TARGET?ref=$branch" --jq .sha)" = "$ergo_blob" ]; then
+            echo "$pr already has ergo $short."
+            echo "url=$pr" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          base_head=$(gh api "repos/$REPO/git/ref/heads/$base" --jq .object.sha)
+          gh api -X PATCH "repos/$REPO/git/refs/heads/$branch" -f sha="$base_head" -F force=true > /dev/null 2>&1 \
+            || gh api -X POST "repos/$REPO/git/refs" -f ref="refs/heads/$branch" -f sha="$base_head" > /dev/null
+
+          # The contents API commits through GitHub, so an app token gets a signed commit.
+          content=$(gh api "repos/kosli-dev/ergo/contents/ergo.rego?ref=$ergo_sha" --jq '.content | gsub("\n"; "")')
+          gh api -X PUT "repos/$REPO/contents/$TARGET" \
+            -f branch="$branch" \
+            -f sha="$base_blob" \
+            -f content="$content" \
+            -f message="Update ergo.rego to ergo $short
+
+          Copy ergo.rego from kosli-dev/ergo@$ergo_sha." > /dev/null
+
+          title="Update ergo.rego to ergo $short"
+          body="Copies \`ergo.rego\` from kosli-dev/ergo@$ergo_sha into \`$TARGET\`.
+
+          Changes in ergo: https://github.com/kosli-dev/ergo/commits/$ergo_sha/ergo.rego"
+          if [ -n "$pr" ]; then
+            gh pr edit "$pr" --title "$title" --body "$body"
+          else
+            pr=$(gh pr create -R "$REPO" --base "$base" --head "$branch" --title "$title" --body "$body")
+          fi
+          echo "PR: $pr"
+          echo "url=$pr" >> "$GITHUB_OUTPUT"
