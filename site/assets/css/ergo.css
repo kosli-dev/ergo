@@ -176,7 +176,7 @@ p code, li code, dd code, td code {
 .ft__view { min-width: 0; }
 .js .ft__view { grid-area: 1 / 1; visibility: hidden; }
 .js .ft__view.is-active { visibility: visible; }
-.ft__label { display: flex; gap: 8px; margin: 0 0 10px; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
+.ft__label { display: flex; gap: 8px; margin: 0 0 10px; font-size: 12px; letter-spacing: .02em; color: var(--faint); }
 .ft__who { color: var(--paper); }
 .ft__who--ergo { color: var(--lime); }
 .ft__code { font-size: 12.5px; line-height: 1.6; padding: 14px 16px; }
@@ -184,13 +184,17 @@ p code, li code, dd code, td code {
 .ft__report .report__row > span { line-height: 1.45; }
 .ft__caption { margin: 12px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
 .ft__foot { padding-top: 12px; padding-bottom: 12px; }
-.ft__steps { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; padding: 0; list-style: none; }
-.ft__step { display: inline-flex; align-items: center; gap: 8px; padding: 4px 0; border: 0; background: none; color: var(--faint); font: 500 12px/1 var(--mono); cursor: pointer; }
-.ft__step:hover { color: var(--muted); }
-.ft__step[aria-current] { color: var(--paper); }
-.ft__dot { width: 8px; height: 8px; border-radius: 2px; background: var(--line-2); }
-.ft__step[aria-current] .ft__dot { background: var(--lime); }
-@media (max-width: 640px) { .ft__file { display: none; } .ft__tabs { margin-left: 0; } }
+/* Step toggles: pick one to take over from the auto-play. Rego steps carry a violet square, ergo steps the therefore sign. */
+.ft__steps { display: flex; flex-wrap: wrap; gap: 4px; width: fit-content; max-width: 100%; padding: 3px; border: 1px solid var(--line); border-radius: 999px; }
+.ft__step { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border: 0; border-radius: 999px; background: none; color: var(--muted); font: 500 12px/1 var(--mono); cursor: pointer; }
+.ft__step:hover { color: var(--paper); background: rgba(247, 247, 239, .06); }
+.ft__step[aria-pressed="true"] { background: var(--paper); color: var(--ink); }
+.ft__mark { flex: none; display: inline-grid; place-items: center; width: 10px; height: 10px; }
+.ft__mark--rego { width: 8px; height: 8px; border-radius: 2px; background: var(--violet); }
+.ft__mark--ergo { color: var(--lime); }
+.ft__mark--ergo .therefore { width: 10px; height: 10px; }
+.ft__step[aria-pressed="true"] .ft__mark--ergo { color: var(--ink); }
+@media (max-width: 640px) { .ft__file { display: none; } .ft__tabs { margin-left: 0; } .ft__steps { border-radius: 18px; } }
 
 /* Code blocks resolve the same way, line by line and faster, as they scroll in. */
 .js .code-line { transition: color .2s ease; }

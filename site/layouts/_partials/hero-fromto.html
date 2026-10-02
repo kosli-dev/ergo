@@ -142,10 +142,12 @@ peer_approved(pr) <span class="kw">if</span> {
   </div>
 
   <div class="term__foot ft__foot">
-    <ol class="ft__steps" aria-label="Steps">
+    <div class="ft__steps" role="group" aria-label="Steps">
       {{- range $i, $s := $c.fromto.steps }}
-      <li><button type="button" class="ft__step mono" data-step="{{ $i }}"{{ if eq $i 0 }} aria-current="step"{{ end }}><span class="ft__dot" aria-hidden="true"></span>{{ $s }}</button></li>
+      <button type="button" class="ft__step mono" data-step="{{ $i }}" aria-pressed="{{ cond (eq $i 0) "true" "false" }}">
+        {{- if lt $i 2 }}<span class="ft__mark ft__mark--rego" aria-hidden="true"></span>{{ else }}<span class="ft__mark ft__mark--ergo" aria-hidden="true">{{ partial "therefore.html" . }}</span>{{ end -}}
+        {{ $s }}</button>
       {{- end }}
-    </ol>
+    </div>
   </div>
 </figure>

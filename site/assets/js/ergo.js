@@ -10,11 +10,11 @@
   fig.querySelectorAll('pre.ft__code > code').forEach(function (code) {
     code.innerHTML = code.innerHTML.split('\n').map(function (l) { return '<span class="code-line">' + l + '</span>'; }).join('\n');
   });
-  var idx = 0, timer = 0, paused = false, ticks = [];
+  var idx = 0, timer = 0, paused = false, manual = false, ticks = [];
   var clearTicks = function () { ticks.forEach(clearTimeout); ticks = []; };
   var schedule = function () {
     clearTimeout(timer);
-    if (still || paused || document.hidden) return;
+    if (still || manual || paused || document.hidden) return;
     timer = setTimeout(function () { show(idx + 1, true); }, +views[idx].dataset.hold || 4000);
   };
   var show = function (i, animate) {
@@ -23,9 +23,7 @@
     var v = views[idx];
     views.forEach(function (x) { x.classList.toggle('is-active', x === v); });
     tabs.forEach(function (t) { t.setAttribute('aria-pressed', t.dataset.ex === v.dataset.ex ? 'true' : 'false'); });
-    steps.forEach(function (s) {
-      if (s.dataset.step === v.dataset.step) s.setAttribute('aria-current', 'step'); else s.removeAttribute('aria-current');
-    });
+    steps.forEach(function (s) { s.setAttribute('aria-pressed', s.dataset.step === v.dataset.step ? 'true' : 'false'); });
     if (file) file.textContent = v.dataset.file;
     var units = [].slice.call(v.querySelectorAll('.code-line, .report__row'));
     if (!animate || still) {
@@ -38,7 +36,7 @@
     }
     schedule();
   };
-  var jump = function (i) { live.setAttribute('aria-live', 'polite'); show(i, true); };
+  var jump = function (i) { manual = true; clearTimeout(timer); live.setAttribute('aria-live', 'polite'); show(i, true); };
   tabs.forEach(function (t) {
     t.addEventListener('click', function () {
       jump(views.findIndex(function (v) { return v.dataset.ex === t.dataset.ex; }));
