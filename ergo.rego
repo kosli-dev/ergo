@@ -64,7 +64,36 @@ valid_name(n) if {
 
 keys_well_formed(step) if not "keys" in object.keys(step)
 
-keys_well_formed(step) if is_array(step.keys)
+keys_well_formed(step) if {
+	is_array(step.keys)
+	every k in step.keys {
+		not malformed(k)
+	}
+}
+
+keys_well_formed(step) if is_ref(step.keys)
+
+keys_well_formed(step) if {
+	is_literal(step.keys)
+	is_array(step.keys.literal)
+}
+
+listed_keys(step) := ks if {
+	is_array(step.keys)
+	ks := [step_key(k) | some k in step.keys]
+	count(ks) == count(step.keys)
+}
+
+listed_keys(step) := step.keys.literal if {
+	is_literal(step.keys)
+	is_array(step.keys.literal)
+}
+
+listed_keys(step) := v if {
+	is_ref(step.keys)
+	v := ref_read(step.keys.ref)
+	is_array(v)
+}
 
 target(doc, req) := object.get(doc, from_keys(req), null)
 
@@ -85,6 +114,18 @@ from_unreadable(req) if {
 	not step_key(seg)
 }
 
+from_unreadable(req) if {
+	step := each_step(req)
+	is_ref(step.keys)
+	not listed_keys(step)
+}
+
+from_unreadable(req) if {
+	step := each_step(req)
+	is_array(step.keys)
+	not listed_keys(step)
+}
+
 from_cause(req) := worst_of(unread) if {
 	unread := from_ref_states(req) - {"value"}
 	count(unread) > 0
@@ -92,7 +133,11 @@ from_cause(req) := worst_of(unread) if {
 
 from_cause(req) := "absent" if from_ref_states(req) - {"value"} == set()
 
-from_ref_states(req) := {ref_state(seg.ref) | some seg in from_path(req); is_ref(seg)}
+from_ref_states(req) := {ref_state(seg.ref) | some seg in from_path(req); is_ref(seg)} | {ref_state(r) | some r in keys_refs(each_step(req))}
+
+keys_refs(step) := {step.keys.ref} if is_ref(step.keys)
+
+keys_refs(step) := {k.ref | some k in step.keys; is_ref(k)} if is_array(step.keys)
 
 listed_subjects(doc, req) := coll if {
 	coll := target(doc, req)
@@ -137,9 +182,16 @@ raw_entries(doc, req) := [] if {
 	not is_object(target(doc, req))
 }
 
-raw_entries(doc, req) := [{"key": k, "subject": object.get(keyed(doc, req), [k], absent)} | some k in sort({k | some k in each_step(req).keys})] if {
+raw_entries(doc, req) := [{"key": k, "subject": object.get(keyed(doc, req), [k], absent)} | some k in sort({k | some k in listed_keys(each_step(req))})] if {
 	from_well_formed(req)
 	"keys" in object.keys(each_step(req))
+	listed_keys(each_step(req))
+}
+
+raw_entries(_, req) := [] if {
+	from_well_formed(req)
+	"keys" in object.keys(each_step(req))
+	not listed_keys(each_step(req))
 }
 
 keyed(doc, req) := coll if {
