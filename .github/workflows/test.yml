@@ -24,6 +24,18 @@ jobs:
       - run: opa test . --ignore .github --timeout 30s --verbose
       - name: Lint for likely bugs
         run: regal lint --format github --disable-all --enable-category bugs --disable redundant-existence-check --ignore-files '.github/**' .
+      - name: Check there are no comments
+        shell: bash
+        run: |
+          comments=$(git ls-files '*.rego' | while read -r f; do
+            opa parse "$f" --format json --json-include comments,locations |
+              jq -r --arg f "$f" '.comments[]? | .Location.row as $r | select(($f == "ergo.rego" and $r <= 2) | not) | "\($f):\($r)"'
+          done)
+          if [ -n "$comments" ]; then
+            echo "These lines have comments:"
+            echo "$comments"
+            exit 1
+          fi
       - name: Check the tests give the same results with --strict-builtin-errors
         run: opa eval --strict-builtin-errors --ignore .github -d . --format raw 'count(data) > 0'
       - name: Check every line is tested
