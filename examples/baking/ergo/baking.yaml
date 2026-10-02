@@ -1,0 +1,24 @@
+baking:
+  requirements:
+    cake_batch:
+      subject_type: batch
+      from: [batches]
+      id: [id]
+      checks:
+        nut_free:
+          description: Must not contain nut allergens
+          op: excludes
+          path: [allergens]
+          value: nuts
+        temp_ok:
+          description: Bake temperature 175–200°C inclusive
+          op: range
+          path: [bake, temp_c]
+          min: 175
+          max: 200
+        time_ok:
+          description: Bake time 25–40 minutes inclusive
+          op: range
+          path: [bake, minutes]
+          min: 25
+          max: 40
