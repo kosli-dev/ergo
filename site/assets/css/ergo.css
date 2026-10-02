@@ -278,20 +278,17 @@ p code, li code, dd code, td code {
 /* ——— Flow ——— */
 .flow { list-style: none; margin: 48px 0 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1.2fr); gap: 36px; align-items: center; }
 .flow > li { position: relative; }
-.flow > li:not(:last-child)::after { content: "→"; position: absolute; right: -26px; top: 50%; transform: translateY(-50%); color: var(--faint); font-family: var(--mono); }
+.flow > li:not(:last-child)::after { content: "→"; position: absolute; right: -26px; top: 50%; transform: translateY(-50%); color: var(--lime); font-family: var(--mono); }
 .flow__group { padding: 12px; border: 1px dashed var(--line-2); border-radius: var(--radius); }
-.flow__label { display: block; margin: 2px 6px 10px; font-size: 12px; color: var(--faint); }
+.flow__label { display: block; margin: 2px 6px 10px; font-size: 12px; font-weight: 700; color: var(--paper); }
 .flow__group ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .flow__card { padding: 20px 18px; border: 1px solid var(--line-2); border-radius: var(--radius-sm); background: var(--ink); }
 .flow__group .flow__card { padding: 14px 16px; }
 .flow__k { display: block; font-size: 12px; color: var(--faint); margin-bottom: 6px; }
 .flow__v { display: flex; align-items: center; gap: 10px; font-weight: 500; }
-.flow__card--ergo { border-color: var(--lime); }
-.flow__card--ergo .flow__k { color: var(--lime); }
+/* What ergo itself contributes is named in lime and bold: the library and the report. */
+.flow__v--ergo { color: var(--lime); font-weight: 700; }
 .flow__report .mark { height: 26px; }
-.flow__end { background: var(--lime); border-color: var(--lime); color: var(--ink); }
-.flow__end .flow__k { color: var(--ink); }
-.flow__end .therefore { width: .8em; height: .8em; }
 
 /* ——— Ops ——— */
 .ops { list-style: none; margin: 40px 0 32px; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }

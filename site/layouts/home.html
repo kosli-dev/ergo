@@ -123,15 +123,15 @@ d-3      <span class="k">$applies</span>   environment = "staging"  <span class=
         <ul>
           <li class="flow__card"><span class="flow__k mono">input</span><span class="flow__v">deployments.json</span></li>
           <li class="flow__card"><span class="flow__k mono">control</span><span class="flow__v">requirements.yaml</span></li>
-          <li class="flow__card flow__card--ergo"><span class="flow__k mono">library</span><span class="flow__v">ergo.rego</span></li>
+          <li class="flow__card"><span class="flow__k mono">library</span><span class="flow__v flow__v--ergo">ergo.rego</span></li>
         </ul>
       </li>
       <li class="flow__card"><span class="flow__k mono">engine</span><span class="flow__v">OPA {{ site.Params.opaVersion }}</span></li>
       <li class="flow__group">
         <span class="flow__label mono">outputs</span>
         <ul>
-          <li class="flow__card flow__end"><span class="flow__k mono">decision</span><span class="flow__v">{{ partial "therefore.html" . }} compliant</span></li>
-          <li class="flow__card flow__card--ergo flow__report"><span class="flow__k mono">evidence</span><span class="flow__v">{{ partial "mark.html" . }}<span>report</span></span></li>
+          <li class="flow__card"><span class="flow__k mono">decision</span><span class="flow__v">compliant</span></li>
+          <li class="flow__card flow__report"><span class="flow__k mono">evidence</span><span class="flow__v">{{ partial "mark.html" . }}<span class="flow__v--ergo">report</span></span></li>
         </ul>
       </li>
     </ol>
