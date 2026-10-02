@@ -19,12 +19,6 @@ require_of(req) := object.get(req, "require", "every") if is_object(req)
 
 size(x) := count(x) if type_name(x) in {"array", "object", "set", "string"}
 
-joined(sep, xs) := concat(sep, xs) if {
-	every x in xs {
-		is_string(x)
-	}
-}
-
 from_path(req) := array.slice(from_of(req), 0, count(from_of(req)) - 1) if each_step(req)
 
 from_path(req) := from_of(req) if not each_step(req)
@@ -1484,16 +1478,18 @@ leaf_describe(check, item) := sprintf("%s %s %s", [item_path_name(item, check.le
 
 default expression_of(_, _) := ""
 
-expression_of(check, _) := check.expression
+expression_of(check, _) := check.expression if written_expression(check)
+
+written_expression(check) if is_string(check.expression)
 
 expression_of(check, item) := leaf_describe(check, item) if {
-	not check.expression
+	not written_expression(check)
 	not quantified(check)
 	not combinator(check)
 }
 
 expression_of(check, item) := list_describe(check, item_given(item)) if {
-	not check.expression
+	not written_expression(check)
 	quantified(check)
 }
 
@@ -1537,7 +1533,7 @@ quantifier(check) := "every" if check.op == "all"
 quantifier(check) := "some" if check.op == "any"
 
 expression_of(check, item) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%v(%s)", [nm, concat(" and ", [top_option_describe(leaf, item) | some leaf in group])]) | some nm, group in check.options]))]) if {
-	not check.expression
+	not written_expression(check)
 	check.op == "any_of"
 }
 
@@ -1815,7 +1811,7 @@ well_formed_inputs(req) := [
 applies_def(req) := {"$applies": with_refs(
 	{
 		"description": sprintf("subject is in scope as a %s under this requirement's applies_to filter; out-of-scope subjects are recorded but not evaluated, and a subject whose filter can't be read fails", [subject_type_of(req)]),
-		"expression": joined(" and ", [expression_of(applies_to_of(req)[name], subject_item_name(req)) | some name in applies_to_names(req)]),
+		"expression": concat(" and ", [expression_of(applies_to_of(req)[name], subject_item_name(req)) | some name in applies_to_names(req)]),
 	},
 	applies_to_of(req),
 )} if size(applies_to_of(req)) > 0
