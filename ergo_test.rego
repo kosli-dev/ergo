@@ -3298,3 +3298,60 @@ test_a_name_given_twice_fails_every_kind_of_list_check if {
 	inner_any_ok := {"op": "any", "path": ["approvers"], "as": "a", "check": {"op": "any", "path": ["$pr", "commits"], "as": "b", "check": {"op": "present", "path": ["sha"]}}}
 	[r[1] | some r in review_rows(inner_any_ok)] == [true, true, true, false, true]
 }
+
+test_a_filter_with_a_name_given_twice_cannot_rule_subjects_out if {
+	rep := ergo.report(review_doc, {"s": {
+		"from": ["pull_requests", {"each_as": "pr"}],
+		"id": ["number"],
+		"min_subjects": 0,
+		"applies_to": {"f": {"op": "any", "path": ["approvers"], "as": "pr", "check": {"op": "present", "path": ["username"]}}},
+		"checks": {"c": {"op": "equals", "path": ["number"], "value": 0}},
+	}})
+	rep.requirements.s.satisfied == false
+	{r.cause | some r in rows_for(rep, "s", "$applies")} == {"absent"}
+}
+
+test_a_filter_with_a_badly_written_as_cannot_rule_subjects_out if {
+	rep := ergo.report(review_doc, {"s": {
+		"from": ["pull_requests", {"each_as": "pr"}],
+		"id": ["number"],
+		"min_subjects": 0,
+		"applies_to": {"f": {"op": "all", "path": ["approvers"], "as": "a", "check": {"op": "any", "path": ["$pr", "commits"], "as": "$c", "check": {"op": "present", "path": ["sha"]}}}},
+		"checks": {"c": {"op": "equals", "path": ["number"], "value": 0}},
+	}})
+	rep.requirements.s.satisfied == false
+	{r.cause | some r in rows_for(rep, "s", "$applies")} == {"absent"}
+}
+
+test_a_filter_nested_too_deep_cannot_rule_subjects_out if {
+	rep := ergo.report({"items": [{"id": 1, "xs": [{"ys": [{"zs": [1]}]}]}]}, {"s": {
+		"from": ["items"],
+		"id": ["id"],
+		"min_subjects": 0,
+		"applies_to": {"f": {"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["ys"], "check": {"op": "all", "path": ["zs"], "check": {"op": "present", "path": []}}}}},
+		"checks": {"c": {"op": "equals", "path": ["id"], "value": 0}},
+	}})
+	rep.requirements.s.satisfied == false
+	[r.cause | some r in rows_for(rep, "s", "$applies")] == ["absent"]
+}
+
+test_a_badly_written_list_check_fails_as_absent if {
+	every check in [
+		{"op": "any", "path": ["approvers"], "as": "pr", "check": {"op": "present", "path": ["username"]}},
+		{"op": "any", "path": ["approvers"], "as": "", "check": {"op": "present", "path": ["username"]}},
+		{"op": "any", "path": ["approvers"], "as": "a", "check": {"op": "all", "path": ["$pr", "commits"], "as": "a", "check": {"op": "present", "path": ["sha"]}}},
+		{"op": "any", "path": ["approvers"], "as": "a", "check": {"op": "all", "path": ["$pr", "commits"], "as": "pr", "check": {"op": "present", "path": ["sha"]}}},
+		{"op": "any", "path": ["approvers"], "check": {"op": "all", "path": ["$pr", "commits"], "as": 3, "check": {"op": "present", "path": ["sha"]}}},
+	] {
+		{r[2] | some r in review_rows(check)} == {"absent"}
+	}
+}
+
+review_expression(check) := ergo.report(review_doc, review_req(check)).requirements.s.checks.c.expression
+
+test_a_name_given_twice_shows_in_the_expression if {
+	review_expression({"op": "any", "path": ["approvers"], "as": "pr", "check": {"op": "present", "path": ["username"]}}) == "some approvers as <name given twice>: username is present"
+	review_expression({"op": "any", "path": ["approvers"], "as": "a", "check": {"op": "all", "path": ["$pr", "commits"], "as": "a", "check": {"op": "present", "path": ["sha"]}}}) == "some approvers as $a: every $pr.commits as <name given twice>: sha is present"
+	review_expression({"op": "any", "path": ["approvers"], "as": "a", "check": {"op": "all", "path": ["$pr", "commits"], "as": "pr", "check": {"op": "present", "path": ["sha"]}}}) == "some approvers as $a: every $pr.commits as <name given twice>: sha is present"
+	expression_in({}, {"id": 1}, {"op": "any", "path": ["xs"], "as": "items", "check": {"op": "present", "path": []}}) == "some xs as $items: $items is present"
+}

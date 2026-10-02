@@ -683,9 +683,42 @@ cause_precedence := ["not_an_object", "ambiguous", "unmatched", "absent", "null"
 
 default worst_read(_, _) := "value"
 
-worst_read(subj, check) := worst_of({read_state(subj, p) | some p in read_paths(check)}) if not unreadable_ref(check)
+worst_read(subj, check) := worst_of({read_state(subj, p) | some p in read_paths(check)}) if {
+	not unreadable_ref(check)
+	not broken_list_check(check)
+}
 
-worst_read(_, check) := worst_of({ref_state(r) | some r in check_refs(check)}) if unreadable_ref(check)
+worst_read(_, check) := worst_of({ref_state(r) | some r in check_refs(check)}) if {
+	unreadable_ref(check)
+	not broken_list_check(check)
+}
+
+worst_read(_, check) := "absent" if broken_list_check(check)
+
+broken_list_check(check) if {
+	quantified(check)
+	not names_free(check)
+}
+
+broken_list_check(check) if {
+	quantified(check)
+	quantified(check.check)
+	not inner_names_free(check, check.check)
+}
+
+broken_list_check(check) if {
+	quantified(check)
+	quantified(check.check)
+	quantified(check.check.check)
+}
+
+inner_names_free(_, inner) if not "as" in object.keys(inner)
+
+inner_names_free(outer, inner) if {
+	valid_name(inner.as)
+	not inner.as in object.keys(bound_names)
+	inner.as != object.get(outer, "as", null)
+}
 
 unreadable_ref(check) if {
 	some r in check_refs(check)
@@ -860,24 +893,43 @@ expression_of(check, item) := leaf_describe(check, item) if {
 	not combinator(check)
 }
 
-expression_of(check, _) := sprintf("every %s%s: %s", [collection_name(check), as_text(check), element_describe(check.check, item_name(check))]) if {
+expression_of(check, item) := sprintf("every %s%s: %s", [collection_name(check), as_text(check, item_given(item)), element_describe(check.check, item_name(check), given_inside(check, item))]) if {
 	not check.expression
 	check.op == "all"
 }
 
-expression_of(check, _) := sprintf("some %s%s: %s", [collection_name(check), as_text(check), element_describe(check.check, item_name(check))]) if {
+expression_of(check, item) := sprintf("some %s%s: %s", [collection_name(check), as_text(check, item_given(item)), element_describe(check.check, item_name(check), given_inside(check, item))]) if {
 	not check.expression
 	check.op == "any"
 }
 
-as_text(check) := "" if not "as" in object.keys(check)
+as_text(check, _) := "" if not "as" in object.keys(check)
 
-as_text(check) := sprintf(" as $%s", [check.as]) if valid_name(check.as)
+as_text(check, given) := sprintf(" as $%s", [check.as]) if {
+	valid_name(check.as)
+	not check.as in given
+}
 
-as_text(check) := " as <invalid name>" if {
+as_text(check, given) := " as <name given twice>" if {
+	valid_name(check.as)
+	check.as in given
+}
+
+as_text(check, _) := " as <invalid name>" if {
 	"as" in object.keys(check)
 	not valid_name(check.as)
 }
+
+item_given(item) := {substring(item, 1, -1)} if {
+	startswith(item, "$")
+	not startswith(item, "$$")
+}
+
+item_given(item) := set() if not startswith(item, "$")
+
+given_inside(check, item) := item_given(item) | {check.as} if valid_name(object.get(check, "as", null))
+
+given_inside(check, item) := item_given(item) if not valid_name(object.get(check, "as", null))
 
 quantifier(check) := "every" if check.op == "all"
 
@@ -904,17 +956,17 @@ inner_item_name(check, item) := sprintf("%s[]", [inner_collection_name(check, it
 
 inner_item_name(check, _) := sprintf("$%s", [check.as]) if valid_name(object.get(check, "as", null))
 
-element_describe(check, item) := leaf_describe(check, item) if {
+element_describe(check, item, _) := leaf_describe(check, item) if {
 	not combinator(check)
 	not quantified(check)
 }
 
-element_describe(check, item) := any_of_describe(check, item) if combinator(check)
+element_describe(check, item, _) := any_of_describe(check, item) if combinator(check)
 
-element_describe(check, item) := sprintf("%s %s%s: %s", [
+element_describe(check, item, given) := sprintf("%s %s%s: %s", [
 	quantifier(check),
 	inner_collection_name(check, item),
-	as_text(check),
+	as_text(check, given),
 	inner_describe(check.check, inner_item_name(check, item)),
 ]) if quantified(check)
 
