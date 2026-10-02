@@ -537,6 +537,7 @@ leaf_passed(check, subj) if {
 	l := value_at(subj, check.left)
 	r := value_at(subj, check.right)
 	comparable(l, r)
+	orderable(check.cmp, l)
 	cmp(check.cmp, l, r)
 }
 
@@ -565,6 +566,20 @@ value_list(v) if is_set(v)
 comparable(l, r) if {
 	l != null
 	type_name(l) == type_name(r)
+}
+
+orderable(c, _) if c in {"eq", "ne"}
+
+orderable(_, v) if is_number(v)
+
+orderable(_, v) if is_string(v)
+
+unordered(subj, leaf) if {
+	leaf.op == "compare"
+	l := value_at(subj, leaf.left)
+	r := value_at(subj, leaf.right)
+	comparable(l, r)
+	not orderable(leaf.cmp, l)
 }
 
 rfc3339_shaped(v) if {
@@ -1027,7 +1042,7 @@ cause_precedence := ["not_an_object", "ambiguous", "unmatched", "absent", "null"
 
 default worst_read(_, _) := "value"
 
-worst_read(subj, check) := worst_of({read_state(subj, p) | some p in read_paths(check)}) if {
+worst_read(subj, check) := worst_of({read_state(subj, p) | some p in read_paths(check)} | {"absent" | some leaf in element_leaves(check); unordered(subj, leaf)}) if {
 	not unreadable_ref(check)
 	not broken_row(check)
 }
