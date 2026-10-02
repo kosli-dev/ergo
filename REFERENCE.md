@@ -164,7 +164,7 @@ The expression says where the value comes from. What it was goes in the check's 
 ergo.report_with_params(doc, params, requirements)
 ```
 
-That works like `ergo.report`, except `$$params` reads `params` instead of `data.params`.
+That works like `ergo.report`, except `$$params` reads `params` instead of `data.params`. If what you pass can be missing, give it a default first, with a rule like `default config := {}`. Rego doesn't call a function with an argument that isn't defined, so the whole report would be undefined, with no rows to say why. The same goes for the document given to `ergo.report`.
 
 Params aren't part of the document, so `$$input.params` doesn't reach them, and `$$params` doesn't read the document. With no `data.params`, or one that isn't an object, every `$$params` read fails as `absent`. ergo has no defaults, so a control run without its params fails instead of checking something nobody configured.
 
