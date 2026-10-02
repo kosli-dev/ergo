@@ -364,7 +364,31 @@ step_key(seg) := seg if {
 
 is_key(v) if is_string(v)
 
-is_key(v) if is_number(v)
+is_key(v) if {
+	is_number(v)
+	regex.match(`^[0-9]+$`, json.marshal(v))
+}
+
+badly_stepped(p) if {
+	is_array(p)
+	some seg in p
+	bad_step(seg)
+}
+
+badly_stepped(p) if {
+	not is_array(p)
+	bad_step(p)
+}
+
+bad_step(seg) if {
+	not is_object(seg)
+	not is_key(seg)
+}
+
+bad_step(seg) if {
+	is_literal(seg)
+	not is_key(seg.literal)
+}
 
 unliteral(seg) := seg.literal if is_literal(seg)
 
@@ -487,11 +511,14 @@ key_name(k) := json_text(k) if {
 	not plain_key(k)
 }
 
-key_name(k) := literal_text(k) if is_number(k)
+key_name(k) := literal_text(k) if {
+	is_number(k)
+	is_key(k)
+}
 
-key_name(k) := sprintf("%v", [k]) if {
+key_name(k) := "<invalid step>" if {
 	not is_string(k)
-	not is_number(k)
+	not is_key(k)
 }
 
 plain_key(k) if {
@@ -555,7 +582,22 @@ value_text(x) := literal_text(written(x)) if {
 
 value_text(x) := "<invalid ref>" if malformed(x)
 
-literal_text(v) := json_text(v)
+literal_text(v) := "<number out of range>" if out_of_range(v)
+
+literal_text(v) := json_text(v) if not out_of_range(v)
+
+out_of_range(x) if {
+	walk(x, [_, n])
+	is_number(n)
+	not fits_a_float(n)
+}
+
+fits_a_float(0)
+
+fits_a_float(n) if {
+	abs(n) >= 2.2250738585072014e-308
+	abs(n) <= 1.7976931348623157e308
+}
 
 default leaf_passed(_, _) := false
 
@@ -796,6 +838,24 @@ fields_broken(node) if {
 	some f in object.get(required_fields, node.op, set())
 	not f in object.keys(node)
 }
+
+fields_broken(node) if out_of_range(node)
+
+fields_broken(node) if {
+	some f in {"path", "left", "right", "each"}
+	f in object.keys(node)
+	badly_stepped(node[f])
+}
+
+fields_broken(node) if {
+	is_array(node.inputs)
+	some spec in node.inputs
+	badly_stepped(input_paths(spec)[_])
+}
+
+input_paths(spec) := [spec] if not is_object(spec)
+
+input_paths(spec) := [object.get(spec, f, []) | some f in ["path", "each"]] if is_object(spec)
 
 fields_broken(node) if {
 	node.op == "range"
@@ -1721,13 +1781,13 @@ min_subjects_def(req) := {"$min_subjects": with_refs(
 )}
 
 well_formed_def(req) := {"$well_formed": {
-	"description": "the requirement declares at least one check and a recognised \"require\" value; lacking either, it asserts nothing that could ever be satisfied",
-	"expression": `count(checks) >= 1 and require in ["every", "some"]`,
+	"description": "the requirement declares at least one check and a recognised \"require\" value, its from and id only hold steps that can be keys, and its from, id and min_subjects only hold numbers a 64-bit float can hold; lacking any of these, it asserts nothing that could ever be satisfied, or not the same way everywhere",
+	"expression": `count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float`,
 }} if not stepped(req)
 
 well_formed_def(req) := {"$well_formed": {
-	"description": "the requirement declares at least one check, a recognised \"require\" value, and a from that ends with its only step, which gives a name that doesn't start with $ and, if it has keys, gives them as a list",
-	"expression": `count(checks) >= 1 and require in ["every", "some"] and from is well formed`,
+	"description": "the requirement declares at least one check, a recognised \"require\" value, and a from that ends with its only step, which gives a name that doesn't start with $ and, if it has keys, gives them as a list, its from and id only hold steps that can be keys, and its from, id and min_subjects only hold numbers a 64-bit float can hold",
+	"expression": `count(checks) >= 1 and require in ["every", "some"] and from is well formed and steps are keys and numbers fit a float`,
 }} if stepped(req)
 
 default well_formed(_) := false
@@ -1736,6 +1796,9 @@ well_formed(req) if {
 	size(checks_of(req)) > 0
 	require_of(req) in {"every", "some"}
 	from_well_formed(req)
+	not out_of_range([object.get(req, f, null) | some f in ["from", "id", "min_subjects"]])
+	not badly_stepped(from_of(req))
+	not badly_stepped(object.get(req, "id", []))
 }
 
 well_formed_inputs(req) := [
