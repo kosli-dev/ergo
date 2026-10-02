@@ -1223,6 +1223,16 @@ scope_readable(doc, req) if {
 	}
 }
 
+nested_describe(check, item) := leaf_describe(check, item) if not misplaced(check)
+
+nested_describe(check, _) := sprintf("<%v can't go here>", [check.op]) if misplaced(check)
+
+misplaced(check) if {
+	check.op in operators
+	not check.op in leaf_ops
+	not quantified(check)
+}
+
 default leaf_describe(_, _) := ""
 
 leaf_describe(check, _) := sprintf("<unknown op %v>", [check.op]) if not check.op in operators
@@ -1345,7 +1355,7 @@ expression_of(check, item) := sprintf("one of: %s", [concat(" | ", sort([sprintf
 	check.op == "any_of"
 }
 
-top_option_describe(leaf, item) := leaf_describe(leaf, item) if not quantified(leaf)
+top_option_describe(leaf, item) := nested_describe(leaf, item) if not quantified(leaf)
 
 top_option_describe(leaf, item) := list_describe(leaf, item_given(item)) if quantified(leaf)
 
@@ -1365,7 +1375,7 @@ inner_item_name(check, item) := sprintf("%s[]", [inner_collection_name(check, it
 
 inner_item_name(check, _) := sprintf("$%s", [check.as]) if valid_name(object.get(check, "as", null))
 
-element_describe(check, item, _) := leaf_describe(check, item) if {
+element_describe(check, item, _) := nested_describe(check, item) if {
 	not combinator(check)
 	not quantified(check)
 }
@@ -1374,7 +1384,7 @@ element_describe(check, item, given) := sprintf("one of: %s", [concat(" | ", sor
 
 element_describe(check, item, given) := element_list_describe(check, item, given) if quantified(check)
 
-element_option_describe(leaf, item, _) := leaf_describe(leaf, item) if not quantified(leaf)
+element_option_describe(leaf, item, _) := nested_describe(leaf, item) if not quantified(leaf)
 
 element_option_describe(leaf, item, given) := element_list_describe(leaf, item, given) if quantified(leaf)
 
@@ -1385,7 +1395,7 @@ element_list_describe(check, item, given) := sprintf("%s %s%s: %s", [
 	inner_describe(check.check, inner_item_name(check, item)),
 ])
 
-inner_describe(check, item) := leaf_describe(check, item) if {
+inner_describe(check, item) := nested_describe(check, item) if {
 	not combinator(check)
 	not quantified(check)
 }
@@ -1398,7 +1408,7 @@ any_of_describe(check, item) := sprintf("one of: %s", [concat(" | ", sort([varia
 
 variant_describe(nm, group, item) := sprintf("%v(%s)", [nm, concat(" and ", [inner_option_describe(leaf, item) | some leaf in group])])
 
-inner_option_describe(leaf, item) := leaf_describe(leaf, item) if not quantified(leaf)
+inner_option_describe(leaf, item) := nested_describe(leaf, item) if not quantified(leaf)
 
 inner_option_describe(leaf, _) := "<nested too deep>" if quantified(leaf)
 

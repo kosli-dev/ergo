@@ -4138,3 +4138,12 @@ test_a_check_that_is_not_an_object_shows_in_the_expression if {
 	rendered({}, {"op": "any_of", "options": {"o": ["present"]}}) == "one of: o(<invalid check>)"
 	rendered({}, {"op": "all", "path": ["xs"], "check": "present"}) == "every xs: <invalid check>"
 }
+
+test_a_check_where_it_cannot_go_shows_in_the_expression if {
+	rendered({}, {"op": "all", "path": ["xs"], "check": {"op": "even", "path": []}}) == "every xs: <even can't go here>"
+	rendered({}, {"op": "any_of", "options": {"o": [{"op": "even", "path": ["n"]}]}}) == "one of: o(<even can't go here>)"
+	rendered({}, {"op": "any_of", "options": {"o": [{"op": "any_of", "options": {"p": [{"op": "present", "path": ["n"]}]}}]}}) == "one of: o(<any_of can't go here>)"
+	rendered({}, {"op": "all", "path": ["xs"], "check": {"op": "any_of", "options": {"o": [{"op": "even", "path": []}]}}}) == "every xs: one of: o(<even can't go here>)"
+	rendered({}, {"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["ys"], "check": {"op": "even", "path": []}}}) == "every xs: every ys: <even can't go here>"
+	rendered({}, {"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["ys"], "check": {"op": "any_of", "options": {"o": [{"op": "even", "path": []}]}}}}) == "every xs: every ys: one of: o(<even can't go here>)"
+}
