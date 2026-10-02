@@ -1200,6 +1200,10 @@ scope_readable(doc, req) if {
 
 default leaf_describe(_, _) := ""
 
+leaf_describe(check, _) := sprintf("<unknown op %v>", [check.op]) if not check.op in operators
+
+leaf_describe(check, _) := "<missing op>" if not "op" in object.keys(check)
+
 leaf_describe(check, item) := sprintf("%s >= %s and %s <= %s", [n, value_text(check.min), n, value_text(check.max)]) if {
 	check.op == "range"
 	n := item_path_name(item, check.path)

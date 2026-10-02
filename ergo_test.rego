@@ -1363,7 +1363,7 @@ test_declared_expression_wins_over_the_rendered_one if {
 	rendered({}, check) == "state is MERGED"
 }
 
-test_unrenderable_op_yields_an_empty_expression if rendered({}, {"op": "bespoke"}) == ""
+test_a_declared_custom_op_without_an_expression_renders_as_empty if rendered({}, {"op": "even", "path": ["n"]}) == ""
 
 two_check_req := {"s": {
 	"subject_type": "thing",
@@ -4087,4 +4087,16 @@ test_a_present_filter_with_a_badly_written_substitute_cannot_rule_subjects_out i
 	rep := ergo.report(typo_doc, typo_req({"op": "present", "path": ["missing"], "substitute": {"op": "nope", "path": ["n"]}}))
 	rep.requirements.s.satisfied == false
 	[r.cause | some r in rows_for(rep, "s", "$applies")] == ["absent"]
+}
+
+test_an_unknown_op_shows_in_the_expression if {
+	rendered({}, {"op": "nope", "path": ["n"]}) == "<unknown op nope>"
+	rendered({}, {"op": 3, "path": ["n"]}) == "<unknown op 3>"
+	rendered({}, {"path": ["n"]}) == "<missing op>"
+	rendered({}, {"op": "all", "path": ["xs"], "check": {"op": "nope", "path": []}}) == "every xs: <unknown op nope>"
+	rendered({}, {"op": "any_of", "options": {"o": [{"op": "nope", "path": ["n"]}]}}) == "one of: o(<unknown op nope>)"
+}
+
+test_a_written_expression_wins_over_the_unknown_op_text if {
+	rendered({}, {"op": "nope", "path": ["n"], "expression": "n is fine"}) == "n is fine"
 }

@@ -329,7 +329,7 @@ These read one or two fields of a subject.
 
 Some things worth knowing:
 
-- A check that's written wrong fails with cause `absent`, whatever the subject holds. That covers an `op` ergo doesn't know, a missing parameter, a `cmp` that isn't in the list above, `values` that isn't a list, a `min` or `max` that isn't a number, and `patterns` that isn't a list of valid regular expressions. It holds for a value read with a [`ref`](#reading-from-the-input) too, so `"values": {"ref": ["$$params", "allowed"]}` fails when `allowed` is a string. The cause isn't `value`, so a filter written like this fails the requirement rather than ruling every subject out.
+- A check that's written wrong fails with cause `absent`, whatever the subject holds. That covers an `op` ergo doesn't know, a missing parameter, a `cmp` that isn't in the list above, `values` that isn't a list, a `min` or `max` that isn't a number, and `patterns` that isn't a list of valid regular expressions. It holds for a value read with a [`ref`](#reading-from-the-input) too, so `"values": {"ref": ["$$params", "allowed"]}` fails when `allowed` is a string. An unknown `op` shows in the expression as `<unknown op nope>`, and a missing one as `<missing op>`. The cause isn't `value`, so a filter written like this fails the requirement rather than ruling every subject out.
 - `equals` with `"value": null` only passes when the field is there and set to `null`. A missing field doesn't count.
 - `range` needs `min` and `max` to be numbers. A string like `"3"` fails the check, because Rego puts every number before every string, so `5 <= "3"` would be true.
 - `in` fails when the field is missing or `null`, even if `values` contains `null`. To check that a field is `null`, use `equals` with `"value": null`. `values` can be a list or, from Rego, a set. `in` also fails when `values` is empty, missing, or not a list or set. In those last two cases, the expression shows `id in <invalid values>` rather than a list.
@@ -529,7 +529,7 @@ Declare its name in the same file, so ergo can tell it from a typo:
 operators contains "even"
 ```
 
-An `op` that isn't built in or declared fails with cause `absent`, even if an `op_passed` rule passes it. So a misspelt operator in `applies_to` fails the requirement instead of ruling every subject out.
+An `op` that isn't built in or declared fails with cause `absent`, even if an `op_passed` rule passes it. Its expression shows `<unknown op even>`, so the report points at the policy. So a misspelt operator in `applies_to` fails the requirement instead of ruling every subject out.
 
 Then use it like any other operator. ergo can't work out what your operator reads or how to describe it, so give the check an `expression` and a list of `inputs`:
 
