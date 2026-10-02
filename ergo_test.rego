@@ -3026,7 +3026,8 @@ test_a_from_with_a_badly_written_step_is_not_well_formed if {
 		["build", "test_runs", {"each_as": "x", "each": "x"}],
 		["build", "test_runs", {"each_as": "x", "kesy": ["a"]}],
 		["build", "test_runs", {"each_as": "x", "keys": "unit-test"}],
-		["build", "test_runs", {"each_as": "x", "keys": {"ref": ["$$input", "keys"]}}],
+		["build", "test_runs", {"each_as": "x", "keys": {"ref": ["$$params", "keys"], "note": "x"}}],
+		["build", "test_runs", {"each_as": "x", "keys": {"literal": "unit-test"}}],
 	] {
 		rep := ill_formed_from(f)
 		rows_for(rep, "s", "$well_formed")[0].passed == false
@@ -3810,4 +3811,66 @@ test_a_ref_used_as_a_value_may_be_any_type if {
 	[r.passed, r.cause] == [true, "satisfied"]
 	f := row_in({}, {"id": 1, "tags": ["w"]}, check) with data.params as {"k": ["v"]}
 	[f.passed, f.cause] == [false, "value"]
+}
+
+suites_from_params := {"s": {
+	"subject_type": "test run",
+	"from": ["build", "test_runs", {"each_as": "run", "keys": {"ref": ["$$params", "suites"]}}],
+	"checks": {"c": {"op": "equals", "path": ["result"], "value": "passed"}},
+}}
+
+test_keys_can_come_from_a_ref if {
+	rep := ergo.report(suite_doc, suites_from_params) with data.params as {"suites": ["unit-test", "system-test"]}
+	[[r.subject.id, r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [
+		["system-test", false, "absent"],
+		["unit-test", true, "satisfied"],
+	]
+	rep.requirements.s.checks["$min_subjects"]["$refs"] == [{"name": "$$params.suites", "value": ["unit-test", "system-test"]}]
+	rows_for(rep, "s", "$well_formed")[0].passed == true
+}
+
+test_keys_from_a_ref_behave_like_keys_written_out if {
+	written := ergo.report(suite_doc, suite_req({"each_as": "run", "keys": ["unit-test", "smoke-test", "unit-test"]}))
+	read := ergo.report(suite_doc, suites_from_params) with data.params as {"suites": ["unit-test", "smoke-test", "unit-test"]}
+	[[r.subject.id, r.passed, r.cause] | some r in rows_for(written, "s", "c")] == [[r.subject.id, r.passed, r.cause] | some r in rows_for(read, "s", "c")]
+}
+
+test_keys_from_a_ref_that_cannot_be_read_fail_the_requirement_even_with_min_subjects_zero if {
+	req := {"s": object.union(suites_from_params.s, {"min_subjects": 0})}
+	rows_for(ergo.report(suite_doc, req), "s", "$min_subjects")[0].cause == "absent" with data.params as {}
+	rows_for(ergo.report(suite_doc, req), "s", "$min_subjects")[0].cause == "null" with data.params as {"suites": null}
+	every bad in ["unit-test", {"a": 1}, true, 3] {
+		rep := ergo.report(suite_doc, req) with data.params as {"suites": bad}
+		rep.requirements.s.satisfied == false
+		rows_for(rep, "s", "$min_subjects")[0].cause == "absent"
+		rep.requirements.s.subjects == {"total": 0, "matching": 0}
+	}
+	ergo.report(suite_doc, req).requirements.s.satisfied == false with data.params as {}
+}
+
+test_keys_from_a_ref_that_cannot_be_read_show_up_in_violations if {
+	vs := ergo.violations(ergo.report(suite_doc, suites_from_params)) with data.params as {}
+	[[v.check, v.cause, v.inputs] | some v in vs] == [["$min_subjects", "absent", [{"name": "count(matching(build.test_runs))", "value": 0}, {"name": "$$params.suites", "value": null}]]]
+}
+
+test_an_empty_list_of_keys_from_a_ref_is_like_an_empty_list_written_out if {
+	rep := ergo.report(suite_doc, suites_from_params) with data.params as {"suites": []}
+	rep.requirements.s.subjects == {"total": 0, "matching": 0}
+	rows_for(rep, "s", "$min_subjects")[0].cause == "value"
+	zero := ergo.report(suite_doc, {"s": object.union(suites_from_params.s, {"min_subjects": 0})}) with data.params as {"suites": []}
+	zero.requirements.s.satisfied == true
+}
+
+test_keys_can_be_written_as_a_literal if {
+	rep := ergo.report(suite_doc, suite_req({"each_as": "run", "keys": {"literal": ["unit-test"]}}))
+	[[r.subject.id, r.passed] | some r in rows_for(rep, "s", "c")] == [["unit-test", true]]
+}
+
+test_keys_and_a_ref_step_can_both_come_from_params if {
+	rep := ergo.report(suite_doc, {"s": {
+		"from": ["build", {"ref": ["$$params", "where"]}, {"each_as": "run", "keys": {"ref": ["$$params", "suites"]}}],
+		"checks": {"c": {"op": "equals", "path": ["result"], "value": "passed"}},
+	}}) with data.params as {"where": "test_runs", "suites": ["unit-test"]}
+	[[r.subject.id, r.passed] | some r in rows_for(rep, "s", "c")] == [["unit-test", true]]
+	rep.requirements.s.checks["$min_subjects"]["$refs"] == [{"name": "$$params.suites", "value": ["unit-test"]}, {"name": "$$params.where", "value": "test_runs"}]
 }
