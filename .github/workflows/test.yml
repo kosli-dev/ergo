@@ -19,6 +19,8 @@ jobs:
       - run: opa check --strict . --ignore .github
       - run: opa fmt --list --fail .
       - run: opa test . --ignore .github --timeout 30s --verbose
+      - name: Check the tests give the same results with --strict-builtin-errors
+        run: opa eval --strict-builtin-errors --ignore .github -d . --format raw 'count(data) > 0'
       - name: Check every line is tested
         shell: bash
         run: |

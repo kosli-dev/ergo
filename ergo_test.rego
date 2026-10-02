@@ -4209,3 +4209,51 @@ test_a_present_filter_with_a_substitute_ordering_numbers_still_rules_subjects_ou
 	rep.requirements.s.satisfied == true
 	[r.cause | some r in rows_for(rep, "s", "$applies")] == ["value"]
 }
+
+one_item := {"items": [{"id": 1}]}
+
+test_a_policy_that_is_not_an_object_is_not_compliant if {
+	ergo.report(one_item, 5).compliant == false
+}
+
+test_a_requirement_that_is_not_an_object_is_not_compliant if {
+	ergo.report(one_item, {"s": 5}).compliant == false
+}
+
+test_checks_that_are_not_an_object_are_not_compliant if {
+	ergo.report(one_item, {"s": {"from": ["items"], "checks": 5}}).compliant == false
+}
+
+test_an_applies_to_that_is_a_number_is_not_compliant if {
+	ergo.report(one_item, {"s": {"from": ["items"], "applies_to": 5, "checks": {"c": {"op": "present", "path": ["id"]}}}}).compliant == false
+}
+
+test_an_applies_to_that_is_a_string_is_not_compliant if {
+	ergo.report(one_item, {"s": {"from": ["items"], "applies_to": "x", "checks": {"c": {"op": "present", "path": ["id"]}}}}).compliant == false
+}
+
+test_a_filter_whose_custom_expression_is_not_a_string_still_filters if {
+	rep := ergo.report(one_item, {"s": {
+		"from": ["items"],
+		"applies_to": {"f": {"op": "present", "path": ["id"], "expression": ["id"]}},
+		"checks": {"c": {"op": "present", "path": ["id"]}},
+	}})
+	rep.compliant == true
+}
+
+test_an_input_that_is_a_string_without_from_is_not_compliant if {
+	ergo.report("x", {"s": {"checks": {"c": {"op": "present", "path": ["id"]}}}}).compliant == false
+}
+
+test_an_input_that_is_a_list_without_from_is_not_compliant if {
+	ergo.report([{"id": 1}], {"s": {"checks": {"c": {"op": "present", "path": ["id"]}}}}).compliant == false
+}
+
+test_a_selector_on_a_subject_that_is_not_an_object_fails_as_not_an_object if {
+	rep := ergo.report({"items": ["b"]}, {"s": {"from": ["items"], "checks": {"c": {"op": "equals", "path": [{"where": {"id": 1}}, "n"], "value": 1}}}})
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "not_an_object"]]
+}
+
+test_a_ref_that_starts_with_a_number_fails_closed if {
+	cause_of({"id": 1}, {"op": "equals", "path": ["id"], "value": {"ref": [5, "x"]}}) == "absent"
+}

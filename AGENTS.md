@@ -19,9 +19,12 @@ Run these before saying a change is done:
 opa check --strict . --ignore .github
 opa fmt --list .
 opa test . --ignore .github
+opa eval --strict-builtin-errors --ignore .github -d . --format raw 'count(data) > 0'
 ```
 
 `opa fmt --list .` should print nothing. If it prints file names, run `opa fmt -w .`.
+
+The last command runs every test again with `--strict-builtin-errors`, which turns a built-in given the wrong type into an error, and should print `true`. If it prints an error, check the value's type before the built-in on that line, so that ergo gives the same report with or without the flag.
 
 OPA loads every JSON and YAML file it finds as data. The workflow files under `.github` clash with each other, so the checks ignore that folder.
 
