@@ -894,10 +894,21 @@ test_an_empty_path_on_a_subject_is_named_after_from if {
 	[r.inputs | some r in rows_for(rep, "s", "c")] == [[{"name": "branches[]", "value": "main"}]]
 }
 
-test_an_empty_path_on_the_whole_input_is_named_input if {
+test_an_empty_path_on_the_whole_input_is_named_dollar_dollar_input if {
 	rep := ergo.report({"state": "ok"}, {"s": {"checks": {"c": {"op": "present", "path": []}}}})
-	rep.requirements.s.checks.c.expression == "input is present"
-	[r.inputs | some r in rows_for(rep, "s", "c")] == [[{"name": "input", "value": {"state": "ok"}}]]
+	rep.requirements.s.checks.c.expression == "$$input is present"
+	[r.inputs | some r in rows_for(rep, "s", "c")] == [[{"name": "$$input", "value": {"state": "ok"}}]]
+}
+
+test_the_whole_input_is_not_named_like_a_key_called_input if {
+	rep := ergo.report({"input": "inner"}, {"s": {"checks": {"c": {"op": "any_of", "options": {
+		"a": [{"op": "present", "path": []}],
+		"b": [{"op": "present", "path": ["input"]}],
+	}}}}})
+	[r.inputs | some r in rows_for(rep, "s", "c")] == [[
+		{"name": "$$input", "value": {"input": "inner"}},
+		{"name": "input", "value": "inner"},
+	]]
 }
 
 test_an_empty_path_on_a_subject_is_named_after_from_in_every_kind_of_check if {
@@ -1452,6 +1463,15 @@ test_a_range_writes_its_bounds_as_numbers if {
 test_min_subjects_is_written_like_any_number if {
 	rep := ergo.report({"xs": []}, {"s": {"from": ["xs"], "min_subjects": 2.0, "checks": {"c": {"op": "present", "path": ["x"]}}}})
 	rep.requirements.s.checks["$min_subjects"].expression == "count(matching(xs)) >= 2"
+}
+
+test_a_number_in_a_path_is_written_like_any_number if {
+	rendered({}, {"op": "present", "path": ["xs", 1e1]}) == "xs.10 is present"
+}
+
+test_min_subjects_is_described_like_any_number if {
+	rep := ergo.report({"xs": []}, {"s": {"from": ["xs"], "min_subjects": 2.0, "checks": {"c": {"op": "present", "path": ["x"]}}}})
+	rep.requirements.s.checks["$min_subjects"].description == "at least 2 matching subject subject(s) required"
 }
 
 test_a_key_is_escaped_as_in_standard_json if {

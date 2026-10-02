@@ -457,7 +457,10 @@ segment_name(_, p) := sprintf("[%s]", [ref_name(p.ref)]) if is_ref(p)
 
 segment_name(_, p) := "[<invalid ref>]" if malformed(p)
 
-first_dollar_key(0, k) if startswith(k, "$")
+first_dollar_key(0, k) if {
+	is_string(k)
+	startswith(k, "$")
+}
 
 key_name(k) := k if plain_key(k)
 
@@ -466,9 +469,17 @@ key_name(k) := json_text(k) if {
 	not plain_key(k)
 }
 
-key_name(k) := sprintf("%v", [k]) if not is_string(k)
+key_name(k) := literal_text(k) if is_number(k)
 
-plain_key(k) if regex.match(`^[A-Za-z_$][A-Za-z0-9_$-]*$`, k)
+key_name(k) := sprintf("%v", [k]) if {
+	not is_string(k)
+	not is_number(k)
+}
+
+plain_key(k) if {
+	is_string(k)
+	regex.match(`^[A-Za-z_$][A-Za-z0-9_$-]*$`, k)
+}
 
 json_text(v) := concat("", [json_token(t) | some t in regex.find_n(`"(?:[^"\\]|\\.)*"|-?[0-9][0-9.eE+-]*|[^"0-9-]+`, json.marshal(v), -1)])
 
@@ -1663,7 +1674,7 @@ subject_item_name(req) := sprintf("%s[]", [path_name(from_of(req))]) if {
 	from_of(req) != []
 }
 
-subject_item_name(req) := "input" if {
+subject_item_name(req) := "$$input" if {
 	not stepped(req)
 	from_of(req) == []
 }
@@ -1679,7 +1690,7 @@ matching_count_name(req) := "count(matching(<invalid from>))" if not from_well_f
 
 min_subjects_def(req) := {"$min_subjects": with_refs(
 	{
-		"description": sprintf("at least %d matching %s subject(s) required", [min_subjects_of(req), subject_type_of(req)]),
+		"description": sprintf("at least %s matching %s subject(s) required", [literal_text(min_subjects_of(req)), subject_type_of(req)]),
 		"expression": sprintf("%s >= %s", [matching_count_name(req), literal_text(min_subjects_of(req))]),
 	},
 	{"from": from_of(req)},
