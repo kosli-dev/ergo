@@ -304,7 +304,6 @@ read_from(start, keys) := v if {
 	base := object.get(start, array.slice(keys, 0, i), absent)
 	base != absent
 	elem := selected(base, keys[i])
-	is_object(elem)
 	v := object.get(elem, array.slice(keys, i + 1, count(keys)), absent)
 }
 
@@ -1392,7 +1391,7 @@ quantifier(check) := "every" if check.op == "all"
 
 quantifier(check) := "some" if check.op == "any"
 
-expression_of(check, item) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%v(%s)", [nm, joined(" and ", [top_option_describe(leaf, item) | some leaf in group])]) | some nm, group in check.options]))]) if {
+expression_of(check, item) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%v(%s)", [nm, concat(" and ", [top_option_describe(leaf, item) | some leaf in group])]) | some nm, group in check.options]))]) if {
 	not check.expression
 	check.op == "any_of"
 }
@@ -1422,7 +1421,7 @@ element_describe(check, item, _) := nested_describe(check, item) if {
 	not quantified(check)
 }
 
-element_describe(check, item, given) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%v(%s)", [nm, joined(" and ", [element_option_describe(leaf, item, given) | some leaf in group])]) | some nm, group in check.options]))]) if combinator(check)
+element_describe(check, item, given) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%v(%s)", [nm, concat(" and ", [element_option_describe(leaf, item, given) | some leaf in group])]) | some nm, group in check.options]))]) if combinator(check)
 
 element_describe(check, item, given) := element_list_describe(check, item, given) if quantified(check)
 
@@ -1448,7 +1447,7 @@ inner_describe(check, _) := "<nested too deep>" if quantified(check)
 
 any_of_describe(check, item) := sprintf("one of: %s", [concat(" | ", sort([variant_describe(nm, group, item) | some nm, group in check.options]))])
 
-variant_describe(nm, group, item) := sprintf("%v(%s)", [nm, joined(" and ", [inner_option_describe(leaf, item) | some leaf in group])])
+variant_describe(nm, group, item) := sprintf("%v(%s)", [nm, concat(" and ", [inner_option_describe(leaf, item) | some leaf in group])])
 
 inner_option_describe(leaf, item) := nested_describe(leaf, item) if not quantified(leaf)
 
@@ -1786,7 +1785,7 @@ requirement_satisfied(doc, req) if {
 default all_satisfied(_, _) := false
 
 all_satisfied(doc, policy) if {
-	count(policy) > 0
+	size(policy) > 0
 	count([name |
 		some name, req in policy
 		not requirement_satisfied(doc, req)
