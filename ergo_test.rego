@@ -3532,3 +3532,53 @@ test_a_filter_with_a_misspelt_name_in_an_each_path_cannot_rule_subjects_out if {
 	}})
 	rep.requirements.s.satisfied == false
 }
+
+params_req(check) := {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}}
+
+params_rows(doc, check) := [[r.passed, r.cause, r.inputs] | some r in rows_for(ergo.report(doc, params_req(check)), "s", "c")]
+
+test_a_ref_to_params_reads_data_params if {
+	check := {"op": "equals", "path": ["name"], "value": {"ref": ["$$params", "artifact_name"]}}
+	params_rows({"items": [{"id": 1, "name": "app"}]}, check) == [[true, "satisfied", [{"name": "name", "value": "app"}]]] with data.params as {"artifact_name": "app"}
+	params_rows({"items": [{"id": 1, "name": "app"}]}, check) == [[false, "value", [{"name": "name", "value": "app"}]]] with data.params as {"artifact_name": "web"}
+	rep := ergo.report({"items": [{"id": 1, "name": "app"}]}, params_req(check)) with data.params as {"artifact_name": "web"}
+	rep.requirements.s.checks.c["$refs"] == [{"name": "$$params.artifact_name", "value": "web"}]
+	rep.requirements.s.checks.c.expression == "name == $$params.artifact_name"
+	ergo.violations(rep)[0].inputs == [{"name": "name", "value": "app"}, {"name": "$$params.artifact_name", "value": "web"}]
+}
+
+test_a_path_can_start_at_params if {
+	check := {"op": "in", "path": ["$$params", "level"], "values": ["strict", "lax"]}
+	params_rows({"items": [{"id": 1}]}, check) == [[true, "satisfied", [{"name": "$$params.level", "value": "strict"}]]] with data.params as {"level": "strict"}
+}
+
+test_params_that_are_missing_fail_closed if {
+	check := {"op": "excludes", "path": ["licences"], "value": {"ref": ["$$params", "banned"]}}
+	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "absent", [{"name": "licences", "value": ["MIT"]}]]]
+	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "absent", [{"name": "licences", "value": ["MIT"]}]]] with data.params as {}
+	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "absent", [{"name": "licences", "value": ["MIT"]}]]] with data.params as "not an object"
+	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "null", [{"name": "licences", "value": ["MIT"]}]]] with data.params as {"banned": null}
+}
+
+test_params_given_to_the_report_replace_data_params if {
+	check := {"op": "equals", "path": ["name"], "value": {"ref": ["$$params", "artifact_name"]}}
+	rep := ergo.report_with_params({"items": [{"id": 1, "name": "app"}]}, {"artifact_name": "app"}, params_req(check)) with data.params as {"artifact_name": "web"}
+	[r.passed | some r in rows_for(rep, "s", "c")] == [true]
+	rep.requirements.s.checks.c["$refs"] == [{"name": "$$params.artifact_name", "value": "app"}]
+}
+
+test_params_are_not_read_from_the_input if {
+	check := {"op": "equals", "path": ["name"], "value": {"ref": ["$$params", "artifact_name"]}}
+	params_rows({"items": [{"id": 1, "name": "app"}], "params": {"artifact_name": "app"}}, check) == [[false, "absent", [{"name": "name", "value": "app"}]]]
+}
+
+test_params_can_be_read_inside_named_and_nested_list_checks if {
+	check := {"op": "all", "path": ["xs"], "as": "x", "check": {"op": "any", "path": ["$x", "ys"], "check": {"op": "compare", "left": [], "right": ["$$params", "max"], "cmp": "lt"}}}
+	rep := ergo.report({"items": [{"id": 1, "xs": [{"ys": [1, 9]}, {"ys": [2]}]}]}, {"s": {"from": ["items", {"each_as": "it"}], "id": ["id"], "checks": {"c": check}}}) with data.params as {"max": 3}
+	[[r.passed, r.inputs] | some r in rows_for(rep, "s", "c")] == [[true, [{"name": "xs[].ys", "value": [[1, 9], [2]]}, {"name": "$$params.max", "value": 3}]]]
+}
+
+test_a_key_called_dollar_dollar_params_is_read_with_literal if {
+	check := {"op": "equals", "path": [{"literal": "$$params"}], "value": "own"}
+	params_rows({"items": [{"id": 1, "$$params": "own"}]}, check) == [[true, "satisfied", [{"name": "$$params", "value": "own"}]]] with data.params as {"$$params": "other"}
+}
