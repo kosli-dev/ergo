@@ -329,7 +329,13 @@ These read one or two fields of a subject.
 
 Some things worth knowing:
 
-- A check that's written wrong fails with cause `absent`, whatever the subject holds. That covers an `op` ergo doesn't know, a missing parameter, a `cmp` that isn't in the list above, `values` that isn't a list, a `min` or `max` that isn't a number, a `min` above `max`, `patterns` that isn't a list of valid regular expressions, an `each` that isn't a path, and `as` or `each` on an operator other than `all` or `any`. It holds for a value read with a [`ref`](#reading-from-the-input) too, so `"values": {"ref": ["$$params", "allowed"]}` fails when `allowed` is a string. An unknown `op` shows in the expression as `<unknown op nope>`, a missing one as `<missing op>`, a check that isn't an object as `<invalid check>`, and a check where it can't go, like a custom operator inside `all`, as `<even can't go here>`. The cause isn't `value`, so a filter written like this fails the requirement rather than ruling every subject out.
+- A check that's written wrong fails with cause `absent`, whatever the subject holds, so in `applies_to` it fails the requirement instead of ruling every subject out. Written wrong means:
+  - an `op` ergo doesn't know, or a missing parameter
+  - a `cmp` that isn't in the list above
+  - `values` that isn't a list, a `min` or `max` that isn't a number, a `min` above `max`, or `patterns` that isn't a list of valid regular expressions, even when it's read with a [`ref`](#reading-from-the-input)
+  - an `each` that isn't a path, or `as` or `each` on an operator other than `all` or `any`
+
+  The expression says what's wrong: `<unknown op nope>`, `<missing op>`, `<invalid check>` for a check that isn't an object, or `<even can't go here>` for a check where it can't go, like a custom operator inside `all`.
 - `equals` with `"value": null` only passes when the field is there and set to `null`. A missing field doesn't count.
 - `range` needs `min` and `max` to be numbers. A string like `"3"` fails the check, because Rego puts every number before every string, so `5 <= "3"` would be true.
 - `in` fails when the field is missing or `null`, even if `values` contains `null`. To check that a field is `null`, use `equals` with `"value": null`. `values` can be a list or, from Rego, a set. `in` also fails when `values` is empty, missing, or not a list or set. In those last two cases, the expression shows `id in <invalid values>` rather than a list.
