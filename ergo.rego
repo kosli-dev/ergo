@@ -64,7 +64,12 @@ valid_name(n) if {
 
 keys_well_formed(step) if not "keys" in object.keys(step)
 
-keys_well_formed(step) if is_array(step.keys)
+keys_well_formed(step) if {
+	is_array(step.keys)
+	every k in step.keys {
+		not malformed(k)
+	}
+}
 
 keys_well_formed(step) if is_ref(step.keys)
 

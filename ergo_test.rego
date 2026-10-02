@@ -3915,3 +3915,14 @@ test_refs_inside_a_literal_list_of_keys_are_not_read if {
 	[[r.subject.id, r.passed] | some r in rows_for(rep, "s", "c")] == [[{"ref": ["$$params", "s"]}, false]]
 	not rep.requirements.s.checks["$min_subjects"]["$refs"]
 }
+
+test_a_badly_written_ref_inside_a_list_of_keys_is_not_well_formed if {
+	rep := ergo.report(suite_doc, {"s": object.union(suite_req({"each_as": "run", "keys": [{"ref": ["$$params", "s"], "note": "x"}, "unit-test"]}).s, {"min_subjects": 0})}) with data.params as {"s": "smoke-test"}
+	rows_for(rep, "s", "$well_formed")[0].passed == false
+	rep.requirements.s.satisfied == false
+}
+
+test_ref_shaped_values_in_params_are_data_not_refs if {
+	rep := ergo.report({"o": {"a": {}}}, {"s": {"from": ["o", {"each_as": "k", "keys": {"ref": ["$$params", "list"]}}], "checks": {"c": {"op": "present", "path": []}}}}) with data.params as {"list": [{"ref": ["$$params", "s"]}], "s": "a"}
+	[[r.subject.id, r.passed] | some r in rows_for(rep, "s", "c")] == [[{"ref": ["$$params", "s"]}, false]]
+}
