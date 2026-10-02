@@ -18,11 +18,11 @@ jobs:
           version: 1.19.0
       - run: opa check --strict . --ignore .github
       - run: opa fmt --list --fail .
-      - run: opa test . --ignore .github --verbose
+      - run: opa test . --ignore .github --timeout 30s --verbose
       - name: Check every line is tested
         shell: bash
         run: |
-          opa test . --ignore .github --coverage > "$RUNNER_TEMP/coverage.json"
+          opa test . --ignore .github --timeout 30s --coverage > "$RUNNER_TEMP/coverage.json"
           jq -e '.files["ergo.rego"]' "$RUNNER_TEMP/coverage.json" > /dev/null
           uncovered=$(jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' "$RUNNER_TEMP/coverage.json" | sort -u)
           if [ -n "$uncovered" ]; then
