@@ -1253,7 +1253,7 @@ scoped_reads(check) := [read |
 
 leaf_reads(leaf, given) := [[p, given] | some p in leaf_paths(leaf)] if not quantified(leaf)
 
-leaf_reads(leaf, given) := array.concat([[p, given] | some p in array.concat([leaf.path], named_each(leaf))], [[p, given | names_of(leaf)] |
+leaf_reads(leaf, given) := array.concat([[p, given] | some p in array.concat([leaf.path], named_each(leaf))], [[p, (given | names_of(leaf))] |
 	some l in element_leaves(leaf.check)
 	some p in leaf_paths(l)
 ]) if quantified(leaf)
