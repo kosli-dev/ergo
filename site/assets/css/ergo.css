@@ -240,7 +240,7 @@ p code, li code, dd code, td code {
 .code .s { color: var(--paper); }
 .code .n { color: var(--muted); }
 .code .kw { color: var(--lime); }
-.code [data-note]::after {
+.code [data-note]::after, .annotated [data-note]::after {
   content: attr(data-note);
   display: inline-grid; place-items: center; width: 18px; height: 18px; margin-left: 6px; vertical-align: 1px;
   border-radius: 50%; background: var(--lime); color: var(--ink); font-size: 10px; font-weight: 500;
@@ -314,9 +314,6 @@ p code, li code, dd code, td code {
 .flow__card .mark { height: 26px; width: auto; }
 
 /* ——— Ops ——— */
-.ops { list-style: none; margin: 40px 0 32px; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
-.ops a { display: inline-block; padding: 9px 16px; border: 1px solid var(--line-2); border-radius: 9999px; font: 400 14px/1 var(--mono); text-decoration: none; }
-.ops a:hover { border-color: var(--lime); color: var(--lime); }
 
 /* ——— Steps ——— */
 .steps { list-style: none; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
@@ -413,18 +410,23 @@ p code, li code, dd code, td code {
 /* Story pages */
 .story { padding-top: 56px; padding-bottom: 96px; }
 .story .prose { max-width: none; }
-.story .prose > :not(.side):not(table):not(pre) { max-width: 780px; }
+.story .prose > :not(.side):not(.annotated):not(table):not(pre) { max-width: 780px; }
 .story .prose > table { width: auto; max-width: 100%; }
 .side { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin: 24px 0; }
 .side > div { min-width: 0; padding: 20px 22px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--ink-2); }
 .side > .side--ergo { border-color: rgba(214, 255, 77, .35); }
-.side .compare__label { margin: 0; }
+.side .compare__label { margin: 0; text-transform: none; letter-spacing: .02em; font-size: 13px; }
 .side--ergo .compare__label { color: var(--lime); }
 .side pre { margin: 14px 0; background: var(--ink) !important; }
 .side p { font-size: 16px; }
 .side table { font-size: 13px; }
 .side th, .side td { padding: 8px 10px; }
 .side > div > :last-child { margin-bottom: 0; }
+.annotated { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: clamp(28px, 4vw, 56px); align-items: center; margin: 24px 0; }
+.annotated pre { margin: 0; }
+.annotated .notes { padding-left: 0; }
+.code-label { margin-left: 8px; color: var(--faint); font-style: normal; user-select: none; }
+.annotated .notes li { margin: 0; }
 
 /* ——— Responsive ——— */
 @media (max-width: 1080px) {
@@ -436,7 +438,7 @@ p code, li code, dd code, td code {
   .flow > li:not(:last-child)::after { content: "↓"; right: auto; left: 50%; top: auto; bottom: -30px; transform: translateX(-50%); }
 }
 @media (max-width: 920px) {
-  .hero__grid, .split, .declare, .docs, .side { grid-template-columns: minmax(0, 1fr); }
+  .hero__grid, .split, .declare, .docs, .side, .annotated { grid-template-columns: minmax(0, 1fr); }
   .split--text-right .split__col, .split--text-right .compare { grid-column: auto; grid-row: auto; }
   .steps { grid-template-columns: minmax(0, 1fr); }
   .docs__side { position: static; max-height: none; overflow: visible; padding: 0; }

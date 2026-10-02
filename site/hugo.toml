@@ -40,3 +40,6 @@ disableKinds = ["taxonomy", "term", "rss"]
   [[module.mounts]]
     source = "../REFERENCE.md"
     target = "assets/repo/REFERENCE.md"
+  [[module.mounts]]
+    source = "../examples"
+    target = "assets/examples"

@@ -1,0 +1,6 @@
+{{- $path := .Get 0 -}}
+{{- with resources.Get (printf "examples/%s" $path) -}}
+{{ partial "marked-code.html" (dict "content" .Content "lang" ($.Get 1) "marks" (after 2 $.Params)) }}
+{{- else -}}
+{{ errorf "example file not found: examples/%s" $path }}
+{{- end -}}
