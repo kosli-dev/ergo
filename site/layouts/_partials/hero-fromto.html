@@ -15,7 +15,8 @@
   <div class="ft__views" aria-live="off">
 
     {{/* Example 1: production deploy approval (README) */}}
-    <div class="ft__view is-active" data-ex="deploy" data-step="0" data-file="policy/deploy.rego" data-hold="3600">
+    {{- if $c.fromto.show_rego }}
+    <div class="ft__view" data-ex="deploy" data-step="0" data-file="policy/deploy.rego" data-hold="6000">
       <p class="ft__label mono"><span class="ft__who">Rego</span> the policy</p>
 <pre class="code ft__code"><code><span class="kw">package</span> deploy
 
@@ -30,8 +31,10 @@ deny <span class="kw">contains</span> msg <span class="kw">if</span> {
 	msg := sprintf(<span class="s">"%s: no approval"</span>, [d.id])
 }</code></pre>
     </div>
+    {{- end }}
 
-    <div class="ft__view" data-ex="deploy" data-step="1" data-file="opa eval ... data.deploy" data-hold="3400">
+    {{- if $c.fromto.show_rego }}
+    <div class="ft__view" data-ex="deploy" data-step="1" data-file="opa eval ... data.deploy" data-hold="5800">
       <p class="ft__label mono"><span class="ft__who">Rego</span> the result</p>
 <pre class="code ft__code ft__code--out"><code>{
   <span class="k">"allow"</span>: <span class="f">false</span>,
@@ -39,8 +42,9 @@ deny <span class="kw">contains</span> msg <span class="kw">if</span> {
 }</code></pre>
       <p class="ft__caption">{{ partial "copy.html" (index $c.fromto.examples 0).rego_caption }}</p>
     </div>
+    {{- end }}
 
-    <div class="ft__view" data-ex="deploy" data-step="2" data-file="policy/requirements.yaml" data-hold="3800">
+    <div class="ft__view" data-ex="deploy" data-step="2" data-file="policy/requirements.yaml" data-hold="6500">
       <p class="ft__label mono"><span class="ft__who ft__who--ergo">ergo</span> the control</p>
 <pre class="code ft__code"><code><span class="k">requirements</span>:
   <span class="k">prod_deploy</span>:
@@ -59,7 +63,7 @@ deny <span class="kw">contains</span> msg <span class="kw">if</span> {
         <span class="k">path</span>: [<span class="s">approved_by</span>]</code></pre>
     </div>
 
-    <div class="ft__view" data-ex="deploy" data-step="3" data-file="opa eval ... data.deploy.report" data-hold="5600">
+    <div class="ft__view" data-ex="deploy" data-step="3" data-file="opa eval ... data.deploy.report" data-hold="8500">
       <p class="ft__label mono"><span class="ft__who ft__who--ergo">ergo</span> the report</p>
       <div class="report ft__report">
         <div class="report__head"><span>subject</span><span>check</span><span>value read</span><span>passed</span><span>cause</span></div>
@@ -75,7 +79,8 @@ deny <span class="kw">contains</span> msg <span class="kw">if</span> {
     </div>
 
     {{/* Example 2: four eyes, someone other than the author approved (REFERENCE, ergo_test.rego pr_doc) */}}
-    <div class="ft__view" data-ex="review" data-step="0" data-file="policy/review.rego" data-hold="4000">
+    {{- if $c.fromto.show_rego }}
+    <div class="ft__view" data-ex="review" data-step="0" data-file="policy/review.rego" data-hold="6400">
       <p class="ft__label mono"><span class="ft__who">Rego</span> the policy</p>
 <pre class="code ft__code"><code><span class="kw">package</span> review
 
@@ -94,8 +99,10 @@ peer_approved(pr) <span class="kw">if</span> {
 	a.username != pr.author
 }</code></pre>
     </div>
+    {{- end }}
 
-    <div class="ft__view" data-ex="review" data-step="1" data-file="opa eval ... data.review" data-hold="3800">
+    {{- if $c.fromto.show_rego }}
+    <div class="ft__view" data-ex="review" data-step="1" data-file="opa eval ... data.review" data-hold="6200">
       <p class="ft__label mono"><span class="ft__who">Rego</span> the result</p>
 <pre class="code ft__code ft__code--out"><code>{
   <span class="k">"allow"</span>: <span class="f">false</span>,
@@ -106,8 +113,9 @@ peer_approved(pr) <span class="kw">if</span> {
 }</code></pre>
       <p class="ft__caption">{{ partial "copy.html" (index $c.fromto.examples 1).rego_caption }}</p>
     </div>
+    {{- end }}
 
-    <div class="ft__view" data-ex="review" data-step="2" data-file="policy/requirements.yaml" data-hold="4000">
+    <div class="ft__view" data-ex="review" data-step="2" data-file="policy/requirements.yaml" data-hold="6500">
       <p class="ft__label mono"><span class="ft__who ft__who--ergo">ergo</span> the control</p>
 <pre class="code ft__code"><code><span class="k">requirements</span>:
   <span class="k">peer_reviewed</span>:
@@ -126,7 +134,7 @@ peer_approved(pr) <span class="kw">if</span> {
           <span class="k">cmp</span>: <span class="s">ne</span></code></pre>
     </div>
 
-    <div class="ft__view" data-ex="review" data-step="3" data-file="opa eval ... data.review.report" data-hold="5600">
+    <div class="ft__view" data-ex="review" data-step="3" data-file="opa eval ... data.review.report" data-hold="8500">
       <p class="ft__label mono"><span class="ft__who ft__who--ergo">ergo</span> the report</p>
       <div class="report ft__report">
         <div class="report__head"><span>subject</span><span>check</span><span>value read</span><span>passed</span><span>cause</span></div>
@@ -144,9 +152,11 @@ peer_approved(pr) <span class="kw">if</span> {
   <div class="term__foot ft__foot">
     <div class="ft__steps" role="group" aria-label="Steps">
       {{- range $i, $s := $c.fromto.steps }}
+      {{- if or $c.fromto.show_rego (ge $i 2) }}
       <button type="button" class="ft__step mono" data-step="{{ $i }}" aria-pressed="{{ cond (eq $i 0) "true" "false" }}">
         {{- if lt $i 2 }}<span class="ft__mark ft__mark--rego" aria-hidden="true"></span>{{ else }}<span class="ft__mark ft__mark--ergo" aria-hidden="true">{{ partial "therefore.html" . }}</span>{{ end -}}
         {{ $s }}</button>
+      {{- end }}
       {{- end }}
     </div>
   </div>

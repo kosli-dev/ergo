@@ -31,7 +31,7 @@
     } else {
       units.forEach(function (u) { u.classList.remove('is-resolved'); });
       units.forEach(function (u, k) {
-        ticks.push(setTimeout(function () { u.classList.add('is-resolved'); }, 120 + k * (u.classList.contains('report__row') ? 170 : 60)));
+        ticks.push(setTimeout(function () { u.classList.add('is-resolved'); }, 60 + k * (u.classList.contains('report__row') ? 80 : 28)));
       });
     }
     schedule();

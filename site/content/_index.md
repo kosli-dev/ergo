@@ -10,6 +10,8 @@ hero:
   fromto:
     label: The same control written in Rego and in ergo, and what each returns
     steps: [Rego policy, Rego result, ergo control, ergo report]
+    # Set to true to bring back the Rego policy and Rego result steps.
+    show_rego: false
     examples:
       - key: deploy
         label: Deploy approval
