@@ -64,7 +64,7 @@ Each row has the clause's wording, the check, what it read, the expression and t
 
 | clause                               | check      | inputs              | expression                                  | passed  |
 | ------------------------------------ | ---------- | ------------------- | ------------------------------------------- | ------- |
-| Must not contain nut allergens       | `nut_free` | `allergens = null`  | `not contains(allergens, nuts)`             | `false` |
+| Must not contain nut allergens       | `nut_free` | `allergens = null`  | `not contains(allergens, "nuts")`           | `false` |
 | Bake temperature 175–200°C inclusive | `temp_ok`  | `bake.temp_c = 180` | `bake.temp_c >= 175 and bake.temp_c <= 200` | `true`  |
 | Bake time 25–40 minutes inclusive    | `time_ok`  | `bake.minutes = 32` | `bake.minutes >= 25 and bake.minutes <= 40` | `true`  |
 

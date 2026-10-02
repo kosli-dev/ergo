@@ -436,7 +436,7 @@ projection_name(path, each) := sprintf("%s[].%s", [path_name(path), path_name(ea
 
 segment_name(_, p) := key_name(p) if not is_object(p)
 
-segment_name(i, p) := json.marshal(p.literal) if {
+segment_name(i, p) := json_string(p.literal) if {
 	is_literal(p)
 	first_dollar_key(i, p.literal)
 }
@@ -461,7 +461,7 @@ first_dollar_key(0, k) if startswith(k, "$")
 
 key_name(k) := k if plain_key(k)
 
-key_name(k) := json.marshal(k) if {
+key_name(k) := json_string(k) if {
 	is_string(k)
 	not plain_key(k)
 }
@@ -470,14 +470,25 @@ key_name(k) := sprintf("%v", [k]) if not is_string(k)
 
 plain_key(k) if regex.match(`^[A-Za-z_$][A-Za-z0-9_$-]*$`, k)
 
+json_string(s) := sprintf(`"%s"`, [strings.replace_n(json_escapes, s)])
+
+json_escapes := object.union(
+	{json.unmarshal(sprintf(`"\u%04x"`, [c])): sprintf(`\u%04x`, [c]) | some c in numbers.range(0, 31)},
+	{`\`: `\\`, `"`: `\"`, "\b": `\b`, "\f": `\f`, "\n": `\n`, "\r": `\r`, "\t": `\t`},
+)
+
 value_text(x) := ref_name(x.ref) if is_ref(x)
 
-value_text(x) := sprintf("%v", [written(x)]) if {
+value_text(x) := literal_text(written(x)) if {
 	not is_ref(x)
 	not malformed(x)
 }
 
 value_text(x) := "<invalid ref>" if malformed(x)
+
+literal_text(v) := json_string(v) if is_string(v)
+
+literal_text(v) := sprintf("%v", [v]) if not is_string(v)
 
 default leaf_passed(_, _) := false
 
@@ -1300,7 +1311,7 @@ leaf_describe(check, item) := sprintf("not contains(%s, %s)", [item_path_name(it
 
 leaf_describe(check, item) := sprintf("contains(%s, %s)", [item_path_name(item, check.path), value_text(check.value)]) if check.op == "includes"
 
-leaf_describe(check, item) := sprintf("%s in [%s]", [item_path_name(item, check.path), concat(", ", sort([sprintf("%v", [v]) | some v in written(check.values)]))]) if {
+leaf_describe(check, item) := sprintf("%s in [%s]", [item_path_name(item, check.path), concat(", ", sort([literal_text(v) | some v in written(check.values)]))]) if {
 	check.op == "in"
 	value_list(written(check.values))
 }
@@ -1332,7 +1343,7 @@ leaf_describe(check, item) := sprintf("%s matches one of %s", [item_path_name(it
 
 leaf_describe(check, item) := sprintf("%s matches none of %s", [item_path_name(item, check.path), pattern_list(check)]) if check.op == "not_matches_any"
 
-pattern_list(check) := sprintf("[%s]", [concat(", ", sort([sprintf("%v", [p]) | some p in written(check.patterns)]))]) if {
+pattern_list(check) := sprintf("[%s]", [concat(", ", sort([literal_text(p) | some p in written(check.patterns)]))]) if {
 	not is_ref(check.patterns)
 	not malformed(check.patterns)
 }
@@ -1638,12 +1649,12 @@ min_subjects_def(req) := {"$min_subjects": with_refs(
 
 well_formed_def(req) := {"$well_formed": {
 	"description": "the requirement declares at least one check and a recognised \"require\" value; lacking either, it asserts nothing that could ever be satisfied",
-	"expression": "count(checks) >= 1 and require in {every, some}",
+	"expression": `count(checks) >= 1 and require in ["every", "some"]`,
 }} if not stepped(req)
 
 well_formed_def(req) := {"$well_formed": {
 	"description": "the requirement declares at least one check, a recognised \"require\" value, and a from that ends with its only step, which gives a name that doesn't start with $ and, if it has keys, gives them as a list",
-	"expression": "count(checks) >= 1 and require in {every, some} and from is well formed",
+	"expression": `count(checks) >= 1 and require in ["every", "some"] and from is well formed`,
 }} if stepped(req)
 
 default well_formed(_) := false

@@ -152,7 +152,7 @@ Here are the rows for batch 001:
 
 | Policy clause (`description`)        | Predicate (`check`) | Inputs used (`inputs`)        | Evaluated expression (`expression`)         | Result (`passed`) |
 | ------------------------------------ | ------------------- | ----------------------------- | ------------------------------------------- | ----------------- |
-| Must not contain nut allergens       | `nut_free`          | `allergens = ["milk","eggs"]` | `not contains(allergens, nuts)`             | `true`            |
+| Must not contain nut allergens       | `nut_free`          | `allergens = ["milk","eggs"]` | `not contains(allergens, "nuts")`           | `true`            |
 | Bake temperature 175–200°C inclusive | `temp_ok`           | `bake.temp_c = 180`           | `bake.temp_c >= 175 and bake.temp_c <= 200` | `true`            |
 | Bake time 25–40 minutes inclusive    | `time_ok`           | `bake.minutes = 32`           | `bake.minutes >= 25 and bake.minutes <= 40` | `true`            |
 
@@ -167,7 +167,7 @@ opa eval -d ergo.rego -d examples/baking/ergo -i examples/baking/batches.json -f
   "cause": "absent",
   "check": "nut_free",
   "description": "Must not contain nut allergens",
-  "expression": "not contains(allergens, nuts)",
+  "expression": "not contains(allergens, \"nuts\")",
   "inputs": [
     {
       "name": "allergens",

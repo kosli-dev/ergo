@@ -96,7 +96,7 @@ An empty path, `[]`, reads the item itself. Use it inside `all` or `any` when th
 }
 ```
 
-ergo names the item after its list, so this renders as `every branches: branches[] matches one of [^main$, ^release/]`, and the row's input is `branches[]`. An empty `each` works the same way, for a list of lists.
+ergo names the item after its list, so this renders as `every branches: branches[] matches one of ["^main$", "^release/"]`, and the row's input is `branches[]`. An empty `each` works the same way, for a list of lists.
 
 An empty path also reads a subject that isn't an object, like each string of `"from": ["branches"]`. There, the item is named after `from` (`branches[]`), or `input` when there's no `from`. Any other path on such a subject fails with cause `not_an_object`.
 
@@ -193,7 +193,7 @@ A ref can also be one step of a path. It's replaced by the value it reads, which
 }},
 ```
 
-With `artifact_name` set to `app` and `attestation_name` to `pull-request`, this reads `trail.artifacts.app.attestations.pull-request.status`. The expression shows where the key came from: `attestations.[$$params.attestation_name].status == COMPLETE`, and the value used is recorded under `$refs`, like any ref.
+With `artifact_name` set to `app` and `attestation_name` to `pull-request`, this reads `trail.artifacts.app.attestations.pull-request.status`. The expression shows where the key came from: `attestations.[$$params.attestation_name].status == "COMPLETE"`, and the value used is recorded under `$refs`, like any ref.
 
 A ref step works anywhere in any path: first, in the middle or last, after a name or `$$input`, before a selector, and in `from`, `id`, `each`, `left` and `right`.
 
@@ -243,7 +243,7 @@ Each key is a subject. A key the object doesn't have is still a subject, so its 
     "subject": { "type": "test run", "id": "integration-test" },
     "check": "passed",
     "description": "The tests passed",
-    "expression": "result == passed",
+    "expression": "result == \"passed\"",
     "inputs": [{ "name": "result", "value": "failed" }],
     "cause": "value"
   },
@@ -252,7 +252,7 @@ Each key is a subject. A key the object doesn't have is still a subject, so its 
     "subject": { "type": "test run", "id": "system-test" },
     "check": "passed",
     "description": "The tests passed",
-    "expression": "result == passed",
+    "expression": "result == \"passed\"",
     "inputs": [{ "name": "result", "value": null }],
     "cause": "absent"
   }
@@ -454,7 +454,7 @@ To require several things of the same approver, put them in one [`any_of`](#any_
 ]}},
 ```
 
-It renders as `some approvers as $approver: one of: peer(state == APPROVED and username ne $pr.author and every $pr.commits: $approver.timestamp gt timestamp)`.
+It renders as `some approvers as $approver: one of: peer(state == "APPROVED" and username ne $pr.author and every $pr.commits: $approver.timestamp gt timestamp)`.
 
 Some things worth knowing:
 
@@ -483,7 +483,7 @@ Some things worth knowing:
 
 This is the only way to say that two fields must agree with each other. Two separate checks, "type is Story or Chore" and "state is Done", would also accept a Chore that isn't Done. With `any_of` it must be a Done Story, or a Chore.
 
-- Name your options. The names show up in the rendered expression: `one of: safe(type == Chore) | standard(type == Story and state == Done)`. A list of options works too, and they're shown by position.
+- Name your options. The names show up in the rendered expression: `one of: safe(type == "Chore") | standard(type == "Story" and state == "Done")`. A list of options works too, and they're shown by position.
 - Options can hold basic checks and `all` or `any`, but not another `any_of`, because Rego doesn't allow recursion. An `all` or `any` in an option counts as being where the `any_of` is, so it can nest as deep as it could there (see [Nesting](#nesting)).
 - An empty `options` fails with cause `absent`, and so does an empty option, an option written as an object instead of a list, or an `any_of` inside an option.
 - The row shows every field any option read, sorted by name. A field read by more than one option shows once. For an `all` or `any` in an option, that's its list and any names it reads.
@@ -598,7 +598,7 @@ Two rules:
   "checks": {
     "$applies": {
       "description": "subject is in scope as a deployment under this requirement's applies_to filter; out-of-scope subjects are recorded but not evaluated, and a subject whose filter can't be read fails",
-      "expression": "environment == prod"
+      "expression": "environment == \"prod\""
     },
     "$min_subjects": {
       "description": "at least 1 matching deployment subject(s) required",
@@ -606,7 +606,7 @@ Two rules:
     },
     "$well_formed": {
       "description": "the requirement declares at least one check and a recognised \"require\" value; lacking either, it asserts nothing that could ever be satisfied",
-      "expression": "count(checks) >= 1 and require in {every, some}"
+      "expression": "count(checks) >= 1 and require in [\"every\", \"some\"]"
     },
     "approved": {
       "description": "Someone approved the deployment",
@@ -622,6 +622,8 @@ Two rules:
 ```
 
 `subjects.total` counts every subject found at `from`, and `subjects.matching` counts the ones left after `applies_to`. `checks` holds each check as you wrote it, plus the `expression` ergo rendered from it. If you write your own `expression`, yours is used. A check that uses a [`ref`](#reading-from-the-input) also gets `$refs`: the name and value of each one, as read for this report. The `$` marks it as ergo's, so it can't be mixed up with a field of your own. It also holds the [checks ergo adds](#checks-ergo-adds), each with a `description` and an `expression`.
+
+In an expression, a string written in the policy is shown as a JSON string, so it is always in quotes: `state == "MERGED"`, `n == "1"` and `x == ""` compare against strings, and `n == 1`, `ok == true` and `x == null` don't. A ref is shown without quotes, as `$$params.x`, so it can't be mistaken for the string `"$$params.x"`. Strings are escaped as in standard JSON: `"` becomes `\"`, `\` becomes `\\`, and control characters become `\n`, `\t` or `\u0001` and so on. Nothing else is escaped, so `"a<b"` stays as it is. Keys in paths are only quoted when needed, as described in [Paths](#paths), and quoting uses the same escapes.
 
 `results` has one row for each subject and check:
 
