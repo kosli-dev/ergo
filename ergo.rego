@@ -73,7 +73,11 @@ keys_well_formed(step) if {
 	is_array(step.keys.literal)
 }
 
-listed_keys(step) := step.keys if is_array(step.keys)
+listed_keys(step) := ks if {
+	is_array(step.keys)
+	ks := [step_key(k) | some k in step.keys]
+	count(ks) == count(step.keys)
+}
 
 listed_keys(step) := step.keys.literal if {
 	is_literal(step.keys)
@@ -111,6 +115,12 @@ from_unreadable(req) if {
 	not listed_keys(step)
 }
 
+from_unreadable(req) if {
+	step := each_step(req)
+	is_array(step.keys)
+	not listed_keys(step)
+}
+
 from_cause(req) := worst_of(unread) if {
 	unread := from_ref_states(req) - {"value"}
 	count(unread) > 0
@@ -118,7 +128,11 @@ from_cause(req) := worst_of(unread) if {
 
 from_cause(req) := "absent" if from_ref_states(req) - {"value"} == set()
 
-from_ref_states(req) := {ref_state(seg.ref) | some seg in from_path(req); is_ref(seg)} | {ref_state(each_step(req).keys.ref) | is_ref(each_step(req).keys)}
+from_ref_states(req) := {ref_state(seg.ref) | some seg in from_path(req); is_ref(seg)} | {ref_state(r) | some r in keys_refs(each_step(req))}
+
+keys_refs(step) := {step.keys.ref} if is_ref(step.keys)
+
+keys_refs(step) := {k.ref | some k in step.keys; is_ref(k)} if is_array(step.keys)
 
 listed_subjects(doc, req) := coll if {
 	coll := target(doc, req)

@@ -3888,3 +3888,30 @@ test_keys_from_a_ref_to_a_name_fail_as_an_invalid_ref if {
 	rows_for(rep, "s", "$min_subjects")[0].cause == "absent"
 	rep.requirements.s.checks["$min_subjects"]["$refs"] == [{"name": "<invalid ref>", "value": null}]
 }
+
+test_a_ref_inside_a_list_of_keys_is_read if {
+	rep := ergo.report(suite_doc, suite_req({"each_as": "run", "keys": [{"ref": ["$$params", "extra"]}, "unit-test"]})) with data.params as {"extra": "smoke-test"}
+	[[r.subject.id, r.passed] | some r in rows_for(rep, "s", "c")] == [["smoke-test", false], ["unit-test", true]]
+	rep.requirements.s.checks["$min_subjects"]["$refs"] == [{"name": "$$params.extra", "value": "smoke-test"}]
+}
+
+test_a_ref_inside_a_list_of_keys_that_cannot_be_read_fails_the_requirement_rather_than_dropping_the_key if {
+	req := {"s": object.union(suite_req({"each_as": "run", "keys": [{"ref": ["$$params", "extra"]}, "unit-test"]}).s, {"min_subjects": 0})}
+	every params in [{}, {"extra": null}, {"extra": ["smoke-test"]}] {
+		rep := ergo.report(suite_doc, req) with data.params as params
+		rep.requirements.s.satisfied == false
+		rep.requirements.s.subjects == {"total": 0, "matching": 0}
+	}
+	rows_for(ergo.report(suite_doc, req), "s", "$min_subjects")[0].cause == "null" with data.params as {"extra": null}
+}
+
+test_a_literal_inside_a_list_of_keys_is_read_as_written if {
+	rep := ergo.report({"o": {"$x": {"result": "passed"}}}, {"s": {"from": ["o", {"each_as": "k", "keys": [{"literal": "$x"}]}], "checks": {"c": {"op": "equals", "path": ["result"], "value": "passed"}}}})
+	[[r.subject.id, r.passed] | some r in rows_for(rep, "s", "c")] == [["$x", true]]
+}
+
+test_refs_inside_a_literal_list_of_keys_are_not_read if {
+	rep := ergo.report({"o": {"a": {}}}, {"s": {"from": ["o", {"each_as": "k", "keys": {"literal": [{"ref": ["$$params", "s"]}]}}], "checks": {"c": {"op": "present", "path": []}}}}) with data.params as {"s": "a"}
+	[[r.subject.id, r.passed] | some r in rows_for(rep, "s", "c")] == [[{"ref": ["$$params", "s"]}, false]]
+	not rep.requirements.s.checks["$min_subjects"]["$refs"]
+}
