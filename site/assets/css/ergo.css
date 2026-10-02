@@ -142,8 +142,8 @@ p code, li code, dd code, td code {
 .term__bar code { margin-left: 10px; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .report { padding: 10px 0; font: 400 12.5px/1.5 var(--mono); overflow-x: auto; }
 .report__head, .report__row {
-  display: grid; grid-template-columns: 44px 112px minmax(170px, 1fr) 52px 76px; gap: 12px;
-  padding: 7px 18px; min-width: 520px;
+  display: grid; grid-template-columns: 62px 112px minmax(170px, 1fr) 52px 76px; gap: 12px;
+  padding: 7px 18px; min-width: 538px;
 }
 .report__head { color: var(--faint); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
 .report__row { border-top: 1px dashed var(--line); }
