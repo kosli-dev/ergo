@@ -3582,3 +3582,232 @@ test_a_key_called_dollar_dollar_params_is_read_with_literal if {
 	check := {"op": "equals", "path": [{"literal": "$$params"}], "value": "own"}
 	params_rows({"items": [{"id": 1, "$$params": "own"}]}, check) == [[true, "satisfied", [{"name": "$$params", "value": "own"}]]] with data.params as {"$$params": "other"}
 }
+
+trail_doc := {"trail": {"artifacts": {"app": {
+	"fingerprint": "abc",
+	"attestations": {"pull-request": {"status": "COMPLETE"}, "junit": {"status": "FAILED"}},
+	"tags": ["v1", "v2"],
+}}}}
+
+trail_req(check) := {"s": {
+	"from": ["trail", "artifacts", {"ref": ["$$params", "artifact"]}],
+	"id": ["fingerprint"],
+	"checks": {"c": check},
+}}
+
+trail_rows(check) := [[r.passed, r.cause, r.inputs] | some r in rows_for(ergo.report(trail_doc, trail_req(check)), "s", "c")]
+
+attested := {"op": "equals", "path": ["attestations", {"ref": ["$$params", "att"]}, "status"], "value": "COMPLETE"}
+
+test_a_ref_step_in_a_path_reads_the_key_it_names if {
+	trail_rows(attested) == [[true, "satisfied", [{"name": "attestations.[$$params.att].status", "value": "COMPLETE"}]]] with data.params as {"artifact": "app", "att": "pull-request"}
+	trail_rows(attested) == [[false, "value", [{"name": "attestations.[$$params.att].status", "value": "FAILED"}]]] with data.params as {"artifact": "app", "att": "junit"}
+}
+
+test_a_ref_step_renders_and_is_recorded_like_any_ref if {
+	rep := ergo.report(trail_doc, trail_req(attested)) with data.params as {"artifact": "app", "att": "junit"}
+	rep.requirements.s.checks.c.expression == "attestations.[$$params.att].status == COMPLETE"
+	rep.requirements.s.checks.c["$refs"] == [{"name": "$$params.att", "value": "junit"}]
+	ergo.violations(rep)[0].inputs == [{"name": "attestations.[$$params.att].status", "value": "FAILED"}, {"name": "$$params.att", "value": "junit"}]
+}
+
+test_a_ref_step_can_be_first_or_last if {
+	last := {"op": "present", "path": ["attestations", {"ref": ["$$params", "att"]}]}
+	trail_rows(last) == [[true, "satisfied", [{"name": "attestations.[$$params.att]", "value": {"status": "COMPLETE"}}]]] with data.params as {"artifact": "app", "att": "pull-request"}
+	first := {"op": "non_empty_string", "path": [{"ref": ["$$params", "field"]}]}
+	trail_rows(first) == [[true, "satisfied", [{"name": "[$$params.field]", "value": "abc"}]]] with data.params as {"artifact": "app", "field": "fingerprint"}
+}
+
+test_a_ref_step_can_be_a_list_index if {
+	check := {"op": "equals", "path": ["tags", {"ref": ["$$params", "i"]}], "value": "v2"}
+	[r[0] | some r in trail_rows(check)] == [true] with data.params as {"artifact": "app", "i": 1}
+}
+
+test_a_ref_step_that_cannot_be_read_fails_the_check if {
+	trail_rows(attested) == [[false, "absent", [{"name": "attestations.[$$params.att].status", "value": null}]]] with data.params as {"artifact": "app"}
+	trail_rows(attested) == [[false, "null", [{"name": "attestations.[$$params.att].status", "value": null}]]] with data.params as {"artifact": "app", "att": null}
+	every bad in [["pull-request"], {"k": "pull-request"}, true] {
+		trail_rows(attested) == [[false, "absent", [{"name": "attestations.[$$params.att].status", "value": null}]]] with data.params as {"artifact": "app", "att": bad}
+	}
+}
+
+test_a_ref_step_with_another_key_fails_the_check if {
+	check := {"op": "present", "path": ["attestations", {"ref": ["$$params", "att"], "note": "x"}]}
+	trail_rows(check) == [[false, "absent", [{"name": "attestations.[<invalid ref>]", "value": null}]]] with data.params as {"artifact": "app", "att": "junit"}
+}
+
+test_a_ref_inside_a_ref_path_is_not_followed if {
+	check := {"op": "equals", "path": ["fingerprint"], "value": {"ref": ["$$params", {"ref": ["$$params", "which"]}]}}
+	[array.slice(r, 0, 2) | some r in trail_rows(check)] == [[false, "absent"]] with data.params as {"artifact": "app", "which": "fp", "fp": "abc"}
+}
+
+test_a_ref_step_works_in_left_right_each_and_id if {
+	rep := ergo.report({"items": [{"key": "k1", "a": 1, "b": 2, "xs": [{"ys": [1]}]}]}, {"s": {
+		"from": ["items"],
+		"id": [{"ref": ["$$params", "id"]}],
+		"checks": {
+			"two_sided": {"op": "compare", "left": [{"ref": ["$$params", "l"]}], "right": [{"ref": ["$$params", "r"]}], "cmp": "lt"},
+			"each": {"op": "all", "path": ["xs"], "each": [{"ref": ["$$params", "inner"]}], "check": {"op": "equals", "path": [], "value": 1}},
+		},
+	}}) with data.params as {"id": "key", "l": "a", "r": "b", "inner": "ys"}
+	[[r.check, r.subject.id, r.passed] | some r in rep.results; not startswith(r.check, "$")] == [["each", "k1", true], ["two_sided", "k1", true]]
+}
+
+test_a_ref_step_can_follow_a_name_and_come_before_a_selector if {
+	rep := ergo.report({"prs": [{"n": 1, "atts": {"list": [{"type": "a", "ok": true}]}}]}, {"s": {
+		"from": ["prs", {"each_as": "pr"}],
+		"id": ["n"],
+		"checks": {"c": {"op": "equals", "path": ["$pr", {"ref": ["$$params", "k"]}, {"where": {"type": "a"}}, "ok"], "value": true}},
+	}}) with data.params as {"k": "atts"}
+	[r.passed | some r in rows_for(rep, "s", "c")] == [false]
+	rep2 := ergo.report({"prs": [{"n": 1, "atts": [{"type": "a", "ok": true}]}]}, {"s": {
+		"from": ["prs", {"each_as": "pr"}],
+		"id": ["n"],
+		"checks": {"c": {"op": "equals", "path": ["$pr", {"ref": ["$$params", "k"]}, {"where": {"type": "a"}}, "ok"], "value": true}},
+	}}) with data.params as {"k": "atts"}
+	[r.passed | some r in rows_for(rep2, "s", "c")] == [true]
+}
+
+test_a_ref_step_in_from_finds_the_subjects if {
+	rep := ergo.report(trail_doc, trail_req({"op": "present", "path": ["fingerprint"]})) with data.params as {"artifact": "app"}
+	rep.requirements.s.subjects == {"total": 1, "matching": 1}
+	rep.requirements.s.checks["$min_subjects"].expression == "count(matching(trail.artifacts.[$$params.artifact])) >= 1"
+	rep.requirements.s.checks["$min_subjects"]["$refs"] == [{"name": "$$params.artifact", "value": "app"}]
+	rep.requirements.s.satisfied == true
+}
+
+test_a_ref_step_in_from_that_cannot_be_read_fails_the_requirement_even_with_min_subjects_zero if {
+	req := {"s": object.union(trail_req({"op": "present", "path": ["fingerprint"]}).s, {"min_subjects": 0})}
+	every params in [{}, {"artifact": null}, {"artifact": ["app"]}] {
+		rep := ergo.report(trail_doc, req) with data.params as params
+		rep.requirements.s.satisfied == false
+		rows_for(rep, "s", "$min_subjects")[0].passed == false
+	}
+	rows_for(ergo.report(trail_doc, req), "s", "$min_subjects")[0].cause == "absent" with data.params as {}
+	rows_for(ergo.report(trail_doc, req), "s", "$min_subjects")[0].cause == "null" with data.params as {"artifact": null}
+	rows_for(ergo.report(trail_doc, req), "s", "$min_subjects")[0].cause == "absent" with data.params as {"artifact": ["app"]}
+}
+
+test_a_ref_step_in_from_that_cannot_be_read_shows_up_in_violations if {
+	vs := ergo.violations(ergo.report(trail_doc, trail_req({"op": "present", "path": ["fingerprint"]}))) with data.params as {}
+	[[v.check, v.cause, v.inputs] | some v in vs] == [["$min_subjects", "absent", [{"name": "count(matching(trail.artifacts.[$$params.artifact]))", "value": 0}, {"name": "$$params.artifact", "value": null}]]]
+}
+
+test_a_ref_step_at_the_end_of_from_is_not_a_naming_step if {
+	rep := ergo.report(trail_doc, trail_req({"op": "present", "path": ["fingerprint"]})) with data.params as {"artifact": "app"}
+	count(rows_for(rep, "s", "$well_formed")[0].inputs) == 2
+}
+
+test_a_ref_step_in_from_works_with_a_naming_step if {
+	rep := ergo.report(trail_doc, {"s": {
+		"from": ["trail", "artifacts", {"ref": ["$$params", "artifact"]}, "attestations", {"each_as": "att", "keys": ["junit", "pull-request", "system-test"]}],
+		"checks": {"c": {"op": "equals", "path": ["$att", "status"], "value": "COMPLETE"}},
+	}}) with data.params as {"artifact": "app"}
+	[[r.subject.id, r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [["junit", false, "value"], ["pull-request", true, "satisfied"], ["system-test", false, "absent"]]
+	rows_for(rep, "s", "$well_formed")[0].passed == true
+}
+
+test_a_badly_written_ref_step_in_from_is_not_well_formed if {
+	rep := ergo.report(trail_doc, {"s": {
+		"from": ["trail", "artifacts", {"ref": ["$$params", "artifact"], "note": "x"}],
+		"min_subjects": 0,
+		"checks": {"c": {"op": "present", "path": ["fingerprint"]}},
+	}}) with data.params as {"artifact": "app"}
+	rows_for(rep, "s", "$well_formed")[0].passed == false
+	rep.requirements.s.satisfied == false
+}
+
+test_a_present_filter_with_a_ref_step_that_cannot_be_read_cannot_rule_subjects_out if {
+	rep := ergo.report(trail_doc, {"s": {
+		"from": ["trail", "artifacts", "app"],
+		"min_subjects": 0,
+		"applies_to": {"f": {"op": "present", "path": ["attestations", {"ref": ["$$params", "att"]}]}},
+		"checks": {"c": {"op": "equals", "path": ["fingerprint"], "value": "nope"}},
+	}})
+	rep.requirements.s.satisfied == false
+	rows_for(rep, "s", "$applies")[0].cause == "absent"
+}
+
+test_a_present_filter_with_a_ref_step_still_rules_out_a_missing_field if {
+	rep := ergo.report(trail_doc, {"s": {
+		"from": ["trail", "artifacts", "app"],
+		"min_subjects": 0,
+		"applies_to": {"f": {"op": "present", "path": ["attestations", {"ref": ["$$params", "att"]}]}},
+		"checks": {"c": {"op": "equals", "path": ["fingerprint"], "value": "nope"}},
+	}}) with data.params as {"att": "sbom"}
+	rep.requirements.s.satisfied == true
+	rows_for(rep, "s", "$applies")[0].cause == "value"
+}
+
+test_a_from_written_as_a_string_reads_that_one_key if {
+	rep := ergo.report({"items": [{"id": 1}, {"id": 2}]}, {"s": {"from": "items", "id": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}}})
+	rep.requirements.s.subjects == {"total": 2, "matching": 2}
+}
+
+test_a_literal_in_a_ref_path_is_read_as_written if {
+	check := {"op": "equals", "path": ["name"], "value": {"ref": ["$$params", {"literal": "$$odd"}]}}
+	params_rows({"items": [{"id": 1, "name": "x"}]}, check) == [[true, "satisfied", [{"name": "name", "value": "x"}]]] with data.params as {"$$odd": "x"}
+}
+
+test_a_present_filter_with_a_path_written_as_an_object_cannot_rule_subjects_out if {
+	rep := ergo.report({"items": [{"id": 1}]}, {"s": {
+		"from": ["items"],
+		"id": ["id"],
+		"min_subjects": 0,
+		"applies_to": {"f": {"op": "present", "path": {"a": 1}}},
+		"checks": {"c": {"op": "equals", "path": ["id"], "value": 0}},
+	}})
+	rep.requirements.s.satisfied == false
+}
+
+test_a_ref_step_after_a_name_that_cannot_be_read_is_not_skipped if {
+	rep := ergo.report({"prs": [{"n": 1, "x": "here"}]}, {"s": {
+		"from": ["prs", {"each_as": "pr"}],
+		"id": ["n"],
+		"checks": {"c": {"op": "present", "path": ["$pr", {"ref": ["$$params", "k"]}, "x"]}},
+	}})
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "absent"]]
+}
+
+test_a_step_with_a_ref_and_a_where_is_a_mistake_not_a_selector if {
+	check := {"op": "present", "path": ["atts", {"where": {"type": "a"}, "ref": ["$$params", "k"]}, "ok"]}
+	r := row_in({}, {"id": 1, "atts": [{"type": "a", "ok": true}]}, check)
+	[r.passed, r.cause] == [false, "absent"]
+}
+
+test_a_ref_step_of_the_wrong_type_inside_a_list_check_fails_as_absent if {
+	inner := {"op": "all", "path": ["xs"], "check": {"op": "present", "path": [{"ref": ["$$params", "k"]}]}}
+	option := {"op": "all", "path": ["xs"], "check": {"op": "any_of", "options": {"o": [{"op": "equals", "path": [{"ref": ["$$params", "k"]}], "value": 1}]}}}
+	each := {"op": "all", "path": ["xs"], "each": [{"ref": ["$$params", "k"]}], "check": {"op": "present", "path": []}}
+	two_sided := {"op": "any", "path": ["xs"], "check": {"op": "compare", "left": [{"ref": ["$$params", "k"]}], "right": ["$$params", "lim"], "cmp": "lt"}}
+	every check in [inner, option, each, two_sided] {
+		every k in [["v"], {"a": 1}, true] {
+			r := row_in({}, {"id": 1, "xs": [{"v": 1}]}, check) with data.params as {"k": k, "lim": 5}
+			[r.passed, r.cause] == [false, "absent"]
+		}
+	}
+}
+
+test_a_ref_step_of_the_wrong_type_shows_its_value_in_refs if {
+	check := {"op": "all", "path": ["xs"], "check": {"op": "present", "path": [{"ref": ["$$params", "k"]}]}}
+	refs_in({}, {"id": 1, "xs": [{"v": 1}]}, check) == [{"name": "$$params.k", "value": ["v"]}] with data.params as {"k": ["v"]}
+}
+
+test_a_filter_with_a_ref_step_of_the_wrong_type_inside_a_list_check_cannot_rule_subjects_out if {
+	rep := ergo.report({"items": [{"id": 1, "xs": [{"v": 1}]}]}, {"s": {
+		"from": ["items"],
+		"id": ["id"],
+		"min_subjects": 0,
+		"applies_to": {"f": {"op": "all", "path": ["xs"], "check": {"op": "present", "path": [{"ref": ["$$params", "k"]}]}}},
+		"checks": {"c": {"op": "equals", "path": ["id"], "value": 0}},
+	}}) with data.params as {"k": ["v"]}
+	rep.requirements.s.satisfied == false
+}
+
+test_a_ref_used_as_a_value_may_be_any_type if {
+	check := {"op": "equals", "path": ["tags"], "value": {"ref": ["$$params", "k"]}}
+	r := row_in({}, {"id": 1, "tags": ["v"]}, check) with data.params as {"k": ["v"]}
+	[r.passed, r.cause] == [true, "satisfied"]
+	f := row_in({}, {"id": 1, "tags": ["w"]}, check) with data.params as {"k": ["v"]}
+	[f.passed, f.cause] == [false, "value"]
+}

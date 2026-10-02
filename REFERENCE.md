@@ -122,7 +122,7 @@ A path normally starts inside the subject. Two first steps start somewhere else:
 
 Every subject reads the same value. These only mean this as the first step of a path, and any other first step starting with `$$` is reserved: it fails the check with cause `absent`. To read a key that really is called `$$input` or `$$params`, write it as `{"literal": "$$input"}`.
 
-A check's fixed values can be read this way too. Write `{"ref": path}` in place of the value, where the path starts with `$$params` or `$$input`. This works for `value`, `values`, `patterns`, `min`, `max` and the values in a selector's `where`. It's how a policy takes params:
+A check's fixed values can be read this way too. Write `{"ref": path}` in place of the value, where the path starts with `$$params` or `$$input`. This works for `value`, `values`, `patterns`, `min`, `max` and the values in a selector's `where`, and as a step of a path (see [Ref steps](#ref-steps)). It's how a policy takes params:
 
 ```rego
 ergo.report({"packages": packages}, {"licences": {
@@ -173,10 +173,33 @@ A policy that calls `ergo.report` can't itself be in a package called `params` (
 Some things worth knowing:
 
 - A ref that leads nowhere, or to `null`, fails the check, with cause `absent` or `null`. That cause wins over anything the subject's own fields would give, because the check can't mean anything without the value. ergo has no defaults, so put the value in the params.
-- A ref must be a list that starts with `$$params` or `$$input`, and it can't contain a selector. Anything else fails the check with cause `absent`, and the expression and `inputs` show `<invalid ref>`.
+- A ref must be a list that starts with `$$params` or `$$input`, and it can't contain a selector or another ref. Anything else fails the check with cause `absent`, and the expression and `inputs` show `<invalid ref>`.
 - An object with a `ref` or `literal` key and any other key is a mistake, not a value, so it fails the check the same way. Otherwise a typo like `{"ref": [...], "note": "..."}` would be compared as an object, and `excludes` would pass.
 - A value that is an object with a single `ref` or `literal` key would be read as one. Wrap it in `{"literal": ...}` to take it as written. Nothing inside a `literal` is read, so `{"literal": {"literal": 1}}` is the object `{"literal": 1}`.
-- `from` already starts at the top of the input, so it doesn't take `$$input` or `$$params`. `"from": ["$$input", "packages"]` looks for a key called `$$input`, finds no subjects, and fails `$min_subjects`.
+- `from` already starts at the top of the input, so it doesn't take `$$input` or `$$params`. `"from": ["$$input", "packages"]` looks for a key called `$$input`, finds no subjects, and fails `$min_subjects`. A [ref step](#ref-steps) works in `from`, though.
+
+### Ref steps
+
+A ref can also be one step of a path. It's replaced by the value it reads, which becomes the key for that step. This is how a key can come from the params:
+
+```rego
+"from": ["trail", "artifacts", {"ref": ["$$params", "artifact_name"]}],
+"checks": {"attested": {
+	"op": "equals",
+	"path": ["attestations", {"ref": ["$$params", "attestation_name"]}, "status"],
+	"value": "COMPLETE",
+}},
+```
+
+With `artifact_name` set to `app` and `attestation_name` to `pull-request`, this reads `trail.artifacts.app.attestations.pull-request.status`. The expression shows where the key came from: `attestations.[$$params.attestation_name].status == COMPLETE`, and the value used is recorded under `$refs`, like any ref.
+
+A ref step works anywhere in any path: first, in the middle or last, after a name or `$$input`, before a selector, and in `from`, `id`, `each`, `left` and `right`.
+
+- The value must be a string, or a number to pick an item of a list. A ref that leads nowhere, to `null`, or to anything else, like a list, means the path can't be followed, so the check fails with cause `absent` or `null`.
+- In `from`, a ref step that can't be read fails `$min_subjects`, even with `min_subjects: 0`, because ergo can't tell where the subjects would be. The `$min_subjects` row takes the ref's cause, and its definition records the ref under `$refs`, so the violation shows which param was missing.
+- A `present` filter whose path has a ref step that can't be read doesn't rule subjects out. It fails the requirement, because the field it looked for is unknown, not missing.
+- A ref step written with another key, like `{"ref": [...], "where": {...}}`, is a mistake, not a selector. It fails the check and shows as `[<invalid ref>]`. In `from`, it fails `$well_formed`.
+- A ref's own path is read as written, so a ref inside a ref isn't followed.
 - Some tools treat `$$` as an escape for `$`, like docker-compose and Make. A policy that passes through one of them reaches ergo as `$input`, which is read as a [name](#naming-subjects). No subject is called `input`, so the check fails with cause `absent`.
 
 ## Naming subjects
