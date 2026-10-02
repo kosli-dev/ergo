@@ -1616,19 +1616,19 @@ test_declared_expression_wins_over_the_rendered_one if {
 	rendered({}, check) == "state is MERGED"
 }
 
-test_an_expression_that_is_false_is_rendered_over if {
-	check := object.union(is_merged, {"expression": false})
-	rendered({}, check) == `state == "MERGED"`
-}
-
-test_an_expression_that_is_not_a_string_is_rendered_over if {
-	every e in [5, null, true, ["x"], {"a": 1}] {
+test_an_expression_that_is_not_a_string_is_ignored if {
+	every e in [false, true, 5, null, ["x"], {"a": 1}] {
 		rendered({}, object.union(is_merged, {"expression": e})) == `state == "MERGED"`
 	}
 }
 
 test_an_expression_that_is_false_still_gives_a_report if {
 	solo({"state": "MERGED"}, object.union(is_merged, {"expression": false})).compliant == true
+}
+
+test_a_substitute_whose_expression_is_false_is_rendered_as_usual if {
+	check := {"op": "present", "path": ["fingerprint"], "substitute": object.union(is_merged, {"expression": false})}
+	rendered({}, check) == `fingerprint is present, or substitute: state == "MERGED"`
 }
 
 test_a_declared_custom_op_without_an_expression_renders_as_empty if rendered({}, {"op": "even", "path": ["n"]}) == ""
