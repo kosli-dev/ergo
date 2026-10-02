@@ -3500,3 +3500,35 @@ test_a_filter_reading_a_name_outside_the_list_check_that_gives_it_cannot_rule_su
 	}})
 	rep.requirements.s.satisfied == false
 }
+
+test_a_name_nothing_gives_in_an_each_path_fails_as_absent if {
+	top := {"op": "all", "path": ["xs"], "each": ["$q", "ys"], "check": {"op": "present", "path": []}}
+	r := row_in({}, {"id": 1, "xs": [{"ys": [1]}]}, top)
+	[r.passed, r.cause] == [false, "absent"]
+	inner := {"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["ys"], "each": ["$q", "zs"], "check": {"op": "present", "path": []}}}
+	i := row_in({}, {"id": 1, "xs": [{"ys": [{"zs": [1]}]}]}, inner)
+	[i.passed, i.cause] == [false, "absent"]
+	in_option := {"op": "any_of", "options": {"o": [{"op": "all", "path": ["xs"], "each": ["$q", "ys"], "check": {"op": "present", "path": []}}]}}
+	o := row_in({}, {"id": 1, "xs": [{"ys": [1]}]}, in_option)
+	[o.passed, o.cause] == [false, "absent"]
+}
+
+test_a_name_in_an_each_path_reads_the_subject if {
+	rep := ergo.report({"items": [{"id": 1, "xs": [1, 2], "ys": [3]}]}, {"s": {
+		"from": ["items", {"each_as": "it"}],
+		"id": ["id"],
+		"checks": {"c": {"op": "all", "path": ["xs"], "each": ["$it", "ys"], "check": {"op": "equals", "path": [], "value": 3}}},
+	}})
+	[r.passed | some r in rows_for(rep, "s", "c")] == [true]
+}
+
+test_a_filter_with_a_misspelt_name_in_an_each_path_cannot_rule_subjects_out if {
+	rep := ergo.report({"items": [{"id": 1, "xs": [{"ys": [1]}]}]}, {"s": {
+		"from": ["items"],
+		"id": ["id"],
+		"min_subjects": 0,
+		"applies_to": {"f": {"op": "all", "path": ["xs"], "each": ["$q", "ys"], "check": {"op": "present", "path": []}}},
+		"checks": {"c": {"op": "equals", "path": ["id"], "value": 0}},
+	}})
+	rep.requirements.s.satisfied == false
+}

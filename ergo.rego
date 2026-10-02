@@ -651,10 +651,16 @@ read_paths(check) := [check.left, check.right] if {
 	two_sided(check)
 }
 
-read_paths(check) := array.concat([check.path], element_name_reads(check)) if {
+read_paths(check) := list_reads(check) if {
 	not check.inputs
 	quantified(check)
 }
+
+list_reads(check) := array.concat(array.concat([check.path], named_each(check)), element_name_reads(check))
+
+named_each(check) := [check.each] if named(object.get(check, "each", []))
+
+named_each(check) := [] if not named(object.get(check, "each", []))
 
 read_paths(check) := [p |
 	some group in check.options
@@ -1108,7 +1114,7 @@ scoped_reads(check) := [read |
 
 leaf_reads(leaf, given) := [[p, given] | some p in leaf_paths(leaf)] if not quantified(leaf)
 
-leaf_reads(leaf, given) := array.concat([[leaf.path, given]], [[p, given | names_of(leaf)] |
+leaf_reads(leaf, given) := array.concat([[p, given] | some p in array.concat([leaf.path], named_each(leaf))], [[p, given | names_of(leaf)] |
 	some l in element_leaves(leaf.check)
 	some p in leaf_paths(l)
 ]) if quantified(leaf)
@@ -1119,7 +1125,7 @@ names_of(check) := set() if not "as" in object.keys(check)
 
 check_reads(leaf) := leaf_paths(leaf) if not quantified(leaf)
 
-check_reads(leaf) := array.concat([leaf.path], element_name_reads(leaf)) if quantified(leaf)
+check_reads(leaf) := list_reads(leaf) if quantified(leaf)
 
 element_leaves(check) := [check] if not combinator(check)
 
