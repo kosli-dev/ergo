@@ -286,6 +286,16 @@ p code, li code, dd code, td code {
 .flow__group .flow__card { padding: 14px 16px; }
 .flow__k { display: block; font-size: 12px; color: var(--faint); margin-bottom: 6px; }
 .flow__v { display: flex; align-items: center; gap: 10px; font-weight: 500; }
+/* On scroll the diagram plays zone by zone: a zone's outline, its cards resolving one at a time, then the arrow on. */
+.js .flow[data-sequence] .flow__group:not(.is-in) { border-color: transparent; }
+.js .flow[data-sequence] .flow__group:not(.is-in) .flow__label { visibility: hidden; }
+.js .flow[data-sequence] .flow__card:not(.is-resolved) {
+  border-color: transparent;
+  background-image: radial-gradient(rgba(247, 247, 239, .22) 1px, transparent 1.4px);
+  background-size: 4px 4px;
+}
+.js .flow[data-sequence] .flow__card:not(.is-resolved) * { visibility: hidden; }
+.js .flow[data-sequence] > li:not(.is-arrow)::after { visibility: hidden; }
 /* What ergo itself contributes is named in lime and bold: the library and the report. */
 .flow__v--ergo { color: var(--lime); font-weight: 700; }
 .flow__report .mark { height: 26px; }
