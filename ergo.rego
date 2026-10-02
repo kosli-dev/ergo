@@ -722,6 +722,16 @@ fields_broken(node) if {
 	not filled_list(group)
 }
 
+fields_broken(node) if {
+	quantified(node)
+	"each" in object.keys(node)
+	not path_shaped(node.each)
+}
+
+path_shaped(p) if is_array(p)
+
+path_shaped(p) if is_string(p)
+
 option_list(options) if is_object(options)
 
 option_list(options) if is_array(options)

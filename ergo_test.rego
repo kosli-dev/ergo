@@ -3970,6 +3970,11 @@ badly_written := [
 	{"op": "not_matches_any", "path": ["s"], "patterns": ["b", "("]},
 	{"op": "not_matches_any", "path": ["s"]},
 	{"op": "all", "path": ["xs"]},
+	{"op": "all", "path": ["xs"], "each": {"x": 1}, "check": {"op": "present", "path": []}},
+	{"op": "any", "path": ["xs"], "each": true, "check": {"op": "present", "path": []}},
+	{"op": "all", "path": ["xs"], "each": false, "check": {"op": "present", "path": []}},
+	{"op": "all", "path": ["xs"], "each": null, "check": {"op": "present", "path": []}},
+	{"op": "all", "path": ["xs"], "each": 0, "check": {"op": "present", "path": []}},
 	{"op": "any", "path": ["xs"], "check": "present"},
 	{"op": "any", "check": {"op": "present", "path": []}},
 	{"op": "all", "path": ["xs"], "check": {"op": "nope", "path": []}},
@@ -4111,4 +4116,8 @@ test_an_empty_list_in_a_filter_rules_subjects_out_because_nobody_can_be_meant if
 		rep.requirements.s.satisfied == true
 		[r.cause | some r in rows_for(rep, "s", "$applies")] == ["value"]
 	}
+}
+
+test_an_each_written_as_one_key_still_reads_the_inner_lists if {
+	verdict({"xs": [{"a": [1]}]}, {"op": "all", "path": ["xs"], "each": "a", "check": {"op": "equals", "path": [], "value": 1}}) == true
 }
