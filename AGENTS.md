@@ -20,15 +20,18 @@ opa check --strict . --ignore .github
 opa fmt --list .
 opa test . --ignore .github
 opa eval --strict-builtin-errors --ignore .github -d . --format raw 'count(data) > 0'
+regal lint --disable-all --enable-category bugs --disable redundant-existence-check --ignore-files '.github/**' .
 ```
 
 `opa fmt --list .` should print nothing. If it prints file names, run `opa fmt -w .`.
 
-The last command runs every test again with `--strict-builtin-errors`, which turns a built-in given the wrong type into an error, and should print `true`. If it prints an error, check the value's type before the built-in on that line, so that ergo gives the same report with or without the flag.
+The `opa eval` command runs every test again with `--strict-builtin-errors`, which turns a built-in given the wrong type into an error, and should print `true`. If it prints an error, check the value's type before the built-in on that line, so that ergo gives the same report with or without the flag.
+
+The `regal lint` command runs [Regal](https://www.openpolicyagent.org/projects/regal)'s rules for likely bugs, and should say `No violations found`. One of them, `leaked-internal-reference`, fails when a file outside `package ergo` calls a rule whose name starts with `_`. Test files are allowed to. `redundant-existence-check` is off because it flags `_verdict_cause(passed) := "satisfied" if passed`, where `if passed` is what stops a `false` from counting as satisfied. The flags are on the command line and not in `.regal/config.yaml` because OPA would load that file as data.
 
 OPA loads every JSON and YAML file it finds as data. The workflow files under `.github` clash with each other, so the checks ignore that folder.
 
-CI runs these checks on pull requests and on pushes to `main` (`.github/workflows/test.yml`), using the OPA version the README names. When you change that version, change it in both places.
+CI runs these checks on pull requests and on pushes to `main` (`.github/workflows/test.yml`), using the OPA version the README names and Regal 0.43.0. When you change the OPA version, change it in both places.
 
 CI also fails when a line of Rego isn't reached by any test. To list those lines yourself:
 
