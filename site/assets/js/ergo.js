@@ -1,5 +1,67 @@
 (function () {
-  var blocks = document.querySelectorAll('pre.code > code');
+  var fig = document.querySelector('[data-fromto]');
+  if (!fig) return;
+  var views = [].slice.call(fig.querySelectorAll('.ft__view'));
+  var tabs = [].slice.call(fig.querySelectorAll('.ft__tab'));
+  var steps = [].slice.call(fig.querySelectorAll('.ft__step'));
+  var file = fig.querySelector('[data-file]');
+  var live = fig.querySelector('.ft__views');
+  var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  fig.querySelectorAll('pre.ft__code > code').forEach(function (code) {
+    code.innerHTML = code.innerHTML.split('\n').map(function (l) { return '<span class="code-line">' + l + '</span>'; }).join('\n');
+  });
+  var idx = 0, timer = 0, paused = false, ticks = [];
+  var clearTicks = function () { ticks.forEach(clearTimeout); ticks = []; };
+  var schedule = function () {
+    clearTimeout(timer);
+    if (still || paused || document.hidden) return;
+    timer = setTimeout(function () { show(idx + 1, true); }, +views[idx].dataset.hold || 4000);
+  };
+  var show = function (i, animate) {
+    clearTicks();
+    idx = (i + views.length) % views.length;
+    var v = views[idx];
+    views.forEach(function (x) { x.classList.toggle('is-active', x === v); });
+    tabs.forEach(function (t) { t.setAttribute('aria-pressed', t.dataset.ex === v.dataset.ex ? 'true' : 'false'); });
+    steps.forEach(function (s) {
+      if (s.dataset.step === v.dataset.step) s.setAttribute('aria-current', 'step'); else s.removeAttribute('aria-current');
+    });
+    if (file) file.textContent = v.dataset.file;
+    var units = [].slice.call(v.querySelectorAll('.code-line, .report__row'));
+    if (!animate || still) {
+      units.forEach(function (u) { u.classList.add('is-resolved'); });
+    } else {
+      units.forEach(function (u) { u.classList.remove('is-resolved'); });
+      units.forEach(function (u, k) {
+        ticks.push(setTimeout(function () { u.classList.add('is-resolved'); }, 120 + k * (u.classList.contains('report__row') ? 170 : 60)));
+      });
+    }
+    schedule();
+  };
+  var jump = function (i) { live.setAttribute('aria-live', 'polite'); show(i, true); };
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () {
+      jump(views.findIndex(function (v) { return v.dataset.ex === t.dataset.ex; }));
+    });
+  });
+  steps.forEach(function (s) {
+    s.addEventListener('click', function () {
+      var ex = views[idx].dataset.ex;
+      jump(views.findIndex(function (v) { return v.dataset.ex === ex && v.dataset.step === s.dataset.step; }));
+    });
+  });
+  var pause = function () { paused = true; clearTimeout(timer); };
+  var resume = function () { paused = false; schedule(); };
+  fig.addEventListener('mouseenter', pause);
+  fig.addEventListener('mouseleave', resume);
+  fig.addEventListener('focusin', pause);
+  fig.addEventListener('focusout', function (e) { if (!fig.contains(e.relatedTarget)) resume(); });
+  document.addEventListener('visibilitychange', function () { if (document.hidden) clearTimeout(timer); else schedule(); });
+  show(0, true);
+})();
+
+(function () {
+  var blocks = document.querySelectorAll('pre.code:not(.ft__code) > code');
   if (!blocks.length) return;
   var lines = function (code) {
     var parts = code.innerHTML.split('\n');
@@ -28,25 +90,6 @@
   });
 })();
 
-(function () {
-  var report = document.querySelector('.report[data-evaluate]');
-  if (!report) return;
-  var rows = report.querySelectorAll('.report__row');
-  var resolveAll = function () { rows.forEach(function (r) { r.classList.add('is-resolved'); }); };
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
-    resolveAll();
-    return;
-  }
-  var run = function () {
-    rows.forEach(function (row, i) {
-      setTimeout(function () { row.classList.add('is-resolved'); }, 420 + i * 260);
-    });
-  };
-  var io = new IntersectionObserver(function (entries) {
-    if (entries[0].isIntersecting) { io.disconnect(); run(); }
-  }, { threshold: 0.3 });
-  io.observe(report);
-})();
 (function () {
   var header = document.querySelector('.site-header');
   var toggle = header && header.querySelector('.menu-toggle');

@@ -7,6 +7,18 @@ hero:
   primary: Get started
   secondary: GitHub
   verdict: d-3 is out of scope. d-2 was never approved... and the report says so.
+  fromto:
+    label: The same control written in Rego and in ergo, and what each returns
+    steps: [Rego policy, Rego result, ergo control, ergo report]
+    examples:
+      - key: deploy
+        label: Deploy approval
+        rego_caption: Rego says no. Nothing about d-1, or why d-3 was skipped.
+        ergo_caption: d-3 is out of scope. d-2 was never approved... and the report says so.
+      - key: review
+        label: Four eyes
+        rego_caption: Two failures, one message. Which is which?
+        ergo_caption: PR 2 was only approved by its author. PR 3 has no author recorded. Different problems, different fixes.
 
 problem:
   title: A decision nobody can inspect

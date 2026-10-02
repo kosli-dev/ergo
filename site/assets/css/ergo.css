@@ -154,16 +154,43 @@ p code, li code, dd code, td code {
 .term__why { flex-basis: 100%; font-family: var(--sans); font-weight: 400; color: var(--muted); font-size: 14px; }
 
 /* Evaluation: rows start as dithered noise and resolve into evidence. */
-.js .report[data-evaluate] .report__row > span {
+.js .report[data-evaluate] .report__row > span, .js .ft__report .report__row > span {
   transition: color .25s ease, background-color .25s ease;
 }
-.js .report[data-evaluate] .report__row:not(.is-resolved) > span:not(:empty) {
+.js .report[data-evaluate] .report__row:not(.is-resolved) > span:not(:empty), .js .ft__report .report__row:not(.is-resolved) > span:not(:empty) {
   color: transparent;
   background-image: radial-gradient(rgba(247, 247, 239, .28) 1px, transparent 1.4px);
   background-size: 4px 4px;
   border-radius: 2px;
 }
-.js .report[data-evaluate] .report__row:not(.is-resolved) { background: none; box-shadow: none; }
+.js .report[data-evaluate] .report__row:not(.is-resolved), .js .ft__report .report__row:not(.is-resolved) { background: none; box-shadow: none; }
+
+/* Hero from → to: each example steps Rego policy → Rego result → ergo control → ergo report. */
+.ft__bar { flex-wrap: wrap; row-gap: 10px; }
+.ft__file { flex: 1 1 auto; min-width: 0; }
+.ft__tabs { display: flex; gap: 4px; margin-left: auto; padding: 3px; border: 1px solid var(--line); border-radius: 999px; }
+.ft__tab { padding: 5px 11px; border: 0; border-radius: 999px; background: none; color: var(--muted); font: 500 12px/1 var(--mono); cursor: pointer; }
+.ft__tab:hover { color: var(--paper); }
+.ft__tab[aria-pressed="true"] { background: var(--lime); color: var(--ink); }
+.ft__views { display: grid; padding: 18px 18px 8px; }
+.ft__view { min-width: 0; }
+.js .ft__view { grid-area: 1 / 1; visibility: hidden; }
+.js .ft__view.is-active { visibility: visible; }
+.ft__label { display: flex; gap: 8px; margin: 0 0 10px; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
+.ft__who { color: var(--paper); }
+.ft__who--ergo { color: var(--lime); }
+.ft__code { font-size: 12.5px; line-height: 1.6; padding: 14px 16px; }
+.ft__report { padding: 4px 0; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--ink); }
+.ft__report .report__row > span { line-height: 1.45; }
+.ft__caption { margin: 12px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+.ft__foot { padding-top: 12px; padding-bottom: 12px; }
+.ft__steps { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; padding: 0; list-style: none; }
+.ft__step { display: inline-flex; align-items: center; gap: 8px; padding: 4px 0; border: 0; background: none; color: var(--faint); font: 500 12px/1 var(--mono); cursor: pointer; }
+.ft__step:hover { color: var(--muted); }
+.ft__step[aria-current] { color: var(--paper); }
+.ft__dot { width: 8px; height: 8px; border-radius: 2px; background: var(--line-2); }
+.ft__step[aria-current] .ft__dot { background: var(--lime); }
+@media (max-width: 640px) { .ft__file { display: none; } .ft__tabs { margin-left: 0; } }
 
 /* Code blocks resolve the same way, line by line and faster, as they scroll in. */
 .js .code-line { transition: color .2s ease; }
