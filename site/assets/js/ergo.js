@@ -36,7 +36,7 @@
     }
     schedule();
   };
-  var jump = function (i) { manual = true; clearTimeout(timer); live.setAttribute('aria-live', 'polite'); show(i, true); };
+  var jump = function (i) { manual = true; clearTimeout(timer); live.setAttribute('aria-live', 'polite'); show(i, false); };
   tabs.forEach(function (t) {
     t.addEventListener('click', function () {
       jump(views.findIndex(function (v) { return v.dataset.ex === t.dataset.ex; }));
