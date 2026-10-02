@@ -1465,8 +1465,115 @@ test_min_subjects_is_written_like_any_number if {
 	rep.requirements.s.checks["$min_subjects"].expression == "count(matching(xs)) >= 2"
 }
 
-test_a_number_in_a_path_is_written_like_any_number if {
-	rendered({}, {"op": "present", "path": ["xs", 1e1]}) == "xs.10 is present"
+test_a_step_that_cannot_be_a_key_is_named_apart_from_a_key_that_looks_like_it if {
+	rendered({}, {"op": "present", "path": ["a", true]}) == "a.<invalid step> is present"
+	rendered({}, {"op": "present", "path": ["a", "true"]}) == "a.true is present"
+}
+
+bad_steps := [true, null, ["a"], 1.5, -1, 1.0, 1e0, {"literal": true}, {"literal": -1}]
+
+test_a_present_filter_with_a_step_that_cannot_be_a_key_cannot_rule_subjects_out if {
+	rows := [[rep.requirements.s.satisfied, r.passed, r.cause] |
+		some seg in bad_steps
+		rep := ergo.report({"xs": [{"id": 1, "a": [1, 2]}]}, {"s": {
+			"from": ["xs"],
+			"id": ["id"],
+			"min_subjects": 0,
+			"applies_to": {"f": {"op": "present", "path": ["a", seg]}},
+			"checks": {"c": {"op": "present", "path": ["id"]}},
+		}})
+		some r in rows_for(rep, "s", "$applies")
+	]
+	rows == [[false, false, "absent"] | some _ in bad_steps]
+}
+
+test_a_check_with_a_step_that_cannot_be_a_key_fails_as_absent if {
+	subj := {"id": 1, "a": [1, 2], "b": 1}
+	checks := [c |
+		some seg in bad_steps
+		some c in [
+			{"op": "present", "path": ["a", seg]},
+			{"op": "compare", "left": ["a", seg], "right": ["b"], "cmp": "eq"},
+			{"op": "all", "path": ["a"], "each": [seg], "check": {"op": "present", "path": []}},
+		]
+	]
+	single := [{"op": "present", "path": seg} | some seg in bad_steps; not is_array(seg)]
+	[[verdict(subj, c), cause_of(subj, c)] | some c in array.concat(checks, single)] == [[false, "absent"] | some _ in array.concat(checks, single)]
+}
+
+test_a_string_never_picks_a_list_item_and_a_number_never_picks_an_object_key if {
+	[cause_of({"id": 1, "a": [10, 20]}, {"op": "present", "path": ["a", "0"]}), cause_of({"id": 1, "o": {"0": "zero"}}, {"op": "present", "path": ["o", 0]})] == ["absent", "absent"]
+}
+
+test_a_check_whose_inputs_have_a_step_that_cannot_be_a_key_fails_as_absent if {
+	subj := {"id": 1, "n": 2, "xs": [{"v": 1}]}
+	[[verdict(subj, c), cause_of(subj, c)] | some c in [
+		{"op": "even", "path": ["n"], "expression": "n is even", "inputs": [["n", true]]},
+		{"op": "even", "path": ["n"], "expression": "n is even", "inputs": [{"path": ["xs"], "each": ["v", -1]}]},
+		{"op": "even", "path": ["n"], "expression": "n is even", "inputs": [{"path": ["xs", 1.0], "each": ["v"]}]},
+		{"op": "equals", "path": ["n"], "value": 2, "inputs": [["n", null]]},
+	]] == [[false, "absent"], [false, "absent"], [false, "absent"], [false, "absent"]]
+	verdict(subj, {"op": "even", "path": ["n"], "expression": "n is even", "inputs": [["n"], {"path": ["xs"], "each": ["v"]}]}) == true
+}
+
+test_a_list_index_written_as_a_whole_number_reads_the_item if {
+	verdict({"id": 1, "a": [1, 2]}, {"op": "equals", "path": ["a", 1], "value": 2}) == true
+	verdict({"id": 1, "a": [1, 2]}, {"op": "equals", "path": ["a", 0], "value": 1}) == true
+	rendered({}, {"op": "present", "path": ["a", 1]}) == "a.1 is present"
+}
+
+test_a_ref_step_that_reads_something_that_cannot_be_a_key_fails_as_absent if {
+	check := {"op": "present", "path": ["a", {"ref": ["$$params", "i"]}]}
+	params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check) == [[true, "satisfied", [{"name": "a.[$$params.i]", "value": 2}]]] with data.params as {"i": 1}
+	r := params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check)[0] with data.params as {"i": -1}
+	[r[0], r[1]] == [false, "absent"]
+	s := params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check)[0] with data.params as {"i": 1.0}
+	[s[0], s[1]] == [false, "absent"]
+}
+
+test_a_from_or_id_with_a_step_that_cannot_be_a_key_is_not_well_formed if {
+	rows := [r.passed |
+		some m in [{"from": ["xs", true]}, {"from": ["xs", 1.0, {"each_as": "x"}]}, {"id": ["id", null]}]
+		rep := ergo.report({"xs": [{"id": 1}]}, {"s": object.union({"from": ["xs"], "checks": {"c": {"op": "present", "path": ["id"]}}}, m)})
+		some r in rows_for(rep, "s", "$well_formed")
+	]
+	rows == [false, false, false]
+}
+
+test_a_check_with_a_number_too_big_for_a_float_fails_closed if {
+	check := {"op": "equals", "path": ["n"], "value": 1e400}
+	[verdict({"id": 1, "n": 1e400}, check), cause_of({"id": 1, "n": 1e400}, check)] == [false, "absent"]
+	rendered({}, check) == "n == <number out of range>"
+}
+
+test_a_check_with_a_number_too_small_for_a_float_fails_closed_so_it_cannot_pass_as_zero if {
+	check := {"op": "equals", "path": ["n"], "value": 1e-400}
+	[verdict({"id": 1, "n": 0}, check), verdict({"id": 1, "n": 1e-400}, check)] == [false, false]
+}
+
+test_a_number_out_of_range_anywhere_in_a_check_fails_it if {
+	verdict({"id": 1, "n": 5}, {"op": "range", "path": ["n"], "min": 0, "max": 1e400}) == false
+	verdict({"id": 1, "n": "a"}, {"op": "in", "path": ["n"], "values": ["a", 1e400]}) == false
+	verdict({"id": 1, "n": "a"}, {"op": "in", "path": ["n"], "values": {"literal": ["a", 1e400]}}) == false
+	verdict({"id": 1, "xs": [{"k": 1, "v": 1}]}, {"op": "present", "path": ["xs", {"where": {"k": 1e400}}, "v"]}) == false
+	verdict({"id": 1, "xs": [1]}, {"op": "all", "path": ["xs"], "check": {"op": "equals", "path": [], "value": 1e400}}) == false
+	rendered({}, {"op": "in", "path": ["n"], "values": ["a", 1e400]}) == `n in ["a", <number out of range>]`
+}
+
+test_a_number_at_the_edge_of_a_float_still_works if {
+	verdict({"id": 1, "n": 1.7976931348623157e308}, {"op": "equals", "path": ["n"], "value": 1.7976931348623157e308}) == true
+	verdict({"id": 1, "n": 2.2250738585072014e-308}, {"op": "equals", "path": ["n"], "value": 2.2250738585072014e-308}) == true
+	verdict({"id": 1, "n": 0}, {"op": "equals", "path": ["n"], "value": 0}) == true
+	verdict({"id": 1, "n": 2.2250738585072e-308}, {"op": "equals", "path": ["n"], "value": 2.2250738585072e-308}) == false
+}
+
+test_a_requirement_with_a_number_out_of_range_is_not_well_formed if {
+	rows := [[r.check, r.passed] |
+		some m in [{"min_subjects": 1e-400}, {"id": ["xs", 1e400]}, {"from": ["xs", 1e400]}]
+		rep := ergo.report({"xs": [{"id": 1}]}, {"s": object.union({"from": ["xs"], "checks": {"c": {"op": "present", "path": ["id"]}}}, m)})
+		some r in rows_for(rep, "s", "$well_formed")
+	]
+	rows == [["$well_formed", false], ["$well_formed", false], ["$well_formed", false]]
 }
 
 test_min_subjects_is_described_like_any_number if {
@@ -1791,7 +1898,7 @@ test_well_formed_echoes_the_declaration_it_read if {
 
 test_well_formed_definition_is_in_the_check_table if {
 	rep := ergo.report({"items": [{"id": "a"}]}, id_req(["items"]))
-	rep.requirements.s.checks["$well_formed"].expression == `count(checks) >= 1 and require in ["every", "some"]`
+	rep.requirements.s.checks["$well_formed"].expression == `count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float`
 }
 
 require_req(q) := {"s": {
@@ -3207,7 +3314,7 @@ test_a_well_formed_row_for_a_from_with_a_step_shows_the_from if {
 	row := rows_for(rep, "s", "$well_formed")[0]
 	row.passed == true
 	row.inputs[2] == {"name": "from", "value": ["build", "test_runs", {"each_as": "suite"}]}
-	rep.requirements.s.checks["$well_formed"].expression == `count(checks) >= 1 and require in ["every", "some"] and from is well formed`
+	rep.requirements.s.checks["$well_formed"].expression == `count(checks) >= 1 and require in ["every", "some"] and from is well formed and steps are keys and numbers fit a float`
 }
 
 test_a_well_formed_row_without_a_step_is_unchanged if {
