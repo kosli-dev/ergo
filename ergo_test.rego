@@ -3933,7 +3933,7 @@ test_ref_shaped_values_in_params_are_data_not_refs if {
 	[[r.subject.id, r.passed] | some r in rows_for(rep, "s", "c")] == [[{"ref": ["$$params", "s"]}, false]]
 }
 
-typo_doc := {"params": {"word": "x", "none": null}, "items": [{"id": 1, "n": 1, "s": "a", "xs": [1], "t": "2026-01-01T00:00:00Z"}]}
+typo_doc := {"params": {"word": "x", "none": null, "nine": 9}, "items": [{"id": 1, "n": 1, "s": "a", "xs": [1], "t": "2026-01-01T00:00:00Z"}]}
 
 typo_req(filter) := {"s": {
 	"from": ["items"],
@@ -3959,6 +3959,12 @@ badly_written := [
 	{"op": "range", "path": ["n"], "min": "a", "max": 5},
 	{"op": "range", "path": ["n"], "min": 0, "max": {"ref": ["$$input", "params", "word"]}},
 	{"op": "range", "path": ["n"], "min": 0},
+	{"op": "range", "path": ["n"], "min": 9, "max": 0},
+	{"op": "range", "path": ["n"], "min": {"ref": ["$$input", "params", "nine"]}, "max": 5},
+	{"op": "equals", "path": ["n"], "value": 1, "as": "x"},
+	{"op": "present", "path": ["n"], "each": ["a"]},
+	{"op": "any_of", "as": "x", "options": {"o": [{"op": "equals", "path": ["n"], "value": 1}]}},
+	{"op": "any_of", "options": {"o": [{"op": "equals", "path": ["n"], "value": 1, "each": []}]}},
 	{"op": "equals", "path": ["n"]},
 	{"op": "includes", "path": ["xs"]},
 	{"op": "excludes", "path": ["xs"]},
@@ -4120,4 +4126,15 @@ test_an_empty_list_in_a_filter_rules_subjects_out_because_nobody_can_be_meant if
 
 test_an_each_written_as_one_key_still_reads_the_inner_lists if {
 	verdict({"xs": [{"a": [1]}]}, {"op": "all", "path": ["xs"], "each": "a", "check": {"op": "equals", "path": [], "value": 1}}) == true
+}
+
+test_a_range_with_equal_bounds_is_well_written if {
+	verdict({"n": 1}, {"op": "range", "path": ["n"], "min": 1, "max": 1}) == true
+}
+
+test_a_check_that_is_not_an_object_shows_in_the_expression if {
+	rendered({}, "present") == "<invalid check>"
+	[[r.passed, r.cause] | some r in solo({}, "present").results; r.check == "c"] == [[false, "absent"]]
+	rendered({}, {"op": "any_of", "options": {"o": ["present"]}}) == "one of: o(<invalid check>)"
+	rendered({}, {"op": "all", "path": ["xs"], "check": "present"}) == "every xs: <invalid check>"
 }

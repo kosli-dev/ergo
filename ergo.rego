@@ -681,6 +681,21 @@ fields_broken(node) if {
 }
 
 fields_broken(node) if {
+	node.op == "range"
+	lo := arg(node.min)
+	hi := arg(node.max)
+	is_number(lo)
+	is_number(hi)
+	lo > hi
+}
+
+fields_broken(node) if {
+	node.op in (leaf_ops | {"any_of"})
+	some f in {"as", "each"}
+	f in object.keys(node)
+}
+
+fields_broken(node) if {
 	node.op == "in"
 	v := arg(node.values)
 	not value_list(v)
@@ -1212,7 +1227,12 @@ default leaf_describe(_, _) := ""
 
 leaf_describe(check, _) := sprintf("<unknown op %v>", [check.op]) if not check.op in operators
 
-leaf_describe(check, _) := "<missing op>" if not "op" in object.keys(check)
+leaf_describe(check, _) := "<missing op>" if {
+	is_object(check)
+	not "op" in object.keys(check)
+}
+
+leaf_describe(check, _) := "<invalid check>" if not is_object(check)
 
 leaf_describe(check, item) := sprintf("%s >= %s and %s <= %s", [n, value_text(check.min), n, value_text(check.max)]) if {
 	check.op == "range"
@@ -1523,6 +1543,8 @@ with_refs(def, checked) := object.union(def, {"$refs": ref_inputs(checked)}) if 
 with_refs(def, checked) := def if count(check_refs(checked)) == 0
 
 described(check, item) := object.union(check, {"expression": expression_of(check, item)}) if not check.substitute
+
+described(check, item) := {"expression": expression_of(check, item)} if not is_object(check)
 
 described(check, item) := object.union(check, {"expression": sprintf(
 	"%s, or substitute: %s",
