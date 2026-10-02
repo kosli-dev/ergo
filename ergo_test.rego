@@ -3774,3 +3774,40 @@ test_a_step_with_a_ref_and_a_where_is_a_mistake_not_a_selector if {
 	r := row_in({}, {"id": 1, "atts": [{"type": "a", "ok": true}]}, check)
 	[r.passed, r.cause] == [false, "absent"]
 }
+
+test_a_ref_step_of_the_wrong_type_inside_a_list_check_fails_as_absent if {
+	inner := {"op": "all", "path": ["xs"], "check": {"op": "present", "path": [{"ref": ["$$params", "k"]}]}}
+	option := {"op": "all", "path": ["xs"], "check": {"op": "any_of", "options": {"o": [{"op": "equals", "path": [{"ref": ["$$params", "k"]}], "value": 1}]}}}
+	each := {"op": "all", "path": ["xs"], "each": [{"ref": ["$$params", "k"]}], "check": {"op": "present", "path": []}}
+	two_sided := {"op": "any", "path": ["xs"], "check": {"op": "compare", "left": [{"ref": ["$$params", "k"]}], "right": ["$$params", "lim"], "cmp": "lt"}}
+	every check in [inner, option, each, two_sided] {
+		every k in [["v"], {"a": 1}, true] {
+			r := row_in({}, {"id": 1, "xs": [{"v": 1}]}, check) with data.params as {"k": k, "lim": 5}
+			[r.passed, r.cause] == [false, "absent"]
+		}
+	}
+}
+
+test_a_ref_step_of_the_wrong_type_shows_its_value_in_refs if {
+	check := {"op": "all", "path": ["xs"], "check": {"op": "present", "path": [{"ref": ["$$params", "k"]}]}}
+	refs_in({}, {"id": 1, "xs": [{"v": 1}]}, check) == [{"name": "$$params.k", "value": ["v"]}] with data.params as {"k": ["v"]}
+}
+
+test_a_filter_with_a_ref_step_of_the_wrong_type_inside_a_list_check_cannot_rule_subjects_out if {
+	rep := ergo.report({"items": [{"id": 1, "xs": [{"v": 1}]}]}, {"s": {
+		"from": ["items"],
+		"id": ["id"],
+		"min_subjects": 0,
+		"applies_to": {"f": {"op": "all", "path": ["xs"], "check": {"op": "present", "path": [{"ref": ["$$params", "k"]}]}}},
+		"checks": {"c": {"op": "equals", "path": ["id"], "value": 0}},
+	}}) with data.params as {"k": ["v"]}
+	rep.requirements.s.satisfied == false
+}
+
+test_a_ref_used_as_a_value_may_be_any_type if {
+	check := {"op": "equals", "path": ["tags"], "value": {"ref": ["$$params", "k"]}}
+	r := row_in({}, {"id": 1, "tags": ["v"]}, check) with data.params as {"k": ["v"]}
+	[r.passed, r.cause] == [true, "satisfied"]
+	f := row_in({}, {"id": 1, "tags": ["w"]}, check) with data.params as {"k": ["v"]}
+	[f.passed, f.cause] == [false, "value"]
+}

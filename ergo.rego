@@ -799,7 +799,7 @@ worst_read(subj, check) := worst_of({read_state(subj, p) | some p in read_paths(
 	not broken_list_check(check)
 }
 
-worst_read(_, check) := worst_of({ref_state(r) | some r in check_refs(check)}) if {
+worst_read(_, check) := worst_of({used_ref_state(check, r) | some r in check_refs(check)}) if {
 	unreadable_ref(check)
 	not broken_list_check(check)
 }
@@ -855,7 +855,7 @@ chain_names_free(chain) if {
 
 unreadable_ref(check) if {
 	some r in check_refs(check)
-	ref_state(r) != "value"
+	used_ref_state(check, r) != "value"
 }
 
 worst_of(states) := cause_precedence[i] if {
@@ -882,6 +882,25 @@ check_refs(check) := {x.ref |
 	walk(check, [p, x])
 	malformed(x)
 	not under_literal(check, p)
+}
+
+step_refs(check) := {x.ref |
+	walk(check, [p, x])
+	is_ref(x)
+	not under_literal(check, p)
+	count(p) >= 2
+	p[count(p) - 2] in {"path", "left", "right", "each"}
+	is_number(p[count(p) - 1])
+}
+
+used_ref_state(check, r) := "absent" if wrong_step(check, r)
+
+used_ref_state(check, r) := ref_state(r) if not wrong_step(check, r)
+
+wrong_step(check, r) if {
+	r in step_refs(check)
+	ref_state(r) == "value"
+	not is_key(ref_read(r))
 }
 
 under_literal(check, p) if {
