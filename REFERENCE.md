@@ -389,17 +389,32 @@ The inner paths start at each commit, so `["timestamp"]` is the commit's. `$appr
 
 The row shows the lists the check read, but not which approver failed or why. A commit with no timestamp fails the check too, because nothing proves the approval came after it.
 
+To require several things of the same approver, put them in one [`any_of`](#any_of) option, list checks included. This one needs an approver who approved, isn't the author, and approved after every commit:
+
+```rego
+"op": "any",
+"path": ["approvers"],
+"as": "approver",
+"check": {"op": "any_of", "options": {"peer": [
+	{"op": "equals", "path": ["state"], "value": "APPROVED"},
+	{"op": "compare", "left": ["username"], "right": ["$pr", "author"], "cmp": "ne"},
+	{"op": "all", "path": ["$pr", "commits"], "check": {"op": "compare_time", "left": ["$approver", "timestamp"], "right": ["timestamp"], "cmp": "gt"}},
+]}},
+```
+
+It renders as `some approvers as $approver: one of: peer(state == APPROVED and username ne $pr.author and every $pr.commits: $approver.timestamp gt timestamp)`.
+
 Some things worth knowing:
 
 - `as` takes the same names as a [naming step](#naming-subjects): a string that doesn't start with `$`. Without `each`, `$approver` reads the same as a path inside the item, so `as` only matters for a check nested inside. With `each`, it names the inner item.
 - A name can only be given once along a chain of checks. `as` with a name that `from` or an outer check already gave fails the check with cause `absent`, and shows as `<name given twice>`. A badly written name fails the same way and shows as `<invalid name>`. The cause isn't `value`, so a filter written like this fails the requirement rather than ruling every subject out. Two separate checks can use the same name.
 - A name given by `as` belongs to one item, so the row doesn't read it, and it doesn't decide the cause. Paths that start with it are shown as paths inside the item, like `approvers[].timestamp`.
 - Inner lists follow the same rules as outer ones. If an approver is tried against an empty or missing list of commits, that try fails.
-- One level of nesting is as deep as it goes, because Rego doesn't allow recursion. A third `all` or `any` fails the check with cause `absent`, and its expression shows `<nested too deep>`.
+- One level of nesting is as deep as it goes, because Rego doesn't allow recursion. An `any_of` doesn't count as a level, but an `all` or `any` in one of its options does. A third `all` or `any` fails the check with cause `absent`, and its expression shows `<nested too deep>`.
 
 ### `any_of`
 
-`any_of` passes when at least one of its options passes. Each option is a list of basic checks that must all pass:
+`any_of` passes when at least one of its options passes. Each option is a list of checks that must all pass:
 
 ```rego
 "permitted": {
@@ -417,9 +432,9 @@ Some things worth knowing:
 This is the only way to say that two fields must agree with each other. Two separate checks, "type is Story or Chore" and "state is Done", would also accept a Chore that isn't Done. With `any_of` it must be a Done Story, or a Chore.
 
 - Name your options. The names show up in the rendered expression: `one of: safe(type == Chore) | standard(type == Story and state == Done)`. A list of options works too, and they're shown by position.
-- Options can only hold basic checks. You can't put `all`, `any` or another `any_of` inside one. Again, this is because Rego doesn't allow recursion.
+- Options can hold basic checks and `all` or `any`, but not another `any_of`, because Rego doesn't allow recursion. An `all` or `any` in an option counts as being where the `any_of` is, so it can nest as deep as it could there (see [Nesting](#nesting)).
 - An empty `options` fails, and so does an empty option. An option written as an object instead of a list also fails.
-- The row shows every field any option read, once each, sorted by name.
+- The row shows every field any option read, once each, sorted by name. For an `all` or `any` in an option, that's its list and any names it reads.
 
 ## Substitutes
 
