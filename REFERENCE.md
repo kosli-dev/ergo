@@ -408,7 +408,7 @@ Some things worth knowing:
 
 - `as` takes the same names as a [naming step](#naming-subjects): a string that doesn't start with `$`. Without `each`, `$approver` reads the same as a path inside the item, so `as` only matters for a check nested inside. With `each`, it names the inner item.
 - A name can only be given once along a chain of checks. `as` with a name that `from` or an outer check already gave fails the check with cause `absent`, and shows as `<name given twice>`. A badly written name fails the same way and shows as `<invalid name>`. The cause isn't `value`, so a filter written like this fails the requirement rather than ruling every subject out. Two separate checks can use the same name.
-- A name given by `as` belongs to one item, so the row doesn't read it, and it doesn't decide the cause. Paths that start with it are shown as paths inside the item, like `approvers[].timestamp`.
+- A name given by `as` belongs to one item, so the row doesn't read it, and it doesn't decide the cause. Paths that start with it are shown as paths inside the item, like `approvers[].timestamp`. That only holds inside the list check that gives the name. Anywhere else, like a neighbouring `any_of` option, nothing gives it, so reading it fails as `absent`.
 - Inner lists follow the same rules as outer ones. If an approver is tried against an empty or missing list of commits, that try fails.
 - One level of nesting is as deep as it goes, because Rego doesn't allow recursion. An `any_of` doesn't count as a level, but an `all` or `any` in one of its options does. A third `all` or `any` fails the check with cause `absent`, and its expression shows `<nested too deep>`.
 
