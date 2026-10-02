@@ -225,6 +225,8 @@ start_of(subj, path) := subj if not named(path)
 
 start_of(_, path) := data.ergo_document if path[0] == "$$input"
 
+start_of(_, path) := data.ergo_params if path[0] == "$$params"
+
 start_of(_, path) := input["ergo/names"][substring(path[0], 1, -1)] if {
 	named(path)
 	not builtin(path)
@@ -1396,8 +1398,14 @@ results(doc, policy) := array.concat(
 	),
 )
 
-report(doc, policy) := r if {
-	r := report_of(doc, policy) with data.ergo_document as doc with input as {"ergo/names": {}}
+report(doc, policy) := report_with_params(doc, configured_params, policy)
+
+configured_params := data.params
+
+default configured_params := {}
+
+report_with_params(doc, params, policy) := r if {
+	r := report_of(doc, policy) with data.ergo_document as doc with data.ergo_params as params with input as {"ergo/names": {}}
 }
 
 report_of(doc, policy) := {

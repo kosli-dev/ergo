@@ -110,30 +110,34 @@ A selector must match exactly one item. If it matches none, or more than one, th
 
 ## Reading from the input
 
-A path normally starts inside the subject. A path that starts with `$$input` starts at the top of the document given to `ergo.report` instead:
+A path normally starts inside the subject. Two first steps start somewhere else:
+
+- `$$input` starts at the top of the document given to `ergo.report`.
+- `$$params` starts at the policy's params, read from `data.params`.
 
 ```rego
 "path": ["$$input", "settings", "mode"]
+"path": ["$$params", "level"]
 ```
 
-Every subject reads the same value. `$$input` only means this as the first step of a path, and any other first step starting with `$$` is reserved: it fails the check with cause `absent`. To read a key that really is called `$$input`, write it as `{"literal": "$$input"}`.
+Every subject reads the same value. These only mean this as the first step of a path, and any other first step starting with `$$` is reserved: it fails the check with cause `absent`. To read a key that really is called `$$input` or `$$params`, write it as `{"literal": "$$input"}`.
 
-A check's fixed values can be read from the input too. Write `{"ref": path}` in place of the value, where the path starts with `$$input`. This works for `value`, `values`, `patterns`, `min`, `max` and the values in a selector's `where`. It's how a policy takes params: put them in the document beside the evidence, and read them from there.
+A check's fixed values can be read this way too. Write `{"ref": path}` in place of the value, where the path starts with `$$params` or `$$input`. This works for `value`, `values`, `patterns`, `min`, `max` and the values in a selector's `where`. It's how a policy takes params:
 
 ```rego
-ergo.report({"params": params, "packages": packages}, {"licences": {
+ergo.report({"packages": packages}, {"licences": {
 	"subject_type": "package",
 	"from": ["packages"],
 	"id": ["name"],
 	"checks": {"approved": {
 		"op": "any",
 		"path": ["licences"],
-		"check": {"op": "in", "path": [], "values": {"ref": ["$$input", "params", "allowed_licences"]}},
+		"check": {"op": "in", "path": [], "values": {"ref": ["$$params", "allowed_licences"]}},
 	}},
 }})
 ```
 
-With `allowed_licences` set to `["MIT", "Apache-2.0"]`, a package licensed `GPL-3.0` gives this violation:
+With `data.params` set to `{"allowed_licences": ["MIT", "Apache-2.0"]}`, a package licensed `GPL-3.0` gives this violation:
 
 ```json
 {
@@ -141,24 +145,38 @@ With `allowed_licences` set to `["MIT", "Apache-2.0"]`, a package licensed `GPL-
   "subject": { "type": "package", "id": "gpl-lib" },
   "check": "approved",
   "description": "",
-  "expression": "some licences: licences[] in $$input.params.allowed_licences",
+  "expression": "some licences: licences[] in $$params.allowed_licences",
   "inputs": [
     { "name": "licences[]", "value": ["GPL-3.0"] },
-    { "name": "$$input.params.allowed_licences", "value": ["MIT", "Apache-2.0"] }
+    { "name": "$$params.allowed_licences", "value": ["MIT", "Apache-2.0"] }
   ],
   "cause": "value"
 }
 ```
 
-The expression says where the value comes from. What it was goes in the check's definition in the report, under `$refs`, once for the whole report and sorted by name, beside the literals the check compares against. The rows' `inputs` only hold what the check reads, like `licences[]` here, and `violations` adds the `$refs` back to each violation's `inputs`, as above. That keeps a record of what was compared, even when the params change between runs, without copying it into every row. A path that starts with `$$input` is something the check reads, so its value stays in the row.
+The expression says where the value comes from. What it was goes in the check's definition in the report, under `$refs`, once for the whole report and sorted by name, beside the literals the check compares against. The rows' `inputs` only hold what the check reads, like `licences[]` here, and `violations` adds the `$refs` back to each violation's `inputs`, as above. That keeps a record of what was compared, even when the params change between runs, without copying it into every row. A path that starts with `$$input` or `$$params` is something the check reads, so its value stays in the row.
+
+### Params
+
+`kosli evaluate --params @params.json` puts a control's params at `data.params`, and `opa eval -d params.json` does the same when the file holds `{"params": ...}`. In tests, write `with data.params as {...}`. To take params from somewhere else, pass them in yourself:
+
+```rego
+ergo.report_with_params(doc, params, requirements)
+```
+
+That works like `ergo.report`, except `$$params` reads `params` instead of `data.params`. If what you pass can be missing, give it a default first, with a rule like `default config := {}`. Rego doesn't call a function with an argument that isn't defined, so the whole report would be undefined, with no rows to say why. The same goes for the document given to `ergo.report`.
+
+Params aren't part of the document, so `$$input.params` doesn't reach them, and `$$params` doesn't read the document. With no `data.params`, or one that isn't an object, every `$$params` read fails as `absent`. ergo has no defaults, so a control run without its params fails instead of checking something nobody configured.
+
+A policy that calls `ergo.report` can't itself be in a package called `params` (or under one), because the report would then read its own rules. OPA rejects that as recursive when it loads the policy.
 
 Some things worth knowing:
 
-- A ref that leads nowhere, or to `null`, fails the check, with cause `absent` or `null`. That cause wins over anything the subject's own fields would give, because the check can't mean anything without the value. ergo has no defaults, so put a default in the policy or the params.
-- A ref must be a list that starts with `$$input`, and it can't contain a selector. Anything else fails the check with cause `absent`, and the expression and `inputs` show `<invalid ref>`.
+- A ref that leads nowhere, or to `null`, fails the check, with cause `absent` or `null`. That cause wins over anything the subject's own fields would give, because the check can't mean anything without the value. ergo has no defaults, so put the value in the params.
+- A ref must be a list that starts with `$$params` or `$$input`, and it can't contain a selector. Anything else fails the check with cause `absent`, and the expression and `inputs` show `<invalid ref>`.
 - An object with a `ref` or `literal` key and any other key is a mistake, not a value, so it fails the check the same way. Otherwise a typo like `{"ref": [...], "note": "..."}` would be compared as an object, and `excludes` would pass.
 - A value that is an object with a single `ref` or `literal` key would be read as one. Wrap it in `{"literal": ...}` to take it as written. Nothing inside a `literal` is read, so `{"literal": {"literal": 1}}` is the object `{"literal": 1}`.
-- `from` already starts at the top of the input, so it doesn't take `$$input`. `"from": ["$$input", "packages"]` looks for a key called `$$input`, finds no subjects, and fails `$min_subjects`.
+- `from` already starts at the top of the input, so it doesn't take `$$input` or `$$params`. `"from": ["$$input", "packages"]` looks for a key called `$$input`, finds no subjects, and fails `$min_subjects`.
 - Some tools treat `$$` as an escape for `$`, like docker-compose and Make. A policy that passes through one of them reaches ergo as `$input`, which is read as a [name](#naming-subjects). No subject is called `input`, so the check fails with cause `absent`.
 
 ## Naming subjects
@@ -502,7 +520,7 @@ op_passed(check, subj) if {
 ```
 
 ```rego
-"even_batches": {"op": "multiple_of", "path": ["n"], "by": {"ref": ["$$input", "params", "batch"]}, "expression": "n is a multiple of the batch size", "inputs": [["n"]]}
+"even_batches": {"op": "multiple_of", "path": ["n"], "by": {"ref": ["$$params", "batch"]}, "expression": "n is a multiple of the batch size", "inputs": [["n"]]}
 ```
 
 ergo finds the refs in your check by itself, so they appear under `$refs` and decide the cause when they can't be read, as for built-in operators.
@@ -512,7 +530,7 @@ A custom operator works in `checks`, in `applies_to`, and on either side of a su
 Two rules:
 
 - **Fail when you can't read the data.** Check that fields are there and have the right type before you compare them. A rule that doesn't hold fails the check, which is what you want. Be careful with `not`, which turns an error into a pass.
-- **Read the document with `value_at` and `$$input`, not with `input`.** While ergo checks a subject, `input` holds ergo's own [names](#naming-subjects), not your input.
+- **Read the document with `value_at` and `$$input`, and params with `$$params` or `arg`, not with `input` or `data.params`.** While ergo checks a subject, `input` holds ergo's own [names](#naming-subjects), not your input, and `data.params` may not be the params the report was given.
 - **Only call ergo's lower-level rules**, like `value_at`, `arg` and `leaf_passed`. Calling `op_passed`, `check_passed` or `report` from your operator creates a loop, which Rego rejects, and the errors will point at `ergo.rego` rather than your file.
 
 ## The report
