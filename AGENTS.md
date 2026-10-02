@@ -9,6 +9,7 @@ ergo is a Rego library that turns policy evaluation into a structured report. Us
 - `custom_op_test.rego` defines custom operators that only the tests use.
 - `README.md` walks a new user through a first policy.
 - `REFERENCE.md` describes every field, operator, cause and report entry.
+- `examples/` holds worked examples. Each one has an input, the same policy in plain Rego and with ergo, and tests that pin what both versions report.
 
 ## Checks
 
@@ -84,6 +85,7 @@ The first line names the part of the repo that changed, then says what the chang
 - `docs:` `README.md`, `REFERENCE.md` and `AGENTS.md`
 - `site:` the website in `site/`
 - `ci:` workflows and Dependabot
+- `examples:` the worked examples in `examples/`
 
 For example, `core: fail compare when either side is missing`.
 
