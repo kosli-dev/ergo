@@ -107,7 +107,7 @@ from_unreadable(req) if {
 
 from_unreadable(req) if {
 	step := each_step(req)
-	"keys" in object.keys(step)
+	is_ref(step.keys)
 	not listed_keys(step)
 }
 

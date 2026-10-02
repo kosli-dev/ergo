@@ -3874,3 +3874,17 @@ test_keys_and_a_ref_step_can_both_come_from_params if {
 	[[r.subject.id, r.passed] | some r in rows_for(rep, "s", "c")] == [["unit-test", true]]
 	rep.requirements.s.checks["$min_subjects"]["$refs"] == [{"name": "$$params.suites", "value": ["unit-test"]}, {"name": "$$params.where", "value": "test_runs"}]
 }
+
+test_badly_written_keys_fail_well_formed_not_the_search_for_subjects if {
+	every keys in ["unit-test", {"literal": "unit-test"}, {"ref": ["$$params", "s"], "note": "x"}] {
+		rep := ergo.report(suite_doc, suite_req({"each_as": "run", "keys": keys}))
+		[[r.check, r.passed, r.cause] | some r in rep.results] == [["$well_formed", false, "value"], ["$min_subjects", false, "value"]]
+	}
+}
+
+test_keys_from_a_ref_to_a_name_fail_as_an_invalid_ref if {
+	rep := ergo.report(suite_doc, suite_req({"each_as": "run", "keys": {"ref": ["$pr", "suites"]}}))
+	rows_for(rep, "s", "$well_formed")[0].passed == true
+	rows_for(rep, "s", "$min_subjects")[0].cause == "absent"
+	rep.requirements.s.checks["$min_subjects"]["$refs"] == [{"name": "<invalid ref>", "value": null}]
+}
