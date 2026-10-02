@@ -10,7 +10,8 @@
   fig.querySelectorAll('pre.ft__code > code').forEach(function (code) {
     code.innerHTML = code.innerHTML.split('\n').map(function (l) { return '<span class="code-line">' + l + '</span>'; }).join('\n');
   });
-  var idx = 0, timer = 0, paused = false, manual = false, ticks = [];
+  var idx = 0, timer = 0, idle = 0, paused = false, manual = false, ticks = [];
+  var RESUME_AFTER = 60000;
   var clearTicks = function () { ticks.forEach(clearTimeout); ticks = []; };
   var schedule = function () {
     clearTimeout(timer);
@@ -36,7 +37,18 @@
     }
     schedule();
   };
-  var jump = function (i) { manual = true; clearTimeout(timer); live.setAttribute('aria-live', 'polite'); show(i, false); };
+  var jump = function (i) {
+    manual = true;
+    clearTimeout(timer);
+    clearTimeout(idle);
+    live.setAttribute('aria-live', 'polite');
+    show(i, false);
+    idle = setTimeout(function () {
+      manual = false;
+      live.setAttribute('aria-live', 'off');
+      schedule();
+    }, RESUME_AFTER);
+  };
   tabs.forEach(function (t) {
     t.addEventListener('click', function () {
       jump(views.findIndex(function (v) { return v.dataset.ex === t.dataset.ex; }));
