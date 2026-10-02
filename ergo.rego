@@ -45,10 +45,10 @@ from_well_formed(req) if {
 	every seg in from_path(req) {
 		not is_object(seg)
 	}
-	object.keys(step) - {"each", "keys"} == set()
-	is_string(step.each)
-	step.each != ""
-	not startswith(step.each, "$")
+	object.keys(step) - {"each_as", "keys"} == set()
+	is_string(step.each_as)
+	step.each_as != ""
+	not startswith(step.each_as, "$")
 	keys_well_formed(step)
 }
 
@@ -124,7 +124,7 @@ matching_subjects(doc, req) := [entry.subject | some entry in matching_entries(d
 
 default scope_of(_, _) := {}
 
-scope_of(req, subj) := {each_step(req).each: subj} if from_well_formed(req)
+scope_of(req, subj) := {each_step(req).each_as: subj} if from_well_formed(req)
 
 passes(req, check, subj) := v if {
 	s := scope_of(req, subj)
@@ -913,7 +913,7 @@ described(check, item) := object.union(check, {"expression": sprintf(
 	[expression_of(check, item), expression_of(check.substitute, item)],
 )}) if check.substitute
 
-subject_item_name(req) := sprintf("$%s", [each_step(req).each]) if from_well_formed(req)
+subject_item_name(req) := sprintf("$%s", [each_step(req).each_as]) if from_well_formed(req)
 
 subject_item_name(req) := sprintf("%s[]", [path_name(from_of(req))]) if {
 	not stepped(req)

@@ -2757,7 +2757,7 @@ suite_req(step) := {"s": {
 suite_rows(doc, step) := [[r.subject.id, r.passed, r.cause] | some r in rows_for(ergo.report(doc, suite_req(step)), "s", "c")]
 
 test_an_each_step_makes_every_entry_of_an_object_a_subject_named_by_its_key if {
-	suite_rows(suite_doc, {"each": "suite"}) == [
+	suite_rows(suite_doc, {"each_as": "suite"}) == [
 		["integration-test", true, "satisfied"],
 		["smoke-test", false, "value"],
 		["unit-test", true, "satisfied"],
@@ -2765,75 +2765,75 @@ test_an_each_step_makes_every_entry_of_an_object_a_subject_named_by_its_key if {
 }
 
 test_an_each_step_identifies_entries_of_an_object_by_key_even_with_an_id if {
-	rep := ergo.report(suite_doc, {"s": object.union(suite_req({"each": "suite"}).s, {"id": ["result"]})})
+	rep := ergo.report(suite_doc, {"s": object.union(suite_req({"each_as": "suite"}).s, {"id": ["result"]})})
 	[r.subject.id | some r in rows_for(rep, "s", "c")] == ["integration-test", "smoke-test", "unit-test"]
 }
 
 test_an_each_step_over_a_list_makes_every_item_a_subject if {
-	rep := ergo.report({"items": [{"id": "b"}, {"id": "a"}]}, {"s": {"from": ["items", {"each": "item"}], "id": ["id"], "checks": {"c": {"op": "present", "path": ["$item", "id"]}}}})
+	rep := ergo.report({"items": [{"id": "b"}, {"id": "a"}]}, {"s": {"from": ["items", {"each_as": "item"}], "id": ["id"], "checks": {"c": {"op": "present", "path": ["$item", "id"]}}}})
 	[[r.subject.id, r.passed] | some r in rows_for(rep, "s", "c")] == [["b", true], ["a", true]]
 }
 
 test_keys_pick_which_entries_are_subjects if {
-	suite_rows(suite_doc, {"each": "suite", "keys": ["unit-test", "smoke-test"]}) == [
+	suite_rows(suite_doc, {"each_as": "suite", "keys": ["unit-test", "smoke-test"]}) == [
 		["smoke-test", false, "value"],
 		["unit-test", true, "satisfied"],
 	]
 }
 
 test_a_key_the_object_does_not_have_is_a_failing_subject if {
-	suite_rows(suite_doc, {"each": "suite", "keys": ["unit-test", "system-test"]}) == [
+	suite_rows(suite_doc, {"each_as": "suite", "keys": ["unit-test", "system-test"]}) == [
 		["system-test", false, "absent"],
 		["unit-test", true, "satisfied"],
 	]
 }
 
 test_a_key_the_object_does_not_have_fails_the_requirement if {
-	rep := ergo.report(suite_doc, suite_req({"each": "suite", "keys": ["system-test"]}))
+	rep := ergo.report(suite_doc, suite_req({"each_as": "suite", "keys": ["system-test"]}))
 	rep.requirements.s.satisfied == false
 	rep.compliant == false
 }
 
 test_a_missing_key_reads_as_absent_even_from_the_subject_itself if {
 	rep := ergo.report(suite_doc, {"s": {
-		"from": ["build", "test_runs", {"each": "suite", "keys": ["system-test"]}],
+		"from": ["build", "test_runs", {"each_as": "suite", "keys": ["system-test"]}],
 		"checks": {"c": {"op": "present", "path": []}},
 	}})
 	[[r.passed, r.cause, r.inputs] | some r in rows_for(rep, "s", "c")] == [[false, "absent", [{"name": "$suite", "value": null}]]]
 }
 
 test_keys_are_sorted_and_duplicates_dropped if {
-	suite_rows(suite_doc, {"each": "suite", "keys": ["unit-test", "smoke-test", "unit-test"]}) == suite_rows(suite_doc, {"each": "suite", "keys": ["smoke-test", "unit-test"]})
-	count(suite_rows(suite_doc, {"each": "suite", "keys": ["unit-test", "unit-test"]})) == 1
+	suite_rows(suite_doc, {"each_as": "suite", "keys": ["unit-test", "smoke-test", "unit-test"]}) == suite_rows(suite_doc, {"each_as": "suite", "keys": ["smoke-test", "unit-test"]})
+	count(suite_rows(suite_doc, {"each_as": "suite", "keys": ["unit-test", "unit-test"]})) == 1
 }
 
 test_keys_on_something_that_is_not_an_object_all_fail if {
-	suite_rows({"build": {"test_runs": [{"result": "passed"}]}}, {"each": "suite", "keys": ["0", "unit-test"]}) == [
+	suite_rows({"build": {"test_runs": [{"result": "passed"}]}}, {"each_as": "suite", "keys": ["0", "unit-test"]}) == [
 		["0", false, "absent"],
 		["unit-test", false, "absent"],
 	]
 }
 
 test_an_empty_keys_list_gives_no_subjects if {
-	rep := ergo.report(suite_doc, suite_req({"each": "suite", "keys": []}))
+	rep := ergo.report(suite_doc, suite_req({"each_as": "suite", "keys": []}))
 	rep.requirements.s.subjects == {"total": 0, "matching": 0}
 	rep.requirements.s.satisfied == false
 }
 
 test_an_each_step_on_something_missing_or_scalar_gives_no_subjects if {
-	ergo.report({}, suite_req({"each": "suite"})).requirements.s.subjects == {"total": 0, "matching": 0}
-	ergo.report({"build": {"test_runs": "x"}}, suite_req({"each": "suite"})).requirements.s.subjects == {"total": 0, "matching": 0}
-	ergo.report({}, suite_req({"each": "suite"})).requirements.s.satisfied == false
+	ergo.report({}, suite_req({"each_as": "suite"})).requirements.s.subjects == {"total": 0, "matching": 0}
+	ergo.report({"build": {"test_runs": "x"}}, suite_req({"each_as": "suite"})).requirements.s.subjects == {"total": 0, "matching": 0}
+	ergo.report({}, suite_req({"each_as": "suite"})).requirements.s.satisfied == false
 }
 
 test_min_subjects_counts_from_the_path_before_the_each_step if {
-	rep := ergo.report(suite_doc, suite_req({"each": "suite"}))
+	rep := ergo.report(suite_doc, suite_req({"each_as": "suite"}))
 	rep.requirements.s.checks["$min_subjects"].expression == "count(matching(build.test_runs)) >= 1"
 }
 
 test_an_empty_path_under_an_each_step_is_named_after_the_name if {
 	rep := ergo.report(suite_doc, {"s": {
-		"from": ["build", "test_runs", {"each": "suite"}],
+		"from": ["build", "test_runs", {"each_as": "suite"}],
 		"applies_to": {"f": {"op": "present", "path": []}},
 		"checks": {"c": {"op": "present", "path": []}},
 	}})
@@ -2843,7 +2843,7 @@ test_an_empty_path_under_an_each_step_is_named_after_the_name if {
 
 test_a_name_at_the_start_of_a_path_reads_the_subject if {
 	rep := ergo.report(suite_doc, {"s": {
-		"from": ["build", "test_runs", {"each": "suite"}],
+		"from": ["build", "test_runs", {"each_as": "suite"}],
 		"checks": {"c": {"op": "equals", "path": ["$suite", "result"], "value": "passed"}},
 	}})
 	[[r.subject.id, r.passed, r.inputs] | some r in rows_for(rep, "s", "c")] == [
@@ -2856,7 +2856,7 @@ test_a_name_at_the_start_of_a_path_reads_the_subject if {
 
 test_a_name_alone_reads_the_whole_subject if {
 	rep := ergo.report({"names": ["a", ""]}, {"s": {
-		"from": ["names", {"each": "n"}],
+		"from": ["names", {"each_as": "n"}],
 		"checks": {"c": {"op": "non_empty_string", "path": ["$n"]}},
 	}})
 	[[r.subject.id, r.passed] | some r in rows_for(rep, "s", "c")] == [["a", true], ["", false]]
@@ -2870,7 +2870,7 @@ pr_doc := {"pull_requests": [
 
 peer_req := {"s": {
 	"subject_type": "pull request",
-	"from": ["pull_requests", {"each": "pr"}],
+	"from": ["pull_requests", {"each_as": "pr"}],
 	"id": ["number"],
 	"checks": {"c": {"op": "any", "path": ["approvers"], "check": {"op": "compare", "left": ["username"], "right": ["$pr", "author"], "cmp": "ne"}}},
 }}
@@ -2895,7 +2895,7 @@ test_a_name_read_inside_a_list_check_is_shown_in_the_row if {
 
 test_a_name_read_inside_an_any_of_in_a_list_check_is_shown_in_the_row if {
 	rep := ergo.report(pr_doc, {"s": {
-		"from": ["pull_requests", {"each": "pr"}],
+		"from": ["pull_requests", {"each_as": "pr"}],
 		"id": ["number"],
 		"checks": {"c": {"op": "all", "path": ["approvers"], "check": {"op": "any_of", "options": {"x": [{"op": "compare", "left": ["username"], "right": ["$pr", "author"], "cmp": "eq"}]}}}},
 	}})
@@ -2916,7 +2916,7 @@ test_an_input_read_inside_a_list_check_is_shown_in_the_row if {
 
 test_each_subject_reads_its_own_name if {
 	rep := ergo.report({"a": [{"x": 1, "y": 1}, {"x": 2, "y": 3}]}, {"s": {
-		"from": ["a", {"each": "it"}],
+		"from": ["a", {"each_as": "it"}],
 		"id": ["x"],
 		"checks": {"c": {"op": "compare", "left": ["$it", "x"], "right": ["y"], "cmp": "eq"}},
 	}})
@@ -2925,7 +2925,7 @@ test_each_subject_reads_its_own_name if {
 
 test_a_name_that_is_not_bound_reads_as_absent if {
 	rep := ergo.report(pr_doc, {"s": {
-		"from": ["pull_requests", {"each": "pr"}],
+		"from": ["pull_requests", {"each_as": "pr"}],
 		"id": ["number"],
 		"checks": {"c": {"op": "present", "path": ["$p", "author"]}},
 	}})
@@ -2944,7 +2944,7 @@ test_a_key_that_starts_with_a_dollar_is_read_with_literal if {
 
 test_a_ref_to_a_name_fails_closed if {
 	rep := ergo.report(pr_doc, {"s": {
-		"from": ["pull_requests", {"each": "pr"}],
+		"from": ["pull_requests", {"each_as": "pr"}],
 		"id": ["number"],
 		"checks": {"c": {"op": "equals", "path": ["author"], "value": {"ref": ["$pr", "author"]}}},
 	}})
@@ -2955,7 +2955,7 @@ test_a_ref_to_a_name_fails_closed if {
 
 test_a_filter_can_read_a_name if {
 	rep := ergo.report(suite_doc, {"s": {
-		"from": ["build", "test_runs", {"each": "suite"}],
+		"from": ["build", "test_runs", {"each_as": "suite"}],
 		"applies_to": {"f": {"op": "equals", "path": ["$suite", "result"], "value": "passed"}},
 		"checks": {"c": {"op": "present", "path": ["result"]}},
 	}})
@@ -2966,7 +2966,7 @@ test_a_filter_can_read_a_name if {
 
 test_a_filter_that_reads_a_name_and_fails_shows_its_value if {
 	rep := ergo.report(suite_doc, {"s": {
-		"from": ["build", "test_runs", {"each": "suite"}],
+		"from": ["build", "test_runs", {"each_as": "suite"}],
 		"applies_to": {"f": {"op": "equals", "path": ["$suite", "result"], "value": "passed"}},
 		"checks": {"c": {"op": "present", "path": ["result"]}},
 	}})
@@ -2977,7 +2977,7 @@ test_a_filter_that_reads_a_name_and_fails_shows_its_value if {
 
 test_a_present_filter_on_a_name_rules_out_a_missing_key if {
 	rep := ergo.report(suite_doc, {"s": {
-		"from": ["build", "test_runs", {"each": "suite", "keys": ["system-test", "unit-test"]}],
+		"from": ["build", "test_runs", {"each_as": "suite", "keys": ["system-test", "unit-test"]}],
 		"applies_to": {"f": {"op": "present", "path": ["$suite"]}},
 		"checks": {"c": {"op": "present", "path": ["result"]}},
 	}})
@@ -2986,13 +2986,13 @@ test_a_present_filter_on_a_name_rules_out_a_missing_key if {
 }
 
 test_require_some_passes_when_one_key_passes if {
-	rep := ergo.report(suite_doc, {"s": object.union(suite_req({"each": "suite", "keys": ["smoke-test", "unit-test"]}).s, {"require": "some"})})
+	rep := ergo.report(suite_doc, {"s": object.union(suite_req({"each_as": "suite", "keys": ["smoke-test", "unit-test"]}).s, {"require": "some"})})
 	rep.requirements.s.satisfied == true
 }
 
 test_a_custom_operator_can_read_a_name if {
 	rep := ergo.report({"xs": [{"n": 2}, {"n": 3}]}, {"s": {
-		"from": ["xs", {"each": "x"}],
+		"from": ["xs", {"each_as": "x"}],
 		"id": ["n"],
 		"checks": {"c": {"op": "even", "path": ["$x", "n"]}},
 	}})
@@ -3001,7 +3001,7 @@ test_a_custom_operator_can_read_a_name if {
 
 test_a_name_read_from_the_input_still_works_under_an_each_step if {
 	rep := ergo.report(object.union(suite_doc, {"params": {"want": "passed"}}), {"s": {
-		"from": ["build", "test_runs", {"each": "suite"}],
+		"from": ["build", "test_runs", {"each_as": "suite"}],
 		"checks": {"c": {"op": "equals", "path": ["$suite", "result"], "value": {"ref": ["$$input", "params", "want"]}}},
 	}})
 	[r.passed | some r in rows_for(rep, "s", "c")] == [true, false, true]
@@ -3015,16 +3015,18 @@ ill_formed_from(step_from) := ergo.report(suite_doc, {"s": {
 
 test_a_from_with_a_badly_written_step_is_not_well_formed if {
 	every f in [
-		["build", {"each": "x"}, "test_runs"],
-		["build", {"each": "x"}, "test_runs", {"each": "y"}],
-		["build", "test_runs", {"each": 1}],
-		["build", "test_runs", {"each": ""}],
-		["build", "test_runs", {"each": "$x"}],
-		["build", "test_runs", {"each": "$$input"}],
+		["build", {"each_as": "x"}, "test_runs"],
+		["build", {"each_as": "x"}, "test_runs", {"each_as": "y"}],
+		["build", "test_runs", {"each_as": 1}],
+		["build", "test_runs", {"each_as": ""}],
+		["build", "test_runs", {"each_as": "$x"}],
+		["build", "test_runs", {"each_as": "$$input"}],
 		["build", "test_runs", {"name": "x"}],
-		["build", "test_runs", {"each": "x", "kesy": ["a"]}],
-		["build", "test_runs", {"each": "x", "keys": "unit-test"}],
-		["build", "test_runs", {"each": "x", "keys": {"ref": ["$$input", "keys"]}}],
+		["build", "test_runs", {"each": "x"}],
+		["build", "test_runs", {"each_as": "x", "each": "x"}],
+		["build", "test_runs", {"each_as": "x", "kesy": ["a"]}],
+		["build", "test_runs", {"each_as": "x", "keys": "unit-test"}],
+		["build", "test_runs", {"each_as": "x", "keys": {"ref": ["$$input", "keys"]}}],
 	] {
 		rep := ill_formed_from(f)
 		rows_for(rep, "s", "$well_formed")[0].passed == false
@@ -3036,17 +3038,17 @@ test_a_from_with_a_badly_written_step_is_not_well_formed if {
 
 test_a_badly_written_from_is_named_as_invalid if {
 	rep := ergo.report(suite_doc, {"s": {
-		"from": ["build", {"each": "x"}, "test_runs"],
+		"from": ["build", {"each_as": "x"}, "test_runs"],
 		"checks": {"c": {"op": "present", "path": []}},
 	}})
 	rep.requirements.s.checks.c.expression == "<invalid from> is present"
 }
 
 test_a_well_formed_row_for_a_from_with_a_step_shows_the_from if {
-	rep := ill_formed_from(["build", "test_runs", {"each": "suite"}])
+	rep := ill_formed_from(["build", "test_runs", {"each_as": "suite"}])
 	row := rows_for(rep, "s", "$well_formed")[0]
 	row.passed == true
-	row.inputs[2] == {"name": "from", "value": ["build", "test_runs", {"each": "suite"}]}
+	row.inputs[2] == {"name": "from", "value": ["build", "test_runs", {"each_as": "suite"}]}
 	rep.requirements.s.checks["$well_formed"].expression == "count(checks) >= 1 and require in {every, some} and from is well formed"
 }
 

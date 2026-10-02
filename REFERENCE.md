@@ -163,7 +163,7 @@ Some things worth knowing:
 
 ## Naming subjects
 
-`from` can end with a step that names each subject: `{"each": "name"}`. A path that starts with `$name` then reads that subject.
+`from` can end with a step that names each subject: `{"each_as": "name"}`. A path that starts with `$name` then reads that subject.
 
 If `from` leads to an object, the step makes every entry a subject, identified by its key and sorted by key. Without it, the whole object is one subject. If `from` leads to a list, every item is a subject, as without the step.
 
@@ -186,7 +186,7 @@ and you need a passing unit test, integration test and system test run:
 ```rego
 "tests_passed": {
 	"subject_type": "test run",
-	"from": ["build", "test_runs", {"each": "run", "keys": ["unit-test", "integration-test", "system-test"]}],
+	"from": ["build", "test_runs", {"each_as": "run", "keys": ["unit-test", "integration-test", "system-test"]}],
 	"checks": {"passed": {"description": "The tests passed", "op": "equals", "path": ["result"], "value": "passed"}},
 }
 ```
@@ -221,7 +221,7 @@ The name matters inside `all` and `any`, where paths start at each item of the l
 ```rego
 "peer_reviewed": {
 	"subject_type": "pull request",
-	"from": ["pull_requests", {"each": "pr"}],
+	"from": ["pull_requests", {"each_as": "pr"}],
 	"id": ["number"],
 	"checks": {"peer": {
 		"description": "Someone other than the author approved it",
