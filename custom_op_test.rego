@@ -1,5 +1,11 @@
 package ergo
 
+operators contains "even"
+
+operators contains "both_present"
+
+operators contains "multiple_of"
+
 op_passed(check, subj) if {
 	check.op == "even"
 	n := value_at(subj, check.path)
@@ -22,3 +28,5 @@ op_passed(check, subj) if {
 	is_number(by)
 	n % by == 0
 }
+
+op_passed(check, _) if check.op == "undeclared"
