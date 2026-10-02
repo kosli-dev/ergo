@@ -26,6 +26,7 @@
     tabs.forEach(function (t) { t.setAttribute('aria-pressed', t.dataset.ex === v.dataset.ex ? 'true' : 'false'); });
     steps.forEach(function (s) { s.setAttribute('aria-pressed', s.dataset.step === v.dataset.step ? 'true' : 'false'); });
     if (file) file.textContent = v.dataset.file;
+    fig.classList.toggle('ft--instant', !animate || still);
     var units = [].slice.call(v.querySelectorAll('.code-line, .report__row'));
     if (!animate || still) {
       units.forEach(function (u) { u.classList.add('is-resolved'); });

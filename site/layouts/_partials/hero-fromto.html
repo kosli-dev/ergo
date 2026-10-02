@@ -63,7 +63,20 @@ deny <span class="kw">contains</span> msg <span class="kw">if</span> {
         <span class="k">path</span>: [<span class="s">approved_by</span>]</code></pre>
     </div>
 
-    <div class="ft__view" data-ex="deploy" data-step="3" data-file="opa eval ... data.deploy.report" data-hold="8500">
+    <div class="ft__view" data-ex="deploy" data-step="3" data-file="deployments.json" data-hold="6000">
+      <p class="ft__label mono"><span class="ft__who ft__who--ergo">ergo</span> the evaluation, reading this input</p>
+<pre class="code ft__code"><code>{
+  <span class="k">"deployments"</span>: [
+    {<span class="k">"id"</span>: <span class="s">"d-1"</span>, <span class="k">"environment"</span>: <span class="s">"prod"</span>,
+     <span class="k">"approved_by"</span>: <span class="s">"alice"</span>},
+    {<span class="k">"id"</span>: <span class="s">"d-2"</span>, <span class="k">"environment"</span>: <span class="s">"prod"</span>},
+    {<span class="k">"id"</span>: <span class="s">"d-3"</span>, <span class="k">"environment"</span>: <span class="s">"staging"</span>}
+  ]
+}</code></pre>
+      <p class="ft__caption">{{ partial "copy.html" (index $c.fromto.examples 0).input_caption }}</p>
+    </div>
+
+    <div class="ft__view" data-ex="deploy" data-step="4" data-file="opa eval ... data.deploy.report" data-hold="8500">
       <p class="ft__label mono"><span class="ft__who ft__who--ergo">ergo</span> the report</p>
       <div class="report ft__report">
         <div class="report__head"><span>subject</span><span>check</span><span>value read</span><span>passed</span><span>cause</span></div>
@@ -134,7 +147,22 @@ peer_approved(pr) <span class="kw">if</span> {
           <span class="k">cmp</span>: <span class="s">ne</span></code></pre>
     </div>
 
-    <div class="ft__view" data-ex="review" data-step="3" data-file="opa eval ... data.review.report" data-hold="8500">
+    <div class="ft__view" data-ex="review" data-step="3" data-file="pull_requests.json" data-hold="6000">
+      <p class="ft__label mono"><span class="ft__who ft__who--ergo">ergo</span> the evaluation, reading this input</p>
+<pre class="code ft__code"><code>{
+  <span class="k">"pull_requests"</span>: [
+    {<span class="k">"number"</span>: <span class="n">1</span>, <span class="k">"author"</span>: <span class="s">"ann"</span>,
+      <span class="k">"approvers"</span>: [{<span class="k">"username"</span>: <span class="s">"ann"</span>}, {<span class="k">"username"</span>: <span class="s">"bob"</span>}]},
+    {<span class="k">"number"</span>: <span class="n">2</span>, <span class="k">"author"</span>: <span class="s">"bob"</span>,
+      <span class="k">"approvers"</span>: [{<span class="k">"username"</span>: <span class="s">"bob"</span>}]},
+    {<span class="k">"number"</span>: <span class="n">3</span>,
+      <span class="k">"approvers"</span>: [{<span class="k">"username"</span>: <span class="s">"bob"</span>}]}
+  ]
+}</code></pre>
+      <p class="ft__caption">{{ partial "copy.html" (index $c.fromto.examples 1).input_caption }}</p>
+    </div>
+
+    <div class="ft__view" data-ex="review" data-step="4" data-file="opa eval ... data.review.report" data-hold="8500">
       <p class="ft__label mono"><span class="ft__who ft__who--ergo">ergo</span> the report</p>
       <div class="report ft__report">
         <div class="report__head"><span>subject</span><span>check</span><span>value read</span><span>passed</span><span>cause</span></div>

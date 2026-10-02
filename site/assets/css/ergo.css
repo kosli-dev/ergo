@@ -174,6 +174,7 @@ p code, li code, dd code, td code {
 .ft__tab[aria-pressed="true"] { background: var(--lime); color: var(--ink); }
 .ft__views { display: grid; padding: 18px 18px 8px; }
 .ft__view { min-width: 0; }
+.ft--instant .code-line, .ft--instant .report__row > span { transition: none !important; }
 .js .ft__view { grid-area: 1 / 1; visibility: hidden; }
 .js .ft__view.is-active { visibility: visible; }
 .ft__label { display: flex; gap: 8px; margin: 0 0 10px; font-size: 12px; letter-spacing: .02em; color: var(--faint); }
