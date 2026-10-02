@@ -27,6 +27,7 @@ each_step(req) := step if {
 	count(f) > 0
 	step := f[count(f) - 1]
 	is_object(step)
+	not is_ref(step)
 }
 
 stepped(req) if {
@@ -34,6 +35,7 @@ stepped(req) if {
 	is_array(f)
 	some seg in f
 	is_object(seg)
+	not is_ref(seg)
 }
 
 default from_well_formed(_) := false
@@ -43,12 +45,16 @@ from_well_formed(req) if not stepped(req)
 from_well_formed(req) if {
 	step := each_step(req)
 	every seg in from_path(req) {
-		not is_object(seg)
+		plain_step(seg)
 	}
 	object.keys(step) - {"each_as", "keys"} == set()
 	valid_name(step.each_as)
 	keys_well_formed(step)
 }
+
+plain_step(seg) if not is_object(seg)
+
+plain_step(seg) if is_ref(seg)
 
 valid_name(n) if {
 	is_string(n)
@@ -60,7 +66,33 @@ keys_well_formed(step) if not "keys" in object.keys(step)
 
 keys_well_formed(step) if is_array(step.keys)
 
-target(doc, req) := object.get(doc, from_path(req), null)
+target(doc, req) := object.get(doc, from_keys(req), null)
+
+from_keys(req) := ks if {
+	p := from_path(req)
+	is_array(p)
+	ks := [step_key(seg) | some seg in p]
+	count(ks) == count(p)
+}
+
+from_keys(req) := from_path(req) if not is_array(from_path(req))
+
+from_unreadable(req) if {
+	p := from_path(req)
+	is_array(p)
+	some seg in p
+	is_ref(seg)
+	not step_key(seg)
+}
+
+from_cause(req) := worst_of(unread) if {
+	unread := from_ref_states(req) - {"value"}
+	count(unread) > 0
+}
+
+from_cause(req) := "absent" if from_ref_states(req) - {"value"} == set()
+
+from_ref_states(req) := {ref_state(seg.ref) | some seg in from_path(req); is_ref(seg)}
 
 listed_subjects(doc, req) := coll if {
 	coll := target(doc, req)
@@ -232,16 +264,41 @@ start_of(_, path) := input["ergo/names"][substring(path[0], 1, -1)] if {
 	not builtin(path)
 }
 
-keys_of(path) := [unliteral(seg) | some seg in path] if {
+keys_of(path) := ks if {
 	is_array(path)
 	not named(path)
+	ks := [step_key(seg) | some seg in path]
+	count(ks) == count(path)
 }
 
 keys_of(path) := [path] if is_string(path)
 
 keys_of(path) := [path] if is_number(path)
 
-keys_of(path) := [unliteral(seg) | some seg in array.slice(path, 1, count(path))] if named(path)
+keys_of(path) := ks if {
+	named(path)
+	rest := array.slice(path, 1, count(path))
+	ks := [step_key(seg) | some seg in rest]
+	count(ks) == count(rest)
+}
+
+step_key(seg) := seg.literal if is_literal(seg)
+
+step_key(seg) := v if {
+	is_ref(seg)
+	v := ref_read(seg.ref)
+	is_key(v)
+}
+
+step_key(seg) := seg if {
+	not is_literal(seg)
+	not is_ref(seg)
+	not malformed(seg)
+}
+
+is_key(v) if is_string(v)
+
+is_key(v) if is_number(v)
 
 unliteral(seg) := seg.literal if is_literal(seg)
 
@@ -272,7 +329,7 @@ arg(x) := x if {
 	not malformed(x)
 }
 
-ref_read(path) := object.get(start_of(null, path), keys_of(path), absent) if builtin(path)
+ref_read(path) := object.get(start_of(null, path), [unliteral(seg) | some seg in array.slice(path, 1, count(path))], absent) if builtin(path)
 
 ref_name(path) := concat(".", [sprintf("%v", [unliteral(seg)]) | some seg in path]) if builtin(path)
 
@@ -328,7 +385,13 @@ segment_name(p) := sprintf("%v", [p.literal]) if is_literal(p)
 segment_name(p) := sprintf("[%s]", [concat(" and ", sort([sprintf("%v==%s", [k, value_text(v)]) | some k, v in p.where]))]) if {
 	is_object(p)
 	not is_literal(p)
+	not is_ref(p)
+	not malformed(p)
 }
+
+segment_name(p) := sprintf("[%s]", [ref_name(p.ref)]) if is_ref(p)
+
+segment_name(p) := "[<invalid ref>]" if malformed(p)
 
 value_text(x) := ref_name(x.ref) if is_ref(x)
 
@@ -883,6 +946,8 @@ filter_cause(check, subj) := row_cause(check, subj) if not answers_presence(chec
 
 answers_presence(check, subj) if {
 	check.op == "present"
+	keys_of(check.path)
+	not unreadable_ref(check)
 	row_cause(check, subj) in {"absent", "null"}
 }
 
@@ -894,6 +959,7 @@ scope_unreadable(subj, req) if {
 }
 
 scope_readable(doc, req) if {
+	not from_unreadable(req)
 	every subj in raw_subjects(doc, req) {
 		not scope_unreadable(subj, req)
 	}
@@ -1237,10 +1303,13 @@ matching_count_name(req) := sprintf("count(matching(%s))", [path_name(from_path(
 
 matching_count_name(req) := "count(matching(<invalid from>))" if not from_well_formed(req)
 
-min_subjects_def(req) := {"$min_subjects": {
-	"description": sprintf("at least %d matching %s subject(s) required", [min_subjects_of(req), subject_type_of(req)]),
-	"expression": sprintf("%s >= %d", [matching_count_name(req), min_subjects_of(req)]),
-}}
+min_subjects_def(req) := {"$min_subjects": with_refs(
+	{
+		"description": sprintf("at least %d matching %s subject(s) required", [min_subjects_of(req), subject_type_of(req)]),
+		"expression": sprintf("%s >= %d", [matching_count_name(req), min_subjects_of(req)]),
+	},
+	{"from": from_of(req)},
+)}
 
 well_formed_def(req) := {"$well_formed": {
 	"description": "the requirement declares at least one check and a recognised \"require\" value; lacking either, it asserts nothing that could ever be satisfied",
@@ -1324,9 +1393,20 @@ min_subjects_row(doc, req, req_name) := {
 	"subject": {"type": subject_type_of(req), "id": null},
 	"check": "$min_subjects",
 	"inputs": [{"name": matching_count_name(req), "value": count(matching_subjects(doc, req))}],
-	"passed": count(matching_subjects(doc, req)) >= min_subjects_of(req),
-	"cause": verdict_cause(count(matching_subjects(doc, req)) >= min_subjects_of(req)),
+	"passed": enough_subjects(doc, req),
+	"cause": min_subjects_cause(doc, req),
 }
+
+default enough_subjects(_, _) := false
+
+enough_subjects(doc, req) if {
+	not from_unreadable(req)
+	count(matching_subjects(doc, req)) >= min_subjects_of(req)
+}
+
+min_subjects_cause(doc, req) := verdict_cause(enough_subjects(doc, req)) if not from_unreadable(req)
+
+min_subjects_cause(_, req) := from_cause(req) if from_unreadable(req)
 
 applies_rows(doc, req, req_name) := [{
 	"requirement": req_name,
