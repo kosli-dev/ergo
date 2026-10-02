@@ -3065,3 +3065,62 @@ test_an_input_missing_inside_a_list_check_fails_as_absent if {
 	}})
 	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "absent"]]
 }
+
+test_a_name_missing_in_the_path_of_a_list_check_fails_as_absent if {
+	rep := ergo.report({"prs": [{"n": 1, "xs": [1, 2]}]}, {"s": {
+		"from": ["prs", {"each_as": "pr"}],
+		"id": ["n"],
+		"checks": {"c": {"op": "all", "path": ["xs"], "check": {"op": "present", "path": ["$pr", "author"]}}},
+	}})
+	[[r.passed, r.cause, r.inputs] | some r in rows_for(rep, "s", "c")] == [[false, "absent", [{"name": "$pr.author", "value": null}]]]
+}
+
+test_an_input_missing_in_the_path_of_a_list_check_fails_as_absent if {
+	rep := ergo.report({"items": [{"id": 1, "xs": [1]}]}, {"s": {
+		"from": ["items"],
+		"id": ["id"],
+		"checks": {"c": {"op": "all", "path": ["xs"], "check": {"op": "present", "path": ["$$input", "nope"]}}},
+	}})
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "absent"]]
+}
+
+test_an_id_can_start_with_a_name if {
+	rep := ergo.report(pr_doc, {"s": {
+		"from": ["pull_requests", {"each_as": "pr"}],
+		"id": ["$pr", "number"],
+		"checks": {"c": {"op": "present", "path": ["number"]}},
+	}})
+	[r.subject.id | some r in rows_for(rep, "s", "c")] == [1, 2, 3]
+}
+
+test_the_input_cannot_give_names if {
+	rep := ergo.report(suite_doc, {"s": {
+		"from": ["build", "test_runs"],
+		"checks": {"c": {"op": "present", "path": ["$suite", "x"]}},
+	}}) with input as {"ergo/names": {"suite": {"x": 1}}}
+	[r.passed | some r in rows_for(rep, "s", "c")] == [false]
+}
+
+test_the_input_cannot_give_other_names_under_a_step if {
+	rep := ergo.report(suite_doc, {"s": {
+		"from": ["build", "test_runs", {"each_as": "run"}],
+		"checks": {"c": {"op": "present", "path": ["$suite", "x"]}},
+	}}) with input as {"ergo/names": {"suite": {"x": 1}}}
+	[r.passed | some r in rows_for(rep, "s", "c")] == [false, false, false]
+}
+
+test_a_badly_written_from_is_named_as_invalid_in_min_subjects if {
+	rep := ergo.report(suite_doc, {"s": {
+		"from": ["build", {"each_as": "x"}, "test_runs"],
+		"checks": {"c": {"op": "present", "path": []}},
+	}})
+	rep.requirements.s.checks["$min_subjects"].expression == "count(matching(<invalid from>)) >= 1"
+}
+
+test_a_literal_or_selector_in_from_is_not_well_formed_so_it_cannot_pass_by_finding_nothing if {
+	every f in [["a", {"literal": "$x"}], ["a", {"where": {"id": 1}}]] {
+		rep := ergo.report({"a": {"$x": [{"id": 1}]}}, {"s": {"from": f, "min_subjects": 0, "checks": {"c": {"op": "present", "path": ["id"]}}}})
+		rows_for(rep, "s", "$well_formed")[0].passed == false
+		rep.requirements.s.satisfied == false
+	}
+}

@@ -254,8 +254,9 @@ If `author` were missing, the cause would be `absent`.
 Some things worth knowing:
 
 - The step must be the last one in `from`, and there can only be one. The name must be a string that doesn't start with `$`. `keys` must be a list. A step with any other field, or one that breaks these rules, fails `$well_formed` and gives no subjects, so the requirement is never met, even with `min_subjects: 0`.
+- Any other object in `from`, like a selector or a `literal`, fails `$well_formed` the same way. `from` has never read them, so a requirement with `min_subjects: 0` used to find nothing and pass.
 - Keys are sorted and duplicates dropped, so the order you list them in doesn't change the report. If `from` doesn't lead to an object, every key is still a subject, and its checks fail as `absent`. An empty `keys` list gives no subjects, so `$min_subjects` fails.
-- A subject from an object is identified by its key, even if the requirement has an `id`.
+- A subject from an object is identified by its key, even if the requirement has an `id`. For a list, the `id` can start with the name, like `["$pr", "number"]`.
 - An empty path is named after the subject's name (`$run`), not after `from`.
 - A path that starts with a name nobody gave, like `["$runs", "result"]`, fails the check with cause `absent`. To read a key that really starts with `$`, write it as `{"literal": "$schema"}`.
 - A `ref` can't start with a name yet, only with `$$input`. `{"ref": ["$pr", "author"]}` fails the check and shows `<invalid ref>`.
@@ -431,6 +432,7 @@ A custom operator works in `checks`, in `applies_to`, and on either side of a su
 Two rules:
 
 - **Fail when you can't read the data.** Check that fields are there and have the right type before you compare them. A rule that doesn't hold fails the check, which is what you want. Be careful with `not`, which turns an error into a pass.
+- **Read the document with `value_at` and `$$input`, not with `input`.** While ergo checks a subject, `input` holds ergo's own [names](#naming-subjects), not your input.
 - **Only call ergo's lower-level rules**, like `value_at`, `arg` and `leaf_passed`. Calling `op_passed`, `check_passed` or `report` from your operator creates a loop, which Rego rejects, and the errors will point at `ergo.rego` rather than your file.
 
 ## The report
