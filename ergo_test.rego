@@ -1264,6 +1264,62 @@ test_inputs_name_nested_paths_with_dots if {
 	inputs_of({"a": {"b": 1}}, check) == [{"name": "a.b", "value": 1}]
 }
 
+test_a_key_with_a_dot_is_quoted_so_it_is_not_named_like_a_nested_path if {
+	check := {"op": "present", "path": ["a.b"]}
+	inputs_of({"a.b": 1}, check) == [{"name": `"a.b"`, "value": 1}]
+	rendered({}, check) == `"a.b" is present`
+}
+
+test_a_kubernetes_label_is_quoted_as_one_key if {
+	check := {"op": "present", "path": ["metadata", "labels", "app.kubernetes.io/name"]}
+	rendered({}, check) == `metadata.labels."app.kubernetes.io/name" is present`
+}
+
+test_a_key_made_of_digits_is_quoted_so_it_is_not_named_like_a_list_index if {
+	rendered({}, {"op": "present", "path": ["xs", "0"]}) == `xs."0" is present`
+	rendered({}, {"op": "present", "path": ["xs", 0]}) == `xs.0 is present`
+}
+
+test_an_empty_key_is_quoted if {
+	rendered({}, {"op": "present", "path": ["a", "", "b"]}) == `a."".b is present`
+}
+
+test_a_key_with_a_quote_is_escaped if {
+	rendered({}, {"op": "present", "path": [`say "hi"`]}) == `"say \"hi\"" is present`
+}
+
+test_a_plain_key_with_a_dash_or_dollar_is_not_quoted if {
+	rendered({}, {"op": "present", "path": ["pull-request", "$schema_x"]}) == `pull-request.$schema_x is present`
+}
+
+test_a_selector_key_with_a_dot_is_quoted if {
+	rendered({}, {"op": "present", "path": ["tags", {"where": {"a.b": "x"}}, "v"]}) == `tags.["a.b"==x].v is present`
+}
+
+test_an_any_of_reading_a_dotted_key_and_a_nested_path_gives_a_report if {
+	check := {"op": "any_of", "options": {
+		"x": [{"op": "present", "path": ["a.b"]}],
+		"y": [{"op": "present", "path": ["a", "b"]}],
+	}}
+	inputs_of({"id": 1, "a.b": "dotted", "a": {"b": "nested"}}, check) == [
+		{"name": `"a.b"`, "value": "dotted"},
+		{"name": "a.b", "value": "nested"},
+	]
+}
+
+test_an_any_of_whose_paths_share_a_name_still_gives_a_report if {
+	check := {"op": "any_of", "options": {
+		"x": [{"op": "equals", "path": ["xs", {"where": {"k": 1}}, "v"], "value": "a"}],
+		"y": [{"op": "equals", "path": ["xs", {"where": {"k": "1"}}, "v"], "value": "a"}],
+	}}
+	subj := {"id": 1, "xs": [{"k": 1, "v": "a"}, {"k": "1", "v": "b"}]}
+	verdict(subj, check) == true
+	inputs_of(subj, check) == [
+		{"name": "xs.[k==1].v", "value": "a"},
+		{"name": "xs.[k==1].v", "value": "b"},
+	]
+}
+
 test_inputs_echo_both_sides_of_a_comparison if {
 	inputs_of({"a": 1, "b": 2}, compare_ab("lt")) == [
 		{"name": "a", "value": 1},
@@ -2467,7 +2523,7 @@ test_input_is_only_a_name_at_the_start_of_a_path if {
 
 test_a_literal_path_step_reads_a_key_that_looks_like_a_name if {
 	r := row_in({"$$input": "top"}, {"id": 1, "$$input": "x"}, {"op": "equals", "path": [{"literal": "$$input"}], "value": "x"})
-	[r.passed, r.inputs] == [true, [{"name": "$$input", "value": "x"}]]
+	[r.passed, r.inputs] == [true, [{"name": `"$$input"`, "value": "x"}]]
 }
 
 licence_params := {"params": {"allowed": ["MIT", "Apache-2.0"]}}
@@ -2941,6 +2997,11 @@ test_a_name_that_is_not_bound_reads_as_absent if {
 test_a_name_is_not_bound_without_an_each_step if {
 	r := row_in({}, {"id": 1, "a": 1}, {"op": "present", "path": ["$items", "a"]})
 	[r.passed, r.cause] == [false, "absent"]
+}
+
+test_a_literal_first_key_that_starts_with_a_dollar_is_quoted_so_it_is_not_named_like_a_name if {
+	rendered({}, {"op": "present", "path": [{"literal": "$schema"}, "v"]}) == `"$schema".v is present`
+	rendered({}, {"op": "present", "path": ["a", {"literal": "$schema"}]}) == `a.$schema is present`
 }
 
 test_a_key_that_starts_with_a_dollar_is_read_with_literal if {
@@ -3587,7 +3648,7 @@ test_params_can_be_read_inside_named_and_nested_list_checks if {
 
 test_a_key_called_dollar_dollar_params_is_read_with_literal if {
 	check := {"op": "equals", "path": [{"literal": "$$params"}], "value": "own"}
-	params_rows({"items": [{"id": 1, "$$params": "own"}]}, check) == [[true, "satisfied", [{"name": "$$params", "value": "own"}]]] with data.params as {"$$params": "other"}
+	params_rows({"items": [{"id": 1, "$$params": "own"}]}, check) == [[true, "satisfied", [{"name": `"$$params"`, "value": "own"}]]] with data.params as {"$$params": "other"}
 }
 
 trail_doc := {"trail": {"artifacts": {"app": {
@@ -3749,6 +3810,13 @@ test_a_present_filter_with_a_ref_step_still_rules_out_a_missing_field if {
 test_a_from_written_as_a_string_reads_that_one_key if {
 	rep := ergo.report({"items": [{"id": 1}, {"id": 2}]}, {"s": {"from": "items", "id": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}}})
 	rep.requirements.s.subjects == {"total": 2, "matching": 2}
+}
+
+test_a_dotted_key_in_a_ref_is_quoted if {
+	check := {"op": "equals", "path": ["name"], "value": {"ref": ["$$params", "a.b"]}}
+	rep := ergo.report({"items": [{"id": 1, "name": "x"}]}, params_req(check)) with data.params as {"a.b": "x"}
+	rep.requirements.s.checks.c.expression == `name == $$params."a.b"`
+	rep.requirements.s.checks.c["$refs"] == [{"name": `$$params."a.b"`, "value": "x"}]
 }
 
 test_a_literal_in_a_ref_path_is_read_as_written if {

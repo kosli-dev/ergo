@@ -82,6 +82,8 @@ A few details:
 
 A path is a list of keys that ergo follows one step at a time. `["release", "approver", "email"]` reads `release.approver.email`.
 
+In expressions and `inputs`, a key is quoted when it could be mistaken for something else: when it has a dot or any character other than letters, digits, `_`, `$` and `-`, when it starts with a digit, or when it's empty. So `["metadata", "labels", "app.kubernetes.io/name"]` is named `metadata.labels."app.kubernetes.io/name"`, and doesn't look like a path four keys deep. The string key `["xs", "0"]` is named `xs."0"`, unlike the list index `["xs", 0]`, named `xs.0`. A first step written as `{"literal": "$schema"}` is named `"$schema"`, so it doesn't look like a [name](#naming-subjects).
+
 `from` is a path into the input. Every other path (`id`, a check's `path`, `left` and `right`) is a path into one subject, unless it starts with [`$$input`](#reading-from-the-input) or a [name](#naming-subjects).
 
 An empty path, `[]`, reads the item itself. Use it inside `all` or `any` when the list holds plain values like strings, not objects:
@@ -484,7 +486,7 @@ This is the only way to say that two fields must agree with each other. Two sepa
 - Name your options. The names show up in the rendered expression: `one of: safe(type == Chore) | standard(type == Story and state == Done)`. A list of options works too, and they're shown by position.
 - Options can hold basic checks and `all` or `any`, but not another `any_of`, because Rego doesn't allow recursion. An `all` or `any` in an option counts as being where the `any_of` is, so it can nest as deep as it could there (see [Nesting](#nesting)).
 - An empty `options` fails with cause `absent`, and so does an empty option, an option written as an object instead of a list, or an `any_of` inside an option.
-- The row shows every field any option read, once each, sorted by name. For an `all` or `any` in an option, that's its list and any names it reads.
+- The row shows every field any option read, sorted by name. A field read by more than one option shows once. For an `all` or `any` in an option, that's its list and any names it reads.
 
 ## Substitutes
 

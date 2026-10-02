@@ -383,7 +383,11 @@ arg(x) := x if {
 
 ref_read(path) := object.get(start_of(null, path), [unliteral(seg) | some seg in array.slice(path, 1, count(path))], absent) if builtin(path)
 
-ref_name(path) := concat(".", [sprintf("%v", [unliteral(seg)]) | some seg in path]) if builtin(path)
+ref_name(path) := concat(".", [ref_segment_name(i, seg) | some i, seg in path]) if builtin(path)
+
+ref_segment_name(0, seg) := seg
+
+ref_segment_name(i, seg) := key_name(unliteral(seg)) if i > 0
 
 ref_name(path) := "<invalid ref>" if not builtin(path)
 
@@ -420,7 +424,7 @@ selector_matches(v, sel) if {
 	}
 }
 
-path_name(path) := concat(".", [segment_name(p) | some p in path])
+path_name(path) := concat(".", [segment_name(i, p) | some i, p in path])
 
 item_path_name(item, []) := item
 
@@ -430,20 +434,41 @@ projection_name(path, []) := sprintf("%s[]", [path_name(path)])
 
 projection_name(path, each) := sprintf("%s[].%s", [path_name(path), path_name(each)]) if each != []
 
-segment_name(p) := sprintf("%v", [p]) if not is_object(p)
+segment_name(_, p) := key_name(p) if not is_object(p)
 
-segment_name(p) := sprintf("%v", [p.literal]) if is_literal(p)
+segment_name(i, p) := json.marshal(p.literal) if {
+	is_literal(p)
+	first_dollar_key(i, p.literal)
+}
 
-segment_name(p) := sprintf("[%s]", [concat(" and ", sort([sprintf("%v==%s", [k, value_text(v)]) | some k, v in p.where]))]) if {
+segment_name(i, p) := key_name(p.literal) if {
+	is_literal(p)
+	not first_dollar_key(i, p.literal)
+}
+
+segment_name(_, p) := sprintf("[%s]", [concat(" and ", sort([sprintf("%s==%s", [key_name(k), value_text(v)]) | some k, v in p.where]))]) if {
 	is_object(p)
 	not is_literal(p)
 	not is_ref(p)
 	not malformed(p)
 }
 
-segment_name(p) := sprintf("[%s]", [ref_name(p.ref)]) if is_ref(p)
+segment_name(_, p) := sprintf("[%s]", [ref_name(p.ref)]) if is_ref(p)
 
-segment_name(p) := "[<invalid ref>]" if malformed(p)
+segment_name(_, p) := "[<invalid ref>]" if malformed(p)
+
+first_dollar_key(0, k) if startswith(k, "$")
+
+key_name(k) := k if plain_key(k)
+
+key_name(k) := json.marshal(k) if {
+	is_string(k)
+	not plain_key(k)
+}
+
+key_name(k) := sprintf("%v", [k]) if not is_string(k)
+
+plain_key(k) if regex.match(`^[A-Za-z_$][A-Za-z0-9_$-]*$`, k)
 
 value_text(x) := ref_name(x.ref) if is_ref(x)
 
@@ -1542,13 +1567,12 @@ check_inputs(subj, check, item) := [{"name": item_path_name(item, check.path), "
 	check.path
 }
 
-check_inputs(subj, check, item) := [{"name": nm, "value": reads[nm]} | some nm in sort(object.keys(reads))] if {
+check_inputs(subj, check, item) := [{"name": r[0], "value": r[1]} | some r in sort(any_of_reads(subj, check, item))] if {
 	not check.inputs
 	check.op == "any_of"
-	reads := any_of_reads(subj, check, item)
 }
 
-any_of_reads(subj, check, item) := {item_path_name(item, p): value_at(subj, p) |
+any_of_reads(subj, check, item) := {[item_path_name(item, p), value_at(subj, p)] |
 	some group in check.options
 	some leaf in group
 	some p in check_reads(leaf)
