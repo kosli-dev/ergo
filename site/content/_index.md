@@ -9,7 +9,7 @@ hero:
   verdict: d-3 is out of scope. d-2 was never approved... and the report says so.
   fromto:
     label: The same control written in Rego and in ergo, and what each returns
-    steps: [Rego policy, Rego result, ergo control, ergo evaluation, ergo report]
+    steps: [Rego policy, Rego result, control, evaluation, report]
     # Set to true to bring back the Rego policy and Rego result steps.
     show_rego: false
     examples:
