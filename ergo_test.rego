@@ -189,14 +189,14 @@ test_applies_row_echoes_the_field_the_filter_read if {
 
 test_applies_definition_renders_the_filter_expression if {
 	rep := ergo.report(two_states, scoped_req(merged_only))
-	rep.requirements.s.checks["$applies"].expression == "state == MERGED"
+	rep.requirements.s.checks["$applies"].expression == `state == "MERGED"`
 }
 
 test_applies_definition_conjoins_multiple_filter_checks if {
 	both := object.union(merged_only, {"on_main": {"op": "equals", "path": ["base_ref"], "value": "main"}})
 	rep := ergo.report(two_states, scoped_req(both))
 
-	rep.requirements.s.checks["$applies"].expression == "state == MERGED and base_ref == main"
+	rep.requirements.s.checks["$applies"].expression == `state == "MERGED" and base_ref == "main"`
 }
 
 test_no_applies_to_means_no_applies_rows_or_definition if {
@@ -310,7 +310,7 @@ test_in_inside_all_shows_every_item_in_inputs if {
 }
 
 test_expression_for_in_inside_all if {
-	rendered({"licences": []}, licences_allowed) == "every licences: id in [Apache-2.0, MIT]"
+	rendered({"licences": []}, licences_allowed) == `every licences: id in ["Apache-2.0", "MIT"]`
 }
 
 test_in_shows_the_field_value_in_inputs if {
@@ -480,7 +480,7 @@ test_selector_expression_is_order_independent if {
 		"value": "right",
 	}
 	rendered(attestations_array, one) == rendered(attestations_array, two)
-	rendered(attestations_array, one) == "attestations.[attestation_type==pull_request and status==COMPLETE].payload == right"
+	rendered(attestations_array, one) == `attestations.[attestation_type=="pull_request" and status=="COMPLETE"].payload == "right"`
 }
 
 test_selector_value_is_echoed_in_the_row if {
@@ -488,7 +488,7 @@ test_selector_value_is_echoed_in_the_row if {
 	some r in report.results
 	r.check == "c"
 	r.inputs == [{
-		"name": "attestations.[attestation_type==pull_request].payload",
+		"name": `attestations.[attestation_type=="pull_request"].payload`,
 		"value": "right",
 	}]
 }
@@ -547,7 +547,7 @@ test_matching_with_no_patterns if {
 test_expression_for_matching_sorts_patterns if {
 	rendered({"author": "Alice"}, matches("not_matches_any")) == sprintf(
 		"author matches none of [%s]",
-		[`.*\[bot\], noreply@github\.com, svc_.*`],
+		[`".*\\[bot\\]", "noreply@github\\.com", "svc_.*"`],
 	)
 }
 
@@ -801,7 +801,7 @@ test_each_renders_an_any_of_element_check if {
 		"every prs[].commits: one of: %s | %s",
 		[
 			"linked_account(author_username is a non-empty string)",
-			`web_flow(author matches one of [noreply@github\.com])`,
+			`web_flow(author matches one of ["noreply@github\\.com"])`,
 		],
 	)
 }
@@ -849,14 +849,14 @@ test_an_empty_path_names_the_item_after_its_list_in_inputs if {
 }
 
 test_an_empty_path_names_the_item_after_its_list_in_the_expression if {
-	rendered({"branches": []}, release_branches) == "every branches: branches[] matches one of [^main$, ^release/]"
+	rendered({"branches": []}, release_branches) == `every branches: branches[] matches one of ["^main$", "^release/"]`
 }
 
 test_an_empty_path_names_the_item_inside_an_any_of if {
 	rendered({"branches": []}, {"op": "all", "path": ["branches"], "check": {"op": "any_of", "options": {
 		"main": [{"op": "equals", "path": [], "value": "main"}],
 		"release": [{"op": "matches_any", "path": [], "patterns": ["^release/"]}],
-	}}}) == "every branches: one of: main(branches[] == main) | release(branches[] matches one of [^release/])"
+	}}}) == `every branches: one of: main(branches[] == "main") | release(branches[] matches one of ["^release/"])`
 }
 
 test_an_empty_path_names_the_item_of_a_compare if {
@@ -890,14 +890,25 @@ test_a_field_path_on_a_subject_that_is_not_an_object_is_still_not_an_object if {
 
 test_an_empty_path_on_a_subject_is_named_after_from if {
 	rep := ergo.report({"branches": ["main"]}, branch_req(on_main))
-	rep.requirements.s.checks.c.expression == "branches[] matches one of [^main$]"
+	rep.requirements.s.checks.c.expression == `branches[] matches one of ["^main$"]`
 	[r.inputs | some r in rows_for(rep, "s", "c")] == [[{"name": "branches[]", "value": "main"}]]
 }
 
-test_an_empty_path_on_the_whole_input_is_named_input if {
+test_an_empty_path_on_the_whole_input_is_named_dollar_dollar_input if {
 	rep := ergo.report({"state": "ok"}, {"s": {"checks": {"c": {"op": "present", "path": []}}}})
-	rep.requirements.s.checks.c.expression == "input is present"
-	[r.inputs | some r in rows_for(rep, "s", "c")] == [[{"name": "input", "value": {"state": "ok"}}]]
+	rep.requirements.s.checks.c.expression == "$$input is present"
+	[r.inputs | some r in rows_for(rep, "s", "c")] == [[{"name": "$$input", "value": {"state": "ok"}}]]
+}
+
+test_the_whole_input_is_not_named_like_a_key_called_input if {
+	rep := ergo.report({"input": "inner"}, {"s": {"checks": {"c": {"op": "any_of", "options": {
+		"a": [{"op": "present", "path": []}],
+		"b": [{"op": "present", "path": ["input"]}],
+	}}}}})
+	[r.inputs | some r in rows_for(rep, "s", "c")] == [[
+		{"name": "$$input", "value": {"input": "inner"}},
+		{"name": "input", "value": "inner"},
+	]]
 }
 
 test_an_empty_path_on_a_subject_is_named_after_from_in_every_kind_of_check if {
@@ -912,9 +923,9 @@ test_an_empty_path_on_a_subject_is_named_after_from_in_every_kind_of_check if {
 		},
 	}})
 	rep.requirements.s.checks["$applies"].expression == "branches[] is a non-empty string"
-	rep.requirements.s.checks.either.expression == "one of: main(branches[] == main)"
+	rep.requirements.s.checks.either.expression == `one of: main(branches[] == "main")`
 	rep.requirements.s.checks.same.expression == "branches[] eq branches[]"
-	rep.requirements.s.checks.backed.expression == "branches[] == x, or substitute: branches[] is present"
+	rep.requirements.s.checks.backed.expression == `branches[] == "x", or substitute: branches[] is present`
 	{r.check: r.inputs | some r in rep.results; r.subject.id == "main"} == {
 		"$applies": [{"name": "branches[]", "value": "main"}],
 		"either": [{"name": "branches[]", "value": "main"}],
@@ -929,7 +940,7 @@ plain_licences := {"op": "all", "path": ["licences"], "check": {"op": "in", "pat
 test_in_checks_a_list_of_plain_strings if {
 	verdict({"licences": ["MIT", "Apache-2.0"]}, plain_licences) == true
 	verdict({"licences": ["MIT", "GPL-3.0"]}, plain_licences) == false
-	rendered({"licences": []}, plain_licences) == "every licences: licences[] in [Apache-2.0, MIT]"
+	rendered({"licences": []}, plain_licences) == `every licences: licences[] in ["Apache-2.0", "MIT"]`
 }
 
 test_in_checks_subjects_that_are_plain_strings if {
@@ -953,7 +964,7 @@ test_an_empty_each_reads_lists_of_lists if {
 }
 
 test_an_empty_each_is_named_after_its_list if {
-	rendered({"repos": []}, nested_branches) == "every repos[]: repos[][] == main"
+	rendered({"repos": []}, nested_branches) == `every repos[]: repos[][] == "main"`
 	inputs_of({"repos": [["main"]]}, nested_branches) == [{"name": "repos[]", "value": [["main"]]}]
 }
 
@@ -1072,9 +1083,9 @@ test_any_of_can_scope_a_requirement if {
 test_any_of_renders_each_option_named if {
 	rendered({"type": "Story"}, flavoured) == concat("", [
 		"one of: ",
-		"safe(type matches one of [^SAFe Story$] and state matches one of [^DONE$])",
+		`safe(type matches one of ["^SAFe Story$"] and state matches one of ["^DONE$"])`,
 		" | ",
-		"standard(type matches one of [^Story$] and state matches one of [^CLOSED$])",
+		`standard(type matches one of ["^Story$"] and state matches one of ["^CLOSED$"])`,
 	])
 }
 
@@ -1264,6 +1275,62 @@ test_inputs_name_nested_paths_with_dots if {
 	inputs_of({"a": {"b": 1}}, check) == [{"name": "a.b", "value": 1}]
 }
 
+test_a_key_with_a_dot_is_quoted_so_it_is_not_named_like_a_nested_path if {
+	check := {"op": "present", "path": ["a.b"]}
+	inputs_of({"a.b": 1}, check) == [{"name": `"a.b"`, "value": 1}]
+	rendered({}, check) == `"a.b" is present`
+}
+
+test_a_kubernetes_label_is_quoted_as_one_key if {
+	check := {"op": "present", "path": ["metadata", "labels", "app.kubernetes.io/name"]}
+	rendered({}, check) == `metadata.labels."app.kubernetes.io/name" is present`
+}
+
+test_a_key_made_of_digits_is_quoted_so_it_is_not_named_like_a_list_index if {
+	rendered({}, {"op": "present", "path": ["xs", "0"]}) == `xs."0" is present`
+	rendered({}, {"op": "present", "path": ["xs", 0]}) == `xs.0 is present`
+}
+
+test_an_empty_key_is_quoted if {
+	rendered({}, {"op": "present", "path": ["a", "", "b"]}) == `a."".b is present`
+}
+
+test_a_key_with_a_quote_is_escaped if {
+	rendered({}, {"op": "present", "path": [`say "hi"`]}) == `"say \"hi\"" is present`
+}
+
+test_a_plain_key_with_a_dash_or_dollar_is_not_quoted if {
+	rendered({}, {"op": "present", "path": ["pull-request", "$schema_x"]}) == `pull-request.$schema_x is present`
+}
+
+test_a_selector_key_with_a_dot_is_quoted if {
+	rendered({}, {"op": "present", "path": ["tags", {"where": {"a.b": "x"}}, "v"]}) == `tags.["a.b"=="x"].v is present`
+}
+
+test_an_any_of_reading_a_dotted_key_and_a_nested_path_gives_a_report if {
+	check := {"op": "any_of", "options": {
+		"x": [{"op": "present", "path": ["a.b"]}],
+		"y": [{"op": "present", "path": ["a", "b"]}],
+	}}
+	inputs_of({"id": 1, "a.b": "dotted", "a": {"b": "nested"}}, check) == [
+		{"name": `"a.b"`, "value": "dotted"},
+		{"name": "a.b", "value": "nested"},
+	]
+}
+
+test_an_any_of_names_selectors_on_a_number_and_a_string_apart if {
+	check := {"op": "any_of", "options": {
+		"x": [{"op": "equals", "path": ["xs", {"where": {"k": 1}}, "v"], "value": "a"}],
+		"y": [{"op": "equals", "path": ["xs", {"where": {"k": "1"}}, "v"], "value": "a"}],
+	}}
+	subj := {"id": 1, "xs": [{"k": 1, "v": "a"}, {"k": "1", "v": "b"}]}
+	verdict(subj, check) == true
+	inputs_of(subj, check) == [
+		{"name": `xs.[k=="1"].v`, "value": "b"},
+		{"name": "xs.[k==1].v", "value": "a"},
+	]
+}
+
 test_inputs_echo_both_sides_of_a_comparison if {
 	inputs_of({"a": 1, "b": 2}, compare_ab("lt")) == [
 		{"name": "a", "value": 1},
@@ -1322,14 +1389,14 @@ test_definition_carries_the_raw_spec_and_description if {
 
 test_expression_for_range if rendered({"temp_c": 5}, in_range) == "temp_c >= 0 and temp_c <= 10"
 
-test_expression_for_excludes if rendered({"labels": []}, no_wip) == "not contains(labels, wip)"
+test_expression_for_excludes if rendered({"labels": []}, no_wip) == `not contains(labels, "wip")`
 
-test_expression_for_includes if rendered({"labels": []}, has_approved) == "contains(labels, approved)"
+test_expression_for_includes if rendered({"labels": []}, has_approved) == `contains(labels, "approved")`
 
-test_expression_for_in_sorts_the_values if rendered({"id": "MIT"}, allowed_licence) == "id in [Apache-2.0, MIT]"
+test_expression_for_in_sorts_the_values if rendered({"id": "MIT"}, allowed_licence) == `id in ["Apache-2.0", "MIT"]`
 
 test_expression_for_in_sorts_a_set_of_values if {
-	rendered({"id": "MIT"}, {"op": "in", "path": ["id"], "values": {"MIT", "Apache-2.0"}}) == "id in [Apache-2.0, MIT]"
+	rendered({"id": "MIT"}, {"op": "in", "path": ["id"], "values": {"MIT", "Apache-2.0"}}) == `id in ["Apache-2.0", "MIT"]`
 }
 
 test_expression_for_in_does_not_list_values_it_will_not_match if {
@@ -1339,7 +1406,86 @@ test_expression_for_in_does_not_list_values_it_will_not_match if {
 	rendered({"id": "MIT"}, {"op": "in", "path": ["id"]}) == "id in <invalid values>"
 }
 
-test_expression_for_equals if rendered({}, is_merged) == "state == MERGED"
+test_expression_for_equals if rendered({}, is_merged) == `state == "MERGED"`
+
+test_a_string_value_is_quoted_so_it_is_not_read_as_a_number if {
+	rendered({}, {"op": "equals", "path": ["n"], "value": "1"}) == `n == "1"`
+	rendered({}, {"op": "equals", "path": ["n"], "value": 1}) == `n == 1`
+}
+
+test_a_string_value_is_quoted_so_it_is_not_read_as_true_false_or_null if {
+	rendered({}, {"op": "equals", "path": ["x"], "value": "true"}) == `x == "true"`
+	rendered({}, {"op": "equals", "path": ["x"], "value": true}) == `x == true`
+	rendered({}, {"op": "equals", "path": ["x"], "value": "null"}) == `x == "null"`
+	rendered({}, {"op": "equals", "path": ["x"], "value": null}) == `x == null`
+}
+
+test_an_empty_string_value_is_shown if {
+	rendered({}, {"op": "equals", "path": ["x"], "value": ""}) == `x == ""`
+}
+
+test_a_string_value_that_looks_like_a_ref_is_quoted if {
+	rendered({}, {"op": "equals", "path": ["x"], "value": "$$params.x"}) == `x == "$$params.x"`
+}
+
+test_a_string_value_is_escaped_as_in_standard_json if {
+	rendered({}, {"op": "equals", "path": ["x"], "value": "a \"b\" \\ <c> & d\n\t\u0001"}) == `x == "a \"b\" \\ <c> & d\n\t\u0001"`
+}
+
+test_a_number_value_is_written_the_same_however_the_policy_wrote_it if {
+	[rendered({}, {"op": "equals", "path": ["n"], "value": v}) | some v in [1, 1.0, 1.50, 1e2, 2.5e-3, -0.0, 1.23e-7]] == [
+		"n == 1", "n == 1", "n == 1.5", "n == 100", "n == 0.0025", "n == 0", "n == 0.000000123",
+	]
+}
+
+test_a_large_number_value_is_written_in_full if {
+	rendered({}, {"op": "equals", "path": ["n"], "value": 1e21}) == "n == 1000000000000000000000"
+	rendered({}, {"op": "equals", "path": ["n"], "value": 123456789012345678901234567890}) == "n == 123456789012345678901234567890"
+}
+
+test_a_list_or_object_value_is_written_as_json_with_sorted_keys if {
+	rendered({}, {"op": "equals", "path": ["x"], "value": ["a", 1.50, {"b": [true, null], "a": "x,y:z"}]}) == `x == ["a", 1.5, {"a": "x,y:z", "b": [true, null]}]`
+	rendered({}, {"op": "equals", "path": ["x"], "value": {}}) == "x == {}"
+}
+
+test_a_string_inside_a_list_value_is_escaped_as_in_standard_json if {
+	rendered({}, {"op": "equals", "path": ["x"], "value": ["a<b&c", "\u0001\b"]}) == `x == ["a<b&c", "\u0001\b"]`
+}
+
+test_text_that_looks_like_an_escape_is_kept_as_written if {
+	rendered({}, {"op": "equals", "path": ["x"], "value": `\u003c`}) == `x == "\\u003c"`
+}
+
+test_a_range_writes_its_bounds_as_numbers if {
+	rendered({}, {"op": "range", "path": ["t"], "min": 175.0, "max": 2e2}) == "t >= 175 and t <= 200"
+}
+
+test_min_subjects_is_written_like_any_number if {
+	rep := ergo.report({"xs": []}, {"s": {"from": ["xs"], "min_subjects": 2.0, "checks": {"c": {"op": "present", "path": ["x"]}}}})
+	rep.requirements.s.checks["$min_subjects"].expression == "count(matching(xs)) >= 2"
+}
+
+test_a_number_in_a_path_is_written_like_any_number if {
+	rendered({}, {"op": "present", "path": ["xs", 1e1]}) == "xs.10 is present"
+}
+
+test_min_subjects_is_described_like_any_number if {
+	rep := ergo.report({"xs": []}, {"s": {"from": ["xs"], "min_subjects": 2.0, "checks": {"c": {"op": "present", "path": ["x"]}}}})
+	rep.requirements.s.checks["$min_subjects"].description == "at least 2 matching subject subject(s) required"
+}
+
+test_a_key_is_escaped_as_in_standard_json if {
+	rendered({}, {"op": "present", "path": ["a<b"]}) == `"a<b" is present`
+}
+
+test_an_in_list_tells_a_number_from_a_string if {
+	rendered({}, {"op": "in", "path": ["n"], "values": [1, "1"]}) == `n in ["1", 1]`
+}
+
+test_a_selector_tells_a_number_from_a_string if {
+	rendered({}, {"op": "present", "path": ["xs", {"where": {"k": 1}}, "v"]}) == `xs.[k==1].v is present`
+	rendered({}, {"op": "present", "path": ["xs", {"where": {"k": "1"}}, "v"]}) == `xs.[k=="1"].v is present`
+}
 
 test_expression_for_present if rendered({}, has_fingerprint) == "fingerprint is present"
 
@@ -1351,7 +1497,7 @@ test_expression_for_compare_time if rendered(span, compare_time_span("lt")) == "
 
 test_expression_for_all if rendered({"commits": []}, all_verified) == "every commits: verified == true"
 
-test_expression_for_any if rendered({"approvers": []}, any_approved) == "some approvers: state == APPROVED"
+test_expression_for_any if rendered({"approvers": []}, any_approved) == `some approvers: state == "APPROVED"`
 
 test_expression_for_nested_paths_is_dotted if {
 	check := {"op": "equals", "path": ["a", "b"], "value": 1}
@@ -1645,7 +1791,7 @@ test_well_formed_echoes_the_declaration_it_read if {
 
 test_well_formed_definition_is_in_the_check_table if {
 	rep := ergo.report({"items": [{"id": "a"}]}, id_req(["items"]))
-	rep.requirements.s.checks["$well_formed"].expression == "count(checks) >= 1 and require in {every, some}"
+	rep.requirements.s.checks["$well_formed"].expression == `count(checks) >= 1 and require in ["every", "some"]`
 }
 
 require_req(q) := {"s": {
@@ -2147,7 +2293,7 @@ test_a_user_check_named_min_subjects_is_not_clobbered if {
 		"op": "equals",
 		"path": ["id"],
 		"value": "zzz",
-		"expression": "id == zzz",
+		"expression": `id == "zzz"`,
 	}
 	rep.requirements.s.checks["$min_subjects"].description == "at least 1 matching thing subject(s) required"
 
@@ -2467,7 +2613,7 @@ test_input_is_only_a_name_at_the_start_of_a_path if {
 
 test_a_literal_path_step_reads_a_key_that_looks_like_a_name if {
 	r := row_in({"$$input": "top"}, {"id": 1, "$$input": "x"}, {"op": "equals", "path": [{"literal": "$$input"}], "value": "x"})
-	[r.passed, r.inputs] == [true, [{"name": "$$input", "value": "x"}]]
+	[r.passed, r.inputs] == [true, [{"name": `"$$input"`, "value": "x"}]]
 }
 
 licence_params := {"params": {"allowed": ["MIT", "Apache-2.0"]}}
@@ -2655,8 +2801,8 @@ test_a_literal_can_hold_a_literal if {
 
 test_a_literal_works_wherever_a_value_goes if {
 	row_in({}, {"id": 1, "licence": "MIT"}, {"op": "in", "path": ["licence"], "values": {"literal": ["MIT"]}}).passed == true
-	expression_in({}, {"id": 1}, {"op": "in", "path": ["licence"], "values": {"literal": ["MIT"]}}) == "licence in [MIT]"
-	expression_in({}, {"id": 1}, {"op": "equals", "path": ["c"], "value": {"literal": "x"}}) == "c == x"
+	expression_in({}, {"id": 1}, {"op": "in", "path": ["licence"], "values": {"literal": ["MIT"]}}) == `licence in ["MIT"]`
+	expression_in({}, {"id": 1}, {"op": "equals", "path": ["c"], "value": {"literal": "x"}}) == `c == "x"`
 }
 
 test_a_readable_ref_leaves_the_cause_to_the_subject if {
@@ -2857,7 +3003,7 @@ test_a_name_at_the_start_of_a_path_reads_the_subject if {
 		["smoke-test", false, [{"name": "$suite.result", "value": "failed"}]],
 		["unit-test", true, [{"name": "$suite.result", "value": "passed"}]],
 	]
-	rep.requirements.s.checks.c.expression == "$suite.result == passed"
+	rep.requirements.s.checks.c.expression == `$suite.result == "passed"`
 }
 
 test_a_name_alone_reads_the_whole_subject if {
@@ -2941,6 +3087,11 @@ test_a_name_that_is_not_bound_reads_as_absent if {
 test_a_name_is_not_bound_without_an_each_step if {
 	r := row_in({}, {"id": 1, "a": 1}, {"op": "present", "path": ["$items", "a"]})
 	[r.passed, r.cause] == [false, "absent"]
+}
+
+test_a_literal_first_key_that_starts_with_a_dollar_is_quoted_so_it_is_not_named_like_a_name if {
+	rendered({}, {"op": "present", "path": [{"literal": "$schema"}, "v"]}) == `"$schema".v is present`
+	rendered({}, {"op": "present", "path": ["a", {"literal": "$schema"}]}) == `a.$schema is present`
 }
 
 test_a_key_that_starts_with_a_dollar_is_read_with_literal if {
@@ -3056,7 +3207,7 @@ test_a_well_formed_row_for_a_from_with_a_step_shows_the_from if {
 	row := rows_for(rep, "s", "$well_formed")[0]
 	row.passed == true
 	row.inputs[2] == {"name": "from", "value": ["build", "test_runs", {"each_as": "suite"}]}
-	rep.requirements.s.checks["$well_formed"].expression == "count(checks) >= 1 and require in {every, some} and from is well formed"
+	rep.requirements.s.checks["$well_formed"].expression == `count(checks) >= 1 and require in ["every", "some"] and from is well formed`
 }
 
 test_a_well_formed_row_without_a_step_is_unchanged if {
@@ -3390,7 +3541,7 @@ test_an_any_of_inside_a_list_check_can_hold_a_list_check if {
 }
 
 test_a_list_check_inside_an_any_of_renders_in_its_option if {
-	ergo.report(peer_doc, review_req(peer_check)).requirements.s.checks.c.expression == "some approvers as $approver: one of: peer(state == APPROVED and username ne $pr.author and every $pr.commits: $approver.timestamp gt timestamp)"
+	ergo.report(peer_doc, review_req(peer_check)).requirements.s.checks.c.expression == "some approvers as $approver: one of: peer(state == \"APPROVED\" and username ne $pr.author and every $pr.commits: $approver.timestamp gt timestamp)"
 }
 
 test_a_list_check_inside_an_any_of_shows_the_names_it_reads if {
@@ -3587,7 +3738,7 @@ test_params_can_be_read_inside_named_and_nested_list_checks if {
 
 test_a_key_called_dollar_dollar_params_is_read_with_literal if {
 	check := {"op": "equals", "path": [{"literal": "$$params"}], "value": "own"}
-	params_rows({"items": [{"id": 1, "$$params": "own"}]}, check) == [[true, "satisfied", [{"name": "$$params", "value": "own"}]]] with data.params as {"$$params": "other"}
+	params_rows({"items": [{"id": 1, "$$params": "own"}]}, check) == [[true, "satisfied", [{"name": `"$$params"`, "value": "own"}]]] with data.params as {"$$params": "other"}
 }
 
 trail_doc := {"trail": {"artifacts": {"app": {
@@ -3613,7 +3764,7 @@ test_a_ref_step_in_a_path_reads_the_key_it_names if {
 
 test_a_ref_step_renders_and_is_recorded_like_any_ref if {
 	rep := ergo.report(trail_doc, trail_req(attested)) with data.params as {"artifact": "app", "att": "junit"}
-	rep.requirements.s.checks.c.expression == "attestations.[$$params.att].status == COMPLETE"
+	rep.requirements.s.checks.c.expression == `attestations.[$$params.att].status == "COMPLETE"`
 	rep.requirements.s.checks.c["$refs"] == [{"name": "$$params.att", "value": "junit"}]
 	ergo.violations(rep)[0].inputs == [{"name": "attestations.[$$params.att].status", "value": "FAILED"}, {"name": "$$params.att", "value": "junit"}]
 }
@@ -3749,6 +3900,13 @@ test_a_present_filter_with_a_ref_step_still_rules_out_a_missing_field if {
 test_a_from_written_as_a_string_reads_that_one_key if {
 	rep := ergo.report({"items": [{"id": 1}, {"id": 2}]}, {"s": {"from": "items", "id": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}}})
 	rep.requirements.s.subjects == {"total": 2, "matching": 2}
+}
+
+test_a_dotted_key_in_a_ref_is_quoted if {
+	check := {"op": "equals", "path": ["name"], "value": {"ref": ["$$params", "a.b"]}}
+	rep := ergo.report({"items": [{"id": 1, "name": "x"}]}, params_req(check)) with data.params as {"a.b": "x"}
+	rep.requirements.s.checks.c.expression == `name == $$params."a.b"`
+	rep.requirements.s.checks.c["$refs"] == [{"name": `$$params."a.b"`, "value": "x"}]
 }
 
 test_a_literal_in_a_ref_path_is_read_as_written if {

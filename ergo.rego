@@ -401,7 +401,11 @@ ref_read(path) := object.get(start, [unliteral(seg) | some seg in array.slice(pa
 	is_object(start)
 }
 
-ref_name(path) := concat(".", [sprintf("%v", [unliteral(seg)]) | some seg in path]) if builtin(path)
+ref_name(path) := concat(".", [ref_segment_name(i, seg) | some i, seg in path]) if builtin(path)
+
+ref_segment_name(0, seg) := seg
+
+ref_segment_name(i, seg) := key_name(unliteral(seg)) if i > 0
 
 ref_name(path) := "<invalid ref>" if not builtin(path)
 
@@ -438,7 +442,7 @@ selector_matches(v, sel) if {
 	}
 }
 
-path_name(path) := concat(".", [segment_name(p) | some p in path])
+path_name(path) := concat(".", [segment_name(i, p) | some i, p in path])
 
 item_path_name(item, []) := item
 
@@ -448,29 +452,110 @@ projection_name(path, []) := sprintf("%s[]", [path_name(path)])
 
 projection_name(path, each) := sprintf("%s[].%s", [path_name(path), path_name(each)]) if each != []
 
-segment_name(p) := sprintf("%v", [p]) if not is_object(p)
+segment_name(_, p) := key_name(p) if not is_object(p)
 
-segment_name(p) := sprintf("%v", [p.literal]) if is_literal(p)
+segment_name(i, p) := json_text(p.literal) if {
+	is_literal(p)
+	first_dollar_key(i, p.literal)
+}
 
-segment_name(p) := sprintf("[%s]", [concat(" and ", sort([sprintf("%v==%s", [k, value_text(v)]) | some k, v in p.where]))]) if {
+segment_name(i, p) := key_name(p.literal) if {
+	is_literal(p)
+	not first_dollar_key(i, p.literal)
+}
+
+segment_name(_, p) := sprintf("[%s]", [concat(" and ", sort([sprintf("%s==%s", [key_name(k), value_text(v)]) | some k, v in p.where]))]) if {
 	is_object(p)
 	not is_literal(p)
 	not is_ref(p)
 	not malformed(p)
 }
 
-segment_name(p) := sprintf("[%s]", [ref_name(p.ref)]) if is_ref(p)
+segment_name(_, p) := sprintf("[%s]", [ref_name(p.ref)]) if is_ref(p)
 
-segment_name(p) := "[<invalid ref>]" if malformed(p)
+segment_name(_, p) := "[<invalid ref>]" if malformed(p)
+
+first_dollar_key(0, k) if {
+	is_string(k)
+	startswith(k, "$")
+}
+
+key_name(k) := k if plain_key(k)
+
+key_name(k) := json_text(k) if {
+	is_string(k)
+	not plain_key(k)
+}
+
+key_name(k) := literal_text(k) if is_number(k)
+
+key_name(k) := sprintf("%v", [k]) if {
+	not is_string(k)
+	not is_number(k)
+}
+
+plain_key(k) if {
+	is_string(k)
+	regex.match(`^[A-Za-z_$][A-Za-z0-9_$-]*$`, k)
+}
+
+json_text(v) := concat("", [json_token(t) | some t in regex.find_n(`"(?:[^"\\]|\\.)*"|-?[0-9][0-9.eE+-]*|[^"0-9-]+`, json.marshal(v), -1)])
+
+json_token(t) := concat("", [object.get(standard_escapes, e, e) | some e in regex.find_n(`\\u[0-9a-f]{4}|\\.|[^\\]+`, t, -1)]) if startswith(t, `"`)
+
+json_token(t) := number_text(t) if regex.match(`^-?[0-9]`, t)
+
+json_token(t) := strings.replace_n({",": ", ", ":": ": "}, t) if {
+	not startswith(t, `"`)
+	not regex.match(`^-?[0-9]`, t)
+}
+
+standard_escapes := {`\u003c`: "<", `\u003e`: ">", `\u0026`: "&", `\u2028`: "\u2028", `\u2029`: "\u2029", `\u0008`: `\b`, `\u000c`: `\f`}
+
+number_text(t) := signed(m[1], decimal(concat("", [m[2], m[3]]), count(m[2]) + exponent(m[4]))) if {
+	m := regex.find_all_string_submatch_n(`^(-?)([0-9]+)(?:\.([0-9]*))?(?:[eE]([+-]?[0-9]+))?$`, t, 1)[0]
+}
+
+exponent("") := 0
+
+exponent(e) := to_number(e) if e != ""
+
+decimal(digits, point) := decimal_text(whole, frac) if {
+	left := max([0, 1 - point])
+	padded := concat("", [zeros(left), digits, zeros(point - count(digits))])
+	whole := trim_left(substring(padded, 0, point + left), "0")
+	frac := trim_right(substring(padded, point + left, -1), "0")
+}
+
+decimal_text("", "") := "0"
+
+decimal_text(whole, "") := whole if whole != ""
+
+decimal_text("", frac) := concat("", ["0.", frac]) if frac != ""
+
+decimal_text(whole, frac) := concat(".", [whole, frac]) if {
+	whole != ""
+	frac != ""
+}
+
+signed(_, "0") := "0"
+
+signed(sign, n) := concat("", [sign, n]) if n != "0"
+
+zeros(n) := concat("", ["0" | some _ in numbers.range(1, n)]) if n > 0
+
+zeros(n) := "" if n <= 0
 
 value_text(x) := ref_name(x.ref) if is_ref(x)
 
-value_text(x) := sprintf("%v", [written(x)]) if {
+value_text(x) := literal_text(written(x)) if {
 	not is_ref(x)
 	not malformed(x)
 }
 
 value_text(x) := "<invalid ref>" if malformed(x)
+
+literal_text(v) := json_text(v)
 
 default leaf_passed(_, _) := false
 
@@ -1294,7 +1379,7 @@ leaf_describe(check, item) := sprintf("not contains(%s, %s)", [item_path_name(it
 
 leaf_describe(check, item) := sprintf("contains(%s, %s)", [item_path_name(item, check.path), value_text(check.value)]) if check.op == "includes"
 
-leaf_describe(check, item) := sprintf("%s in [%s]", [item_path_name(item, check.path), concat(", ", sort([sprintf("%v", [v]) | some v in written(check.values)]))]) if {
+leaf_describe(check, item) := sprintf("%s in [%s]", [item_path_name(item, check.path), concat(", ", sort([literal_text(v) | some v in written(check.values)]))]) if {
 	check.op == "in"
 	value_list(written(check.values))
 }
@@ -1326,7 +1411,7 @@ leaf_describe(check, item) := sprintf("%s matches one of %s", [item_path_name(it
 
 leaf_describe(check, item) := sprintf("%s matches none of %s", [item_path_name(item, check.path), pattern_list(check)]) if check.op == "not_matches_any"
 
-pattern_list(check) := sprintf("[%s]", [concat(", ", sort([sprintf("%v", [p]) | some p in written(check.patterns)]))]) if {
+pattern_list(check) := sprintf("[%s]", [concat(", ", sort([literal_text(p) | some p in written(check.patterns)]))]) if {
 	not is_ref(check.patterns)
 	not malformed(check.patterns)
 }
@@ -1563,13 +1648,12 @@ check_inputs(subj, check, item) := [{"name": item_path_name(item, check.path), "
 	check.path
 }
 
-check_inputs(subj, check, item) := [{"name": nm, "value": reads[nm]} | some nm in sort(object.keys(reads))] if {
+check_inputs(subj, check, item) := [{"name": r[0], "value": r[1]} | some r in sort(any_of_reads(subj, check, item))] if {
 	not check.inputs
 	check.op == "any_of"
-	reads := any_of_reads(subj, check, item)
 }
 
-any_of_reads(subj, check, item) := {item_path_name(item, p): value_at(subj, p) |
+any_of_reads(subj, check, item) := {[item_path_name(item, p), value_at(subj, p)] |
 	some group in check.options
 	some leaf in group
 	some p in check_reads(leaf)
@@ -1614,7 +1698,7 @@ subject_item_name(req) := sprintf("%s[]", [path_name(from_of(req))]) if {
 	from_of(req) != []
 }
 
-subject_item_name(req) := "input" if {
+subject_item_name(req) := "$$input" if {
 	not stepped(req)
 	from_of(req) == []
 }
@@ -1630,20 +1714,20 @@ matching_count_name(req) := "count(matching(<invalid from>))" if not from_well_f
 
 min_subjects_def(req) := {"$min_subjects": with_refs(
 	{
-		"description": sprintf("at least %d matching %s subject(s) required", [min_subjects_of(req), subject_type_of(req)]),
-		"expression": sprintf("%s >= %d", [matching_count_name(req), min_subjects_of(req)]),
+		"description": sprintf("at least %s matching %s subject(s) required", [literal_text(min_subjects_of(req)), subject_type_of(req)]),
+		"expression": sprintf("%s >= %s", [matching_count_name(req), literal_text(min_subjects_of(req))]),
 	},
 	{"from": from_of(req)},
 )}
 
 well_formed_def(req) := {"$well_formed": {
 	"description": "the requirement declares at least one check and a recognised \"require\" value; lacking either, it asserts nothing that could ever be satisfied",
-	"expression": "count(checks) >= 1 and require in {every, some}",
+	"expression": `count(checks) >= 1 and require in ["every", "some"]`,
 }} if not stepped(req)
 
 well_formed_def(req) := {"$well_formed": {
 	"description": "the requirement declares at least one check, a recognised \"require\" value, and a from that ends with its only step, which gives a name that doesn't start with $ and, if it has keys, gives them as a list",
-	"expression": "count(checks) >= 1 and require in {every, some} and from is well formed",
+	"expression": `count(checks) >= 1 and require in ["every", "some"] and from is well formed`,
 }} if stepped(req)
 
 default well_formed(_) := false

@@ -72,7 +72,7 @@ test_workings_table_shows_the_good_batch_clause_by_clause if {
 			"clause": "Must not contain nut allergens",
 			"check": "nut_free",
 			"inputs": [{"name": "allergens", "value": ["milk", "eggs"]}],
-			"expression": "not contains(allergens, nuts)",
+			"expression": `not contains(allergens, "nuts")`,
 			"passed": true,
 		},
 		{
