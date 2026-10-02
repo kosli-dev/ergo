@@ -4147,3 +4147,65 @@ test_a_check_where_it_cannot_go_shows_in_the_expression if {
 	rendered({}, {"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["ys"], "check": {"op": "even", "path": []}}}) == "every xs: every ys: <even can't go here>"
 	rendered({}, {"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["ys"], "check": {"op": "any_of", "options": {"o": [{"op": "even", "path": []}]}}}}) == "every xs: every ys: one of: o(<even can't go here>)"
 }
+
+ordering_doc := {"id": 1, "a": {"name": "ann"}, "b": {"owner": "bob"}, "xs": [2], "ys": [1, 9], "f": false, "t": true, "n": 1, "m": 2, "s": "a", "z": "b"}
+
+test_ordering_objects_lists_or_booleans_fails_as_absent if {
+	every check in [
+		{"op": "compare", "left": ["a"], "right": ["b"], "cmp": "lt"},
+		{"op": "compare", "left": ["b"], "right": ["a"], "cmp": "gte"},
+		{"op": "compare", "left": ["xs"], "right": ["ys"], "cmp": "gt"},
+		{"op": "compare", "left": ["f"], "right": ["t"], "cmp": "lte"},
+		{"op": "compare", "left": [], "right": [], "cmp": "lte"},
+	] {
+		verdict(ordering_doc, check) == false
+		cause_of(ordering_doc, check) == "absent"
+	}
+}
+
+test_ordering_numbers_and_strings_still_works if {
+	verdict(ordering_doc, {"op": "compare", "left": ["n"], "right": ["m"], "cmp": "lt"}) == true
+	verdict(ordering_doc, {"op": "compare", "left": ["z"], "right": ["s"], "cmp": "gt"}) == true
+	cause_of(ordering_doc, {"op": "compare", "left": ["m"], "right": ["n"], "cmp": "lt"}) == "value"
+}
+
+test_ordering_a_number_against_a_string_still_fails_as_value if {
+	cause_of(ordering_doc, {"op": "compare", "left": ["n"], "right": ["s"], "cmp": "lt"}) == "value"
+}
+
+test_eq_and_ne_still_compare_objects_lists_and_booleans if {
+	verdict(ordering_doc, {"op": "compare", "left": ["a"], "right": ["a"], "cmp": "eq"}) == true
+	verdict(ordering_doc, {"op": "compare", "left": ["xs"], "right": ["ys"], "cmp": "ne"}) == true
+	cause_of(ordering_doc, {"op": "compare", "left": ["f"], "right": ["t"], "cmp": "eq"}) == "value"
+}
+
+test_a_filter_ordering_objects_cannot_rule_subjects_out if {
+	every filter in [
+		{"op": "compare", "left": ["a"], "right": ["b"], "cmp": "lt"},
+		{"op": "any_of", "options": {"o": [{"op": "compare", "left": ["xs"], "right": ["ys"], "cmp": "lt"}]}},
+		{"op": "equals", "path": ["n"], "value": 5, "substitute": {"op": "compare", "left": ["a"], "right": ["b"], "cmp": "lt"}},
+		{"op": "present", "path": ["missing"], "substitute": {"op": "compare", "left": ["a"], "right": ["b"], "cmp": "lt"}},
+	] {
+		rep := ergo.report({"items": [ordering_doc]}, {"s": {
+			"from": ["items"],
+			"id": ["id"],
+			"min_subjects": 0,
+			"applies_to": {"f": filter},
+			"checks": {"c": {"op": "equals", "path": ["n"], "value": 999}},
+		}})
+		rep.requirements.s.satisfied == false
+		[r.cause | some r in rows_for(rep, "s", "$applies")] == ["absent"]
+	}
+}
+
+test_a_present_filter_with_a_substitute_ordering_numbers_still_rules_subjects_out if {
+	rep := ergo.report({"items": [ordering_doc]}, {"s": {
+		"from": ["items"],
+		"id": ["id"],
+		"min_subjects": 0,
+		"applies_to": {"f": {"op": "present", "path": ["missing"], "substitute": {"op": "compare", "left": ["n"], "right": ["m"], "cmp": "gt"}}},
+		"checks": {"c": {"op": "equals", "path": ["n"], "value": 999}},
+	}})
+	rep.requirements.s.satisfied == true
+	[r.cause | some r in rows_for(rep, "s", "$applies")] == ["value"]
+}
