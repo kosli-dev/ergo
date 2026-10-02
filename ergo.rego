@@ -46,10 +46,14 @@ from_well_formed(req) if {
 		not is_object(seg)
 	}
 	object.keys(step) - {"each_as", "keys"} == set()
-	is_string(step.each_as)
-	step.each_as != ""
-	not startswith(step.each_as, "$")
+	valid_name(step.each_as)
 	keys_well_formed(step)
+}
+
+valid_name(n) if {
+	is_string(n)
+	n != ""
+	not startswith(n, "$")
 }
 
 keys_well_formed(step) if not "keys" in object.keys(step)
@@ -477,18 +481,62 @@ op_passed(check, subj) if {
 	leaf_passed(check, subj)
 }
 
-op_passed(check, subj) if {
+op_passed(check, subj) if list_passed(check, subj)
+
+default list_passed(_, _) := false
+
+list_passed(check, subj) if {
 	check.op == "all"
+	names_free(check)
 	every elem in elements(subj, check) {
-		element_passed(check.check, elem)
+		item_passed(check, elem)
 	}
 }
 
-op_passed(check, subj) if {
+list_passed(check, subj) if {
 	check.op == "any"
+	names_free(check)
 	some elem in elements(subj, check)
-	element_passed(check.check, elem)
+	item_passed(check, elem)
 }
+
+bound_names := n if {
+	n := input["ergo/names"]
+	is_object(n)
+}
+
+names_free(check) if not "as" in object.keys(check)
+
+names_free(check) if {
+	valid_name(check.as)
+	not check.as in object.keys(bound_names)
+}
+
+item_passed(check, elem) := element_passed(check.check, elem) if not "as" in object.keys(check)
+
+item_passed(check, elem) := v if {
+	"as" in object.keys(check)
+	names := object.union(bound_names, {check.as: elem})
+	v := element_passed(check.check, elem) with input as {"ergo/names": names}
+}
+
+inner_item_passed(check, elem) := inner_passed(check.check, elem) if not "as" in object.keys(check)
+
+inner_item_passed(check, elem) := v if {
+	"as" in object.keys(check)
+	names := object.union(bound_names, {check.as: elem})
+	v := inner_passed(check.check, elem) with input as {"ergo/names": names}
+}
+
+default inner_passed(_, _) := false
+
+inner_passed(check, elem) if {
+	not quantified(check)
+	not combinator(check)
+	leaf_passed(check, elem)
+}
+
+inner_passed(check, elem) if any_of_passed(check, elem)
 
 elements(subj, check) := coll if {
 	not check.each
@@ -519,9 +567,60 @@ element_passed(check, elem) if {
 	leaf_passed(check, elem)
 }
 
-element_passed(check, elem) if any_of_passed(check, elem)
+element_passed(check, elem) if element_any_of_passed(check, elem)
 
-op_passed(check, subj) if any_of_passed(check, subj)
+element_passed(check, elem) if element_list_passed(check, elem)
+
+default element_list_passed(_, _) := false
+
+element_list_passed(check, elem) if {
+	check.op == "all"
+	names_free(check)
+	every inner in elements(elem, check) {
+		inner_item_passed(check, inner)
+	}
+}
+
+element_list_passed(check, elem) if {
+	check.op == "any"
+	names_free(check)
+	some inner in elements(elem, check)
+	inner_item_passed(check, inner)
+}
+
+op_passed(check, subj) if top_any_of_passed(check, subj)
+
+default top_any_of_passed(_, _) := false
+
+top_any_of_passed(check, subj) if {
+	check.op == "any_of"
+	some group in check.options
+	is_array(group)
+	count(group) > 0
+	every leaf in group {
+		top_option_passed(leaf, subj)
+	}
+}
+
+top_option_passed(leaf, subj) if leaf_passed(leaf, subj)
+
+top_option_passed(leaf, subj) if list_passed(leaf, subj)
+
+default element_any_of_passed(_, _) := false
+
+element_any_of_passed(check, elem) if {
+	check.op == "any_of"
+	some group in check.options
+	is_array(group)
+	count(group) > 0
+	every leaf in group {
+		element_option_passed(leaf, elem)
+	}
+}
+
+element_option_passed(leaf, elem) if leaf_passed(leaf, elem)
+
+element_option_passed(leaf, elem) if element_list_passed(leaf, elem)
 
 default any_of_passed(_, _) := false
 
@@ -552,15 +651,21 @@ read_paths(check) := [check.left, check.right] if {
 	two_sided(check)
 }
 
-read_paths(check) := array.concat([check.path], element_name_reads(check)) if {
+read_paths(check) := list_reads(check) if {
 	not check.inputs
 	quantified(check)
 }
 
+list_reads(check) := array.concat(array.concat([check.path], named_each(check)), element_name_reads(check))
+
+named_each(check) := [check.each] if named(object.get(check, "each", []))
+
+named_each(check) := [] if not named(object.get(check, "each", []))
+
 read_paths(check) := [p |
 	some group in check.options
 	some leaf in group
-	some p in leaf_paths(leaf)
+	some p in check_reads(leaf)
 ] if {
 	not check.inputs
 	combinator(check)
@@ -624,9 +729,64 @@ cause_precedence := ["not_an_object", "ambiguous", "unmatched", "absent", "null"
 
 default worst_read(_, _) := "value"
 
-worst_read(subj, check) := worst_of({read_state(subj, p) | some p in read_paths(check)}) if not unreadable_ref(check)
+worst_read(subj, check) := worst_of({read_state(subj, p) | some p in read_paths(check)}) if {
+	not unreadable_ref(check)
+	not broken_list_check(check)
+}
 
-worst_read(_, check) := worst_of({ref_state(r) | some r in check_refs(check)}) if unreadable_ref(check)
+worst_read(_, check) := worst_of({ref_state(r) | some r in check_refs(check)}) if {
+	unreadable_ref(check)
+	not broken_list_check(check)
+}
+
+worst_read(_, check) := "absent" if broken_list_check(check)
+
+broken_list_check(check) if {
+	some chain in list_chains(check)
+	count(chain) > 2
+}
+
+broken_list_check(check) if {
+	some chain in list_chains(check)
+	not chain_names_free(chain)
+}
+
+lists_at(check) := [check] if quantified(check)
+
+lists_at(check) := [leaf |
+	some group in check.options
+	is_array(group)
+	some leaf in group
+	quantified(leaf)
+] if combinator(check)
+
+lists_at(check) := [] if {
+	not quantified(check)
+	not combinator(check)
+}
+
+list_chains(check) := array.concat(
+	array.concat(
+		[[a] | some a in lists_at(check)],
+		[[a, b] | some a in lists_at(check); some b in lists_at(object.get(a, "check", {}))],
+	),
+	[[a, b, c] |
+		some a in lists_at(check)
+		some b in lists_at(object.get(a, "check", {}))
+		some c in lists_at(object.get(b, "check", {}))
+	],
+)
+
+chain_names_free(chain) if not "as" in object.keys(chain[count(chain) - 1])
+
+chain_names_free(chain) if {
+	last := chain[count(chain) - 1]
+	valid_name(last.as)
+	not last.as in object.keys(bound_names)
+	every c in array.slice(chain, 0, count(chain) - 1) {
+		object.get(c, "as", null) != last.as
+	}
+}
 
 unreadable_ref(check) if {
 	some r in check_refs(check)
@@ -801,34 +961,111 @@ expression_of(check, item) := leaf_describe(check, item) if {
 	not combinator(check)
 }
 
-expression_of(check, _) := sprintf("every %s: %s", [collection_name(check), element_describe(check.check, item_name(check))]) if {
+expression_of(check, item) := list_describe(check, item_given(item)) if {
 	not check.expression
-	check.op == "all"
+	quantified(check)
 }
 
-expression_of(check, _) := sprintf("some %s: %s", [collection_name(check), element_describe(check.check, item_name(check))]) if {
-	not check.expression
-	check.op == "any"
+list_describe(check, given) := sprintf("%s %s%s: %s", [
+	quantifier(check),
+	collection_name(check),
+	as_text(check, given),
+	element_describe(check.check, item_name(check), given_with(check, given)),
+])
+
+as_text(check, _) := "" if not "as" in object.keys(check)
+
+as_text(check, given) := sprintf(" as $%s", [check.as]) if {
+	valid_name(check.as)
+	not check.as in given
 }
 
-expression_of(check, item) := any_of_describe(check, item) if {
+as_text(check, given) := " as <name given twice>" if {
+	valid_name(check.as)
+	check.as in given
+}
+
+as_text(check, _) := " as <invalid name>" if {
+	"as" in object.keys(check)
+	not valid_name(check.as)
+}
+
+item_given(item) := {substring(item, 1, -1)} if {
+	startswith(item, "$")
+	not startswith(item, "$$")
+}
+
+item_given(item) := set() if not startswith(item, "$")
+
+given_with(check, given) := given | {check.as} if valid_name(object.get(check, "as", null))
+
+given_with(check, given) := given if not valid_name(object.get(check, "as", null))
+
+quantifier(check) := "every" if check.op == "all"
+
+quantifier(check) := "some" if check.op == "any"
+
+expression_of(check, item) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%v(%s)", [nm, concat(" and ", [top_option_describe(leaf, item) | some leaf in group])]) | some nm, group in check.options]))]) if {
 	not check.expression
 	check.op == "any_of"
 }
+
+top_option_describe(leaf, item) := leaf_describe(leaf, item) if not quantified(leaf)
+
+top_option_describe(leaf, item) := list_describe(leaf, item_given(item)) if quantified(leaf)
 
 collection_name(check) := path_name(check.path) if not check.each
 
 collection_name(check) := projection_name(check.path, check.each) if check.each
 
-item_name(check) := sprintf("%s[]", [collection_name(check)])
+item_name(check) := sprintf("%s[]", [collection_name(check)]) if not valid_name(object.get(check, "as", null))
 
-element_describe(check, item) := leaf_describe(check, item) if not combinator(check)
+item_name(check) := sprintf("$%s", [check.as]) if valid_name(object.get(check, "as", null))
 
-element_describe(check, item) := any_of_describe(check, item) if combinator(check)
+inner_collection_name(check, item) := item_path_name(item, check.path) if not check.each
+
+inner_collection_name(check, item) := sprintf("%s[].%s", [item_path_name(item, check.path), path_name(check.each)]) if check.each
+
+inner_item_name(check, item) := sprintf("%s[]", [inner_collection_name(check, item)]) if not valid_name(object.get(check, "as", null))
+
+inner_item_name(check, _) := sprintf("$%s", [check.as]) if valid_name(object.get(check, "as", null))
+
+element_describe(check, item, _) := leaf_describe(check, item) if {
+	not combinator(check)
+	not quantified(check)
+}
+
+element_describe(check, item, given) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%v(%s)", [nm, concat(" and ", [element_option_describe(leaf, item, given) | some leaf in group])]) | some nm, group in check.options]))]) if combinator(check)
+
+element_describe(check, item, given) := element_list_describe(check, item, given) if quantified(check)
+
+element_option_describe(leaf, item, _) := leaf_describe(leaf, item) if not quantified(leaf)
+
+element_option_describe(leaf, item, given) := element_list_describe(leaf, item, given) if quantified(leaf)
+
+element_list_describe(check, item, given) := sprintf("%s %s%s: %s", [
+	quantifier(check),
+	inner_collection_name(check, item),
+	as_text(check, given),
+	inner_describe(check.check, inner_item_name(check, item)),
+])
+
+inner_describe(check, item) := leaf_describe(check, item) if {
+	not combinator(check)
+	not quantified(check)
+}
+
+inner_describe(check, item) := any_of_describe(check, item) if combinator(check)
+
+inner_describe(check, _) := "<nested too deep>" if quantified(check)
 
 any_of_describe(check, item) := sprintf("one of: %s", [concat(" | ", sort([variant_describe(nm, group, item) | some nm, group in check.options]))])
 
-variant_describe(nm, group, item) := sprintf("%v(%s)", [nm, concat(" and ", [leaf_describe(leaf, item) | some leaf in group])])
+variant_describe(nm, group, item) := sprintf("%v(%s)", [nm, concat(" and ", [inner_option_describe(leaf, item) | some leaf in group])])
+
+inner_option_describe(leaf, item) := leaf_describe(leaf, item) if not quantified(leaf)
+
+inner_option_describe(leaf, _) := "<nested too deep>" if quantified(leaf)
 
 two_sided(check) if check.op in {"compare", "compare_time"}
 
@@ -863,26 +1100,67 @@ name_inputs(subj, check) := [{"name": path_name(p), "value": value_at(subj, p)} 
 element_name_paths(check) := [p | some p in element_name_reads(check); p != object.get(check.check, "path", [])]
 
 element_name_reads(check) := sort({p |
-	some leaf in element_leaves(check.check)
-	some p in leaf_paths(leaf)
+	some read in scoped_reads(check)
+	p := read[0]
 	named(p)
+	not substring(p[0], 1, -1) in read[1]
 })
+
+scoped_reads(check) := [read |
+	given := names_of(check)
+	some leaf in element_leaves(check.check)
+	some read in leaf_reads(leaf, given)
+]
+
+leaf_reads(leaf, given) := [[p, given] | some p in leaf_paths(leaf)] if not quantified(leaf)
+
+leaf_reads(leaf, given) := array.concat([[p, given] | some p in array.concat([leaf.path], named_each(leaf))], [[p, given | names_of(leaf)] |
+	some l in element_leaves(leaf.check)
+	some p in leaf_paths(l)
+]) if quantified(leaf)
+
+names_of(check) := {check.as} if "as" in object.keys(check)
+
+names_of(check) := set() if not "as" in object.keys(check)
+
+check_reads(leaf) := leaf_paths(leaf) if not quantified(leaf)
+
+check_reads(leaf) := list_reads(leaf) if quantified(leaf)
 
 element_leaves(check) := [check] if not combinator(check)
 
 element_leaves(check) := [leaf | some group in check.options; some leaf in group] if combinator(check)
 
-quantified_inputs(subj, check) := [{"name": nm, "value": vals}] if {
-	not check.each
-	not named(object.get(check.check, "path", []))
-	vals := [value_at(elem, object.get(check.check, "path", [])) | some elem in value_at(subj, check.path)]
-	nm := projection_name(check.path, object.get(check.check, "path", []))
+outer_named(check, p) if {
+	named(p)
+	not substring(p[0], 1, -1) in names_of(check)
 }
 
-quantified_inputs(subj, check) := [{"name": path_name(inner), "value": value_at(subj, inner)}] if {
+relative_path(check, p) := array.slice(p, 1, count(p)) if reads_item(check, p)
+
+relative_path(check, p) := p if not reads_item(check, p)
+
+reads_item(check, p) if {
+	named(p)
+	substring(p[0], 1, -1) == check.as
+}
+
+quantified_inputs(subj, check) := [{"name": nm, "value": vals}] if {
 	not check.each
 	inner := object.get(check.check, "path", [])
-	named(inner)
+	not outer_named(check, inner)
+	rel := relative_path(check, inner)
+	vals := [value_at(elem, rel) | some elem in value_at(subj, check.path)]
+	nm := projection_name(check.path, rel)
+}
+
+quantified_inputs(subj, check) := [
+	{"name": projection_name(check.path, []), "value": value_at(subj, check.path)},
+	{"name": path_name(inner), "value": value_at(subj, inner)},
+] if {
+	not check.each
+	inner := object.get(check.check, "path", [])
+	outer_named(check, inner)
 }
 
 quantified_inputs(subj, check) := [{"name": collection_name(check), "value": vals}] if {
@@ -906,7 +1184,7 @@ check_inputs(subj, check, item) := [{"name": nm, "value": reads[nm]} | some nm i
 any_of_reads(subj, check, item) := {item_path_name(item, p): value_at(subj, p) |
 	some group in check.options
 	some leaf in group
-	some p in leaf_paths(leaf)
+	some p in check_reads(leaf)
 }
 
 leaf_paths(leaf) := [leaf.left, leaf.right] if two_sided(leaf)

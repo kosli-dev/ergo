@@ -2694,7 +2694,7 @@ test_a_ref_that_is_not_a_path_from_input_reads_as_invalid if {
 
 test_an_input_path_inside_all_is_shown_once_under_its_own_name if {
 	check := {"op": "all", "path": ["xs"], "check": {"op": "equals", "path": ["$$input", "mode"], "value": "strict"}}
-	row_in({"mode": "strict"}, {"id": 1, "xs": [1, 2]}, check).inputs == [{"name": "$$input.mode", "value": "strict"}]
+	row_in({"mode": "strict"}, {"id": 1, "xs": [1, 2]}, check).inputs == [{"name": "xs[]", "value": [1, 2]}, {"name": "$$input.mode", "value": "strict"}]
 }
 
 test_a_check_field_called_refs_is_the_users_own if {
@@ -3072,7 +3072,7 @@ test_a_name_missing_in_the_path_of_a_list_check_fails_as_absent if {
 		"id": ["n"],
 		"checks": {"c": {"op": "all", "path": ["xs"], "check": {"op": "present", "path": ["$pr", "author"]}}},
 	}})
-	[[r.passed, r.cause, r.inputs] | some r in rows_for(rep, "s", "c")] == [[false, "absent", [{"name": "$pr.author", "value": null}]]]
+	[[r.passed, r.cause, r.inputs] | some r in rows_for(rep, "s", "c")] == [[false, "absent", [{"name": "xs[]", "value": [1, 2]}, {"name": "$pr.author", "value": null}]]]
 }
 
 test_an_input_missing_in_the_path_of_a_list_check_fails_as_absent if {
@@ -3123,4 +3123,412 @@ test_a_literal_or_selector_in_from_is_not_well_formed_so_it_cannot_pass_by_findi
 		rows_for(rep, "s", "$well_formed")[0].passed == false
 		rep.requirements.s.satisfied == false
 	}
+}
+
+review_doc := {"pull_requests": [
+	{"number": 41, "author": "ann", "commits": [{"sha": "c1", "timestamp": "2026-10-01T10:00:00Z"}, {"sha": "c2", "timestamp": "2026-10-01T12:00:00Z"}], "approvers": [{"username": "bob", "timestamp": "2026-10-01T11:00:00Z"}, {"username": "cat", "timestamp": "2026-10-01T13:00:00Z"}]},
+	{"number": 42, "author": "ann", "commits": [{"sha": "c1", "timestamp": "2026-10-01T10:00:00Z"}, {"sha": "c2", "timestamp": "2026-10-01T12:00:00Z"}], "approvers": [{"username": "bob", "timestamp": "2026-10-01T11:00:00Z"}]},
+	{"number": 43, "author": "ann", "commits": [{"sha": "c1"}], "approvers": [{"username": "bob", "timestamp": "2026-10-01T11:00:00Z"}]},
+	{"number": 44, "author": "ann", "commits": [], "approvers": [{"username": "bob", "timestamp": "2026-10-01T11:00:00Z"}]},
+	{"number": 45, "author": "ann", "commits": [{"sha": "c1", "timestamp": "2026-10-01T10:00:00Z"}], "approvers": [{"username": "bob"}]},
+]}
+
+after_last_commit := {"op": "any", "path": ["approvers"], "as": "approver", "check": {"op": "all", "path": ["$pr", "commits"], "check": {"op": "compare_time", "left": ["$approver", "timestamp"], "right": ["timestamp"], "cmp": "gt"}}}
+
+review_req(check) := {"s": {
+	"subject_type": "pull request",
+	"from": ["pull_requests", {"each_as": "pr"}],
+	"id": ["number"],
+	"checks": {"c": check},
+}}
+
+review_rows(check) := [[r.subject.id, r.passed, r.cause] | some r in rows_for(ergo.report(review_doc, review_req(check)), "s", "c")]
+
+test_a_check_inside_a_list_check_can_read_the_item_by_its_name if {
+	review_rows(after_last_commit) == [
+		[41, true, "satisfied"],
+		[42, false, "value"],
+		[43, false, "value"],
+		[44, false, "value"],
+		[45, false, "value"],
+	]
+}
+
+test_a_nested_list_check_renders_both_levels if {
+	ergo.report(review_doc, review_req(after_last_commit)).requirements.s.checks.c.expression == "some approvers as $approver: every $pr.commits: $approver.timestamp gt timestamp"
+}
+
+test_a_nested_list_check_shows_the_list_and_the_names_it_reads if {
+	some r in rows_for(ergo.report(review_doc, review_req(after_last_commit)), "s", "c")
+	r.subject.id == 42
+	r.inputs == [
+		{"name": "approvers[]", "value": [{"username": "bob", "timestamp": "2026-10-01T11:00:00Z"}]},
+		{"name": "$pr.commits", "value": [{"sha": "c1", "timestamp": "2026-10-01T10:00:00Z"}, {"sha": "c2", "timestamp": "2026-10-01T12:00:00Z"}]},
+	]
+}
+
+test_a_name_given_by_as_is_not_read_for_the_row_so_it_does_not_decide_the_cause if {
+	check := {"op": "all", "path": ["approvers"], "as": "a", "check": {"op": "present", "path": ["$a", "timestamp"]}}
+	review_rows(check)[4] == [45, false, "value"]
+	some r in rows_for(ergo.report(review_doc, review_req(check)), "s", "c")
+	r.subject.id == 45
+	r.inputs == [{"name": "approvers[].timestamp", "value": [null]}]
+}
+
+test_a_name_given_by_as_reads_the_same_as_a_path_inside_the_item if {
+	with_name := {"op": "any", "path": ["approvers"], "as": "a", "check": {"op": "equals", "path": ["$a", "username"], "value": "cat"}}
+	without := {"op": "any", "path": ["approvers"], "check": {"op": "equals", "path": ["username"], "value": "cat"}}
+	review_rows(with_name) == review_rows(without)
+	review_rows(with_name)[0] == [41, true, "satisfied"]
+}
+
+test_an_empty_path_under_as_is_named_after_the_name if {
+	rep := ergo.report({"items": [{"id": 1, "tags": ["a"]}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "all", "path": ["tags"], "as": "tag", "check": {"op": "non_empty_string", "path": []}}}}})
+	rep.requirements.s.checks.c.expression == "every tags as $tag: $tag is a non-empty string"
+	rows_for(rep, "s", "c")[0].passed == true
+}
+
+test_as_works_without_a_naming_step if {
+	rep := ergo.report({"items": [{"id": 1, "xs": [{"v": 1, "w": [1]}]}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "all", "path": ["xs"], "as": "x", "check": {"op": "all", "path": ["w"], "check": {"op": "compare", "left": [], "right": ["$x", "v"], "cmp": "eq"}}}}}})
+	rows_for(rep, "s", "c")[0].passed == true
+}
+
+test_an_inner_list_check_can_read_a_list_inside_the_outer_item if {
+	rep := ergo.report({"items": [{"id": 1, "xs": [{"ys": [2, 3]}, {"ys": [4]}]}, {"id": 2, "xs": [{"ys": [1]}]}]}, {"s": {
+		"from": ["items"],
+		"id": ["id"],
+		"checks": {"c": {"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["ys"], "check": {"op": "range", "path": [], "min": 2, "max": 9}}}},
+	}})
+	[[r.subject.id, r.passed] | some r in rows_for(rep, "s", "c")] == [[1, true], [2, false]]
+	rep.requirements.s.checks.c.expression == "every xs: every ys: ys[] >= 2 and ys[] <= 9"
+	rows_for(rep, "s", "c")[0].inputs == [{"name": "xs[].ys", "value": [[2, 3], [4]]}]
+}
+
+test_an_inner_list_check_fails_on_an_empty_or_missing_inner_list if {
+	rep := ergo.report({"items": [{"id": 1, "xs": [{"ys": [2]}, {"ys": []}]}, {"id": 2, "xs": [{"ys": [2]}, {}]}]}, {"s": {
+		"from": ["items"],
+		"id": ["id"],
+		"checks": {"c": {"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["ys"], "check": {"op": "present", "path": []}}}},
+	}})
+	[r.passed | some r in rows_for(rep, "s", "c")] == [false, false]
+}
+
+test_any_inside_all_needs_one_item_of_every_inner_list if {
+	check := {"op": "all", "path": ["xs"], "check": {"op": "any", "path": ["ys"], "check": {"op": "equals", "path": [], "value": 1}}}
+	row_in({}, {"id": 1, "xs": [{"ys": [0, 1]}, {"ys": [1]}]}, check).passed == true
+	row_in({}, {"id": 1, "xs": [{"ys": [0, 1]}, {"ys": [0]}]}, check).passed == false
+}
+
+test_an_inner_list_check_can_use_each_and_as if {
+	check := {"op": "any", "path": ["teams"], "as": "team", "check": {"op": "all", "path": ["repos"], "each": ["owners"], "as": "owner", "check": {"op": "equals", "path": ["$owner"], "value": {"ref": ["$$input", "lead"]}}}}
+	row_in({"lead": "ann"}, {"id": 1, "teams": [{"repos": [{"owners": ["bob"]}]}, {"repos": [{"owners": ["ann"]}, {"owners": ["ann"]}]}]}, check).passed == true
+	row_in({"lead": "ann"}, {"id": 1, "teams": [{"repos": [{"owners": ["ann", "bob"]}]}]}, check).passed == false
+	expression_in({}, {"id": 1}, check) == "some teams as $team: every repos[].owners as $owner: $owner == $$input.lead"
+}
+
+test_an_inner_list_check_can_hold_an_any_of_that_reads_both_names if {
+	check := {"op": "any", "path": ["approvers"], "as": "approver", "check": {"op": "all", "path": ["$pr", "commits"], "as": "commit", "check": {"op": "any_of", "options": {
+		"later": [{"op": "compare_time", "left": ["$approver", "timestamp"], "right": ["$commit", "timestamp"], "cmp": "gt"}],
+		"self": [{"op": "compare", "left": ["$approver", "username"], "right": ["$pr", "author"], "cmp": "eq"}],
+	}}}}
+	array.slice(review_rows(check), 0, 3) == [[41, true, "satisfied"], [42, false, "value"], [43, false, "value"]]
+}
+
+test_a_list_check_nested_two_levels_deep_fails_closed if {
+	check := {"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["ys"], "check": {"op": "all", "path": ["zs"], "check": {"op": "present", "path": []}}}}
+	r := row_in({}, {"id": 1, "xs": [{"ys": [{"zs": [1]}]}]}, check)
+	r.passed == false
+	expression_in({}, {"id": 1}, check) == "every xs: every ys: <nested too deep>"
+}
+
+test_a_badly_written_as_fails_the_check if {
+	every name in [1, "", "$a", "$$input", null] {
+		check := {"op": "any", "path": ["approvers"], "as": name, "check": {"op": "present", "path": ["username"]}}
+		[r[1] | some r in review_rows(check)] == [false, false, false, false, false]
+		ergo.report(review_doc, review_req(check)).requirements.s.checks.c.expression == "some approvers as <invalid name>: username is present"
+	}
+}
+
+test_a_badly_written_inner_as_fails_the_check if {
+	check := {"op": "any", "path": ["approvers"], "check": {"op": "all", "path": ["$pr", "commits"], "as": "", "check": {"op": "present", "path": ["sha"]}}}
+	[r[1] | some r in review_rows(check)] == [false, false, false, false, false]
+}
+
+test_a_name_given_twice_fails_the_check if {
+	shadow_step := {"op": "any", "path": ["approvers"], "as": "pr", "check": {"op": "present", "path": ["username"]}}
+	[r[1] | some r in review_rows(shadow_step)] == [false, false, false, false, false]
+	shadow_outer := {"op": "any", "path": ["approvers"], "as": "a", "check": {"op": "all", "path": ["$pr", "commits"], "as": "a", "check": {"op": "present", "path": ["sha"]}}}
+	[r[1] | some r in review_rows(shadow_outer)] == [false, false, false, false, false]
+}
+
+test_the_same_name_can_be_given_in_two_separate_checks if {
+	rep := ergo.report(review_doc, {"s": {
+		"from": ["pull_requests", {"each_as": "pr"}],
+		"id": ["number"],
+		"checks": {
+			"a": {"op": "any", "path": ["approvers"], "as": "x", "check": {"op": "present", "path": ["$x", "username"]}},
+			"b": {"op": "all", "path": ["commits"], "as": "x", "check": {"op": "present", "path": ["$x", "sha"]}},
+		},
+	}})
+	[r.passed | some r in rows_for(rep, "s", "a")] == [true, true, true, true, true]
+	[r.passed | some r in rows_for(rep, "s", "b")] == [true, true, true, false, true]
+}
+
+test_a_filter_can_use_as if {
+	rep := ergo.report(review_doc, {"s": {
+		"from": ["pull_requests", {"each_as": "pr"}],
+		"id": ["number"],
+		"applies_to": {"f": {"op": "any", "path": ["approvers"], "as": "a", "check": {"op": "equals", "path": ["$a", "username"], "value": "cat"}}},
+		"checks": {"c": {"op": "present", "path": ["author"]}},
+	}})
+	rep.requirements.s.subjects == {"total": 5, "matching": 1}
+}
+
+test_a_path_through_as_inside_a_list_check_is_shown_as_a_path_inside_the_item if {
+	check := {"op": "all", "path": ["xs"], "as": "x", "check": {"op": "present", "path": ["$x", "v"]}}
+	r := row_in({}, {"id": 1, "xs": [{"v": 1}, {"w": 2}]}, check)
+	[r.passed, r.cause, r.inputs] == [false, "value", [{"name": "xs[].v", "value": [1, null]}]]
+}
+
+test_a_name_given_twice_fails_every_kind_of_list_check if {
+	outer_all := {"op": "all", "path": ["approvers"], "as": "pr", "check": {"op": "present", "path": ["username"]}}
+	[r[1] | some r in review_rows(outer_all)] == [false, false, false, false, false]
+	inner_any := {"op": "any", "path": ["approvers"], "as": "a", "check": {"op": "any", "path": ["$pr", "commits"], "as": "a", "check": {"op": "present", "path": ["sha"]}}}
+	[r[1] | some r in review_rows(inner_any)] == [false, false, false, false, false]
+	inner_any_ok := {"op": "any", "path": ["approvers"], "as": "a", "check": {"op": "any", "path": ["$pr", "commits"], "as": "b", "check": {"op": "present", "path": ["sha"]}}}
+	[r[1] | some r in review_rows(inner_any_ok)] == [true, true, true, false, true]
+}
+
+test_a_filter_with_a_name_given_twice_cannot_rule_subjects_out if {
+	rep := ergo.report(review_doc, {"s": {
+		"from": ["pull_requests", {"each_as": "pr"}],
+		"id": ["number"],
+		"min_subjects": 0,
+		"applies_to": {"f": {"op": "any", "path": ["approvers"], "as": "pr", "check": {"op": "present", "path": ["username"]}}},
+		"checks": {"c": {"op": "equals", "path": ["number"], "value": 0}},
+	}})
+	rep.requirements.s.satisfied == false
+	{r.cause | some r in rows_for(rep, "s", "$applies")} == {"absent"}
+}
+
+test_a_filter_with_a_badly_written_as_cannot_rule_subjects_out if {
+	rep := ergo.report(review_doc, {"s": {
+		"from": ["pull_requests", {"each_as": "pr"}],
+		"id": ["number"],
+		"min_subjects": 0,
+		"applies_to": {"f": {"op": "all", "path": ["approvers"], "as": "a", "check": {"op": "any", "path": ["$pr", "commits"], "as": "$c", "check": {"op": "present", "path": ["sha"]}}}},
+		"checks": {"c": {"op": "equals", "path": ["number"], "value": 0}},
+	}})
+	rep.requirements.s.satisfied == false
+	{r.cause | some r in rows_for(rep, "s", "$applies")} == {"absent"}
+}
+
+test_a_filter_nested_too_deep_cannot_rule_subjects_out if {
+	rep := ergo.report({"items": [{"id": 1, "xs": [{"ys": [{"zs": [1]}]}]}]}, {"s": {
+		"from": ["items"],
+		"id": ["id"],
+		"min_subjects": 0,
+		"applies_to": {"f": {"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["ys"], "check": {"op": "all", "path": ["zs"], "check": {"op": "present", "path": []}}}}},
+		"checks": {"c": {"op": "equals", "path": ["id"], "value": 0}},
+	}})
+	rep.requirements.s.satisfied == false
+	[r.cause | some r in rows_for(rep, "s", "$applies")] == ["absent"]
+}
+
+test_a_badly_written_list_check_fails_as_absent if {
+	every check in [
+		{"op": "any", "path": ["approvers"], "as": "pr", "check": {"op": "present", "path": ["username"]}},
+		{"op": "any", "path": ["approvers"], "as": "", "check": {"op": "present", "path": ["username"]}},
+		{"op": "any", "path": ["approvers"], "as": "a", "check": {"op": "all", "path": ["$pr", "commits"], "as": "a", "check": {"op": "present", "path": ["sha"]}}},
+		{"op": "any", "path": ["approvers"], "as": "a", "check": {"op": "all", "path": ["$pr", "commits"], "as": "pr", "check": {"op": "present", "path": ["sha"]}}},
+		{"op": "any", "path": ["approvers"], "check": {"op": "all", "path": ["$pr", "commits"], "as": 3, "check": {"op": "present", "path": ["sha"]}}},
+	] {
+		{r[2] | some r in review_rows(check)} == {"absent"}
+	}
+}
+
+review_expression(check) := ergo.report(review_doc, review_req(check)).requirements.s.checks.c.expression
+
+test_a_name_given_twice_shows_in_the_expression if {
+	review_expression({"op": "any", "path": ["approvers"], "as": "pr", "check": {"op": "present", "path": ["username"]}}) == "some approvers as <name given twice>: username is present"
+	review_expression({"op": "any", "path": ["approvers"], "as": "a", "check": {"op": "all", "path": ["$pr", "commits"], "as": "a", "check": {"op": "present", "path": ["sha"]}}}) == "some approvers as $a: every $pr.commits as <name given twice>: sha is present"
+	review_expression({"op": "any", "path": ["approvers"], "as": "a", "check": {"op": "all", "path": ["$pr", "commits"], "as": "pr", "check": {"op": "present", "path": ["sha"]}}}) == "some approvers as $a: every $pr.commits as <name given twice>: sha is present"
+	expression_in({}, {"id": 1}, {"op": "any", "path": ["xs"], "as": "items", "check": {"op": "present", "path": []}}) == "some xs as $items: $items is present"
+}
+
+peer_doc := {"pull_requests": [
+	{"number": 1, "author": "ann", "commits": [{"timestamp": "2026-10-01T10:00:00Z"}], "approvers": [{"username": "bob", "state": "APPROVED", "timestamp": "2026-10-01T11:00:00Z"}]},
+	{"number": 2, "author": "ann", "commits": [{"timestamp": "2026-10-01T12:00:00Z"}], "approvers": [{"username": "bob", "state": "APPROVED", "timestamp": "2026-10-01T11:00:00Z"}]},
+	{"number": 3, "author": "ann", "commits": [{"timestamp": "2026-10-01T10:00:00Z"}], "approvers": [{"username": "ann", "state": "APPROVED", "timestamp": "2026-10-01T11:00:00Z"}, {"username": "bob", "state": "COMMENTED", "timestamp": "2026-10-01T11:00:00Z"}]},
+	{"number": 4, "commits": [{"timestamp": "2026-10-01T10:00:00Z"}], "approvers": [{"username": "bob", "state": "APPROVED", "timestamp": "2026-10-01T11:00:00Z"}]},
+	{"number": 5, "author": "ann", "commits": [{}], "approvers": [{"username": "bob", "state": "APPROVED", "timestamp": "2026-10-01T11:00:00Z"}]},
+]}
+
+peer_check := {"op": "any", "path": ["approvers"], "as": "approver", "check": {"op": "any_of", "options": {"peer": [
+	{"op": "equals", "path": ["state"], "value": "APPROVED"},
+	{"op": "compare", "left": ["username"], "right": ["$pr", "author"], "cmp": "ne"},
+	{"op": "all", "path": ["$pr", "commits"], "check": {"op": "compare", "left": ["$approver", "timestamp"], "right": ["timestamp"], "cmp": "gt"}},
+]}}}
+
+peer_rows(check) := [[r.subject.id, r.passed, r.cause] | some r in rows_for(ergo.report(peer_doc, review_req(check)), "s", "c")]
+
+test_an_any_of_inside_a_list_check_can_hold_a_list_check if {
+	peer_rows(peer_check) == [
+		[1, true, "satisfied"],
+		[2, false, "value"],
+		[3, false, "value"],
+		[4, false, "absent"],
+		[5, false, "value"],
+	]
+}
+
+test_a_list_check_inside_an_any_of_renders_in_its_option if {
+	ergo.report(peer_doc, review_req(peer_check)).requirements.s.checks.c.expression == "some approvers as $approver: one of: peer(state == APPROVED and username ne $pr.author and every $pr.commits: $approver.timestamp gt timestamp)"
+}
+
+test_a_list_check_inside_an_any_of_shows_the_names_it_reads if {
+	some r in rows_for(ergo.report(peer_doc, review_req(peer_check)), "s", "c")
+	r.subject.id == 4
+	r.inputs == [
+		{"name": "approvers[]", "value": [{"username": "bob", "state": "APPROVED", "timestamp": "2026-10-01T11:00:00Z"}]},
+		{"name": "$pr.author", "value": null},
+		{"name": "$pr.commits", "value": [{"timestamp": "2026-10-01T10:00:00Z"}]},
+	]
+}
+
+test_an_any_of_at_the_top_can_hold_a_list_check if {
+	check := {"op": "any_of", "options": {
+		"signed": [{"op": "all", "path": ["commits"], "check": {"op": "equals", "path": ["verified"], "value": true}}],
+		"exempt": [{"op": "equals", "path": ["exempt"], "value": true}],
+	}}
+	row_in({}, {"id": 1, "commits": [{"verified": true}]}, check).passed == true
+	row_in({}, {"id": 1, "commits": [{"verified": false}], "exempt": true}, check).passed == true
+	row_in({}, {"id": 1, "commits": [{"verified": false}], "exempt": false}, check).passed == false
+	r := row_in({}, {"id": 1, "exempt": false}, check)
+	[r.passed, r.cause] == [false, "absent"]
+	r.inputs == [{"name": "commits", "value": null}, {"name": "exempt", "value": false}]
+	expression_in({}, {"id": 1}, check) == "one of: exempt(exempt == true) | signed(every commits: verified == true)"
+}
+
+test_a_list_check_in_an_any_of_at_the_top_can_nest_and_name_its_items if {
+	check := {"op": "any_of", "options": {"o": [{"op": "all", "path": ["xs"], "as": "x", "check": {"op": "all", "path": ["ys"], "check": {"op": "compare", "left": [], "right": ["$x", "v"], "cmp": "lt"}}}]}}
+	row_in({}, {"id": 1, "xs": [{"v": 5, "ys": [1, 2]}]}, check).passed == true
+	row_in({}, {"id": 1, "xs": [{"v": 2, "ys": [1, 2]}]}, check).passed == false
+	expression_in({}, {"id": 1}, check) == "one of: o(every xs as $x: every ys: ys[] lt $x.v)"
+}
+
+test_a_list_check_in_an_any_of_inside_a_nested_list_check_is_too_deep if {
+	check := {"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["ys"], "check": {"op": "any_of", "options": {"o": [{"op": "all", "path": ["zs"], "check": {"op": "present", "path": []}}]}}}}
+	r := row_in({}, {"id": 1, "xs": [{"ys": [{"zs": [1]}]}]}, check)
+	[r.passed, r.cause] == [false, "absent"]
+	expression_in({}, {"id": 1}, check) == "every xs: every ys: one of: o(<nested too deep>)"
+}
+
+test_a_list_check_two_levels_under_an_any_of_at_the_top_is_too_deep if {
+	check := {"op": "any_of", "options": {"o": [{"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["ys"], "check": {"op": "all", "path": ["zs"], "check": {"op": "present", "path": []}}}}]}}
+	r := row_in({}, {"id": 1, "xs": [{"ys": [{"zs": [1]}]}]}, check)
+	[r.passed, r.cause] == [false, "absent"]
+}
+
+test_a_name_given_twice_in_a_list_check_inside_an_any_of_fails_as_absent if {
+	inner := {"op": "any", "path": ["approvers"], "as": "approver", "check": {"op": "any_of", "options": {"peer": [{"op": "all", "path": ["$pr", "commits"], "as": "approver", "check": {"op": "present", "path": ["timestamp"]}}]}}}
+	{r[2] | some r in peer_rows(inner)} == {"absent"}
+	ergo.report(peer_doc, review_req(inner)).requirements.s.checks.c.expression == "some approvers as $approver: one of: peer(every $pr.commits as <name given twice>: timestamp is present)"
+	top := {"op": "any_of", "options": {"o": [{"op": "all", "path": ["commits"], "as": "pr", "check": {"op": "present", "path": ["timestamp"]}}]}}
+	{r[2] | some r in peer_rows(top)} == {"absent"}
+	ergo.report(peer_doc, review_req(top)).requirements.s.checks.c.expression == "one of: o(every commits as <name given twice>: timestamp is present)"
+}
+
+test_a_broken_list_check_in_an_any_of_filter_cannot_rule_subjects_out if {
+	rep := ergo.report(peer_doc, {"s": {
+		"from": ["pull_requests", {"each_as": "pr"}],
+		"id": ["number"],
+		"min_subjects": 0,
+		"applies_to": {"f": {"op": "any_of", "options": {"o": [{"op": "all", "path": ["commits"], "as": "pr", "check": {"op": "present", "path": ["timestamp"]}}]}}},
+		"checks": {"c": {"op": "equals", "path": ["number"], "value": 0}},
+	}})
+	rep.requirements.s.satisfied == false
+}
+
+test_a_list_check_inside_an_any_of_at_the_top_reads_names_for_its_row if {
+	check := {"op": "any_of", "options": {"o": [{"op": "all", "path": ["xs"], "check": {"op": "compare", "left": [], "right": ["$$input", "lim"], "cmp": "lt"}}]}}
+	row_in({"lim": 3}, {"id": 1, "xs": [1, 2]}, check).passed == true
+	r := row_in({}, {"id": 1, "xs": [1, 2]}, check)
+	[r.passed, r.cause] == [false, "absent"]
+	r.inputs == [{"name": "$$input.lim", "value": null}, {"name": "xs", "value": [1, 2]}]
+}
+
+test_a_list_check_inside_an_any_of_inside_a_list_check_reads_names_for_its_row if {
+	check := {"op": "all", "path": ["as"], "check": {"op": "any_of", "options": {"o": [{"op": "all", "path": ["xs"], "check": {"op": "compare", "left": [], "right": ["$$input", "lim"], "cmp": "lt"}}]}}}
+	row_in({"lim": 3}, {"id": 1, "as": [{"xs": [1, 2]}]}, check).passed == true
+	r := row_in({}, {"id": 1, "as": [{"xs": [1, 2]}]}, check)
+	[r.passed, r.cause] == [false, "absent"]
+	r.inputs == [{"name": "as[]", "value": [{"xs": [1, 2]}]}, {"name": "$$input.lim", "value": null}]
+}
+
+test_a_name_read_outside_the_list_check_that_gives_it_fails_as_absent if {
+	inside := {"op": "all", "path": ["xs"], "check": {"op": "any_of", "options": {
+		"a": [{"op": "all", "path": ["ys"], "as": "x", "check": {"op": "present", "path": []}}],
+		"b": [{"op": "equals", "path": ["$x", "v"], "value": 1}],
+	}}}
+	r := row_in({}, {"id": 1, "xs": [{"ys": []}]}, inside)
+	[r.passed, r.cause] == [false, "absent"]
+	top := {"op": "any_of", "options": {
+		"a": [{"op": "all", "path": ["ys"], "as": "x", "check": {"op": "present", "path": []}}],
+		"b": [{"op": "equals", "path": ["$x", "v"], "value": 1}],
+	}}
+	t := row_in({}, {"id": 1, "ys": []}, top)
+	[t.passed, t.cause] == [false, "absent"]
+	beside := {"op": "all", "path": ["xs"], "as": "o", "check": {"op": "any_of", "options": {"a": [
+		{"op": "all", "path": ["ys"], "as": "y", "check": {"op": "present", "path": []}},
+		{"op": "equals", "path": ["$y"], "value": 1},
+	]}}}
+	b := row_in({}, {"id": 1, "xs": [{"ys": [1]}]}, beside)
+	[b.passed, b.cause] == [false, "absent"]
+}
+
+test_a_filter_reading_a_name_outside_the_list_check_that_gives_it_cannot_rule_subjects_out if {
+	rep := ergo.report({"items": [{"id": 1, "xs": [{"ys": []}]}]}, {"s": {
+		"from": ["items"],
+		"id": ["id"],
+		"min_subjects": 0,
+		"applies_to": {"f": {"op": "all", "path": ["xs"], "check": {"op": "any_of", "options": {
+			"a": [{"op": "all", "path": ["ys"], "as": "x", "check": {"op": "present", "path": []}}],
+			"b": [{"op": "equals", "path": ["$x", "v"], "value": 1}],
+		}}}},
+		"checks": {"c": {"op": "equals", "path": ["id"], "value": 0}},
+	}})
+	rep.requirements.s.satisfied == false
+}
+
+test_a_name_nothing_gives_in_an_each_path_fails_as_absent if {
+	top := {"op": "all", "path": ["xs"], "each": ["$q", "ys"], "check": {"op": "present", "path": []}}
+	r := row_in({}, {"id": 1, "xs": [{"ys": [1]}]}, top)
+	[r.passed, r.cause] == [false, "absent"]
+	inner := {"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["ys"], "each": ["$q", "zs"], "check": {"op": "present", "path": []}}}
+	i := row_in({}, {"id": 1, "xs": [{"ys": [{"zs": [1]}]}]}, inner)
+	[i.passed, i.cause] == [false, "absent"]
+	in_option := {"op": "any_of", "options": {"o": [{"op": "all", "path": ["xs"], "each": ["$q", "ys"], "check": {"op": "present", "path": []}}]}}
+	o := row_in({}, {"id": 1, "xs": [{"ys": [1]}]}, in_option)
+	[o.passed, o.cause] == [false, "absent"]
+}
+
+test_a_name_in_an_each_path_reads_the_subject if {
+	rep := ergo.report({"items": [{"id": 1, "xs": [1, 2], "ys": [3]}]}, {"s": {
+		"from": ["items", {"each_as": "it"}],
+		"id": ["id"],
+		"checks": {"c": {"op": "all", "path": ["xs"], "each": ["$it", "ys"], "check": {"op": "equals", "path": [], "value": 3}}},
+	}})
+	[r.passed | some r in rows_for(rep, "s", "c")] == [true]
+}
+
+test_a_filter_with_a_misspelt_name_in_an_each_path_cannot_rule_subjects_out if {
+	rep := ergo.report({"items": [{"id": 1, "xs": [{"ys": [1]}]}]}, {"s": {
+		"from": ["items"],
+		"id": ["id"],
+		"min_subjects": 0,
+		"applies_to": {"f": {"op": "all", "path": ["xs"], "each": ["$q", "ys"], "check": {"op": "present", "path": []}}},
+		"checks": {"c": {"op": "equals", "path": ["id"], "value": 0}},
+	}})
+	rep.requirements.s.satisfied == false
 }
