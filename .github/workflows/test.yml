@@ -46,10 +46,10 @@ jobs:
         run: |
           dir="$RUNNER_TEMP/wasm"
           mkdir -p "$dir"
-          opa build -t wasm -e baking/report ergo.rego examples/baking/ergo/baking.rego examples/baking/ergo/workings.rego -o "$dir/baking.tar.gz"
+          opa build -t wasm -e baking/report -e baking/violations ergo.rego examples/baking/ergo/baking.rego examples/baking/ergo/workings.rego -o "$dir/baking.tar.gz"
           tar -xzf "$dir/baking.tar.gz" -C "$dir" /policy.wasm
           opa eval --format raw -d examples/baking/ergo/baking.yaml data > "$dir/data.json"
-          opa eval --format raw -d ergo.rego -d examples/baking/ergo/baking.rego -d examples/baking/ergo/workings.rego -d examples/baking/ergo/baking.yaml -i examples/baking/batches.json data.baking.report > "$dir/eval.json"
+          opa eval --format raw -d ergo.rego -d examples/baking/ergo/baking.rego -d examples/baking/ergo/workings.rego -d examples/baking/ergo/baking.yaml -i examples/baking/batches.json '{"report": data.baking.report, "violations": data.baking.violations}' > "$dir/eval.json"
           npm install --silent --no-save --prefix "$dir" @open-policy-agent/opa-wasm@1.10.0
           WASM_DIR="$dir" node -e '
           const fs = require("fs");
@@ -58,7 +58,7 @@ jobs:
           const canon = (v) => Array.isArray(v) ? "[" + v.map(canon).join(",") + "]"
             : v !== null && typeof v === "object" ? "{" + Object.keys(v).sort().map((k) => JSON.stringify(k) + ":" + canon(v[k])).join(",") + "}"
             : JSON.stringify(v);
-          const sorted = (r) => canon({ ...r, results: r.results.map(canon).sort() });
+          const unordered = (xs) => canon(xs.map(canon).sort());
           (async () => {
             const policy = await loadPolicy(fs.readFileSync(dir + "/policy.wasm"));
             const provided = require(dir + "/node_modules/@open-policy-agent/opa-wasm/src/builtins/index.js");
@@ -72,13 +72,19 @@ jobs:
               process.exit(1);
             }
             policy.setData(JSON.parse(fs.readFileSync(dir + "/data.json")));
-            const wasm = policy.evaluate(JSON.parse(fs.readFileSync("examples/baking/batches.json")))[0].result;
+            const input = JSON.parse(fs.readFileSync("examples/baking/batches.json"));
+            const report = policy.evaluate(input, "baking/report")[0].result;
+            const violations = policy.evaluate(input, "baking/violations")[0].result;
             const want = JSON.parse(fs.readFileSync(dir + "/eval.json"));
-            if (sorted(wasm) !== sorted(want)) {
+            if (canon({ ...report, results: unordered(report.results) }) !== canon({ ...want.report, results: unordered(want.report.results) })) {
               console.error("Wasm gives a different report from opa eval");
               process.exit(1);
             }
-            console.log("Wasm report matches opa eval:", want.results.length, "rows");
+            if (unordered(violations) !== unordered(want.violations)) {
+              console.error("Wasm gives different violations from opa eval");
+              process.exit(1);
+            }
+            console.log("Wasm matches opa eval:", want.report.results.length, "rows,", want.violations.length, "violations");
           })().catch((e) => { console.error(e.message); process.exit(1); });
           '
       - name: Check every line is tested
