@@ -1483,6 +1483,10 @@ test_a_large_number_value_is_written_in_full if {
 	rendered({}, {"op": "equals", "path": ["n"], "value": 123456789012345678901234567890}) == "n == 123456789012345678901234567890"
 }
 
+test_a_set_value_is_written_as_a_sorted_list if {
+	rendered({}, {"op": "equals", "path": ["x"], "value": {"o": {3, {"b": 1, "a": {2, 1}}, set()}}}) == `x == {"o": [3, {"a": [1, 2], "b": 1}, []]}`
+}
+
 test_an_empty_list_value_is_written_as_json if rendered({}, {"op": "equals", "path": ["x"], "value": [[], {}]}) == "x == [[], {}]"
 
 test_a_key_that_is_not_a_string_is_written_as_a_json_string if rendered({}, {"op": "equals", "path": ["x"], "value": {1: "a"}}) == `x == {"1": "a"}`
