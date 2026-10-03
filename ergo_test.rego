@@ -573,6 +573,31 @@ test_compare_time_rejects_malformed_timestamp if {
 	verdict({"start": "yesterday", "end": "2024-01-01T00:00:00Z"}, compare_time_span("lt")) == false
 }
 
+test_compare_time_fails_on_a_date_that_does_not_exist_rather_than_rolling_it_over if {
+	verdict({"start": "2024-02-30T00:00:00Z", "end": "2024-03-01T00:00:01Z"}, compare_time_span("lt")) == false
+	verdict({"start": "2023-02-29T00:00:00Z", "end": "2023-03-01T00:00:01Z"}, compare_time_span("lt")) == false
+}
+
+test_compare_time_fails_on_a_lowercase_t_or_z if {
+	verdict({"start": "2024-01-01t00:00:00Z", "end": "2024-06-01T00:00:00Z"}, compare_time_span("lt")) == false
+	verdict({"start": "2024-01-01T00:00:00z", "end": "2024-06-01T00:00:00Z"}, compare_time_span("lt")) == false
+}
+
+test_compare_time_only_reads_years_from_1678_to_2261_so_nanoseconds_since_1970_always_fit if {
+	verdict({"start": "1678-01-01T00:00:00Z", "end": "2261-12-31T23:59:59Z"}, compare_time_span("lt")) == true
+	verdict({"start": "1677-12-31T23:59:59Z", "end": "2024-06-01T00:00:00Z"}, compare_time_span("lt")) == false
+	verdict({"start": "2024-01-01T00:00:00Z", "end": "2262-01-01T00:00:00Z"}, compare_time_span("lt")) == false
+	verdict({"start": "0999-01-01T00:00:00Z", "end": "2024-06-01T00:00:00Z"}, compare_time_span("lt")) == false
+}
+
+test_compare_time_knows_which_years_have_a_29th_of_february if {
+	verdict({"start": "2024-02-29T00:00:00Z", "end": "2024-03-01T00:00:00Z"}, compare_time_span("lt")) == true
+	verdict({"start": "2000-02-29T00:00:00Z", "end": "2000-03-01T00:00:00Z"}, compare_time_span("lt")) == true
+	verdict({"start": "1900-02-29T00:00:00Z", "end": "1900-03-01T00:00:00Z"}, compare_time_span("lt")) == false
+	verdict({"start": "2023-04-31T00:00:00Z", "end": "2023-05-01T00:00:00Z"}, compare_time_span("lt")) == false
+	verdict({"start": "2023-12-31T00:00:00Z", "end": "2024-01-01T00:00:00Z"}, compare_time_span("lt")) == true
+}
+
 test_compare_time_rejects_an_out_of_range_month if {
 	verdict({"start": "2024-13-01T00:00:00Z", "end": "2024-01-01T00:00:00Z"}, compare_time_span("lt")) == false
 }
@@ -584,7 +609,6 @@ test_compare_time_rejects_a_date_without_a_time if {
 test_rfc3339_gate_accepts_valid_timestamps if {
 	every ts in [
 		"2024-01-01T00:00:00Z",
-		"2024-01-01T00:00:00z",
 		"2024-06-30T23:59:59.999999999Z",
 		"2024-06-30T12:00:00+02:00",
 		"2024-06-30T12:00:00-05:30",
@@ -598,6 +622,11 @@ test_rfc3339_gate_rejects_everything_else if {
 		"yesterday",
 		"",
 		"2024-01-01",
+		"2024-01-01T00:00:00z",
+		"2024-01-01t00:00:00Z",
+		"2024-02-30T00:00:00Z",
+		"1677-12-31T23:59:59Z",
+		"2262-01-01T00:00:00Z",
 		"2024-13-01T00:00:00Z",
 		"2024-00-01T00:00:00Z",
 		"2024-01-32T00:00:00Z",
@@ -1454,6 +1483,14 @@ test_a_large_number_value_is_written_in_full if {
 	rendered({}, {"op": "equals", "path": ["n"], "value": 123456789012345678901234567890}) == "n == 123456789012345678901234567890"
 }
 
+test_keys_of_different_types_are_sorted_by_how_they_are_written if {
+	rendered({}, {"op": "equals", "path": ["x"], "value": {"o": {false: 1, 1: 2, "a": {null: 3, 10: 4, 9: 5}}}}) == `x == {"o": {"1": 2, "a": {"10": 4, "9": 5, "null": 3}, "false": 1}}`
+}
+
+test_a_set_value_is_written_as_a_sorted_list if {
+	rendered({}, {"op": "equals", "path": ["x"], "value": {"o": {3, {"b": 1, "a": {2, 1}}, set()}}}) == `x == {"o": [3, {"a": [1, 2], "b": 1}, []]}`
+}
+
 test_an_empty_list_value_is_written_as_json if rendered({}, {"op": "equals", "path": ["x"], "value": [[], {}]}) == "x == [[], {}]"
 
 test_a_key_that_is_not_a_string_is_written_as_a_json_string if rendered({}, {"op": "equals", "path": ["x"], "value": {1: "a"}}) == `x == {"1": "a"}`
@@ -2087,22 +2124,22 @@ test_row_order_groups_by_check_kind_then_requirement if {
 	}
 	doc := {"items": [{"id": "s2", "live": true}, {"id": "s1", "live": false}]}
 
-	sequence := [sprintf("%s/%s/%v", [r.requirement, r.check, r.subject.id]) |
+	sequence := [[r.requirement, r.check, r.subject.id] |
 		some r in ergo.report(doc, {"zzz": req, "aaa": req}).results
 	]
 	sequence == [
-		"aaa/$well_formed/null",
-		"zzz/$well_formed/null",
-		"aaa/$min_subjects/null",
-		"zzz/$min_subjects/null",
-		"aaa/$applies/s2",
-		"aaa/$applies/s1",
-		"zzz/$applies/s2",
-		"zzz/$applies/s1",
-		"aaa/alpha/s2",
-		"aaa/zeta/s2",
-		"zzz/alpha/s2",
-		"zzz/zeta/s2",
+		["aaa", "$well_formed", null],
+		["zzz", "$well_formed", null],
+		["aaa", "$min_subjects", null],
+		["zzz", "$min_subjects", null],
+		["aaa", "$applies", "s2"],
+		["aaa", "$applies", "s1"],
+		["zzz", "$applies", "s2"],
+		["zzz", "$applies", "s1"],
+		["aaa", "alpha", "s2"],
+		["aaa", "zeta", "s2"],
+		["zzz", "alpha", "s2"],
+		["zzz", "zeta", "s2"],
 	]
 }
 
@@ -2147,6 +2184,36 @@ test_an_option_written_as_an_object_is_rendered_in_key_order if {
 	}}}
 	rendered({}, check) == "one of: o(a is present and b is present and d is present and c is present)"
 	rendered({"xs": []}, {"op": "all", "path": ["xs"], "check": check}) == "every xs: one of: o(a is present and b is present and d is present and c is present)"
+}
+
+test_an_op_that_is_not_a_string_is_written_as_json_in_every_runtime if {
+	rendered({}, {"op": {"ref": ["a"]}, "path": ["x"]}) == `<unknown op {"ref": ["a"]}>`
+	rendered({}, {"op": null, "path": ["x"]}) == "<unknown op null>"
+	rendered({}, {"op": 1.50, "path": ["x"]}) == "<unknown op 1.5>"
+}
+
+test_a_cmp_that_is_not_a_string_is_written_as_json_in_every_runtime if {
+	rendered({}, {"op": "compare", "left": ["a"], "right": ["b"], "cmp": {"x": 1}}) == `a {"x": 1} b`
+	rendered({}, {"op": "compare", "left": ["a"], "right": ["b"], "cmp": null}) == "a null b"
+	rendered({}, {"op": "compare", "left": ["a"], "right": ["b"], "cmp": 1.5}) == "a 1.5 b"
+}
+
+test_an_option_name_that_is_not_a_string_is_written_as_json_in_every_runtime if {
+	rendered({}, {"op": "any_of", "options": {[{"op": "present", "path": ["a"]}]}}) == `one of: [{"op": "present", "path": ["a"]}](a is present)`
+}
+
+test_a_subject_type_that_is_not_a_string_is_written_as_json_in_every_runtime if {
+	req := {"from": ["xs"], "applies_to": {"f": {"op": "present", "path": ["id"]}}, "checks": {"c": {"op": "present", "path": ["id"]}}}
+	checks := ergo.report({"xs": [{"id": 1}]}, {"s": object.union(req, {"subject_type": ["a", "b"]})}).requirements.s.checks
+	checks["$min_subjects"].description == `at least 1 matching ["a", "b"] subject(s) required`
+	startswith(checks["$applies"].description, `subject is in scope as a ["a", "b"] under`)
+	ergo.report({"xs": [{"id": 1}]}, {"s": object.union(req, {"subject_type": null})}).requirements.s.checks["$min_subjects"].description == "at least 1 matching null subject(s) required"
+	ergo.report({"xs": [{"id": 1}]}, {"s": object.union(req, {"subject_type": -1})}).requirements.s.checks["$min_subjects"].description == "at least 1 matching -1 subject(s) required"
+}
+
+test_a_number_written_with_a_plus_in_its_exponent_is_written_in_full if {
+	rendered({}, {"op": "equals", "path": ["x"], "value": 1e+21}) == "x == 1000000000000000000000"
+	rendered({}, {"op": "equals", "path": ["x"], "value": 2.5e+30}) == "x == 2500000000000000000000000000000"
 }
 
 test_every_row_resolves_to_one_check_definition if {

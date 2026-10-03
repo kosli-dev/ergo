@@ -524,8 +524,18 @@ _json_text(v) := concat("", [_json_token(t) | some m in regex.find_all_string_su
 
 _sorted_json(v) := concat("", [_node_json(paths, index, i) | some i, _ in paths]) if {
 	index := {p: x | walk(v, [p, x])}
-	paths := sort(object.keys(index))
+	paths := [pair[1] | some pair in sort([[_written_path(index, p), p] | some p, _ in index])]
 }
+
+_written_path(index, p) := [_written_step(index, p, i) | some i, _ in p]
+
+_written_step(index, p, i) := _key_text(p[i]) if is_object(index[array.slice(p, 0, i)])
+
+_written_step(index, p, i) := p[i] if not is_object(index[array.slice(p, 0, i)])
+
+_key_text(k) := k if is_string(k)
+
+_key_text(k) := json.marshal(k) if not is_string(k)
 
 _node_json(paths, index, i) := concat("", [
 	_node_separator(paths, i),
@@ -560,9 +570,7 @@ _node_key(index, p) := "" if {
 	not is_object(index[_parent(p)])
 }
 
-_key_json(k) := json.marshal(k) if is_string(k)
-
-_key_json(k) := json.marshal(json.marshal(k)) if not is_string(k)
+_key_json(k) := json.marshal(_key_text(k))
 
 _node_body(x) := "{" if {
 	_opens(x)
@@ -624,7 +632,7 @@ _number_text(t) := _signed(m[1], _decimal(concat("", [m[2], m[3]]), count(m[2]) 
 
 _exponent("") := 0
 
-_exponent(e) := to_number(e) if e != ""
+_exponent(e) := to_number(trim_prefix(e, "+")) if e != ""
 
 _decimal(digits, point) := _decimal_text(whole, frac) if {
 	left := max([0, 1 - point])
@@ -664,6 +672,10 @@ _value_text(x) := "<invalid ref>" if _malformed(x)
 _literal_text(v) := "<number out of range>" if _out_of_range(v)
 
 _literal_text(v) := _json_text(v) if not _out_of_range(v)
+
+_text(x) := x if is_string(x)
+
+_text(x) := _literal_text(x) if not is_string(x)
 
 _out_of_range(x) if {
 	walk(x, [_, n])
@@ -814,8 +826,27 @@ _unordered_reads(subj, check) := {"absent" |
 
 _rfc3339_shaped(v) if {
 	is_string(v)
-	regex.match(`^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])[Tt]([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\.[0-9]+)?([Zz]|[+-]([01][0-9]|2[0-3]):[0-5][0-9])$`, v)
+	m := regex.find_all_string_submatch_n(`^(1[6-9][0-9]{2}|2[0-2][0-9]{2})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\.[0-9]+)?(Z|[+-]([01][0-9]|2[0-3]):[0-5][0-9])$`, v, 1)[0]
+	year := to_number(m[1])
+	year >= 1678
+	year <= 2261
+	to_number(trim_left(m[3], "0")) <= _days_in(year, to_number(trim_left(m[2], "0")))
 }
+
+_days_in(_, month) := 31 if month in {1, 3, 5, 7, 8, 10, 12}
+
+_days_in(_, month) := 30 if month in {4, 6, 9, 11}
+
+_days_in(year, 2) := 29 if _leap_year(year)
+
+_days_in(year, 2) := 28 if not _leap_year(year)
+
+_leap_year(year) if {
+	year % 4 == 0
+	year % 100 != 0
+}
+
+_leap_year(year) if year % 400 == 0
 
 default _cmp(_, _, _) := false
 
@@ -1490,7 +1521,7 @@ _scope_readable(doc, req) if {
 
 _nested_describe(check, item) := _leaf_describe(check, item) if not _misplaced(check)
 
-_nested_describe(check, _) := sprintf("<%v can't go here>", [check.op]) if _misplaced(check)
+_nested_describe(check, _) := sprintf("<%s can't go here>", [_text(check.op)]) if _misplaced(check)
 
 _misplaced(check) if {
 	check.op in operators
@@ -1500,7 +1531,7 @@ _misplaced(check) if {
 
 default _leaf_describe(_, _) := ""
 
-_leaf_describe(check, _) := sprintf("<unknown op %v>", [check.op]) if not check.op in operators
+_leaf_describe(check, _) := sprintf("<unknown op %s>", [_text(check.op)]) if not check.op in operators
 
 _leaf_describe(check, _) := "<missing op>" if {
 	is_object(check)
@@ -1559,7 +1590,7 @@ _pattern_list(check) := _ref_name(check.patterns.ref) if _is_ref(check.patterns)
 
 _pattern_list(check) := "<invalid ref>" if _malformed(check.patterns)
 
-_leaf_describe(check, item) := sprintf("%s %s %s", [_item_path_name(item, check.left), check.cmp, _item_path_name(item, check.right)]) if check.op in {"compare", "compare_time"}
+_leaf_describe(check, item) := sprintf("%s %s %s", [_item_path_name(item, check.left), _text(check.cmp), _item_path_name(item, check.right)]) if check.op in {"compare", "compare_time"}
 
 default _expression_of(_, _) := ""
 
@@ -1617,7 +1648,7 @@ _quantifier(check) := "every" if check.op == "all"
 
 _quantifier(check) := "some" if check.op == "any"
 
-_expression_of(check, item) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%v(%s)", [nm, concat(" and ", [_top_option_describe(group[k], item) | some k in _names(group)])]) | some nm, group in check.options]))]) if {
+_expression_of(check, item) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%s(%s)", [_text(nm), concat(" and ", [_top_option_describe(group[k], item) | some k in _names(group)])]) | some nm, group in check.options]))]) if {
 	not _written_expression(check)
 	check.op == "any_of"
 }
@@ -1647,7 +1678,7 @@ _element_describe(check, item, _) := _nested_describe(check, item) if {
 	not _quantified(check)
 }
 
-_element_describe(check, item, given) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%v(%s)", [nm, concat(" and ", [_element_option_describe(group[k], item, given) | some k in _names(group)])]) | some nm, group in check.options]))]) if _combinator(check)
+_element_describe(check, item, given) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%s(%s)", [_text(nm), concat(" and ", [_element_option_describe(group[k], item, given) | some k in _names(group)])]) | some nm, group in check.options]))]) if _combinator(check)
 
 _element_describe(check, item, given) := _element_list_describe(check, item, given) if _quantified(check)
 
@@ -1673,7 +1704,7 @@ _inner_describe(check, _) := "<nested too deep>" if _quantified(check)
 
 _any_of_describe(check, item) := sprintf("one of: %s", [concat(" | ", sort([_variant_describe(nm, group, item) | some nm, group in check.options]))])
 
-_variant_describe(nm, group, item) := sprintf("%v(%s)", [nm, concat(" and ", [_inner_option_describe(group[k], item) | some k in _names(group)])])
+_variant_describe(nm, group, item) := sprintf("%s(%s)", [_text(nm), concat(" and ", [_inner_option_describe(group[k], item) | some k in _names(group)])])
 
 _inner_option_describe(leaf, item) := _nested_describe(leaf, item) if not _quantified(leaf)
 
@@ -1862,7 +1893,7 @@ _matching_count_name(req) := "count(matching(<invalid from>))" if not _from_well
 
 _min_subjects_def(req) := {"$min_subjects": _with_refs(
 	{
-		"description": sprintf("at least %s matching %s subject(s) required", [_literal_text(_min_subjects_of(req)), _subject_type_of(req)]),
+		"description": sprintf("at least %s matching %s subject(s) required", [_literal_text(_min_subjects_of(req)), _text(_subject_type_of(req))]),
 		"expression": sprintf("%s >= %s", [_matching_count_name(req), _literal_text(_min_subjects_of(req))]),
 	},
 	{"from": _from_of(req)},
@@ -1902,7 +1933,7 @@ _well_formed_inputs(req) := [
 
 _applies_def(req) := {"$applies": _with_refs(
 	{
-		"description": sprintf("subject is in scope as a %s under this requirement's applies_to filter; out-of-scope subjects are recorded but not evaluated, and a subject whose filter can't be read fails", [_subject_type_of(req)]),
+		"description": sprintf("subject is in scope as a %s under this requirement's applies_to filter; out-of-scope subjects are recorded but not evaluated, and a subject whose filter can't be read fails", [_text(_subject_type_of(req))]),
 		"expression": concat(" and ", [_expression_of(_applies_to_of(req)[name], _subject_item_name(req)) | some name in _applies_to_names(req)]),
 	},
 	_applies_to_of(req),

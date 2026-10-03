@@ -59,12 +59,18 @@ jobs:
           version: 1.19.0
       - name: Run the tests compiled to Wasm
         run: opa test . --ignore .github --target wasm --timeout 30s
+
+  wasm-js:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.19.0
       - uses: actions/setup-node@v7
         with:
           node-version: 24
-      - name: Check the Wasm JS runtime has every built-in ergo needs
+      - name: Run the tests with the Wasm JS runtime
         run: |
-          opa build -t wasm -e baking/report ergo.rego examples/baking/ergo/baking.rego examples/baking/ergo/workings.rego -o "$RUNNER_TEMP/ergo.tar.gz"
-          tar -xzf "$RUNNER_TEMP/ergo.tar.gz" -C "$RUNNER_TEMP" /policy.wasm
           npm install --silent --no-save --prefix "$RUNNER_TEMP" @open-policy-agent/opa-wasm@1.10.0
-          node .github/wasm-builtins.cjs "$RUNNER_TEMP/policy.wasm" "$RUNNER_TEMP"
+          node .github/wasm-js.cjs "$RUNNER_TEMP"
