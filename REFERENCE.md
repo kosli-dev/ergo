@@ -369,7 +369,7 @@ These apply a check to each item of a list inside the subject.
 }
 ```
 
-An empty list fails. No commits isn't proof that every commit is signed.
+An empty list fails. No commits isn't proof that every commit is signed. Anything that isn't a list fails too, an object included. The row's `inputs` then show `[]` for the list, because an object's values have no order of their own.
 
 `each` goes one level deeper. The check then applies to every item of every inner list:
 
@@ -682,7 +682,7 @@ Rows always come in the same order, whatever order you wrote the policy in:
 3. within a requirement, subjects in the order they appear in the input, or in key order when a [naming step](#naming-subjects) reads an object
 4. within a subject, checks in name order
 
-Patterns, options and selector fields are sorted in rendered expressions too. Names, keys and strings are sorted by Unicode code point, so `！` (U+FF01) comes before `😀` (U+1F600). JavaScript's default `sort()` puts them the other way round, so an implementation there needs to compare code points. So the same policy and the same input always produce exactly the same report, byte for byte, which means you can hash it and compare hashes.
+Patterns, options, selector fields and the keys of objects written in the policy are sorted in rendered expressions too. Names, keys and strings are sorted by Unicode code point, so `！` (U+FF01) comes before `😀` (U+1F600). JavaScript's default `sort()` puts them the other way round, so an implementation there needs to compare code points. So the same policy and the same input always produce exactly the same report, byte for byte once it's written as JSON with its keys sorted, which means you can hash it and compare hashes. `opa eval` sorts the keys. OPA's Wasm runtime doesn't, so sort them yourself before hashing a report from Wasm.
 
 ## Causes
 

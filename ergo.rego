@@ -460,7 +460,7 @@ _selector_matches(v, sel) if {
 	}
 }
 
-_path_name(path) := concat(".", [_segment_name(i, p) | some i, p in path])
+_path_name(path) := concat(".", [_segment_name(i, path[i]) | some i in _names(path)])
 
 _item_path_name(item, []) := item
 
@@ -520,7 +520,92 @@ _plain_key(k) if {
 	regex.match(`^[A-Za-z_$][A-Za-z0-9_$-]*$`, k)
 }
 
-_json_text(v) := concat("", [_json_token(t) | some m in regex.find_all_string_submatch_n(`"(?:[^"\\]|\\.)*"|-?[0-9][0-9.eE+-]*|[^"0-9-]+`, json.marshal(v), -1); t := m[0]])
+_json_text(v) := concat("", [_json_token(t) | some m in regex.find_all_string_submatch_n(`"(?:[^"\\]|\\.)*"|-?[0-9][0-9.eE+-]*|[^"0-9-]+`, _sorted_json(v), -1); t := m[0]])
+
+_sorted_json(v) := concat("", [_node_json(paths, index, i) | some i, _ in paths]) if {
+	index := {p: x | walk(v, [p, x])}
+	paths := sort(object.keys(index))
+}
+
+_node_json(paths, index, i) := concat("", [
+	_node_separator(paths, i),
+	_node_key(index, paths[i]),
+	_node_body(index[paths[i]]),
+	_node_closers(paths, index, i),
+])
+
+_node_separator(_, 0) := ""
+
+_node_separator(paths, i) := "" if {
+	i > 0
+	paths[i - 1] == _parent(paths[i])
+}
+
+_node_separator(paths, i) := "," if {
+	i > 0
+	paths[i - 1] != _parent(paths[i])
+}
+
+_parent(p) := array.slice(p, 0, count(p) - 1)
+
+_node_key(index, p) := concat("", [_key_json(p[count(p) - 1]), ":"]) if {
+	count(p) > 0
+	is_object(index[_parent(p)])
+}
+
+_node_key(_, p) := "" if count(p) == 0
+
+_node_key(index, p) := "" if {
+	count(p) > 0
+	not is_object(index[_parent(p)])
+}
+
+_key_json(k) := json.marshal(k) if is_string(k)
+
+_key_json(k) := json.marshal(json.marshal(k)) if not is_string(k)
+
+_node_body(x) := "{" if {
+	_opens(x)
+	is_object(x)
+}
+
+_node_body(x) := "[" if {
+	_opens(x)
+	not is_object(x)
+}
+
+_node_body(x) := "{}" if {
+	is_object(x)
+	count(x) == 0
+}
+
+_node_body(x) := "[]" if {
+	type_name(x) in {"array", "set"}
+	count(x) == 0
+}
+
+_node_body(x) := json.marshal(x) if not type_name(x) in {"object", "array", "set"}
+
+_opens(x) if {
+	type_name(x) in {"object", "array", "set"}
+	count(x) > 0
+}
+
+_node_closers(paths, index, i) := "" if _opens(index[paths[i]])
+
+_node_closers(paths, index, i) := concat("", [_closer(index[array.slice(paths[i], 0, k)]) | some k in _closed_depths(paths, i)]) if not _opens(index[paths[i]])
+
+_closed_depths(paths, i) := numbers.range(count(paths[i]) - 1, _next_depth(paths, i)) if count(paths[i]) > _next_depth(paths, i)
+
+_closed_depths(paths, i) := [] if count(paths[i]) <= _next_depth(paths, i)
+
+_next_depth(paths, i) := count(paths[i + 1]) if i + 1 < count(paths)
+
+_next_depth(paths, i) := 0 if i + 1 == count(paths)
+
+_closer(x) := "}" if is_object(x)
+
+_closer(x) := "]" if not is_object(x)
 
 _json_token(t) := concat("", [object.get(_standard_escapes, e, e) | some m in regex.find_all_string_submatch_n(`\\u[0-9a-f]{4}|\\.|[^\\]+`, t, -1); e := m[0]]) if startswith(t, `"`)
 
@@ -1532,7 +1617,7 @@ _quantifier(check) := "every" if check.op == "all"
 
 _quantifier(check) := "some" if check.op == "any"
 
-_expression_of(check, item) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%v(%s)", [nm, concat(" and ", [_top_option_describe(leaf, item) | some leaf in group])]) | some nm, group in check.options]))]) if {
+_expression_of(check, item) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%v(%s)", [nm, concat(" and ", [_top_option_describe(group[k], item) | some k in _names(group)])]) | some nm, group in check.options]))]) if {
 	not _written_expression(check)
 	check.op == "any_of"
 }
@@ -1562,7 +1647,7 @@ _element_describe(check, item, _) := _nested_describe(check, item) if {
 	not _quantified(check)
 }
 
-_element_describe(check, item, given) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%v(%s)", [nm, concat(" and ", [_element_option_describe(leaf, item, given) | some leaf in group])]) | some nm, group in check.options]))]) if _combinator(check)
+_element_describe(check, item, given) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%v(%s)", [nm, concat(" and ", [_element_option_describe(group[k], item, given) | some k in _names(group)])]) | some nm, group in check.options]))]) if _combinator(check)
 
 _element_describe(check, item, given) := _element_list_describe(check, item, given) if _quantified(check)
 
@@ -1588,7 +1673,7 @@ _inner_describe(check, _) := "<nested too deep>" if _quantified(check)
 
 _any_of_describe(check, item) := sprintf("one of: %s", [concat(" | ", sort([_variant_describe(nm, group, item) | some nm, group in check.options]))])
 
-_variant_describe(nm, group, item) := sprintf("%v(%s)", [nm, concat(" and ", [_inner_option_describe(leaf, item) | some leaf in group])])
+_variant_describe(nm, group, item) := sprintf("%v(%s)", [nm, concat(" and ", [_inner_option_describe(group[k], item) | some k in _names(group)])])
 
 _inner_option_describe(leaf, item) := _nested_describe(leaf, item) if not _quantified(leaf)
 
@@ -1598,7 +1683,7 @@ _two_sided(check) if check.op in {"compare", "compare_time"}
 
 default _check_inputs(_, _, _) := []
 
-_check_inputs(subj, check, item) := [_echoed(subj, spec, item) | some spec in check.inputs] if {
+_check_inputs(subj, check, item) := [_echoed(subj, check.inputs[k], item) | some k in _names(check.inputs)] if {
 	check.inputs
 }
 
@@ -1606,7 +1691,7 @@ _echoed(subj, spec, item) := {"name": _item_path_name(item, spec), "value": valu
 
 _echoed(subj, spec, _) := {
 	"name": _projection_name(object.get(spec, "path", []), object.get(spec, "each", [])),
-	"value": [value_at(elem, object.get(spec, "each", [])) | some elem in value_at(subj, object.get(spec, "path", []))],
+	"value": [value_at(elem, object.get(spec, "each", [])) | some elem in _list_at(subj, object.get(spec, "path", []))],
 } if is_object(spec)
 
 _check_inputs(subj, check, item) := [
@@ -1679,7 +1764,7 @@ _quantified_inputs(subj, check) := [{"name": nm, "value": vals}] if {
 	inner := _inner_path(check)
 	not _outer_named(check, inner)
 	rel := _relative_path(check, inner)
-	vals := [value_at(elem, rel) | some elem in value_at(subj, check.path)]
+	vals := [value_at(elem, rel) | some elem in _list_at(subj, check.path)]
 	nm := _projection_name(check.path, rel)
 }
 
@@ -1694,8 +1779,15 @@ _quantified_inputs(subj, check) := [
 
 _quantified_inputs(subj, check) := [{"name": _collection_name(check), "value": vals}] if {
 	check.each
-	vals := [value_at(elem, check.each) | some elem in value_at(subj, check.path)]
+	vals := [value_at(elem, check.each) | some elem in _list_at(subj, check.path)]
 }
+
+_list_at(subj, path) := v if {
+	v := value_at(subj, path)
+	is_array(v)
+}
+
+_list_at(subj, path) := [] if not is_array(value_at(subj, path))
 
 _check_inputs(subj, check, item) := [{"name": _item_path_name(item, check.path), "value": value_at(subj, check.path)}] if {
 	not check.inputs
@@ -1836,7 +1928,8 @@ _subject_passed(req, subj) if {
 
 _subject_rows(doc, req, req_name) := [row |
 	some entry in _matching_entries(doc, req)
-	some check_name, check in _checks_of(req)
+	some check_name in _names(_checks_of(req))
+	check := _checks_of(req)[check_name]
 	row := {
 		"requirement": req_name,
 		"subject": _entry_ref(entry, req),
@@ -1937,14 +2030,20 @@ _all_satisfied(doc, policy) if {
 
 _results(doc, policy) := array.concat(
 	array.concat(
-		[_well_formed_row(req, name) | some name, req in policy],
-		[_min_subjects_row(doc, req, name) | some name, req in policy],
+		[_well_formed_row(policy[name], name) | some name in _names(policy)],
+		[_min_subjects_row(doc, policy[name], name) | some name in _names(policy)],
 	),
 	array.concat(
-		[row | some name, req in policy; some row in _applies_rows(doc, req, name)],
-		[row | some name, req in policy; some row in _subject_rows(doc, req, name)],
+		[row | some name in _names(policy); some row in _applies_rows(doc, policy[name], name)],
+		[row | some name in _names(policy); some row in _subject_rows(doc, policy[name], name)],
 	),
 )
+
+_names(x) := sort(object.keys(x)) if is_object(x)
+
+_names(x) := [i | some i, _ in x] if is_array(x)
+
+_names(x) := sort(x) if is_set(x)
 
 report(doc, policy) := report_with_params(doc, _configured_params, policy)
 

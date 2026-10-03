@@ -1370,6 +1370,17 @@ test_inputs_projection_over_a_missing_collection if {
 	inputs_of({}, check) == [{"name": "commits[].timestamp", "value": []}]
 }
 
+test_inputs_projection_over_an_object_lists_nothing_so_its_order_cannot_vary if {
+	check := {"op": "bespoke", "inputs": [{"path": ["commits"], "each": ["timestamp"]}]}
+	inputs_of({"commits": {"b": {"timestamp": 2}, "a": {"timestamp": 1}}}, check) == [{"name": "commits[].timestamp", "value": []}]
+}
+
+test_a_list_check_over_an_object_lists_nothing_so_its_order_cannot_vary if {
+	subj := {"m": {"alpha": {"v": 1}, "beta": {"v": 2}, "gamma": {"v": 3}, "delta": {"v": 4}}}
+	inputs_of(subj, {"op": "all", "path": ["m"], "check": {"op": "present", "path": ["v"]}}) == [{"name": "m[].v", "value": []}]
+	inputs_of(subj, {"op": "any", "path": ["m"], "each": ["v"], "check": {"op": "present", "path": []}}) == [{"name": "m[].v", "value": []}]
+}
+
 test_inputs_mix_paths_and_projections if {
 	check := {"op": "bespoke", "inputs": [["author"], {"path": ["commits"], "each": ["sha1"]}]}
 	inputs_of({"author": "alice", "commits": [{"sha1": "aaaa"}]}, check) == [
@@ -1442,6 +1453,10 @@ test_a_large_number_value_is_written_in_full if {
 	rendered({}, {"op": "equals", "path": ["n"], "value": 1e21}) == "n == 1000000000000000000000"
 	rendered({}, {"op": "equals", "path": ["n"], "value": 123456789012345678901234567890}) == "n == 123456789012345678901234567890"
 }
+
+test_an_empty_list_value_is_written_as_json if rendered({}, {"op": "equals", "path": ["x"], "value": [[], {}]}) == "x == [[], {}]"
+
+test_a_key_that_is_not_a_string_is_written_as_a_json_string if rendered({}, {"op": "equals", "path": ["x"], "value": {1: "a"}}) == `x == {"1": "a"}`
 
 test_a_list_or_object_value_is_written_as_json_with_sorted_keys if {
 	rendered({}, {"op": "equals", "path": ["x"], "value": ["a", 1.50, {"b": [true, null], "a": "x,y:z"}]}) == `x == ["a", 1.5, {"a": "x,y:z", "b": [true, null]}]`
@@ -2089,6 +2104,49 @@ test_row_order_groups_by_check_kind_then_requirement if {
 		"zzz/alpha/s2",
 		"zzz/zeta/s2",
 	]
+}
+
+test_requirements_come_out_in_name_order_whatever_the_runtime if {
+	req := {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}}
+	rep := ergo.report({"items": [{"id": 1}]}, {"t": req, "s": req, "delta": req, "alpha": req, "gamma": req, "beta": req})
+	[r.requirement | some r in rep.results; r.check == "c"] == ["alpha", "beta", "delta", "gamma", "s", "t"]
+}
+
+test_checks_come_out_in_name_order_whatever_the_runtime if {
+	check := {"op": "present", "path": ["id"]}
+	rep := ergo.report({"items": [{"id": 1}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check, "b": check, "a": check, "delta": check, "gamma": check}}})
+	[r.check | some r in rep.results; not startswith(r.check, "$")] == ["a", "b", "c", "delta", "gamma"]
+}
+
+test_checks_written_as_a_list_still_come_out_in_order if {
+	rep := ergo.report({"items": [{"id": 1}]}, {"s": {"from": ["items"], "id": ["id"], "checks": [{"op": "present", "path": ["id"]}, {"op": "present", "path": ["nope"]}]}})
+	[[r.check, r.passed] | some r in rep.results; not r.check in {"$well_formed", "$min_subjects"}] == [[0, true], [1, false]]
+}
+
+test_a_policy_written_as_a_set_still_gets_its_rows if {
+	req := {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}}
+	[r.check | some r in ergo.report({"items": [{"id": 1}]}, {req}).results] == ["$well_formed", "$min_subjects", "c"]
+}
+
+test_a_from_written_as_an_object_is_named_in_key_order if {
+	rep := ergo.report({}, {"s": {"from": {"delta": "w", "beta": "x", "alpha": "y", "gamma": 1}, "checks": {"c": {"op": "present", "path": ["id"]}}}})
+	rep.requirements.s.checks["$min_subjects"].expression == "count(matching(y.x.w.1)) >= 1"
+}
+
+test_inputs_written_as_an_object_come_out_in_key_order if {
+	check := {"op": "bespoke", "inputs": {"alpha": ["a"], "beta": ["b"], "gamma": ["c"], "delta": ["d"]}}
+	[i.name | some i in inputs_of({"a": 1, "b": 2, "c": 3, "d": 4}, check)] == ["a", "b", "d", "c"]
+}
+
+test_an_option_written_as_an_object_is_rendered_in_key_order if {
+	check := {"op": "any_of", "options": {"o": {
+		"alpha": {"op": "present", "path": ["a"]},
+		"beta": {"op": "present", "path": ["b"]},
+		"gamma": {"op": "present", "path": ["c"]},
+		"delta": {"op": "present", "path": ["d"]},
+	}}}
+	rendered({}, check) == "one of: o(a is present and b is present and d is present and c is present)"
+	rendered({"xs": []}, {"op": "all", "path": ["xs"], "check": check}) == "every xs: one of: o(a is present and b is present and d is present and c is present)"
 }
 
 test_every_row_resolves_to_one_check_definition if {
