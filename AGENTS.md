@@ -33,6 +33,8 @@ OPA loads every JSON and YAML file it finds as data. The workflow files under `.
 
 CI runs these checks on pull requests and on pushes to `main` (`.github/workflows/test.yml`), using the OPA version the README names and Regal 0.43.0. When you change the OPA version, change it in both places.
 
+CI also compiles ergo to Wasm with `opa build -t wasm` and checks that OPA's JavaScript runtime, `@open-policy-agent/opa-wasm`, has every built-in the compiled module needs (`.github/wasm-builtins.cjs`). The only exception is `time.parse_rfc3339_ns`, which `REFERENCE.md` tells Wasm users to pass in themselves. A new built-in in ergo can pass every other check and still break Wasm users this way.
+
 CI also fails when a line of Rego isn't reached by any test. To list those lines yourself:
 
 ```sh

@@ -520,9 +520,9 @@ _plain_key(k) if {
 	regex.match(`^[A-Za-z_$][A-Za-z0-9_$-]*$`, k)
 }
 
-_json_text(v) := concat("", [_json_token(t) | some t in regex.find_n(`"(?:[^"\\]|\\.)*"|-?[0-9][0-9.eE+-]*|[^"0-9-]+`, json.marshal(v), -1)])
+_json_text(v) := concat("", [_json_token(t) | some m in regex.find_all_string_submatch_n(`"(?:[^"\\]|\\.)*"|-?[0-9][0-9.eE+-]*|[^"0-9-]+`, json.marshal(v), -1); t := m[0]])
 
-_json_token(t) := concat("", [object.get(_standard_escapes, e, e) | some e in regex.find_n(`\\u[0-9a-f]{4}|\\.|[^\\]+`, t, -1)]) if startswith(t, `"`)
+_json_token(t) := concat("", [object.get(_standard_escapes, e, e) | some m in regex.find_all_string_submatch_n(`\\u[0-9a-f]{4}|\\.|[^\\]+`, t, -1); e := m[0]]) if startswith(t, `"`)
 
 _json_token(t) := _number_text(t) if regex.match(`^-?[0-9]`, t)
 
