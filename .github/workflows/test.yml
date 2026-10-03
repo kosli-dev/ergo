@@ -59,6 +59,14 @@ jobs:
           version: 1.19.0
       - name: Run the tests compiled to Wasm
         run: opa test . --ignore .github --target wasm --timeout 30s
+
+  wasm-js:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.19.0
       - uses: actions/setup-node@v7
         with:
           node-version: 24
