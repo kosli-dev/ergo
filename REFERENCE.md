@@ -741,22 +741,12 @@ To decide whether to allow something, use `report.compliant`, not whether `viola
 
 ergo runs in a policy compiled with `opa build -t wasm` and run with OPA's JavaScript runtime, `@open-policy-agent/opa-wasm`. One built-in is missing from that runtime: `time.parse_rfc3339_ns`, which `compare_time` uses on RFC 3339 strings. A policy with such a check fails with `not implemented: built-in function`, unless you pass the built-in in yourself, as the third argument to `loadPolicy`.
 
-It has to give the same answer as OPA's: nanoseconds since 1970 for a time it accepts, and nothing for one it rejects, which makes the check fail. Return `undefined` then, rather than throwing, because an error stops the whole evaluation and there's no report. JavaScript's `Date.parse` isn't enough on its own: it rolls `2024-02-30` over to 1 March, where OPA rejects it, so a check could pass in JavaScript and fail in OPA. And a JavaScript number can't hold nanoseconds since 1970 exactly, because today's are about 1.76×10¹⁸, where a number can only step by 256, so return the digits with `JSON.rawJSON` (Node 21 and later). This is the version ergo's CI uses, and it agrees with OPA on 40,000 generated timestamps:
+ergo only passes it a time it has already checked: an uppercase `T` and `Z`, a date that exists and a year from 1678 to 2261. So it only has to turn that into nanoseconds since 1970, exactly. A JavaScript number can't hold that: today's are about 1.76×10¹⁸, where a number can only step by 256. So return the digits with `JSON.rawJSON` (Node 21 and later). This is the version ergo's CI uses, and it gives the same nanoseconds as OPA on 16,922 generated timestamps, before and after 1970:
 
 ```js
 const parseTime = (v) => {
-  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(?:Z|([+-])(\d{2}):(\d{2}))$/.exec(v);
-  if (!m) return undefined;
-  const [year, month, day, hour, minute, second] = m.slice(1, 7).map(Number);
-  const date = new Date(0);
-  date.setUTCFullYear(year, month - 1, day);
-  date.setUTCHours(hour, minute, second);
-  const fields = [date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()];
-  if (fields.some((f, i) => f !== [year, month, day, hour, minute, second][i])) return undefined;
-  const offset = m[8] ? BigInt((m[8] === "-" ? -1 : 1) * (Number(m[9]) * 3600 + Number(m[10]) * 60)) : 0n;
-  const nanos = (BigInt(date.getTime() / 1000) - offset) * 1000000000n + BigInt((m[7] || "").padEnd(9, "0").slice(0, 9));
-  if (nanos < -(2n ** 63n) || nanos >= 2n ** 63n) return undefined;
-  return JSON.rawJSON(String(nanos));
+  const [, time, fraction = "", zone] = /^(.{19})(?:\.(\d+))?(.*)$/.exec(v);
+  return JSON.rawJSON(String(BigInt(Date.parse(time + zone)) / 1000n * 1000000000n + BigInt(fraction.padEnd(9, "0").slice(0, 9))));
 };
 
 const policy = await loadPolicy(wasm, undefined, { "time.parse_rfc3339_ns": parseTime });
