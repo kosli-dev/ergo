@@ -1617,7 +1617,7 @@ _quantifier(check) := "every" if check.op == "all"
 
 _quantifier(check) := "some" if check.op == "any"
 
-_expression_of(check, item) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%v(%s)", [nm, concat(" and ", [_top_option_describe(leaf, item) | some leaf in group])]) | some nm, group in check.options]))]) if {
+_expression_of(check, item) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%v(%s)", [nm, concat(" and ", [_top_option_describe(group[k], item) | some k in _names(group)])]) | some nm, group in check.options]))]) if {
 	not _written_expression(check)
 	check.op == "any_of"
 }
@@ -1647,7 +1647,7 @@ _element_describe(check, item, _) := _nested_describe(check, item) if {
 	not _quantified(check)
 }
 
-_element_describe(check, item, given) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%v(%s)", [nm, concat(" and ", [_element_option_describe(leaf, item, given) | some leaf in group])]) | some nm, group in check.options]))]) if _combinator(check)
+_element_describe(check, item, given) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%v(%s)", [nm, concat(" and ", [_element_option_describe(group[k], item, given) | some k in _names(group)])]) | some nm, group in check.options]))]) if _combinator(check)
 
 _element_describe(check, item, given) := _element_list_describe(check, item, given) if _quantified(check)
 
@@ -1673,7 +1673,7 @@ _inner_describe(check, _) := "<nested too deep>" if _quantified(check)
 
 _any_of_describe(check, item) := sprintf("one of: %s", [concat(" | ", sort([_variant_describe(nm, group, item) | some nm, group in check.options]))])
 
-_variant_describe(nm, group, item) := sprintf("%v(%s)", [nm, concat(" and ", [_inner_option_describe(leaf, item) | some leaf in group])])
+_variant_describe(nm, group, item) := sprintf("%v(%s)", [nm, concat(" and ", [_inner_option_describe(group[k], item) | some k in _names(group)])])
 
 _inner_option_describe(leaf, item) := _nested_describe(leaf, item) if not _quantified(leaf)
 
@@ -1683,7 +1683,7 @@ _two_sided(check) if check.op in {"compare", "compare_time"}
 
 default _check_inputs(_, _, _) := []
 
-_check_inputs(subj, check, item) := [_echoed(subj, spec, item) | some spec in check.inputs] if {
+_check_inputs(subj, check, item) := [_echoed(subj, check.inputs[k], item) | some k in _names(check.inputs)] if {
 	check.inputs
 }
 

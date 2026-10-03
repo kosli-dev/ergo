@@ -369,7 +369,7 @@ These apply a check to each item of a list inside the subject.
 }
 ```
 
-An empty list fails. No commits isn't proof that every commit is signed. So does anything that isn't a list, an object included, and the row's `inputs` then show `[]` for the list, because an object's values have no order of their own.
+An empty list fails. No commits isn't proof that every commit is signed. Anything that isn't a list fails too, an object included. The row's `inputs` then show `[]` for the list, because an object's values have no order of their own.
 
 `each` goes one level deeper. The check then applies to every item of every inner list:
 

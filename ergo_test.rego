@@ -2133,6 +2133,22 @@ test_a_from_written_as_an_object_is_named_in_key_order if {
 	rep.requirements.s.checks["$min_subjects"].expression == "count(matching(y.x.w.1)) >= 1"
 }
 
+test_inputs_written_as_an_object_come_out_in_key_order if {
+	check := {"op": "bespoke", "inputs": {"alpha": ["a"], "beta": ["b"], "gamma": ["c"], "delta": ["d"]}}
+	[i.name | some i in inputs_of({"a": 1, "b": 2, "c": 3, "d": 4}, check)] == ["a", "b", "d", "c"]
+}
+
+test_an_option_written_as_an_object_is_rendered_in_key_order if {
+	check := {"op": "any_of", "options": {"o": {
+		"alpha": {"op": "present", "path": ["a"]},
+		"beta": {"op": "present", "path": ["b"]},
+		"gamma": {"op": "present", "path": ["c"]},
+		"delta": {"op": "present", "path": ["d"]},
+	}}}
+	rendered({}, check) == "one of: o(a is present and b is present and d is present and c is present)"
+	rendered({"xs": []}, {"op": "all", "path": ["xs"], "check": check}) == "every xs: one of: o(a is present and b is present and d is present and c is present)"
+}
+
 test_every_row_resolves_to_one_check_definition if {
 	scoped := {"s": object.union(min_subjects_req(1).s, {"applies_to": merged_only})}
 	rep := ergo.report(two_states, scoped)

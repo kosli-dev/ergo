@@ -31,9 +31,13 @@ The `regal lint` command runs [Regal](https://www.openpolicyagent.org/projects/r
 
 OPA loads every JSON and YAML file it finds as data. The workflow files under `.github` clash with each other, so the checks ignore that folder.
 
-CI runs these checks on pull requests and on pushes to `main` (`.github/workflows/test.yml`), using the OPA version the README names and Regal 0.43.0. When you change the OPA version, change it in the README and in both jobs of the workflow.
+CI runs these checks on pull requests and on pushes to `main` (`.github/workflows/test.yml`), using the OPA version the README names and Regal 0.43.0. When you change the OPA version, change it in the README, in both jobs of the workflow and in the Docker command below.
 
-CI also runs every test compiled to Wasm, with `opa test . --ignore .github --target wasm`, because Wasm walks objects and sets in a different order from `opa eval`, so anything that ends up in the report has to be sorted. That needs the Linux build of OPA. The macOS one says `engine not found`.
+CI also runs every test compiled to Wasm, with `opa test . --ignore .github --target wasm`, because Wasm walks objects and sets in a different order from `opa eval`, so anything that ends up in the report has to be sorted. That needs the Linux build of OPA. The macOS one says `engine not found`, so on a Mac run it in Docker:
+
+```sh
+docker run --rm -v "$PWD":/src:ro -w /src openpolicyagent/opa:1.19.0 test . --ignore .github --target wasm
+```
 
 CI also compiles ergo to Wasm with `opa build -t wasm` and checks that OPA's JavaScript runtime, `@open-policy-agent/opa-wasm`, has every built-in the compiled module needs (`.github/wasm-builtins.cjs`). The only exception is `time.parse_rfc3339_ns`, which `REFERENCE.md` tells Wasm users to pass in themselves. A new built-in in ergo can pass every other check and still break Wasm users this way.
 
