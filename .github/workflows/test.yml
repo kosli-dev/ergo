@@ -61,6 +61,16 @@ jobs:
           const sorted = (r) => canon({ ...r, results: r.results.map(canon).sort() });
           (async () => {
             const policy = await loadPolicy(fs.readFileSync(dir + "/policy.wasm"));
+            const provided = require(dir + "/node_modules/@open-policy-agent/opa-wasm/src/builtins/index.js");
+            const exports = policy.wasmInstance.exports;
+            const addr = exports.opa_json_dump(exports.builtins());
+            const memory = new Uint8Array(policy.mem.buffer);
+            const needed = Object.keys(JSON.parse(Buffer.from(memory.slice(addr, memory.indexOf(0, addr))).toString()));
+            const missing = needed.filter((b) => !provided[b] && b !== "time.parse_rfc3339_ns");
+            if (missing.length > 0) {
+              console.error("ergo uses built-ins the Wasm JS runtime does not have:", missing.join(", "));
+              process.exit(1);
+            }
             policy.setData(JSON.parse(fs.readFileSync(dir + "/data.json")));
             const wasm = policy.evaluate(JSON.parse(fs.readFileSync("examples/baking/batches.json")))[0].result;
             const want = JSON.parse(fs.readFileSync(dir + "/eval.json"));
