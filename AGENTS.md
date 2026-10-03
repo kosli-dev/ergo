@@ -39,7 +39,7 @@ CI also runs every test compiled to Wasm, with `opa test . --ignore .github --ta
 docker run --rm -v "$PWD":/src:ro -w /src openpolicyagent/opa:1.19.0 test . --ignore .github --target wasm
 ```
 
-CI also compiles ergo to Wasm with `opa build -t wasm` and checks that OPA's JavaScript runtime, `@open-policy-agent/opa-wasm`, has every built-in the compiled module needs (`.github/wasm-builtins.cjs`). The only exception is `time.parse_rfc3339_ns`, which `REFERENCE.md` tells Wasm users to pass in themselves. A new built-in in ergo can pass every other check and still break Wasm users this way.
+CI also runs every test with OPA's JavaScript runtime, `@open-policy-agent/opa-wasm` (`.github/wasm-js.cjs`), because that runtime brings its own versions of some built-ins, like a `sprintf` that formats lists and objects differently, and lacks others. The script compiles each test as a Wasm entrypoint, fails if ergo uses a built-in the runtime doesn't have (apart from `time.parse_rfc3339_ns`, which it passes in, as `REFERENCE.md` tells Wasm users to), and then runs every test. So pass `sprintf` only strings: write anything else with `_text`.
 
 CI also fails when a line of Rego isn't reached by any test. To list those lines yourself:
 

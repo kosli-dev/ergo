@@ -633,6 +633,7 @@ In an expression, a value written in the policy is shown as JSON, written the sa
 - A number is a plain decimal, with no exponent and no trailing zeros: `1.0`, `1.50`, `1e2` and `2.5e-3` are shown as `1`, `1.5`, `100` and `0.0025`, and `-0` as `0`. A number keeps every digit the policy wrote, so it's only shown the same by every implementation when it has at most 15 significant digits, which is as many as any language's 64-bit floating point number is sure to keep. A number in the policy has to be `0` or have a magnitude between `2.2250738585072014e-308` and `1.7976931348623157e308`, the range those numbers hold without losing digits. Elsewhere, a language like JavaScript turns `1e400` into `Infinity` and `1e-400` into `0`, so a check could pass there and fail here. A check holding such a number anywhere fails with cause `absent`, and the number is shown as `<number out of range>`. One in `from`, `id` or `min_subjects` fails `$well_formed`.
 - A list or object has one space after each comma and colon, and its keys are sorted: `["a", 1.5, {"a": "x", "b": [true, null]}]`.
 - A ref is shown without quotes, as `$$params.x`, so it can't be mistaken for the string `"$$params.x"`.
+- Something that should be a string but isn't, like an `op`, `cmp` or `subject_type` written as an object, is shown as JSON too: `<unknown op {"ref": ["a"]}>`. A string there is shown as it is, without quotes: `<unknown op nope>`.
 
 Keys in paths are only quoted when needed, as described in [Paths](#paths), and are escaped the same way.
 
@@ -738,6 +739,19 @@ To decide whether to allow something, use `report.compliant`, not whether `viola
 ## Compiling to Wasm
 
 ergo runs in a policy compiled with `opa build -t wasm` and run with OPA's JavaScript runtime, `@open-policy-agent/opa-wasm`. One built-in is missing from that runtime: `time.parse_rfc3339_ns`, which `compare_time` uses on RFC 3339 strings. A policy with such a check fails with `not implemented: built-in function`, unless you pass the built-in in yourself, as the third argument to `loadPolicy`.
+
+It has to return nanoseconds since 1970, and a JavaScript number can't hold that exactly: today's timestamps are about 1.76×10¹⁸ nanoseconds, where a number can only step by 256. So return the digits with `JSON.rawJSON` (Node 21 and later), or two times less than 256 nanoseconds apart can compare as equal. This is the version ergo's CI uses:
+
+```js
+const parseTime = (v) => {
+  const m = /^(\d{4}-\d{2}-\d{2}[Tt]\d{2}:\d{2}:\d{2})(?:\.(\d+))?([Zz]|[+-]\d{2}:\d{2})$/.exec(v);
+  if (!m) throw new Error(`not an RFC 3339 time: ${v}`);
+  const seconds = BigInt(Date.parse((m[1] + m[3]).toUpperCase()) / 1000);
+  return JSON.rawJSON(String(seconds * 1000000000n + BigInt((m[2] || "").padEnd(9, "0").slice(0, 9))));
+};
+
+const policy = await loadPolicy(wasm, undefined, { "time.parse_rfc3339_ns": parseTime });
+```
 
 ## Failing closed
 

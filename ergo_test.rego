@@ -2087,22 +2087,22 @@ test_row_order_groups_by_check_kind_then_requirement if {
 	}
 	doc := {"items": [{"id": "s2", "live": true}, {"id": "s1", "live": false}]}
 
-	sequence := [sprintf("%s/%s/%v", [r.requirement, r.check, r.subject.id]) |
+	sequence := [[r.requirement, r.check, r.subject.id] |
 		some r in ergo.report(doc, {"zzz": req, "aaa": req}).results
 	]
 	sequence == [
-		"aaa/$well_formed/null",
-		"zzz/$well_formed/null",
-		"aaa/$min_subjects/null",
-		"zzz/$min_subjects/null",
-		"aaa/$applies/s2",
-		"aaa/$applies/s1",
-		"zzz/$applies/s2",
-		"zzz/$applies/s1",
-		"aaa/alpha/s2",
-		"aaa/zeta/s2",
-		"zzz/alpha/s2",
-		"zzz/zeta/s2",
+		["aaa", "$well_formed", null],
+		["zzz", "$well_formed", null],
+		["aaa", "$min_subjects", null],
+		["zzz", "$min_subjects", null],
+		["aaa", "$applies", "s2"],
+		["aaa", "$applies", "s1"],
+		["zzz", "$applies", "s2"],
+		["zzz", "$applies", "s1"],
+		["aaa", "alpha", "s2"],
+		["aaa", "zeta", "s2"],
+		["zzz", "alpha", "s2"],
+		["zzz", "zeta", "s2"],
 	]
 }
 
@@ -2147,6 +2147,36 @@ test_an_option_written_as_an_object_is_rendered_in_key_order if {
 	}}}
 	rendered({}, check) == "one of: o(a is present and b is present and d is present and c is present)"
 	rendered({"xs": []}, {"op": "all", "path": ["xs"], "check": check}) == "every xs: one of: o(a is present and b is present and d is present and c is present)"
+}
+
+test_an_op_that_is_not_a_string_is_written_as_json_in_every_runtime if {
+	rendered({}, {"op": {"ref": ["a"]}, "path": ["x"]}) == `<unknown op {"ref": ["a"]}>`
+	rendered({}, {"op": null, "path": ["x"]}) == "<unknown op null>"
+	rendered({}, {"op": 1.50, "path": ["x"]}) == "<unknown op 1.5>"
+}
+
+test_a_cmp_that_is_not_a_string_is_written_as_json_in_every_runtime if {
+	rendered({}, {"op": "compare", "left": ["a"], "right": ["b"], "cmp": {"x": 1}}) == `a {"x": 1} b`
+	rendered({}, {"op": "compare", "left": ["a"], "right": ["b"], "cmp": null}) == "a null b"
+	rendered({}, {"op": "compare", "left": ["a"], "right": ["b"], "cmp": 1.5}) == "a 1.5 b"
+}
+
+test_an_option_name_that_is_not_a_string_is_written_as_json_in_every_runtime if {
+	rendered({}, {"op": "any_of", "options": {[{"op": "present", "path": ["a"]}]}}) == `one of: [{"op": "present", "path": ["a"]}](a is present)`
+}
+
+test_a_subject_type_that_is_not_a_string_is_written_as_json_in_every_runtime if {
+	req := {"from": ["xs"], "applies_to": {"f": {"op": "present", "path": ["id"]}}, "checks": {"c": {"op": "present", "path": ["id"]}}}
+	checks := ergo.report({"xs": [{"id": 1}]}, {"s": object.union(req, {"subject_type": ["a", "b"]})}).requirements.s.checks
+	checks["$min_subjects"].description == `at least 1 matching ["a", "b"] subject(s) required`
+	startswith(checks["$applies"].description, `subject is in scope as a ["a", "b"] under`)
+	ergo.report({"xs": [{"id": 1}]}, {"s": object.union(req, {"subject_type": null})}).requirements.s.checks["$min_subjects"].description == "at least 1 matching null subject(s) required"
+	ergo.report({"xs": [{"id": 1}]}, {"s": object.union(req, {"subject_type": -1})}).requirements.s.checks["$min_subjects"].description == "at least 1 matching -1 subject(s) required"
+}
+
+test_a_number_written_with_a_plus_in_its_exponent_is_written_in_full if {
+	rendered({}, {"op": "equals", "path": ["x"], "value": 1e+21}) == "x == 1000000000000000000000"
+	rendered({}, {"op": "equals", "path": ["x"], "value": 2.5e+30}) == "x == 2500000000000000000000000000000"
 }
 
 test_every_row_resolves_to_one_check_definition if {
