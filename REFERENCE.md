@@ -348,6 +348,7 @@ Some things worth knowing:
 - `compare` and `compare_time` compare two fields of the same subject. To compare a field with a fixed number, use `range`.
 - `compare` with `lt`, `lte`, `gt` or `gte` needs both fields to be numbers or both to be strings. Ordering objects, lists or booleans fails with cause `absent`, because Rego's order for them means nothing in a policy: `{"name": "ann"}` comes before `{"owner": "bob"}` only because `name` sorts before `owner`. You'd usually hit this by leaving the field off the end of a path. `eq` and `ne` work on any type. A substitute that orders objects, lists or booleans gives its check the same cause. Inside `all` or `any`, the row's cause is about the list, so it shows `value`.
 - `compare_time` never converts between formats, so a number against a string fails. With numbers, ergo can't tell seconds from milliseconds, so make sure both sides use the same unit.
+- An RFC 3339 string needs an uppercase `T` and `Z`, a date that exists, and a year from 1678 to 2261, which keeps its nanoseconds since 1970 inside a 64-bit integer. Anything else fails `compare_time`, so `2024-02-30T00:00:00Z` isn't read as 1 March, and `2024-01-01t00:00:00z` isn't read at all.
 - Patterns in `matches_any` and `not_matches_any` aren't anchored: `svc_` matches `my_svc_account`. Use `^` and `$` when you need a full match. A pattern that isn't a string, or isn't a valid regular expression, fails either operator, even when another pattern matches. With an empty `patterns` list, `matches_any` fails and `not_matches_any` passes.
 
 These two are useful in `applies_to`, for example to leave bot accounts out of a review rule. If the author field is missing, ergo can't tell whether the subject is in scope, so the requirement fails. See [Checks ergo adds](#checks-ergo-adds).
@@ -740,14 +741,22 @@ To decide whether to allow something, use `report.compliant`, not whether `viola
 
 ergo runs in a policy compiled with `opa build -t wasm` and run with OPA's JavaScript runtime, `@open-policy-agent/opa-wasm`. One built-in is missing from that runtime: `time.parse_rfc3339_ns`, which `compare_time` uses on RFC 3339 strings. A policy with such a check fails with `not implemented: built-in function`, unless you pass the built-in in yourself, as the third argument to `loadPolicy`.
 
-It has to return nanoseconds since 1970, and a JavaScript number can't hold that exactly: today's timestamps are about 1.76×10¹⁸ nanoseconds, where a number can only step by 256. So return the digits with `JSON.rawJSON` (Node 21 and later), or two times less than 256 nanoseconds apart can compare as equal. This is the version ergo's CI uses:
+It has to give the same answer as OPA's: nanoseconds since 1970 for a time it accepts, and nothing for one it rejects, which makes the check fail. Return `undefined` then, rather than throwing, because an error stops the whole evaluation and there's no report. JavaScript's `Date.parse` isn't enough on its own: it rolls `2024-02-30` over to 1 March, where OPA rejects it, so a check could pass in JavaScript and fail in OPA. And a JavaScript number can't hold nanoseconds since 1970 exactly, because today's are about 1.76×10¹⁸, where a number can only step by 256, so return the digits with `JSON.rawJSON` (Node 21 and later). This is the version ergo's CI uses, and it agrees with OPA on 20,000 generated timestamps:
 
 ```js
 const parseTime = (v) => {
-  const m = /^(\d{4}-\d{2}-\d{2}[Tt]\d{2}:\d{2}:\d{2})(?:\.(\d+))?([Zz]|[+-]\d{2}:\d{2})$/.exec(v);
-  if (!m) throw new Error(`not an RFC 3339 time: ${v}`);
-  const seconds = BigInt(Date.parse((m[1] + m[3]).toUpperCase()) / 1000);
-  return JSON.rawJSON(String(seconds * 1000000000n + BigInt((m[2] || "").padEnd(9, "0").slice(0, 9))));
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(?:Z|([+-])(\d{2}):(\d{2}))$/.exec(v);
+  if (!m) return undefined;
+  const [year, month, day, hour, minute, second] = m.slice(1, 7).map(Number);
+  const date = new Date(0);
+  date.setUTCFullYear(year, month - 1, day);
+  date.setUTCHours(hour, minute, second);
+  const fields = [date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()];
+  if (fields.some((f, i) => f !== [year, month, day, hour, minute, second][i])) return undefined;
+  const offset = m[8] ? BigInt((m[8] === "-" ? -1 : 1) * (Number(m[9]) * 3600 + Number(m[10]) * 60)) : 0n;
+  const nanos = (BigInt(date.getTime() / 1000) - offset) * 1000000000n + BigInt((m[7] || "").padEnd(9, "0").slice(0, 9));
+  if (nanos < -(2n ** 63n) || nanos >= 2n ** 63n) return undefined;
+  return JSON.rawJSON(String(nanos));
 };
 
 const policy = await loadPolicy(wasm, undefined, { "time.parse_rfc3339_ns": parseTime });

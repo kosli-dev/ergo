@@ -18,10 +18,18 @@ execFileSync("opa", ["build", "-t", "wasm", "--ignore", ".github", ...tests.flat
 execFileSync("tar", ["-xzf", bundle, "-C", runtimeDir, "/policy.wasm", "/data.json"]);
 
 const parseTime = (v) => {
-  const m = /^(\d{4}-\d{2}-\d{2}[Tt]\d{2}:\d{2}:\d{2})(?:\.(\d+))?([Zz]|[+-]\d{2}:\d{2})$/.exec(v);
-  if (!m) throw new Error(`not an RFC 3339 time: ${v}`);
-  const seconds = BigInt(Date.parse((m[1] + m[3]).toUpperCase()) / 1000);
-  return JSON.rawJSON(String(seconds * 1000000000n + BigInt((m[2] || "").padEnd(9, "0").slice(0, 9))));
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(?:Z|([+-])(\d{2}):(\d{2}))$/.exec(v);
+  if (!m) return undefined;
+  const [year, month, day, hour, minute, second] = m.slice(1, 7).map(Number);
+  const date = new Date(0);
+  date.setUTCFullYear(year, month - 1, day);
+  date.setUTCHours(hour, minute, second);
+  const fields = [date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()];
+  if (fields.some((f, i) => f !== [year, month, day, hour, minute, second][i])) return undefined;
+  const offset = m[8] ? BigInt((m[8] === "-" ? -1 : 1) * (Number(m[9]) * 3600 + Number(m[10]) * 60)) : 0n;
+  const nanos = (BigInt(date.getTime() / 1000) - offset) * 1000000000n + BigInt((m[7] || "").padEnd(9, "0").slice(0, 9));
+  if (nanos < -(2n ** 63n) || nanos >= 2n ** 63n) return undefined;
+  return JSON.rawJSON(String(nanos));
 };
 
 loadPolicy(fs.readFileSync(path.join(runtimeDir, "policy.wasm")), undefined, { "time.parse_rfc3339_ns": parseTime }).then((policy) => {

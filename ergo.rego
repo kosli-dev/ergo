@@ -818,8 +818,27 @@ _unordered_reads(subj, check) := {"absent" |
 
 _rfc3339_shaped(v) if {
 	is_string(v)
-	regex.match(`^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])[Tt]([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\.[0-9]+)?([Zz]|[+-]([01][0-9]|2[0-3]):[0-5][0-9])$`, v)
+	m := regex.find_all_string_submatch_n(`^(1[6-9][0-9]{2}|2[0-2][0-9]{2})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\.[0-9]+)?(Z|[+-]([01][0-9]|2[0-3]):[0-5][0-9])$`, v, 1)[0]
+	year := to_number(m[1])
+	year >= 1678
+	year <= 2261
+	to_number(trim_left(m[3], "0")) <= _days_in(year, to_number(trim_left(m[2], "0")))
 }
+
+_days_in(_, month) := 31 if month in {1, 3, 5, 7, 8, 10, 12}
+
+_days_in(_, month) := 30 if month in {4, 6, 9, 11}
+
+_days_in(year, 2) := 29 if _leap_year(year)
+
+_days_in(year, 2) := 28 if not _leap_year(year)
+
+_leap_year(year) if {
+	year % 4 == 0
+	year % 100 != 0
+}
+
+_leap_year(year) if year % 400 == 0
 
 default _cmp(_, _, _) := false
 

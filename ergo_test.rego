@@ -573,6 +573,31 @@ test_compare_time_rejects_malformed_timestamp if {
 	verdict({"start": "yesterday", "end": "2024-01-01T00:00:00Z"}, compare_time_span("lt")) == false
 }
 
+test_compare_time_fails_on_a_date_that_does_not_exist_rather_than_rolling_it_over if {
+	verdict({"start": "2024-02-30T00:00:00Z", "end": "2024-03-01T00:00:01Z"}, compare_time_span("lt")) == false
+	verdict({"start": "2023-02-29T00:00:00Z", "end": "2023-03-01T00:00:01Z"}, compare_time_span("lt")) == false
+}
+
+test_compare_time_fails_on_a_lowercase_t_or_z if {
+	verdict({"start": "2024-01-01t00:00:00Z", "end": "2024-06-01T00:00:00Z"}, compare_time_span("lt")) == false
+	verdict({"start": "2024-01-01T00:00:00z", "end": "2024-06-01T00:00:00Z"}, compare_time_span("lt")) == false
+}
+
+test_compare_time_only_reads_years_from_1678_to_2261_so_nanoseconds_since_1970_always_fit if {
+	verdict({"start": "1678-01-01T00:00:00Z", "end": "2261-12-31T23:59:59Z"}, compare_time_span("lt")) == true
+	verdict({"start": "1677-12-31T23:59:59Z", "end": "2024-06-01T00:00:00Z"}, compare_time_span("lt")) == false
+	verdict({"start": "2024-01-01T00:00:00Z", "end": "2262-01-01T00:00:00Z"}, compare_time_span("lt")) == false
+	verdict({"start": "0999-01-01T00:00:00Z", "end": "2024-06-01T00:00:00Z"}, compare_time_span("lt")) == false
+}
+
+test_compare_time_knows_which_years_have_a_29th_of_february if {
+	verdict({"start": "2024-02-29T00:00:00Z", "end": "2024-03-01T00:00:00Z"}, compare_time_span("lt")) == true
+	verdict({"start": "2000-02-29T00:00:00Z", "end": "2000-03-01T00:00:00Z"}, compare_time_span("lt")) == true
+	verdict({"start": "1900-02-29T00:00:00Z", "end": "1900-03-01T00:00:00Z"}, compare_time_span("lt")) == false
+	verdict({"start": "2023-04-31T00:00:00Z", "end": "2023-05-01T00:00:00Z"}, compare_time_span("lt")) == false
+	verdict({"start": "2023-12-31T00:00:00Z", "end": "2024-01-01T00:00:00Z"}, compare_time_span("lt")) == true
+}
+
 test_compare_time_rejects_an_out_of_range_month if {
 	verdict({"start": "2024-13-01T00:00:00Z", "end": "2024-01-01T00:00:00Z"}, compare_time_span("lt")) == false
 }
@@ -584,7 +609,6 @@ test_compare_time_rejects_a_date_without_a_time if {
 test_rfc3339_gate_accepts_valid_timestamps if {
 	every ts in [
 		"2024-01-01T00:00:00Z",
-		"2024-01-01T00:00:00z",
 		"2024-06-30T23:59:59.999999999Z",
 		"2024-06-30T12:00:00+02:00",
 		"2024-06-30T12:00:00-05:30",
@@ -598,6 +622,11 @@ test_rfc3339_gate_rejects_everything_else if {
 		"yesterday",
 		"",
 		"2024-01-01",
+		"2024-01-01T00:00:00z",
+		"2024-01-01t00:00:00Z",
+		"2024-02-30T00:00:00Z",
+		"1677-12-31T23:59:59Z",
+		"2262-01-01T00:00:00Z",
 		"2024-13-01T00:00:00Z",
 		"2024-00-01T00:00:00Z",
 		"2024-01-32T00:00:00Z",
