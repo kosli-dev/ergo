@@ -524,8 +524,18 @@ _json_text(v) := concat("", [_json_token(t) | some m in regex.find_all_string_su
 
 _sorted_json(v) := concat("", [_node_json(paths, index, i) | some i, _ in paths]) if {
 	index := {p: x | walk(v, [p, x])}
-	paths := sort(object.keys(index))
+	paths := [pair[1] | some pair in sort([[_written_path(index, p), p] | some p, _ in index])]
 }
+
+_written_path(index, p) := [_written_step(index, p, i) | some i, _ in p]
+
+_written_step(index, p, i) := _key_text(p[i]) if is_object(index[array.slice(p, 0, i)])
+
+_written_step(index, p, i) := p[i] if not is_object(index[array.slice(p, 0, i)])
+
+_key_text(k) := k if is_string(k)
+
+_key_text(k) := json.marshal(k) if not is_string(k)
 
 _node_json(paths, index, i) := concat("", [
 	_node_separator(paths, i),
@@ -560,9 +570,7 @@ _node_key(index, p) := "" if {
 	not is_object(index[_parent(p)])
 }
 
-_key_json(k) := json.marshal(k) if is_string(k)
-
-_key_json(k) := json.marshal(json.marshal(k)) if not is_string(k)
+_key_json(k) := json.marshal(_key_text(k))
 
 _node_body(x) := "{" if {
 	_opens(x)

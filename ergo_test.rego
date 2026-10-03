@@ -1483,6 +1483,10 @@ test_a_large_number_value_is_written_in_full if {
 	rendered({}, {"op": "equals", "path": ["n"], "value": 123456789012345678901234567890}) == "n == 123456789012345678901234567890"
 }
 
+test_keys_of_different_types_are_sorted_by_how_they_are_written if {
+	rendered({}, {"op": "equals", "path": ["x"], "value": {"o": {false: 1, 1: 2, "a": {null: 3, 10: 4, 9: 5}}}}) == `x == {"o": {"1": 2, "a": {"10": 4, "9": 5, "null": 3}, "false": 1}}`
+}
+
 test_a_set_value_is_written_as_a_sorted_list if {
 	rendered({}, {"op": "equals", "path": ["x"], "value": {"o": {3, {"b": 1, "a": {2, 1}}, set()}}}) == `x == {"o": [3, {"a": [1, 2], "b": 1}, []]}`
 }
