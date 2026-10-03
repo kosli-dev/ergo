@@ -33,6 +33,8 @@ OPA loads every JSON and YAML file it finds as data. The workflow files under `.
 
 CI runs these checks on pull requests and on pushes to `main` (`.github/workflows/test.yml`), using the OPA version the README names and Regal 0.43.0. When you change the OPA version, change it in both places.
 
+CI also compiles the baking example to Wasm with `opa build -t wasm`, runs it with the JavaScript runtime `@open-policy-agent/opa-wasm`, and fails when the report differs from `opa eval`'s. The runtime doesn't have every built-in, so a built-in ergo starts using can break this even when every other check passes.
+
 CI also fails when a line of Rego isn't reached by any test. To list those lines yourself:
 
 ```sh
