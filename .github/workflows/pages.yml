@@ -29,6 +29,11 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.19.0
+      - name: Build the playground's Wasm
+        run: site/build-playground.sh
       - id: pages
         uses: actions/configure-pages@v6
       - name: Build
