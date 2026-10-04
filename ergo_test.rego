@@ -2492,6 +2492,12 @@ test_present_that_cannot_reach_its_field_is_not_a_clean_no if {
 	[r.cause | some r in rows_for(ergo.report({"items": ["x"]}, {"s": {"from": ["items"], "checks": {"c": {"op": "present", "path": ["a"]}}}}), "s", "c")] == ["not_an_object"]
 }
 
+test_a_path_starting_with_a_reserved_double_dollar_name_is_ill_formed if {
+	rep := ergo.report({"items": [{"id": 1}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["$$foo", "x"], "value": 1}}}})
+	problem_inputs(rep) == [{"name": "checks.c", "value": ["unknown name $$foo"]}]
+	[r.cause | some r in rows_for(rep, "s", "c")] == ["ill_formed"]
+}
+
 test_well_formed_definition_is_in_the_check_table if {
 	rep := ergo.report({"items": [{"id": "a"}]}, id_req(["items"]))
 	rep.requirements.s.checks["$well_formed"].expression == `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float and checks are written right`
