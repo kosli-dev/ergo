@@ -784,7 +784,7 @@ leaf_passed(check, subj) if {
 	check.op == "excludes"
 	v := value_at(subj, check.path)
 	is_array(v)
-	wants := arg(check.values)
+	wants := _wants(check.values)
 	_wanted(wants)
 	every want in wants {
 		not want in v
@@ -795,12 +795,23 @@ leaf_passed(check, subj) if {
 	check.op == "includes"
 	v := value_at(subj, check.path)
 	is_array(v)
-	wants := arg(check.values)
+	wants := _wants(check.values)
 	_wanted(wants)
 	every want in wants {
 		want in v
 	}
 }
+
+_wants(values) := arg(values) if not _value_list(values)
+
+_wants(values) := [arg(x) | some x in values] if {
+	_value_list(values)
+	every x in values {
+		_readable(x)
+	}
+}
+
+_readable(x) if arg(x) == arg(x)
 
 _wanted(v) if {
 	_value_list(v)
@@ -1958,7 +1969,12 @@ _values_only(check) if {
 	not "value" in object.keys(check)
 }
 
-_values_text(v) := sprintf("[%s]", [concat(", ", sort([_literal_text(x) | some x in _written(v)]))]) if _value_list(_written(v))
+_values_text(v) := sprintf("[%s]", [concat(", ", sort([_value_text(x) | some x in v]))]) if _value_list(v)
+
+_values_text(v) := sprintf("[%s]", [concat(", ", sort([_literal_text(x) | some x in v.literal]))]) if {
+	_is_literal(v)
+	_value_list(v.literal)
+}
 
 _values_text(v) := _ref_name(v.ref) if _is_ref(v)
 

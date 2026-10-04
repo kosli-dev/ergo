@@ -3570,6 +3570,49 @@ test_a_ref_reads_the_values_of_includes_and_excludes if {
 	expression_in(top, {"id": 1}, {"op": "excludes", "path": ["xs"], "values": banned_ref}) == "contains_none(xs, $$input.params.banned)"
 }
 
+nuts_ref := {"ref": ["$$input", "params", "nut"]}
+
+test_a_ref_or_literal_in_the_values_of_includes_or_excludes_is_read_like_value if {
+	top := {"params": {"nut": "nuts"}}
+	every item in [nuts_ref, {"literal": "nuts"}] {
+		excl := {"op": "excludes", "path": ["xs"], "values": [item, "garlic"]}
+		[row_in(top, {"id": 1, "xs": ["nuts"]}, excl).passed, row_in(top, {"id": 1, "xs": ["nuts"]}, excl).cause] == [false, "value"]
+		row_in(top, {"id": 1, "xs": ["milk"]}, excl).passed == true
+		incl := {"op": "includes", "path": ["xs"], "values": [item, "garlic"]}
+		row_in(top, {"id": 1, "xs": ["garlic", "nuts"]}, incl).passed == true
+		[row_in(top, {"id": 1, "xs": ["garlic"]}, incl).passed, row_in(top, {"id": 1, "xs": ["garlic"]}, incl).cause] == [false, "value"]
+	}
+	expression_in(top, {"id": 1}, {"op": "excludes", "path": ["xs"], "values": [nuts_ref, "garlic"]}) == `contains_none(xs, ["garlic", $$input.params.nut])`
+	refs_in(top, {"id": 1, "xs": ["nuts"]}, {"op": "excludes", "path": ["xs"], "values": [nuts_ref]}) == [{"name": "$$input.params.nut", "value": "nuts"}]
+}
+
+test_a_missing_or_null_ref_in_the_values_of_includes_or_excludes_fails_instead_of_being_skipped if {
+	every op in ["includes", "excludes"] {
+		check := {"op": op, "path": ["xs"], "values": [nuts_ref, "garlic"]}
+		missing := row_in({}, {"id": 1, "xs": ["milk"]}, check)
+		[missing.passed, missing.cause] == [false, "absent"]
+		null_ref := row_in({"params": {"nut": null}}, {"id": 1, "xs": ["milk"]}, check)
+		[null_ref.passed, null_ref.cause] == [false, "null"]
+	}
+}
+
+test_a_malformed_ref_in_the_values_of_includes_or_excludes_is_ill_formed if {
+	check := {"op": "excludes", "path": ["xs"], "values": [{"ref": ["$$input", "params", "nut"], "x": 1}]}
+	r := row_in({"params": {"nut": "nuts"}}, {"id": 1, "xs": ["milk"]}, check)
+	[r.passed, r.cause] == [false, "ill_formed"]
+	expression_in({}, {"id": 1}, check) == "contains_none(xs, [<invalid ref>])"
+}
+
+test_ref_shaped_items_under_a_literal_or_read_from_params_are_data_not_refs if {
+	shaped := {"ref": ["$$input", "params", "nut"]}
+	top := {"params": {"nut": "nuts", "list": [shaped]}}
+	every values in [{"literal": [shaped]}, {"ref": ["$$input", "params", "list"]}] {
+		check := {"op": "excludes", "path": ["xs"], "values": values}
+		row_in(top, {"id": 1, "xs": ["nuts"]}, check).passed == true
+		[row_in(top, {"id": 1, "xs": [shaped]}, check).passed, row_in(top, {"id": 1, "xs": [shaped]}, check).cause] == [false, "value"]
+	}
+}
+
 test_a_ref_that_gives_includes_or_excludes_an_empty_list_or_no_list_fails_as_unusable if {
 	every op in ["includes", "excludes"] {
 		every banned in [[], "nuts", {"a": "nuts"}] {
