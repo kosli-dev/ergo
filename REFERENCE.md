@@ -611,15 +611,15 @@ Three rules:
 {
   "checks": {
     "$applies": {
-      "description": "subject is in scope as a deployment under this requirement's applies_to filter; out-of-scope subjects are recorded but not evaluated, and a subject whose filter can't be read fails",
+      "description": "The deployment is in scope",
       "expression": "environment == \"prod\""
     },
     "$min_subjects": {
-      "description": "at least 1 matching deployment subject(s) required",
+      "description": "At least 1 deployment is required",
       "expression": "count(matching(deployments)) >= 1"
     },
     "$well_formed": {
-      "description": "the requirement is an object whose checks and applies_to are objects, whose from and id are lists, whose min_subjects is a whole number of 0 or more and whose subject_type is a string, and it declares at least one check and a recognised \"require\" value, its from and id only hold steps that can be keys, and its from, id and min_subjects only hold numbers a 64-bit float can hold, and every check in checks and applies_to is written right; lacking any of these, it asserts nothing that could ever be satisfied, or not the same way everywhere",
+      "description": "The requirement is written correctly",
       "expression": "fields have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right"
     },
     "approved": {
@@ -686,6 +686,8 @@ When a check is [written wrong](#basic-operators), the `$well_formed` row gets a
 ```
 
 A check inside another one is named further in, like `checks.signed.check` for the inner check of an `all`, `checks.reviewed.substitute` for a substitute, or `checks.permitted.options.standard.1` for the second check of an `any_of` option. A name that needs quotes is quoted as in [paths](#paths): `checks."a.b"`.
+
+Their descriptions are plain sentences, like your own checks': `The requirement is written correctly`, `At least 1 deployment is required` and `The deployment is in scope`. The details are in `expression`, `inputs` and `cause`. `$min_subjects` names its input after what it counts, like `matching deployments`. Both use `subject_type` in the plural when needed, made by its ending: `-s`, `-x`, `-z`, `-ch` or `-sh` takes `-es`, a consonant followed by `-y` becomes `-ies`, and anything else takes `-s`. So `batch` becomes `batches` and `pull request` becomes `pull requests`, but an irregular word like `person` becomes `persons`.
 
 A subject that fails `$applies` gets no other rows, since it was never checked. But its `$applies` row stays, so you can see what was left out and why.
 
