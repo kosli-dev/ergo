@@ -3911,7 +3911,7 @@ test_a_ref_deeper_inside_a_value_is_written_wrong_so_it_cannot_be_compared_as_da
 		{"op": "equals", "path": ["xs"], "value": [nuts_ref]},
 		{"op": "excludes", "path": ["xs"], "values": [[nuts_ref]]},
 		{"op": "in", "path": ["xs"], "values": [{"a": nuts_ref}]},
-		{"op": "matches_any", "path": ["xs"], "patterns": [[nuts_ref]]},
+		{"op": "includes", "path": ["xs"], "values": [{"a": nuts_ref}]},
 	] {
 		r := row_in(top, {"id": 1, "xs": [["nuts"]]}, check)
 		[r.passed, r.cause] == [false, "ill_formed"]
@@ -3929,6 +3929,56 @@ test_well_formed_says_where_a_ref_sits_inside_a_value if {
 		{"name": "checks.in_value", "value": ["ref inside value"]},
 		{"name": "checks.in_values", "value": ["ref inside values"]},
 	]
+}
+
+test_a_literal_deeper_inside_a_value_is_written_wrong_so_it_cannot_be_compared_as_data if {
+	every check in [
+		{"op": "excludes", "path": ["xs"], "value": [{"literal": "nuts"}]},
+		{"op": "equals", "path": ["xs"], "value": {"a": {"literal": 1}}},
+		{"op": "excludes", "path": ["xs"], "values": [[{"literal": "nuts"}]]},
+		{"op": "in", "path": ["xs"], "values": [[{"literal": "nuts"}]]},
+	] {
+		r := row_in({}, {"id": 1, "xs": [["nuts"]]}, check)
+		[r.passed, r.cause] == [false, "ill_formed"]
+	}
+	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "excludes", "path": ["xs"], "value": [{"literal": "nuts"}]}}}})
+	problem_inputs(rep) == [{"name": "checks.c", "value": ["literal inside value"]}]
+}
+
+test_a_literal_under_a_literal_is_data if {
+	check := {"op": "excludes", "path": ["xs"], "value": {"literal": [{"literal": "nuts"}]}}
+	row_in({}, {"id": 1, "xs": [["nuts"]]}, check).passed == true
+	r := row_in({}, {"id": 1, "xs": [[{"literal": "nuts"}]]}, check)
+	[r.passed, r.cause] == [false, "value"]
+}
+
+test_a_literal_step_inside_a_ref_is_part_of_the_ref_and_not_a_literal_inside_a_value if {
+	check := {"op": "excludes", "path": ["xs"], "value": {"ref": ["$$input", "params", {"literal": "nut"}]}}
+	r := row_in({"params": {"nut": "nuts"}}, {"id": 1, "xs": ["nuts"]}, check)
+	[r.passed, r.cause] == [false, "value"]
+	row_in({"params": {"nut": "nuts"}}, {"id": 1, "xs": ["milk"]}, check).passed == true
+}
+
+test_a_ref_or_literal_deeper_inside_a_where_value_is_written_wrong if {
+	top := {"params": {"k": "a"}}
+	subj := {"id": 1, "items": [{"k": ["a"], "tags": ["bad"]}]}
+	rep := ergo.report(object.union(top, {"items": [subj]}), {"s": {"from": ["items"], "id": ["id"], "checks": {
+		"ref": {"op": "excludes", "path": ["items", {"where": {"k": [{"ref": ["$$input", "params", "k"]}]}}, "tags"], "value": "bad"},
+		"literal": {"op": "present", "path": ["items", {"where": {"k": {"a": {"literal": 1}}}}, "tags"]},
+		"right": {"op": "compare", "left": ["id"], "right": ["items", {"where": {"k": [{"literal": "a"}]}}, "n"], "cmp": "eq"},
+	}}})
+	problem_inputs(rep) == [
+		{"name": "checks.literal", "value": ["literal inside where"]},
+		{"name": "checks.ref", "value": ["ref inside where"]},
+		{"name": "checks.right", "value": ["literal inside where"]},
+	]
+	[[r.check, r.cause] | some r in rep.results; r.check in {"ref", "literal", "right"}] == [["literal", "ill_formed"], ["ref", "ill_formed"], ["right", "ill_formed"]]
+}
+
+test_a_where_value_under_a_literal_is_data if {
+	shaped := {"ref": ["$$input", "params", "k"]}
+	check := {"op": "present", "path": ["items", {"where": {"k": {"literal": [shaped]}}}, "tags"]}
+	row_in({"params": {"k": "a"}}, {"id": 1, "items": [{"k": [shaped], "tags": []}]}, check).passed == true
 }
 
 test_a_ref_shaped_object_under_a_literal_is_still_data if {

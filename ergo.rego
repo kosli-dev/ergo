@@ -1185,7 +1185,7 @@ _nested_ops := {
 	"check": [set(), _leaf_ops | {"all", "any", "any_of"}, _leaf_ops | {"any_of"}],
 }
 
-_field_problems(node) := union({_unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_ref_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _each_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node)})
+_field_problems(node) := union({_unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _each_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node)})
 
 _missing_fields_problem(node) := {sprintf("missing %s", [f]) |
 	some f in object.get(_required_fields, node.op, set())
@@ -1262,14 +1262,39 @@ _written_pattern(p) if _is_ref(p)
 
 _written_pattern(p) if _valid_pattern(_written(p))
 
-_nested_ref_problem(node) := {sprintf("ref inside %s", [f]) |
+_nested_wrapper_problem(node) := {sprintf("%s inside %s", [_wrapper(x), f]) |
 	node.op in _leaf_ops
 	some f in ["value", "values", "patterns", "min", "max"]
 	f in object.keys(node)
 	walk(node[f], [p, x])
-	_is_ref(x)
+	_wrapper(x)
 	not _ref_read_at(f, node[f], p)
 	not _under_literal(node[f], p)
+	not _under_ref(node[f], p)
+} | {sprintf("%s inside where", [_wrapper(x)]) |
+	some f in ["path", "left", "right", "each", "inputs"]
+	some path in _own_paths(node, f)
+	is_array(path)
+	some seg in path
+	is_object(seg)
+	is_object(object.get(seg, "where", null))
+	some w in seg.where
+	walk(w, [p, x])
+	p != []
+	_wrapper(x)
+	not _under_literal(w, p)
+	not _under_ref(w, p)
+}
+
+_wrapper(x) := "ref" if _is_ref(x)
+
+_wrapper(x) := "literal" if _is_literal(x)
+
+_under_ref(v, p) if {
+	some i, _ in p
+	walk(v, [q, w])
+	q == array.slice(p, 0, i)
+	_is_ref(w)
 }
 
 _ref_read_at(_, _, [])

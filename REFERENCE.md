@@ -161,7 +161,7 @@ With `data.params` set to `{"allowed_licences": ["MIT", "Apache-2.0"]}`, a packa
 }
 ```
 
-A ref anywhere else inside a value, like `"value": [{"ref": [...]}]`, is written wrong, because ergo wouldn't read it and would compare the object instead. Wrap an object that only looks like a ref in a `literal` to compare it as it is.
+A ref or a `literal` anywhere deeper inside a value, like `"value": [{"ref": [...]}]` or `"where": {"k": [{"literal": "a"}]}`, is written wrong, because ergo wouldn't read it and would compare the object instead. To compare data that holds an object that only looks like a ref or a literal, wrap the whole value in a `literal`: `{"literal": [{"ref": [...]}]}`.
 
 The expression says where the value comes from. What it was goes in the check's definition in the report, under `$refs`, once for the whole report and sorted by name, beside the literals the check compares against. The rows' `inputs` only hold what the check reads, like `licences[]` here, and `violations` adds the `$refs` back to each violation's `inputs`, as above. That keeps a record of what was compared, even when the params change between runs, without copying it into every row. A path that starts with `$$input` or `$$params` is something the check reads, so its value stays in the row.
 
@@ -345,7 +345,7 @@ Some things worth knowing:
   - a `cmp` that isn't in the list above
   - `values` that isn't a list, an empty `values` for `includes` or `excludes`, both `value` and `values`, a `min` or `max` that isn't a number, a `min` above `max`, or `patterns` that isn't a list of valid regular expressions
   - an `each` that isn't a path, or `as` or `each` on an operator other than `all` or `any`
-  - a step that can't be a [key](#paths), a number out of range, a badly written [ref](#reading-from-the-input), a ref deeper inside a value than ergo reads, or a path that starts with a [name](#naming-subjects) nothing gave
+  - a step that can't be a [key](#paths), a number out of range, a badly written [ref](#reading-from-the-input), a ref or `literal` deeper inside a value than ergo reads, or a path that starts with a [name](#naming-subjects) nothing gave
   - an `all` or `any` [nested](#nesting) too deep, or a name given twice or badly written
   - a check that isn't an object, or one where it can't go, like a custom operator inside `all`
   - a field its op doesn't use, like `valeu` or `descripton`. Besides its own parameters, any check can have `description`, `expression`, `substitute` and `inputs`. A [custom operator](#custom-operators) can have any fields.
