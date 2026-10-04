@@ -49,6 +49,11 @@ _has_type("min_subjects", v) if {
 
 _has_type("subject_type", v) if is_string(v)
 
+_bad_applies_to(req) if {
+	is_object(req)
+	"applies_to" in _wrong_typed_fields(req)
+}
+
 _typed(req) if {
 	is_object(req)
 	_wrong_typed_fields(req) == []
@@ -284,6 +289,7 @@ _inputs_in(req, check, subj) := i if {
 default _subject_matches(_, _) := false
 
 _subject_matches(subj, req) if {
+	not _bad_applies_to(req)
 	every _, check in _applies_to_of(req) {
 		_passes(req, check, subj)
 	}
@@ -1995,15 +2001,25 @@ _well_formed_inputs(req) := array.concat(
 	_wrong_type_inputs(req),
 ) if _stepped(req)
 
+_applies_description(req) := sprintf("subject is in scope as a %s under this requirement's applies_to filter; out-of-scope subjects are recorded but not evaluated, and a subject whose filter can't be read fails", [_text(_subject_type_of(req))])
+
 _applies_def(req) := {"$applies": _with_refs(
 	{
-		"description": sprintf("subject is in scope as a %s under this requirement's applies_to filter; out-of-scope subjects are recorded but not evaluated, and a subject whose filter can't be read fails", [_text(_subject_type_of(req))]),
+		"description": _applies_description(req),
 		"expression": concat(" and ", [_expression_of(_applies_to_of(req)[name], _subject_item_name(req)) | some name in _applies_to_names(req)]),
 	},
 	_applies_to_of(req),
 )} if _size(_applies_to_of(req)) > 0
 
-_applies_def(req) := {} if _size(_applies_to_of(req)) == 0
+_applies_def(req) := {"$applies": {
+	"description": _applies_description(req),
+	"expression": "<invalid applies_to>",
+}} if _bad_applies_to(req)
+
+_applies_def(req) := {} if {
+	_size(_applies_to_of(req)) == 0
+	not _bad_applies_to(req)
+}
 
 _applies_to_names(req) := sort(object.keys(_applies_to_of(req))) if is_object(_applies_to_of(req))
 
@@ -2078,7 +2094,21 @@ _applies_rows(doc, req, req_name) := [{
 	_size(_applies_to_of(req)) > 0
 }
 
-_applies_rows(_, req, _) := [] if _size(_applies_to_of(req)) == 0
+_applies_rows(doc, req, req_name) := [{
+	"requirement": req_name,
+	"subject": _entry_ref(entry, req),
+	"check": "$applies",
+	"inputs": [],
+	"passed": false,
+	"cause": "absent",
+} |
+	some entry in _raw_entries(doc, req)
+] if _bad_applies_to(req)
+
+_applies_rows(_, req, _) := [] if {
+	_size(_applies_to_of(req)) == 0
+	not _bad_applies_to(req)
+}
 
 _applies_inputs(subj, req) := [inp |
 	some name in _applies_to_names(req)

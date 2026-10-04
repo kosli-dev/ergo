@@ -2049,6 +2049,23 @@ test_a_from_that_is_not_a_list_records_no_refs_because_it_is_never_read if {
 	not "$refs" in object.keys(rep.requirements.s.checks["$min_subjects"])
 }
 
+test_an_applies_to_that_is_not_an_object_fails_every_subject_as_absent_so_none_is_blamed_for_a_check if {
+	doc := {"items": [{"id": 1, "env": "dev"}, {"id": 2, "env": "prod"}]}
+	reps := [ergo.report(doc, {"s": object.union(typed_req, {"applies_to": a})}) |
+		some a in [[{"op": "equals", "path": ["env"], "value": "prod"}], true, null]
+	]
+	every rep in reps {
+		[[r.check, r.subject.id, r.passed, r.cause, r.inputs] | some r in rep.results; not r.check in {"$well_formed", "$min_subjects"}] == [
+			["$applies", 1, false, "absent", []],
+			["$applies", 2, false, "absent", []],
+		]
+		rep.requirements.s.subjects == {"total": 2, "matching": 0}
+		rep.requirements.s.checks["$applies"].expression == "<invalid applies_to>"
+		[[v.check, v.subject.id] | some v in ergo.violations(rep)] == [["$well_formed", null], ["$applies", 1], ["$applies", 2]]
+	}
+	count(reps) == 3
+}
+
 test_a_field_of_the_right_type_adds_no_input_to_well_formed if {
 	rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"applies_to": {"a": {"op": "present", "path": ["id"]}}})})
 	row := rows_for(rep, "s", "$well_formed")[0]
