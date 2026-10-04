@@ -253,6 +253,101 @@ test_includes_rejects_non_array if verdict({"labels": "approved"}, has_approved)
 
 test_includes_rejects_missing_field if verdict({}, has_approved) == false
 
+no_allergens := {"op": "excludes", "path": ["allergens"], "values": ["nuts", "garlic"]}
+
+test_excludes_values_passes_when_the_field_holds_none_of_them if {
+	verdict({"allergens": ["milk"]}, no_allergens) == true
+	verdict({"allergens": []}, no_allergens) == true
+}
+
+test_excludes_values_fails_when_the_field_holds_any_one_of_them if {
+	every allergens in [["garlic", "milk"], ["nuts"], ["nuts", "garlic"]] {
+		[verdict({"allergens": allergens}, no_allergens), cause_of({"allergens": allergens}, no_allergens)] == [false, "value"]
+	}
+}
+
+all_signed_off := {"op": "includes", "path": ["sign_offs"], "values": ["qa", "security"]}
+
+test_includes_values_passes_when_the_field_holds_all_of_them if {
+	verdict({"sign_offs": ["security", "qa"]}, all_signed_off) == true
+	verdict({"sign_offs": ["qa", "legal", "security"]}, all_signed_off) == true
+}
+
+test_includes_values_fails_when_the_field_misses_any_one_of_them if {
+	every sign_offs in [["qa"], ["security"], []] {
+		[verdict({"sign_offs": sign_offs}, all_signed_off), cause_of({"sign_offs": sign_offs}, all_signed_off)] == [false, "value"]
+	}
+}
+
+test_includes_and_excludes_take_a_set_of_values if {
+	verdict({"sign_offs": ["security", "qa"]}, object.union(all_signed_off, {"values": {"qa", "security"}})) == true
+	verdict({"allergens": ["garlic"]}, object.union(no_allergens, {"values": {"nuts", "garlic"}})) == false
+}
+
+test_includes_and_excludes_values_fail_closed_on_a_missing_null_or_wrong_typed_field if {
+	every check in [no_allergens, all_signed_off] {
+		field := check.path[0]
+		[verdict({}, check), cause_of({}, check)] == [false, "absent"]
+		[verdict({field: null}, check), cause_of({field: null}, check)] == [false, "null"]
+		[verdict({field: "nuts"}, check), cause_of({field: "nuts"}, check)] == [false, "unusable"]
+	}
+}
+
+test_empty_values_is_ill_formed_because_includes_and_excludes_would_pass_anything if {
+	every op in ["includes", "excludes"] {
+		every values in [[], set()] {
+			check := {"op": op, "path": ["xs"], "values": values}
+			[verdict({"xs": []}, check), cause_of({"xs": []}, check)] == [false, "ill_formed"]
+		}
+	}
+}
+
+test_values_that_is_not_a_list_is_ill_formed_for_includes_and_excludes if {
+	every op in ["includes", "excludes"] {
+		every values in ["nuts", {"a": "nuts"}, null, 1] {
+			check := {"op": op, "path": ["xs"], "values": values}
+			[verdict({"xs": ["nuts"]}, check), cause_of({"xs": ["nuts"]}, check)] == [false, "ill_formed"]
+		}
+	}
+}
+
+test_includes_and_excludes_take_value_or_values_but_not_both if {
+	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {
+		"both": {"op": "excludes", "path": ["xs"], "value": 2, "values": [3]},
+		"neither": {"op": "includes", "path": ["xs"]},
+	}}})
+	problem_inputs(rep) == [
+		{"name": "checks.both", "value": ["both value and values"]},
+		{"name": "checks.neither", "value": ["missing value or values"]},
+	]
+	[[r.check, r.passed, r.cause] | some r in rep.results; r.check in {"both", "neither"}] == [["both", false, "ill_formed"], ["neither", false, "ill_formed"]]
+}
+
+test_well_formed_says_when_the_values_of_includes_or_excludes_are_empty_or_not_a_list if {
+	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {
+		"empty": {"op": "excludes", "path": ["xs"], "values": []},
+		"text": {"op": "includes", "path": ["xs"], "values": "nuts"},
+	}}})
+	problem_inputs(rep) == [
+		{"name": "checks.empty", "value": ["empty values"]},
+		{"name": "checks.text", "value": ["invalid values"]},
+	]
+}
+
+test_any_with_in_is_how_to_say_includes_any_of if {
+	check := {"op": "any", "path": ["allergens"], "check": {"op": "in", "path": [], "values": ["nuts", "garlic"]}}
+	verdict({"allergens": ["garlic", "milk"]}, check) == true
+	[verdict({"allergens": ["milk"]}, check), cause_of({"allergens": ["milk"]}, check)] == [false, "value"]
+	[verdict({"allergens": []}, check), cause_of({"allergens": []}, check)] == [false, "value"]
+	rendered({"allergens": []}, check) == `some allergens: allergens[] in ["garlic", "nuts"]`
+}
+
+test_a_list_in_value_is_still_one_value_and_not_several if {
+	check := {"op": "includes", "path": ["pairs"], "value": ["a", "b"]}
+	verdict({"pairs": [["a", "b"]]}, check) == true
+	verdict({"pairs": ["a", "b"]}, check) == false
+}
+
 allowed_licence := {"op": "in", "path": ["id"], "values": ["MIT", "Apache-2.0"]}
 
 test_in_when_field_is_one_of_the_values if verdict({"id": "Apache-2.0"}, allowed_licence) == true
@@ -1433,6 +1528,18 @@ test_expression_for_excludes if rendered({"labels": []}, no_wip) == `not contain
 
 test_expression_for_includes if rendered({"labels": []}, has_approved) == `contains(labels, "approved")`
 
+test_expression_for_includes_and_excludes_values_sorts_them if {
+	rendered({"allergens": []}, no_allergens) == `contains_none(allergens, ["garlic", "nuts"])`
+	rendered({"sign_offs": []}, all_signed_off) == `contains_all(sign_offs, ["qa", "security"])`
+}
+
+test_expression_for_includes_and_excludes_does_not_list_values_it_will_not_use if {
+	rendered({"xs": []}, {"op": "excludes", "path": ["xs"], "values": "nuts"}) == "contains_none(xs, <invalid values>)"
+	rendered({"xs": []}, {"op": "includes", "path": ["xs"], "values": {"ref": ["$$input"], "x": 1}}) == "contains_all(xs, <invalid ref>)"
+	rendered({"xs": []}, {"op": "includes", "path": ["xs"]}) == "contains(xs, <missing value or values>)"
+	rendered({"xs": []}, {"op": "excludes", "path": ["xs"], "value": 2, "values": [3]}) == "not contains(xs, <both value and values>)"
+}
+
 test_expression_for_in_sorts_the_values if rendered({"id": "MIT"}, allowed_licence) == `id in ["Apache-2.0", "MIT"]`
 
 test_expression_for_in_sorts_a_set_of_values if {
@@ -2234,8 +2341,8 @@ test_a_missing_parameter_shows_in_the_expression_instead_of_leaving_it_empty if 
 	rows == [
 		"state == <missing value>",
 		"<missing path> == 1",
-		"contains(xs, <missing value>)",
-		"not contains(xs, <missing value>)",
+		"contains(xs, <missing value or values>)",
+		"not contains(xs, <missing value or values>)",
 		"<missing path> is present",
 		"<missing path> is a non-empty string",
 		"n >= 0 and n <= <missing max>",
@@ -3450,6 +3557,33 @@ test_a_ref_reads_the_value_of_includes_and_excludes if {
 	label := {"ref": ["$$input", "params", "label"]}
 	row_in(top, {"id": 1, "labels": ["approved"]}, {"op": "includes", "path": ["labels"], "value": label}).passed == true
 	row_in(top, {"id": 1, "labels": ["approved"]}, {"op": "excludes", "path": ["labels"], "value": label}).passed == false
+}
+
+banned_ref := {"ref": ["$$input", "params", "banned"]}
+
+test_a_ref_reads_the_values_of_includes_and_excludes if {
+	top := {"params": {"banned": ["nuts", "garlic"]}}
+	row_in(top, {"id": 1, "xs": ["milk"]}, {"op": "excludes", "path": ["xs"], "values": banned_ref}).passed == true
+	row_in(top, {"id": 1, "xs": ["garlic"]}, {"op": "excludes", "path": ["xs"], "values": banned_ref}).passed == false
+	row_in(top, {"id": 1, "xs": ["garlic", "nuts"]}, {"op": "includes", "path": ["xs"], "values": banned_ref}).passed == true
+	row_in(top, {"id": 1, "xs": ["garlic"]}, {"op": "includes", "path": ["xs"], "values": banned_ref}).passed == false
+	expression_in(top, {"id": 1}, {"op": "excludes", "path": ["xs"], "values": banned_ref}) == "contains_none(xs, $$input.params.banned)"
+}
+
+test_a_ref_that_gives_includes_or_excludes_an_empty_list_or_no_list_fails_as_unusable if {
+	every op in ["includes", "excludes"] {
+		every banned in [[], "nuts", {"a": "nuts"}] {
+			r := row_in({"params": {"banned": banned}}, {"id": 1, "xs": ["milk"]}, {"op": op, "path": ["xs"], "values": banned_ref})
+			[r.passed, r.cause] == [false, "unusable"]
+		}
+	}
+}
+
+test_a_missing_ref_for_the_values_of_includes_or_excludes_fails_as_absent if {
+	every op in ["includes", "excludes"] {
+		r := row_in({}, {"id": 1, "xs": ["milk"]}, {"op": op, "path": ["xs"], "values": banned_ref})
+		[r.passed, r.cause] == [false, "absent"]
+	}
 }
 
 test_a_ref_reads_the_patterns if {
