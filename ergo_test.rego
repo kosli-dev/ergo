@@ -2037,6 +2037,18 @@ test_a_field_of_the_wrong_type_fails_well_formed_and_shows_its_value if {
 	rows == [[f, true, false, false, "value", {"name": f, "value": v}] | some [f, v] in wrong_types]
 }
 
+test_a_requirement_that_is_not_an_object_finds_no_subjects_so_it_cannot_claim_the_whole_input if {
+	rep := ergo.report({"items": [{"id": 1}]}, {"s": 5})
+	rep.requirements.s.subjects == {"total": 0, "matching": 0}
+	rep.requirements.s.checks["$min_subjects"].expression == "count(matching(<invalid from>)) >= 1"
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "$min_subjects")] == [[false, "value"]]
+}
+
+test_a_from_that_is_not_a_list_records_no_refs_because_it_is_never_read if {
+	rep := ergo.report({}, {"s": object.union(typed_req, {"from": {"ref": ["$$params", "p"]}})})
+	not "$refs" in object.keys(rep.requirements.s.checks["$min_subjects"])
+}
+
 test_a_field_of_the_right_type_adds_no_input_to_well_formed if {
 	rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"applies_to": {"a": {"op": "present", "path": ["id"]}}})})
 	row := rows_for(rep, "s", "$well_formed")[0]

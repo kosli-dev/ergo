@@ -84,6 +84,7 @@ _stepped(req) if {
 default _from_well_formed(_) := false
 
 _from_well_formed(req) if {
+	is_object(req)
 	is_array(_from_of(req))
 	not _stepped(req)
 }
@@ -1948,8 +1949,12 @@ _min_subjects_def(req) := {"$min_subjects": _with_refs(
 		"description": sprintf("at least %s matching %s subject(s) required", [_literal_text(_min_subjects_of(req)), _text(_subject_type_of(req))]),
 		"expression": sprintf("%s >= %s", [_matching_count_name(req), _literal_text(_min_subjects_of(req))]),
 	},
-	{"from": _from_of(req)},
+	{"from": _listed_from(req)},
 )}
+
+_listed_from(req) := _from_of(req) if is_array(_from_of(req))
+
+_listed_from(req) := [] if not is_array(_from_of(req))
 
 _well_formed_def(req) := {"$well_formed": {
 	"description": "the requirement is an object whose checks and applies_to are objects, whose from and id are lists, whose min_subjects is a whole number of 0 or more and whose subject_type is a string, and it declares at least one check and a recognised \"require\" value, its from and id only hold steps that can be keys, and its from, id and min_subjects only hold numbers a 64-bit float can hold; lacking any of these, it asserts nothing that could ever be satisfied, or not the same way everywhere",
