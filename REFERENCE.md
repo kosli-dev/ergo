@@ -79,7 +79,7 @@ A few details:
 - `min_subjects` defaults to 1 so that a typo in `from` fails the requirement instead of quietly passing it. Set it to `0` when you mean "if there are any, they must pass; if there are none, that's fine". It means the same under `every` and `some`.
 - Under `some`, one subject has to pass all the checks by itself. Two subjects that each pass half of them don't count.
 - A requirement with no checks, a `require` other than `every` or `some`, or a badly written [naming step](#naming-subjects), is never met. The `$well_formed` row says so.
-- So is a requirement that isn't an object, or whose `checks` or `applies_to` isn't an object, whose `from` or `id` isn't a list, or whose `min_subjects` isn't a number. `null` counts as the wrong type. It still has its entry in `requirements` and its `$well_formed` row, which shows each such field and its value as an input, like `{"name": "from", "value": "deployments"}`, or `{"name": "requirement", "value": 5}` for the whole requirement. ergo then reads `checks` and `applies_to` as empty, a `from` as giving no subjects (shown as `<invalid from>`), and an `id` as giving the id `null`. A `min_subjects` that isn't a number fails `$min_subjects` too.
+- So is a requirement that isn't an object, or whose `checks` or `applies_to` isn't an object, whose `from` or `id` isn't a list, whose `min_subjects` isn't a whole number of 0 or more, or whose `subject_type` isn't a string. `null` counts as the wrong type. `2.0` is a whole number, but `-1` and `0.5` aren't. It still has its entry in `requirements` and its `$well_formed` row, which shows each such field and its value as an input, like `{"name": "from", "value": "deployments"}`, or `{"name": "requirement", "value": 5}` for the whole requirement. ergo then reads `checks` and `applies_to` as empty, a `from` as giving no subjects (shown as `<invalid from>`), and an `id` as giving the id `null`. A `min_subjects` that isn't a number fails `$min_subjects` too.
 
 ## Paths
 
@@ -611,7 +611,7 @@ Three rules:
       "expression": "count(matching(deployments)) >= 1"
     },
     "$well_formed": {
-      "description": "the requirement is an object whose checks and applies_to are objects, whose from and id are lists and whose min_subjects is a number, and it declares at least one check and a recognised \"require\" value, its from and id only hold steps that can be keys, and its from, id and min_subjects only hold numbers a 64-bit float can hold; lacking any of these, it asserts nothing that could ever be satisfied, or not the same way everywhere",
+      "description": "the requirement is an object whose checks and applies_to are objects, whose from and id are lists, whose min_subjects is a whole number of 0 or more and whose subject_type is a string, and it declares at least one check and a recognised \"require\" value, its from and id only hold steps that can be keys, and its from, id and min_subjects only hold numbers a 64-bit float can hold; lacking any of these, it asserts nothing that could ever be satisfied, or not the same way everywhere",
       "expression": "fields have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float"
     },
     "approved": {
@@ -635,7 +635,7 @@ In an expression, a value written in the policy is shown as JSON, written the sa
 - A number is a plain decimal, with no exponent and no trailing zeros: `1.0`, `1.50`, `1e2` and `2.5e-3` are shown as `1`, `1.5`, `100` and `0.0025`, and `-0` as `0`. A number keeps every digit the policy wrote, so it's only shown the same by every implementation when it has at most 15 significant digits, which is as many as any language's 64-bit floating point number is sure to keep. The same goes for a number copied from the input into the report: a runtime that reads JSON into 64-bit numbers, like JavaScript, turns `12345678901234567890` into `12345678901234567000` before ergo sees it. A number in the policy has to be `0` or have a magnitude between `2.2250738585072014e-308` and `1.7976931348623157e308`, the range those numbers hold without losing digits. Elsewhere, a language like JavaScript turns `1e400` into `Infinity` and `1e-400` into `0`, so a check could pass there and fail here. A check holding such a number anywhere fails with cause `absent`, and the number is shown as `<number out of range>`. One in `from`, `id` or `min_subjects` fails `$well_formed`.
 - A list or object has one space after each comma and colon, and its keys are sorted: `["a", 1.5, {"a": "x", "b": [true, null]}]`.
 - A ref is shown without quotes, as `$$params.x`, so it can't be mistaken for the string `"$$params.x"`.
-- Something that should be a string but isn't, like an `op`, `cmp` or `subject_type` written as an object, is shown as JSON too: `<unknown op {"ref": ["a"]}>`. A string there is shown as it is, without quotes: `<unknown op nope>`.
+- Something that should be a string but isn't, like an `op` or `cmp` written as an object, is shown as JSON too: `<unknown op {"ref": ["a"]}>`. A string there is shown as it is, without quotes: `<unknown op nope>`.
 
 Keys in paths are only quoted when needed, as described in [Paths](#paths), and are escaped the same way.
 

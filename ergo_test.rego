@@ -2011,7 +2011,22 @@ wrong_types := [
 	["id", null],
 	["min_subjects", "0"],
 	["min_subjects", null],
+	["min_subjects", -1],
+	["min_subjects", 0.5],
+	["min_subjects", 1.5],
+	["subject_type", 3],
+	["subject_type", {"name": "x"}],
+	["subject_type", null],
 ]
+
+test_a_min_subjects_written_as_a_whole_number_with_a_fraction_part_is_well_formed if {
+	rows := [r.passed |
+		some m in [0, 2.0, 1e2]
+		rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"min_subjects": m})})
+		some r in rows_for(rep, "s", "$well_formed")
+	]
+	rows == [true, true, true]
+}
 
 test_a_field_of_the_wrong_type_fails_well_formed_and_shows_its_value if {
 	rows := [[f, "s" in object.keys(rep.requirements), rep.requirements.s.satisfied, r.passed, r.cause, r.inputs[count(r.inputs) - 1]] |

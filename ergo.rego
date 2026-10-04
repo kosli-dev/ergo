@@ -28,7 +28,7 @@ _min_subjects_of(req) := _req_field(req, "min_subjects", 1)
 _require_of(req) := _req_field(req, "require", "every")
 
 _wrong_typed_fields(req) := [f |
-	some f in ["applies_to", "checks", "from", "id", "min_subjects"]
+	some f in ["applies_to", "checks", "from", "id", "min_subjects", "subject_type"]
 	f in object.keys(req)
 	not _has_type(f, req[f])
 ]
@@ -41,7 +41,13 @@ _has_type("from", v) if is_array(v)
 
 _has_type("id", v) if is_array(v)
 
-_has_type("min_subjects", v) if is_number(v)
+_has_type("min_subjects", v) if {
+	is_number(v)
+	v >= 0
+	v == floor(v)
+}
+
+_has_type("subject_type", v) if is_string(v)
 
 _typed(req) if {
 	is_object(req)
@@ -1946,12 +1952,12 @@ _min_subjects_def(req) := {"$min_subjects": _with_refs(
 )}
 
 _well_formed_def(req) := {"$well_formed": {
-	"description": "the requirement is an object whose checks and applies_to are objects, whose from and id are lists and whose min_subjects is a number, and it declares at least one check and a recognised \"require\" value, its from and id only hold steps that can be keys, and its from, id and min_subjects only hold numbers a 64-bit float can hold; lacking any of these, it asserts nothing that could ever be satisfied, or not the same way everywhere",
+	"description": "the requirement is an object whose checks and applies_to are objects, whose from and id are lists, whose min_subjects is a whole number of 0 or more and whose subject_type is a string, and it declares at least one check and a recognised \"require\" value, its from and id only hold steps that can be keys, and its from, id and min_subjects only hold numbers a 64-bit float can hold; lacking any of these, it asserts nothing that could ever be satisfied, or not the same way everywhere",
 	"expression": `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float`,
 }} if not _stepped(req)
 
 _well_formed_def(req) := {"$well_formed": {
-	"description": "the requirement is an object whose checks and applies_to are objects, whose from and id are lists and whose min_subjects is a number, and it declares at least one check, a recognised \"require\" value, and a from that ends with its only step, which gives a name that doesn't start with $ and, if it has keys, gives them as a list, its from and id only hold steps that can be keys, and its from, id and min_subjects only hold numbers a 64-bit float can hold",
+	"description": "the requirement is an object whose checks and applies_to are objects, whose from and id are lists, whose min_subjects is a whole number of 0 or more and whose subject_type is a string, and it declares at least one check, a recognised \"require\" value, and a from that ends with its only step, which gives a name that doesn't start with $ and, if it has keys, gives them as a list, its from and id only hold steps that can be keys, and its from, id and min_subjects only hold numbers a 64-bit float can hold",
 	"expression": `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and from is well formed and steps are keys and numbers fit a float`,
 }} if _stepped(req)
 
