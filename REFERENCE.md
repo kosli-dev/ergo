@@ -85,7 +85,7 @@ A few details:
 
 A path is a list of keys that ergo follows one step at a time. `["release", "approver", "email"]` reads `release.approver.email`.
 
-A key is a string, or a list index written as digits alone, like `0` or `12`. A string only picks a key of an object and a number only picks an item of a list, so `["a", "0"]` reads nothing when `a` is a list, and `["o", 0]` reads nothing when `o` is `{"0": "zero"}`. JavaScript reads both, so an implementation there has to check the type. A step that can't be a key, like `true`, `null`, a list, `-1`, `1.5`, or even `1.0`, which OPA doesn't read as `1` but JavaScript does, can never read anything. So a check with one is written wrong: it fails `$well_formed`, its rows fail with cause `ill_formed`, even as a `present` filter, and the step is shown as `<invalid step>`. The same goes for the paths in a check's `inputs`. One in `from` or `id` fails `$well_formed`.
+A key is a string, or a list index written as digits alone, like `0` or `12`. A string only picks a key of an object and a number only picks an item of a list, so `["a", "0"]` reads nothing when `a` is a list, and `["o", 0]` reads nothing when `o` is `{"0": "zero"}`. JavaScript reads both, so an implementation there has to check the type. A path that runs into something that can't hold its next key, like these, or a string, number or boolean where an object or list should be, fails its check with cause `unusable`, so `["pr", "state"]` on `"pr": "none"` isn't reported as a missing field. A parent that isn't there, or is `null`, is different: the field is just missing. A step that can't be a key, like `true`, `null`, a list, `-1`, `1.5`, or even `1.0`, which OPA doesn't read as `1` but JavaScript does, can never read anything. So a check with one is written wrong: it fails `$well_formed`, its rows fail with cause `ill_formed`, even as a `present` filter, and the step is shown as `<invalid step>`. The same goes for the paths in a check's `inputs`. One in `from` or `id` fails `$well_formed`.
 
 In expressions and `inputs`, a key is written as it is when it starts with an ASCII letter (`a` to `z` or `A` to `Z`), `_` or `$`, and the rest is ASCII letters, digits, `_`, `$` and `-`. Any other key is quoted, so a key with a dot, a space or an accented letter, one that starts with a digit or `-`, and the empty key are all written in quotes. So `["metadata", "labels", "app.kubernetes.io/name"]` is named `metadata.labels."app.kubernetes.io/name"`, and doesn't look like a path four keys deep. The string key `["xs", "0"]` is named `xs."0"`, unlike the list index `["xs", 0]`, named `xs.0`. A first step written as `{"literal": "$schema"}` is named `"$schema"`, so it doesn't look like a [name](#naming-subjects). `from` takes no names and no `$$input`, so there a first key that starts with `$` is always quoted: `["$$input"]` is named `"$$input"`, and can't be mistaken for the whole input.
 
@@ -323,7 +323,9 @@ These read one or two fields of a subject.
 | `equals`           | `path`, `value`             | the field equals `value`. The type must match too, so `"1"` doesn't equal `1`.                                       |
 | `in`               | `path`, `values`            | the field is one of `values`. The type must match too, as for `equals`.                                              |
 | `present`          | `path`                      | the field exists and isn't `null`. An empty string or `false` still counts as present.                               |
+| `missing`          | `path`                      | the field isn't there, or is `null`.                                                                                 |
 | `non_empty_string` | `path`                      | the field is a string, and not `""`.                                                                                 |
+| `empty`            | `path`                      | the field is an empty list.                                                                                          |
 | `matches_any`      | `path`, `patterns`          | the field is a string that matches at least one of the regular expressions.                                          |
 | `not_matches_any`  | `path`, `patterns`          | the field is a string that matches none of them.                                                                     |
 | `range`            | `path`, `min`, `max`        | the field is a number between `min` and `max`, both included.                                                        |
@@ -350,7 +352,9 @@ Some things worth knowing:
 
   A [`ref`](#reading-from-the-input) that reads the wrong kind of value from the params, like `values` read from a param that holds `3`, or an empty list read as the `values` of `includes` or `excludes`, isn't a mistake in the policy, so it doesn't fail `$well_formed`. The check fails with cause `unusable`.
 - A field with the wrong kind of value for the operator fails with cause `unusable`, not `value`: a field that isn't a number for `range`, isn't a string for `matches_any` or `not_matches_any`, or isn't a list for `includes`, `excludes`, `all` or `any`, two fields of different types for `compare`, or anything but two timestamps in the same format for `compare_time`. So a filter fails the requirement instead of quietly ruling the subject out. `equals` and `in` are different: `"5"` isn't `5`, which is a sound answer, so that fails with `value`. So does `non_empty_string` on a number, since checking the type is its job.
-- `present` on a missing or `null` field fails with cause `value`, not `absent`: whether the field is there is the question it asks, so "it isn't" is a sound answer. In an `any_of` option, a `present` check that finds its field missing settles the option as `value`, even when the option's other checks can't read that field.
+- `present` on a missing or `null` field fails with cause `value`, not `absent`: whether the field is there is the question it asks, so "it isn't" is a sound answer. A field whose parent isn't there, or is `null`, is missing too, so `build.fingerprint` is missing when there's no `build`, and so is a field under a [selector](#paths) when the list it selects from isn't there or is `null`. A parent that can't hold the field still fails with cause `unusable`, as for every [path](#paths). In an `any_of` option, a `present` check that finds its field missing settles the option as `value`, even when the option's other checks can't read that field.
+- `missing` is the opposite of `present`: it passes where `present` fails with cause `value`, fails with `value` where `present` passes, and otherwise fails with the same cause as `present`. So a field that's there fails it whatever it holds, `false` and `""` included, and a selector that matches nothing in a list that's there fails it as `unmatched`. To let a missing field pass a check, or keep a subject with no such field in scope, put `missing` in its own [`any_of`](#any_of) option.
+- `empty` only passes on an empty list. A missing list fails with cause `absent`, a `null` one with `null`, and anything else with `unusable`, an empty string or object included. It's for saying that no items is fine where [`all` or `any`](#all-and-any) would fail.
 - `equals` with `"value": null` only passes when the field is there and set to `null`. A missing field doesn't count.
 - `range` needs `min` and `max` to be numbers. A string like `"3"` fails the check, because Rego puts every number before every string, so `5 <= "3"` would be true.
 - `in` fails when the field is missing or `null`, even if `values` contains `null`. To check that a field is `null`, use `equals` with `"value": null`. `values` can be a list or, from Rego, a set. `in` also fails when `values` is empty, missing, or not a list or set. The expression then shows `id in <missing values>` or `id in <invalid values>` rather than a list.
@@ -382,7 +386,21 @@ These apply a check to each item of a list inside the subject.
 }
 ```
 
-An empty list fails, with cause `value`. No commits isn't proof that every commit is signed. Anything that isn't a list fails too, an object included, with cause `unusable`. The row's `inputs` then show `[]` for the list, because an object's values have no order of their own.
+An empty list fails, with cause `value`. No commits isn't proof that every commit is signed. When no commits is fine, say so with `empty` in an `any_of`:
+
+```rego
+"signed": {
+	"op": "any_of",
+	"options": {
+		"none": [{"op": "empty", "path": ["commits"]}],
+		"signed": [{"op": "all", "path": ["commits"], "check": {"op": "equals", "path": ["signed"], "value": true}}],
+	},
+}
+```
+
+That renders as `one of: none(commits is empty) | signed(every commits: signed == true)`. A missing `commits` still fails, as `absent`.
+
+Anything that isn't a list fails too, an object included, with cause `unusable`. The row's `inputs` then show `[]` for the list, because an object's values have no order of their own.
 
 `each` goes one level deeper. The check then applies to every item of every inner list:
 
@@ -503,6 +521,19 @@ This is the only way to say that two fields must agree with each other. Two sepa
 - Name your options. The names show up in the rendered expression: `one of: safe(type == "Chore") | standard(type == "Story" and state == "Done")`. A list of options works too, and they're shown by position.
 - Options can hold basic checks and `all` or `any`, but not another `any_of`, because Rego doesn't allow recursion. An `all` or `any` in an option counts as being where the `any_of` is, so it can nest as deep as it could there (see [Nesting](#nesting)).
 - An empty `options` is written wrong, and so is an empty option, an option written as an object instead of a list, or an `any_of` inside an option. Each fails `$well_formed`, and the check fails with cause `ill_formed`.
+- To let a missing field pass, give `missing` an option of its own. "No label is `do-not-merge`" then passes on a pull request with no `labels`, and renders as `one of: clean(not contains(labels, "do-not-merge")) | no_labels(labels is missing)`:
+
+  ```rego
+  "mergeable": {
+  	"op": "any_of",
+  	"options": {
+  		"no_labels": [{"op": "missing", "path": ["labels"]}],
+  		"clean": [{"op": "excludes", "path": ["labels"], "value": "do-not-merge"}],
+  	},
+  }
+  ```
+
+  Inside `all`, this skips an item by letting it pass. Inside `any`, skip an item by making it fail instead, with `present` in the same option as the check: `present` on a missing field fails with cause `value`, so the item counts as a plain no.
 - The row shows every field any option read, sorted by name. A field read by more than one option shows once. For an `all` or `any` in an option, that's its list and any names it reads.
 
 ## Substitutes
@@ -696,7 +727,7 @@ A subject that fails `$applies` gets no other rows, since it was never checked. 
 
 A subject is only out of scope when ergo read a filter's fields and the values didn't match, so the row's cause is `value`. When a filter fails because a field it reads is missing, `null` or can't be found by a selector, ergo can't tell whether the subject is in scope. Its `$applies` row then fails with that cause, the requirement isn't met, and the row shows up in the violations. This holds with `min_subjects: 0` too, so a missing field can't quietly make a requirement pass.
 
-`present` is the exception, because a missing or `null` field is exactly what it checks for. A `present` filter that finds one rules the subject out, so `{"op": "present", "path": ["lock_release"]}` leaves out a package with no `lock_release`. A selector in its path that matches nothing or more than one item still fails the requirement, as does a subject that isn't an object, or a path that starts with a name nothing gave, like `["$p", "author"]` when `from` gave `$pr`.
+`present` is the exception, because a missing or `null` field is exactly what it checks for. A `present` filter that finds one rules the subject out, so `{"op": "present", "path": ["lock_release"]}` leaves out a package with no `lock_release`. A selector in its path that matches nothing or more than one item in a list that's there still fails the requirement, as does a parent that can't hold the field, like `"build": "abc"` for `["build", "fingerprint"]`, a subject that isn't an object, or a path that starts with a name nothing gave, like `["$p", "author"]` when `from` gave `$pr`.
 
 With several filters, the subject is only out of scope when every filter that failed did so with `value`. If one rules it out and another can't be read, the requirement fails, so missing data always shows. A `present` filter that finds its field missing is the exception: it says on purpose that a missing field means out of scope, so it rules the subject out whatever the other filters read. That lets a filter on the same field sit next to it:
 
@@ -707,7 +738,7 @@ With several filters, the subject is only out of scope when every filter that fa
 }
 ```
 
-A lockfile with no `status` is out of scope, although `attested` can't read it. A filter that's written wrong still fails the requirement. A substitute that isn't there doesn't count as unreadable, because substitutes are usually missing.
+A lockfile with no `status` is out of scope, although `attested` can't read it. To keep a subject with a missing field in scope instead, use `missing` in an `any_of` option, as in `one of: named(environment == "prod") | unset(environment is missing)`. A filter that's written wrong still fails the requirement. A substitute that isn't there doesn't count as unreadable, because substitutes are usually missing.
 
 Together, these make sure that whenever a requirement isn't met, at least one row explains why.
 
@@ -726,18 +757,18 @@ Patterns, options, selector fields and the keys of objects written in the policy
 
 Every row has a `cause`. A missing field, a field set to `null`, and a selector that matched nothing all show up as `null` in `inputs`, but they're different problems with different fixes. The cause tells them apart.
 
-| `cause`         | Meaning                                                                                                                           |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `satisfied`     | The check passed.                                                                                                                 |
-| `substituted`   | The check failed, but its substitute passed.                                                                                      |
-| `ill_formed`    | The check is written wrong, so it can't be run. `$well_formed` fails too.                                                         |
-| `not_an_object` | The subject isn't an object, so it has no fields.                                                                                 |
-| `ambiguous`     | A selector matched more than one item.                                                                                            |
-| `unmatched`     | A selector matched nothing, although the list was there.                                                                          |
-| `unusable`      | A value the check reads is there, but it's not the kind the check needs, like a string for `range`, or a param of the wrong type. |
-| `absent`        | A field the check reads isn't there.                                                                                              |
-| `null`          | A field the check reads is there, but `null`.                                                                                     |
-| `value`         | Everything was read fine. The values just don't pass.                                                                             |
+| `cause`         | Meaning                                                                                                                                                                  |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `satisfied`     | The check passed.                                                                                                                                                        |
+| `substituted`   | The check failed, but its substitute passed.                                                                                                                             |
+| `ill_formed`    | The check is written wrong, so it can't be run. `$well_formed` fails too.                                                                                                |
+| `not_an_object` | The subject isn't an object, so it has no fields.                                                                                                                        |
+| `ambiguous`     | A selector matched more than one item.                                                                                                                                   |
+| `unmatched`     | A selector matched nothing, although the list was there.                                                                                                                 |
+| `unusable`      | A value the check reads is there, but it's not the kind the check needs, like a string for `range`, a string where a path needs an object, or a param of the wrong type. |
+| `absent`        | A field the check reads isn't there.                                                                                                                                     |
+| `null`          | A field the check reads is there, but `null`.                                                                                                                            |
+| `value`         | Everything was read fine. The values just don't pass.                                                                                                                    |
 
 When a check reads several fields, the row shows the first cause in this table's order. An ambiguous selector matters more than any value, because it means the policy can't even tell what it's looking at.
 
@@ -794,9 +825,9 @@ const policy = await loadPolicy(wasm, undefined, { "time.parse_rfc3339_ns": pars
 
 ergo fails a check whenever it can't be sure, instead of letting it pass. Rego doesn't do that by default in a few places, so these are handled on purpose:
 
-- A missing, `null` or wrong-typed field fails every operator.
+- A missing, `null` or wrong-typed field fails every operator, except `missing`, which passes on a missing or `null` field.
 - `compare` needs both sides to exist and have the same type. In plain Rego, `null < 5` is true, so a missing field would otherwise pass a `lt` check. Ordering objects, lists or booleans fails too.
-- `all`, `any` and `each` need non-empty lists, inner lists of nested checks included.
+- `all`, `any` and `each` need non-empty lists, inner lists of nested checks included. A policy that's fine with no items says so with `empty`.
 - A name given twice, or badly written, fails the check, so an inner name can't quietly hide an outer one.
 - A check that's written wrong, like an unknown `op` or `cmp`, fails `$well_formed`, and its rows fail with cause `ill_formed`, so a mistake in `applies_to` can't rule every subject out.
 - A value of the wrong kind, like a string where `range` needs a number, or a param of the wrong type, fails with cause `unusable`, so a filter can't rule a subject out on it.
