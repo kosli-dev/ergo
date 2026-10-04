@@ -2446,6 +2446,30 @@ test_a_list_check_that_passes_in_an_option_adds_nothing_to_the_cause_even_when_a
 	[r.cause | some r in rows_for(rep, "s", "c")] == ["value"]
 }
 
+lockfile_req(filters) := {"s": {"from": ["items"], "id": ["id"], "min_subjects": 0, "applies_to": filters, "checks": {"c": {"op": "equals", "path": ["hashed"], "value": true}}}}
+
+lockfile_scope(item, filters) := [rep.requirements.s.satisfied, [r.cause | some r in rows_for(rep, "s", "$applies")]] if {
+	rep := ergo.report({"items": [item]}, lockfile_req(filters))
+}
+
+test_a_present_filter_that_finds_its_field_missing_rules_the_subject_out_whatever_the_other_filters_read if {
+	filters := {"recorded": {"op": "present", "path": ["status"]}, "attested": {"op": "equals", "path": ["status"], "value": "COMPLETE"}}
+	lockfile_scope({"id": 1}, filters) == [true, ["value"]]
+	lockfile_scope({"id": 1, "status": null}, filters) == [true, ["value"]]
+	lockfile_scope({"id": 1}, object.union(filters, {"other": {"op": "equals", "path": ["owner"], "value": "me"}})) == [true, ["value"]]
+	lockfile_scope({"id": 1, "status": "PENDING"}, filters) == [true, ["value"]]
+	lockfile_scope({"id": 1, "status": "COMPLETE", "hashed": true}, filters) == [true, ["satisfied"]]
+}
+
+test_a_present_filter_does_not_win_over_a_filter_written_wrong if {
+	lockfile_scope({"id": 1}, {"recorded": {"op": "present", "path": ["status"]}, "broken": {"op": "nope"}}) == [false, ["ill_formed"]]
+}
+
+test_a_present_filter_that_cannot_reach_its_field_does_not_rule_the_subject_out if {
+	filters := {"recorded": {"op": "present", "path": ["atts", {"where": {"k": "lock"}}, "status"]}, "env": {"op": "equals", "path": ["env"], "value": "prod"}}
+	lockfile_scope({"id": 1, "atts": [], "env": "dev"}, filters) == [false, ["unmatched"]]
+}
+
 test_well_formed_definition_is_in_the_check_table if {
 	rep := ergo.report({"items": [{"id": "a"}]}, id_req(["items"]))
 	rep.requirements.s.checks["$well_formed"].expression == `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float and checks are written right`

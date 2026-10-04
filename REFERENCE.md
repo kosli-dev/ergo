@@ -692,7 +692,16 @@ A subject is only out of scope when ergo read a filter's fields and the values d
 
 `present` is the exception, because a missing or `null` field is exactly what it checks for. A `present` filter that finds one rules the subject out, so `{"op": "present", "path": ["lock_release"]}` leaves out a package with no `lock_release`. A selector in its path that matches nothing or more than one item still fails the requirement, as does a subject that isn't an object, or a path that starts with a name nothing gave, like `["$p", "author"]` when `from` gave `$pr`.
 
-With several filters, the subject is only out of scope when every filter that failed did so with `value`. If one rules it out and another can't be read, the requirement fails, so missing data always shows. A substitute that isn't there doesn't count as unreadable, because substitutes are usually missing.
+With several filters, the subject is only out of scope when every filter that failed did so with `value`. If one rules it out and another can't be read, the requirement fails, so missing data always shows. A `present` filter that finds its field missing is the exception: it says on purpose that a missing field means out of scope, so it rules the subject out whatever the other filters read. That lets a filter on the same field sit next to it:
+
+```json
+"applies_to": {
+  "recorded": {"op": "present", "path": ["status"]},
+  "attested": {"op": "equals", "path": ["status"], "value": "COMPLETE"}
+}
+```
+
+A lockfile with no `status` is out of scope, although `attested` can't read it. A filter that's written wrong still fails the requirement. A substitute that isn't there doesn't count as unreadable, because substitutes are usually missing.
 
 Together, these make sure that whenever a requirement isn't met, at least one row explains why.
 
@@ -785,7 +794,7 @@ ergo fails a check whenever it can't be sure, instead of letting it pass. Rego d
 - A name given twice, or badly written, fails the check, so an inner name can't quietly hide an outer one.
 - A check that's written wrong, like an unknown `op` or `cmp`, fails `$well_formed`, and its rows fail with cause `ill_formed`, so a mistake in `applies_to` can't rule every subject out.
 - A value of the wrong kind, like a string where `range` needs a number, or a param of the wrong type, fails with cause `unusable`, so a filter can't rule a subject out on it.
-- With several filters, one that can't be read fails the requirement, even when another rules the subject out.
+- With several filters, one that can't be read fails the requirement, even when another rules the subject out, unless that one is a `present` filter that found its field missing.
 - `min_subjects` is 1 unless you say otherwise, so finding nothing fails.
 - A key listed in `keys` that the input doesn't have is still a subject, so it fails instead of being skipped.
 - A subject whose `applies_to` filter can't be read fails the requirement instead of being left out.

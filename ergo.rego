@@ -1760,7 +1760,11 @@ _applies_cause(subj, req) := "satisfied" if {
 	_subject_matches(subj, req)
 } else := _scope_cause(_failed_filter_causes(subj, req))
 
-_scope_cause(causes) := "value" if {
+_scope_cause(causes) := "ill_formed" if {
+	"ill_formed" in causes
+} else := "value" if {
+	"missing" in causes
+} else := "value" if {
 	causes == {"value"}
 } else := _worst_of(causes)
 
@@ -1777,7 +1781,7 @@ _filter_causes(subj, req) := {_filter_cause(check, subj) |
 	not _check_passed(check, subj)
 }
 
-_filter_cause(check, subj) := "value" if _answers_presence(check, subj)
+_filter_cause(check, subj) := "missing" if _answers_presence(check, subj)
 
 _filter_cause(check, subj) := _row_cause(check, subj) if not _answers_presence(check, subj)
 
