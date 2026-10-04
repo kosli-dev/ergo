@@ -1932,7 +1932,7 @@ _described(check, item) := object.union(check, {"expression": sprintf(
 
 _subject_item_name(req) := sprintf("$%s", [_each_step(req).each_as]) if _from_well_formed(req)
 
-_subject_item_name(req) := sprintf("%s[]", [_path_name(_from_of(req))]) if {
+_subject_item_name(req) := sprintf("%s[]", [_from_name(_from_of(req))]) if {
 	not _stepped(req)
 	_from_well_formed(req)
 	_from_of(req) != []
@@ -1946,9 +1946,23 @@ _subject_item_name(req) := "$$input" if {
 
 _subject_item_name(req) := "<invalid from>" if not _from_well_formed(req)
 
-_matching_count_name(req) := sprintf("count(matching(%s))", [_path_name(_from_path(req))]) if _from_well_formed(req)
+_matching_count_name(req) := sprintf("count(matching(%s))", [_from_name(_from_path(req))]) if {
+	_from_well_formed(req)
+	_from_path(req) != []
+}
+
+_matching_count_name(req) := "count(matching($$input))" if {
+	_from_well_formed(req)
+	_from_path(req) == []
+}
 
 _matching_count_name(req) := "count(matching(<invalid from>))" if not _from_well_formed(req)
+
+_from_name(p) := _path_name(array.concat([{"literal": p[0]}], array.slice(p, 1, count(p)))) if _starts_with_dollar_key(p)
+
+_from_name(p) := _path_name(p) if not _starts_with_dollar_key(p)
+
+_starts_with_dollar_key(p) if _first_dollar_key(0, p[0])
 
 _min_subjects_def(req) := {"$min_subjects": _with_refs(
 	{
