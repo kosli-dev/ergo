@@ -738,7 +738,7 @@ When a check reads several fields, the row shows the first cause in this table's
 
 - For `all` and `any`, a list that isn't there gives `absent`, and one that isn't a list gives `unusable`. An empty list gives `value`, since it was read fine and just has nothing in it. Otherwise the cause is the first, in this table's order, among the items that failed. So when one approver is a bot and another has no `username`, a check that some approver isn't a bot fails as `absent`, because the second one might not be. An `any_of` works the same way across its options, and so does `each` across its inner lists.
 - For a custom operator, the cause is worked out from its `inputs`, or from its `path` if it has no `inputs`. With neither, the cause is always `value`.
-- `$well_formed` and `$min_subjects` don't read the subject, so their cause is `satisfied` or `value`. `$applies` reports the state of the fields read by the filters that failed. For example, a subject whose filter field is missing says `absent`, and that fails the requirement. A filter that's written wrong gives `ill_formed`, even when another filter rules the subject out, because the scope can't be trusted.
+- `$well_formed` and `$min_subjects` don't read the subject, so their cause is `satisfied` or `value`, except that `$min_subjects` takes a ref's cause (`absent`, `null` or `unusable`) when `from` or `keys` can't be read. `$applies` reports the state of the fields read by the filters that failed. For example, a subject whose filter field is missing says `absent`, and that fails the requirement. A filter that's written wrong gives `ill_formed`, even when another filter rules the subject out, because the scope can't be trusted.
 
 ## Violations
 
@@ -795,7 +795,7 @@ ergo fails a check whenever it can't be sure, instead of letting it pass. Rego d
 - A name given twice, or badly written, fails the check, so an inner name can't quietly hide an outer one.
 - A check that's written wrong, like an unknown `op` or `cmp`, fails `$well_formed`, and its rows fail with cause `ill_formed`, so a mistake in `applies_to` can't rule every subject out.
 - A value of the wrong kind, like a string where `range` needs a number, or a param of the wrong type, fails with cause `unusable`, so a filter can't rule a subject out on it.
-- With several filters, one that can't be read fails the requirement, even when another rules the subject out, unless that one is a `present` filter that found its field missing.
+- With several filters, one that can't be read fails the requirement, even when another rules the subject out. The only filter that can rule a subject out regardless is a `present` filter that found its field missing.
 - `min_subjects` is 1 unless you say otherwise, so finding nothing fails.
 - A key listed in `keys` that the input doesn't have is still a subject, so it fails instead of being skipped.
 - A subject whose `applies_to` filter can't be read fails the requirement instead of being left out.

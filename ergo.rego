@@ -871,17 +871,20 @@ _unusable_states(leaf, x) := {"unusable" | _unusable(leaf, x)}
 
 _unusable(leaf, x) if {
 	leaf.op == "range"
-	not is_number(_found(x, leaf.path))
+	v := _found(x, leaf.path)
+	not is_number(v)
 }
 
 _unusable(leaf, x) if {
 	leaf.op in {"matches_any", "not_matches_any"}
-	not is_string(_found(x, leaf.path))
+	v := _found(x, leaf.path)
+	not is_string(v)
 }
 
 _unusable(leaf, x) if {
 	leaf.op in {"includes", "excludes"}
-	not is_array(_found(x, leaf.path))
+	v := _found(x, leaf.path)
+	not is_array(v)
 }
 
 _unusable(leaf, x) if {
@@ -1614,7 +1617,10 @@ _list_states(check, x) := ({_read_state(x, check.path)} | {"unusable" | _not_a_l
 	some outer in coll
 }
 
-_not_a_list(x, path) if not is_array(_found(x, path))
+_not_a_list(x, path) if {
+	v := _found(x, path)
+	not is_array(v)
+}
 
 _each_state(outer, each) := "unusable" if {
 	_not_a_list(outer, each)
