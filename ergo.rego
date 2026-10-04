@@ -781,6 +781,28 @@ leaf_passed(check, subj) if {
 }
 
 leaf_passed(check, subj) if {
+	check.op == "excludes"
+	v := value_at(subj, check.path)
+	is_array(v)
+	wants := _wants(check.values)
+	_wanted(wants)
+	every want in wants {
+		not want in v
+	}
+}
+
+leaf_passed(check, subj) if {
+	check.op == "includes"
+	v := value_at(subj, check.path)
+	is_array(v)
+	wants := _wants(check.values)
+	_wanted(wants)
+	every want in wants {
+		want in v
+	}
+}
+
+leaf_passed(check, subj) if {
 	check.op == "in"
 	v := value_at(subj, check.path)
 	v != null
@@ -853,6 +875,22 @@ leaf_passed(check, subj) if {
 	is_number(l)
 	is_number(r)
 	_cmp(check.cmp, l, r)
+}
+
+_wants(values) := arg(values) if not _value_list(values)
+
+_wants(values) := [arg(x) | some x in values] if {
+	_value_list(values)
+	every x in values {
+		_readable(x)
+	}
+}
+
+_readable(x) if _ = arg(x)
+
+_wanted(v) if {
+	_value_list(v)
+	count(v) > 0
 }
 
 _value_list(v) if is_array(v)
@@ -968,8 +1006,8 @@ operators contains op if some op in (_leaf_ops | {"all", "any", "any_of"})
 
 _required_fields := {
 	"range": {"path", "min", "max"},
-	"excludes": {"path", "value"},
-	"includes": {"path", "value"},
+	"excludes": {"path"},
+	"includes": {"path"},
 	"in": {"path", "values"},
 	"equals": {"path", "value"},
 	"present": {"path"},
@@ -1072,11 +1110,19 @@ _nested_ops := {
 	"check": [set(), _leaf_ops | {"all", "any", "any_of"}, _leaf_ops | {"any_of"}],
 }
 
-_field_problems(node) := union({_unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _patterns_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _each_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node)})
+_field_problems(node) := union({_unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _each_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node)})
 
 _missing_fields_problem(node) := {sprintf("missing %s", [f]) |
 	some f in object.get(_required_fields, node.op, set())
 	not f in object.keys(node)
+}
+
+_value_or_values_problem(node) := {"missing value or values" |
+	node.op in {"includes", "excludes"}
+	count({"value", "values"} & object.keys(node)) == 0
+} | {"both value and values" |
+	node.op in {"includes", "excludes"}
+	count({"value", "values"} & object.keys(node)) == 2
 }
 
 _unknown_fields_problem(node) := {sprintf("unknown field %s", [_text(f)]) |
@@ -1087,6 +1133,8 @@ _unknown_fields_problem(node) := {sprintf("unknown field %s", [_text(f)]) |
 }
 
 _op_fields := object.union(_required_fields, {
+	"excludes": {"path", "value", "values"},
+	"includes": {"path", "value", "values"},
 	"all": {"path", "check", "each", "as"},
 	"any": {"path", "check", "each", "as"},
 })
@@ -1109,11 +1157,15 @@ _range_order_problem(node) := {"min above max" |
 }
 
 _values_problem(node) := {"invalid values" |
-	node.op == "in"
+	node.op in {"in", "includes", "excludes"}
 	"values" in object.keys(node)
 	not _value_list(_written(node.values))
 	not _is_ref(node.values)
 	not _malformed(node.values)
+} | {"empty values" |
+	node.op in {"includes", "excludes"}
+	_value_list(_written(node.values))
+	count(_written(node.values)) == 0
 }
 
 _patterns_problem(node) := {"invalid patterns" |
@@ -1270,6 +1322,13 @@ _node_param_broken(node) if {
 	_is_ref(node.values)
 	v := arg(node.values)
 	not _value_list(v)
+}
+
+_node_param_broken(node) if {
+	node.op in {"includes", "excludes"}
+	_is_ref(node.values)
+	v := arg(node.values)
+	not _wanted(v)
 }
 
 _node_param_broken(node) if {
@@ -1873,9 +1932,25 @@ _param_text(check, f) := _value_text(check[f]) if f in object.keys(check)
 
 _param_text(check, f) := sprintf("<missing %s>", [f]) if not f in object.keys(check)
 
-_leaf_describe(check, item) := sprintf("not contains(%s, %s)", [_path_text(item, check, "path"), _param_text(check, "value")]) if check.op == "excludes"
+_leaf_describe(check, item) := sprintf("not contains(%s, %s)", [_path_text(item, check, "path"), _one_value_text(check)]) if {
+	check.op == "excludes"
+	not _values_only(check)
+}
 
-_leaf_describe(check, item) := sprintf("contains(%s, %s)", [_path_text(item, check, "path"), _param_text(check, "value")]) if check.op == "includes"
+_leaf_describe(check, item) := sprintf("contains(%s, %s)", [_path_text(item, check, "path"), _one_value_text(check)]) if {
+	check.op == "includes"
+	not _values_only(check)
+}
+
+_leaf_describe(check, item) := sprintf("contains_none(%s, %s)", [_path_text(item, check, "path"), _values_text(check.values)]) if {
+	check.op == "excludes"
+	_values_only(check)
+}
+
+_leaf_describe(check, item) := sprintf("contains_all(%s, %s)", [_path_text(item, check, "path"), _values_text(check.values)]) if {
+	check.op == "includes"
+	_values_only(check)
+}
 
 _leaf_describe(check, item) := sprintf("%s in [%s]", [_path_text(item, check, "path"), concat(", ", sort([_literal_text(v) | some v in _written(check.values)]))]) if {
 	check.op == "in"
@@ -1931,6 +2006,40 @@ _pattern_list(check) := "<invalid patterns>" if {
 }
 
 _leaf_describe(check, item) := sprintf("%s %s %s", [_path_text(item, check, "left"), _cmp_text(check), _path_text(item, check, "right")]) if check.op in {"compare", "compare_time"}
+
+_one_value_text(check) := _value_text(check.value) if {
+	"value" in object.keys(check)
+	not "values" in object.keys(check)
+}
+
+_one_value_text(check) := "<both value and values>" if {
+	"value" in object.keys(check)
+	"values" in object.keys(check)
+}
+
+_one_value_text(check) := "<missing value or values>" if count({"value", "values"} & object.keys(check)) == 0
+
+_values_only(check) if {
+	"values" in object.keys(check)
+	not "value" in object.keys(check)
+}
+
+_values_text(v) := sprintf("[%s]", [concat(", ", sort([_value_text(x) | some x in v]))]) if _value_list(v)
+
+_values_text(v) := sprintf("[%s]", [concat(", ", sort([_literal_text(x) | some x in v.literal]))]) if {
+	_is_literal(v)
+	_value_list(v.literal)
+}
+
+_values_text(v) := _ref_name(v.ref) if _is_ref(v)
+
+_values_text(v) := "<invalid ref>" if _malformed(v)
+
+_values_text(v) := "<invalid values>" if {
+	not _is_ref(v)
+	not _malformed(v)
+	not _value_list(_written(v))
+}
 
 _cmp_text(check) := _text(check.cmp) if "cmp" in object.keys(check)
 
