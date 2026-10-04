@@ -2272,20 +2272,9 @@ _listed_from(req) := _from_of(req) if is_array(_from_of(req))
 
 _listed_from(req) := [] if not is_array(_from_of(req))
 
-_min_subjects_description(req) := sprintf("At least %s %s is required", [_literal_text(_min_subjects_of(req)), _text(_subject_type_of(req))]) if _min_subjects_of(req) == 1
+_min_subjects_description(req) := sprintf("The %s is at least %s", [_subject_count_name(req), _literal_text(_min_subjects_of(req))])
 
-_min_subjects_description(req) := sprintf("At least %s %s are required", [_literal_text(_min_subjects_of(req)), _subjects_word(req)]) if _min_subjects_of(req) != 1
-
-_subjects_word(req) := _plural(_text(_subject_type_of(req)))
-
-_plural(w) := concat("", [w, "es"]) if regex.match(`(s|x|z|ch|sh)$`, w)
-
-_plural(w) := concat("", [trim_suffix(w, "y"), "ies"]) if regex.match(`[^aeiou]y$`, w)
-
-_plural(w) := concat("", [w, "s"]) if {
-	not regex.match(`(s|x|z|ch|sh)$`, w)
-	not regex.match(`[^aeiou]y$`, w)
-}
+_subject_count_name(req) := concat(" ", [_text(_subject_type_of(req)), "count"])
 
 _well_formed_def(req) := {"$well_formed": {
 	"description": "The requirement is written correctly",
@@ -2410,7 +2399,7 @@ _min_subjects_row(doc, req, req_name) := {
 	"requirement": req_name,
 	"subject": {"type": _subject_type_of(req), "id": null},
 	"check": "$min_subjects",
-	"inputs": [{"name": concat(" ", ["matching", _subjects_word(req)]), "value": count(_matching_subjects(doc, req))}],
+	"inputs": [{"name": _subject_count_name(req), "value": count(_matching_subjects(doc, req))}],
 	"passed": _enough_subjects(doc, req),
 	"cause": _min_subjects_cause(doc, req),
 }

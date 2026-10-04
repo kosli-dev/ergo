@@ -1648,7 +1648,7 @@ test_a_requirement_with_a_number_out_of_range_is_not_well_formed if {
 
 test_min_subjects_is_described_like_any_number if {
 	rep := ergo.report({"xs": []}, {"s": {"from": ["xs"], "min_subjects": 2.0, "checks": {"c": {"op": "present", "path": ["x"]}}}})
-	rep.requirements.s.checks["$min_subjects"].description == "At least 2 subjects are required"
+	rep.requirements.s.checks["$min_subjects"].description == "The subject count is at least 2"
 }
 
 test_a_key_is_escaped_as_in_standard_json if {
@@ -1912,7 +1912,7 @@ test_min_subjects_row_has_a_null_subject_id if {
 test_min_subjects_definition_is_in_the_check_table if {
 	rep := ergo.report({"items": []}, min_subjects_req(2))
 	def := rep.requirements.s.checks["$min_subjects"]
-	def.description == "At least 2 things are required"
+	def.description == "The thing count is at least 2"
 	def.expression == "count(matching(items)) >= 2"
 }
 
@@ -2106,9 +2106,9 @@ test_min_subjects_names_the_whole_input_like_the_checks_do_when_from_reads_it if
 		some r in rows_for(rep, "s", "$min_subjects")
 	]
 	rows == [
-		["count(matching($$input)) >= 1", "matching subjects"],
-		["count(matching($$input)) >= 1", "matching subjects"],
-		["count(matching($$input)) >= 1", "matching subjects"],
+		["count(matching($$input)) >= 1", "subject count"],
+		["count(matching($$input)) >= 1", "subject count"],
+		["count(matching($$input)) >= 1", "subject count"],
 	]
 }
 
@@ -2502,12 +2502,12 @@ plain_defs(req) := ergo.report({"items": [{"id": 1}]}, {"s": object.union({"from
 
 test_the_checks_ergo_adds_are_described_in_plain_words if {
 	defs := plain_defs({"subject_type": "deployment"})
-	defs["$min_subjects"].description == "At least 1 deployment is required"
+	defs["$min_subjects"].description == "The deployment count is at least 1"
 	defs["$applies"].description == "The deployment is in scope"
 	defs["$well_formed"].description == "The requirement is written correctly"
-	plain_defs({"subject_type": "deployment", "min_subjects": 2})["$min_subjects"].description == "At least 2 deployments are required"
-	plain_defs({"subject_type": "deployment", "min_subjects": 0})["$min_subjects"].description == "At least 0 deployments are required"
-	plain_defs({})["$min_subjects"].description == "At least 1 subject is required"
+	plain_defs({"subject_type": "deployment", "min_subjects": 2})["$min_subjects"].description == "The deployment count is at least 2"
+	plain_defs({"subject_type": "deployment", "min_subjects": 0})["$min_subjects"].description == "The deployment count is at least 0"
+	plain_defs({})["$min_subjects"].description == "The subject count is at least 1"
 	plain_defs({})["$applies"].description == "The subject is in scope"
 }
 
@@ -2516,15 +2516,9 @@ test_the_well_formed_description_is_the_same_with_a_naming_step if {
 	rep.requirements.s.checks["$well_formed"].description == "The requirement is written correctly"
 }
 
-test_a_subject_type_is_made_plural_by_its_ending if {
-	every pair in [["batch", "batches"], ["repository", "repositories"], ["key", "keys"], ["pull request", "pull requests"], ["box", "boxes"], ["bus", "buses"], ["dish", "dishes"], ["buzz", "buzzes"]] {
-		plain_defs({"subject_type": pair[0], "min_subjects": 2})["$min_subjects"].description == sprintf("At least 2 %s are required", [pair[1]])
-	}
-}
-
 test_min_subjects_names_its_input_after_what_it_counts if {
 	rep := ergo.report({"items": []}, {"s": {"subject_type": "deployment", "from": ["items"], "checks": {"c": {"op": "present", "path": ["id"]}}}})
-	[r.inputs | some r in rows_for(rep, "s", "$min_subjects")] == [[{"name": "matching deployments", "value": 0}]]
+	[r.inputs | some r in rows_for(rep, "s", "$min_subjects")] == [[{"name": "deployment count", "value": 0}]]
 	rep.requirements.s.checks["$min_subjects"].expression == "count(matching(items)) >= 1"
 }
 
@@ -2760,10 +2754,10 @@ test_an_option_name_that_is_not_a_string_is_written_as_json_in_every_runtime if 
 test_a_subject_type_that_is_not_a_string_is_written_as_json_in_every_runtime if {
 	req := {"from": ["xs"], "applies_to": {"f": {"op": "present", "path": ["id"]}}, "checks": {"c": {"op": "present", "path": ["id"]}}}
 	checks := ergo.report({"xs": [{"id": 1}]}, {"s": object.union(req, {"subject_type": ["a", "b"]})}).requirements.s.checks
-	checks["$min_subjects"].description == `At least 1 ["a", "b"] is required`
+	checks["$min_subjects"].description == `The ["a", "b"] count is at least 1`
 	checks["$applies"].description == `The ["a", "b"] is in scope`
-	ergo.report({"xs": [{"id": 1}]}, {"s": object.union(req, {"subject_type": null})}).requirements.s.checks["$min_subjects"].description == "At least 1 null is required"
-	ergo.report({"xs": [{"id": 1}]}, {"s": object.union(req, {"subject_type": -1})}).requirements.s.checks["$min_subjects"].description == "At least 1 -1 is required"
+	ergo.report({"xs": [{"id": 1}]}, {"s": object.union(req, {"subject_type": null})}).requirements.s.checks["$min_subjects"].description == "The null count is at least 1"
+	ergo.report({"xs": [{"id": 1}]}, {"s": object.union(req, {"subject_type": -1})}).requirements.s.checks["$min_subjects"].description == "The -1 count is at least 1"
 }
 
 test_a_number_written_with_a_plus_in_its_exponent_is_written_in_full if {
@@ -2845,7 +2839,7 @@ test_violations_include_min_subjects_failures if {
 	count(v) == 1
 	v[0].check == "$min_subjects"
 	v[0].subject == {"type": "thing", "id": null}
-	v[0].description == "At least 1 thing is required"
+	v[0].description == "The thing count is at least 1"
 }
 
 test_violations_exclude_subjects_that_are_out_of_scope if {
@@ -3095,7 +3089,7 @@ test_a_user_check_named_min_subjects_is_not_clobbered if {
 		"value": "zzz",
 		"expression": `id == "zzz"`,
 	}
-	rep.requirements.s.checks["$min_subjects"].description == "At least 1 thing is required"
+	rep.requirements.s.checks["$min_subjects"].description == "The thing count is at least 1"
 
 	count(rows_for(rep, "s", "min_subjects")) == 1
 	rows_for(rep, "s", "min_subjects")[0].passed == false
@@ -4650,7 +4644,7 @@ test_a_ref_step_in_from_that_cannot_be_read_fails_the_requirement_even_with_min_
 
 test_a_ref_step_in_from_that_cannot_be_read_shows_up_in_violations if {
 	vs := ergo.violations(ergo.report(trail_doc, trail_req({"op": "present", "path": ["fingerprint"]}))) with data.params as {}
-	[[v.check, v.cause, v.inputs] | some v in vs] == [["$min_subjects", "absent", [{"name": "matching subjects", "value": 0}, {"name": "$$params.artifact", "value": null}]]]
+	[[v.check, v.cause, v.inputs] | some v in vs] == [["$min_subjects", "absent", [{"name": "subject count", "value": 0}, {"name": "$$params.artifact", "value": null}]]]
 }
 
 test_a_ref_step_at_the_end_of_from_is_not_a_naming_step if {
@@ -4811,7 +4805,7 @@ test_keys_from_a_ref_that_cannot_be_read_fail_the_requirement_even_with_min_subj
 
 test_keys_from_a_ref_that_cannot_be_read_show_up_in_violations if {
 	vs := ergo.violations(ergo.report(suite_doc, suites_from_params)) with data.params as {}
-	[[v.check, v.cause, v.inputs] | some v in vs] == [["$min_subjects", "absent", [{"name": "matching test runs", "value": 0}, {"name": "$$params.suites", "value": null}]]]
+	[[v.check, v.cause, v.inputs] | some v in vs] == [["$min_subjects", "absent", [{"name": "test run count", "value": 0}, {"name": "$$params.suites", "value": null}]]]
 }
 
 test_an_empty_list_of_keys_from_a_ref_is_like_an_empty_list_written_out if {
