@@ -89,7 +89,7 @@ test_a_subject_that_is_not_an_object_keeps_its_applies_row if {
 
 test_a_subject_that_is_not_an_object_is_not_mistaken_for_one_missing_its_fields if {
 	causes := {r.subject.id: r.cause | some r in rows_for(ergo.report({"items": [{"id": "x"}, "b"]}, mixed_req), "s", "c")}
-	causes == {"x": "absent", "b": "not_an_object"}
+	causes == {"x": "value", "b": "not_an_object"}
 }
 
 test_a_subject_that_is_not_an_object_fails_a_quantified_check_as_not_an_object if {
@@ -536,7 +536,7 @@ test_not_matches_any_fails_closed_on_a_non_string_pattern if {
 test_matches_any_fails_on_a_non_string_pattern_even_when_another_matches if {
 	check := {"op": "matches_any", "path": ["author"], "patterns": {"svc_.*", 42}}
 	verdict({"author": "svc_bot"}, check) == false
-	cause_of({"author": "svc_bot"}, check) == "absent"
+	cause_of({"author": "svc_bot"}, check) == "ill_formed"
 }
 
 test_matching_with_no_patterns if {
@@ -1443,7 +1443,7 @@ test_expression_for_in_does_not_list_values_it_will_not_match if {
 	rendered({"id": "MIT"}, {"op": "in", "path": ["id"], "values": {"licence": "MIT"}}) == "id in <invalid values>"
 	rendered({"id": "MIT"}, {"op": "in", "path": ["id"], "values": "MIT"}) == "id in <invalid values>"
 	rendered({"id": "MIT"}, {"op": "in", "path": ["id"], "values": null}) == "id in <invalid values>"
-	rendered({"id": "MIT"}, {"op": "in", "path": ["id"]}) == "id in <invalid values>"
+	rendered({"id": "MIT"}, {"op": "in", "path": ["id"]}) == "id in <missing values>"
 }
 
 test_expression_for_matches_any_does_not_list_patterns_it_will_not_match if {
@@ -1451,13 +1451,13 @@ test_expression_for_matches_any_does_not_list_patterns_it_will_not_match if {
 	rendered({"a": "x"}, {"op": "matches_any", "path": ["a"], "patterns": "x"}) == "a matches one of <invalid patterns>"
 	rendered({"a": "x"}, {"op": "matches_any", "path": ["a"], "patterns": {"literal": "x"}}) == "a matches one of <invalid patterns>"
 	rendered({"a": "x"}, {"op": "matches_any", "path": ["a"], "patterns": null}) == "a matches one of <invalid patterns>"
-	rendered({"a": "x"}, {"op": "matches_any", "path": ["a"]}) == "a matches one of <invalid patterns>"
+	rendered({"a": "x"}, {"op": "matches_any", "path": ["a"]}) == "a matches one of <missing patterns>"
 }
 
 test_expression_for_not_matches_any_does_not_list_patterns_it_will_not_match if {
 	rendered({"a": "x"}, {"op": "not_matches_any", "path": ["a"], "patterns": "x"}) == "a matches none of <invalid patterns>"
 	rendered({"a": "x"}, {"op": "not_matches_any", "path": ["a"], "patterns": null}) == "a matches none of <invalid patterns>"
-	rendered({"a": "x"}, {"op": "not_matches_any", "path": ["a"]}) == "a matches none of <invalid patterns>"
+	rendered({"a": "x"}, {"op": "not_matches_any", "path": ["a"]}) == "a matches none of <missing patterns>"
 }
 
 test_expression_for_matches_any_lists_a_literal_list_of_patterns if {
@@ -1554,10 +1554,10 @@ test_a_present_filter_with_a_step_that_cannot_be_a_key_cannot_rule_subjects_out 
 		}})
 		some r in rows_for(rep, "s", "$applies")
 	]
-	rows == [[false, false, "absent"] | some _ in bad_steps]
+	rows == [[false, false, "ill_formed"] | some _ in bad_steps]
 }
 
-test_a_check_with_a_step_that_cannot_be_a_key_fails_as_absent if {
+test_a_check_with_a_step_that_cannot_be_a_key_is_ill_formed if {
 	subj := {"id": 1, "a": [1, 2], "b": 1}
 	checks := [c |
 		some seg in bad_steps
@@ -1568,21 +1568,21 @@ test_a_check_with_a_step_that_cannot_be_a_key_fails_as_absent if {
 		]
 	]
 	single := [{"op": "present", "path": seg} | some seg in bad_steps; not is_array(seg)]
-	[[verdict(subj, c), cause_of(subj, c)] | some c in array.concat(checks, single)] == [[false, "absent"] | some _ in array.concat(checks, single)]
+	[[verdict(subj, c), cause_of(subj, c)] | some c in array.concat(checks, single)] == [[false, "ill_formed"] | some _ in array.concat(checks, single)]
 }
 
 test_a_string_never_picks_a_list_item_and_a_number_never_picks_an_object_key if {
-	[cause_of({"id": 1, "a": [10, 20]}, {"op": "present", "path": ["a", "0"]}), cause_of({"id": 1, "o": {"0": "zero"}}, {"op": "present", "path": ["o", 0]})] == ["absent", "absent"]
+	[cause_of({"id": 1, "a": [10, 20]}, {"op": "present", "path": ["a", "0"]}), cause_of({"id": 1, "o": {"0": "zero"}}, {"op": "present", "path": ["o", 0]})] == ["value", "value"]
 }
 
-test_a_check_whose_inputs_have_a_step_that_cannot_be_a_key_fails_as_absent if {
+test_a_check_whose_inputs_have_a_step_that_cannot_be_a_key_is_ill_formed if {
 	subj := {"id": 1, "n": 2, "xs": [{"v": 1}]}
 	[[verdict(subj, c), cause_of(subj, c)] | some c in [
 		{"op": "even", "path": ["n"], "expression": "n is even", "inputs": [["n", true]]},
 		{"op": "even", "path": ["n"], "expression": "n is even", "inputs": [{"path": ["xs"], "each": ["v", -1]}]},
 		{"op": "even", "path": ["n"], "expression": "n is even", "inputs": [{"path": ["xs", 1.0], "each": ["v"]}]},
 		{"op": "equals", "path": ["n"], "value": 2, "inputs": [["n", null]]},
-	]] == [[false, "absent"], [false, "absent"], [false, "absent"], [false, "absent"]]
+	]] == [[false, "ill_formed"], [false, "ill_formed"], [false, "ill_formed"], [false, "ill_formed"]]
 	verdict(subj, {"op": "even", "path": ["n"], "expression": "n is even", "inputs": [["n"], {"path": ["xs"], "each": ["v"]}]}) == true
 }
 
@@ -1592,13 +1592,13 @@ test_a_list_index_written_as_a_whole_number_reads_the_item if {
 	rendered({}, {"op": "present", "path": ["a", 1]}) == "a.1 is present"
 }
 
-test_a_ref_step_that_reads_something_that_cannot_be_a_key_fails_as_absent if {
+test_a_ref_step_that_reads_something_that_cannot_be_a_key_fails_as_unusable if {
 	check := {"op": "present", "path": ["a", {"ref": ["$$params", "i"]}]}
 	params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check) == [[true, "satisfied", [{"name": "a.[$$params.i]", "value": 2}]]] with data.params as {"i": 1}
 	r := params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check)[0] with data.params as {"i": -1}
-	[r[0], r[1]] == [false, "absent"]
+	[r[0], r[1]] == [false, "unusable"]
 	s := params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check)[0] with data.params as {"i": 1.0}
-	[s[0], s[1]] == [false, "absent"]
+	[s[0], s[1]] == [false, "unusable"]
 }
 
 test_a_from_or_id_with_a_step_that_cannot_be_a_key_is_not_well_formed if {
@@ -1612,7 +1612,7 @@ test_a_from_or_id_with_a_step_that_cannot_be_a_key_is_not_well_formed if {
 
 test_a_check_with_a_number_too_big_for_a_float_fails_closed if {
 	check := {"op": "equals", "path": ["n"], "value": 1e400}
-	[verdict({"id": 1, "n": 1e400}, check), cause_of({"id": 1, "n": 1e400}, check)] == [false, "absent"]
+	[verdict({"id": 1, "n": 1e400}, check), cause_of({"id": 1, "n": 1e400}, check)] == [false, "ill_formed"]
 	rendered({}, check) == "n == <number out of range>"
 }
 
@@ -2049,15 +2049,15 @@ test_a_from_that_is_not_a_list_records_no_refs_because_it_is_never_read if {
 	not "$refs" in object.keys(rep.requirements.s.checks["$min_subjects"])
 }
 
-test_an_applies_to_that_is_not_an_object_fails_every_subject_as_absent_so_none_is_blamed_for_a_check if {
+test_an_applies_to_that_is_not_an_object_fails_every_subject_as_ill_formed_so_none_is_blamed_for_a_check if {
 	doc := {"items": [{"id": 1, "env": "dev"}, {"id": 2, "env": "prod"}]}
 	reps := [ergo.report(doc, {"s": object.union(typed_req, {"applies_to": a})}) |
 		some a in [[{"op": "equals", "path": ["env"], "value": "prod"}], true, null]
 	]
 	every rep in reps {
 		[[r.check, r.subject.id, r.passed, r.cause, r.inputs] | some r in rep.results; not r.check in {"$well_formed", "$min_subjects"}] == [
-			["$applies", 1, false, "absent", []],
-			["$applies", 2, false, "absent", []],
+			["$applies", 1, false, "ill_formed", []],
+			["$applies", 2, false, "ill_formed", []],
 		]
 		rep.requirements.s.subjects == {"total": 2, "matching": 0}
 		rep.requirements.s.checks["$applies"].expression == "<invalid applies_to>"
@@ -2124,9 +2124,383 @@ test_a_from_starting_with_a_dollar_key_is_quoted_because_from_takes_no_names_or_
 	]
 }
 
+problem_inputs(rep) := [i | some i in rows_for(rep, "s", "$well_formed")[0].inputs; not i.name in {"count(checks)", "require", "from"}]
+
+test_a_badly_written_check_fails_well_formed_and_says_where_and_what if {
+	rep := ergo.report({"items": [{"id": 1}]}, {"s": {
+		"from": ["items"],
+		"id": ["id"],
+		"applies_to": {"is_prod": {"op": "equals", "path": ["env"]}},
+		"checks": {"merged": {"op": "equls", "path": ["state"], "value": "MERGED"}, "fine": {"op": "present", "path": ["id"]}},
+	}})
+	r := rows_for(rep, "s", "$well_formed")[0]
+	[r.passed, r.cause] == [false, "value"]
+	problem_inputs(rep) == [
+		{"name": "applies_to.is_prod", "value": ["missing value"]},
+		{"name": "checks.merged", "value": ["unknown op equls"]},
+	]
+}
+
+test_a_problem_inside_a_check_is_named_by_where_it_sits if {
+	rep := ergo.report({"items": [{"id": 1}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {
+		"signed": {"op": "all", "path": ["xs"], "check": {"op": "equals", "path": ["v"]}},
+		"reviewed": {"op": "present", "path": ["id"], "substitute": {"op": "nope"}},
+		"permitted": {"op": "any_of", "options": {"standard": [{"op": "present", "path": ["id"]}, {"op": "in", "path": ["x"], "values": 3}]}},
+		"a.b": {"op": "present", "path": ["id"], "as": "x"},
+	}}})
+	problem_inputs(rep) == [
+		{"name": `checks."a.b"`, "value": ["as can't go here"]},
+		{"name": "checks.permitted.options.standard.1", "value": ["invalid values"]},
+		{"name": "checks.reviewed.substitute", "value": ["unknown op nope"]},
+		{"name": "checks.signed.check", "value": ["missing value"]},
+	]
+}
+
+test_a_check_with_several_problems_lists_them_in_order if {
+	rep := ergo.report({"items": [{"id": 1}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "range", "path": ["n", 1e400], "min": 9, "max": 1}}}})
+	problem_inputs(rep) == [{"name": "checks.c", "value": ["min above max", "number out of range", "step that can't be a key in path"]}]
+}
+
+_within(name, base) if name == base
+
+_within(name, base) if startswith(name, concat("", [base, "."]))
+
+test_every_badly_written_check_fails_well_formed if {
+	checks := {sprintf("c%d", [i]): c | some i, c in badly_written}
+	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": checks}})
+	rows_for(rep, "s", "$well_formed")[0].passed == false
+	every i, _ in badly_written {
+		some p in problem_inputs(rep)
+		_within(p.name, sprintf("checks.c%d", [i]))
+	}
+}
+
+test_a_ref_that_reads_the_wrong_kind_of_value_leaves_well_formed_alone_because_params_are_input if {
+	every check in read_the_wrong_kind {
+		rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
+		rows_for(rep, "s", "$well_formed")[0].passed == true
+	}
+}
+
+test_a_name_given_by_from_is_known_and_any_other_is_not if {
+	good := ergo.report({"prs": [{"n": 1}]}, {"s": {"from": ["prs", {"each_as": "pr"}], "id": ["n"], "checks": {"c": {"op": "present", "path": ["$pr", "n"]}}}})
+	bad := ergo.report({"prs": [{"n": 1}]}, {"s": {"from": ["prs", {"each_as": "pr"}], "id": ["n"], "checks": {"c": {"op": "present", "path": ["$p", "n"]}}}})
+	rows_for(good, "s", "$well_formed")[0].passed == true
+	problem_inputs(bad) == [{"name": "checks.c", "value": ["unknown name $p"]}]
+	[r.cause | some r in rows_for(bad, "s", "c")] == ["ill_formed"]
+}
+
+test_a_name_given_by_as_is_known_only_inside_its_check if {
+	rep := ergo.report({"prs": [{"n": 1}]}, {"s": {"from": ["prs"], "id": ["n"], "checks": {"c": {"op": "any_of", "options": {
+		"a": [{"op": "any", "path": ["approvers"], "as": "approver", "check": {"op": "present", "path": ["$approver", "id"]}}],
+		"b": [{"op": "present", "path": ["$approver", "id"]}],
+	}}}}})
+	problem_inputs(rep) == [{"name": "checks.c.options.b.0", "value": ["unknown name $approver"]}]
+}
+
+test_a_badly_written_filter_fails_well_formed_too if {
+	rep := ergo.report(typo_doc, typo_req({"op": "nope", "path": ["n"]}))
+	problem_inputs(rep) == [{"name": "applies_to.f", "value": ["unknown op nope"]}]
+}
+
+test_a_badly_written_filter_wins_over_one_that_rules_the_subject_out_because_scope_cannot_be_trusted if {
+	rep := ergo.report(typo_doc, {"s": {
+		"from": ["items"], "id": ["id"], "min_subjects": 0, "applies_to": {
+			"out": {"op": "equals", "path": ["n"], "value": 2},
+			"broken": {"op": "nope", "path": ["n"]},
+		},
+		"checks": {"c": {"op": "present", "path": ["id"]}},
+	}})
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "$applies")] == [[false, "ill_formed"]]
+	[v.check | some v in ergo.violations(rep)] == ["$well_formed", "$applies"]
+}
+
+test_a_missing_parameter_shows_in_the_expression_instead_of_leaving_it_empty if {
+	rows := [rendered({}, c) | some c in [
+		{"op": "equals", "path": ["state"]},
+		{"op": "equals", "value": 1},
+		{"op": "includes", "path": ["xs"]},
+		{"op": "excludes", "path": ["xs"]},
+		{"op": "present"},
+		{"op": "non_empty_string"},
+		{"op": "range", "path": ["n"], "min": 0},
+		{"op": "range", "path": ["n"]},
+		{"op": "compare", "left": ["a"], "right": ["b"]},
+		{"op": "compare_time", "left": ["a"], "cmp": "lt"},
+		{"op": "all", "path": ["xs"]},
+		{"op": "any", "check": {"op": "present", "path": ["v"]}},
+		{"op": "any_of"},
+	]]
+	rows == [
+		"state == <missing value>",
+		"<missing path> == 1",
+		"contains(xs, <missing value>)",
+		"not contains(xs, <missing value>)",
+		"<missing path> is present",
+		"<missing path> is a non-empty string",
+		"n >= 0 and n <= <missing max>",
+		"n >= <missing min> and n <= <missing max>",
+		"a <missing cmp> b",
+		"a lt <missing right>",
+		"every xs: <missing check>",
+		"some <missing path>: v is present",
+		"one of: <missing options>",
+	]
+}
+
+odd_checks := [
+	{"op": "any_of", "options": 5},
+	{"op": "any_of", "options": {"a": 5}},
+	{"op": "all", "path": 5, "check": {"op": "present", "path": []}},
+	{"op": "range", "path": ["n"], "min": {"ref": 5}, "max": 1},
+	{"op": "compare", "left": 5, "right": ["a"], "cmp": "eq"},
+	{"op": "present", "path": "x"},
+	{"op": "present", "path": {"a": 1}},
+	{"op": "all", "path": ["xs"], "each": 5, "check": {"op": "present", "path": []}},
+	{"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["ys"], "check": {"op": "all", "path": [], "check": {}}}},
+	{"op": {"x": 1}},
+	{"op": null},
+	{"op": "all"},
+	{"op": "any_of", "options": []},
+	{"op": "all", "path": ["xs"], "check": {"op": "any", "check": {"op": "present", "path": []}}},
+	{"op": "all", "path": ["xs"], "check": {"op": "any", "path": ["ys"]}},
+]
+
+test_every_check_however_badly_written_keeps_an_expression_in_its_definition if {
+	checks := {sprintf("c%d", [i]): c | some i, c in array.concat(badly_written, odd_checks)}
+	defs := ergo.report({}, {"s": {"checks": checks}}).requirements.s.checks
+	every name, _ in checks {
+		is_string(defs[name].expression)
+	}
+}
+
+test_a_missing_path_or_check_inside_a_nested_list_check_shows_in_the_expression if {
+	rendered({}, {"op": "all", "path": ["xs"], "check": {"op": "any", "check": {"op": "present", "path": []}}}) == "every xs: some <missing path>: <missing path>[] is present"
+	rendered({}, {"op": "all", "path": ["xs"], "check": {"op": "any", "path": ["ys"]}}) == "every xs: some ys: <missing check>"
+}
+
+test_a_check_reading_a_name_nothing_gives_fails_the_requirement_even_when_no_subject_is_found if {
+	rep := ergo.report({"items": []}, {"s": {"from": ["items"], "min_subjects": 0, "checks": {"c": {"op": "present", "path": ["$p", "id"]}}}})
+	rep.requirements.s.satisfied == false
+	problem_inputs(rep) == [{"name": "checks.c", "value": ["unknown name $p"]}]
+}
+
+test_a_field_its_op_does_not_use_fails_well_formed if {
+	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {
+		"typo": {"op": "equals", "path": ["n"], "valeu": 1},
+		"note": {"op": "equals", "path": ["n"], "value": 1, "descripton": "n is one"},
+	}}})
+	problem_inputs(rep) == [
+		{"name": "checks.note", "value": ["unknown field descripton"]},
+		{"name": "checks.typo", "value": ["missing value", "unknown field valeu"]},
+	]
+	[[r.check, r.passed, r.cause] | some r in rep.results; r.check in {"note", "typo"}] == [["note", false, "ill_formed"], ["typo", false, "ill_formed"]]
+}
+
+test_an_unknown_field_inside_a_check_is_found_where_it_sits if {
+	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {
+		"inner": {"op": "all", "path": ["xs"], "check": {"op": "present", "path": [], "owner": "me"}},
+		"sub": {"op": "present", "path": ["n"], "substitute": {"op": "present", "path": ["s"], "x": 1}},
+		"opt": {"op": "any_of", "options": {"o": [{"op": "present", "path": ["n"], "y": 2}]}, "z": 3},
+	}}})
+	problem_inputs(rep) == [
+		{"name": "checks.inner.check", "value": ["unknown field owner"]},
+		{"name": "checks.opt", "value": ["unknown field z"]},
+		{"name": "checks.opt.options.o.0", "value": ["unknown field y"]},
+		{"name": "checks.sub.substitute", "value": ["unknown field x"]},
+	]
+}
+
+test_every_built_in_op_takes_its_own_fields_and_the_ones_every_check_can_have if {
+	common := {"description": "d", "expression": "e", "inputs": [["n"]], "substitute": {"op": "present", "path": ["n"]}}
+	checks := {
+		"range": {"op": "range", "path": ["n"], "min": 0, "max": 9},
+		"excludes": {"op": "excludes", "path": ["xs"], "value": 5},
+		"includes": {"op": "includes", "path": ["xs"], "value": 1},
+		"in": {"op": "in", "path": ["n"], "values": [1]},
+		"equals": {"op": "equals", "path": ["n"], "value": 1},
+		"present": {"op": "present", "path": ["n"]},
+		"non_empty_string": {"op": "non_empty_string", "path": ["s"]},
+		"matches_any": {"op": "matches_any", "path": ["s"], "patterns": ["a"]},
+		"not_matches_any": {"op": "not_matches_any", "path": ["s"], "patterns": ["b"]},
+		"compare": {"op": "compare", "left": ["n"], "right": ["n"], "cmp": "eq"},
+		"compare_time": {"op": "compare_time", "left": ["t"], "right": ["t"], "cmp": "eq"},
+		"all": {"op": "all", "path": ["xs"], "each": [], "as": "x", "check": {"op": "present", "path": []}},
+		"any": {"op": "any", "path": ["xs"], "each": [], "as": "x", "check": {"op": "present", "path": []}},
+		"any_of": {"op": "any_of", "options": {"o": [{"op": "present", "path": ["n"]}]}},
+	}
+	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {name: object.union(c, common) | some name, c in checks}}})
+	problem_inputs(rep) == []
+	object.keys(checks) == {op | some op in ergo.operators; not op in {"even", "both_present", "multiple_of"}}
+}
+
+test_a_custom_op_keeps_any_fields_it_likes if {
+	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "multiple_of", "path": ["n"], "by": 1, "owner": "me", "expression": "n is whole", "inputs": [["n"]]}}}})
+	problem_inputs(rep) == []
+	[r.cause | some r in rows_for(rep, "s", "c")] == ["satisfied"]
+}
+
+test_a_list_check_without_from_is_described if {
+	rep := ergo.report({"xs": [1]}, {"s": {"checks": {"c": {"op": "all", "path": ["xs"], "check": {"op": "present", "path": []}}}}})
+	rep.requirements.s.checks.c.expression == "every xs: xs[] is present"
+}
+
+kinds_doc := {"items": [{"id": 1, "s": "x", "n": 5, "o": {"a": 1}, "e": [], "l": [1], "t": "2026-01-01T00:00:00Z", "bad_t": "2026-02-30T00:00:00Z"}]}
+
+kind_cause(check) := [r.cause | some r in rows_for(ergo.report(kinds_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}}), "s", "c")][0]
+
+kind_filter(check) := [rep.requirements.s.satisfied, [r.cause | some r in rows_for(rep, "s", "$applies")]] if {
+	rep := ergo.report(kinds_doc, {"s": {"from": ["items"], "id": ["id"], "min_subjects": 0, "applies_to": {"f": check}, "checks": {"c": {"op": "present", "path": ["id"]}}}})
+}
+
+test_a_value_the_op_cannot_use_fails_as_unusable_and_a_filter_cannot_rule_the_subject_out_with_it if {
+	every check in [
+		{"op": "range", "path": ["s"], "min": 0, "max": 9},
+		{"op": "matches_any", "path": ["n"], "patterns": ["x"]},
+		{"op": "not_matches_any", "path": ["n"], "patterns": ["x"]},
+		{"op": "includes", "path": ["s"], "value": "x"},
+		{"op": "excludes", "path": ["s"], "value": "y"},
+		{"op": "all", "path": ["o"], "check": {"op": "present", "path": []}},
+		{"op": "any", "path": ["s"], "check": {"op": "present", "path": []}},
+		{"op": "compare", "left": ["n"], "right": ["s"], "cmp": "eq"},
+		{"op": "compare", "left": ["o"], "right": ["o"], "cmp": "lt"},
+		{"op": "compare_time", "left": ["n"], "right": ["t"], "cmp": "lt"},
+		{"op": "compare_time", "left": ["bad_t"], "right": ["t"], "cmp": "lt"},
+		{"op": "compare_time", "left": ["o"], "right": ["o"], "cmp": "eq"},
+	] {
+		kind_cause(check) == "unusable"
+		kind_filter(check) == [false, ["unusable"]]
+	}
+}
+
+test_a_value_ergo_could_use_that_does_not_pass_stays_value if {
+	every check in [
+		{"op": "equals", "path": ["n"], "value": "5"},
+		{"op": "in", "path": ["n"], "values": ["5"]},
+		{"op": "non_empty_string", "path": ["n"]},
+		{"op": "all", "path": ["e"], "check": {"op": "present", "path": []}},
+		{"op": "any", "path": ["e"], "check": {"op": "present", "path": []}},
+		{"op": "excludes", "path": ["l"], "value": 1},
+	] {
+		kind_cause(check) == "value"
+		kind_filter(check) == [true, ["value"]]
+	}
+}
+
+approvers_doc(approvers) := {"items": [{"id": 1, "approvers": approvers}]}
+
+not_a_bot := {"op": "any", "path": ["approvers"], "check": {"op": "not_matches_any", "path": ["username"], "patterns": ["\\[bot\\]$"]}}
+
+every_human := {"op": "all", "path": ["approvers"], "check": {"op": "not_matches_any", "path": ["username"], "patterns": ["\\[bot\\]$"]}}
+
+item_cause(check, approvers) := [r.cause | some r in rows_for(ergo.report(approvers_doc(approvers), {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}}), "s", "c")][0]
+
+test_a_list_check_takes_the_worst_cause_of_its_failing_items if {
+	item_cause(not_a_bot, [{"username": "renovate[bot]"}, {}]) == "absent"
+	item_cause(not_a_bot, [{"username": "renovate[bot]"}, {"username": 42}]) == "unusable"
+	item_cause(not_a_bot, [{"username": "renovate[bot]"}, {"username": "dependabot[bot]"}]) == "value"
+	item_cause(every_human, [{"username": "renovate[bot]"}, {}]) == "absent"
+	item_cause(every_human, [{"username": "renovate[bot]"}, {"username": "ann"}]) == "value"
+	item_cause(every_human, [{"username": "ann"}, {"username": null}]) == "null"
+}
+
+test_a_filter_cannot_rule_out_a_subject_whose_items_could_not_be_read if {
+	rep := ergo.report(approvers_doc([{"username": "renovate[bot]"}, {}]), {"s": {"from": ["items"], "id": ["id"], "min_subjects": 0, "applies_to": {"f": not_a_bot}, "checks": {"c": {"op": "present", "path": ["id"]}}}})
+	rep.requirements.s.satisfied == false
+	[r.cause | some r in rows_for(rep, "s", "$applies")] == ["absent"]
+}
+
+test_each_takes_the_cause_of_its_inner_lists if {
+	check := {"op": "all", "path": ["prs"], "each": ["commits"], "check": {"op": "present", "path": ["sha"]}}
+	causes := [[r.passed, r.cause] |
+		some prs in [[{"commits": [{"sha": "a"}]}, {}], [{"commits": "a"}], [{"commits": []}], [{"commits": [{"sha": "a"}]}]]
+		some r in rows_for(ergo.report({"items": [{"id": 1, "prs": prs}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}}), "s", "c")
+	]
+	causes == [[false, "absent"], [false, "unusable"], [false, "value"], [true, "satisfied"]]
+}
+
+test_a_nested_list_check_takes_the_worst_cause_of_its_inner_items if {
+	check := {"op": "all", "path": ["prs"], "check": {"op": "all", "path": ["commits"], "check": {"op": "range", "path": ["n"], "min": 0, "max": 9}}}
+	causes := [r.cause |
+		some commits in [[{"n": 1}, {"n": 99}], [{"n": 1}, {}], [{"n": 1}, {"n": "x"}]]
+		some r in rows_for(ergo.report({"items": [{"id": 1, "prs": [{"commits": commits}]}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}}), "s", "c")
+	]
+	causes == ["value", "absent", "unusable"]
+}
+
+test_an_any_of_inside_a_list_check_takes_the_worst_cause_of_its_options if {
+	check := {"op": "any", "path": ["xs"], "check": {"op": "any_of", "options": {"a": [{"op": "equals", "path": ["k"], "value": 1}], "b": [{"op": "range", "path": ["n"], "min": 0, "max": 9}]}}}
+	causes := [r.cause |
+		some xs in [[{"k": 2, "n": 99}], [{"k": 2}], [{"k": 2, "n": "x"}]]
+		some r in rows_for(ergo.report({"items": [{"id": 1, "xs": xs}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}}), "s", "c")
+	]
+	causes == ["value", "absent", "unusable"]
+}
+
+test_a_list_check_that_passes_in_an_option_adds_nothing_to_the_cause_even_when_an_item_could_not_be_read if {
+	check := {"op": "any_of", "options": {"o": [
+		{"op": "any", "path": ["xs"], "check": {"op": "equals", "path": ["k"], "value": 1}},
+		{"op": "equals", "path": ["n"], "value": 1},
+	]}}
+	rep := ergo.report({"items": [{"id": 1, "n": 2, "xs": [{"k": 1}, {}]}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
+	[r.cause | some r in rows_for(rep, "s", "c")] == ["value"]
+}
+
+lockfile_req(filters) := {"s": {"from": ["items"], "id": ["id"], "min_subjects": 0, "applies_to": filters, "checks": {"c": {"op": "equals", "path": ["hashed"], "value": true}}}}
+
+lockfile_scope(item, filters) := [rep.requirements.s.satisfied, [r.cause | some r in rows_for(rep, "s", "$applies")]] if {
+	rep := ergo.report({"items": [item]}, lockfile_req(filters))
+}
+
+test_a_present_filter_that_finds_its_field_missing_rules_the_subject_out_whatever_the_other_filters_read if {
+	filters := {"recorded": {"op": "present", "path": ["status"]}, "attested": {"op": "equals", "path": ["status"], "value": "COMPLETE"}}
+	lockfile_scope({"id": 1}, filters) == [true, ["value"]]
+	lockfile_scope({"id": 1, "status": null}, filters) == [true, ["value"]]
+	lockfile_scope({"id": 1}, object.union(filters, {"other": {"op": "equals", "path": ["owner"], "value": "me"}})) == [true, ["value"]]
+	lockfile_scope({"id": 1, "status": "PENDING"}, filters) == [true, ["value"]]
+	lockfile_scope({"id": 1, "status": "COMPLETE", "hashed": true}, filters) == [true, ["satisfied"]]
+}
+
+test_a_present_filter_does_not_win_over_a_filter_written_wrong if {
+	lockfile_scope({"id": 1}, {"recorded": {"op": "present", "path": ["status"]}, "broken": {"op": "nope"}}) == [false, ["ill_formed"]]
+}
+
+test_a_present_filter_that_cannot_reach_its_field_does_not_rule_the_subject_out if {
+	filters := {"recorded": {"op": "present", "path": ["atts", {"where": {"k": "lock"}}, "status"]}, "env": {"op": "equals", "path": ["env"], "value": "prod"}}
+	lockfile_scope({"id": 1, "atts": [], "env": "dev"}, filters) == [false, ["unmatched"]]
+}
+
+test_present_on_a_missing_field_is_a_clean_no_wherever_it_is if {
+	doc := {"items": [{"id": 1, "approvers": [{"username": "renovate[bot]"}, {}]}]}
+	human := {"op": "any", "path": ["approvers"], "check": {"op": "any_of", "options": {"human": [
+		{"op": "present", "path": ["username"]},
+		{"op": "not_matches_any", "path": ["username"], "patterns": ["\\[bot\\]$"]},
+	]}}}
+	as_check := ergo.report(doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["owner"]}, "h": human}}})
+	[[r.check, r.cause] | some r in as_check.results; r.check in {"c", "h"}] == [["c", "value"], ["h", "value"]]
+	as_filter := ergo.report(doc, {"s": {"from": ["items"], "id": ["id"], "min_subjects": 0, "applies_to": {"h": human}, "checks": {"c": {"op": "present", "path": ["id"]}}}})
+	[as_filter.requirements.s.satisfied, [r.cause | some r in rows_for(as_filter, "s", "$applies")]] == [true, ["value"]]
+}
+
+test_present_that_cannot_reach_its_field_is_not_a_clean_no if {
+	causes := [[r.cause | some r in rows_for(ergo.report({"items": [item]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}}), "s", "c")][0] |
+		some [item, check] in [
+			[{"id": 1, "xs": []}, {"op": "present", "path": ["xs", {"where": {"k": 1}}, "v"]}],
+		]
+	]
+	causes == ["unmatched"]
+	[r.cause | some r in rows_for(ergo.report({"items": ["x"]}, {"s": {"from": ["items"], "checks": {"c": {"op": "present", "path": ["a"]}}}}), "s", "c")] == ["not_an_object"]
+}
+
+test_a_path_starting_with_a_reserved_double_dollar_name_is_ill_formed if {
+	rep := ergo.report({"items": [{"id": 1}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["$$foo", "x"], "value": 1}}}})
+	problem_inputs(rep) == [{"name": "checks.c", "value": ["unknown name $$foo"]}]
+	[r.cause | some r in rows_for(rep, "s", "c")] == ["ill_formed"]
+}
+
 test_well_formed_definition_is_in_the_check_table if {
 	rep := ergo.report({"items": [{"id": "a"}]}, id_req(["items"]))
-	rep.requirements.s.checks["$well_formed"].expression == `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float`
+	rep.requirements.s.checks["$well_formed"].expression == `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float and checks are written right`
 }
 
 require_req(q) := {"s": {
@@ -2547,8 +2921,6 @@ test_an_unknown_require_value_yields_a_violation if {
 	[v.check | some v in ergo.violations(rep)] == ["$well_formed"]
 }
 
-scan_requires := ["every", "some", "most"]
-
 scan_mins := [0, 1, 2]
 
 scan_checksets := [{}, {"c": {"op": "present", "path": ["id"]}}]
@@ -2573,40 +2945,40 @@ scan_policy(rq, mn, cs, fl) := {"s": {
 	"checks": cs,
 }}
 
-test_an_unsatisfied_report_always_explains_itself if {
-	unexplained := [rep |
-		some rq in scan_requires
-		some mn in scan_mins
-		some cs in scan_checksets
-		some fl in scan_filters
-		some d in scan_docs
-		rep := ergo.report(d, scan_policy(rq, mn, cs, fl))
-		rep.compliant == false
-		count(ergo.violations(rep)) == 0
-	]
-	count(unexplained) == 0
-}
+scan_reports(rq) := [ergo.report(d, scan_policy(rq, mn, cs, fl)) |
+	some mn in scan_mins
+	some cs in scan_checksets
+	some fl in scan_filters
+	some d in scan_docs
+]
 
-test_a_malformed_requirement_is_never_satisfied if {
-	malformed := [rep |
-		some rq in scan_requires
-		some mn in scan_mins
-		some cs in scan_checksets
-		some fl in scan_filters
-		some d in scan_docs
-		rep := ergo.report(d, scan_policy(rq, mn, cs, fl))
-		rows_for(rep, "s", "$well_formed")[0].passed == false
-	]
+unexplained(rq) := [rep | some rep in scan_reports(rq); rep.compliant == false; count(ergo.violations(rep)) == 0]
 
-	count(malformed) > 0
+test_an_unsatisfied_report_always_explains_itself_under_every if count(unexplained("every")) == 0
 
-	every rep in malformed {
+test_an_unsatisfied_report_always_explains_itself_under_some if count(unexplained("some")) == 0
+
+test_an_unsatisfied_report_always_explains_itself_under_a_bad_require if count(unexplained("most")) == 0
+
+malformed(rq) := [rep | some rep in scan_reports(rq); rows_for(rep, "s", "$well_formed")[0].passed == false]
+
+malformed_ones_fail_and_say_why(rq) if {
+	every rep in malformed(rq) {
 		rep.requirements.s.satisfied == false
 		count([v |
 			some v in ergo.violations(rep)
 			v.check == "$well_formed"
 		]) == 1
 	}
+}
+
+test_a_malformed_requirement_is_never_satisfied_under_every if malformed_ones_fail_and_say_why("every")
+
+test_a_malformed_requirement_is_never_satisfied_under_some if malformed_ones_fail_and_say_why("some")
+
+test_a_malformed_requirement_is_never_satisfied_under_a_bad_require if {
+	count(malformed("most")) > 0
+	malformed_ones_fail_and_say_why("most")
 }
 
 test_compare_lt_fails_when_the_left_side_is_missing if {
@@ -2859,12 +3231,19 @@ test_a_filter_value_of_the_wrong_type_leaves_the_subject_out_of_scope if {
 	rows_for(rep, "s", "$applies")[0].cause == "value"
 }
 
-test_a_subject_ruled_out_by_one_filter_stays_out_of_scope_when_another_filter_cannot_be_read if {
+test_a_subject_ruled_out_by_one_filter_still_fails_the_requirement_when_another_filter_cannot_be_read if {
 	req := {"s": object.union(degraded_req("every").s, {"applies_to": object.union(degraded_only, merged_only)})}
 	rep := ergo.report({"rounds": [{"id": "r1", "state": "CLOSED"}]}, req)
+	rep.requirements.s.satisfied == false
+	rows_for(rep, "s", "$applies")[0].cause == "absent"
+	[v.check | some v in ergo.violations(rep)] == ["$applies"]
+}
+
+test_a_subject_is_out_of_scope_when_every_failing_filter_reads_sound_values if {
+	req := {"s": object.union(degraded_req("every").s, {"applies_to": object.union(degraded_only, merged_only)})}
+	rep := ergo.report({"rounds": [{"id": "r1", "state": "CLOSED", "degraded": false}]}, req)
 	rep.requirements.s.satisfied == true
 	rows_for(rep, "s", "$applies")[0].cause == "value"
-	ergo.violations(rep) == []
 }
 
 test_a_subject_whose_filter_fails_on_an_unreadable_field_is_not_ruled_out_by_a_passing_filter if {
@@ -2924,8 +3303,8 @@ test_a_present_filter_still_fails_on_a_subject_that_is_not_an_object if {
 	[r.cause | some r in rows_for(rep, "s", "$applies")] == ["not_an_object"]
 }
 
-test_a_present_check_on_a_missing_field_still_says_absent if {
-	cause_of({}, {"op": "present", "path": ["lock"]}) == "absent"
+test_a_present_check_on_a_missing_field_is_a_clean_no if {
+	cause_of({}, {"op": "present", "path": ["lock"]}) == "value"
 }
 
 test_only_a_present_filter_rules_out_a_subject_whose_field_is_missing if {
@@ -2937,7 +3316,7 @@ test_only_a_present_filter_rules_out_a_subject_whose_field_is_missing if {
 
 test_a_custom_op_filter_without_inputs_rules_a_subject_out if {
 	req := {"s": object.union(degraded_req("every").s, {"applies_to": {"is_even": {"op": "even", "path": ["n"], "expression": "n is even"}}})}
-	ergo.report({"rounds": [{"id": "r1", "n": 3}]}, req).requirements.s.satisfied == true
+	ergo.report({"rounds": [{"id": "r1", "n": 3, "degraded": true}]}, req).requirements.s.satisfied == true
 }
 
 test_a_failing_custom_op_filter_that_declares_no_reads_rules_a_subject_out if {
@@ -2946,7 +3325,7 @@ test_a_failing_custom_op_filter_that_declares_no_reads_rules_a_subject_out if {
 		"paths": [["a"], ["b"]],
 		"expression": "a and b are present",
 	}}})}
-	rep := ergo.report({"rounds": [{"id": "r1", "a": 1}]}, req)
+	rep := ergo.report({"rounds": [{"id": "r1", "a": 1, "degraded": true}]}, req)
 	rep.requirements.s.satisfied == true
 	rows_for(rep, "s", "$applies")[0].cause == "value"
 }
@@ -3002,7 +3381,7 @@ test_an_input_path_reads_from_the_top_for_a_subject_that_is_not_an_object if {
 
 test_an_unknown_built_in_name_fails_closed if {
 	r := row_in({"mode": "strict"}, {"id": 1}, {"op": "equals", "path": ["$$inptu", "mode"], "value": "strict"})
-	[r.passed, r.cause] == [false, "absent"]
+	[r.passed, r.cause] == [false, "ill_formed"]
 }
 
 test_input_is_only_a_name_at_the_start_of_a_path if {
@@ -3079,7 +3458,7 @@ test_a_missing_ref_fails_every_op_closed if {
 test_a_ref_cannot_use_a_selector if {
 	check := {"op": "equals", "path": ["v"], "value": {"ref": ["$$input", "params", {"where": {"k": "a"}}, "v"]}}
 	r := row_in({"params": [{"k": "a", "v": "x"}]}, {"id": 1, "v": "x"}, check)
-	[r.passed, r.cause] == [false, "absent"]
+	[r.passed, r.cause] == [false, "ill_formed"]
 }
 
 test_a_null_ref_fails_closed_with_cause_null if {
@@ -3090,7 +3469,7 @@ test_a_null_ref_fails_closed_with_cause_null if {
 
 test_a_ref_must_start_with_input if {
 	r := row_in({}, {"id": 1, "licence": "MIT"}, {"op": "equals", "path": ["licence"], "value": {"ref": ["licence"]}})
-	[r.passed, r.cause] == [false, "absent"]
+	[r.passed, r.cause] == [false, "ill_formed"]
 }
 
 test_a_ref_value_is_recorded_once_in_the_check_definition if {
@@ -3216,7 +3595,7 @@ test_range_fails_closed_on_bounds_that_are_not_numbers if {
 test_an_object_with_ref_and_another_key_fails_closed if {
 	check := {"op": "excludes", "path": ["labels"], "value": {"ref": ["$$input", "params", "label"], "note": "x"}}
 	r := row_in({"params": {"label": "wip"}}, {"id": 1, "labels": ["ready"]}, check)
-	[r.passed, r.cause] == [false, "absent"]
+	[r.passed, r.cause] == [false, "ill_formed"]
 	r.inputs == [{"name": "labels", "value": ["ready"]}]
 	refs_in({}, {"id": 1}, check) == [{"name": "<invalid ref>", "value": null}]
 	expression_in({}, {"id": 1}, check) == "not contains(labels, <invalid ref>)"
@@ -3225,7 +3604,7 @@ test_an_object_with_ref_and_another_key_fails_closed if {
 test_an_object_with_literal_and_another_key_fails_closed if {
 	check := {"op": "excludes", "path": ["labels"], "value": {"literal": "wip", "note": "x"}}
 	r := row_in({}, {"id": 1, "labels": ["ready"]}, check)
-	[r.passed, r.cause] == [false, "absent"]
+	[r.passed, r.cause] == [false, "ill_formed"]
 }
 
 test_a_malformed_ref_in_patterns_or_values_reads_as_invalid if {
@@ -3269,7 +3648,7 @@ test_a_custom_op_reads_a_ref_with_arg if {
 
 test_a_path_written_as_a_string_reads_that_one_key if {
 	row_in({}, {"id": 1}, {"op": "present", "path": "state"}).passed == false
-	row_in({}, {"id": 1}, {"op": "present", "path": "state"}).cause == "absent"
+	row_in({}, {"id": 1}, {"op": "present", "path": "state"}).cause == "value"
 	row_in({}, {"id": 1, "state": "OPEN"}, {"op": "equals", "path": "state", "value": "OPEN"}).passed == true
 	row_in({}, {"id": 1}, {"op": "present", "path": 3}).passed == false
 }
@@ -3342,7 +3721,7 @@ test_a_key_the_object_does_not_have_fails_the_requirement if {
 test_a_missing_key_reads_as_absent_even_from_the_subject_itself if {
 	rep := ergo.report(suite_doc, {"s": {
 		"from": ["build", "test_runs", {"each_as": "suite", "keys": ["system-test"]}],
-		"checks": {"c": {"op": "present", "path": []}},
+		"checks": {"c": {"op": "non_empty_string", "path": []}},
 	}})
 	[[r.passed, r.cause, r.inputs] | some r in rows_for(rep, "s", "c")] == [[false, "absent", [{"name": "$suite", "value": null}]]]
 }
@@ -3468,18 +3847,18 @@ test_each_subject_reads_its_own_name if {
 	[[r.subject.id, r.passed] | some r in rows_for(rep, "s", "c")] == [[1, true], [2, false]]
 }
 
-test_a_name_that_is_not_bound_reads_as_absent if {
+test_a_name_that_is_not_bound_is_ill_formed if {
 	rep := ergo.report(pr_doc, {"s": {
 		"from": ["pull_requests", {"each_as": "pr"}],
 		"id": ["number"],
 		"checks": {"c": {"op": "present", "path": ["$p", "author"]}},
 	}})
-	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "absent"], [false, "absent"], [false, "absent"]]
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "ill_formed"], [false, "ill_formed"], [false, "ill_formed"]]
 }
 
 test_a_name_is_not_bound_without_an_each_step if {
 	r := row_in({}, {"id": 1, "a": 1}, {"op": "present", "path": ["$items", "a"]})
-	[r.passed, r.cause] == [false, "absent"]
+	[r.passed, r.cause] == [false, "ill_formed"]
 }
 
 test_a_literal_first_key_that_starts_with_a_dollar_is_quoted_so_it_is_not_named_like_a_name if {
@@ -3600,7 +3979,7 @@ test_a_well_formed_row_for_a_from_with_a_step_shows_the_from if {
 	row := rows_for(rep, "s", "$well_formed")[0]
 	row.passed == true
 	row.inputs[2] == {"name": "from", "value": ["build", "test_runs", {"each_as": "suite"}]}
-	rep.requirements.s.checks["$well_formed"].expression == `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and from is well formed and steps are keys and numbers fit a float`
+	rep.requirements.s.checks["$well_formed"].expression == `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and from is well formed and steps are keys and numbers fit a float and checks are written right`
 }
 
 test_a_well_formed_row_without_a_step_is_unchanged if {
@@ -3621,7 +4000,7 @@ test_a_name_missing_in_the_path_of_a_list_check_fails_as_absent if {
 	rep := ergo.report({"prs": [{"n": 1, "xs": [1, 2]}]}, {"s": {
 		"from": ["prs", {"each_as": "pr"}],
 		"id": ["n"],
-		"checks": {"c": {"op": "all", "path": ["xs"], "check": {"op": "present", "path": ["$pr", "author"]}}},
+		"checks": {"c": {"op": "all", "path": ["xs"], "check": {"op": "non_empty_string", "path": ["$pr", "author"]}}},
 	}})
 	[[r.passed, r.cause, r.inputs] | some r in rows_for(rep, "s", "c")] == [[false, "absent", [{"name": "xs[]", "value": [1, 2]}, {"name": "$pr.author", "value": null}]]]
 }
@@ -3630,7 +4009,7 @@ test_an_input_missing_in_the_path_of_a_list_check_fails_as_absent if {
 	rep := ergo.report({"items": [{"id": 1, "xs": [1]}]}, {"s": {
 		"from": ["items"],
 		"id": ["id"],
-		"checks": {"c": {"op": "all", "path": ["xs"], "check": {"op": "present", "path": ["$$input", "nope"]}}},
+		"checks": {"c": {"op": "all", "path": ["xs"], "check": {"op": "non_empty_string", "path": ["$$input", "nope"]}}},
 	}})
 	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "absent"]]
 }
@@ -3699,9 +4078,9 @@ test_a_check_inside_a_list_check_can_read_the_item_by_its_name if {
 	review_rows(after_last_commit) == [
 		[41, true, "satisfied"],
 		[42, false, "value"],
-		[43, false, "value"],
+		[43, false, "absent"],
 		[44, false, "value"],
-		[45, false, "value"],
+		[45, false, "absent"],
 	]
 }
 
@@ -3718,9 +4097,9 @@ test_a_nested_list_check_shows_the_list_and_the_names_it_reads if {
 	]
 }
 
-test_a_name_given_by_as_is_not_read_for_the_row_so_it_does_not_decide_the_cause if {
-	check := {"op": "all", "path": ["approvers"], "as": "a", "check": {"op": "present", "path": ["$a", "timestamp"]}}
-	review_rows(check)[4] == [45, false, "value"]
+test_a_name_given_by_as_is_not_read_for_the_row_but_its_item_decides_the_cause if {
+	check := {"op": "all", "path": ["approvers"], "as": "a", "check": {"op": "non_empty_string", "path": ["$a", "timestamp"]}}
+	review_rows(check)[4] == [45, false, "absent"]
 	some r in rows_for(ergo.report(review_doc, review_req(check)), "s", "c")
 	r.subject.id == 45
 	r.inputs == [{"name": "approvers[].timestamp", "value": [null]}]
@@ -3782,7 +4161,7 @@ test_an_inner_list_check_can_hold_an_any_of_that_reads_both_names if {
 		"later": [{"op": "compare_time", "left": ["$approver", "timestamp"], "right": ["$commit", "timestamp"], "cmp": "gt"}],
 		"self": [{"op": "compare", "left": ["$approver", "username"], "right": ["$pr", "author"], "cmp": "eq"}],
 	}}}}
-	array.slice(review_rows(check), 0, 3) == [[41, true, "satisfied"], [42, false, "value"], [43, false, "value"]]
+	array.slice(review_rows(check), 0, 3) == [[41, true, "satisfied"], [42, false, "value"], [43, false, "absent"]]
 }
 
 test_a_list_check_nested_two_levels_deep_fails_closed if {
@@ -3859,7 +4238,7 @@ test_a_filter_with_a_name_given_twice_cannot_rule_subjects_out if {
 		"checks": {"c": {"op": "equals", "path": ["number"], "value": 0}},
 	}})
 	rep.requirements.s.satisfied == false
-	{r.cause | some r in rows_for(rep, "s", "$applies")} == {"absent"}
+	{r.cause | some r in rows_for(rep, "s", "$applies")} == {"ill_formed"}
 }
 
 test_a_filter_with_a_badly_written_as_cannot_rule_subjects_out if {
@@ -3871,7 +4250,7 @@ test_a_filter_with_a_badly_written_as_cannot_rule_subjects_out if {
 		"checks": {"c": {"op": "equals", "path": ["number"], "value": 0}},
 	}})
 	rep.requirements.s.satisfied == false
-	{r.cause | some r in rows_for(rep, "s", "$applies")} == {"absent"}
+	{r.cause | some r in rows_for(rep, "s", "$applies")} == {"ill_formed"}
 }
 
 test_a_filter_nested_too_deep_cannot_rule_subjects_out if {
@@ -3883,10 +4262,10 @@ test_a_filter_nested_too_deep_cannot_rule_subjects_out if {
 		"checks": {"c": {"op": "equals", "path": ["id"], "value": 0}},
 	}})
 	rep.requirements.s.satisfied == false
-	[r.cause | some r in rows_for(rep, "s", "$applies")] == ["absent"]
+	[r.cause | some r in rows_for(rep, "s", "$applies")] == ["ill_formed"]
 }
 
-test_a_badly_written_list_check_fails_as_absent if {
+test_a_badly_written_list_check_is_ill_formed if {
 	every check in [
 		{"op": "any", "path": ["approvers"], "as": "pr", "check": {"op": "present", "path": ["username"]}},
 		{"op": "any", "path": ["approvers"], "as": "", "check": {"op": "present", "path": ["username"]}},
@@ -3894,7 +4273,7 @@ test_a_badly_written_list_check_fails_as_absent if {
 		{"op": "any", "path": ["approvers"], "as": "a", "check": {"op": "all", "path": ["$pr", "commits"], "as": "pr", "check": {"op": "present", "path": ["sha"]}}},
 		{"op": "any", "path": ["approvers"], "check": {"op": "all", "path": ["$pr", "commits"], "as": 3, "check": {"op": "present", "path": ["sha"]}}},
 	] {
-		{r[2] | some r in review_rows(check)} == {"absent"}
+		{r[2] | some r in review_rows(check)} == {"ill_formed"}
 	}
 }
 
@@ -3929,7 +4308,7 @@ test_an_any_of_inside_a_list_check_can_hold_a_list_check if {
 		[2, false, "value"],
 		[3, false, "value"],
 		[4, false, "absent"],
-		[5, false, "value"],
+		[5, false, "absent"],
 	]
 }
 
@@ -3971,22 +4350,22 @@ test_a_list_check_in_an_any_of_at_the_top_can_nest_and_name_its_items if {
 test_a_list_check_in_an_any_of_inside_a_nested_list_check_is_too_deep if {
 	check := {"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["ys"], "check": {"op": "any_of", "options": {"o": [{"op": "all", "path": ["zs"], "check": {"op": "present", "path": []}}]}}}}
 	r := row_in({}, {"id": 1, "xs": [{"ys": [{"zs": [1]}]}]}, check)
-	[r.passed, r.cause] == [false, "absent"]
+	[r.passed, r.cause] == [false, "ill_formed"]
 	expression_in({}, {"id": 1}, check) == "every xs: every ys: one of: o(<nested too deep>)"
 }
 
 test_a_list_check_two_levels_under_an_any_of_at_the_top_is_too_deep if {
 	check := {"op": "any_of", "options": {"o": [{"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["ys"], "check": {"op": "all", "path": ["zs"], "check": {"op": "present", "path": []}}}}]}}
 	r := row_in({}, {"id": 1, "xs": [{"ys": [{"zs": [1]}]}]}, check)
-	[r.passed, r.cause] == [false, "absent"]
+	[r.passed, r.cause] == [false, "ill_formed"]
 }
 
-test_a_name_given_twice_in_a_list_check_inside_an_any_of_fails_as_absent if {
+test_a_name_given_twice_in_a_list_check_inside_an_any_of_is_ill_formed if {
 	inner := {"op": "any", "path": ["approvers"], "as": "approver", "check": {"op": "any_of", "options": {"peer": [{"op": "all", "path": ["$pr", "commits"], "as": "approver", "check": {"op": "present", "path": ["timestamp"]}}]}}}
-	{r[2] | some r in peer_rows(inner)} == {"absent"}
+	{r[2] | some r in peer_rows(inner)} == {"ill_formed"}
 	ergo.report(peer_doc, review_req(inner)).requirements.s.checks.c.expression == "some approvers as $approver: one of: peer(every $pr.commits as <name given twice>: timestamp is present)"
 	top := {"op": "any_of", "options": {"o": [{"op": "all", "path": ["commits"], "as": "pr", "check": {"op": "present", "path": ["timestamp"]}}]}}
-	{r[2] | some r in peer_rows(top)} == {"absent"}
+	{r[2] | some r in peer_rows(top)} == {"ill_formed"}
 	ergo.report(peer_doc, review_req(top)).requirements.s.checks.c.expression == "one of: o(every commits as <name given twice>: timestamp is present)"
 }
 
@@ -4017,25 +4396,25 @@ test_a_list_check_inside_an_any_of_inside_a_list_check_reads_names_for_its_row i
 	r.inputs == [{"name": "as[]", "value": [{"xs": [1, 2]}]}, {"name": "$$input.lim", "value": null}]
 }
 
-test_a_name_read_outside_the_list_check_that_gives_it_fails_as_absent if {
+test_a_name_read_outside_the_list_check_that_gives_it_is_ill_formed if {
 	inside := {"op": "all", "path": ["xs"], "check": {"op": "any_of", "options": {
 		"a": [{"op": "all", "path": ["ys"], "as": "x", "check": {"op": "present", "path": []}}],
 		"b": [{"op": "equals", "path": ["$x", "v"], "value": 1}],
 	}}}
 	r := row_in({}, {"id": 1, "xs": [{"ys": []}]}, inside)
-	[r.passed, r.cause] == [false, "absent"]
+	[r.passed, r.cause] == [false, "ill_formed"]
 	top := {"op": "any_of", "options": {
 		"a": [{"op": "all", "path": ["ys"], "as": "x", "check": {"op": "present", "path": []}}],
 		"b": [{"op": "equals", "path": ["$x", "v"], "value": 1}],
 	}}
 	t := row_in({}, {"id": 1, "ys": []}, top)
-	[t.passed, t.cause] == [false, "absent"]
+	[t.passed, t.cause] == [false, "ill_formed"]
 	beside := {"op": "all", "path": ["xs"], "as": "o", "check": {"op": "any_of", "options": {"a": [
 		{"op": "all", "path": ["ys"], "as": "y", "check": {"op": "present", "path": []}},
 		{"op": "equals", "path": ["$y"], "value": 1},
 	]}}}
 	b := row_in({}, {"id": 1, "xs": [{"ys": [1]}]}, beside)
-	[b.passed, b.cause] == [false, "absent"]
+	[b.passed, b.cause] == [false, "ill_formed"]
 }
 
 test_a_filter_reading_a_name_outside_the_list_check_that_gives_it_cannot_rule_subjects_out if {
@@ -4052,16 +4431,16 @@ test_a_filter_reading_a_name_outside_the_list_check_that_gives_it_cannot_rule_su
 	rep.requirements.s.satisfied == false
 }
 
-test_a_name_nothing_gives_in_an_each_path_fails_as_absent if {
+test_a_name_nothing_gives_in_an_each_path_is_ill_formed if {
 	top := {"op": "all", "path": ["xs"], "each": ["$q", "ys"], "check": {"op": "present", "path": []}}
 	r := row_in({}, {"id": 1, "xs": [{"ys": [1]}]}, top)
-	[r.passed, r.cause] == [false, "absent"]
+	[r.passed, r.cause] == [false, "ill_formed"]
 	inner := {"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["ys"], "each": ["$q", "zs"], "check": {"op": "present", "path": []}}}
 	i := row_in({}, {"id": 1, "xs": [{"ys": [{"zs": [1]}]}]}, inner)
-	[i.passed, i.cause] == [false, "absent"]
+	[i.passed, i.cause] == [false, "ill_formed"]
 	in_option := {"op": "any_of", "options": {"o": [{"op": "all", "path": ["xs"], "each": ["$q", "ys"], "check": {"op": "present", "path": []}}]}}
 	o := row_in({}, {"id": 1, "xs": [{"ys": [1]}]}, in_option)
-	[o.passed, o.cause] == [false, "absent"]
+	[o.passed, o.cause] == [false, "ill_formed"]
 }
 
 test_a_name_in_an_each_path_reads_the_subject if {
@@ -4178,18 +4557,18 @@ test_a_ref_step_that_cannot_be_read_fails_the_check if {
 	trail_rows(attested) == [[false, "absent", [{"name": "attestations.[$$params.att].status", "value": null}]]] with data.params as {"artifact": "app"}
 	trail_rows(attested) == [[false, "null", [{"name": "attestations.[$$params.att].status", "value": null}]]] with data.params as {"artifact": "app", "att": null}
 	every bad in [["pull-request"], {"k": "pull-request"}, true] {
-		trail_rows(attested) == [[false, "absent", [{"name": "attestations.[$$params.att].status", "value": null}]]] with data.params as {"artifact": "app", "att": bad}
+		trail_rows(attested) == [[false, "unusable", [{"name": "attestations.[$$params.att].status", "value": null}]]] with data.params as {"artifact": "app", "att": bad}
 	}
 }
 
 test_a_ref_step_with_another_key_fails_the_check if {
 	check := {"op": "present", "path": ["attestations", {"ref": ["$$params", "att"], "note": "x"}]}
-	trail_rows(check) == [[false, "absent", [{"name": "attestations.[<invalid ref>]", "value": null}]]] with data.params as {"artifact": "app", "att": "junit"}
+	trail_rows(check) == [[false, "ill_formed", [{"name": "attestations.[<invalid ref>]", "value": null}]]] with data.params as {"artifact": "app", "att": "junit"}
 }
 
 test_a_ref_inside_a_ref_path_is_not_followed if {
 	check := {"op": "equals", "path": ["fingerprint"], "value": {"ref": ["$$params", {"ref": ["$$params", "which"]}]}}
-	[array.slice(r, 0, 2) | some r in trail_rows(check)] == [[false, "absent"]] with data.params as {"artifact": "app", "which": "fp", "fp": "abc"}
+	[array.slice(r, 0, 2) | some r in trail_rows(check)] == [[false, "ill_formed"]] with data.params as {"artifact": "app", "which": "fp", "fp": "abc"}
 }
 
 test_a_ref_step_works_in_left_right_each_and_id if {
@@ -4236,7 +4615,7 @@ test_a_ref_step_in_from_that_cannot_be_read_fails_the_requirement_even_with_min_
 	}
 	rows_for(ergo.report(trail_doc, req), "s", "$min_subjects")[0].cause == "absent" with data.params as {}
 	rows_for(ergo.report(trail_doc, req), "s", "$min_subjects")[0].cause == "null" with data.params as {"artifact": null}
-	rows_for(ergo.report(trail_doc, req), "s", "$min_subjects")[0].cause == "absent" with data.params as {"artifact": ["app"]}
+	rows_for(ergo.report(trail_doc, req), "s", "$min_subjects")[0].cause == "unusable" with data.params as {"artifact": ["app"]}
 }
 
 test_a_ref_step_in_from_that_cannot_be_read_shows_up_in_violations if {
@@ -4325,10 +4704,10 @@ test_a_ref_step_after_a_name_that_cannot_be_read_is_not_skipped if {
 test_a_step_with_a_ref_and_a_where_is_a_mistake_not_a_selector if {
 	check := {"op": "present", "path": ["atts", {"where": {"type": "a"}, "ref": ["$$params", "k"]}, "ok"]}
 	r := row_in({}, {"id": 1, "atts": [{"type": "a", "ok": true}]}, check)
-	[r.passed, r.cause] == [false, "absent"]
+	[r.passed, r.cause] == [false, "ill_formed"]
 }
 
-test_a_ref_step_of_the_wrong_type_inside_a_list_check_fails_as_absent if {
+test_a_ref_step_of_the_wrong_type_inside_a_list_check_fails_as_unusable if {
 	inner := {"op": "all", "path": ["xs"], "check": {"op": "present", "path": [{"ref": ["$$params", "k"]}]}}
 	option := {"op": "all", "path": ["xs"], "check": {"op": "any_of", "options": {"o": [{"op": "equals", "path": [{"ref": ["$$params", "k"]}], "value": 1}]}}}
 	each := {"op": "all", "path": ["xs"], "each": [{"ref": ["$$params", "k"]}], "check": {"op": "present", "path": []}}
@@ -4336,7 +4715,7 @@ test_a_ref_step_of_the_wrong_type_inside_a_list_check_fails_as_absent if {
 	every check in [inner, option, each, two_sided] {
 		every k in [["v"], {"a": 1}, true] {
 			r := row_in({}, {"id": 1, "xs": [{"v": 1}]}, check) with data.params as {"k": k, "lim": 5}
-			[r.passed, r.cause] == [false, "absent"]
+			[r.passed, r.cause] == [false, "unusable"]
 		}
 	}
 }
@@ -4394,7 +4773,7 @@ test_keys_from_a_ref_that_cannot_be_read_fail_the_requirement_even_with_min_subj
 	every bad in ["unit-test", {"a": 1}, true, 3] {
 		rep := ergo.report(suite_doc, req) with data.params as {"suites": bad}
 		rep.requirements.s.satisfied == false
-		rows_for(rep, "s", "$min_subjects")[0].cause == "absent"
+		rows_for(rep, "s", "$min_subjects")[0].cause == "unusable"
 		rep.requirements.s.subjects == {"total": 0, "matching": 0}
 	}
 	ergo.report(suite_doc, req).requirements.s.satisfied == false with data.params as {}
@@ -4500,13 +4879,10 @@ badly_written := [
 	{"op": "compare", "left": ["n"], "cmp": "eq"},
 	{"op": "in", "path": ["n"], "values": "notalist"},
 	{"op": "in", "path": ["n"], "values": {"literal": "notalist"}},
-	{"op": "in", "path": ["n"], "values": {"ref": ["$$input", "params", "word"]}},
 	{"op": "in", "path": ["n"]},
 	{"op": "range", "path": ["n"], "min": "a", "max": 5},
-	{"op": "range", "path": ["n"], "min": 0, "max": {"ref": ["$$input", "params", "word"]}},
 	{"op": "range", "path": ["n"], "min": 0},
 	{"op": "range", "path": ["n"], "min": 9, "max": 0},
-	{"op": "range", "path": ["n"], "min": {"ref": ["$$input", "params", "nine"]}, "max": 5},
 	{"op": "equals", "path": ["n"], "value": 1, "as": "x"},
 	{"op": "present", "path": ["n"], "each": ["a"]},
 	{"op": "any_of", "as": "x", "options": {"o": [{"op": "equals", "path": ["n"], "value": 1}]}},
@@ -4550,37 +4926,60 @@ badly_written := [
 	{"op": "any_of", "options": {"o": [{"op": "all", "path": ["xs"], "check": {"op": "any_of", "options": {"p": [{"op": "all", "path": [], "check": {"op": "any_of", "options": {"q": [{"op": "compare", "left": [], "right": [], "cmp": "bad"}]}}}]}}}]}},
 ]
 
+read_the_wrong_kind := [
+	{"op": "range", "path": ["n"], "min": 10, "max": {"ref": ["$$input", "params", "nine"]}},
+	{"op": "matches_any", "path": ["s"], "patterns": {"ref": ["$$input", "params", "word"]}},
+	{"op": "in", "path": ["n"], "values": {"ref": ["$$input", "params", "word"]}},
+	{"op": "range", "path": ["n"], "min": 0, "max": {"ref": ["$$input", "params", "word"]}},
+	{"op": "range", "path": ["n"], "min": {"ref": ["$$input", "params", "nine"]}, "max": 5},
+]
+
+test_a_filter_whose_ref_reads_the_wrong_kind_of_value_cannot_rule_subjects_out if {
+	every filter in read_the_wrong_kind {
+		rep := ergo.report(typo_doc, typo_req(filter))
+		rep.requirements.s.satisfied == false
+		[r.cause | some r in rows_for(rep, "s", "$applies")] == ["unusable"]
+	}
+}
+
+test_a_check_whose_ref_reads_the_wrong_kind_of_value_fails_and_is_not_ill_formed if {
+	every check in read_the_wrong_kind {
+		rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
+		[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "unusable"]]
+	}
+}
+
 test_a_badly_written_filter_cannot_rule_subjects_out if {
 	every filter in badly_written {
 		rep := ergo.report(typo_doc, typo_req(filter))
 		rep.requirements.s.satisfied == false
-		[r.cause | some r in rows_for(rep, "s", "$applies")] == ["absent"]
+		[r.cause | some r in rows_for(rep, "s", "$applies")] == ["ill_formed"]
 	}
 }
 
-test_a_badly_written_check_fails_as_absent if {
+test_a_badly_written_check_is_ill_formed if {
 	every check in badly_written {
 		rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
-		[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "absent"]]
+		[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "ill_formed"]]
 	}
 }
 
 test_an_operator_that_is_not_declared_fails_even_when_a_rule_passes_it if {
 	ergo.op_passed({"op": "undeclared", "path": ["n"]}, {"n": 1})
 	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "undeclared", "path": ["n"]}}}})
-	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "absent"]]
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "ill_formed"]]
 }
 
 test_a_badly_written_option_fails_an_any_of_even_when_another_option_passes if {
 	check := {"op": "any_of", "options": {"good": [{"op": "present", "path": ["n"]}], "bad": [{"op": "compare", "left": ["n"], "right": ["n"], "cmp": "bad"}]}}
 	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
-	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "absent"]]
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "ill_formed"]]
 }
 
 test_a_badly_written_substitute_fails_the_check_even_when_the_check_passes if {
 	check := {"op": "present", "path": ["n"], "substitute": {"op": "nope", "path": ["n"]}}
 	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
-	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "absent"]]
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "ill_formed"]]
 }
 
 test_a_bound_that_reads_null_keeps_the_cause_of_its_ref if {
@@ -4614,7 +5013,7 @@ test_a_present_filter_on_a_name_nothing_gives_cannot_rule_subjects_out if {
 			"checks": {"c": {"op": "equals", "path": ["n"], "value": 999}},
 		}})
 		rep.requirements.s.satisfied == false
-		[r.cause | some r in rows_for(rep, "s", "$applies")] == ["absent"]
+		[r.cause | some r in rows_for(rep, "s", "$applies")] == ["ill_formed"]
 	}
 }
 
@@ -4636,14 +5035,14 @@ test_a_check_fails_when_its_substitute_passes_but_one_side_is_badly_written if {
 		{"op": "nope", "path": ["n"], "substitute": {"op": "present", "path": ["n"]}},
 	] {
 		rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
-		[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "absent"]]
+		[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "ill_formed"]]
 	}
 }
 
 test_a_present_filter_with_a_badly_written_substitute_cannot_rule_subjects_out if {
 	rep := ergo.report(typo_doc, typo_req({"op": "present", "path": ["missing"], "substitute": {"op": "nope", "path": ["n"]}}))
 	rep.requirements.s.satisfied == false
-	[r.cause | some r in rows_for(rep, "s", "$applies")] == ["absent"]
+	[r.cause | some r in rows_for(rep, "s", "$applies")] == ["ill_formed"]
 }
 
 test_an_unknown_op_shows_in_the_expression if {
@@ -4680,7 +5079,7 @@ test_a_range_with_equal_bounds_is_well_written if {
 
 test_a_check_that_is_not_an_object_shows_in_the_expression if {
 	rendered({}, "present") == "<invalid check>"
-	[[r.passed, r.cause] | some r in solo({}, "present").results; r.check == "c"] == [[false, "absent"]]
+	[[r.passed, r.cause] | some r in solo({}, "present").results; r.check == "c"] == [[false, "ill_formed"]]
 	rendered({}, {"op": "any_of", "options": {"o": ["present"]}}) == "one of: o(<invalid check>)"
 	rendered({}, {"op": "all", "path": ["xs"], "check": "present"}) == "every xs: <invalid check>"
 }
@@ -4696,7 +5095,7 @@ test_a_check_where_it_cannot_go_shows_in_the_expression if {
 
 ordering_doc := {"id": 1, "a": {"name": "ann"}, "b": {"owner": "bob"}, "xs": [2], "ys": [1, 9], "f": false, "t": true, "n": 1, "m": 2, "s": "a", "z": "b"}
 
-test_ordering_objects_lists_or_booleans_fails_as_absent if {
+test_ordering_objects_lists_or_booleans_fails_as_unusable if {
 	every check in [
 		{"op": "compare", "left": ["a"], "right": ["b"], "cmp": "lt"},
 		{"op": "compare", "left": ["b"], "right": ["a"], "cmp": "gte"},
@@ -4705,7 +5104,7 @@ test_ordering_objects_lists_or_booleans_fails_as_absent if {
 		{"op": "compare", "left": [], "right": [], "cmp": "lte"},
 	] {
 		verdict(ordering_doc, check) == false
-		cause_of(ordering_doc, check) == "absent"
+		cause_of(ordering_doc, check) == "unusable"
 	}
 }
 
@@ -4715,8 +5114,8 @@ test_ordering_numbers_and_strings_still_works if {
 	cause_of(ordering_doc, {"op": "compare", "left": ["m"], "right": ["n"], "cmp": "lt"}) == "value"
 }
 
-test_ordering_a_number_against_a_string_still_fails_as_value if {
-	cause_of(ordering_doc, {"op": "compare", "left": ["n"], "right": ["s"], "cmp": "lt"}) == "value"
+test_ordering_a_number_against_a_string_fails_as_unusable if {
+	cause_of(ordering_doc, {"op": "compare", "left": ["n"], "right": ["s"], "cmp": "lt"}) == "unusable"
 }
 
 test_eq_and_ne_still_compare_objects_lists_and_booleans if {
@@ -4740,7 +5139,7 @@ test_a_filter_ordering_objects_cannot_rule_subjects_out if {
 			"checks": {"c": {"op": "equals", "path": ["n"], "value": 999}},
 		}})
 		rep.requirements.s.satisfied == false
-		[r.cause | some r in rows_for(rep, "s", "$applies")] == ["absent"]
+		[r.cause | some r in rows_for(rep, "s", "$applies")] == ["unusable"]
 	}
 }
 
@@ -4801,5 +5200,5 @@ test_a_selector_on_a_subject_that_is_not_an_object_fails_as_not_an_object if {
 }
 
 test_a_ref_that_starts_with_a_number_fails_closed if {
-	cause_of({"id": 1}, {"op": "equals", "path": ["id"], "value": {"ref": [5, "x"]}}) == "absent"
+	cause_of({"id": 1}, {"op": "equals", "path": ["id"], "value": {"ref": [5, "x"]}}) == "ill_formed"
 }
