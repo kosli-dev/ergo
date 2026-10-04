@@ -2277,6 +2277,61 @@ test_a_check_reading_a_name_nothing_gives_fails_the_requirement_even_when_no_sub
 	problem_inputs(rep) == [{"name": "checks.c", "value": ["unknown name $p"]}]
 }
 
+test_a_field_its_op_does_not_use_fails_well_formed if {
+	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {
+		"typo": {"op": "equals", "path": ["n"], "valeu": 1},
+		"note": {"op": "equals", "path": ["n"], "value": 1, "descripton": "n is one"},
+	}}})
+	problem_inputs(rep) == [
+		{"name": "checks.note", "value": ["unknown field descripton"]},
+		{"name": "checks.typo", "value": ["missing value", "unknown field valeu"]},
+	]
+	[[r.check, r.passed, r.cause] | some r in rep.results; r.check in {"note", "typo"}] == [["note", false, "ill_formed"], ["typo", false, "ill_formed"]]
+}
+
+test_an_unknown_field_inside_a_check_is_found_where_it_sits if {
+	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {
+		"inner": {"op": "all", "path": ["xs"], "check": {"op": "present", "path": [], "owner": "me"}},
+		"sub": {"op": "present", "path": ["n"], "substitute": {"op": "present", "path": ["s"], "x": 1}},
+		"opt": {"op": "any_of", "options": {"o": [{"op": "present", "path": ["n"], "y": 2}]}, "z": 3},
+	}}})
+	problem_inputs(rep) == [
+		{"name": "checks.inner.check", "value": ["unknown field owner"]},
+		{"name": "checks.opt", "value": ["unknown field z"]},
+		{"name": "checks.opt.options.o.0", "value": ["unknown field y"]},
+		{"name": "checks.sub.substitute", "value": ["unknown field x"]},
+	]
+}
+
+test_every_built_in_op_takes_its_own_fields_and_the_ones_every_check_can_have if {
+	common := {"description": "d", "expression": "e", "inputs": [["n"]], "substitute": {"op": "present", "path": ["n"]}}
+	checks := {
+		"range": {"op": "range", "path": ["n"], "min": 0, "max": 9},
+		"excludes": {"op": "excludes", "path": ["xs"], "value": 5},
+		"includes": {"op": "includes", "path": ["xs"], "value": 1},
+		"in": {"op": "in", "path": ["n"], "values": [1]},
+		"equals": {"op": "equals", "path": ["n"], "value": 1},
+		"present": {"op": "present", "path": ["n"]},
+		"non_empty_string": {"op": "non_empty_string", "path": ["s"]},
+		"matches_any": {"op": "matches_any", "path": ["s"], "patterns": ["a"]},
+		"not_matches_any": {"op": "not_matches_any", "path": ["s"], "patterns": ["b"]},
+		"compare": {"op": "compare", "left": ["n"], "right": ["n"], "cmp": "eq"},
+		"compare_time": {"op": "compare_time", "left": ["t"], "right": ["t"], "cmp": "eq"},
+		"all": {"op": "all", "path": ["xs"], "each": [], "as": "x", "check": {"op": "present", "path": []}},
+		"any": {"op": "any", "path": ["xs"], "each": [], "as": "x", "check": {"op": "present", "path": []}},
+		"any_of": {"op": "any_of", "options": {"o": [{"op": "present", "path": ["n"]}]}},
+	}
+	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {name: object.union(c, common) | some name, c in checks}}})
+	problem_inputs(rep) == []
+	object.keys(checks) == {op | some op in ergo.operators; not op in {"even", "both_present", "multiple_of"}}
+}
+
+test_a_custom_op_keeps_any_fields_it_likes if {
+	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "multiple_of", "path": ["n"], "by": 1, "owner": "me", "expression": "n is whole", "inputs": [["n"]]}}}})
+	problem_inputs(rep) == []
+	[r.cause | some r in rows_for(rep, "s", "c")] == ["satisfied"]
+}
+
 test_well_formed_definition_is_in_the_check_table if {
 	rep := ergo.report({"items": [{"id": "a"}]}, id_req(["items"]))
 	rep.requirements.s.checks["$well_formed"].expression == `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float and checks are written right`

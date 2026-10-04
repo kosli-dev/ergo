@@ -1029,12 +1029,24 @@ _nested_ops := {
 	"check": [set(), _leaf_ops | {"all", "any", "any_of"}, _leaf_ops | {"any_of"}],
 }
 
-_field_problems(node) := union({_missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _patterns_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _each_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node)})
+_field_problems(node) := union({_unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _patterns_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _each_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node)})
 
 _missing_fields_problem(node) := {sprintf("missing %s", [f]) |
 	some f in object.get(_required_fields, node.op, set())
 	not f in object.keys(node)
 }
+
+_unknown_fields_problem(node) := {sprintf("unknown field %s", [_text(f)]) |
+	node.op in object.keys(_op_fields)
+	some f in object.keys(node)
+	not f in _op_fields[node.op]
+	not f in {"op", "description", "expression", "substitute", "inputs", "as", "each"}
+}
+
+_op_fields := object.union(_required_fields, {
+	"all": {"path", "check", "each", "as"},
+	"any": {"path", "check", "each", "as"},
+})
 
 _range_bounds_problem(node) := {sprintf("invalid %s", [f]) |
 	node.op == "range"

@@ -312,7 +312,7 @@ Some things worth knowing:
 
 ## Operators
 
-Every check has an `op` and the parameters that operator needs.
+Every check has an `op` and the parameters that operator needs. A field the operator doesn't use is a mistake, so a typo like `valeu` is caught instead of ignored.
 
 ### Basic operators
 
@@ -344,6 +344,7 @@ Some things worth knowing:
   - a step that can't be a [key](#paths), a number out of range, a badly written [ref](#reading-from-the-input), or a path that starts with a [name](#naming-subjects) nothing gave
   - an `all` or `any` [nested](#nesting) too deep, or a name given twice or badly written
   - a check that isn't an object, or one where it can't go, like a custom operator inside `all`
+  - a field its op doesn't use, like `valeu` or `descripton`. Besides its own parameters, any check can have `description`, `expression`, `substitute` and `inputs`. A [custom operator](#custom-operators) can have any fields.
 
   The expression says what's wrong: `<unknown op nope>`, `<missing op>`, `<invalid check>` for a check that isn't an object, `<even can't go here>` for a check where it can't go, or `<missing value>` in place of a missing parameter, as in `state == <missing value>`. The [`$well_formed` row](#checks-ergo-adds) lists each check that's written wrong, and what's wrong with it.
 
@@ -677,7 +678,7 @@ When a check is [written wrong](#basic-operators), the `$well_formed` row gets a
 "inputs": [
   { "name": "count(checks)", "value": 1 },
   { "name": "require", "value": "every" },
-  { "name": "applies_to.is_prod", "value": ["missing value"] },
+  { "name": "applies_to.is_prod", "value": ["missing value", "unknown field valeu"] },
   { "name": "checks.approved", "value": ["unknown op non_emtpy_string"] }
 ]
 ```
