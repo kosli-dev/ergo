@@ -124,7 +124,7 @@ The report has a row for every check it ran on every batch, with the value it re
 | batch | check           | value read                               | passed  | cause       |
 | ----- | --------------- | ---------------------------------------- | ------- | ----------- |
 |       | `$well_formed`  | `count(checks) = 3`, `require = "every"` | `true`  | `satisfied` |
-|       | `$min_subjects` | `count(matching(batches)) = 4`           | `true`  | `satisfied` |
+|       | `$min_subjects` | `in-scope batch count = 4`               | `true`  | `satisfied` |
 | 001   | `nut_free`      | `allergens = ["milk","eggs"]`            | `true`  | `satisfied` |
 | 001   | `temp_ok`       | `bake.temp_c = 180`                      | `true`  | `satisfied` |
 | 001   | `time_ok`       | `bake.minutes = 32`                      | `true`  | `satisfied` |

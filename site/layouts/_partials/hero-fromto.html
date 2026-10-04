@@ -81,7 +81,7 @@ deny <span class="kw">contains</span> msg <span class="kw">if</span> {
       <div class="report ft__report">
         <div class="report__head"><span>subject</span><span>check</span><span>value read</span><span>passed</span><span>cause</span></div>
         <div class="report__row is-sys"><span></span><span class="sys">$well_formed</span><span>count(checks) = 1</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row is-sys"><span></span><span class="sys">$min_subjects</span><span>count(matching) = 2</span><span class="t">true</span><span>satisfied</span></div>
+        <div class="report__row is-sys"><span></span><span class="sys">$min_subjects</span><span>in-scope deployment count = 2</span><span class="t">true</span><span>satisfied</span></div>
         <div class="report__row"><span>d-1</span><span class="sys">$applies</span><span>environment = "prod"</span><span class="t">true</span><span>satisfied</span></div>
         <div class="report__row"><span>d-2</span><span class="sys">$applies</span><span>environment = "prod"</span><span class="t">true</span><span>satisfied</span></div>
         <div class="report__row is-scope"><span>d-3</span><span class="sys">$applies</span><span>environment = "staging"</span><span class="f">false</span><span>value</span></div>
@@ -167,7 +167,7 @@ peer_approved(pr) <span class="kw">if</span> {
       <div class="report ft__report">
         <div class="report__head"><span>subject</span><span>check</span><span>value read</span><span>passed</span><span>cause</span></div>
         <div class="report__row is-sys"><span></span><span class="sys">$well_formed</span><span>count(checks) = 1</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row is-sys"><span></span><span class="sys">$min_subjects</span><span>count(matching) = 3</span><span class="t">true</span><span>satisfied</span></div>
+        <div class="report__row is-sys"><span></span><span class="sys">$min_subjects</span><span>in-scope pull request count = 3</span><span class="t">true</span><span>satisfied</span></div>
         <div class="report__row"><span>1</span><span>peer</span><span><span class="sys">$pr</span>.author = "ann"<br><span class="n">approvers: ann, bob</span></span><span class="t">true</span><span>satisfied</span></div>
         <div class="report__row is-fail"><span>2</span><span>peer</span><span><span class="sys">$pr</span>.author = "bob"<br><span class="n">approvers: bob</span></span><span class="f">false</span><span class="f">value</span></div>
         <div class="report__row is-fail"><span>3</span><span>peer</span><span><span class="sys">$pr</span>.author = null<br><span class="n">approvers: bob</span></span><span class="f">false</span><span class="f">absent</span></div>
