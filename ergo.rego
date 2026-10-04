@@ -861,12 +861,9 @@ _missing_at(x, path) if {
 	_keys_of(path)
 	_ := _start_of(x, path)
 	_read_state(x, path) in {"absent", "null"}
-	not _blocked(x, path)
 }
 
-_blocked(x, path) if {
-	keys := _keys_of(path)
-	start := _start_of(x, path)
+_blocked(start, keys) if {
 	some i, k in keys
 	v := _read_from(start, array.slice(keys, 0, i))
 	not _can_hold(v, k)
@@ -982,11 +979,6 @@ _unusable(leaf, x) if {
 	leaf.op in {"matches_any", "not_matches_any"}
 	v := _found(x, leaf.path)
 	not is_string(v)
-}
-
-_unusable(leaf, x) if {
-	leaf.op in {"present", "missing"}
-	_blocked(x, leaf.path)
 }
 
 _unusable(leaf, x) if {
@@ -1651,6 +1643,15 @@ _read_state(subj, path) := "unmatched" if count(_selector_candidates(subj, path)
 
 _read_state(subj, path) := "null" if _resolved(subj, path) == null
 
+_read_state(subj, path) := "unusable" if {
+	start := _start_of(subj, path)
+	is_object(start)
+	not _read_anything(subj, path)
+	_blocked(start, _keys_of(path))
+}
+
+_read_anything(subj, path) if _resolved(subj, path) != _absent
+
 _read_state(subj, path) := "value" if {
 	v := _resolved(subj, path)
 	v != _absent
@@ -1728,7 +1729,6 @@ _leaf_cause(leaf, x) := "satisfied" if {
 } else := "missing" if {
 	_asks_presence(leaf, x)
 	_read_state(x, leaf.path) in {"absent", "null"}
-	not _blocked(x, leaf.path)
 } else := _worst_or_value({_read_state(x, p) | some p in _leaf_paths(leaf)} | _unusable_states(leaf, x))
 
 _answered(check, x, states) := {_presence_state(s) | some s in states} if _asks_presence(check, x)
@@ -1907,6 +1907,11 @@ default _ref_state(_) := "absent"
 
 _ref_state(r) := "null" if _ref_read(r) == null
 
+_ref_state(r) := "unusable" if {
+	_ref_read(r) == _absent
+	_blocked(_start_of(null, r), [_unliteral(seg) | some seg in array.slice(r, 1, count(r))])
+}
+
 _ref_state(r) := "value" if {
 	v := _ref_read(r)
 	v != _absent
@@ -1967,7 +1972,6 @@ _answers_presence(check, subj, "") if {
 	not _unreadable_ref(check)
 	_substitute_unusable(check, subj) == set()
 	_read_state(subj, check.path) in {"absent", "null"}
-	not _blocked(subj, check.path)
 }
 
 _ruled_out(subj, req) if _scope_cause(_failed_filter_causes(subj, req)) == "value"

@@ -2090,8 +2090,28 @@ test_cause_null_when_the_path_is_there_and_null if {
 	cause_of({"state": null}, {"op": "equals", "path": ["state"], "value": "MERGED"}) == "null"
 }
 
-test_cause_absent_when_the_path_walks_through_a_scalar if {
-	cause_of({"pr": "none"}, {"op": "equals", "path": ["pr", "state"], "value": "MERGED"}) == "absent"
+test_cause_unusable_when_the_path_walks_through_a_scalar if {
+	cause_of({"pr": "none"}, {"op": "equals", "path": ["pr", "state"], "value": "MERGED"}) == "unusable"
+}
+
+test_every_read_fails_as_unusable_when_a_step_before_the_field_cannot_hold_it if {
+	every pair in [
+		[{"a": "x"}, {"op": "all", "path": ["a", "b"], "check": {"op": "present", "path": []}}],
+		[{"xs": [{"b": 1}]}, {"op": "all", "path": ["xs"], "each": ["b", "c"], "check": {"op": "present", "path": []}}],
+		[{"xs": [{"v": "s"}]}, {"op": "all", "path": ["xs"], "check": {"op": "equals", "path": ["v", "w"], "value": 1}}],
+		[{"a": 3}, {"op": "equals", "path": ["id"], "value": 0, "inputs": [["a", "b"]]}],
+		[{"a": "x", "b": 1}, {"op": "compare", "left": ["a", "z"], "right": ["b"], "cmp": "eq"}],
+		[{"a": [1]}, {"op": "equals", "path": ["a", "b"], "value": 1}],
+	] {
+		cause_of(pair[0], pair[1]) == "unusable"
+	}
+}
+
+test_a_ref_fails_as_unusable_when_a_step_before_its_value_cannot_hold_it if {
+	value := {"op": "equals", "path": ["n"], "value": {"ref": ["$$input", "params", "cfg", "n"]}}
+	step := {"op": "present", "path": [{"ref": ["$$input", "params", "cfg", "k"]}]}
+	[[r.passed, r.cause] | some r in [row_in({"params": {"cfg": "flat"}}, {"id": 1, "n": 1}, value), row_in({"params": {"cfg": "flat"}}, {"id": 1, "n": 1}, step)]] == [[false, "unusable"], [false, "unusable"]]
+	row_in({"params": {}}, {"id": 1, "n": 1}, value).cause == "absent"
 }
 
 test_cause_ambiguous_when_a_selector_matches_more_than_one_element if {
