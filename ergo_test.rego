@@ -3847,6 +3847,163 @@ test_ref_shaped_items_under_a_literal_or_read_from_params_are_data_not_refs if {
 	}
 }
 
+licence_ref := {"ref": ["$$input", "params", "licence"]}
+
+test_a_ref_or_literal_in_the_values_of_in_is_read_like_value if {
+	top := {"params": {"licence": "BSD-3-Clause"}}
+	every item in [licence_ref, {"literal": "BSD-3-Clause"}] {
+		check := {"op": "in", "path": ["licence"], "values": [item, "MIT"]}
+		row_in(top, {"id": 1, "licence": "BSD-3-Clause"}, check).passed == true
+		row_in(top, {"id": 1, "licence": "MIT"}, check).passed == true
+		r := row_in(top, {"id": 1, "licence": "GPL-3.0"}, check)
+		[r.passed, r.cause] == [false, "value"]
+	}
+	expression_in(top, {"id": 1}, {"op": "in", "path": ["licence"], "values": [licence_ref, "MIT"]}) == `licence in ["MIT", $$input.params.licence]`
+	expression_in(top, {"id": 1}, {"op": "in", "path": ["licence"], "values": [{"literal": "BSD-3-Clause"}, "MIT"]}) == `licence in ["BSD-3-Clause", "MIT"]`
+}
+
+test_a_missing_or_null_ref_in_the_values_of_in_fails_instead_of_being_skipped if {
+	check := {"op": "in", "path": ["licence"], "values": [licence_ref, "MIT"]}
+	missing := row_in({}, {"id": 1, "licence": "MIT"}, check)
+	[missing.passed, missing.cause] == [false, "absent"]
+	null_ref := row_in({"params": {"licence": null}}, {"id": 1, "licence": "MIT"}, check)
+	[null_ref.passed, null_ref.cause] == [false, "null"]
+}
+
+bot_ref := {"ref": ["$$input", "params", "bot"]}
+
+test_a_ref_in_the_patterns_is_read_like_a_pattern if {
+	top := {"params": {"bot": "\\[bot\\]$"}}
+	matches := {"op": "matches_any", "path": ["author"], "patterns": [bot_ref, "^svc_"]}
+	row_in(top, {"id": 1, "author": "renovate[bot]"}, matches).passed == true
+	row_in(top, {"id": 1, "author": "svc_deploy"}, matches).passed == true
+	[row_in(top, {"id": 1, "author": "ann"}, matches).passed, row_in(top, {"id": 1, "author": "ann"}, matches).cause] == [false, "value"]
+	not_matches := {"op": "not_matches_any", "path": ["author"], "patterns": [bot_ref, "^svc_"]}
+	row_in(top, {"id": 1, "author": "ann"}, not_matches).passed == true
+	[row_in(top, {"id": 1, "author": "renovate[bot]"}, not_matches).passed, row_in(top, {"id": 1, "author": "renovate[bot]"}, not_matches).cause] == [false, "value"]
+	expression_in(top, {"id": 1}, matches) == `author matches one of ["^svc_", $$input.params.bot]`
+}
+
+test_a_ref_in_the_patterns_that_reads_no_valid_pattern_fails_as_unusable if {
+	every op in ["matches_any", "not_matches_any"] {
+		every bot in ["(", 3, ["x"]] {
+			r := row_in({"params": {"bot": bot}}, {"id": 1, "author": "ann"}, {"op": op, "path": ["author"], "patterns": [bot_ref, "^svc_"]})
+			[r.passed, r.cause] == [false, "unusable"]
+		}
+	}
+}
+
+test_a_missing_or_null_ref_in_the_patterns_fails_instead_of_being_skipped if {
+	every op in ["matches_any", "not_matches_any"] {
+		check := {"op": op, "path": ["author"], "patterns": [bot_ref, "^svc_"]}
+		missing := row_in({}, {"id": 1, "author": "ann"}, check)
+		[missing.passed, missing.cause] == [false, "absent"]
+		null_ref := row_in({"params": {"bot": null}}, {"id": 1, "author": "ann"}, check)
+		[null_ref.passed, null_ref.cause] == [false, "null"]
+	}
+}
+
+test_a_ref_deeper_inside_a_value_is_written_wrong_so_it_cannot_be_compared_as_data if {
+	top := {"params": {"nut": "nuts"}}
+	every check in [
+		{"op": "excludes", "path": ["xs"], "value": [nuts_ref]},
+		{"op": "includes", "path": ["xs"], "value": {"a": nuts_ref}},
+		{"op": "equals", "path": ["xs"], "value": [nuts_ref]},
+		{"op": "excludes", "path": ["xs"], "values": [[nuts_ref]]},
+		{"op": "in", "path": ["xs"], "values": [{"a": nuts_ref}]},
+		{"op": "includes", "path": ["xs"], "values": [{"a": nuts_ref}]},
+	] {
+		r := row_in(top, {"id": 1, "xs": [["nuts"]]}, check)
+		[r.passed, r.cause] == [false, "ill_formed"]
+	}
+}
+
+test_well_formed_says_where_a_ref_sits_inside_a_value if {
+	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {
+		"in_value": {"op": "excludes", "path": ["xs"], "value": [nuts_ref]},
+		"in_values": {"op": "in", "path": ["n"], "values": [[nuts_ref]]},
+		"in_patterns": {"op": "matches_any", "path": ["s"], "patterns": [{"p": nuts_ref}]},
+	}}})
+	problem_inputs(rep) == [
+		{"name": "checks.in_patterns", "value": ["invalid patterns", "ref inside patterns"]},
+		{"name": "checks.in_value", "value": ["ref inside value"]},
+		{"name": "checks.in_values", "value": ["ref inside values"]},
+	]
+}
+
+test_a_literal_deeper_inside_a_value_is_written_wrong_so_it_cannot_be_compared_as_data if {
+	every check in [
+		{"op": "excludes", "path": ["xs"], "value": [{"literal": "nuts"}]},
+		{"op": "equals", "path": ["xs"], "value": {"a": {"literal": 1}}},
+		{"op": "excludes", "path": ["xs"], "values": [[{"literal": "nuts"}]]},
+		{"op": "in", "path": ["xs"], "values": [[{"literal": "nuts"}]]},
+	] {
+		r := row_in({}, {"id": 1, "xs": [["nuts"]]}, check)
+		[r.passed, r.cause] == [false, "ill_formed"]
+	}
+	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "excludes", "path": ["xs"], "value": [{"literal": "nuts"}]}}}})
+	problem_inputs(rep) == [{"name": "checks.c", "value": ["literal inside value"]}]
+}
+
+test_a_literal_under_a_literal_is_data if {
+	check := {"op": "excludes", "path": ["xs"], "value": {"literal": [{"literal": "nuts"}]}}
+	row_in({}, {"id": 1, "xs": [["nuts"]]}, check).passed == true
+	r := row_in({}, {"id": 1, "xs": [[{"literal": "nuts"}]]}, check)
+	[r.passed, r.cause] == [false, "value"]
+}
+
+test_a_literal_step_inside_a_ref_is_part_of_the_ref_and_not_a_literal_inside_a_value if {
+	check := {"op": "excludes", "path": ["xs"], "value": {"ref": ["$$input", "params", {"literal": "nut"}]}}
+	r := row_in({"params": {"nut": "nuts"}}, {"id": 1, "xs": ["nuts"]}, check)
+	[r.passed, r.cause] == [false, "value"]
+	row_in({"params": {"nut": "nuts"}}, {"id": 1, "xs": ["milk"]}, check).passed == true
+}
+
+test_a_ref_or_literal_deeper_inside_a_where_value_is_written_wrong if {
+	top := {"params": {"k": "a"}}
+	subj := {"id": 1, "items": [{"k": ["a"], "tags": ["bad"]}]}
+	rep := ergo.report(object.union(top, {"items": [subj]}), {"s": {"from": ["items"], "id": ["id"], "checks": {
+		"ref": {"op": "excludes", "path": ["items", {"where": {"k": [{"ref": ["$$input", "params", "k"]}]}}, "tags"], "value": "bad"},
+		"literal": {"op": "present", "path": ["items", {"where": {"k": {"a": {"literal": 1}}}}, "tags"]},
+		"right": {"op": "compare", "left": ["id"], "right": ["items", {"where": {"k": [{"literal": "a"}]}}, "n"], "cmp": "eq"},
+	}}})
+	problem_inputs(rep) == [
+		{"name": "checks.literal", "value": ["literal inside where"]},
+		{"name": "checks.ref", "value": ["ref inside where"]},
+		{"name": "checks.right", "value": ["literal inside where"]},
+	]
+	[[r.check, r.cause] | some r in rep.results; r.check in {"ref", "literal", "right"}] == [["literal", "ill_formed"], ["ref", "ill_formed"], ["right", "ill_formed"]]
+}
+
+id_where_well_formed(where) := rows_for(
+	ergo.report(
+		{"params": {"k": "a"}, "items": [{"ids": [{"k": "a", "v": 1}], "x": 1}]},
+		{"s": {"from": ["items"], "id": ["ids", {"where": {"k": where}}, "v"], "checks": {"c": {"op": "present", "path": ["x"]}}}},
+	),
+	"s", "$well_formed",
+)[0].passed
+
+test_a_ref_or_literal_deeper_inside_a_where_value_in_id_is_not_well_formed if {
+	id_where_well_formed([{"ref": ["$$input", "params", "k"]}]) == false
+	id_where_well_formed({"a": {"literal": "a"}}) == false
+	id_where_well_formed({"ref": ["$$input", "params", "k"]}) == true
+	id_where_well_formed({"literal": [{"ref": ["x"]}]}) == true
+}
+
+test_a_where_value_under_a_literal_is_data if {
+	shaped := {"ref": ["$$input", "params", "k"]}
+	check := {"op": "present", "path": ["items", {"where": {"k": {"literal": [shaped]}}}, "tags"]}
+	row_in({"params": {"k": "a"}}, {"id": 1, "items": [{"k": [shaped], "tags": []}]}, check).passed == true
+}
+
+test_a_ref_shaped_object_under_a_literal_is_still_data if {
+	shaped := {"ref": ["$$input", "params", "nut"]}
+	check := {"op": "excludes", "path": ["xs"], "value": {"literal": [shaped]}}
+	row_in({"params": {"nut": "nuts"}}, {"id": 1, "xs": [["nuts"]]}, check).passed == true
+	r := row_in({"params": {"nut": "nuts"}}, {"id": 1, "xs": [[shaped]]}, check)
+	[r.passed, r.cause] == [false, "value"]
+}
+
 test_a_ref_that_gives_includes_or_excludes_an_empty_list_or_no_list_fails_as_unusable if {
 	every op in ["includes", "excludes"] {
 		every banned in [[], "nuts", {"a": "nuts"}] {
