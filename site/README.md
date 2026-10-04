@@ -12,6 +12,22 @@ hugo server -s site
 
 Then open http://localhost:1313.
 
+The playground at `/playground/` needs ergo compiled to Wasm, and two JavaScript libraries. Build them once, and again after changing `ergo.rego`:
+
+```sh
+site/build-playground.sh
+```
+
+It needs [OPA](https://www.openpolicyagent.org/docs/#1-download-opa) and writes to `assets/playground/`, which git ignores. It downloads `@open-policy-agent/opa-wasm` and `js-yaml` from npm and stops if either doesn't match the hash pinned in the script, so to upgrade one, change its version and hash together. Hugo bundles them into the page's script, so the page loads no scripts from other sites.
+
+The code that converts between YAML, JSON and Rego is in `assets/js/playground/lib.mjs`. Test it with:
+
+```sh
+node --test site/assets/js/playground/lib.test.mjs
+```
+
+The tests run `opa`, and CI runs them on every pull request, along with the script and a build of the site.
+
 ## Files
 
 | What | Where |
@@ -23,6 +39,7 @@ Then open http://localhost:1313.
 | Styles and colour tokens | `assets/css/ergo.css` |
 | Logo | `static/brand/ergo-wordmark-white.svg` (master), inlined in `layouts/_partials/wordmark.html` and `mark.html`; `static/favicon.svg` |
 | Site settings (repo links, status bar) | `hugo.toml` |
+| Playground (not linked from the site) | `content/playground.md`, `layouts/playground.html`, `assets/js/playground/`, `build-playground.sh` |
 
 ## Edit the landing page copy
 
