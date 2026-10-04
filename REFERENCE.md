@@ -79,6 +79,7 @@ A few details:
 - `min_subjects` defaults to 1 so that a typo in `from` fails the requirement instead of quietly passing it. Set it to `0` when you mean "if there are any, they must pass; if there are none, that's fine". It means the same under `every` and `some`.
 - Under `some`, one subject has to pass all the checks by itself. Two subjects that each pass half of them don't count.
 - A requirement with no checks, a `require` other than `every` or `some`, or a badly written [naming step](#naming-subjects), is never met. The `$well_formed` row says so.
+- So is a requirement that isn't an object, or whose `checks` or `applies_to` isn't an object, whose `from` or `id` isn't a list, or whose `min_subjects` isn't a number. `null` counts as the wrong type. It still has its entry in `requirements` and its `$well_formed` row, which shows each such field and its value as an input, like `{"name": "from", "value": "deployments"}`, or `{"name": "requirement", "value": 5}` for the whole requirement. ergo then reads `checks` and `applies_to` as empty, a `from` as giving no subjects (shown as `<invalid from>`), and an `id` as giving the id `null`. A `min_subjects` that isn't a number fails `$min_subjects` too.
 
 ## Paths
 
@@ -610,8 +611,8 @@ Three rules:
       "expression": "count(matching(deployments)) >= 1"
     },
     "$well_formed": {
-      "description": "the requirement declares at least one check and a recognised \"require\" value, its from and id only hold steps that can be keys, and its from, id and min_subjects only hold numbers a 64-bit float can hold; lacking any of these, it asserts nothing that could ever be satisfied, or not the same way everywhere",
-      "expression": "count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float"
+      "description": "the requirement is an object whose checks and applies_to are objects, whose from and id are lists and whose min_subjects is a number, and it declares at least one check and a recognised \"require\" value, its from and id only hold steps that can be keys, and its from, id and min_subjects only hold numbers a 64-bit float can hold; lacking any of these, it asserts nothing that could ever be satisfied, or not the same way everywhere",
+      "expression": "fields have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float"
     },
     "approved": {
       "description": "Someone approved the deployment",
@@ -661,7 +662,7 @@ ergo adds three checks of its own. They start with `$`, so they can't clash with
 
 | Check           | One row per | Passes when                                                                                                                            |
 | --------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `$well_formed`  | requirement | the requirement has at least one check, a valid `require`, a well written naming step if `from` has one, no step in `from` or `id` that can't be a key, and no number a 64-bit float can't hold in `from`, `id` or `min_subjects`. This depends only on how the requirement is written, never on the input. |
+| `$well_formed`  | requirement | the requirement and its fields have the right types, it has at least one check, a valid `require`, a well written naming step if `from` has one, no step in `from` or `id` that can't be a key, and no number a 64-bit float can't hold in `from`, `id` or `min_subjects`. This depends only on how the requirement is written, never on the input. |
 | `$min_subjects` | requirement | at least `min_subjects` subjects are left after `applies_to`.                                                                          |
 | `$applies`      | subject     | the subject passes the `applies_to` filter. These rows only exist when the requirement has a filter.                                   |
 
