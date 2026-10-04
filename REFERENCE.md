@@ -103,7 +103,7 @@ An empty path, `[]`, reads the item itself. Use it inside `all` or `any` when th
 
 ergo names the item after its list, so this renders as `every branches: branches[] matches one of ["^main$", "^release/"]`, and the row's input is `branches[]`. An empty `each` works the same way, for a list of lists.
 
-An empty path also reads a subject that isn't an object, like each string of `"from": ["branches"]`. There, the item is named after `from` (`branches[]`), or `$$input` when there's no `from`, because then the subject is the input and `["$$input"]` reads the same thing. That keeps it apart from a key called `input`. Any other path on such a subject fails with cause `not_an_object`.
+An empty path also reads a subject that isn't an object, like each string of `"from": ["branches"]`. There, the item is named after `from` (`branches[]`), or `$$input` when there's no `from`, because then the subject is the input and `["$$input"]` reads the same thing. That keeps it apart from a key called `input`. `$min_subjects` names it the same way, as `count(matching($$input))`, when `from` reads the whole input. Any other path on such a subject fails with cause `not_an_object`.
 
 One step in a path can be a **selector** instead of a key. It picks the single item in a list (or an object's values) whose fields match:
 

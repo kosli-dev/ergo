@@ -1946,7 +1946,15 @@ _subject_item_name(req) := "$$input" if {
 
 _subject_item_name(req) := "<invalid from>" if not _from_well_formed(req)
 
-_matching_count_name(req) := sprintf("count(matching(%s))", [_path_name(_from_path(req))]) if _from_well_formed(req)
+_matching_count_name(req) := sprintf("count(matching(%s))", [_path_name(_from_path(req))]) if {
+	_from_well_formed(req)
+	_from_path(req) != []
+}
+
+_matching_count_name(req) := "count(matching($$input))" if {
+	_from_well_formed(req)
+	_from_path(req) == []
+}
 
 _matching_count_name(req) := "count(matching(<invalid from>))" if not _from_well_formed(req)
 
