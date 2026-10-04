@@ -1981,9 +1981,126 @@ test_well_formed_echoes_the_declaration_it_read if {
 	]
 }
 
+test_a_requirement_that_is_not_an_object_stays_in_the_report_and_is_not_well_formed if {
+	rows := [[name in object.keys(rep.requirements), rep.requirements[name].satisfied, r.passed, r.inputs[2]] |
+		some [name, req] in [["a", 5], ["b", null], ["c", [1]], ["d", "x"]]
+		rep := ergo.report({"items": [{"id": 1}]}, {name: req})
+		some r in rows_for(rep, name, "$well_formed")
+	]
+	rows == [
+		[true, false, false, {"name": "requirement", "value": 5}],
+		[true, false, false, {"name": "requirement", "value": null}],
+		[true, false, false, {"name": "requirement", "value": [1]}],
+		[true, false, false, {"name": "requirement", "value": "x"}],
+	]
+}
+
+typed_req := {"from": ["items"], "id": ["id"], "min_subjects": 0, "checks": {"c": {"op": "present", "path": ["id"]}}}
+
+wrong_types := [
+	["applies_to", true],
+	["applies_to", [{"op": "present", "path": ["id"]}]],
+	["applies_to", null],
+	["checks", 5],
+	["checks", [{"op": "present", "path": ["id"]}]],
+	["checks", null],
+	["from", "items"],
+	["from", {"a": 1}],
+	["from", null],
+	["id", "id"],
+	["id", null],
+	["min_subjects", "0"],
+	["min_subjects", null],
+	["min_subjects", -1],
+	["min_subjects", 0.5],
+	["min_subjects", 1.5],
+	["subject_type", 3],
+	["subject_type", {"name": "x"}],
+	["subject_type", null],
+]
+
+test_a_min_subjects_whose_value_is_a_whole_number_is_well_formed_however_it_is_written if {
+	rows := [r.passed |
+		some m in [0, 2.0, 1e2]
+		rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"min_subjects": m})})
+		some r in rows_for(rep, "s", "$well_formed")
+	]
+	rows == [true, true, true]
+}
+
+test_a_field_of_the_wrong_type_fails_well_formed_and_shows_its_value if {
+	rows := [[f, "s" in object.keys(rep.requirements), rep.requirements.s.satisfied, r.passed, r.cause, r.inputs[count(r.inputs) - 1]] |
+		some [f, v] in wrong_types
+		rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {f: v})})
+		some r in rows_for(rep, "s", "$well_formed")
+	]
+	rows == [[f, true, false, false, "value", {"name": f, "value": v}] | some [f, v] in wrong_types]
+}
+
+test_a_requirement_that_is_not_an_object_finds_no_subjects_so_it_cannot_claim_the_whole_input if {
+	rep := ergo.report({"items": [{"id": 1}]}, {"s": 5})
+	rep.requirements.s.subjects == {"total": 0, "matching": 0}
+	rep.requirements.s.checks["$min_subjects"].expression == "count(matching(<invalid from>)) >= 1"
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "$min_subjects")] == [[false, "value"]]
+}
+
+test_a_from_that_is_not_a_list_records_no_refs_because_it_is_never_read if {
+	rep := ergo.report({}, {"s": object.union(typed_req, {"from": {"ref": ["$$params", "p"]}})})
+	not "$refs" in object.keys(rep.requirements.s.checks["$min_subjects"])
+}
+
+test_an_applies_to_that_is_not_an_object_fails_every_subject_as_absent_so_none_is_blamed_for_a_check if {
+	doc := {"items": [{"id": 1, "env": "dev"}, {"id": 2, "env": "prod"}]}
+	reps := [ergo.report(doc, {"s": object.union(typed_req, {"applies_to": a})}) |
+		some a in [[{"op": "equals", "path": ["env"], "value": "prod"}], true, null]
+	]
+	every rep in reps {
+		[[r.check, r.subject.id, r.passed, r.cause, r.inputs] | some r in rep.results; not r.check in {"$well_formed", "$min_subjects"}] == [
+			["$applies", 1, false, "absent", []],
+			["$applies", 2, false, "absent", []],
+		]
+		rep.requirements.s.subjects == {"total": 2, "matching": 0}
+		rep.requirements.s.checks["$applies"].expression == "<invalid applies_to>"
+		[[v.check, v.subject.id] | some v in ergo.violations(rep)] == [["$well_formed", null], ["$applies", 1], ["$applies", 2]]
+	}
+	count(reps) == 3
+}
+
+test_a_field_of_the_right_type_adds_no_input_to_well_formed if {
+	rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"applies_to": {"a": {"op": "present", "path": ["id"]}}})})
+	row := rows_for(rep, "s", "$well_formed")[0]
+	[row.passed, count(row.inputs)] == [true, 2]
+}
+
+test_checks_that_are_not_an_object_give_no_rows_named_by_list_index if {
+	rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"checks": [{"op": "present", "path": ["id"]}]})})
+	[r.check | some r in rep.results] == ["$well_formed", "$min_subjects"]
+	rows_for(rep, "s", "$well_formed")[0].inputs[0] == {"name": "count(checks)", "value": 0}
+}
+
+test_a_from_that_is_not_a_list_gives_no_subjects if {
+	rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"from": "items", "min_subjects": 1})})
+	rep.requirements.s.subjects == {"total": 0, "matching": 0}
+	rep.requirements.s.checks["$min_subjects"].expression == "count(matching(<invalid from>)) >= 1"
+}
+
+test_an_id_that_is_not_a_list_gives_a_null_id if {
+	rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"id": "id"})})
+	[r.subject.id | some r in rows_for(rep, "s", "c")] == [null]
+}
+
+test_a_min_subjects_that_is_not_a_number_fails_min_subjects_whatever_opa_thinks_of_comparing_it if {
+	rows := [[r.passed, r.cause] |
+		some m in ["0", null, [], {}]
+		rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"min_subjects": m})})
+		some r in rows_for(rep, "s", "$min_subjects")
+	]
+	rows == [[false, "value"], [false, "value"], [false, "value"], [false, "value"]]
+}
+
 test_well_formed_definition_is_in_the_check_table if {
 	rep := ergo.report({"items": [{"id": "a"}]}, id_req(["items"]))
-	rep.requirements.s.checks["$well_formed"].expression == `count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float`
+	rep.requirements.s.checks["$well_formed"].expression == `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float`
 }
 
 require_req(q) := {"s": {
@@ -2173,19 +2290,9 @@ test_checks_come_out_in_name_order_whatever_the_runtime if {
 	[r.check | some r in rep.results; not startswith(r.check, "$")] == ["a", "b", "c", "delta", "gamma"]
 }
 
-test_checks_written_as_a_list_still_come_out_in_order if {
-	rep := ergo.report({"items": [{"id": 1}]}, {"s": {"from": ["items"], "id": ["id"], "checks": [{"op": "present", "path": ["id"]}, {"op": "present", "path": ["nope"]}]}})
-	[[r.check, r.passed] | some r in rep.results; not r.check in {"$well_formed", "$min_subjects"}] == [[0, true], [1, false]]
-}
-
 test_a_policy_written_as_a_set_still_gets_its_rows if {
 	req := {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}}
 	[r.check | some r in ergo.report({"items": [{"id": 1}]}, {req}).results] == ["$well_formed", "$min_subjects", "c"]
-}
-
-test_a_from_written_as_an_object_is_named_in_key_order if {
-	rep := ergo.report({}, {"s": {"from": {"delta": "w", "beta": "x", "alpha": "y", "gamma": 1}, "checks": {"c": {"op": "present", "path": ["id"]}}}})
-	rep.requirements.s.checks["$min_subjects"].expression == "count(matching(y.x.w.1)) >= 1"
 }
 
 test_inputs_written_as_an_object_come_out_in_key_order if {
@@ -3146,11 +3253,6 @@ test_a_path_written_as_an_object_reads_nothing if {
 	[r.passed, r.cause] == [false, "absent"]
 }
 
-test_an_id_written_as_a_string_reads_that_one_key if {
-	rep := ergo.report({"items": [{"id": 1, "name": "x"}]}, {"s": {"from": ["items"], "id": "name", "checks": {"c": {"op": "present", "path": ["id"]}}}})
-	[r.subject.id | some r in rows_for(rep, "s", "c")] == ["x"]
-}
-
 test_a_string_that_starts_with_two_dollars_is_not_a_name_when_it_is_the_whole_path if {
 	row_in({"mode": "strict"}, {"id": 1, "$$input": "own"}, {"op": "equals", "path": "$$input", "value": "own"}).passed == true
 }
@@ -3472,7 +3574,7 @@ test_a_well_formed_row_for_a_from_with_a_step_shows_the_from if {
 	row := rows_for(rep, "s", "$well_formed")[0]
 	row.passed == true
 	row.inputs[2] == {"name": "from", "value": ["build", "test_runs", {"each_as": "suite"}]}
-	rep.requirements.s.checks["$well_formed"].expression == `count(checks) >= 1 and require in ["every", "some"] and from is well formed and steps are keys and numbers fit a float`
+	rep.requirements.s.checks["$well_formed"].expression == `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and from is well formed and steps are keys and numbers fit a float`
 }
 
 test_a_well_formed_row_without_a_step_is_unchanged if {
@@ -4160,11 +4262,6 @@ test_a_present_filter_with_a_ref_step_still_rules_out_a_missing_field if {
 	}}) with data.params as {"att": "sbom"}
 	rep.requirements.s.satisfied == true
 	rows_for(rep, "s", "$applies")[0].cause == "value"
-}
-
-test_a_from_written_as_a_string_reads_that_one_key if {
-	rep := ergo.report({"items": [{"id": 1}, {"id": 2}]}, {"s": {"from": "items", "id": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}}})
-	rep.requirements.s.subjects == {"total": 2, "matching": 2}
 }
 
 test_a_dotted_key_in_a_ref_is_quoted if {

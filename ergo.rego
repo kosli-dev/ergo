@@ -5,17 +5,63 @@ package ergo
 
 import rego.v1
 
-_checks_of(req) := object.get(req, "checks", {}) if is_object(req)
+_req_field(req, f, d) := object.get(req, f, d) if is_object(req)
 
-_applies_to_of(req) := object.get(req, "applies_to", {}) if is_object(req)
+_req_field(req, _, d) := d if not is_object(req)
 
-_from_of(req) := object.get(req, "from", []) if is_object(req)
+_object_or_empty(x) := x if is_object(x)
 
-_subject_type_of(req) := object.get(req, "subject_type", "subject") if is_object(req)
+_object_or_empty(x) := {} if not is_object(x)
 
-_min_subjects_of(req) := object.get(req, "min_subjects", 1) if is_object(req)
+_checks_of(req) := _object_or_empty(_req_field(req, "checks", {}))
 
-_require_of(req) := object.get(req, "require", "every") if is_object(req)
+_applies_to_of(req) := _object_or_empty(_req_field(req, "applies_to", {}))
+
+_from_of(req) := _req_field(req, "from", [])
+
+_id_of(req) := _req_field(req, "id", [])
+
+_subject_type_of(req) := _req_field(req, "subject_type", "subject")
+
+_min_subjects_of(req) := _req_field(req, "min_subjects", 1)
+
+_require_of(req) := _req_field(req, "require", "every")
+
+_wrong_typed_fields(req) := [f |
+	some f in ["applies_to", "checks", "from", "id", "min_subjects", "subject_type"]
+	f in object.keys(req)
+	not _has_type(f, req[f])
+]
+
+_has_type("applies_to", v) if is_object(v)
+
+_has_type("checks", v) if is_object(v)
+
+_has_type("from", v) if is_array(v)
+
+_has_type("id", v) if is_array(v)
+
+_has_type("min_subjects", v) if {
+	is_number(v)
+	v >= 0
+	v == floor(v)
+}
+
+_has_type("subject_type", v) if is_string(v)
+
+_bad_applies_to(req) if {
+	is_object(req)
+	"applies_to" in _wrong_typed_fields(req)
+}
+
+_typed(req) if {
+	is_object(req)
+	_wrong_typed_fields(req) == []
+}
+
+_wrong_type_inputs(req) := [{"name": "requirement", "value": req}] if not is_object(req)
+
+_wrong_type_inputs(req) := [{"name": f, "value": req[f]} | some f in _wrong_typed_fields(req)] if is_object(req)
 
 _size(x) := count(x) if type_name(x) in {"array", "object", "set", "string"}
 
@@ -42,7 +88,11 @@ _stepped(req) if {
 
 default _from_well_formed(_) := false
 
-_from_well_formed(req) if not _stepped(req)
+_from_well_formed(req) if {
+	is_object(req)
+	is_array(_from_of(req))
+	not _stepped(req)
+}
 
 _from_well_formed(req) if {
 	step := _each_step(req)
@@ -106,8 +156,6 @@ _from_keys(req) := ks if {
 	count(ks) == count(p)
 }
 
-_from_keys(req) := _from_path(req) if not is_array(_from_path(req))
-
 _from_unreadable(req) if {
 	p := _from_path(req)
 	is_array(p)
@@ -156,12 +204,12 @@ _listed_subjects(doc, req) := [] if {
 	not is_object(_target(doc, req))
 }
 
-_raw_entries(doc, req) := [{"subject": subj} | some subj in _listed_subjects(doc, req)] if not _stepped(req)
-
-_raw_entries(_, req) := [] if {
-	_stepped(req)
-	not _from_well_formed(req)
+_raw_entries(doc, req) := [{"subject": subj} | some subj in _listed_subjects(doc, req)] if {
+	not _stepped(req)
+	_from_well_formed(req)
 }
+
+_raw_entries(_, req) := [] if not _from_well_formed(req)
 
 _raw_entries(doc, req) := [{"subject": subj} | some subj in coll] if {
 	_from_well_formed(req)
@@ -241,6 +289,7 @@ _inputs_in(req, check, subj) := i if {
 default _subject_matches(_, _) := false
 
 _subject_matches(subj, req) if {
+	not _bad_applies_to(req)
 	every _, check in _applies_to_of(req) {
 		_passes(req, check, subj)
 	}
@@ -265,7 +314,15 @@ _subject_ref(subj, req) := {
 	"id": _subject_id(subj, req),
 }
 
-_subject_id(subj, req) := value_at(subj, object.get(req, "id", [])) if is_object(subj)
+_subject_id(subj, req) := value_at(subj, _id_of(req)) if {
+	is_object(subj)
+	is_array(_id_of(req))
+}
+
+_subject_id(subj, req) := null if {
+	is_object(subj)
+	not is_array(_id_of(req))
+}
 
 _subject_id(subj, _) := subj if not is_object(subj)
 
@@ -1877,18 +1934,17 @@ _subject_item_name(req) := sprintf("$%s", [_each_step(req).each_as]) if _from_we
 
 _subject_item_name(req) := sprintf("%s[]", [_path_name(_from_of(req))]) if {
 	not _stepped(req)
+	_from_well_formed(req)
 	_from_of(req) != []
 }
 
 _subject_item_name(req) := "$$input" if {
 	not _stepped(req)
+	_from_well_formed(req)
 	_from_of(req) == []
 }
 
-_subject_item_name(req) := "<invalid from>" if {
-	_stepped(req)
-	not _from_well_formed(req)
-}
+_subject_item_name(req) := "<invalid from>" if not _from_well_formed(req)
 
 _matching_count_name(req) := sprintf("count(matching(%s))", [_path_name(_from_path(req))]) if _from_well_formed(req)
 
@@ -1899,50 +1955,71 @@ _min_subjects_def(req) := {"$min_subjects": _with_refs(
 		"description": sprintf("at least %s matching %s subject(s) required", [_literal_text(_min_subjects_of(req)), _text(_subject_type_of(req))]),
 		"expression": sprintf("%s >= %s", [_matching_count_name(req), _literal_text(_min_subjects_of(req))]),
 	},
-	{"from": _from_of(req)},
+	{"from": _listed_from(req)},
 )}
 
+_listed_from(req) := _from_of(req) if is_array(_from_of(req))
+
+_listed_from(req) := [] if not is_array(_from_of(req))
+
 _well_formed_def(req) := {"$well_formed": {
-	"description": "the requirement declares at least one check and a recognised \"require\" value, its from and id only hold steps that can be keys, and its from, id and min_subjects only hold numbers a 64-bit float can hold; lacking any of these, it asserts nothing that could ever be satisfied, or not the same way everywhere",
-	"expression": `count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float`,
+	"description": "the requirement is an object whose checks and applies_to are objects, whose from and id are lists, whose min_subjects is a whole number of 0 or more and whose subject_type is a string, and it declares at least one check and a recognised \"require\" value, its from and id only hold steps that can be keys, and its from, id and min_subjects only hold numbers a 64-bit float can hold; lacking any of these, it asserts nothing that could ever be satisfied, or not the same way everywhere",
+	"expression": `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float`,
 }} if not _stepped(req)
 
 _well_formed_def(req) := {"$well_formed": {
-	"description": "the requirement declares at least one check, a recognised \"require\" value, and a from that ends with its only step, which gives a name that doesn't start with $ and, if it has keys, gives them as a list, its from and id only hold steps that can be keys, and its from, id and min_subjects only hold numbers a 64-bit float can hold",
-	"expression": `count(checks) >= 1 and require in ["every", "some"] and from is well formed and steps are keys and numbers fit a float`,
+	"description": "the requirement is an object whose checks and applies_to are objects, whose from and id are lists, whose min_subjects is a whole number of 0 or more and whose subject_type is a string, and it declares at least one check, a recognised \"require\" value, and a from that ends with its only step, which gives a name that doesn't start with $ and, if it has keys, gives them as a list, its from and id only hold steps that can be keys, and its from, id and min_subjects only hold numbers a 64-bit float can hold",
+	"expression": `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and from is well formed and steps are keys and numbers fit a float`,
 }} if _stepped(req)
 
 default _well_formed(_) := false
 
 _well_formed(req) if {
-	_size(_checks_of(req)) > 0
+	_typed(req)
+	count(_checks_of(req)) > 0
 	_require_of(req) in {"every", "some"}
 	_from_well_formed(req)
-	not _out_of_range([object.get(req, f, null) | some f in ["from", "id", "min_subjects"]])
+	not _out_of_range([_from_of(req), _id_of(req), _min_subjects_of(req)])
 	not _badly_stepped(_from_of(req))
-	not _badly_stepped(object.get(req, "id", []))
+	not _badly_stepped(_id_of(req))
 }
 
-_well_formed_inputs(req) := [
-	{"name": "count(checks)", "value": _size(_checks_of(req))},
-	{"name": "require", "value": _require_of(req)},
-] if not _stepped(req)
+_well_formed_inputs(req) := array.concat(
+	[
+		{"name": "count(checks)", "value": count(_checks_of(req))},
+		{"name": "require", "value": _require_of(req)},
+	],
+	_wrong_type_inputs(req),
+) if not _stepped(req)
 
-_well_formed_inputs(req) := [
-	{"name": "count(checks)", "value": _size(_checks_of(req))},
-	{"name": "require", "value": _require_of(req)},
-	{"name": "from", "value": _from_of(req)},
-] if _stepped(req)
+_well_formed_inputs(req) := array.concat(
+	[
+		{"name": "count(checks)", "value": count(_checks_of(req))},
+		{"name": "require", "value": _require_of(req)},
+		{"name": "from", "value": _from_of(req)},
+	],
+	_wrong_type_inputs(req),
+) if _stepped(req)
+
+_applies_description(req) := sprintf("subject is in scope as a %s under this requirement's applies_to filter; out-of-scope subjects are recorded but not evaluated, and a subject whose filter can't be read fails", [_text(_subject_type_of(req))])
 
 _applies_def(req) := {"$applies": _with_refs(
 	{
-		"description": sprintf("subject is in scope as a %s under this requirement's applies_to filter; out-of-scope subjects are recorded but not evaluated, and a subject whose filter can't be read fails", [_text(_subject_type_of(req))]),
+		"description": _applies_description(req),
 		"expression": concat(" and ", [_expression_of(_applies_to_of(req)[name], _subject_item_name(req)) | some name in _applies_to_names(req)]),
 	},
 	_applies_to_of(req),
 )} if _size(_applies_to_of(req)) > 0
 
-_applies_def(req) := {} if _size(_applies_to_of(req)) == 0
+_applies_def(req) := {"$applies": {
+	"description": _applies_description(req),
+	"expression": "<invalid applies_to>",
+}} if _bad_applies_to(req)
+
+_applies_def(req) := {} if {
+	_size(_applies_to_of(req)) == 0
+	not _bad_applies_to(req)
+}
 
 _applies_to_names(req) := sort(object.keys(_applies_to_of(req))) if is_object(_applies_to_of(req))
 
@@ -1996,6 +2073,7 @@ default _enough_subjects(_, _) := false
 
 _enough_subjects(doc, req) if {
 	not _from_unreadable(req)
+	is_number(_min_subjects_of(req))
 	count(_matching_subjects(doc, req)) >= _min_subjects_of(req)
 }
 
@@ -2016,7 +2094,21 @@ _applies_rows(doc, req, req_name) := [{
 	_size(_applies_to_of(req)) > 0
 }
 
-_applies_rows(_, req, _) := [] if _size(_applies_to_of(req)) == 0
+_applies_rows(doc, req, req_name) := [{
+	"requirement": req_name,
+	"subject": _entry_ref(entry, req),
+	"check": "$applies",
+	"inputs": [],
+	"passed": false,
+	"cause": "absent",
+} |
+	some entry in _raw_entries(doc, req)
+] if _bad_applies_to(req)
+
+_applies_rows(_, req, _) := [] if {
+	_size(_applies_to_of(req)) == 0
+	not _bad_applies_to(req)
+}
 
 _applies_inputs(subj, req) := [inp |
 	some name in _applies_to_names(req)
