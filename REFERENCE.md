@@ -615,7 +615,7 @@ Three rules:
       "expression": "environment == \"prod\""
     },
     "$min_subjects": {
-      "description": "The deployment count is at least 1",
+      "description": "The in-scope deployment count is at least 1",
       "expression": "count(matching(deployments)) >= 1"
     },
     "$well_formed": {
@@ -687,7 +687,7 @@ When a check is [written wrong](#basic-operators), the `$well_formed` row gets a
 
 A check inside another one is named further in, like `checks.signed.check` for the inner check of an `all`, `checks.reviewed.substitute` for a substitute, or `checks.permitted.options.standard.1` for the second check of an `any_of` option. A name that needs quotes is quoted as in [paths](#paths): `checks."a.b"`.
 
-Their descriptions are plain sentences, like your own checks': `The requirement is written correctly`, `The deployment count is at least 1` and `The deployment is in scope`. The details are in `expression`, `inputs` and `cause`. `$min_subjects` names its input after what it counts, like `deployment count`. Both use `subject_type` as it's written, so they read right whatever the word's plural would be.
+Their descriptions are plain sentences, like your own checks': `The requirement is written correctly`, `The in-scope deployment count is at least 1` and `The deployment is in scope`. The details are in `expression`, `inputs` and `cause`. `$min_subjects` names its input after what it counts, like `in-scope deployment count`: only the subjects left after `applies_to`. Both use `subject_type` as it's written, so they read right whatever the word's plural would be.
 
 A subject that fails `$applies` gets no other rows, since it was never checked. But its `$applies` row stays, so you can see what was left out and why.
 

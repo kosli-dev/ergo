@@ -2274,7 +2274,7 @@ _listed_from(req) := [] if not is_array(_from_of(req))
 
 _min_subjects_description(req) := sprintf("The %s is at least %s", [_subject_count_name(req), _literal_text(_min_subjects_of(req))])
 
-_subject_count_name(req) := concat(" ", [_text(_subject_type_of(req)), "count"])
+_subject_count_name(req) := concat(" ", ["in-scope", _text(_subject_type_of(req)), "count"])
 
 _well_formed_def(req) := {"$well_formed": {
 	"description": "The requirement is written correctly",
