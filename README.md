@@ -1,5 +1,7 @@
 # ergo
 
+ergo is brand new and still changing a lot before its first alpha, so expect breaking changes.
+
 ## Getting started
 
 ergo is a single Rego file, so using it is as simple as copying it into your project.
