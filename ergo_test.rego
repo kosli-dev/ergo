@@ -2498,6 +2498,16 @@ test_a_path_starting_with_a_reserved_double_dollar_name_is_ill_formed if {
 	[r.cause | some r in rows_for(rep, "s", "c")] == ["ill_formed"]
 }
 
+test_an_empty_subject_type_fails_well_formed_because_rows_and_descriptions_would_name_nothing if {
+	every name in ["", " ", "\t "] {
+		rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"subject_type": name})})
+		row := rows_for(rep, "s", "$well_formed")[0]
+		[row.passed, row.inputs[count(row.inputs) - 1]] == [false, {"name": "subject_type", "value": name}]
+	}
+	rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"subject_type": "a b"})})
+	rows_for(rep, "s", "$well_formed")[0].passed == true
+}
+
 test_well_formed_definition_is_in_the_check_table if {
 	rep := ergo.report({"items": [{"id": "a"}]}, id_req(["items"]))
 	rep.requirements.s.checks["$well_formed"].expression == `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float and checks are written right`
