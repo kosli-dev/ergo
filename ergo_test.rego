@@ -2019,7 +2019,7 @@ wrong_types := [
 	["subject_type", null],
 ]
 
-test_a_min_subjects_written_as_a_whole_number_with_a_fraction_part_is_well_formed if {
+test_a_min_subjects_whose_value_is_a_whole_number_is_well_formed_however_it_is_written if {
 	rows := [r.passed |
 		some m in [0, 2.0, 1e2]
 		rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"min_subjects": m})})
