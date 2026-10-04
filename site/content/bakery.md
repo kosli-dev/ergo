@@ -6,7 +6,7 @@ sitemap:
   disable: true
 ---
 
-In this introduction to ergo, we'll show how to define control decisions with rego and ergo through the example of a bakery's allergen requirements (hat tip to Toby Weston for [the original example](https://baddotrobot.com/blog/2026-10-02-baking-in-evidence/)). You'll learn how to validate cake batches against three compliance rules and produce explanatory reports of decisions. No deep technical expertise or prior experience with rego is required.
+In this introduction to ergo, we'll show how to define control decisions with rego and ergo through the example of a bakery's allergen requirements (hat tip to Toby Weston for [the original inspiration](https://baddotrobot.com/blog/2026-10-02-baking-in-evidence/)). You'll learn how to validate cake batches against three compliance rules and produce explanatory reports of decisions. No deep technical expertise or prior experience with rego is required.
 
 We will look at the same policy written two ways, in plain Rego and with ergo, and compare thre results. You can follow along, the files are in [`examples/baking`](https://github.com/kosli-dev/ergo/tree/main/examples/baking).
 
