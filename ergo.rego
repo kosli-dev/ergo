@@ -1956,13 +1956,13 @@ _matching_count_name(req) := "count(matching($$input))" if {
 	_from_path(req) == []
 }
 
+_matching_count_name(req) := "count(matching(<invalid from>))" if not _from_well_formed(req)
+
 _from_name(p) := _path_name(array.concat([{"literal": p[0]}], array.slice(p, 1, count(p)))) if _starts_with_dollar_key(p)
 
 _from_name(p) := _path_name(p) if not _starts_with_dollar_key(p)
 
 _starts_with_dollar_key(p) if _first_dollar_key(0, p[0])
-
-_matching_count_name(req) := "count(matching(<invalid from>))" if not _from_well_formed(req)
 
 _min_subjects_def(req) := {"$min_subjects": _with_refs(
 	{
