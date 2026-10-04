@@ -89,7 +89,7 @@ test_a_subject_that_is_not_an_object_keeps_its_applies_row if {
 
 test_a_subject_that_is_not_an_object_is_not_mistaken_for_one_missing_its_fields if {
 	causes := {r.subject.id: r.cause | some r in rows_for(ergo.report({"items": [{"id": "x"}, "b"]}, mixed_req), "s", "c")}
-	causes == {"x": "absent", "b": "not_an_object"}
+	causes == {"x": "value", "b": "not_an_object"}
 }
 
 test_a_subject_that_is_not_an_object_fails_a_quantified_check_as_not_an_object if {
@@ -1572,7 +1572,7 @@ test_a_check_with_a_step_that_cannot_be_a_key_is_ill_formed if {
 }
 
 test_a_string_never_picks_a_list_item_and_a_number_never_picks_an_object_key if {
-	[cause_of({"id": 1, "a": [10, 20]}, {"op": "present", "path": ["a", "0"]}), cause_of({"id": 1, "o": {"0": "zero"}}, {"op": "present", "path": ["o", 0]})] == ["absent", "absent"]
+	[cause_of({"id": 1, "a": [10, 20]}, {"op": "present", "path": ["a", "0"]}), cause_of({"id": 1, "o": {"0": "zero"}}, {"op": "present", "path": ["o", 0]})] == ["value", "value"]
 }
 
 test_a_check_whose_inputs_have_a_step_that_cannot_be_a_key_is_ill_formed if {
@@ -2470,6 +2470,28 @@ test_a_present_filter_that_cannot_reach_its_field_does_not_rule_the_subject_out 
 	lockfile_scope({"id": 1, "atts": [], "env": "dev"}, filters) == [false, ["unmatched"]]
 }
 
+test_present_on_a_missing_field_is_a_clean_no_wherever_it_is if {
+	doc := {"items": [{"id": 1, "approvers": [{"username": "renovate[bot]"}, {}]}]}
+	human := {"op": "any", "path": ["approvers"], "check": {"op": "any_of", "options": {"human": [
+		{"op": "present", "path": ["username"]},
+		{"op": "not_matches_any", "path": ["username"], "patterns": ["\\[bot\\]$"]},
+	]}}}
+	as_check := ergo.report(doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["owner"]}, "h": human}}})
+	[[r.check, r.cause] | some r in as_check.results; r.check in {"c", "h"}] == [["c", "value"], ["h", "value"]]
+	as_filter := ergo.report(doc, {"s": {"from": ["items"], "id": ["id"], "min_subjects": 0, "applies_to": {"h": human}, "checks": {"c": {"op": "present", "path": ["id"]}}}})
+	[as_filter.requirements.s.satisfied, [r.cause | some r in rows_for(as_filter, "s", "$applies")]] == [true, ["value"]]
+}
+
+test_present_that_cannot_reach_its_field_is_not_a_clean_no if {
+	causes := [[r.cause | some r in rows_for(ergo.report({"items": [item]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}}), "s", "c")][0] |
+		some [item, check] in [
+			[{"id": 1, "xs": []}, {"op": "present", "path": ["xs", {"where": {"k": 1}}, "v"]}],
+		]
+	]
+	causes == ["unmatched"]
+	[r.cause | some r in rows_for(ergo.report({"items": ["x"]}, {"s": {"from": ["items"], "checks": {"c": {"op": "present", "path": ["a"]}}}}), "s", "c")] == ["not_an_object"]
+}
+
 test_well_formed_definition_is_in_the_check_table if {
 	rep := ergo.report({"items": [{"id": "a"}]}, id_req(["items"]))
 	rep.requirements.s.checks["$well_formed"].expression == `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float and checks are written right`
@@ -3275,8 +3297,8 @@ test_a_present_filter_still_fails_on_a_subject_that_is_not_an_object if {
 	[r.cause | some r in rows_for(rep, "s", "$applies")] == ["not_an_object"]
 }
 
-test_a_present_check_on_a_missing_field_still_says_absent if {
-	cause_of({}, {"op": "present", "path": ["lock"]}) == "absent"
+test_a_present_check_on_a_missing_field_is_a_clean_no if {
+	cause_of({}, {"op": "present", "path": ["lock"]}) == "value"
 }
 
 test_only_a_present_filter_rules_out_a_subject_whose_field_is_missing if {
@@ -3620,7 +3642,7 @@ test_a_custom_op_reads_a_ref_with_arg if {
 
 test_a_path_written_as_a_string_reads_that_one_key if {
 	row_in({}, {"id": 1}, {"op": "present", "path": "state"}).passed == false
-	row_in({}, {"id": 1}, {"op": "present", "path": "state"}).cause == "absent"
+	row_in({}, {"id": 1}, {"op": "present", "path": "state"}).cause == "value"
 	row_in({}, {"id": 1, "state": "OPEN"}, {"op": "equals", "path": "state", "value": "OPEN"}).passed == true
 	row_in({}, {"id": 1}, {"op": "present", "path": 3}).passed == false
 }
@@ -3693,7 +3715,7 @@ test_a_key_the_object_does_not_have_fails_the_requirement if {
 test_a_missing_key_reads_as_absent_even_from_the_subject_itself if {
 	rep := ergo.report(suite_doc, {"s": {
 		"from": ["build", "test_runs", {"each_as": "suite", "keys": ["system-test"]}],
-		"checks": {"c": {"op": "present", "path": []}},
+		"checks": {"c": {"op": "non_empty_string", "path": []}},
 	}})
 	[[r.passed, r.cause, r.inputs] | some r in rows_for(rep, "s", "c")] == [[false, "absent", [{"name": "$suite", "value": null}]]]
 }
@@ -3972,7 +3994,7 @@ test_a_name_missing_in_the_path_of_a_list_check_fails_as_absent if {
 	rep := ergo.report({"prs": [{"n": 1, "xs": [1, 2]}]}, {"s": {
 		"from": ["prs", {"each_as": "pr"}],
 		"id": ["n"],
-		"checks": {"c": {"op": "all", "path": ["xs"], "check": {"op": "present", "path": ["$pr", "author"]}}},
+		"checks": {"c": {"op": "all", "path": ["xs"], "check": {"op": "non_empty_string", "path": ["$pr", "author"]}}},
 	}})
 	[[r.passed, r.cause, r.inputs] | some r in rows_for(rep, "s", "c")] == [[false, "absent", [{"name": "xs[]", "value": [1, 2]}, {"name": "$pr.author", "value": null}]]]
 }
@@ -3981,7 +4003,7 @@ test_an_input_missing_in_the_path_of_a_list_check_fails_as_absent if {
 	rep := ergo.report({"items": [{"id": 1, "xs": [1]}]}, {"s": {
 		"from": ["items"],
 		"id": ["id"],
-		"checks": {"c": {"op": "all", "path": ["xs"], "check": {"op": "present", "path": ["$$input", "nope"]}}},
+		"checks": {"c": {"op": "all", "path": ["xs"], "check": {"op": "non_empty_string", "path": ["$$input", "nope"]}}},
 	}})
 	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "absent"]]
 }
@@ -4070,7 +4092,7 @@ test_a_nested_list_check_shows_the_list_and_the_names_it_reads if {
 }
 
 test_a_name_given_by_as_is_not_read_for_the_row_but_its_item_decides_the_cause if {
-	check := {"op": "all", "path": ["approvers"], "as": "a", "check": {"op": "present", "path": ["$a", "timestamp"]}}
+	check := {"op": "all", "path": ["approvers"], "as": "a", "check": {"op": "non_empty_string", "path": ["$a", "timestamp"]}}
 	review_rows(check)[4] == [45, false, "absent"]
 	some r in rows_for(ergo.report(review_doc, review_req(check)), "s", "c")
 	r.subject.id == 45
@@ -4189,7 +4211,7 @@ test_a_filter_can_use_as if {
 test_a_path_through_as_inside_a_list_check_is_shown_as_a_path_inside_the_item if {
 	check := {"op": "all", "path": ["xs"], "as": "x", "check": {"op": "present", "path": ["$x", "v"]}}
 	r := row_in({}, {"id": 1, "xs": [{"v": 1}, {"w": 2}]}, check)
-	[r.passed, r.cause, r.inputs] == [false, "absent", [{"name": "xs[].v", "value": [1, null]}]]
+	[r.passed, r.cause, r.inputs] == [false, "value", [{"name": "xs[].v", "value": [1, null]}]]
 }
 
 test_a_name_given_twice_fails_every_kind_of_list_check if {

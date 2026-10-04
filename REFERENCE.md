@@ -239,7 +239,7 @@ and you need a passing unit test, integration test and system test run:
 }
 ```
 
-Each key is a subject. A key the object doesn't have is still a subject, so its checks fail as `absent`, and the smoke test run isn't checked at all:
+Each key is a subject. A key the object doesn't have is still a subject, so its checks fail as `absent` (or `value`, for a `present` check), and the smoke test run isn't checked at all:
 
 ```json
 [
@@ -350,6 +350,7 @@ Some things worth knowing:
 
   A [`ref`](#reading-from-the-input) that reads the wrong kind of value from the params, like `values` read from a param that holds `3`, isn't a mistake in the policy, so it doesn't fail `$well_formed`. The check fails with cause `unusable`.
 - A field with the wrong kind of value for the operator fails with cause `unusable`, not `value`: a field that isn't a number for `range`, isn't a string for `matches_any` or `not_matches_any`, or isn't a list for `includes`, `excludes`, `all` or `any`, two fields of different types for `compare`, or anything but two timestamps in the same format for `compare_time`. So a filter fails the requirement instead of quietly ruling the subject out. `equals` and `in` are different: `"5"` isn't `5`, which is a sound answer, so that fails with `value`. So does `non_empty_string` on a number, since checking the type is its job.
+- `present` on a missing or `null` field fails with cause `value`, not `absent`: whether the field is there is the question it asks, so "it isn't" is a sound answer. In an `any_of` option, a `present` check that finds its field missing settles the option as `value`, even when the option's other checks can't read that field.
 - `equals` with `"value": null` only passes when the field is there and set to `null`. A missing field doesn't count.
 - `range` needs `min` and `max` to be numbers. A string like `"3"` fails the check, because Rego puts every number before every string, so `5 <= "3"` would be true.
 - `in` fails when the field is missing or `null`, even if `values` contains `null`. To check that a field is `null`, use `equals` with `"value": null`. `values` can be a list or, from Rego, a set. `in` also fails when `values` is empty, missing, or not a list or set. The expression then shows `id in <missing values>` or `id in <invalid values>` rather than a list.

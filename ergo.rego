@@ -1556,7 +1556,7 @@ _has_inputs(check) if check.inputs
 
 _check_states(check, subj) := {_read_state(subj, p) | some p in _read_paths(check)} if _has_inputs(check)
 
-_check_states(check, subj) := {_read_state(subj, p) | some p in _read_paths(check)} | _unusable_states(check, subj) if {
+_check_states(check, subj) := _answered(check, subj, {_read_state(subj, p) | some p in _read_paths(check)}) | _unusable_states(check, subj) if {
 	not _has_inputs(check)
 	not _quantified(check)
 	not _combinator(check)
@@ -1572,7 +1572,11 @@ _check_states(check, subj) := {_option_cause(group, subj) | some group in check.
 	_combinator(check)
 }
 
-_option_cause(group, subj) := _worst_or_value({_top_leaf_cause(leaf, subj) | some leaf in group})
+_option_cause(group, subj) := _group_cause({_top_leaf_cause(leaf, subj) | some leaf in group})
+
+_group_cause(causes) := "value" if {
+	"missing" in causes
+} else := _worst_or_value(causes)
 
 _top_leaf_cause(leaf, subj) := _list_cause(leaf, subj) if _quantified(leaf)
 
@@ -1580,7 +1584,24 @@ _top_leaf_cause(leaf, subj) := _leaf_cause(leaf, subj) if not _quantified(leaf)
 
 _leaf_cause(leaf, x) := "satisfied" if {
 	leaf_passed(leaf, x)
+} else := "missing" if {
+	_asks_presence(leaf, x)
+	_read_state(x, leaf.path) in {"absent", "null"}
 } else := _worst_or_value({_read_state(x, p) | some p in _leaf_paths(leaf)} | _unusable_states(leaf, x))
+
+_answered(check, x, states) := {_presence_state(s) | some s in states} if _asks_presence(check, x)
+
+_answered(check, x, states) := states if not _asks_presence(check, x)
+
+_asks_presence(check, x) if {
+	check.op == "present"
+	_keys_of(check.path)
+	_ := _start_of(x, check.path)
+}
+
+_presence_state(s) := "missing" if s in {"absent", "null"}
+
+_presence_state(s) := s if not s in {"absent", "null"}
 
 _list_cause(check, subj) := "satisfied" if {
 	_list_passed(check, subj)
@@ -1639,7 +1660,7 @@ _element_failure(check, elem) := _worst_or_value({_element_option_cause(group, e
 
 _element_failure(check, elem) := _nested_list_cause(check, elem) if _quantified(check)
 
-_element_option_cause(group, elem) := _worst_or_value({_element_option_leaf_cause(leaf, elem) | some leaf in group})
+_element_option_cause(group, elem) := _group_cause({_element_option_leaf_cause(leaf, elem) | some leaf in group})
 
 _element_option_leaf_cause(leaf, elem) := _nested_list_cause(leaf, elem) if _quantified(leaf)
 
@@ -1665,7 +1686,7 @@ _inner_any_of_cause(check, inner) := "satisfied" if {
 	_inner_passed(check, inner)
 } else := _worst_or_value({_inner_option_cause(group, inner) | some group in check.options})
 
-_inner_option_cause(group, inner) := _worst_or_value({_leaf_cause(leaf, inner) | some leaf in group})
+_inner_option_cause(group, inner) := _group_cause({_leaf_cause(leaf, inner) | some leaf in group})
 
 _worst_read(_, check) := _worst_of({_used_ref_state(check, r) | some r in _check_refs(check)}) if _unreadable_ref(check)
 
@@ -1792,7 +1813,7 @@ _answers_presence(check, subj) if {
 	not _unreadable_ref(check)
 	not _broken_row(check)
 	_substitute_unusable(check, subj) == set()
-	_row_cause(check, subj) in {"absent", "null"}
+	_read_state(subj, check.path) in {"absent", "null"}
 }
 
 _ruled_out(subj, req) if _scope_cause(_failed_filter_causes(subj, req)) == "value"
