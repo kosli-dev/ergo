@@ -181,7 +181,7 @@ _from_cause(req) := _worst_of(unread) if {
 	count(unread) > 0
 }
 
-_from_cause(req) := "absent" if _from_ref_states(req) - {"value"} == set()
+_from_cause(req) := "unusable" if _from_ref_states(req) - {"value"} == set()
 
 _from_ref_states(req) := {_ref_state(seg.ref) | some seg in _from_path(req); _is_ref(seg)} | {_ref_state(r) | some r in _keys_refs(_each_step(req))}
 
@@ -867,18 +867,55 @@ _orderable(_, v) if is_number(v)
 
 _orderable(_, v) if is_string(v)
 
-_unordered(subj, leaf) if {
-	leaf.op == "compare"
-	l := value_at(subj, leaf.left)
-	r := value_at(subj, leaf.right)
-	_comparable(l, r)
-	not _orderable(leaf.cmp, l)
+_unusable_states(leaf, x) := {"unusable" | _unusable(leaf, x)}
+
+_unusable(leaf, x) if {
+	leaf.op == "range"
+	not is_number(_found(x, leaf.path))
 }
 
-_unordered_reads(subj, check) := {"absent" |
-	some c in [check, object.get(check, "substitute", {})]
-	some leaf in _element_leaves(c)
-	_unordered(subj, leaf)
+_unusable(leaf, x) if {
+	leaf.op in {"matches_any", "not_matches_any"}
+	not is_string(_found(x, leaf.path))
+}
+
+_unusable(leaf, x) if {
+	leaf.op in {"includes", "excludes"}
+	not is_array(_found(x, leaf.path))
+}
+
+_unusable(leaf, x) if {
+	leaf.op == "compare"
+	l := _found(x, leaf.left)
+	r := _found(x, leaf.right)
+	not _usable_pair(leaf.cmp, l, r)
+}
+
+_unusable(leaf, x) if {
+	leaf.op == "compare_time"
+	l := _found(x, leaf.left)
+	r := _found(x, leaf.right)
+	not _timestamps(l, r)
+}
+
+_usable_pair(cmp, l, r) if {
+	_comparable(l, r)
+	_orderable(cmp, l)
+}
+
+_timestamps(l, r) if {
+	_rfc3339_shaped(l)
+	_rfc3339_shaped(r)
+}
+
+_timestamps(l, r) if {
+	is_number(l)
+	is_number(r)
+}
+
+_found(x, path) := v if {
+	v := _field(x, path)
+	v != null
 }
 
 _rfc3339_shaped(v) if {
@@ -1441,25 +1478,11 @@ _read_paths(check) := [check.left, check.right] if {
 	_two_sided(check)
 }
 
-_read_paths(check) := _list_reads(check) if {
-	not check.inputs
-	_quantified(check)
-}
-
 _list_reads(check) := array.concat(array.concat([check.path], _named_each(check)), _element_name_reads(check))
 
 _named_each(check) := [check.each] if _named(object.get(check, "each", []))
 
 _named_each(check) := [] if not _named(object.get(check, "each", []))
-
-_read_paths(check) := [p |
-	some group in check.options
-	some leaf in group
-	some p in _check_reads(leaf)
-] if {
-	not check.inputs
-	_combinator(check)
-}
 
 _read_paths(check) := [check.path] if {
 	not check.inputs
@@ -1516,11 +1539,133 @@ _is_collection(v) if is_array(v)
 
 _is_collection(v) if is_object(v)
 
-_cause_precedence := ["ill_formed", "not_an_object", "ambiguous", "unmatched", "absent", "null"]
+_cause_precedence := ["ill_formed", "not_an_object", "ambiguous", "unmatched", "unusable", "absent", "null"]
 
-default _worst_read(_, _) := "value"
+_worst_read(subj, check) := _worst_or_value(_check_states(check, subj) | _substitute_unusable(check, subj)) if not _unreadable_ref(check)
 
-_worst_read(subj, check) := _worst_of({_read_state(subj, p) | some p in _read_paths(check)} | _unordered_reads(subj, check)) if not _unreadable_ref(check)
+_worst_or_value(states) := c if {
+	c := _worst_of(states)
+} else := "value"
+
+_substitute_unusable(check, subj) := {"unusable" |
+	some leaf in _element_leaves(_substitute_of(check))
+	_unusable(leaf, subj)
+}
+
+_has_inputs(check) if check.inputs
+
+_check_states(check, subj) := {_read_state(subj, p) | some p in _read_paths(check)} if _has_inputs(check)
+
+_check_states(check, subj) := {_read_state(subj, p) | some p in _read_paths(check)} | _unusable_states(check, subj) if {
+	not _has_inputs(check)
+	not _quantified(check)
+	not _combinator(check)
+}
+
+_check_states(check, subj) := {_list_cause(check, subj)} if {
+	not _has_inputs(check)
+	_quantified(check)
+}
+
+_check_states(check, subj) := {_option_cause(group, subj) | some group in check.options} if {
+	not _has_inputs(check)
+	_combinator(check)
+}
+
+_option_cause(group, subj) := _worst_or_value({_top_leaf_cause(leaf, subj) | some leaf in group})
+
+_top_leaf_cause(leaf, subj) := _list_cause(leaf, subj) if _quantified(leaf)
+
+_top_leaf_cause(leaf, subj) := _leaf_cause(leaf, subj) if not _quantified(leaf)
+
+_leaf_cause(leaf, x) := "satisfied" if {
+	leaf_passed(leaf, x)
+} else := _worst_or_value({_read_state(x, p) | some p in _leaf_paths(leaf)} | _unusable_states(leaf, x))
+
+_list_cause(check, subj) := "satisfied" if {
+	_list_passed(check, subj)
+} else := _worst_or_value(_list_states(check, subj) | {_item_cause(check, e) | some e in _items(subj, check)})
+
+_list_states(check, x) := ({_read_state(x, check.path)} | {"unusable" | _not_a_list(x, check.path)}) | {_each_state(outer, check.each) |
+	check.each
+	coll := _field(x, check.path)
+	is_array(coll)
+	some outer in coll
+}
+
+_not_a_list(x, path) if not is_array(_found(x, path))
+
+_each_state(outer, each) := "unusable" if {
+	_not_a_list(outer, each)
+} else := _read_state(outer, each)
+
+default _items(_, _) := []
+
+_items(x, check) := coll if {
+	not check.each
+	coll := _field(x, check.path)
+	is_array(coll)
+}
+
+_items(x, check) := [elem |
+	some outer in coll
+	inner := _field(outer, check.each)
+	is_array(inner)
+	some elem in inner
+] if {
+	check.each
+	coll := _field(x, check.path)
+	is_array(coll)
+}
+
+_item_cause(check, elem) := _element_cause(check.check, elem) if not "as" in object.keys(check)
+
+_item_cause(check, elem) := c if {
+	"as" in object.keys(check)
+	names := object.union(_bound_names, {check.as: elem})
+	c := _element_cause(check.check, elem) with input as {"ergo/names": names}
+}
+
+_element_cause(check, elem) := "satisfied" if {
+	_element_passed(check, elem)
+} else := _element_failure(check, elem)
+
+_element_failure(check, elem) := _leaf_cause(check, elem) if {
+	not _combinator(check)
+	not _quantified(check)
+}
+
+_element_failure(check, elem) := _worst_or_value({_element_option_cause(group, elem) | some group in check.options}) if _combinator(check)
+
+_element_failure(check, elem) := _nested_list_cause(check, elem) if _quantified(check)
+
+_element_option_cause(group, elem) := _worst_or_value({_element_option_leaf_cause(leaf, elem) | some leaf in group})
+
+_element_option_leaf_cause(leaf, elem) := _nested_list_cause(leaf, elem) if _quantified(leaf)
+
+_element_option_leaf_cause(leaf, elem) := _leaf_cause(leaf, elem) if not _quantified(leaf)
+
+_nested_list_cause(check, elem) := "satisfied" if {
+	_element_list_passed(check, elem)
+} else := _worst_or_value(_list_states(check, elem) | {_inner_item_cause(check, i) | some i in _items(elem, check)})
+
+_inner_item_cause(check, inner) := _inner_cause(check.check, inner) if not "as" in object.keys(check)
+
+_inner_item_cause(check, inner) := c if {
+	"as" in object.keys(check)
+	names := object.union(_bound_names, {check.as: inner})
+	c := _inner_cause(check.check, inner) with input as {"ergo/names": names}
+}
+
+_inner_cause(check, inner) := _leaf_cause(check, inner) if not _combinator(check)
+
+_inner_cause(check, inner) := _inner_any_of_cause(check, inner) if _combinator(check)
+
+_inner_any_of_cause(check, inner) := "satisfied" if {
+	_inner_passed(check, inner)
+} else := _worst_or_value({_inner_option_cause(group, inner) | some group in check.options})
+
+_inner_option_cause(group, inner) := _worst_or_value({_leaf_cause(leaf, inner) | some leaf in group})
 
 _worst_read(_, check) := _worst_of({_used_ref_state(check, r) | some r in _check_refs(check)}) if _unreadable_ref(check)
 
@@ -1538,7 +1683,7 @@ _worst_of(states) := _cause_precedence[i] if {
 
 _row_cause(check, subj) := "ill_formed" if {
 	_ill_formed(check)
-} else := "absent" if {
+} else := "unusable" if {
 	_param_broken(check)
 } else := _readable_cause(check, subj)
 
@@ -1570,7 +1715,7 @@ _step_refs(check) := {x.ref |
 	is_number(p[count(p) - 1])
 }
 
-_used_ref_state(check, r) := "absent" if _wrong_step(check, r)
+_used_ref_state(check, r) := "unusable" if _wrong_step(check, r)
 
 _used_ref_state(check, r) := _ref_state(r) if not _wrong_step(check, r)
 
@@ -1616,8 +1761,7 @@ _applies_cause(subj, req) := "satisfied" if {
 } else := _scope_cause(_failed_filter_causes(subj, req))
 
 _scope_cause(causes) := "value" if {
-	"value" in causes
-	not "ill_formed" in causes
+	causes == {"value"}
 } else := _worst_of(causes)
 
 _failed_filter_causes(subj, req) := _filter_causes(subj, req) if not _each_step(req)
@@ -1643,7 +1787,7 @@ _answers_presence(check, subj) if {
 	_ := _start_of(subj, check.path)
 	not _unreadable_ref(check)
 	not _broken_row(check)
-	_unordered_reads(subj, check) == set()
+	_substitute_unusable(check, subj) == set()
 	_row_cause(check, subj) in {"absent", "null"}
 }
 
@@ -1801,12 +1945,10 @@ _as_text(check, _) := " as <invalid name>" if {
 	not _valid_name(check.as)
 }
 
-_item_given(item) := {substring(item, 1, -1)} if {
+_item_given(item) := {substring(item, 1, -1) |
 	startswith(item, "$")
 	not startswith(item, "$$")
 }
-
-_item_given(item) := set() if not startswith(item, "$")
 
 _given_with(check, given) := given | {check.as} if _valid_name(object.get(check, "as", null))
 
@@ -2206,13 +2348,16 @@ _subject_rows(doc, req, req_name) := [row |
 	}
 ]
 
-_well_formed_row(req, req_name) := {
-	"requirement": req_name,
-	"subject": {"type": _subject_type_of(req), "id": null},
-	"check": "$well_formed",
-	"inputs": _well_formed_inputs(req),
-	"passed": _well_formed(req),
-	"cause": _verdict_cause(_well_formed(req)),
+_well_formed_row(req, req_name) := row if {
+	passed := _well_formed(req)
+	row := {
+		"requirement": req_name,
+		"subject": {"type": _subject_type_of(req), "id": null},
+		"check": "$well_formed",
+		"inputs": _well_formed_inputs(req),
+		"passed": passed,
+		"cause": _verdict_cause(passed),
+	}
 }
 
 _min_subjects_row(doc, req, req_name) := {
@@ -2274,6 +2419,10 @@ default _requirement_satisfied(_, _) := false
 
 _requirement_satisfied(doc, req) if {
 	_well_formed(req)
+	_well_formed_requirement_met(doc, req)
+}
+
+_well_formed_requirement_met(doc, req) if {
 	_require_of(req) == "every"
 	_scope_readable(doc, req)
 	count(_matching_subjects(doc, req)) >= _min_subjects_of(req)
@@ -2282,8 +2431,7 @@ _requirement_satisfied(doc, req) if {
 	}
 }
 
-_requirement_satisfied(doc, req) if {
-	_well_formed(req)
+_well_formed_requirement_met(doc, req) if {
 	_require_of(req) == "some"
 	_scope_readable(doc, req)
 	count(_matching_subjects(doc, req)) >= _min_subjects_of(req)
@@ -2291,8 +2439,7 @@ _requirement_satisfied(doc, req) if {
 	_subject_passed(req, subj)
 }
 
-_requirement_satisfied(doc, req) if {
-	_well_formed(req)
+_well_formed_requirement_met(doc, req) if {
 	_require_of(req) == "some"
 	_scope_readable(doc, req)
 	_min_subjects_of(req) == 0

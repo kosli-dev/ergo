@@ -202,7 +202,7 @@ With `artifact_name` set to `app` and `attestation_name` to `pull-request`, this
 
 A ref step works anywhere in any path: first, in the middle or last, after a name or `$$input`, before a selector, and in `from`, `id`, `each`, `left` and `right`.
 
-- The value must be a [key](#paths): a string, or a list index written as digits alone. A ref that leads nowhere, to `null`, or to anything else, like a list, means the path can't be followed, so the check fails with cause `absent` or `null`.
+- The value must be a [key](#paths): a string, or a list index written as digits alone. A ref that leads nowhere, to `null`, or to anything else, like a list, means the path can't be followed, so the check fails with cause `absent`, `null` or, for anything that isn't a key, `unusable`.
 - In `from`, a ref step that can't be read fails `$min_subjects`, even with `min_subjects: 0`, because ergo can't tell where the subjects would be. The `$min_subjects` row takes the ref's cause, and its definition records the ref under `$refs`, so the violation shows which param was missing.
 - A `present` filter whose path has a ref step that can't be read doesn't rule subjects out. It fails the requirement, because the field it looked for is unknown, not missing.
 - A ref step written with another key, like `{"ref": [...], "where": {...}}`, is a mistake, not a selector. It fails the check and shows as `[<invalid ref>]`. In `from`, it fails `$well_formed`.
@@ -304,7 +304,7 @@ Some things worth knowing:
 - The step must be the last one in `from`, and there can only be one. The name must be a string that doesn't start with `$`. `keys` must be a list, a `literal` holding a list, or a [`ref`](#reading-from-the-input), and a key in the list can't be a ref with another key beside it. A step with any other field, or one that breaks these rules, fails `$well_formed` and gives no subjects, so the requirement is never met, even with `min_subjects: 0`.
 - Any other object in `from`, like a selector or a `literal`, fails `$well_formed` the same way. `from` has never read them, so a requirement with `min_subjects: 0` used to find nothing and pass.
 - Keys are sorted and duplicates dropped, so the order you list them in doesn't change the report. If `from` doesn't lead to an object, every key is still a subject, and its checks fail as `absent`. An empty `keys` list gives no subjects, so `$min_subjects` fails.
-- `keys` can come from the params: `"keys": {"ref": ["$$params", "required_suites"]}`. The list it reads works exactly like one written in the policy. A single key can be a ref too: `[{"ref": ["$$params", "suite"]}, "unit-test"]`, as can a `literal` like `{"literal": "$x"}`. If a ref can't be read, or reads the wrong type (anything but a list for the whole of `keys`, or a string or number for one key), there are no subjects and `$min_subjects` fails as `absent` or `null`, even with `min_subjects: 0`. A key is never just left out. The definition of `$min_subjects` records the ref under `$refs`.
+- `keys` can come from the params: `"keys": {"ref": ["$$params", "required_suites"]}`. The list it reads works exactly like one written in the policy. A single key can be a ref too: `[{"ref": ["$$params", "suite"]}, "unit-test"]`, as can a `literal` like `{"literal": "$x"}`. If a ref can't be read, or reads the wrong type (anything but a list for the whole of `keys`, or a string or number for one key), there are no subjects and `$min_subjects` fails as `absent`, `null` or, for the wrong type, `unusable`, even with `min_subjects: 0`. A key is never just left out. The definition of `$min_subjects` records the ref under `$refs`.
 - A subject from an object is identified by its key, even if the requirement has an `id`. For a list, the `id` can start with the name, like `["$pr", "number"]`.
 - An empty path is named after the subject's name (`$run`), not after `from`.
 - A path that starts with a name nobody gave, like `["$runs", "result"]`, is written wrong: it fails `$well_formed`, and the check fails with cause `ill_formed`. That holds even when no subject is found, so a requirement can't pass by never running the check. To read a key that really starts with `$`, write it as `{"literal": "$schema"}`.
@@ -348,14 +348,15 @@ Some things worth knowing:
 
   The expression says what's wrong: `<unknown op nope>`, `<missing op>`, `<invalid check>` for a check that isn't an object, `<even can't go here>` for a check where it can't go, or `<missing value>` in place of a missing parameter, as in `state == <missing value>`. The [`$well_formed` row](#checks-ergo-adds) lists each check that's written wrong, and what's wrong with it.
 
-  A [`ref`](#reading-from-the-input) that reads the wrong kind of value from the params, like `values` read from a param that holds `3`, isn't a mistake in the policy, so it doesn't fail `$well_formed`. The check fails with cause `absent`.
+  A [`ref`](#reading-from-the-input) that reads the wrong kind of value from the params, like `values` read from a param that holds `3`, isn't a mistake in the policy, so it doesn't fail `$well_formed`. The check fails with cause `unusable`.
+- A field with the wrong kind of value for the operator fails with cause `unusable`, not `value`: a field that isn't a number for `range`, isn't a string for `matches_any` or `not_matches_any`, or isn't a list for `includes`, `excludes`, `all` or `any`, two fields of different types for `compare`, or anything but two timestamps in the same format for `compare_time`. So a filter fails the requirement instead of quietly ruling the subject out. `equals` and `in` are different: `"5"` isn't `5`, which is a sound answer, so that fails with `value`. So does `non_empty_string` on a number, since checking the type is its job.
 - `equals` with `"value": null` only passes when the field is there and set to `null`. A missing field doesn't count.
 - `range` needs `min` and `max` to be numbers. A string like `"3"` fails the check, because Rego puts every number before every string, so `5 <= "3"` would be true.
 - `in` fails when the field is missing or `null`, even if `values` contains `null`. To check that a field is `null`, use `equals` with `"value": null`. `values` can be a list or, from Rego, a set. `in` also fails when `values` is empty, missing, or not a list or set. The expression then shows `id in <missing values>` or `id in <invalid values>` rather than a list.
 - `compare` and `compare_time` compare two fields of the same subject. To compare a field with a fixed number, use `range`.
-- `compare` with `lt`, `lte`, `gt` or `gte` needs both fields to be numbers or both to be strings. Ordering objects, lists or booleans fails with cause `absent`, because Rego's order for them means nothing in a policy: `{"name": "ann"}` comes before `{"owner": "bob"}` only because `name` sorts before `owner`. You'd usually hit this by leaving the field off the end of a path. `eq` and `ne` work on any type. A substitute that orders objects, lists or booleans gives its check the same cause. Inside `all` or `any`, the row's cause is about the list, so it shows `value`.
-- `compare_time` never converts between formats, so a number against a string fails. With numbers, ergo can't tell seconds from milliseconds, so make sure both sides use the same unit.
-- An RFC 3339 string needs an uppercase `T` and `Z`, a date that exists, and a year from 1678 to 2261, which keeps its nanoseconds since 1970 inside a 64-bit integer. Anything else fails `compare_time`, so `2024-02-30T00:00:00Z` isn't read as 1 March, and `2024-01-01t00:00:00z` isn't read at all.
+- `compare` with `lt`, `lte`, `gt` or `gte` needs both fields to be numbers or both to be strings. Ordering objects, lists or booleans fails with cause `unusable`, because Rego's order for them means nothing in a policy: `{"name": "ann"}` comes before `{"owner": "bob"}` only because `name` sorts before `owner`. You'd usually hit this by leaving the field off the end of a path. `eq` and `ne` work on any type. A substitute that orders objects, lists or booleans gives its check the same cause, and so does an item inside `all` or `any`.
+- `compare_time` never converts between formats, so a number against a string fails as `unusable`. With numbers, ergo can't tell seconds from milliseconds, so make sure both sides use the same unit.
+- An RFC 3339 string needs an uppercase `T` and `Z`, a date that exists, and a year from 1678 to 2261, which keeps its nanoseconds since 1970 inside a 64-bit integer. Anything else fails `compare_time` as `unusable`, so `2024-02-30T00:00:00Z` isn't read as 1 March, and `2024-01-01t00:00:00z` isn't read at all.
 - Patterns in `matches_any` and `not_matches_any` aren't anchored: `svc_` matches `my_svc_account`. Use `^` and `$` when you need a full match. A pattern that isn't a string, or isn't a valid regular expression, fails either operator, even when another pattern matches. With an empty `patterns` list, `matches_any` fails and `not_matches_any` passes. When `patterns` isn't a list or, from Rego, a set, both fail and the expression shows `author matches one of <invalid patterns>` or `author matches none of <invalid patterns>`. When it's missing, the expression shows `<missing patterns>` instead.
 
 These two are useful in `applies_to`, for example to leave bot accounts out of a review rule. If the author field is missing, ergo can't tell whether the subject is in scope, so the requirement fails. See [Checks ergo adds](#checks-ergo-adds).
@@ -377,7 +378,7 @@ These apply a check to each item of a list inside the subject.
 }
 ```
 
-An empty list fails. No commits isn't proof that every commit is signed. Anything that isn't a list fails too, an object included. The row's `inputs` then show `[]` for the list, because an object's values have no order of their own.
+An empty list fails, with cause `value`. No commits isn't proof that every commit is signed. Anything that isn't a list fails too, an object included, with cause `unusable`. The row's `inputs` then show `[]` for the list, because an object's values have no order of their own.
 
 `each` goes one level deeper. The check then applies to every item of every inner list:
 
@@ -451,7 +452,7 @@ The inner paths start at each commit, so `["timestamp"]` is the commit's. `$appr
 }
 ```
 
-The row shows the lists the check read, but not which approver failed or why. A commit with no timestamp fails the check too, because nothing proves the approval came after it.
+The row shows the lists the check read, but not which approver failed or why. A commit with no timestamp fails the check too, with cause `absent`, because nothing proves the approval came after it.
 
 To require several things of the same approver, put them in one [`any_of`](#any_of) option, list checks included. This one needs an approver who approved, isn't the author, and approved after every commit:
 
@@ -472,7 +473,7 @@ Some things worth knowing:
 
 - `as` takes the same names as a [naming step](#naming-subjects): a string that doesn't start with `$`. Without `each`, `$approver` reads the same as a path inside the item, so `as` only matters for a check nested inside. With `each`, it names the inner item.
 - A name can only be given once along a chain of checks. `as` with a name that `from` or an outer check already gave is written wrong: it fails `$well_formed`, the check fails with cause `ill_formed`, and it shows as `<name given twice>`. A badly written name fails the same way and shows as `<invalid name>`. The cause isn't `value`, so a filter written like this fails the requirement rather than ruling every subject out. Two separate checks can use the same name.
-- A name given by `as` belongs to one item, so the row doesn't read it, and it doesn't decide the cause. Paths that start with it are shown as paths inside the item, like `approvers[].timestamp`. That only holds inside the list check that gives the name. Anywhere else, like a neighbouring `any_of` option, nothing gives it, so reading it there is written wrong and fails as `ill_formed`.
+- A name given by `as` belongs to one item, so the row doesn't show it in its `inputs`. It still decides that item's cause, so an approver with no `timestamp` makes the check fail as `absent`. Paths that start with it are shown as paths inside the item, like `approvers[].timestamp`. That only holds inside the list check that gives the name. Anywhere else, like a neighbouring `any_of` option, nothing gives it, so reading it there is written wrong and fails as `ill_formed`.
 - Inner lists follow the same rules as outer ones. If an approver is tried against an empty or missing list of commits, that try fails.
 - One level of nesting is as deep as it goes, because Rego doesn't allow recursion. An `any_of` doesn't count as a level, but an `all` or `any` in one of its options does. A third `all` or `any` is written wrong: it fails `$well_formed`, the check fails with cause `ill_formed`, and its expression shows `<nested too deep>`.
 
@@ -691,7 +692,7 @@ A subject is only out of scope when ergo read a filter's fields and the values d
 
 `present` is the exception, because a missing or `null` field is exactly what it checks for. A `present` filter that finds one rules the subject out, so `{"op": "present", "path": ["lock_release"]}` leaves out a package with no `lock_release`. A selector in its path that matches nothing or more than one item still fails the requirement, as does a subject that isn't an object, or a path that starts with a name nothing gave, like `["$p", "author"]` when `from` gave `$pr`.
 
-With several filters, one that clearly rules the subject out is enough, even if another can't be read. A substitute that isn't there doesn't count as unreadable, because substitutes are usually missing.
+With several filters, the subject is only out of scope when every filter that failed did so with `value`. If one rules it out and another can't be read, the requirement fails, so missing data always shows. A substitute that isn't there doesn't count as unreadable, because substitutes are usually missing.
 
 Together, these make sure that whenever a requirement isn't met, at least one row explains why.
 
@@ -710,21 +711,22 @@ Patterns, options, selector fields and the keys of objects written in the policy
 
 Every row has a `cause`. A missing field, a field set to `null`, and a selector that matched nothing all show up as `null` in `inputs`, but they're different problems with different fixes. The cause tells them apart.
 
-| `cause`         | Meaning                                                             |
-| --------------- | ------------------------------------------------------------------- |
-| `satisfied`     | The check passed.                                                   |
-| `substituted`   | The check failed, but its substitute passed.                        |
-| `ill_formed`    | The check is written wrong, so it can't be run. `$well_formed` fails too. |
-| `not_an_object` | The subject isn't an object, so it has no fields.                   |
-| `ambiguous`     | A selector matched more than one item.                              |
-| `unmatched`     | A selector matched nothing, although the list was there.            |
-| `absent`        | A field the check reads isn't there.                                |
-| `null`          | A field the check reads is there, but `null`.                       |
-| `value`         | Everything was read fine. The values just don't pass.               |
+| `cause`         | Meaning                                                                                                                           |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `satisfied`     | The check passed.                                                                                                                 |
+| `substituted`   | The check failed, but its substitute passed.                                                                                      |
+| `ill_formed`    | The check is written wrong, so it can't be run. `$well_formed` fails too.                                                         |
+| `not_an_object` | The subject isn't an object, so it has no fields.                                                                                 |
+| `ambiguous`     | A selector matched more than one item.                                                                                            |
+| `unmatched`     | A selector matched nothing, although the list was there.                                                                          |
+| `unusable`      | A value the check reads is there, but it's not the kind the check needs, like a string for `range`, or a param of the wrong type. |
+| `absent`        | A field the check reads isn't there.                                                                                              |
+| `null`          | A field the check reads is there, but `null`.                                                                                     |
+| `value`         | Everything was read fine. The values just don't pass.                                                                             |
 
 When a check reads several fields, the row shows the first cause in this table's order. An ambiguous selector matters more than any value, because it means the policy can't even tell what it's looking at.
 
-- For `all` and `any`, the cause is about the list itself. A problem inside one item shows up as `value`. So does an empty list, since it was read fine and just has nothing in it.
+- For `all` and `any`, a list that isn't there gives `absent`, and one that isn't a list gives `unusable`. An empty list gives `value`, since it was read fine and just has nothing in it. Otherwise the cause is the first, in this table's order, among the items that failed. So when one approver is a bot and another has no `username`, a check that some approver isn't a bot fails as `absent`, because the second one might not be. An `any_of` works the same way across its options, and so does `each` across its inner lists.
 - For a custom operator, the cause is worked out from its `inputs`, or from its `path` if it has no `inputs`. With neither, the cause is always `value`.
 - `$well_formed` and `$min_subjects` don't read the subject, so their cause is `satisfied` or `value`. `$applies` reports the state of the fields read by the filters that failed. For example, a subject whose filter field is missing says `absent`, and that fails the requirement. A filter that's written wrong gives `ill_formed`, even when another filter rules the subject out, because the scope can't be trusted.
 
@@ -782,6 +784,8 @@ ergo fails a check whenever it can't be sure, instead of letting it pass. Rego d
 - `all`, `any` and `each` need non-empty lists, inner lists of nested checks included.
 - A name given twice, or badly written, fails the check, so an inner name can't quietly hide an outer one.
 - A check that's written wrong, like an unknown `op` or `cmp`, fails `$well_formed`, and its rows fail with cause `ill_formed`, so a mistake in `applies_to` can't rule every subject out.
+- A value of the wrong kind, like a string where `range` needs a number, or a param of the wrong type, fails with cause `unusable`, so a filter can't rule a subject out on it.
+- With several filters, one that can't be read fails the requirement, even when another rules the subject out.
 - `min_subjects` is 1 unless you say otherwise, so finding nothing fails.
 - A key listed in `keys` that the input doesn't have is still a subject, so it fails instead of being skipped.
 - A subject whose `applies_to` filter can't be read fails the requirement instead of being left out.
