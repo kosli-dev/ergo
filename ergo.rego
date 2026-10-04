@@ -47,7 +47,10 @@ _has_type("min_subjects", v) if {
 	v == floor(v)
 }
 
-_has_type("subject_type", v) if is_string(v)
+_has_type("subject_type", v) if {
+	is_string(v)
+	trim_space(v) != ""
+}
 
 _bad_applies_to(req) if {
 	is_object(req)
