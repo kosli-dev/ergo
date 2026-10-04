@@ -1446,6 +1446,24 @@ test_expression_for_in_does_not_list_values_it_will_not_match if {
 	rendered({"id": "MIT"}, {"op": "in", "path": ["id"]}) == "id in <invalid values>"
 }
 
+test_expression_for_matches_any_does_not_list_patterns_it_will_not_match if {
+	rendered({"a": "x"}, {"op": "matches_any", "path": ["a"], "patterns": {"p": "x"}}) == "a matches one of <invalid patterns>"
+	rendered({"a": "x"}, {"op": "matches_any", "path": ["a"], "patterns": "x"}) == "a matches one of <invalid patterns>"
+	rendered({"a": "x"}, {"op": "matches_any", "path": ["a"], "patterns": {"literal": "x"}}) == "a matches one of <invalid patterns>"
+	rendered({"a": "x"}, {"op": "matches_any", "path": ["a"], "patterns": null}) == "a matches one of <invalid patterns>"
+	rendered({"a": "x"}, {"op": "matches_any", "path": ["a"]}) == "a matches one of <invalid patterns>"
+}
+
+test_expression_for_not_matches_any_does_not_list_patterns_it_will_not_match if {
+	rendered({"a": "x"}, {"op": "not_matches_any", "path": ["a"], "patterns": "x"}) == "a matches none of <invalid patterns>"
+	rendered({"a": "x"}, {"op": "not_matches_any", "path": ["a"], "patterns": null}) == "a matches none of <invalid patterns>"
+	rendered({"a": "x"}, {"op": "not_matches_any", "path": ["a"]}) == "a matches none of <invalid patterns>"
+}
+
+test_expression_for_matches_any_lists_a_literal_list_of_patterns if {
+	rendered({"a": "x"}, {"op": "matches_any", "path": ["a"], "patterns": {"literal": ["y", "x"]}}) == `a matches one of ["x", "y"]`
+}
+
 test_expression_for_equals if rendered({}, is_merged) == `state == "MERGED"`
 
 test_a_string_value_is_quoted_so_it_is_not_read_as_a_number if {

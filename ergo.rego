@@ -1581,14 +1581,17 @@ _leaf_describe(check, item) := sprintf("%s matches one of %s", [_item_path_name(
 
 _leaf_describe(check, item) := sprintf("%s matches none of %s", [_item_path_name(item, check.path), _pattern_list(check)]) if check.op == "not_matches_any"
 
-_pattern_list(check) := sprintf("[%s]", [concat(", ", sort([_literal_text(p) | some p in _written(check.patterns)]))]) if {
-	not _is_ref(check.patterns)
-	not _malformed(check.patterns)
-}
+_pattern_list(check) := sprintf("[%s]", [concat(", ", sort([_literal_text(p) | some p in _written(check.patterns)]))]) if _value_list(_written(check.patterns))
 
 _pattern_list(check) := _ref_name(check.patterns.ref) if _is_ref(check.patterns)
 
 _pattern_list(check) := "<invalid ref>" if _malformed(check.patterns)
+
+_pattern_list(check) := "<invalid patterns>" if {
+	not _is_ref(object.get(check, "patterns", null))
+	not _malformed(object.get(check, "patterns", null))
+	not _value_list(_written(object.get(check, "patterns", null)))
+}
 
 _leaf_describe(check, item) := sprintf("%s %s %s", [_item_path_name(item, check.left), _text(check.cmp), _item_path_name(item, check.right)]) if check.op in {"compare", "compare_time"}
 
