@@ -1271,9 +1271,13 @@ _nested_wrapper_problem(node) := {sprintf("%s inside %s", [_wrapper(x), f]) |
 	not _ref_read_at(f, node[f], p)
 	not _under_literal(node[f], p)
 	not _under_ref(node[f], p)
-} | {sprintf("%s inside where", [_wrapper(x)]) |
+} | {sprintf("%s inside where", [kind]) |
 	some f in ["path", "left", "right", "each", "inputs"]
 	some path in _own_paths(node, f)
+	some kind in _wrapped_in_where(path)
+}
+
+_wrapped_in_where(path) := {_wrapper(x) |
 	is_array(path)
 	some seg in path
 	is_object(seg)
@@ -2546,6 +2550,7 @@ _well_formed(req) if {
 	not _out_of_range([_from_of(req), _id_of(req), _min_subjects_of(req)])
 	not _badly_stepped(_from_of(req))
 	not _badly_stepped(_id_of(req))
+	_wrapped_in_where(_id_of(req)) == set()
 	_check_problem_inputs(req) == []
 }
 

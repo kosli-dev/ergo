@@ -3975,6 +3975,21 @@ test_a_ref_or_literal_deeper_inside_a_where_value_is_written_wrong if {
 	[[r.check, r.cause] | some r in rep.results; r.check in {"ref", "literal", "right"}] == [["literal", "ill_formed"], ["ref", "ill_formed"], ["right", "ill_formed"]]
 }
 
+id_where_well_formed(where) := rows_for(
+	ergo.report(
+		{"params": {"k": "a"}, "items": [{"ids": [{"k": "a", "v": 1}], "x": 1}]},
+		{"s": {"from": ["items"], "id": ["ids", {"where": {"k": where}}, "v"], "checks": {"c": {"op": "present", "path": ["x"]}}}},
+	),
+	"s", "$well_formed",
+)[0].passed
+
+test_a_ref_or_literal_deeper_inside_a_where_value_in_id_is_not_well_formed if {
+	id_where_well_formed([{"ref": ["$$input", "params", "k"]}]) == false
+	id_where_well_formed({"a": {"literal": "a"}}) == false
+	id_where_well_formed({"ref": ["$$input", "params", "k"]}) == true
+	id_where_well_formed({"literal": [{"ref": ["x"]}]}) == true
+}
+
 test_a_where_value_under_a_literal_is_data if {
 	shaped := {"ref": ["$$input", "params", "k"]}
 	check := {"op": "present", "path": ["items", {"where": {"k": {"literal": [shaped]}}}, "tags"]}
