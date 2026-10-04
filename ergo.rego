@@ -986,7 +986,6 @@ _unusable(leaf, x) if {
 
 _unusable(leaf, x) if {
 	leaf.op in {"present", "missing"}
-	_read_state(x, leaf.path) == "absent"
 	_blocked(x, leaf.path)
 }
 
@@ -1729,6 +1728,7 @@ _leaf_cause(leaf, x) := "satisfied" if {
 } else := "missing" if {
 	_asks_presence(leaf, x)
 	_read_state(x, leaf.path) in {"absent", "null"}
+	not _blocked(x, leaf.path)
 } else := _worst_or_value({_read_state(x, p) | some p in _leaf_paths(leaf)} | _unusable_states(leaf, x))
 
 _answered(check, x, states) := {_presence_state(s) | some s in states} if _asks_presence(check, x)
@@ -1741,7 +1741,6 @@ _asks_presence(check, x) if {
 	check.op == "present"
 	_keys_of(check.path)
 	_ := _start_of(x, check.path)
-	not _blocked(x, check.path)
 }
 
 _presence_state(s) := "missing" if s in {"absent", "null"}
