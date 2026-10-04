@@ -848,6 +848,44 @@ leaf_passed(check, subj) if {
 }
 
 leaf_passed(check, subj) if {
+	check.op == "missing"
+	_missing_at(subj, check.path)
+}
+
+leaf_passed(check, subj) if {
+	check.op == "empty"
+	value_at(subj, check.path) == []
+}
+
+_missing_at(x, path) if {
+	keys := _keys_of(path)
+	start := _start_of(x, path)
+	_read_state(x, path) in {"absent", "null"}
+	every i, k in keys {
+		_can_hold(_read_from(start, array.slice(keys, 0, i)), k)
+	}
+}
+
+_can_hold(v, _) if v == _absent
+
+_can_hold(v, _) if v == null
+
+_can_hold(v, k) if {
+	is_object(v)
+	is_string(k)
+}
+
+_can_hold(v, k) if {
+	is_array(v)
+	is_number(k)
+}
+
+_can_hold(v, k) if {
+	_is_collection(v)
+	is_object(k)
+}
+
+leaf_passed(check, subj) if {
 	check.op == "matches_any"
 	v := value_at(subj, check.path)
 	is_string(v)
@@ -941,7 +979,16 @@ _unusable(leaf, x) if {
 }
 
 _unusable(leaf, x) if {
-	leaf.op in {"includes", "excludes"}
+	leaf.op == "missing"
+	_read_state(x, leaf.path) == "absent"
+	keys := _keys_of(leaf.path)
+	start := _start_of(x, leaf.path)
+	some i, k in keys
+	not _can_hold(_read_from(start, array.slice(keys, 0, i)), k)
+}
+
+_unusable(leaf, x) if {
+	leaf.op in {"includes", "excludes", "empty"}
 	v := _found(x, leaf.path)
 	not is_array(v)
 }
@@ -1018,7 +1065,7 @@ _cmp("lt", l, r) if l < r
 
 _cmp("lte", l, r) if l <= r
 
-_leaf_ops := {"range", "excludes", "includes", "in", "equals", "present", "non_empty_string", "matches_any", "not_matches_any", "compare", "compare_time"}
+_leaf_ops := {"range", "excludes", "includes", "in", "equals", "present", "missing", "non_empty_string", "empty", "matches_any", "not_matches_any", "compare", "compare_time"}
 
 operators contains op if some op in (_leaf_ops | {"all", "any", "any_of"})
 
@@ -1029,7 +1076,9 @@ _required_fields := {
 	"in": {"path", "values"},
 	"equals": {"path", "value"},
 	"present": {"path"},
+	"missing": {"path"},
 	"non_empty_string": {"path"},
+	"empty": {"path"},
 	"matches_any": {"path", "patterns"},
 	"not_matches_any": {"path", "patterns"},
 	"compare": {"left", "right", "cmp"},
@@ -2017,7 +2066,11 @@ _leaf_describe(check, item) := sprintf("%s == %s", [_path_text(item, check, "pat
 
 _leaf_describe(check, item) := sprintf("%s is present", [_path_text(item, check, "path")]) if check.op == "present"
 
+_leaf_describe(check, item) := sprintf("%s is missing", [_path_text(item, check, "path")]) if check.op == "missing"
+
 _leaf_describe(check, item) := sprintf("%s is a non-empty string", [_path_text(item, check, "path")]) if check.op == "non_empty_string"
+
+_leaf_describe(check, item) := sprintf("%s is empty", [_path_text(item, check, "path")]) if check.op == "empty"
 
 _leaf_describe(check, item) := sprintf("%s matches one of %s", [_path_text(item, check, "path"), _pattern_list(check)]) if check.op == "matches_any"
 

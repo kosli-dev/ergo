@@ -456,6 +456,143 @@ test_non_empty_string_rejects_null if verdict({"fingerprint": null}, filled) == 
 
 test_non_empty_string_rejects_missing_field if verdict({}, filled) == false
 
+no_fingerprint := {"op": "missing", "path": ["fingerprint"]}
+
+test_missing_when_the_field_is_not_there if verdict({}, no_fingerprint) == true
+
+test_missing_when_the_field_is_null if verdict({"fingerprint": null}, no_fingerprint) == true
+
+test_missing_fails_as_value_when_the_field_is_set if {
+	every v in ["abc", "", false, 0, [], {}] {
+		[verdict({"fingerprint": v}, no_fingerprint), cause_of({"fingerprint": v}, no_fingerprint)] == [false, "value"]
+	}
+}
+
+test_missing_passes_when_a_step_before_the_field_is_not_there_or_is_null if {
+	check := {"op": "missing", "path": ["build", "fingerprint"]}
+	verdict({}, check) == true
+	verdict({"build": null}, check) == true
+	verdict({"build": {}}, check) == true
+}
+
+test_missing_reads_past_the_end_of_a_list_as_missing if verdict({"xs": [1]}, {"op": "missing", "path": ["xs", 3]}) == true
+
+test_missing_fails_as_unusable_when_a_step_before_the_field_cannot_hold_it if {
+	every pair in [
+		[{"build": "abc"}, ["build", "fingerprint"]],
+		[{"build": 5}, ["build", "fingerprint"]],
+		[{"build": ["abc"]}, ["build", "fingerprint"]],
+		[{"build": {}}, ["build", 0]],
+		[{"build": "abc"}, ["build", {"where": {"k": 1}}, "v"]],
+	] {
+		[verdict(pair[0], {"op": "missing", "path": pair[1]}), cause_of(pair[0], {"op": "missing", "path": pair[1]})] == [false, "unusable"]
+	}
+}
+
+test_missing_needs_a_selector_to_match_one_item if {
+	check := {"op": "missing", "path": ["xs", {"where": {"k": 1}}, "v"]}
+	verdict({"xs": [{"k": 1}]}, check) == true
+	[verdict({"xs": [{"k": 2}]}, check), cause_of({"xs": [{"k": 2}]}, check)] == [false, "unmatched"]
+	[verdict({"xs": [{"k": 1}, {"k": 1}]}, check), cause_of({"xs": [{"k": 1}, {"k": 1}]}, check)] == [false, "ambiguous"]
+	[verdict({}, check), cause_of({}, check)] == [false, "absent"]
+}
+
+test_missing_fails_on_a_subject_that_is_not_an_object if {
+	rep := ergo.report({"items": ["abc"]}, {"s": {"from": ["items"], "checks": {"c": {"op": "missing", "path": ["v"]}}}})
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "not_an_object"]]
+}
+
+test_missing_with_an_empty_path_passes_only_on_a_null_item if {
+	check := {"op": "all", "path": ["xs"], "check": {"op": "missing", "path": []}}
+	verdict({"xs": [null, null]}, check) == true
+	verdict({"xs": [null, "a"]}, check) == false
+}
+
+no_commits := {"op": "empty", "path": ["commits"]}
+
+test_empty_when_the_list_is_empty if verdict({"commits": []}, no_commits) == true
+
+test_empty_fails_as_value_when_the_list_has_items if {
+	[verdict({"commits": [null]}, no_commits), cause_of({"commits": [null]}, no_commits)] == [false, "value"]
+}
+
+test_empty_fails_when_the_list_is_missing_or_null if {
+	[verdict({}, no_commits), cause_of({}, no_commits)] == [false, "absent"]
+	[verdict({"commits": null}, no_commits), cause_of({"commits": null}, no_commits)] == [false, "null"]
+}
+
+test_empty_only_takes_a_list if {
+	every v in ["", {}, 0, false] {
+		[verdict({"commits": v}, no_commits), cause_of({"commits": v}, no_commits)] == [false, "unusable"]
+	}
+}
+
+clean_labels := {"op": "any_of", "options": {
+	"no_labels": [{"op": "missing", "path": ["labels"]}],
+	"clean": [{"op": "excludes", "path": ["labels"], "value": "do-not-merge"}],
+}}
+
+test_missing_in_any_of_lets_a_missing_field_pass_a_check if {
+	[verdict({}, clean_labels), verdict({"labels": ["ok"]}, clean_labels)] == [true, true]
+	[verdict({"labels": ["do-not-merge"]}, clean_labels), cause_of({"labels": ["do-not-merge"]}, clean_labels)] == [false, "value"]
+	[verdict({"labels": "do-not-merge"}, clean_labels), cause_of({"labels": "do-not-merge"}, clean_labels)] == [false, "unusable"]
+	rendered({}, clean_labels) == `one of: clean(not contains(labels, "do-not-merge")) | no_labels(labels is missing)`
+}
+
+test_missing_in_any_of_keeps_a_subject_with_no_field_in_scope if {
+	doc := {"items": [
+		{"id": "a", "environment": "prod"},
+		{"id": "b"},
+		{"id": "c", "environment": "staging"},
+	]}
+	prod := {"prod": {"op": "any_of", "options": {
+		"named": [{"op": "equals", "path": ["environment"], "value": "prod"}],
+		"unset": [{"op": "missing", "path": ["environment"]}],
+	}}}
+	rep := ergo.report(doc, scoped_req(prod))
+	[[r.subject.id, r.passed, r.cause] | some r in rows_for(rep, "s", "$applies")] == [["a", true, "satisfied"], ["b", true, "satisfied"], ["c", false, "value"]]
+	rep.compliant == true
+}
+
+test_a_missing_filter_rules_a_subject_with_the_field_out if {
+	rep := ergo.report({"items": [{"id": "a", "draft": true}, {"id": "b"}]}, scoped_req({"final": {"op": "missing", "path": ["draft"]}}))
+	rep.requirements.s.subjects == {"total": 2, "matching": 1}
+	rep.compliant == true
+}
+
+humans_with_usernames_only := {"op": "all", "path": ["approvers"], "check": {"op": "any_of", "options": {
+	"human": [{"op": "not_matches_any", "path": ["username"], "patterns": ["\\[bot\\]$"]}],
+	"skip": [{"op": "missing", "path": ["username"]}],
+}}}
+
+test_missing_skips_an_item_in_all_by_passing_it if {
+	verdict({"approvers": [{"username": "ann"}, {}]}, humans_with_usernames_only) == true
+	verdict({"approvers": [{"username": "renovate[bot]"}, {}]}, humans_with_usernames_only) == false
+}
+
+some_person := {"op": "any", "path": ["approvers"], "check": {"op": "any_of", "options": {"person": [
+	{"op": "present", "path": ["username"]},
+	{"op": "not_matches_any", "path": ["username"], "patterns": ["\\[bot\\]$"]},
+]}}}
+
+test_present_skips_an_item_in_any_by_failing_it_cleanly if {
+	subj := {"approvers": [{"username": "renovate[bot]"}, {}]}
+	[verdict(subj, some_person), cause_of(subj, some_person)] == [false, "value"]
+	verdict({"approvers": [{"username": "ann"}, {}]}, some_person) == true
+}
+
+commits_signed_or_none := {"op": "any_of", "options": {
+	"none": [{"op": "empty", "path": ["commits"]}],
+	"signed": [{"op": "all", "path": ["commits"], "check": {"op": "equals", "path": ["signed"], "value": true}}],
+}}
+
+test_empty_in_any_of_lets_an_empty_list_pass_all if {
+	verdict({"commits": []}, commits_signed_or_none) == true
+	verdict({"commits": [{"signed": true}]}, commits_signed_or_none) == true
+	[verdict({"commits": [{"signed": false}]}, commits_signed_or_none), cause_of({"commits": [{"signed": false}]}, commits_signed_or_none)] == [false, "value"]
+	[verdict({}, commits_signed_or_none), cause_of({}, commits_signed_or_none)] == [false, "absent"]
+}
+
 compare_ab(op) := {"op": "compare", "cmp": op, "left": ["a"], "right": ["b"]}
 
 test_compare_eq_when_equal if verdict({"a": 1, "b": 1}, compare_ab("eq")) == true
@@ -1775,6 +1912,10 @@ test_expression_for_present if rendered({}, has_fingerprint) == "fingerprint is 
 
 test_expression_for_non_empty_string if rendered({}, filled) == "fingerprint is a non-empty string"
 
+test_expression_for_missing if rendered({}, no_fingerprint) == "fingerprint is missing"
+
+test_expression_for_empty if rendered({}, no_commits) == "commits is empty"
+
 test_expression_for_compare if rendered({}, compare_ab("lt")) == "a lt b"
 
 test_expression_for_compare_time if rendered(span, compare_time_span("lt")) == "start lt end"
@@ -2330,6 +2471,8 @@ test_a_missing_parameter_shows_in_the_expression_instead_of_leaving_it_empty if 
 		{"op": "excludes", "path": ["xs"]},
 		{"op": "present"},
 		{"op": "non_empty_string"},
+		{"op": "missing"},
+		{"op": "empty"},
 		{"op": "range", "path": ["n"], "min": 0},
 		{"op": "range", "path": ["n"]},
 		{"op": "compare", "left": ["a"], "right": ["b"]},
@@ -2345,6 +2488,8 @@ test_a_missing_parameter_shows_in_the_expression_instead_of_leaving_it_empty if 
 		"not contains(xs, <missing value or values>)",
 		"<missing path> is present",
 		"<missing path> is a non-empty string",
+		"<missing path> is missing",
+		"<missing path> is empty",
 		"n >= 0 and n <= <missing max>",
 		"n >= <missing min> and n <= <missing max>",
 		"a <missing cmp> b",
@@ -2428,6 +2573,8 @@ test_every_built_in_op_takes_its_own_fields_and_the_ones_every_check_can_have if
 		"equals": {"op": "equals", "path": ["n"], "value": 1},
 		"present": {"op": "present", "path": ["n"]},
 		"non_empty_string": {"op": "non_empty_string", "path": ["s"]},
+		"missing": {"op": "missing", "path": ["gone"]},
+		"empty": {"op": "empty", "path": ["xs"]},
 		"matches_any": {"op": "matches_any", "path": ["s"], "patterns": ["a"]},
 		"not_matches_any": {"op": "not_matches_any", "path": ["s"], "patterns": ["b"]},
 		"compare": {"op": "compare", "left": ["n"], "right": ["n"], "cmp": "eq"},
@@ -2474,6 +2621,11 @@ test_a_value_the_op_cannot_use_fails_as_unusable_and_a_filter_cannot_rule_the_su
 		{"op": "compare_time", "left": ["n"], "right": ["t"], "cmp": "lt"},
 		{"op": "compare_time", "left": ["bad_t"], "right": ["t"], "cmp": "lt"},
 		{"op": "compare_time", "left": ["o"], "right": ["o"], "cmp": "eq"},
+		{"op": "empty", "path": ["s"]},
+		{"op": "empty", "path": ["o"]},
+		{"op": "missing", "path": ["s", "x"]},
+		{"op": "missing", "path": ["l", "x"]},
+		{"op": "missing", "path": ["o", 0]},
 	] {
 		kind_cause(check) == "unusable"
 		kind_filter(check) == [false, ["unusable"]]
@@ -2488,6 +2640,9 @@ test_a_value_ergo_could_use_that_does_not_pass_stays_value if {
 		{"op": "all", "path": ["e"], "check": {"op": "present", "path": []}},
 		{"op": "any", "path": ["e"], "check": {"op": "present", "path": []}},
 		{"op": "excludes", "path": ["l"], "value": 1},
+		{"op": "empty", "path": ["l"]},
+		{"op": "missing", "path": ["n"]},
+		{"op": "missing", "path": ["e"]},
 	] {
 		kind_cause(check) == "value"
 		kind_filter(check) == [true, ["value"]]
@@ -5096,6 +5251,8 @@ badly_written := [
 	{"op": "range", "path": ["n"], "min": 9, "max": 0},
 	{"op": "equals", "path": ["n"], "value": 1, "as": "x"},
 	{"op": "present", "path": ["n"], "each": ["a"]},
+	{"op": "missing", "path": ["n"], "value": null},
+	{"op": "empty", "path": ["xs"], "check": {"op": "present", "path": []}},
 	{"op": "any_of", "as": "x", "options": {"o": [{"op": "equals", "path": ["n"], "value": 1}]}},
 	{"op": "any_of", "options": {"o": [{"op": "equals", "path": ["n"], "value": 1, "each": []}]}},
 	{"op": "equals", "path": ["n"]},
@@ -5103,6 +5260,8 @@ badly_written := [
 	{"op": "excludes", "path": ["xs"]},
 	{"op": "present"},
 	{"op": "non_empty_string"},
+	{"op": "missing"},
+	{"op": "empty"},
 	{"op": "matches_any", "path": ["s"], "patterns": "a"},
 	{"op": "matches_any", "path": ["s"], "patterns": [3]},
 	{"op": "matches_any", "path": ["s"], "patterns": ["("]},
