@@ -6,7 +6,7 @@ ergo is brand new and still changing a lot before its first alpha, so expect bre
 
 ergo is a single Rego file, so using it is as simple as copying it into your project.
 
-You'll need [OPA](https://www.openpolicyagent.org/docs/#1-download-opa) to run it. We test ergo with OPA 1.19. Older versions may not load it: OPA 1.2, for example, stops with `rego_parse_error: unexpected as keyword`. Run `opa version` to see which one you have.
+You'll need [OPA](https://www.openpolicyagent.org/docs/#1-download-opa) to run it. We test ergo with OPA 1.19, and with 1.20.2, the version the Kosli CLI embeds. Older versions may not load it: OPA 1.2, for example, stops with `rego_parse_error: unexpected as keyword`. Run `opa version` to see which one you have.
 
 ### 1. Copy the library
 

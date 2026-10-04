@@ -33,6 +33,12 @@ OPA loads every JSON and YAML file it finds as data. The workflow files under `.
 
 CI runs these checks on pull requests and on pushes to `main` (`.github/workflows/test.yml`), using the OPA version the README names and Regal 0.43.0. When you change the OPA version, change it in the README, in every job of the workflow and in the Docker command below.
 
+A second job runs `opa check --strict`, `opa fmt --list` and `opa test` with OPA 1.20.2, the version the Kosli CLI embeds. Repos that copy `ergo.rego` lint their copy with it, and the two versions don't always format the same way. To run them yourself:
+
+```sh
+docker run --rm -v "$PWD":/src:ro -w /src openpolicyagent/opa:1.20.2 fmt --list .
+```
+
 CI also runs every test compiled to Wasm, with `opa test . --ignore .github --target wasm`, because Wasm walks objects and sets in a different order from `opa eval`, so anything that ends up in the report has to be sorted. That needs the Linux build of OPA. The macOS one says `engine not found`, so on a Mac run it in Docker:
 
 ```sh
