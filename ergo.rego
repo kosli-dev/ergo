@@ -802,22 +802,6 @@ leaf_passed(check, subj) if {
 	}
 }
 
-_wants(values) := arg(values) if not _value_list(values)
-
-_wants(values) := [arg(x) | some x in values] if {
-	_value_list(values)
-	every x in values {
-		_readable(x)
-	}
-}
-
-_readable(x) if arg(x) == arg(x)
-
-_wanted(v) if {
-	_value_list(v)
-	count(v) > 0
-}
-
 leaf_passed(check, subj) if {
 	check.op == "in"
 	v := value_at(subj, check.path)
@@ -891,6 +875,22 @@ leaf_passed(check, subj) if {
 	is_number(l)
 	is_number(r)
 	_cmp(check.cmp, l, r)
+}
+
+_wants(values) := arg(values) if not _value_list(values)
+
+_wants(values) := [arg(x) | some x in values] if {
+	_value_list(values)
+	every x in values {
+		_readable(x)
+	}
+}
+
+_readable(x) if _ = arg(x)
+
+_wanted(v) if {
+	_value_list(v)
+	count(v) > 0
 }
 
 _value_list(v) if is_array(v)
@@ -1942,18 +1942,6 @@ _leaf_describe(check, item) := sprintf("contains(%s, %s)", [_path_text(item, che
 	not _values_only(check)
 }
 
-_one_value_text(check) := _value_text(check.value) if {
-	"value" in object.keys(check)
-	not "values" in object.keys(check)
-}
-
-_one_value_text(check) := "<both value and values>" if {
-	"value" in object.keys(check)
-	"values" in object.keys(check)
-}
-
-_one_value_text(check) := "<missing value or values>" if count({"value", "values"} & object.keys(check)) == 0
-
 _leaf_describe(check, item) := sprintf("contains_none(%s, %s)", [_path_text(item, check, "path"), _values_text(check.values)]) if {
 	check.op == "excludes"
 	_values_only(check)
@@ -1962,28 +1950,6 @@ _leaf_describe(check, item) := sprintf("contains_none(%s, %s)", [_path_text(item
 _leaf_describe(check, item) := sprintf("contains_all(%s, %s)", [_path_text(item, check, "path"), _values_text(check.values)]) if {
 	check.op == "includes"
 	_values_only(check)
-}
-
-_values_only(check) if {
-	"values" in object.keys(check)
-	not "value" in object.keys(check)
-}
-
-_values_text(v) := sprintf("[%s]", [concat(", ", sort([_value_text(x) | some x in v]))]) if _value_list(v)
-
-_values_text(v) := sprintf("[%s]", [concat(", ", sort([_literal_text(x) | some x in v.literal]))]) if {
-	_is_literal(v)
-	_value_list(v.literal)
-}
-
-_values_text(v) := _ref_name(v.ref) if _is_ref(v)
-
-_values_text(v) := "<invalid ref>" if _malformed(v)
-
-_values_text(v) := "<invalid values>" if {
-	not _is_ref(v)
-	not _malformed(v)
-	not _value_list(_written(v))
 }
 
 _leaf_describe(check, item) := sprintf("%s in [%s]", [_path_text(item, check, "path"), concat(", ", sort([_literal_text(v) | some v in _written(check.values)]))]) if {
@@ -2040,6 +2006,40 @@ _pattern_list(check) := "<invalid patterns>" if {
 }
 
 _leaf_describe(check, item) := sprintf("%s %s %s", [_path_text(item, check, "left"), _cmp_text(check), _path_text(item, check, "right")]) if check.op in {"compare", "compare_time"}
+
+_one_value_text(check) := _value_text(check.value) if {
+	"value" in object.keys(check)
+	not "values" in object.keys(check)
+}
+
+_one_value_text(check) := "<both value and values>" if {
+	"value" in object.keys(check)
+	"values" in object.keys(check)
+}
+
+_one_value_text(check) := "<missing value or values>" if count({"value", "values"} & object.keys(check)) == 0
+
+_values_only(check) if {
+	"values" in object.keys(check)
+	not "value" in object.keys(check)
+}
+
+_values_text(v) := sprintf("[%s]", [concat(", ", sort([_value_text(x) | some x in v]))]) if _value_list(v)
+
+_values_text(v) := sprintf("[%s]", [concat(", ", sort([_literal_text(x) | some x in v.literal]))]) if {
+	_is_literal(v)
+	_value_list(v.literal)
+}
+
+_values_text(v) := _ref_name(v.ref) if _is_ref(v)
+
+_values_text(v) := "<invalid ref>" if _malformed(v)
+
+_values_text(v) := "<invalid values>" if {
+	not _is_ref(v)
+	not _malformed(v)
+	not _value_list(_written(v))
+}
 
 _cmp_text(check) := _text(check.cmp) if "cmp" in object.keys(check)
 
