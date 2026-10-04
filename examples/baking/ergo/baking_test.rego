@@ -32,7 +32,7 @@ test_batch_with_nuts_in_its_allergens_fails_on_the_value if {
 }
 
 test_batch_with_nuts_as_a_string_fails_instead_of_passing if {
-	causes("cake-batch-2026-03-18-003").nut_free == "value"
+	causes("cake-batch-2026-03-18-003").nut_free == "unusable"
 }
 
 test_batch_without_allergens_fails_as_absent if {

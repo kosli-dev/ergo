@@ -44,11 +44,11 @@ opa eval -d ergo.rego -d examples/baking/ergo -i examples/baking/batches.json -f
 
 The rules are in `ergo/baking.yaml`, with each rule's wording as its `description`. ergo checks every batch and records what it read. Only batch 001 passes, and the violations say why each of the others failed:
 
-| batch                       | check      | value read        | cause    |
-| --------------------------- | ---------- | ----------------- | -------- |
-| `cake-batch-2026-03-18-002` | `nut_free` | `["nuts","milk"]` | `value`  |
-| `cake-batch-2026-03-18-003` | `nut_free` | `"nuts"`          | `value`  |
-| `cake-batch-2026-03-18-004` | `nut_free` | `null`            | `absent` |
+| batch                       | check      | value read        | cause      |
+| --------------------------- | ---------- | ----------------- | ---------- |
+| `cake-batch-2026-03-18-002` | `nut_free` | `["nuts","milk"]` | `value`    |
+| `cake-batch-2026-03-18-003` | `nut_free` | `"nuts"`          | `unusable` |
+| `cake-batch-2026-03-18-004` | `nut_free` | `null`            | `absent`   |
 
 To get those rows yourself, ask for `data.baking.violations` instead of the report.
 
