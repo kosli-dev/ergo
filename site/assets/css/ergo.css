@@ -62,17 +62,6 @@ em.hl { font-style: normal; }
   -webkit-box-decoration-break: clone; box-decoration-break: clone;
 }
 
-/* ——— Status bar ——— */
-.status {
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  padding: 8px var(--gutter);
-  font: 400 12px/1.4 var(--mono);
-  color: var(--muted);
-  border-bottom: 1px solid var(--line);
-  text-align: center;
-}
-.status__dot { width: 8px; height: 8px; border-radius: 2px; background: var(--signal); flex: none; }
-
 /* ——— Wordmark ——— */
 .wm, .mark { height: 34px; width: auto; }
 .wm__bracket, .wm__word { fill: var(--paper); }

@@ -2265,7 +2265,7 @@ _starts_with_dollar_key(p) if _first_dollar_key(0, p[0])
 
 _min_subjects_def(req) := {"$min_subjects": _with_refs(
 	{
-		"description": sprintf("at least %s matching %s subject(s) required", [_literal_text(_min_subjects_of(req)), _text(_subject_type_of(req))]),
+		"description": _min_subjects_description(req),
 		"expression": sprintf("%s >= %s", [_matching_count_name(req), _literal_text(_min_subjects_of(req))]),
 	},
 	{"from": _listed_from(req)},
@@ -2275,13 +2275,17 @@ _listed_from(req) := _from_of(req) if is_array(_from_of(req))
 
 _listed_from(req) := [] if not is_array(_from_of(req))
 
+_min_subjects_description(req) := sprintf("The %s is at least %s", [_subject_count_name(req), _literal_text(_min_subjects_of(req))])
+
+_subject_count_name(req) := concat(" ", ["in-scope", _text(_subject_type_of(req)), "count"])
+
 _well_formed_def(req) := {"$well_formed": {
-	"description": "the requirement is an object whose checks and applies_to are objects, whose from and id are lists, whose min_subjects is a whole number of 0 or more and whose subject_type is a string, and it declares at least one check and a recognised \"require\" value, its from and id only hold steps that can be keys, and its from, id and min_subjects only hold numbers a 64-bit float can hold, and every check in checks and applies_to is written right; lacking any of these, it asserts nothing that could ever be satisfied, or not the same way everywhere",
+	"description": "The requirement is written correctly",
 	"expression": `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float and checks are written right`,
 }} if not _stepped(req)
 
 _well_formed_def(req) := {"$well_formed": {
-	"description": "the requirement is an object whose checks and applies_to are objects, whose from and id are lists, whose min_subjects is a whole number of 0 or more and whose subject_type is a string, and it declares at least one check, a recognised \"require\" value, and a from that ends with its only step, which gives a name that doesn't start with $ and, if it has keys, gives them as a list, its from and id only hold steps that can be keys, and its from, id and min_subjects only hold numbers a 64-bit float can hold, and every check in checks and applies_to is written right",
+	"description": "The requirement is written correctly",
 	"expression": `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and from is well formed and steps are keys and numbers fit a float and checks are written right`,
 }} if _stepped(req)
 
@@ -2332,7 +2336,7 @@ _well_formed_inputs(req) := array.concat(
 	array.concat(_wrong_type_inputs(req), _check_problem_inputs(req)),
 ) if _stepped(req)
 
-_applies_description(req) := sprintf("subject is in scope as a %s under this requirement's applies_to filter; out-of-scope subjects are recorded but not evaluated, and a subject whose filter can't be read fails", [_text(_subject_type_of(req))])
+_applies_description(req) := sprintf("The %s is in scope", [_text(_subject_type_of(req))])
 
 _applies_def(req) := {"$applies": _with_refs(
 	{
@@ -2398,7 +2402,7 @@ _min_subjects_row(doc, req, req_name) := {
 	"requirement": req_name,
 	"subject": {"type": _subject_type_of(req), "id": null},
 	"check": "$min_subjects",
-	"inputs": [{"name": _matching_count_name(req), "value": count(_matching_subjects(doc, req))}],
+	"inputs": [{"name": _subject_count_name(req), "value": count(_matching_subjects(doc, req))}],
 	"passed": _enough_subjects(doc, req),
 	"cause": _min_subjects_cause(doc, req),
 }

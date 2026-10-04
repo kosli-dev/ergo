@@ -1,5 +1,7 @@
 # ergo
 
+ergo is brand new and still changing a lot before its first alpha, so expect breaking changes.
+
 ## Getting started
 
 ergo is a single Rego file, so using it is as simple as copying it into your project.
@@ -136,7 +138,7 @@ Here's what those rows look like for our example:
 | subject | check           | value read                               | passed  | cause       |
 | ------- | --------------- | ---------------------------------------- | ------- | ----------- |
 |         | `$well_formed`  | `count(checks) = 1`, `require = "every"` | `true`  | `satisfied` |
-|         | `$min_subjects` | `count(matching(deployments)) = 2`       | `true`  | `satisfied` |
+|         | `$min_subjects` | `in-scope deployment count = 2`          | `true`  | `satisfied` |
 | `d-1`   | `$applies`      | `environment = "prod"`                   | `true`  | `satisfied` |
 | `d-2`   | `$applies`      | `environment = "prod"`                   | `true`  | `satisfied` |
 | `d-3`   | `$applies`      | `environment = "staging"`                | `false` | `value`     |
