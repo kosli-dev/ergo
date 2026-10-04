@@ -863,7 +863,19 @@ _missing_at(x, path) if {
 	_read_state(x, path) in {"absent", "null"}
 }
 
-_blocked(start, keys) if {
+_blocked(start, keys) if _blocked_under(start, keys, _parent_read(start, keys))
+
+_parent_read(start, keys) := v if {
+	v := _read_from(start, array.slice(keys, 0, count(keys) - 1))
+} else := _absent
+
+_blocked_under(_, keys, parent) if {
+	parent != _absent
+	not _can_hold(parent, keys[count(keys) - 1])
+}
+
+_blocked_under(start, keys, parent) if {
+	parent == _absent
 	some i, k in keys
 	v := _read_from(start, array.slice(keys, 0, i))
 	not _can_hold(v, k)
@@ -1646,11 +1658,8 @@ _read_state(subj, path) := "null" if _resolved(subj, path) == null
 _read_state(subj, path) := "unusable" if {
 	start := _start_of(subj, path)
 	is_object(start)
-	not _read_anything(subj, path)
 	_blocked(start, _keys_of(path))
 }
-
-_read_anything(subj, path) if _resolved(subj, path) != _absent
 
 _read_state(subj, path) := "value" if {
 	v := _resolved(subj, path)
