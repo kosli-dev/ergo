@@ -318,19 +318,19 @@ Every check has an `op` and the parameters that operator needs. A field the oper
 
 These read one or two fields of a subject.
 
-| `op`               | Parameters                  | Passes when                                                                                                          |
-| ------------------ | --------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `equals`           | `path`, `value`             | the field equals `value`. The type must match too, so `"1"` doesn't equal `1`.                                       |
-| `in`               | `path`, `values`            | the field is one of `values`. The type must match too, as for `equals`.                                              |
-| `present`          | `path`                      | the field exists and isn't `null`. An empty string or `false` still counts as present.                               |
-| `non_empty_string` | `path`                      | the field is a string, and not `""`.                                                                                 |
-| `matches_any`      | `path`, `patterns`          | the field is a string that matches at least one of the regular expressions.                                          |
-| `not_matches_any`  | `path`, `patterns`          | the field is a string that matches none of them.                                                                     |
-| `range`            | `path`, `min`, `max`        | the field is a number between `min` and `max`, both included.                                                        |
-| `includes`         | `path`, `value` or `values` | the field is a list that contains `value`. With `values` in place of `value`, it contains every one of them.         |
-| `excludes`         | `path`, `value` or `values` | the field is a list that doesn't contain `value`. With `values` in place of `value`, it contains none of them.       |
-| `compare`          | `left`, `right`, `cmp`      | both fields exist, have the same type, and `left cmp right` is true.                                                 |
-| `compare_time`     | `left`, `right`, `cmp`      | both fields are timestamps in the same format (both RFC 3339 strings, or both numbers) and `left cmp right` is true. |
+| `op`               | Parameters             | Passes when                                                                                                          |
+| ------------------ | ---------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `equals`           | `path`, `value`        | the field equals `value`. The type must match too, so `"1"` doesn't equal `1`.                                       |
+| `in`               | `path`, `values`       | the field is one of `values`. The type must match too, as for `equals`.                                              |
+| `present`          | `path`                 | the field exists and isn't `null`. An empty string or `false` still counts as present.                               |
+| `non_empty_string` | `path`                 | the field is a string, and not `""`.                                                                                 |
+| `matches_any`      | `path`, `patterns`     | the field is a string that matches at least one of the regular expressions.                                          |
+| `not_matches_any`  | `path`, `patterns`     | the field is a string that matches none of them.                                                                     |
+| `range`            | `path`, `min`, `max`   | the field is a number between `min` and `max`, both included.                                                        |
+| `includes`         | `path`, `value`        | the field is a list that contains `value`.                                                                           |
+| `excludes`         | `path`, `value`        | the field is a list that doesn't contain `value`.                                                                    |
+| `compare`          | `left`, `right`, `cmp` | both fields exist, have the same type, and `left cmp right` is true.                                                 |
+| `compare_time`     | `left`, `right`, `cmp` | both fields are timestamps in the same format (both RFC 3339 strings, or both numbers) and `left cmp right` is true. |
 
 `cmp` is one of `eq`, `ne`, `gt`, `gte`, `lt` or `lte`.
 
@@ -339,7 +339,7 @@ Some things worth knowing:
 - A check that's written wrong fails `$well_formed`, and its rows fail with cause `ill_formed`, whatever the subject holds. So in `applies_to` it fails the requirement instead of ruling every subject out. Written wrong means:
   - an `op` ergo doesn't know, a missing `op`, or a missing parameter
   - a `cmp` that isn't in the list above
-  - `values` that isn't a list, an empty `values` for `includes` or `excludes`, both `value` and `values`, a `min` or `max` that isn't a number, a `min` above `max`, or `patterns` that isn't a list of valid regular expressions
+  - `values` that isn't a list, a `min` or `max` that isn't a number, a `min` above `max`, or `patterns` that isn't a list of valid regular expressions
   - an `each` that isn't a path, or `as` or `each` on an operator other than `all` or `any`
   - a step that can't be a [key](#paths), a number out of range, a badly written [ref](#reading-from-the-input), or a path that starts with a [name](#naming-subjects) nothing gave
   - an `all` or `any` [nested](#nesting) too deep, or a name given twice or badly written
@@ -348,15 +348,12 @@ Some things worth knowing:
 
   The expression says what's wrong: `<unknown op nope>`, `<missing op>`, `<invalid check>` for a check that isn't an object, `<even can't go here>` for a check where it can't go, or `<missing value>` in place of a missing parameter, as in `state == <missing value>`. The [`$well_formed` row](#checks-ergo-adds) lists each check that's written wrong, and what's wrong with it.
 
-  A [`ref`](#reading-from-the-input) that reads the wrong kind of value from the params, like `values` read from a param that holds `3`, or an empty list read as the `values` of `includes` or `excludes`, isn't a mistake in the policy, so it doesn't fail `$well_formed`. The check fails with cause `unusable`.
+  A [`ref`](#reading-from-the-input) that reads the wrong kind of value from the params, like `values` read from a param that holds `3`, isn't a mistake in the policy, so it doesn't fail `$well_formed`. The check fails with cause `unusable`.
 - A field with the wrong kind of value for the operator fails with cause `unusable`, not `value`: a field that isn't a number for `range`, isn't a string for `matches_any` or `not_matches_any`, or isn't a list for `includes`, `excludes`, `all` or `any`, two fields of different types for `compare`, or anything but two timestamps in the same format for `compare_time`. So a filter fails the requirement instead of quietly ruling the subject out. `equals` and `in` are different: `"5"` isn't `5`, which is a sound answer, so that fails with `value`. So does `non_empty_string` on a number, since checking the type is its job.
 - `present` on a missing or `null` field fails with cause `value`, not `absent`: whether the field is there is the question it asks, so "it isn't" is a sound answer. In an `any_of` option, a `present` check that finds its field missing settles the option as `value`, even when the option's other checks can't read that field.
 - `equals` with `"value": null` only passes when the field is there and set to `null`. A missing field doesn't count.
 - `range` needs `min` and `max` to be numbers. A string like `"3"` fails the check, because Rego puts every number before every string, so `5 <= "3"` would be true.
 - `in` fails when the field is missing or `null`, even if `values` contains `null`. To check that a field is `null`, use `equals` with `"value": null`. `values` can be a list or, from Rego, a set. `in` also fails when `values` is empty, missing, or not a list or set. The expression then shows `id in <missing values>` or `id in <invalid values>` rather than a list.
-- `includes` and `excludes` take `value` or `values`. Giving both, or neither, is written wrong, and the expression shows `not contains(xs, <both value and values>)` or `contains(xs, <missing value or values>)`. `values` works as one check per value: `"op": "excludes", "values": ["nuts", "garlic"]` passes when neither is in the list, and `includes` with the same `values` passes when both are. The expression shows `contains_none(allergens, ["garlic", "nuts"])` or `contains_all(allergens, ["garlic", "nuts"])`. An empty `values` would pass every list, so it's written wrong.
-- Each value in `values` can be a [`ref`](#reading-from-the-input) or a `literal`, as `value` can, so `"values": [{"ref": ["$$params", "nut"]}, "garlic"]` reads the param, and a param that's missing or `null` fails the check instead of being skipped. A list read through a `ref`, or wrapped in a `literal`, is data, so an item in it that looks like a ref is compared as it is. A `value` that's a list is still one value, so `"value": ["a", "b"]` looks for the list `["a", "b"]` inside the field. Write separate checks instead when you want a row and a description for each value.
-- To check that a list holds at least one of several values, use [`any`](#all-and-any) with `in`: `{"op": "any", "path": ["allergens"], "check": {"op": "in", "path": [], "values": ["nuts", "garlic"]}}`. Its expression is `some allergens: allergens[] in ["garlic", "nuts"]`. Keep this in mind in `applies_to`, where `includes` with `values` only keeps subjects that have every one of them.
 - `compare` and `compare_time` compare two fields of the same subject. To compare a field with a fixed number, use `range`.
 - `compare` with `lt`, `lte`, `gt` or `gte` needs both fields to be numbers or both to be strings. Ordering objects, lists or booleans fails with cause `unusable`, because Rego's order for them means nothing in a policy: `{"name": "ann"}` comes before `{"owner": "bob"}` only because `name` sorts before `owner`. You'd usually hit this by leaving the field off the end of a path. `eq` and `ne` work on any type. A substitute that orders objects, lists or booleans gives its check the same cause, and so does an item inside `all` or `any`.
 - `compare_time` never converts between formats, so a number against a string fails as `unusable`. With numbers, ergo can't tell seconds from milliseconds, so make sure both sides use the same unit.
