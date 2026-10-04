@@ -8,7 +8,7 @@
   {{ with resources.Get $doc.file }}
     {{ $md := .Content }}
     {{ $md = replaceRE `^# [^\n]*\n+` "" $md 1 }}
-    {{ $md = replaceRE `^## Getting started\n+` "" $md 1 }}
+    {{ $md = replaceRE `(?m)^## Getting started\n+` "" $md 1 }}
     {{ $md = replace $md "(REFERENCE.md)" "(../reference/)" }}
     {{ $md = replace $md "(README.md)" "(../getting-started/)" }}
     {{ $md = replace $md "(LICENSE)" (printf "(%s/blob/main/LICENSE)" site.Params.repo) }}
