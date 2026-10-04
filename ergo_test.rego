@@ -483,18 +483,77 @@ test_missing_fails_as_unusable_when_a_step_before_the_field_cannot_hold_it if {
 		[{"build": 5}, ["build", "fingerprint"]],
 		[{"build": ["abc"]}, ["build", "fingerprint"]],
 		[{"build": {}}, ["build", 0]],
-		[{"build": "abc"}, ["build", {"where": {"k": 1}}, "v"]],
 	] {
 		[verdict(pair[0], {"op": "missing", "path": pair[1]}), cause_of(pair[0], {"op": "missing", "path": pair[1]})] == [false, "unusable"]
 	}
 }
 
-test_missing_needs_a_selector_to_match_one_item if {
+test_missing_needs_a_selector_to_match_one_item_of_a_list_that_is_there if {
 	check := {"op": "missing", "path": ["xs", {"where": {"k": 1}}, "v"]}
 	verdict({"xs": [{"k": 1}]}, check) == true
 	[verdict({"xs": [{"k": 2}]}, check), cause_of({"xs": [{"k": 2}]}, check)] == [false, "unmatched"]
 	[verdict({"xs": [{"k": 1}, {"k": 1}]}, check), cause_of({"xs": [{"k": 1}, {"k": 1}]}, check)] == [false, "ambiguous"]
-	[verdict({}, check), cause_of({}, check)] == [false, "absent"]
+	verdict({}, check) == true
+	verdict({"xs": null}, check) == true
+}
+
+presence_cases := [
+	[{}, ["a"]],
+	[{"a": null}, ["a"]],
+	[{"a": 1}, ["a"]],
+	[{"a": false}, ["a"]],
+	[{}, ["a", "b"]],
+	[{"a": null}, ["a", "b"]],
+	[{"a": "x"}, ["a", "b"]],
+	[{"a": [1]}, ["a", "b"]],
+	[{"a": {}}, ["a", 0]],
+	[{"a": [1]}, ["a", 3]],
+	[{"a": [1]}, ["a", 0]],
+	[{}, ["xs", {"where": {"k": 1}}, "v"]],
+	[{"xs": null}, ["xs", {"where": {"k": 1}}, "v"]],
+	[{"xs": "x"}, ["xs", {"where": {"k": 1}}, "v"]],
+	[{"xs": []}, ["xs", {"where": {"k": 1}}, "v"]],
+	[{"xs": [{"k": 1}, {"k": 1}]}, ["xs", {"where": {"k": 1}}, "v"]],
+	[{"xs": [{"k": 1}]}, ["xs", {"where": {"k": 1}}, "v"]],
+	[{"xs": [{"k": 1, "v": 2}]}, ["xs", {"where": {"k": 1}}, "v"]],
+]
+
+test_missing_is_the_opposite_of_present if {
+	every case in presence_cases {
+		present := cause_of(case[0], {"op": "present", "path": case[1]})
+		missing := cause_of(case[0], {"op": "missing", "path": case[1]})
+		opposite(present, missing)
+	}
+}
+
+opposite("satisfied", "value")
+
+opposite("value", "satisfied")
+
+opposite(c, c) if not c in {"satisfied", "value"}
+
+test_present_and_missing_fail_as_unusable_when_a_step_before_the_field_cannot_hold_it if {
+	every case in [[{"a": "x"}, ["a", "b"]], [{"xs": "x"}, ["xs", {"where": {"k": 1}}, "v"]]] {
+		cause_of(case[0], {"op": "present", "path": case[1]}) == "unusable"
+		cause_of(case[0], {"op": "missing", "path": case[1]}) == "unusable"
+	}
+}
+
+test_a_present_filter_cannot_rule_a_subject_out_when_a_step_before_the_field_cannot_hold_it if {
+	rep := ergo.report({"items": [{"id": "a", "build": "abc"}]}, scoped_req({"built": {"op": "present", "path": ["build", "fingerprint"]}}))
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "$applies")] == [[false, "unusable"]]
+	rep.compliant == false
+}
+
+test_a_present_filter_still_rules_out_a_subject_whose_selector_has_no_list if {
+	rep := ergo.report({"items": [{"id": "a"}]}, scoped_req({"f": {"op": "present", "path": ["xs", {"where": {"k": 1}}, "v"]}}))
+	rep.requirements.s.subjects == {"total": 1, "matching": 0}
+}
+
+test_missing_reads_names_given_by_as if {
+	check := {"op": "all", "path": ["xs"], "as": "x", "check": {"op": "missing", "path": ["$x", "b"]}}
+	verdict({"xs": [{"a": 1}, {}]}, check) == true
+	verdict({"xs": [{"a": 1}, {"b": 2}]}, check) == false
 }
 
 test_missing_fails_on_a_subject_that_is_not_an_object if {
@@ -1816,7 +1875,7 @@ test_a_check_with_a_step_that_cannot_be_a_key_is_ill_formed if {
 }
 
 test_a_string_never_picks_a_list_item_and_a_number_never_picks_an_object_key if {
-	[cause_of({"id": 1, "a": [10, 20]}, {"op": "present", "path": ["a", "0"]}), cause_of({"id": 1, "o": {"0": "zero"}}, {"op": "present", "path": ["o", 0]})] == ["value", "value"]
+	[cause_of({"id": 1, "a": [10, 20]}, {"op": "present", "path": ["a", "0"]}), cause_of({"id": 1, "o": {"0": "zero"}}, {"op": "present", "path": ["o", 0]})] == ["unusable", "unusable"]
 }
 
 test_a_check_whose_inputs_have_a_step_that_cannot_be_a_key_is_ill_formed if {

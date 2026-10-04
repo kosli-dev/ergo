@@ -858,12 +858,18 @@ leaf_passed(check, subj) if {
 }
 
 _missing_at(x, path) if {
+	_keys_of(path)
+	_ := _start_of(x, path)
+	_read_state(x, path) in {"absent", "null"}
+	not _blocked(x, path)
+}
+
+_blocked(x, path) if {
 	keys := _keys_of(path)
 	start := _start_of(x, path)
-	_read_state(x, path) in {"absent", "null"}
-	every i, k in keys {
-		_can_hold(_read_from(start, array.slice(keys, 0, i)), k)
-	}
+	some i, k in keys
+	v := _read_from(start, array.slice(keys, 0, i))
+	not _can_hold(v, k)
 }
 
 _can_hold(v, _) if v == _absent
@@ -979,12 +985,9 @@ _unusable(leaf, x) if {
 }
 
 _unusable(leaf, x) if {
-	leaf.op == "missing"
+	leaf.op in {"present", "missing"}
 	_read_state(x, leaf.path) == "absent"
-	keys := _keys_of(leaf.path)
-	start := _start_of(x, leaf.path)
-	some i, k in keys
-	not _can_hold(_read_from(start, array.slice(keys, 0, i)), k)
+	_blocked(x, leaf.path)
 }
 
 _unusable(leaf, x) if {
@@ -1738,6 +1741,7 @@ _asks_presence(check, x) if {
 	check.op == "present"
 	_keys_of(check.path)
 	_ := _start_of(x, check.path)
+	not _blocked(x, check.path)
 }
 
 _presence_state(s) := "missing" if s in {"absent", "null"}
@@ -1964,6 +1968,7 @@ _answers_presence(check, subj, "") if {
 	not _unreadable_ref(check)
 	_substitute_unusable(check, subj) == set()
 	_read_state(subj, check.path) in {"absent", "null"}
+	not _blocked(subj, check.path)
 }
 
 _ruled_out(subj, req) if _scope_cause(_failed_filter_causes(subj, req)) == "value"
