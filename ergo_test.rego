@@ -2112,6 +2112,18 @@ test_min_subjects_names_the_whole_input_like_the_checks_do_when_from_reads_it if
 	]
 }
 
+test_a_from_starting_with_a_dollar_key_is_quoted_because_from_takes_no_names_or_input if {
+	rows := [[rep.requirements.s.checks["$min_subjects"].expression, rep.requirements.s.checks.c.expression] |
+		some f in [["$$input"], ["$x", "a"], ["$schema", {"each_as": "x"}]]
+		rep := ergo.report({}, {"s": {"from": f, "checks": {"c": {"op": "present", "path": []}}}})
+	]
+	rows == [
+		[`count(matching("$$input")) >= 1`, `"$$input"[] is present`],
+		[`count(matching("$x".a)) >= 1`, `"$x".a[] is present`],
+		[`count(matching("$schema")) >= 1`, "$x is present"],
+	]
+}
+
 test_well_formed_definition_is_in_the_check_table if {
 	rep := ergo.report({"items": [{"id": "a"}]}, id_req(["items"]))
 	rep.requirements.s.checks["$well_formed"].expression == `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float`
