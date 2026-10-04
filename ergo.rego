@@ -1181,8 +1181,8 @@ _allowed_ops(kinds) := operators if kinds == []
 _allowed_ops(kinds) := object.get(_nested_ops, [kinds[count(kinds) - 1], count([k | some k in kinds; k == "check"])], set()) if kinds != []
 
 _nested_ops := {
-	"option": [_leaf_ops | {"all", "any"}, _leaf_ops | {"all", "any"}, _leaf_ops],
-	"check": [set(), _leaf_ops | {"all", "any", "any_of"}, _leaf_ops | {"any_of"}],
+	"option": [(_leaf_ops | {"all", "any"}), (_leaf_ops | {"all", "any"}), _leaf_ops],
+	"check": [set(), (_leaf_ops | {"all", "any", "any_of"}), (_leaf_ops | {"any_of"})],
 }
 
 _field_problems(node) := union({_unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _each_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node)})
