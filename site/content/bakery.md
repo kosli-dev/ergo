@@ -131,7 +131,7 @@ The report has a row for every check it ran on every batch, with the value it re
 | 002   | `nut_free`      | `allergens = ["nuts","milk"]`            | `false` | `value`     |
 | 002   | `temp_ok`       | `bake.temp_c = 180`                      | `true`  | `satisfied` |
 | 002   | `time_ok`       | `bake.minutes = 32`                      | `true`  | `satisfied` |
-| 003   | `nut_free`      | `allergens = "nuts"`                     | `false` | `value`     |
+| 003   | `nut_free`      | `allergens = "nuts"`                     | `false` | `unusable`  |
 | 003   | `temp_ok`       | `bake.temp_c = 180`                      | `true`  | `satisfied` |
 | 003   | `time_ok`       | `bake.minutes = 32`                      | `true`  | `satisfied` |
 | 004   | `nut_free`      | `allergens = null`                       | `false` | `absent`    |
@@ -140,7 +140,7 @@ The report has a row for every check it ran on every batch, with the value it re
 
 An ergo report, some checks are reported by default (those starting with `$`). They tell you if requirements are well formed, and that there was at least one input subject to check.
 
-In this example, Batch 003 fails because ergo's `excludes` only passes for lists. Both 002 and 004 fail, but you can see the different reasons. The `cause: value` means the value was invalid (allergens contain nuts), and `cause: absent` means there was no value provided.
+In this example, Batch 003 fails because ergo's `excludes` needs a list, and `"nuts"` isn't one. All three batches fail, but you can see the different reasons. `cause: value` means ergo read the value and it didn't pass (allergens contain nuts), `cause: unusable` means the value was there but not the kind the check needs, and `cause: absent` means there was no value at all.
 
 The report also writes each check as an expression, so the table comes straight out of it. [`ergo/workings.rego`](https://github.com/kosli-dev/ergo/blob/main/examples/baking/ergo/workings.rego) builds it from the report, and the policy exposes it as `workings_table`:
 
