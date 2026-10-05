@@ -2058,7 +2058,7 @@ test_one_row_per_subject_and_check if {
 	rep := ergo.report(doc, two_check_req)
 	count([r | some r in rep.results; not startswith(r.check, "$")]) == 4
 
-	count(rep.results) == 6
+	count(rep.results) == 7
 }
 
 test_row_carries_exactly_the_documented_keys if {
@@ -2300,6 +2300,118 @@ test_min_subjects_guards_a_missing_collection if {
 	rep.compliant == false
 }
 
+owner_req := {"s": {
+	"subject_type": "repo",
+	"from": ["repos"],
+	"id": ["name"],
+	"checks": {"owned": {"op": "non_empty_string", "path": ["owner"]}},
+}}
+
+unique_ids_row(doc, policy) := [r.inputs, r.passed, r.cause] if {
+	some r in rows_for(ergo.report(doc, policy), "s", "$unique_ids")
+}
+
+test_unique_ids_passes_when_every_subject_has_its_own_id if {
+	rep := ergo.report({"repos": [{"name": "a", "owner": "bob"}, {"name": "b", "owner": "carol"}]}, owner_req)
+	[[r.inputs, r.passed, r.cause] | some r in rows_for(rep, "s", "$unique_ids")] == [[[{"name": "repeated repo ids", "value": []}], true, "satisfied"]]
+	rep.requirements.s.satisfied == true
+}
+
+test_unique_ids_fails_the_requirement_when_two_subjects_share_an_id if {
+	rep := ergo.report({"repos": [{"name": "a", "owner": "bob"}, {"name": "a", "owner": "carol"}]}, owner_req)
+	[[r.subject, r.inputs, r.passed, r.cause] | some r in rows_for(rep, "s", "$unique_ids")] == [[
+		{"type": "repo", "id": null},
+		[{"name": "repeated repo ids", "value": ["a"]}],
+		false,
+		"value",
+	]]
+	rep.requirements.s.satisfied == false
+	rep.compliant == false
+	[v.check | some v in ergo.violations(rep)] == ["$unique_ids"]
+}
+
+test_unique_ids_fails_a_some_requirement_too if {
+	policy := {"s": object.union(owner_req.s, {"require": "some"})}
+	rep := ergo.report({"repos": [{"name": "a", "owner": "bob"}, {"name": "a", "owner": ""}]}, policy)
+	rep.requirements.s.satisfied == false
+}
+
+test_unique_ids_tells_apart_subjects_whose_rows_would_look_the_same if {
+	unique_ids_row({"repos": [{"name": "a", "owner": ""}, {"name": "a", "owner": ""}]}, owner_req) == [[{"name": "repeated repo ids", "value": ["a"]}], false, "value"]
+}
+
+test_unique_ids_counts_two_subjects_without_an_id_as_sharing_the_id_null if {
+	unique_ids_row({"repos": [{"owner": "bob"}, {"owner": "carol"}]}, owner_req) == [[{"name": "repeated repo ids", "value": [null]}], false, "value"]
+}
+
+test_unique_ids_reads_a_subject_that_is_not_an_object_as_its_own_id if {
+	unique_ids_row({"repos": ["api", "api", "web"]}, owner_req) == [[{"name": "repeated repo ids", "value": ["api"]}], false, "value"]
+}
+
+test_unique_ids_counts_two_identical_subjects_as_a_clash_without_an_id_path if {
+	policy := {"s": object.remove(owner_req.s, ["id"])}
+	unique_ids_row({"repos": [{"owner": "bob"}, {"owner": "bob"}, {"owner": "carol"}]}, policy) == [[{"name": "repeated repo ids", "value": [{"owner": "bob"}]}], false, "value"]
+}
+
+test_unique_ids_counts_subjects_that_are_out_of_scope if {
+	policy := {"s": object.union(owner_req.s, {"applies_to": {"live": {"op": "equals", "path": ["live"], "value": true}}})}
+	doc := {"repos": [{"name": "a", "owner": "bob", "live": true}, {"name": "a", "owner": "bob", "live": false}]}
+	rep := ergo.report(doc, policy)
+	rep.requirements.s.subjects == {"total": 2, "matching": 1}
+	[[r.inputs, r.passed] | some r in rows_for(rep, "s", "$unique_ids")] == [[[{"name": "repeated repo ids", "value": ["a"]}], false]]
+	rep.requirements.s.satisfied == false
+}
+
+test_unique_ids_lists_each_repeated_id_once_in_the_order_it_is_written_whatever_the_input_order if {
+	rows := {row |
+		some ids in [[3, "b", 10, "a", 3, "b", 10, 10], [10, 10, "b", 3, "a", 10, "b", 3]]
+		row := unique_ids_row({"repos": [{"name": n} | some n in ids]}, owner_req)
+	}
+	rows == {[[{"name": "repeated repo ids", "value": ["b", 10, 3]}], false, "value"]}
+}
+
+test_unique_ids_reads_ids_through_a_name if {
+	policy := {"s": object.union(owner_req.s, {"from": ["repos", {"each_as": "repo"}], "id": ["$repo", "name"]})}
+	unique_ids_row({"repos": [{"name": "a"}, {"name": "a"}]}, policy) == [[{"name": "repeated repo ids", "value": ["a"]}], false, "value"]
+}
+
+test_unique_ids_never_fails_for_subjects_named_by_their_keys if {
+	policy := {"s": object.union(owner_req.s, {"from": ["repos", {"each_as": "repo"}]})}
+	unique_ids_row({"repos": {"x": {"name": "a"}, "y": {"name": "a"}}}, policy) == [[{"name": "repeated repo ids", "value": []}], true, "satisfied"]
+}
+
+test_unique_ids_passes_with_no_subjects_because_min_subjects_already_fails_the_requirement if {
+	rep := ergo.report({}, owner_req)
+	[[r.check, r.passed] | some r in rep.results; r.check in {"$min_subjects", "$unique_ids"}] == [["$min_subjects", false], ["$unique_ids", true]]
+	rep.requirements.s.satisfied == false
+}
+
+test_unique_ids_definition_is_in_the_check_table if {
+	rows := [[d.description, d.expression] |
+		some from in [["repos"], [], "repos"]
+		d := ergo.report({}, {"s": object.union(owner_req.s, {"from": from})}).requirements.s.checks["$unique_ids"]
+	]
+	rows == [
+		["Every repo id is unique", "count(repeated(ids(repos))) == 0"],
+		["Every repo id is unique", "count(repeated(ids($$input))) == 0"],
+		["Every repo id is unique", "count(repeated(ids(<invalid from>))) == 0"],
+	]
+}
+
+test_unique_ids_records_the_refs_in_from_and_id if {
+	policy := {"s": object.union(owner_req.s, {
+		"from": [{"ref": ["$$params", "list"]}],
+		"id": [{"ref": ["$$params", "key"]}],
+	})}
+	rep := ergo.report_with_params({"repos": [{"name": "a"}, {"name": "a"}]}, {"list": "repos", "key": "name"}, policy)
+	rep.requirements.s.checks["$unique_ids"]["$refs"] == [{"name": "$$params.key", "value": "name"}, {"name": "$$params.list", "value": "repos"}]
+	[v.inputs | some v in ergo.violations(rep); v.check == "$unique_ids"] == [[
+		{"name": "repeated repo ids", "value": ["a"]},
+		{"name": "$$params.key", "value": "name"},
+		{"name": "$$params.list", "value": "repos"},
+	]]
+}
+
 test_well_formed_passes_for_an_ordinary_requirement if {
 	rep := ergo.report({"items": [{"id": "a"}]}, id_req(["items"]))
 	rows_for(rep, "s", "$well_formed")[0].passed == true
@@ -2415,7 +2527,7 @@ test_an_applies_to_that_is_not_an_object_fails_every_subject_as_ill_formed_so_no
 		some a in [[{"op": "equals", "path": ["env"], "value": "prod"}], true, null]
 	]
 	every rep in reps {
-		[[r.check, r.subject.id, r.passed, r.cause, r.inputs] | some r in rep.results; not r.check in {"$well_formed", "$min_subjects"}] == [
+		[[r.check, r.subject.id, r.passed, r.cause, r.inputs] | some r in rep.results; not r.check in {"$well_formed", "$min_subjects", "$unique_ids"}] == [
 			["$applies", 1, false, "ill_formed", []],
 			["$applies", 2, false, "ill_formed", []],
 		]
@@ -2434,7 +2546,7 @@ test_a_field_of_the_right_type_adds_no_input_to_well_formed if {
 
 test_checks_that_are_not_an_object_give_no_rows_named_by_list_index if {
 	rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"checks": [{"op": "present", "path": ["id"]}]})})
-	[r.check | some r in rep.results] == ["$well_formed", "$min_subjects"]
+	[r.check | some r in rep.results] == ["$well_formed", "$min_subjects", "$unique_ids"]
 	rows_for(rep, "s", "$well_formed")[0].inputs[0] == {"name": "count(checks)", "value": 0}
 }
 
@@ -3075,6 +3187,8 @@ test_row_order_groups_by_check_kind_then_requirement if {
 		["zzz", "$well_formed", null],
 		["aaa", "$min_subjects", null],
 		["zzz", "$min_subjects", null],
+		["aaa", "$unique_ids", null],
+		["zzz", "$unique_ids", null],
 		["aaa", "$applies", "s2"],
 		["aaa", "$applies", "s1"],
 		["zzz", "$applies", "s2"],
@@ -3100,7 +3214,7 @@ test_checks_come_out_in_name_order_whatever_the_runtime if {
 
 test_a_policy_written_as_a_set_still_gets_its_rows if {
 	req := {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}}
-	[r.check | some r in ergo.report({"items": [{"id": 1}]}, {req}).results] == ["$well_formed", "$min_subjects", "c"]
+	[r.check | some r in ergo.report({"items": [{"id": 1}]}, {req}).results] == ["$well_formed", "$min_subjects", "$unique_ids", "c"]
 }
 
 test_inputs_written_as_an_object_come_out_in_key_order if {
@@ -3302,7 +3416,7 @@ test_violations_keep_two_failures_that_look_alike if {
 		{"items": [{"signed": false}, {"signed": false}]},
 		{"s": {"from": ["items"], "id": ["no_such_field"], "checks": {"signed": {"op": "equals", "path": ["signed"], "value": true}}}},
 	)
-	count(ergo.violations(rep)) == 2
+	[[v.check, v.subject.id] | some v in ergo.violations(rep)] == [["$unique_ids", null], ["signed", null], ["signed", null]]
 }
 
 test_violations_take_the_definition_from_the_rows_own_requirement if {
@@ -5444,7 +5558,7 @@ test_keys_and_a_ref_step_can_both_come_from_params if {
 test_badly_written_keys_fail_well_formed_not_the_search_for_subjects if {
 	every keys in ["unit-test", {"literal": "unit-test"}, {"ref": ["$$params", "s"], "note": "x"}] {
 		rep := ergo.report(suite_doc, suite_req({"each_as": "run", "keys": keys}))
-		[[r.check, r.passed, r.cause] | some r in rep.results] == [["$well_formed", false, "value"], ["$min_subjects", false, "value"]]
+		[[r.check, r.passed, r.cause] | some r in rep.results] == [["$well_formed", false, "value"], ["$min_subjects", false, "value"], ["$unique_ids", true, "satisfied"]]
 	}
 }
 
