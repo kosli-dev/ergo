@@ -84,7 +84,7 @@ A few details:
 
 ### A requirement that only applies sometimes
 
-Some controls only apply to some inputs, like "new features must be tested", which doesn't apply to a bug fix. Make the thing that decides it the subject, and filter it with `applies_to`:
+Some controls only apply to some inputs, like "new features must be tested", which doesn't apply to a bug fix. Make the thing that decides it the subject, and filter it with `applies_to`. This one reads a [param and a ref](#reading-from-the-input):
 
 ```yaml
 params:
@@ -112,7 +112,7 @@ With `{"deployment": {"change_type": "bug_fix"}, "test_runs": []}`, the deployme
     ...
 ```
 
-The `$applies` check records the value it read, under `$refs`: `{"name": "$$input.deployment.change_type", "value": "bug_fix"}`. A new feature with no test runs fails `tested` and `passed`, and so does a change type that isn't listed, like `hotfix`, so a new or misspelt type has to be tested until someone adds it to the list. A deployment with no `change_type` fails the requirement, because ergo can't tell whether it applies.
+The `$applies` entry in `checks` records the value the ref read, under `$refs`: `{"name": "$$input.deployment.change_type", "value": "bug_fix"}`. A new feature with no test runs fails `tested` and `passed`, and so does a change type that isn't listed, like `hotfix`, so a new or misspelt type has to be tested until someone adds it to the list. A deployment with no `change_type` fails the requirement, because ergo can't tell whether it applies.
 
 The filter lists the types that don't need tests, rather than the ones that do. Listing `new_development` with `in` would also work, but then any other type, misspelt ones included, would quietly skip the tests.
 
@@ -716,9 +716,9 @@ Three rules:
 
 | `status`         | When                                                                                                    |
 | ---------------- | ------------------------------------------------------------------------------------------------------- |
-| `met`            | every row that has to pass did, and at least one subject was left to check                              |
+| `met`            | the requirement passed, and at least one subject was left to check                                      |
 | `not_met`        | anything else: a check failed, too few subjects were left, a filter couldn't be read, or the requirement is [written wrong](#basic-operators) |
-| `not_applicable` | nothing failed, but no subject was left after `applies_to`, which only happens with `min_subjects: 0`   |
+| `not_applicable` | the requirement would have passed, but no subject was left after `applies_to`, which only happens with `min_subjects: 0` |
 
 To tell whether a requirement passed, compare `status` with `"met"` (or `"not_applicable"`, if that counts as passing for you). Don't test for `"not_met"`, so a value you didn't expect counts as a failure.
 
