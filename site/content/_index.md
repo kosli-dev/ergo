@@ -1,15 +1,15 @@
 ---
-title: "ergo - Explainable controls that run on Open Policy Agent and Rego."
+title: "ergo - Explainable policies that run on Open Policy Agent and Rego."
 
 hero:
-  title: Explainable controls that run on Open Policy Agent and Rego.
-  lede: ==ergo== is an open source language for defining explainable controls. Instead of a binary result, every decision returns an audit report of what was checked, and why it passed or failed.
+  title: Explainable policies that run on Open Policy Agent and Rego.
+  lede: ==ergo== is an open source language for writing explainable policies. Instead of a binary result, every decision returns an audit report of what was checked, and why it passed or failed.
   primary: Get started
   secondary: GitHub
   verdict: d-3 is out of scope. d-2 was never approved... and the report says so.
   fromto:
-    label: The same control written in Rego and in ergo, and what each returns
-    steps: [Rego policy, Rego result, control, evaluation, report]
+    label: The same policy written in Rego and in ergo, and what each returns
+    steps: [Rego policy, Rego result, ergo policy, evaluation, report]
     # Set to true to bring back the Rego policy and Rego result steps.
     show_rego: false
     examples:
@@ -26,9 +26,9 @@ hero:
 
 problem:
   title: A decision nobody can inspect
-  muted: isn't a control.
-  lede: With Rego you can block a deployment, but you can't show later why. When you define controls with ==ergo== you have records of why decisions were made.
-  body: In regulated settings, someone else has to be able to check that a control behaved as it should. A yes or no can't be validated. You don't just tell the auditor the decision. You hand over the workings.
+  muted: isn't evidence.
+  lede: With Rego you can block a deployment, but you can't show later why. When you write policies with ==ergo== you have records of why decisions were made.
+  body: In regulated settings, someone else has to be able to check that a policy behaved as it should. A yes or no can't be validated. You don't just tell the auditor the decision. You hand over the workings.
   without:
     label: "**Rego** provides decisions"
     note: Useful. But why was it false?
@@ -37,7 +37,7 @@ problem:
     note: Same decision. Now you can see why.
 
 declaration:
-  title: Write the control.
+  title: Write the policy.
   muted: Not the sorcery.
   notes_title: Defined in YAML or Rego
   notes_intro: Write the requirement as a YAML file or as a Rego object. ==ergo== reads both the same way and gives the same report.
@@ -45,17 +45,17 @@ declaration:
     - title: Define the subjects
       body: "`subject_type`, `from` and `id` say what the subjects are and where to find them."
     - title: Filter the scope
-      body: "`applies_to` keeps only the subjects this control is about. The rest are recorded, not dropped."
+      body: "`applies_to` keeps only the subjects this requirement is about. The rest are recorded, not dropped."
     - title: Test the values
       body: "`checks` are the rules each subject must pass. ==ergo== does the looping, the evaluation and the report."
 
 shape:
   title: One report format.
-  muted: Every control.
-  lede: "A deployment control. A code-review control. A vulnerability control. Different policy, same evidence: one row per subject and check. Passing and failing rows have the same fields."
+  muted: Every policy.
+  lede: "A deployment policy. A code-review policy. A vulnerability policy. Different checks, same evidence: one row per subject and check. Passing and failing rows have the same fields."
   fields:
     - name: requirement
-      body: Which control produced the row.
+      body: Which requirement produced the row.
     - name: subject
       body: The thing that was judged, with its type and id.
     - name: check
@@ -80,7 +80,7 @@ manifesto:
 architecture:
   title: OPA is the engine.
   muted: ==ergo== is a rego library.
-  lede: ==ergo== doesn't replace OPA. Copy a single rego file into your policies. The control is expressed as yaml, JSON or rego and ==ergo== provides a single evaluation and reporting model.
+  lede: ==ergo== doesn't replace OPA. Copy a single rego file into your policies. The policy is expressed as YAML, JSON or rego and ==ergo== provides a single evaluation and reporting model.
 
 vocabulary:
   title: Auditor says why

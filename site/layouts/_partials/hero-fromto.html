@@ -1,4 +1,4 @@
-{{/* The hero's from → to: each example goes Rego policy → Rego result → ergo control → ergo report.
+{{/* The hero's from → to: each example goes Rego policy → Rego result → ergo policy → ergo report.
      Data and results match README.md, REFERENCE.md and the fixtures in ergo_test.rego. */}}
 {{- $c := .Params.hero }}
 <figure class="term ft" data-fromto aria-roledescription="carousel" aria-label="{{ $c.fromto.label }}">
@@ -45,7 +45,7 @@ deny <span class="kw">contains</span> msg <span class="kw">if</span> {
     {{- end }}
 
     <div class="ft__view" data-ex="deploy" data-step="2" data-file="policy/requirements.yaml" data-hold="6500">
-      <p class="ft__label mono"><span class="ft__who ft__who--ergo">ergo</span> the control</p>
+      <p class="ft__label mono"><span class="ft__who ft__who--ergo">ergo</span> the policy</p>
 <pre class="code ft__code"><code><span class="k">requirements</span>:
   <span class="k">prod_deploy</span>:
     <span class="k">subject_type</span>: <span class="s">deployment</span>
@@ -130,7 +130,7 @@ peer_approved(pr) <span class="kw">if</span> {
     {{- end }}
 
     <div class="ft__view" data-ex="review" data-step="2" data-file="policy/requirements.yaml" data-hold="6500">
-      <p class="ft__label mono"><span class="ft__who ft__who--ergo">ergo</span> the control</p>
+      <p class="ft__label mono"><span class="ft__who ft__who--ergo">ergo</span> the policy</p>
 <pre class="code ft__code"><code><span class="k">requirements</span>:
   <span class="k">peer_reviewed</span>:
     <span class="k">subject_type</span>: <span class="s">pull request</span>
