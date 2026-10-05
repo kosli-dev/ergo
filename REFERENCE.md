@@ -74,8 +74,9 @@ A few details:
 
 - If `from` leads to a list, each item is a subject. If it leads to a single object, that object is the only subject. Anything else (nothing, a string, a number) gives no subjects at all, and `$min_subjects` fails.
 - If `id` doesn't lead anywhere, the subject's id is `null`. Its rows are still there.
+- No two subjects can share an id, or their rows could be identical and the report couldn't say which one failed. If two do, `$unique_ids` fails and so does the requirement. Every subject counts, even one that `applies_to` leaves out, and `null` is an id like any other, so two subjects without one clash.
 - An item of the list that isn't an object, like a string or a `null`, is still a subject. Its id is the item itself, and its checks fail with cause `not_an_object`.
-- Leaving out `from` or `id` is allowed, but rarely what you want. Without `from`, the whole input is checked as one subject. Without `id`, each row repeats the whole subject as its id.
+- Leaving out `from` or `id` is allowed, but rarely what you want. Without `from`, the whole input is checked as one subject. Without `id`, each row repeats the whole subject as its id, so two identical subjects clash.
 - `min_subjects` defaults to 1 so that a typo in `from` fails the requirement instead of quietly passing it. Set it to `0` when you mean "if there are any, they must pass; if there are none, that's fine". It means the same under `every` and `some`.
 - Under `some`, one subject has to pass all the checks by itself. Two subjects that each pass half of them don't count.
 - A requirement with no checks, a `require` other than `every` or `some`, a badly written [naming step](#naming-subjects), an `id` whose selector has a ref or `literal` deeper inside a `where` value than ergo reads, or a check that's [written wrong](#basic-operators), is never met. The `$well_formed` row says so.
@@ -654,6 +655,10 @@ Three rules:
       "description": "The in-scope deployment count is at least 1",
       "expression": "count(matching(deployments)) >= 1"
     },
+    "$unique_ids": {
+      "description": "Every deployment id is unique",
+      "expression": "count(repeated(ids(deployments))) == 0"
+    },
     "$well_formed": {
       "description": "The requirement is written correctly",
       "expression": "fields have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right"
@@ -702,12 +707,13 @@ Passing and failing rows have the same fields. To find a row's description and e
 
 ### Checks ergo adds
 
-ergo adds three checks of its own. They start with `$`, so they can't clash with yours.
+ergo adds four checks of its own. They start with `$`, so they can't clash with yours.
 
 | Check           | One row per | Passes when                                                                                                                            |
 | --------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | `$well_formed`  | requirement | the requirement and its fields have the right types, it has at least one check, a valid `require`, a well written naming step if `from` has one, no step in `from` or `id` that can't be a key, no number a 64-bit float can't hold in `from`, `id` or `min_subjects`, and no check that's [written wrong](#basic-operators). This depends only on how the requirement is written, never on the input or the params. |
 | `$min_subjects` | requirement | at least `min_subjects` subjects are left after `applies_to`.                                                                          |
+| `$unique_ids`   | requirement | no two subjects share an id, counting the ones `applies_to` leaves out.                                                                |
 | `$applies`      | subject     | the subject passes the `applies_to` filter. These rows only exist when the requirement has a filter.                                   |
 
 When a check is [written wrong](#basic-operators), the `$well_formed` row gets an input for it, named after where the check sits in the requirement, with the list of what's wrong. With a typo in each of a filter and a check:
@@ -723,7 +729,7 @@ When a check is [written wrong](#basic-operators), the `$well_formed` row gets a
 
 A check inside another one is named further in, like `checks.signed.check` for the inner check of an `all`, `checks.reviewed.substitute` for a substitute, or `checks.permitted.options.standard.1` for the second check of an `any_of` option. A name that needs quotes is quoted as in [paths](#paths): `checks."a.b"`.
 
-Their descriptions are plain sentences, like your own checks': `The requirement is written correctly`, `The in-scope deployment count is at least 1` and `The deployment is in scope`. The details are in `expression`, `inputs` and `cause`. `$min_subjects` names its input after what it counts, like `in-scope deployment count`: only the subjects left after `applies_to`. Both use `subject_type` as it's written, so they read right whatever the word's plural would be.
+Their descriptions are plain sentences, like your own checks': `The requirement is written correctly`, `The in-scope deployment count is at least 1`, `Every deployment id is unique` and `The deployment is in scope`. The details are in `expression`, `inputs` and `cause`. `$min_subjects` names its input after what it counts, like `in-scope deployment count`: only the subjects left after `applies_to`. `$unique_ids` lists the ids that more than one subject has, once each, under `repeated deployment ids`, sorted by how they're written as JSON, so `"b"` comes before `10`, and `10` before `3`. They use `subject_type` as it's written, so they read right whatever the word's plural would be.
 
 A subject that fails `$applies` gets no other rows, since it was never checked. But its `$applies` row stays, so you can see what was left out and why.
 
@@ -748,7 +754,7 @@ Together, these make sure that whenever a requirement isn't met, at least one ro
 
 Rows always come in the same order, whatever order you wrote the policy in:
 
-1. all the `$well_formed` rows, then all the `$min_subjects` rows, then all the `$applies` rows, then your own checks
+1. all the `$well_formed` rows, then all the `$min_subjects` rows, then all the `$unique_ids` rows, then all the `$applies` rows, then your own checks
 2. within each group, requirements in name order
 3. within a requirement, subjects in the order they appear in the input, or in key order when a [naming step](#naming-subjects) reads an object
 4. within a subject, checks in name order
