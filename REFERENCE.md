@@ -538,6 +538,40 @@ Some things worth knowing:
 - Inner lists follow the same rules as outer ones. If an approver is tried against an empty or missing list of commits, that try fails.
 - One level of nesting is as deep as it goes, because Rego doesn't allow recursion. An `any_of` doesn't count as a level, but an `all` or `any` in one of its options does. A third `all` or `any` is written wrong: it fails `$well_formed`, the check fails with cause `ill_formed`, and its expression shows `<nested too deep>`.
 
+#### Which items failed
+
+A row of an `all` or `any` check also has `failed_items`: the items that made the check fail, in list order, with where it is, its cause and its value. With this input:
+
+```json
+{ "releases": [ { "id": "r-1", "pull_requests": [
+  { "number": 7, "commits": [ { "sha": "a1", "signed": true }, { "sha": "a2", "signed": false } ] },
+  { "number": 8 },
+  { "number": 9, "commits": [ { "sha": "c1" } ] }
+] } ] }
+```
+
+and the check from above, `every pull_requests[].commits: signed == true`, the row says:
+
+```json
+"cause": "absent",
+"failed_items": [
+  { "path": "pull_requests[0].commits[1]", "cause": "value", "value": { "sha": "a2", "signed": false } },
+  { "path": "pull_requests[1].commits", "cause": "absent", "value": null },
+  { "path": "pull_requests[2].commits[0]", "cause": "absent", "value": { "sha": "c1" } }
+]
+```
+
+`inputs` still shows the whole list, so the row records what was checked as well as what failed.
+
+- `path` is written like a path in an expression, with the item's position added: `pull_requests[0].commits[1]` is the second commit of the first pull request. A path that starts with a name keeps it, as in `$pr.commits[1]`.
+- With `each`, an inner list that's missing, `null`, not a list or empty fails the check, so it's listed in place of its items, like `pull_requests[1].commits` above.
+- When the check passes, it's `[]`. A passing `any` can have items that failed, but none of them is why the row came out the way it did.
+- It's `[]` when the list itself can't be read, because there are no items to blame. The row's `cause` says what's wrong with the list.
+- When the check is [written wrong](#basic-operators), every item, and every inner list that's missing or empty, is listed with cause `ill_formed`, because none of them could be checked. When a [`ref`](#reading-from-the-input) in it can't be read, every item is listed with the ref's cause.
+- For a nested check, only the outer items are listed. An approver who approved before the last commit is listed with cause `value`, but not the commit.
+- With a [substitute](#substitutes), it lists the items that failed the check itself, even when the substitute passed and the row with it.
+- Only rows of `all` and `any` checks have it. Rows of `any_of` checks, `$applies` rows and rows of custom operators don't, even when an `all` or `any` sits inside them.
+
 ### `any_of`
 
 `any_of` passes when at least one of its options passes. Each option is a list of checks that must all pass:
@@ -749,7 +783,7 @@ Several of these rules depend on how a number was written, not only on its value
 }
 ```
 
-Passing and failing rows have the same fields. To find a row's description and expression, look up `requirements[row.requirement].checks[row.check]`. Look it up through the requirement, because two requirements can use the same check name for different things.
+Passing and failing rows have the same fields. A row of an `all` or `any` check also has [`failed_items`](#which-items-failed). To find a row's description and expression, look up `requirements[row.requirement].checks[row.check]`. Look it up through the requirement, because two requirements can use the same check name for different things.
 
 ### Checks ergo adds
 
@@ -847,6 +881,8 @@ When a check reads several fields, the row shows the first cause in this table's
   }
 ]
 ```
+
+A violation of an `all` or `any` check keeps its row's `failed_items`.
 
 It leaves out:
 
