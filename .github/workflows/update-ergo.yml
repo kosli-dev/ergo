@@ -64,21 +64,26 @@ jobs:
           fi
 
           pr=$(gh pr list -R "$REPO" --head "$branch" --base "$base" --state open --json url --jq '.[0].url // ""')
-          if [ -n "$pr" ] && [ "$(gh api "repos/$REPO/contents/$TARGET?ref=$branch" --jq .sha)" = "$ergo_blob" ]; then
-            echo "$pr already has ergo $short."
-            echo "url=$pr" >> "$GITHUB_OUTPUT"
-            exit 0
+          if [ -n "$pr" ]; then
+            parent_blob=$(gh api "repos/$REPO/contents/$TARGET?ref=$branch" --jq .sha)
+            if [ "$parent_blob" = "$ergo_blob" ]; then
+              echo "$pr already has ergo $short."
+              echo "url=$pr" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          else
+            # Resetting the branch of an open PR to base empties its diff, and GitHub closes it.
+            parent_blob=$base_blob
+            base_head=$(gh api "repos/$REPO/git/ref/heads/$base" --jq .object.sha)
+            gh api -X PATCH "repos/$REPO/git/refs/heads/$branch" -f sha="$base_head" -F force=true > /dev/null 2>&1 \
+              || gh api -X POST "repos/$REPO/git/refs" -f ref="refs/heads/$branch" -f sha="$base_head" > /dev/null
           fi
-
-          base_head=$(gh api "repos/$REPO/git/ref/heads/$base" --jq .object.sha)
-          gh api -X PATCH "repos/$REPO/git/refs/heads/$branch" -f sha="$base_head" -F force=true > /dev/null 2>&1 \
-            || gh api -X POST "repos/$REPO/git/refs" -f ref="refs/heads/$branch" -f sha="$base_head" > /dev/null
 
           # The contents API commits through GitHub, so an app token gets a signed commit.
           content=$(gh api "repos/kosli-dev/ergo/contents/ergo.rego?ref=$ergo_sha" --jq '.content | gsub("\n"; "")')
           gh api -X PUT "repos/$REPO/contents/$TARGET" \
             -f branch="$branch" \
-            -f sha="$base_blob" \
+            -f sha="$parent_blob" \
             -f content="$content" \
             -f message="Update ergo.rego to ergo $short
 
