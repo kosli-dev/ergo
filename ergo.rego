@@ -2200,7 +2200,14 @@ _expression_of(check, item) := _list_describe(check, _item_given(item)) if {
 	_quantified(check)
 }
 
-_list_describe(check, given) := concat("", [_quantifier(check), " ", _collection_name(check), _as_text(check, given), ": ", _inner_check_describe(check, _item_name(check), _given_with(check, given))])
+_list_describe(check, given) := concat("", [
+	_quantifier(check),
+	" ",
+	_collection_name(check),
+	_as_text(check, given),
+	": ",
+	_inner_check_describe(check, _item_name(check), _given_with(check, given)),
+])
 
 _inner_check_describe(check, item, given) := _element_describe(check.check, item, given) if "check" in object.keys(check)
 
@@ -2285,7 +2292,14 @@ _element_option_describe(leaf, item, _) := _nested_describe(leaf, item) if not _
 
 _element_option_describe(leaf, item, given) := _element_list_describe(leaf, item, given) if _quantified(leaf)
 
-_element_list_describe(check, item, given) := concat("", [_quantifier(check), " ", _inner_collection_name(check, item), _as_text(check, given), ": ", _deeper_check_describe(check, _inner_item_name(check, item))])
+_element_list_describe(check, item, given) := concat("", [
+	_quantifier(check),
+	" ",
+	_inner_collection_name(check, item),
+	_as_text(check, given),
+	": ",
+	_deeper_check_describe(check, _inner_item_name(check, item)),
+])
 
 _deeper_check_describe(check, item) := _inner_describe(check.check, item) if "check" in object.keys(check)
 
@@ -2465,7 +2479,11 @@ _described(check, item) := object.union(check, {"expression": _expression_of(che
 
 _described(check, item) := {"expression": _expression_of(check, item)} if not is_object(check)
 
-_described(check, item) := object.union(check, {"expression": concat("", [_expression_of(check, item), ", or substitute: ", _expression_of(check.substitute, item)])}) if check.substitute
+_described(check, item) := object.union(check, {"expression": concat("", [
+	_expression_of(check, item),
+	", or substitute: ",
+	_expression_of(check.substitute, item),
+])}) if check.substitute
 
 _subject_item_name(req) := concat("", ["$", _each_step(req).each_as]) if _from_well_formed(req)
 
