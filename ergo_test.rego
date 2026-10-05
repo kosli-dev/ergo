@@ -539,6 +539,15 @@ test_present_and_missing_fail_as_unusable_when_a_step_before_the_field_cannot_ho
 	}
 }
 
+test_present_and_missing_fail_as_unusable_when_the_subject_cannot_hold_a_one_step_path if {
+	every path in [[0], [3]] {
+		cause_of({"a": 1}, {"op": "present", "path": path}) == "unusable"
+		cause_of({"a": 1}, {"op": "missing", "path": path}) == "unusable"
+	}
+	cause_of({"a": 1}, {"op": "present", "path": ["b"]}) == "value"
+	verdict({"a": 1}, {"op": "missing", "path": ["b"]}) == true
+}
+
 test_a_present_filter_cannot_rule_a_subject_out_when_a_step_before_the_field_cannot_hold_it if {
 	rep := ergo.report({"items": [{"id": "a", "build": "abc"}]}, scoped_req({"built": {"op": "present", "path": ["build", "fingerprint"]}}))
 	[[r.passed, r.cause] | some r in rows_for(rep, "s", "$applies")] == [[false, "unusable"]]
