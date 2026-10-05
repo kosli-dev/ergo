@@ -2750,15 +2750,15 @@ _applies_inputs(subj, req) := [inp |
 	some inp in _inputs_in(req, _applies_to_of(req)[name], subj)
 ]
 
-default _requirement_satisfied(_, _) := false
+default _requirement_holds(_, _) := false
 
-_requirement_satisfied(doc, req) if {
+_requirement_holds(doc, req) if {
 	_well_formed(req)
 	_ids_unique(doc, req)
-	_well_formed_requirement_met(doc, req)
+	_well_formed_requirement_holds(doc, req)
 }
 
-_well_formed_requirement_met(doc, req) if {
+_well_formed_requirement_holds(doc, req) if {
 	_require_of(req) == "every"
 	_scope_readable(doc, req)
 	count(_matching_subjects(doc, req)) >= _min_subjects_of(req)
@@ -2767,7 +2767,7 @@ _well_formed_requirement_met(doc, req) if {
 	}
 }
 
-_well_formed_requirement_met(doc, req) if {
+_well_formed_requirement_holds(doc, req) if {
 	_require_of(req) == "some"
 	_scope_readable(doc, req)
 	count(_matching_subjects(doc, req)) >= _min_subjects_of(req)
@@ -2775,20 +2775,32 @@ _well_formed_requirement_met(doc, req) if {
 	_subject_passed(req, subj)
 }
 
-_well_formed_requirement_met(doc, req) if {
+_well_formed_requirement_holds(doc, req) if {
 	_require_of(req) == "some"
 	_scope_readable(doc, req)
 	_min_subjects_of(req) == 0
 	count(_matching_subjects(doc, req)) == 0
 }
 
-default _all_satisfied(_, _) := false
+default _requirement_status(_, _) := "not_met"
 
-_all_satisfied(doc, policy) if {
+_requirement_status(doc, req) := "met" if {
+	_requirement_holds(doc, req)
+	count(_matching_subjects(doc, req)) > 0
+}
+
+_requirement_status(doc, req) := "not_applicable" if {
+	_requirement_holds(doc, req)
+	count(_matching_subjects(doc, req)) == 0
+}
+
+default _policy_compliant(_, _) := false
+
+_policy_compliant(doc, policy) if {
 	_size(policy) > 0
 	count([name |
 		some name, req in policy
-		not _requirement_satisfied(doc, req)
+		not _requirement_holds(doc, req)
 	]) == 0
 }
 
@@ -2823,10 +2835,10 @@ report_with_params(doc, params, policy) := r if {
 }
 
 _report_of(doc, policy) := {
-	"compliant": _all_satisfied(doc, policy),
+	"compliant": _policy_compliant(doc, policy),
 	"requirements": {name: {
 		"require": _require_of(req),
-		"satisfied": _requirement_satisfied(doc, req),
+		"status": _requirement_status(doc, req),
 		"subjects": {"total": count(_raw_subjects(doc, req)), "matching": count(_matching_subjects(doc, req))},
 		"checks": _requirement_check_defs(req),
 	} |
@@ -2860,8 +2872,10 @@ default _is_violation(_, _) := false
 _is_violation(requirements, row) if {
 	row.passed == false
 	not _out_of_scope_row(row)
-	not requirements[row.requirement].satisfied
+	not _reported_as_holding(requirements, row.requirement)
 }
+
+_reported_as_holding(requirements, name) if requirements[name].status in {"met", "not_applicable"}
 
 _out_of_scope_row(row) if {
 	row.check == "$applies"
