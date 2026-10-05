@@ -168,7 +168,7 @@ The expression says where the value comes from. What it was goes in the check's 
 
 ### Params
 
-`kosli evaluate --params @params.json` puts a control's params at `data.params`, and `opa eval -d params.json` does the same when the file holds `{"params": ...}`. In tests, write `with data.params as {...}`. To take params from somewhere else, pass them in yourself:
+`kosli evaluate --params @params.json` puts a policy's params at `data.params`, and `opa eval -d params.json` does the same when the file holds `{"params": ...}`. In tests, write `with data.params as {...}`. To take params from somewhere else, pass them in yourself:
 
 ```rego
 ergo.report_with_params(doc, params, requirements)
@@ -176,7 +176,7 @@ ergo.report_with_params(doc, params, requirements)
 
 That works like `ergo.report`, except `$$params` reads `params` instead of `data.params`. If what you pass can be missing, give it a default first, with a rule like `default config := {}`. Rego doesn't call a function with an argument that isn't defined, so the whole report would be undefined, with no rows to say why. The same goes for the document given to `ergo.report`.
 
-Params aren't part of the document, so `$$input.params` doesn't reach them, and `$$params` doesn't read the document. With no `data.params`, or one that isn't an object, every `$$params` read fails as `absent`. ergo has no defaults, so a control run without its params fails instead of checking something nobody configured.
+Params aren't part of the document, so `$$input.params` doesn't reach them, and `$$params` doesn't read the document. With no `data.params`, or one that isn't an object, every `$$params` read fails as `absent`. ergo has no defaults, so a policy run without its params fails instead of checking something nobody configured.
 
 A policy that calls `ergo.report` can't itself be in a package called `params` (or under one), because the report would then read its own rules. OPA rejects that as recursive when it loads the policy.
 
