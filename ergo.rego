@@ -863,7 +863,12 @@ _missing_at(x, path) if {
 	_read_state(x, path) in {"absent", "null"}
 }
 
-_blocked(start, keys) if _blocked_under(start, keys, _parent_read(start, keys))
+_blocked(start, [k]) if not _can_hold(start, k)
+
+_blocked(start, keys) if {
+	count(keys) > 1
+	_blocked_under(start, keys, _parent_read(start, keys))
+}
 
 _parent_read(start, keys) := v if {
 	v := _read_from(start, array.slice(keys, 0, count(keys) - 1))
