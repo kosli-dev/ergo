@@ -139,6 +139,7 @@ Here's what those rows look like for our example:
 | ------- | --------------- | ---------------------------------------- | ------- | ----------- |
 |         | `$well_formed`  | `count(checks) = 1`, `require = "every"` | `true`  | `satisfied` |
 |         | `$min_subjects` | `in-scope deployment count = 2`          | `true`  | `satisfied` |
+|         | `$unique_ids`   | `repeated deployment ids = []`           | `true`  | `satisfied` |
 | `d-1`   | `$applies`      | `environment = "prod"`                   | `true`  | `satisfied` |
 | `d-2`   | `$applies`      | `environment = "prod"`                   | `true`  | `satisfied` |
 | `d-3`   | `$applies`      | `environment = "staging"`                | `false` | `value`     |
@@ -149,6 +150,7 @@ You didn't write the checks starting with `$`. ergo adds them for you:
 
 - `$well_formed` makes sure the requirement itself makes sense, for example that it has at least one check.
 - `$min_subjects` makes sure at least one subject was found. If `from` points to nothing, this check fails, so the policy can't pass without checking anything.
+- `$unique_ids` makes sure no two deployments share an id. Otherwise their rows could look the same, and you couldn't tell which one failed.
 - `$applies` records whether each subject passed the `applies_to` filter. `d-3` didn't, and the report says so rather than leaving it out. A deployment with no `environment` at all would fail `$applies` with the cause `absent`, and the requirement would fail with it, because ergo can't tell whether it's a production deployment.
 
 When a check fails, `cause` tells you why. `d-2` failed with `absent` because it has no `approved_by` field at all: no approval was ever recorded. Had `approved_by` been `""`, the cause would be `value` instead, since an approval was recorded but it's empty. Both fail, but they're different problems and you'd fix them differently.

@@ -2506,17 +2506,19 @@ _subject_item_name(req) := "$$input" if {
 
 _subject_item_name(req) := "<invalid from>" if not _from_well_formed(req)
 
-_matching_count_name(req) := concat("", ["count(matching(", _from_name(_from_path(req)), "))"]) if {
+_matching_count_name(req) := concat("", ["count(matching(", _from_text(req), "))"])
+
+_from_text(req) := _from_name(_from_path(req)) if {
 	_from_well_formed(req)
 	_from_path(req) != []
 }
 
-_matching_count_name(req) := "count(matching($$input))" if {
+_from_text(req) := "$$input" if {
 	_from_well_formed(req)
 	_from_path(req) == []
 }
 
-_matching_count_name(req) := "count(matching(<invalid from>))" if not _from_well_formed(req)
+_from_text(req) := "<invalid from>" if not _from_well_formed(req)
 
 _from_name(p) := _path_name(array.concat([{"literal": p[0]}], array.slice(p, 1, count(p)))) if _starts_with_dollar_key(p)
 
@@ -2539,6 +2541,16 @@ _listed_from(req) := [] if not is_array(_from_of(req))
 _min_subjects_description(req) := concat("", ["The ", _subject_count_name(req), " is at least ", _literal_text(_min_subjects_of(req))])
 
 _subject_count_name(req) := concat(" ", ["in-scope", _text(_subject_type_of(req)), "count"])
+
+_unique_ids_def(req) := {"$unique_ids": _with_refs(
+	{
+		"description": concat("", ["Every ", _text(_subject_type_of(req)), " id is unique"]),
+		"expression": concat("", ["count(repeated(ids(", _from_text(req), "))) == 0"]),
+	},
+	{"from": _listed_from(req), "id": _id_of(req)},
+)}
+
+_repeated_ids_name(req) := concat(" ", ["repeated", _text(_subject_type_of(req)), "ids"])
 
 _well_formed_def(req) := {"$well_formed": {
 	"description": "The requirement is written correctly",
@@ -2623,7 +2635,7 @@ _applies_to_names(req) := sort(object.keys(_applies_to_of(req))) if is_object(_a
 _requirement_check_defs(req) := object.union(
 	object.union(
 		{name: _check_def(check, _subject_item_name(req)) | some name, check in _checks_of(req)},
-		_min_subjects_def(req),
+		object.union(_min_subjects_def(req), _unique_ids_def(req)),
 	),
 	object.union(_applies_def(req), _well_formed_def(req)),
 )
@@ -2681,6 +2693,29 @@ _min_subjects_cause(doc, req) := _verdict_cause(_enough_subjects(doc, req)) if n
 
 _min_subjects_cause(_, req) := _from_cause(req) if _from_unreadable(req)
 
+_unique_ids_row(doc, req, req_name) := {
+	"requirement": req_name,
+	"subject": {"type": _subject_type_of(req), "id": null},
+	"check": "$unique_ids",
+	"inputs": [{"name": _repeated_ids_name(req), "value": _repeated_ids(doc, req)}],
+	"passed": _ids_unique(doc, req),
+	"cause": _verdict_cause(_ids_unique(doc, req)),
+}
+
+_repeated_ids(doc, req) := [pair[1] | some pair in sort({[_literal_text(id), id] | some id in _repeats(sort(_subject_ids(doc, req)))})]
+
+_subject_ids(doc, req) := [_entry_ref(entry, req).id | some entry in _raw_entries(doc, req)]
+
+_repeats(sorted) := {x |
+	some i, x in sorted
+	i > 0
+	x == sorted[i - 1]
+}
+
+default _ids_unique(_, _) := false
+
+_ids_unique(doc, req) if count(_repeated_ids(doc, req)) == 0
+
 _applies_rows(doc, req, req_name) := [{
 	"requirement": req_name,
 	"subject": _entry_ref(entry, req),
@@ -2719,6 +2754,7 @@ default _requirement_satisfied(_, _) := false
 
 _requirement_satisfied(doc, req) if {
 	_well_formed(req)
+	_ids_unique(doc, req)
 	_well_formed_requirement_met(doc, req)
 }
 
@@ -2759,7 +2795,10 @@ _all_satisfied(doc, policy) if {
 _results(doc, policy) := array.concat(
 	array.concat(
 		[_well_formed_row(policy[name], name) | some name in _names(policy)],
-		[_min_subjects_row(doc, policy[name], name) | some name in _names(policy)],
+		array.concat(
+			[_min_subjects_row(doc, policy[name], name) | some name in _names(policy)],
+			[_unique_ids_row(doc, policy[name], name) | some name in _names(policy)],
+		),
 	),
 	array.concat(
 		[row | some name in _names(policy); some row in _applies_rows(doc, policy[name], name)],
