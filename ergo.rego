@@ -2782,6 +2782,18 @@ _well_formed_requirement_met(doc, req) if {
 	count(_matching_subjects(doc, req)) == 0
 }
 
+default _requirement_status(_, _) := "not_met"
+
+_requirement_status(doc, req) := "met" if {
+	_requirement_satisfied(doc, req)
+	count(_matching_subjects(doc, req)) > 0
+}
+
+_requirement_status(doc, req) := "not_applicable" if {
+	_requirement_satisfied(doc, req)
+	count(_matching_subjects(doc, req)) == 0
+}
+
 default _all_satisfied(_, _) := false
 
 _all_satisfied(doc, policy) if {
@@ -2826,7 +2838,7 @@ _report_of(doc, policy) := {
 	"compliant": _all_satisfied(doc, policy),
 	"requirements": {name: {
 		"require": _require_of(req),
-		"satisfied": _requirement_satisfied(doc, req),
+		"status": _requirement_status(doc, req),
 		"subjects": {"total": count(_raw_subjects(doc, req)), "matching": count(_matching_subjects(doc, req))},
 		"checks": _requirement_check_defs(req),
 	} |
@@ -2860,8 +2872,10 @@ default _is_violation(_, _) := false
 _is_violation(requirements, row) if {
 	row.passed == false
 	not _out_of_scope_row(row)
-	not requirements[row.requirement].satisfied
+	not _requirement_passed(requirements, row.requirement)
 }
+
+_requirement_passed(requirements, name) if requirements[name].status in {"met", "not_applicable"}
 
 _out_of_scope_row(row) if {
 	row.check == "$applies"

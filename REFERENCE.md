@@ -77,10 +77,46 @@ A few details:
 - No two subjects can share an id, or their rows could be identical and the report couldn't say which one failed. If two do, `$unique_ids` fails and so does the requirement. Every subject counts, even one that `applies_to` leaves out, and `null` is an id like any other, so two subjects without one clash.
 - An item of the list that isn't an object, like a string or a `null`, is still a subject. Its id is the item itself, and its checks fail with cause `not_an_object`.
 - Leaving out `from` or `id` is allowed, but rarely what you want. Without `from`, the whole input is checked as one subject. Without `id`, each row repeats the whole subject as its id, so two identical subjects clash.
-- `min_subjects` defaults to 1 so that a typo in `from` fails the requirement instead of quietly passing it. Set it to `0` when you mean "if there are any, they must pass; if there are none, that's fine". It means the same under `every` and `some`.
+- `min_subjects` defaults to 1 so that a typo in `from` fails the requirement instead of quietly passing it. Set it to `0` when you mean "if there are any, they must pass; if there are none, that's fine". It means the same under `every` and `some`. When none are left, the requirement is [not applicable](#the-report).
 - Under `some`, one subject has to pass all the checks by itself. Two subjects that each pass half of them don't count.
 - A requirement with no checks, a `require` other than `every` or `some`, a badly written [naming step](#naming-subjects), an `id` whose selector has a ref or `literal` deeper inside a `where` value than ergo reads, or a check that's [written wrong](#basic-operators), is never met. The `$well_formed` row says so.
 - So is a requirement that isn't an object, or whose `checks` or `applies_to` isn't an object, whose `from` or `id` isn't a list, whose `min_subjects` isn't a whole number of 0 or more, or whose `subject_type` isn't a string with something besides whitespace in it, since rows and descriptions name the subject by it. `null` counts as the wrong type. `2.0` is a whole number, but `-1` and `0.5` aren't. It still has its entry in `requirements` and its `$well_formed` row, which shows each such field and its value as an input, like `{"name": "from", "value": "deployments"}`, or `{"name": "requirement", "value": 5}` for the whole requirement. ergo then reads `checks` as empty and `applies_to` as a filter it can't read, so every subject fails `$applies` with cause `absent`, shown as `<invalid applies_to>`, and gets no other rows. It reads a `from` as giving no subjects (shown as `<invalid from>`), and an `id` as giving the id `null`. A requirement that isn't an object gives no subjects either. A `min_subjects` that isn't a number fails `$min_subjects` too.
+
+### A requirement that only applies sometimes
+
+Some controls only apply to some inputs, like "new features must be tested", which doesn't apply to a bug fix. Make the thing that decides it the subject, and filter it with `applies_to`:
+
+```yaml
+params:
+  untested_change_types: [bug_fix, refactor]
+requirements:
+  features_tested:
+    subject_type: deployment
+    from: []
+    min_subjects: 0
+    applies_to:
+      needs_tests: { op: excludes, path: [$$params, untested_change_types], value: { ref: [$$input, deployment, change_type] } }
+    checks:
+      tested: { op: any, path: [test_runs], check: { op: present, path: [status] } }
+      passed: { op: all, path: [test_runs], check: { op: equals, path: [status], value: passed } }
+```
+
+With `{"deployment": {"change_type": "bug_fix"}, "test_runs": []}`, the deployment is out of scope, and the report says so:
+
+```json
+"compliant": true,
+"requirements": {
+  "features_tested": {
+    "status": "not_applicable",
+    "subjects": { "matching": 0, "total": 1 },
+    ...
+```
+
+The `$applies` check records the value it read, under `$refs`: `{"name": "$$input.deployment.change_type", "value": "bug_fix"}`. A new feature with no test runs fails `tested` and `passed`, and so does a change type that isn't listed, like `hotfix`, so a new or misspelt type has to be tested until someone adds it to the list. A deployment with no `change_type` fails the requirement, because ergo can't tell whether it applies.
+
+The filter lists the types that don't need tests, rather than the ones that do. Listing `new_development` with `in` would also work, but then any other type, misspelt ones included, would quietly skip the tests.
+
+Don't filter the test runs instead, with `from: [test_runs]` and `min_subjects: 0`. That lets a new feature with no test runs pass, because there's nothing to check.
 
 ## Paths
 
@@ -640,7 +676,7 @@ Three rules:
 }
 ```
 
-`compliant` is `true` only when every requirement is met.
+`compliant` is `true` when there's at least one requirement and none of them is `not_met`.
 
 `requirements` has an entry for each requirement:
 
@@ -671,10 +707,20 @@ Three rules:
     }
   },
   "require": "every",
-  "satisfied": false,
+  "status": "not_met",
   "subjects": { "matching": 2, "total": 3 }
 }
 ```
+
+`status` is one of:
+
+| `status`         | When                                                                                                    |
+| ---------------- | ------------------------------------------------------------------------------------------------------- |
+| `met`            | every row that has to pass did, and at least one subject was left to check                              |
+| `not_met`        | anything else: a check failed, too few subjects were left, a filter couldn't be read, or the requirement is [written wrong](#basic-operators) |
+| `not_applicable` | nothing failed, but no subject was left after `applies_to`, which only happens with `min_subjects: 0`   |
+
+To tell whether a requirement passed, compare `status` with `"met"` (or `"not_applicable"`, if that counts as passing for you). Don't test for `"not_met"`, so a value you didn't expect counts as a failure.
 
 `subjects.total` counts every subject found at `from`, and `subjects.matching` counts the ones left after `applies_to`. `checks` holds each check as you wrote it, plus the `expression` ergo rendered from it. If you write your own `expression`, yours is used, as long as it's a string. Any other value is ignored, and ergo renders the expression as if it weren't there. A check that uses a [`ref`](#reading-from-the-input) also gets `$refs`: the name and value of each one, as read for this report. The `$` marks it as ergo's, so it can't be mixed up with a field of your own. It also holds the [checks ergo adds](#checks-ergo-adds), each with a `description` and an `expression`.
 
@@ -806,9 +852,9 @@ It leaves out:
 
 - rows that passed
 - `$applies` rows with the cause `value`, since being out of scope isn't a problem. An `$applies` row that failed because its filter couldn't be read is kept.
-- every row of a requirement that was met. Under `require: "some"`, other subjects can fail while the requirement still passes, and those failures aren't problems.
+- every row of a requirement whose `status` is `met` or `not_applicable`. Under `require: "some"`, other subjects can fail while the requirement still passes, and those failures aren't problems.
 
-It keeps `$min_subjects` failures, because finding nothing to check is a problem, and `$well_formed` failures, because they mean the policy itself is broken.
+It keeps the rows of a requirement with any other `status`, or none. It keeps `$min_subjects` failures, because finding nothing to check is a problem, and `$well_formed` failures, because they mean the policy itself is broken.
 
 It only reads the report, never the input or the policy. It returns a list in the same order as `results`, so two failures that look the same are both kept. And it returns data, not text, so you decide how to word your messages. A missing `description` or `expression` comes back as `""`.
 
