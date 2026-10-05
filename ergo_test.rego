@@ -1825,6 +1825,30 @@ test_a_string_inside_a_list_value_is_escaped_as_in_standard_json if {
 	rendered({}, {"op": "equals", "path": ["x"], "value": ["a<b&c", "\u0001\b"]}) == `x == ["a<b&c", "\u0001\b"]`
 }
 
+test_a_byte_order_mark_in_a_value_is_written_as_is if {
+	rendered({}, {"op": "equals", "path": ["x"], "value": "\ufeff"}) == "x == \"\ufeff\""
+	rendered({}, {"op": "in", "path": ["x"], "values": ["\ufeff"]}) == "x in [\"\ufeff\"]"
+}
+
+test_a_byte_order_mark_in_a_path_key_is_written_as_is if {
+	rendered({}, {"op": "present", "path": ["\ufeffa"]}) == "\"\ufeffa\" is present"
+}
+
+test_a_byte_order_mark_in_an_op_is_written_as_is if {
+	rendered({}, {"op": "\ufeff", "path": ["x"]}) == "<unknown op \ufeff>"
+}
+
+test_a_byte_order_mark_in_subject_type_and_from_is_written_as_is if {
+	min_subjects := ergo.report({"i\ufeff": [{"id": 1}]}, {"s": {
+		"subject_type": "t\ufeff",
+		"from": ["i\ufeff"],
+		"id": ["id"],
+		"checks": {"c": {"op": "present", "path": ["id"]}},
+	}}).requirements.s.checks["$min_subjects"]
+	min_subjects.description == "The in-scope t\ufeff count is at least 1"
+	min_subjects.expression == "count(matching(\"i\ufeff\")) >= 1"
+}
+
 test_text_that_looks_like_an_escape_is_kept_as_written if {
 	rendered({}, {"op": "equals", "path": ["x"], "value": `\u003c`}) == `x == "\\u003c"`
 }

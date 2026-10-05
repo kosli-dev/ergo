@@ -544,9 +544,9 @@ _item_path_name(item, []) := item
 
 _item_path_name(_, path) := _path_name(path) if path != []
 
-_projection_name(path, []) := sprintf("%s[]", [_path_name(path)])
+_projection_name(path, []) := concat("", [_path_name(path), "[]"])
 
-_projection_name(path, each) := sprintf("%s[].%s", [_path_name(path), _path_name(each)]) if each != []
+_projection_name(path, each) := concat("", [_path_name(path), "[].", _path_name(each)]) if each != []
 
 _segment_name(_, p) := _key_name(p) if not is_object(p)
 
@@ -560,14 +560,14 @@ _segment_name(i, p) := _key_name(p.literal) if {
 	not _first_dollar_key(i, p.literal)
 }
 
-_segment_name(_, p) := sprintf("[%s]", [concat(" and ", sort([sprintf("%s==%s", [_key_name(k), _value_text(v)]) | some k, v in p.where]))]) if {
+_segment_name(_, p) := concat("", ["[", concat(" and ", sort([concat("", [_key_name(k), "==", _value_text(v)]) | some k, v in p.where])), "]"]) if {
 	is_object(p)
 	not _is_literal(p)
 	not _is_ref(p)
 	not _malformed(p)
 }
 
-_segment_name(_, p) := sprintf("[%s]", [_ref_name(p.ref)]) if _is_ref(p)
+_segment_name(_, p) := concat("", ["[", _ref_name(p.ref), "]"]) if _is_ref(p)
 
 _segment_name(_, p) := "[<invalid ref>]" if _malformed(p)
 
@@ -1163,14 +1163,14 @@ default _op_problems(_, _) := set()
 
 _op_problems(node, _) := {"missing op"} if not "op" in object.keys(node)
 
-_op_problems(node, _) := {sprintf("unknown op %s", [_text(node.op)])} if {
+_op_problems(node, _) := {concat("", ["unknown op ", _text(node.op)])} if {
 	"op" in object.keys(node)
 	not node.op in operators
 }
 
 _op_problems(node, kinds) := {"nested too deep"} if _too_deep(node, kinds)
 
-_op_problems(node, kinds) := {sprintf("%s can't go here", [_text(node.op)])} if {
+_op_problems(node, kinds) := {concat("", [_text(node.op), " can't go here"])} if {
 	node.op in operators
 	not _quantified(node)
 	not node.op in _allowed_ops(kinds)
@@ -1187,7 +1187,7 @@ _nested_ops := {
 
 _field_problems(node) := union({_unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _each_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node)})
 
-_missing_fields_problem(node) := {sprintf("missing %s", [f]) |
+_missing_fields_problem(node) := {concat("", ["missing ", f]) |
 	some f in object.get(_required_fields, node.op, set())
 	not f in object.keys(node)
 }
@@ -1200,7 +1200,7 @@ _value_or_values_problem(node) := {"missing value or values" |
 	count({"value", "values"} & object.keys(node)) == 2
 }
 
-_unknown_fields_problem(node) := {sprintf("unknown field %s", [_text(f)]) |
+_unknown_fields_problem(node) := {concat("", ["unknown field ", _text(f)]) |
 	node.op in object.keys(_op_fields)
 	some f in object.keys(node)
 	not f in _op_fields[node.op]
@@ -1214,7 +1214,7 @@ _op_fields := object.union(_required_fields, {
 	"any": {"path", "check", "each", "as"},
 })
 
-_range_bounds_problem(node) := {sprintf("invalid %s", [f]) |
+_range_bounds_problem(node) := {concat("", ["invalid ", f]) |
 	node.op == "range"
 	some f in ["min", "max"]
 	f in object.keys(node)
@@ -1262,7 +1262,7 @@ _written_pattern(p) if _is_ref(p)
 
 _written_pattern(p) if _valid_pattern(_written(p))
 
-_nested_wrapper_problem(node) := {sprintf("%s inside %s", [_wrapper(x), f]) |
+_nested_wrapper_problem(node) := {concat("", [_wrapper(x), " inside ", f]) |
 	node.op in _leaf_ops
 	some f in ["value", "values", "patterns", "min", "max"]
 	f in object.keys(node)
@@ -1271,7 +1271,7 @@ _nested_wrapper_problem(node) := {sprintf("%s inside %s", [_wrapper(x), f]) |
 	not _ref_read_at(f, node[f], p)
 	not _under_literal(node[f], p)
 	not _under_ref(node[f], p)
-} | {sprintf("%s inside where", [kind]) |
+} | {concat("", [kind, " inside where"]) |
 	some f in ["path", "left", "right", "each", "inputs"]
 	some path in _own_paths(node, f)
 	some kind in _wrapped_in_where(path)
@@ -1314,7 +1314,7 @@ _cmp_problem(node) := {"invalid cmp" |
 	not node.cmp in {"eq", "ne", "gt", "gte", "lt", "lte"}
 }
 
-_misplaced_fields_problem(node) := {sprintf("%s can't go here", [f]) |
+_misplaced_fields_problem(node) := {concat("", [f, " can't go here"]) |
 	node.op in (_leaf_ops | {"any_of"})
 	some f in ["as", "each"]
 	f in object.keys(node)
@@ -1338,7 +1338,7 @@ _empty_options_problem(node) := {"empty options" |
 	count(node.options) == 0
 }
 
-_empty_option_problem(node) := {sprintf("empty option %s", [_text(nm)]) |
+_empty_option_problem(node) := {concat("", ["empty option ", _text(nm)]) |
 	_combinator(node)
 	_option_list(node.options)
 	some nm, group in node.options
@@ -1369,7 +1369,7 @@ _valid_patterns(v) if {
 
 _own_fields(node) := object.remove(node, ["check", "options", "substitute"])
 
-_step_problems(node) := {sprintf("step that can't be a key in %s", [f]) |
+_step_problems(node) := {concat("", ["step that can't be a key in ", f]) |
 	some f in ["path", "left", "right", "each", "inputs"]
 	some p in _own_paths(node, f)
 	_badly_stepped(p)
@@ -1402,7 +1402,7 @@ _name_given_twice_problem(node, names) := {"name given twice" |
 	node.as in names
 }
 
-_unknown_name_problem(node, names) := {sprintf("unknown name %s", [p[0]]) |
+_unknown_name_problem(node, names) := {concat("", ["unknown name ", p[0]]) |
 	some f in ["path", "left", "right", "each", "inputs"]
 	some p in _own_paths(node, f)
 	_named(p)
@@ -2065,7 +2065,7 @@ _scope_readable(doc, req) if {
 
 _nested_describe(check, item) := _leaf_describe(check, item) if not _misplaced(check)
 
-_nested_describe(check, _) := sprintf("<%s can't go here>", [_text(check.op)]) if _misplaced(check)
+_nested_describe(check, _) := concat("", ["<", _text(check.op), " can't go here>"]) if _misplaced(check)
 
 _misplaced(check) if {
 	check.op in operators
@@ -2075,7 +2075,7 @@ _misplaced(check) if {
 
 default _leaf_describe(_, _) := ""
 
-_leaf_describe(check, _) := sprintf("<unknown op %s>", [_text(check.op)]) if not check.op in operators
+_leaf_describe(check, _) := concat("", ["<unknown op ", _text(check.op), ">"]) if not check.op in operators
 
 _leaf_describe(check, _) := "<missing op>" if {
 	is_object(check)
@@ -2084,68 +2084,68 @@ _leaf_describe(check, _) := "<missing op>" if {
 
 _leaf_describe(check, _) := "<invalid check>" if not is_object(check)
 
-_leaf_describe(check, item) := sprintf("%s >= %s and %s <= %s", [n, _param_text(check, "min"), n, _param_text(check, "max")]) if {
+_leaf_describe(check, item) := concat("", [n, " >= ", _param_text(check, "min"), " and ", n, " <= ", _param_text(check, "max")]) if {
 	check.op == "range"
 	n := _path_text(item, check, "path")
 }
 
 _path_text(item, check, f) := _item_path_name(item, check[f]) if f in object.keys(check)
 
-_path_text(_, check, f) := sprintf("<missing %s>", [f]) if not f in object.keys(check)
+_path_text(_, check, f) := concat("", ["<missing ", f, ">"]) if not f in object.keys(check)
 
 _param_text(check, f) := _value_text(check[f]) if f in object.keys(check)
 
-_param_text(check, f) := sprintf("<missing %s>", [f]) if not f in object.keys(check)
+_param_text(check, f) := concat("", ["<missing ", f, ">"]) if not f in object.keys(check)
 
-_leaf_describe(check, item) := sprintf("not contains(%s, %s)", [_path_text(item, check, "path"), _one_value_text(check)]) if {
+_leaf_describe(check, item) := concat("", ["not contains(", _path_text(item, check, "path"), ", ", _one_value_text(check), ")"]) if {
 	check.op == "excludes"
 	not _values_only(check)
 }
 
-_leaf_describe(check, item) := sprintf("contains(%s, %s)", [_path_text(item, check, "path"), _one_value_text(check)]) if {
+_leaf_describe(check, item) := concat("", ["contains(", _path_text(item, check, "path"), ", ", _one_value_text(check), ")"]) if {
 	check.op == "includes"
 	not _values_only(check)
 }
 
-_leaf_describe(check, item) := sprintf("contains_none(%s, %s)", [_path_text(item, check, "path"), _list_text(check.values, "values")]) if {
+_leaf_describe(check, item) := concat("", ["contains_none(", _path_text(item, check, "path"), ", ", _list_text(check.values, "values"), ")"]) if {
 	check.op == "excludes"
 	_values_only(check)
 }
 
-_leaf_describe(check, item) := sprintf("contains_all(%s, %s)", [_path_text(item, check, "path"), _list_text(check.values, "values")]) if {
+_leaf_describe(check, item) := concat("", ["contains_all(", _path_text(item, check, "path"), ", ", _list_text(check.values, "values"), ")"]) if {
 	check.op == "includes"
 	_values_only(check)
 }
 
-_leaf_describe(check, item) := sprintf("%s in %s", [_path_text(item, check, "path"), _list_text(check.values, "values")]) if {
+_leaf_describe(check, item) := concat("", [_path_text(item, check, "path"), " in ", _list_text(check.values, "values")]) if {
 	check.op == "in"
 	"values" in object.keys(check)
 }
 
-_leaf_describe(check, item) := sprintf("%s in <missing values>", [_path_text(item, check, "path")]) if {
+_leaf_describe(check, item) := concat("", [_path_text(item, check, "path"), " in <missing values>"]) if {
 	check.op == "in"
 	not "values" in object.keys(check)
 }
 
-_leaf_describe(check, item) := sprintf("%s == %s", [_path_text(item, check, "path"), _param_text(check, "value")]) if check.op == "equals"
+_leaf_describe(check, item) := concat("", [_path_text(item, check, "path"), " == ", _param_text(check, "value")]) if check.op == "equals"
 
-_leaf_describe(check, item) := sprintf("%s is present", [_path_text(item, check, "path")]) if check.op == "present"
+_leaf_describe(check, item) := concat("", [_path_text(item, check, "path"), " is present"]) if check.op == "present"
 
-_leaf_describe(check, item) := sprintf("%s is missing", [_path_text(item, check, "path")]) if check.op == "missing"
+_leaf_describe(check, item) := concat("", [_path_text(item, check, "path"), " is missing"]) if check.op == "missing"
 
-_leaf_describe(check, item) := sprintf("%s is a non-empty string", [_path_text(item, check, "path")]) if check.op == "non_empty_string"
+_leaf_describe(check, item) := concat("", [_path_text(item, check, "path"), " is a non-empty string"]) if check.op == "non_empty_string"
 
-_leaf_describe(check, item) := sprintf("%s is empty", [_path_text(item, check, "path")]) if check.op == "empty"
+_leaf_describe(check, item) := concat("", [_path_text(item, check, "path"), " is empty"]) if check.op == "empty"
 
-_leaf_describe(check, item) := sprintf("%s matches one of %s", [_path_text(item, check, "path"), _pattern_list(check)]) if check.op == "matches_any"
+_leaf_describe(check, item) := concat("", [_path_text(item, check, "path"), " matches one of ", _pattern_list(check)]) if check.op == "matches_any"
 
-_leaf_describe(check, item) := sprintf("%s matches none of %s", [_path_text(item, check, "path"), _pattern_list(check)]) if check.op == "not_matches_any"
+_leaf_describe(check, item) := concat("", [_path_text(item, check, "path"), " matches none of ", _pattern_list(check)]) if check.op == "not_matches_any"
 
 _pattern_list(check) := _list_text(check.patterns, "patterns") if "patterns" in object.keys(check)
 
 _pattern_list(check) := "<missing patterns>" if not "patterns" in object.keys(check)
 
-_leaf_describe(check, item) := sprintf("%s %s %s", [_path_text(item, check, "left"), _cmp_text(check), _path_text(item, check, "right")]) if check.op in {"compare", "compare_time"}
+_leaf_describe(check, item) := concat("", [_path_text(item, check, "left"), " ", _cmp_text(check), " ", _path_text(item, check, "right")]) if check.op in {"compare", "compare_time"}
 
 _one_value_text(check) := _value_text(check.value) if {
 	"value" in object.keys(check)
@@ -2164,9 +2164,9 @@ _values_only(check) if {
 	not "value" in object.keys(check)
 }
 
-_list_text(v, _) := sprintf("[%s]", [concat(", ", sort([_value_text(x) | some x in v]))]) if _value_list(v)
+_list_text(v, _) := concat("", ["[", concat(", ", sort([_value_text(x) | some x in v])), "]"]) if _value_list(v)
 
-_list_text(v, _) := sprintf("[%s]", [concat(", ", sort([_literal_text(x) | some x in v.literal]))]) if {
+_list_text(v, _) := concat("", ["[", concat(", ", sort([_literal_text(x) | some x in v.literal])), "]"]) if {
 	_is_literal(v)
 	_value_list(v.literal)
 }
@@ -2175,7 +2175,7 @@ _list_text(v, _) := _ref_name(v.ref) if _is_ref(v)
 
 _list_text(v, _) := "<invalid ref>" if _malformed(v)
 
-_list_text(v, name) := sprintf("<invalid %s>", [name]) if {
+_list_text(v, name) := concat("", ["<invalid ", name, ">"]) if {
 	not _is_ref(v)
 	not _malformed(v)
 	not _value_list(_written(v))
@@ -2200,12 +2200,7 @@ _expression_of(check, item) := _list_describe(check, _item_given(item)) if {
 	_quantified(check)
 }
 
-_list_describe(check, given) := sprintf("%s %s%s: %s", [
-	_quantifier(check),
-	_collection_name(check),
-	_as_text(check, given),
-	_inner_check_describe(check, _item_name(check), _given_with(check, given)),
-])
+_list_describe(check, given) := concat("", [_quantifier(check), " ", _collection_name(check), _as_text(check, given), ": ", _inner_check_describe(check, _item_name(check), _given_with(check, given))])
 
 _inner_check_describe(check, item, given) := _element_describe(check.check, item, given) if "check" in object.keys(check)
 
@@ -2213,7 +2208,7 @@ _inner_check_describe(check, _, _) := "<missing check>" if not "check" in object
 
 _as_text(check, _) := "" if not "as" in object.keys(check)
 
-_as_text(check, given) := sprintf(" as $%s", [check.as]) if {
+_as_text(check, given) := concat("", [" as $", check.as]) if {
 	_valid_name(check.as)
 	not check.as in given
 }
@@ -2247,7 +2242,7 @@ _expression_of(check, _) := "one of: <missing options>" if {
 	not "options" in object.keys(check)
 }
 
-_expression_of(check, item) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%s(%s)", [_text(nm), concat(" and ", [_top_option_describe(group[k], item) | some k in _names(group)])]) | some nm, group in check.options]))]) if {
+_expression_of(check, item) := concat("", ["one of: ", concat(" | ", sort([concat("", [_text(nm), "(", concat(" and ", [_top_option_describe(group[k], item) | some k in _names(group)]), ")"]) | some nm, group in check.options]))]) if {
 	not _written_expression(check)
 	check.op == "any_of"
 	"options" in object.keys(check)
@@ -2263,26 +2258,26 @@ _collection_name(check) := _path_name(check.path) if not check.each
 
 _collection_name(check) := _projection_name(check.path, check.each) if check.each
 
-_item_name(check) := sprintf("%s[]", [_collection_name(check)]) if not _valid_name(object.get(check, "as", null))
+_item_name(check) := concat("", [_collection_name(check), "[]"]) if not _valid_name(object.get(check, "as", null))
 
-_item_name(check) := sprintf("$%s", [check.as]) if _valid_name(object.get(check, "as", null))
+_item_name(check) := concat("", ["$", check.as]) if _valid_name(object.get(check, "as", null))
 
 _inner_collection_name(check, _) := "<missing path>" if not "path" in object.keys(check)
 
 _inner_collection_name(check, item) := _item_path_name(item, check.path) if not check.each
 
-_inner_collection_name(check, item) := sprintf("%s[].%s", [_item_path_name(item, check.path), _path_name(check.each)]) if check.each
+_inner_collection_name(check, item) := concat("", [_item_path_name(item, check.path), "[].", _path_name(check.each)]) if check.each
 
-_inner_item_name(check, item) := sprintf("%s[]", [_inner_collection_name(check, item)]) if not _valid_name(object.get(check, "as", null))
+_inner_item_name(check, item) := concat("", [_inner_collection_name(check, item), "[]"]) if not _valid_name(object.get(check, "as", null))
 
-_inner_item_name(check, _) := sprintf("$%s", [check.as]) if _valid_name(object.get(check, "as", null))
+_inner_item_name(check, _) := concat("", ["$", check.as]) if _valid_name(object.get(check, "as", null))
 
 _element_describe(check, item, _) := _nested_describe(check, item) if {
 	not _combinator(check)
 	not _quantified(check)
 }
 
-_element_describe(check, item, given) := sprintf("one of: %s", [concat(" | ", sort([sprintf("%s(%s)", [_text(nm), concat(" and ", [_element_option_describe(group[k], item, given) | some k in _names(group)])]) | some nm, group in check.options]))]) if _combinator(check)
+_element_describe(check, item, given) := concat("", ["one of: ", concat(" | ", sort([concat("", [_text(nm), "(", concat(" and ", [_element_option_describe(group[k], item, given) | some k in _names(group)]), ")"]) | some nm, group in check.options]))]) if _combinator(check)
 
 _element_describe(check, item, given) := _element_list_describe(check, item, given) if _quantified(check)
 
@@ -2290,12 +2285,7 @@ _element_option_describe(leaf, item, _) := _nested_describe(leaf, item) if not _
 
 _element_option_describe(leaf, item, given) := _element_list_describe(leaf, item, given) if _quantified(leaf)
 
-_element_list_describe(check, item, given) := sprintf("%s %s%s: %s", [
-	_quantifier(check),
-	_inner_collection_name(check, item),
-	_as_text(check, given),
-	_deeper_check_describe(check, _inner_item_name(check, item)),
-])
+_element_list_describe(check, item, given) := concat("", [_quantifier(check), " ", _inner_collection_name(check, item), _as_text(check, given), ": ", _deeper_check_describe(check, _inner_item_name(check, item))])
 
 _deeper_check_describe(check, item) := _inner_describe(check.check, item) if "check" in object.keys(check)
 
@@ -2310,9 +2300,9 @@ _inner_describe(check, item) := _any_of_describe(check, item) if _combinator(che
 
 _inner_describe(check, _) := "<nested too deep>" if _quantified(check)
 
-_any_of_describe(check, item) := sprintf("one of: %s", [concat(" | ", sort([_variant_describe(nm, group, item) | some nm, group in check.options]))])
+_any_of_describe(check, item) := concat("", ["one of: ", concat(" | ", sort([_variant_describe(nm, group, item) | some nm, group in check.options]))])
 
-_variant_describe(nm, group, item) := sprintf("%s(%s)", [_text(nm), concat(" and ", [_inner_option_describe(group[k], item) | some k in _names(group)])])
+_variant_describe(nm, group, item) := concat("", [_text(nm), "(", concat(" and ", [_inner_option_describe(group[k], item) | some k in _names(group)]), ")"])
 
 _inner_option_describe(leaf, item) := _nested_describe(leaf, item) if not _quantified(leaf)
 
@@ -2475,14 +2465,11 @@ _described(check, item) := object.union(check, {"expression": _expression_of(che
 
 _described(check, item) := {"expression": _expression_of(check, item)} if not is_object(check)
 
-_described(check, item) := object.union(check, {"expression": sprintf(
-	"%s, or substitute: %s",
-	[_expression_of(check, item), _expression_of(check.substitute, item)],
-)}) if check.substitute
+_described(check, item) := object.union(check, {"expression": concat("", [_expression_of(check, item), ", or substitute: ", _expression_of(check.substitute, item)])}) if check.substitute
 
-_subject_item_name(req) := sprintf("$%s", [_each_step(req).each_as]) if _from_well_formed(req)
+_subject_item_name(req) := concat("", ["$", _each_step(req).each_as]) if _from_well_formed(req)
 
-_subject_item_name(req) := sprintf("%s[]", [_from_name(_from_of(req))]) if {
+_subject_item_name(req) := concat("", [_from_name(_from_of(req)), "[]"]) if {
 	not _stepped(req)
 	_from_well_formed(req)
 	_from_of(req) != []
@@ -2496,7 +2483,7 @@ _subject_item_name(req) := "$$input" if {
 
 _subject_item_name(req) := "<invalid from>" if not _from_well_formed(req)
 
-_matching_count_name(req) := sprintf("count(matching(%s))", [_from_name(_from_path(req))]) if {
+_matching_count_name(req) := concat("", ["count(matching(", _from_name(_from_path(req)), "))"]) if {
 	_from_well_formed(req)
 	_from_path(req) != []
 }
@@ -2517,7 +2504,7 @@ _starts_with_dollar_key(p) if _first_dollar_key(0, p[0])
 _min_subjects_def(req) := {"$min_subjects": _with_refs(
 	{
 		"description": _min_subjects_description(req),
-		"expression": sprintf("%s >= %s", [_matching_count_name(req), _literal_text(_min_subjects_of(req))]),
+		"expression": concat("", [_matching_count_name(req), " >= ", _literal_text(_min_subjects_of(req))]),
 	},
 	{"from": _listed_from(req)},
 )}
@@ -2526,7 +2513,7 @@ _listed_from(req) := _from_of(req) if is_array(_from_of(req))
 
 _listed_from(req) := [] if not is_array(_from_of(req))
 
-_min_subjects_description(req) := sprintf("The %s is at least %s", [_subject_count_name(req), _literal_text(_min_subjects_of(req))])
+_min_subjects_description(req) := concat("", ["The ", _subject_count_name(req), " is at least ", _literal_text(_min_subjects_of(req))])
 
 _subject_count_name(req) := concat(" ", ["in-scope", _text(_subject_type_of(req)), "count"])
 
@@ -2588,7 +2575,7 @@ _well_formed_inputs(req) := array.concat(
 	array.concat(_wrong_type_inputs(req), _check_problem_inputs(req)),
 ) if _stepped(req)
 
-_applies_description(req) := sprintf("The %s is in scope", [_text(_subject_type_of(req))])
+_applies_description(req) := concat("", ["The ", _text(_subject_type_of(req)), " is in scope"])
 
 _applies_def(req) := {"$applies": _with_refs(
 	{
