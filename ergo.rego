@@ -71,7 +71,7 @@ _unknown_req_fields(req) := sort([f |
 
 _unknown_req_fields(req) := [] if not is_object(req)
 
-_unknown_field_inputs(req) := [{"name": "unknown fields", "value": _unknown_req_fields(req)} | count(_unknown_req_fields(req)) > 0]
+_unknown_field_inputs(req) := [{"name": _path_name([f]), "value": req[f]} | some f in _unknown_req_fields(req)]
 
 _wrong_type_inputs(req) := [{"name": "requirement", "value": req}] if not is_object(req)
 
