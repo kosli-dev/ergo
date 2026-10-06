@@ -204,7 +204,7 @@ The expression says where the value comes from. What it was goes in the check's 
 
 ### Params
 
-`kosli evaluate --params @params.json` puts a policy's params at `data.params`, and `opa eval -d params.json` does the same when the file holds `{"params": ...}`. In tests, write `with data.params as {...}`. To take params from somewhere else, pass them in yourself:
+A policy reads its params from `data.params`, so `opa eval -d params.json` passes them in when the file holds `{"params": ...}`. In tests, write `with data.params as {...}`. To take params from somewhere else, pass them in yourself:
 
 ```rego
 ergo.report_with_params(doc, params, requirements)
