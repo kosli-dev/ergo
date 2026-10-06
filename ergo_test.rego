@@ -2475,7 +2475,7 @@ test_a_requirement_field_ergo_does_not_know_fails_well_formed if {
 	rep.requirements.s.status == "not_met"
 	row := rows_for(rep, "s", "$well_formed")[0]
 	row.passed == false
-	row.inputs[2] == {"name": "subject", "value": {"type": "release", "from": ["releases"], "id": ["id"]}}
+	row.inputs[2] == {"name": "subject", "value": ["unknown field"]}
 }
 
 test_a_requirement_with_an_unknown_field_still_has_its_subject_rows if {
@@ -2483,26 +2483,26 @@ test_a_requirement_with_an_unknown_field_still_has_its_subject_rows if {
 	[[r.subject.id, r.passed] | some r in rows_for(rep, "s", "c")] == [[1, true], [2, true]]
 }
 
-test_unknown_requirement_fields_are_listed_in_order_with_their_values if {
+test_unknown_requirement_fields_are_listed_in_order_and_say_what_is_wrong if {
 	req := object.union(typed_req, {"requires": "some", "notes": "x", "description": "d"})
 	problem_inputs(ergo.report({"items": [{"id": 1}]}, {"s": req})) == [
-		{"name": "description", "value": "d"},
-		{"name": "notes", "value": "x"},
-		{"name": "requires", "value": "some"},
+		{"name": "description", "value": ["unknown field"]},
+		{"name": "notes", "value": ["unknown field"]},
+		{"name": "requires", "value": ["unknown field"]},
 	]
 }
 
 test_an_unknown_requirement_field_is_named_as_a_path if {
 	req := object.union(typed_req, {"a b": 1})
-	problem_inputs(ergo.report({"items": [{"id": 1}]}, {"s": req})) == [{"name": `"a b"`, "value": 1}]
+	problem_inputs(ergo.report({"items": [{"id": 1}]}, {"s": req})) == [{"name": `"a b"`, "value": ["unknown field"]}]
 }
 
 test_unknown_requirement_keys_that_are_not_strings_are_listed_in_the_same_order_everywhere if {
 	req := object.union(typed_req, {"zz": 2, 1: "x", true: 3})
 	problem_inputs(ergo.report({"items": [{"id": 1}]}, {"s": req})) == [
-		{"name": "<invalid step>", "value": 3},
-		{"name": "1", "value": "x"},
-		{"name": "zz", "value": 2},
+		{"name": "<invalid step>", "value": ["unknown field"]},
+		{"name": "1", "value": ["unknown field"]},
+		{"name": "zz", "value": ["unknown field"]},
 	]
 }
 
