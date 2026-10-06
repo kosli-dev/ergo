@@ -810,7 +810,7 @@ When a check is [written wrong](#basic-operators), the `$well_formed` row gets a
 
 A check inside another one is named further in, like `checks.signed.check` for the inner check of an `all`, `checks.reviewed.substitute` for a substitute, or `checks.permitted.options.standard.1` for the second check of an `any_of` option. A name that needs quotes is quoted as in [paths](#paths): `checks."a.b"`.
 
-The requirement's own fields get an input of the same form when something is wrong with them, named after the field and sorted by it. `require` and a `from` with a [naming step](#naming-subjects) are shown with their value when they're fine, and with what's wrong instead when they aren't, so no name appears twice:
+The requirement's own fields get an input of the same form when something is wrong with them, named after the field and sorted by field. `require` and a `from` with a [naming step](#naming-subjects) are shown with their value when they're fine, and with what's wrong instead when they aren't, so no name appears twice:
 
 ```json
 "inputs": [
@@ -823,17 +823,17 @@ The requirement's own fields get an input of the same form when something is wro
 ]
 ```
 
-| Field                        | What's wrong                                                                                                                                   |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| any field ergo doesn't know  | `unknown field`                                                                                                                                |
-| `applies_to`, `checks`       | `not an object`                                                                                                                                |
-| `checks`                     | `missing`, `empty`                                                                                                                             |
-| `require`                    | `neither every nor some`                                                                                                                       |
-| `from`, `id`                 | `not a list`, `step that can't be a key`, `number out of range`                                                                                |
-| `from`                       | `object step before the last`, `object step without each_as`, `invalid name`, `invalid keys`, `unknown field foo in naming step` |
-| `id`                         | `ref inside where`, `literal inside where`                                                                                                     |
-| `min_subjects`               | `not a whole number of 0 or more`, `number out of range`                                                                                       |
-| `subject_type`               | `empty or not a string`                                                                                                                        |
+| Field                       | What's wrong                                                                                                                     |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| any field ergo doesn't know | `unknown field`                                                                                                                  |
+| `applies_to`, `checks`      | `not an object`                                                                                                                  |
+| `checks`                    | `missing`, `empty`                                                                                                               |
+| `require`                   | `neither every nor some`                                                                                                         |
+| `from`, `id`                | `not a list`, `step that can't be a key`, `number out of range`                                                                  |
+| `from`                      | `object step before the last`, `object step without each_as`, `invalid name`, `invalid keys`, `unknown field foo in naming step` |
+| `id`                        | `ref inside where`, `literal inside where`                                                                                       |
+| `min_subjects`              | `not a whole number of 0 or more`, `number out of range`                                                                         |
+| `subject_type`              | `empty or not a string`                                                                                                          |
 
 A policy written in Rego can use a key that isn't a string, like `true` or `1.5`. ergo names it `<invalid key true>` or `<invalid key 1.5>`, so two such keys never share a name.
 
