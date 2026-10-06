@@ -191,7 +191,7 @@ Copy the new `ergo.rego` over the old one and run your policy's tests.
 
 ## Contributing
 
-Bug reports, ideas and pull requests are welcome. [`CONTRIBUTING.md`](CONTRIBUTING.md) explains how, and everyone taking part follows the [code of conduct](CODE_OF_CONDUCT.md).
+Bug reports, ideas and pull requests are welcome. [`CONTRIBUTING.md`](https://github.com/kosli-dev/ergo/blob/main/CONTRIBUTING.md) explains how, and everyone taking part follows the [code of conduct](https://github.com/kosli-dev/ergo/blob/main/CODE_OF_CONDUCT.md).
 
 ## License
 

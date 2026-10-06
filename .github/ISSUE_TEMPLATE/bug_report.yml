@@ -35,7 +35,7 @@ body:
       label: What you expected
     validations:
       required: true
-  - type: input
+  - type: textarea
     id: versions
     attributes:
       label: Versions
