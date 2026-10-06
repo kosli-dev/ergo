@@ -119,6 +119,70 @@ The filter lists the types that don't need tests, rather than the ones that do. 
 
 Don't filter the test runs instead, with `from: [test_runs]` and `min_subjects: 0`. That lets a new feature with no test runs pass, because there's nothing to check.
 
+### Picking the subject
+
+The subject is what each row is about, so it's the first choice to make, and it changes more than the rows. Take "every commit was reviewed in an approved pull request", with this input:
+
+```json
+{"commits": [
+  {"sha": "a1", "pull_requests": [{"number": 7, "approved_by": "bob"}, {"number": 8}]},
+  {"sha": "a2", "pull_requests": []}
+]}
+```
+
+With the commit as the subject, the check looks through its pull requests:
+
+```yaml
+reviewed:
+  subject_type: commit
+  from: [commits]
+  id: [sha]
+  checks:
+    reviewed:
+      description: Some pull request for the commit was approved
+      op: any
+      path: [pull_requests]
+      check: { op: non_empty_string, path: [approved_by] }
+```
+
+| subject | check      | passed  | cause       |
+| ------- | ---------- | ------- | ----------- |
+| `a1`    | `reviewed` | `true`  | `satisfied` |
+| `a2`    | `reviewed` | `false` | `value`     |
+
+The requirement is `not_met`: `a2` has no pull request.
+
+With the pull request as the subject, the same sentence turns into "some pull request was approved":
+
+```yaml
+reviewed:
+  subject_type: pull request
+  from: [commits, 0, pull_requests]
+  id: [number]
+  require: some
+  checks:
+    approved:
+      description: The pull request was approved
+      op: non_empty_string
+      path: [approved_by]
+```
+
+| subject | check      | passed  | cause       |
+| ------- | ---------- | ------- | ----------- |
+| `7`     | `approved` | `true`  | `satisfied` |
+| `8`     | `approved` | `false` | `absent`    |
+
+The requirement is `met`. Pull request 7 is approved, and `a2` is never looked at, because `from` reads one commit's pull requests. Same input, same words, opposite answers.
+
+So before writing a check, decide:
+
+- **What would the policy's owner list?** The report has one row per subject, so the subject is what it lists. A rule about commits should list commits, even when the evidence is organised by pull request.
+- **What id would they cite?** `id` is how a row is found again, and how two reports are compared.
+- **How many lists sit between the subject and the values compared?** Each one costs a level of `all` or `any`, and ergo allows [one level of nesting](#nesting). A check that needs more usually means the subject is one list too high, or the evidence was recorded at the wrong grain. Moving the subject down flattens the check, but then the report lists the smaller thing, as above.
+- **Does `require` still say what the sentence says?** "Every commit has some approved pull request" is `every` over commits with `any` inside a check. With the pull request as the subject it becomes `some` over pull requests, which is only the same rule when there is one commit.
+
+A policy can hold several requirements with different subjects over the same input, like a lockfile and each of its entries. Each requirement picks its own grain.
+
 ## Paths
 
 A path is a list of keys that ergo follows one step at a time. `["release", "approver", "email"]` reads `release.approver.email`.
