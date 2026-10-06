@@ -2544,13 +2544,22 @@ test_a_min_subjects_whose_value_is_a_whole_number_is_well_formed_however_it_is_w
 	rows == [true, true, true]
 }
 
-test_a_field_of_the_wrong_type_fails_well_formed_and_shows_its_value if {
+wrong_type_problems := {
+	"applies_to": "not an object",
+	"checks": "not an object",
+	"from": "not a list",
+	"id": "not a list",
+	"min_subjects": "not a whole number of 0 or more",
+	"subject_type": "empty or not a string",
+}
+
+test_a_field_of_the_wrong_type_fails_well_formed_and_says_what_it_should_be if {
 	rows := [[f, "s" in object.keys(rep.requirements), rep.requirements.s.status, r.passed, r.cause, r.inputs[count(r.inputs) - 1]] |
 		some [f, v] in wrong_types
 		rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {f: v})})
 		some r in rows_for(rep, "s", "$well_formed")
 	]
-	rows == [[f, true, "not_met", false, "value", {"name": f, "value": v}] | some [f, v] in wrong_types]
+	rows == [[f, true, "not_met", false, "value", {"name": f, "value": [wrong_type_problems[f]]}] | some [f, _] in wrong_types]
 }
 
 test_a_requirement_that_is_not_an_object_finds_no_subjects_so_it_cannot_claim_the_whole_input if {
@@ -3032,7 +3041,7 @@ test_an_empty_subject_type_fails_well_formed_because_rows_and_descriptions_would
 	every name in ["", " ", "\t "] {
 		rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"subject_type": name})})
 		row := rows_for(rep, "s", "$well_formed")[0]
-		[row.passed, row.inputs[count(row.inputs) - 1]] == [false, {"name": "subject_type", "value": name}]
+		[row.passed, row.inputs[count(row.inputs) - 1]] == [false, {"name": "subject_type", "value": ["empty or not a string"]}]
 	}
 	rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"subject_type": "a b"})})
 	rows_for(rep, "s", "$well_formed")[0].passed == true

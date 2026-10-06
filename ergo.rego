@@ -75,7 +75,16 @@ _unknown_field_inputs(req) := [{"name": _path_name([f]), "value": ["unknown fiel
 
 _wrong_type_inputs(req) := [{"name": "requirement", "value": req}] if not is_object(req)
 
-_wrong_type_inputs(req) := [{"name": f, "value": req[f]} | some f in _wrong_typed_fields(req)] if is_object(req)
+_wrong_type_inputs(req) := [{"name": f, "value": [_wrong_type_problems[f]]} | some f in _wrong_typed_fields(req)] if is_object(req)
+
+_wrong_type_problems := {
+	"applies_to": "not an object",
+	"checks": "not an object",
+	"from": "not a list",
+	"id": "not a list",
+	"min_subjects": "not a whole number of 0 or more",
+	"subject_type": "empty or not a string",
+}
 
 _size(x) := count(x) if type_name(x) in {"array", "object", "set", "string"}
 
