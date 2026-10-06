@@ -6243,3 +6243,21 @@ test_failed_items_of_a_nested_check_name_the_outer_item_only if {
 	)
 	rows_for(rep, "s", "c")[0].failed_items == [{"path": "approvers[0]", "cause": "value", "value": {"username": "bob", "timestamp": "2026-10-01T11:00:00Z"}}]
 }
+
+test_failed_items_leave_out_an_item_that_passes_another_option_when_a_ref_cannot_be_read if {
+	check := {"op": "all", "path": ["xs"], "check": {"op": "any_of", "options": {
+		"listed": [{"op": "in", "path": [], "values": {"ref": ["$$params", "missing"]}}],
+		"one": [{"op": "equals", "path": [], "value": 1}],
+	}}}
+	subj := {"id": 1, "xs": [1, 2]}
+	cause_of(subj, check) == "absent"
+	failed_of(subj, check) == [{"path": "xs[1]", "cause": "absent", "value": 2}]
+}
+
+test_failed_items_of_an_empty_each_add_only_the_position if {
+	check := {"op": "all", "path": ["xs"], "each": [], "check": {"op": "equals", "path": [], "value": 1}}
+	failed_of({"id": 1, "xs": [[1, 2], {"v": 1}]}, check) == [
+		{"path": "xs[0][1]", "cause": "value", "value": 2},
+		{"path": "xs[1]", "cause": "unusable", "value": {"v": 1}},
+	]
+}

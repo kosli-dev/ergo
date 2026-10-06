@@ -329,9 +329,11 @@ _entry_failure(subj, check, [p, v]) := [{"path": p, "cause": c, "value": v} |
 
 _entry_failure(_, _, [p, v, c]) := [{"path": p, "cause": c, "value": v}]
 
-_failed_item_cause(subj, check, _) := _worst_read(subj, check) if _unreadable_ref(check)
-
-_failed_item_cause(_, check, v) := _item_cause(check, v) if not _unreadable_ref(check)
+_failed_item_cause(subj, check, v) := "satisfied" if {
+	_item_passed(check, v)
+} else := _worst_read(subj, check) if {
+	_unreadable_ref(check)
+} else := _item_cause(check, v)
 
 default _item_entries(_, _, _) := []
 
@@ -345,7 +347,7 @@ _item_entries(subj, check, item) := [[concat("", [_item_path_name(item, check.pa
 
 _item_entries(subj, check, item) := [e |
 	some i, outer in coll
-	some e in _outer_entries(outer, check, concat("", [_item_path_name(item, check.path), "[", _text(i), "].", _path_name(check.each)]))
+	some e in _outer_entries(outer, check, concat("", [_item_path_name(item, check.path), "[", _text(i), "]", _each_suffix(check.each)]))
 ] if {
 	check.each
 	coll := _field(subj, check.path)
@@ -361,6 +363,10 @@ _outer_entries(outer, check, name) := [[concat("", [name, "[", _text(j), "]"]), 
 _outer_entries(outer, check, name) := [[name, [], "value"]] if _field(outer, check.each) == []
 
 _outer_entries(outer, check, name) := [[name, value_at(outer, check.each), _each_state(outer, check.each)]] if not _is_list_at(outer, check.each)
+
+_each_suffix([]) := ""
+
+_each_suffix(each) := concat("", [".", _path_name(each)]) if each != []
 
 _is_list_at(x, path) if is_array(_field(x, path))
 

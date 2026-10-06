@@ -540,7 +540,7 @@ Some things worth knowing:
 
 #### Which items failed
 
-A row of an `all` or `any` check also has `failed_items`: the items that made the check fail, in list order, with where it is, its cause and its value. With this input:
+A row of an `all` or `any` check also has `failed_items`: the items that made the check fail, in list order, each with its path, cause and value. With this input:
 
 ```json
 { "releases": [ { "id": "r-1", "pull_requests": [
@@ -567,7 +567,7 @@ and the check from above, `every pull_requests[].commits: signed == true`, the r
 - With `each`, an inner list that's missing, `null`, not a list or empty fails the check, so it's listed in place of its items, like `pull_requests[1].commits` above.
 - When the check passes, it's `[]`. A passing `any` can have items that failed, but none of them is why the row came out the way it did.
 - It's `[]` when the list itself can't be read, because there are no items to blame. The row's `cause` says what's wrong with the list.
-- When the check is [written wrong](#basic-operators), every item, and every inner list that's missing or empty, is listed with cause `ill_formed`, because none of them could be checked. When a [`ref`](#reading-from-the-input) in it can't be read, every item is listed with the ref's cause.
+- When the check is [written wrong](#basic-operators), every item, and every inner list that's missing, `null`, not a list or empty, is listed with cause `ill_formed`, because none of them could be checked. When a [`ref`](#reading-from-the-input) in it can't be read, every item that fails is listed with the ref's cause, as the row is.
 - For a nested check, only the outer items are listed. An approver who approved before the last commit is listed with cause `value`, but not the commit.
 - With a [substitute](#substitutes), it lists the items that failed the check itself, even when the substitute passed and the row with it.
 - Only rows of `all` and `any` checks have it. Rows of `any_of` checks, `$applies` rows and rows of custom operators don't, even when an `all` or `any` sits inside them.
