@@ -1,0 +1,44 @@
+name: Bug report
+description: ergo gave the wrong report, or failed to run
+title: "core: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        If the bug lets a check pass when it should fail, or you think it's a security problem, email security@kosli.com instead of opening a public issue.
+  - type: textarea
+    id: policy
+    attributes:
+      label: Policy
+      description: The smallest policy that shows the problem.
+      render: rego
+    validations:
+      required: true
+  - type: textarea
+    id: input
+    attributes:
+      label: Input
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: got
+    attributes:
+      label: What you got
+      description: The report or the error, and the command you ran.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: The output of `opa version`, and the commit or date of the `ergo.rego` you copied.
+    validations:
+      required: true

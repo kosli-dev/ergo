@@ -9,6 +9,9 @@ ergo is a Rego library that turns policy evaluation into a structured report. Us
 - `custom_op_test.rego` defines custom operators that only the tests use.
 - `README.md` walks a new user through a first policy.
 - `REFERENCE.md` describes every field, operator, cause and report entry.
+- `CONTRIBUTING.md` tells people how to report bugs and send changes, and points them here for the rules.
+- `CODE_OF_CONDUCT.md` is the Contributor Covenant 2.1, unchanged apart from the contact address.
+- `.github/ISSUE_TEMPLATE/` and `.github/pull_request_template.md` are the forms GitHub shows for new issues and pull requests.
 - `examples/` holds worked examples. Each one has an input, the same policy in plain Rego and with ergo, and tests that pin what both versions report.
 
 ## Checks
@@ -108,7 +111,7 @@ When talking to people:
 The first line names the part of the repo that changed, then says what the change does, in the imperative and in lowercase:
 
 - `core:` the library and its tests
-- `docs:` `README.md`, `REFERENCE.md` and `AGENTS.md`
+- `docs:` `README.md`, `REFERENCE.md`, `AGENTS.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md` and the issue and pull request templates
 - `site:` the website in `site/`
 - `ci:` workflows and Dependabot
 - `examples:` the worked examples in `examples/`
