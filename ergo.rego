@@ -28,7 +28,8 @@ _min_subjects_of(req) := _req_field(req, "min_subjects", 1)
 _require_of(req) := _req_field(req, "require", "every")
 
 _wrong_typed_fields(req) := [f |
-	some f in ["applies_to", "checks", "from", "id", "min_subjects", "subject_type"]
+	is_object(req)
+	some f in sort(object.keys(_wrong_type_problems))
 	f in object.keys(req)
 	not _has_type(f, req[f])
 ]
@@ -66,16 +67,14 @@ _typed(req) if {
 
 _unknown_req_fields(req) := sort([f |
 	some f in object.keys(req)
-	not f in {"applies_to", "checks", "from", "id", "min_subjects", "require", "subject_type"}
+	not f in (object.keys(_wrong_type_problems) | {"require"})
 ]) if is_object(req)
 
 _unknown_req_fields(req) := [] if not is_object(req)
 
-_unknown_field_inputs(req) := [{"name": _path_name([f]), "value": ["unknown field"]} | some f in _unknown_req_fields(req)]
-
 _wrong_type_inputs(req) := [{"name": "requirement", "value": req}] if not is_object(req)
 
-_wrong_type_inputs(req) := [{"name": f, "value": [_wrong_type_problems[f]]} | some f in _wrong_typed_fields(req)] if is_object(req)
+_wrong_type_inputs(req) := [] if is_object(req)
 
 _wrong_type_problems := {
 	"applies_to": "not an object",
@@ -84,6 +83,53 @@ _wrong_type_problems := {
 	"id": "not a list",
 	"min_subjects": "not a whole number of 0 or more",
 	"subject_type": "empty or not a string",
+}
+
+_req_problems(req) := union({_type_problems(req), _range_problems(req), _unknown_problems(req), _checks_problems(req), _require_problems(req), _path_problems(req, "from"), _path_problems(req, "id"), _naming_step_problems(req), _where_problems(req)})
+
+_type_problems(req) := {[f, _wrong_type_problems[f]] |
+	some f in _wrong_typed_fields(req)
+	not _min_subjects_out_of_range(req, f)
+}
+
+_min_subjects_out_of_range(req, "min_subjects") if _out_of_range(req.min_subjects)
+
+_range_problems(req) := {["min_subjects", "number out of range"] | _out_of_range(_min_subjects_of(req))}
+
+_unknown_problems(req) := {[f, "unknown field"] | some f in _unknown_req_fields(req)}
+
+_checks_problems(req) := {["checks", "missing"] | is_object(req); not "checks" in object.keys(req)} | {["checks", "empty"] | req.checks == {}}
+
+_require_problems(req) := {["require", "neither every nor some"] | is_object(req); not _require_of(req) in {"every", "some"}}
+
+_path_problems(req, f) := {[f, "step that can't be a key"] | is_array(_req_field(req, f, null)); _badly_stepped(req[f])} | {[f, "number out of range"] | is_array(_req_field(req, f, null)); _out_of_range(req[f])}
+
+_naming_step_problems(req) := {["from", m] |
+	is_array(_from_of(req))
+	some i, seg in _from_of(req)
+	is_object(seg)
+	not _is_ref(seg)
+	some m in _object_step_problems(seg, i == (count(_from_of(req)) - 1))
+}
+
+_object_step_problems(_, false) := {"object step before the last"}
+
+_object_step_problems(step, true) := {"object step without each_as"} if not "each_as" in object.keys(step)
+
+_object_step_problems(step, true) := ({concat("", ["unknown field ", _text(k), " in naming step"]) |
+	some k in object.keys(step)
+	not k in {"each_as", "keys"}
+} | {"invalid name" | not _valid_name(step.each_as)}) | {"invalid keys" | not _keys_well_formed(step)} if "each_as" in object.keys(step)
+
+_where_problems(req) := {["id", concat("", [kind, " inside where"])] | some kind in _wrapped_in_where(_id_of(req))}
+
+_field_problem_inputs(req) := [{"name": _path_name([f]), "value": sort({p[1] | some p in problems; p[0] == f})} | some f in sort({p[0] | some p in problems})] if {
+	problems := _req_problems(req)
+}
+
+_has_problems(req, f) if {
+	some p in _req_problems(req)
+	p[0] == f
 }
 
 _size(x) := count(x) if type_name(x) in {"array", "object", "set", "string"}
@@ -2684,21 +2730,20 @@ _from_names(req) := {n |
 }
 
 _well_formed_inputs(req) := array.concat(
-	[
-		{"name": "count(checks)", "value": count(_checks_of(req))},
-		{"name": "require", "value": _require_of(req)},
-	],
-	array.concat(array.concat(_wrong_type_inputs(req), _unknown_field_inputs(req)), _check_problem_inputs(req)),
-) if not _stepped(req)
+	array.concat(
+		[{"name": "count(checks)", "value": count(_checks_of(req))}],
+		array.concat(_echo(req, "require", _require_of(req)), _from_echo(req)),
+	),
+	array.concat(array.concat(_wrong_type_inputs(req), _field_problem_inputs(req)), _check_problem_inputs(req)),
+)
 
-_well_formed_inputs(req) := array.concat(
-	[
-		{"name": "count(checks)", "value": count(_checks_of(req))},
-		{"name": "require", "value": _require_of(req)},
-		{"name": "from", "value": _from_of(req)},
-	],
-	array.concat(array.concat(_wrong_type_inputs(req), _unknown_field_inputs(req)), _check_problem_inputs(req)),
-) if _stepped(req)
+_echo(req, f, v) := [{"name": f, "value": v}] if not _has_problems(req, f)
+
+_echo(req, f, _) := [] if _has_problems(req, f)
+
+_from_echo(req) := _echo(req, "from", _from_of(req)) if _stepped(req)
+
+_from_echo(req) := [] if not _stepped(req)
 
 _applies_description(req) := concat("", ["The ", _text(_subject_type_of(req)), " is in scope"])
 

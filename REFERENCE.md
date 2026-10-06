@@ -79,7 +79,7 @@ A few details:
 - Leaving out `from` or `id` is allowed, but rarely what you want. Without `from`, the whole input is checked as one subject. Without `id`, each row repeats the whole subject as its id, so two identical subjects clash.
 - `min_subjects` defaults to 1 so that a typo in `from` fails the requirement instead of quietly passing it. Set it to `0` when you mean "if there are any, they must pass; if there are none, that's fine". It means the same under `every` and `some`. When none are left, the requirement is [not applicable](#the-report).
 - Under `some`, one subject has to pass all the checks by itself. Two subjects that each pass half of them don't count.
-- A requirement with no checks, a `require` other than `every` or `some`, a badly written [naming step](#naming-subjects), an `id` whose selector has a ref or `literal` deeper inside a `where` value than ergo reads, or a check that's [written wrong](#basic-operators), is never met. The `$well_formed` row says so.
+- A requirement with no checks, a `require` other than `every` or `some`, a badly written [naming step](#naming-subjects), an `id` whose selector has a ref or `literal` deeper inside a `where` value than ergo reads, or a check that's [written wrong](#basic-operators), is never met. The `$well_formed` row says so, and says [what's wrong](#checks-ergo-adds), like `{"name": "require", "value": ["neither every nor some"]}`.
 - So is a requirement with a field that isn't in the table above, like `subject` or `requires`, because ergo would otherwise ignore it and check something you didn't mean. The `$well_formed` row lists each one in order and says what's wrong with it, the way it does for a [check that's written wrong](#checks-ergo-adds), like `{"name": "subject", "value": ["unknown field"]}`. Rows for the subjects are still there.
 - So is a requirement that isn't an object, or whose `checks` or `applies_to` isn't an object, whose `from` or `id` isn't a list, whose `min_subjects` isn't a whole number of 0 or more, or whose `subject_type` isn't a string with something besides whitespace in it, since rows and descriptions name the subject by it. `null` counts as the wrong type. `2.0` is a whole number, but `-1` and `0.5` aren't. It still has its entry in `requirements` and its `$well_formed` row, which shows each such field and what it should be, like `{"name": "from", "value": ["not a list"]}`, or the whole requirement and its value, like `{"name": "requirement", "value": 5}`. ergo then reads `checks` as empty and `applies_to` as a filter it can't read, so every subject fails `$applies` with cause `absent`, shown as `<invalid applies_to>`, and gets no other rows. It reads a `from` as giving no subjects (shown as `<invalid from>`), and an `id` as giving the id `null`. A requirement that isn't an object gives no subjects either. A `min_subjects` that isn't a number fails `$min_subjects` too.
 
@@ -810,7 +810,30 @@ When a check is [written wrong](#basic-operators), the `$well_formed` row gets a
 
 A check inside another one is named further in, like `checks.signed.check` for the inner check of an `all`, `checks.reviewed.substitute` for a substitute, or `checks.permitted.options.standard.1` for the second check of an `any_of` option. A name that needs quotes is quoted as in [paths](#paths): `checks."a.b"`.
 
-A field of the requirement that ergo doesn't know, like `requires` written for `require`, or one of the wrong type, gets an input named after the field, in the same form: `{ "name": "requires", "value": ["unknown field"] }` or `{ "name": "from", "value": ["not a list"] }`.
+The requirement's own fields get an input of the same form when something is wrong with them, named after the field and sorted by it. `require` and a `from` with a [naming step](#naming-subjects) are shown with their value when they're fine, and with what's wrong instead when they aren't, so no name appears twice:
+
+```json
+"inputs": [
+  { "name": "count(checks)", "value": 0 },
+  { "name": "checks", "value": ["empty"] },
+  { "name": "from", "value": ["not a list"] },
+  { "name": "min_subjects", "value": ["not a whole number of 0 or more"] },
+  { "name": "require", "value": ["neither every nor some"] },
+  { "name": "zz", "value": ["unknown field"] }
+]
+```
+
+| Field                        | What's wrong                                                                                                                                   |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| any field ergo doesn't know  | `unknown field`                                                                                                                                |
+| `applies_to`, `checks`       | `not an object`                                                                                                                                |
+| `checks`                     | `missing`, `empty`                                                                                                                             |
+| `require`                    | `neither every nor some`                                                                                                                       |
+| `from`, `id`                 | `not a list`, `step that can't be a key`, `number out of range`                                                                                |
+| `from`                       | `object step before the last`, `object step without each_as`, `invalid name`, `invalid keys`, `unknown field foo in naming step` |
+| `id`                         | `ref inside where`, `literal inside where`                                                                                                     |
+| `min_subjects`               | `not a whole number of 0 or more`, `number out of range`                                                                                       |
+| `subject_type`               | `empty or not a string`                                                                                                                        |
 
 Their descriptions are plain sentences, like your own checks': `The requirement is written correctly`, `The in-scope deployment count is at least 1`, `Every deployment id is unique` and `The deployment is in scope`. The details are in `expression`, `inputs` and `cause`. `$min_subjects` names its input after what it counts, like `in-scope deployment count`: only the subjects left after `applies_to`. `$unique_ids` lists the ids that more than one subject has, once each, under `repeated deployment ids`, sorted by how they're written as JSON, so `"b"` comes before `10`, and `10` before `3`. They use `subject_type` as it's written, so they read right whatever the word's plural would be.
 
@@ -930,6 +953,6 @@ ergo fails a check whenever it can't be sure, instead of letting it pass. Rego d
 - A subject whose `applies_to` filter can't be read fails the requirement instead of being left out.
 - A `ref` that can't be read fails the check, even for operators like `excludes` or `not_matches_any` that would pass on an empty value.
 - A policy with no requirements, and a requirement with no checks, are never met.
-- A requirement that isn't an object, or a field of the wrong type, fails `$well_formed` and keeps its place in the report, so a typo in the policy can't make a requirement vanish.
+- A requirement that isn't an object, a field of the wrong type, or a field ergo doesn't know, fails `$well_formed` and keeps its place in the report, so a typo in the policy can't make a requirement vanish.
 - A malformed timestamp fails `compare_time` rather than stopping the whole evaluation with an error.
 - Running OPA with `--strict-builtin-errors` gives the same report as running without it, because ergo checks a value's type before it passes it to a built-in like `object.get` or `count`. A [custom operator](#custom-operators) is your own Rego, so it needs the same care if you use the flag.
