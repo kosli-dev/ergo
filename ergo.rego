@@ -299,6 +299,77 @@ _inputs_in(req, check, subj) := i if {
 	i := _row_inputs(subj, check, _subject_item_name(req)) with input as s
 }
 
+_failed_items_field(req, check, subj) := {"failed_items": _failed_items_in(req, check, subj)} if _quantified(check)
+
+_failed_items_field(_, check, _) := {} if not _quantified(check)
+
+_failed_items_in(req, check, subj) := _failed_items(subj, check, _flaw(check, _from_names(req)), _subject_item_name(req)) if not _has_step(req)
+
+_failed_items_in(req, check, subj) := f if {
+	_has_step(req)
+	s := _scope_of(req, subj)
+	f := _failed_items(subj, check, _flaw(check, _from_names(req)), _subject_item_name(req)) with input as s
+}
+
+_failed_items(subj, check, flaw, item) := [{"path": e[0], "cause": flaw, "value": e[1]} |
+	some e in _item_entries(subj, check, item)
+] if flaw != ""
+
+_failed_items(subj, check, "", item) := [] if {
+	_list_passed(check, subj)
+} else := [f |
+	some e in _item_entries(subj, check, item)
+	some f in _entry_failure(subj, check, e)
+]
+
+_entry_failure(subj, check, [p, v]) := [{"path": p, "cause": c, "value": v} |
+	c := _failed_item_cause(subj, check, v)
+	c != "satisfied"
+]
+
+_entry_failure(_, _, [p, v, c]) := [{"path": p, "cause": c, "value": v}]
+
+_failed_item_cause(subj, check, v) := "satisfied" if {
+	_item_passed(check, v)
+} else := _worst_read(subj, check) if {
+	_unreadable_ref(check)
+} else := _item_cause(check, v)
+
+default _item_entries(_, _, _) := []
+
+_item_entries(subj, check, item) := [[concat("", [_item_path_name(item, check.path), "[", _text(i), "]"]), v] |
+	some i, v in coll
+] if {
+	not check.each
+	coll := _field(subj, check.path)
+	is_array(coll)
+}
+
+_item_entries(subj, check, item) := [e |
+	some i, outer in coll
+	some e in _outer_entries(outer, check, concat("", [_item_path_name(item, check.path), "[", _text(i), "]", _each_suffix(check.each)]))
+] if {
+	check.each
+	coll := _field(subj, check.path)
+	is_array(coll)
+}
+
+_outer_entries(outer, check, name) := [[concat("", [name, "[", _text(j), "]"]), v] | some j, v in inner] if {
+	inner := _field(outer, check.each)
+	is_array(inner)
+	count(inner) > 0
+}
+
+_outer_entries(outer, check, name) := [[name, [], "value"]] if _field(outer, check.each) == []
+
+_outer_entries(outer, check, name) := [[name, value_at(outer, check.each), _each_state(outer, check.each)]] if not _is_list_at(outer, check.each)
+
+_each_suffix([]) := ""
+
+_each_suffix(each) := concat("", [".", _path_name(each)]) if each != []
+
+_is_list_at(x, path) if is_array(_field(x, path))
+
 default _subject_matches(_, _) := false
 
 _subject_matches(subj, req) if {
@@ -2650,7 +2721,7 @@ _subject_rows(doc, req, req_name) := [row |
 	some entry in _matching_entries(doc, req)
 	some check_name in _names(_checks_of(req))
 	check := _checks_of(req)[check_name]
-	row := {
+	base := {
 		"requirement": req_name,
 		"subject": _entry_ref(entry, req),
 		"check": check_name,
@@ -2658,6 +2729,7 @@ _subject_rows(doc, req, req_name) := [row |
 		"passed": _passes(req, check, entry.subject),
 		"cause": _cause_in(req, check, entry.subject),
 	}
+	row := object.union(base, _failed_items_field(req, check, entry.subject))
 ]
 
 _well_formed_row(req, req_name) := row if {
@@ -2847,18 +2919,25 @@ _report_of(doc, policy) := {
 	"results": _results(doc, policy),
 }
 
-violations(report) := [{
-	"requirement": row.requirement,
-	"subject": row.subject,
-	"check": row.check,
-	"description": _definition_field(report.requirements, row, "description"),
-	"expression": _definition_field(report.requirements, row, "expression"),
-	"inputs": array.concat(row.inputs, _recorded_refs(report.requirements, row)),
-	"cause": row.cause,
-} |
+violations(report) := [object.union(
+	{
+		"requirement": row.requirement,
+		"subject": row.subject,
+		"check": row.check,
+		"description": _definition_field(report.requirements, row, "description"),
+		"expression": _definition_field(report.requirements, row, "expression"),
+		"inputs": array.concat(row.inputs, _recorded_refs(report.requirements, row)),
+		"cause": row.cause,
+	},
+	_failed_items_of(row),
+) |
 	some row in report.results
 	_is_violation(report.requirements, row)
 ]
+
+_failed_items_of(row) := {"failed_items": row.failed_items} if "failed_items" in object.keys(row)
+
+_failed_items_of(row) := {} if not "failed_items" in object.keys(row)
 
 default _recorded_refs(_, _) := []
 

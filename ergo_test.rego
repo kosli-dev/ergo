@@ -6052,3 +6052,212 @@ test_a_selector_on_a_subject_that_is_not_an_object_fails_as_not_an_object if {
 test_a_ref_that_starts_with_a_number_fails_closed if {
 	cause_of({"id": 1}, {"op": "equals", "path": ["id"], "value": {"ref": [5, "x"]}}) == "ill_formed"
 }
+
+failed_of(subj, check) := row.failed_items if {
+	some row in solo(subj, check).results
+	row.check == "c"
+}
+
+no_self_deploy := {"segregation": {
+	"subject_type": "deployment",
+	"from": ["deployments", {"each_as": "deploy"}],
+	"id": ["id"],
+	"checks": {"not_self_deployed": {
+		"op": "all",
+		"path": ["pull_requests"],
+		"each": ["commits"],
+		"check": {"op": "compare", "left": ["author"], "right": ["$deploy", "deployed_by"], "cmp": "ne"},
+	}},
+}}
+
+self_deployed(prs) := rows_for(ergo.report({"deployments": [{"id": "d", "deployed_by": "bob", "pull_requests": prs}]}, no_self_deploy), "segregation", "not_self_deployed")[0]
+
+test_failed_items_name_only_the_items_of_an_all_that_failed if {
+	row := self_deployed([
+		{"number": 7, "commits": [{"sha": "a1", "author": "ann"}]},
+		{"number": 8, "commits": [{"sha": "b1", "author": "ann"}, {"sha": "b2", "author": "bob"}]},
+	])
+	row.passed == false
+	row.failed_items == [{"path": "pull_requests[1].commits[1]", "cause": "value", "value": {"sha": "b2", "author": "bob"}}]
+}
+
+test_failed_items_is_empty_when_every_item_passes if {
+	row := self_deployed([{"number": 9, "commits": [{"sha": "c1", "author": "ann"}, {"sha": "c2", "author": "carol"}]}])
+	row.passed == true
+	row.failed_items == []
+}
+
+test_failed_items_name_an_inner_list_that_fails_the_check_because_it_is_empty_missing_or_not_a_list if {
+	row := self_deployed([
+		{"number": 11, "commits": []},
+		{"number": 12},
+		{"number": 13, "commits": "x"},
+		{"number": 14, "commits": [{"sha": "e1", "author": "ann"}]},
+	])
+	row.passed == false
+	row.failed_items == [
+		{"path": "pull_requests[0].commits", "cause": "value", "value": []},
+		{"path": "pull_requests[1].commits", "cause": "absent", "value": null},
+		{"path": "pull_requests[2].commits", "cause": "unusable", "value": "x"},
+	]
+}
+
+test_failed_items_give_items_that_are_not_objects_or_are_null_their_own_cause if {
+	row := self_deployed(["x", {"number": 1, "commits": [null, "y", {"author": null}]}])
+	[[f.path, f.cause] | some f in row.failed_items] == [
+		["pull_requests[0].commits", "not_an_object"],
+		["pull_requests[1].commits[0]", "not_an_object"],
+		["pull_requests[1].commits[1]", "not_an_object"],
+		["pull_requests[1].commits[2]", "null"],
+	]
+}
+
+test_failed_items_of_a_failing_any_list_every_item_with_its_own_cause if {
+	check := {"op": "any", "path": ["approvers"], "check": {"op": "compare", "left": ["username"], "right": ["$$input", "items", 0, "author"], "cmp": "ne"}}
+	subj := {"id": 42, "author": "ann", "approvers": [{"username": "ann"}, {"name": "Bob"}]}
+	verdict(subj, check) == false
+	failed_of(subj, check) == [
+		{"path": "approvers[0]", "cause": "value", "value": {"username": "ann"}},
+		{"path": "approvers[1]", "cause": "absent", "value": {"name": "Bob"}},
+	]
+}
+
+test_failed_items_of_a_passing_any_is_empty_because_no_item_made_it_fail if {
+	subj := {"id": 1, "approvers": [{"username": "ann"}, {"username": "bob"}]}
+	check := {"op": "any", "path": ["approvers"], "check": {"op": "equals", "path": ["username"], "value": "bob"}}
+	verdict(subj, check) == true
+	failed_of(subj, check) == []
+}
+
+test_failed_items_is_empty_when_the_list_itself_cannot_be_read_because_the_row_cause_says_why if {
+	check := {"op": "all", "path": ["xs"], "check": {"op": "equals", "path": [], "value": 1}}
+	rows := [[cause_of(subj, check), failed_of(subj, check)] | some subj in [{"id": 1}, {"id": 1, "xs": null}, {"id": 1, "xs": "a"}, {"id": 1, "xs": []}]]
+	rows == [["absent", []], ["null", []], ["unusable", []], ["value", []]]
+}
+
+test_failed_items_of_a_check_written_wrong_name_every_item_as_ill_formed if {
+	check := {"op": "all", "path": ["xs"], "check": {"op": "equals", "path": [], "value": 1}, "typo": true}
+	subj := {"id": 1, "xs": [1, 2]}
+	cause_of(subj, check) == "ill_formed"
+	failed_of(subj, check) == [
+		{"path": "xs[0]", "cause": "ill_formed", "value": 1},
+		{"path": "xs[1]", "cause": "ill_formed", "value": 2},
+	]
+}
+
+test_failed_items_of_a_check_written_wrong_name_bad_inner_lists_as_ill_formed_too if {
+	check := {"op": "all", "path": ["prs"], "each": ["commits"], "check": {"op": "nope"}}
+	failed_of({"id": 1, "prs": [{"commits": [1]}, {}]}, check) == [
+		{"path": "prs[0].commits[0]", "cause": "ill_formed", "value": 1},
+		{"path": "prs[1].commits", "cause": "ill_formed", "value": null},
+	]
+}
+
+test_failed_items_take_the_cause_of_a_ref_that_cannot_be_read if {
+	check := {"op": "all", "path": ["xs"], "check": {"op": "in", "path": [], "values": {"ref": ["$$params", "allowed"]}}}
+	subj := {"id": 1, "xs": ["a", "b"]}
+	failed_of(subj, check) == [
+		{"path": "xs[0]", "cause": "absent", "value": "a"},
+		{"path": "xs[1]", "cause": "absent", "value": "b"},
+	]
+}
+
+test_failed_items_read_names_given_with_as if {
+	check := {"op": "all", "path": ["commits"], "as": "c", "check": {"op": "compare", "left": ["$c", "author"], "right": ["$$input", "items", 0, "owner"], "cmp": "ne"}}
+	subj := {"id": 1, "owner": "bob", "commits": [{"author": "bob"}, {"author": "ann"}]}
+	failed_of(subj, check) == [{"path": "commits[0]", "cause": "value", "value": {"author": "bob"}}]
+}
+
+test_failed_items_write_paths_the_way_inputs_do if {
+	check := {"op": "all", "path": ["pull requests"], "each": ["the commits"], "check": {"op": "present", "path": ["sha"]}}
+	subj := {"id": 1, "pull requests": [{"the commits": [{}]}]}
+	inputs_of(subj, check)[0].name == "\"pull requests\"[].\"the commits\""
+	failed_of(subj, check)[0].path == "\"pull requests\"[0].\"the commits\"[0]"
+}
+
+test_failed_items_of_a_named_path_start_with_the_name if {
+	rep := ergo.report({"prs": [{"number": 1, "commits": [{"sha": "a"}, {}]}]}, {"s": {
+		"from": ["prs", {"each_as": "pr"}],
+		"id": ["number"],
+		"checks": {"c": {"op": "all", "path": ["$pr", "commits"], "check": {"op": "present", "path": ["sha"]}}},
+	}})
+	rows_for(rep, "s", "c")[0].failed_items == [{"path": "$pr.commits[1]", "cause": "missing", "value": {}}]
+}
+
+test_failed_items_of_a_substituted_check_are_those_of_the_main_check if {
+	check := {
+		"op": "all", "path": ["xs"], "check": {"op": "equals", "path": [], "value": 1},
+		"substitute": {"op": "present", "path": ["waiver"]},
+	}
+	subj := {"id": 1, "xs": [1, 2], "waiver": "ok"}
+	cause_of(subj, check) == "substituted"
+	failed_of(subj, check) == [{"path": "xs[1]", "cause": "value", "value": 2}]
+}
+
+test_only_rows_of_all_and_any_checks_have_failed_items if {
+	rep := ergo.report({"items": [{"id": 1, "xs": [1], "env": "prod"}]}, {"s": {
+		"from": ["items"],
+		"id": ["id"],
+		"applies_to": {"f": {"op": "all", "path": ["xs"], "check": {"op": "equals", "path": [], "value": 1}}},
+		"checks": {
+			"leaf": {"op": "equals", "path": ["env"], "value": "prod"},
+			"either": {"op": "any_of", "options": {"a": [{"op": "all", "path": ["xs"], "check": {"op": "equals", "path": [], "value": 2}}]}},
+			"every": {"op": "all", "path": ["xs"], "check": {"op": "equals", "path": [], "value": 2}},
+		},
+	}})
+	{r.check | some r in rep.results; "failed_items" in object.keys(r)} == {"every"}
+}
+
+test_violations_carry_failed_items_and_other_checks_have_none if {
+	rep := ergo.report({"items": [{"id": 1, "xs": [1, 2], "env": "dev"}]}, {"s": {
+		"from": ["items"],
+		"id": ["id"],
+		"checks": {
+			"leaf": {"op": "equals", "path": ["env"], "value": "prod"},
+			"every": {"op": "all", "path": ["xs"], "check": {"op": "equals", "path": [], "value": 1}},
+		},
+	}})
+	[[v.check, object.get(v, "failed_items", "none")] | some v in ergo.violations(rep)] == [
+		["every", [{"path": "xs[1]", "cause": "value", "value": 2}]],
+		["leaf", "none"],
+	]
+}
+
+test_failed_items_of_a_nested_check_name_the_outer_item_only if {
+	rep := ergo.report(
+		{"prs": [{
+			"number": 42,
+			"commits": [{"sha": "c1", "timestamp": "2026-10-01T10:00:00Z"}, {"sha": "c2", "timestamp": "2026-10-01T12:00:00Z"}],
+			"approvers": [{"username": "bob", "timestamp": "2026-10-01T11:00:00Z"}],
+		}]},
+		{"s": {
+			"from": ["prs", {"each_as": "pr"}],
+			"id": ["number"],
+			"checks": {"c": {
+				"op": "any",
+				"path": ["approvers"],
+				"as": "approver",
+				"check": {"op": "all", "path": ["$pr", "commits"], "check": {"op": "compare_time", "left": ["$approver", "timestamp"], "right": ["timestamp"], "cmp": "gt"}},
+			}},
+		}},
+	)
+	rows_for(rep, "s", "c")[0].failed_items == [{"path": "approvers[0]", "cause": "value", "value": {"username": "bob", "timestamp": "2026-10-01T11:00:00Z"}}]
+}
+
+test_failed_items_leave_out_an_item_that_passes_another_option_when_a_ref_cannot_be_read if {
+	check := {"op": "all", "path": ["xs"], "check": {"op": "any_of", "options": {
+		"listed": [{"op": "in", "path": [], "values": {"ref": ["$$params", "missing"]}}],
+		"one": [{"op": "equals", "path": [], "value": 1}],
+	}}}
+	subj := {"id": 1, "xs": [1, 2]}
+	cause_of(subj, check) == "absent"
+	failed_of(subj, check) == [{"path": "xs[1]", "cause": "absent", "value": 2}]
+}
+
+test_failed_items_of_an_empty_each_add_only_the_position if {
+	check := {"op": "all", "path": ["xs"], "each": [], "check": {"op": "equals", "path": [], "value": 1}}
+	failed_of({"id": 1, "xs": [[1, 2], {"v": 1}]}, check) == [
+		{"path": "xs[0][1]", "cause": "value", "value": 2},
+		{"path": "xs[1]", "cause": "unusable", "value": {"v": 1}},
+	]
+}
