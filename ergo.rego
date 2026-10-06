@@ -72,9 +72,9 @@ _unknown_req_fields(req) := sort([f |
 
 _unknown_req_fields(req) := [] if not is_object(req)
 
-_wrong_type_inputs(req) := [{"name": "requirement", "value": req}] if not is_object(req)
+_not_an_object_inputs(req) := [{"name": "requirement", "value": req}] if not is_object(req)
 
-_wrong_type_inputs(req) := [] if is_object(req)
+_not_an_object_inputs(req) := [] if is_object(req)
 
 _wrong_type_problems := {
 	"applies_to": "not an object",
@@ -92,9 +92,15 @@ _type_problems(req) := {[f, _wrong_type_problems[f]] |
 	not _min_subjects_out_of_range(req, f)
 }
 
-_min_subjects_out_of_range(req, "min_subjects") if _out_of_range(req.min_subjects)
+_min_subjects_out_of_range(req, "min_subjects") if {
+	is_number(req.min_subjects)
+	_out_of_range(req.min_subjects)
+}
 
-_range_problems(req) := {["min_subjects", "number out of range"] | _out_of_range(_min_subjects_of(req))}
+_range_problems(req) := {["min_subjects", "number out of range"] |
+	is_number(_min_subjects_of(req))
+	_out_of_range(_min_subjects_of(req))
+}
 
 _unknown_problems(req) := {[f, "unknown field"] | some f in _unknown_req_fields(req)}
 
@@ -123,9 +129,13 @@ _object_step_problems(step, true) := ({concat("", ["unknown field ", _text(k), "
 
 _where_problems(req) := {["id", concat("", [kind, " inside where"])] | some kind in _wrapped_in_where(_id_of(req))}
 
-_field_problem_inputs(req) := [{"name": _path_name([f]), "value": sort({p[1] | some p in problems; p[0] == f})} | some f in sort({p[0] | some p in problems})] if {
+_field_problem_inputs(req) := [{"name": _field_name(f), "value": sort({p[1] | some p in problems; p[0] == f})} | some f in sort({p[0] | some p in problems})] if {
 	problems := _req_problems(req)
 }
+
+_field_name(f) := _path_name([f]) if is_string(f)
+
+_field_name(f) := concat("", ["<invalid key ", _literal_text(f), ">"]) if not is_string(f)
 
 _has_problems(req, f) if {
 	some p in _req_problems(req)
@@ -2734,7 +2744,7 @@ _well_formed_inputs(req) := array.concat(
 		[{"name": "count(checks)", "value": count(_checks_of(req))}],
 		array.concat(_echo(req, "require", _require_of(req)), _from_echo(req)),
 	),
-	array.concat(array.concat(_wrong_type_inputs(req), _field_problem_inputs(req)), _check_problem_inputs(req)),
+	array.concat(array.concat(_not_an_object_inputs(req), _field_problem_inputs(req)), _check_problem_inputs(req)),
 )
 
 _echo(req, f, v) := [{"name": f, "value": v}] if not _has_problems(req, f)

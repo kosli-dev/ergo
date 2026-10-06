@@ -835,6 +835,8 @@ The requirement's own fields get an input of the same form when something is wro
 | `min_subjects`               | `not a whole number of 0 or more`, `number out of range`                                                                                       |
 | `subject_type`               | `empty or not a string`                                                                                                                        |
 
+A policy written in Rego can use a key that isn't a string, like `true` or `1.5`. ergo names it `<invalid key true>` or `<invalid key 1.5>`, so two such keys never share a name.
+
 Their descriptions are plain sentences, like your own checks': `The requirement is written correctly`, `The in-scope deployment count is at least 1`, `Every deployment id is unique` and `The deployment is in scope`. The details are in `expression`, `inputs` and `cause`. `$min_subjects` names its input after what it counts, like `in-scope deployment count`: only the subjects left after `applies_to`. `$unique_ids` lists the ids that more than one subject has, once each, under `repeated deployment ids`, sorted by how they're written as JSON, so `"b"` comes before `10`, and `10` before `3`. They use `subject_type` as it's written, so they read right whatever the word's plural would be.
 
 A subject that fails `$applies` gets no other rows, since it was never checked. But its `$applies` row stays, so you can see what was left out and why.
