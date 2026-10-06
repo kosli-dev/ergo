@@ -64,6 +64,15 @@ _typed(req) if {
 	_wrong_typed_fields(req) == []
 }
 
+_unknown_req_fields(req) := sort([f |
+	some f in object.keys(req)
+	not f in {"applies_to", "checks", "from", "id", "min_subjects", "require", "subject_type"}
+]) if is_object(req)
+
+_unknown_req_fields(req) := [] if not is_object(req)
+
+_unknown_field_inputs(req) := [{"name": "unknown fields", "value": _unknown_req_fields(req)} | count(_unknown_req_fields(req)) > 0]
+
 _wrong_type_inputs(req) := [{"name": "requirement", "value": req}] if not is_object(req)
 
 _wrong_type_inputs(req) := [{"name": f, "value": req[f]} | some f in _wrong_typed_fields(req)] if is_object(req)
@@ -2625,18 +2634,19 @@ _repeated_ids_name(req) := concat(" ", ["repeated", _text(_subject_type_of(req))
 
 _well_formed_def(req) := {"$well_formed": {
 	"description": "The requirement is written correctly",
-	"expression": `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float and checks are written right`,
+	"expression": `fields are known and have the right types and count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float and checks are written right`,
 }} if not _stepped(req)
 
 _well_formed_def(req) := {"$well_formed": {
 	"description": "The requirement is written correctly",
-	"expression": `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and from is well formed and steps are keys and numbers fit a float and checks are written right`,
+	"expression": `fields are known and have the right types and count(checks) >= 1 and require in ["every", "some"] and from is well formed and steps are keys and numbers fit a float and checks are written right`,
 }} if _stepped(req)
 
 default _well_formed(_) := false
 
 _well_formed(req) if {
 	_typed(req)
+	_unknown_req_fields(req) == []
 	count(_checks_of(req)) > 0
 	_require_of(req) in {"every", "some"}
 	_from_well_formed(req)
@@ -2669,7 +2679,7 @@ _well_formed_inputs(req) := array.concat(
 		{"name": "count(checks)", "value": count(_checks_of(req))},
 		{"name": "require", "value": _require_of(req)},
 	],
-	array.concat(_wrong_type_inputs(req), _check_problem_inputs(req)),
+	array.concat(array.concat(_wrong_type_inputs(req), _unknown_field_inputs(req)), _check_problem_inputs(req)),
 ) if not _stepped(req)
 
 _well_formed_inputs(req) := array.concat(
@@ -2678,7 +2688,7 @@ _well_formed_inputs(req) := array.concat(
 		{"name": "require", "value": _require_of(req)},
 		{"name": "from", "value": _from_of(req)},
 	],
-	array.concat(_wrong_type_inputs(req), _check_problem_inputs(req)),
+	array.concat(array.concat(_wrong_type_inputs(req), _unknown_field_inputs(req)), _check_problem_inputs(req)),
 ) if _stepped(req)
 
 _applies_description(req) := concat("", ["The ", _text(_subject_type_of(req)), " is in scope"])

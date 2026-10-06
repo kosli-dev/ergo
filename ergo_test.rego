@@ -2467,6 +2467,27 @@ test_a_requirement_that_is_not_an_object_stays_in_the_report_and_is_not_well_for
 	]
 }
 
+test_a_requirement_field_ergo_does_not_know_fails_well_formed if {
+	rep := ergo.report({"releases": [{"id": "r-1", "signed": false}]}, {"s": {
+		"subject": {"type": "release", "from": ["releases"], "id": ["id"]},
+		"checks": {"signed": {"op": "equals", "path": ["signed"], "value": true}},
+	}})
+	rep.requirements.s.status == "not_met"
+	row := rows_for(rep, "s", "$well_formed")[0]
+	row.passed == false
+	row.inputs[2] == {"name": "unknown fields", "value": ["subject"]}
+}
+
+test_unknown_requirement_fields_are_listed_in_order if {
+	req := object.union(typed_req, {"requires": "some", "notes": "x", "description": "d"})
+	problem_inputs(ergo.report({"items": [{"id": 1}]}, {"s": req})) == [{"name": "unknown fields", "value": ["description", "notes", "requires"]}]
+}
+
+test_every_requirement_field_ergo_knows_is_well_formed if {
+	req := object.union(typed_req, {"subject_type": "item", "require": "some", "applies_to": {"a": {"op": "present", "path": ["id"]}}})
+	rows_for(ergo.report({"items": [{"id": 1}]}, {"s": req}), "s", "$well_formed")[0].passed == true
+}
+
 typed_req := {"from": ["items"], "id": ["id"], "min_subjects": 0, "checks": {"c": {"op": "present", "path": ["id"]}}}
 
 wrong_types := [
@@ -3020,7 +3041,7 @@ test_min_subjects_names_its_input_after_what_it_counts if {
 
 test_well_formed_definition_is_in_the_check_table if {
 	rep := ergo.report({"items": [{"id": "a"}]}, id_req(["items"]))
-	rep.requirements.s.checks["$well_formed"].expression == `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float and checks are written right`
+	rep.requirements.s.checks["$well_formed"].expression == `fields are known and have the right types and count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float and checks are written right`
 }
 
 require_req(q) := {"s": {
@@ -4825,7 +4846,7 @@ test_a_well_formed_row_for_a_from_with_a_step_shows_the_from if {
 	row := rows_for(rep, "s", "$well_formed")[0]
 	row.passed == true
 	row.inputs[2] == {"name": "from", "value": ["build", "test_runs", {"each_as": "suite"}]}
-	rep.requirements.s.checks["$well_formed"].expression == `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and from is well formed and steps are keys and numbers fit a float and checks are written right`
+	rep.requirements.s.checks["$well_formed"].expression == `fields are known and have the right types and count(checks) >= 1 and require in ["every", "some"] and from is well formed and steps are keys and numbers fit a float and checks are written right`
 }
 
 test_a_well_formed_row_without_a_step_is_unchanged if {

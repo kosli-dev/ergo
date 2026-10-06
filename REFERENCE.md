@@ -80,6 +80,7 @@ A few details:
 - `min_subjects` defaults to 1 so that a typo in `from` fails the requirement instead of quietly passing it. Set it to `0` when you mean "if there are any, they must pass; if there are none, that's fine". It means the same under `every` and `some`. When none are left, the requirement is [not applicable](#the-report).
 - Under `some`, one subject has to pass all the checks by itself. Two subjects that each pass half of them don't count.
 - A requirement with no checks, a `require` other than `every` or `some`, a badly written [naming step](#naming-subjects), an `id` whose selector has a ref or `literal` deeper inside a `where` value than ergo reads, or a check that's [written wrong](#basic-operators), is never met. The `$well_formed` row says so.
+- So is a requirement with a field that isn't in the table above, like `subject` or `requires`, because ergo would otherwise ignore it and check something you didn't mean. The `$well_formed` row lists them in order, like `{"name": "unknown fields", "value": ["requires", "subject"]}`. Rows for the subjects are still there.
 - So is a requirement that isn't an object, or whose `checks` or `applies_to` isn't an object, whose `from` or `id` isn't a list, whose `min_subjects` isn't a whole number of 0 or more, or whose `subject_type` isn't a string with something besides whitespace in it, since rows and descriptions name the subject by it. `null` counts as the wrong type. `2.0` is a whole number, but `-1` and `0.5` aren't. It still has its entry in `requirements` and its `$well_formed` row, which shows each such field and its value as an input, like `{"name": "from", "value": "deployments"}`, or `{"name": "requirement", "value": 5}` for the whole requirement. ergo then reads `checks` as empty and `applies_to` as a filter it can't read, so every subject fails `$applies` with cause `absent`, shown as `<invalid applies_to>`, and gets no other rows. It reads a `from` as giving no subjects (shown as `<invalid from>`), and an `id` as giving the id `null`. A requirement that isn't an object gives no subjects either. A `min_subjects` that isn't a number fails `$min_subjects` too.
 
 ### A requirement that only applies sometimes
@@ -731,7 +732,7 @@ Three rules:
     },
     "$well_formed": {
       "description": "The requirement is written correctly",
-      "expression": "fields have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right"
+      "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right"
     },
     "approved": {
       "description": "Someone approved the deployment",
@@ -791,7 +792,7 @@ ergo adds four checks of its own. They start with `$`, so they can't clash with 
 
 | Check           | One row per | Passes when                                                                                                                            |
 | --------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `$well_formed`  | requirement | the requirement and its fields have the right types, it has at least one check, a valid `require`, a well written naming step if `from` has one, no step in `from` or `id` that can't be a key, no number a 64-bit float can't hold in `from`, `id` or `min_subjects`, and no check that's [written wrong](#basic-operators). This depends only on how the requirement is written, never on the input or the params. |
+| `$well_formed`  | requirement | the requirement has only the fields ergo knows and they have the right types, it has at least one check, a valid `require`, a well written naming step if `from` has one, no step in `from` or `id` that can't be a key, no number a 64-bit float can't hold in `from`, `id` or `min_subjects`, and no check that's [written wrong](#basic-operators). This depends only on how the requirement is written, never on the input or the params. |
 | `$min_subjects` | requirement | at least `min_subjects` subjects are left after `applies_to`.                                                                          |
 | `$unique_ids`   | requirement | no two subjects share an id, counting the ones `applies_to` leaves out.                                                                |
 | `$applies`      | subject     | the subject passes the `applies_to` filter. These rows only exist when the requirement has a filter.                                   |
