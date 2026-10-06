@@ -2445,11 +2445,14 @@ test_well_formed_does_not_depend_on_the_input if {
 	rows_for(with_items, "s", "$well_formed")[0] == rows_for(without, "s", "$well_formed")[0]
 }
 
-test_well_formed_echoes_the_declaration_it_read if {
-	rep := ergo.report(both_ok, require_req("most"))
-	rows_for(rep, "s", "$well_formed")[0].inputs == [
+test_well_formed_echoes_a_valid_require_and_says_what_is_wrong_with_any_other if {
+	rows_for(ergo.report(both_ok, require_req("some")), "s", "$well_formed")[0].inputs == [
 		{"name": "count(checks)", "value": 2},
-		{"name": "require", "value": "most"},
+		{"name": "require", "value": "some"},
+	]
+	rows_for(ergo.report(both_ok, require_req("most")), "s", "$well_formed")[0].inputs == [
+		{"name": "count(checks)", "value": 2},
+		{"name": "require", "value": ["neither every nor some"]},
 	]
 }
 
@@ -2464,6 +2467,136 @@ test_a_requirement_that_is_not_an_object_stays_in_the_report_and_is_not_well_for
 		[true, "not_met", false, {"name": "requirement", "value": null}],
 		[true, "not_met", false, {"name": "requirement", "value": [1]}],
 		[true, "not_met", false, {"name": "requirement", "value": "x"}],
+	]
+}
+
+test_a_requirement_field_ergo_does_not_know_fails_well_formed if {
+	rep := ergo.report({"releases": [{"id": "r-1", "signed": false}]}, {"s": {
+		"subject": {"type": "release", "from": ["releases"], "id": ["id"]},
+		"checks": {"signed": {"op": "equals", "path": ["signed"], "value": true}},
+	}})
+	rep.requirements.s.status == "not_met"
+	row := rows_for(rep, "s", "$well_formed")[0]
+	row.passed == false
+	row.inputs[2] == {"name": "subject", "value": ["unknown field"]}
+}
+
+test_a_requirement_with_an_unknown_field_still_has_its_subject_rows if {
+	rep := ergo.report({"items": [{"id": 1}, {"id": 2}]}, {"s": object.union(typed_req, {"subject": "item"})})
+	[[r.subject.id, r.passed] | some r in rows_for(rep, "s", "c")] == [[1, true], [2, true]]
+}
+
+test_unknown_requirement_fields_are_listed_in_order_and_say_what_is_wrong if {
+	req := object.union(typed_req, {"requires": "some", "notes": "x", "description": "d"})
+	problem_inputs(ergo.report({"items": [{"id": 1}]}, {"s": req})) == [
+		{"name": "description", "value": ["unknown field"]},
+		{"name": "notes", "value": ["unknown field"]},
+		{"name": "requires", "value": ["unknown field"]},
+	]
+}
+
+test_an_unknown_requirement_field_is_named_as_a_path if {
+	req := object.union(typed_req, {"a b": 1})
+	problem_inputs(ergo.report({"items": [{"id": 1}]}, {"s": req})) == [{"name": `"a b"`, "value": ["unknown field"]}]
+}
+
+test_unknown_requirement_keys_that_are_not_strings_are_listed_in_the_same_order_everywhere if {
+	req := object.union(typed_req, {"zz": 2, 1: "x", true: 3})
+	problem_inputs(ergo.report({"items": [{"id": 1}]}, {"s": req})) == [
+		{"name": "<invalid key true>", "value": ["unknown field"]},
+		{"name": "<invalid key 1>", "value": ["unknown field"]},
+		{"name": "zz", "value": ["unknown field"]},
+	]
+}
+
+test_every_requirement_field_ergo_knows_is_well_formed if {
+	req := object.union(typed_req, {"subject_type": "item", "require": "some", "applies_to": {"a": {"op": "present", "path": ["id"]}}})
+	rows_for(ergo.report({"items": [{"id": 1}]}, {"s": req}), "s", "$well_formed")[0].passed == true
+}
+
+badly_written_requirements := {
+	"require_most": [{"require": "most"}, [{"name": "require", "value": ["neither every nor some"]}]],
+	"require_number": [{"require": 5}, [{"name": "require", "value": ["neither every nor some"]}]],
+	"checks_empty": [{"checks": {}}, [{"name": "require", "value": "every"}, {"name": "checks", "value": ["empty"]}]],
+	"name_with_dollar": [{"from": ["items", {"each_as": "$x"}]}, [{"name": "require", "value": "every"}, {"name": "from", "value": ["invalid name"]}]],
+	"step_not_last": [{"from": [{"each_as": "x"}, "items"]}, [{"name": "require", "value": "every"}, {"name": "from", "value": ["object step before the last"]}]],
+	"selector_in_from": [{"from": ["items", {"where": {"id": 1}}]}, [{"name": "require", "value": "every"}, {"name": "from", "value": ["object step without each_as"]}]],
+	"keys_without_name": [{"from": ["items", {"keys": ["a"]}]}, [{"name": "require", "value": "every"}, {"name": "from", "value": ["object step without each_as"]}]],
+	"naming_step_field": [{"from": ["items", {"each_as": "x", "foo": 1}]}, [{"name": "require", "value": "every"}, {"name": "from", "value": ["unknown field foo in naming step"]}]],
+	"naming_step_keys": [{"from": ["items", {"each_as": "x", "keys": 5}]}, [{"name": "require", "value": "every"}, {"name": "from", "value": ["invalid keys"]}]],
+	"from_step_not_key": [{"from": ["items", true]}, [{"name": "require", "value": "every"}, {"name": "from", "value": ["step that can't be a key"]}]],
+	"from_out_of_range": [{"from": ["items", 1e400]}, [{"name": "require", "value": "every"}, {"name": "from", "value": ["number out of range", "step that can't be a key"]}]],
+	"id_step_not_key": [{"id": [1.5]}, [{"name": "require", "value": "every"}, {"name": "id", "value": ["step that can't be a key"]}]],
+	"id_ref_in_where": [{"id": [{"where": {"k": {"v": {"ref": ["$$params", "x"]}}}}]}, [{"name": "require", "value": "every"}, {"name": "id", "value": ["ref inside where"]}]],
+	"min_out_of_range": [{"min_subjects": 1e400}, [{"name": "require", "value": "every"}, {"name": "min_subjects", "value": ["number out of range"]}]],
+}
+
+test_every_way_a_requirement_is_written_wrong_says_what_is_wrong if {
+	got := {name: [row.passed, array.slice(row.inputs, 1, count(row.inputs))] |
+		some name, [fields, _] in badly_written_requirements
+		base := {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}}
+		req := object.union(object.remove(base, object.keys(fields)), fields)
+		row := rows_for(ergo.report({"items": [{"id": 1}]}, {"s": req}), "s", "$well_formed")[0]
+	}
+	got == {name: [false, want] | some name, [_, want] in badly_written_requirements}
+}
+
+test_keys_that_are_not_strings_get_a_name_each if {
+	req := object.union(typed_req, {true: 1, false: 2, null: 3, 1.5: 4, 2.5: 5})
+	names := [i.name | some i in problem_inputs(ergo.report({"items": [{"id": 1}]}, {"s": req}))]
+	names == ["<invalid key null>", "<invalid key false>", "<invalid key true>", "<invalid key 1.5>", "<invalid key 2.5>"]
+}
+
+test_a_min_subjects_that_is_not_a_number_says_so_even_holding_a_number_out_of_range if {
+	every v in [[1e400], {"a": 1e400}] {
+		rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"min_subjects": v})})
+		problem_inputs(rep) == [{"name": "min_subjects", "value": ["not a whole number of 0 or more"]}]
+	}
+}
+
+well_formed_or_not := array.concat(
+	[object.union(object.remove(typed_req, object.keys(fields)), fields) | some [fields, _] in badly_written_requirements],
+	array.concat(
+		[object.union(typed_req, {f: v}) | some [f, v] in wrong_types],
+		[
+			typed_req,
+			object.union(typed_req, {"require": "some", "subject_type": "item", "applies_to": {"a": {"op": "present", "path": ["id"]}}}),
+			object.union(typed_req, {"from": ["items", {"each_as": "x", "keys": ["a"]}]}),
+			object.union(typed_req, {"zz": 1}),
+			object.union(typed_req, {"checks": {"c": {"op": "nope"}}}),
+			{"from": ["items"]},
+			{"from": ["items"], "checks": {}},
+			5,
+		],
+	),
+)
+
+test_a_requirement_fails_well_formed_exactly_when_its_row_says_what_is_wrong if {
+	well_formed := {i | some i, req in well_formed_or_not; ergo._well_formed(req)}
+	nothing_listed := {i |
+		some i, req in well_formed_or_not
+		(count(ergo._req_problems(req)) + count(ergo._check_problem_inputs(req))) + count(ergo._not_an_object_inputs(req)) == 0
+	}
+	well_formed == nothing_listed
+	count(well_formed) > 2
+	count(well_formed_or_not) - count(well_formed) > 30
+}
+
+test_a_requirement_without_checks_says_they_are_missing if {
+	row := rows_for(ergo.report({"items": [{"id": 1}]}, {"s": {"from": ["items"]}}), "s", "$well_formed")[0]
+	row.inputs == [{"name": "count(checks)", "value": 0}, {"name": "require", "value": "every"}, {"name": "checks", "value": ["missing"]}]
+}
+
+test_problems_with_several_fields_are_listed_by_field if {
+	req := {"from": "items", "require": "most", "zz": 1, "checks": {}, "min_subjects": -1}
+	row := rows_for(ergo.report({"items": [{"id": 1}]}, {"s": req}), "s", "$well_formed")[0]
+	row.inputs == [
+		{"name": "count(checks)", "value": 0},
+		{"name": "checks", "value": ["empty"]},
+		{"name": "from", "value": ["not a list"]},
+		{"name": "min_subjects", "value": ["not a whole number of 0 or more"]},
+		{"name": "require", "value": ["neither every nor some"]},
+		{"name": "zz", "value": ["unknown field"]},
 	]
 }
 
@@ -2500,13 +2633,22 @@ test_a_min_subjects_whose_value_is_a_whole_number_is_well_formed_however_it_is_w
 	rows == [true, true, true]
 }
 
-test_a_field_of_the_wrong_type_fails_well_formed_and_shows_its_value if {
+wrong_type_problems := {
+	"applies_to": "not an object",
+	"checks": "not an object",
+	"from": "not a list",
+	"id": "not a list",
+	"min_subjects": "not a whole number of 0 or more",
+	"subject_type": "empty or not a string",
+}
+
+test_a_field_of_the_wrong_type_fails_well_formed_and_says_what_it_should_be if {
 	rows := [[f, "s" in object.keys(rep.requirements), rep.requirements.s.status, r.passed, r.cause, r.inputs[count(r.inputs) - 1]] |
 		some [f, v] in wrong_types
 		rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {f: v})})
 		some r in rows_for(rep, "s", "$well_formed")
 	]
-	rows == [[f, true, "not_met", false, "value", {"name": f, "value": v}] | some [f, v] in wrong_types]
+	rows == [[f, true, "not_met", false, "value", {"name": f, "value": [wrong_type_problems[f]]}] | some [f, _] in wrong_types]
 }
 
 test_a_requirement_that_is_not_an_object_finds_no_subjects_so_it_cannot_claim_the_whole_input if {
@@ -2988,7 +3130,7 @@ test_an_empty_subject_type_fails_well_formed_because_rows_and_descriptions_would
 	every name in ["", " ", "\t "] {
 		rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"subject_type": name})})
 		row := rows_for(rep, "s", "$well_formed")[0]
-		[row.passed, row.inputs[count(row.inputs) - 1]] == [false, {"name": "subject_type", "value": name}]
+		[row.passed, row.inputs[count(row.inputs) - 1]] == [false, {"name": "subject_type", "value": ["empty or not a string"]}]
 	}
 	rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"subject_type": "a b"})})
 	rows_for(rep, "s", "$well_formed")[0].passed == true
@@ -3020,7 +3162,7 @@ test_min_subjects_names_its_input_after_what_it_counts if {
 
 test_well_formed_definition_is_in_the_check_table if {
 	rep := ergo.report({"items": [{"id": "a"}]}, id_req(["items"]))
-	rep.requirements.s.checks["$well_formed"].expression == `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float and checks are written right`
+	rep.requirements.s.checks["$well_formed"].expression == `fields are known and have the right types and count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float and checks are written right`
 }
 
 require_req(q) := {"s": {
@@ -4825,7 +4967,7 @@ test_a_well_formed_row_for_a_from_with_a_step_shows_the_from if {
 	row := rows_for(rep, "s", "$well_formed")[0]
 	row.passed == true
 	row.inputs[2] == {"name": "from", "value": ["build", "test_runs", {"each_as": "suite"}]}
-	rep.requirements.s.checks["$well_formed"].expression == `fields have the right types and count(checks) >= 1 and require in ["every", "some"] and from is well formed and steps are keys and numbers fit a float and checks are written right`
+	rep.requirements.s.checks["$well_formed"].expression == `fields are known and have the right types and count(checks) >= 1 and require in ["every", "some"] and from is well formed and steps are keys and numbers fit a float and checks are written right`
 }
 
 test_a_well_formed_row_without_a_step_is_unchanged if {
