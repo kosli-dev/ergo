@@ -851,6 +851,22 @@ _plain_key(k) if {
 
 _json_text(v) := concat("", [_json_token(t) | some m in regex.find_all_string_submatch_n(`"(?:[^"\\]|\\.)*"|-?[0-9][0-9.eE+-]*|[^"0-9-]+`, _sorted_json(v), -1); t := m[0]])
 
+_plain_numbers(v) := _plain_json(v, json.marshal(v))
+
+_plain_json(v, text) := v if not regex.match(`[:,\[]\s*(?:-?[0-9]+(?:\.[0-9]+)?[eE]|-?[0-9]+\.[0-9]*0\s*[,\]}]|-0\s*[,\]}])`, text)
+
+else := json.unmarshal(concat("", [_plain_part(m) | some m in regex.find_all_string_submatch_n(`(-?[0-9][0-9.eE+-]*)|(?:"(?:[^"\\]|\\.)*"|[^"0-9-])+`, text, -1)]))
+
+_plain_part(m) := m[0] if m[1] == ""
+
+_plain_part(m) := _plain_number(m[1]) if m[1] != ""
+
+_plain_number(t) := t if regex.match(`^(?:0|-?[1-9][0-9]*|-?(?:0|[1-9][0-9]*)\.[0-9]*[1-9])$`, t)
+
+else := t if not _fits_a_float(json.unmarshal(t))
+
+else := _number_text(t)
+
 _sorted_json(v) := concat("", [_node_json(paths, index, i) | some i, _ in paths]) if {
 	index := {p: x | walk(v, [p, x])}
 	paths := [pair[1] | some pair in sort([[_written_path(index, p), p] | some p, _ in index])]
@@ -3148,8 +3164,15 @@ default _configured_params := {}
 
 report_with_params(doc, params, policy) := r if {
 	unreadable := _unreadable_inputs(doc, params)
-	r := _report_of(doc, policy) with data.ergo_document as doc with data.ergo_params as params with data.ergo_unreadable as unreadable with input as {"ergo/names": {}}
+	written := _report_of(doc, policy) with data.ergo_document as doc with data.ergo_params as params with data.ergo_unreadable as unreadable with input as {"ergo/names": {}}
+	r := _reported(written, unreadable, policy)
 }
+
+_reported(written, unreadable, policy) := _plain_numbers(written) if {
+	count(unreadable) == 0
+	is_object(policy)
+	count(_json_problems(policy)) == 0
+} else := written
 
 _unreadable_inputs(doc, params) := [{"name": name, "value": sort(_json_problems(v))} |
 	some [name, v] in [["$$input", doc], ["$$params", params]]

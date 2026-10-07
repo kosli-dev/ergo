@@ -2678,6 +2678,62 @@ test_numbers_in_meta_are_written_the_same_way_however_the_policy_wrote_them if {
 	json.marshal(ergo.report({"items": [{"id": 1}]}, written).requirements.s.meta) == `{"n":[1.5,100,0,1,0.0025]}`
 }
 
+numbers_req(value, bound, inner) := {"s": {"from": ["items"], "id": ["id"], "checks": {
+	"eq": {"op": "equals", "path": ["n"], "value": value},
+	"rg": {"op": "range", "path": ["n"], "min": -0.0, "max": bound},
+	"ref": {"op": "equals", "path": ["n"], "value": {"ref": ["$$params", "p"]}},
+	"all": {"op": "all", "path": ["xs"], "check": {"op": "equals", "path": [], "value": inner}},
+}}}
+
+test_numbers_in_the_report_are_written_in_their_plain_form_however_the_policy_input_and_params_wrote_them if {
+	rep := ergo.report_with_params(
+		{"items": [{"id": 1.0, "n": 1.50, "xs": [2.0, 3e0, 2.5e-3]}, {"id": 1e0, "n": -0.0, "xs": []}]},
+		{"p": 2.50},
+		numbers_req(1.50, 1e1, 9.0),
+	)
+	checks := rep.requirements.s.checks
+	json.marshal([checks.eq.value, checks.rg.min, checks.rg.max, named_values(checks.ref["$refs"]), checks.all.check.value]) == `[1.5,0,10,[["$$params.p",2.5]],9]`
+	json.marshal([[r.check, r.subject.id, named_values(r.inputs), [[f.path, f.value] | some f in object.get(r, "failed_items", [])]] | some r in rep.results; not startswith(r.check, "$")]) == `[["all",1,[["xs[]",[2,3,0.0025]]],[["xs[0]",2],["xs[1]",3],["xs[2]",0.0025]]],["eq",1,[["n",1.5]],[]],["ref",1,[["n",1.5]],[]],["rg",1,[["n",1.5]],[]],["all",1,[["xs[]",[]]],[]],["eq",1,[["n",0]],[]],["ref",1,[["n",0]],[]],["rg",1,[["n",0]],[]]]`
+	json.marshal([[v.check, v.subject.id, named_values(v.inputs)] | some v in ergo.violations(rep)]) == `[["$unique_ids",null,[["repeated subject ids",[1]]]],["all",1,[["xs[]",[2,3,0.0025]]]],["ref",1,[["n",1.5],["$$params.p",2.5]]],["all",1,[["xs[]",[]]]],["eq",1,[["n",0]]],["ref",1,[["n",0],["$$params.p",2.5]]]]`
+}
+
+named_values(inputs) := [[i.name, i.value] | some i in inputs]
+
+test_a_repeated_subject_id_is_written_the_same_way_whichever_spelling_comes_first if {
+	ids := [json.marshal(rows_for(ergo.report({"items": items}, {"s": typed_req}), "s", "$unique_ids")[0].inputs[0].value) |
+		some items in [[{"id": 1.0, "k": "a"}, {"id": 1e0, "k": "b"}], [{"id": 1e0, "k": "a"}, {"id": 1.0, "k": "b"}]]
+	]
+	ids == ["[1]", "[1]"]
+}
+
+test_a_number_a_float_cannot_hold_is_copied_into_the_report_as_written if {
+	rep := ergo.report({"items": [{"id": 1, "n": 1e400}]}, {"s": object.union(typed_req, {"checks": {"c": {"op": "equals", "path": ["n"], "value": 1.50}}})})
+	json.marshal([named_values(row.inputs) | some row in rep.results; row.check == "c"]) == `[[["n",1e400]]]`
+}
+
+test_a_number_is_written_in_its_plain_form_even_when_it_is_the_only_one_spelled_another_way if {
+	written := [json.marshal([row.inputs[0].value | some row in ergo.report({"items": [{"id": "a", "n": n}]}, {"s": object.union(typed_req, {"checks": {"c": {"op": "present", "path": ["n"]}}})}).results; row.check == "c"]) |
+		some n in [1.50, -0, 1e2, 2.5E-3, 10.0, [7, -0.0]]
+	]
+	written == ["[1.5]", "[0]", "[100]", "[0.0025]", "[10]", "[[7,0]]"]
+}
+
+test_a_report_from_a_policy_json_cannot_hold_is_left_as_built_so_rows_still_name_their_requirement if {
+	every policy in [{1: typed_req}, [typed_req]] {
+		rep := ergo.report({"items": [{"id": 1.50}]}, policy)
+		every row in rep.results {
+			rep.requirements[row.requirement].status == "not_met"
+		}
+	}
+}
+
+test_a_report_from_an_input_json_cannot_hold_is_left_as_built if {
+	rep := ergo.report({"items": [{"id": 1.50, "t": {"a"}}]}, {"s": object.union(typed_req, {"checks": {"c": {"op": "present", "path": ["t"]}}})})
+	some row in rep.results
+	row.check == "c"
+	is_set(row.inputs[0].value)
+}
+
 test_a_requirement_meta_that_json_cannot_hold_fails_well_formed_and_is_reported_empty if {
 	rows := [[r.requirements.s.status, r.requirements.s.meta, problem_inputs(r)] |
 		some m in [{1: "x"}, {"a": {"b": {2: "y"}}}, {"tags": {"a"}}, {"n": [1e400]}]
