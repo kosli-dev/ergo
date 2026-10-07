@@ -8,3 +8,4 @@ publish = false
 serde_json = { version = "1", features = ["arbitrary_precision"] }
 regex = "1"
 cel = "0.15"
+sha2 = "0.11"

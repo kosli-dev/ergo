@@ -1,8 +1,15 @@
-use crate::render::{LEAF_OPS, combinator, is_key, is_literal, is_operator, is_ref, malformed, out_of_range, path_name, quantified, text, two_sided, unliteral, valid_name, written};
+use crate::render::{LEAF_OPS, combinator, is_builtin, is_key, is_leaf, is_literal, is_operator, is_ref, malformed, out_of_range, path_name, quantified, text, two_sided, unliteral, valid_name, written};
 use serde_json::{Map, Value, json};
 use std::collections::BTreeSet;
 
-fn required_fields(op: &str) -> &'static [&'static str] {
+fn required_fields(op: &str) -> Vec<String> {
+    if let Some(def) = Some(op).filter(|o| !is_builtin(o)).and_then(crate::operators::find) {
+        return def.params.iter().filter(|p| !p.optional).map(|p| p.name.clone()).collect();
+    }
+    builtin_required(op).iter().map(|f| f.to_string()).collect()
+}
+
+fn builtin_required(op: &str) -> &'static [&'static str] {
     match op {
         "range" => &["path", "min", "max"],
         "excludes" | "includes" | "present" | "missing" | "non_empty_string" | "empty" => &["path"],
@@ -12,19 +19,21 @@ fn required_fields(op: &str) -> &'static [&'static str] {
         "compare" | "compare_time" => &["left", "right", "cmp"],
         "all" | "any" => &["path", "check"],
         "any_of" => &["options"],
-        "cel" => &["expr"],
         _ => &[],
     }
 }
 
-fn op_fields(op: &str) -> Option<Vec<&'static str>> {
+fn op_fields(op: &str) -> Option<Vec<String>> {
     if !is_operator(op) {
         return None;
     }
-    let mut f = required_fields(op).to_vec();
+    if let Some(def) = Some(op).filter(|o| !is_builtin(o)).and_then(crate::operators::find) {
+        return Some(def.params.iter().map(|p| p.name.clone()).collect());
+    }
+    let mut f = required_fields(op);
     match op {
-        "excludes" | "includes" => f.extend(["value", "values"]),
-        "all" | "any" => f.extend(["each", "as"]),
+        "excludes" | "includes" => f.extend(["value".to_string(), "values".to_string()]),
+        "all" | "any" => f.extend(["each".to_string(), "as".to_string()]),
         _ => {}
     }
     Some(f)
@@ -123,7 +132,22 @@ pub fn badly_stepped(p: &Value) -> bool {
     }
 }
 
+fn path_fields(node: &Map<String, Value>) -> Vec<String> {
+    let mut fields: Vec<String> = ["path", "left", "right", "each", "inputs"].iter().map(|f| f.to_string()).collect();
+    if let Some(def) = node.get("op").and_then(Value::as_str).filter(|o| !is_builtin(o)).and_then(crate::operators::find) {
+        fields.extend(def.params.iter().filter(|p| p.kind == crate::operators::Kind::Path).map(|p| p.name.clone()));
+        fields.extend(def.params.iter().filter(|p| p.kind == crate::operators::Kind::Paths).map(|p| format!("{}[]", p.name)));
+    }
+    fields
+}
+
 fn own_paths<'a>(node: &'a Map<String, Value>, f: &str) -> Vec<&'a Value> {
+    if let Some(list) = f.strip_suffix("[]") {
+        return match node.get(list) {
+            Some(Value::Array(ps)) => ps.iter().collect(),
+            _ => vec![],
+        };
+    }
     if f != "inputs" {
         return node.get(f).into_iter().collect();
     }
@@ -273,7 +297,8 @@ fn node_problems(node: &Node) -> BTreeSet<String> {
         out.insert("nested too deep".into());
     }
     if let Some(o) = op_str {
-        if !quantified(node.check) && !allowed_ops(&node.kinds).contains(&o) {
+        let allowed = allowed_ops(&node.kinds);
+        if !quantified(node.check) && !(allowed.contains(&o) || (is_leaf(o) && allowed.contains(&"equals"))) {
             out.insert(format!("{o} can't go here"));
         }
     }
@@ -291,13 +316,13 @@ fn node_problems(node: &Node) -> BTreeSet<String> {
     }
     if let Some(fields) = op_fields(op) {
         for f in m.keys() {
-            if !fields.contains(&f.as_str()) && !["op", "description", "meta", "expression", "substitute", "inputs", "as", "each"].contains(&f.as_str()) {
+            if !fields.contains(f) && !["op", "description", "meta", "expression", "substitute", "inputs", "as", "each"].contains(&f.as_str()) {
                 out.insert(format!("unknown field {f}"));
             }
         }
     }
     for f in required_fields(op) {
-        if !has(f) {
+        if !has(&f) {
             out.insert(format!("missing {f}"));
         }
     }
@@ -347,7 +372,7 @@ fn node_problems(node: &Node) -> BTreeSet<String> {
             }
         }
     }
-    if LEAF_OPS.contains(&op) {
+    if is_leaf(op) {
         for f in ["value", "values", "patterns", "min", "max"] {
             let Some(v) = m.get(f) else { continue };
             for (p, x) in walked(v) {
@@ -373,7 +398,7 @@ fn node_problems(node: &Node) -> BTreeSet<String> {
             }
         }
     }
-    if LEAF_OPS.contains(&op) || op == "any_of" {
+    if is_leaf(op) || op == "any_of" {
         for f in ["as", "each"] {
             if has(f) {
                 out.insert(format!("{f} can't go here"));
@@ -401,17 +426,19 @@ fn node_problems(node: &Node) -> BTreeSet<String> {
             None => {}
         }
     }
-    if op == "cel" {
-        match m.get("expr") {
-            Some(Value::String(e)) => {
-                if let Some(p) = crate::cel::problem(e, &node.names) {
-                    out.insert(p);
-                }
+    if let Some(def) = Some(op).filter(|o| !is_builtin(o)).and_then(crate::operators::find) {
+        for p in &def.params {
+            let Some(v) = m.get(&p.name) else { continue };
+            let wrong = match p.kind {
+                crate::operators::Kind::Path => !matches!(v, Value::Array(_) | Value::String(_)),
+                crate::operators::Kind::Paths => !matches!(v, Value::Array(ps) if ps.iter().all(|p| matches!(p, Value::Array(_) | Value::String(_)))),
+                crate::operators::Kind::Number => written(v).is_some_and(|w| !w.is_number()),
+                crate::operators::Kind::String => written(v).is_some_and(|w| !w.is_string()),
+                crate::operators::Kind::Value => false,
+            };
+            if wrong {
+                out.insert(format!("invalid {}", p.name));
             }
-            Some(_) => {
-                out.insert("invalid expr".into());
-            }
-            None => {}
         }
     }
     let own = own_fields(m);
@@ -421,8 +448,8 @@ fn node_problems(node: &Node) -> BTreeSet<String> {
     if check_refs(&own).iter().any(|r| !known_ref(r)) {
         out.insert("invalid ref".into());
     }
-    for f in ["path", "left", "right", "each", "inputs"] {
-        if own_paths(m, f).iter().any(|p| badly_stepped(p)) {
+    for f in path_fields(m) {
+        if own_paths(m, &f).iter().any(|p| badly_stepped(p)) {
             out.insert(format!("step that can't be a key in {f}"));
         }
     }
@@ -439,8 +466,8 @@ fn node_problems(node: &Node) -> BTreeSet<String> {
             }
         }
     }
-    for f in ["path", "left", "right", "each", "inputs"] {
-        for p in own_paths(m, f) {
+    for f in path_fields(m) {
+        for p in own_paths(m, &f) {
             let Some(first) = p.as_array().and_then(|a| a.first()).and_then(Value::as_str).filter(|s| s.starts_with('$')) else { continue };
             let known = first == "$$input" || first == "$$params" || (!first.starts_with("$$") && node.names.iter().any(|n| n == &first[1..]));
             if !known {

@@ -2,13 +2,59 @@ use crate::path::{Ctx, Read, index_key};
 use crate::value::rego_order;
 use serde_json::{Map, Value, json};
 
-pub const LEAF_OPS: [&str; 14] = [
-    "cel",
+pub const LEAF_OPS: [&str; 13] = [
     "range", "excludes", "includes", "in", "equals", "present", "missing", "non_empty_string", "empty", "matches_any", "not_matches_any", "compare", "compare_time",
 ];
 
-pub fn is_operator(op: &str) -> bool {
+pub fn is_builtin(op: &str) -> bool {
     LEAF_OPS.contains(&op) || ["all", "any", "any_of"].contains(&op)
+}
+
+pub fn is_operator(op: &str) -> bool {
+    is_builtin(op) || crate::operators::find(op).is_some()
+}
+
+pub fn is_leaf(op: &str) -> bool {
+    LEAF_OPS.contains(&op) || (!is_builtin(op) && crate::operators::find(op).is_some())
+}
+
+fn custom_text(check: &Value, item: &str, def: &crate::operators::Definition) -> Option<String> {
+    let arg = |p: &crate::operators::Param| -> Option<String> {
+        if p.kind == crate::operators::Kind::Path {
+            path_text(item, check, &p.name)
+        } else if p.kind == crate::operators::Kind::Paths {
+            match check.get(&p.name) {
+                Some(Value::Array(ps)) => Some(format!("[{}]", ps.iter().map(|x| item_path_name(item, x)).collect::<Option<Vec<_>>>()?.join(", "))),
+                Some(_) => Some(format!("<invalid {}>", p.name)),
+                None => Some(format!("<missing {}>", p.name)),
+            }
+        } else {
+            Some(param_text(check, &p.name))
+        }
+    };
+    match &def.template {
+        Some(t) => {
+            let mut out = t.clone();
+            for p in &def.params {
+                out = out.replace(&format!("{{{}}}", p.name), &arg(p)?);
+            }
+            Some(out)
+        }
+        None => Some(format!("{}({})", def.name, def.params.iter().map(arg).collect::<Option<Vec<_>>>()?.join(", "))),
+    }
+}
+
+fn custom_paths(check: &Value) -> Vec<&Value> {
+    let Some(def) = op_of(check).filter(|o| !is_builtin(o)).and_then(crate::operators::find) else { return vec![] };
+    let mut out = vec![];
+    for p in &def.params {
+        match (p.kind, check.get(&p.name)) {
+            (crate::operators::Kind::Path, Some(v)) => out.push(v),
+            (crate::operators::Kind::Paths, Some(Value::Array(ps))) => out.extend(ps.iter()),
+            _ => {}
+        }
+    }
+    out
 }
 
 pub fn truthy(v: Option<&Value>) -> bool {
@@ -266,6 +312,9 @@ fn param_text(check: &Value, f: &str) -> String {
 fn leaf_describe(check: &Value, item: &str) -> Option<String> {
     let Some(m) = check.as_object() else { return Some("<invalid check>".into()) };
     let Some(op_value) = m.get("op") else { return Some("<missing op>".into()) };
+    if let Some(def) = op_value.as_str().filter(|o| !is_builtin(o)).and_then(crate::operators::find) {
+        return custom_text(check, item, &def);
+    }
     let op = match op_value.as_str() {
         Some(op) if is_operator(op) => op,
         _ => return Some(format!("<unknown op {}>", text(op_value))),
@@ -297,11 +346,6 @@ fn leaf_describe(check: &Value, item: &str) -> Option<String> {
         "empty" => format!("{} is empty", p("path")?),
         "matches_any" => format!("{} matches one of {}", p("path")?, patterns()),
         "not_matches_any" => format!("{} matches none of {}", p("path")?, patterns()),
-        "cel" => match m.get("expr") {
-            Some(Value::String(e)) => e.clone(),
-            Some(other) => text(other),
-            None => "<missing expr>".into(),
-        },
         "compare" | "compare_time" => {
             let cmp = m.get("cmp").map(text).unwrap_or_else(|| "<missing cmp>".into());
             format!("{} {cmp} {}", p("left")?, p("right")?)
@@ -312,7 +356,7 @@ fn leaf_describe(check: &Value, item: &str) -> Option<String> {
 
 fn nested_describe(check: &Value, item: &str) -> Option<String> {
     match op_of(check) {
-        Some(op) if is_operator(op) && !LEAF_OPS.contains(&op) && !quantified(check) => Some(format!("<{op} can't go here>")),
+        Some(op) if is_operator(op) && !is_leaf(op) && !quantified(check) => Some(format!("<{op} can't go here>")),
         _ => leaf_describe(check, item),
     }
 }
@@ -466,14 +510,11 @@ fn named_path(p: &Value) -> Option<&str> {
     p.as_array()?.first()?.as_str().filter(|s| s.starts_with('$'))
 }
 
-fn cel_reads(leaf: &Value) -> Vec<Value> {
-    match (op_of(leaf), leaf.get("expr").and_then(Value::as_str)) {
-        (Some("cel"), Some(e)) => crate::cel::reads(e),
-        _ => vec![],
-    }
-}
-
 fn leaf_paths(leaf: &Value) -> Vec<&Value> {
+    let custom = custom_paths(leaf);
+    if !custom.is_empty() {
+        return custom;
+    }
     if two_sided(leaf) {
         return [leaf.get("left"), leaf.get("right")].into_iter().flatten().collect();
     }
@@ -513,7 +554,6 @@ fn element_name_reads(check: &Value) -> Vec<Value> {
             }
         } else {
             reads.extend(leaf_paths(leaf).into_iter().map(|p| (p.clone(), given.clone())));
-            reads.extend(cel_reads(leaf).into_iter().map(|p| (p, given.clone())));
         }
     }
     let mut named: Vec<Value> = reads
@@ -601,8 +641,7 @@ fn check_inputs<'a>(ctx: &Ctx<'a>, subject: &'a Value, check: &Value, item: &str
     if combinator(check) {
         let mut reads: Vec<(String, Value)> = vec![];
         for leaf in element_leaves(check) {
-            let mut paths: Vec<Value> = if quantified(leaf) { list_reads(leaf) } else { leaf_paths(leaf).into_iter().cloned().collect() };
-            paths.extend(cel_reads(leaf));
+            let paths: Vec<Value> = if quantified(leaf) { list_reads(leaf) } else { leaf_paths(leaf).into_iter().cloned().collect() };
             for p in paths {
                 reads.push((item_path_name(item, &p)?, value_at(ctx, subject, &p)));
             }
@@ -611,8 +650,8 @@ fn check_inputs<'a>(ctx: &Ctx<'a>, subject: &'a Value, check: &Value, item: &str
         reads.dedup();
         return Some(reads.into_iter().map(|(n, v)| entry(n, v)).collect());
     }
-    if op_of(check) == Some("cel") {
-        return cel_reads(check).iter().map(|p| Some(entry(item_path_name(item, p)?, value_at(ctx, subject, p)))).collect();
+    if op_of(check).is_some_and(|o| !is_builtin(o) && crate::operators::find(o).is_some()) {
+        return custom_paths(check).into_iter().map(|p| Some(entry(item_path_name(item, p)?, value_at(ctx, subject, p)))).collect();
     }
     let p = m.get("path").filter(|p| truthy(Some(p)))?;
     Some(vec![entry(item_path_name(item, p)?, value_at(ctx, subject, p))])

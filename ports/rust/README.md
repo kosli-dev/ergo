@@ -26,11 +26,45 @@ On 7 October 2026 both gave the same reports. OPA 1.19 took 0.9 s and 8.5 s to e
 
 Run the Docker commands from the root of the repo. Keep the build in `/target` and out of `ports/rust/target`, because Cargo writes JSON files there and `opa test .` would load them as data.
 
-Instead of Rego custom operators, it has a `cel` operator, a prototype: `{"op": "cel", "expr": "size(self.files) >= self.total_files"}`. The expression is [CEL](https://cel.dev). `self` is the subject or list item being checked, each name given by `each_as` or `as` is a variable, and so are `params` and `input`. The check passes only when the expression gives `true`. A missing field fails it as `absent`, a type error as `unusable`, and otherwise the cause comes from the fields it read, which the row lists as its inputs. ergo adds one function to CEL, `sum(list)`. `ergo.rego` doesn't know `cel`, so its tests are in `tests/cel.rs` rather than the conformance suite:
+## Custom operators
+
+A policy uses a custom operator like any other, by name. It doesn't say how the operator works:
+
+```json
+{"op": "min_length_at", "path": ["files"], "min_path": ["total_files"]}
+```
+
+Whoever runs the policy supplies the definitions, the way Cucumber is given step definitions that the feature files never mention:
+
+```json
+{
+  "min_length_at": {
+    "params": {"path": {"kind": "path", "type": "list"}, "min_path": {"kind": "path", "type": "number"}},
+    "expression": "count({path}) >= {min_path}",
+    "passes": "size(path) >= min_path"
+  }
+}
+```
+
+```rust
+let operators = ergo::Operators::load(&definitions)?;
+let report = ergo::report_with(&input, params, &requirements, &operators);
+```
+
+- A param's kind is `path`, `paths` (a list of paths), `value`, `number` or `string`. A `path` can say which `type` it must lead to: `list`, `number`, `string`, `object` or `boolean`. Any param can be `optional`, and an optional `value`, `number` or `string` can have a `default`.
+- ergo reads the paths itself. A missing, `null` or wrong-typed one fails the check with cause `absent`, `null` or `unusable` before `passes` runs, so a definition doesn't need to guard against them. The row's `inputs` list the paths in param-name order, because JSON doesn't keep the order of an object's keys.
+- `passes` is a [CEL](https://cel.dev) expression over the params, and nothing else. The check passes only when it gives `true`. Anything else, an error included, fails it, with cause `value` for `false` and `unusable` otherwise. ergo adds one function, `ergo.sum(list)`, because CEL has no way to add up a list.
+- `expression` is how the check is written in the report, with `{param}` replaced by the path or value the policy gave. Without it, the check is written `min_length_at(files, total_files)`.
+- A check that's missing a param, has one of the wrong kind, or has a field the definition doesn't list is written wrong, like a basic operator with the same mistake. Without definitions, the op is unknown.
+- `Operators::load` refuses definitions that are written wrong, like a `passes` that isn't valid CEL or reads something that isn't a param, and says which.
+- The report lists each custom operator it used under `operators`, with the SHA-256 of its definition and its `version` if it has one, so a report can be traced to the definitions behind it.
+- A custom operator can go anywhere a basic operator can, inside `all`, `any` and `any_of` too.
+
+`tests/operators.rs` has pr-reviewer's seven custom operators written this way. `ergo.rego` has nothing like it, so these tests aren't in the conformance suite:
 
 ```sh
 docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry \
-  -e CARGO_TARGET_DIR=/target -w /src/ports/rust rust:1 sh -c 'touch src/*.rs tests/*.rs && cargo test --test cel'
+  -e CARGO_TARGET_DIR=/target -w /src/ports/rust rust:1 sh -c 'touch src/*.rs tests/*.rs && cargo test --test operators'
 ```
 
 Docker on a Mac doesn't always tell Cargo that a file changed, which is why the command touches the sources first.

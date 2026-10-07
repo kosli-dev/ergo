@@ -57,7 +57,7 @@ pub struct List<'a> {
 
 pub enum Kind<'a> {
     Leaf(Leaf<'a>),
-    Cel(crate::cel::Expression),
+    Custom(Custom<'a>),
     List(List<'a>),
     AnyOf(Vec<Vec<Check<'a>>>),
 }
@@ -248,10 +248,6 @@ pub fn parse<'a>(v: &'a Value, place: &Place) -> Option<Check<'a>> {
             let inner = Box::new(parse(raw.get("check")?, &inner_place)?);
             (Kind::List(List { every: op == "all", path, each, as_, inner }), &["path", "check", "each", "as"])
         }
-        "cel" => {
-            let expr = crate::cel::compile(raw.get("expr")?.as_str()?, &place.given).ok()?;
-            (Kind::Cel(expr), &["expr"])
-        }
         "any_of" => {
             if place.in_option {
                 return None;
@@ -271,6 +267,44 @@ pub fn parse<'a>(v: &'a Value, place: &Place) -> Option<Check<'a>> {
                 options.push(checks.iter().map(|c| parse(c, &option_place)).collect::<Option<Vec<_>>>()?);
             }
             (Kind::AnyOf(options), &["options"])
+        }
+        _ if !crate::render::is_builtin(op) => {
+            let def = crate::operators::find(op)?;
+            let mut args = vec![];
+            for p in &def.params {
+                let arg = match (raw.get(&p.name), p.kind) {
+                    (None, _) if p.optional => None,
+                    (None, _) => return None,
+                    (Some(v), crate::operators::Kind::Path) => Some(path_in(Some(v), place)?),
+                    (Some(v), crate::operators::Kind::Paths) => {
+                        for p in v.as_array()? {
+                            path_in(Some(p), place)?;
+                        }
+                        Some(v)
+                    }
+                    (Some(v), kind) => {
+                        let a = known_arg(v)?;
+                        if let Arg::Literal(l) = a {
+                            let fits = match kind {
+                                crate::operators::Kind::Number => l.is_number(),
+                                crate::operators::Kind::String => l.is_string(),
+                                _ => true,
+                            };
+                            if !fits {
+                                return None;
+                            }
+                        }
+                        Some(v)
+                    }
+                };
+                args.push(arg);
+            }
+            let names: Vec<&str> = def.params.iter().map(|p| p.name.as_str()).collect();
+            let common = ["op", "description", "meta", "expression", "substitute", "inputs"];
+            if !raw.keys().all(|k| common.contains(&k.as_str()) || names.contains(&k.as_str())) {
+                return None;
+            }
+            return Some(Check { kind: Kind::Custom(Custom { def, args }), inputs, substitute });
         }
         _ => {
             let (leaf, fields) = parse_leaf(raw, op, place)?;
@@ -541,6 +575,77 @@ impl<'a> List<'a> {
 
 }
 
+pub struct Custom<'a> {
+    def: std::sync::Arc<crate::operators::Definition>,
+    args: Vec<Option<&'a Value>>,
+}
+
+fn has_type(v: &Value, expects: &str) -> bool {
+    match expects {
+        "list" => v.is_array(),
+        "number" => v.is_number(),
+        "string" => v.is_string(),
+        "object" => v.is_object(),
+        _ => v.is_boolean(),
+    }
+}
+
+impl<'a> Custom<'a> {
+    fn cause(&self, x: &'a Value, ctx: &Ctx<'a>) -> Cause {
+        use crate::operators::Kind as K;
+        let mut bound = vec![];
+        let mut problems = vec![];
+        for (p, raw) in self.def.params.iter().zip(&self.args) {
+            let Some(raw) = raw else {
+                bound.push((p.name.clone(), p.default.clone().unwrap_or(Value::Null)));
+                continue;
+            };
+            if p.kind == K::Paths {
+                let mut values = vec![];
+                for path in raw.as_array().map(Vec::as_slice).unwrap_or(&[]) {
+                    match crate::render::read_raw(ctx, x, path) {
+                        Read::Found(v) => values.push(v.clone()),
+                        r => problems.push(r.problem().unwrap_or(Cause::Absent)),
+                    }
+                }
+                bound.push((p.name.clone(), Value::Array(values)));
+                continue;
+            }
+            let value = match p.kind {
+                K::Path => crate::render::read_raw(ctx, x, raw),
+                _ => match arg(raw) {
+                    Arg::Literal(v) => Read::Found(v),
+                    Arg::Ref(r) => ctx.read_ref(r),
+                },
+            };
+            match value {
+                Read::Found(v) => {
+                    let fits = match (p.kind, &p.expects) {
+                        (K::Path, Some(t)) => has_type(v, t),
+                        (K::Number, _) => v.is_number(),
+                        (K::String, _) => v.is_string(),
+                        _ => true,
+                    };
+                    if fits {
+                        bound.push((p.name.clone(), v.clone()));
+                    } else {
+                        problems.push(Cause::Unusable);
+                    }
+                }
+                r => problems.push(r.problem().unwrap_or(Cause::Absent)),
+            }
+        }
+        if let Some(c) = problems.into_iter().min() {
+            return c;
+        }
+        match self.def.body.run(&bound) {
+            crate::cel::Verdict::True => Cause::Satisfied,
+            crate::cel::Verdict::False => Cause::Value,
+            crate::cel::Verdict::Failed => Cause::Unusable,
+        }
+    }
+}
+
 pub struct Row {
     pub passed: bool,
     pub cause: Cause,
@@ -552,7 +657,7 @@ impl<'a> Check<'a> {
     pub fn passed(&self, x: &'a Value, ctx: &Ctx<'a>) -> bool {
         match &self.kind {
             Kind::Leaf(l) => l.passed(x, ctx),
-            Kind::Cel(e) => matches!(e.evaluate(x, ctx), crate::cel::Outcome::True),
+            Kind::Custom(c) => c.cause(x, ctx) == Cause::Satisfied,
             Kind::List(l) => l.passed(x, ctx),
             Kind::AnyOf(options) => options.iter().any(|group| group.iter().all(|c| c.passed(x, ctx))),
         }
@@ -561,7 +666,7 @@ impl<'a> Check<'a> {
     pub fn cause(&self, x: &'a Value, ctx: &Ctx<'a>) -> Cause {
         match &self.kind {
             Kind::Leaf(l) => l.cause(x, ctx),
-            Kind::Cel(e) => e.cause(x, ctx),
+            Kind::Custom(c) => c.cause(x, ctx),
             Kind::List(l) => l.cause(x, ctx),
             Kind::AnyOf(options) => {
                 if self.passed(x, ctx) {
@@ -583,7 +688,7 @@ impl<'a> Check<'a> {
         let mut out = vec![];
         match &self.kind {
             Kind::Leaf(l) => out.push(l),
-            Kind::Cel(_) => {}
+            Kind::Custom(_) => {}
             Kind::List(l) => out.extend(l.inner.all_leaves()),
             Kind::AnyOf(options) => out.extend(options.iter().flat_map(|g| g.iter().flat_map(|c| c.all_leaves()))),
         }

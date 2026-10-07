@@ -1,5 +1,6 @@
 mod cel;
 mod check;
+mod operators;
 mod path;
 mod problems;
 mod render;
@@ -522,6 +523,30 @@ fn definitions(e: &Evaluated) -> Value {
         defs.insert(named.name.into(), Value::Object(def));
     }
     Value::Object(defs)
+}
+
+pub use operators::Operators;
+
+pub fn report_with(document: &Value, params: Option<&Value>, requirements: &Value, operators: &Operators) -> Value {
+    let mut out = operators::with_active(std::sync::Arc::new(operators.clone()), || report(document, params, requirements));
+    let mut used = Map::new();
+    fn walk(v: &Value, operators: &Operators, used: &mut Map<String, Value>) {
+        match v {
+            Value::Object(m) => {
+                if let Some(def) = m.get("op").and_then(Value::as_str).filter(|o| !render::is_builtin(o)).and_then(|o| operators.find(o)) {
+                    used.insert(def.name.clone(), def.record.clone());
+                }
+                m.values().for_each(|x| walk(x, operators, used));
+            }
+            Value::Array(a) => a.iter().for_each(|x| walk(x, operators, used)),
+            _ => {}
+        }
+    }
+    walk(requirements, operators, &mut used);
+    if !used.is_empty() {
+        out["operators"] = Value::Object(used);
+    }
+    out
 }
 
 pub fn report(document: &Value, params: Option<&Value>, requirements: &Value) -> Value {
