@@ -6,624 +6,6 @@
         "input": {
           "items": [
             {
-              "temp_c": 5
-            }
-          ]
-        },
-        "report": {
-          "compliant": true,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every thing id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "description": "",
-                  "expression": "temp_c >= 0 and temp_c <= 10",
-                  "max": 10,
-                  "meta": {},
-                  "min": 0,
-                  "op": "range",
-                  "path": [
-                    "temp_c"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "satisfied",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope thing count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated thing ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "c",
-              "inputs": [
-                {
-                  "name": "temp_c",
-                  "value": 5
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            }
-          ]
-        },
-        "violations": []
-      }
-    ],
-    "description": "range inside",
-    "requirements": {
-      "s": {
-        "checks": {
-          "c": {
-            "max": 10,
-            "min": 0,
-            "op": "range",
-            "path": [
-              "temp_c"
-            ]
-          }
-        },
-        "from": [
-          "items"
-        ],
-        "id": [
-          "id"
-        ],
-        "subject_type": "thing"
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "items": [
-            {
-              "temp_c": 0
-            }
-          ]
-        },
-        "report": {
-          "compliant": true,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every thing id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "description": "",
-                  "expression": "temp_c >= 0 and temp_c <= 10",
-                  "max": 10,
-                  "meta": {},
-                  "min": 0,
-                  "op": "range",
-                  "path": [
-                    "temp_c"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "satisfied",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope thing count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated thing ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "c",
-              "inputs": [
-                {
-                  "name": "temp_c",
-                  "value": 0
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            }
-          ]
-        },
-        "violations": []
-      }
-    ],
-    "description": "range at lower bound",
-    "requirements": {
-      "s": {
-        "checks": {
-          "c": {
-            "max": 10,
-            "min": 0,
-            "op": "range",
-            "path": [
-              "temp_c"
-            ]
-          }
-        },
-        "from": [
-          "items"
-        ],
-        "id": [
-          "id"
-        ],
-        "subject_type": "thing"
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "items": [
-            {
-              "temp_c": 10
-            }
-          ]
-        },
-        "report": {
-          "compliant": true,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every thing id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "description": "",
-                  "expression": "temp_c >= 0 and temp_c <= 10",
-                  "max": 10,
-                  "meta": {},
-                  "min": 0,
-                  "op": "range",
-                  "path": [
-                    "temp_c"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "satisfied",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope thing count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated thing ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "c",
-              "inputs": [
-                {
-                  "name": "temp_c",
-                  "value": 10
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            }
-          ]
-        },
-        "violations": []
-      }
-    ],
-    "description": "range at upper bound",
-    "requirements": {
-      "s": {
-        "checks": {
-          "c": {
-            "max": 10,
-            "min": 0,
-            "op": "range",
-            "path": [
-              "temp_c"
-            ]
-          }
-        },
-        "from": [
-          "items"
-        ],
-        "id": [
-          "id"
-        ],
-        "subject_type": "thing"
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "items": [
-            {
-              "temp_c": "5"
-            }
-          ]
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every thing id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "description": "",
-                  "expression": "temp_c >= 0 and temp_c <= 10",
-                  "max": 10,
-                  "meta": {},
-                  "min": 0,
-                  "op": "range",
-                  "path": [
-                    "temp_c"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "satisfied",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope thing count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated thing ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "unusable",
-              "check": "c",
-              "inputs": [
-                {
-                  "name": "temp_c",
-                  "value": "5"
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "unusable",
-            "check": "c",
-            "description": "",
-            "expression": "temp_c >= 0 and temp_c <= 10",
-            "inputs": [
-              {
-                "name": "temp_c",
-                "value": "5"
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "thing"
-            }
-          }
-        ]
-      }
-    ],
-    "description": "range rejects numeric string",
-    "requirements": {
-      "s": {
-        "checks": {
-          "c": {
-            "max": 10,
-            "min": 0,
-            "op": "range",
-            "path": [
-              "temp_c"
-            ]
-          }
-        },
-        "from": [
-          "items"
-        ],
-        "id": [
-          "id"
-        ],
-        "subject_type": "thing"
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "items": [
-            {
               "temp_c": 11
             }
           ]
@@ -635,7 +17,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -645,12 +27,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "temp_c >= 0 and temp_c <= 10",
+                  "expression": "temp_c \u003e= 0 and temp_c \u003c= 10",
                   "max": 10,
                   "meta": {},
                   "min": 0,
@@ -746,7 +128,7 @@
             "cause": "value",
             "check": "c",
             "description": "",
-            "expression": "temp_c >= 0 and temp_c <= 10",
+            "expression": "temp_c \u003e= 0 and temp_c \u003c= 10",
             "inputs": [
               {
                 "name": "temp_c",
@@ -792,7 +174,7 @@
         "input": {
           "items": [
             {
-              "other": 5
+              "temp_c": "5"
             }
           ]
         },
@@ -803,7 +185,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -813,12 +195,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "temp_c >= 0 and temp_c <= 10",
+                  "expression": "temp_c \u003e= 0 and temp_c \u003c= 10",
                   "max": 10,
                   "meta": {},
                   "min": 0,
@@ -892,12 +274,12 @@
               }
             },
             {
-              "cause": "absent",
+              "cause": "unusable",
               "check": "c",
               "inputs": [
                 {
                   "name": "temp_c",
-                  "value": null
+                  "value": "5"
                 }
               ],
               "passed": false,
@@ -911,14 +293,14 @@
         },
         "violations": [
           {
-            "cause": "absent",
+            "cause": "unusable",
             "check": "c",
             "description": "",
-            "expression": "temp_c >= 0 and temp_c <= 10",
+            "expression": "temp_c \u003e= 0 and temp_c \u003c= 10",
             "inputs": [
               {
                 "name": "temp_c",
-                "value": null
+                "value": "5"
               }
             ],
             "requirement": "s",
@@ -930,7 +312,7 @@
         ]
       }
     ],
-    "description": "range rejects missing field",
+    "description": "range rejects numeric string",
     "requirements": {
       "s": {
         "checks": {
@@ -971,7 +353,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -981,12 +363,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "temp_c >= 0 and temp_c <= 10",
+                  "expression": "temp_c \u003e= 0 and temp_c \u003c= 10",
                   "max": 10,
                   "meta": {},
                   "min": 0,
@@ -1082,7 +464,7 @@
             "cause": "null",
             "check": "c",
             "description": "",
-            "expression": "temp_c >= 0 and temp_c <= 10",
+            "expression": "temp_c \u003e= 0 and temp_c \u003c= 10",
             "inputs": [
               {
                 "name": "temp_c",
@@ -1128,7 +510,7 @@
         "input": {
           "items": [
             {
-              "temp_c": -1
+              "other": 5
             }
           ]
         },
@@ -1139,7 +521,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -1149,12 +531,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "temp_c >= 0 and temp_c <= 10",
+                  "expression": "temp_c \u003e= 0 and temp_c \u003c= 10",
                   "max": 10,
                   "meta": {},
                   "min": 0,
@@ -1228,12 +610,12 @@
               }
             },
             {
-              "cause": "value",
+              "cause": "absent",
               "check": "c",
               "inputs": [
                 {
                   "name": "temp_c",
-                  "value": -1
+                  "value": null
                 }
               ],
               "passed": false,
@@ -1247,14 +629,14 @@
         },
         "violations": [
           {
-            "cause": "value",
+            "cause": "absent",
             "check": "c",
             "description": "",
-            "expression": "temp_c >= 0 and temp_c <= 10",
+            "expression": "temp_c \u003e= 0 and temp_c \u003c= 10",
             "inputs": [
               {
                 "name": "temp_c",
-                "value": -1
+                "value": null
               }
             ],
             "requirement": "s",
@@ -1266,7 +648,157 @@
         ]
       }
     ],
-    "description": "range below bound",
+    "description": "range rejects missing field",
+    "requirements": {
+      "s": {
+        "checks": {
+          "c": {
+            "max": 10,
+            "min": 0,
+            "op": "range",
+            "path": [
+              "temp_c"
+            ]
+          }
+        },
+        "from": [
+          "items"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "items": [
+            {
+              "temp_c": 5
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "temp_c \u003e= 0 and temp_c \u003c= 10",
+                  "max": 10,
+                  "meta": {},
+                  "min": 0,
+                  "op": "range",
+                  "path": [
+                    "temp_c"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "c",
+              "inputs": [
+                {
+                  "name": "temp_c",
+                  "value": 5
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": []
+      }
+    ],
+    "description": "expression for range",
     "requirements": {
       "s": {
         "checks": {
@@ -1305,7 +837,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -1315,15 +847,15 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "t >= 175 and t <= 200",
-                  "max": 200.0,
+                  "expression": "t \u003e= 175 and t \u003c= 200",
+                  "max": 200,
                   "meta": {},
-                  "min": 175.0,
+                  "min": 175,
                   "op": "range",
                   "path": [
                     "t"
@@ -1416,7 +948,7 @@
             "cause": "absent",
             "check": "c",
             "description": "",
-            "expression": "t >= 175 and t <= 200",
+            "expression": "t \u003e= 175 and t \u003c= 200",
             "inputs": [
               {
                 "name": "t",
@@ -1484,7 +1016,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -1494,7 +1026,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -1505,7 +1037,7 @@
                     }
                   ],
                   "description": "",
-                  "expression": "n >= 10 and n <= $$input.params.nine",
+                  "expression": "n \u003e= 10 and n \u003c= $$input.params.nine",
                   "max": {
                     "ref": [
                       "$$input",
@@ -1607,7 +1139,7 @@
             "cause": "unusable",
             "check": "c",
             "description": "",
-            "expression": "n >= 10 and n <= $$input.params.nine",
+            "expression": "n \u003e= 10 and n \u003c= $$input.params.nine",
             "inputs": [
               {
                 "name": "n",
@@ -1684,7 +1216,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -1694,7 +1226,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -1705,7 +1237,7 @@
                     }
                   ],
                   "description": "",
-                  "expression": "n >= 0 and n <= $$input.params.word",
+                  "expression": "n \u003e= 0 and n \u003c= $$input.params.word",
                   "max": {
                     "ref": [
                       "$$input",
@@ -1807,7 +1339,7 @@
             "cause": "unusable",
             "check": "c",
             "description": "",
-            "expression": "n >= 0 and n <= $$input.params.word",
+            "expression": "n \u003e= 0 and n \u003c= $$input.params.word",
             "inputs": [
               {
                 "name": "n",
@@ -1884,7 +1416,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -1894,7 +1426,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -1905,7 +1437,7 @@
                     }
                   ],
                   "description": "",
-                  "expression": "n >= $$input.params.nine and n <= 5",
+                  "expression": "n \u003e= $$input.params.nine and n \u003c= 5",
                   "max": 5,
                   "meta": {},
                   "min": {
@@ -2007,7 +1539,7 @@
             "cause": "unusable",
             "check": "c",
             "description": "",
-            "expression": "n >= $$input.params.nine and n <= 5",
+            "expression": "n \u003e= $$input.params.nine and n \u003c= 5",
             "inputs": [
               {
                 "name": "n",
@@ -2071,7 +1603,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -2081,12 +1613,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "n >= 0 and n <= <missing max>",
+                  "expression": "n \u003e= 0 and n \u003c= \u003cmissing max\u003e",
                   "meta": {},
                   "min": 0,
                   "op": "range",
@@ -2187,7 +1719,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -2214,7 +1746,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "n >= 0 and n <= <missing max>",
+            "expression": "n \u003e= 0 and n \u003c= \u003cmissing max\u003e",
             "inputs": [
               {
                 "name": "n",
@@ -2268,7 +1800,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -2278,12 +1810,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "n >= <missing min> and n <= <missing max>",
+                  "expression": "n \u003e= \u003cmissing min\u003e and n \u003c= \u003cmissing max\u003e",
                   "meta": {},
                   "op": "range",
                   "path": [
@@ -2384,7 +1916,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -2412,7 +1944,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "n >= <missing min> and n <= <missing max>",
+            "expression": "n \u003e= \u003cmissing min\u003e and n \u003c= \u003cmissing max\u003e",
             "inputs": [
               {
                 "name": "n",
@@ -2478,7 +2010,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -2488,12 +2020,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "s >= 0 and s <= 9",
+                  "expression": "s \u003e= 0 and s \u003c= 9",
                   "max": 9,
                   "meta": {},
                   "min": 0,
@@ -2589,7 +2121,7 @@
             "cause": "unusable",
             "check": "c",
             "description": "",
-            "expression": "s >= 0 and s <= 9",
+            "expression": "s \u003e= 0 and s \u003c= 9",
             "inputs": [
               {
                 "name": "s",
@@ -2635,6 +2167,356 @@
           "items": [
             {
               "id": 1,
+              "n": 1,
+              "s": "a",
+              "t": "2026-01-01T00:00:00Z",
+              "xs": [
+                1
+              ]
+            }
+          ],
+          "params": {
+            "nine": 9,
+            "none": null,
+            "word": "x"
+          }
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope subject count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every subject id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "$refs": [
+                    {
+                      "name": "$$input.params.none",
+                      "value": null
+                    }
+                  ],
+                  "description": "",
+                  "expression": "n \u003e= $$input.params.none and n \u003c= 5",
+                  "max": 5,
+                  "meta": {},
+                  "min": {
+                    "ref": [
+                      "$$input",
+                      "params",
+                      "none"
+                    ]
+                  },
+                  "op": "range",
+                  "path": [
+                    "n"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope subject count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated subject ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            },
+            {
+              "cause": "null",
+              "check": "c",
+              "inputs": [
+                {
+                  "name": "n",
+                  "value": 1
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": 1,
+                "type": "subject"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "null",
+            "check": "c",
+            "description": "",
+            "expression": "n \u003e= $$input.params.none and n \u003c= 5",
+            "inputs": [
+              {
+                "name": "n",
+                "value": 1
+              },
+              {
+                "name": "$$input.params.none",
+                "value": null
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": 1,
+              "type": "subject"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "a bound that reads null keeps the cause of its ref",
+    "requirements": {
+      "s": {
+        "checks": {
+          "c": {
+            "max": 5,
+            "min": {
+              "ref": [
+                "$$input",
+                "params",
+                "none"
+              ]
+            },
+            "op": "range",
+            "path": [
+              "n"
+            ]
+          }
+        },
+        "from": [
+          "items"
+        ],
+        "id": [
+          "id"
+        ]
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "items": [
+            {
+              "n": 1
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "n \u003e= 1 and n \u003c= 1",
+                  "max": 1,
+                  "meta": {},
+                  "min": 1,
+                  "op": "range",
+                  "path": [
+                    "n"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "c",
+              "inputs": [
+                {
+                  "name": "n",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": []
+      }
+    ],
+    "description": "a range with equal bounds is well written",
+    "requirements": {
+      "s": {
+        "checks": {
+          "c": {
+            "max": 1,
+            "min": 1,
+            "op": "range",
+            "path": [
+              "n"
+            ]
+          }
+        },
+        "from": [
+          "items"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "items": [
+            {
+              "id": 1,
               "n": 2
             }
           ],
@@ -2650,7 +2532,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -2660,7 +2542,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -2675,7 +2557,7 @@
                     }
                   ],
                   "description": "",
-                  "expression": "n >= $$input.params.lo and n <= $$input.params.hi",
+                  "expression": "n \u003e= $$input.params.lo and n \u003c= $$input.params.hi",
                   "max": {
                     "ref": [
                       "$$input",
@@ -2801,7 +2683,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -2811,7 +2693,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -2826,7 +2708,7 @@
                     }
                   ],
                   "description": "",
-                  "expression": "n >= $$input.params.lo and n <= $$input.params.hi",
+                  "expression": "n \u003e= $$input.params.lo and n \u003c= $$input.params.hi",
                   "max": {
                     "ref": [
                       "$$input",
@@ -2934,7 +2816,7 @@
             "cause": "value",
             "check": "c",
             "description": "",
-            "expression": "n >= $$input.params.lo and n <= $$input.params.hi",
+            "expression": "n \u003e= $$input.params.lo and n \u003c= $$input.params.hi",
             "inputs": [
               {
                 "name": "n",
@@ -3012,7 +2894,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -3022,12 +2904,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "n >= 1 and n <= \"3\"",
+                  "expression": "n \u003e= 1 and n \u003c= \"3\"",
                   "max": "3",
                   "meta": {},
                   "min": 1,
@@ -3129,7 +3011,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -3156,7 +3038,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "n >= 1 and n <= \"3\"",
+            "expression": "n \u003e= 1 and n \u003c= \"3\"",
             "inputs": [
               {
                 "name": "n",
@@ -3214,7 +3096,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -3224,12 +3106,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "n >= \"1\" and n <= 10",
+                  "expression": "n \u003e= \"1\" and n \u003c= 10",
                   "max": 10,
                   "meta": {},
                   "min": "1",
@@ -3331,7 +3213,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -3358,7 +3240,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "n >= \"1\" and n <= 10",
+            "expression": "n \u003e= \"1\" and n \u003c= 10",
             "inputs": [
               {
                 "name": "n",
@@ -3419,7 +3301,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -3429,7 +3311,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -3440,7 +3322,7 @@
                     }
                   ],
                   "description": "",
-                  "expression": "n >= 1 and n <= $$input.params.hi",
+                  "expression": "n \u003e= 1 and n \u003c= $$input.params.hi",
                   "max": {
                     "ref": [
                       "$$input",
@@ -3542,7 +3424,7 @@
             "cause": "unusable",
             "check": "c",
             "description": "",
-            "expression": "n >= 1 and n <= $$input.params.hi",
+            "expression": "n \u003e= 1 and n \u003c= $$input.params.hi",
             "inputs": [
               {
                 "name": "n",
@@ -3598,7 +3480,307 @@
         "input": {
           "items": [
             {
-              "id": 1
+              "temp_c": 10
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "temp_c \u003e= 0 and temp_c \u003c= 10",
+                  "max": 10,
+                  "meta": {},
+                  "min": 0,
+                  "op": "range",
+                  "path": [
+                    "temp_c"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "c",
+              "inputs": [
+                {
+                  "name": "temp_c",
+                  "value": 10
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": []
+      }
+    ],
+    "description": "range at upper bound",
+    "requirements": {
+      "s": {
+        "checks": {
+          "c": {
+            "max": 10,
+            "min": 0,
+            "op": "range",
+            "path": [
+              "temp_c"
+            ]
+          }
+        },
+        "from": [
+          "items"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "items": [
+            {
+              "temp_c": 0
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "temp_c \u003e= 0 and temp_c \u003c= 10",
+                  "max": 10,
+                  "meta": {},
+                  "min": 0,
+                  "op": "range",
+                  "path": [
+                    "temp_c"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "c",
+              "inputs": [
+                {
+                  "name": "temp_c",
+                  "value": 0
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": []
+      }
+    ],
+    "description": "range at lower bound",
+    "requirements": {
+      "s": {
+        "checks": {
+          "c": {
+            "max": 10,
+            "min": 0,
+            "op": "range",
+            "path": [
+              "temp_c"
+            ]
+          }
+        },
+        "from": [
+          "items"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "items": [
+            {
+              "temp_c": -1
             }
           ]
         },
@@ -3609,7 +3791,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -3619,30 +3801,18 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
-                  "$refs": [
-                    {
-                      "name": "$$input.params.missing",
-                      "value": null
-                    }
-                  ],
                   "description": "",
-                  "expression": "n >= $$input.params.missing and n <= 3",
-                  "max": 3,
+                  "expression": "temp_c \u003e= 0 and temp_c \u003c= 10",
+                  "max": 10,
                   "meta": {},
-                  "min": {
-                    "ref": [
-                      "$$input",
-                      "params",
-                      "missing"
-                    ]
-                  },
+                  "min": 0,
                   "op": "range",
                   "path": [
-                    "n"
+                    "temp_c"
                   ]
                 }
               },
@@ -3710,18 +3880,18 @@
               }
             },
             {
-              "cause": "absent",
+              "cause": "value",
               "check": "c",
               "inputs": [
                 {
-                  "name": "n",
-                  "value": null
+                  "name": "temp_c",
+                  "value": -1
                 }
               ],
               "passed": false,
               "requirement": "s",
               "subject": {
-                "id": 1,
+                "id": null,
                 "type": "thing"
               }
             }
@@ -3729,45 +3899,35 @@
         },
         "violations": [
           {
-            "cause": "absent",
+            "cause": "value",
             "check": "c",
             "description": "",
-            "expression": "n >= $$input.params.missing and n <= 3",
+            "expression": "temp_c \u003e= 0 and temp_c \u003c= 10",
             "inputs": [
               {
-                "name": "n",
-                "value": null
-              },
-              {
-                "name": "$$input.params.missing",
-                "value": null
+                "name": "temp_c",
+                "value": -1
               }
             ],
             "requirement": "s",
             "subject": {
-              "id": 1,
+              "id": null,
               "type": "thing"
             }
           }
         ]
       }
     ],
-    "description": "a ref shows its path in the expression",
+    "description": "range below bound",
     "requirements": {
       "s": {
         "checks": {
           "c": {
-            "max": 3,
-            "min": {
-              "ref": [
-                "$$input",
-                "params",
-                "missing"
-              ]
-            },
+            "max": 10,
+            "min": 0,
             "op": "range",
             "path": [
-              "n"
+              "temp_c"
             ]
           }
         },
@@ -3804,7 +3964,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -3814,7 +3974,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -3825,7 +3985,7 @@
                     }
                   ],
                   "description": "",
-                  "expression": "n >= $$input.params.missing and n <= 3",
+                  "expression": "n \u003e= $$input.params.missing and n \u003c= 3",
                   "max": 3,
                   "meta": {},
                   "min": {
@@ -3927,7 +4087,7 @@
             "cause": "absent",
             "check": "c",
             "description": "",
-            "expression": "n >= $$input.params.missing and n <= 3",
+            "expression": "n \u003e= $$input.params.missing and n \u003c= 3",
             "inputs": [
               {
                 "name": "n",
@@ -3999,7 +4159,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -4009,7 +4169,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -4020,7 +4180,7 @@
                     }
                   ],
                   "description": "",
-                  "expression": "n >= 1 and n <= $$input.params.missing",
+                  "expression": "n \u003e= 1 and n \u003c= $$input.params.missing",
                   "max": {
                     "ref": [
                       "$$input",
@@ -4122,7 +4282,7 @@
             "cause": "absent",
             "check": "c",
             "description": "",
-            "expression": "n >= 1 and n <= $$input.params.missing",
+            "expression": "n \u003e= 1 and n \u003c= $$input.params.missing",
             "inputs": [
               {
                 "name": "n",
@@ -4178,20 +4338,9 @@
         "input": {
           "items": [
             {
-              "id": 1,
-              "n": 1,
-              "s": "a",
-              "t": "2026-01-01T00:00:00Z",
-              "xs": [
-                1
-              ]
+              "id": 1
             }
-          ],
-          "params": {
-            "nine": 9,
-            "none": null,
-            "word": "x"
-          }
+          ]
         },
         "report": {
           "compliant": false,
@@ -4199,36 +4348,36 @@
             "s": {
               "checks": {
                 "$min_subjects": {
-                  "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
-                  "description": "Every subject id is unique",
+                  "description": "Every thing id is unique",
                   "expression": "count(repeated(ids(items))) == 0",
                   "meta": {}
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "$refs": [
                     {
-                      "name": "$$input.params.none",
+                      "name": "$$input.params.missing",
                       "value": null
                     }
                   ],
                   "description": "",
-                  "expression": "n >= $$input.params.none and n <= 5",
-                  "max": 5,
+                  "expression": "n \u003e= $$input.params.missing and n \u003c= 3",
+                  "max": 3,
                   "meta": {},
                   "min": {
                     "ref": [
                       "$$input",
                       "params",
-                      "none"
+                      "missing"
                     ]
                   },
                   "op": "range",
@@ -4241,183 +4390,6 @@
               "meta": {},
               "require": "every",
               "status": "not_met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "satisfied",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope subject count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated subject ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            },
-            {
-              "cause": "null",
-              "check": "c",
-              "inputs": [
-                {
-                  "name": "n",
-                  "value": 1
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": 1,
-                "type": "subject"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "null",
-            "check": "c",
-            "description": "",
-            "expression": "n >= $$input.params.none and n <= 5",
-            "inputs": [
-              {
-                "name": "n",
-                "value": 1
-              },
-              {
-                "name": "$$input.params.none",
-                "value": null
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": 1,
-              "type": "subject"
-            }
-          }
-        ]
-      }
-    ],
-    "description": "a bound that reads null keeps the cause of its ref",
-    "requirements": {
-      "s": {
-        "checks": {
-          "c": {
-            "max": 5,
-            "min": {
-              "ref": [
-                "$$input",
-                "params",
-                "none"
-              ]
-            },
-            "op": "range",
-            "path": [
-              "n"
-            ]
-          }
-        },
-        "from": [
-          "items"
-        ],
-        "id": [
-          "id"
-        ]
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "items": [
-            {
-              "n": 1
-            }
-          ]
-        },
-        "report": {
-          "compliant": true,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every thing id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "description": "",
-                  "expression": "n >= 1 and n <= 1",
-                  "max": 1,
-                  "meta": {},
-                  "min": 1,
-                  "op": "range",
-                  "path": [
-                    "n"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "met",
               "subjects": {
                 "matching": 1,
                 "total": 1
@@ -4478,33 +4450,61 @@
               }
             },
             {
-              "cause": "satisfied",
+              "cause": "absent",
               "check": "c",
               "inputs": [
                 {
                   "name": "n",
-                  "value": 1
+                  "value": null
                 }
               ],
-              "passed": true,
+              "passed": false,
               "requirement": "s",
               "subject": {
-                "id": null,
+                "id": 1,
                 "type": "thing"
               }
             }
           ]
         },
-        "violations": []
+        "violations": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "description": "",
+            "expression": "n \u003e= $$input.params.missing and n \u003c= 3",
+            "inputs": [
+              {
+                "name": "n",
+                "value": null
+              },
+              {
+                "name": "$$input.params.missing",
+                "value": null
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": 1,
+              "type": "thing"
+            }
+          }
+        ]
       }
     ],
-    "description": "a range with equal bounds is well written",
+    "description": "a ref shows its path in the expression",
     "requirements": {
       "s": {
         "checks": {
           "c": {
-            "max": 1,
-            "min": 1,
+            "max": 3,
+            "min": {
+              "ref": [
+                "$$input",
+                "params",
+                "missing"
+              ]
+            },
             "op": "range",
             "path": [
               "n"
@@ -4550,7 +4550,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -4560,12 +4560,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "n >= \"a\" and n <= 5",
+                  "expression": "n \u003e= \"a\" and n \u003c= 5",
                   "max": 5,
                   "meta": {},
                   "min": "a",
@@ -4667,7 +4667,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -4694,7 +4694,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "n >= \"a\" and n <= 5",
+            "expression": "n \u003e= \"a\" and n \u003c= 5",
             "inputs": [
               {
                 "name": "n",
@@ -4761,7 +4761,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -4771,12 +4771,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "n >= 0 and n <= <missing max>",
+                  "expression": "n \u003e= 0 and n \u003c= \u003cmissing max\u003e",
                   "meta": {},
                   "min": 0,
                   "op": "range",
@@ -4877,7 +4877,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -4904,7 +4904,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "n >= 0 and n <= <missing max>",
+            "expression": "n \u003e= 0 and n \u003c= \u003cmissing max\u003e",
             "inputs": [
               {
                 "name": "n",
@@ -4970,7 +4970,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -4980,12 +4980,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "n >= 9 and n <= 0",
+                  "expression": "n \u003e= 9 and n \u003c= 0",
                   "max": 0,
                   "meta": {},
                   "min": 9,
@@ -5087,7 +5087,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -5114,7 +5114,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "n >= 9 and n <= 0",
+            "expression": "n \u003e= 9 and n \u003c= 0",
             "inputs": [
               {
                 "name": "n",

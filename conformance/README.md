@@ -57,7 +57,7 @@ Compare parsed values, not text. Key order in an object doesn't matter, but orde
 
 Print the descriptions of the group and the case when one fails. They say what should happen and why.
 
-Read numbers without rounding them. A parser that reads every number as a 64-bit float, like JavaScript's or `serde_json` without `arbitrary_precision`, turns `9007199254740993` into `9007199254740992`, and ergo treats a number that doesn't fit a float differently from one that does.
+Every number in a report is written in its plain form, so `1.50`, `-0.0` and `1e2` in the input come out as `1.5`, `0` and `100`. If your JSON parser keeps each number's text, compare that text too, because a value comparison won't notice a report that writes `1.50`. Read numbers without rounding them. A parser that reads every number as a 64-bit float, like JavaScript's or `serde_json` without `arbitrary_precision`, turns `9007199254740993` into `9007199254740992`, and ergo treats a number that doesn't fit a float differently from one that does.
 
 ## Values JSON can't hold
 

@@ -606,7 +606,16 @@ pub fn report(document: &Value, params: Option<&Value>, requirements: &Value) ->
         );
     }
     let compliant = !evaluated.is_empty() && evaluated.iter().all(|e| e.status != "not_met");
-    json!({"compliant": compliant, "requirements": reqs, "results": results})
+    plain(json!({"compliant": compliant, "requirements": reqs, "results": results}))
+}
+
+fn plain(v: Value) -> Value {
+    match v {
+        Value::Number(n) if !render::out_of_range(&Value::Number(n.clone())) => serde_json::from_str(&render::number_text(&n.to_string())).unwrap_or(Value::Number(n)),
+        Value::Array(a) => Value::Array(a.into_iter().map(plain).collect()),
+        Value::Object(m) => Value::Object(m.into_iter().map(|(k, x)| (k, plain(x))).collect()),
+        other => other,
+    }
 }
 
 pub fn violations(report: &Value) -> Value {

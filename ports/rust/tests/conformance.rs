@@ -2,29 +2,9 @@ use serde_json::Value;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-fn exact(text: &str) -> (bool, String, i64) {
-    let (negative, unsigned) = match text.strip_prefix('-') {
-        Some(rest) => (true, rest),
-        None => (false, text),
-    };
-    let (mantissa, exponent) = match unsigned.split_once(['e', 'E']) {
-        Some((m, e)) => (m, e.trim_start_matches('+').parse::<i64>().unwrap()),
-        None => (unsigned, 0),
-    };
-    let (whole, fraction) = mantissa.split_once('.').unwrap_or((mantissa, ""));
-    let digits = format!("{whole}{fraction}");
-    let trimmed = digits.trim_start_matches('0');
-    let point = exponent + whole.len() as i64 - (digits.len() - trimmed.len()) as i64;
-    let significant = trimmed.trim_end_matches('0');
-    if significant.is_empty() {
-        return (false, String::new(), 0);
-    }
-    (negative, significant.to_string(), point)
-}
-
 fn same(a: &Value, b: &Value) -> bool {
     match (a, b) {
-        (Value::Number(x), Value::Number(y)) => exact(&x.to_string()) == exact(&y.to_string()),
+        (Value::Number(x), Value::Number(y)) => x.to_string() == y.to_string(),
         (Value::Array(x), Value::Array(y)) => x.len() == y.len() && x.iter().zip(y).all(|(p, q)| same(p, q)),
         (Value::Object(x), Value::Object(y)) => x.len() == y.len() && x.iter().all(|(k, v)| y.get(k).is_some_and(|w| same(v, w))),
         _ => a == b,

@@ -17,7 +17,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -27,7 +27,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -165,7 +165,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -175,7 +175,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -331,7 +331,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -341,7 +341,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -471,7 +471,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -481,7 +481,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -635,7 +635,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -645,7 +645,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -775,7 +775,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -785,7 +785,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -915,7 +915,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -925,7 +925,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -1055,7 +1055,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -1065,7 +1065,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -1217,7 +1217,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -1227,12 +1227,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "<missing path> is empty",
+                  "expression": "\u003cmissing path\u003e is empty",
                   "meta": {},
                   "op": "empty"
                 }
@@ -1324,7 +1324,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -1351,7 +1351,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "<missing path> is empty",
+            "expression": "\u003cmissing path\u003e is empty",
             "inputs": [],
             "requirement": "s",
             "subject": {
@@ -1409,7 +1409,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -1419,7 +1419,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -1587,7 +1587,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -1597,7 +1597,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -1761,7 +1761,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -1771,7 +1771,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -1939,7 +1939,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -1949,7 +1949,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -2060,7 +2060,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -2158,7 +2158,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -2168,12 +2168,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "<missing path> is empty",
+                  "expression": "\u003cmissing path\u003e is empty",
                   "meta": {},
                   "op": "empty"
                 }
@@ -2265,7 +2265,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -2292,7 +2292,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "<missing path> is empty",
+            "expression": "\u003cmissing path\u003e is empty",
             "inputs": [],
             "requirement": "s",
             "subject": {

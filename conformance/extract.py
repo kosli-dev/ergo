@@ -111,12 +111,15 @@ def description_of(test):
     return test.removeprefix("test_").replace("_", " ")
 
 
-skipped = {"Rego-only values": 0, "custom operators": 0, "numbers too big for a float": 0, "repeated calls": 0}
+skipped = {"Rego-only values": 0, "policies that aren't objects": 0, "custom operators": 0, "numbers too big for a float": 0, "repeated calls": 0}
 seen = set()
 groups = {}
 for test, call in traced_calls():
     if call["rego_only"]:
         skipped["Rego-only values"] += 1
+        continue
+    if not isinstance(call["policy"], dict):
+        skipped["policies that aren't objects"] += 1
         continue
     if uses(call["policy"], custom_ops):
         skipped["custom operators"] += 1

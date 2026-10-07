@@ -20,7 +20,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -30,12 +30,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "<unknown op bespoke>",
+                  "expression": "\u003cunknown op bespoke\u003e",
                   "inputs": [
                     {
                       "each": [],
@@ -143,7 +143,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -170,7 +170,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "<unknown op bespoke>",
+            "expression": "\u003cunknown op bespoke\u003e",
             "inputs": [
               {
                 "name": "tags[]",
@@ -236,7 +236,7 @@
                 },
                 "$min_subjects": {
                   "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(branches)) >= 1",
+                  "expression": "count(matching(branches)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -246,7 +246,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "backed": {
@@ -459,7 +459,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -571,7 +571,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -581,12 +581,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "<unknown op bespoke>",
+                  "expression": "\u003cunknown op bespoke\u003e",
                   "meta": {},
                   "op": "bespoke"
                 }
@@ -678,7 +678,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -705,7 +705,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "<unknown op bespoke>",
+            "expression": "\u003cunknown op bespoke\u003e",
             "inputs": [],
             "requirement": "s",
             "subject": {
@@ -740,224 +740,6 @@
         "description": "input 1",
         "input": {
           "items": [
-            {
-              "commits": {
-                "a": {
-                  "timestamp": 1
-                },
-                "b": {
-                  "timestamp": 2
-                }
-              }
-            }
-          ]
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every thing id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "description": "",
-                  "expression": "<unknown op bespoke>",
-                  "inputs": [
-                    {
-                      "each": [
-                        "timestamp"
-                      ],
-                      "path": [
-                        "commits"
-                      ]
-                    }
-                  ],
-                  "meta": {},
-                  "op": "bespoke"
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "value",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                },
-                {
-                  "name": "checks.c",
-                  "value": [
-                    "unknown op bespoke"
-                  ]
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope thing count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated thing ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "ill_formed",
-              "check": "c",
-              "inputs": [
-                {
-                  "name": "commits[].timestamp",
-                  "value": []
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "value",
-            "check": "$well_formed",
-            "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-            "inputs": [
-              {
-                "name": "count(checks)",
-                "value": 1
-              },
-              {
-                "name": "require",
-                "value": "every"
-              },
-              {
-                "name": "checks.c",
-                "value": [
-                  "unknown op bespoke"
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "thing"
-            }
-          },
-          {
-            "cause": "ill_formed",
-            "check": "c",
-            "description": "",
-            "expression": "<unknown op bespoke>",
-            "inputs": [
-              {
-                "name": "commits[].timestamp",
-                "value": []
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "thing"
-            }
-          }
-        ]
-      }
-    ],
-    "description": "inputs projection over an object lists nothing so its order cannot vary",
-    "requirements": {
-      "s": {
-        "checks": {
-          "c": {
-            "inputs": [
-              {
-                "each": [
-                  "timestamp"
-                ],
-                "path": [
-                  "commits"
-                ]
-              }
-            ],
-            "op": "bespoke"
-          }
-        },
-        "from": [
-          "items"
-        ],
-        "id": [
-          "id"
-        ],
-        "subject_type": "thing"
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "items": [
             {}
           ]
         },
@@ -968,7 +750,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -978,12 +760,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "<unknown op bespoke>",
+                  "expression": "\u003cunknown op bespoke\u003e",
                   "inputs": [
                     {
                       "each": [
@@ -1090,7 +872,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -1117,7 +899,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "<unknown op bespoke>",
+            "expression": "\u003cunknown op bespoke\u003e",
             "inputs": [
               {
                 "name": "commits[].timestamp",
@@ -1186,7 +968,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -1196,12 +978,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "<unknown op bespoke>",
+                  "expression": "\u003cunknown op bespoke\u003e",
                   "inputs": [
                     {
                       "each": [
@@ -1311,7 +1093,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -1338,7 +1120,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "<unknown op bespoke>",
+            "expression": "\u003cunknown op bespoke\u003e",
             "inputs": [
               {
                 "name": "commits[].timestamp",
@@ -1392,6 +1174,224 @@
         "input": {
           "items": [
             {
+              "commits": {
+                "a": {
+                  "timestamp": 1
+                },
+                "b": {
+                  "timestamp": 2
+                }
+              }
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "\u003cunknown op bespoke\u003e",
+                  "inputs": [
+                    {
+                      "each": [
+                        "timestamp"
+                      ],
+                      "path": [
+                        "commits"
+                      ]
+                    }
+                  ],
+                  "meta": {},
+                  "op": "bespoke"
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "value",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                },
+                {
+                  "name": "checks.c",
+                  "value": [
+                    "unknown op bespoke"
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "ill_formed",
+              "check": "c",
+              "inputs": [
+                {
+                  "name": "commits[].timestamp",
+                  "value": []
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "description": "The requirement is written correctly",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "unknown op bespoke"
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "c",
+            "description": "",
+            "expression": "\u003cunknown op bespoke\u003e",
+            "inputs": [
+              {
+                "name": "commits[].timestamp",
+                "value": []
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "inputs projection over an object lists nothing so its order cannot vary",
+    "requirements": {
+      "s": {
+        "checks": {
+          "c": {
+            "inputs": [
+              {
+                "each": [
+                  "timestamp"
+                ],
+                "path": [
+                  "commits"
+                ]
+              }
+            ],
+            "op": "bespoke"
+          }
+        },
+        "from": [
+          "items"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "items": [
+            {
               "author": "alice",
               "commits": [
                 {
@@ -1408,7 +1408,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -1418,12 +1418,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "<unknown op bespoke>",
+                  "expression": "\u003cunknown op bespoke\u003e",
                   "inputs": [
                     [
                       "author"
@@ -1539,7 +1539,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -1566,7 +1566,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "<unknown op bespoke>",
+            "expression": "\u003cunknown op bespoke\u003e",
             "inputs": [
               {
                 "name": "author",
@@ -1635,7 +1635,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -1645,12 +1645,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "<unknown op ﻿>",
+                  "expression": "\u003cunknown op ﻿\u003e",
                   "meta": {},
                   "op": "﻿",
                   "path": [
@@ -1750,7 +1750,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -1777,7 +1777,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "<unknown op ﻿>",
+            "expression": "\u003cunknown op ﻿\u003e",
             "inputs": [
               {
                 "name": "x",
@@ -1821,203 +1821,6 @@
         "input": {
           "items": [
             {
-              "id": "x"
-            }
-          ]
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every thing id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "description": "",
-                  "expression": "<unknown op no_such_op>",
-                  "meta": {},
-                  "op": "no_such_op",
-                  "path": [
-                    "id"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "value",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                },
-                {
-                  "name": "checks.c",
-                  "value": [
-                    "unknown op no_such_op"
-                  ]
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope thing count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated thing ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "ill_formed",
-              "check": "c",
-              "inputs": [
-                {
-                  "name": "id",
-                  "value": "x"
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": "x",
-                "type": "thing"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "value",
-            "check": "$well_formed",
-            "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-            "inputs": [
-              {
-                "name": "count(checks)",
-                "value": 1
-              },
-              {
-                "name": "require",
-                "value": "every"
-              },
-              {
-                "name": "checks.c",
-                "value": [
-                  "unknown op no_such_op"
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "thing"
-            }
-          },
-          {
-            "cause": "ill_formed",
-            "check": "c",
-            "description": "",
-            "expression": "<unknown op no_such_op>",
-            "inputs": [
-              {
-                "name": "id",
-                "value": "x"
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": "x",
-              "type": "thing"
-            }
-          }
-        ]
-      }
-    ],
-    "description": "unknown op produces a failing row not a gap",
-    "requirements": {
-      "s": {
-        "checks": {
-          "c": {
-            "op": "no_such_op",
-            "path": [
-              "id"
-            ]
-          }
-        },
-        "from": [
-          "items"
-        ],
-        "id": [
-          "id"
-        ],
-        "subject_type": "thing"
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "items": [
-            {
               "id": 1
             }
           ]
@@ -2029,12 +1832,12 @@
               "checks": {
                 "$applies": {
                   "description": "The subject is in scope",
-                  "expression": "env == <missing value>",
+                  "expression": "env == \u003cmissing value\u003e",
                   "meta": {}
                 },
                 "$min_subjects": {
                   "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -2044,7 +1847,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "fine": {
@@ -2058,7 +1861,7 @@
                 },
                 "merged": {
                   "description": "",
-                  "expression": "<unknown op equls>",
+                  "expression": "\u003cunknown op equls\u003e",
                   "meta": {},
                   "op": "equls",
                   "path": [
@@ -2165,7 +1968,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -2198,7 +2001,7 @@
             "cause": "value",
             "check": "$min_subjects",
             "description": "The in-scope subject count is at least 1",
-            "expression": "count(matching(items)) >= 1",
+            "expression": "count(matching(items)) \u003e= 1",
             "inputs": [
               {
                 "name": "in-scope subject count",
@@ -2215,7 +2018,7 @@
             "cause": "ill_formed",
             "check": "$applies",
             "description": "The subject is in scope",
-            "expression": "env == <missing value>",
+            "expression": "env == \u003cmissing value\u003e",
             "inputs": [
               {
                 "name": "env",
@@ -2295,7 +2098,7 @@
               "checks": {
                 "$applies": {
                   "description": "The subject is in scope",
-                  "expression": "<unknown op nope>",
+                  "expression": "\u003cunknown op nope\u003e",
                   "meta": {}
                 },
                 "$min_subjects": {
@@ -2310,7 +2113,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -2416,7 +2219,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -2443,7 +2246,7 @@
             "cause": "ill_formed",
             "check": "$applies",
             "description": "The subject is in scope",
-            "expression": "<unknown op nope>",
+            "expression": "\u003cunknown op nope\u003e",
             "inputs": [
               {
                 "name": "n",
@@ -2518,7 +2321,7 @@
               "checks": {
                 "$applies": {
                   "description": "The subject is in scope",
-                  "expression": "<unknown op nope> and n == 2",
+                  "expression": "\u003cunknown op nope\u003e and n == 2",
                   "meta": {}
                 },
                 "$min_subjects": {
@@ -2533,7 +2336,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -2642,7 +2445,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -2669,7 +2472,7 @@
             "cause": "ill_formed",
             "check": "$applies",
             "description": "The subject is in scope",
-            "expression": "<unknown op nope> and n == 2",
+            "expression": "\u003cunknown op nope\u003e and n == 2",
             "inputs": [
               {
                 "name": "n",
@@ -2743,7 +2546,7 @@
               "checks": {
                 "$applies": {
                   "description": "The subject is in scope",
-                  "expression": "<unknown op nope> and status is present",
+                  "expression": "\u003cunknown op nope\u003e and status is present",
                   "meta": {}
                 },
                 "$min_subjects": {
@@ -2758,7 +2561,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -2864,7 +2667,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -2891,7 +2694,7 @@
             "cause": "ill_formed",
             "check": "$applies",
             "description": "The subject is in scope",
-            "expression": "<unknown op nope> and status is present",
+            "expression": "\u003cunknown op nope\u003e and status is present",
             "inputs": [
               {
                 "name": "status",
@@ -2945,6 +2748,202 @@
       {
         "description": "input 1",
         "input": {
+          "deployments": [
+            {
+              "env": "dev",
+              "id": 1
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$applies": {
+                  "description": "The deployment is in scope",
+                  "expression": "env == \"prod\"",
+                  "meta": {}
+                },
+                "$min_subjects": {
+                  "description": "The deployment list can be read",
+                  "expression": "deployments can be read",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every deployment id is unique",
+                  "expression": "count(repeated(ids(deployments))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "approved": {
+                  "description": "",
+                  "expression": "\u003cunknown op nope\u003e",
+                  "meta": {},
+                  "op": "nope",
+                  "path": [
+                    "approved_by"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 0,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "value",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                },
+                {
+                  "name": "checks.approved",
+                  "value": [
+                    "unknown op nope"
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "deployment"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope deployment count",
+                  "value": 0
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "deployment"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated deployment ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "deployment"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "$applies",
+              "inputs": [
+                {
+                  "name": "env",
+                  "value": "dev"
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": 1,
+                "type": "deployment"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "description": "The requirement is written correctly",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.approved",
+                "value": [
+                  "unknown op nope"
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "deployment"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "a requirement is only not applicable when it would otherwise be met",
+    "requirements": {
+      "s": {
+        "applies_to": {
+          "prod": {
+            "op": "equals",
+            "path": [
+              "env"
+            ],
+            "value": "prod"
+          }
+        },
+        "checks": {
+          "approved": {
+            "op": "nope",
+            "path": [
+              "approved_by"
+            ]
+          }
+        },
+        "from": [
+          "deployments"
+        ],
+        "id": [
+          "id"
+        ],
+        "min_subjects": 0,
+        "subject_type": "deployment"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
           "items": [
             {
               "a": 1,
@@ -2961,7 +2960,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -2971,12 +2970,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "<unknown op bespoke>",
+                  "expression": "\u003cunknown op bespoke\u003e",
                   "inputs": {
                     "alpha": [
                       "a"
@@ -3099,7 +3098,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -3126,7 +3125,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "<unknown op bespoke>",
+            "expression": "\u003cunknown op bespoke\u003e",
             "inputs": [
               {
                 "name": "a",
@@ -3191,10 +3190,9 @@
       {
         "description": "input 1",
         "input": {
-          "deployments": [
+          "items": [
             {
-              "env": "dev",
-              "id": 1
+              "id": "x"
             }
           ]
         },
@@ -3203,33 +3201,28 @@
           "requirements": {
             "s": {
               "checks": {
-                "$applies": {
-                  "description": "The deployment is in scope",
-                  "expression": "env == \"prod\"",
-                  "meta": {}
-                },
                 "$min_subjects": {
-                  "description": "The deployment list can be read",
-                  "expression": "deployments can be read",
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
-                  "description": "Every deployment id is unique",
-                  "expression": "count(repeated(ids(deployments))) == 0",
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
                   "meta": {}
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
-                "approved": {
+                "c": {
                   "description": "",
-                  "expression": "<unknown op nope>",
+                  "expression": "\u003cunknown op no_such_op\u003e",
                   "meta": {},
-                  "op": "nope",
+                  "op": "no_such_op",
                   "path": [
-                    "approved_by"
+                    "id"
                   ]
                 }
               },
@@ -3238,7 +3231,7 @@
               "require": "every",
               "status": "not_met",
               "subjects": {
-                "matching": 0,
+                "matching": 1,
                 "total": 1
               }
             }
@@ -3257,9 +3250,9 @@
                   "value": "every"
                 },
                 {
-                  "name": "checks.approved",
+                  "name": "checks.c",
                   "value": [
-                    "unknown op nope"
+                    "unknown op no_such_op"
                   ]
                 }
               ],
@@ -3267,7 +3260,7 @@
               "requirement": "s",
               "subject": {
                 "id": null,
-                "type": "deployment"
+                "type": "thing"
               }
             },
             {
@@ -3275,15 +3268,15 @@
               "check": "$min_subjects",
               "inputs": [
                 {
-                  "name": "in-scope deployment count",
-                  "value": 0
+                  "name": "in-scope thing count",
+                  "value": 1
                 }
               ],
               "passed": true,
               "requirement": "s",
               "subject": {
                 "id": null,
-                "type": "deployment"
+                "type": "thing"
               }
             },
             {
@@ -3291,7 +3284,7 @@
               "check": "$unique_ids",
               "inputs": [
                 {
-                  "name": "repeated deployment ids",
+                  "name": "repeated thing ids",
                   "value": []
                 }
               ],
@@ -3299,23 +3292,23 @@
               "requirement": "s",
               "subject": {
                 "id": null,
-                "type": "deployment"
+                "type": "thing"
               }
             },
             {
-              "cause": "value",
-              "check": "$applies",
+              "cause": "ill_formed",
+              "check": "c",
               "inputs": [
                 {
-                  "name": "env",
-                  "value": "dev"
+                  "name": "id",
+                  "value": "x"
                 }
               ],
               "passed": false,
               "requirement": "s",
               "subject": {
-                "id": 1,
-                "type": "deployment"
+                "id": "x",
+                "type": "thing"
               }
             }
           ]
@@ -3325,7 +3318,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -3336,49 +3329,56 @@
                 "value": "every"
               },
               {
-                "name": "checks.approved",
+                "name": "checks.c",
                 "value": [
-                  "unknown op nope"
+                  "unknown op no_such_op"
                 ]
               }
             ],
             "requirement": "s",
             "subject": {
               "id": null,
-              "type": "deployment"
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "c",
+            "description": "",
+            "expression": "\u003cunknown op no_such_op\u003e",
+            "inputs": [
+              {
+                "name": "id",
+                "value": "x"
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": "x",
+              "type": "thing"
             }
           }
         ]
       }
     ],
-    "description": "a requirement is only not applicable when it would otherwise be met",
+    "description": "unknown op produces a failing row not a gap",
     "requirements": {
       "s": {
-        "applies_to": {
-          "prod": {
-            "op": "equals",
-            "path": [
-              "env"
-            ],
-            "value": "prod"
-          }
-        },
         "checks": {
-          "approved": {
-            "op": "nope",
+          "c": {
+            "op": "no_such_op",
             "path": [
-              "approved_by"
+              "id"
             ]
           }
         },
         "from": [
-          "deployments"
+          "items"
         ],
         "id": [
           "id"
         ],
-        "min_subjects": 0,
-        "subject_type": "deployment"
+        "subject_type": "thing"
       }
     }
   },
@@ -3411,7 +3411,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -3421,12 +3421,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "<unknown op undeclared>",
+                  "expression": "\u003cunknown op undeclared\u003e",
                   "meta": {},
                   "op": "undeclared",
                   "path": [
@@ -3526,7 +3526,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -3553,7 +3553,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "<unknown op undeclared>",
+            "expression": "\u003cunknown op undeclared\u003e",
             "inputs": [
               {
                 "name": "n",
@@ -3605,7 +3605,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -3615,7 +3615,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -3720,7 +3720,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -3814,7 +3814,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -3824,12 +3824,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "<unknown op nope>, or substitute: n is present",
+                  "expression": "\u003cunknown op nope\u003e, or substitute: n is present",
                   "meta": {},
                   "op": "nope",
                   "path": [
@@ -3939,7 +3939,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -3966,7 +3966,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "<unknown op nope>, or substitute: n is present",
+            "expression": "\u003cunknown op nope\u003e, or substitute: n is present",
             "inputs": [
               {
                 "name": "n",
@@ -4028,7 +4028,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -4038,12 +4038,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "<unknown op nope>",
+                  "expression": "\u003cunknown op nope\u003e",
                   "meta": {},
                   "op": "nope",
                   "path": [
@@ -4143,7 +4143,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -4170,7 +4170,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "<unknown op nope>",
+            "expression": "\u003cunknown op nope\u003e",
             "inputs": [
               {
                 "name": "n",
@@ -4236,7 +4236,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -4246,12 +4246,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "<unknown op nope>",
+                  "expression": "\u003cunknown op nope\u003e",
                   "meta": {},
                   "op": "nope",
                   "path": [
@@ -4351,7 +4351,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -4378,7 +4378,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "<unknown op nope>",
+            "expression": "\u003cunknown op nope\u003e",
             "inputs": [
               {
                 "name": "n",
@@ -4443,7 +4443,7 @@
               "checks": {
                 "$applies": {
                   "description": "The subject is in scope",
-                  "expression": "<unknown op undeclared>",
+                  "expression": "\u003cunknown op undeclared\u003e",
                   "meta": {}
                 },
                 "$min_subjects": {
@@ -4458,7 +4458,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -4564,7 +4564,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -4591,7 +4591,7 @@
             "cause": "ill_formed",
             "check": "$applies",
             "description": "The subject is in scope",
-            "expression": "<unknown op undeclared>",
+            "expression": "\u003cunknown op undeclared\u003e",
             "inputs": [
               {
                 "name": "n",

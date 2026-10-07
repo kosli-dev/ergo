@@ -6,6 +6,170 @@
         "input": {
           "items": [
             {
+              "fingerprint": null
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "fingerprint is a non-empty string",
+                  "meta": {},
+                  "op": "non_empty_string",
+                  "path": [
+                    "fingerprint"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "null",
+              "check": "c",
+              "inputs": [
+                {
+                  "name": "fingerprint",
+                  "value": null
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "null",
+            "check": "c",
+            "description": "",
+            "expression": "fingerprint is a non-empty string",
+            "inputs": [
+              {
+                "name": "fingerprint",
+                "value": null
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "non empty string rejects null",
+    "requirements": {
+      "s": {
+        "checks": {
+          "c": {
+            "op": "non_empty_string",
+            "path": [
+              "fingerprint"
+            ]
+          }
+        },
+        "from": [
+          "items"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "items": [
+            {
               "fingerprint": "abc"
             }
           ]
@@ -17,7 +181,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -27,7 +191,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -163,7 +327,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -173,7 +337,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -325,7 +489,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -335,7 +499,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -489,7 +653,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -499,7 +663,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -640,170 +804,6 @@
       {
         "description": "input 1",
         "input": {
-          "items": [
-            {
-              "fingerprint": null
-            }
-          ]
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every thing id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "description": "",
-                  "expression": "fingerprint is a non-empty string",
-                  "meta": {},
-                  "op": "non_empty_string",
-                  "path": [
-                    "fingerprint"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "satisfied",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope thing count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated thing ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "null",
-              "check": "c",
-              "inputs": [
-                {
-                  "name": "fingerprint",
-                  "value": null
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "null",
-            "check": "c",
-            "description": "",
-            "expression": "fingerprint is a non-empty string",
-            "inputs": [
-              {
-                "name": "fingerprint",
-                "value": null
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "thing"
-            }
-          }
-        ]
-      }
-    ],
-    "description": "non empty string rejects null",
-    "requirements": {
-      "s": {
-        "checks": {
-          "c": {
-            "op": "non_empty_string",
-            "path": [
-              "fingerprint"
-            ]
-          }
-        },
-        "from": [
-          "items"
-        ],
-        "id": [
-          "id"
-        ],
-        "subject_type": "thing"
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
           "repos": [
             {
               "name": "a",
@@ -822,7 +822,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope repo count is at least 1",
-                  "expression": "count(matching(repos)) >= 1",
+                  "expression": "count(matching(repos)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -832,7 +832,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "owned": {
@@ -989,7 +989,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope repo count is at least 1",
-                  "expression": "count(matching(repos)) >= 1",
+                  "expression": "count(matching(repos)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -999,7 +999,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "owned": {
@@ -1163,6 +1163,613 @@
           "repos": [
             {
               "name": "a",
+              "owner": "bob"
+            },
+            {
+              "name": "a",
+              "owner": ""
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope repo count is at least 1",
+                  "expression": "count(matching(repos)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every repo id is unique",
+                  "expression": "count(repeated(ids(repos))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "owned": {
+                  "description": "",
+                  "expression": "owner is a non-empty string",
+                  "meta": {},
+                  "op": "non_empty_string",
+                  "path": [
+                    "owner"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "some",
+              "status": "not_met",
+              "subjects": {
+                "matching": 2,
+                "total": 2
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "some"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "repo"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope repo count",
+                  "value": 2
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "repo"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated repo ids",
+                  "value": [
+                    "a"
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "repo"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "owned",
+              "inputs": [
+                {
+                  "name": "owner",
+                  "value": "bob"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": "a",
+                "type": "repo"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "owned",
+              "inputs": [
+                {
+                  "name": "owner",
+                  "value": ""
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "a",
+                "type": "repo"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "$unique_ids",
+            "description": "Every repo id is unique",
+            "expression": "count(repeated(ids(repos))) == 0",
+            "inputs": [
+              {
+                "name": "repeated repo ids",
+                "value": [
+                  "a"
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "repo"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "owned",
+            "description": "",
+            "expression": "owner is a non-empty string",
+            "inputs": [
+              {
+                "name": "owner",
+                "value": ""
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "repo"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "unique ids fails a some requirement too",
+    "requirements": {
+      "s": {
+        "checks": {
+          "owned": {
+            "op": "non_empty_string",
+            "path": [
+              "owner"
+            ]
+          }
+        },
+        "from": [
+          "repos"
+        ],
+        "id": [
+          "name"
+        ],
+        "require": "some",
+        "subject_type": "repo"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "repos": [
+            {
+              "owner": "bob"
+            },
+            {
+              "owner": "bob"
+            },
+            {
+              "owner": "carol"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope repo count is at least 1",
+                  "expression": "count(matching(repos)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every repo id is unique",
+                  "expression": "count(repeated(ids(repos))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "owned": {
+                  "description": "",
+                  "expression": "owner is a non-empty string",
+                  "meta": {},
+                  "op": "non_empty_string",
+                  "path": [
+                    "owner"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 3,
+                "total": 3
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "repo"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope repo count",
+                  "value": 3
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "repo"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated repo ids",
+                  "value": [
+                    {
+                      "owner": "bob"
+                    }
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "repo"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "owned",
+              "inputs": [
+                {
+                  "name": "owner",
+                  "value": "bob"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": {
+                  "owner": "bob"
+                },
+                "type": "repo"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "owned",
+              "inputs": [
+                {
+                  "name": "owner",
+                  "value": "bob"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": {
+                  "owner": "bob"
+                },
+                "type": "repo"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "owned",
+              "inputs": [
+                {
+                  "name": "owner",
+                  "value": "carol"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": {
+                  "owner": "carol"
+                },
+                "type": "repo"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "$unique_ids",
+            "description": "Every repo id is unique",
+            "expression": "count(repeated(ids(repos))) == 0",
+            "inputs": [
+              {
+                "name": "repeated repo ids",
+                "value": [
+                  {
+                    "owner": "bob"
+                  }
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "repo"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "unique ids counts two identical subjects as a clash without an id path",
+    "requirements": {
+      "s": {
+        "checks": {
+          "owned": {
+            "op": "non_empty_string",
+            "path": [
+              "owner"
+            ]
+          }
+        },
+        "from": [
+          "repos"
+        ],
+        "subject_type": "repo"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "repos": [
+            {
+              "owner": "bob"
+            },
+            {
+              "owner": "carol"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope repo count is at least 1",
+                  "expression": "count(matching(repos)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every repo id is unique",
+                  "expression": "count(repeated(ids(repos))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "owned": {
+                  "description": "",
+                  "expression": "owner is a non-empty string",
+                  "meta": {},
+                  "op": "non_empty_string",
+                  "path": [
+                    "owner"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 2,
+                "total": 2
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "repo"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope repo count",
+                  "value": 2
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "repo"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated repo ids",
+                  "value": [
+                    null
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "repo"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "owned",
+              "inputs": [
+                {
+                  "name": "owner",
+                  "value": "bob"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "repo"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "owned",
+              "inputs": [
+                {
+                  "name": "owner",
+                  "value": "carol"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "repo"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "$unique_ids",
+            "description": "Every repo id is unique",
+            "expression": "count(repeated(ids(repos))) == 0",
+            "inputs": [
+              {
+                "name": "repeated repo ids",
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "repo"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "unique ids counts two subjects without an id as sharing the id null",
+    "requirements": {
+      "s": {
+        "checks": {
+          "owned": {
+            "op": "non_empty_string",
+            "path": [
+              "owner"
+            ]
+          }
+        },
+        "from": [
+          "repos"
+        ],
+        "id": [
+          "name"
+        ],
+        "subject_type": "repo"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "repos": [
+            {
+              "name": "a",
               "owner": ""
             },
             {
@@ -1178,7 +1785,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope repo count is at least 1",
-                  "expression": "count(matching(repos)) >= 1",
+                  "expression": "count(matching(repos)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -1188,7 +1795,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "owned": {
@@ -1382,18 +1989,7 @@
     "cases": [
       {
         "description": "input 1",
-        "input": {
-          "repos": [
-            {
-              "name": "a",
-              "owner": "bob"
-            },
-            {
-              "name": "a",
-              "owner": ""
-            }
-          ]
-        },
+        "input": {},
         "report": {
           "compliant": false,
           "requirements": {
@@ -1401,7 +1997,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope repo count is at least 1",
-                  "expression": "count(matching(repos)) >= 1",
+                  "expression": "count(matching(repos)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -1411,212 +2007,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "owned": {
-                  "description": "",
-                  "expression": "owner is a non-empty string",
-                  "meta": {},
-                  "op": "non_empty_string",
-                  "path": [
-                    "owner"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "some",
-              "status": "not_met",
-              "subjects": {
-                "matching": 2,
-                "total": 2
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "satisfied",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "some"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "repo"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope repo count",
-                  "value": 2
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "repo"
-              }
-            },
-            {
-              "cause": "value",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated repo ids",
-                  "value": [
-                    "a"
-                  ]
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "repo"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "owned",
-              "inputs": [
-                {
-                  "name": "owner",
-                  "value": "bob"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": "a",
-                "type": "repo"
-              }
-            },
-            {
-              "cause": "value",
-              "check": "owned",
-              "inputs": [
-                {
-                  "name": "owner",
-                  "value": ""
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": "a",
-                "type": "repo"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "value",
-            "check": "$unique_ids",
-            "description": "Every repo id is unique",
-            "expression": "count(repeated(ids(repos))) == 0",
-            "inputs": [
-              {
-                "name": "repeated repo ids",
-                "value": [
-                  "a"
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "repo"
-            }
-          },
-          {
-            "cause": "value",
-            "check": "owned",
-            "description": "",
-            "expression": "owner is a non-empty string",
-            "inputs": [
-              {
-                "name": "owner",
-                "value": ""
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": "a",
-              "type": "repo"
-            }
-          }
-        ]
-      }
-    ],
-    "description": "unique ids fails a some requirement too",
-    "requirements": {
-      "s": {
-        "checks": {
-          "owned": {
-            "op": "non_empty_string",
-            "path": [
-              "owner"
-            ]
-          }
-        },
-        "from": [
-          "repos"
-        ],
-        "id": [
-          "name"
-        ],
-        "require": "some",
-        "subject_type": "repo"
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "repos": [
-            {
-              "owner": "bob"
-            },
-            {
-              "owner": "carol"
-            }
-          ]
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope repo count is at least 1",
-                  "expression": "count(matching(repos)) >= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every repo id is unique",
-                  "expression": "count(repeated(ids(repos))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "owned": {
@@ -1634,8 +2025,8 @@
               "require": "every",
               "status": "not_met",
               "subjects": {
-                "matching": 2,
-                "total": 2
+                "matching": 0,
+                "total": 0
               }
             }
           },
@@ -1661,30 +2052,12 @@
               }
             },
             {
-              "cause": "satisfied",
+              "cause": "absent",
               "check": "$min_subjects",
               "inputs": [
                 {
                   "name": "in-scope repo count",
-                  "value": 2
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "repo"
-              }
-            },
-            {
-              "cause": "value",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated repo ids",
-                  "value": [
-                    null
-                  ]
+                  "value": 0
                 }
               ],
               "passed": false,
@@ -1696,27 +2069,11 @@
             },
             {
               "cause": "satisfied",
-              "check": "owned",
+              "check": "$unique_ids",
               "inputs": [
                 {
-                  "name": "owner",
-                  "value": "bob"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "repo"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "owned",
-              "inputs": [
-                {
-                  "name": "owner",
-                  "value": "carol"
+                  "name": "repeated repo ids",
+                  "value": []
                 }
               ],
               "passed": true,
@@ -1730,16 +2087,14 @@
         },
         "violations": [
           {
-            "cause": "value",
-            "check": "$unique_ids",
-            "description": "Every repo id is unique",
-            "expression": "count(repeated(ids(repos))) == 0",
+            "cause": "absent",
+            "check": "$min_subjects",
+            "description": "The in-scope repo count is at least 1",
+            "expression": "count(matching(repos)) \u003e= 1",
             "inputs": [
               {
-                "name": "repeated repo ids",
-                "value": [
-                  null
-                ]
+                "name": "in-scope repo count",
+                "value": 0
               }
             ],
             "requirement": "s",
@@ -1751,7 +2106,7 @@
         ]
       }
     ],
-    "description": "unique ids counts two subjects without an id as sharing the id null",
+    "description": "unique ids passes with no subjects because min subjects already fails the requirement",
     "requirements": {
       "s": {
         "checks": {
@@ -1767,219 +2122,6 @@
         ],
         "id": [
           "name"
-        ],
-        "subject_type": "repo"
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "repos": [
-            {
-              "owner": "bob"
-            },
-            {
-              "owner": "bob"
-            },
-            {
-              "owner": "carol"
-            }
-          ]
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope repo count is at least 1",
-                  "expression": "count(matching(repos)) >= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every repo id is unique",
-                  "expression": "count(repeated(ids(repos))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "owned": {
-                  "description": "",
-                  "expression": "owner is a non-empty string",
-                  "meta": {},
-                  "op": "non_empty_string",
-                  "path": [
-                    "owner"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 3,
-                "total": 3
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "satisfied",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "repo"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope repo count",
-                  "value": 3
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "repo"
-              }
-            },
-            {
-              "cause": "value",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated repo ids",
-                  "value": [
-                    {
-                      "owner": "bob"
-                    }
-                  ]
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "repo"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "owned",
-              "inputs": [
-                {
-                  "name": "owner",
-                  "value": "bob"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": {
-                  "owner": "bob"
-                },
-                "type": "repo"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "owned",
-              "inputs": [
-                {
-                  "name": "owner",
-                  "value": "bob"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": {
-                  "owner": "bob"
-                },
-                "type": "repo"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "owned",
-              "inputs": [
-                {
-                  "name": "owner",
-                  "value": "carol"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": {
-                  "owner": "carol"
-                },
-                "type": "repo"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "value",
-            "check": "$unique_ids",
-            "description": "Every repo id is unique",
-            "expression": "count(repeated(ids(repos))) == 0",
-            "inputs": [
-              {
-                "name": "repeated repo ids",
-                "value": [
-                  {
-                    "owner": "bob"
-                  }
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "repo"
-            }
-          }
-        ]
-      }
-    ],
-    "description": "unique ids counts two identical subjects as a clash without an id path",
-    "requirements": {
-      "s": {
-        "checks": {
-          "owned": {
-            "op": "non_empty_string",
-            "path": [
-              "owner"
-            ]
-          }
-        },
-        "from": [
-          "repos"
         ],
         "subject_type": "repo"
       }
@@ -2003,7 +2145,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope repo count is at least 1",
-                  "expression": "count(matching(repos)) >= 1",
+                  "expression": "count(matching(repos)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -2013,7 +2155,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "owned": {
@@ -2240,148 +2382,6 @@
     "cases": [
       {
         "description": "input 1",
-        "input": {},
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope repo count is at least 1",
-                  "expression": "count(matching(repos)) >= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every repo id is unique",
-                  "expression": "count(repeated(ids(repos))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "owned": {
-                  "description": "",
-                  "expression": "owner is a non-empty string",
-                  "meta": {},
-                  "op": "non_empty_string",
-                  "path": [
-                    "owner"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 0,
-                "total": 0
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "satisfied",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "repo"
-              }
-            },
-            {
-              "cause": "absent",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope repo count",
-                  "value": 0
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "repo"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated repo ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "repo"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "absent",
-            "check": "$min_subjects",
-            "description": "The in-scope repo count is at least 1",
-            "expression": "count(matching(repos)) >= 1",
-            "inputs": [
-              {
-                "name": "in-scope repo count",
-                "value": 0
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "repo"
-            }
-          }
-        ]
-      }
-    ],
-    "description": "unique ids passes with no subjects because min subjects already fails the requirement",
-    "requirements": {
-      "s": {
-        "checks": {
-          "owned": {
-            "op": "non_empty_string",
-            "path": [
-              "owner"
-            ]
-          }
-        },
-        "from": [
-          "repos"
-        ],
-        "id": [
-          "name"
-        ],
-        "subject_type": "repo"
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
         "input": {
           "repos": [
             {
@@ -2399,7 +2399,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope repo count is at least 1",
-                  "expression": "count(matching(repos)) >= 1",
+                  "expression": "count(matching(repos)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -2409,7 +2409,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and from is well formed and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and from is well formed and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "owned": {
@@ -2633,7 +2633,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope repo count is at least 1",
-                  "expression": "count(matching(repos)) >= 1",
+                  "expression": "count(matching(repos)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -2643,7 +2643,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and from is well formed and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and from is well formed and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "owned": {
@@ -2851,7 +2851,7 @@
                     }
                   ],
                   "description": "The in-scope repo count is at least 1",
-                  "expression": "count(matching([$$params.list])) >= 1",
+                  "expression": "count(matching([$$params.list])) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -2871,7 +2871,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "owned": {
@@ -3095,7 +3095,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope repo count is at least 1",
-                  "expression": "count(matching($$input)) >= 1",
+                  "expression": "count(matching($$input)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -3105,7 +3105,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "owned": {
@@ -3251,17 +3251,17 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope repo count is at least 1",
-                  "expression": "count(matching(<invalid from>)) >= 1",
+                  "expression": "count(matching(\u003cinvalid from\u003e)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
                   "description": "Every repo id is unique",
-                  "expression": "count(repeated(ids(<invalid from>))) == 0",
+                  "expression": "count(repeated(ids(\u003cinvalid from\u003e))) == 0",
                   "meta": {}
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "owned": {
@@ -3350,7 +3350,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -3377,7 +3377,7 @@
             "cause": "value",
             "check": "$min_subjects",
             "description": "The in-scope repo count is at least 1",
-            "expression": "count(matching(<invalid from>)) >= 1",
+            "expression": "count(matching(\u003cinvalid from\u003e)) \u003e= 1",
             "inputs": [
               {
                 "name": "in-scope repo count",
@@ -3451,7 +3451,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope repo count is at least 1",
-                  "expression": "count(matching(repos)) >= 1",
+                  "expression": "count(matching(repos)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -3461,7 +3461,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "owned": {
@@ -3868,7 +3868,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope repo count is at least 1",
-                  "expression": "count(matching(repos)) >= 1",
+                  "expression": "count(matching(repos)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -3878,7 +3878,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "owned": {
@@ -4286,7 +4286,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -4296,12 +4296,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "<missing path> is a non-empty string",
+                  "expression": "\u003cmissing path\u003e is a non-empty string",
                   "meta": {},
                   "op": "non_empty_string"
                 }
@@ -4393,7 +4393,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -4420,7 +4420,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "<missing path> is a non-empty string",
+            "expression": "\u003cmissing path\u003e is a non-empty string",
             "inputs": [],
             "requirement": "s",
             "subject": {
@@ -4454,204 +4454,6 @@
       {
         "description": "input 1",
         "input": {
-          "trail": {
-            "artifacts": {
-              "app": {
-                "attestations": {
-                  "junit": {
-                    "status": "FAILED"
-                  },
-                  "pull-request": {
-                    "status": "COMPLETE"
-                  }
-                },
-                "fingerprint": "abc",
-                "tags": [
-                  "v1",
-                  "v2"
-                ]
-              }
-            }
-          }
-        },
-        "report": {
-          "compliant": true,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "$refs": [
-                    {
-                      "name": "$$params.artifact",
-                      "value": "app"
-                    }
-                  ],
-                  "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(trail.artifacts.[$$params.artifact])) >= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "$refs": [
-                    {
-                      "name": "$$params.artifact",
-                      "value": "app"
-                    }
-                  ],
-                  "description": "Every subject id is unique",
-                  "expression": "count(repeated(ids(trail.artifacts.[$$params.artifact]))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "$refs": [
-                    {
-                      "name": "$$params.field",
-                      "value": "fingerprint"
-                    }
-                  ],
-                  "description": "",
-                  "expression": "[$$params.field] is a non-empty string",
-                  "meta": {},
-                  "op": "non_empty_string",
-                  "path": [
-                    {
-                      "ref": [
-                        "$$params",
-                        "field"
-                      ]
-                    }
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "satisfied",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope subject count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated subject ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "c",
-              "inputs": [
-                {
-                  "name": "[$$params.field]",
-                  "value": "abc"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": "abc",
-                "type": "subject"
-              }
-            }
-          ]
-        },
-        "violations": []
-      }
-    ],
-    "description": "a ref step can be first or last",
-    "params": {
-      "artifact": "app",
-      "field": "fingerprint"
-    },
-    "requirements": {
-      "s": {
-        "checks": {
-          "c": {
-            "op": "non_empty_string",
-            "path": [
-              {
-                "ref": [
-                  "$$params",
-                  "field"
-                ]
-              }
-            ]
-          }
-        },
-        "from": [
-          "trail",
-          "artifacts",
-          {
-            "ref": [
-              "$$params",
-              "artifact"
-            ]
-          }
-        ],
-        "id": [
-          "fingerprint"
-        ]
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
           "items": [
             {
               "bad_t": "2026-02-30T00:00:00Z",
@@ -4676,7 +4478,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -4686,7 +4488,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -4847,7 +4649,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(build.test_runs)) >= 1",
+                  "expression": "count(matching(build.test_runs)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -4857,7 +4659,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and from is well formed and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and from is well formed and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -5022,7 +4824,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(names)) >= 1",
+                  "expression": "count(matching(names)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -5032,7 +4834,7 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and from is well formed and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and from is well formed and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
@@ -5197,6 +4999,204 @@
       {
         "description": "input 1",
         "input": {
+          "trail": {
+            "artifacts": {
+              "app": {
+                "attestations": {
+                  "junit": {
+                    "status": "FAILED"
+                  },
+                  "pull-request": {
+                    "status": "COMPLETE"
+                  }
+                },
+                "fingerprint": "abc",
+                "tags": [
+                  "v1",
+                  "v2"
+                ]
+              }
+            }
+          }
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "$refs": [
+                    {
+                      "name": "$$params.artifact",
+                      "value": "app"
+                    }
+                  ],
+                  "description": "The in-scope subject count is at least 1",
+                  "expression": "count(matching(trail.artifacts.[$$params.artifact])) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "$refs": [
+                    {
+                      "name": "$$params.artifact",
+                      "value": "app"
+                    }
+                  ],
+                  "description": "Every subject id is unique",
+                  "expression": "count(repeated(ids(trail.artifacts.[$$params.artifact]))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "$refs": [
+                    {
+                      "name": "$$params.field",
+                      "value": "fingerprint"
+                    }
+                  ],
+                  "description": "",
+                  "expression": "[$$params.field] is a non-empty string",
+                  "meta": {},
+                  "op": "non_empty_string",
+                  "path": [
+                    {
+                      "ref": [
+                        "$$params",
+                        "field"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope subject count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated subject ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "c",
+              "inputs": [
+                {
+                  "name": "[$$params.field]",
+                  "value": "abc"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": "abc",
+                "type": "subject"
+              }
+            }
+          ]
+        },
+        "violations": []
+      }
+    ],
+    "description": "a ref step can be first or last",
+    "params": {
+      "artifact": "app",
+      "field": "fingerprint"
+    },
+    "requirements": {
+      "s": {
+        "checks": {
+          "c": {
+            "op": "non_empty_string",
+            "path": [
+              {
+                "ref": [
+                  "$$params",
+                  "field"
+                ]
+              }
+            ]
+          }
+        },
+        "from": [
+          "trail",
+          "artifacts",
+          {
+            "ref": [
+              "$$params",
+              "artifact"
+            ]
+          }
+        ],
+        "id": [
+          "fingerprint"
+        ]
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
           "items": [
             {
               "id": 1,
@@ -5221,7 +5221,7 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(items)) >= 1",
+                  "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
@@ -5231,12 +5231,12 @@
                 },
                 "$well_formed": {
                   "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
                   "meta": {}
                 },
                 "c": {
                   "description": "",
-                  "expression": "<missing path> is a non-empty string",
+                  "expression": "\u003cmissing path\u003e is a non-empty string",
                   "meta": {},
                   "op": "non_empty_string"
                 }
@@ -5328,7 +5328,7 @@
             "cause": "value",
             "check": "$well_formed",
             "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
                 "name": "count(checks)",
@@ -5355,7 +5355,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "<missing path> is a non-empty string",
+            "expression": "\u003cmissing path\u003e is a non-empty string",
             "inputs": [],
             "requirement": "s",
             "subject": {
