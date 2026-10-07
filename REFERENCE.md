@@ -50,6 +50,8 @@ From your own policies, call only `ergo.report`, `ergo.report_with_params` and `
 
 ```rego
 {
+	"description": "Every production deployment is approved",
+	"meta": {"control": "SDLC-CTRL-0007", "frameworks": ["SOC 2"]},
 	"subject_type": "deployment",
 	"from": ["deployments"],
 	"id": ["id"],
@@ -62,6 +64,8 @@ From your own policies, call only `ergo.report`, `ergo.report_with_params` and `
 
 | Field          | Meaning                                                                                               | Default           |
 | -------------- | ----------------------------------------------------------------------------------------------------- | ----------------- |
+| `description`  | What the requirement asks for, in words anyone can read. It's copied into the report.                 | `""`              |
+| `meta`         | Anything else you want to keep with the requirement, like a control id or an owner. It's copied into the report. ergo never reads it. | `{}`              |
 | `subject_type` | A name for the kind of thing being checked. It appears in every row.                                  | `"subject"`       |
 | `from`         | The [path](#paths) to the subjects in the input. It can end with a [naming step](#naming-subjects).   | the whole input   |
 | `id`           | The path, inside one subject, to the value that identifies it.                                        | the whole subject |
@@ -72,6 +76,7 @@ From your own policies, call only `ergo.report`, `ergo.report_with_params` and `
 
 A few details:
 
+- `meta` can hold anything JSON can, like `{"control": "SDLC-CTRL-0007", "frameworks": ["SOC 2", "ISO 27001"], "version": 3, "reviewed": true}`. Its numbers follow the same rule as numbers anywhere else in a policy: one a 64-bit float can't hold, like `1e400`, makes the requirement [written wrong](#basic-operators). So does a key that isn't a string, or a set, which a policy written in Rego can hold but JSON can't. In the report, a number is written in its plain form, so `1.50`, `1e2` and `-0` come out as `1.5`, `100` and `0`, and the same `meta` gives the same report however it was written.
 - If `from` leads to a list, each item is a subject. If it leads to a single object, that object is the only subject. Anything else (nothing, a string, a number) gives no subjects at all, and `$min_subjects` fails.
 - If `id` doesn't lead anywhere, the subject's id is `null`. Its rows are still there.
 - No two subjects can share an id, or their rows could be identical and the report couldn't say which one failed. If two do, `$unique_ids` fails and so does the requirement. Every subject counts, even one that `applies_to` leaves out, and `null` is an id like any other, so two subjects without one clash.
@@ -81,7 +86,7 @@ A few details:
 - Under `some`, one subject has to pass all the checks by itself. Two subjects that each pass half of them don't count.
 - A requirement with no checks, a `require` other than `every` or `some`, a badly written [naming step](#naming-subjects), an `id` whose selector has a ref or `literal` deeper inside a `where` value than ergo reads, or a check that's [written wrong](#basic-operators), is never met. The `$well_formed` row says so, and says [what's wrong](#checks-ergo-adds), like `{"name": "require", "value": ["neither every nor some"]}`.
 - So is a requirement with a field that isn't in the table above, like `subject` or `requires`, because ergo would otherwise ignore it and check something you didn't mean. The `$well_formed` row lists each one in order and says what's wrong with it, the way it does for a [check that's written wrong](#checks-ergo-adds), like `{"name": "subject", "value": ["unknown field"]}`. Rows for the subjects are still there.
-- So is a requirement that isn't an object, or whose `checks` or `applies_to` isn't an object, whose `from` or `id` isn't a list, whose `min_subjects` isn't a whole number of 0 or more, or whose `subject_type` isn't a string with something besides whitespace in it, since rows and descriptions name the subject by it. `null` counts as the wrong type. `2.0` is a whole number, but `-1` and `0.5` aren't. It still has its entry in `requirements` and its `$well_formed` row, which shows each such field and what it should be, like `{"name": "from", "value": ["not a list"]}`, or the whole requirement and its value, like `{"name": "requirement", "value": 5}`. ergo then reads `checks` as empty and `applies_to` as a filter it can't read, so every subject fails `$applies` with cause `absent`, shown as `<invalid applies_to>`, and gets no other rows. It reads a `from` as giving no subjects (shown as `<invalid from>`), and an `id` as giving the id `null`. A requirement that isn't an object gives no subjects either. A `min_subjects` that isn't a number fails `$min_subjects` too.
+- So is a requirement that isn't an object, or whose `checks` or `applies_to` isn't an object, whose `from` or `id` isn't a list, whose `min_subjects` isn't a whole number of 0 or more, whose `subject_type` isn't a string with something besides whitespace in it, since rows and descriptions name the subject by it, whose `description` isn't a string, or whose `meta` isn't an object. `null` counts as the wrong type, except for `description` and `meta`: ergo only copies those, so a `null` one counts as not written, which is what YAML gives for an empty `description:`. `2.0` is a whole number, but `-1` and `0.5` aren't. It still has its entry in `requirements` and its `$well_formed` row, which shows each such field and what it should be, like `{"name": "from", "value": ["not a list"]}`, or the whole requirement and its value, like `{"name": "requirement", "value": 5}`. ergo then reads `checks` as empty and `applies_to` as a filter it can't read, so every subject fails `$applies` with cause `absent`, shown as `<invalid applies_to>`, and gets no other rows. It reads a `from` as giving no subjects (shown as `<invalid from>`), and an `id` as giving the id `null`. A requirement that isn't an object gives no subjects either. A `min_subjects` that isn't a number fails `$min_subjects` too.
 
 ### A requirement that only applies sometimes
 
@@ -450,7 +455,8 @@ Some things worth knowing:
   - a step that can't be a [key](#paths), a number out of range, a badly written [ref](#reading-from-the-input), a ref or `literal` deeper inside a value than ergo reads, or a path that starts with a [name](#naming-subjects) nothing gave
   - an `all` or `any` [nested](#nesting) too deep, or a name given twice or badly written
   - a check that isn't an object, or one where it can't go, like a custom operator inside `all`
-  - a field its op doesn't use, like `valeu` or `descripton`. Besides its own parameters, any check can have `description`, `expression`, `substitute` and `inputs`. A [custom operator](#custom-operators) can have any fields.
+  - a field its op doesn't use, like `valeu` or `descripton`. Besides its own parameters, any check can have `description`, `meta`, `expression`, `substitute` and `inputs`. A [custom operator](#custom-operators) can have any fields.
+  - a `description` that isn't a string, or a `meta` that isn't an object or holds something JSON can't, as on a [requirement](#requirements). A `null` one counts as not written. This holds for a custom operator too, and for a check inside another one. The expression doesn't show it, but the `$well_formed` row does, as `invalid description`, `invalid meta`, `meta holds a set` or `meta holds a key that isn't a string`. A number in `meta` that's out of range shows as `number out of range`.
 
   The expression says what's wrong: `<unknown op nope>`, `<missing op>`, `<invalid check>` for a check that isn't an object, `<even can't go here>` for a check where it can't go, or `<missing value>` in place of a missing parameter, as in `state == <missing value>`. The [`$well_formed` row](#checks-ergo-adds) lists each check that's written wrong, and what's wrong with it.
 
@@ -784,27 +790,34 @@ Three rules:
   "checks": {
     "$applies": {
       "description": "The deployment is in scope",
-      "expression": "environment == \"prod\""
+      "expression": "environment == \"prod\"",
+      "meta": {}
     },
     "$min_subjects": {
       "description": "The in-scope deployment count is at least 1",
-      "expression": "count(matching(deployments)) >= 1"
+      "expression": "count(matching(deployments)) >= 1",
+      "meta": {}
     },
     "$unique_ids": {
       "description": "Every deployment id is unique",
-      "expression": "count(repeated(ids(deployments))) == 0"
+      "expression": "count(repeated(ids(deployments))) == 0",
+      "meta": {}
     },
     "$well_formed": {
       "description": "The requirement is written correctly",
-      "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right"
+      "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+      "meta": {}
     },
     "approved": {
       "description": "Someone approved the deployment",
       "expression": "approved_by is a non-empty string",
+      "meta": {},
       "op": "non_empty_string",
       "path": ["approved_by"]
     }
   },
+  "description": "Every production deployment is approved",
+  "meta": {},
   "require": "every",
   "status": "not_met",
   "subjects": { "matching": 2, "total": 3 }
@@ -821,7 +834,9 @@ Three rules:
 
 To tell whether a requirement passed, compare `status` with `"met"` (or `"not_applicable"`, if that counts as passing for you). Don't test for `"not_met"`, so a value you didn't expect counts as a failure.
 
-`subjects.total` counts every subject found at `from`, and `subjects.matching` counts the ones left after `applies_to`. `checks` holds each check as you wrote it, plus the `expression` ergo rendered from it. If you write your own `expression`, yours is used, as long as it's a string. Any other value is ignored, and ergo renders the expression as if it weren't there. A check that uses a [`ref`](#reading-from-the-input) also gets `$refs`: the name and value of each one, as read for this report. The `$` marks it as ergo's, so it can't be mixed up with a field of your own. It also holds the [checks ergo adds](#checks-ergo-adds), each with a `description` and an `expression`.
+`description` and `meta` are the requirement's, or `""` and `{}` when it has none, with the numbers in `meta` in their plain form. They're always there, so you can read `meta.control` without first checking that `meta` exists.
+
+`subjects.total` counts every subject found at `from`, and `subjects.matching` counts the ones left after `applies_to`. `checks` holds each check as you wrote it, plus the `expression` ergo rendered from it. Each check has a `description` and a `meta` too, `""` and `{}` when you didn't write them. A filter in `applies_to` can have them as well, and they're checked the same way, but the report doesn't copy them: its filters all share the one `$applies` entry, with ergo's own description. A `description` or `meta` of the wrong type makes the requirement or the check [written wrong](#basic-operators), and the report shows `""` or `{}` in its place, so a tool always finds a string and an object there. If you write your own `expression`, yours is used, as long as it's a string. Any other value is ignored, and ergo renders the expression as if it weren't there. A check that uses a [`ref`](#reading-from-the-input) also gets `$refs`: the name and value of each one, as read for this report. The `$` marks it as ergo's, so it can't be mixed up with a field of your own. It also holds the [checks ergo adds](#checks-ergo-adds), each with a `description`, an `expression` and an empty `meta`.
 
 In an expression, a value written in the policy is shown as JSON, written the same way whatever the policy looked like, so anyone can produce the same text:
 

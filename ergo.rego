@@ -53,6 +53,45 @@ _has_type("subject_type", v) if {
 	trim_space(v) != ""
 }
 
+_has_type("description", v) if is_string(v)
+
+_has_type("description", null)
+
+_has_type("meta", v) if is_object(v)
+
+_has_type("meta", null)
+
+_meta_problems(m) := ({"holds a key that isn't a string" |
+	walk(m, [_, x])
+	is_object(x)
+	some k in object.keys(x)
+	not is_string(k)
+} | {"holds a set" |
+	walk(m, [_, x])
+	is_set(x)
+}) | {"number out of range" | _out_of_range(m)}
+
+_meta_shaped(v) if {
+	is_object(v)
+	count(_meta_problems(v)) == 0
+}
+
+_req_meta_problems(req) := {["meta", p] |
+	is_object(req)
+	is_object(object.get(req, "meta", null))
+	some p in _meta_problems(req.meta)
+}
+
+_reported_description(x) := object.get(x, "description", "") if {
+	is_object(x)
+	is_string(object.get(x, "description", ""))
+} else := ""
+
+_reported_meta(x) := json.unmarshal(_json_text(x.meta)) if {
+	is_object(x)
+	_meta_shaped(object.get(x, "meta", null))
+} else := {}
+
 default _bad_applies_to(_) := false
 
 _bad_applies_to(req) if {
@@ -83,9 +122,11 @@ _wrong_type_problems := {
 	"id": "not a list",
 	"min_subjects": "not a whole number of 0 or more",
 	"subject_type": "empty or not a string",
+	"description": "not a string",
+	"meta": "not an object",
 }
 
-_req_problems(req) := union({_type_problems(req), _range_problems(req), _unknown_problems(req), _checks_problems(req), _require_problems(req), _path_problems(req, "from"), _path_problems(req, "id"), _naming_step_problems(req), _where_problems(req)})
+_req_problems(req) := union({_req_meta_problems(req), _type_problems(req), _range_problems(req), _unknown_problems(req), _checks_problems(req), _require_problems(req), _path_problems(req, "from"), _path_problems(req, "id"), _naming_step_problems(req), _where_problems(req)})
 
 _type_problems(req) := {[f, _wrong_type_problems[f]] |
 	some f in _wrong_typed_fields(req)
@@ -1335,7 +1376,7 @@ _nested_ops := {
 	"check": [set(), (_leaf_ops | {"all", "any", "any_of"}), (_leaf_ops | {"any_of"})],
 }
 
-_field_problems(node) := union({_unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _each_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node)})
+_field_problems(node) := union({_wording_problem(node), _unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _each_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node)})
 
 _missing_fields_problem(node) := {concat("", ["missing ", f]) |
 	some f in object.get(_required_fields, node.op, set())
@@ -1354,7 +1395,19 @@ _unknown_fields_problem(node) := {concat("", ["unknown field ", _text(f)]) |
 	node.op in object.keys(_op_fields)
 	some f in object.keys(node)
 	not f in _op_fields[node.op]
-	not f in {"op", "description", "expression", "substitute", "inputs", "as", "each"}
+	not f in {"op", "description", "meta", "expression", "substitute", "inputs", "as", "each"}
+}
+
+_wording_problem(node) := ({"invalid description" |
+	"description" in object.keys(node)
+	not _has_type("description", node.description)
+} | {"invalid meta" |
+	"meta" in object.keys(node)
+	not _has_type("meta", node.meta)
+}) | {concat("", ["meta ", p]) |
+	"meta" in object.keys(node)
+	is_object(node.meta)
+	some p in (_meta_problems(node.meta) - {"number out of range"})
 }
 
 _op_fields := object.union(_required_fields, {
@@ -2616,7 +2669,7 @@ _row_inputs(subj, check, item) := array.concat(
 	_check_inputs(subj, check.substitute, item),
 ) if check.substitute
 
-_check_def(check, item) := _with_refs(_described(check, item), check)
+_check_def(check, item) := _with_refs(object.union(object.remove(_described(check, item), {"description", "meta"}), {"description": _reported_description(check), "meta": _reported_meta(check)}), check)
 
 _with_refs(def, checked) := object.union(def, {"$refs": _ref_inputs(checked)}) if count(_check_refs(checked)) > 0
 
@@ -2711,6 +2764,7 @@ default _well_formed(_) := false
 
 _well_formed(req) if {
 	_typed(req)
+	_req_meta_problems(req) == set()
 	_unknown_req_fields(req) == []
 	count(_checks_of(req)) > 0
 	_require_of(req) in {"every", "some"}
@@ -2777,7 +2831,9 @@ _applies_def(req) := {} if {
 
 _applies_to_names(req) := sort(object.keys(_applies_to_of(req))) if is_object(_applies_to_of(req))
 
-_requirement_check_defs(req) := object.union(
+_requirement_check_defs(req) := {name: object.union({"meta": {}}, def) | some name, def in _requirement_checks_written_or_added(req)}
+
+_requirement_checks_written_or_added(req) := object.union(
 	object.union(
 		{name: _check_def(check, _subject_item_name(req)) | some name, check in _checks_of(req)},
 		object.union(_min_subjects_def(req), _unique_ids_def(req)),
@@ -2983,6 +3039,8 @@ report_with_params(doc, params, policy) := r if {
 _report_of(doc, policy) := {
 	"compliant": _policy_compliant(doc, policy),
 	"requirements": {name: {
+		"description": _reported_description(req),
+		"meta": _reported_meta(req),
 		"require": _require_of(req),
 		"status": _requirement_status(doc, req),
 		"subjects": {"total": count(_raw_subjects(doc, req)), "matching": count(_matching_subjects(doc, req))},
