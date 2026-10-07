@@ -65,7 +65,7 @@ From your own policies, call only `ergo.report`, `ergo.report_with_params` and `
 | Field          | Meaning                                                                                               | Default           |
 | -------------- | ----------------------------------------------------------------------------------------------------- | ----------------- |
 | `description`  | What the requirement asks for, in words anyone can read. It's copied into the report.                 | `""`              |
-| `meta`         | Anything else you want to keep with the requirement, like a control id or an owner. It's copied into the report. ergo never reads it. | none              |
+| `meta`         | Anything else you want to keep with the requirement, like a control id or an owner. It's copied into the report. ergo never reads it. | `{}`              |
 | `subject_type` | A name for the kind of thing being checked. It appears in every row.                                  | `"subject"`       |
 | `from`         | The [path](#paths) to the subjects in the input. It can end with a [naming step](#naming-subjects).   | the whole input   |
 | `id`           | The path, inside one subject, to the value that identifies it.                                        | the whole subject |
@@ -790,28 +790,34 @@ Three rules:
   "checks": {
     "$applies": {
       "description": "The deployment is in scope",
-      "expression": "environment == \"prod\""
+      "expression": "environment == \"prod\"",
+      "meta": {}
     },
     "$min_subjects": {
       "description": "The in-scope deployment count is at least 1",
-      "expression": "count(matching(deployments)) >= 1"
+      "expression": "count(matching(deployments)) >= 1",
+      "meta": {}
     },
     "$unique_ids": {
       "description": "Every deployment id is unique",
-      "expression": "count(repeated(ids(deployments))) == 0"
+      "expression": "count(repeated(ids(deployments))) == 0",
+      "meta": {}
     },
     "$well_formed": {
       "description": "The requirement is written correctly",
-      "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right"
+      "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+      "meta": {}
     },
     "approved": {
       "description": "Someone approved the deployment",
       "expression": "approved_by is a non-empty string",
+      "meta": {},
       "op": "non_empty_string",
       "path": ["approved_by"]
     }
   },
   "description": "Every production deployment is approved",
+  "meta": {},
   "require": "every",
   "status": "not_met",
   "subjects": { "matching": 2, "total": 3 }
@@ -828,9 +834,9 @@ Three rules:
 
 To tell whether a requirement passed, compare `status` with `"met"` (or `"not_applicable"`, if that counts as passing for you). Don't test for `"not_met"`, so a value you didn't expect counts as a failure.
 
-`description` is the requirement's, or `""` when it has none, so there's always text to show. `meta` is there only when the requirement has one, as written.
+`description` and `meta` are the requirement's, as written, or `""` and `{}` when it has none. They're always there, so you can read `meta.control` without first checking that `meta` exists.
 
-`subjects.total` counts every subject found at `from`, and `subjects.matching` counts the ones left after `applies_to`. `checks` holds each check as you wrote it, plus the `expression` ergo rendered from it. Each check has a `description` too, `""` when you didn't write one. A `description` or `meta` of the wrong type makes the requirement or the check [written wrong](#basic-operators), and the report leaves it out, showing `""` as the description, so a tool only ever finds text there. If you write your own `expression`, yours is used, as long as it's a string. Any other value is ignored, and ergo renders the expression as if it weren't there. A check that uses a [`ref`](#reading-from-the-input) also gets `$refs`: the name and value of each one, as read for this report. The `$` marks it as ergo's, so it can't be mixed up with a field of your own. It also holds the [checks ergo adds](#checks-ergo-adds), each with a `description` and an `expression`.
+`subjects.total` counts every subject found at `from`, and `subjects.matching` counts the ones left after `applies_to`. `checks` holds each check as you wrote it, plus the `expression` ergo rendered from it. Each check has a `description` and a `meta` too, `""` and `{}` when you didn't write them. A `description` or `meta` of the wrong type makes the requirement or the check [written wrong](#basic-operators), and the report shows `""` or `{}` in its place, so a tool only ever finds text and an object of text there. If you write your own `expression`, yours is used, as long as it's a string. Any other value is ignored, and ergo renders the expression as if it weren't there. A check that uses a [`ref`](#reading-from-the-input) also gets `$refs`: the name and value of each one, as read for this report. The `$` marks it as ergo's, so it can't be mixed up with a field of your own. It also holds the [checks ergo adds](#checks-ergo-adds), each with a `description`, an `expression` and an empty `meta`.
 
 In an expression, a value written in the policy is shown as JSON, written the same way whatever the policy looked like, so anyone can produce the same text:
 

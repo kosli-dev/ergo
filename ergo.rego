@@ -79,7 +79,7 @@ _reported_description(x) := object.get(x, "description", "") if {
 	is_string(object.get(x, "description", ""))
 } else := ""
 
-_reported_meta(x) := {"meta": x.meta} if {
+_reported_meta(x) := x.meta if {
 	is_object(x)
 	_meta_shaped(object.get(x, "meta", null))
 } else := {}
@@ -2657,7 +2657,7 @@ _row_inputs(subj, check, item) := array.concat(
 	_check_inputs(subj, check.substitute, item),
 ) if check.substitute
 
-_check_def(check, item) := _with_refs(object.union(object.remove(_described(check, item), {"description", "meta"}), object.union({"description": _reported_description(check)}, _reported_meta(check))), check)
+_check_def(check, item) := _with_refs(object.union(object.remove(_described(check, item), {"description", "meta"}), {"description": _reported_description(check), "meta": _reported_meta(check)}), check)
 
 _with_refs(def, checked) := object.union(def, {"$refs": _ref_inputs(checked)}) if count(_check_refs(checked)) > 0
 
@@ -2818,7 +2818,9 @@ _applies_def(req) := {} if {
 
 _applies_to_names(req) := sort(object.keys(_applies_to_of(req))) if is_object(_applies_to_of(req))
 
-_requirement_check_defs(req) := object.union(
+_requirement_check_defs(req) := {name: object.union({"meta": {}}, def) | some name, def in _requirement_checks_written_or_added(req)}
+
+_requirement_checks_written_or_added(req) := object.union(
 	object.union(
 		{name: _check_def(check, _subject_item_name(req)) | some name, check in _checks_of(req)},
 		object.union(_min_subjects_def(req), _unique_ids_def(req)),
@@ -3031,7 +3033,7 @@ _report_of(doc, policy) := {
 			"subjects": {"total": count(_raw_subjects(doc, req)), "matching": count(_matching_subjects(doc, req))},
 			"checks": _requirement_check_defs(req),
 		},
-		_reported_meta(req),
+		{"meta": _reported_meta(req)},
 	) |
 		some name, req in policy
 	},

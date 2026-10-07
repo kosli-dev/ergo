@@ -2522,10 +2522,10 @@ test_a_requirement_description_and_meta_are_carried_into_the_report if {
 	rows_for(rep, "s", "$well_formed")[0].passed == true
 }
 
-test_a_requirement_without_a_description_reports_an_empty_one_so_tools_always_find_text if {
+test_a_requirement_without_a_description_or_meta_reports_empty_ones_so_tools_can_read_them_without_checking if {
 	rep := ergo.report({"items": [{"id": 1}]}, {"s": typed_req})
 	rep.requirements.s.description == ""
-	not "meta" in object.keys(rep.requirements.s)
+	rep.requirements.s.meta == {}
 }
 
 test_an_empty_requirement_meta_is_well_formed_and_reported if {
@@ -2538,17 +2538,17 @@ test_a_requirement_description_or_meta_of_the_wrong_type_never_reaches_the_repor
 	reps := [ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"description": d, "meta": m})}) |
 		some [d, m] in [[5, "x"], [null, null], [["a"], {"a": 1}]]
 	]
-	[[r.requirements.s.status, r.requirements.s.description, "meta" in object.keys(r.requirements.s)] | some r in reps] == [
-		["not_met", "", false],
-		["not_met", "", false],
-		["not_met", "", false],
+	[[r.requirements.s.status, r.requirements.s.description, r.requirements.s.meta] | some r in reps] == [
+		["not_met", "", {}],
+		["not_met", "", {}],
+		["not_met", "", {}],
 	]
 }
 
-test_a_requirement_that_is_not_an_object_reports_an_empty_description if {
+test_a_requirement_that_is_not_an_object_reports_an_empty_description_and_meta if {
 	rep := ergo.report({"items": [{"id": 1}]}, {"s": 5})
 	rep.requirements.s.description == ""
-	not "meta" in object.keys(rep.requirements.s)
+	rep.requirements.s.meta == {}
 }
 
 badly_written_requirements := {
@@ -3011,10 +3011,10 @@ test_a_check_meta_is_carried_into_the_report if {
 	rep.requirements.s.checks.c.meta == {"severity": "high", "refs": ["RB-1"]}
 }
 
-test_a_check_without_a_description_reports_an_empty_one_so_tools_always_find_text if {
+test_a_check_without_a_description_or_meta_reports_empty_ones_so_tools_can_read_them_without_checking if {
 	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["n"]}}}})
 	rep.requirements.s.checks.c.description == ""
-	not "meta" in object.keys(rep.requirements.s.checks.c)
+	rep.requirements.s.checks.c.meta == {}
 }
 
 test_a_check_description_or_meta_of_the_wrong_type_is_written_wrong_and_never_reaches_the_report if {
@@ -3030,8 +3030,8 @@ test_a_check_description_or_meta_of_the_wrong_type_is_written_wrong_and_never_re
 	]
 	[[r.check, r.passed, r.cause] | some r in rep.results; r.check in {"d", "m", "n"}] == [["d", false, "ill_formed"], ["m", false, "ill_formed"], ["n", false, "ill_formed"]]
 	rep.requirements.s.checks.d.description == ""
-	not "meta" in object.keys(rep.requirements.s.checks.m)
-	not "meta" in object.keys(rep.requirements.s.checks.n)
+	rep.requirements.s.checks.m.meta == {}
+	rep.requirements.s.checks.n.meta == {}
 	[v.description | some v in ergo.violations(rep); v.check == "d"] == [""]
 }
 
@@ -3061,6 +3061,17 @@ test_a_bad_meta_or_description_inside_a_check_is_found_where_it_sits if {
 test_a_custom_op_keeps_its_own_fields_but_not_a_description_or_meta_of_the_wrong_type if {
 	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "multiple_of", "path": ["n"], "by": 1, "description": 5, "meta": "x"}}}})
 	problem_inputs(rep) == [{"name": "checks.c", "value": ["invalid description", "invalid meta"]}]
+}
+
+test_every_check_in_the_report_has_a_description_and_meta_even_the_ones_ergo_adds if {
+	rep := ergo.report({"items": [{"id": 1, "env": "prod"}]}, {"s": {"from": ["items"], "id": ["id"], "applies_to": {"f": {"op": "equals", "path": ["env"], "value": "prod"}}, "checks": {"c": {"op": "equals", "path": ["id"], "value": {"ref": ["$$params", "p"]}}}}})
+	{name: [is_string(def.description), def.meta] | some name, def in rep.requirements.s.checks} == {
+		"$applies": [true, {}],
+		"$min_subjects": [true, {}],
+		"$unique_ids": [true, {}],
+		"$well_formed": [true, {}],
+		"c": [true, {}],
+	}
 }
 
 test_a_custom_op_keeps_any_fields_it_likes if {
@@ -3493,7 +3504,7 @@ test_report_has_one_entry_per_declared_requirement if {
 
 test_requirement_entry_carries_exactly_the_documented_keys if {
 	rep := solo({"state": "MERGED"}, is_merged)
-	object.keys(rep.requirements.s) == {"description", "require", "status", "subjects", "checks"}
+	object.keys(rep.requirements.s) == {"description", "meta", "require", "status", "subjects", "checks"}
 }
 
 test_report_carries_exactly_the_documented_keys if {
@@ -3930,6 +3941,7 @@ test_a_user_check_named_min_subjects_is_not_clobbered if {
 
 	rep.requirements.s.checks.min_subjects == {
 		"description": "user check",
+		"meta": {},
 		"op": "equals",
 		"path": ["id"],
 		"value": "zzz",
