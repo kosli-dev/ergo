@@ -2711,12 +2711,27 @@ test_a_number_a_float_cannot_hold_is_copied_into_the_report_as_written if {
 	json.marshal([named_values(row.inputs) | some row in rep.results; row.check == "c"]) == `[[["n",1e400]]]`
 }
 
-test_a_report_holding_a_key_json_cannot_hold_is_left_as_written_so_rows_still_name_their_requirement if {
-	rep := ergo.report({"items": [{"id": 1.50}]}, {1: typed_req})
-	every row in rep.results {
-		row.requirement == 1
-		rep.requirements[row.requirement].status == "not_met"
+test_a_number_is_written_in_its_plain_form_even_when_it_is_the_only_one_spelled_another_way if {
+	written := [json.marshal([row.inputs[0].value | some row in ergo.report({"items": [{"id": "a", "n": n}]}, {"s": object.union(typed_req, {"checks": {"c": {"op": "present", "path": ["n"]}}})}).results; row.check == "c"]) |
+		some n in [1.50, -0, 1e2, 2.5E-3, 10.0, [7, -0.0]]
+	]
+	written == ["[1.5]", "[0]", "[100]", "[0.0025]", "[10]", "[[7,0]]"]
+}
+
+test_a_report_from_a_policy_json_cannot_hold_is_left_as_built_so_rows_still_name_their_requirement if {
+	every policy in [{1: typed_req}, [typed_req]] {
+		rep := ergo.report({"items": [{"id": 1.50}]}, policy)
+		every row in rep.results {
+			rep.requirements[row.requirement].status == "not_met"
+		}
 	}
+}
+
+test_a_report_from_an_input_json_cannot_hold_is_left_as_built if {
+	rep := ergo.report({"items": [{"id": 1.50, "t": {"a"}}]}, {"s": object.union(typed_req, {"checks": {"c": {"op": "present", "path": ["t"]}}})})
+	some row in rep.results
+	row.check == "c"
+	is_set(row.inputs[0].value)
 }
 
 test_a_requirement_meta_that_json_cannot_hold_fails_well_formed_and_is_reported_empty if {
