@@ -2774,16 +2774,27 @@ _starts_with_dollar_key(p) if _first_dollar_key(0, p[0])
 _min_subjects_def(req) := {"$min_subjects": _with_refs(
 	{
 		"description": _min_subjects_description(req),
-		"expression": concat("", [_matching_count_name(req), " >= ", _literal_text(_min_subjects_of(req))]),
+		"expression": _min_subjects_expression(req),
 	},
 	{"from": _listed_from(req)},
 )}
+
+_min_subjects_expression(req) := concat("", [_matching_count_name(req), " >= ", _literal_text(_min_subjects_of(req))]) if not _only_reads_from(req)
+
+_min_subjects_expression(req) := concat("", [_from_text(req), " can be read"]) if _only_reads_from(req)
+
+_only_reads_from(req) if {
+	_min_subjects_of(req) == 0
+	not _keys_step(req)
+}
 
 _listed_from(req) := _from_of(req) if is_array(_from_of(req))
 
 _listed_from(req) := [] if not is_array(_from_of(req))
 
-_min_subjects_description(req) := concat("", ["The ", _subject_count_name(req), " is at least ", _literal_text(_min_subjects_of(req))])
+_min_subjects_description(req) := concat("", ["The ", _subject_count_name(req), " is at least ", _literal_text(_min_subjects_of(req))]) if not _only_reads_from(req)
+
+_min_subjects_description(req) := concat("", ["The ", _text(_subject_type_of(req)), " list can be read"]) if _only_reads_from(req)
 
 _subject_count_name(req) := concat(" ", ["in-scope", _text(_subject_type_of(req)), "count"])
 

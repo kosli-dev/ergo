@@ -2390,6 +2390,35 @@ test_min_subjects_leaves_a_keys_from_alone_because_each_key_is_a_subject_even_wh
 	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "value"]]
 }
 
+test_min_subjects_at_zero_says_it_only_checks_that_from_can_be_read if {
+	def := ergo.report({"items": []}, min_subjects_req(0)).requirements.s.checks["$min_subjects"]
+	def.description == "The thing list can be read"
+	def.expression == "items can be read"
+}
+
+test_min_subjects_at_zero_names_the_input_when_there_is_no_from if {
+	req := {"s": object.union(min_subjects_req(0).s, {"from": []})}
+	ergo.report({}, req).requirements.s.checks["$min_subjects"].expression == "$$input can be read"
+}
+
+test_min_subjects_at_zero_keeps_the_count_with_a_keys_step_because_from_is_not_read if {
+	req := {"s": object.union(min_subjects_req(0).s, {"from": ["items", {"each_as": "item", "keys": ["a"]}]})}
+	def := ergo.report({}, req).requirements.s.checks["$min_subjects"]
+	def.description == "The in-scope thing count is at least 0"
+	def.expression == "count(matching(items)) >= 0"
+}
+
+test_min_subjects_above_zero_keeps_the_count if {
+	def := ergo.report({"items": []}, min_subjects_req(1)).requirements.s.checks["$min_subjects"]
+	def.description == "The in-scope thing count is at least 1"
+	def.expression == "count(matching(items)) >= 1"
+}
+
+test_a_violation_for_a_from_that_reads_nothing_says_what_failed if {
+	rep := ergo.report({}, min_subjects_req(0))
+	[[v.description, v.expression, v.cause] | some v in ergo.violations(rep)] == [["The thing list can be read", "items can be read", "absent"]]
+}
+
 test_a_from_that_reads_nothing_lists_its_min_subjects_row_as_a_violation if {
 	rep := ergo.report({}, min_subjects_req(0))
 	[[v.check, v.cause] | some v in ergo.violations(rep)] == [["$min_subjects", "absent"]]
@@ -3408,7 +3437,7 @@ test_the_checks_ergo_adds_are_described_in_plain_words if {
 	defs["$applies"].description == "The deployment is in scope"
 	defs["$well_formed"].description == "The requirement is written correctly"
 	plain_defs({"subject_type": "deployment", "min_subjects": 2})["$min_subjects"].description == "The in-scope deployment count is at least 2"
-	plain_defs({"subject_type": "deployment", "min_subjects": 0})["$min_subjects"].description == "The in-scope deployment count is at least 0"
+	plain_defs({"subject_type": "deployment", "min_subjects": 0})["$min_subjects"].description == "The deployment list can be read"
 	plain_defs({})["$min_subjects"].description == "The in-scope subject count is at least 1"
 	plain_defs({})["$applies"].description == "The subject is in scope"
 }
