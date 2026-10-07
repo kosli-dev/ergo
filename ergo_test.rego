@@ -2317,6 +2317,14 @@ test_min_subjects_fails_with_the_cause_of_a_from_it_cannot_read_even_at_zero if 
 	}
 }
 
+test_a_from_that_reads_nothing_fails_a_some_requirement_at_zero_which_an_empty_list_leaves_not_applicable if {
+	req := {"s": object.union(min_subjects_req(0).s, {"require": "some"})}
+	missing := ergo.report({}, req)
+	[missing.requirements.s.status, missing.compliant] == ["not_met", false]
+	empty := ergo.report({"items": []}, req)
+	[empty.requirements.s.status, empty.compliant] == ["not_applicable", true]
+}
+
 test_min_subjects_fails_as_value_on_an_empty_list_so_a_missing_one_stays_apart if {
 	rep := ergo.report({"items": []}, min_subjects_req(1))
 	[[r.passed, r.cause] | some r in rows_for(rep, "s", "$min_subjects")] == [[false, "value"]]
