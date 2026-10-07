@@ -1,6 +1,6 @@
 # ergo in Rust
 
-An experiment: ergo written in Rust and checked against the [conformance suite](../../conformance/README.md). It knows every built-in operator, `all` and `any` with `each`, `as` and nesting, `any_of`, substitutes, `applies_to`, and naming steps in `from`. A requirement that uses anything else fails `$well_formed`, so it never passes by accident.
+An experiment: ergo written in Rust and checked against the [conformance suite](../../conformance/README.md). It passes 1,682 of the 1,683 cases. The one it fails has a wrong expected report, because OPA 1.19 compares some numbers wrongly (see [FINDINGS.md](../../conformance/FINDINGS.md)).
 
 Run the suite with Docker, so you don't need Rust installed:
 
@@ -22,8 +22,8 @@ docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registr
 opa eval -d ergo.rego -d <folder>/bench.rego -d <folder>/data.json -i <folder>/input-1000.json --metrics 'count(data.bench.report.results)'
 ```
 
-On 7 October 2026 both gave the same reports. OPA 1.19 took 0.9 s and 8.5 s to evaluate them, and the Rust port 9 ms and 91 ms.
+On 7 October 2026 both gave the same reports. OPA 1.19 took 0.9 s and 8.5 s to evaluate them, and the Rust port 12.5 ms and 200 ms.
 
 Run the Docker commands from the root of the repo. Keep the build in `/target` and out of `ports/rust/target`, because Cargo writes JSON files there and `opa test .` would load them as data.
 
-What it doesn't do yet: selectors, refs used as path steps, custom operators, and the details `$well_formed` and expressions give when a requirement is written wrong.
+What it doesn't do: custom operators, which only exist in Rego for now.

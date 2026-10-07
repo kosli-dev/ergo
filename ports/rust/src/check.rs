@@ -30,13 +30,15 @@ fn values_of(v: &Value) -> Option<Values<'_>> {
     if let Some(r) = ref_of(v) {
         return known_ref(r).then_some(Values::Ref(r));
     }
-    let items = literal_of(v).unwrap_or(v).as_array()?;
-    items.iter().map(known_arg).collect::<Option<Vec<_>>>().map(Values::List)
+    if let Some(l) = literal_of(v) {
+        return Some(Values::List(l.as_array()?.iter().map(Arg::Literal).collect()));
+    }
+    v.as_array()?.iter().map(known_arg).collect::<Option<Vec<_>>>().map(Values::List)
 }
 
 pub struct Leaf<'a> {
     pub op: &'a str,
-    pub paths: Vec<&'a [Value]>,
+    pub paths: Vec<&'a Value>,
     value: Option<Arg<'a>>,
     values: Option<Values<'a>>,
     patterns: Option<Values<'a>>,
@@ -47,8 +49,8 @@ pub struct Leaf<'a> {
 
 pub struct List<'a> {
     every: bool,
-    path: &'a [Value],
-    each: Option<&'a [Value]>,
+    path: &'a Value,
+    each: Option<&'a Value>,
     as_: Option<&'a str>,
     inner: Box<Check<'a>>,
 }
@@ -56,18 +58,18 @@ pub struct List<'a> {
 pub enum Kind<'a> {
     Leaf(Leaf<'a>),
     List(List<'a>),
-    AnyOf(Vec<(Value, Vec<Check<'a>>)>),
+    AnyOf(Vec<Vec<Check<'a>>>),
 }
 
 pub enum Spec<'a> {
-    Path(&'a [Value]),
-    Each(&'a [Value], &'a [Value]),
+    Path(&'a Value),
+    Each(&'a Value),
 }
 
+static EMPTY_PATH: Value = Value::Array(vec![]);
+
 pub struct Check<'a> {
-    pub raw: &'a Map<String, Value>,
     pub kind: Kind<'a>,
-    expression: Option<&'a str>,
     inputs: Option<Vec<Spec<'a>>>,
     pub substitute: Option<Box<Check<'a>>>,
 }
@@ -86,16 +88,23 @@ impl Place {
     }
 }
 
-fn path_in<'a>(v: Option<&'a Value>, place: &Place) -> Option<&'a [Value]> {
-    let p = v?.as_array()?;
+fn path_in<'a>(v: Option<&'a Value>, place: &Place) -> Option<&'a Value> {
+    let v = v?;
+    if matches!(v, Value::String(_) | Value::Number(_)) {
+        return Some(v);
+    }
+    if v.is_object() && literal_of(v).is_none() && ref_of(v).is_none() {
+        return Some(v);
+    }
+    let p = v.as_array()?;
     if !path_ok(p) {
         return None;
     }
     match p.first() {
-        Some(Value::String(s)) if s == "$$input" || s == "$$params" => Some(p),
+        Some(Value::String(s)) if s == "$$input" || s == "$$params" => Some(v),
         Some(Value::String(s)) if s.starts_with("$$") => None,
-        Some(Value::String(s)) if s.starts_with('$') => place.given.iter().any(|g| g == &s[1..]).then_some(p.as_slice()),
-        _ => Some(p),
+        Some(Value::String(s)) if s.starts_with('$') => place.given.iter().any(|g| g == &s[1..]).then_some(v),
+        _ => Some(v),
     }
 }
 
@@ -176,7 +185,7 @@ fn specs<'a>(v: &'a Value, place: &Place) -> Option<Vec<Spec<'a>>> {
         .map(|s| match s {
             Value::Array(_) => path_in(Some(s), place).map(Spec::Path),
             Value::Object(m) if m.keys().all(|k| k == "path" || k == "each") => {
-                let empty: &'a [Value] = &[];
+                let empty: &'a Value = &EMPTY_PATH;
                 let path = match m.get("path") {
                     None => empty,
                     p => path_in(p, place)?,
@@ -185,7 +194,8 @@ fn specs<'a>(v: &'a Value, place: &Place) -> Option<Vec<Spec<'a>>> {
                     None => empty,
                     e => path_in(e, place)?,
                 };
-                Some(Spec::Each(path, each))
+                let _ = each;
+                Some(Spec::Each(path))
             }
             _ => None,
         })
@@ -198,11 +208,6 @@ pub fn parse<'a>(v: &'a Value, place: &Place) -> Option<Check<'a>> {
     if !described(raw) {
         return None;
     }
-    let expression = match raw.get("expression") {
-        None => None,
-        Some(Value::String(s)) => Some(s.as_str()),
-        Some(_) => return None,
-    };
     let inputs = match raw.get("inputs") {
         None => None,
         Some(v) => Some(specs(v, place)?),
@@ -256,9 +261,9 @@ pub fn parse<'a>(v: &'a Value, place: &Place) -> Option<Check<'a>> {
                 return None;
             }
             let mut options = vec![];
-            for (name, group) in groups {
+            for (_, group) in groups {
                 let checks = group.as_array().filter(|g| !g.is_empty())?;
-                options.push((name, checks.iter().map(|c| parse(c, &option_place)).collect::<Option<Vec<_>>>()?));
+                options.push(checks.iter().map(|c| parse(c, &option_place)).collect::<Option<Vec<_>>>()?);
             }
             (Kind::AnyOf(options), &["options"])
         }
@@ -271,54 +276,10 @@ pub fn parse<'a>(v: &'a Value, place: &Place) -> Option<Check<'a>> {
     if !raw.keys().all(|k| common.contains(&k.as_str()) || fields.contains(&k.as_str())) {
         return None;
     }
-    Some(Check { raw, kind, expression, inputs, substitute })
-}
-
-fn arg_text(a: &Arg) -> String {
-    match a {
-        Arg::Literal(v) => literal_text(v),
-        Arg::Ref(r) => ref_text(r),
-    }
-}
-
-fn list_text(values: &Values) -> String {
-    match values {
-        Values::Ref(r) => ref_text(r),
-        Values::List(items) => {
-            let mut texts: Vec<String> = items.iter().map(arg_text).collect();
-            texts.sort();
-            format!("[{}]", texts.join(", "))
-        }
-    }
+    Some(Check { kind, inputs, substitute })
 }
 
 impl<'a> Leaf<'a> {
-    fn expression(&self, item: &str) -> String {
-        let p = |i: usize| item_path_name(item, self.paths[i]);
-        let one = || self.value.as_ref().map(arg_text).unwrap_or_default();
-        let many = |v: &Option<Values>| v.as_ref().map(list_text).unwrap_or_default();
-        match self.op {
-            "equals" => format!("{} == {}", p(0), one()),
-            "present" => format!("{} is present", p(0)),
-            "missing" => format!("{} is missing", p(0)),
-            "non_empty_string" => format!("{} is a non-empty string", p(0)),
-            "empty" => format!("{} is empty", p(0)),
-            "in" => format!("{} in {}", p(0), many(&self.values)),
-            "includes" if self.value.is_some() => format!("contains({}, {})", p(0), one()),
-            "excludes" if self.value.is_some() => format!("not contains({}, {})", p(0), one()),
-            "includes" => format!("contains_all({}, {})", p(0), many(&self.values)),
-            "excludes" => format!("contains_none({}, {})", p(0), many(&self.values)),
-            "range" => {
-                let n = p(0);
-                let b = |a: &Option<Arg>| a.as_ref().map(arg_text).unwrap_or_default();
-                format!("{n} >= {} and {n} <= {}", b(&self.min), b(&self.max))
-            }
-            "matches_any" => format!("{} matches one of {}", p(0), many(&self.patterns)),
-            "not_matches_any" => format!("{} matches none of {}", p(0), many(&self.patterns)),
-            _ => format!("{} {} {}", p(0), self.cmp.unwrap_or(""), p(1)),
-        }
-    }
-
     fn resolve(&self, a: &Arg<'a>, ctx: &Ctx<'a>) -> Option<&'a Value> {
         match a {
             Arg::Literal(v) => Some(*v),
@@ -377,7 +338,7 @@ impl<'a> Leaf<'a> {
     }
 
     fn passed(&self, x: &'a Value, ctx: &Ctx<'a>) -> bool {
-        let reads: Vec<Read> = self.paths.iter().map(|p| ctx.read(x, p)).collect();
+        let reads: Vec<Read> = self.paths.iter().map(|p| crate::render::read_raw(ctx, x, p)).collect();
         let v = reads[0].found();
         match self.op {
             "equals" => {
@@ -451,7 +412,7 @@ impl<'a> Leaf<'a> {
     }
 
     fn unusable(&self, x: &'a Value, ctx: &Ctx<'a>) -> bool {
-        let reads: Vec<Read> = self.paths.iter().map(|p| ctx.read(x, p)).collect();
+        let reads: Vec<Read> = self.paths.iter().map(|p| crate::render::read_raw(ctx, x, p)).collect();
         let f = |i: usize| reads[i].found();
         match self.op {
             "range" => f(0).is_some_and(|v| !v.is_number()),
@@ -468,10 +429,11 @@ impl<'a> Leaf<'a> {
         if self.passed(x, ctx) {
             return Cause::Satisfied;
         }
-        let states: Vec<Option<Cause>> = self.paths.iter().map(|p| ctx.read(x, p).problem()).collect();
-        if self.op == "present" && matches!(states[0], Some(Cause::Absent | Cause::Null)) {
+        let reads: Vec<Read> = self.paths.iter().map(|p| crate::render::read_raw(ctx, x, p)).collect();
+        if self.op == "present" && matches!(reads[0], Read::Absent | Read::Null) {
             return Cause::Missing;
         }
+        let states: Vec<Option<Cause>> = reads.iter().map(Read::problem).collect();
         let mut causes: Vec<Cause> = states.into_iter().flatten().collect();
         if self.unusable(x, ctx) {
             causes.push(Cause::Unusable);
@@ -484,13 +446,9 @@ fn usable_pair(cmp: &str, l: &Value, r: &Value) -> bool {
     type_name(l) == type_name(r) && (cmp == "eq" || cmp == "ne" || l.is_number() || l.is_string())
 }
 
-fn raw_path(check: &Map<String, Value>) -> &[Value] {
-    check.get("path").and_then(Value::as_array).map_or(&[], Vec::as_slice)
-}
-
 impl<'a> List<'a> {
     fn collection(&self, x: &'a Value, ctx: &Ctx<'a>) -> Option<&'a Vec<Value>> {
-        match ctx.read(x, self.path) {
+        match crate::render::read_raw(ctx, x, self.path) {
             Read::Found(Value::Array(items)) => Some(items),
             _ => None,
         }
@@ -503,7 +461,7 @@ impl<'a> List<'a> {
             Some(each) => {
                 let mut out = vec![];
                 for outer in coll {
-                    match ctx.read(outer, each) {
+                    match crate::render::read_raw(ctx, outer, each) {
                         Read::Found(Value::Array(inner)) if !inner.is_empty() => out.extend(inner.iter()),
                         _ => return None,
                     }
@@ -519,7 +477,7 @@ impl<'a> List<'a> {
             None => coll.iter().collect(),
             Some(each) => coll
                 .iter()
-                .flat_map(|outer| match ctx.read(outer, each) {
+                .flat_map(|outer| match crate::render::read_raw(ctx, outer, each) {
                     Read::Found(Value::Array(inner)) => inner.iter().collect(),
                     _ => vec![],
                 })
@@ -548,8 +506,8 @@ impl<'a> List<'a> {
         }
     }
 
-    fn each_state(&self, outer: &'a Value, each: &[Value], ctx: &Ctx<'a>) -> Option<Cause> {
-        match ctx.read(outer, each) {
+    fn each_state(&self, outer: &'a Value, each: &Value, ctx: &Ctx<'a>) -> Option<Cause> {
+        match crate::render::read_raw(ctx, outer, each) {
             Read::Found(v) if !v.is_array() => Some(Cause::Unusable),
             r => r.problem(),
         }
@@ -557,7 +515,7 @@ impl<'a> List<'a> {
 
     fn states(&self, x: &'a Value, ctx: &Ctx<'a>) -> Vec<Cause> {
         let mut out = vec![];
-        match ctx.read(x, self.path) {
+        match crate::render::read_raw(ctx, x, self.path) {
             Read::Found(v) if !v.is_array() => out.push(Cause::Unusable),
             r => out.extend(r.problem()),
         }
@@ -590,7 +548,7 @@ impl<'a> Check<'a> {
         match &self.kind {
             Kind::Leaf(l) => l.passed(x, ctx),
             Kind::List(l) => l.passed(x, ctx),
-            Kind::AnyOf(options) => options.iter().any(|(_, group)| group.iter().all(|c| c.passed(x, ctx))),
+            Kind::AnyOf(options) => options.iter().any(|group| group.iter().all(|c| c.passed(x, ctx))),
         }
     }
 
@@ -602,14 +560,14 @@ impl<'a> Check<'a> {
                 if self.passed(x, ctx) {
                     return Cause::Satisfied;
                 }
-                worst_or_value(options.iter().map(|(_, group)| group_cause(&group.iter().map(|c| c.cause(x, ctx)).collect::<Vec<_>>())))
+                worst_or_value(options.iter().map(|group| group_cause(&group.iter().map(|c| c.cause(x, ctx)).collect::<Vec<_>>())))
             }
         }
     }
 
     fn leaves(&self) -> Vec<&Check<'a>> {
         match &self.kind {
-            Kind::AnyOf(options) => options.iter().flat_map(|(_, g)| g.iter()).collect(),
+            Kind::AnyOf(options) => options.iter().flat_map(|g| g.iter()).collect(),
             _ => vec![self],
         }
     }
@@ -619,7 +577,7 @@ impl<'a> Check<'a> {
         match &self.kind {
             Kind::Leaf(l) => out.push(l),
             Kind::List(l) => out.extend(l.inner.all_leaves()),
-            Kind::AnyOf(options) => out.extend(options.iter().flat_map(|(_, g)| g.iter().flat_map(|c| c.all_leaves()))),
+            Kind::AnyOf(options) => out.extend(options.iter().flat_map(|g| g.iter().flat_map(|c| c.all_leaves()))),
         }
         if let Some(s) = &self.substitute {
             out.extend(s.all_leaves());
@@ -631,50 +589,13 @@ impl<'a> Check<'a> {
         self.all_leaves().iter().any(|l| l.param_broken(ctx))
     }
 
-    pub fn expression(&self, item: &str, top: bool) -> String {
-        if let Some(e) = self.expression {
-            return e.to_string();
-        }
-        match &self.kind {
-            Kind::Leaf(l) => l.expression(item),
-            Kind::List(l) => {
-                let base = if top { path_name(l.path) } else { item_path_name(item, l.path) };
-                let collection = match l.each {
-                    Some(each) => format!("{base}[].{}", path_name(each)),
-                    None => base,
-                };
-                let item_name = match l.as_ {
-                    Some(n) => format!("${n}"),
-                    None => format!("{collection}[]"),
-                };
-                let as_text = l.as_.map(|n| format!(" as ${n}")).unwrap_or_default();
-                format!("{} {collection}{as_text}: {}", if l.every { "every" } else { "some" }, l.inner.expression(&item_name, false))
-            }
-            Kind::AnyOf(options) => {
-                let mut parts: Vec<String> = options
-                    .iter()
-                    .map(|(nm, group)| format!("{}({})", text(nm), group.iter().map(|c| c.expression(item, top)).collect::<Vec<_>>().join(" and ")))
-                    .collect();
-                parts.sort();
-                format!("one of: {}", parts.join(" | "))
-            }
-        }
-    }
-
-    pub fn described(&self, item: &str) -> String {
-        match &self.substitute {
-            Some(s) => format!("{}, or substitute: {}", self.expression(item, true), s.expression(item, true)),
-            None => self.expression(item, true),
-        }
-    }
-
     fn override_states(&self, x: &'a Value, ctx: &Ctx<'a>) -> Option<Vec<Cause>> {
         let specs = self.inputs.as_ref()?;
         Some(
             specs
                 .iter()
                 .filter_map(|s| match s {
-                    Spec::Path(p) | Spec::Each(p, _) => ctx.read(x, p).problem(),
+                    Spec::Path(p) | Spec::Each(p) => crate::render::read_raw(ctx, x, p).problem(),
                 })
                 .collect(),
         )
@@ -749,12 +670,35 @@ pub fn ill_formed_row(inputs: Vec<Value>, entries: Option<Vec<crate::render::Ent
     Row { passed: false, cause: Cause::IllFormed, inputs, failed_items }
 }
 
-pub fn raw_refs(v: &Value) -> Vec<&[Value]> {
+fn step_refs(v: &Value) -> Vec<&[Value]> {
     let mut out = vec![];
-    fn walk<'a>(v: &'a Value, out: &mut Vec<&'a [Value]>) {
-        if let Some(r) = ref_of(v) {
-            out.push(r);
+    fn walk<'a>(v: &'a Value, field: Option<&str>, out: &mut Vec<&'a [Value]>) {
+        if literal_of(v).is_some() {
             return;
+        }
+        match v {
+            Value::Object(m) => m.iter().for_each(|(k, x)| walk(x, Some(k), out)),
+            Value::Array(a) => {
+                for x in a {
+                    if let (Some("path" | "left" | "right" | "each"), Some(r)) = (field, ref_of(x)) {
+                        out.push(r);
+                    }
+                    walk(x, None, out);
+                }
+            }
+            _ => {}
+        }
+    }
+    walk(v, None, &mut out);
+    out
+}
+
+pub fn refs_of<'a>(v: &Value, ctx: &Ctx<'a>) -> Vec<(String, Value, Option<Cause>)> {
+    let steps = step_refs(v);
+    let mut found: Vec<(String, Value, Option<Cause>)> = vec![];
+    fn walk<'v>(v: &'v Value, out: &mut Vec<&'v Value>) {
+        if crate::render::is_ref(v) || crate::render::malformed(v) {
+            out.push(v);
         }
         if literal_of(v).is_some() {
             return;
@@ -765,18 +709,23 @@ pub fn raw_refs(v: &Value) -> Vec<&[Value]> {
             _ => {}
         }
     }
-    walk(v, &mut out);
-    out
-}
-
-pub fn refs_of<'a>(v: &'a Value, ctx: &Ctx<'a>) -> Vec<(String, Value, Option<Cause>)> {
-    let mut refs: Vec<(String, Value, Option<Cause>)> = raw_refs(v)
-        .into_iter()
-        .map(|r| {
-            let read = ctx.read_ref(r);
-            (ref_text(r), read.shown(), read.problem())
-        })
-        .collect();
+    let mut wrapped = vec![];
+    walk(v, &mut wrapped);
+    for w in wrapped {
+        if crate::render::malformed(w) {
+            found.push(("<invalid ref>".into(), Value::Null, Some(Cause::Absent)));
+            continue;
+        }
+        let r = &w["ref"];
+        let read = match r.as_array() {
+            Some(p) if crate::render::builtin(r) => ctx.read_ref(p),
+            _ => Read::Absent,
+        };
+        let wrong_step = r.as_array().is_some_and(|p| steps.contains(&p.as_slice())) && read.found().is_some_and(|x| !is_key(x));
+        let problem = if wrong_step { Some(Cause::Unusable) } else { read.problem() };
+        found.push((crate::render::ref_name(r), read.shown(), problem));
+    }
+    let mut refs = found;
     refs.sort_by(|a, b| a.0.cmp(&b.0).then_with(|| rego_order(&a.1, &b.1)));
     refs.dedup_by(|a, b| a.0 == b.0 && a.1 == b.1);
     refs
@@ -790,8 +739,3 @@ pub fn is_list(v: &Value) -> bool {
     matches!(v.get("op").and_then(Value::as_str), Some("all" | "any"))
 }
 
-pub fn path_ok_with(p: &[Value], given: &[String]) -> bool {
-    let place = Place::top(given.to_vec());
-    let v = Value::Array(p.to_vec());
-    path_in(Some(&v), &place).is_some()
-}

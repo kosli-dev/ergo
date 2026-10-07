@@ -1,4 +1,4 @@
-use crate::value::{Cause, literal_text};
+use crate::value::Cause;
 use serde_json::{Number, Value};
 
 pub enum Read<'a> {
@@ -7,6 +7,9 @@ pub enum Read<'a> {
     Absent,
     Unusable,
     NotAnObject,
+    Ambiguous,
+    Unmatched,
+    NoKeys,
 }
 
 impl<'a> Read<'a> {
@@ -24,6 +27,9 @@ impl<'a> Read<'a> {
             Read::Absent => Some(Cause::Absent),
             Read::Unusable => Some(Cause::Unusable),
             Read::NotAnObject => Some(Cause::NotAnObject),
+            Read::Ambiguous => Some(Cause::Ambiguous),
+            Read::Unmatched => Some(Cause::Unmatched),
+            Read::NoKeys => Some(Cause::Absent),
         }
     }
 
@@ -70,8 +76,24 @@ pub fn step_key(step: &Value) -> Option<&Value> {
     literal_of(step).filter(|k| is_key(k))
 }
 
-pub fn path_ok(path: &[Value]) -> bool {
+pub fn keys_only(path: &[Value]) -> bool {
     path.iter().all(|s| step_key(s).is_some())
+}
+
+pub fn path_ok(path: &[Value]) -> bool {
+    path.iter().all(|s| step_key(s).is_some() || ref_of(s).is_some_and(known_ref) || is_selector(s))
+}
+
+pub fn is_selector(s: &Value) -> bool {
+    match s {
+        Value::Object(m) => !m.contains_key("ref") && !m.contains_key("literal"),
+        _ => false,
+    }
+}
+
+enum Step<'s> {
+    Key(&'s Value),
+    Select(&'s Value),
 }
 
 fn plain_key(k: &str) -> bool {
@@ -101,14 +123,6 @@ pub fn path_name(path: &[Value]) -> String {
     path.iter().enumerate().map(|(i, s)| segment_name(i, s)).collect::<Vec<_>>().join(".")
 }
 
-pub fn item_path_name(item: &str, path: &[Value]) -> String {
-    if path.is_empty() { item.to_string() } else { path_name(path) }
-}
-
-pub fn projection(path: &[Value], each: &[Value]) -> String {
-    if each.is_empty() { format!("{}[]", path_name(path)) } else { format!("{}[].{}", path_name(path), path_name(each)) }
-}
-
 pub fn from_name(from: &[Value]) -> String {
     match from.split_first() {
         None => "$$input".into(),
@@ -132,7 +146,7 @@ pub fn valid_name(v: &Value) -> Option<&str> {
 }
 
 pub fn known_ref(r: &[Value]) -> bool {
-    matches!(r.first().and_then(Value::as_str), Some("$$params" | "$$input")) && path_ok(&r[1..])
+    matches!(r.first().and_then(Value::as_str), Some("$$params" | "$$input")) && keys_only(&r[1..])
 }
 
 pub fn absent() -> &'static Value {
@@ -189,15 +203,107 @@ impl<'a> Ctx<'a> {
         self.names.iter().rev().find(|(k, _)| k == n).map(|(_, v)| *v)
     }
 
+    fn step<'s>(&self, seg: &'s Value) -> Option<Step<'s>>
+    where
+        'a: 's,
+    {
+        if is_key(seg) {
+            return Some(Step::Key(seg));
+        }
+        if let Some(l) = literal_of(seg) {
+            return is_key(l).then_some(Step::Key(l));
+        }
+        if let Some(r) = ref_of(seg) {
+            return match self.read_ref(r) {
+                Read::Found(v) if is_key(v) => Some(Step::Key(v)),
+                _ => None,
+            };
+        }
+        is_selector(seg).then_some(Step::Select(seg))
+    }
+
+    fn matches(&self, v: &Value, sel: &Value) -> bool {
+        let Some(Value::Object(w)) = sel.get("where") else { return false };
+        let Value::Object(item) = v else { return false };
+        !w.is_empty()
+            && w.iter().all(|(k, want)| {
+                let want = if let Some(r) = ref_of(want) {
+                    match self.read_ref(r) {
+                        Read::Found(x) => x,
+                        _ => return false,
+                    }
+                } else if let Some(l) = literal_of(want) {
+                    l
+                } else if want.get("ref").is_some() || want.get("literal").is_some() {
+                    return false;
+                } else {
+                    want
+                };
+                item.get(k).is_some_and(|x| crate::value::same(x, want))
+            })
+    }
+
     pub fn read(&self, subject: &'a Value, path: &[Value]) -> Read<'a> {
-        match path.first().and_then(Value::as_str) {
-            Some("$$input") => read_steps(self.doc, &path[1..]),
-            Some("$$params") => read_steps(self.params, &path[1..]),
+        let (start, rest): (&'a Value, &[Value]) = match path.first().and_then(Value::as_str) {
+            Some("$$input") => (self.doc, &path[1..]),
+            Some("$$params") => (self.params, &path[1..]),
             Some(s) if s.starts_with('$') => match self.name(&s[1..]) {
-                Some(v) => read_steps(v, &path[1..]),
-                None => Read::Unusable,
+                Some(v) => (v, &path[1..]),
+                None => return Read::Absent,
             },
-            _ => read_steps(subject, path),
+            _ => (subject, path),
+        };
+        self.read_from(start, rest)
+    }
+
+    pub fn read_from(&self, start: &'a Value, rest: &[Value]) -> Read<'a> {
+        if std::ptr::eq(start, absent()) {
+            return Read::Absent;
+        }
+        if !rest.is_empty() && !start.is_object() {
+            return Read::NotAnObject;
+        }
+        let mut steps = vec![];
+        for seg in rest {
+            match self.step(seg) {
+                Some(s) => steps.push(s),
+                None => return Read::NoKeys,
+            }
+        }
+        let mut at = start;
+        let mut selected = false;
+        for step in steps {
+            at = match (at, step) {
+                (Value::Object(m), Step::Key(Value::String(k))) => match m.get(k) {
+                    Some(v) => v,
+                    None => return Read::Absent,
+                },
+                (Value::Array(items), Step::Key(Value::Number(n))) => match n.as_u64().and_then(|i| items.get(i as usize)) {
+                    Some(v) => v,
+                    None => return Read::Absent,
+                },
+                (Value::Array(_) | Value::Object(_), Step::Select(sel)) if !selected => {
+                    selected = true;
+                    let values: Vec<&'a Value> = match at {
+                        Value::Array(items) => items.iter().collect(),
+                        Value::Object(m) => m.values().collect(),
+                        _ => vec![],
+                    };
+                    let found: Vec<&'a Value> = values.into_iter().filter(|v| self.matches(v, sel)).collect();
+                    match found.len() {
+                        0 => return Read::Unmatched,
+                        1 => found[0],
+                        _ => return Read::Ambiguous,
+                    }
+                }
+                (Value::Null, _) => return Read::Absent,
+                (_, Step::Select(_)) if selected => return Read::Absent,
+                _ => return Read::Unusable,
+            };
+        }
+        match at {
+            Value::Null => Read::Null,
+            v => Read::Found(v),
         }
     }
 
@@ -209,7 +315,7 @@ impl<'a> Ctx<'a> {
         let root = match r.first().and_then(Value::as_str) {
             Some("$$params") => self.params,
             Some("$$input") => self.doc,
-            _ => return Read::Unusable,
+            _ => return Read::Absent,
         };
         match read_steps(root, &r[1..]) {
             Read::NotAnObject => Read::Absent,
@@ -218,6 +324,3 @@ impl<'a> Ctx<'a> {
     }
 }
 
-pub fn ref_text(r: &[Value]) -> String {
-    path_name(r)
-}

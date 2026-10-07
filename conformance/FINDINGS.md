@@ -12,6 +12,8 @@ Writing ergo in Rust against this suite shows where `ergo.rego` does something o
 
 The row's own `cause` says `value`, as it should. Cases: `all / an empty path fails closed on a null item (2)`, `all / failed items write paths the way inputs do`, `all / failed items of a named path start with the name`, `all / a path through as inside a list check is shown as a path inside the item`. The Rust port copies it for now, so the other differences stay visible.
 
+**OPA 1.19 compares some numbers wrongly, and ergo inherits it.** In OPA 1.19.0, `1 >= 100.0` is `true` and `100.0 > 1` is `false`, with the numbers written in the query or read from JSON. `10.0` and `1000.0` do the same, while `100`, `1e2` and `2.0` are fine. OPA 1.20.2 gets all of them right. So on 1.19 a requirement with `"min_subjects": 100.0` is met by a single subject, and `range` and `compare` can go wrong the same way. CI runs ergo's main checks on 1.19 and the README names it. Case: `present / a min subjects whose value is a whole number is well formed however it is written (2)`, whose expected report was made with 1.19 and is wrong. The Rust port gets it right.
+
 **Values JSON can't hold were treated unevenly.** A set passed `in` as its `values`, but a set in the input failed `includes`. A number in a path read the key `1` of `{1: "a"}`. Fixed on the branch `core/reject-non-json-values`, which isn't merged yet: any set or key that isn't a string in the input or params now fails every check as `unusable`, and in a policy it's written wrong.
 
 ## Rego details a port has to copy

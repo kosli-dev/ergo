@@ -130,13 +130,6 @@ pub fn literal_text(v: &Value) -> String {
     }
 }
 
-pub fn text(v: &Value) -> String {
-    match v {
-        Value::String(s) => s.clone(),
-        other => literal_text(other),
-    }
-}
-
 pub fn type_name(v: &Value) -> &'static str {
     match v {
         Value::Null => "null",

@@ -169,7 +169,7 @@ fn own_fields(node: &Map<String, Value>) -> Value {
 }
 
 fn allowed_ops(kinds: &[&str]) -> Vec<&'static str> {
-    let mut leaf_and = |extra: &[&'static str]| -> Vec<&'static str> {
+    let leaf_and = |extra: &[&'static str]| -> Vec<&'static str> {
         let mut v = LEAF_OPS.to_vec();
         v.extend(extra);
         v
@@ -468,13 +468,10 @@ pub struct Shape<'a> {
 }
 
 pub fn shape(req: &Map<String, Value>) -> Shape<'_> {
-    let step = req
-        .get("from")
-        .and_then(Value::as_array)
-        .and_then(|f| f.last())
-        .and_then(Value::as_object)
-        .filter(|s| !is_ref(&Value::Object((*s).clone())) && !is_literal(&Value::Object((*s).clone())));
-    Shape { stepped: step.is_some(), step }
+    let from = req.get("from").and_then(Value::as_array);
+    let stepped = from.is_some_and(|f| f.iter().any(|s| s.is_object() && !is_ref(s)));
+    let step = from.and_then(|f| f.last()).and_then(Value::as_object).filter(|_| stepped);
+    Shape { stepped, step }
 }
 
 pub fn keys_well_formed(step: &Map<String, Value>) -> bool {
@@ -489,10 +486,14 @@ pub fn keys_well_formed(step: &Map<String, Value>) -> bool {
 
 pub fn from_well_formed(req: &Map<String, Value>) -> bool {
     let Some(Value::Array(from)) = req.get("from").or(Some(&EMPTY)) else { return false };
-    match shape(req).step {
-        None => true,
+    let shaped = shape(req);
+    if !shaped.stepped {
+        return true;
+    }
+    match shaped.step {
+        None => false,
         Some(step) => {
-            from[..from.len() - 1].iter().all(|s| !s.is_object() || is_literal(s))
+            from[..from.len() - 1].iter().all(|s| !s.is_object() || is_ref(s))
                 && step.keys().all(|k| k == "each_as" || k == "keys")
                 && valid_name(step.get("each_as")).is_some()
                 && keys_well_formed(step)

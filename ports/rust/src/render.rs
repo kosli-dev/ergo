@@ -1,4 +1,4 @@
-use crate::path::{Ctx, Read, index_key, read_steps};
+use crate::path::{Ctx, Read, index_key};
 use crate::value::rego_order;
 use serde_json::{Map, Value, json};
 
@@ -222,8 +222,8 @@ fn segment_name(i: usize, p: &Value) -> String {
 pub fn path_name(path: &Value) -> Option<String> {
     match path {
         Value::Array(p) => Some(p.iter().enumerate().map(|(i, s)| segment_name(i, s)).collect::<Vec<_>>().join(".")),
-        Value::Object(m) => Some(m.keys().map(|k| key_name(&json!(k))).collect::<Vec<_>>().join(".")),
-        _ => None,
+        Value::Object(m) => Some(m.values().map(key_name).collect::<Vec<_>>().join(".")),
+        _ => Some(String::new()),
     }
 }
 
@@ -435,8 +435,9 @@ pub fn described(check: &Value, item: &str) -> Option<String> {
 pub fn read_raw<'a>(ctx: &Ctx<'a>, subject: &'a Value, path: &Value) -> Read<'a> {
     match path {
         Value::Array(p) => ctx.read(subject, p),
-        Value::String(_) | Value::Number(_) => read_steps(subject, std::slice::from_ref(path)),
-        _ => Read::Unusable,
+        Value::String(_) | Value::Number(_) => ctx.read_from(subject, std::slice::from_ref(path)),
+        _ if !subject.is_object() => Read::NotAnObject,
+        _ => Read::NoKeys,
     }
 }
 
@@ -600,15 +601,11 @@ fn check_inputs<'a>(ctx: &Ctx<'a>, subject: &'a Value, check: &Value, item: &str
 }
 
 pub fn row_inputs<'a>(ctx: &Ctx<'a>, subject: &'a Value, check: &Value, item: &str) -> Vec<Value> {
-    let main = check_inputs(ctx, subject, check, item);
-    let all = match check.get("substitute") {
-        Some(s) if truthy(Some(s)) => main.and_then(|mut m| {
-            m.extend(check_inputs(ctx, subject, s, item)?);
-            Some(m)
-        }),
-        _ => main,
-    };
-    all.unwrap_or_default()
+    let mut all = check_inputs(ctx, subject, check, item).unwrap_or_default();
+    if let Some(s) = check.get("substitute").filter(|s| truthy(Some(s))) {
+        all.extend(check_inputs(ctx, subject, s, item).unwrap_or_default());
+    }
+    all
 }
 
 pub fn definition(check: &Value, item: &str) -> Value {
