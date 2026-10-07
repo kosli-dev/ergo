@@ -2528,6 +2528,48 @@ test_a_requirement_without_a_description_or_meta_reports_empty_ones_so_tools_can
 	rep.requirements.s.meta == {}
 }
 
+test_meta_can_hold_anything_json_can if {
+	meta := {"owner": {"name": "alice", "team": null}, "reviewed": true, "version": 2026, "ratio": 0.5, "tags": ["a", 1, false, [], {}], "note": "a<b>&c \"q\" \\ é\n\t\u0001\u2028\ufeff 😀", "a.b \"k\"": "", "": "empty key"}
+	rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"meta": meta, "checks": {"c": {"op": "present", "path": ["id"], "meta": meta}}})})
+	rows_for(rep, "s", "$well_formed")[0].passed == true
+	rep.requirements.s.meta == meta
+	rep.requirements.s.checks.c.meta == meta
+}
+
+test_numbers_in_meta_are_written_the_same_way_however_the_policy_wrote_them if {
+	written := {"s": object.union(typed_req, {"meta": {"n": [1.50, 1e2, -0, 1.0, 2.5e-3]}, "checks": {"c": {"op": "present", "path": ["id"], "meta": {"n": 1E+2}}}})}
+	plain := {"s": object.union(typed_req, {"meta": {"n": [1.5, 100, 0, 1, 0.0025]}, "checks": {"c": {"op": "present", "path": ["id"], "meta": {"n": 100}}}})}
+	json.marshal(ergo.report({"items": [{"id": 1}]}, written)) == json.marshal(ergo.report({"items": [{"id": 1}]}, plain))
+	json.marshal(ergo.report({"items": [{"id": 1}]}, written).requirements.s.meta) == `{"n":[1.5,100,0,1,0.0025]}`
+}
+
+test_a_requirement_meta_that_json_cannot_hold_fails_well_formed_and_is_reported_empty if {
+	rows := [[r.requirements.s.status, r.requirements.s.meta, problem_inputs(r)] |
+		some m in [{1: "x"}, {"a": {"b": {2: "y"}}}, {"tags": {"a"}}, {"n": [1e400]}]
+		r := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"meta": m})})
+	]
+	rows == [
+		["not_met", {}, [{"name": "meta", "value": ["holds a key that isn't a string"]}]],
+		["not_met", {}, [{"name": "meta", "value": ["holds a key that isn't a string"]}]],
+		["not_met", {}, [{"name": "meta", "value": ["holds a set"]}]],
+		["not_met", {}, [{"name": "meta", "value": ["number out of range"]}]],
+	]
+}
+
+test_a_check_meta_that_json_cannot_hold_is_written_wrong_and_is_reported_empty if {
+	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {
+		"k": {"op": "present", "path": ["n"], "meta": {"a": {1: "x"}}},
+		"s": {"op": "present", "path": ["n"], "meta": {"tags": {"a"}}},
+		"r": {"op": "present", "path": ["n"], "meta": {"n": 1e400}},
+	}}})
+	problem_inputs(rep) == [
+		{"name": "checks.k", "value": ["meta holds a key that isn't a string"]},
+		{"name": "checks.r", "value": ["number out of range"]},
+		{"name": "checks.s", "value": ["meta holds a set"]},
+	]
+	[rep.requirements.s.checks[c].meta | some c in ["k", "r", "s"]] == [{}, {}, {}]
+}
+
 test_an_empty_requirement_meta_is_well_formed_and_reported if {
 	rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"meta": {}})})
 	rows_for(rep, "s", "$well_formed")[0].passed == true
@@ -2536,7 +2578,7 @@ test_an_empty_requirement_meta_is_well_formed_and_reported if {
 
 test_a_requirement_description_or_meta_of_the_wrong_type_never_reaches_the_report if {
 	reps := [ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"description": d, "meta": m})}) |
-		some [d, m] in [[5, "x"], [null, null], [["a"], {"a": 1}]]
+		some [d, m] in [[5, "x"], [null, null], [["a"], ["m"]]]
 	]
 	[[r.requirements.s.status, r.requirements.s.description, r.requirements.s.meta] | some r in reps] == [
 		["not_met", "", {}],
@@ -2665,12 +2707,6 @@ wrong_types := [
 	["meta", "x"],
 	["meta", null],
 	["meta", ["x"]],
-	["meta", {"owner": 5}],
-	["meta", {"owner": null}],
-	["meta", {"owner": {"name": "x"}}],
-	["meta", {"tags": ["a", 1]}],
-	["meta", {"tags": [["a"]]}],
-	["meta", {1: "x"}],
 ]
 
 test_a_min_subjects_whose_value_is_a_whole_number_is_well_formed_however_it_is_written if {
@@ -2690,7 +2726,7 @@ wrong_type_problems := {
 	"min_subjects": "not a whole number of 0 or more",
 	"subject_type": "empty or not a string",
 	"description": "not a string",
-	"meta": "not an object of strings or lists of strings",
+	"meta": "not an object",
 }
 
 test_a_field_of_the_wrong_type_fails_well_formed_and_says_what_it_should_be if {
@@ -3020,7 +3056,7 @@ test_a_check_without_a_description_or_meta_reports_empty_ones_so_tools_can_read_
 test_a_check_description_or_meta_of_the_wrong_type_is_written_wrong_and_never_reaches_the_report if {
 	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {
 		"d": {"op": "present", "path": ["n"], "description": 5},
-		"m": {"op": "present", "path": ["n"], "meta": {"severity": 1}},
+		"m": {"op": "present", "path": ["n"], "meta": "high"},
 		"n": {"op": "present", "path": ["n"], "meta": null},
 	}}})
 	problem_inputs(rep) == [
