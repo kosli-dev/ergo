@@ -1,6 +1,6 @@
 # ergo in Rust
 
-An experiment: ergo written in Rust and checked against the [conformance suite](../../conformance/README.md). So far it knows `equals`, `present`, `all`, `any` and `applies_to`. A requirement that uses anything else fails `$well_formed`, so it never passes by accident.
+An experiment: ergo written in Rust and checked against the [conformance suite](../../conformance/README.md). It knows every built-in operator, `all` and `any` with `each`, `as` and nesting, `any_of`, substitutes, `applies_to`, and naming steps in `from`. A requirement that uses anything else fails `$well_formed`, so it never passes by accident.
 
 Run the suite with Docker, so you don't need Rust installed:
 
@@ -26,4 +26,4 @@ On 7 October 2026 both gave the same reports. OPA 1.19 took 0.9 s and 8.5 s to e
 
 Run the Docker commands from the root of the repo. Keep the build in `/target` and out of `ports/rust/target`, because Cargo writes JSON files there and `opa test .` would load them as data.
 
-What it doesn't do yet: the other operators, `each`, `as` and nested `all` or `any`, `any_of`, substitutes, selectors and naming steps, custom operators, and the details `$well_formed` gives when a requirement is written wrong.
+What it doesn't do yet: selectors, refs used as path steps, custom operators, and the details `$well_formed` and expressions give when a requirement is written wrong.

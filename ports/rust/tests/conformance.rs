@@ -22,6 +22,7 @@ fn every_conformance_case_gives_its_expected_report() {
     assert!(!files.is_empty(), "no cases.json under {}", root.display());
 
     let mut failures = vec![];
+    let mut recorded = vec![];
     let mut total = 0;
     for file in &files {
         let topic = file.parent().unwrap().strip_prefix(&root).unwrap().display().to_string();
@@ -32,17 +33,22 @@ fn every_conformance_case_gives_its_expected_report() {
                 let name = format!("{topic} / {} / {}", group["description"].as_str().unwrap(), case["description"].as_str().unwrap());
                 let report = ergo::report(&case["input"], group.get("params"), &group["requirements"]);
                 if report != case["report"] {
+                    recorded.push(serde_json::json!({"case": name, "expected": case["report"], "actual": report}).to_string());
                     failures.push(format!("{name}\n  expected report: {}\n  actual report:   {report}", case["report"]));
                     continue;
                 }
                 if let Some(expected) = case.get("violations") {
                     let actual = ergo::violations(&report);
                     if &actual != expected {
+                        recorded.push(serde_json::json!({"case": name, "expected_violations": expected, "actual_violations": actual}).to_string());
                         failures.push(format!("{name}\n  expected violations: {expected}\n  actual violations:   {actual}"));
                     }
                 }
             }
         }
+    }
+    if let Ok(path) = std::env::var("ERGO_FAILURES") {
+        fs::write(path, recorded.join("\n")).unwrap();
     }
     assert!(failures.is_empty(), "{} of {total} cases failed:\n\n{}", failures.len(), failures.join("\n\n"));
     println!("{total} cases passed");
