@@ -1,5 +1,7 @@
 mod check;
 mod path;
+mod problems;
+mod render;
 mod value;
 
 use check::{Check, Place, Row, described, ill_formed_row, is_list, parse, refs_entry, refs_of};
@@ -35,6 +37,7 @@ struct Named<'a> {
     name: &'a str,
     raw: &'a Value,
     check: Option<Check<'a>>,
+    flawed: bool,
 }
 
 struct Requirement<'a> {
@@ -58,7 +61,11 @@ fn named_checks<'a>(v: Option<&'a Value>, given: &[String]) -> Option<Vec<Named<
         None => Some(vec![]),
         Some(Value::Object(m)) => Some(
             m.iter()
-                .map(|(k, c)| Named { name: k.as_str(), raw: c, check: parse(c, &Place::top(given.to_vec())) })
+                .map(|(k, c)| {
+                    let check = parse(c, &Place::top(given.to_vec()));
+                    let flawed = check.is_none() || !problems::check_problems(c, given).is_empty();
+                    Named { name: k.as_str(), raw: c, check, flawed }
+                })
                 .collect(),
         ),
         Some(_) => None,
@@ -115,17 +122,9 @@ fn requirement<'a>(name: &'a str, raw: &'a Map<String, Value>) -> Requirement<'a
         None => Some(1),
         Some(v) => v.as_u64(),
     };
-    let all_parsed = |n: &Option<Vec<Named>>| n.as_ref().is_some_and(|n| n.iter().all(|c| c.check.is_some()));
-    let well_formed = raw.keys().all(|k| KNOWN.contains(&k.as_str()))
-        && subject_type.is_some_and(|s| !s.trim().is_empty())
-        && from_ok
-        && id.is_some()
-        && matches!(require.as_str(), Some("every" | "some"))
-        && min_subjects.is_some()
-        && checks.as_ref().is_some_and(|c| !c.is_empty())
-        && all_parsed(&checks)
-        && all_parsed(&filters)
-        && described(raw);
+    let _ = (KNOWN, described as fn(&Map<String, Value>) -> bool, &subject_type, &min_subjects);
+    let names: Vec<String> = if problems::from_well_formed(raw) { given.clone() } else { vec![] };
+    let well_formed = problems::requirement_well_formed(raw, &names);
     let item = match (&step, from) {
         (Some(s), _) => format!("${}", s.name),
         (None, []) => "$$input".into(),
@@ -320,13 +319,17 @@ fn evaluate<'a>(name: &'a str, raw: &'a Map<String, Value>, base: &Ctx<'a>) -> E
         let rows: Vec<(Row, bool)> = req
             .filters
             .iter()
-            .map(|f| match &f.check {
-                Some(c) => {
-                    let row = c.row(entry.subject, &req.item, &ctx, &refs_of(f.raw, &ctx));
-                    let missing = !row.passed && c.substitute.is_none() && matches!(&c.kind, check::Kind::Leaf(l) if l.op == "present") && c.cause(entry.subject, &ctx) == Cause::Missing;
-                    (row, missing)
+            .map(|f| {
+                let inputs = render::row_inputs(&ctx, entry.subject, f.raw, &req.item);
+                match &f.check {
+                    Some(c) if !f.flawed => {
+                        let row = c.row(entry.subject, &ctx, &refs_of(f.raw, &ctx), inputs, vec![]);
+                        let missing = !row.passed && c.substitute.is_none() && matches!(&c.kind, check::Kind::Leaf(l) if l.op == "present") && c.cause(entry.subject, &ctx) == Cause::Missing;
+                        let row = Row { failed_items: None, ..row };
+                        (row, missing)
+                    }
+                    _ => (ill_formed_row(inputs, None), false),
                 }
-                None => (ill_formed_row(false), false),
             })
             .collect();
         let passed = !bad_applies && rows.iter().all(|(r, _)| r.passed);
@@ -352,9 +355,11 @@ fn evaluate<'a>(name: &'a str, raw: &'a Map<String, Value>, base: &Ctx<'a>) -> E
     for (entry, id, ctx) in &in_scope {
         let mut all_passed = true;
         for named in &req.checks {
+            let inputs = render::row_inputs(ctx, entry.subject, named.raw, &req.item);
+            let entries = if is_list(named.raw) { Some(render::item_entries(ctx, entry.subject, named.raw, &req.item)) } else { None };
             let row = match &named.check {
-                Some(c) => c.row(entry.subject, &req.item, ctx, &refs_of(named.raw, ctx)),
-                None => ill_formed_row(is_list(named.raw)),
+                Some(c) if !named.flawed => c.row(entry.subject, ctx, &refs_of(named.raw, ctx), inputs, entries.unwrap_or_default()),
+                _ => ill_formed_row(inputs, entries),
             };
             all_passed &= row.passed;
             rows.push(Line { check: named.name.into(), id: (*id).clone(), row });
@@ -368,7 +373,7 @@ fn evaluate<'a>(name: &'a str, raw: &'a Map<String, Value>, base: &Ctx<'a>) -> E
     let unique = repeated_ids.is_empty();
     let t = req.subject_type.clone();
     let builtins = [
-        Line::builtin("$well_formed", vec![json!({"name": "count(checks)", "value": req.checks.len()}), json!({"name": "require", "value": req.require})], req.well_formed, verdict(req.well_formed)),
+        Line::builtin("$well_formed", well_formed_inputs(raw, &req), req.well_formed, verdict(req.well_formed)),
         Line::builtin("$min_subjects", vec![json!({"name": format!("in-scope {t} count"), "value": matching})], enough, from_problem.unwrap_or(verdict(enough))),
         Line::builtin("$unique_ids", vec![json!({"name": format!("repeated {t} ids"), "value": repeated_ids})], unique, verdict(unique)),
     ];
@@ -385,6 +390,20 @@ fn evaluate<'a>(name: &'a str, raw: &'a Map<String, Value>, base: &Ctx<'a>) -> E
     Evaluated { total: all.len(), matching, req, builtins, applies, rows, status, ctx: base.clone() }
 }
 
+fn well_formed_inputs(raw: &Map<String, Value>, req: &Requirement) -> Vec<Value> {
+    let mut out = vec![json!({"name": "count(checks)", "value": raw.get("checks").and_then(Value::as_object).map_or(0, |c| c.len())})];
+    if !problems::has_problems(raw, "require") {
+        out.push(json!({"name": "require", "value": req.require}));
+    }
+    if problems::shape(raw).stepped && !problems::has_problems(raw, "from") {
+        out.push(json!({"name": "from", "value": raw["from"]}));
+    }
+    out.extend(problems::field_problem_inputs(raw));
+    let names: Vec<String> = if problems::from_well_formed(raw) { req.step.iter().map(|s| s.name.to_string()).collect() } else { vec![] };
+    out.extend(problems::check_problem_inputs(raw, &names));
+    out
+}
+
 fn definitions(e: &Evaluated) -> Value {
     let r = &e.req;
     let t = &r.subject_type;
@@ -397,8 +416,10 @@ fn definitions(e: &Evaluated) -> Value {
     };
     defs.insert("$min_subjects".into(), min_subjects);
     defs.insert("$unique_ids".into(), json!({"description": format!("Every {t} id is unique"), "expression": format!("count(repeated(ids({from}))) == 0"), "meta": {}}));
-    if !r.filters.is_empty() || r.raw.get("applies_to").is_some_and(|v| !v.is_object()) {
-        let expression = r.filters.iter().filter_map(|f| f.check.as_ref()).map(|c| c.expression(&r.item, true)).collect::<Vec<_>>().join(" and ");
+    if r.raw.get("applies_to").is_some_and(|v| !v.is_object()) {
+        defs.insert("$applies".into(), json!({"description": format!("The {t} is in scope"), "expression": "<invalid applies_to>", "meta": {}}));
+    } else if !r.filters.is_empty() {
+        let expression = r.filters.iter().map(|f| render::expression_of(f.raw, &r.item).unwrap_or_default()).collect::<Vec<_>>().join(" and ");
         let mut def = json!({"description": format!("The {t} is in scope"), "expression": expression, "meta": {}});
         let refs = r.raw.get("applies_to").map(|a| refs_of(a, &e.ctx)).unwrap_or_default();
         if let Some(refs) = refs_entry(&refs) {
@@ -407,12 +428,15 @@ fn definitions(e: &Evaluated) -> Value {
         defs.insert("$applies".into(), def);
     }
     for named in &r.checks {
-        let Some(c) = named.raw.as_object() else { continue };
-        let mut def = c.clone();
-        def.insert("description".into(), reported_description(c));
-        def.insert("meta".into(), reported_meta(c));
-        if let Some(check) = &named.check {
-            def.insert("expression".into(), json!(check.described(&r.item)));
+        let mut def = match render::definition(named.raw, &r.item) {
+            Value::Object(m) => m,
+            _ => Map::new(),
+        };
+        if let Some(c) = named.raw.as_object() {
+            def.insert("description".into(), reported_description(c));
+            def.insert("meta".into(), reported_meta(c));
+        } else {
+            def.insert("meta".into(), json!({}));
         }
         if let Some(refs) = refs_entry(&refs_of(named.raw, &e.ctx)) {
             def.insert("$refs".into(), refs);

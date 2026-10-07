@@ -21,6 +21,9 @@ These aren't wrong, but they come from how `ergo.rego` is written rather than fr
 - **An `all` or `any` row's `inputs` follow the inner check's `path` field only.** With `equals` inside, the row shows `commits[].signed`, one value per item. With `compare` inside, which has `left` and `right` but no `path`, it shows the whole items as `approvers[]`.
 - **A top-level `all` or `any` names its list differently from a nested one.** At the top, the list is named by its path alone. Nested, an empty path is named after the item, so the same check renders differently depending on where it sits.
 - **A key listed in `keys` that the object doesn't have becomes a subject that reads as absent everywhere.** `ergo.rego` uses an internal marker, `{"ergo/absent": true}`, for it. The marker never reaches the report, but a port needs its own stand-in.
+- **Numbers in expressions are written as plain decimals.** `1e2` is written `100`, `1.50` is `1.5`, `1e-7` is `0.0000001` and `-0` is `0`. `ergo.rego` gets there with its own JSON printer (`_json_text`), because OPA's `json.marshal` escapes `<`, `>` and `&` and writes numbers differently in each runtime. A port has to keep each number's text as written to do the same, like `serde_json`'s `arbitrary_precision`.
+- **When part of a row's inputs can't be worked out, the whole list is `[]`.** That's how Rego handles an undefined value inside an array, and the report shows it. For example, an `all` with no `check` has `"inputs": []`, not the list it would read.
+- **A path written as a string is read as a single key.** `"each": "commits"` reads `commits`, as if it were `["commits"]`, but it's rendered oddly: `every xs[].: xs[].[] == 1`.
 - **Written-wrong checks are still rendered and still read.** The expression and the row's `inputs` come from the check as written, even when it can't be run, so a port needs a second, forgiving way to describe a check besides the one that runs it.
 
 ## Rules a port wouldn't guess

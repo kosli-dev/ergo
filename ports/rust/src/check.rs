@@ -576,28 +576,6 @@ impl<'a> List<'a> {
         worst_or_value(causes)
     }
 
-    fn entries(&self, x: &'a Value, item: &str, ctx: &Ctx<'a>) -> Vec<(String, Value, Option<Cause>, Option<&'a Value>)> {
-        let Some(coll) = self.collection(x, ctx) else { return vec![] };
-        let list = item_path_name(item, self.path);
-        match self.each {
-            None => coll.iter().enumerate().map(|(i, v)| (format!("{list}[{i}]"), v.clone(), None, Some(v))).collect(),
-            Some(each) => {
-                let suffix = if each.is_empty() { String::new() } else { format!(".{}", path_name(each)) };
-                let mut out = vec![];
-                for (i, outer) in coll.iter().enumerate() {
-                    let name = format!("{list}[{i}]{suffix}");
-                    match ctx.read(outer, each) {
-                        Read::Found(Value::Array(inner)) if !inner.is_empty() => {
-                            out.extend(inner.iter().enumerate().map(|(j, v)| (format!("{name}[{j}]"), v.clone(), None, Some(v))))
-                        }
-                        Read::Found(Value::Array(_)) => out.push((name, json!([]), Some(Cause::Value), None)),
-                        r => out.push((name, r.shown(), self.each_state(outer, each, ctx), None)),
-                    }
-                }
-                out
-            }
-        }
-    }
 }
 
 pub struct Row {
@@ -690,119 +668,6 @@ impl<'a> Check<'a> {
         }
     }
 
-    fn leaf_paths(&self) -> Vec<&'a [Value]> {
-        match &self.kind {
-            Kind::Leaf(l) => l.paths.clone(),
-            _ => self.raw.get("path").and_then(Value::as_array).map(|p| vec![p.as_slice()]).unwrap_or_default(),
-        }
-    }
-
-    fn name_reads(list: &List<'a>) -> Vec<&'a [Value]> {
-        let given: Vec<&str> = list.as_.into_iter().collect();
-        let mut reads: Vec<(&'a [Value], Vec<&str>)> = vec![];
-        for leaf in list.inner.leaves() {
-            match &leaf.kind {
-                Kind::List(inner) => {
-                    reads.push((inner.path, given.clone()));
-                    if let Some(each) = inner.each.filter(|e| first_name(e).is_some()) {
-                        reads.push((each, given.clone()));
-                    }
-                    let mut deeper = given.clone();
-                    deeper.extend(inner.as_);
-                    for l in inner.inner.leaves() {
-                        reads.extend(l.leaf_paths().into_iter().map(|p| (p, deeper.clone())));
-                    }
-                }
-                _ => reads.extend(leaf.leaf_paths().into_iter().map(|p| (p, given.clone()))),
-            }
-        }
-        let mut named: Vec<&'a [Value]> = reads
-            .into_iter()
-            .filter(|(p, g)| first_name(p).is_some_and(|n| !g.contains(&n)))
-            .map(|(p, _)| p)
-            .collect();
-        named.sort_by(|a, b| rego_order(&json!(a), &json!(b)));
-        named.dedup_by(|a, b| a == b);
-        named
-    }
-
-    fn check_reads(&self) -> Vec<&'a [Value]> {
-        match &self.kind {
-            Kind::List(l) => {
-                let mut out = vec![l.path];
-                if let Some(each) = l.each.filter(|e| first_name(e).is_some()) {
-                    out.push(each);
-                }
-                out.extend(Self::name_reads(l));
-                out
-            }
-            _ => self.leaf_paths(),
-        }
-    }
-
-    fn own_inputs(&self, x: &'a Value, item: &str, ctx: &Ctx<'a>) -> Vec<Value> {
-        let entry = |name: String, value: Value| json!({"name": name, "value": value});
-        if let Some(specs) = &self.inputs {
-            return specs
-                .iter()
-                .map(|s| match s {
-                    Spec::Path(p) => entry(item_path_name(item, p), ctx.value_at(x, p)),
-                    Spec::Each(p, e) => {
-                        let list = match ctx.read(x, p) {
-                            Read::Found(Value::Array(items)) => items.iter().map(|el| ctx.value_at(el, e)).collect(),
-                            _ => vec![],
-                        };
-                        entry(projection(p, e), Value::Array(list))
-                    }
-                })
-                .collect();
-        }
-        match &self.kind {
-            Kind::Leaf(l) => l.paths.iter().map(|p| entry(item_path_name(item, p), ctx.value_at(x, p))).collect(),
-            Kind::AnyOf(options) => {
-                let mut reads: Vec<(String, Value)> = options
-                    .iter()
-                    .flat_map(|(_, g)| g.iter())
-                    .flat_map(|c| c.check_reads())
-                    .map(|p| (item_path_name(item, p), ctx.value_at(x, p)))
-                    .collect();
-                reads.sort_by(|a, b| a.0.cmp(&b.0).then_with(|| rego_order(&a.1, &b.1)));
-                reads.dedup_by(|a, b| a.0 == b.0 && a.1 == b.1);
-                reads.into_iter().map(|(n, v)| entry(n, v)).collect()
-            }
-            Kind::List(l) => {
-                let list_at = || match ctx.read(x, l.path) {
-                    Read::Found(Value::Array(items)) => items.iter().collect::<Vec<_>>(),
-                    _ => vec![],
-                };
-                let inner_path = raw_path(l.inner.raw);
-                let mut out = match l.each {
-                    Some(each) => vec![entry(projection(l.path, each), Value::Array(list_at().into_iter().map(|el| ctx.value_at(el, each)).collect()))],
-                    None => {
-                        let outer_named = first_name(inner_path).is_some_and(|n| l.as_ != Some(n));
-                        if outer_named {
-                            vec![entry(projection(l.path, &[]), ctx.value_at(x, l.path)), entry(path_name(inner_path), ctx.value_at(x, inner_path))]
-                        } else {
-                            let rel = if first_name(inner_path).is_some() { &inner_path[1..] } else { inner_path };
-                            let vals = list_at().into_iter().map(|el| ctx.value_at(el, rel)).collect();
-                            vec![entry(projection(l.path, rel), Value::Array(vals))]
-                        }
-                    }
-                };
-                out.extend(Self::name_reads(l).into_iter().filter(|p| *p != inner_path).map(|p| entry(path_name(p), ctx.value_at(x, p))));
-                out
-            }
-        }
-    }
-
-    pub fn inputs(&self, x: &'a Value, item: &str, ctx: &Ctx<'a>) -> Vec<Value> {
-        let mut out = self.own_inputs(x, item, ctx);
-        if let Some(s) = &self.substitute {
-            out.extend(s.own_inputs(x, item, ctx));
-        }
-        out
-    }
-
     fn override_states(&self, x: &'a Value, ctx: &Ctx<'a>) -> Option<Vec<Cause>> {
         let specs = self.inputs.as_ref()?;
         Some(
@@ -822,8 +687,7 @@ impl<'a> Check<'a> {
         }
     }
 
-    pub fn row(&self, x: &'a Value, item: &str, ctx: &Ctx<'a>, refs: &[(String, Value, Option<Cause>)]) -> Row {
-        let inputs = self.inputs(x, item, ctx);
+    pub fn row(&self, x: &'a Value, ctx: &Ctx<'a>, refs: &[(String, Value, Option<Cause>)], inputs: Vec<Value>, entries: Vec<crate::render::Entry<'a>>) -> Row {
         let flaw = self.param_broken(ctx).then_some(Cause::Unusable);
         let unreadable: Vec<Cause> = refs.iter().filter_map(|r| r.2).collect();
         let main = flaw.is_none() && self.passed(x, ctx);
@@ -846,14 +710,13 @@ impl<'a> Check<'a> {
             worst_or_value(causes)
         };
         let failed_items = match &self.kind {
-            Kind::List(l) => Some(self.failed_items(l, x, item, ctx, flaw, &unreadable, main)),
+            Kind::List(l) => Some(self.failed_items(l, ctx, entries, flaw, &unreadable, main)),
             _ => None,
         };
         Row { passed: main || sub, cause, inputs, failed_items }
     }
 
-    fn failed_items(&self, l: &List<'a>, x: &'a Value, item: &str, ctx: &Ctx<'a>, flaw: Option<Cause>, unreadable: &[Cause], main: bool) -> Vec<Value> {
-        let entries = l.entries(x, item, ctx);
+    fn failed_items(&self, l: &List<'a>, ctx: &Ctx<'a>, entries: Vec<crate::render::Entry<'a>>, flaw: Option<Cause>, unreadable: &[Cause], main: bool) -> Vec<Value> {
         let shown = |p: String, c: Cause, v: Value| json!({"path": p, "cause": c.name(), "value": v});
         if let Some(f) = flaw {
             return entries.into_iter().map(|(p, v, _, _)| shown(p, f, v)).collect();
@@ -881,8 +744,9 @@ impl<'a> Check<'a> {
     }
 }
 
-pub fn ill_formed_row(is_list: bool) -> Row {
-    Row { passed: false, cause: Cause::IllFormed, inputs: vec![], failed_items: is_list.then(Vec::new) }
+pub fn ill_formed_row(inputs: Vec<Value>, entries: Option<Vec<crate::render::Entry>>) -> Row {
+    let failed_items = entries.map(|es| es.into_iter().map(|(p, v, _, _)| json!({"path": p, "cause": "ill_formed", "value": v})).collect());
+    Row { passed: false, cause: Cause::IllFormed, inputs, failed_items }
 }
 
 pub fn raw_refs(v: &Value) -> Vec<&[Value]> {
