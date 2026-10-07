@@ -2300,6 +2300,93 @@ test_min_subjects_guards_a_missing_collection if {
 	rep.compliant == false
 }
 
+test_min_subjects_fails_with_the_cause_of_a_from_it_cannot_read_even_at_zero if {
+	every doc, cause in {
+		"{}": "absent",
+		`{"items": null}`: "null",
+		`{"items": "none"}`: "unusable",
+		`{"items": 3}`: "unusable",
+		`{"items": true}`: "unusable",
+	} {
+		every n in [0, 1] {
+			rep := ergo.report(json.unmarshal(doc), min_subjects_req(n))
+			[[r.passed, r.cause] | some r in rows_for(rep, "s", "$min_subjects")] == [[false, cause]]
+			rep.requirements.s.status == "not_met"
+			rep.compliant == false
+		}
+	}
+}
+
+test_min_subjects_fails_as_value_on_an_empty_list_so_a_missing_one_stays_apart if {
+	rep := ergo.report({"items": []}, min_subjects_req(1))
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "$min_subjects")] == [[false, "value"]]
+}
+
+test_min_subjects_reads_the_from_path_like_a_check_reads_a_path if {
+	req := {"s": object.union(min_subjects_req(0).s, {"from": ["build", "items"]})}
+	every doc, cause in {
+		"{}": "absent",
+		`{"build": null}`: "absent",
+		`{"build": "b1"}`: "unusable",
+		`{"build": ["b1"]}`: "unusable",
+		`{"build": {"items": null}}`: "null",
+	} {
+		rep := ergo.report(json.unmarshal(doc), req)
+		rows_for(rep, "s", "$min_subjects")[0].cause == cause
+	}
+}
+
+test_min_subjects_reads_a_list_index_in_from if {
+	req := {"s": object.union(min_subjects_req(0).s, {"from": ["builds", 1, "items"]})}
+	ok := ergo.report({"builds": [{}, {"items": []}]}, req)
+	[[r.passed, r.cause] | some r in rows_for(ok, "s", "$min_subjects")] == [[true, "satisfied"]]
+	short := ergo.report({"builds": [{}]}, req)
+	rows_for(short, "s", "$min_subjects")[0].cause == "absent"
+}
+
+test_min_subjects_accepts_a_single_object_from_as_one_subject if {
+	rep := ergo.report({"items": {"id": "a"}}, min_subjects_req(1))
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "$min_subjects")] == [[true, "satisfied"]]
+}
+
+test_min_subjects_with_an_empty_from_fails_when_the_document_is_not_an_object if {
+	req := {"s": object.union(min_subjects_req(0).s, {"from": []})}
+	every doc, cause in {"null": "null", `"x"`: "unusable", "3": "unusable", `[{"id": "a"}]`: "unusable"} {
+		rep := ergo.report(json.unmarshal(doc), req)
+		[[r.passed, r.cause] | some r in rows_for(rep, "s", "$min_subjects")] == [[false, cause]]
+	}
+}
+
+test_min_subjects_fails_when_from_has_steps_and_the_document_is_not_an_object if {
+	every doc, cause in {"null": "absent", `"x"`: "unusable", `[{"items": []}]`: "unusable"} {
+		rep := ergo.report(json.unmarshal(doc), min_subjects_req(0))
+		[[r.passed, r.cause] | some r in rows_for(rep, "s", "$min_subjects")] == [[false, cause]]
+	}
+}
+
+test_min_subjects_fails_with_the_cause_of_an_each_from_it_cannot_read if {
+	req := {"s": object.union(min_subjects_req(0).s, {"from": ["items", {"each_as": "item"}]})}
+	every doc, cause in {"{}": "absent", `{"items": null}`: "null", `{"items": "none"}`: "unusable"} {
+		rep := ergo.report(json.unmarshal(doc), req)
+		[[r.passed, r.cause] | some r in rows_for(rep, "s", "$min_subjects")] == [[false, cause]]
+	}
+	empty := ergo.report({"items": {}}, req)
+	[[r.passed, r.cause] | some r in rows_for(empty, "s", "$min_subjects")] == [[true, "satisfied"]]
+	empty.requirements.s.status == "not_applicable"
+}
+
+test_min_subjects_leaves_a_keys_from_alone_because_each_key_is_a_subject_even_when_from_reads_nothing if {
+	req := {"s": object.union(min_subjects_req(1).s, {"from": ["items", {"each_as": "item", "keys": ["a"]}]})}
+	rep := ergo.report({}, req)
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "$min_subjects")] == [[true, "satisfied"]]
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "value"]]
+}
+
+test_a_from_that_reads_nothing_lists_its_min_subjects_row_as_a_violation if {
+	rep := ergo.report({}, min_subjects_req(0))
+	[[v.check, v.cause] | some v in ergo.violations(rep)] == [["$min_subjects", "absent"]]
+}
+
 owner_req := {"s": {
 	"subject_type": "repo",
 	"from": ["repos"],

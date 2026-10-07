@@ -275,6 +275,60 @@ _listed_keys(step) := v if {
 
 _target(doc, req) := object.get(doc, _from_keys(req), null) if is_object(doc)
 
+_target_read(doc, req) := object.get(doc, _from_keys(req), _absent) if is_object(doc)
+
+_target_read(doc, req) := doc if {
+	not _is_collection(doc)
+	_from_keys(req) == []
+}
+
+_target_read(doc, req) := _absent if {
+	is_array(doc)
+	_from_keys(req) == []
+}
+
+_target_read(doc, req) := _absent if {
+	not is_object(doc)
+	count(_from_keys(req)) > 0
+}
+
+_target_cause(doc, req) := c if {
+	_from_well_formed(req)
+	not _from_unreadable(req)
+	not _keys_step(req)
+	c := _target_state(doc, req)
+	c != "value"
+}
+
+_keys_step(req) if "keys" in object.keys(_each_step(req))
+
+default _target_state(_, _) := "absent"
+
+_target_state(doc, req) := "null" if _target_read(doc, req) == null
+
+_target_state(doc, req) := "unusable" if {
+	is_array(doc)
+	_from_keys(req) == []
+}
+
+_target_state(doc, req) := "unusable" if {
+	_target_read(doc, req) == _absent
+	_blocked(doc, _from_keys(req))
+}
+
+_target_state(doc, req) := "unusable" if {
+	v := _target_read(doc, req)
+	v != _absent
+	v != null
+	not _is_collection(v)
+}
+
+_target_state(doc, req) := "value" if {
+	v := _target_read(doc, req)
+	v != _absent
+	_is_collection(v)
+}
+
 _from_keys(req) := ks if {
 	p := _from_path(req)
 	is_array(p)
@@ -2261,6 +2315,7 @@ _scope_unreadable(subj, req) if {
 
 _scope_readable(doc, req) if {
 	not _from_unreadable(req)
+	not _target_cause(doc, req)
 	every subj in _raw_subjects(doc, req) {
 		not _scope_unreadable(subj, req)
 	}
@@ -2887,11 +2942,17 @@ default _enough_subjects(_, _) := false
 
 _enough_subjects(doc, req) if {
 	not _from_unreadable(req)
+	not _target_cause(doc, req)
 	is_number(_min_subjects_of(req))
 	count(_matching_subjects(doc, req)) >= _min_subjects_of(req)
 }
 
-_min_subjects_cause(doc, req) := _verdict_cause(_enough_subjects(doc, req)) if not _from_unreadable(req)
+_min_subjects_cause(doc, req) := _verdict_cause(_enough_subjects(doc, req)) if {
+	not _from_unreadable(req)
+	not _target_cause(doc, req)
+}
+
+_min_subjects_cause(doc, req) := _target_cause(doc, req)
 
 _min_subjects_cause(_, req) := _from_cause(req) if _from_unreadable(req)
 
