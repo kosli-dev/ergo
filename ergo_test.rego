@@ -3071,6 +3071,12 @@ test_a_check_description_or_meta_of_the_wrong_type_is_written_wrong_and_never_re
 	[v.description | some v in ergo.violations(rep); v.check == "d"] == [""]
 }
 
+test_a_filter_description_and_meta_are_checked_but_the_shared_applies_entry_keeps_ergos_own if {
+	rep := ergo.report({"items": [{"id": 1, "env": "prod"}]}, {"s": {"from": ["items"], "id": ["id"], "applies_to": {"f": {"op": "equals", "path": ["env"], "value": "prod", "description": "Production only", "meta": {"why": "scope"}}}, "checks": {"c": {"op": "present", "path": ["id"]}}}})
+	rows_for(rep, "s", "$well_formed")[0].passed == true
+	rep.requirements.s.checks["$applies"] == {"description": "The subject is in scope", "expression": `env == "prod"`, "meta": {}}
+}
+
 test_meta_can_sit_wherever_a_description_can if {
 	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "applies_to": {"f": {"op": "present", "path": ["n"], "meta": {"m": "x"}}}, "checks": {
 		"inner": {"op": "all", "path": ["xs"], "check": {"op": "present", "path": [], "meta": {"m": "x"}}},

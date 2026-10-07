@@ -3034,16 +3034,14 @@ report_with_params(doc, params, policy) := r if {
 
 _report_of(doc, policy) := {
 	"compliant": _policy_compliant(doc, policy),
-	"requirements": {name: object.union(
-		{
-			"description": _reported_description(req),
-			"require": _require_of(req),
-			"status": _requirement_status(doc, req),
-			"subjects": {"total": count(_raw_subjects(doc, req)), "matching": count(_matching_subjects(doc, req))},
-			"checks": _requirement_check_defs(req),
-		},
-		{"meta": _reported_meta(req)},
-	) |
+	"requirements": {name: {
+		"description": _reported_description(req),
+		"meta": _reported_meta(req),
+		"require": _require_of(req),
+		"status": _requirement_status(doc, req),
+		"subjects": {"total": count(_raw_subjects(doc, req)), "matching": count(_matching_subjects(doc, req))},
+		"checks": _requirement_check_defs(req),
+	} |
 		some name, req in policy
 	},
 	"results": _results(doc, policy),
