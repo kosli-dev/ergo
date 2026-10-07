@@ -1,0 +1,3055 @@
+[
+  {
+    "cases": [
+      {
+        "description": "checks a subject in scope",
+        "input": {
+          "things": [
+            {
+              "env": "prod",
+              "id": "t1",
+              "ok": true
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$applies": {
+                  "description": "The thing is in scope",
+                  "expression": "env == \"prod\"",
+                  "meta": {}
+                },
+                "$min_subjects": {
+                  "description": "The thing list can be read",
+                  "expression": "things can be read",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "ok == true",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "ok"
+                  ],
+                  "value": true
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$applies",
+              "inputs": [
+                {
+                  "name": "env",
+                  "value": "prod"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "c",
+              "inputs": [
+                {
+                  "name": "ok",
+                  "value": true
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "fails a subject in scope that fails a check",
+        "input": {
+          "things": [
+            {
+              "env": "prod",
+              "id": "t1",
+              "ok": false
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$applies": {
+                  "description": "The thing is in scope",
+                  "expression": "env == \"prod\"",
+                  "meta": {}
+                },
+                "$min_subjects": {
+                  "description": "The thing list can be read",
+                  "expression": "things can be read",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "ok == true",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "ok"
+                  ],
+                  "value": true
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$applies",
+              "inputs": [
+                {
+                  "name": "env",
+                  "value": "prod"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "c",
+              "inputs": [
+                {
+                  "name": "ok",
+                  "value": false
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "c",
+            "description": "",
+            "expression": "ok == true",
+            "inputs": [
+              {
+                "name": "ok",
+                "value": false
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "leaves out a subject whose field doesn't match, so the requirement is not applicable",
+        "input": {
+          "things": [
+            {
+              "env": "dev",
+              "id": "t1",
+              "ok": false
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$applies": {
+                  "description": "The thing is in scope",
+                  "expression": "env == \"prod\"",
+                  "meta": {}
+                },
+                "$min_subjects": {
+                  "description": "The thing list can be read",
+                  "expression": "things can be read",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "ok == true",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "ok"
+                  ],
+                  "value": true
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_applicable",
+              "subjects": {
+                "matching": 0,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 0
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "$applies",
+              "inputs": [
+                {
+                  "name": "env",
+                  "value": "dev"
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": []
+      },
+      {
+        "description": "fails the requirement when the filter's field is missing, because ergo can't tell",
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "ok": true
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$applies": {
+                  "description": "The thing is in scope",
+                  "expression": "env == \"prod\"",
+                  "meta": {}
+                },
+                "$min_subjects": {
+                  "description": "The thing list can be read",
+                  "expression": "things can be read",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "ok == true",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "ok"
+                  ],
+                  "value": true
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 0,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 0
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "$applies",
+              "inputs": [
+                {
+                  "name": "env",
+                  "value": null
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "absent",
+            "check": "$applies",
+            "description": "The thing is in scope",
+            "expression": "env == \"prod\"",
+            "inputs": [
+              {
+                "name": "env",
+                "value": null
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails the requirement when the filter's field is null",
+        "input": {
+          "things": [
+            {
+              "env": null,
+              "id": "t1",
+              "ok": true
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$applies": {
+                  "description": "The thing is in scope",
+                  "expression": "env == \"prod\"",
+                  "meta": {}
+                },
+                "$min_subjects": {
+                  "description": "The thing list can be read",
+                  "expression": "things can be read",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "ok == true",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "ok"
+                  ],
+                  "value": true
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 0,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 0
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "null",
+              "check": "$applies",
+              "inputs": [
+                {
+                  "name": "env",
+                  "value": null
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "fails the requirement for a subject that isn't an object",
+        "input": {
+          "things": [
+            "t1"
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$applies": {
+                  "description": "The thing is in scope",
+                  "expression": "env == \"prod\"",
+                  "meta": {}
+                },
+                "$min_subjects": {
+                  "description": "The thing list can be read",
+                  "expression": "things can be read",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "ok == true",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "ok"
+                  ],
+                  "value": true
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 0,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 0
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "not_an_object",
+              "check": "$applies",
+              "inputs": [
+                {
+                  "name": "env",
+                  "value": null
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "checks only the subjects in scope, in input order",
+        "input": {
+          "things": [
+            {
+              "env": "dev",
+              "id": "a"
+            },
+            {
+              "env": "prod",
+              "id": "b",
+              "ok": true
+            },
+            {
+              "env": "prod",
+              "id": "c",
+              "ok": false
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$applies": {
+                  "description": "The thing is in scope",
+                  "expression": "env == \"prod\"",
+                  "meta": {}
+                },
+                "$min_subjects": {
+                  "description": "The thing list can be read",
+                  "expression": "things can be read",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "ok == true",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "ok"
+                  ],
+                  "value": true
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 2,
+                "total": 3
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 2
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "$applies",
+              "inputs": [
+                {
+                  "name": "env",
+                  "value": "dev"
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "a",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$applies",
+              "inputs": [
+                {
+                  "name": "env",
+                  "value": "prod"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": "b",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$applies",
+              "inputs": [
+                {
+                  "name": "env",
+                  "value": "prod"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": "c",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "c",
+              "inputs": [
+                {
+                  "name": "ok",
+                  "value": true
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": "b",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "c",
+              "inputs": [
+                {
+                  "name": "ok",
+                  "value": false
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "c",
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "c",
+            "description": "",
+            "expression": "ok == true",
+            "inputs": [
+              {
+                "name": "ok",
+                "value": false
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": "c",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "a filter on a field",
+    "requirements": {
+      "s": {
+        "applies_to": {
+          "prod": {
+            "op": "equals",
+            "path": [
+              "env"
+            ],
+            "value": "prod"
+          }
+        },
+        "checks": {
+          "c": {
+            "op": "equals",
+            "path": [
+              "ok"
+            ],
+            "value": true
+          }
+        },
+        "from": [
+          "things"
+        ],
+        "id": [
+          "id"
+        ],
+        "min_subjects": 0,
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "fails min_subjects when every subject is left out",
+        "input": {
+          "things": [
+            {
+              "env": "dev",
+              "id": "t1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$applies": {
+                  "description": "The thing is in scope",
+                  "expression": "env == \"prod\"",
+                  "meta": {}
+                },
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "ok == true",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "ok"
+                  ],
+                  "value": true
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 0,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 0
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "$applies",
+              "inputs": [
+                {
+                  "name": "env",
+                  "value": "dev"
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "description": "a filter with the default min_subjects",
+    "requirements": {
+      "s": {
+        "applies_to": {
+          "prod": {
+            "op": "equals",
+            "path": [
+              "env"
+            ],
+            "value": "prod"
+          }
+        },
+        "checks": {
+          "c": {
+            "op": "equals",
+            "path": [
+              "ok"
+            ],
+            "value": true
+          }
+        },
+        "from": [
+          "things"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "leaves out a subject with no status, although the equals filter can't read it",
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "ok": true
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$applies": {
+                  "description": "The thing is in scope",
+                  "expression": "status == \"COMPLETE\" and status is present",
+                  "meta": {}
+                },
+                "$min_subjects": {
+                  "description": "The thing list can be read",
+                  "expression": "things can be read",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "ok == true",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "ok"
+                  ],
+                  "value": true
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_applicable",
+              "subjects": {
+                "matching": 0,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 0
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "$applies",
+              "inputs": [
+                {
+                  "name": "status",
+                  "value": null
+                },
+                {
+                  "name": "status",
+                  "value": null
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "leaves out a subject whose status is null",
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "ok": true,
+              "status": null
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$applies": {
+                  "description": "The thing is in scope",
+                  "expression": "status == \"COMPLETE\" and status is present",
+                  "meta": {}
+                },
+                "$min_subjects": {
+                  "description": "The thing list can be read",
+                  "expression": "things can be read",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "ok == true",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "ok"
+                  ],
+                  "value": true
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_applicable",
+              "subjects": {
+                "matching": 0,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 0
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "$applies",
+              "inputs": [
+                {
+                  "name": "status",
+                  "value": null
+                },
+                {
+                  "name": "status",
+                  "value": null
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "leaves out a subject whose status differs",
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "ok": true,
+              "status": "PENDING"
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$applies": {
+                  "description": "The thing is in scope",
+                  "expression": "status == \"COMPLETE\" and status is present",
+                  "meta": {}
+                },
+                "$min_subjects": {
+                  "description": "The thing list can be read",
+                  "expression": "things can be read",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "ok == true",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "ok"
+                  ],
+                  "value": true
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_applicable",
+              "subjects": {
+                "matching": 0,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 0
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "$applies",
+              "inputs": [
+                {
+                  "name": "status",
+                  "value": "PENDING"
+                },
+                {
+                  "name": "status",
+                  "value": "PENDING"
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "checks a subject whose status matches",
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "ok": true,
+              "status": "COMPLETE"
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$applies": {
+                  "description": "The thing is in scope",
+                  "expression": "status == \"COMPLETE\" and status is present",
+                  "meta": {}
+                },
+                "$min_subjects": {
+                  "description": "The thing list can be read",
+                  "expression": "things can be read",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "ok == true",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "ok"
+                  ],
+                  "value": true
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$applies",
+              "inputs": [
+                {
+                  "name": "status",
+                  "value": "COMPLETE"
+                },
+                {
+                  "name": "status",
+                  "value": "COMPLETE"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "c",
+              "inputs": [
+                {
+                  "name": "ok",
+                  "value": true
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "description": "a present filter next to a filter on the same field",
+    "requirements": {
+      "s": {
+        "applies_to": {
+          "attested": {
+            "op": "equals",
+            "path": [
+              "status"
+            ],
+            "value": "COMPLETE"
+          },
+          "recorded": {
+            "op": "present",
+            "path": [
+              "status"
+            ]
+          }
+        },
+        "checks": {
+          "c": {
+            "op": "equals",
+            "path": [
+              "ok"
+            ],
+            "value": true
+          }
+        },
+        "from": [
+          "things"
+        ],
+        "id": [
+          "id"
+        ],
+        "min_subjects": 0,
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "fails the requirement when one filter rules the subject out and the other can't read its field",
+        "input": {
+          "things": [
+            {
+              "env": "dev",
+              "id": "t1",
+              "ok": true
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$applies": {
+                  "description": "The thing is in scope",
+                  "expression": "env == \"prod\" and team == \"core\"",
+                  "meta": {}
+                },
+                "$min_subjects": {
+                  "description": "The thing list can be read",
+                  "expression": "things can be read",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "ok == true",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "ok"
+                  ],
+                  "value": true
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 0,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 0
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "$applies",
+              "inputs": [
+                {
+                  "name": "env",
+                  "value": "dev"
+                },
+                {
+                  "name": "team",
+                  "value": null
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "leaves out a subject both filters rule out",
+        "input": {
+          "things": [
+            {
+              "env": "dev",
+              "id": "t1",
+              "ok": true,
+              "team": "web"
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$applies": {
+                  "description": "The thing is in scope",
+                  "expression": "env == \"prod\" and team == \"core\"",
+                  "meta": {}
+                },
+                "$min_subjects": {
+                  "description": "The thing list can be read",
+                  "expression": "things can be read",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "ok == true",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "ok"
+                  ],
+                  "value": true
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_applicable",
+              "subjects": {
+                "matching": 0,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 0
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "$applies",
+              "inputs": [
+                {
+                  "name": "env",
+                  "value": "dev"
+                },
+                {
+                  "name": "team",
+                  "value": "web"
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "description": "two filters on different fields",
+    "requirements": {
+      "s": {
+        "applies_to": {
+          "prod": {
+            "op": "equals",
+            "path": [
+              "env"
+            ],
+            "value": "prod"
+          },
+          "team": {
+            "op": "equals",
+            "path": [
+              "team"
+            ],
+            "value": "core"
+          }
+        },
+        "checks": {
+          "c": {
+            "op": "equals",
+            "path": [
+              "ok"
+            ],
+            "value": true
+          }
+        },
+        "from": [
+          "things"
+        ],
+        "id": [
+          "id"
+        ],
+        "min_subjects": 0,
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "fails the requirement when a parent can't hold the field",
+        "input": {
+          "things": [
+            {
+              "build": "abc",
+              "id": "t1",
+              "ok": true
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$applies": {
+                  "description": "The thing is in scope",
+                  "expression": "build.fingerprint is present",
+                  "meta": {}
+                },
+                "$min_subjects": {
+                  "description": "The thing list can be read",
+                  "expression": "things can be read",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "ok == true",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "ok"
+                  ],
+                  "value": true
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 0,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 0
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "unusable",
+              "check": "$applies",
+              "inputs": [
+                {
+                  "name": "build.fingerprint",
+                  "value": null
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "description": "a present filter that can't read its field",
+    "requirements": {
+      "s": {
+        "applies_to": {
+          "has_build": {
+            "op": "present",
+            "path": [
+              "build",
+              "fingerprint"
+            ]
+          }
+        },
+        "checks": {
+          "c": {
+            "op": "equals",
+            "path": [
+              "ok"
+            ],
+            "value": true
+          }
+        },
+        "from": [
+          "things"
+        ],
+        "id": [
+          "id"
+        ],
+        "min_subjects": 0,
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "checks a subject that matches the param",
+        "input": {
+          "things": [
+            {
+              "env": "prod",
+              "id": "t1",
+              "ok": true
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$applies": {
+                  "$refs": [
+                    {
+                      "name": "$$params.env",
+                      "value": "prod"
+                    }
+                  ],
+                  "description": "The thing is in scope",
+                  "expression": "env == $$params.env",
+                  "meta": {}
+                },
+                "$min_subjects": {
+                  "description": "The thing list can be read",
+                  "expression": "things can be read",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "ok == true",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "ok"
+                  ],
+                  "value": true
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$applies",
+              "inputs": [
+                {
+                  "name": "env",
+                  "value": "prod"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "c",
+              "inputs": [
+                {
+                  "name": "ok",
+                  "value": true
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "leaves out a subject that differs from the param",
+        "input": {
+          "things": [
+            {
+              "env": "dev",
+              "id": "t1",
+              "ok": true
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$applies": {
+                  "$refs": [
+                    {
+                      "name": "$$params.env",
+                      "value": "prod"
+                    }
+                  ],
+                  "description": "The thing is in scope",
+                  "expression": "env == $$params.env",
+                  "meta": {}
+                },
+                "$min_subjects": {
+                  "description": "The thing list can be read",
+                  "expression": "things can be read",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "ok == true",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "ok"
+                  ],
+                  "value": true
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_applicable",
+              "subjects": {
+                "matching": 0,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 0
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "$applies",
+              "inputs": [
+                {
+                  "name": "env",
+                  "value": "dev"
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "description": "a filter against a param",
+    "params": {
+      "env": "prod"
+    },
+    "requirements": {
+      "s": {
+        "applies_to": {
+          "prod": {
+            "op": "equals",
+            "path": [
+              "env"
+            ],
+            "value": {
+              "ref": [
+                "$$params",
+                "env"
+              ]
+            }
+          }
+        },
+        "checks": {
+          "c": {
+            "op": "equals",
+            "path": [
+              "ok"
+            ],
+            "value": true
+          }
+        },
+        "from": [
+          "things"
+        ],
+        "id": [
+          "id"
+        ],
+        "min_subjects": 0,
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "fails the requirement, because ergo has no defaults",
+        "input": {
+          "things": [
+            {
+              "env": "prod",
+              "id": "t1",
+              "ok": true
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$applies": {
+                  "$refs": [
+                    {
+                      "name": "$$params.env",
+                      "value": null
+                    }
+                  ],
+                  "description": "The thing is in scope",
+                  "expression": "env == $$params.env",
+                  "meta": {}
+                },
+                "$min_subjects": {
+                  "description": "The thing list can be read",
+                  "expression": "things can be read",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "ok == true",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "ok"
+                  ],
+                  "value": true
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 0,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 0
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "$applies",
+              "inputs": [
+                {
+                  "name": "env",
+                  "value": "prod"
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "absent",
+            "check": "$applies",
+            "description": "The thing is in scope",
+            "expression": "env == $$params.env",
+            "inputs": [
+              {
+                "name": "env",
+                "value": "prod"
+              },
+              {
+                "name": "$$params.env",
+                "value": null
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "a filter against params that are missing",
+    "requirements": {
+      "s": {
+        "applies_to": {
+          "prod": {
+            "op": "equals",
+            "path": [
+              "env"
+            ],
+            "value": {
+              "ref": [
+                "$$params",
+                "env"
+              ]
+            }
+          }
+        },
+        "checks": {
+          "c": {
+            "op": "equals",
+            "path": [
+              "ok"
+            ],
+            "value": true
+          }
+        },
+        "from": [
+          "things"
+        ],
+        "id": [
+          "id"
+        ],
+        "min_subjects": 0,
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "checks the list of a subject in scope",
+        "input": {
+          "things": [
+            {
+              "commits": [
+                {
+                  "signed": false
+                }
+              ],
+              "env": "prod",
+              "id": "t1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$applies": {
+                  "description": "The thing is in scope",
+                  "expression": "env == \"prod\"",
+                  "meta": {}
+                },
+                "$min_subjects": {
+                  "description": "The thing list can be read",
+                  "expression": "things can be read",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "signed": {
+                  "check": {
+                    "op": "equals",
+                    "path": [
+                      "signed"
+                    ],
+                    "value": true
+                  },
+                  "description": "",
+                  "expression": "every commits: signed == true",
+                  "meta": {},
+                  "op": "all",
+                  "path": [
+                    "commits"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$applies",
+              "inputs": [
+                {
+                  "name": "env",
+                  "value": "prod"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "signed",
+              "failed_items": [
+                {
+                  "cause": "value",
+                  "path": "commits[0]",
+                  "value": {
+                    "signed": false
+                  }
+                }
+              ],
+              "inputs": [
+                {
+                  "name": "commits[].signed",
+                  "value": [
+                    false
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "description": "a filter with an all check",
+    "requirements": {
+      "s": {
+        "applies_to": {
+          "prod": {
+            "op": "equals",
+            "path": [
+              "env"
+            ],
+            "value": "prod"
+          }
+        },
+        "checks": {
+          "signed": {
+            "check": {
+              "op": "equals",
+              "path": [
+                "signed"
+              ],
+              "value": true
+            },
+            "op": "all",
+            "path": [
+              "commits"
+            ]
+          }
+        },
+        "from": [
+          "things"
+        ],
+        "id": [
+          "id"
+        ],
+        "min_subjects": 0,
+        "subject_type": "thing"
+      }
+    }
+  }
+]

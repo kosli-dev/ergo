@@ -1,0 +1,2651 @@
+[
+  {
+    "cases": [
+      {
+        "description": "passes when every item passes",
+        "input": {
+          "things": [
+            {
+              "commits": [
+                {
+                  "signed": true
+                },
+                {
+                  "signed": true
+                }
+              ],
+              "id": "t1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "signed": {
+                  "check": {
+                    "op": "equals",
+                    "path": [
+                      "signed"
+                    ],
+                    "value": true
+                  },
+                  "description": "",
+                  "expression": "every commits: signed == true",
+                  "meta": {},
+                  "op": "all",
+                  "path": [
+                    "commits"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "signed",
+              "failed_items": [],
+              "inputs": [
+                {
+                  "name": "commits[].signed",
+                  "value": [
+                    true,
+                    true
+                  ]
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "fails as value and lists the item that failed",
+        "input": {
+          "things": [
+            {
+              "commits": [
+                {
+                  "signed": true
+                },
+                {
+                  "signed": false
+                }
+              ],
+              "id": "t1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "signed": {
+                  "check": {
+                    "op": "equals",
+                    "path": [
+                      "signed"
+                    ],
+                    "value": true
+                  },
+                  "description": "",
+                  "expression": "every commits: signed == true",
+                  "meta": {},
+                  "op": "all",
+                  "path": [
+                    "commits"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "signed",
+              "failed_items": [
+                {
+                  "cause": "value",
+                  "path": "commits[1]",
+                  "value": {
+                    "signed": false
+                  }
+                }
+              ],
+              "inputs": [
+                {
+                  "name": "commits[].signed",
+                  "value": [
+                    true,
+                    false
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "signed",
+            "description": "",
+            "expression": "every commits: signed == true",
+            "failed_items": [
+              {
+                "cause": "value",
+                "path": "commits[1]",
+                "value": {
+                  "signed": false
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "name": "commits[].signed",
+                "value": [
+                  true,
+                  false
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when an item lacks the field, even when another fails on its value",
+        "input": {
+          "things": [
+            {
+              "commits": [
+                {
+                  "signed": false
+                },
+                {}
+              ],
+              "id": "t1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "signed": {
+                  "check": {
+                    "op": "equals",
+                    "path": [
+                      "signed"
+                    ],
+                    "value": true
+                  },
+                  "description": "",
+                  "expression": "every commits: signed == true",
+                  "meta": {},
+                  "op": "all",
+                  "path": [
+                    "commits"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "signed",
+              "failed_items": [
+                {
+                  "cause": "value",
+                  "path": "commits[0]",
+                  "value": {
+                    "signed": false
+                  }
+                },
+                {
+                  "cause": "absent",
+                  "path": "commits[1]",
+                  "value": {}
+                }
+              ],
+              "inputs": [
+                {
+                  "name": "commits[].signed",
+                  "value": [
+                    false,
+                    null
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "fails as value on an empty list, because no items isn't proof",
+        "input": {
+          "things": [
+            {
+              "commits": [],
+              "id": "t1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "signed": {
+                  "check": {
+                    "op": "equals",
+                    "path": [
+                      "signed"
+                    ],
+                    "value": true
+                  },
+                  "description": "",
+                  "expression": "every commits: signed == true",
+                  "meta": {},
+                  "op": "all",
+                  "path": [
+                    "commits"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "signed",
+              "failed_items": [],
+              "inputs": [
+                {
+                  "name": "commits[].signed",
+                  "value": []
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "fails as absent when the list is missing",
+        "input": {
+          "things": [
+            {
+              "id": "t1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "signed": {
+                  "check": {
+                    "op": "equals",
+                    "path": [
+                      "signed"
+                    ],
+                    "value": true
+                  },
+                  "description": "",
+                  "expression": "every commits: signed == true",
+                  "meta": {},
+                  "op": "all",
+                  "path": [
+                    "commits"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "signed",
+              "failed_items": [],
+              "inputs": [
+                {
+                  "name": "commits[].signed",
+                  "value": []
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "fails as null when the list is null",
+        "input": {
+          "things": [
+            {
+              "commits": null,
+              "id": "t1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "signed": {
+                  "check": {
+                    "op": "equals",
+                    "path": [
+                      "signed"
+                    ],
+                    "value": true
+                  },
+                  "description": "",
+                  "expression": "every commits: signed == true",
+                  "meta": {},
+                  "op": "all",
+                  "path": [
+                    "commits"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "null",
+              "check": "signed",
+              "failed_items": [],
+              "inputs": [
+                {
+                  "name": "commits[].signed",
+                  "value": []
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "fails as unusable when the list is an object",
+        "input": {
+          "things": [
+            {
+              "commits": {
+                "a": {
+                  "signed": true
+                }
+              },
+              "id": "t1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "signed": {
+                  "check": {
+                    "op": "equals",
+                    "path": [
+                      "signed"
+                    ],
+                    "value": true
+                  },
+                  "description": "",
+                  "expression": "every commits: signed == true",
+                  "meta": {},
+                  "op": "all",
+                  "path": [
+                    "commits"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "unusable",
+              "check": "signed",
+              "failed_items": [],
+              "inputs": [
+                {
+                  "name": "commits[].signed",
+                  "value": []
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "fails as unusable when the list is a string",
+        "input": {
+          "things": [
+            {
+              "commits": "abc",
+              "id": "t1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "signed": {
+                  "check": {
+                    "op": "equals",
+                    "path": [
+                      "signed"
+                    ],
+                    "value": true
+                  },
+                  "description": "",
+                  "expression": "every commits: signed == true",
+                  "meta": {},
+                  "op": "all",
+                  "path": [
+                    "commits"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "unusable",
+              "check": "signed",
+              "failed_items": [],
+              "inputs": [
+                {
+                  "name": "commits[].signed",
+                  "value": []
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "fails as not_an_object on an item that isn't an object",
+        "input": {
+          "things": [
+            {
+              "commits": [
+                {
+                  "signed": true
+                },
+                "c2"
+              ],
+              "id": "t1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "signed": {
+                  "check": {
+                    "op": "equals",
+                    "path": [
+                      "signed"
+                    ],
+                    "value": true
+                  },
+                  "description": "",
+                  "expression": "every commits: signed == true",
+                  "meta": {},
+                  "op": "all",
+                  "path": [
+                    "commits"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "not_an_object",
+              "check": "signed",
+              "failed_items": [
+                {
+                  "cause": "not_an_object",
+                  "path": "commits[1]",
+                  "value": "c2"
+                }
+              ],
+              "inputs": [
+                {
+                  "name": "commits[].signed",
+                  "value": [
+                    true,
+                    null
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "description": "all of a list",
+    "requirements": {
+      "s": {
+        "checks": {
+          "signed": {
+            "check": {
+              "op": "equals",
+              "path": [
+                "signed"
+              ],
+              "value": true
+            },
+            "op": "all",
+            "path": [
+              "commits"
+            ]
+          }
+        },
+        "from": [
+          "things"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "passes when one item passes, and lists no failed items",
+        "input": {
+          "things": [
+            {
+              "approvers": [
+                {
+                  "state": "COMMENTED"
+                },
+                {
+                  "state": "APPROVED"
+                }
+              ],
+              "id": "t1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "approved": {
+                  "check": {
+                    "op": "equals",
+                    "path": [
+                      "state"
+                    ],
+                    "value": "APPROVED"
+                  },
+                  "description": "",
+                  "expression": "some approvers: state == \"APPROVED\"",
+                  "meta": {},
+                  "op": "any",
+                  "path": [
+                    "approvers"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "approved",
+              "failed_items": [],
+              "inputs": [
+                {
+                  "name": "approvers[].state",
+                  "value": [
+                    "COMMENTED",
+                    "APPROVED"
+                  ]
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "fails as value when no item passes",
+        "input": {
+          "things": [
+            {
+              "approvers": [
+                {
+                  "state": "COMMENTED"
+                },
+                {
+                  "state": "CHANGES_REQUESTED"
+                }
+              ],
+              "id": "t1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "approved": {
+                  "check": {
+                    "op": "equals",
+                    "path": [
+                      "state"
+                    ],
+                    "value": "APPROVED"
+                  },
+                  "description": "",
+                  "expression": "some approvers: state == \"APPROVED\"",
+                  "meta": {},
+                  "op": "any",
+                  "path": [
+                    "approvers"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "approved",
+              "failed_items": [
+                {
+                  "cause": "value",
+                  "path": "approvers[0]",
+                  "value": {
+                    "state": "COMMENTED"
+                  }
+                },
+                {
+                  "cause": "value",
+                  "path": "approvers[1]",
+                  "value": {
+                    "state": "CHANGES_REQUESTED"
+                  }
+                }
+              ],
+              "inputs": [
+                {
+                  "name": "approvers[].state",
+                  "value": [
+                    "COMMENTED",
+                    "CHANGES_REQUESTED"
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "approved",
+            "description": "",
+            "expression": "some approvers: state == \"APPROVED\"",
+            "failed_items": [
+              {
+                "cause": "value",
+                "path": "approvers[0]",
+                "value": {
+                  "state": "COMMENTED"
+                }
+              },
+              {
+                "cause": "value",
+                "path": "approvers[1]",
+                "value": {
+                  "state": "CHANGES_REQUESTED"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "name": "approvers[].state",
+                "value": [
+                  "COMMENTED",
+                  "CHANGES_REQUESTED"
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when one item lacks the field and the others fail",
+        "input": {
+          "things": [
+            {
+              "approvers": [
+                {
+                  "state": "COMMENTED"
+                },
+                {}
+              ],
+              "id": "t1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "approved": {
+                  "check": {
+                    "op": "equals",
+                    "path": [
+                      "state"
+                    ],
+                    "value": "APPROVED"
+                  },
+                  "description": "",
+                  "expression": "some approvers: state == \"APPROVED\"",
+                  "meta": {},
+                  "op": "any",
+                  "path": [
+                    "approvers"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "approved",
+              "failed_items": [
+                {
+                  "cause": "value",
+                  "path": "approvers[0]",
+                  "value": {
+                    "state": "COMMENTED"
+                  }
+                },
+                {
+                  "cause": "absent",
+                  "path": "approvers[1]",
+                  "value": {}
+                }
+              ],
+              "inputs": [
+                {
+                  "name": "approvers[].state",
+                  "value": [
+                    "COMMENTED",
+                    null
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "fails as value on an empty list",
+        "input": {
+          "things": [
+            {
+              "approvers": [],
+              "id": "t1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "approved": {
+                  "check": {
+                    "op": "equals",
+                    "path": [
+                      "state"
+                    ],
+                    "value": "APPROVED"
+                  },
+                  "description": "",
+                  "expression": "some approvers: state == \"APPROVED\"",
+                  "meta": {},
+                  "op": "any",
+                  "path": [
+                    "approvers"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "approved",
+              "failed_items": [],
+              "inputs": [
+                {
+                  "name": "approvers[].state",
+                  "value": []
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "fails as absent when the list is missing",
+        "input": {
+          "things": [
+            {
+              "id": "t1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "approved": {
+                  "check": {
+                    "op": "equals",
+                    "path": [
+                      "state"
+                    ],
+                    "value": "APPROVED"
+                  },
+                  "description": "",
+                  "expression": "some approvers: state == \"APPROVED\"",
+                  "meta": {},
+                  "op": "any",
+                  "path": [
+                    "approvers"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "approved",
+              "failed_items": [],
+              "inputs": [
+                {
+                  "name": "approvers[].state",
+                  "value": []
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "description": "any of a list",
+    "requirements": {
+      "s": {
+        "checks": {
+          "approved": {
+            "check": {
+              "op": "equals",
+              "path": [
+                "state"
+              ],
+              "value": "APPROVED"
+            },
+            "op": "any",
+            "path": [
+              "approvers"
+            ]
+          }
+        },
+        "from": [
+          "things"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "passes when every item matches the param",
+        "input": {
+          "things": [
+            {
+              "commits": [
+                {
+                  "signed": true
+                }
+              ],
+              "id": "t1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "signed": {
+                  "$refs": [
+                    {
+                      "name": "$$params.want",
+                      "value": true
+                    }
+                  ],
+                  "check": {
+                    "op": "equals",
+                    "path": [
+                      "signed"
+                    ],
+                    "value": {
+                      "ref": [
+                        "$$params",
+                        "want"
+                      ]
+                    }
+                  },
+                  "description": "",
+                  "expression": "every commits: signed == $$params.want",
+                  "meta": {},
+                  "op": "all",
+                  "path": [
+                    "commits"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "signed",
+              "failed_items": [],
+              "inputs": [
+                {
+                  "name": "commits[].signed",
+                  "value": [
+                    true
+                  ]
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "fails and lists the item that differs from the param",
+        "input": {
+          "things": [
+            {
+              "commits": [
+                {
+                  "signed": false
+                }
+              ],
+              "id": "t1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "signed": {
+                  "$refs": [
+                    {
+                      "name": "$$params.want",
+                      "value": true
+                    }
+                  ],
+                  "check": {
+                    "op": "equals",
+                    "path": [
+                      "signed"
+                    ],
+                    "value": {
+                      "ref": [
+                        "$$params",
+                        "want"
+                      ]
+                    }
+                  },
+                  "description": "",
+                  "expression": "every commits: signed == $$params.want",
+                  "meta": {},
+                  "op": "all",
+                  "path": [
+                    "commits"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "signed",
+              "failed_items": [
+                {
+                  "cause": "value",
+                  "path": "commits[0]",
+                  "value": {
+                    "signed": false
+                  }
+                }
+              ],
+              "inputs": [
+                {
+                  "name": "commits[].signed",
+                  "value": [
+                    false
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "signed",
+            "description": "",
+            "expression": "every commits: signed == $$params.want",
+            "failed_items": [
+              {
+                "cause": "value",
+                "path": "commits[0]",
+                "value": {
+                  "signed": false
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "name": "commits[].signed",
+                "value": [
+                  false
+                ]
+              },
+              {
+                "name": "$$params.want",
+                "value": true
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "all against a param",
+    "params": {
+      "want": true
+    },
+    "requirements": {
+      "s": {
+        "checks": {
+          "signed": {
+            "check": {
+              "op": "equals",
+              "path": [
+                "signed"
+              ],
+              "value": {
+                "ref": [
+                  "$$params",
+                  "want"
+                ]
+              }
+            },
+            "op": "all",
+            "path": [
+              "commits"
+            ]
+          }
+        },
+        "from": [
+          "things"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "fails as absent and lists every item with that cause",
+        "input": {
+          "things": [
+            {
+              "commits": [
+                {
+                  "signed": true
+                },
+                {
+                  "signed": false
+                }
+              ],
+              "id": "t1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "signed": {
+                  "$refs": [
+                    {
+                      "name": "$$params.want",
+                      "value": null
+                    }
+                  ],
+                  "check": {
+                    "op": "equals",
+                    "path": [
+                      "signed"
+                    ],
+                    "value": {
+                      "ref": [
+                        "$$params",
+                        "want"
+                      ]
+                    }
+                  },
+                  "description": "",
+                  "expression": "every commits: signed == $$params.want",
+                  "meta": {},
+                  "op": "all",
+                  "path": [
+                    "commits"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "signed",
+              "failed_items": [
+                {
+                  "cause": "absent",
+                  "path": "commits[0]",
+                  "value": {
+                    "signed": true
+                  }
+                },
+                {
+                  "cause": "absent",
+                  "path": "commits[1]",
+                  "value": {
+                    "signed": false
+                  }
+                }
+              ],
+              "inputs": [
+                {
+                  "name": "commits[].signed",
+                  "value": [
+                    true,
+                    false
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "description": "all against params that are missing",
+    "requirements": {
+      "s": {
+        "checks": {
+          "signed": {
+            "check": {
+              "op": "equals",
+              "path": [
+                "signed"
+              ],
+              "value": {
+                "ref": [
+                  "$$params",
+                  "want"
+                ]
+              }
+            },
+            "op": "all",
+            "path": [
+              "commits"
+            ]
+          }
+        },
+        "from": [
+          "things"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "thing"
+      }
+    }
+  }
+]
