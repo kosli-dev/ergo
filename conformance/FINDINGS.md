@@ -23,7 +23,7 @@ The cause is in OPA's `NumberCompare`, which strips trailing `.` and `0` charact
 
 Case: `present / a min subjects whose value is a whole number is well formed however it is written (2)`, whose expected report was made with 1.19 and is wrong. The Rust port gets it right.
 
-**Values JSON can't hold were treated unevenly.** A set passed `in` as its `values`, but a set in the input failed `includes`. A number in a path read the key `1` of `{1: "a"}`. Fixed on the branch `core/reject-non-json-values`, which isn't merged yet: any set or key that isn't a string in the input or params now fails every check as `unusable`, and in a policy it's written wrong.
+**Values JSON can't hold were treated unevenly.** A set passed `in` as its `values`, but a set in the input failed `includes`. A number in a path read the key `1` of `{1: "a"}`. Fixed in #155: any set or key that isn't a string in the input or params now fails every check as `unusable`, and in a policy it's written wrong.
 
 ## Rego details a port has to copy
 
