@@ -855,7 +855,7 @@ _plain_numbers(v) := _plain_json(v, json.marshal(v))
 
 _plain_json(v, text) := v if not regex.match(`[:,\[]\s*(?:-?[0-9]+(?:\.[0-9]+)?[eE]|-?[0-9]+\.[0-9]*0\s*[,\]}]|-0\s*[,\]}])`, text)
 
-_plain_json(_, text) := json.unmarshal(concat("", [_plain_part(m) | some m in regex.find_all_string_submatch_n(`(-?[0-9][0-9.eE+-]*)|(?:"(?:[^"\\]|\\.)*"|[^"0-9-])+`, text, -1)])) if regex.match(`[:,\[]\s*(?:-?[0-9]+(?:\.[0-9]+)?[eE]|-?[0-9]+\.[0-9]*0\s*[,\]}]|-0\s*[,\]}])`, text)
+else := json.unmarshal(concat("", [_plain_part(m) | some m in regex.find_all_string_submatch_n(`(-?[0-9][0-9.eE+-]*)|(?:"(?:[^"\\]|\\.)*"|[^"0-9-])+`, text, -1)]))
 
 _plain_part(m) := m[0] if m[1] == ""
 
@@ -863,15 +863,9 @@ _plain_part(m) := _plain_number(m[1]) if m[1] != ""
 
 _plain_number(t) := t if regex.match(`^(?:0|-?[1-9][0-9]*|-?(?:0|[1-9][0-9]*)\.[0-9]*[1-9])$`, t)
 
-_plain_number(t) := t if {
-	not regex.match(`^(?:0|-?[1-9][0-9]*|-?(?:0|[1-9][0-9]*)\.[0-9]*[1-9])$`, t)
-	not _fits_a_float(json.unmarshal(t))
-}
+else := t if not _fits_a_float(json.unmarshal(t))
 
-_plain_number(t) := _number_text(t) if {
-	not regex.match(`^(?:0|-?[1-9][0-9]*|-?(?:0|[1-9][0-9]*)\.[0-9]*[1-9])$`, t)
-	_fits_a_float(json.unmarshal(t))
-}
+else := _number_text(t)
 
 _sorted_json(v) := concat("", [_node_json(paths, index, i) | some i, _ in paths]) if {
 	index := {p: x | walk(v, [p, x])}
