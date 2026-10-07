@@ -2713,6 +2713,7 @@ _check_inputs(subj, check, item) := [{"name": _item_path_name(item, check.path),
 	not check.inputs
 	not _two_sided(check)
 	not _quantified(check)
+	not _combinator(check)
 	check.path
 }
 

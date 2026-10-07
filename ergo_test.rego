@@ -6823,3 +6823,11 @@ test_patterns_written_as_a_set_are_only_reported_as_a_set if {
 	rep := ergo.report({"items": [{"id": "a", "x": "b"}]}, {"s": object.union(json_only_req.s, {"checks": {"m": {"op": "matches_any", "path": ["x"], "patterns": {"b"}}}})})
 	problem_inputs(rep) == [{"name": "checks.m", "value": ["holds a set"]}]
 }
+
+test_an_any_of_with_a_stray_path_is_written_wrong_instead_of_stopping_the_report if {
+	check := {"op": "any_of", "path": ["y"], "options": {"o": [{"op": "equals", "path": ["x"], "value": 1}]}}
+	rep := ergo.report({"items": [{"id": "a", "x": 1}]}, {"s": {"subject_type": "thing", "from": ["items"], "id": ["id"], "checks": {"c": check}}})
+	r := rows_for(rep, "s", "c")[0]
+	[r.passed, r.cause, r.inputs] == [false, "ill_formed", [{"name": "x", "value": 1}]]
+	rep.compliant == false
+}
