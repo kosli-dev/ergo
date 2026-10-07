@@ -57,6 +57,7 @@ pub struct List<'a> {
 
 pub enum Kind<'a> {
     Leaf(Leaf<'a>),
+    Cel(crate::cel::Expression),
     List(List<'a>),
     AnyOf(Vec<Vec<Check<'a>>>),
 }
@@ -246,6 +247,10 @@ pub fn parse<'a>(v: &'a Value, place: &Place) -> Option<Check<'a>> {
             }
             let inner = Box::new(parse(raw.get("check")?, &inner_place)?);
             (Kind::List(List { every: op == "all", path, each, as_, inner }), &["path", "check", "each", "as"])
+        }
+        "cel" => {
+            let expr = crate::cel::compile(raw.get("expr")?.as_str()?, &place.given).ok()?;
+            (Kind::Cel(expr), &["expr"])
         }
         "any_of" => {
             if place.in_option {
@@ -547,6 +552,7 @@ impl<'a> Check<'a> {
     pub fn passed(&self, x: &'a Value, ctx: &Ctx<'a>) -> bool {
         match &self.kind {
             Kind::Leaf(l) => l.passed(x, ctx),
+            Kind::Cel(e) => matches!(e.evaluate(x, ctx), crate::cel::Outcome::True),
             Kind::List(l) => l.passed(x, ctx),
             Kind::AnyOf(options) => options.iter().any(|group| group.iter().all(|c| c.passed(x, ctx))),
         }
@@ -555,6 +561,7 @@ impl<'a> Check<'a> {
     pub fn cause(&self, x: &'a Value, ctx: &Ctx<'a>) -> Cause {
         match &self.kind {
             Kind::Leaf(l) => l.cause(x, ctx),
+            Kind::Cel(e) => e.cause(x, ctx),
             Kind::List(l) => l.cause(x, ctx),
             Kind::AnyOf(options) => {
                 if self.passed(x, ctx) {
@@ -576,6 +583,7 @@ impl<'a> Check<'a> {
         let mut out = vec![];
         match &self.kind {
             Kind::Leaf(l) => out.push(l),
+            Kind::Cel(_) => {}
             Kind::List(l) => out.extend(l.inner.all_leaves()),
             Kind::AnyOf(options) => out.extend(options.iter().flat_map(|g| g.iter().flat_map(|c| c.all_leaves()))),
         }

@@ -26,4 +26,11 @@ On 7 October 2026 both gave the same reports. OPA 1.19 took 0.9 s and 8.5 s to e
 
 Run the Docker commands from the root of the repo. Keep the build in `/target` and out of `ports/rust/target`, because Cargo writes JSON files there and `opa test .` would load them as data.
 
-What it doesn't do: custom operators, which only exist in Rego for now.
+Instead of Rego custom operators, it has a `cel` operator, a prototype: `{"op": "cel", "expr": "size(self.files) >= self.total_files"}`. The expression is [CEL](https://cel.dev). `self` is the subject or list item being checked, each name given by `each_as` or `as` is a variable, and so are `params` and `input`. The check passes only when the expression gives `true`. A missing field fails it as `absent`, a type error as `unusable`, and otherwise the cause comes from the fields it read, which the row lists as its inputs. ergo adds one function to CEL, `sum(list)`. `ergo.rego` doesn't know `cel`, so its tests are in `tests/cel.rs` rather than the conformance suite:
+
+```sh
+docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry \
+  -e CARGO_TARGET_DIR=/target -w /src/ports/rust rust:1 sh -c 'touch src/*.rs tests/*.rs && cargo test --test cel'
+```
+
+Docker on a Mac doesn't always tell Cargo that a file changed, which is why the command touches the sources first.

@@ -12,6 +12,7 @@ fn required_fields(op: &str) -> &'static [&'static str] {
         "compare" | "compare_time" => &["left", "right", "cmp"],
         "all" | "any" => &["path", "check"],
         "any_of" => &["options"],
+        "cel" => &["expr"],
         _ => &[],
     }
 }
@@ -396,6 +397,19 @@ fn node_problems(node: &Node) -> BTreeSet<String> {
             }
             Some(_) => {
                 out.insert("invalid options".into());
+            }
+            None => {}
+        }
+    }
+    if op == "cel" {
+        match m.get("expr") {
+            Some(Value::String(e)) => {
+                if let Some(p) = crate::cel::problem(e, &node.names) {
+                    out.insert(p);
+                }
+            }
+            Some(_) => {
+                out.insert("invalid expr".into());
             }
             None => {}
         }

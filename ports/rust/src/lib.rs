@@ -1,3 +1,4 @@
+mod cel;
 mod check;
 mod path;
 mod problems;

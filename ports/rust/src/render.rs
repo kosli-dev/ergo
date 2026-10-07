@@ -2,7 +2,8 @@ use crate::path::{Ctx, Read, index_key};
 use crate::value::rego_order;
 use serde_json::{Map, Value, json};
 
-pub const LEAF_OPS: [&str; 13] = [
+pub const LEAF_OPS: [&str; 14] = [
+    "cel",
     "range", "excludes", "includes", "in", "equals", "present", "missing", "non_empty_string", "empty", "matches_any", "not_matches_any", "compare", "compare_time",
 ];
 
@@ -296,6 +297,11 @@ fn leaf_describe(check: &Value, item: &str) -> Option<String> {
         "empty" => format!("{} is empty", p("path")?),
         "matches_any" => format!("{} matches one of {}", p("path")?, patterns()),
         "not_matches_any" => format!("{} matches none of {}", p("path")?, patterns()),
+        "cel" => match m.get("expr") {
+            Some(Value::String(e)) => e.clone(),
+            Some(other) => text(other),
+            None => "<missing expr>".into(),
+        },
         "compare" | "compare_time" => {
             let cmp = m.get("cmp").map(text).unwrap_or_else(|| "<missing cmp>".into());
             format!("{} {cmp} {}", p("left")?, p("right")?)
@@ -460,6 +466,13 @@ fn named_path(p: &Value) -> Option<&str> {
     p.as_array()?.first()?.as_str().filter(|s| s.starts_with('$'))
 }
 
+fn cel_reads(leaf: &Value) -> Vec<Value> {
+    match (op_of(leaf), leaf.get("expr").and_then(Value::as_str)) {
+        (Some("cel"), Some(e)) => crate::cel::reads(e),
+        _ => vec![],
+    }
+}
+
 fn leaf_paths(leaf: &Value) -> Vec<&Value> {
     if two_sided(leaf) {
         return [leaf.get("left"), leaf.get("right")].into_iter().flatten().collect();
@@ -500,6 +513,7 @@ fn element_name_reads(check: &Value) -> Vec<Value> {
             }
         } else {
             reads.extend(leaf_paths(leaf).into_iter().map(|p| (p.clone(), given.clone())));
+            reads.extend(cel_reads(leaf).into_iter().map(|p| (p, given.clone())));
         }
     }
     let mut named: Vec<Value> = reads
@@ -587,7 +601,8 @@ fn check_inputs<'a>(ctx: &Ctx<'a>, subject: &'a Value, check: &Value, item: &str
     if combinator(check) {
         let mut reads: Vec<(String, Value)> = vec![];
         for leaf in element_leaves(check) {
-            let paths: Vec<Value> = if quantified(leaf) { list_reads(leaf) } else { leaf_paths(leaf).into_iter().cloned().collect() };
+            let mut paths: Vec<Value> = if quantified(leaf) { list_reads(leaf) } else { leaf_paths(leaf).into_iter().cloned().collect() };
+            paths.extend(cel_reads(leaf));
             for p in paths {
                 reads.push((item_path_name(item, &p)?, value_at(ctx, subject, &p)));
             }
@@ -595,6 +610,9 @@ fn check_inputs<'a>(ctx: &Ctx<'a>, subject: &'a Value, check: &Value, item: &str
         reads.sort_by(|a, b| a.0.cmp(&b.0).then_with(|| rego_order(&a.1, &b.1)));
         reads.dedup();
         return Some(reads.into_iter().map(|(n, v)| entry(n, v)).collect());
+    }
+    if op_of(check) == Some("cel") {
+        return cel_reads(check).iter().map(|p| Some(entry(item_path_name(item, p)?, value_at(ctx, subject, p)))).collect();
     }
     let p = m.get("path").filter(|p| truthy(Some(p)))?;
     Some(vec![entry(item_path_name(item, p)?, value_at(ctx, subject, p))])
