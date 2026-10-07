@@ -2570,6 +2570,13 @@ test_a_check_meta_that_json_cannot_hold_is_written_wrong_and_is_reported_empty i
 	[rep.requirements.s.checks[c].meta | some c in ["k", "r", "s"]] == [{}, {}, {}]
 }
 
+test_a_null_description_or_meta_counts_as_none_since_an_empty_yaml_field_reads_as_null if {
+	rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"description": null, "meta": null, "checks": {"c": {"op": "present", "path": ["id"], "description": null, "meta": null}}})})
+	rows_for(rep, "s", "$well_formed")[0].passed == true
+	[rep.requirements.s.description, rep.requirements.s.meta] == ["", {}]
+	[rep.requirements.s.checks.c.description, rep.requirements.s.checks.c.meta] == ["", {}]
+}
+
 test_an_empty_requirement_meta_is_well_formed_and_reported if {
 	rep := ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"meta": {}})})
 	rows_for(rep, "s", "$well_formed")[0].passed == true
@@ -2578,7 +2585,7 @@ test_an_empty_requirement_meta_is_well_formed_and_reported if {
 
 test_a_requirement_description_or_meta_of_the_wrong_type_never_reaches_the_report if {
 	reps := [ergo.report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"description": d, "meta": m})}) |
-		some [d, m] in [[5, "x"], [null, null], [["a"], ["m"]]]
+		some [d, m] in [[5, "x"], [false, 0], [["a"], ["m"]]]
 	]
 	[[r.requirements.s.status, r.requirements.s.description, r.requirements.s.meta] | some r in reps] == [
 		["not_met", "", {}],
@@ -2702,10 +2709,10 @@ wrong_types := [
 	["subject_type", {"name": "x"}],
 	["subject_type", null],
 	["description", 5],
-	["description", null],
+	["description", false],
 	["description", ["d"]],
 	["meta", "x"],
-	["meta", null],
+	["meta", 0],
 	["meta", ["x"]],
 ]
 
@@ -3057,7 +3064,7 @@ test_a_check_description_or_meta_of_the_wrong_type_is_written_wrong_and_never_re
 	rep := ergo.report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {
 		"d": {"op": "present", "path": ["n"], "description": 5},
 		"m": {"op": "present", "path": ["n"], "meta": "high"},
-		"n": {"op": "present", "path": ["n"], "meta": null},
+		"n": {"op": "present", "path": ["n"], "meta": []},
 	}}})
 	problem_inputs(rep) == [
 		{"name": "checks.d", "value": ["invalid description"]},

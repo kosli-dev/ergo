@@ -55,7 +55,11 @@ _has_type("subject_type", v) if {
 
 _has_type("description", v) if is_string(v)
 
+_has_type("description", null)
+
 _has_type("meta", v) if is_object(v)
+
+_has_type("meta", null)
 
 _meta_problems(m) := ({"holds a key that isn't a string" |
 	walk(m, [_, x])
@@ -1396,10 +1400,10 @@ _unknown_fields_problem(node) := {concat("", ["unknown field ", _text(f)]) |
 
 _wording_problem(node) := ({"invalid description" |
 	"description" in object.keys(node)
-	not is_string(node.description)
+	not _has_type("description", node.description)
 } | {"invalid meta" |
 	"meta" in object.keys(node)
-	not is_object(node.meta)
+	not _has_type("meta", node.meta)
 }) | {concat("", ["meta ", p]) |
 	"meta" in object.keys(node)
 	is_object(node.meta)
