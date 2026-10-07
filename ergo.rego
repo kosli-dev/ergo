@@ -283,11 +283,6 @@ _target_read(doc, req) := doc if {
 }
 
 _target_read(doc, req) := _absent if {
-	is_array(doc)
-	_from_keys(req) == []
-}
-
-_target_read(doc, req) := _absent if {
 	not is_object(doc)
 	count(_from_keys(req)) > 0
 }
@@ -306,10 +301,7 @@ default _target_state(_, _) := "absent"
 
 _target_state(doc, req) := "null" if _target_read(doc, req) == null
 
-_target_state(doc, req) := "unusable" if {
-	is_array(doc)
-	_from_keys(req) == []
-}
+_target_state(doc, _) := "unusable" if is_array(doc)
 
 _target_state(doc, req) := "unusable" if {
 	_target_read(doc, req) == _absent

@@ -2364,6 +2364,14 @@ test_min_subjects_fails_when_from_has_steps_and_the_document_is_not_an_object if
 	}
 }
 
+test_min_subjects_fails_as_unusable_on_a_list_input_even_when_from_starts_with_an_index if {
+	every f in [[0], [0, "items"]] {
+		req := {"s": object.union(min_subjects_req(0).s, {"from": f})}
+		rep := ergo.report([{"items": []}], req)
+		[[r.passed, r.cause] | some r in rows_for(rep, "s", "$min_subjects")] == [[false, "unusable"]]
+	}
+}
+
 test_min_subjects_fails_with_the_cause_of_an_each_from_it_cannot_read if {
 	req := {"s": object.union(min_subjects_req(0).s, {"from": ["items", {"each_as": "item"}]})}
 	every doc, cause in {"{}": "absent", `{"items": null}`: "null", `{"items": "none"}`: "unusable"} {
