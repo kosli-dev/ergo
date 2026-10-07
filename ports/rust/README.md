@@ -16,6 +16,14 @@ docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registr
   -e CARGO_TARGET_DIR=/target -w /src/ports/rust rust:1 cargo run --release -q --example report -- input.json requirements.json 5
 ```
 
-Run both from the root of the repo. Keep the build in `/target` and out of `ports/rust/target`, because Cargo writes JSON files there and `opa test .` would load them as data.
+`bench/make_inputs.py <folder>` writes the inputs and requirements used to compare it with `ergo.rego`, 1,000 and 10,000 deployments, along with a `data.json` and `bench.rego` for OPA:
+
+```sh
+opa eval -d ergo.rego -d <folder>/bench.rego -d <folder>/data.json -i <folder>/input-1000.json --metrics 'count(data.bench.report.results)'
+```
+
+On 7 October 2026 both gave the same reports. OPA 1.19 took 0.9 s and 8.5 s to evaluate them, and the Rust port 9 ms and 91 ms.
+
+Run the Docker commands from the root of the repo. Keep the build in `/target` and out of `ports/rust/target`, because Cargo writes JSON files there and `opa test .` would load them as data.
 
 What it doesn't do yet: the other operators, `each`, `as` and nested `all` or `any`, `any_of`, substitutes, selectors and naming steps, custom operators, and the details `$well_formed` gives when a requirement is written wrong.
