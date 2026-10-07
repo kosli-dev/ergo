@@ -295,6 +295,8 @@ _target_cause(doc, req) := c if {
 	c != "value"
 }
 
+_target_cause(_, req) := "value" if not _from_well_formed(req)
+
 _keys_step(req) if "keys" in object.keys(_each_step(req))
 
 default _target_state(_, _) := "absent"
@@ -2957,7 +2959,10 @@ _min_subjects_cause(doc, req) := _verdict_cause(_enough_subjects(doc, req)) if {
 
 _min_subjects_cause(doc, req) := _target_cause(doc, req)
 
-_min_subjects_cause(_, req) := _from_cause(req) if _from_unreadable(req)
+_min_subjects_cause(_, req) := _from_cause(req) if {
+	_from_well_formed(req)
+	_from_unreadable(req)
+}
 
 _unique_ids_row(doc, req, req_name) := {
 	"requirement": req_name,

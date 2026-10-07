@@ -2419,6 +2419,16 @@ test_a_violation_for_a_from_that_reads_nothing_says_what_failed if {
 	[[v.description, v.expression, v.cause] | some v in ergo.violations(rep)] == [["The thing list can be read", "items can be read", "absent"]]
 }
 
+test_min_subjects_fails_like_well_formed_when_from_is_written_wrong_even_at_zero if {
+	every f in ["items", [{"each_as": "it"}, "items"], ["items", {"each_as": "it", "bad": 1}], ["items", {"ref": ["$$params", "nope"]}, {"bad": 1}]] {
+		every n in [0, 1] {
+			req := {"s": object.union(min_subjects_req(n).s, {"from": f})}
+			rep := ergo.report({"items": [{"id": "a"}]}, req)
+			[[r.passed, r.cause] | some r in rows_for(rep, "s", "$min_subjects")] == [[false, "value"]]
+		}
+	}
+}
+
 test_a_from_that_reads_nothing_lists_its_min_subjects_row_as_a_violation if {
 	rep := ergo.report({}, min_subjects_req(0))
 	[[v.check, v.cause] | some v in ergo.violations(rep)] == [["$min_subjects", "absent"]]
