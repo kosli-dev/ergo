@@ -9,6 +9,13 @@ docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registr
   -e CARGO_TARGET_DIR=/target -w /src/ports/rust rust:1 cargo test --test conformance -- --nocapture
 ```
 
-Run it from the root of the repo. Keep the build in `/target` and out of `ports/rust/target`, because Cargo writes JSON files there and `opa test .` would load them as data.
+To time a report, `examples/report.rs` takes an input file, a requirements file and a number of runs, prints the report and says how long a run took:
+
+```sh
+docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry \
+  -e CARGO_TARGET_DIR=/target -w /src/ports/rust rust:1 cargo run --release -q --example report -- input.json requirements.json 5
+```
+
+Run both from the root of the repo. Keep the build in `/target` and out of `ports/rust/target`, because Cargo writes JSON files there and `opa test .` would load them as data.
 
 What it doesn't do yet: the other operators, `each`, `as` and nested `all` or `any`, `any_of`, substitutes, selectors and naming steps, custom operators, and the details `$well_formed` gives when a requirement is written wrong.
