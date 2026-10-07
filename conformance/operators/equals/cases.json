@@ -1,0 +1,2352 @@
+[
+  {
+    "cases": [
+      {
+        "description": "passes when the value matches",
+        "input": {
+          "pull_requests": [
+            {
+              "id": "p1",
+              "state": "MERGED"
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "merged": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope pull request count is at least 1",
+                  "expression": "count(matching(pull_requests)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every pull request id is unique",
+                  "expression": "count(repeated(ids(pull_requests))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "is_merged": {
+                  "description": "",
+                  "expression": "state == \"MERGED\"",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "state"
+                  ],
+                  "value": "MERGED"
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "merged",
+              "subject": {
+                "id": null,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope pull request count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "merged",
+              "subject": {
+                "id": null,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated pull request ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "merged",
+              "subject": {
+                "id": null,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "is_merged",
+              "inputs": [
+                {
+                  "name": "state",
+                  "value": "MERGED"
+                }
+              ],
+              "passed": true,
+              "requirement": "merged",
+              "subject": {
+                "id": "p1",
+                "type": "pull request"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "fails when the value differs",
+        "input": {
+          "pull_requests": [
+            {
+              "id": "p1",
+              "state": "CLOSED"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "merged": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope pull request count is at least 1",
+                  "expression": "count(matching(pull_requests)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every pull request id is unique",
+                  "expression": "count(repeated(ids(pull_requests))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "is_merged": {
+                  "description": "",
+                  "expression": "state == \"MERGED\"",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "state"
+                  ],
+                  "value": "MERGED"
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "merged",
+              "subject": {
+                "id": null,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope pull request count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "merged",
+              "subject": {
+                "id": null,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated pull request ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "merged",
+              "subject": {
+                "id": null,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "is_merged",
+              "inputs": [
+                {
+                  "name": "state",
+                  "value": "CLOSED"
+                }
+              ],
+              "passed": false,
+              "requirement": "merged",
+              "subject": {
+                "id": "p1",
+                "type": "pull request"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "is_merged",
+            "description": "",
+            "expression": "state == \"MERGED\"",
+            "inputs": [
+              {
+                "name": "state",
+                "value": "CLOSED"
+              }
+            ],
+            "requirement": "merged",
+            "subject": {
+              "id": "p1",
+              "type": "pull request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "input": {
+          "pull_requests": [
+            {
+              "id": "p1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "merged": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope pull request count is at least 1",
+                  "expression": "count(matching(pull_requests)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every pull request id is unique",
+                  "expression": "count(repeated(ids(pull_requests))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "is_merged": {
+                  "description": "",
+                  "expression": "state == \"MERGED\"",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "state"
+                  ],
+                  "value": "MERGED"
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "merged",
+              "subject": {
+                "id": null,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope pull request count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "merged",
+              "subject": {
+                "id": null,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated pull request ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "merged",
+              "subject": {
+                "id": null,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "is_merged",
+              "inputs": [
+                {
+                  "name": "state",
+                  "value": null
+                }
+              ],
+              "passed": false,
+              "requirement": "merged",
+              "subject": {
+                "id": "p1",
+                "type": "pull request"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "absent",
+            "check": "is_merged",
+            "description": "",
+            "expression": "state == \"MERGED\"",
+            "inputs": [
+              {
+                "name": "state",
+                "value": null
+              }
+            ],
+            "requirement": "merged",
+            "subject": {
+              "id": "p1",
+              "type": "pull request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "input": {
+          "pull_requests": [
+            {
+              "id": "p1",
+              "state": null
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "merged": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope pull request count is at least 1",
+                  "expression": "count(matching(pull_requests)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every pull request id is unique",
+                  "expression": "count(repeated(ids(pull_requests))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "is_merged": {
+                  "description": "",
+                  "expression": "state == \"MERGED\"",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "state"
+                  ],
+                  "value": "MERGED"
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "merged",
+              "subject": {
+                "id": null,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope pull request count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "merged",
+              "subject": {
+                "id": null,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated pull request ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "merged",
+              "subject": {
+                "id": null,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "null",
+              "check": "is_merged",
+              "inputs": [
+                {
+                  "name": "state",
+                  "value": null
+                }
+              ],
+              "passed": false,
+              "requirement": "merged",
+              "subject": {
+                "id": "p1",
+                "type": "pull request"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "null",
+            "check": "is_merged",
+            "description": "",
+            "expression": "state == \"MERGED\"",
+            "inputs": [
+              {
+                "name": "state",
+                "value": null
+              }
+            ],
+            "requirement": "merged",
+            "subject": {
+              "id": "p1",
+              "type": "pull request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails when the field is another type",
+        "input": {
+          "pull_requests": [
+            {
+              "id": "p1",
+              "state": [
+                "MERGED"
+              ]
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "merged": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope pull request count is at least 1",
+                  "expression": "count(matching(pull_requests)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every pull request id is unique",
+                  "expression": "count(repeated(ids(pull_requests))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "is_merged": {
+                  "description": "",
+                  "expression": "state == \"MERGED\"",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "state"
+                  ],
+                  "value": "MERGED"
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "merged",
+              "subject": {
+                "id": null,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope pull request count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "merged",
+              "subject": {
+                "id": null,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated pull request ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "merged",
+              "subject": {
+                "id": null,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "is_merged",
+              "inputs": [
+                {
+                  "name": "state",
+                  "value": [
+                    "MERGED"
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "merged",
+              "subject": {
+                "id": "p1",
+                "type": "pull request"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "is_merged",
+            "description": "",
+            "expression": "state == \"MERGED\"",
+            "inputs": [
+              {
+                "name": "state",
+                "value": [
+                  "MERGED"
+                ]
+              }
+            ],
+            "requirement": "merged",
+            "subject": {
+              "id": "p1",
+              "type": "pull request"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "equals a string",
+    "requirements": {
+      "merged": {
+        "checks": {
+          "is_merged": {
+            "op": "equals",
+            "path": [
+              "state"
+            ],
+            "value": "MERGED"
+          }
+        },
+        "from": [
+          "pull_requests"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "pull request"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "passes on the same number",
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "n": 1
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "one": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "is_one": {
+                  "description": "",
+                  "expression": "n == 1",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "n"
+                  ],
+                  "value": 1
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "one",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "one",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "one",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "is_one",
+              "inputs": [
+                {
+                  "name": "n",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "one",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "fails on the same digits as a string, because equals compares types too",
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "n": "1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "one": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "is_one": {
+                  "description": "",
+                  "expression": "n == 1",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "n"
+                  ],
+                  "value": 1
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "one",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "one",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "one",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "is_one",
+              "inputs": [
+                {
+                  "name": "n",
+                  "value": "1"
+                }
+              ],
+              "passed": false,
+              "requirement": "one",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "description": "equals a number",
+    "requirements": {
+      "one": {
+        "checks": {
+          "is_one": {
+            "op": "equals",
+            "path": [
+              "n"
+            ],
+            "value": 1
+          }
+        },
+        "from": [
+          "things"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "passes on true",
+        "input": {
+          "commits": [
+            {
+              "sha": "abc",
+              "verified": true
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "verified": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope commit count is at least 1",
+                  "expression": "count(matching(commits)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every commit id is unique",
+                  "expression": "count(repeated(ids(commits))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "is_verified": {
+                  "description": "",
+                  "expression": "verified == true",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "verified"
+                  ],
+                  "value": true
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "verified",
+              "subject": {
+                "id": null,
+                "type": "commit"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope commit count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "verified",
+              "subject": {
+                "id": null,
+                "type": "commit"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated commit ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "verified",
+              "subject": {
+                "id": null,
+                "type": "commit"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "is_verified",
+              "inputs": [
+                {
+                  "name": "verified",
+                  "value": true
+                }
+              ],
+              "passed": true,
+              "requirement": "verified",
+              "subject": {
+                "id": "abc",
+                "type": "commit"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "fails on the string true",
+        "input": {
+          "commits": [
+            {
+              "sha": "abc",
+              "verified": "true"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "verified": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope commit count is at least 1",
+                  "expression": "count(matching(commits)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every commit id is unique",
+                  "expression": "count(repeated(ids(commits))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "is_verified": {
+                  "description": "",
+                  "expression": "verified == true",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "verified"
+                  ],
+                  "value": true
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "verified",
+              "subject": {
+                "id": null,
+                "type": "commit"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope commit count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "verified",
+              "subject": {
+                "id": null,
+                "type": "commit"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated commit ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "verified",
+              "subject": {
+                "id": null,
+                "type": "commit"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "is_verified",
+              "inputs": [
+                {
+                  "name": "verified",
+                  "value": "true"
+                }
+              ],
+              "passed": false,
+              "requirement": "verified",
+              "subject": {
+                "id": "abc",
+                "type": "commit"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "description": "equals a boolean",
+    "requirements": {
+      "verified": {
+        "checks": {
+          "is_verified": {
+            "op": "equals",
+            "path": [
+              "verified"
+            ],
+            "value": true
+          }
+        },
+        "from": [
+          "commits"
+        ],
+        "id": [
+          "sha"
+        ],
+        "subject_type": "commit"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "passes when the whole object matches",
+        "input": {
+          "things": [
+            {
+              "a": {
+                "b": [
+                  1,
+                  2
+                ]
+              },
+              "id": "t1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "nested": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "same": {
+                  "description": "",
+                  "expression": "a == {\"b\": [1, 2]}",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "a"
+                  ],
+                  "value": {
+                    "b": [
+                      1,
+                      2
+                    ]
+                  }
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "nested",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "nested",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "nested",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "same",
+              "inputs": [
+                {
+                  "name": "a",
+                  "value": {
+                    "b": [
+                      1,
+                      2
+                    ]
+                  }
+                }
+              ],
+              "passed": true,
+              "requirement": "nested",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "fails when a list inside is in another order",
+        "input": {
+          "things": [
+            {
+              "a": {
+                "b": [
+                  2,
+                  1
+                ]
+              },
+              "id": "t1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "nested": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "same": {
+                  "description": "",
+                  "expression": "a == {\"b\": [1, 2]}",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "a"
+                  ],
+                  "value": {
+                    "b": [
+                      1,
+                      2
+                    ]
+                  }
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "nested",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "nested",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "nested",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "same",
+              "inputs": [
+                {
+                  "name": "a",
+                  "value": {
+                    "b": [
+                      2,
+                      1
+                    ]
+                  }
+                }
+              ],
+              "passed": false,
+              "requirement": "nested",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "description": "equals an object",
+    "requirements": {
+      "nested": {
+        "checks": {
+          "same": {
+            "op": "equals",
+            "path": [
+              "a"
+            ],
+            "value": {
+              "b": [
+                1,
+                2
+              ]
+            }
+          }
+        },
+        "from": [
+          "things"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "passes on an explicit null",
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "x": null
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "cleared": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "is_null": {
+                  "description": "",
+                  "expression": "x == null",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "x"
+                  ],
+                  "value": null
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "cleared",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "cleared",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "cleared",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "is_null",
+              "inputs": [
+                {
+                  "name": "x",
+                  "value": null
+                }
+              ],
+              "passed": true,
+              "requirement": "cleared",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "fails when the field is missing, because missing is not null",
+        "input": {
+          "things": [
+            {
+              "id": "t1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "cleared": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(things)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(things))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "is_null": {
+                  "description": "",
+                  "expression": "x == null",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "x"
+                  ],
+                  "value": null
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "cleared",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "cleared",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "cleared",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "is_null",
+              "inputs": [
+                {
+                  "name": "x",
+                  "value": null
+                }
+              ],
+              "passed": false,
+              "requirement": "cleared",
+              "subject": {
+                "id": "t1",
+                "type": "thing"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "description": "equals null",
+    "requirements": {
+      "cleared": {
+        "checks": {
+          "is_null": {
+            "op": "equals",
+            "path": [
+              "x"
+            ],
+            "value": null
+          }
+        },
+        "from": [
+          "things"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "passes when the value matches the param",
+        "input": {
+          "deployments": [
+            {
+              "environment": "prod",
+              "id": "d1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "prod": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope deployment count is at least 1",
+                  "expression": "count(matching(deployments)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every deployment id is unique",
+                  "expression": "count(repeated(ids(deployments))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "is_prod": {
+                  "$refs": [
+                    {
+                      "name": "$$params.env",
+                      "value": "prod"
+                    }
+                  ],
+                  "description": "",
+                  "expression": "environment == $$params.env",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "environment"
+                  ],
+                  "value": {
+                    "ref": [
+                      "$$params",
+                      "env"
+                    ]
+                  }
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "prod",
+              "subject": {
+                "id": null,
+                "type": "deployment"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope deployment count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "prod",
+              "subject": {
+                "id": null,
+                "type": "deployment"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated deployment ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "prod",
+              "subject": {
+                "id": null,
+                "type": "deployment"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "is_prod",
+              "inputs": [
+                {
+                  "name": "environment",
+                  "value": "prod"
+                }
+              ],
+              "passed": true,
+              "requirement": "prod",
+              "subject": {
+                "id": "d1",
+                "type": "deployment"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "description": "fails when the value differs from the param",
+        "input": {
+          "deployments": [
+            {
+              "environment": "staging",
+              "id": "d1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "prod": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope deployment count is at least 1",
+                  "expression": "count(matching(deployments)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every deployment id is unique",
+                  "expression": "count(repeated(ids(deployments))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "is_prod": {
+                  "$refs": [
+                    {
+                      "name": "$$params.env",
+                      "value": "prod"
+                    }
+                  ],
+                  "description": "",
+                  "expression": "environment == $$params.env",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "environment"
+                  ],
+                  "value": {
+                    "ref": [
+                      "$$params",
+                      "env"
+                    ]
+                  }
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "prod",
+              "subject": {
+                "id": null,
+                "type": "deployment"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope deployment count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "prod",
+              "subject": {
+                "id": null,
+                "type": "deployment"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated deployment ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "prod",
+              "subject": {
+                "id": null,
+                "type": "deployment"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "is_prod",
+              "inputs": [
+                {
+                  "name": "environment",
+                  "value": "staging"
+                }
+              ],
+              "passed": false,
+              "requirement": "prod",
+              "subject": {
+                "id": "d1",
+                "type": "deployment"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "is_prod",
+            "description": "",
+            "expression": "environment == $$params.env",
+            "inputs": [
+              {
+                "name": "environment",
+                "value": "staging"
+              },
+              {
+                "name": "$$params.env",
+                "value": "prod"
+              }
+            ],
+            "requirement": "prod",
+            "subject": {
+              "id": "d1",
+              "type": "deployment"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "equals a value from the params",
+    "params": {
+      "env": "prod"
+    },
+    "requirements": {
+      "prod": {
+        "checks": {
+          "is_prod": {
+            "op": "equals",
+            "path": [
+              "environment"
+            ],
+            "value": {
+              "ref": [
+                "$$params",
+                "env"
+              ]
+            }
+          }
+        },
+        "from": [
+          "deployments"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "deployment"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "fails as absent, because ergo has no defaults",
+        "input": {
+          "deployments": [
+            {
+              "environment": "prod",
+              "id": "d1"
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "prod": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope deployment count is at least 1",
+                  "expression": "count(matching(deployments)) >= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every deployment id is unique",
+                  "expression": "count(repeated(ids(deployments))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "is_prod": {
+                  "$refs": [
+                    {
+                      "name": "$$params.env",
+                      "value": null
+                    }
+                  ],
+                  "description": "",
+                  "expression": "environment == $$params.env",
+                  "meta": {},
+                  "op": "equals",
+                  "path": [
+                    "environment"
+                  ],
+                  "value": {
+                    "ref": [
+                      "$$params",
+                      "env"
+                    ]
+                  }
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "prod",
+              "subject": {
+                "id": null,
+                "type": "deployment"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope deployment count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "prod",
+              "subject": {
+                "id": null,
+                "type": "deployment"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated deployment ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "prod",
+              "subject": {
+                "id": null,
+                "type": "deployment"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "is_prod",
+              "inputs": [
+                {
+                  "name": "environment",
+                  "value": "prod"
+                }
+              ],
+              "passed": false,
+              "requirement": "prod",
+              "subject": {
+                "id": "d1",
+                "type": "deployment"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "absent",
+            "check": "is_prod",
+            "description": "",
+            "expression": "environment == $$params.env",
+            "inputs": [
+              {
+                "name": "environment",
+                "value": "prod"
+              },
+              {
+                "name": "$$params.env",
+                "value": null
+              }
+            ],
+            "requirement": "prod",
+            "subject": {
+              "id": "d1",
+              "type": "deployment"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "equals a value from params that are missing",
+    "requirements": {
+      "prod": {
+        "checks": {
+          "is_prod": {
+            "op": "equals",
+            "path": [
+              "environment"
+            ],
+            "value": {
+              "ref": [
+                "$$params",
+                "env"
+              ]
+            }
+          }
+        },
+        "from": [
+          "deployments"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "deployment"
+      }
+    }
+  }
+]

@@ -13,6 +13,7 @@ ergo is a Rego library that turns policy evaluation into a structured report. Us
 - `CODE_OF_CONDUCT.md` is the Contributor Covenant 2.1, unchanged apart from the contact address.
 - `.github/ISSUE_TEMPLATE/` and `.github/pull_request_template.md` are the forms GitHub shows for new issues and pull requests.
 - `examples/` holds worked examples. Each one has an input, the same policy in plain Rego and with ergo, and tests that pin what both versions report.
+- `conformance/` holds tests in plain JSON that any implementation of ergo can run, not just this one. `conformance_test.rego` runs them against `ergo.rego`.
 
 ## Checks
 
@@ -54,6 +55,18 @@ CI also fails when a line of Rego isn't reached by any test. To list those lines
 
 ```sh
 opa test . --ignore .github --coverage | jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' | sort -u
+```
+
+## Conformance suite
+
+The conformance suite pins whole reports in JSON, so a version of ergo in another language can be checked against the same cases. Each topic is a folder with one `cases.json` in it, like `conformance/operators/equals/cases.json`, because OPA names the data after the folder and not the file.
+
+A `cases.json` holds a list of groups. Each group has a `description`, the `requirements`, and `params` when the policy takes any. Leaving `params` out means the policy has none. Each case in the group's `cases` has a `description`, an `input` and the expected `report`, and `violations` when the case should check those too.
+
+Write a new case without its `report` (and with `"violations": []` if you want them checked), then run `conformance/generate.sh` to fill in what `ergo.rego` reports. Read the diff before committing it, because a generated report is only right if ergo is. When a test fails, this lists the cases that differ:
+
+```sh
+opa eval -d . --ignore .github --format pretty 'data.conformance_test.failures'
 ```
 
 ## Tests
