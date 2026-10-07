@@ -61,15 +61,17 @@ _has_type("meta", v) if is_object(v)
 
 _has_type("meta", null)
 
-_meta_problems(m) := ({"holds a key that isn't a string" |
-	walk(m, [_, x])
+_json_problems(v) := {"holds a key that isn't a string" |
+	walk(v, [_, x])
 	is_object(x)
 	some k in object.keys(x)
 	not is_string(k)
 } | {"holds a set" |
-	walk(m, [_, x])
+	walk(v, [_, x])
 	is_set(x)
-}) | {"number out of range" | _out_of_range(m)}
+}
+
+_meta_problems(m) := _json_problems(m) | {"number out of range" | _out_of_range(m)}
 
 _meta_shaped(v) if {
 	is_object(v)
@@ -126,7 +128,14 @@ _wrong_type_problems := {
 	"meta": "not an object",
 }
 
-_req_problems(req) := union({_req_meta_problems(req), _type_problems(req), _range_problems(req), _unknown_problems(req), _checks_problems(req), _require_problems(req), _path_problems(req, "from"), _path_problems(req, "id"), _naming_step_problems(req), _where_problems(req)})
+_req_problems(req) := union({_req_meta_problems(req), _type_problems(req), _range_problems(req), _unknown_problems(req), _checks_problems(req), _require_problems(req), _path_problems(req, "from"), _path_problems(req, "id"), _naming_step_problems(req), _where_problems(req), _req_json_problems(req)})
+
+_req_json_problems(req) := {[f, p] |
+	some f in ["from", "id"]
+	v := _req_field(req, f, null)
+	is_array(v)
+	some p in _json_problems(v)
+}
 
 _type_problems(req) := {[f, _wrong_type_problems[f]] |
 	some f in _wrong_typed_fields(req)
@@ -329,6 +338,8 @@ _from_keys(req) := ks if {
 	ks := [_step_key(seg) | some seg in p]
 	count(ks) == count(p)
 }
+
+_from_unreadable(_) if _unreadable_input
 
 _from_unreadable(req) if {
 	p := _from_path(req)
@@ -1205,8 +1216,6 @@ _wanted(v) if {
 
 _value_list(v) if is_array(v)
 
-_value_list(v) if is_set(v)
-
 _comparable(l, r) if {
 	l != null
 	type_name(l) == type_name(r)
@@ -1337,7 +1346,13 @@ _flaw(check, names) := "ill_formed" if {
 	_ill_formed(check, names)
 } else := "unusable" if {
 	_param_broken(check, names)
+} else := "unusable" if {
+	_unreadable_input
 } else := ""
+
+_unreadable_input if count(_json_problems(data.ergo_document)) > 0
+
+_unreadable_input if count(_json_problems(data.ergo_params)) > 0
 
 default _ill_formed(_, _) := false
 
@@ -1424,7 +1439,9 @@ _nested_ops := {
 	"check": [set(), (_leaf_ops | {"all", "any", "any_of"}), (_leaf_ops | {"any_of"})],
 }
 
-_field_problems(node) := union({_wording_problem(node), _unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _each_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node)})
+_field_problems(node) := union({_wording_problem(node), _unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _each_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node), _json_problem(node)})
+
+_json_problem(node) := _json_problems(object.remove(_own_fields(node), ["meta"]))
 
 _missing_fields_problem(node) := {concat("", ["missing ", f]) |
 	some f in object.get(_required_fields, node.op, set())
@@ -2833,6 +2850,7 @@ _well_formed(req) if {
 	not _badly_stepped(_from_of(req))
 	not _badly_stepped(_id_of(req))
 	_wrapped_in_where(_id_of(req)) == set()
+	_req_json_problems(req) == set()
 	_check_problem_inputs(req) == []
 }
 

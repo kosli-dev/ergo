@@ -279,9 +279,9 @@ test_includes_values_fails_when_the_field_misses_any_one_of_them if {
 	}
 }
 
-test_includes_and_excludes_take_a_set_of_values if {
-	verdict({"sign_offs": ["security", "qa"]}, object.union(all_signed_off, {"values": {"qa", "security"}})) == true
-	verdict({"allergens": ["garlic"]}, object.union(no_allergens, {"values": {"nuts", "garlic"}})) == false
+test_includes_and_excludes_take_a_list_of_values if {
+	verdict({"sign_offs": ["security", "qa"]}, object.union(all_signed_off, {"values": ["qa", "security"]})) == true
+	verdict({"allergens": ["garlic"]}, object.union(no_allergens, {"values": ["nuts", "garlic"]})) == false
 }
 
 test_includes_and_excludes_values_fail_closed_on_a_missing_null_or_wrong_typed_field if {
@@ -295,7 +295,7 @@ test_includes_and_excludes_values_fail_closed_on_a_missing_null_or_wrong_typed_f
 
 test_empty_values_is_ill_formed_because_includes_and_excludes_would_pass_anything if {
 	every op in ["includes", "excludes"] {
-		every values in [[], set()] {
+		every values in [[]] {
 			check := {"op": op, "path": ["xs"], "values": values}
 			[verdict({"xs": []}, check), cause_of({"xs": []}, check)] == [false, "ill_formed"]
 		}
@@ -385,12 +385,9 @@ test_in_fails_closed_when_values_is_not_a_list_or_set if {
 
 test_in_fails_closed_on_empty_values if verdict({"id": "MIT"}, {"op": "in", "path": ["id"], "values": []}) == false
 
-test_in_fails_closed_on_an_empty_set if verdict({"id": "MIT"}, {"op": "in", "path": ["id"], "values": set()}) == false
-
-test_in_accepts_a_set_of_values if {
+test_in_rejects_a_set_of_values_because_json_has_no_sets if {
 	check := {"op": "in", "path": ["id"], "values": {"MIT", "Apache-2.0"}}
-	verdict({"id": "MIT"}, check) == true
-	verdict({"id": "GPL-3.0"}, check) == false
+	[verdict({"id": "MIT"}, check), cause_of({"id": "MIT"}, check)] == [false, "ill_formed"]
 }
 
 licences_allowed := {"op": "all", "path": ["licences"], "check": allowed_licence}
@@ -793,7 +790,7 @@ test_selector_value_is_echoed_in_the_row if {
 	}]
 }
 
-service_accounts := {"svc_.*", `.*\[bot\]`, `noreply@github\.com`}
+service_accounts := ["svc_.*", `.*\[bot\]`, `noreply@github\.com`]
 
 matches(op) := {"op": op, "path": ["author"], "patterns": service_accounts}
 
@@ -829,19 +826,19 @@ test_matching_fails_closed_on_a_non_string_field if {
 }
 
 test_not_matches_any_fails_closed_on_a_non_string_pattern if {
-	check := {"op": "not_matches_any", "path": ["author"], "patterns": {"svc_.*", 42}}
+	check := {"op": "not_matches_any", "path": ["author"], "patterns": ["svc_.*", 42]}
 	verdict({"author": "Alice <alice@example.com>"}, check) == false
 }
 
 test_matches_any_fails_on_a_non_string_pattern_even_when_another_matches if {
-	check := {"op": "matches_any", "path": ["author"], "patterns": {"svc_.*", 42}}
+	check := {"op": "matches_any", "path": ["author"], "patterns": ["svc_.*", 42]}
 	verdict({"author": "svc_bot"}, check) == false
 	cause_of({"author": "svc_bot"}, check) == "ill_formed"
 }
 
 test_matching_with_no_patterns if {
-	verdict({"author": "Alice"}, {"op": "matches_any", "path": ["author"], "patterns": set()}) == false
-	verdict({"author": "Alice"}, {"op": "not_matches_any", "path": ["author"], "patterns": set()}) == true
+	verdict({"author": "Alice"}, {"op": "matches_any", "path": ["author"], "patterns": []}) == false
+	verdict({"author": "Alice"}, {"op": "not_matches_any", "path": ["author"], "patterns": []}) == true
 }
 
 test_expression_for_matching_sorts_patterns if {
@@ -1746,10 +1743,6 @@ test_expression_for_includes_and_excludes_does_not_list_values_it_will_not_use i
 }
 
 test_expression_for_in_sorts_the_values if rendered({"id": "MIT"}, allowed_licence) == `id in ["Apache-2.0", "MIT"]`
-
-test_expression_for_in_sorts_a_set_of_values if {
-	rendered({"id": "MIT"}, {"op": "in", "path": ["id"], "values": {"MIT", "Apache-2.0"}}) == `id in ["Apache-2.0", "MIT"]`
-}
 
 test_expression_for_in_does_not_list_values_it_will_not_match if {
 	rendered({"id": "MIT"}, {"op": "in", "path": ["id"], "values": {"licence": "MIT"}}) == "id in <invalid values>"
@@ -6714,4 +6707,68 @@ test_failed_items_of_an_empty_each_add_only_the_position if {
 		{"path": "xs[0][1]", "cause": "value", "value": 2},
 		{"path": "xs[1]", "cause": "unusable", "value": {"v": 1}},
 	]
+}
+
+json_only_req := {"s": {"subject_type": "thing", "from": ["items"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["x"], "value": 1}}}}
+
+row_verdicts(rep) := [[r.check, r.passed, r.cause] | some r in rep.results]
+
+test_a_set_anywhere_in_the_input_fails_every_check_as_unusable_so_a_port_can_check_the_input_once if {
+	rep := ergo.report({"items": [{"id": "a", "x": 1}], "tags": {"prod"}}, json_only_req)
+	row_verdicts(rep) == [["$well_formed", true, "satisfied"], ["$min_subjects", false, "unusable"], ["$unique_ids", true, "satisfied"], ["c", false, "unusable"]]
+	rep.requirements.s.status == "not_met"
+}
+
+test_a_key_that_is_not_a_string_in_the_input_fails_the_check_even_when_a_number_step_reaches_it if {
+	req := {"s": {"subject_type": "thing", "from": ["items"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["x", 1], "value": "a"}}}}
+	rows_for(ergo.report({"items": [{"id": "a", "x": {1: "a"}}]}, req), "s", "c")[0].cause == "unusable"
+}
+
+test_a_set_in_the_input_fails_checks_that_pass_on_nothing if {
+	every check in [{"op": "missing", "path": ["y"]}, {"op": "excludes", "path": ["y"], "value": "x"}, {"op": "empty", "path": ["y"]}] {
+		req := {"s": {"subject_type": "thing", "from": ["items"], "id": ["id"], "checks": {"c": check}}}
+		r := rows_for(ergo.report({"items": [{"id": "a"}], "tags": {"prod"}}, req), "s", "c")[0]
+		[r.passed, r.cause] == [false, "unusable"]
+	}
+}
+
+test_a_set_in_the_input_takes_every_subject_out_of_scope_as_unusable if {
+	req := {"s": object.union(json_only_req.s, {"applies_to": {"f": {"op": "present", "path": ["id"]}}})}
+	rows_for(ergo.report({"items": [{"id": "a", "x": 1}], "tags": {"prod"}}, req), "s", "$applies")[0].cause == "unusable"
+}
+
+test_a_set_in_the_input_fails_a_requirement_that_has_no_subjects if {
+	req := {"s": object.union(json_only_req.s, {"min_subjects": 0})}
+	ergo.report({"items": [], "tags": {"prod"}}, req).requirements.s.status == "not_met"
+}
+
+test_a_set_in_the_params_fails_every_check_as_unusable if {
+	req := {"s": {"subject_type": "thing", "from": ["items"], "id": ["id"], "checks": {"c": {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}}}}
+	rows_for(ergo.report_with_params({"items": [{"id": "a", "x": "MIT"}]}, {"allowed": {"MIT"}}, req), "s", "c")[0].cause == "unusable"
+}
+
+test_a_list_in_the_params_is_read_as_usual if {
+	req := {"s": {"subject_type": "thing", "from": ["items"], "id": ["id"], "checks": {"c": {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}}}}
+	rows_for(ergo.report_with_params({"items": [{"id": "a", "x": "MIT"}]}, {"allowed": ["MIT"]}, req), "s", "c")[0].passed == true
+}
+
+test_a_check_holding_a_set_or_a_key_that_is_not_a_string_is_written_wrong if {
+	rep := ergo.report({"items": [{"id": "a", "x": 1}]}, {"s": {"subject_type": "thing", "from": ["items"], "id": ["id"], "checks": {
+		"k": {"op": "equals", "path": ["x"], "value": {1: "a"}},
+		"s": {"op": "in", "path": ["x"], "values": {1, 2}},
+	}}})
+	problem_inputs(rep) == [
+		{"name": "checks.k", "value": ["holds a key that isn't a string"]},
+		{"name": "checks.s", "value": ["holds a set", "invalid values"]},
+	]
+	[r.cause | some r in rep.results; r.check in {"k", "s"}] == ["ill_formed", "ill_formed"]
+}
+
+test_a_set_in_a_selector_of_from_or_id_is_written_wrong if {
+	every f in ["from", "id"] {
+		req := {"s": object.union(json_only_req.s, {f: [{"where": {"x": {1}}}]})}
+		some i in rows_for(ergo.report({"items": [{"id": "a", "x": 1}]}, req), "s", "$well_formed")[0].inputs
+		i.name == f
+		"holds a set" in i.value
+	}
 }
