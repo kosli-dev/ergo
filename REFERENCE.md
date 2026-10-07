@@ -907,16 +907,16 @@ The requirement's own fields get an input of the same form when something is wro
 | Field                       | What's wrong                                                                                                                     |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | any field ergo doesn't know | `unknown field`                                                                                                                  |
-| `applies_to`, `checks`      | `not an object`                                                                                                                  |
+| `applies_to`, `checks`      | `not an object`, `holds a key that isn't a string`                                                                               |
 | `checks`                    | `missing`, `empty`                                                                                                               |
 | `require`                   | `neither every nor some`                                                                                                         |
-| `from`, `id`                | `not a list`, `step that can't be a key`, `number out of range`                                                                  |
+| `from`, `id`                | `not a list`, `step that can't be a key`, `number out of range`, `holds a set`, `holds a key that isn't a string`                |
 | `from`                      | `object step before the last`, `object step without each_as`, `invalid name`, `invalid keys`, `unknown field foo in naming step` |
 | `id`                        | `ref inside where`, `literal inside where`                                                                                       |
 | `min_subjects`              | `not a whole number of 0 or more`, `number out of range`                                                                         |
 | `subject_type`              | `empty or not a string`                                                                                                          |
 
-A policy written in Rego can use a key that isn't a string, like `true` or `1.5`. ergo names it `<invalid key true>` or `<invalid key 1.5>`, so two such keys never share a name.
+A policy written in Rego can use a key that isn't a string, like `true` or `1.5`. ergo names it `<invalid key true>` or `<invalid key 1.5>`, so two such keys never share a name. A requirement whose own name isn't a string, like `1`, or every requirement of a policy written as a list, fails `$well_formed`, which then starts with `{"name": "requirement name", "value": ["not a string"]}`. The requirement is `not_met`, so the policy isn't compliant.
 
 Their descriptions are plain sentences, like your own checks': `The requirement is written correctly`, `The in-scope deployment count is at least 1`, `Every deployment id is unique` and `The deployment is in scope`. The details are in `expression`, `inputs` and `cause`. `$min_subjects` names its input after what it counts, like `in-scope deployment count`: only the subjects left after `applies_to`. With `min_subjects: 0` the count can't fail, so `$min_subjects` only checks that `from` can be read, and says so: `The deployment list can be read`, with the expression `deployments can be read`. A `from` that ends with a `keys` step keeps the count, because `from` isn't read there. `$unique_ids` lists the ids that more than one subject has, once each, under `repeated deployment ids`, sorted by how they're written as JSON, so `"b"` comes before `10`, and `10` before `3`. They use `subject_type` as it's written, so they read right whatever the word's plural would be.
 
@@ -967,7 +967,7 @@ Every row has a `cause`. A missing field, a field set to `null`, and a selector 
 | `null`          | A field the check reads is there, but `null`.                                                                                                                            |
 | `value`         | Everything was read fine. The values just don't pass.                                                                                                                    |
 
-When the input or the params hold something JSON can't, every row fails as `unusable` (see [Failing closed](#failing-closed)).
+When the input or the params hold something JSON can't, every check on a subject, every `$applies` row and every `$min_subjects` row fails as `unusable` (see [Failing closed](#failing-closed)).
 
 When a check reads several fields, the row shows the first cause in this table's order. An ambiguous selector matters more than any value, because it means the policy can't even tell what it's looking at.
 
@@ -1038,7 +1038,7 @@ ergo fails a check whenever it can't be sure, instead of letting it pass. Rego d
 - A subject whose `applies_to` filter can't be read fails the requirement instead of being left out.
 - A `ref` that can't be read fails the check, even for operators like `excludes` or `not_matches_any` that would pass on an empty value.
 - A policy with no requirements, and a requirement with no checks, are never met.
-- ergo only reads what JSON can hold. A set, or an object key that isn't a string, anywhere in the input or the params fails every check with cause `unusable`, `$min_subjects` included, so a requirement with no subjects isn't met either. In a policy, either one is written wrong. Rego can build both, but a policy read from JSON or YAML can't hold them, and ergo gives the same report however it's run. So when you build the input in Rego, make lists, `[x | ...]`, not sets, `{x | ...}`.
+- ergo only reads what JSON can hold. Rego can build sets and object keys that aren't strings, but JSON and YAML can't, so ergo turns both down and gives the same report however it's run. A set or such a key anywhere in the input or the params fails every check on a subject, every `$applies` row and every `$min_subjects` row with cause `unusable`, so even a requirement with no subjects isn't met. `$min_subjects` says why in its inputs, like `{"name": "$$input", "value": ["holds a set"]}`, or `$$params` for the params. In a policy, a requirement or check holding either one is [written wrong](#checks-ergo-adds), and so is a requirement whose name isn't a string. So when you build the input in Rego, make lists, `[x | ...]`, not sets, `{x | ...}`.
 - A requirement that isn't an object, a field of the wrong type, or a field ergo doesn't know, fails `$well_formed` and keeps its place in the report, so a typo in the policy can't make a requirement vanish.
 - A malformed timestamp fails `compare_time` rather than stopping the whole evaluation with an error.
 - Running OPA with `--strict-builtin-errors` gives the same report as running without it, because ergo checks a value's type before it passes it to a built-in like `object.get` or `count`. A [custom operator](#custom-operators) is your own Rego, so it needs the same care if you use the flag.

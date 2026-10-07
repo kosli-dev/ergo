@@ -6759,7 +6759,7 @@ test_a_check_holding_a_set_or_a_key_that_is_not_a_string_is_written_wrong if {
 	}}})
 	problem_inputs(rep) == [
 		{"name": "checks.k", "value": ["holds a key that isn't a string"]},
-		{"name": "checks.s", "value": ["holds a set", "invalid values"]},
+		{"name": "checks.s", "value": ["holds a set"]},
 	]
 	[r.cause | some r in rep.results; r.check in {"k", "s"}] == ["ill_formed", "ill_formed"]
 }
@@ -6771,4 +6771,55 @@ test_a_set_in_a_selector_of_from_or_id_is_written_wrong if {
 		i.name == f
 		"holds a set" in i.value
 	}
+}
+
+test_a_set_in_the_input_fails_every_check_on_subjects_named_with_each_as if {
+	req := {"s": object.union(json_only_req.s, {"from": ["items", {"each_as": "it"}], "checks": {"c": {"op": "equals", "path": ["$it", "x"], "value": 1}}})}
+	rep := ergo.report({"items": [{"id": "a", "x": 1}, {"id": "b", "x": 1}], "tags": {"prod"}}, req)
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "unusable"], [false, "unusable"]]
+}
+
+test_min_subjects_says_what_the_input_and_params_hold_that_json_cannot if {
+	rep := ergo.report_with_params({"items": [{"id": "a", "x": 1}], "tags": {"prod"}, "k": {1: "a"}}, {"allowed": {"MIT"}}, json_only_req)
+	rows_for(rep, "s", "$min_subjects")[0].inputs == [
+		{"name": "in-scope thing count", "value": 1},
+		{"name": "$$input", "value": ["holds a key that isn't a string", "holds a set"]},
+		{"name": "$$params", "value": ["holds a set"]},
+	]
+}
+
+test_min_subjects_lists_only_the_count_when_the_input_and_params_are_json if {
+	rows_for(ergo.report_with_params({"items": [{"id": "a", "x": 1}]}, {"allowed": ["MIT"]}, json_only_req), "s", "$min_subjects")[0].inputs == [{"name": "in-scope thing count", "value": 1}]
+}
+
+test_a_check_or_filter_name_that_is_not_a_string_is_written_wrong if {
+	every f in ["checks", "applies_to"] {
+		named := {1: {"op": "present", "path": ["x"]}}
+		req := {"s": object.union(json_only_req.s, {f: object.union(object.get(json_only_req.s, f, {}), named)})}
+		rep := ergo.report({"items": [{"id": "a", "x": 1}]}, req)
+		rows_for(rep, "s", "$well_formed")[0].passed == false
+		{"name": f, "value": ["holds a key that isn't a string"]} in rows_for(rep, "s", "$well_formed")[0].inputs
+		rep.requirements.s.status == "not_met"
+	}
+}
+
+test_a_requirement_name_that_is_not_a_string_fails_the_requirement_and_the_policy if {
+	every policy in [{1: json_only_req.s}, [json_only_req.s]] {
+		rep := ergo.report({"items": [{"id": "a", "x": 1}]}, policy)
+		rep.compliant == false
+		some name, r in rep.requirements
+		r.status == "not_met"
+		some row in rep.results
+		[row.requirement, row.check, row.passed] == [name, "$well_formed", false]
+		row.inputs[0] == {"name": "requirement name", "value": ["not a string"]}
+	}
+}
+
+test_a_policy_written_as_a_set_is_not_compliant if {
+	ergo.report({"items": [{"id": "a", "x": 1}]}, {json_only_req.s}).compliant == false
+}
+
+test_patterns_written_as_a_set_are_only_reported_as_a_set if {
+	rep := ergo.report({"items": [{"id": "a", "x": "b"}]}, {"s": object.union(json_only_req.s, {"checks": {"m": {"op": "matches_any", "path": ["x"], "patterns": {"b"}}}})})
+	problem_inputs(rep) == [{"name": "checks.m", "value": ["holds a set"]}]
 }

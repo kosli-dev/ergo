@@ -135,6 +135,12 @@ _req_json_problems(req) := {[f, p] |
 	v := _req_field(req, f, null)
 	is_array(v)
 	some p in _json_problems(v)
+} | {[f, "holds a key that isn't a string"] |
+	some f in ["checks", "applies_to"]
+	v := _req_field(req, f, null)
+	is_object(v)
+	some k in object.keys(v)
+	not is_string(k)
 }
 
 _type_problems(req) := {[f, _wrong_type_problems[f]] |
@@ -1350,9 +1356,7 @@ _flaw(check, names) := "ill_formed" if {
 	_unreadable_input
 } else := ""
 
-_unreadable_input if count(_json_problems(data.ergo_document)) > 0
-
-_unreadable_input if count(_json_problems(data.ergo_params)) > 0
+_unreadable_input if data.ergo_unreadable != []
 
 default _ill_formed(_, _) := false
 
@@ -1503,6 +1507,7 @@ _values_problem(node) := {"invalid values" |
 	node.op in {"in", "includes", "excludes"}
 	"values" in object.keys(node)
 	not _value_list(_written(node.values))
+	not is_set(_written(node.values))
 	not _is_ref(node.values)
 	not _malformed(node.values)
 } | {"empty values" |
@@ -1516,6 +1521,7 @@ _patterns_problem(node) := {"invalid patterns" |
 	"patterns" in object.keys(node)
 	not _is_ref(node.patterns)
 	not _malformed(node.patterns)
+	not is_set(_written(node.patterns))
 	not _written_patterns(_written(node.patterns))
 }
 
@@ -2837,6 +2843,17 @@ _well_formed_def(req) := {"$well_formed": {
 	"expression": `fields are known and have the right types and count(checks) >= 1 and require in ["every", "some"] and from is well formed and steps are keys and numbers fit a float and checks are written right`,
 }} if _stepped(req)
 
+default _well_formed_named(_, _) := false
+
+_well_formed_named(req, name) if {
+	is_string(name)
+	_well_formed(req)
+}
+
+_name_problem_inputs(name) := [] if is_string(name)
+
+_name_problem_inputs(name) := [{"name": "requirement name", "value": ["not a string"]}] if not is_string(name)
+
 default _well_formed(_) := false
 
 _well_formed(req) if {
@@ -2941,12 +2958,12 @@ _subject_rows(doc, req, req_name) := [row |
 ]
 
 _well_formed_row(req, req_name) := row if {
-	passed := _well_formed(req)
+	passed := _well_formed_named(req, req_name)
 	row := {
 		"requirement": req_name,
 		"subject": {"type": _subject_type_of(req), "id": null},
 		"check": "$well_formed",
-		"inputs": _well_formed_inputs(req),
+		"inputs": array.concat(_name_problem_inputs(req_name), _well_formed_inputs(req)),
 		"passed": passed,
 		"cause": _verdict_cause(passed),
 	}
@@ -2956,7 +2973,7 @@ _min_subjects_row(doc, req, req_name) := {
 	"requirement": req_name,
 	"subject": {"type": _subject_type_of(req), "id": null},
 	"check": "$min_subjects",
-	"inputs": [{"name": _subject_count_name(req), "value": count(_matching_subjects(doc, req))}],
+	"inputs": array.concat([{"name": _subject_count_name(req), "value": count(_matching_subjects(doc, req))}], data.ergo_unreadable),
 	"passed": _enough_subjects(doc, req),
 	"cause": _min_subjects_cause(doc, req),
 }
@@ -3039,6 +3056,11 @@ _applies_inputs(subj, req) := [inp |
 	some inp in _inputs_in(req, _applies_to_of(req)[name], subj)
 ]
 
+_named_requirement_holds(doc, req, name) if {
+	is_string(name)
+	_requirement_holds(doc, req)
+}
+
 default _requirement_holds(_, _) := false
 
 _requirement_holds(doc, req) if {
@@ -3071,6 +3093,10 @@ _well_formed_requirement_holds(doc, req) if {
 	count(_matching_subjects(doc, req)) == 0
 }
 
+_named_requirement_status(doc, req, name) := _requirement_status(doc, req) if is_string(name)
+
+_named_requirement_status(_, _, name) := "not_met" if not is_string(name)
+
 default _requirement_status(_, _) := "not_met"
 
 _requirement_status(doc, req) := "met" if {
@@ -3089,7 +3115,7 @@ _policy_compliant(doc, policy) if {
 	_size(policy) > 0
 	count([name |
 		some name, req in policy
-		not _requirement_holds(doc, req)
+		not _named_requirement_holds(doc, req, name)
 	]) == 0
 }
 
@@ -3120,8 +3146,14 @@ _configured_params := data.params
 default _configured_params := {}
 
 report_with_params(doc, params, policy) := r if {
-	r := _report_of(doc, policy) with data.ergo_document as doc with data.ergo_params as params with input as {"ergo/names": {}}
+	unreadable := _unreadable_inputs(doc, params)
+	r := _report_of(doc, policy) with data.ergo_document as doc with data.ergo_params as params with data.ergo_unreadable as unreadable with input as {"ergo/names": {}}
 }
+
+_unreadable_inputs(doc, params) := [{"name": name, "value": sort(_json_problems(v))} |
+	some [name, v] in [["$$input", doc], ["$$params", params]]
+	count(_json_problems(v)) > 0
+]
 
 _report_of(doc, policy) := {
 	"compliant": _policy_compliant(doc, policy),
@@ -3129,7 +3161,7 @@ _report_of(doc, policy) := {
 		"description": _reported_description(req),
 		"meta": _reported_meta(req),
 		"require": _require_of(req),
-		"status": _requirement_status(doc, req),
+		"status": _named_requirement_status(doc, req, name),
 		"subjects": {"total": count(_raw_subjects(doc, req)), "matching": count(_matching_subjects(doc, req))},
 		"checks": _requirement_check_defs(req),
 	} |
