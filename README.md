@@ -29,6 +29,7 @@ package deploy
 import data.ergo
 
 requirements := {"prod_deploy": {
+	"description": "Every production deployment is approved",
 	"subject_type": "deployment",
 	"from": ["deployments"],
 	"id": ["id"],
@@ -45,7 +46,7 @@ report := ergo.report(input, requirements)
 violations := ergo.violations(report)
 ```
 
-A requirement describes what to check, not how to check it. It starts by saying what the policy is about, the things we call _subjects_:
+A requirement describes what to check, not how to check it. Its `description` says what it requires, in words anyone can read. Then it says what the policy is about, the things we call _subjects_:
 
 - `subject_type` is a human-friendly name for them.
 - `from` is the path to the subjects in the input. `["deployments"]` means `input.deployments`, and `["release", "deployments"]` would mean `input.release.deployments`.
@@ -68,6 +69,7 @@ Requirements are plain data, so you can keep them in a YAML file instead. OPA re
 ```yaml
 requirements:
   prod_deploy:
+    description: Every production deployment is approved
     subject_type: deployment
     from: [deployments]
     id: [id]
@@ -130,7 +132,7 @@ The report records every check ergo ran, including the ones that passed. It come
 ```
 
 - `compliant` is the overall answer. When you need a plain yes or no to allow or block something, this is the one to use: `allow := report.compliant`.
-- `requirements` has an entry for each requirement. Its `status` is `met`, `not_met`, or `not_applicable` when no subject was left to check. It also says how many subjects were found and kept, and lists every check with a readable `expression`, such as `approved_by is a non-empty string`.
+- `requirements` has an entry for each requirement. It repeats the requirement's `description`, and its `status` is `met`, `not_met`, or `not_applicable` when no subject was left to check. It also says how many subjects were found and kept, and lists every check with a readable `expression`, such as `approved_by is a non-empty string`.
 - `results` has one row per subject and check, with the value ergo read, whether the check passed, and a `cause`.
 
 Here's what those rows look like for our example:

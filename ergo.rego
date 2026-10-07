@@ -53,6 +53,37 @@ _has_type("subject_type", v) if {
 	trim_space(v) != ""
 }
 
+_has_type("description", v) if is_string(v)
+
+_has_type("meta", v) if _meta_shaped(v)
+
+_meta_shaped(v) if {
+	is_object(v)
+	every k, x in v {
+		is_string(k)
+		_meta_value(x)
+	}
+}
+
+_meta_value(x) if is_string(x)
+
+_meta_value(x) if {
+	is_array(x)
+	every y in x {
+		is_string(y)
+	}
+}
+
+_reported_description(x) := object.get(x, "description", "") if {
+	is_object(x)
+	is_string(object.get(x, "description", ""))
+} else := ""
+
+_reported_meta(x) := {"meta": x.meta} if {
+	is_object(x)
+	_meta_shaped(object.get(x, "meta", null))
+} else := {}
+
 default _bad_applies_to(_) := false
 
 _bad_applies_to(req) if {
@@ -83,6 +114,8 @@ _wrong_type_problems := {
 	"id": "not a list",
 	"min_subjects": "not a whole number of 0 or more",
 	"subject_type": "empty or not a string",
+	"description": "not a string",
+	"meta": "not an object of strings or lists of strings",
 }
 
 _req_problems(req) := union({_type_problems(req), _range_problems(req), _unknown_problems(req), _checks_problems(req), _require_problems(req), _path_problems(req, "from"), _path_problems(req, "id"), _naming_step_problems(req), _where_problems(req)})
@@ -1335,7 +1368,7 @@ _nested_ops := {
 	"check": [set(), (_leaf_ops | {"all", "any", "any_of"}), (_leaf_ops | {"any_of"})],
 }
 
-_field_problems(node) := union({_unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _each_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node)})
+_field_problems(node) := union({_wording_problem(node), _unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _each_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node)})
 
 _missing_fields_problem(node) := {concat("", ["missing ", f]) |
 	some f in object.get(_required_fields, node.op, set())
@@ -1354,7 +1387,15 @@ _unknown_fields_problem(node) := {concat("", ["unknown field ", _text(f)]) |
 	node.op in object.keys(_op_fields)
 	some f in object.keys(node)
 	not f in _op_fields[node.op]
-	not f in {"op", "description", "expression", "substitute", "inputs", "as", "each"}
+	not f in {"op", "description", "meta", "expression", "substitute", "inputs", "as", "each"}
+}
+
+_wording_problem(node) := {"invalid description" |
+	"description" in object.keys(node)
+	not is_string(node.description)
+} | {"invalid meta" |
+	"meta" in object.keys(node)
+	not _meta_shaped(node.meta)
 }
 
 _op_fields := object.union(_required_fields, {
@@ -2616,7 +2657,7 @@ _row_inputs(subj, check, item) := array.concat(
 	_check_inputs(subj, check.substitute, item),
 ) if check.substitute
 
-_check_def(check, item) := _with_refs(_described(check, item), check)
+_check_def(check, item) := _with_refs(object.union(object.remove(_described(check, item), {"description", "meta"}), object.union({"description": _reported_description(check)}, _reported_meta(check))), check)
 
 _with_refs(def, checked) := object.union(def, {"$refs": _ref_inputs(checked)}) if count(_check_refs(checked)) > 0
 
@@ -2982,12 +3023,16 @@ report_with_params(doc, params, policy) := r if {
 
 _report_of(doc, policy) := {
 	"compliant": _policy_compliant(doc, policy),
-	"requirements": {name: {
-		"require": _require_of(req),
-		"status": _requirement_status(doc, req),
-		"subjects": {"total": count(_raw_subjects(doc, req)), "matching": count(_matching_subjects(doc, req))},
-		"checks": _requirement_check_defs(req),
-	} |
+	"requirements": {name: object.union(
+		{
+			"description": _reported_description(req),
+			"require": _require_of(req),
+			"status": _requirement_status(doc, req),
+			"subjects": {"total": count(_raw_subjects(doc, req)), "matching": count(_matching_subjects(doc, req))},
+			"checks": _requirement_check_defs(req),
+		},
+		_reported_meta(req),
+	) |
 		some name, req in policy
 	},
 	"results": _results(doc, policy),
