@@ -61,15 +61,17 @@ _has_type("meta", v) if is_object(v)
 
 _has_type("meta", null)
 
-_meta_problems(m) := ({"holds a key that isn't a string" |
-	walk(m, [_, x])
+_json_problems(v) := {"holds a key that isn't a string" |
+	walk(v, [_, x])
 	is_object(x)
 	some k in object.keys(x)
 	not is_string(k)
 } | {"holds a set" |
-	walk(m, [_, x])
+	walk(v, [_, x])
 	is_set(x)
-}) | {"number out of range" | _out_of_range(m)}
+}
+
+_meta_problems(m) := _json_problems(m) | {"number out of range" | _out_of_range(m)}
 
 _meta_shaped(v) if {
 	is_object(v)
@@ -126,7 +128,20 @@ _wrong_type_problems := {
 	"meta": "not an object",
 }
 
-_req_problems(req) := union({_req_meta_problems(req), _type_problems(req), _range_problems(req), _unknown_problems(req), _checks_problems(req), _require_problems(req), _path_problems(req, "from"), _path_problems(req, "id"), _naming_step_problems(req), _where_problems(req)})
+_req_problems(req) := union({_req_meta_problems(req), _type_problems(req), _range_problems(req), _unknown_problems(req), _checks_problems(req), _require_problems(req), _path_problems(req, "from"), _path_problems(req, "id"), _naming_step_problems(req), _where_problems(req), _req_json_problems(req)})
+
+_req_json_problems(req) := {[f, p] |
+	some f in ["from", "id"]
+	v := _req_field(req, f, null)
+	is_array(v)
+	some p in _json_problems(v)
+} | {[f, "holds a key that isn't a string"] |
+	some f in ["checks", "applies_to"]
+	v := _req_field(req, f, null)
+	is_object(v)
+	some k in object.keys(v)
+	not is_string(k)
+}
 
 _type_problems(req) := {[f, _wrong_type_problems[f]] |
 	some f in _wrong_typed_fields(req)
@@ -329,6 +344,8 @@ _from_keys(req) := ks if {
 	ks := [_step_key(seg) | some seg in p]
 	count(ks) == count(p)
 }
+
+_from_unreadable(_) if _unreadable_input
 
 _from_unreadable(req) if {
 	p := _from_path(req)
@@ -834,6 +851,22 @@ _plain_key(k) if {
 
 _json_text(v) := concat("", [_json_token(t) | some m in regex.find_all_string_submatch_n(`"(?:[^"\\]|\\.)*"|-?[0-9][0-9.eE+-]*|[^"0-9-]+`, _sorted_json(v), -1); t := m[0]])
 
+_plain_numbers(v) := _plain_json(v, json.marshal(v))
+
+_plain_json(v, text) := v if not regex.match(`[:,\[]\s*(?:-?[0-9]+(?:\.[0-9]+)?[eE]|-?[0-9]+\.[0-9]*0\s*[,\]}]|-0\s*[,\]}])`, text)
+
+else := json.unmarshal(concat("", [_plain_part(m) | some m in regex.find_all_string_submatch_n(`(-?[0-9][0-9.eE+-]*)|(?:"(?:[^"\\]|\\.)*"|[^"0-9-])+`, text, -1)]))
+
+_plain_part(m) := m[0] if m[1] == ""
+
+_plain_part(m) := _plain_number(m[1]) if m[1] != ""
+
+_plain_number(t) := t if regex.match(`^(?:0|-?[1-9][0-9]*|-?(?:0|[1-9][0-9]*)\.[0-9]*[1-9])$`, t)
+
+else := t if not _fits_a_float(json.unmarshal(t))
+
+else := _number_text(t)
+
 _sorted_json(v) := concat("", [_node_json(paths, index, i) | some i, _ in paths]) if {
 	index := {p: x | walk(v, [p, x])}
 	paths := [pair[1] | some pair in sort([[_written_path(index, p), p] | some p, _ in index])]
@@ -1205,8 +1238,6 @@ _wanted(v) if {
 
 _value_list(v) if is_array(v)
 
-_value_list(v) if is_set(v)
-
 _comparable(l, r) if {
 	l != null
 	type_name(l) == type_name(r)
@@ -1337,7 +1368,11 @@ _flaw(check, names) := "ill_formed" if {
 	_ill_formed(check, names)
 } else := "unusable" if {
 	_param_broken(check, names)
+} else := "unusable" if {
+	_unreadable_input
 } else := ""
+
+_unreadable_input if data.ergo_unreadable != []
 
 default _ill_formed(_, _) := false
 
@@ -1424,7 +1459,9 @@ _nested_ops := {
 	"check": [set(), (_leaf_ops | {"all", "any", "any_of"}), (_leaf_ops | {"any_of"})],
 }
 
-_field_problems(node) := union({_wording_problem(node), _unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _each_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node)})
+_field_problems(node) := union({_wording_problem(node), _unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _each_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node), _json_problem(node)})
+
+_json_problem(node) := _json_problems(object.remove(_own_fields(node), ["meta"]))
 
 _missing_fields_problem(node) := {concat("", ["missing ", f]) |
 	some f in object.get(_required_fields, node.op, set())
@@ -1486,6 +1523,7 @@ _values_problem(node) := {"invalid values" |
 	node.op in {"in", "includes", "excludes"}
 	"values" in object.keys(node)
 	not _value_list(_written(node.values))
+	not is_set(_written(node.values))
 	not _is_ref(node.values)
 	not _malformed(node.values)
 } | {"empty values" |
@@ -1499,6 +1537,7 @@ _patterns_problem(node) := {"invalid patterns" |
 	"patterns" in object.keys(node)
 	not _is_ref(node.patterns)
 	not _malformed(node.patterns)
+	not is_set(_written(node.patterns))
 	not _written_patterns(_written(node.patterns))
 }
 
@@ -2690,6 +2729,7 @@ _check_inputs(subj, check, item) := [{"name": _item_path_name(item, check.path),
 	not check.inputs
 	not _two_sided(check)
 	not _quantified(check)
+	not _combinator(check)
 	check.path
 }
 
@@ -2820,6 +2860,17 @@ _well_formed_def(req) := {"$well_formed": {
 	"expression": `fields are known and have the right types and count(checks) >= 1 and require in ["every", "some"] and from is well formed and steps are keys and numbers fit a float and checks are written right`,
 }} if _stepped(req)
 
+default _well_formed_named(_, _) := false
+
+_well_formed_named(req, name) if {
+	is_string(name)
+	_well_formed(req)
+}
+
+_name_problem_inputs(name) := [] if is_string(name)
+
+_name_problem_inputs(name) := [{"name": "requirement name", "value": ["not a string"]}] if not is_string(name)
+
 default _well_formed(_) := false
 
 _well_formed(req) if {
@@ -2833,6 +2884,7 @@ _well_formed(req) if {
 	not _badly_stepped(_from_of(req))
 	not _badly_stepped(_id_of(req))
 	_wrapped_in_where(_id_of(req)) == set()
+	_req_json_problems(req) == set()
 	_check_problem_inputs(req) == []
 }
 
@@ -2923,12 +2975,12 @@ _subject_rows(doc, req, req_name) := [row |
 ]
 
 _well_formed_row(req, req_name) := row if {
-	passed := _well_formed(req)
+	passed := _well_formed_named(req, req_name)
 	row := {
 		"requirement": req_name,
 		"subject": {"type": _subject_type_of(req), "id": null},
 		"check": "$well_formed",
-		"inputs": _well_formed_inputs(req),
+		"inputs": array.concat(_name_problem_inputs(req_name), _well_formed_inputs(req)),
 		"passed": passed,
 		"cause": _verdict_cause(passed),
 	}
@@ -2938,7 +2990,7 @@ _min_subjects_row(doc, req, req_name) := {
 	"requirement": req_name,
 	"subject": {"type": _subject_type_of(req), "id": null},
 	"check": "$min_subjects",
-	"inputs": [{"name": _subject_count_name(req), "value": count(_matching_subjects(doc, req))}],
+	"inputs": array.concat([{"name": _subject_count_name(req), "value": count(_matching_subjects(doc, req))}], data.ergo_unreadable),
 	"passed": _enough_subjects(doc, req),
 	"cause": _min_subjects_cause(doc, req),
 }
@@ -3021,6 +3073,11 @@ _applies_inputs(subj, req) := [inp |
 	some inp in _inputs_in(req, _applies_to_of(req)[name], subj)
 ]
 
+_named_requirement_holds(doc, req, name) if {
+	is_string(name)
+	_requirement_holds(doc, req)
+}
+
 default _requirement_holds(_, _) := false
 
 _requirement_holds(doc, req) if {
@@ -3053,6 +3110,10 @@ _well_formed_requirement_holds(doc, req) if {
 	count(_matching_subjects(doc, req)) == 0
 }
 
+_named_requirement_status(doc, req, name) := _requirement_status(doc, req) if is_string(name)
+
+_named_requirement_status(_, _, name) := "not_met" if not is_string(name)
+
 default _requirement_status(_, _) := "not_met"
 
 _requirement_status(doc, req) := "met" if {
@@ -3071,7 +3132,7 @@ _policy_compliant(doc, policy) if {
 	_size(policy) > 0
 	count([name |
 		some name, req in policy
-		not _requirement_holds(doc, req)
+		not _named_requirement_holds(doc, req, name)
 	]) == 0
 }
 
@@ -3102,8 +3163,21 @@ _configured_params := data.params
 default _configured_params := {}
 
 report_with_params(doc, params, policy) := r if {
-	r := _report_of(doc, policy) with data.ergo_document as doc with data.ergo_params as params with input as {"ergo/names": {}}
+	unreadable := _unreadable_inputs(doc, params)
+	written := _report_of(doc, policy) with data.ergo_document as doc with data.ergo_params as params with data.ergo_unreadable as unreadable with input as {"ergo/names": {}}
+	r := _reported(written, unreadable, policy)
 }
+
+_reported(written, unreadable, policy) := _plain_numbers(written) if {
+	count(unreadable) == 0
+	is_object(policy)
+	count(_json_problems(policy)) == 0
+} else := written
+
+_unreadable_inputs(doc, params) := [{"name": name, "value": sort(_json_problems(v))} |
+	some [name, v] in [["$$input", doc], ["$$params", params]]
+	count(_json_problems(v)) > 0
+]
 
 _report_of(doc, policy) := {
 	"compliant": _policy_compliant(doc, policy),
@@ -3111,7 +3185,7 @@ _report_of(doc, policy) := {
 		"description": _reported_description(req),
 		"meta": _reported_meta(req),
 		"require": _require_of(req),
-		"status": _requirement_status(doc, req),
+		"status": _named_requirement_status(doc, req, name),
 		"subjects": {"total": count(_raw_subjects(doc, req)), "matching": count(_matching_subjects(doc, req))},
 		"checks": _requirement_check_defs(req),
 	} |
