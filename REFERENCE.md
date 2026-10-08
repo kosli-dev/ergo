@@ -902,7 +902,7 @@ Three rules:
     },
     "$well_formed": {
       "description": "The requirement is written correctly",
-      "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+      "expression": "subject in subjects and fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
       "meta": {}
     },
     "approved": {
