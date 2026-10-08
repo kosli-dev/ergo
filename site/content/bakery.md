@@ -62,7 +62,7 @@ This is the example's policy with three changes. It reads every batch in the lis
 
 {{< example "baking/ergo/baking.rego" "rego" >}}
 
-The requirements are plain data, so they can live in YAML. Each clause becomes a check, with the clause's own words as its `description`. Clause 4 needs nothing: a requirement passes only when every check passes, unless you say otherwise.
+The policy is plain data, so it can live in YAML. Its `batch` subject says where the batches are and how each one is identified, and the `cake_batch` requirement checks every batch. Each clause becomes a check, with the clause's own words as its `description`. Clause 4 needs nothing: a requirement passes only when every check passes, unless you say otherwise.
 
 </div>
 </div>

@@ -62,10 +62,9 @@ d-3      <span class="k">$applies</span>   environment = "staging"  <span class=
         </ol>
       </div>
       <div class="declare__code">
-<pre class="code code--lg"><code><span class="n"># policy/requirements.yaml</span>
-<span class="k">requirements</span>:
-  <span class="k">prod_deploy</span>:
-    <span class="k" data-note="1">subject_type</span>: <span class="s">deployment</span>
+<pre class="code code--lg"><code><span class="n"># policy/policy.yaml</span>
+<span class="k" data-note="1">subjects</span>:
+  <span class="k">deployment</span>:
     <span class="k" data-note="1">from</span>: [<span class="s">deployments</span>]
     <span class="k" data-note="1">id</span>: [<span class="s">id</span>]
     <span class="k" data-note="2">applies_to</span>:
@@ -73,6 +72,9 @@ d-3      <span class="k">$applies</span>   environment = "staging"  <span class=
         <span class="k">op</span>: <span class="s">equals</span>
         <span class="k">path</span>: [<span class="s">environment</span>]
         <span class="k">value</span>: <span class="s">prod</span>
+<span class="k">requirements</span>:
+  <span class="k">prod_deploy</span>:
+    <span class="k" data-note="3">subject</span>: <span class="s">deployment</span>
     <span class="k" data-note="3">checks</span>:
       <span class="k">approved</span>:
         <span class="k">description</span>: <span class="s">Someone approved the deployment</span>
