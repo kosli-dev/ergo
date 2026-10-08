@@ -3,6 +3,7 @@
 This page describes everything ergo accepts and everything it returns. If you haven't used ergo before, start with the [README](README.md).
 
 - [Policies](#policies)
+- [Subjects](#subjects)
 - [Requirements](#requirements)
 - [Paths](#paths)
 - [Reading from the input](#reading-from-the-input)
@@ -17,28 +18,40 @@ This page describes everything ergo accepts and everything it returns. If you ha
 
 ## Policies
 
-A policy is an object whose `requirements` section maps requirement names to requirements. You pass it to `ergo.report` along with the input and the [params](#params):
+A policy is an object with two sections. `subjects` says what the policy checks and where to find it in the input, and `requirements` says what must be true of it. Each section maps names to definitions. You pass the policy to `ergo.report` along with the input and the [params](#params):
 
 ```rego
-requirements := {
-	"approved_deploy": { ... },
-	"signed_commits": { ... },
+subjects := {
+	"deployment": { ... },
+	"commit": { ... },
 }
 
-report := ergo.report(input, {"requirements": requirements}, {})
+requirements := {
+	"approved_deploy": {"subject": "deployment", ... },
+	"signed_commits": {"subject": "commit", ... },
+}
+
+report := ergo.report(input, {"subjects": subjects, "requirements": requirements}, {})
 ```
 
 `ergo.report` reads only its three arguments, so the same arguments always give the same report.
 
-A policy is plain data, so it can also live in a YAML or JSON file that OPA loads. A file in the policy directory with a top-level `requirements` key is read as `data.requirements`:
+A policy is plain data, so it can also live in a YAML or JSON file that OPA loads. A file in the policy directory with top-level `subjects` and `requirements` keys is read as `data.subjects` and `data.requirements`:
 
 ```yaml
+subjects:
+  deployment: { ... }
+  commit: { ... }
 requirements:
-  approved_deploy: { ... }
-  signed_commits: { ... }
+  approved_deploy: { subject: deployment, ... }
+  signed_commits: { subject: commit, ... }
 ```
 
 ```rego
+default subjects := {}
+
+subjects := data.subjects
+
 default requirements := {}
 
 requirements := data.requirements
@@ -47,10 +60,10 @@ default params := {}
 
 params := data.params
 
-report := ergo.report(input, {"requirements": requirements}, params)
+report := ergo.report(input, {"subjects": subjects, "requirements": requirements}, params)
 ```
 
-Give each argument a default like this when it comes from `data`. Rego doesn't call a function with an argument that isn't defined, so a file without `requirements:`, or a run without params, would make the whole report undefined, with no rows to say why. The defaults still fail closed: with no requirements the policy isn't compliant, and with no params every `$$params` read fails as `absent`. The same goes for the input: if it can be missing, give it a default too.
+Give each argument a default like this when it comes from `data`. Rego doesn't call a function with an argument that isn't defined, so a file without `requirements:`, or a run without params, would make the whole report undefined, with no rows to say why. The defaults still fail closed: with no subjects every requirement fails, because the subject it names isn't there, with no requirements the policy isn't compliant, and with no params every `$$params` read fails as `absent`. The same goes for the input: if it can be missing, give it a default too.
 
 Because each name is an object key, two requirements can't share a name, and every row in the report points back to exactly one requirement.
 
@@ -58,48 +71,71 @@ A policy with no requirements is never compliant: it doesn't check anything, so 
 
 From your own policies, call only `ergo.report` and `ergo.violations`. Rules whose names start with `_`, like `ergo._row_cause`, are ergo's own and can change or disappear in any release. If you lint with [Regal](https://www.openpolicyagent.org/projects/regal), its `leaked-internal-reference` rule flags a call to one.
 
-## Requirements
+## Subjects
+
+A subject is the kind of thing a requirement checks, like a deployment or a pull request, and says where to find them in the input:
 
 ```rego
-{
-	"description": "Every production deployment is approved",
-	"meta": {"control": "SDLC-CTRL-0007", "frameworks": ["SOC 2"]},
-	"subject_type": "deployment",
+"deployment": {
+	"description": "A deployment to production",
 	"from": ["deployments"],
 	"id": ["id"],
-	"require": "every",
-	"min_subjects": 1,
 	"applies_to": {"is_prod": { ... }},
-	"checks": {"approved": { ... }},
 }
 ```
 
-| Field          | Meaning                                                                                               | Default           |
-| -------------- | ----------------------------------------------------------------------------------------------------- | ----------------- |
-| `description`  | What the requirement asks for, in words anyone can read. It's copied into the report.                 | `""`              |
-| `meta`         | Anything else you want to keep with the requirement, like a control id or an owner. It's copied into the report. ergo never reads it. | `{}`              |
-| `subject_type` | A name for the kind of thing being checked. It appears in every row.                                  | `"subject"`       |
-| `from`         | The [path](#paths) to the subjects in the input. It can end with a [naming step](#naming-subjects).   | the whole input   |
-| `id`           | The path, inside one subject, to the value that identifies it.                                        | the whole subject |
-| `require`      | `"every"`: every subject must pass every check. `"some"`: at least one subject must pass every check. | `"every"`         |
-| `min_subjects` | How many subjects must be left after `applies_to` for the requirement to be met.                      | `1`               |
-| `applies_to`   | Named checks that pick which subjects the requirement is about. A subject must pass all of them.      | no filter         |
-| `checks`       | Named checks that each subject must pass.                                                             | required          |
+| Field         | Meaning                                                                                                | Default           |
+| ------------- | ------------------------------------------------------------------------------------------------------ | ----------------- |
+| `description` | What the subject is, in words anyone can read. ergo doesn't copy it into the report.                   | `""`              |
+| `from`        | The [path](#paths) to the subjects in the input. It can end with a [naming step](#naming-subjects).    | the whole input   |
+| `id`          | The path, inside one subject, to the value that identifies it.                                         | the whole subject |
+| `applies_to`  | Named checks that pick which of them are in scope. A subject must pass all of them.                    | no filter         |
+
+The subject's name is what the report calls each one, in every row, like `"subject": {"type": "deployment", "id": "d-2"}`, and in the descriptions of the [checks ergo adds](#checks-ergo-adds), like `The in-scope deployment count is at least 1`. So name it the way a reader would, like `deployment` or `pull request`.
+
+A requirement names its subject with `subject`. Several requirements can name the same subject, and each one checks it on its own, with its own rows. A subject that no requirement names isn't read, so it changes nothing in the report.
 
 A few details:
 
-- `meta` can hold anything JSON can, like `{"control": "SDLC-CTRL-0007", "frameworks": ["SOC 2", "ISO 27001"], "version": 3, "reviewed": true}`. Its numbers follow the same rule as numbers anywhere else in a policy: one a 64-bit float can't hold, like `1e400`, makes the requirement [written wrong](#basic-operators). So does a key that isn't a string, or a set, which a policy written in Rego can hold but JSON can't. In the report, a number is written in its plain form, so `1.50`, `1e2` and `-0` come out as `1.5`, `100` and `0`, and the same `meta` gives the same report however it was written.
 - If `from` leads to a list, each item is a subject. If it leads to a single object, that object is the only subject. If it leads nowhere, to `null`, or to anything else, like a string or a number, there are no subjects and `$min_subjects` fails with cause `absent`, `null` or `unusable`, even with `min_subjects: 0`, because that's what a typo in `from` looks like. A path through something that can't hold the next key, like `"build": "b1"` for `["build", "items"]`, gives `unusable`, and a missing or `null` parent gives `absent`, as they do in a [check](#paths). An empty list is different: it was read fine, so it fails `$min_subjects` as `value`, or passes with `min_subjects: 0`.
 - The input has to be an object. A `null` input fails `$min_subjects` as `null` when `from` is empty or left out, and as `absent` when it has a step. Any other input that isn't an object, a list included, fails it as `unusable`.
 - If `id` doesn't lead anywhere, the subject's id is `null`. Its rows are still there.
 - No two subjects can share an id, or their rows could be identical and the report couldn't say which one failed. If two do, `$unique_ids` fails and so does the requirement. Every subject counts, even one that `applies_to` leaves out, and `null` is an id like any other, so two subjects without one clash.
 - An item of the list that isn't an object, like a string or a `null`, is still a subject. Its id is the item itself, and its checks fail with cause `not_an_object`.
 - Leaving out `from` or `id` is allowed, but rarely what you want. Without `from`, the whole input is checked as one subject. Without `id`, each row repeats the whole subject as its id, so two identical subjects clash.
+- A subject that's written wrong fails `$well_formed` on every requirement that names it, so none of them is met. That's a subject that isn't an object, or that has a field that isn't in the table above, like `subject_type`, or whose `applies_to` isn't an object, whose `from` or `id` isn't a list, or whose `description` isn't a string, or a badly written [naming step](#naming-subjects), an `id` whose selector has a ref or `literal` deeper inside a `where` value than ergo reads, or a filter that's [written wrong](#basic-operators). The `$well_formed` row names each field with its subject, like `{"name": "subjects.deployment.from", "value": ["not a list"]}`. ergo then reads `applies_to` as a filter it can't read, so every subject fails `$applies` with cause `absent`, shown as `<invalid applies_to>`, and gets no other rows. It reads a `from` as giving no subjects (shown as `<invalid from>`), so `$min_subjects` fails as `value`, even with `min_subjects: 0`, and an `id` as giving the id `null`.
+
+## Requirements
+
+```rego
+{
+	"description": "Every production deployment is approved",
+	"meta": {"control": "SDLC-CTRL-0007", "frameworks": ["SOC 2"]},
+	"subject": "deployment",
+	"require": "every",
+	"min_subjects": 1,
+	"checks": {"approved": { ... }},
+}
+```
+
+| Field          | Meaning                                                                                               | Default   |
+| -------------- | ----------------------------------------------------------------------------------------------------- | --------- |
+| `description`  | What the requirement asks for, in words anyone can read. It's copied into the report.                 | `""`      |
+| `meta`         | Anything else you want to keep with the requirement, like a control id or an owner. It's copied into the report. ergo never reads it. | `{}`      |
+| `subject`      | The name of the [subject](#subjects) it checks.                                                       | required  |
+| `require`      | `"every"`: every subject must pass every check. `"some"`: at least one subject must pass every check. | `"every"` |
+| `min_subjects` | How many subjects must be left after `applies_to` for the requirement to be met.                      | `1`       |
+| `checks`       | Named checks that each subject must pass.                                                             | required  |
+
+A few details:
+
+- `meta` can hold anything JSON can, like `{"control": "SDLC-CTRL-0007", "frameworks": ["SOC 2", "ISO 27001"], "version": 3, "reviewed": true}`. Its numbers follow the same rule as numbers anywhere else in a policy: one a 64-bit float can't hold, like `1e400`, makes the requirement [written wrong](#basic-operators). So does a key that isn't a string, or a set, which a policy written in Rego can hold but JSON can't. In the report, a number is written in its plain form, so `1.50`, `1e2` and `-0` come out as `1.5`, `100` and `0`, and the same `meta` gives the same report however it was written.
 - `min_subjects` defaults to 1 so that a typo in `from` fails the requirement instead of quietly passing it. Set it to `0` when you mean "if there are any, they must pass; if there are none, that's fine". It means the same under `every` and `some`. When none are left, the requirement is [not applicable](#the-report). That only holds for a list that's there: a `from` that leads nowhere still fails, as above. A `from` that ends with a [`keys` step](#naming-subjects) is the exception, because each key is a subject even when `from` leads nowhere.
 - Under `some`, one subject has to pass all the checks by itself. Two subjects that each pass half of them don't count.
-- A requirement with no checks, a `require` other than `every` or `some`, a badly written [naming step](#naming-subjects), an `id` whose selector has a ref or `literal` deeper inside a `where` value than ergo reads, or a check that's [written wrong](#basic-operators), is never met. The `$well_formed` row says so, and says [what's wrong](#checks-ergo-adds), like `{"name": "require", "value": ["neither every nor some"]}`.
-- So is a requirement with a field that isn't in the table above, like `subject` or `requires`, because ergo would otherwise ignore it and check something you didn't mean. The `$well_formed` row lists each one in order and says what's wrong with it, the way it does for a [check that's written wrong](#checks-ergo-adds), like `{"name": "subject", "value": ["unknown field"]}`. Rows for the subjects are still there.
-- So is a requirement that isn't an object, or whose `checks` or `applies_to` isn't an object, whose `from` or `id` isn't a list, whose `min_subjects` isn't a whole number of 0 or more, whose `subject_type` isn't a string with something besides whitespace in it, since rows and descriptions name the subject by it, whose `description` isn't a string, or whose `meta` isn't an object. `null` counts as the wrong type, except for `description` and `meta`: ergo only copies those, so a `null` one counts as not written, which is what YAML gives for an empty `description:`. `2.0` is a whole number, but `-1` and `0.5` aren't. It still has its entry in `requirements` and its `$well_formed` row, which shows each such field and what it should be, like `{"name": "from", "value": ["not a list"]}`, or the whole requirement and its value, like `{"name": "requirement", "value": 5}`. ergo then reads `checks` as empty and `applies_to` as a filter it can't read, so every subject fails `$applies` with cause `absent`, shown as `<invalid applies_to>`, and gets no other rows. It reads a `from` as giving no subjects (shown as `<invalid from>`), so `$min_subjects` fails as `value`, even with `min_subjects: 0`, and an `id` as giving the id `null`. A requirement that isn't an object gives no subjects either. A `min_subjects` that isn't a number fails `$min_subjects` too.
+- A requirement with no checks, a `require` other than `every` or `some`, a check that's [written wrong](#basic-operators), or a [subject that's written wrong](#subjects), is never met. The `$well_formed` row says so, and says [what's wrong](#checks-ergo-adds), like `{"name": "require", "value": ["neither every nor some"]}`.
+- So is a requirement without a `subject`, or whose `subject` isn't in `subjects`, like a typo for `deploymnt`. The `$well_formed` row says `{"name": "subject", "value": ["missing"]}` or `{"name": "subject", "value": ["not in subjects"]}`, and ergo reads it as having no subjects, so `$min_subjects` fails too. If `subjects` itself isn't an object, every requirement that names a subject fails with `{"name": "subjects", "value": ["not an object"]}`.
+- So is a requirement with a field that isn't in the table above, like `from` or `requires`, because ergo would otherwise ignore it and check something you didn't mean. `from`, `id` and `applies_to` belong to the [subject](#subjects). The `$well_formed` row lists each one in order and says what's wrong with it, the way it does for a [check that's written wrong](#checks-ergo-adds), like `{"name": "from", "value": ["unknown field"]}`. Rows for the subjects are still there.
+- So is a requirement that isn't an object, or whose `checks` isn't an object, whose `min_subjects` isn't a whole number of 0 or more, whose `subject` isn't a string with something besides whitespace in it, since rows and descriptions name the subject by it, whose `description` isn't a string, or whose `meta` isn't an object. `null` counts as the wrong type, except for `description` and `meta`: ergo only copies those, so a `null` one counts as not written, which is what YAML gives for an empty `description:`. `2.0` is a whole number, but `-1` and `0.5` aren't. It still has its entry in `requirements` and its `$well_formed` row, which shows each such field and what it should be, like `{"name": "checks", "value": ["not an object"]}`, or the whole requirement and its value, like `{"name": "requirement", "value": 5}`. ergo then reads `checks` as empty. A requirement that isn't an object gives no subjects. A `min_subjects` that isn't a number fails `$min_subjects` too.
 
 ### A requirement that only applies sometimes
 
@@ -108,13 +144,15 @@ Some controls only apply to some inputs, like "new features must be tested", whi
 ```yaml
 params:
   untested_change_types: [bug_fix, refactor]
-requirements:
-  features_tested:
-    subject_type: deployment
+subjects:
+  deployment:
     from: []
-    min_subjects: 0
     applies_to:
       needs_tests: { op: excludes, path: [$$params, untested_change_types], value: { ref: [$$input, deployment, change_type] } }
+requirements:
+  features_tested:
+    subject: deployment
+    min_subjects: 0
     checks:
       tested: { op: any, path: [test_runs], check: { op: present, path: [status] } }
       passed: { op: all, path: [test_runs], check: { op: equals, path: [status], value: passed } }
@@ -151,16 +189,19 @@ The subject is what each row is about, so it's the first choice to make, and it 
 With the commit as the subject, the check looks through its pull requests:
 
 ```yaml
-reviewed:
-  subject_type: commit
-  from: [commits]
-  id: [sha]
-  checks:
-    reviewed:
-      description: Some pull request for the commit was approved
-      op: any
-      path: [pull_requests]
-      check: { op: non_empty_string, path: [approved_by] }
+subjects:
+  commit:
+    from: [commits]
+    id: [sha]
+requirements:
+  reviewed:
+    subject: commit
+    checks:
+      reviewed:
+        description: Some pull request for the commit was approved
+        op: any
+        path: [pull_requests]
+        check: { op: non_empty_string, path: [approved_by] }
 ```
 
 | subject | check      | passed  | cause       |
@@ -173,16 +214,19 @@ The requirement is `not_met`: `a2` has no pull request.
 With the pull request as the subject, the same sentence turns into "some pull request was approved":
 
 ```yaml
-reviewed:
-  subject_type: pull request
-  from: [commits, 0, pull_requests]
-  id: [number]
-  require: some
-  checks:
-    approved:
-      description: The pull request was approved
-      op: non_empty_string
-      path: [approved_by]
+subjects:
+  pull request:
+    from: [commits, 0, pull_requests]
+    id: [number]
+requirements:
+  reviewed:
+    subject: pull request
+    require: some
+    checks:
+      approved:
+        description: The pull request was approved
+        op: non_empty_string
+        path: [approved_by]
 ```
 
 | subject | check      | passed  | cause       |
@@ -252,10 +296,8 @@ Every subject reads the same value. These only mean this as the first step of a 
 A check's fixed values can be read this way too. Write `{"ref": path}` in place of the value, where the path starts with `$$params` or `$$input`. This works for `value`, `values`, `patterns`, `min`, `max`, each item in a `values` or `patterns` list, and the values in a selector's `where`, and as a step of a path (see [Ref steps](#ref-steps)). It's how a policy takes params:
 
 ```rego
-ergo.report({"packages": packages}, {"requirements": {"licences": {
-	"subject_type": "package",
-	"from": ["packages"],
-	"id": ["name"],
+ergo.report({"packages": packages}, {"subjects": {"package": {"from": ["packages"], "id": ["name"]}}, "requirements": {"licences": {
+	"subject": "package",
 	"checks": {"approved": {
 		"op": "any",
 		"path": ["licences"],
@@ -347,11 +389,13 @@ If `from` leads to an object, the step makes every entry a subject, identified b
 and you need a passing unit test, integration test and system test run:
 
 ```rego
-"tests_passed": {
-	"subject_type": "test run",
+"subjects": {"test run": {
 	"from": ["build", "test_runs", {"each_as": "run", "keys": ["unit-test", "integration-test", "system-test"]}],
+}},
+"requirements": {"tests_passed": {
+	"subject": "test run",
 	"checks": {"passed": {"description": "The tests passed", "op": "equals", "path": ["result"], "value": "passed"}},
-}
+}}
 ```
 
 Each key is a subject. A key the object doesn't have is still a subject, so its checks fail as `absent` (or `value`, for a `present` check), and the smoke test run isn't checked at all:
@@ -382,17 +426,19 @@ Each key is a subject. A key the object doesn't have is still a subject, so its 
 The name matters inside `all` and `any`, where paths start at each item of the list. `$name` reaches back to the subject, so an item can be compared with it. `as` names the items of a list the same way (see [Nesting](#nesting)):
 
 ```rego
-"peer_reviewed": {
-	"subject_type": "pull request",
+"subjects": {"pull request": {
 	"from": ["pull_requests", {"each_as": "pr"}],
 	"id": ["number"],
+}},
+"requirements": {"peer_reviewed": {
+	"subject": "pull request",
 	"checks": {"peer": {
 		"description": "Someone other than the author approved it",
 		"op": "any",
 		"path": ["approvers"],
 		"check": {"op": "compare", "left": ["username"], "right": ["$pr", "author"], "cmp": "ne"},
 	}},
-}
+}}
 ```
 
 A pull request that only its author approved gives this violation. The row shows the value read through `$pr` beside the list:
@@ -408,7 +454,8 @@ A pull request that only its author approved gives this violation. The row shows
     { "name": "approvers[]", "value": [{ "username": "ann" }] },
     { "name": "$pr.author", "value": "ann" }
   ],
-  "cause": "value"
+  "cause": "value",
+  "failed_items": [{ "path": "approvers[0]", "value": { "username": "ann" }, "cause": "value" }]
 }
 ```
 
@@ -553,10 +600,12 @@ An `all` or `any` inside another one checks a list for each item of the outer li
 That's "some approver, such that every commit is earlier than their approval":
 
 ```rego
-"approved_after_last_commit": {
-	"subject_type": "pull request",
+"subjects": {"pull request": {
 	"from": ["pull_requests", {"each_as": "pr"}],
 	"id": ["number"],
+}},
+"requirements": {"approved_after_last_commit": {
+	"subject": "pull request",
 	"checks": {"after_commits": {
 		"description": "Someone approved it after its last commit",
 		"op": "any",
@@ -568,7 +617,7 @@ That's "some approver, such that every commit is earlier than their approval":
 			"check": {"op": "compare_time", "left": ["$approver", "timestamp"], "right": ["timestamp"], "cmp": "gt"},
 		},
 	}},
-}
+}}
 ```
 
 The inner paths start at each commit, so `["timestamp"]` is the commit's. `$approver` is the approver being tried, and `$pr` is the pull request. Bob approved before `c2`, so this fails:
@@ -587,11 +636,12 @@ The inner paths start at each commit, so `["timestamp"]` is the commit's. `$appr
       { "sha": "c2", "timestamp": "2026-10-01T12:00:00Z" }
     ] }
   ],
-  "cause": "value"
+  "cause": "value",
+  "failed_items": [{ "path": "approvers[0]", "value": { "username": "bob", "timestamp": "2026-10-01T11:00:00Z" }, "cause": "value" }]
 }
 ```
 
-The row shows the lists the check read, but not which approver failed or why. A commit with no timestamp fails the check too, with cause `absent`, because nothing proves the approval came after it.
+The row shows the lists the check read, and `failed_items` names the approver who didn't count, but not which commit came after the approval. A commit with no timestamp fails the check too, with cause `absent`, because nothing proves the approval came after it.
 
 To require several things of the same approver, put them in one [`any_of`](#any_of) option, list checks included. This one needs an approver who approved, isn't the author, and approved after every commit:
 
@@ -879,52 +929,55 @@ ergo adds four checks of its own. They start with `$`, so they can't clash with 
 
 | Check           | One row per | Passes when                                                                                                                            |
 | --------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `$well_formed`  | requirement | the requirement has only the fields ergo knows and they have the right types, it has at least one check, a valid `require`, a well written naming step if `from` has one, no step in `from` or `id` that can't be a key, no number a 64-bit float can't hold in `from`, `id` or `min_subjects`, no set or key that isn't a string in `from` or `id` and no key that isn't a string in `checks` or `applies_to`, a name that's a string, and no check that's [written wrong](#basic-operators). This depends only on how the requirement is written, never on the input or the params. |
+| `$well_formed`  | requirement | the requirement names a subject in `subjects`, the requirement and its subject have only the fields ergo knows and they have the right types, it has at least one check, a valid `require`, a well written naming step if `from` has one, no step in `from` or `id` that can't be a key, no number a 64-bit float can't hold in `from`, `id` or `min_subjects`, no set or key that isn't a string in `from` or `id` and no key that isn't a string in `checks` or `applies_to`, a name that's a string, and no check that's [written wrong](#basic-operators). This depends only on how the requirement and its subject are written, never on the input or the params. |
 | `$min_subjects` | requirement | `from` leads to a list or an object, unless it ends with a `keys` step, and at least `min_subjects` subjects are left after `applies_to`. |
 | `$unique_ids`   | requirement | no two subjects share an id, counting the ones `applies_to` leaves out.                                                                |
 | `$applies`      | subject     | the subject passes the `applies_to` filter. These rows only exist when the requirement has a filter.                                   |
 
-When a check is [written wrong](#basic-operators), the `$well_formed` row gets an input for it, named after where the check sits in the requirement, with the list of what's wrong. With a typo in each of a filter and a check:
+When a check is [written wrong](#basic-operators), the `$well_formed` row gets an input for it, named after where the check sits in the policy, with the list of what's wrong. With a typo in each of a filter of the `deployment` subject and a check:
 
 ```json
 "inputs": [
   { "name": "count(checks)", "value": 1 },
   { "name": "require", "value": "every" },
-  { "name": "applies_to.is_prod", "value": ["missing value", "unknown field valeu"] },
-  { "name": "checks.approved", "value": ["unknown op non_emtpy_string"] }
+  { "name": "checks.approved", "value": ["unknown op non_emtpy_string"] },
+  { "name": "subjects.deployment.applies_to.is_prod", "value": ["missing value", "unknown field valeu"] }
 ]
 ```
 
 A check inside another one is named further in, like `checks.signed.check` for the inner check of an `all`, `checks.reviewed.substitute` for a substitute, or `checks.permitted.options.standard.1` for the second check of an `any_of` option. A name that needs quotes is quoted as in [paths](#paths): `checks."a.b"`.
 
-The requirement's own fields get an input of the same form when something is wrong with them, named after the field and sorted by field. `require` and a `from` with a [naming step](#naming-subjects) are shown with their value when they're fine, and with what's wrong instead when they aren't, so no name appears twice:
+The fields of the requirement and its subject get an input of the same form when something is wrong with them. The requirement's own fields come first, named after the field, and then the subject's, named after the subject and the field. Each group is sorted by field. `require` and a `from` with a [naming step](#naming-subjects) are shown with their value when they're fine, and with what's wrong instead when they aren't, so no name appears twice:
 
 ```json
 "inputs": [
   { "name": "count(checks)", "value": 0 },
   { "name": "checks", "value": ["empty"] },
-  { "name": "from", "value": ["not a list"] },
   { "name": "min_subjects", "value": ["not a whole number of 0 or more"] },
   { "name": "require", "value": ["neither every nor some"] },
-  { "name": "zz", "value": ["unknown field"] }
+  { "name": "zz", "value": ["unknown field"] },
+  { "name": "subjects.deployment.from", "value": ["not a list"] }
 ]
 ```
 
-| Field                       | What's wrong                                                                                                                     |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| any field ergo doesn't know | `unknown field`                                                                                                                  |
-| `applies_to`, `checks`      | `not an object`, `holds a key that isn't a string`                                                                               |
-| `checks`                    | `missing`, `empty`                                                                                                               |
-| `require`                   | `neither every nor some`                                                                                                         |
-| `from`, `id`                | `not a list`, `step that can't be a key`, `number out of range`, `holds a set`, `holds a key that isn't a string`                |
-| `from`                      | `object step before the last`, `object step without each_as`, `invalid name`, `invalid keys`, `unknown field foo in naming step` |
-| `id`                        | `ref inside where`, `literal inside where`                                                                                       |
-| `min_subjects`              | `not a whole number of 0 or more`, `number out of range`                                                                         |
-| `subject_type`              | `empty or not a string`                                                                                                          |
+| Field                                     | What's wrong                                                                                                                     |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| any field ergo doesn't know               | `unknown field`                                                                                                                  |
+| `checks`                                  | `not an object`, `holds a key that isn't a string`, `missing`, `empty`                                                           |
+| `require`                                 | `neither every nor some`                                                                                                         |
+| `min_subjects`                            | `not a whole number of 0 or more`, `number out of range`                                                                         |
+| `subject`                                 | `missing`, `empty or not a string`, `not in subjects`                                                                            |
+| `subjects`                                | `not an object`                                                                                                                  |
+| `subjects.deployment`                     | `not an object`                                                                                                                  |
+| `subjects.deployment.applies_to`          | `not an object`, `holds a key that isn't a string`                                                                               |
+| `subjects.deployment.from`, `...id`       | `not a list`, `step that can't be a key`, `number out of range`, `holds a set`, `holds a key that isn't a string`                |
+| `subjects.deployment.from`                | `object step before the last`, `object step without each_as`, `invalid name`, `invalid keys`, `unknown field foo in naming step` |
+| `subjects.deployment.id`                  | `ref inside where`, `literal inside where`                                                                                       |
+| `subjects.deployment.description`         | `not a string`                                                                                                                   |
 
 A policy written in Rego can use a key that isn't a string, like `true` or `1.5`. ergo names it `<invalid key true>` or `<invalid key 1.5>`, so two such keys never share a name. A requirement whose own name isn't a string, like `1`, or every requirement of a policy written as a list, fails `$well_formed`, which then starts with `{"name": "requirement name", "value": ["not a string"]}`. The requirement is `not_met`, so the policy isn't compliant.
 
-Their descriptions are plain sentences, like your own checks': `The requirement is written correctly`, `The in-scope deployment count is at least 1`, `Every deployment id is unique` and `The deployment is in scope`. The details are in `expression`, `inputs` and `cause`. `$min_subjects` names its input after what it counts, like `in-scope deployment count`: only the subjects left after `applies_to`. With `min_subjects: 0` the count can't fail, so `$min_subjects` only checks that `from` can be read, and says so: `The deployment list can be read`, with the expression `deployments can be read`. A `from` that ends with a `keys` step keeps the count, because `from` isn't read there. `$unique_ids` lists the ids that more than one subject has, once each, under `repeated deployment ids`, sorted by how they're written as JSON, so `"b"` comes before `10`, and `10` before `3`. They use `subject_type` as it's written, so they read right whatever the word's plural would be.
+Their descriptions are plain sentences, like your own checks': `The requirement is written correctly`, `The in-scope deployment count is at least 1`, `Every deployment id is unique` and `The deployment is in scope`. The details are in `expression`, `inputs` and `cause`. `$min_subjects` names its input after what it counts, like `in-scope deployment count`: only the subjects left after `applies_to`. With `min_subjects: 0` the count can't fail, so `$min_subjects` only checks that `from` can be read, and says so: `The deployment list can be read`, with the expression `deployments can be read`. A `from` that ends with a `keys` step keeps the count, because `from` isn't read there. `$unique_ids` lists the ids that more than one subject has, once each, under `repeated deployment ids`, sorted by how they're written as JSON, so `"b"` comes before `10`, and `10` before `3`. They use the subject's name as it's written, so they read right whatever the word's plural would be.
 
 A subject that fails `$applies` gets no other rows, since it was never checked. But its `$applies` row stays, so you can see what was left out and why.
 
