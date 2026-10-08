@@ -3817,7 +3817,7 @@ test_report_has_one_entry_per_declared_requirement if {
 
 test_requirement_entry_carries_exactly_the_documented_keys if {
 	rep := solo({"state": "MERGED"}, is_merged)
-	object.keys(rep.requirements.s) == {"description", "meta", "require", "status", "subjects", "checks"}
+	object.keys(rep.requirements.s) == {"description", "meta", "require", "status", "causes", "subjects", "checks"}
 }
 
 test_report_carries_exactly_the_documented_keys if {
@@ -7402,4 +7402,57 @@ test_a_subject_without_an_applies_row_leaves_the_scope_unknown if {
 	ergo._scope_readable([{"subject": {}}, {"subject": {}}], [passing_row, passing_row], two_checks_req) with data.ergo_subjects as subjects with data.ergo_resolved as resolved
 	not ergo._scope_readable([{"subject": {}}, {"subject": {}}], [passing_row], two_checks_req) with data.ergo_subjects as subjects with data.ergo_resolved as resolved
 	not ergo._scope_readable([{"subject": {}}], [{"passed": false, "cause": "absent"}], two_checks_req) with data.ergo_subjects as subjects with data.ergo_resolved as resolved
+}
+
+causes_doc := {"deployments": [
+	{"id": "d-1", "environment": "prod", "approved_by": "alice"},
+	{"id": "d-2", "environment": "prod"},
+	{"id": "d-3", "environment": "staging"},
+	{"id": "d-4", "environment": "prod", "approved_by": ""},
+	{"id": "d-5"},
+]}
+
+causes_policy(check) := {"subjects": {"deployment": {"from": ["deployments"], "id": ["id"], "applies_to": {"is_prod": {"op": "equals", "path": ["environment"], "value": "prod"}}}}, "requirements": {"r": {"subject": "deployment", "checks": {"approved": check}}}}
+
+causes_of(deployments, check) := ergo.report({"deployments": deployments}, causes_policy(check), {}).requirements.r.causes
+
+approved_check := {"op": "non_empty_string", "path": ["approved_by"]}
+
+test_a_requirement_that_holds_has_no_causes if {
+	met := ergo.report({"deployments": [causes_doc.deployments[0], causes_doc.deployments[2]]}, causes_policy(approved_check), {}).requirements.r
+	[met.status, met.causes] == ["met", []]
+	policy := causes_policy(approved_check)
+	optional := object.union(policy, {"requirements": {"r": object.union(policy.requirements.r, {"min_subjects": 0})}})
+	not_applicable := ergo.report({"deployments": [causes_doc.deployments[2]]}, optional, {}).requirements.r
+	[not_applicable.status, not_applicable.causes] == ["not_applicable", []]
+}
+
+test_a_requirement_lists_the_causes_of_its_failing_rows_worst_first_with_how_many_rows_each if {
+	causes_of(causes_doc.deployments, approved_check) == [
+		{"cause": "absent", "rows": 2},
+		{"cause": "value", "rows": 1},
+	]
+}
+
+test_subjects_that_are_only_out_of_scope_are_not_causes if {
+	causes_of([causes_doc.deployments[1], causes_doc.deployments[2]], approved_check) == [{"cause": "absent", "rows": 1}]
+}
+
+test_a_badly_written_check_puts_ill_formed_first if {
+	causes_of(causes_doc.deployments, {"op": "non_empty_strng", "path": ["approved_by"]}) == [
+		{"cause": "ill_formed", "rows": 3},
+		{"cause": "absent", "rows": 1},
+		{"cause": "value", "rows": 1},
+	]
+}
+
+test_causes_count_the_rows_violations_returns if {
+	rep := ergo.report(causes_doc, causes_policy(approved_check), {})
+	vs := ergo.violations(rep)
+	rep.requirements.r.causes == [{"cause": c, "rows": n} |
+		some c in ["ill_formed", "not_an_object", "ambiguous", "unmatched", "unusable", "absent", "null", "value"]
+		n := count([v | some v in vs; v.cause == c])
+		n > 0
+	]
+	sum([e.rows | some e in rep.requirements.r.causes]) == count(vs)
 }

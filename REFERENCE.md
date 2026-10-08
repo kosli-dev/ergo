@@ -917,6 +917,7 @@ Three rules:
   "meta": {},
   "require": "every",
   "status": "not_met",
+  "causes": [{ "cause": "absent", "rows": 1 }],
   "subjects": { "matching": 2, "total": 3 }
 }
 ```
@@ -930,6 +931,32 @@ Three rules:
 | `not_applicable` | the requirement would have passed, but no subject was left after `applies_to`, which only happens with `min_subjects: 0` |
 
 To tell whether a requirement passed, compare `status` with `"met"` (or `"not_applicable"`, if that counts as passing for you). Don't test for `"not_met"`, so a value you didn't expect counts as a failure.
+
+`causes` says why a requirement isn't met, so a tool can tell a breach from missing evidence or a policy that's written wrong without reading every row. It lists the [causes](#causes) of the rows [`violations`](#violations) would return for the requirement, each with how many rows have it, in the order of the cause table, so the first entry is the worst. It counts rows, not subjects, because one subject can fail several checks.
+
+Take the [README](README.md)'s policy with its check's `op` misspelt as `non_empty_strng`, and this input:
+
+```json
+{
+  "deployments": [
+    { "id": "d-1", "environment": "prod", "approved_by": "alice" },
+    { "id": "d-2", "environment": "prod" },
+    { "id": "d-3", "environment": "staging" },
+    { "id": "d-4", "environment": "prod", "approved_by": "" },
+    { "id": "d-5" }
+  ]
+}
+```
+
+```json
+"causes": [
+  { "cause": "ill_formed", "rows": 3 },
+  { "cause": "absent", "rows": 1 },
+  { "cause": "value", "rows": 1 }
+]
+```
+
+The three `ill_formed` rows are the misspelt check on `d-1`, `d-2` and `d-4`. The `absent` row is `d-5`'s `$applies`, because its filter can't read `environment`, and the `value` row is `$well_formed`, which fails with `value` like any check that read what it needed. `d-3` is only out of scope, so it isn't counted. A requirement that's `met` or `not_applicable` has `"causes": []`.
 
 `description` and `meta` are the requirement's, or `""` and `{}` when it has none. They're always there, so you can read `meta.control` without first checking that `meta` exists.
 

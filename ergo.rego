@@ -3340,6 +3340,24 @@ _status(req, e) := "not_applicable" if {
 
 _status(req, e) := "not_met" if not _holds(req, e)
 
+_causes(status, _) := [] if status in {"met", "not_applicable"}
+
+_causes("not_met", e) := [{"cause": cause, "rows": n} |
+	some cause in array.concat(_cause_precedence, ["value"])
+	n := count([row |
+		some row in _requirement_rows(e)
+		row.passed == false
+		not _out_of_scope_row(row)
+		row.cause == cause
+	])
+	n > 0
+]
+
+_requirement_rows(e) := array.concat(
+	array.concat([e.well_formed, e.min_subjects, e.unique_ids], e.applies),
+	[row | some group in e.subject_rows; some row in group],
+)
+
 default _policy_compliant(_, _) := false
 
 _policy_compliant(policy, evaluations) if {
@@ -3408,6 +3426,7 @@ _report_of(doc, policy) := {
 		"meta": _reported_meta(req),
 		"require": _require_of(req),
 		"status": _status(req, evaluations[name]),
+		"causes": _causes(_status(req, evaluations[name]), evaluations[name]),
 		"subjects": {"total": evaluations[name].total, "matching": evaluations[name].matching},
 		"checks": _requirement_check_defs(req),
 	} |
