@@ -20,6 +20,6 @@ jobs:
           if ! printf '%s\n' "$TITLE" | grep -Eq "^($areas): [a-z0-9]"; then
             echo "This title doesn't follow the commit rules in AGENTS.md: $TITLE"
             echo "It should start with one of: ${areas//|/, }, then a colon and a lowercase summary."
-            echo "For example: core: fail compare when either side is missing"
+            echo "For example: spec: fail compare when either side is missing"
             exit 1
           fi
