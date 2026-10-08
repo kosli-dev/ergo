@@ -96,6 +96,16 @@ The subject's name is what the report calls each one, in every row, like `"subje
 
 A requirement names its subject with `subject`. Several requirements can name the same subject, and each one checks it on its own, with its own rows. A subject that no requirement names isn't read, so it changes nothing in the report.
 
+A few details:
+
+- If `from` leads to a list, each item is a subject. If it leads to a single object, that object is the only subject. If it leads nowhere, to `null`, or to anything else, like a string or a number, there are no subjects and `$min_subjects` fails with cause `absent`, `null` or `unusable`, even with `min_subjects: 0`, because that's what a typo in `from` looks like. A path through something that can't hold the next key, like `"build": "b1"` for `["build", "items"]`, gives `unusable`, and a missing or `null` parent gives `absent`, as they do in a [check](#paths). An empty list is different: it was read fine, so it fails `$min_subjects` as `value`, or passes with `min_subjects: 0`.
+- The input has to be an object. A `null` input fails `$min_subjects` as `null` when `from` is empty or left out, and as `absent` when it has a step. Any other input that isn't an object, a list included, fails it as `unusable`.
+- If `id` doesn't lead anywhere, the subject's id is `null`. Its rows are still there.
+- No two subjects can share an id, or their rows could be identical and the report couldn't say which one failed. If two do, `$unique_ids` fails and so does the requirement. Every subject counts, even one that `applies_to` leaves out, and `null` is an id like any other, so two subjects without one clash.
+- An item of the list that isn't an object, like a string or a `null`, is still a subject. Its id is the item itself, and its checks fail with cause `not_an_object`.
+- Leaving out `from` or `id` is allowed, but rarely what you want. Without `from`, the whole input is checked as one subject. Without `id`, each row repeats the whole subject as its id, so two identical subjects clash.
+- A subject that's written wrong fails `$well_formed` on every requirement that names it, so none of them is met. That's a subject that isn't an object, or that has a field that isn't in the table above, like `subject_type`, or whose `applies_to` isn't an object, whose `from` or `id` isn't a list, or whose `description` isn't a string, or a badly written [naming step](#naming-subjects), an `id` whose selector has a ref or `literal` deeper inside a `where` value than ergo reads, or a filter that's [written wrong](#basic-operators). The `$well_formed` row names each field with its subject, like `{"name": "subjects.deployment.from", "value": ["not a list"]}`. ergo then reads `applies_to` as a filter it can't read, so every subject fails `$applies` with cause `ill_formed`, shown as `<invalid applies_to>`, and gets no other rows. It reads a `from` as giving no subjects (shown as `<invalid from>`), so `$min_subjects` fails as `value`, even with `min_subjects: 0`, and an `id` as giving the id `null`.
+
 ### A subject built on another
 
 When requirements check different parts of the same list, give each part its own subject, built on one that says where the list is. Say the SBOM lists components, some pinned by the lockfile and some exempt from the licence rules:
@@ -134,16 +144,6 @@ A subject with `of` reads `from` and `id` from the subject it names, and keeps o
 - Any of these fails `$well_formed` on every requirement that names a subject whose chain has it, and the requirement finds no subjects. A problem is named after the subject it's in, like `subjects."SBOM package".from`.
 - A requirement can name the subject others build on too, like `SBOM package` to check every component.
 
-A few details:
-
-- If `from` leads to a list, each item is a subject. If it leads to a single object, that object is the only subject. If it leads nowhere, to `null`, or to anything else, like a string or a number, there are no subjects and `$min_subjects` fails with cause `absent`, `null` or `unusable`, even with `min_subjects: 0`, because that's what a typo in `from` looks like. A path through something that can't hold the next key, like `"build": "b1"` for `["build", "items"]`, gives `unusable`, and a missing or `null` parent gives `absent`, as they do in a [check](#paths). An empty list is different: it was read fine, so it fails `$min_subjects` as `value`, or passes with `min_subjects: 0`.
-- The input has to be an object. A `null` input fails `$min_subjects` as `null` when `from` is empty or left out, and as `absent` when it has a step. Any other input that isn't an object, a list included, fails it as `unusable`.
-- If `id` doesn't lead anywhere, the subject's id is `null`. Its rows are still there.
-- No two subjects can share an id, or their rows could be identical and the report couldn't say which one failed. If two do, `$unique_ids` fails and so does the requirement. Every subject counts, even one that `applies_to` leaves out, and `null` is an id like any other, so two subjects without one clash.
-- An item of the list that isn't an object, like a string or a `null`, is still a subject. Its id is the item itself, and its checks fail with cause `not_an_object`.
-- Leaving out `from` or `id` is allowed, but rarely what you want. Without `from`, the whole input is checked as one subject. Without `id`, each row repeats the whole subject as its id, so two identical subjects clash.
-- A subject that's written wrong fails `$well_formed` on every requirement that names it, so none of them is met. That's a subject that isn't an object, or that has a field that isn't in the table above, like `subject_type`, or whose `applies_to` isn't an object, whose `from` or `id` isn't a list, or whose `description` isn't a string, or a badly written [naming step](#naming-subjects), an `id` whose selector has a ref or `literal` deeper inside a `where` value than ergo reads, or a filter that's [written wrong](#basic-operators). The `$well_formed` row names each field with its subject, like `{"name": "subjects.deployment.from", "value": ["not a list"]}`. ergo then reads `applies_to` as a filter it can't read, so every subject fails `$applies` with cause `ill_formed`, shown as `<invalid applies_to>`, and gets no other rows. It reads a `from` as giving no subjects (shown as `<invalid from>`), so `$min_subjects` fails as `value`, even with `min_subjects: 0`, and an `id` as giving the id `null`.
-
 ## Requirements
 
 ```rego
@@ -163,7 +163,7 @@ A few details:
 | `meta`         | Anything else you want to keep with the requirement, like a control id or an owner. It's copied into the report. ergo never reads it. | `{}`      |
 | `subject`      | The name of the [subject](#subjects) it checks.                                                       | required  |
 | `require`      | `"every"`: every subject must pass every check. `"some"`: at least one subject must pass every check. | `"every"` |
-| `min_subjects` | How many subjects must be left after `applies_to` for the requirement to be met.                      | `1`       |
+| `min_subjects` | How many subjects must be left after the subject's `applies_to` for the requirement to be met.        | `1`       |
 | `checks`       | Named checks that each subject must pass.                                                             | required  |
 
 A few details:
@@ -506,7 +506,7 @@ Some things worth knowing:
 - Any other object in `from`, like a selector or a `literal`, fails `$well_formed` the same way. `from` has never read them, so a requirement with `min_subjects: 0` used to find nothing and pass.
 - Keys are sorted and duplicates dropped, so the order you list them in doesn't change the report. If `from` doesn't lead to an object, every key is still a subject, and its checks fail as `absent` (or `value`, for a `present` check). An empty `keys` list gives no subjects, so `$min_subjects` fails.
 - `keys` can come from the params: `"keys": {"ref": ["$$params", "required_suites"]}`. The list it reads works exactly like one written in the policy. A single key can be a ref too: `[{"ref": ["$$params", "suite"]}, "unit-test"]`, as can a `literal` like `{"literal": "$x"}`. If a ref can't be read, or reads the wrong type (anything but a list for the whole of `keys`, or a string or number for one key), there are no subjects and `$min_subjects` fails as `absent`, `null` or, for the wrong type, `unusable`, even with `min_subjects: 0`. A key is never just left out. The definition of `$min_subjects` records the ref under `$refs`.
-- A subject from an object is identified by its key, even if the requirement has an `id`. For a list, the `id` can start with the name, like `["$pr", "number"]`.
+- A subject from an object is identified by its key, even if the subject has an `id`. For a list, the `id` can start with the name, like `["$pr", "number"]`.
 - An empty path is named after the subject's name (`$run`), not after `from`.
 - A path that starts with a name nobody gave, like `["$runs", "result"]`, is written wrong: it fails `$well_formed`, and the check fails with cause `ill_formed`. That holds even when no subject is found, so a requirement can't pass by never running the check. To read a key that really starts with `$`, write it as `{"literal": "$schema"}`.
 - A `ref` can't start with a name yet, only with `$$input`. `{"ref": ["$pr", "author"]}` fails the check and shows `<invalid ref>`.
@@ -971,7 +971,7 @@ ergo adds four checks of its own. They start with `$`, so they can't clash with 
 | `$well_formed`  | requirement | the requirement names a subject in `subjects`, the requirement and its subject have only the fields ergo knows and they have the right types, it has at least one check, a valid `require`, a well written naming step if `from` has one, no step in `from` or `id` that can't be a key, no number a 64-bit float can't hold in `from`, `id` or `min_subjects`, no set or key that isn't a string in `from` or `id` and no key that isn't a string in `checks` or `applies_to`, a name that's a string, and no check that's [written wrong](#basic-operators). This depends only on how the requirement and its subject are written, never on the input or the params. |
 | `$min_subjects` | requirement | `from` leads to a list or an object, unless it ends with a `keys` step, and at least `min_subjects` subjects are left after `applies_to`. |
 | `$unique_ids`   | requirement | no two subjects share an id, counting the ones `applies_to` leaves out.                                                                |
-| `$applies`      | subject     | the subject passes the `applies_to` filter. These rows only exist when the requirement has a filter.                                   |
+| `$applies`      | subject     | the subject passes the `applies_to` filter. These rows only exist when the subject has a filter.                                       |
 
 When a check is [written wrong](#basic-operators), the `$well_formed` row gets an input for it, named after where the check sits in the policy, with the list of what's wrong. With a typo in each of a filter of the `deployment` subject and a check:
 
