@@ -40,14 +40,14 @@ declaration:
   title: Write the policy.
   muted: Not the sorcery.
   notes_title: Defined in YAML or Rego
-  notes_intro: Write the requirement as a YAML file or as a Rego object. ==ergo== reads both the same way and gives the same report.
+  notes_intro: Write the policy as a YAML file or as a Rego object. ==ergo== reads both the same way and gives the same report.
   notes:
     - title: Define the subjects
-      body: "`subject_type`, `from` and `id` say what the subjects are and where to find them."
+      body: "Each subject gets a name, and `from` and `id` say where to find them."
     - title: Filter the scope
-      body: "`applies_to` keeps only the subjects this requirement is about. The rest are recorded, not dropped."
+      body: "`applies_to` keeps only the subjects the policy is about. The rest are recorded, not dropped."
     - title: Test the values
-      body: "`checks` are the rules each subject must pass. ==ergo== does the looping, the evaluation and the report."
+      body: "A requirement names its subject, and its `checks` are the rules each one must pass. ==ergo== does the looping, the evaluation and the report."
 
 shape:
   title: One report format.
@@ -96,9 +96,13 @@ start:
       code: |-
         policy/
           ergo.rego
-    - title: Write a requirement
+    - title: Write a policy
       body: Say what you're judging, what's in scope and what must hold.
-      code: report := ergo.report(input, data.requirements)
+      code: |-
+        report := ergo.report(input, {
+          "subjects": data.subjects,
+          "requirements": data.requirements,
+        }, {})
     - title: Read the report
       body: Ask OPA for the report, or just the violations.
       code: |-
