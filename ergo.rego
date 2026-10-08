@@ -595,7 +595,7 @@ _subject_id(subj, req) := null if {
 
 _subject_id(subj, _) := subj if not is_object(subj)
 
-_absent := {"ergo/absent": true}
+_absent := {"ergo/absent": set()}
 
 default value_at(_, _) := null
 
