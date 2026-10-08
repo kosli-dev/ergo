@@ -3425,12 +3425,13 @@ _report_of(doc, policy) := {
 		"description": _reported_description(req),
 		"meta": _reported_meta(req),
 		"require": _require_of(req),
-		"status": _status(req, evaluations[name]),
-		"causes": _causes(_status(req, evaluations[name]), evaluations[name]),
+		"status": status,
+		"causes": _causes(status, evaluations[name]),
 		"subjects": {"total": evaluations[name].total, "matching": evaluations[name].matching},
 		"checks": _requirement_check_defs(req),
 	} |
 		some name, req in policy
+		status := _status(req, evaluations[name])
 	},
 	"results": _results(policy, evaluations),
 } if {
