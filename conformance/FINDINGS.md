@@ -4,13 +4,7 @@ Writing ergo in Rust against this suite shows where `ergo.rego` does something o
 
 ## Bugs in ergo.rego
 
-**`failed_items` can report the cause `missing`.** The causes table in `REFERENCE.md` has no `missing`. It's a value `ergo.rego` uses inside, to tell "`present` found nothing" apart from other failures, and it leaks out when `present` fails on an item of an `all` or `any`:
-
-```json
-{"cause": "missing", "path": "branches[0]", "value": null}
-```
-
-The row's own `cause` says `value`, as it should. Cases: `all / an empty path fails closed on a null item (2)`, `all / failed items write paths the way inputs do`, `all / failed items of a named path start with the name`, `all / a path through as inside a list check is shown as a path inside the item`. The Rust port copies it for now, so the other differences stay visible.
+**`failed_items` could report the cause `missing`.** The causes table in `REFERENCE.md` has no `missing`. `ergo.rego` uses it inside to tell "`present` found nothing" apart from other failures, and it leaked out when `present` failed on an item of an `all` or `any`, as `{"cause": "missing", "path": "branches[0]", "value": null}`, while the row itself said `value`. Fixed on the branch `core/no-missing-in-failed-items`: such an item is now listed with cause `value`.
 
 **OPA before 1.20 compares some numbers wrongly, and ergo inherits it.** Up to OPA 1.19.1, `1 >= 100.0` and `1 == 100.0` are `true` and `100.0 > 1` is `false`, whether the numbers are written in the policy or read from JSON. `10.0` and `1000.0` go wrong the same way, while `100`, `1e2` and `2.0` are fine. So on those versions a requirement with `"min_subjects": 100.0` is met by a single subject, an `equals` check with `"value": 100.0` passes on `1`, and `range` and `compare` can go wrong too. CI runs ergo's main checks on 1.19 and the README names it.
 

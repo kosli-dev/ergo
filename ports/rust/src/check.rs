@@ -768,7 +768,10 @@ impl<'a> Check<'a> {
                     } else if let Some(r) = unreadable.iter().copied().min() {
                         r
                     } else {
-                        l.item_cause(e, ctx)
+                        match l.item_cause(e, ctx) {
+                            Cause::Missing => Cause::Value,
+                            c => c,
+                        }
                     };
                     (c != Cause::Satisfied).then(|| shown(p, c, v))
                 }
