@@ -6684,7 +6684,7 @@ test_failed_items_of_a_named_path_start_with_the_name if {
 		"id": ["number"],
 		"checks": {"c": {"op": "all", "path": ["$pr", "commits"], "check": {"op": "present", "path": ["sha"]}}},
 	}})
-	rows_for(rep, "s", "c")[0].failed_items == [{"path": "$pr.commits[1]", "cause": "missing", "value": {}}]
+	rows_for(rep, "s", "c")[0].failed_items == [{"path": "$pr.commits[1]", "cause": "value", "value": {}}]
 }
 
 test_failed_items_of_a_substituted_check_are_those_of_the_main_check if {
@@ -6886,4 +6886,21 @@ test_an_any_of_with_a_stray_path_is_written_wrong_instead_of_stopping_the_report
 	r := rows_for(rep, "s", "c")[0]
 	[r.passed, r.cause, r.inputs] == [false, "ill_formed", [{"name": "x", "value": 1}]]
 	rep.compliant == false
+}
+
+test_an_item_present_finds_empty_is_listed_as_value_like_its_row_because_missing_is_not_a_cause if {
+	every op in ["all", "any"] {
+		check := {"op": op, "path": ["commits"], "check": {"op": "present", "path": ["sha"]}}
+		subj := {"id": 1, "commits": [{}, {"sha": null}]}
+		cause_of(subj, check) == "value"
+		failed_of(subj, check) == [
+			{"path": "commits[0]", "cause": "value", "value": {}},
+			{"path": "commits[1]", "cause": "value", "value": {"sha": null}},
+		]
+	}
+}
+
+test_an_inner_list_present_finds_empty_is_listed_as_value_too if {
+	check := {"op": "all", "path": ["prs"], "each": ["commits"], "check": {"op": "present", "path": ["sha"]}}
+	failed_of({"id": 1, "prs": [{"commits": [{"sha": "a"}, {}]}]}, check) == [{"path": "prs[0].commits[1]", "cause": "value", "value": {}}]
 }

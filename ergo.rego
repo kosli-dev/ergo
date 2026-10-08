@@ -514,7 +514,11 @@ _failed_item_cause(subj, check, v) := "satisfied" if {
 	_item_passed(check, v)
 } else := _worst_read(subj, check) if {
 	_unreadable_ref(check)
-} else := _item_cause(check, v)
+} else := _shown_cause(_item_cause(check, v))
+
+_shown_cause("missing") := "value"
+
+_shown_cause(c) := c if c != "missing"
 
 default _item_entries(_, _, _) := []
 
