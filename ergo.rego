@@ -1895,7 +1895,7 @@ _elements(subj, check) := [elem |
 default _element_passed(_, _) := false
 
 _element_passed(check, elem) if {
-	not check.op == "any_of"
+	not _combinator(check)
 	leaf_passed(check, elem)
 }
 
