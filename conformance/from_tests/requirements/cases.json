@@ -5,478 +5,6 @@
         "description": "input 1",
         "input": {
           "items": [
-            {}
-          ]
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) \u003e= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every thing id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "description": "",
-                  "expression": "\u003cinvalid check\u003e",
-                  "meta": {}
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "value",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                },
-                {
-                  "name": "checks.c",
-                  "value": [
-                    "invalid check"
-                  ]
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope thing count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated thing ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "ill_formed",
-              "check": "c",
-              "inputs": [],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "value",
-            "check": "$well_formed",
-            "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-            "inputs": [
-              {
-                "name": "count(checks)",
-                "value": 1
-              },
-              {
-                "name": "require",
-                "value": "every"
-              },
-              {
-                "name": "checks.c",
-                "value": [
-                  "invalid check"
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "thing"
-            }
-          },
-          {
-            "cause": "ill_formed",
-            "check": "c",
-            "description": "",
-            "expression": "\u003cinvalid check\u003e",
-            "inputs": [],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "thing"
-            }
-          }
-        ]
-      }
-    ],
-    "description": "a check that is not an object shows in the expression",
-    "requirements": {
-      "s": {
-        "checks": {
-          "c": "present"
-        },
-        "from": [
-          "items"
-        ],
-        "id": [
-          "id"
-        ],
-        "subject_type": "thing"
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "items": [
-            {
-              "id": 1
-            }
-          ]
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(\u003cinvalid from\u003e)) \u003e= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every subject id is unique",
-                  "expression": "count(repeated(ids(\u003cinvalid from\u003e))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 0,
-                "total": 0
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "value",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 0
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                },
-                {
-                  "name": "requirement",
-                  "value": 5
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            },
-            {
-              "cause": "value",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope subject count",
-                  "value": 0
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated subject ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "value",
-            "check": "$well_formed",
-            "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-            "inputs": [
-              {
-                "name": "count(checks)",
-                "value": 0
-              },
-              {
-                "name": "require",
-                "value": "every"
-              },
-              {
-                "name": "requirement",
-                "value": 5
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "subject"
-            }
-          },
-          {
-            "cause": "value",
-            "check": "$min_subjects",
-            "description": "The in-scope subject count is at least 1",
-            "expression": "count(matching(\u003cinvalid from\u003e)) \u003e= 1",
-            "inputs": [
-              {
-                "name": "in-scope subject count",
-                "value": 0
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "subject"
-            }
-          }
-        ]
-      }
-    ],
-    "description": "a requirement that is not an object is not compliant",
-    "requirements": {
-      "s": 5
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "items": [
-            {
-              "id": 1
-            }
-          ]
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(items)) \u003e= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every subject id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "value",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 0
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                },
-                {
-                  "name": "checks",
-                  "value": [
-                    "not an object"
-                  ]
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope subject count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated subject ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "value",
-            "check": "$well_formed",
-            "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-            "inputs": [
-              {
-                "name": "count(checks)",
-                "value": 0
-              },
-              {
-                "name": "require",
-                "value": "every"
-              },
-              {
-                "name": "checks",
-                "value": [
-                  "not an object"
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "subject"
-            }
-          }
-        ]
-      }
-    ],
-    "description": "checks that are not an object are not compliant",
-    "requirements": {
-      "s": {
-        "checks": 5,
-        "from": [
-          "items"
-        ]
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "items": [
             {
               "id": "a"
             }
@@ -1230,6 +758,158 @@
     "description": "a requirement that is not an object stays in the report and is not well formed (4)",
     "requirements": {
       "d": "x"
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "items": [
+            {
+              "id": 1
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope subject count is at least 1",
+                  "expression": "count(matching(\u003cinvalid from\u003e)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every subject id is unique",
+                  "expression": "count(repeated(ids(\u003cinvalid from\u003e))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 0,
+                "total": 0
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "value",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 0
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                },
+                {
+                  "name": "requirement",
+                  "value": 5
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope subject count",
+                  "value": 0
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated subject ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "description": "The requirement is written correctly",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 0
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "requirement",
+                "value": 5
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$min_subjects",
+            "description": "The in-scope subject count is at least 1",
+            "expression": "count(matching(\u003cinvalid from\u003e)) \u003e= 1",
+            "inputs": [
+              {
+                "name": "in-scope subject count",
+                "value": 0
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "a requirement that is not an object reports an empty description and meta",
+    "requirements": {
+      "s": 5
     }
   },
   {
@@ -2785,40 +2465,9 @@
       {
         "description": "input 1",
         "input": {
-          "items": []
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {},
-          "results": []
-        },
-        "violations": []
-      }
-    ],
-    "description": "a policy with no requirements is not compliant",
-    "requirements": {}
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
           "items": [
-            {
-              "id": 1,
-              "n": 1,
-              "s": "a",
-              "t": "2026-01-01T00:00:00Z",
-              "xs": [
-                1
-              ]
-            }
-          ],
-          "params": {
-            "nine": 9,
-            "none": null,
-            "word": "x"
-          }
+            {}
+          ]
         },
         "report": {
           "compliant": false,
@@ -2826,12 +2475,12 @@
             "s": {
               "checks": {
                 "$min_subjects": {
-                  "description": "The in-scope subject count is at least 1",
+                  "description": "The in-scope thing count is at least 1",
                   "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
-                  "description": "Every subject id is unique",
+                  "description": "Every thing id is unique",
                   "expression": "count(repeated(ids(items))) == 0",
                   "meta": {}
                 },
@@ -2842,11 +2491,8 @@
                 },
                 "c": {
                   "description": "",
-                  "expression": "\u003cmissing op\u003e",
-                  "meta": {},
-                  "path": [
-                    "n"
-                  ]
+                  "expression": "\u003cinvalid check\u003e",
+                  "meta": {}
                 }
               },
               "description": "",
@@ -2875,7 +2521,180 @@
                 {
                   "name": "checks.c",
                   "value": [
-                    "missing op"
+                    "invalid check"
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "ill_formed",
+              "check": "c",
+              "inputs": [],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "description": "The requirement is written correctly",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "invalid check"
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "c",
+            "description": "",
+            "expression": "\u003cinvalid check\u003e",
+            "inputs": [],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "a check that is not an object shows in the expression",
+    "requirements": {
+      "s": {
+        "checks": {
+          "c": "present"
+        },
+        "from": [
+          "items"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "items": [
+            {
+              "id": 1
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope subject count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every subject id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "value",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 0
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                },
+                {
+                  "name": "checks",
+                  "value": [
+                    "not an object"
                   ]
                 }
               ],
@@ -2917,22 +2736,6 @@
                 "id": null,
                 "type": "subject"
               }
-            },
-            {
-              "cause": "ill_formed",
-              "check": "c",
-              "inputs": [
-                {
-                  "name": "n",
-                  "value": 1
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": 1,
-                "type": "subject"
-              }
             }
           ]
         },
@@ -2945,16 +2748,16 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 0
               },
               {
                 "name": "require",
                 "value": "every"
               },
               {
-                "name": "checks.c",
+                "name": "checks",
                 "value": [
-                  "missing op"
+                  "not an object"
                 ]
               }
             ],
@@ -2963,42 +2766,16 @@
               "id": null,
               "type": "subject"
             }
-          },
-          {
-            "cause": "ill_formed",
-            "check": "c",
-            "description": "",
-            "expression": "\u003cmissing op\u003e",
-            "inputs": [
-              {
-                "name": "n",
-                "value": 1
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": 1,
-              "type": "subject"
-            }
           }
         ]
       }
     ],
-    "description": "a badly written check is ill formed",
+    "description": "checks that are not an object are not compliant",
     "requirements": {
       "s": {
-        "checks": {
-          "c": {
-            "path": [
-              "n"
-            ]
-          }
-        },
+        "checks": 5,
         "from": [
           "items"
-        ],
-        "id": [
-          "id"
         ]
       }
     }
@@ -3009,21 +2786,8 @@
         "description": "input 1",
         "input": {
           "items": [
-            {
-              "id": 1,
-              "n": 1,
-              "s": "a",
-              "t": "2026-01-01T00:00:00Z",
-              "xs": [
-                1
-              ]
-            }
-          ],
-          "params": {
-            "nine": 9,
-            "none": null,
-            "word": "x"
-          }
+            {}
+          ]
         },
         "report": {
           "compliant": false,
@@ -3031,12 +2795,12 @@
             "s": {
               "checks": {
                 "$min_subjects": {
-                  "description": "The in-scope subject count is at least 1",
+                  "description": "The in-scope thing count is at least 1",
                   "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
-                  "description": "Every subject id is unique",
+                  "description": "Every thing id is unique",
                   "expression": "count(repeated(ids(items))) == 0",
                   "meta": {}
                 },
@@ -3089,7 +2853,7 @@
               "requirement": "s",
               "subject": {
                 "id": null,
-                "type": "subject"
+                "type": "thing"
               }
             },
             {
@@ -3097,7 +2861,7 @@
               "check": "$min_subjects",
               "inputs": [
                 {
-                  "name": "in-scope subject count",
+                  "name": "in-scope thing count",
                   "value": 1
                 }
               ],
@@ -3105,7 +2869,7 @@
               "requirement": "s",
               "subject": {
                 "id": null,
-                "type": "subject"
+                "type": "thing"
               }
             },
             {
@@ -3113,7 +2877,7 @@
               "check": "$unique_ids",
               "inputs": [
                 {
-                  "name": "repeated subject ids",
+                  "name": "repeated thing ids",
                   "value": []
                 }
               ],
@@ -3121,7 +2885,7 @@
               "requirement": "s",
               "subject": {
                 "id": null,
-                "type": "subject"
+                "type": "thing"
               }
             },
             {
@@ -3130,14 +2894,14 @@
               "inputs": [
                 {
                   "name": "n",
-                  "value": 1
+                  "value": null
                 }
               ],
               "passed": false,
               "requirement": "s",
               "subject": {
-                "id": 1,
-                "type": "subject"
+                "id": null,
+                "type": "thing"
               }
             }
           ]
@@ -3167,7 +2931,7 @@
             "requirement": "s",
             "subject": {
               "id": null,
-              "type": "subject"
+              "type": "thing"
             }
           },
           {
@@ -3178,19 +2942,19 @@
             "inputs": [
               {
                 "name": "n",
-                "value": 1
+                "value": null
               }
             ],
             "requirement": "s",
             "subject": {
-              "id": 1,
-              "type": "subject"
+              "id": null,
+              "type": "thing"
             }
           }
         ]
       }
     ],
-    "description": "a badly written check is ill formed (2)",
+    "description": "an unknown op shows in the expression",
     "requirements": {
       "s": {
         "checks": {
@@ -3206,9 +2970,221 @@
         ],
         "id": [
           "id"
-        ]
+        ],
+        "subject_type": "thing"
       }
     }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "items": [
+            {}
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "\u003cmissing op\u003e",
+                  "meta": {},
+                  "path": [
+                    "n"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "value",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                },
+                {
+                  "name": "checks.c",
+                  "value": [
+                    "missing op"
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "ill_formed",
+              "check": "c",
+              "inputs": [
+                {
+                  "name": "n",
+                  "value": null
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "description": "The requirement is written correctly",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "missing op"
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "c",
+            "description": "",
+            "expression": "\u003cmissing op\u003e",
+            "inputs": [
+              {
+                "name": "n",
+                "value": null
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "an unknown op shows in the expression (2)",
+    "requirements": {
+      "s": {
+        "checks": {
+          "c": {
+            "path": [
+              "n"
+            ]
+          }
+        },
+        "from": [
+          "items"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "items": []
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {},
+          "results": []
+        },
+        "violations": []
+      }
+    ],
+    "description": "a policy with no requirements is not compliant",
+    "requirements": {}
   },
   {
     "cases": [
@@ -3240,7 +3216,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "some",
+              "require": "every",
               "status": "not_met",
               "subjects": {
                 "matching": 0,
@@ -3259,7 +3235,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "some"
+                  "value": "every"
                 },
                 {
                   "name": "checks",
@@ -3322,7 +3298,7 @@
               },
               {
                 "name": "require",
-                "value": "some"
+                "value": "every"
               },
               {
                 "name": "checks",
@@ -3372,7 +3348,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "some",
+              "require": "every",
               "status": "not_met",
               "subjects": {
                 "matching": 1,
@@ -3391,7 +3367,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "some"
+                  "value": "every"
                 },
                 {
                   "name": "checks",
@@ -3454,7 +3430,7 @@
               },
               {
                 "name": "require",
-                "value": "some"
+                "value": "every"
               },
               {
                 "name": "checks",
@@ -3504,7 +3480,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "some",
+              "require": "every",
               "status": "not_met",
               "subjects": {
                 "matching": 1,
@@ -3523,7 +3499,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "some"
+                  "value": "every"
                 },
                 {
                   "name": "checks",
@@ -3586,7 +3562,7 @@
               },
               {
                 "name": "require",
-                "value": "some"
+                "value": "every"
               },
               {
                 "name": "checks",
@@ -3640,7 +3616,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "some",
+              "require": "every",
               "status": "not_met",
               "subjects": {
                 "matching": 2,
@@ -3659,7 +3635,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "some"
+                  "value": "every"
                 },
                 {
                   "name": "checks",
@@ -3722,7 +3698,7 @@
               },
               {
                 "name": "require",
-                "value": "some"
+                "value": "every"
               },
               {
                 "name": "checks",
@@ -3772,7 +3748,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "some",
+              "require": "every",
               "status": "not_met",
               "subjects": {
                 "matching": 1,
@@ -3791,7 +3767,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "some"
+                  "value": "every"
                 },
                 {
                   "name": "checks",
@@ -3854,7 +3830,7 @@
               },
               {
                 "name": "require",
-                "value": "some"
+                "value": "every"
               },
               {
                 "name": "checks",
@@ -3872,7 +3848,7 @@
         ]
       }
     ],
-    "description": "an not met report always explains itself under some",
+    "description": "an not met report always explains itself under every",
     "requirements": {
       "s": {
         "applies_to": {},
@@ -3884,7 +3860,7 @@
           "id"
         ],
         "min_subjects": 0,
-        "require": "some",
+        "require": "every",
         "subject_type": "thing"
       }
     }
@@ -3919,7 +3895,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "some",
+              "require": "every",
               "status": "not_met",
               "subjects": {
                 "matching": 0,
@@ -3938,7 +3914,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "some"
+                  "value": "every"
                 },
                 {
                   "name": "checks",
@@ -4001,7 +3977,7 @@
               },
               {
                 "name": "require",
-                "value": "some"
+                "value": "every"
               },
               {
                 "name": "checks",
@@ -4068,7 +4044,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "some",
+              "require": "every",
               "status": "not_met",
               "subjects": {
                 "matching": 1,
@@ -4087,7 +4063,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "some"
+                  "value": "every"
                 },
                 {
                   "name": "checks",
@@ -4150,7 +4126,7 @@
               },
               {
                 "name": "require",
-                "value": "some"
+                "value": "every"
               },
               {
                 "name": "checks",
@@ -4200,7 +4176,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "some",
+              "require": "every",
               "status": "not_met",
               "subjects": {
                 "matching": 1,
@@ -4219,7 +4195,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "some"
+                  "value": "every"
                 },
                 {
                   "name": "checks",
@@ -4282,7 +4258,7 @@
               },
               {
                 "name": "require",
-                "value": "some"
+                "value": "every"
               },
               {
                 "name": "checks",
@@ -4336,7 +4312,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "some",
+              "require": "every",
               "status": "not_met",
               "subjects": {
                 "matching": 2,
@@ -4355,7 +4331,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "some"
+                  "value": "every"
                 },
                 {
                   "name": "checks",
@@ -4418,7 +4394,7 @@
               },
               {
                 "name": "require",
-                "value": "some"
+                "value": "every"
               },
               {
                 "name": "checks",
@@ -4468,7 +4444,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "some",
+              "require": "every",
               "status": "not_met",
               "subjects": {
                 "matching": 1,
@@ -4487,7 +4463,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "some"
+                  "value": "every"
                 },
                 {
                   "name": "checks",
@@ -4550,7 +4526,7 @@
               },
               {
                 "name": "require",
-                "value": "some"
+                "value": "every"
               },
               {
                 "name": "checks",
@@ -4568,7 +4544,7 @@
         ]
       }
     ],
-    "description": "an not met report always explains itself under some (2)",
+    "description": "an not met report always explains itself under every (2)",
     "requirements": {
       "s": {
         "applies_to": {},
@@ -4580,7 +4556,7 @@
           "id"
         ],
         "min_subjects": 1,
-        "require": "some",
+        "require": "every",
         "subject_type": "thing"
       }
     }
@@ -4615,7 +4591,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "some",
+              "require": "every",
               "status": "not_met",
               "subjects": {
                 "matching": 0,
@@ -4634,7 +4610,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "some"
+                  "value": "every"
                 },
                 {
                   "name": "checks",
@@ -4697,7 +4673,7 @@
               },
               {
                 "name": "require",
-                "value": "some"
+                "value": "every"
               },
               {
                 "name": "checks",
@@ -4764,7 +4740,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "some",
+              "require": "every",
               "status": "not_met",
               "subjects": {
                 "matching": 1,
@@ -4783,7 +4759,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "some"
+                  "value": "every"
                 },
                 {
                   "name": "checks",
@@ -4846,7 +4822,7 @@
               },
               {
                 "name": "require",
-                "value": "some"
+                "value": "every"
               },
               {
                 "name": "checks",
@@ -4913,7 +4889,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "some",
+              "require": "every",
               "status": "not_met",
               "subjects": {
                 "matching": 1,
@@ -4932,7 +4908,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "some"
+                  "value": "every"
                 },
                 {
                   "name": "checks",
@@ -4995,7 +4971,7 @@
               },
               {
                 "name": "require",
-                "value": "some"
+                "value": "every"
               },
               {
                 "name": "checks",
@@ -5066,7 +5042,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "some",
+              "require": "every",
               "status": "not_met",
               "subjects": {
                 "matching": 2,
@@ -5085,7 +5061,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "some"
+                  "value": "every"
                 },
                 {
                   "name": "checks",
@@ -5148,7 +5124,7 @@
               },
               {
                 "name": "require",
-                "value": "some"
+                "value": "every"
               },
               {
                 "name": "checks",
@@ -5198,7 +5174,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "some",
+              "require": "every",
               "status": "not_met",
               "subjects": {
                 "matching": 1,
@@ -5217,7 +5193,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "some"
+                  "value": "every"
                 },
                 {
                   "name": "checks",
@@ -5280,7 +5256,7 @@
               },
               {
                 "name": "require",
-                "value": "some"
+                "value": "every"
               },
               {
                 "name": "checks",
@@ -5315,7 +5291,7 @@
         ]
       }
     ],
-    "description": "an not met report always explains itself under some (3)",
+    "description": "an not met report always explains itself under every (3)",
     "requirements": {
       "s": {
         "applies_to": {},
@@ -5327,7 +5303,7 @@
           "id"
         ],
         "min_subjects": 2,
-        "require": "some",
+        "require": "every",
         "subject_type": "thing"
       }
     }
@@ -7544,7 +7520,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "every",
+              "require": "some",
               "status": "not_met",
               "subjects": {
                 "matching": 0,
@@ -7563,7 +7539,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "every"
+                  "value": "some"
                 },
                 {
                   "name": "checks",
@@ -7626,7 +7602,7 @@
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "some"
               },
               {
                 "name": "checks",
@@ -7676,7 +7652,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "every",
+              "require": "some",
               "status": "not_met",
               "subjects": {
                 "matching": 1,
@@ -7695,7 +7671,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "every"
+                  "value": "some"
                 },
                 {
                   "name": "checks",
@@ -7758,7 +7734,7 @@
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "some"
               },
               {
                 "name": "checks",
@@ -7808,7 +7784,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "every",
+              "require": "some",
               "status": "not_met",
               "subjects": {
                 "matching": 1,
@@ -7827,7 +7803,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "every"
+                  "value": "some"
                 },
                 {
                   "name": "checks",
@@ -7890,7 +7866,7 @@
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "some"
               },
               {
                 "name": "checks",
@@ -7944,7 +7920,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "every",
+              "require": "some",
               "status": "not_met",
               "subjects": {
                 "matching": 2,
@@ -7963,7 +7939,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "every"
+                  "value": "some"
                 },
                 {
                   "name": "checks",
@@ -8026,7 +8002,7 @@
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "some"
               },
               {
                 "name": "checks",
@@ -8076,7 +8052,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "every",
+              "require": "some",
               "status": "not_met",
               "subjects": {
                 "matching": 1,
@@ -8095,7 +8071,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "every"
+                  "value": "some"
                 },
                 {
                   "name": "checks",
@@ -8158,7 +8134,7 @@
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "some"
               },
               {
                 "name": "checks",
@@ -8176,7 +8152,7 @@
         ]
       }
     ],
-    "description": "a malformed requirement is never met under every",
+    "description": "an not met report always explains itself under some",
     "requirements": {
       "s": {
         "applies_to": {},
@@ -8188,7 +8164,7 @@
           "id"
         ],
         "min_subjects": 0,
-        "require": "every",
+        "require": "some",
         "subject_type": "thing"
       }
     }
@@ -8223,7 +8199,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "every",
+              "require": "some",
               "status": "not_met",
               "subjects": {
                 "matching": 0,
@@ -8242,7 +8218,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "every"
+                  "value": "some"
                 },
                 {
                   "name": "checks",
@@ -8305,7 +8281,7 @@
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "some"
               },
               {
                 "name": "checks",
@@ -8372,7 +8348,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "every",
+              "require": "some",
               "status": "not_met",
               "subjects": {
                 "matching": 1,
@@ -8391,7 +8367,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "every"
+                  "value": "some"
                 },
                 {
                   "name": "checks",
@@ -8454,7 +8430,7 @@
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "some"
               },
               {
                 "name": "checks",
@@ -8504,7 +8480,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "every",
+              "require": "some",
               "status": "not_met",
               "subjects": {
                 "matching": 1,
@@ -8523,7 +8499,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "every"
+                  "value": "some"
                 },
                 {
                   "name": "checks",
@@ -8586,7 +8562,7 @@
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "some"
               },
               {
                 "name": "checks",
@@ -8640,7 +8616,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "every",
+              "require": "some",
               "status": "not_met",
               "subjects": {
                 "matching": 2,
@@ -8659,7 +8635,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "every"
+                  "value": "some"
                 },
                 {
                   "name": "checks",
@@ -8722,7 +8698,7 @@
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "some"
               },
               {
                 "name": "checks",
@@ -8772,7 +8748,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "every",
+              "require": "some",
               "status": "not_met",
               "subjects": {
                 "matching": 1,
@@ -8791,7 +8767,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "every"
+                  "value": "some"
                 },
                 {
                   "name": "checks",
@@ -8854,7 +8830,7 @@
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "some"
               },
               {
                 "name": "checks",
@@ -8872,7 +8848,7 @@
         ]
       }
     ],
-    "description": "a malformed requirement is never met under every (2)",
+    "description": "an not met report always explains itself under some (2)",
     "requirements": {
       "s": {
         "applies_to": {},
@@ -8884,7 +8860,7 @@
           "id"
         ],
         "min_subjects": 1,
-        "require": "every",
+        "require": "some",
         "subject_type": "thing"
       }
     }
@@ -8919,7 +8895,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "every",
+              "require": "some",
               "status": "not_met",
               "subjects": {
                 "matching": 0,
@@ -8938,7 +8914,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "every"
+                  "value": "some"
                 },
                 {
                   "name": "checks",
@@ -9001,7 +8977,7 @@
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "some"
               },
               {
                 "name": "checks",
@@ -9068,7 +9044,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "every",
+              "require": "some",
               "status": "not_met",
               "subjects": {
                 "matching": 1,
@@ -9087,7 +9063,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "every"
+                  "value": "some"
                 },
                 {
                   "name": "checks",
@@ -9150,7 +9126,7 @@
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "some"
               },
               {
                 "name": "checks",
@@ -9217,7 +9193,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "every",
+              "require": "some",
               "status": "not_met",
               "subjects": {
                 "matching": 1,
@@ -9236,7 +9212,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "every"
+                  "value": "some"
                 },
                 {
                   "name": "checks",
@@ -9299,7 +9275,7 @@
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "some"
               },
               {
                 "name": "checks",
@@ -9370,7 +9346,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "every",
+              "require": "some",
               "status": "not_met",
               "subjects": {
                 "matching": 2,
@@ -9389,7 +9365,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "every"
+                  "value": "some"
                 },
                 {
                   "name": "checks",
@@ -9452,7 +9428,7 @@
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "some"
               },
               {
                 "name": "checks",
@@ -9502,7 +9478,7 @@
               },
               "description": "",
               "meta": {},
-              "require": "every",
+              "require": "some",
               "status": "not_met",
               "subjects": {
                 "matching": 1,
@@ -9521,7 +9497,7 @@
                 },
                 {
                   "name": "require",
-                  "value": "every"
+                  "value": "some"
                 },
                 {
                   "name": "checks",
@@ -9584,7 +9560,7 @@
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "some"
               },
               {
                 "name": "checks",
@@ -9619,7 +9595,7 @@
         ]
       }
     ],
-    "description": "a malformed requirement is never met under every (3)",
+    "description": "an not met report always explains itself under some (3)",
     "requirements": {
       "s": {
         "applies_to": {},
@@ -9631,7 +9607,7 @@
           "id"
         ],
         "min_subjects": 2,
-        "require": "every",
+        "require": "some",
         "subject_type": "thing"
       }
     }
@@ -9642,8 +9618,21 @@
         "description": "input 1",
         "input": {
           "items": [
-            {}
-          ]
+            {
+              "id": 1,
+              "n": 1,
+              "s": "a",
+              "t": "2026-01-01T00:00:00Z",
+              "xs": [
+                1
+              ]
+            }
+          ],
+          "params": {
+            "nine": 9,
+            "none": null,
+            "word": "x"
+          }
         },
         "report": {
           "compliant": false,
@@ -9651,12 +9640,217 @@
             "s": {
               "checks": {
                 "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
+                  "description": "The in-scope subject count is at least 1",
                   "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
-                  "description": "Every thing id is unique",
+                  "description": "Every subject id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "\u003cmissing op\u003e",
+                  "meta": {},
+                  "path": [
+                    "n"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "value",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                },
+                {
+                  "name": "checks.c",
+                  "value": [
+                    "missing op"
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope subject count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated subject ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            },
+            {
+              "cause": "ill_formed",
+              "check": "c",
+              "inputs": [
+                {
+                  "name": "n",
+                  "value": 1
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": 1,
+                "type": "subject"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "description": "The requirement is written correctly",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "missing op"
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "c",
+            "description": "",
+            "expression": "\u003cmissing op\u003e",
+            "inputs": [
+              {
+                "name": "n",
+                "value": 1
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": 1,
+              "type": "subject"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "a badly written check is ill formed",
+    "requirements": {
+      "s": {
+        "checks": {
+          "c": {
+            "path": [
+              "n"
+            ]
+          }
+        },
+        "from": [
+          "items"
+        ],
+        "id": [
+          "id"
+        ]
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "items": [
+            {
+              "id": 1,
+              "n": 1,
+              "s": "a",
+              "t": "2026-01-01T00:00:00Z",
+              "xs": [
+                1
+              ]
+            }
+          ],
+          "params": {
+            "nine": 9,
+            "none": null,
+            "word": "x"
+          }
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope subject count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every subject id is unique",
                   "expression": "count(repeated(ids(items))) == 0",
                   "meta": {}
                 },
@@ -9709,7 +9903,7 @@
               "requirement": "s",
               "subject": {
                 "id": null,
-                "type": "thing"
+                "type": "subject"
               }
             },
             {
@@ -9717,7 +9911,7 @@
               "check": "$min_subjects",
               "inputs": [
                 {
-                  "name": "in-scope thing count",
+                  "name": "in-scope subject count",
                   "value": 1
                 }
               ],
@@ -9725,7 +9919,7 @@
               "requirement": "s",
               "subject": {
                 "id": null,
-                "type": "thing"
+                "type": "subject"
               }
             },
             {
@@ -9733,7 +9927,7 @@
               "check": "$unique_ids",
               "inputs": [
                 {
-                  "name": "repeated thing ids",
+                  "name": "repeated subject ids",
                   "value": []
                 }
               ],
@@ -9741,7 +9935,7 @@
               "requirement": "s",
               "subject": {
                 "id": null,
-                "type": "thing"
+                "type": "subject"
               }
             },
             {
@@ -9750,14 +9944,14 @@
               "inputs": [
                 {
                   "name": "n",
-                  "value": null
+                  "value": 1
                 }
               ],
               "passed": false,
               "requirement": "s",
               "subject": {
-                "id": null,
-                "type": "thing"
+                "id": 1,
+                "type": "subject"
               }
             }
           ]
@@ -9787,7 +9981,7 @@
             "requirement": "s",
             "subject": {
               "id": null,
-              "type": "thing"
+              "type": "subject"
             }
           },
           {
@@ -9798,19 +9992,19 @@
             "inputs": [
               {
                 "name": "n",
-                "value": null
+                "value": 1
               }
             ],
             "requirement": "s",
             "subject": {
-              "id": null,
-              "type": "thing"
+              "id": 1,
+              "type": "subject"
             }
           }
         ]
       }
     ],
-    "description": "an unknown op shows in the expression",
+    "description": "a badly written check is ill formed (2)",
     "requirements": {
       "s": {
         "checks": {
@@ -9826,201 +10020,7 @@
         ],
         "id": [
           "id"
-        ],
-        "subject_type": "thing"
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "items": [
-            {}
-          ]
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) \u003e= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every thing id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "description": "",
-                  "expression": "\u003cmissing op\u003e",
-                  "meta": {},
-                  "path": [
-                    "n"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "value",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                },
-                {
-                  "name": "checks.c",
-                  "value": [
-                    "missing op"
-                  ]
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope thing count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated thing ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "ill_formed",
-              "check": "c",
-              "inputs": [
-                {
-                  "name": "n",
-                  "value": null
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "value",
-            "check": "$well_formed",
-            "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-            "inputs": [
-              {
-                "name": "count(checks)",
-                "value": 1
-              },
-              {
-                "name": "require",
-                "value": "every"
-              },
-              {
-                "name": "checks.c",
-                "value": [
-                  "missing op"
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "thing"
-            }
-          },
-          {
-            "cause": "ill_formed",
-            "check": "c",
-            "description": "",
-            "expression": "\u003cmissing op\u003e",
-            "inputs": [
-              {
-                "name": "n",
-                "value": null
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "thing"
-            }
-          }
         ]
-      }
-    ],
-    "description": "an unknown op shows in the expression (2)",
-    "requirements": {
-      "s": {
-        "checks": {
-          "c": {
-            "path": [
-              "n"
-            ]
-          }
-        },
-        "from": [
-          "items"
-        ],
-        "id": [
-          "id"
-        ],
-        "subject_type": "thing"
       }
     }
   }

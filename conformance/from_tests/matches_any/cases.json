@@ -6,7 +6,7 @@
         "input": {
           "items": [
             {
-              "author": "dependabot[bot]"
+              "author": "svc_release \u003csvc_release@example.com\u003e"
             }
           ]
         },
@@ -114,7 +114,7 @@
               "inputs": [
                 {
                   "name": "author",
-                  "value": "dependabot[bot]"
+                  "value": "svc_release \u003csvc_release@example.com\u003e"
                 }
               ],
               "passed": true,
@@ -129,7 +129,7 @@
         "violations": []
       }
     ],
-    "description": "matches any matches a bracketed bot",
+    "description": "matches any matches a prefix pattern",
     "requirements": {
       "s": {
         "checks": {
@@ -318,162 +318,6 @@
         "input": {
           "items": [
             {
-              "author": "svc_release \u003csvc_release@example.com\u003e"
-            }
-          ]
-        },
-        "report": {
-          "compliant": true,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) \u003e= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every thing id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "description": "",
-                  "expression": "author matches one of [\".*\\\\[bot\\\\]\", \"noreply@github\\\\.com\", \"svc_.*\"]",
-                  "meta": {},
-                  "op": "matches_any",
-                  "path": [
-                    "author"
-                  ],
-                  "patterns": [
-                    "svc_.*",
-                    ".*\\[bot\\]",
-                    "noreply@github\\.com"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "satisfied",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope thing count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated thing ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "c",
-              "inputs": [
-                {
-                  "name": "author",
-                  "value": "svc_release \u003csvc_release@example.com\u003e"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            }
-          ]
-        },
-        "violations": []
-      }
-    ],
-    "description": "matches any matches a prefix pattern",
-    "requirements": {
-      "s": {
-        "checks": {
-          "c": {
-            "op": "matches_any",
-            "path": [
-              "author"
-            ],
-            "patterns": [
-              "svc_.*",
-              ".*\\[bot\\]",
-              "noreply@github\\.com"
-            ]
-          }
-        },
-        "from": [
-          "items"
-        ],
-        "id": [
-          "id"
-        ],
-        "subject_type": "thing"
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "items": [
-            {
               "author": "Alice \u003calice@example.com\u003e"
             }
           ]
@@ -616,6 +460,162 @@
       }
     ],
     "description": "matches any rejects a human",
+    "requirements": {
+      "s": {
+        "checks": {
+          "c": {
+            "op": "matches_any",
+            "path": [
+              "author"
+            ],
+            "patterns": [
+              "svc_.*",
+              ".*\\[bot\\]",
+              "noreply@github\\.com"
+            ]
+          }
+        },
+        "from": [
+          "items"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "items": [
+            {
+              "author": "dependabot[bot]"
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "author matches one of [\".*\\\\[bot\\\\]\", \"noreply@github\\\\.com\", \"svc_.*\"]",
+                  "meta": {},
+                  "op": "matches_any",
+                  "path": [
+                    "author"
+                  ],
+                  "patterns": [
+                    "svc_.*",
+                    ".*\\[bot\\]",
+                    "noreply@github\\.com"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "c",
+              "inputs": [
+                {
+                  "name": "author",
+                  "value": "dependabot[bot]"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": []
+      }
+    ],
+    "description": "matches any matches a bracketed bot",
     "requirements": {
       "s": {
         "checks": {
@@ -3041,7 +3041,7 @@
         ]
       }
     ],
-    "description": "a check whose ref reads the wrong kind of value fails and is not ill formed",
+    "description": "a ref that reads the wrong kind of value leaves well formed alone because params are input",
     "requirements": {
       "s": {
         "checks": {
@@ -3075,230 +3075,21 @@
         "input": {
           "items": [
             {
+              "bad_t": "2026-02-30T00:00:00Z",
+              "e": [],
               "id": 1,
-              "n": 1,
-              "s": "a",
-              "t": "2026-01-01T00:00:00Z",
-              "xs": [
+              "l": [
                 1
-              ]
-            }
-          ],
-          "params": {
-            "nine": 9,
-            "none": null,
-            "word": "x"
-          }
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(items)) \u003e= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every subject id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "description": "",
-                  "expression": "s matches one of \u003cinvalid patterns\u003e",
-                  "meta": {},
-                  "op": "matches_any",
-                  "path": [
-                    "s"
-                  ],
-                  "patterns": "a"
-                }
+              ],
+              "n": 5,
+              "o": {
+                "a": 1
               },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "value",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                },
-                {
-                  "name": "checks.c",
-                  "value": [
-                    "invalid patterns"
-                  ]
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope subject count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated subject ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            },
-            {
-              "cause": "ill_formed",
-              "check": "c",
-              "inputs": [
-                {
-                  "name": "s",
-                  "value": "a"
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": 1,
-                "type": "subject"
-              }
+              "s": "x",
+              "t": "2026-01-01T00:00:00Z"
             }
           ]
         },
-        "violations": [
-          {
-            "cause": "value",
-            "check": "$well_formed",
-            "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-            "inputs": [
-              {
-                "name": "count(checks)",
-                "value": 1
-              },
-              {
-                "name": "require",
-                "value": "every"
-              },
-              {
-                "name": "checks.c",
-                "value": [
-                  "invalid patterns"
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "subject"
-            }
-          },
-          {
-            "cause": "ill_formed",
-            "check": "c",
-            "description": "",
-            "expression": "s matches one of \u003cinvalid patterns\u003e",
-            "inputs": [
-              {
-                "name": "s",
-                "value": "a"
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": 1,
-              "type": "subject"
-            }
-          }
-        ]
-      }
-    ],
-    "description": "a badly written check is ill formed",
-    "requirements": {
-      "s": {
-        "checks": {
-          "c": {
-            "op": "matches_any",
-            "path": [
-              "s"
-            ],
-            "patterns": "a"
-          }
-        },
-        "from": [
-          "items"
-        ],
-        "id": [
-          "id"
-        ]
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "items": [
-            {
-              "id": 1,
-              "n": 1,
-              "s": "a",
-              "t": "2026-01-01T00:00:00Z",
-              "xs": [
-                1
-              ]
-            }
-          ],
-          "params": {
-            "nine": 9,
-            "none": null,
-            "word": "x"
-          }
-        },
         "report": {
           "compliant": false,
           "requirements": {
@@ -3321,14 +3112,14 @@
                 },
                 "c": {
                   "description": "",
-                  "expression": "s matches one of [3]",
+                  "expression": "n matches one of [\"x\"]",
                   "meta": {},
                   "op": "matches_any",
                   "path": [
-                    "s"
+                    "n"
                   ],
                   "patterns": [
-                    3
+                    "x"
                   ]
                 }
               },
@@ -3344,7 +3135,7 @@
           },
           "results": [
             {
-              "cause": "value",
+              "cause": "satisfied",
               "check": "$well_formed",
               "inputs": [
                 {
@@ -3354,15 +3145,9 @@
                 {
                   "name": "require",
                   "value": "every"
-                },
-                {
-                  "name": "checks.c",
-                  "value": [
-                    "invalid patterns"
-                  ]
                 }
               ],
-              "passed": false,
+              "passed": true,
               "requirement": "s",
               "subject": {
                 "id": null,
@@ -3402,12 +3187,12 @@
               }
             },
             {
-              "cause": "ill_formed",
+              "cause": "unusable",
               "check": "c",
               "inputs": [
                 {
-                  "name": "s",
-                  "value": "a"
+                  "name": "n",
+                  "value": 5
                 }
               ],
               "passed": false,
@@ -3421,41 +3206,14 @@
         },
         "violations": [
           {
-            "cause": "value",
-            "check": "$well_formed",
-            "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-            "inputs": [
-              {
-                "name": "count(checks)",
-                "value": 1
-              },
-              {
-                "name": "require",
-                "value": "every"
-              },
-              {
-                "name": "checks.c",
-                "value": [
-                  "invalid patterns"
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "subject"
-            }
-          },
-          {
-            "cause": "ill_formed",
+            "cause": "unusable",
             "check": "c",
             "description": "",
-            "expression": "s matches one of [3]",
+            "expression": "n matches one of [\"x\"]",
             "inputs": [
               {
-                "name": "s",
-                "value": "a"
+                "name": "n",
+                "value": 5
               }
             ],
             "requirement": "s",
@@ -3467,230 +3225,17 @@
         ]
       }
     ],
-    "description": "a badly written check is ill formed (2)",
+    "description": "a value the op cannot use fails as unusable and a filter cannot rule the subject out with it",
     "requirements": {
       "s": {
         "checks": {
           "c": {
             "op": "matches_any",
             "path": [
-              "s"
+              "n"
             ],
             "patterns": [
-              3
-            ]
-          }
-        },
-        "from": [
-          "items"
-        ],
-        "id": [
-          "id"
-        ]
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "items": [
-            {
-              "id": 1,
-              "n": 1,
-              "s": "a",
-              "t": "2026-01-01T00:00:00Z",
-              "xs": [
-                1
-              ]
-            }
-          ],
-          "params": {
-            "nine": 9,
-            "none": null,
-            "word": "x"
-          }
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(items)) \u003e= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every subject id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "description": "",
-                  "expression": "s matches one of [\"(\"]",
-                  "meta": {},
-                  "op": "matches_any",
-                  "path": [
-                    "s"
-                  ],
-                  "patterns": [
-                    "("
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "value",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                },
-                {
-                  "name": "checks.c",
-                  "value": [
-                    "invalid patterns"
-                  ]
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope subject count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated subject ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            },
-            {
-              "cause": "ill_formed",
-              "check": "c",
-              "inputs": [
-                {
-                  "name": "s",
-                  "value": "a"
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": 1,
-                "type": "subject"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "value",
-            "check": "$well_formed",
-            "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-            "inputs": [
-              {
-                "name": "count(checks)",
-                "value": 1
-              },
-              {
-                "name": "require",
-                "value": "every"
-              },
-              {
-                "name": "checks.c",
-                "value": [
-                  "invalid patterns"
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "subject"
-            }
-          },
-          {
-            "cause": "ill_formed",
-            "check": "c",
-            "description": "",
-            "expression": "s matches one of [\"(\"]",
-            "inputs": [
-              {
-                "name": "s",
-                "value": "a"
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": 1,
-              "type": "subject"
-            }
-          }
-        ]
-      }
-    ],
-    "description": "a badly written check is ill formed (3)",
-    "requirements": {
-      "s": {
-        "checks": {
-          "c": {
-            "op": "matches_any",
-            "path": [
-              "s"
-            ],
-            "patterns": [
-              "("
+              "x"
             ]
           }
         },
@@ -4069,20 +3614,13 @@
         "input": {
           "items": [
             {
-              "bad_t": "2026-02-30T00:00:00Z",
-              "e": [],
-              "id": 1,
-              "l": [
-                1
-              ],
-              "n": 5,
-              "o": {
-                "a": 1
-              },
-              "s": "x",
-              "t": "2026-01-01T00:00:00Z"
+              "author": "ann",
+              "id": 1
             }
-          ]
+          ],
+          "params": {
+            "bot": "("
+          }
         },
         "report": {
           "compliant": false,
@@ -4090,12 +3628,12 @@
             "s": {
               "checks": {
                 "$min_subjects": {
-                  "description": "The in-scope subject count is at least 1",
+                  "description": "The in-scope thing count is at least 1",
                   "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
-                  "description": "Every subject id is unique",
+                  "description": "Every thing id is unique",
                   "expression": "count(repeated(ids(items))) == 0",
                   "meta": {}
                 },
@@ -4105,15 +3643,28 @@
                   "meta": {}
                 },
                 "c": {
+                  "$refs": [
+                    {
+                      "name": "$$input.params.bot",
+                      "value": "("
+                    }
+                  ],
                   "description": "",
-                  "expression": "n matches one of [\"x\"]",
+                  "expression": "author matches one of [\"^svc_\", $$input.params.bot]",
                   "meta": {},
                   "op": "matches_any",
                   "path": [
-                    "n"
+                    "author"
                   ],
                   "patterns": [
-                    "x"
+                    {
+                      "ref": [
+                        "$$input",
+                        "params",
+                        "bot"
+                      ]
+                    },
+                    "^svc_"
                   ]
                 }
               },
@@ -4145,7 +3696,7 @@
               "requirement": "s",
               "subject": {
                 "id": null,
-                "type": "subject"
+                "type": "thing"
               }
             },
             {
@@ -4153,7 +3704,7 @@
               "check": "$min_subjects",
               "inputs": [
                 {
-                  "name": "in-scope subject count",
+                  "name": "in-scope thing count",
                   "value": 1
                 }
               ],
@@ -4161,7 +3712,7 @@
               "requirement": "s",
               "subject": {
                 "id": null,
-                "type": "subject"
+                "type": "thing"
               }
             },
             {
@@ -4169,7 +3720,7 @@
               "check": "$unique_ids",
               "inputs": [
                 {
-                  "name": "repeated subject ids",
+                  "name": "repeated thing ids",
                   "value": []
                 }
               ],
@@ -4177,7 +3728,7 @@
               "requirement": "s",
               "subject": {
                 "id": null,
-                "type": "subject"
+                "type": "thing"
               }
             },
             {
@@ -4185,15 +3736,15 @@
               "check": "c",
               "inputs": [
                 {
-                  "name": "n",
-                  "value": 5
+                  "name": "author",
+                  "value": "ann"
                 }
               ],
               "passed": false,
               "requirement": "s",
               "subject": {
                 "id": 1,
-                "type": "subject"
+                "type": "thing"
               }
             }
           ]
@@ -4203,33 +3754,378 @@
             "cause": "unusable",
             "check": "c",
             "description": "",
-            "expression": "n matches one of [\"x\"]",
+            "expression": "author matches one of [\"^svc_\", $$input.params.bot]",
             "inputs": [
               {
-                "name": "n",
-                "value": 5
+                "name": "author",
+                "value": "ann"
+              },
+              {
+                "name": "$$input.params.bot",
+                "value": "("
               }
             ],
             "requirement": "s",
             "subject": {
               "id": 1,
-              "type": "subject"
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "input 2",
+        "input": {
+          "items": [
+            {
+              "author": "ann",
+              "id": 1
+            }
+          ],
+          "params": {
+            "bot": 3
+          }
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "$refs": [
+                    {
+                      "name": "$$input.params.bot",
+                      "value": 3
+                    }
+                  ],
+                  "description": "",
+                  "expression": "author matches one of [\"^svc_\", $$input.params.bot]",
+                  "meta": {},
+                  "op": "matches_any",
+                  "path": [
+                    "author"
+                  ],
+                  "patterns": [
+                    {
+                      "ref": [
+                        "$$input",
+                        "params",
+                        "bot"
+                      ]
+                    },
+                    "^svc_"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "unusable",
+              "check": "c",
+              "inputs": [
+                {
+                  "name": "author",
+                  "value": "ann"
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": 1,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "description": "",
+            "expression": "author matches one of [\"^svc_\", $$input.params.bot]",
+            "inputs": [
+              {
+                "name": "author",
+                "value": "ann"
+              },
+              {
+                "name": "$$input.params.bot",
+                "value": 3
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": 1,
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "input 3",
+        "input": {
+          "items": [
+            {
+              "author": "ann",
+              "id": 1
+            }
+          ],
+          "params": {
+            "bot": [
+              "x"
+            ]
+          }
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "$refs": [
+                    {
+                      "name": "$$input.params.bot",
+                      "value": [
+                        "x"
+                      ]
+                    }
+                  ],
+                  "description": "",
+                  "expression": "author matches one of [\"^svc_\", $$input.params.bot]",
+                  "meta": {},
+                  "op": "matches_any",
+                  "path": [
+                    "author"
+                  ],
+                  "patterns": [
+                    {
+                      "ref": [
+                        "$$input",
+                        "params",
+                        "bot"
+                      ]
+                    },
+                    "^svc_"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "unusable",
+              "check": "c",
+              "inputs": [
+                {
+                  "name": "author",
+                  "value": "ann"
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": 1,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "description": "",
+            "expression": "author matches one of [\"^svc_\", $$input.params.bot]",
+            "inputs": [
+              {
+                "name": "author",
+                "value": "ann"
+              },
+              {
+                "name": "$$input.params.bot",
+                "value": [
+                  "x"
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": 1,
+              "type": "thing"
             }
           }
         ]
       }
     ],
-    "description": "a value the op cannot use fails as unusable and a filter cannot rule the subject out with it",
+    "description": "a ref in the patterns that reads no valid pattern fails as unusable",
     "requirements": {
       "s": {
         "checks": {
           "c": {
             "op": "matches_any",
             "path": [
-              "n"
+              "author"
             ],
             "patterns": [
-              "x"
+              {
+                "ref": [
+                  "$$input",
+                  "params",
+                  "bot"
+                ]
+              },
+              "^svc_"
             ]
           }
         },
@@ -4238,7 +4134,8 @@
         ],
         "id": [
           "id"
-        ]
+        ],
+        "subject_type": "thing"
       }
     }
   },
@@ -4894,538 +4791,6 @@
         "input": {
           "items": [
             {
-              "author": "ann",
-              "id": 1
-            }
-          ],
-          "params": {
-            "bot": "("
-          }
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) \u003e= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every thing id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "$refs": [
-                    {
-                      "name": "$$input.params.bot",
-                      "value": "("
-                    }
-                  ],
-                  "description": "",
-                  "expression": "author matches one of [\"^svc_\", $$input.params.bot]",
-                  "meta": {},
-                  "op": "matches_any",
-                  "path": [
-                    "author"
-                  ],
-                  "patterns": [
-                    {
-                      "ref": [
-                        "$$input",
-                        "params",
-                        "bot"
-                      ]
-                    },
-                    "^svc_"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "satisfied",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope thing count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated thing ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "unusable",
-              "check": "c",
-              "inputs": [
-                {
-                  "name": "author",
-                  "value": "ann"
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": 1,
-                "type": "thing"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "unusable",
-            "check": "c",
-            "description": "",
-            "expression": "author matches one of [\"^svc_\", $$input.params.bot]",
-            "inputs": [
-              {
-                "name": "author",
-                "value": "ann"
-              },
-              {
-                "name": "$$input.params.bot",
-                "value": "("
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": 1,
-              "type": "thing"
-            }
-          }
-        ]
-      },
-      {
-        "description": "input 2",
-        "input": {
-          "items": [
-            {
-              "author": "ann",
-              "id": 1
-            }
-          ],
-          "params": {
-            "bot": 3
-          }
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) \u003e= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every thing id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "$refs": [
-                    {
-                      "name": "$$input.params.bot",
-                      "value": 3
-                    }
-                  ],
-                  "description": "",
-                  "expression": "author matches one of [\"^svc_\", $$input.params.bot]",
-                  "meta": {},
-                  "op": "matches_any",
-                  "path": [
-                    "author"
-                  ],
-                  "patterns": [
-                    {
-                      "ref": [
-                        "$$input",
-                        "params",
-                        "bot"
-                      ]
-                    },
-                    "^svc_"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "satisfied",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope thing count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated thing ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "unusable",
-              "check": "c",
-              "inputs": [
-                {
-                  "name": "author",
-                  "value": "ann"
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": 1,
-                "type": "thing"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "unusable",
-            "check": "c",
-            "description": "",
-            "expression": "author matches one of [\"^svc_\", $$input.params.bot]",
-            "inputs": [
-              {
-                "name": "author",
-                "value": "ann"
-              },
-              {
-                "name": "$$input.params.bot",
-                "value": 3
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": 1,
-              "type": "thing"
-            }
-          }
-        ]
-      },
-      {
-        "description": "input 3",
-        "input": {
-          "items": [
-            {
-              "author": "ann",
-              "id": 1
-            }
-          ],
-          "params": {
-            "bot": [
-              "x"
-            ]
-          }
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) \u003e= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every thing id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "$refs": [
-                    {
-                      "name": "$$input.params.bot",
-                      "value": [
-                        "x"
-                      ]
-                    }
-                  ],
-                  "description": "",
-                  "expression": "author matches one of [\"^svc_\", $$input.params.bot]",
-                  "meta": {},
-                  "op": "matches_any",
-                  "path": [
-                    "author"
-                  ],
-                  "patterns": [
-                    {
-                      "ref": [
-                        "$$input",
-                        "params",
-                        "bot"
-                      ]
-                    },
-                    "^svc_"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "satisfied",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope thing count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated thing ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "unusable",
-              "check": "c",
-              "inputs": [
-                {
-                  "name": "author",
-                  "value": "ann"
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": 1,
-                "type": "thing"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "unusable",
-            "check": "c",
-            "description": "",
-            "expression": "author matches one of [\"^svc_\", $$input.params.bot]",
-            "inputs": [
-              {
-                "name": "author",
-                "value": "ann"
-              },
-              {
-                "name": "$$input.params.bot",
-                "value": [
-                  "x"
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": 1,
-              "type": "thing"
-            }
-          }
-        ]
-      }
-    ],
-    "description": "a ref in the patterns that reads no valid pattern fails as unusable",
-    "requirements": {
-      "s": {
-        "checks": {
-          "c": {
-            "op": "matches_any",
-            "path": [
-              "author"
-            ],
-            "patterns": [
-              {
-                "ref": [
-                  "$$input",
-                  "params",
-                  "bot"
-                ]
-              },
-              "^svc_"
-            ]
-          }
-        },
-        "from": [
-          "items"
-        ],
-        "id": [
-          "id"
-        ],
-        "subject_type": "thing"
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "items": [
-            {
               "author": "dependabot[bot]",
               "id": 1
             }
@@ -5579,6 +4944,194 @@
                 "$$input",
                 "params",
                 "bots"
+              ]
+            }
+          }
+        },
+        "from": [
+          "items"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "items": [
+            {
+              "id": 1
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "$refs": [
+                    {
+                      "name": "$$input.params.missing",
+                      "value": null
+                    }
+                  ],
+                  "description": "",
+                  "expression": "a matches one of $$input.params.missing",
+                  "meta": {},
+                  "op": "matches_any",
+                  "path": [
+                    "a"
+                  ],
+                  "patterns": {
+                    "ref": [
+                      "$$input",
+                      "params",
+                      "missing"
+                    ]
+                  }
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "c",
+              "inputs": [
+                {
+                  "name": "a",
+                  "value": null
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": 1,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "description": "",
+            "expression": "a matches one of $$input.params.missing",
+            "inputs": [
+              {
+                "name": "a",
+                "value": null
+              },
+              {
+                "name": "$$input.params.missing",
+                "value": null
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": 1,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "a ref shows its path in the expression",
+    "requirements": {
+      "s": {
+        "checks": {
+          "c": {
+            "op": "matches_any",
+            "path": [
+              "a"
+            ],
+            "patterns": {
+              "ref": [
+                "$$input",
+                "params",
+                "missing"
               ]
             }
           }
@@ -5793,9 +5346,20 @@
         "input": {
           "items": [
             {
-              "id": 1
+              "id": 1,
+              "n": 1,
+              "s": "a",
+              "t": "2026-01-01T00:00:00Z",
+              "xs": [
+                1
+              ]
             }
-          ]
+          ],
+          "params": {
+            "nine": 9,
+            "none": null,
+            "word": "x"
+          }
         },
         "report": {
           "compliant": false,
@@ -5803,12 +5367,12 @@
             "s": {
               "checks": {
                 "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
+                  "description": "The in-scope subject count is at least 1",
                   "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
                 "$unique_ids": {
-                  "description": "Every thing id is unique",
+                  "description": "Every subject id is unique",
                   "expression": "count(repeated(ids(items))) == 0",
                   "meta": {}
                 },
@@ -5818,26 +5382,14 @@
                   "meta": {}
                 },
                 "c": {
-                  "$refs": [
-                    {
-                      "name": "$$input.params.missing",
-                      "value": null
-                    }
-                  ],
                   "description": "",
-                  "expression": "a matches one of $$input.params.missing",
+                  "expression": "s matches one of \u003cinvalid patterns\u003e",
                   "meta": {},
                   "op": "matches_any",
                   "path": [
-                    "a"
+                    "s"
                   ],
-                  "patterns": {
-                    "ref": [
-                      "$$input",
-                      "params",
-                      "missing"
-                    ]
-                  }
+                  "patterns": "a"
                 }
               },
               "description": "",
@@ -5852,7 +5404,7 @@
           },
           "results": [
             {
-              "cause": "satisfied",
+              "cause": "value",
               "check": "$well_formed",
               "inputs": [
                 {
@@ -5862,13 +5414,19 @@
                 {
                   "name": "require",
                   "value": "every"
+                },
+                {
+                  "name": "checks.c",
+                  "value": [
+                    "invalid patterns"
+                  ]
                 }
               ],
-              "passed": true,
+              "passed": false,
               "requirement": "s",
               "subject": {
                 "id": null,
-                "type": "thing"
+                "type": "subject"
               }
             },
             {
@@ -5876,7 +5434,7 @@
               "check": "$min_subjects",
               "inputs": [
                 {
-                  "name": "in-scope thing count",
+                  "name": "in-scope subject count",
                   "value": 1
                 }
               ],
@@ -5884,7 +5442,7 @@
               "requirement": "s",
               "subject": {
                 "id": null,
-                "type": "thing"
+                "type": "subject"
               }
             },
             {
@@ -5892,7 +5450,7 @@
               "check": "$unique_ids",
               "inputs": [
                 {
-                  "name": "repeated thing ids",
+                  "name": "repeated subject ids",
                   "value": []
                 }
               ],
@@ -5900,68 +5458,85 @@
               "requirement": "s",
               "subject": {
                 "id": null,
-                "type": "thing"
+                "type": "subject"
               }
             },
             {
-              "cause": "absent",
+              "cause": "ill_formed",
               "check": "c",
               "inputs": [
                 {
-                  "name": "a",
-                  "value": null
+                  "name": "s",
+                  "value": "a"
                 }
               ],
               "passed": false,
               "requirement": "s",
               "subject": {
                 "id": 1,
-                "type": "thing"
+                "type": "subject"
               }
             }
           ]
         },
         "violations": [
           {
-            "cause": "absent",
-            "check": "c",
-            "description": "",
-            "expression": "a matches one of $$input.params.missing",
+            "cause": "value",
+            "check": "$well_formed",
+            "description": "The requirement is written correctly",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
             "inputs": [
               {
-                "name": "a",
-                "value": null
+                "name": "count(checks)",
+                "value": 1
               },
               {
-                "name": "$$input.params.missing",
-                "value": null
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "invalid patterns"
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "c",
+            "description": "",
+            "expression": "s matches one of \u003cinvalid patterns\u003e",
+            "inputs": [
+              {
+                "name": "s",
+                "value": "a"
               }
             ],
             "requirement": "s",
             "subject": {
               "id": 1,
-              "type": "thing"
+              "type": "subject"
             }
           }
         ]
       }
     ],
-    "description": "a ref shows its path in the expression",
+    "description": "a badly written check is ill formed",
     "requirements": {
       "s": {
         "checks": {
           "c": {
             "op": "matches_any",
             "path": [
-              "a"
+              "s"
             ],
-            "patterns": {
-              "ref": [
-                "$$input",
-                "params",
-                "missing"
-              ]
-            }
+            "patterns": "a"
           }
         },
         "from": [
@@ -5969,8 +5544,433 @@
         ],
         "id": [
           "id"
+        ]
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "items": [
+            {
+              "id": 1,
+              "n": 1,
+              "s": "a",
+              "t": "2026-01-01T00:00:00Z",
+              "xs": [
+                1
+              ]
+            }
+          ],
+          "params": {
+            "nine": 9,
+            "none": null,
+            "word": "x"
+          }
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope subject count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every subject id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "s matches one of [3]",
+                  "meta": {},
+                  "op": "matches_any",
+                  "path": [
+                    "s"
+                  ],
+                  "patterns": [
+                    3
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "value",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                },
+                {
+                  "name": "checks.c",
+                  "value": [
+                    "invalid patterns"
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope subject count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated subject ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            },
+            {
+              "cause": "ill_formed",
+              "check": "c",
+              "inputs": [
+                {
+                  "name": "s",
+                  "value": "a"
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": 1,
+                "type": "subject"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "description": "The requirement is written correctly",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "invalid patterns"
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "c",
+            "description": "",
+            "expression": "s matches one of [3]",
+            "inputs": [
+              {
+                "name": "s",
+                "value": "a"
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": 1,
+              "type": "subject"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "a badly written check is ill formed (2)",
+    "requirements": {
+      "s": {
+        "checks": {
+          "c": {
+            "op": "matches_any",
+            "path": [
+              "s"
+            ],
+            "patterns": [
+              3
+            ]
+          }
+        },
+        "from": [
+          "items"
         ],
-        "subject_type": "thing"
+        "id": [
+          "id"
+        ]
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "items": [
+            {
+              "id": 1,
+              "n": 1,
+              "s": "a",
+              "t": "2026-01-01T00:00:00Z",
+              "xs": [
+                1
+              ]
+            }
+          ],
+          "params": {
+            "nine": 9,
+            "none": null,
+            "word": "x"
+          }
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope subject count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every subject id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "s matches one of [\"(\"]",
+                  "meta": {},
+                  "op": "matches_any",
+                  "path": [
+                    "s"
+                  ],
+                  "patterns": [
+                    "("
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "value",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                },
+                {
+                  "name": "checks.c",
+                  "value": [
+                    "invalid patterns"
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope subject count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated subject ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            },
+            {
+              "cause": "ill_formed",
+              "check": "c",
+              "inputs": [
+                {
+                  "name": "s",
+                  "value": "a"
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": 1,
+                "type": "subject"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "description": "The requirement is written correctly",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "invalid patterns"
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "c",
+            "description": "",
+            "expression": "s matches one of [\"(\"]",
+            "inputs": [
+              {
+                "name": "s",
+                "value": "a"
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": 1,
+              "type": "subject"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "a badly written check is ill formed (3)",
+    "requirements": {
+      "s": {
+        "checks": {
+          "c": {
+            "op": "matches_any",
+            "path": [
+              "s"
+            ],
+            "patterns": [
+              "("
+            ]
+          }
+        },
+        "from": [
+          "items"
+        ],
+        "id": [
+          "id"
+        ]
       }
     }
   }
