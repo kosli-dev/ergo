@@ -17,7 +17,7 @@ This page describes everything ergo accepts and everything it returns. If you ha
 
 ## Policies
 
-A policy is an object that maps requirement names to requirements. You pass it to `ergo.report` along with the input:
+A policy is an object whose `requirements` section maps requirement names to requirements. You pass it to `ergo.report` along with the input and the [params](#params):
 
 ```rego
 requirements := {
@@ -25,8 +25,10 @@ requirements := {
 	"signed_commits": { ... },
 }
 
-report := ergo.report(input, requirements)
+report := ergo.report(input, {"requirements": requirements}, {})
 ```
+
+`ergo.report` reads only its three arguments, so the same arguments always give the same report.
 
 A policy is plain data, so it can also live in a YAML or JSON file that OPA loads. A file in the policy directory with a top-level `requirements` key is read as `data.requirements`:
 
@@ -37,14 +39,24 @@ requirements:
 ```
 
 ```rego
-report := ergo.report(input, data.requirements)
+default requirements := {}
+
+requirements := data.requirements
+
+default params := {}
+
+params := data.params
+
+report := ergo.report(input, {"requirements": requirements}, params)
 ```
+
+Give each argument a default like this when it comes from `data`. Rego doesn't call a function with an argument that isn't defined, so a file without `requirements:`, or a run without params, would make the whole report undefined, with no rows to say why. The defaults still fail closed: with no requirements the policy isn't compliant, and with no params every `$$params` read fails as `absent`. The same goes for the input: if it can be missing, give it a default too.
 
 Because each name is an object key, two requirements can't share a name, and every row in the report points back to exactly one requirement.
 
-A policy with no requirements is never compliant: it doesn't check anything, so it can't vouch for anything either.
+A policy with no requirements is never compliant: it doesn't check anything, so it can't vouch for anything either. The same goes for a policy that isn't an object, or whose `requirements` isn't one. ergo leaves out any other section of the policy, so it changes nothing in the report.
 
-From your own policies, call only `ergo.report`, `ergo.report_with_params` and `ergo.violations`. Rules whose names start with `_`, like `ergo._row_cause`, are ergo's own and can change or disappear in any release. If you lint with [Regal](https://www.openpolicyagent.org/projects/regal), its `leaked-internal-reference` rule flags a call to one.
+From your own policies, call only `ergo.report` and `ergo.violations`. Rules whose names start with `_`, like `ergo._row_cause`, are ergo's own and can change or disappear in any release. If you lint with [Regal](https://www.openpolicyagent.org/projects/regal), its `leaked-internal-reference` rule flags a call to one.
 
 ## Requirements
 
@@ -228,7 +240,7 @@ A selector must match exactly one item. If it matches none, or more than one, th
 A path normally starts inside the subject. Two first steps start somewhere else:
 
 - `$$input` starts at the top of the document given to `ergo.report`.
-- `$$params` starts at the policy's params, read from `data.params`.
+- `$$params` starts at the params given to `ergo.report`.
 
 ```rego
 "path": ["$$input", "settings", "mode"]
@@ -240,7 +252,7 @@ Every subject reads the same value. These only mean this as the first step of a 
 A check's fixed values can be read this way too. Write `{"ref": path}` in place of the value, where the path starts with `$$params` or `$$input`. This works for `value`, `values`, `patterns`, `min`, `max`, each item in a `values` or `patterns` list, and the values in a selector's `where`, and as a step of a path (see [Ref steps](#ref-steps)). It's how a policy takes params:
 
 ```rego
-ergo.report({"packages": packages}, {"licences": {
+ergo.report({"packages": packages}, {"requirements": {"licences": {
 	"subject_type": "package",
 	"from": ["packages"],
 	"id": ["name"],
@@ -249,10 +261,10 @@ ergo.report({"packages": packages}, {"licences": {
 		"path": ["licences"],
 		"check": {"op": "in", "path": [], "values": {"ref": ["$$params", "allowed_licences"]}},
 	}},
-}})
+}}}, {"allowed_licences": ["MIT", "Apache-2.0"]})
 ```
 
-With `data.params` set to `{"allowed_licences": ["MIT", "Apache-2.0"]}`, a package licensed `GPL-3.0` gives this violation:
+With those params, a package licensed `GPL-3.0` gives this violation:
 
 ```json
 {
@@ -265,7 +277,8 @@ With `data.params` set to `{"allowed_licences": ["MIT", "Apache-2.0"]}`, a packa
     { "name": "licences[]", "value": ["GPL-3.0"] },
     { "name": "$$params.allowed_licences", "value": ["MIT", "Apache-2.0"] }
   ],
-  "cause": "value"
+  "cause": "value",
+  "failed_items": [{ "path": "licences[0]", "value": "GPL-3.0", "cause": "value" }]
 }
 ```
 
@@ -275,17 +288,9 @@ The expression says where the value comes from. What it was goes in the check's 
 
 ### Params
 
-A policy reads its params from `data.params`, so `opa eval -d params.json` passes them in when the file holds `{"params": ...}`. In tests, write `with data.params as {...}`. To take params from somewhere else, pass them in yourself:
+Params are the third argument to `ergo.report`. ergo doesn't look for them anywhere else, so the policy that calls it picks where they come from. Reading them from `data.params`, as in [Policies](#policies), means `opa eval -d params.json` passes them in when the file holds `{"params": ...}`, and a test can write `with data.params as {...}`.
 
-```rego
-ergo.report_with_params(doc, params, requirements)
-```
-
-That works like `ergo.report`, except `$$params` reads `params` instead of `data.params`. If what you pass can be missing, give it a default first, with a rule like `default config := {}`. Rego doesn't call a function with an argument that isn't defined, so the whole report would be undefined, with no rows to say why. The same goes for the document given to `ergo.report`.
-
-Params aren't part of the document, so `$$input.params` doesn't reach them, and `$$params` doesn't read the document. With no `data.params`, or one that isn't an object, every `$$params` read fails as `absent`. ergo has no defaults, so a policy run without its params fails instead of checking something nobody configured.
-
-A policy that calls `ergo.report` can't itself be in a package called `params` (or under one), because the report would then read its own rules. OPA rejects that as recursive when it loads the policy.
+Params aren't part of the document, so `$$input.params` doesn't reach them, and `$$params` doesn't read the document. With params of `{}`, or params that aren't an object, every `$$params` read fails as `absent`. ergo has no defaults, so a policy run without its params fails instead of checking something nobody configured.
 
 Some things worth knowing:
 
@@ -769,12 +774,12 @@ A custom operator works in `checks`, in `applies_to`, and on either side of a su
 Three rules:
 
 - **Fail when you can't read the data.** Check that fields are there and have the right type before you compare them. A rule that doesn't hold fails the check, which is what you want. Be careful with `not`, which turns an error into a pass.
-- **Read the document with `value_at` and `$$input`, and params with `$$params` or `arg`, not with `input` or `data.params`.** While ergo checks a subject, `input` holds ergo's own [names](#naming-subjects), not your input, and `data.params` may not be the params the report was given.
+- **Read the document with `value_at` and `$$input`, and params with `$$params` or `arg`, not with `input` or `data`.** While ergo checks a subject, `input` holds ergo's own [names](#naming-subjects), not your input, and `data.params` may not be the params the report was given.
 - **Only call `value_at`, `arg` and `leaf_passed`.** `value_at(subj, path)` reads a path, `arg(value)` reads one of your parameters, and `leaf_passed(check, subj)` runs a built-in check like `{"op": "present", "path": ["approved_by"]}` (but not `all`, `any` or `any_of`). Calling `op_passed` or `report` from your operator creates a loop, which Rego rejects, and the errors will point at `ergo.rego` rather than your file. Every other rule in `ergo.rego` starts with `_` and can change or disappear in any release.
 
 ## The report
 
-`ergo.report(input, requirements)` returns:
+`ergo.report(input, policy, params)` returns:
 
 ```json
 {
