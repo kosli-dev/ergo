@@ -1,26 +1,26 @@
 {{ define "main" }}
-{{ $requirements := resources.Get "examples/baking/ergo/baking.yaml" }}
+{{ $policy := resources.Get "examples/baking/ergo/baking.yaml" }}
 {{ $input := resources.Get "examples/baking/batches.json" }}
 {{ $wasm := resources.Get "playground/ergo.wasm" }}
 {{ if not $wasm }}{{ errorf "The playground needs ergo compiled to Wasm: run site/build-playground.sh" }}{{ end }}
 {{ $commit := resources.Get "playground/commit.txt" }}
-<div class="wrap pg" id="playground" data-wasm="{{ ($wasm | fingerprint).RelPermalink }}" data-requirements="{{ $requirements.Content }}" data-input="{{ $input.Content }}">
+<div class="wrap pg" id="playground" data-wasm="{{ ($wasm | fingerprint).RelPermalink }}" data-policy="{{ $policy.Content }}" data-input="{{ $input.Content }}">
   <div class="pg__head">
     <h1>Playground</h1>
-    <p>Change the requirements or the input and the report follows. ergo runs in your browser, compiled to Wasm, and what you type stays there unless you copy a link to it. It starts on <a href="{{ "bakery/" | relURL }}">the bakery example</a>.</p>
+    <p>Change the policy, the input or the params and the report follows. ergo runs in your browser, compiled to Wasm, and what you type stays there unless you copy a link to it. It starts on <a href="{{ "bakery/" | relURL }}">the bakery example</a>.</p>
   </div>
 
   <div class="pg__editors">
-    <section class="pg__pane" data-pane="requirements">
+    <section class="pg__pane pg__pane--policy" data-pane="policy">
       <div class="pg__bar">
-        <h2 class="pg__label mono">Requirements</h2>
-        <div class="pg__tabs" role="group" aria-label="Requirements format">
+        <h2 class="pg__label mono">Policy</h2>
+        <div class="pg__tabs" role="group" aria-label="Policy format">
           <button type="button" data-format="yaml">YAML</button>
           <button type="button" data-format="json">JSON</button>
           <button type="button" data-format="rego">Rego</button>
         </div>
       </div>
-      <textarea class="pg__code mono" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Requirements"></textarea>
+      <textarea class="pg__code mono" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Policy"></textarea>
       <p class="pg__error mono" role="status"></p>
     </section>
     <section class="pg__pane" data-pane="input">
@@ -32,6 +32,17 @@
         </div>
       </div>
       <textarea class="pg__code mono" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Input"></textarea>
+      <p class="pg__error mono" role="status"></p>
+    </section>
+    <section class="pg__pane pg__pane--params" data-pane="params">
+      <div class="pg__bar">
+        <h2 class="pg__label mono">Params</h2>
+        <div class="pg__tabs" role="group" aria-label="Params format">
+          <button type="button" data-format="json">JSON</button>
+          <button type="button" data-format="yaml">YAML</button>
+        </div>
+      </div>
+      <textarea class="pg__code mono" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Params"></textarea>
       <p class="pg__error mono" role="status"></p>
     </section>
   </div>
@@ -53,7 +64,7 @@
       <summary class="mono">The whole report</summary>
       <pre class="mono"></pre>
     </details>
-    <p class="pg__fine">Custom operators aren't available here, because they're written in Rego and the page only runs ergo itself. The report's keys are sorted, but numbers are written the way JavaScript writes them, so <code>1.50</code> shows as <code>1.5</code>. This is ergo at <a href="{{ site.Params.repo }}/commit/{{ $commit.Content | strings.TrimSpace | strings.TrimSuffix "-dirty" }}"><code>{{ $commit.Content | strings.TrimSpace }}</code></a>.</p>
+    <p class="pg__fine">Custom operators aren't available here, because they're written in Rego and the page only runs ergo itself. The page reads what you type with JavaScript, which keeps a number's value but not how it was written, so ergo sees <code>1.0</code> as <code>1</code>, and a number too big for JavaScript, like <code>1e400</code>, as <code>null</code>. OPA can report those differently. This is ergo at <a href="{{ site.Params.repo }}/commit/{{ $commit.Content | strings.TrimSpace | strings.TrimSuffix "-dirty" }}"><code>{{ $commit.Content | strings.TrimSpace }}</code></a>.</p>
   </section>
 </div>
 {{ with resources.Get "js/playground/main.mjs" | js.Build (dict "format" "esm" "target" "es2022" "minify" true) | fingerprint }}<script type="module" src="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}"></script>{{ end }}

@@ -8,7 +8,7 @@ mkdir -p "$out/vendor"
 
 mkdir "$dir/src"
 cp ergo.rego "$dir/src/"
-printf 'package playground\n\nimport data.ergo\n\nreport := ergo.report(input.input, input.requirements)\n' > "$dir/src/playground.rego"
+printf 'package playground\n\nimport data.ergo\n\nreport := ergo.report(input.input, input.policy, input.params)\n' > "$dir/src/playground.rego"
 opa build -t wasm -e playground/report -o "$dir/bundle.tar.gz" "$dir/src"
 tar -xzf "$dir/bundle.tar.gz" -C "$dir" /policy.wasm 2>/dev/null
 mv "$dir/policy.wasm" "$out/ergo.wasm"

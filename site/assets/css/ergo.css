@@ -423,6 +423,9 @@ p code, li code, dd code, td code {
 .pg__head p { max-width: 780px; color: rgba(247, 247, 239, .82); margin: 0 0 32px; }
 .pg a { color: var(--lime); text-underline-offset: 3px; }
 .pg__editors { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.pg__pane--policy { grid-row: span 2; }
+.pg__pane--policy .pg__code { flex: 1; min-height: 440px; }
+.pg__pane--params .pg__code { height: 120px; }
 .pg__pane { min-width: 0; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--radius); background: var(--ink-2); padding: 14px 16px 10px; }
 .pg__bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
 .pg__label { margin: 0; font-size: 13px; font-weight: 500; letter-spacing: .02em; color: var(--lime); }
@@ -440,6 +443,10 @@ p code, li code, dd code, td code {
 .pg__status { margin: 0 0 12px; color: var(--muted); font-size: 14px; }
 .pg__verdict { margin: 0 0 8px; font: 500 28px/1.2 var(--mono); }
 .pg__reqs { list-style: none; padding: 0; margin: 0 0 24px; font-size: 14px; }
+.pg__reqs li + li { margin-top: 10px; }
+.pg__desc { font: 13.5px/1.5 var(--sans); color: var(--muted); white-space: normal; }
+.pg__meta { font-size: 12.5px; color: var(--faint); white-space: normal; }
+.pg__table .pg__desc, .pg__table .pg__meta { min-width: 220px; }
 .pg__table { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius-sm); }
 .pg__table table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .pg__table th, .pg__table td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; white-space: nowrap; }
@@ -451,7 +458,7 @@ p code, li code, dd code, td code {
 .pg__raw pre { margin: 12px 0 0; padding: 16px 18px; max-height: 560px; overflow: auto; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--ink-2); font-size: 12.5px; line-height: 1.6; }
 .pg__fine { margin: 28px 0 0; max-width: 780px; font-size: 14px; color: var(--muted); }
 .pg__fine code { font-size: .9em; }
-@media (max-width: 920px) { .pg__editors { grid-template-columns: minmax(0, 1fr); } .pg__code { height: 320px; } }
+@media (max-width: 920px) { .pg__editors { grid-template-columns: minmax(0, 1fr); } .pg__pane--policy { grid-row: auto; } .pg__code, .pg__pane--policy .pg__code { height: 320px; min-height: 0; } .pg__pane--params .pg__code { height: 120px; } }
 
 /* ——— Responsive ——— */
 @media (max-width: 1080px) {

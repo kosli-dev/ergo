@@ -1,5 +1,5 @@
 import opa from "../../playground/vendor/opa-wasm.mjs";
-import { bakeryRequirements, decodeState, encodeState, formats, parseTime, sortKeys } from "./lib.mjs";
+import { bakeryPolicy, decodeState, encodeState, formats, parseTime, showStatus, sortKeys } from "./lib.mjs";
 
 const root = document.getElementById("playground");
 
@@ -27,15 +27,21 @@ const panes = Object.fromEntries([...root.querySelectorAll("[data-pane]")].map((
   el.querySelectorAll("[data-format]").forEach((b) => b.addEventListener("click", () => {
     if (b.dataset.format === pane.format) return;
     const r = pane.read();
-    if (r.ok) pane.set(formats[b.dataset.format].write(r.value), b.dataset.format);
+    if (!r.ok) return;
+    try {
+      pane.set(formats[b.dataset.format].write(r.value), b.dataset.format);
+    } catch (e) {
+      pane.error.textContent = e.message;
+    }
   }));
   pane.code.addEventListener("input", () => schedule());
   return [el.dataset.pane, pane];
 }));
 
 const bakery = () => {
-  panes.requirements.set(bakeryRequirements(root.dataset.requirements), "yaml");
+  panes.policy.set(bakeryPolicy(root.dataset.policy), "yaml");
   panes.input.set(root.dataset.input, "json");
+  panes.params.set("{}\n", "json");
 };
 
 const status = root.querySelector("[data-status]");
@@ -56,11 +62,16 @@ const show = (report) => {
   status.textContent = "";
   const verdict = el("p", "pg__verdict");
   verdict.append("compliant: ", el("span", report.compliant === true ? "t" : "f", JSON.stringify(report.compliant)));
-  const reqs = el("ul", "pg__reqs mono");
+  const reqs = el("ul", "pg__reqs");
   for (const [name, r] of Object.entries(report.requirements ?? {})) {
     const li = el("li");
-    li.append(el("span", "", name), " ", el("span", r.satisfied === true ? "t" : "f", r.satisfied === true ? "satisfied" : "not satisfied"));
-    if (r.subjects) li.append(el("span", "muted", ` · ${r.subjects.matching} of ${r.subjects.total} subjects match`));
+    const [cls, label] = showStatus(r.status);
+    const head = el("div", "mono");
+    head.append(el("span", "", name), " ", el("span", cls, label));
+    if (r.subjects) head.append(el("span", "muted", ` · ${r.subjects.matching} of ${r.subjects.total} subjects match`));
+    li.append(head);
+    if (r.description) li.append(el("div", "pg__desc", r.description));
+    if (r.meta && Object.keys(r.meta).length) li.append(el("div", "pg__meta mono", `meta ${JSON.stringify(r.meta)}`));
     reqs.append(li);
   }
   summary.replaceChildren(verdict, reqs);
@@ -68,15 +79,20 @@ const show = (report) => {
   table.tBodies[0].replaceChildren(...(report.results ?? []).map((row) => {
     const tr = el("tr");
     const id = row.subject?.id;
+    const check = el("td", `mono ${String(row.check).startsWith("$") ? "sys" : ""}`, row.check);
+    const def = report.requirements?.[row.requirement]?.checks?.[row.check];
+    if (def?.description) check.append(el("div", "pg__desc", def.description));
+    if (def?.meta && Object.keys(def.meta).length) check.append(el("div", "pg__meta", `meta ${JSON.stringify(def.meta)}`));
     tr.append(
       el("td", "mono", row.requirement),
       el("td", "mono", id === null || id === undefined ? `(${row.subject?.type ?? "requirement"})` : typeof id === "string" ? id : JSON.stringify(id)),
-      el("td", `mono ${String(row.check).startsWith("$") ? "sys" : ""}`, row.check),
+      check,
       el("td", `mono ${row.passed === true ? "t" : "f"}`, row.passed === true ? "passed" : "failed"),
       el("td", "mono", row.cause),
     );
     const inputs = el("td", "mono pg__inputs");
     for (const x of row.inputs ?? []) inputs.append(el("div", "", `${x.name} = ${"value" in x ? JSON.stringify(x.value) : "(missing)"}`));
+    for (const x of row.failed_items ?? []) inputs.append(el("div", "f", `failed ${x.path} = ${"value" in x ? JSON.stringify(x.value) : "(missing)"} (${x.cause})`));
     tr.append(inputs);
     return tr;
   }));
@@ -86,17 +102,18 @@ const show = (report) => {
   reportEl.classList.remove("is-stale");
 };
 
-let policy;
+let ergo;
 let timer;
 const schedule = () => { clearTimeout(timer); timer = setTimeout(run, 200); };
 
 const run = () => {
-  const r = panes.requirements.read();
+  const p = panes.policy.read();
   const i = panes.input.read();
-  if (!policy) return;
-  if (!r.ok || !i.ok) { reportEl.classList.add("is-stale"); return; }
+  const a = panes.params.read();
+  if (!ergo) return;
+  if (!p.ok || !i.ok || !a.ok) { reportEl.classList.add("is-stale"); return; }
   try {
-    const out = policy.evaluate({ input: i.value, requirements: r.value });
+    const out = ergo.evaluate({ input: i.value, policy: p.value, params: a.value });
     if (!out?.length || out[0].result === undefined) throw new Error("ergo gave no report");
     show(sortKeys(out[0].result));
   } catch (e) {
@@ -106,7 +123,11 @@ const run = () => {
 };
 
 root.querySelector("[data-action=share]").addEventListener("click", async () => {
-  const hash = await encodeState({ r: panes.requirements.code.value, rf: panes.requirements.format, i: panes.input.code.value, if: panes.input.format });
+  const hash = await encodeState({
+    p: panes.policy.code.value, pf: panes.policy.format,
+    i: panes.input.code.value, if: panes.input.format,
+    a: panes.params.code.value, af: panes.params.format,
+  });
   history.replaceState(null, "", `#${hash}`);
   try {
     await navigator.clipboard.writeText(location.href);
@@ -127,8 +148,9 @@ const restore = async () => {
   if (location.hash.length < 2) return false;
   try {
     const s = await decodeState(location.hash.slice(1));
-    panes.requirements.set(s.r, s.rf);
+    panes.policy.set(s.p, s.pf);
     panes.input.set(s.i, s.if);
+    panes.params.set(s.a, s.af);
     return true;
   } catch {
     note.textContent = "That link couldn't be read, so this is the bakery.";
@@ -140,7 +162,7 @@ if (!(await restore())) bakery();
 try {
   const res = await fetch(root.dataset.wasm);
   if (!res.ok) throw new Error(`couldn't fetch ergo (${res.status})`);
-  policy = await opa.loadPolicy(await res.arrayBuffer(), undefined, { "time.parse_rfc3339_ns": parseTime });
+  ergo = await opa.loadPolicy(await res.arrayBuffer(), undefined, { "time.parse_rfc3339_ns": parseTime });
   status.textContent = "";
   run();
 } catch (e) {

@@ -4,7 +4,8 @@ import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { bakeryRequirements, byCodePoint, decodeState, encodeState, formats, parseRego, parseTime, sortKeys, toRego, toYaml } from "./lib.mjs";
+import { bakeryPolicy, byCodePoint, decodeState, encodeState, formats, parseRego, parseTime, showStatus, sortKeys, toRego, toYaml } from "./lib.mjs";
+import opa from "../../playground/vendor/opa-wasm.mjs";
 
 const repo = new URL("../../../../", import.meta.url).pathname;
 const bakeryFile = readFileSync(join(repo, "examples/baking/ergo/baking.yaml"), "utf8");
@@ -18,37 +19,45 @@ const tricky = {
   "key with spaces": { "$name": "x", "": "empty key" },
 };
 
-const roundTrips = (value) => {
-  for (const from of Object.keys(formats)) {
-    for (const to of Object.keys(formats)) {
+const roundTrips = (value, names = Object.keys(formats)) => {
+  for (const from of names) {
+    for (const to of names) {
       const once = formats[to].parse(formats[to].write(formats[from].parse(formats[from].write(value))));
       assert.deepEqual(once, value, `${from} → ${to}`);
     }
   }
 };
 
-test("the bakery requirements come out of the example file as they were written", () => {
-  const written = bakeryFile.split("\n").slice(2).map((l) => l.slice(4)).join("\n");
-  assert.equal(bakeryRequirements(bakeryFile), written);
+test("the bakery policy comes out of the example file as it was written", () => {
+  const written = bakeryFile.split("\n").slice(1).map((l) => l.slice(2)).join("\n");
+  assert.equal(bakeryPolicy(bakeryFile), written);
 });
 
 test("every format reads back what every other format writes", () => {
-  roundTrips(formats.yaml.parse(bakeryRequirements(bakeryFile)));
-  roundTrips(tricky);
+  roundTrips(formats.yaml.parse(bakeryPolicy(bakeryFile)));
+  roundTrips({ subjects: tricky, requirements: tricky });
+  roundTrips(tricky, ["json", "yaml"]);
+});
+
+test("Rego refuses a policy it can't write as rules, and says why", () => {
+  assert.throws(() => toRego(tricky), /Rego can't hold a section called "key with spaces"/);
+  assert.throws(() => toRego({ input: {} }), /Rego can't hold a section called "input"/);
+  for (const v of [{}, [], "x", null]) assert.throws(() => toRego(v), /Rego can only hold a policy with sections/);
 });
 
 test("lists of plain values are written on one line", () => {
   assert.equal(toYaml({ path: ["bake", "temp_c"], deep: [[1, 2]] }), "path: [bake, temp_c]\ndeep:\n- [1, 2]\n");
-  assert.equal(toRego({ path: ["bake", "temp_c"] }), 'requirements := {\n\t"path": ["bake", "temp_c"],\n}\n');
+  assert.equal(toRego({ requirements: { path: ["bake", "temp_c"] } }), 'requirements := {\n\t"path": ["bake", "temp_c"],\n}\n');
 });
 
 test("the Rego it writes is formatted the way opa fmt formats it and means the same to OPA", () => {
   const dir = mkdtempSync(join(tmpdir(), "playground-"));
   const file = join(dir, "x.rego");
-  writeFileSync(file, `package x\n\n${toRego(tricky)}`);
+  const policy = { subjects: tricky, requirements: tricky };
+  writeFileSync(file, `package x\n\n${toRego(policy)}`);
   assert.equal(execFileSync("opa", ["fmt", "--list", file], { encoding: "utf8" }), "");
-  const read = JSON.parse(execFileSync("opa", ["eval", "-d", file, "--format", "raw", "data.x.requirements"], { encoding: "utf8" }));
-  assert.deepEqual(read, tricky);
+  const read = JSON.parse(execFileSync("opa", ["eval", "-d", file, "--format", "raw", "data.x"], { encoding: "utf8" }));
+  assert.deepEqual(read, policy);
 });
 
 test("Rego as people write it, with comments, trailing commas, raw strings and sets", () => {
@@ -60,9 +69,10 @@ test("Rego as people write it, with comments, trailing commas, raw strings and s
 	"none": set(),
 	"n": -2.5e1, # trailing
 }}`);
-  assert.deepEqual(v, { prod_deploy: { from: ["deployments"], value: "prod\\n", names: ["b", "a"], none: [], n: -25 } });
+  assert.deepEqual(v, { requirements: { prod_deploy: { from: ["deployments"], value: "prod\\n", names: ["b", "a"], none: [], n: -25 } } });
   assert.deepEqual(parseRego("{}"), {});
-  assert.deepEqual(parseRego("x = [true, false, null]"), [true, false, null]);
+  assert.deepEqual(parseRego("[true, false, null]"), [true, false, null]);
+  assert.deepEqual(parseRego("x = [true, false, null]"), { x: [true, false, null] });
 });
 
 test("Rego that OPA wouldn't take gives an error with its place", () => {
@@ -74,6 +84,9 @@ test("Rego that OPA wouldn't take gives an error with its place", () => {
   assert.throws(() => parseRego('{"a" 1}'), /expected } at line 1, column 6/);
   assert.throws(() => parseRego("[01]"), /unexpected input/);
   assert.throws(() => parseRego(""), /unexpected end/);
+  assert.throws(() => parseRego("a := 1\nb := 2\na := 3"), /a is given twice at line 3, column 1/);
+  assert.throws(() => parseRego("a := 1\n{}"), /expected a rule like requirements := \{\.\.\.\} at line 2/);
+  assert.throws(() => parseRego("a := 1\nreport := ergo.report(input, {}, {})"), /unexpected input at line 2/);
 });
 
 test("a key called __proto__ stays a key", () => {
@@ -99,13 +112,54 @@ test("times are read to the nanosecond, the same as OPA reads them", () => {
 });
 
 test("a shared link gives back what was typed", async () => {
-  const state = { r: "a: 1\n# 😀", rf: "rego", i: "{}", if: "yaml" };
+  const state = { p: "a: 1\n# 😀", pf: "rego", i: "{}", if: "yaml", a: "x: 1", af: "json" };
   assert.deepEqual(await decodeState(await encodeState(state)), state);
 });
 
 test("a shared link with a format the page doesn't have is refused", async () => {
-  for (const bad of [{ r: "", rf: "constructor", i: "", if: "json" }, { r: "", rf: "yaml", i: "", if: "rego" }, { r: 1, rf: "yaml", i: "", if: "json" }]) {
-    await assert.rejects(async () => decodeState(await encodeState(bad)), /not a playground link/);
+  const ok = { p: "", pf: "yaml", i: "", if: "json", a: "", af: "json" };
+  for (const bad of [{ pf: "constructor" }, { if: "rego" }, { af: "rego" }, { p: 1 }, { a: undefined }]) {
+    await assert.rejects(async () => decodeState(await encodeState({ ...ok, ...bad })), /not a playground link/);
   }
   await assert.rejects(() => decodeState("not-base64!"));
+});
+
+test("a status ergo reports is shown as it is, and any other as not met", () => {
+  assert.deepEqual(showStatus("met"), ["t", "met"]);
+  assert.deepEqual(showStatus("not_met"), ["f", "not met"]);
+  assert.deepEqual(showStatus("not_applicable"), ["muted", "not applicable"]);
+  for (const s of [undefined, null, true, "MET", "constructor", "toString"]) assert.deepEqual(showStatus(s), ["f", "not met"], String(s));
+});
+
+test("the page's Wasm build gives the same report as opa eval", async () => {
+  const wasm = join(repo, "site/assets/playground/ergo.wasm");
+  const ergo = await opa.loadPolicy(readFileSync(wasm), undefined, { "time.parse_rfc3339_ns": parseTime });
+  const dir = mkdtempSync(join(tmpdir(), "playground-"));
+  writeFileSync(join(dir, "p.rego"), "package p\n\nimport data.ergo\n\nreport := ergo.report(input.input, input.policy, input.params)\n");
+  const cases = {
+    bakery: { input: JSON.parse(readFileSync(join(repo, "examples/baking/batches.json"), "utf8")), policy: formats.yaml.parse(bakeryPolicy(bakeryFile)), params: {} },
+    params: {
+      input: { items: [{ id: "a", n: 3, big: false }, { id: "b", n: 9, big: false }] },
+      policy: {
+        subjects: { item: { from: ["items"], id: ["id"] }, big: { of: "item", applies_to: { big: { op: "equals", path: ["big"], value: true } } } },
+        requirements: {
+          small: { description: "Items are small", meta: { control: "X-1" }, subject: "item", checks: { n: { op: "range", path: ["n"], min: 0, max: { ref: ["$$params", "max"] }, meta: { severity: 2 } } } },
+          positive: { subject: "item", checks: { n: { op: "range", path: ["n"], min: 0, max: 100 } } },
+          none_big: { subject: "big", min_subjects: 0, checks: { n: { op: "range", path: ["n"], min: 0, max: 100 } } },
+        },
+      },
+      params: { max: 5 },
+    },
+    empty: { input: {}, policy: { subjects: {}, requirements: { r: { subject: "nope", checks: {} } } }, params: {} },
+    "not a policy": { input: {}, policy: [], params: null },
+  };
+  for (const [name, c] of Object.entries(cases)) {
+    writeFileSync(join(dir, "input.json"), JSON.stringify(c));
+    const want = JSON.parse(execFileSync("opa", ["eval", "-d", join(repo, "ergo.rego"), "-d", join(dir, "p.rego"), "-i", join(dir, "input.json"), "--format", "raw", "data.p.report"], { encoding: "utf8" }));
+    const got = ergo.evaluate(c)[0].result;
+    assert.deepEqual(got, want, name);
+    assert.notEqual(got.requirements, undefined, name);
+  }
+  const statuses = ergo.evaluate(cases.params)[0].result.requirements;
+  assert.deepEqual([statuses.small.status, statuses.positive.status, statuses.none_big.status], ["not_met", "met", "not_applicable"]);
 });

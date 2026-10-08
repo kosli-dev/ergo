@@ -26,7 +26,7 @@ The code that converts between YAML, JSON and Rego is in `assets/js/playground/l
 node --test site/assets/js/playground/lib.test.mjs
 ```
 
-The tests run `opa`, and CI runs them on every pull request, along with the script and a build of the site.
+The tests run `opa`, and one of them checks that the page's Wasm build gives the same report as `opa eval`, so run the build script first. CI runs them on every pull request, along with the script and a build of the site.
 
 ## Files
 

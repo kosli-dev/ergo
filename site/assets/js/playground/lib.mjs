@@ -73,11 +73,24 @@ export const parseRego = (text) => {
     if ((m = eat(/^(?:true|false|null)\b/))) return JSON.parse(m[0]);
     fail(i >= text.length ? "unexpected end" : "unexpected input");
   };
-  eat(/^[A-Za-z_]\w*\s*:?=/);
-  const v = value();
-  skip();
-  if (i < text.length) fail("unexpected input after the value");
-  return v;
+  eat(/^package\s+[\w.]+/);
+  while (eat(/^import\s+[\w.]+(?:\s+as\s+\w+)?/));
+  const head = /^([A-Za-z_]\w*)\s*:?=/;
+  if (!head.test(text.slice((skip(), i)))) {
+    const v = value();
+    skip();
+    if (i < text.length) fail("unexpected input after the value");
+    return v;
+  }
+  const out = {};
+  while (peek() !== undefined) {
+    const start = i;
+    const m = eat(head);
+    if (!m) fail("expected a rule like requirements := {...}");
+    if (Object.hasOwn(out, m[1])) { i = start; fail(`${m[1]} is given twice`); }
+    Object.defineProperty(out, m[1], { value: value(), enumerable: true, writable: true, configurable: true });
+  }
+  return out;
 };
 
 const regoValue = (v, ind) => {
@@ -91,7 +104,15 @@ const regoValue = (v, ind) => {
   return `{\n${Object.keys(v).map((k) => `${inner}${JSON.stringify(k)}: ${regoValue(v[k], inner)},\n`).join("")}${ind}}`;
 };
 
-export const toRego = (v) => `requirements := ${regoValue(v, "")}\n`;
+const keywords = new Set(["as", "contains", "data", "default", "else", "every", "false", "if", "import", "in", "input", "not", "null", "package", "some", "true", "with"]);
+
+export const toRego = (v) => {
+  if (isScalar(v) || Array.isArray(v) || Object.keys(v).length === 0) throw new Error("Rego can only hold a policy with sections, like requirements := {...}");
+  for (const k of Object.keys(v)) {
+    if (!/^[A-Za-z_]\w*$/.test(k) || keywords.has(k)) throw new Error(`Rego can't hold a section called ${JSON.stringify(k)}`);
+  }
+  return Object.keys(v).map((k) => `${k} := ${regoValue(v[k], "")}\n`).join("\n");
+};
 
 const flow = (v) => yaml.dump(v, { flowLevel: 0, lineWidth: -1 }).trimEnd();
 
@@ -115,7 +136,11 @@ export const formats = {
   rego: { parse: parseRego, write: toRego },
 };
 
-export const bakeryRequirements = (fileText) => toYaml(yaml.load(fileText).baking.requirements);
+export const bakeryPolicy = (fileText) => toYaml(yaml.load(fileText).baking);
+
+const statuses = { met: ["t", "met"], not_met: ["f", "not met"], not_applicable: ["muted", "not applicable"] };
+
+export const showStatus = (status) => (Object.hasOwn(statuses, status) ? statuses[status] : statuses.not_met);
 
 export const parseTime = (v) => {
   if (!JSON.rawJSON) throw new Error("this browser can't hold a time in nanoseconds exactly, so compare_time can't run here");
@@ -134,6 +159,7 @@ export const encodeState = async (state) => b64.encode(await pipe(new TextEncode
 
 export const decodeState = async (hash) => {
   const s = JSON.parse(new TextDecoder().decode(await pipe(b64.decode(hash), new DecompressionStream("deflate-raw"))));
-  if (typeof s?.r !== "string" || typeof s.i !== "string" || !Object.hasOwn(formats, s.rf) || !["json", "yaml"].includes(s.if)) throw new Error("not a playground link");
+  const data = ["json", "yaml"];
+  if (typeof s?.p !== "string" || typeof s.i !== "string" || typeof s.a !== "string" || !Object.hasOwn(formats, s.pf) || !data.includes(s.if) || !data.includes(s.af)) throw new Error("not a playground link");
   return s;
 };
