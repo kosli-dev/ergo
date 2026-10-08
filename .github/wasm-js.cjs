@@ -63,7 +63,7 @@ Promise.all([load(runtimeDir), load(ergoDir)]).then(([policy, ergo]) => {
   failed.forEach((test) => console.error(`FAIL ${test}`));
   console.log(`PASS: ${tests.length - failed.length}/${tests.length} with the Wasm JS runtime`);
 
-  const budgetMB = 50;
+  const budgetMB = 20;
   const document = { deployments: Array.from({ length: 100 }, (_, i) => ({ id: `d-${i}`, environment: i % 3 ? "prod" : "staging", ...(i % 2 ? { approved_by: "a" } : {}), tests: [{ ok: i % 5 > 0 }, { ok: true }] })) };
   const budgetPolicy = {
     subjects: { deployment: { from: ["deployments"], id: ["id"], applies_to: { is_prod: { op: "equals", path: ["environment"], value: "prod" } } } },
