@@ -3595,7 +3595,7 @@ test_min_subjects_names_its_input_after_what_it_counts if {
 
 test_well_formed_definition_is_in_the_check_table if {
 	rep := report({"items": [{"id": "a"}]}, id_req(["items"]))
-	rep.requirements.s.checks["$well_formed"].expression == `subject in subjects and fields are known and have the right types and count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float and checks are written right`
+	rep.requirements.s.checks["$well_formed"].expression == "count(problems) == 0"
 }
 
 require_req(q) := {"s": {
@@ -5400,7 +5400,7 @@ test_a_well_formed_row_for_a_from_with_a_step_shows_the_from if {
 	row := rows_for(rep, "s", "$well_formed")[0]
 	row.passed == true
 	row.inputs[2] == {"name": "subjects.subject.from", "value": ["build", "test_runs", {"each_as": "suite"}]}
-	rep.requirements.s.checks["$well_formed"].expression == `subject in subjects and fields are known and have the right types and count(checks) >= 1 and require in ["every", "some"] and from is well formed and steps are keys and numbers fit a float and checks are written right`
+	rep.requirements.s.checks["$well_formed"].expression == "count(problems) == 0"
 }
 
 test_a_well_formed_row_without_a_step_is_unchanged if {

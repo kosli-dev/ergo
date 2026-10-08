@@ -902,7 +902,7 @@ Three rules:
     },
     "$well_formed": {
       "description": "The requirement is written correctly",
-      "expression": "subject in subjects and fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+      "expression": "count(problems) == 0",
       "meta": {}
     },
     "approved": {
@@ -972,6 +972,8 @@ ergo adds four checks of its own. They start with `$`, so they can't clash with 
 | `$min_subjects` | requirement | `from` leads to a list or an object, unless it ends with a `keys` step, and at least `min_subjects` subjects are left after `applies_to`. |
 | `$unique_ids`   | requirement | no two subjects share an id, counting the ones `applies_to` leaves out.                                                                |
 | `$applies`      | subject     | the subject passes the `applies_to` filter. These rows only exist when the subject has a filter.                                       |
+
+The `$well_formed` expression is `count(problems) == 0`. The problems are the inputs below, one for each check or field that's written wrong, so a requirement that's written correctly has none.
 
 When a check is [written wrong](#basic-operators), the `$well_formed` row gets an input for it, named after where the check sits in the policy, with the list of what's wrong. With a typo in each of a filter of the `deployment` subject and a check:
 
