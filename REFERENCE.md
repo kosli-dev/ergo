@@ -126,11 +126,12 @@ requirements:
 
 A subject with `of` reads `from` and `id` from the subject it names, and keeps only the items that pass that subject's filters and its own. Everything else about it is its own: its rows and descriptions use its name, like `locked SBOM package`. It reports exactly what the same subject written out in full would.
 
+- A subject can build on one that builds on another, and so on. The chain ends at the one subject without `of`, which gives `from` and `id`, and a subject keeps the items that pass the filters of every subject along its chain.
 - A subject with `of` can't have its own `from` or `id`. They fail as `not allowed with of`.
-- It can only build on a subject that doesn't build on another one, so `of` never leads to a chain or a loop. Building on one that does fails as `names a subject that builds on another`.
-- A filter name can't be in both subjects, because one would hide the other. It fails as `also a filter of the subject it builds on`.
+- A chain that comes back to a subject already in it, like a subject whose `of` names itself, never reaches `from`. It fails as `leads to a loop`.
+- A filter name can only be used once along a chain, because one filter would hide the other. Using it again fails as `also a filter of a subject it builds on`.
 - An `of` that isn't a name in `subjects` fails as `not in subjects`, and one that names something other than an object fails the way a requirement's `subject` does.
-- Any of these fails `$well_formed` on every requirement that names the subject, and the requirement finds no subjects. A problem with the subject it builds on is named after that one, like `subjects."SBOM package".from`.
+- Any of these fails `$well_formed` on every requirement that names a subject whose chain has it, and the requirement finds no subjects. A problem is named after the subject it's in, like `subjects."SBOM package".from`.
 - A requirement can name the subject others build on too, like `SBOM package` to check every component.
 
 A few details:
@@ -1012,9 +1013,9 @@ The fields of the requirement and its subject get an input of the same form when
 | `subjects.deployment.from`                | `object step before the last`, `object step without each_as`, `invalid name`, `invalid keys`, `unknown field foo in naming step` |
 | `subjects.deployment.id`                  | `ref inside where`, `literal inside where`                                                                                       |
 | `subjects.deployment.description`         | `not a string`                                                                                                                   |
-| `subjects.deployment.of`                  | `empty or not a string`, `not in subjects`, `names a subject that builds on another`                                             |
+| `subjects.deployment.of`                  | `empty or not a string`, `not in subjects`, `leads to a loop`                                                                    |
 | `subjects.deployment.from`, `...id`       | `not allowed with of`                                                                                                            |
-| `subjects.deployment.applies_to.locked`   | `also a filter of the subject it builds on`                                                                                      |
+| `subjects.deployment.applies_to.locked`   | `also a filter of a subject it builds on`                                                                                        |
 
 A policy written in Rego can use a key that isn't a string, like `true` or `1.5`. ergo names it `<invalid key true>` or `<invalid key 1.5>`, so two such keys never share a name. A requirement whose own name isn't a string, like `1`, or every requirement of a policy written as a list, fails `$well_formed`, which then starts with `{"name": "requirement name", "value": ["not a string"]}`. The requirement is `not_met`, so the policy isn't compliant.
 

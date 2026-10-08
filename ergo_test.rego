@@ -7245,19 +7245,56 @@ test_a_subject_built_on_one_that_is_not_an_object_fails if {
 	}
 }
 
-test_a_subject_can_only_build_on_one_that_builds_on_nothing if {
-	chained := {
-		"deep": {"from": ["components"]},
-		"SBOM package": {"of": "deep"},
-		"locked SBOM package": sbom_subjects["locked SBOM package"],
+deep_subjects := {
+	"component": {"from": ["components"], "id": ["name"]},
+	"SBOM package": {"of": "component", "applies_to": {"has_sbom": {"op": "present", "path": ["sbom_release"]}}},
+	"pinned SBOM package": {"of": "SBOM package", "applies_to": {"pinned": {"op": "present", "path": ["lock_release"]}}},
+	"locked SBOM package": {"of": "pinned SBOM package", "applies_to": {"not_exempt": {"op": "equals", "path": ["exempt"], "value": false}}},
+}
+
+test_a_subject_can_build_on_a_chain_of_subjects if {
+	rep := ergo.report(sbom_doc, subject_policy(deep_subjects, {"v": sbom_reqs.versions}), {})
+	written_out := {"locked SBOM package": {"from": ["components"], "id": ["name"], "applies_to": {
+		"has_sbom": {"op": "present", "path": ["sbom_release"]},
+		"pinned": {"op": "present", "path": ["lock_release"]},
+		"not_exempt": {"op": "equals", "path": ["exempt"], "value": false},
+	}}}
+	rep == ergo.report(sbom_doc, subject_policy(written_out, {"v": sbom_reqs.versions}), {})
+	[[r.subject.id, r.passed] | some r in rep.results; r.check == "$applies"] == [["a", true], ["b", false], ["c", false]]
+	rows_for(rep, "v", "$well_formed")[0].passed == true
+}
+
+test_a_subject_whose_chain_loops_fails_and_checks_nothing if {
+	every loop in [
+		{"locked SBOM package": {"of": "locked SBOM package"}},
+		{"locked SBOM package": {"of": "SBOM package"}, "SBOM package": {"of": "locked SBOM package"}},
+		{"locked SBOM package": {"of": "SBOM package"}, "SBOM package": {"of": "component"}, "component": {"of": "SBOM package"}},
+	] {
+		rep := ergo.report(sbom_doc, subject_policy(loop, {"v": sbom_reqs.versions}), {})
+		well_formed_problems(rep, "v") == [{"name": "subjects.\"locked SBOM package\".of", "value": ["leads to a loop"]}]
+		[[r.check, r.passed] | some r in rep.results; r.check != "$well_formed"] == [["$min_subjects", false], ["$unique_ids", true]]
 	}
-	built_problems(chained) == [
-		{"name": "subjects.\"locked SBOM package\".of", "value": ["names a subject that builds on another"]},
-	]
-	rep := ergo.report(sbom_doc, subject_policy(chained, {"v": sbom_reqs.versions}), {})
+}
+
+test_a_broken_link_anywhere_in_the_chain_fails_the_subject if {
+	missing := object.remove(deep_subjects, ["component"])
+	built_problems(missing) == [{"name": "subjects.\"SBOM package\".of", "value": ["not in subjects"]}]
+	not_object := object.union(object.remove(deep_subjects, ["component"]), {"component": "components"})
+	built_problems(not_object) == [{"name": "subjects.component", "value": ["not an object"]}]
+	with_from := object.union(deep_subjects, {"pinned SBOM package": {"from": ["other"]}})
+	built_problems(with_from) == [{"name": "subjects.\"pinned SBOM package\".from", "value": ["not allowed with of"]}]
+	rep := ergo.report(sbom_doc, subject_policy(missing, {"v": sbom_reqs.versions}), {})
 	[[r.check, r.passed] | some r in rep.results; r.check != "$well_formed"] == [["$min_subjects", false], ["$unique_ids", true]]
-	itself := {"loop": {"of": "loop", "applies_to": {}}}
-	well_formed_problems(ergo.report(sbom_doc, subject_policy(itself, {"v": object.union(sbom_reqs.versions, {"subject": "loop"})}), {}), "v") == [{"name": "subjects.loop.of", "value": ["names a subject that builds on another"]}]
+}
+
+test_a_filter_name_used_anywhere_along_the_chain_fails if {
+	clash := object.union(deep_subjects, {"locked SBOM package": {"applies_to": {"has_sbom": {"op": "present", "path": ["x"]}}}})
+	built_problems(clash) == [{"name": "subjects.\"locked SBOM package\".applies_to.has_sbom", "value": ["also a filter of a subject it builds on"]}]
+}
+
+test_a_problem_in_a_filter_deep_in_the_chain_is_named_after_its_subject if {
+	bad := object.union(deep_subjects, {"SBOM package": {"applies_to": {"has_sbom": {"op": "nope"}}}})
+	built_problems(bad) == [{"name": "subjects.\"SBOM package\".applies_to.has_sbom", "value": ["unknown op nope"]}]
 }
 
 test_a_subject_built_on_another_takes_its_from_and_id_from_it if {
@@ -7270,7 +7307,7 @@ test_a_subject_built_on_another_takes_its_from_and_id_from_it if {
 
 test_a_filter_name_used_by_both_subjects_fails_instead_of_one_replacing_the_other if {
 	base := object.union(sbom_subjects["SBOM package"], {"applies_to": {"locked": {"op": "present", "path": ["sbom_release"]}}})
-	built_problems(object.union(sbom_subjects, {"SBOM package": base})) == [{"name": "subjects.\"locked SBOM package\".applies_to.locked", "value": ["also a filter of the subject it builds on"]}]
+	built_problems(object.union(sbom_subjects, {"SBOM package": base})) == [{"name": "subjects.\"locked SBOM package\".applies_to.locked", "value": ["also a filter of a subject it builds on"]}]
 }
 
 test_an_of_that_is_not_a_name_fails if {

@@ -21,53 +21,61 @@ _raw_subject(name) := def if {
 	is_object(def)
 }
 
-_subject_def(req) := def if {
-	_names_a_subject(req)
-	def := _raw_subject(req.subject)
+_of_graph := {name: _of_edges(def, data.ergo_subjects) | some name, def in data.ergo_subjects} if is_object(data.ergo_subjects)
+
+_of_edges(def, subjects) := [def.of] if {
+	is_object(def)
+	_has_type("of", object.get(def, "of", null))
+	def.of in object.keys(subjects)
+} else := []
+
+_members(req) := {m | some m in graph.reachable(_of_graph, [req.subject])} if _names_a_subject(req)
+
+default _is_root(_) := false
+
+_is_root(name) if {
+	def := _raw_subject(name)
 	not "of" in object.keys(def)
 }
 
-_subject_def(req) := _built_on(def, base) if {
-	_names_a_subject(req)
-	def := _raw_subject(req.subject)
-	_has_type("of", object.get(def, "of", null))
-	base := _raw_subject(def.of)
-	not "of" in object.keys(base)
+default _links(_) := false
+
+_links(name) if _of_edges(_raw_subject(name), data.ergo_subjects) != []
+
+_roots(req) := {m | some m in _members(req); _is_root(m)}
+
+_subject_def(req) := object.union(
+	{f: root[f] | some f in ["from", "id"]; f in object.keys(root)},
+	{"applies_to": _merged_filters(req)},
+) if {
+	some r in _roots(req)
+	root := _raw_subject(r)
 }
 
-_built_on(def, base) := object.union(
-	{f: base[f] | some f in ["from", "id"]; f in object.keys(base)},
-	{"applies_to": _merged_filters(object.get(base, "applies_to", {}), object.get(def, "applies_to", {}))},
-)
+_filters_of(name) := object.get(_raw_subject(name), "applies_to", {})
 
-_merged_filters(base, own) := object.union(base, own) if {
-	is_object(base)
-	is_object(own)
+_merged_filters(req) := [f | some m in sort(_members(req)); f := _filters_of(m); not is_object(f)][0] if {
+	some m in _members(req)
+	not is_object(_filters_of(m))
 }
 
-_merged_filters(base, _) := base if not is_object(base)
-
-_merged_filters(base, own) := own if {
-	is_object(base)
-	not is_object(own)
+_merged_filters(req) := {n: _filters_of(_filter_owner(req, n))[n] | some m in _members(req); some n, _ in _filters_of(m)} if {
+	every m in _members(req) {
+		is_object(_filters_of(m))
+	}
 }
 
-default _built(_) := false
+_built_on_count(name) := count(graph.reachable(_of_graph, [name]))
 
-_built(req) if "of" in object.keys(_raw_subject(req.subject))
+_from_owner(req) := r if some r in _roots(req)
 
-_from_owner(req) := _raw_subject(req.subject).of if _built(req)
-
-_from_owner(req) := req.subject if not _built(req)
-
-_filter_owner(req, n) := _raw_subject(req.subject).of if {
-	_built(req)
-	not n in object.keys(_object_or_empty(object.get(_raw_subject(req.subject), "applies_to", {})))
+_filter_owner(req, n) := owners[count(owners) - 1][1] if {
+	owners := sort([[_built_on_count(m), m] |
+		some m in _members(req)
+		n in object.keys(_object_or_empty(_filters_of(m)))
+	])
+	count(owners) > 0
 }
-
-_filter_owner(req, _) := req.subject if not _built(req)
-
-_filter_owner(req, n) := req.subject if n in object.keys(_object_or_empty(object.get(_raw_subject(req.subject), "applies_to", {})))
 
 default _resolves(_) := false
 
@@ -219,14 +227,8 @@ _req_problems(req) := union({_req_meta_problems(req), _type_problems(req), _rang
 
 _subject_problems(req) := union({_subject_ref_problems(req), _chain_problems(req), _read_problems(req), _of_problems(req)})
 
-_chain(req) := {name |
-	_names_a_subject(req)
-	some name in [req.subject, object.get(_raw_subject(req.subject), "of", null)]
-	_raw_subject(name)
-}
-
 _chain_problems(req) := {[array.concat(["subjects", name], [p[0]]), p[1]] |
-	some name in _chain(req)
+	some name in _members(req)
 	some p in _def_problems(_raw_subject(name))
 }
 
@@ -235,26 +237,31 @@ _read_problems(req) := {[array.concat(["subjects", _from_owner(req)], [p[0]]), p
 	some p in (_naming_step_problems(req) | _where_problems(req))
 }
 
-_of_problems(req) := (({[["subjects", req.subject, "of"], "not in subjects"] |
-	_built(req)
-	of := _raw_subject(req.subject).of
-	_has_type("of", of)
-	not of in object.keys(data.ergo_subjects)
-} | {[["subjects", of], "not an object"] |
-	_built(req)
-	of := _raw_subject(req.subject).of
-	_has_type("of", of)
-	of in object.keys(data.ergo_subjects)
-	not is_object(data.ergo_subjects[of])
-}) | {[["subjects", req.subject, "of"], "names a subject that builds on another"] |
-	_built(req)
-	"of" in object.keys(_raw_subject(_raw_subject(req.subject).of))
-}) | {[["subjects", req.subject, "applies_to", n], "also a filter of the subject it builds on"] |
-	_built(req)
-	def := _raw_subject(req.subject)
-	some n in object.keys(_object_or_empty(object.get(def, "applies_to", {})))
-	n in object.keys(_object_or_empty(object.get(_raw_subject(def.of), "applies_to", {})))
-}
+_of_problems(req) := union({
+	{[["subjects", m, "of"], "not in subjects"] |
+		some m in _members(req)
+		of := object.get(_raw_subject(m), "of", null)
+		_has_type("of", of)
+		not of in object.keys(data.ergo_subjects)
+	},
+	{[["subjects", m], "not an object"] |
+		some m in _members(req)
+		not _raw_subject(m)
+	},
+	{[["subjects", req.subject, "of"], "leads to a loop"] |
+		count(_members(req)) > 0
+		every m in _members(req) {
+			_links(m)
+		}
+	},
+	{[["subjects", m, "applies_to", n], "also a filter of a subject it builds on"] |
+		some m in _members(req)
+		some n in object.keys(_object_or_empty(_filters_of(m)))
+		some other in graph.reachable(_of_graph, [m])
+		other != m
+		n in object.keys(_object_or_empty(_filters_of(other)))
+	},
+})
 
 _subject_ref_problems(req) := (({["subject", "missing"] |
 	is_object(req)
