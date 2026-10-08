@@ -15,12 +15,59 @@ _object_or_empty(x) := {} if not is_object(x)
 
 _checks_of(req) := _object_or_empty(_req_field(req, "checks", {}))
 
-_subject_def(req) := def if {
-	_names_a_subject(req)
+_raw_subject(name) := def if {
 	is_object(data.ergo_subjects)
-	def := object.get(data.ergo_subjects, req.subject, null)
+	def := object.get(data.ergo_subjects, name, null)
 	is_object(def)
 }
+
+_subject_def(req) := def if {
+	_names_a_subject(req)
+	def := _raw_subject(req.subject)
+	not "of" in object.keys(def)
+}
+
+_subject_def(req) := _built_on(def, base) if {
+	_names_a_subject(req)
+	def := _raw_subject(req.subject)
+	_has_type("of", object.get(def, "of", null))
+	base := _raw_subject(def.of)
+	not "of" in object.keys(base)
+}
+
+_built_on(def, base) := object.union(
+	{f: base[f] | some f in ["from", "id"]; f in object.keys(base)},
+	{"applies_to": _merged_filters(object.get(base, "applies_to", {}), object.get(def, "applies_to", {}))},
+)
+
+_merged_filters(base, own) := object.union(base, own) if {
+	is_object(base)
+	is_object(own)
+}
+
+_merged_filters(base, _) := base if not is_object(base)
+
+_merged_filters(base, own) := own if {
+	is_object(base)
+	not is_object(own)
+}
+
+default _built(_) := false
+
+_built(req) if "of" in object.keys(_raw_subject(req.subject))
+
+_from_owner(req) := _raw_subject(req.subject).of if _built(req)
+
+_from_owner(req) := req.subject if not _built(req)
+
+_filter_owner(req, n) := _raw_subject(req.subject).of if {
+	_built(req)
+	not n in object.keys(_object_or_empty(object.get(_raw_subject(req.subject), "applies_to", {})))
+}
+
+_filter_owner(req, _) := req.subject if not _built(req)
+
+_filter_owner(req, n) := req.subject if n in object.keys(_object_or_empty(object.get(_raw_subject(req.subject), "applies_to", {})))
 
 default _resolves(_) := false
 
@@ -77,6 +124,11 @@ _has_type("min_subjects", v) if {
 }
 
 _has_type("subject", v) if {
+	is_string(v)
+	trim_space(v) != ""
+}
+
+_has_type("of", v) if {
 	is_string(v)
 	trim_space(v) != ""
 }
@@ -160,13 +212,48 @@ _subject_wrong_type_problems := {
 	"from": "not a list",
 	"id": "not a list",
 	"description": "not a string",
+	"of": "empty or not a string",
 }
 
 _req_problems(req) := union({_req_meta_problems(req), _type_problems(req), _range_problems(req), _unknown_problems(req), _checks_problems(req), _require_problems(req), _req_json_problems(req), _subject_problems(req)})
 
-_subject_problems(req) := _subject_ref_problems(req) | {[array.concat(["subjects", req.subject], [p[0]]), p[1]] |
+_subject_problems(req) := union({_subject_ref_problems(req), _chain_problems(req), _read_problems(req), _of_problems(req)})
+
+_chain(req) := {name |
+	_names_a_subject(req)
+	some name in [req.subject, object.get(_raw_subject(req.subject), "of", null)]
+	_raw_subject(name)
+}
+
+_chain_problems(req) := {[array.concat(["subjects", name], [p[0]]), p[1]] |
+	some name in _chain(req)
+	some p in _def_problems(_raw_subject(name))
+}
+
+_read_problems(req) := {[array.concat(["subjects", _from_owner(req)], [p[0]]), p[1]] |
 	_resolves(req)
-	some p in _def_problems(_subject_def(req), req)
+	some p in (_naming_step_problems(req) | _where_problems(req))
+}
+
+_of_problems(req) := (({[["subjects", req.subject, "of"], "not in subjects"] |
+	_built(req)
+	of := _raw_subject(req.subject).of
+	_has_type("of", of)
+	not of in object.keys(data.ergo_subjects)
+} | {[["subjects", of], "not an object"] |
+	_built(req)
+	of := _raw_subject(req.subject).of
+	_has_type("of", of)
+	of in object.keys(data.ergo_subjects)
+	not is_object(data.ergo_subjects[of])
+}) | {[["subjects", req.subject, "of"], "names a subject that builds on another"] |
+	_built(req)
+	"of" in object.keys(_raw_subject(_raw_subject(req.subject).of))
+}) | {[["subjects", req.subject, "applies_to", n], "also a filter of the subject it builds on"] |
+	_built(req)
+	def := _raw_subject(req.subject)
+	some n in object.keys(_object_or_empty(object.get(def, "applies_to", {})))
+	n in object.keys(_object_or_empty(object.get(_raw_subject(def.of), "applies_to", {})))
 }
 
 _subject_ref_problems(req) := (({["subject", "missing"] |
@@ -186,13 +273,12 @@ _subject_ref_problems(req) := (({["subject", "missing"] |
 	not is_object(data.ergo_subjects[req.subject])
 }
 
-_def_problems(def, req) := union({
+_def_problems(def) := union({
 	{[f, _subject_wrong_type_problems[f]] | some f in _wrong_typed(def, _subject_wrong_type_problems)},
 	{[f, "unknown field"] | some f in _unknown_subject_fields(def)},
+	{[f, "not allowed with of"] | "of" in object.keys(def); some f in ["from", "id"]; f in object.keys(def)},
 	_path_problems(def, "from"),
 	_path_problems(def, "id"),
-	_naming_step_problems(req),
-	_where_problems(req),
 	_def_json_problems(def),
 })
 
@@ -3003,7 +3089,7 @@ _req_checks(req, "applies_to") := _applies_to_of(req)
 
 _req_checks(req, "checks") := _checks_of(req)
 
-_checks_at(req, "applies_to", n) := ["subjects", req.subject, "applies_to", n]
+_checks_at(req, "applies_to", n) := ["subjects", _filter_owner(req, n), "applies_to", n]
 
 _checks_at(_, "checks", n) := ["checks", n]
 
@@ -3024,7 +3110,7 @@ _echo(req, f, v) := [{"name": _field_name(f), "value": v}] if not _has_problems(
 
 _echo(req, f, _) := [] if _has_problems(req, f)
 
-_from_echo(req) := _echo(req, ["subjects", req.subject, "from"], _from_of(req)) if _stepped(req)
+_from_echo(req) := _echo(req, ["subjects", _from_owner(req), "from"], _from_of(req)) if _stepped(req)
 
 _from_echo(req) := [] if not _stepped(req)
 

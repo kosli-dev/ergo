@@ -90,10 +90,48 @@ A subject is the kind of thing a requirement checks, like a deployment or a pull
 | `from`        | The [path](#paths) to the subjects in the input. It can end with a [naming step](#naming-subjects).    | the whole input   |
 | `id`          | The path, inside one subject, to the value that identifies it.                                         | the whole subject |
 | `applies_to`  | Named checks that pick which of them are in scope. A subject must pass all of them.                    | no filter         |
+| `of`          | The name of another subject this one [builds on](#a-subject-built-on-another).                          | none              |
 
 The subject's name is what the report calls each one, in every row, like `"subject": {"type": "deployment", "id": "d-2"}`, and in the descriptions of the [checks ergo adds](#checks-ergo-adds), like `The in-scope deployment count is at least 1`. So name it the way a reader would, like `deployment` or `pull request`.
 
 A requirement names its subject with `subject`. Several requirements can name the same subject, and each one checks it on its own, with its own rows. A subject that no requirement names isn't read, so it changes nothing in the report.
+
+### A subject built on another
+
+When requirements check different parts of the same list, give each part its own subject, built on one that says where the list is. Say the SBOM lists components, some pinned by the lockfile and some exempt from the licence rules:
+
+```yaml
+subjects:
+  SBOM package:
+    from: [components]
+    id: [name]
+  locked SBOM package:
+    of: SBOM package
+    applies_to:
+      locked: { op: present, path: [lock_release] }
+  non-exempt SBOM package:
+    of: SBOM package
+    applies_to:
+      not_exempt: { op: equals, path: [exempt], value: false }
+requirements:
+  versions:
+    subject: locked SBOM package
+    checks:
+      matches_lock: { op: compare, left: [sbom_release], right: [lock_release], cmp: eq }
+  licences:
+    subject: non-exempt SBOM package
+    checks:
+      licence_known: { op: any, path: [licences], check: { op: non_empty_string, path: [] } }
+```
+
+A subject with `of` reads `from` and `id` from the subject it names, and keeps only the items that pass that subject's filters and its own. Everything else about it is its own: its rows and descriptions use its name, like `locked SBOM package`. It reports exactly what the same subject written out in full would.
+
+- A subject with `of` can't have its own `from` or `id`. They fail as `not allowed with of`.
+- It can only build on a subject that doesn't build on another one, so `of` never leads to a chain or a loop. Building on one that does fails as `names a subject that builds on another`.
+- A filter name can't be in both subjects, because one would hide the other. It fails as `also a filter of the subject it builds on`.
+- An `of` that isn't a name in `subjects` fails as `not in subjects`, and one that names something other than an object fails the way a requirement's `subject` does.
+- Any of these fails `$well_formed` on every requirement that names the subject, and the requirement finds no subjects. A problem with the subject it builds on is named after that one, like `subjects."SBOM package".from`.
+- A requirement can name the subject others build on too, like `SBOM package` to check every component.
 
 A few details:
 
@@ -103,7 +141,7 @@ A few details:
 - No two subjects can share an id, or their rows could be identical and the report couldn't say which one failed. If two do, `$unique_ids` fails and so does the requirement. Every subject counts, even one that `applies_to` leaves out, and `null` is an id like any other, so two subjects without one clash.
 - An item of the list that isn't an object, like a string or a `null`, is still a subject. Its id is the item itself, and its checks fail with cause `not_an_object`.
 - Leaving out `from` or `id` is allowed, but rarely what you want. Without `from`, the whole input is checked as one subject. Without `id`, each row repeats the whole subject as its id, so two identical subjects clash.
-- A subject that's written wrong fails `$well_formed` on every requirement that names it, so none of them is met. That's a subject that isn't an object, or that has a field that isn't in the table above, like `subject_type`, or whose `applies_to` isn't an object, whose `from` or `id` isn't a list, or whose `description` isn't a string, or a badly written [naming step](#naming-subjects), an `id` whose selector has a ref or `literal` deeper inside a `where` value than ergo reads, or a filter that's [written wrong](#basic-operators). The `$well_formed` row names each field with its subject, like `{"name": "subjects.deployment.from", "value": ["not a list"]}`. ergo then reads `applies_to` as a filter it can't read, so every subject fails `$applies` with cause `absent`, shown as `<invalid applies_to>`, and gets no other rows. It reads a `from` as giving no subjects (shown as `<invalid from>`), so `$min_subjects` fails as `value`, even with `min_subjects: 0`, and an `id` as giving the id `null`.
+- A subject that's written wrong fails `$well_formed` on every requirement that names it, so none of them is met. That's a subject that isn't an object, or that has a field that isn't in the table above, like `subject_type`, or whose `applies_to` isn't an object, whose `from` or `id` isn't a list, or whose `description` isn't a string, or a badly written [naming step](#naming-subjects), an `id` whose selector has a ref or `literal` deeper inside a `where` value than ergo reads, or a filter that's [written wrong](#basic-operators). The `$well_formed` row names each field with its subject, like `{"name": "subjects.deployment.from", "value": ["not a list"]}`. ergo then reads `applies_to` as a filter it can't read, so every subject fails `$applies` with cause `ill_formed`, shown as `<invalid applies_to>`, and gets no other rows. It reads a `from` as giving no subjects (shown as `<invalid from>`), so `$min_subjects` fails as `value`, even with `min_subjects: 0`, and an `id` as giving the id `null`.
 
 ## Requirements
 
@@ -974,6 +1012,9 @@ The fields of the requirement and its subject get an input of the same form when
 | `subjects.deployment.from`                | `object step before the last`, `object step without each_as`, `invalid name`, `invalid keys`, `unknown field foo in naming step` |
 | `subjects.deployment.id`                  | `ref inside where`, `literal inside where`                                                                                       |
 | `subjects.deployment.description`         | `not a string`                                                                                                                   |
+| `subjects.deployment.of`                  | `empty or not a string`, `not in subjects`, `names a subject that builds on another`                                             |
+| `subjects.deployment.from`, `...id`       | `not allowed with of`                                                                                                            |
+| `subjects.deployment.applies_to.locked`   | `also a filter of the subject it builds on`                                                                                      |
 
 A policy written in Rego can use a key that isn't a string, like `true` or `1.5`. ergo names it `<invalid key true>` or `<invalid key 1.5>`, so two such keys never share a name. A requirement whose own name isn't a string, like `1`, or every requirement of a policy written as a list, fails `$well_formed`, which then starts with `{"name": "requirement name", "value": ["not a string"]}`. The requirement is `not_met`, so the policy isn't compliant.
 

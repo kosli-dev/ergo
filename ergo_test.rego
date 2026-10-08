@@ -7174,3 +7174,139 @@ test_a_subject_can_read_params if {
 	[[r.subject.id, r.check, r.passed] | some r in rep.results; r.check == "$applies"] == [["d-1", "$applies", false], ["d-2", "$applies", false], ["d-3", "$applies", true]]
 	rep.requirements.a.checks["$applies"]["$refs"] == [{"name": "$$params.env", "value": "staging"}]
 }
+
+sbom_doc := {"components": [
+	{"name": "a", "lock_release": "1.0", "sbom_release": "1.0", "exempt": false},
+	{"name": "b", "lock_release": "2.0", "sbom_release": "2.1", "exempt": true},
+	{"name": "c", "sbom_release": "3.0", "exempt": false},
+]}
+
+sbom_subjects := {
+	"SBOM package": {"from": ["components"], "id": ["name"]},
+	"locked SBOM package": {"of": "SBOM package", "applies_to": {"locked": {"op": "present", "path": ["lock_release"]}}},
+	"non-exempt SBOM package": {"of": "SBOM package", "applies_to": {"not_exempt": {"op": "equals", "path": ["exempt"], "value": false}}},
+}
+
+sbom_reqs := {
+	"versions": {"subject": "locked SBOM package", "checks": {"matches_lock": {"op": "compare", "left": ["sbom_release"], "right": ["lock_release"], "cmp": "eq"}}},
+	"named": {"subject": "non-exempt SBOM package", "checks": {"named": {"op": "non_empty_string", "path": ["name"]}}},
+}
+
+test_a_subject_built_on_another_reads_its_from_and_id_and_adds_its_own_filters if {
+	rep := ergo.report(sbom_doc, subject_policy(sbom_subjects, sbom_reqs), {})
+	[[r.requirement, r.subject.type, r.subject.id, r.check, r.passed] | some r in rep.results; not r.check in {"$well_formed", "$min_subjects", "$unique_ids"}] == [
+		["named", "non-exempt SBOM package", "a", "$applies", true],
+		["named", "non-exempt SBOM package", "b", "$applies", false],
+		["named", "non-exempt SBOM package", "c", "$applies", true],
+		["versions", "locked SBOM package", "a", "$applies", true],
+		["versions", "locked SBOM package", "b", "$applies", true],
+		["versions", "locked SBOM package", "c", "$applies", false],
+		["named", "non-exempt SBOM package", "a", "named", true],
+		["named", "non-exempt SBOM package", "c", "named", true],
+		["versions", "locked SBOM package", "a", "matches_lock", true],
+		["versions", "locked SBOM package", "b", "matches_lock", false],
+	]
+	[r.passed | some r in rep.results; r.check == "$well_formed"] == [true, true]
+}
+
+test_a_subject_built_on_another_reports_what_the_same_subject_written_out_reports if {
+	built := {
+		"base": {"from": ["components"], "id": ["name"], "applies_to": {"has_sbom": {"op": "present", "path": ["sbom_release"]}}},
+		"locked": {"of": "base", "description": "A package the lockfile pins", "applies_to": {"locked": {"op": "present", "path": ["lock_release"]}}},
+	}
+	written_out := {"locked": {"from": ["components"], "id": ["name"], "applies_to": {
+		"has_sbom": {"op": "present", "path": ["sbom_release"]},
+		"locked": {"op": "present", "path": ["lock_release"]},
+	}}}
+	versions := object.union(sbom_reqs.versions, {"subject": "locked"})
+	rep := ergo.report(sbom_doc, subject_policy(built, {"versions": versions}), {})
+	rep == ergo.report(sbom_doc, subject_policy(written_out, {"versions": versions}), {})
+	rep.requirements.versions.checks["$applies"].expression == "sbom_release is present and lock_release is present"
+}
+
+test_a_requirement_can_name_the_subject_others_build_on if {
+	rep := ergo.report(sbom_doc, subject_policy(sbom_subjects, {"all": {"subject": "SBOM package", "checks": {"named": {"op": "non_empty_string", "path": ["name"]}}}}), {})
+	rep.compliant == true
+	rep.requirements.all.subjects == {"total": 3, "matching": 3}
+}
+
+built_problems(subjects) := well_formed_problems(ergo.report(sbom_doc, subject_policy(subjects, {"v": sbom_reqs.versions}), {}), "v")
+
+test_a_subject_built_on_one_that_is_not_there_fails_and_checks_nothing if {
+	subjects := {"locked SBOM package": sbom_subjects["locked SBOM package"]}
+	built_problems(subjects) == [{"name": "subjects.\"locked SBOM package\".of", "value": ["not in subjects"]}]
+	rep := ergo.report(sbom_doc, subject_policy(subjects, {"v": sbom_reqs.versions}), {})
+	[[r.check, r.passed] | some r in rep.results; r.check != "$well_formed"] == [["$min_subjects", false], ["$unique_ids", true]]
+}
+
+test_a_subject_built_on_one_that_is_not_an_object_fails if {
+	every base in [null, "components", []] {
+		built_problems(object.union(sbom_subjects, {"SBOM package": base})) == [{"name": "subjects.\"SBOM package\"", "value": ["not an object"]}]
+	}
+}
+
+test_a_subject_can_only_build_on_one_that_builds_on_nothing if {
+	chained := {
+		"deep": {"from": ["components"]},
+		"SBOM package": {"of": "deep"},
+		"locked SBOM package": sbom_subjects["locked SBOM package"],
+	}
+	built_problems(chained) == [
+		{"name": "subjects.\"locked SBOM package\".of", "value": ["names a subject that builds on another"]},
+	]
+	rep := ergo.report(sbom_doc, subject_policy(chained, {"v": sbom_reqs.versions}), {})
+	[[r.check, r.passed] | some r in rep.results; r.check != "$well_formed"] == [["$min_subjects", false], ["$unique_ids", true]]
+	itself := {"loop": {"of": "loop", "applies_to": {}}}
+	well_formed_problems(ergo.report(sbom_doc, subject_policy(itself, {"v": object.union(sbom_reqs.versions, {"subject": "loop"})}), {}), "v") == [{"name": "subjects.loop.of", "value": ["names a subject that builds on another"]}]
+}
+
+test_a_subject_built_on_another_takes_its_from_and_id_from_it if {
+	own := object.union(sbom_subjects, {"locked SBOM package": object.union(sbom_subjects["locked SBOM package"], {"from": ["other"], "id": ["x"]})})
+	built_problems(own) == [
+		{"name": "subjects.\"locked SBOM package\".from", "value": ["not allowed with of"]},
+		{"name": "subjects.\"locked SBOM package\".id", "value": ["not allowed with of"]},
+	]
+}
+
+test_a_filter_name_used_by_both_subjects_fails_instead_of_one_replacing_the_other if {
+	base := object.union(sbom_subjects["SBOM package"], {"applies_to": {"locked": {"op": "present", "path": ["sbom_release"]}}})
+	built_problems(object.union(sbom_subjects, {"SBOM package": base})) == [{"name": "subjects.\"locked SBOM package\".applies_to.locked", "value": ["also a filter of the subject it builds on"]}]
+}
+
+test_an_of_that_is_not_a_name_fails if {
+	every of in ["", " ", 1, null, ["SBOM package"]] {
+		built := object.union(sbom_subjects, {"locked SBOM package": object.union(sbom_subjects["locked SBOM package"], {"of": of})})
+		built_problems(built) == [{"name": "subjects.\"locked SBOM package\".of", "value": ["empty or not a string"]}]
+	}
+}
+
+test_problems_with_the_subject_built_on_are_named_after_it if {
+	base := {"from": "components", "applies_to": {"bad": {"op": "nope", "path": ["x"]}}}
+	built_problems(object.union(sbom_subjects, {"SBOM package": base})) == [
+		{"name": "subjects.\"SBOM package\".from", "value": ["not a list"]},
+		{"name": "subjects.\"SBOM package\".applies_to.bad", "value": ["unknown op nope"]},
+	]
+	stepped := object.union(sbom_subjects, {"SBOM package": {"from": ["components", {"each_as": "$p"}]}})
+	built_problems(stepped) == [{"name": "subjects.\"SBOM package\".from", "value": ["invalid name"]}]
+}
+
+test_a_well_formed_row_names_the_from_after_the_subject_it_comes_from if {
+	stepped := object.union(sbom_subjects, {"SBOM package": {"from": ["components", {"each_as": "p"}], "id": ["name"]}})
+	row := rows_for(ergo.report(sbom_doc, subject_policy(stepped, {"v": sbom_reqs.versions}), {}), "v", "$well_formed")[0]
+	row.passed == true
+	row.inputs[2] == {"name": "subjects.\"SBOM package\".from", "value": ["components", {"each_as": "p"}]}
+}
+
+test_filters_that_are_not_an_object_on_either_subject_rule_no_one_out if {
+	every pair in [[[], {"locked": {"op": "present", "path": ["lock_release"]}}], [{}, null]] {
+		[base_filters, own_filters] := pair
+		subjects := {
+			"SBOM package": {"from": ["components"], "id": ["name"], "applies_to": base_filters},
+			"locked SBOM package": {"of": "SBOM package", "applies_to": own_filters},
+		}
+		rep := ergo.report(sbom_doc, subject_policy(subjects, {"v": sbom_reqs.versions}), {})
+		rep.requirements.v.status == "not_met"
+		rep.requirements.v.checks["$applies"].expression == "<invalid applies_to>"
+		{[r.check, r.cause] | some r in rep.results; r.subject.id != null} == {["$applies", "ill_formed"]}
+	}
+}
