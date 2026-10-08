@@ -642,30 +642,28 @@ _keyed(doc, req) := {} if not is_object(_target(doc, req))
 
 _scope_of(req, subj) := {"ergo/names": {_each_step(req).each_as: subj}} if _from_well_formed(req)
 
-_passes(req, check, subj) := _check_passed(check, subj, _flaw(check, _from_names(req))) if not _has_step(req)
+_passes(req, check, flaw, subj) := _check_passed(check, subj, flaw) if not _has_step(req)
 
 else := v if {
 	_has_step(req)
-	flaw := _flaw(check, _from_names(req))
 	s := _scope_of(req, subj)
 	v := _check_passed(check, subj, flaw) with input as s
 }
 
-_inputs_in(req, check, subj) := _row_inputs(subj, check, _subject_item_name(req)) if not _has_step(req)
+_inputs_in(req, check, subj, item) := _row_inputs(subj, check, item) if not _has_step(req)
 
 else := i if {
 	_has_step(req)
 	s := _scope_of(req, subj)
-	i := _row_inputs(subj, check, _subject_item_name(req)) with input as s
+	i := _row_inputs(subj, check, item) with input as s
 }
 
-_outcome(req, check, subj) := _check_outcome(check, subj, _flaw(check, _from_names(req)), _subject_item_name(req)) if not _has_step(req)
+_outcome(req, check, flaw, subj, item) := _check_outcome(check, subj, flaw, item) if not _has_step(req)
 
 else := o if {
 	_has_step(req)
-	flaw := _flaw(check, _from_names(req))
 	s := _scope_of(req, subj)
-	o := _check_outcome(check, subj, flaw, _subject_item_name(req)) with input as s
+	o := _check_outcome(check, subj, flaw, item) with input as s
 }
 
 _check_outcome(check, subj, flaw, item) := object.union(
@@ -744,12 +742,12 @@ _each_suffix(each) := concat("", [".", _path_name(each)]) if each != []
 
 _is_list_at(x, path) if is_array(_field(x, path))
 
-default _subject_matches(_, _) := false
+default _subject_matches(_, _, _) := false
 
-_subject_matches(subj, req) if {
+_subject_matches(subj, req, flaws) if {
 	not _bad_applies_to(req)
-	every _, check in _applies_to_of(req) {
-		_passes(req, check, subj)
+	every name, check in _applies_to_of(req) {
+		_passes(req, check, flaws[name], subj)
 	}
 }
 
@@ -2510,9 +2508,9 @@ _verdict_cause(passed) := "satisfied" if passed
 
 _verdict_cause(passed) := "value" if not passed
 
-_applies_cause(_, _, true) := "satisfied"
+_applies_cause(_, _, _, true) := "satisfied"
 
-_applies_cause(subj, req, false) := _scope_cause(_failed_filter_causes(subj, req))
+_applies_cause(subj, req, flaws, false) := _scope_cause(_failed_filter_causes(subj, req, flaws))
 
 _scope_cause(causes) := "ill_formed" if {
 	"ill_formed" in causes
@@ -2522,16 +2520,13 @@ _scope_cause(causes) := "ill_formed" if {
 	causes == {"value"}
 } else := _worst_of(causes)
 
-_failed_filter_causes(subj, req) := _filter_causes(subj, req, _filter_flaws(req)) if not _has_step(req)
+_failed_filter_causes(subj, req, flaws) := _filter_causes(subj, req, flaws) if not _has_step(req)
 
 else := causes if {
 	_has_step(req)
-	flaws := _filter_flaws(req)
 	s := _scope_of(req, subj)
 	causes := _filter_causes(subj, req, flaws) with input as s
 }
-
-_filter_flaws(req) := {name: _flaw(check, _from_names(req)) | some name, check in _applies_to_of(req)}
 
 _filter_causes(subj, req, flaws) := {_filter_cause(check, subj, flaws[name]) |
 	some name, check in _applies_to_of(req)
@@ -3157,7 +3152,7 @@ _requirement_checks_written_or_added(req) := object.union(
 	object.union(_applies_def(req), _well_formed_def(req)),
 )
 
-_subject_row_groups(matching, req, req_name) := [[row |
+_subject_row_groups(matching, req, req_name, flaws, item) := [[row |
 	some check_name in _names(_checks_of(req))
 	row := object.union(
 		{
@@ -3165,7 +3160,7 @@ _subject_row_groups(matching, req, req_name) := [[row |
 			"subject": ref,
 			"check": check_name,
 		},
-		_outcome(req, _checks_of(req)[check_name], entry.subject),
+		_outcome(req, _checks_of(req)[check_name], flaws[check_name], entry.subject, item),
 	)
 ] |
 	some entry in matching
@@ -3233,20 +3228,20 @@ _repeats(sorted) := {x |
 	x == sorted[i - 1]
 }
 
-_applies_rows(raw, refs, matches, req, req_name) := [{
+_applies_rows(raw, refs, matches, req, req_name, flaws, item) := [{
 	"requirement": req_name,
 	"subject": refs[i],
 	"check": "$applies",
-	"inputs": _applies_inputs(entry.subject, req),
+	"inputs": _applies_inputs(entry.subject, req, item),
 	"passed": matches[i],
-	"cause": _applies_cause(entry.subject, req, matches[i]),
+	"cause": _applies_cause(entry.subject, req, flaws, matches[i]),
 } |
 	some i, entry in raw
 ] if {
 	_size(_applies_to_of(req)) > 0
 }
 
-_applies_rows(raw, refs, _, req, req_name) := [{
+_applies_rows(raw, refs, _, req, req_name, _, _) := [{
 	"requirement": req_name,
 	"subject": refs[i],
 	"check": "$applies",
@@ -3257,14 +3252,14 @@ _applies_rows(raw, refs, _, req, req_name) := [{
 	some i, _ in raw
 ] if _bad_applies_to(req)
 
-_applies_rows(_, _, _, req, _) := [] if {
+_applies_rows(_, _, _, req, _, _, _) := [] if {
 	_size(_applies_to_of(req)) == 0
 	not _bad_applies_to(req)
 }
 
-_applies_inputs(subj, req) := [inp |
+_applies_inputs(subj, req, item) := [inp |
 	some name in _applies_to_names(req)
-	some inp in _inputs_in(req, _applies_to_of(req)[name], subj)
+	some inp in _inputs_in(req, _applies_to_of(req)[name], subj, item)
 ]
 
 _evaluation(doc, req, name) := {
@@ -3279,11 +3274,15 @@ _evaluation(doc, req, name) := {
 	"rows_complete": _rows_complete(groups, matching, req),
 } if {
 	raw := _raw_entries(doc, req)
+	names := _from_names(req)
+	filter_flaws := {n: _flaw(check, names) | some n, check in _applies_to_of(req)}
+	check_flaws := {n: _flaw(check, names) | some n, check in _checks_of(req)}
+	item := _subject_item_name(req)
 	refs := {i: _entry_ref(entry, req) | some i, entry in raw}
-	matches := {i: _subject_matches(entry.subject, req) | some i, entry in raw}
-	applies := _applies_rows(raw, refs, matches, req, name)
+	matches := {i: _subject_matches(entry.subject, req, filter_flaws) | some i, entry in raw}
+	applies := _applies_rows(raw, refs, matches, req, name, filter_flaws, item)
 	matching := [raw[i] | some i, _ in raw; matches[i]]
-	groups := _subject_row_groups(matching, req, name)
+	groups := _subject_row_groups(matching, req, name, check_flaws, item)
 }
 
 default _scope_readable(_, _, _) := false
