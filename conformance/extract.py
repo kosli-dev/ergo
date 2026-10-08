@@ -45,7 +45,7 @@ def traced_calls():
     with tempfile.TemporaryDirectory() as tmp:
         files = subprocess.run(["git", "ls-files"], cwd=root, capture_output=True, text=True, check=True).stdout.split("\n")
         for f in files:
-            if f and not f.startswith(("conformance", "site/", "ports/", ".github/")):
+            if f and not f.startswith(("conformance", "spec", "site/", "ports/", ".github/")):
                 os.makedirs(os.path.join(tmp, os.path.dirname(f)), exist_ok=True)
                 shutil.copy(os.path.join(root, f), os.path.join(tmp, f))
         path = os.path.join(tmp, "ergo.rego")
