@@ -2897,11 +2897,16 @@ well_formed_or_not := array.concat(
 
 test_a_requirement_fails_well_formed_exactly_when_its_row_says_what_is_wrong if {
 	lifted_reqs := [lifted({"s": req}) | some req in well_formed_or_not]
-	well_formed := {i | some i, l in lifted_reqs; ergo._well_formed(l.requirements.s) with data.ergo_subjects as l.subjects}
+	well_formed := {i |
+		some i, l in lifted_reqs
+		resolved := ergo._resolved_subjects with data.ergo_subjects as l.subjects
+		ergo._well_formed(l.requirements.s) with data.ergo_subjects as l.subjects with data.ergo_resolved as resolved
+	}
 	nothing_listed := {i |
 		some i, l in lifted_reqs
 		req := l.requirements.s
-		problems := (count(ergo._req_problems(req)) + count(ergo._check_problem_inputs(req))) + count(ergo._not_an_object_inputs(req)) with data.ergo_subjects as l.subjects
+		resolved := ergo._resolved_subjects with data.ergo_subjects as l.subjects
+		problems := (count(ergo._req_problems(req)) + count(ergo._check_problem_inputs(req))) + count(ergo._not_an_object_inputs(req)) with data.ergo_subjects as l.subjects with data.ergo_resolved as resolved
 		problems == 0
 	}
 	well_formed == nothing_listed
