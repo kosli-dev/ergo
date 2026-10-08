@@ -1,0 +1,432 @@
+[
+  {
+    "description": "present on a field of the subject",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["x"]}}}},
+    "cases": [
+      {
+        "description": "passes on a string",
+        "rules": ["present.pass"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
+        ]
+      },
+      {
+        "description": "passes on an empty string",
+        "rules": ["present.pass"],
+        "input": {"things": [{"id": "t1", "x": ""}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ""}]}
+        ]
+      },
+      {
+        "description": "passes on false",
+        "rules": ["present.pass"],
+        "input": {"things": [{"id": "t1", "x": false}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": false}]}
+        ]
+      },
+      {
+        "description": "passes on zero",
+        "rules": ["present.pass"],
+        "input": {"things": [{"id": "t1", "x": 0}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 0}]}
+        ]
+      },
+      {
+        "description": "passes on an empty list",
+        "rules": ["present.pass"],
+        "input": {"things": [{"id": "t1", "x": []}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": []}]}
+        ]
+      },
+      {
+        "description": "passes on an empty object",
+        "rules": ["present.pass"],
+        "input": {"things": [{"id": "t1", "x": {}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": {}}]}
+        ]
+      },
+      {
+        "description": "fails as value, not absent, when the field is missing",
+        "rules": ["present.missing", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as value, not null, when the field is null",
+        "rules": ["present.missing", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as not_an_object when the subject is a string",
+        "rules": ["present.other", "path.not_an_object"],
+        "input": {"things": ["t1"]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as not_an_object when the subject is null",
+        "rules": ["present.other", "path.not_an_object"],
+        "input": {"things": [null]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "c", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "present on a nested field",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["x", "y"]}}}},
+    "cases": [
+      {
+        "description": "fails as value when the parent is missing",
+        "rules": ["present.missing", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x.y", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as value when the parent is null",
+        "rules": ["present.missing", "path.absent"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x.y", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the parent is a string",
+        "rules": ["present.other", "path.unusable"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x.y", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the parent is a list, because a string key only reads an object",
+        "rules": ["present.other", "path.unusable"],
+        "input": {"things": [{"id": "t1", "x": [{"y": 1}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x.y", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "present on a list item",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["x", 1]}}}},
+    "cases": [
+      {
+        "description": "passes when the item is there",
+        "rules": ["present.pass"],
+        "input": {"things": [{"id": "t1", "x": ["a", "b"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x.1", "value": "b"}]}
+        ]
+      },
+      {
+        "description": "fails as value when the list is too short",
+        "rules": ["present.missing", "path.absent"],
+        "input": {"things": [{"id": "t1", "x": ["a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x.1", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as value when the item is null",
+        "rules": ["present.missing", "path.null"],
+        "input": {"things": [{"id": "t1", "x": ["a", null]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x.1", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the parent is an object, because an index only reads a list",
+        "rules": ["present.other", "path.unusable"],
+        "input": {"things": [{"id": "t1", "x": {"1": "a"}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x.1", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "present with an empty path",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "checks": {"c": {"op": "present", "path": []}}}},
+    "cases": [
+      {
+        "description": "passes on a subject that isn't an object, because an empty path reads the subject itself",
+        "rules": ["present.pass", "path.empty"],
+        "input": {"things": ["a"]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "a"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "things[]", "value": "a"}]}
+        ]
+      },
+      {
+        "description": "fails as value on a null subject",
+        "rules": ["present.missing", "path.empty", "path.null"],
+        "input": {"things": [null]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "things[]", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "present through a selector",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["xs", {"where": {"k": "a"}}, "v"]}}}},
+    "cases": [
+      {
+        "description": "passes when the one matching item has the field",
+        "rules": ["present.pass", "path.selector"],
+        "input": {"things": [{"id": "t1", "xs": [{"k": "a", "v": 1}, {"k": "b"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "xs.[k==\"a\"].v", "value": 1}]}
+        ]
+      },
+      {
+        "description": "fails as value when the matching item lacks the field",
+        "rules": ["present.missing", "path.selector"],
+        "input": {"things": [{"id": "t1", "xs": [{"k": "a"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "xs.[k==\"a\"].v", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as value when the list to select from is missing",
+        "rules": ["present.missing", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "xs.[k==\"a\"].v", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as unmatched when no item matches",
+        "rules": ["present.other", "path.unmatched"],
+        "input": {"things": [{"id": "t1", "xs": [{"k": "b", "v": 1}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unmatched", "inputs": [{"name": "xs.[k==\"a\"].v", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as ambiguous when two items match",
+        "rules": ["present.other", "path.ambiguous"],
+        "input": {"things": [{"id": "t1", "xs": [{"k": "a", "v": 1}, {"k": "a", "v": 2}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ambiguous", "inputs": [{"name": "xs.[k==\"a\"].v", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "present through a selector with two fields, onto a key that needs quotes",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["xs", {"where": {"k": "a", "b": 2}}, "a.b"]}}}},
+    "cases": [
+      {
+        "description": "names the selector's fields in order and quotes the key",
+        "rules": ["present.pass", "name.selector", "name.keys"],
+        "input": {"things": [{"id": "t1", "xs": [{"k": "a", "b": 2, "a.b": 1}, {"k": "a", "b": 3}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "xs.[b==2 and k==\"a\"].\"a.b\"", "value": 1}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "present on the input and with a ref step",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["things"],
+        "id": ["id"],
+        "checks": {"by_ref": {"op": "present", "path": ["x", {"ref": ["$$params", "key"]}]}, "on_input": {"op": "present", "path": ["$$input", "flag"]}}
+      }
+    },
+    "params": {"key": "a"},
+    "cases": [
+      {
+        "description": "both pass when the fields are there",
+        "rules": ["present.pass", "path.input", "path.ref_step"],
+        "input": {"flag": true, "things": [{"id": "t1", "x": {"a": 1}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "by_ref", "passed": true, "cause": "satisfied", "inputs": [{"name": "x.[$$params.key]", "value": 1}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "on_input", "passed": true, "cause": "satisfied", "inputs": [{"name": "$$input.flag", "value": true}]}
+        ]
+      },
+      {
+        "description": "both fail as value when the fields are missing",
+        "rules": ["present.missing", "path.input", "path.ref_step"],
+        "input": {"things": [{"id": "t1", "x": {}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "by_ref", "passed": false, "cause": "value", "inputs": [{"name": "x.[$$params.key]", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "on_input", "passed": false, "cause": "value", "inputs": [{"name": "$$input.flag", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "present with a ref step that can't be read",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["x", {"ref": ["$$params", "key"]}]}}}},
+    "params": {"key": ["a"]},
+    "cases": [
+      {
+        "description": "fails as unusable when the ref reads something that can't be a key",
+        "rules": ["present.other", "path.ref_step"],
+        "input": {"things": [{"id": "t1", "x": {"a": 1}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x.[$$params.key]", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "present with a ref step whose param is missing",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["x", {"ref": ["$$params", "key"]}]}}}},
+    "params": {},
+    "cases": [
+      {
+        "description": "fails as absent, not value, because the field it looks for is unknown, not missing",
+        "rules": ["present.other", "path.ref_step"],
+        "input": {"things": [{"id": "t1", "x": {"a": 1}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x.[$$params.key]", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "present written wrong",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["things"],
+        "id": ["id"],
+        "checks": {"bad_step": {"op": "present", "path": ["x", true]}, "extra_field": {"op": "present", "path": ["x"], "value": 1}, "no_path": {"op": "present"}, "string_path": {"op": "present", "path": "x"}}
+      }
+    },
+    "cases": [
+      {
+        "description": "fails every check as ill_formed whatever the subject holds",
+        "rules": ["present.written_wrong", "written_wrong"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {"name": "count(checks)", "value": 4},
+              {"name": "require", "value": "every"},
+              {"name": "checks.bad_step", "value": ["step that can't be a key in path"]},
+              {"name": "checks.extra_field", "value": ["unknown field value"]},
+              {"name": "checks.no_path", "value": ["missing path"]},
+              {"name": "checks.string_path", "value": ["path not a list"]}
+            ]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "bad_step", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x.<invalid step>", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "extra_field", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": 1}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "no_path", "passed": false, "cause": "ill_formed", "inputs": []},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "string_path", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "present as a filter",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["things"],
+        "id": ["id"],
+        "min_subjects": 0,
+        "applies_to": {"complete": {"op": "equals", "path": ["status"], "value": "COMPLETE"}, "recorded": {"op": "present", "path": ["status"]}},
+        "checks": {"c": {"op": "present", "path": ["x"]}}
+      }
+    },
+    "cases": [
+      {
+        "description": "rules a subject out when the field is missing, even though the other filter can't read it",
+        "rules": ["present.filter"],
+        "input": {"things": [{"id": "t1"}]},
+        "status": {"s": "not_applicable"},
+        "compliant": true,
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "status", "value": null}]}
+        ]
+      },
+      {
+        "description": "rules a subject out when the field is null",
+        "rules": ["present.filter"],
+        "input": {"things": [{"id": "t1", "status": null}]},
+        "status": {"s": "not_applicable"},
+        "compliant": true,
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "status", "value": null}]}
+        ]
+      },
+      {
+        "description": "keeps a subject in scope when the field is there",
+        "rules": ["present.filter"],
+        "input": {"things": [{"id": "t1", "status": "COMPLETE", "x": 1}]},
+        "status": {"s": "met"},
+        "compliant": true,
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "status", "value": "COMPLETE"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "present as a filter on a parent that can't hold the field",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["things"],
+        "id": ["id"],
+        "min_subjects": 0,
+        "applies_to": {"recorded": {"op": "present", "path": ["build", "fingerprint"]}},
+        "checks": {"c": {"op": "present", "path": ["x"]}}
+      }
+    },
+    "cases": [
+      {
+        "description": "fails the requirement instead of ruling the subject out",
+        "rules": ["present.filter", "path.unusable"],
+        "input": {"things": [{"build": "abc", "id": "t1", "x": 1}]},
+        "status": {"s": "not_met"},
+        "compliant": false,
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": false, "cause": "unusable", "inputs": [{"name": "build.fingerprint", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "present on a key that from names but the input doesn't have",
+    "policy": {"s": {"subject_type": "test run", "from": ["runs", {"each_as": "run", "keys": ["unit"]}], "checks": {"c": {"op": "present", "path": ["result"]}}}},
+    "cases": [
+      {
+        "description": "fails as value",
+        "rules": ["present.missing"],
+        "input": {"runs": {}},
+        "results": [
+          {"requirement": "s", "subject": {"type": "test run", "id": "unit"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "result", "value": null}]}
+        ]
+      }
+    ]
+  }
+]

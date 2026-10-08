@@ -1,0 +1,611 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ergo policy",
+  "description": "A policy that passes this schema can still be written wrong in ways a schema can't express, like a min above max, a step after a naming step or nesting deeper than one level. ergo reports those in $well_formed. A policy that fails this schema still gets a report, which says what's wrong.",
+  "type": "object",
+  "additionalProperties": {
+    "$ref": "#/$defs/requirement"
+  },
+  "$defs": {
+    "requirement": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "meta": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "subject_type": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "from": {
+          "type": "array",
+          "description": "A naming step can only be the last step.",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/key"
+              },
+              {
+                "$ref": "#/$defs/ref"
+              },
+              {
+                "$ref": "#/$defs/naming_step"
+              }
+            ]
+          }
+        },
+        "id": {
+          "$ref": "#/$defs/path"
+        },
+        "require": {
+          "enum": [
+            "every",
+            "some"
+          ]
+        },
+        "min_subjects": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "applies_to": {
+          "$ref": "#/$defs/named_checks"
+        },
+        "checks": {
+          "$ref": "#/$defs/named_checks",
+          "minProperties": 1
+        }
+      },
+      "required": [
+        "checks"
+      ],
+      "additionalProperties": false
+    },
+    "named_checks": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/check"
+      }
+    },
+    "key": {
+      "description": "A key of an object, or an index of a list. An index has to be written as digits alone, so 1.0 can't be one, although JSON Schema reads it as an integer.",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "integer",
+          "minimum": 0
+        }
+      ]
+    },
+    "ref": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "enum": [
+                "$$params",
+                "$$input"
+              ]
+            }
+          ],
+          "items": {
+            "$ref": "#/$defs/key"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false
+    },
+    "literal": {
+      "type": "object",
+      "properties": {
+        "literal": true
+      },
+      "required": [
+        "literal"
+      ],
+      "additionalProperties": false
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[^$]"
+    },
+    "naming_step": {
+      "type": "object",
+      "properties": {
+        "each_as": {
+          "$ref": "#/$defs/name"
+        },
+        "keys": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/key"
+                  },
+                  {
+                    "$ref": "#/$defs/ref"
+                  },
+                  {
+                    "$ref": "#/$defs/literal"
+                  }
+                ]
+              }
+            },
+            {
+              "$ref": "#/$defs/ref"
+            },
+            {
+              "$ref": "#/$defs/literal"
+            }
+          ]
+        }
+      },
+      "required": [
+        "each_as"
+      ],
+      "additionalProperties": false
+    },
+    "selector": {
+      "type": "object",
+      "properties": {
+        "where": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/value"
+          },
+          "description": "An empty where matches nothing."
+        }
+      },
+      "required": [
+        "where"
+      ],
+      "additionalProperties": false
+    },
+    "path": {
+      "type": "array",
+      "description": "Its first step can be $$input, $$params or $name. It can hold one selector at most.",
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/key"
+          },
+          {
+            "$ref": "#/$defs/selector"
+          },
+          {
+            "$ref": "#/$defs/ref"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "literal": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "literal"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "value": {
+      "description": "Any JSON value. An object with a single ref or literal key is read as a ref or a literal.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ref"
+        },
+        {
+          "$ref": "#/$defs/literal"
+        },
+        true
+      ]
+    },
+    "values": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/value"
+          }
+        },
+        {
+          "$ref": "#/$defs/ref"
+        },
+        {
+          "$ref": "#/$defs/literal"
+        }
+      ]
+    },
+    "number": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "$ref": "#/$defs/ref"
+        },
+        {
+          "$ref": "#/$defs/literal"
+        }
+      ]
+    },
+    "common": {
+      "properties": {
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "meta": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "expression": {
+          "description": "Used in place of the rendered expression when it's a string, and ignored otherwise."
+        },
+        "inputs": {
+          "type": "array"
+        },
+        "substitute": {
+          "$ref": "#/$defs/check"
+        }
+      }
+    },
+    "builtin_ops": {
+      "enum": [
+        "equals",
+        "in",
+        "present",
+        "missing",
+        "non_empty_string",
+        "empty",
+        "matches_any",
+        "not_matches_any",
+        "range",
+        "includes",
+        "excludes",
+        "compare",
+        "compare_time",
+        "all",
+        "any",
+        "any_of"
+      ]
+    },
+    "check": {
+      "description": "A check in checks or applies_to. It can have a substitute, and its op can be a custom operator.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/builtin_check"
+        },
+        {
+          "description": "A custom operator. It can have any fields, and its op must be declared to ergo.",
+          "type": "object",
+          "properties": {
+            "op": {
+              "type": "string",
+              "not": {
+                "$ref": "#/$defs/builtin_ops"
+              }
+            }
+          },
+          "required": [
+            "op"
+          ]
+        }
+      ]
+    },
+    "builtin_check": {
+      "type": "object",
+      "required": [
+        "op"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        }
+      ],
+      "oneOf": [
+        {
+          "properties": {
+            "op": {
+              "const": "equals"
+            },
+            "path": {
+              "$ref": "#/$defs/path"
+            },
+            "value": {
+              "$ref": "#/$defs/value"
+            }
+          },
+          "required": [
+            "path",
+            "value"
+          ]
+        },
+        {
+          "properties": {
+            "op": {
+              "const": "in"
+            },
+            "path": {
+              "$ref": "#/$defs/path"
+            },
+            "values": {
+              "$ref": "#/$defs/values"
+            }
+          },
+          "required": [
+            "path",
+            "values"
+          ]
+        },
+        {
+          "properties": {
+            "op": {
+              "enum": [
+                "present",
+                "missing",
+                "non_empty_string",
+                "empty"
+              ]
+            },
+            "path": {
+              "$ref": "#/$defs/path"
+            }
+          },
+          "required": [
+            "path"
+          ]
+        },
+        {
+          "properties": {
+            "op": {
+              "enum": [
+                "matches_any",
+                "not_matches_any"
+              ]
+            },
+            "path": {
+              "$ref": "#/$defs/path"
+            },
+            "patterns": {
+              "$ref": "#/$defs/patterns"
+            }
+          },
+          "required": [
+            "path",
+            "patterns"
+          ]
+        },
+        {
+          "properties": {
+            "op": {
+              "const": "range"
+            },
+            "path": {
+              "$ref": "#/$defs/path"
+            },
+            "min": {
+              "$ref": "#/$defs/number"
+            },
+            "max": {
+              "$ref": "#/$defs/number"
+            }
+          },
+          "required": [
+            "path",
+            "min",
+            "max"
+          ]
+        },
+        {
+          "properties": {
+            "op": {
+              "enum": [
+                "includes",
+                "excludes"
+              ]
+            },
+            "path": {
+              "$ref": "#/$defs/path"
+            },
+            "value": {
+              "$ref": "#/$defs/value"
+            }
+          },
+          "required": [
+            "path",
+            "value"
+          ]
+        },
+        {
+          "properties": {
+            "op": {
+              "enum": [
+                "includes",
+                "excludes"
+              ]
+            },
+            "path": {
+              "$ref": "#/$defs/path"
+            },
+            "values": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "$ref": "#/$defs/value"
+                  }
+                },
+                {
+                  "$ref": "#/$defs/ref"
+                },
+                {
+                  "$ref": "#/$defs/literal"
+                }
+              ]
+            }
+          },
+          "required": [
+            "path",
+            "values"
+          ]
+        },
+        {
+          "properties": {
+            "op": {
+              "enum": [
+                "compare",
+                "compare_time"
+              ]
+            },
+            "left": {
+              "$ref": "#/$defs/path"
+            },
+            "right": {
+              "$ref": "#/$defs/path"
+            },
+            "cmp": {
+              "enum": [
+                "eq",
+                "ne",
+                "gt",
+                "gte",
+                "lt",
+                "lte"
+              ]
+            }
+          },
+          "required": [
+            "left",
+            "right",
+            "cmp"
+          ]
+        },
+        {
+          "properties": {
+            "op": {
+              "enum": [
+                "all",
+                "any"
+              ]
+            },
+            "path": {
+              "$ref": "#/$defs/path"
+            },
+            "each": {
+              "$ref": "#/$defs/path"
+            },
+            "as": {
+              "$ref": "#/$defs/name"
+            },
+            "check": {
+              "$ref": "#/$defs/inner_check"
+            }
+          },
+          "required": [
+            "path",
+            "check"
+          ]
+        },
+        {
+          "properties": {
+            "op": {
+              "const": "any_of"
+            },
+            "options": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "minProperties": 1,
+                  "additionalProperties": {
+                    "$ref": "#/$defs/option"
+                  }
+                },
+                {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "$ref": "#/$defs/option"
+                  }
+                }
+              ]
+            }
+          },
+          "required": [
+            "options"
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "inner_check": {
+      "description": "The check inside all or any. It can't be a custom operator, and a substitute on it is ignored.",
+      "$ref": "#/$defs/builtin_check"
+    },
+    "option": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/builtin_check",
+        "properties": {
+          "op": {
+            "not": {
+              "const": "any_of"
+            }
+          }
+        }
+      }
+    },
+    "patterns": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/$defs/ref"
+              },
+              {
+                "$ref": "#/$defs/literal"
+              }
+            ]
+          }
+        },
+        {
+          "$ref": "#/$defs/ref"
+        },
+        {
+          "$ref": "#/$defs/literal"
+        }
+      ]
+    }
+  }
+}

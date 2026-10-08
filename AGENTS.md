@@ -13,6 +13,7 @@ ergo is a Rego library that turns policy evaluation into a structured report. Us
 - `CODE_OF_CONDUCT.md` is the Contributor Covenant 2.1, unchanged apart from the contact address.
 - `.github/ISSUE_TEMPLATE/` and `.github/pull_request_template.md` are the forms GitHub shows for new issues and pull requests.
 - `examples/` holds worked examples. Each one has an input, the same policy in plain Rego and with ergo, and tests that pin what both versions report.
+- `spec/` holds the spec that `ergo.rego` and the Rust port implement: the policy and report schemas, the rules in `semantics.md`, and cases written from those rules. `spec_test.rego` runs the cases against `ergo.rego`.
 - `conformance/` holds tests in plain JSON that any implementation of ergo can run, not just this one. `conformance_test.rego` runs them against `ergo.rego`.
 
 ## Checks
@@ -56,6 +57,12 @@ CI also fails when a line of Rego isn't reached by any test. To list those lines
 ```sh
 opa test . --ignore .github --coverage | jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' | sort -u
 ```
+
+## Spec
+
+A change to ergo's behaviour starts in `spec/`: write the rule in `semantics.md`, then a case for it in `spec/cases/<topic>/cases.json` that names the rule, then change `ergo.rego` and the Rust port. When an implementation and the spec disagree, the implementation is wrong. If it can't be fixed in the same change, add the case to that implementation's known differences, in `spec_test.rego` or `ports/rust/tests/spec.rs`. See `spec/README.md` for the case format.
+
+Write the expected rows from the rules, not by copying what `ergo.rego` reports.
 
 ## Conformance suite
 
