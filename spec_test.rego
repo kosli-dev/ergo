@@ -32,6 +32,28 @@ test_a_case_with_the_wrong_status_is_listed_by_name if {
 	}]}
 }
 
+test_a_case_with_the_wrong_expression_is_listed_by_name if {
+	failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
+		"description": "group",
+		"policy": {"s": {"checks": {"c": {"op": "present", "path": ["x"]}}}},
+		"cases": [{"description": "case", "input": {"x": 1}, "expressions": {"s": {"c": "y is present"}}, "results": [{
+			"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c",
+			"passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}],
+		}]}],
+	}]}
+}
+
+test_a_case_with_the_wrong_refs_is_listed_by_name if {
+	failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
+		"description": "group",
+		"policy": {"s": {"checks": {"c": {"op": "present", "path": ["x"]}}}},
+		"cases": [{"description": "case", "input": {"x": 1}, "refs": {"s": {"c": [{"name": "$$params.x", "value": 1}]}}, "results": [{
+			"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c",
+			"passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}],
+		}]}],
+	}]}
+}
+
 test_a_case_with_the_wrong_compliant_is_listed_by_name if {
 	failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
 		"description": "group",
@@ -50,6 +72,16 @@ _passes(group, c) if {
 		report.requirements[name].status == status
 	}
 	object.get(c, "compliant", report.compliant) == report.compliant
+	every name, checks in object.get(c, "expressions", {}) {
+		every check, expression in checks {
+			report.requirements[name].checks[check].expression == expression
+		}
+	}
+	every name, checks in object.get(c, "refs", {}) {
+		every check, refs in checks {
+			object.get(report.requirements[name].checks[check], "$refs", []) == refs
+		}
+	}
 }
 
 _report(group, c) := ergo.report_with_params(c.input, group.params, group.policy) if "params" in object.keys(group)

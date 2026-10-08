@@ -1,0 +1,222 @@
+[
+  {
+    "description": "in a list",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "in", "path": ["x"], "values": ["b", 1, "a"]}}}},
+    "cases": [
+      {
+        "description": "passes when the field is one of the values",
+        "rules": ["in.pass"],
+        "input": {"things": [{"id": "t1", "x": "b"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "b"}]}
+        ],
+        "expressions": {"s": {"c": "x in [\"a\", \"b\", 1]"}}
+      },
+      {
+        "description": "fails as value when it is none of them",
+        "rules": ["in.fail"],
+        "input": {"things": [{"id": "t1", "x": "c"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "c"}]}
+        ]
+      },
+      {
+        "description": "fails as value when the type differs",
+        "rules": ["in.fail", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": "1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "1"}]}
+        ]
+      },
+      {
+        "description": "passes on 1.0, because numbers compare by value",
+        "rules": ["in.pass", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": 1.0}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "in a list holding null",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "in", "path": ["x"], "values": ["a", null]}}}},
+    "cases": [
+      {
+        "description": "fails as absent on a missing field",
+        "rules": ["in.fail"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null on a null field",
+        "rules": ["in.fail"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "in an empty list",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "in", "path": ["x"], "values": []}}}},
+    "cases": [
+      {
+        "description": "fails as value",
+        "rules": ["in.fail"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "expressions": {"s": {"c": "x in []"}}
+      }
+    ]
+  },
+  {
+    "description": "in values of every type",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["things"],
+        "id": ["id"],
+        "checks": {"c": {"op": "in", "path": ["x"], "values": [{"b": 1}, [1], "a", 10, 2, null, true, false, {"ref": ["$$params", "w"]}, "B", 1.5]}}
+      }
+    },
+    "params": {"w": "z"},
+    "cases": [
+      {
+        "description": "are shown sorted by the text they're shown as",
+        "rules": ["in.expression"],
+        "input": {"things": [{"id": "t1", "x": "B"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "B"}]}
+        ],
+        "expressions": {"s": {"c": "x in [\"B\", \"a\", $$params.w, 1.5, 10, 2, [1], false, null, true, {\"b\": 1}]"}}
+      }
+    ]
+  },
+  {
+    "description": "in values with a ref among them",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "in", "path": ["x"], "values": [{"ref": ["$$params", "want"]}, "z"]}}}},
+    "params": {},
+    "cases": [
+      {
+        "description": "fails as absent when the ref can't be read, even when another value matches",
+        "rules": ["value.ref", "in.values"],
+        "input": {"things": [{"id": "t1", "x": "z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": "z"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "in values read through a ref",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}}}},
+    "params": {"allowed": ["a", "b"]},
+    "cases": [
+      {
+        "description": "passes when the field is in the list",
+        "rules": ["in.values", "in.pass"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "expressions": {"s": {"c": "x in $$params.allowed"}}
+      }
+    ]
+  },
+  {
+    "description": "in values read through a ref that isn't a list",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}}}},
+    "params": {"allowed": "a"},
+    "cases": [
+      {
+        "description": "fails as unusable",
+        "rules": ["in.values"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "in values read through a ref that holds an object like a ref",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}}}},
+    "params": {"allowed": [{"ref": ["q"]}]},
+    "cases": [
+      {
+        "description": "compares the object as it is",
+        "rules": ["in.values"],
+        "input": {"things": [{"id": "t1", "x": {"ref": ["q"]}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": {"ref": ["q"]}}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "in values held in a literal",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "in", "path": ["x"], "values": {"literal": [{"ref": ["q"]}]}}}}},
+    "cases": [
+      {
+        "description": "compares the object as it is",
+        "rules": ["in.values", "value.literal"],
+        "input": {"things": [{"id": "t1", "x": {"ref": ["q"]}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": {"ref": ["q"]}}]}
+        ],
+        "expressions": {"s": {"c": "x in [{\"ref\": [\"q\"]}]"}}
+      }
+    ]
+  },
+  {
+    "description": "in written wrong",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["things"],
+        "id": ["id"],
+        "checks": {
+          "deep_ref": {"op": "in", "path": ["x"], "values": [[{"ref": ["$$params", "want"]}]]},
+          "literal_not_a_list": {"op": "in", "path": ["x"], "values": {"literal": "a"}},
+          "no_values": {"op": "in", "path": ["x"]},
+          "not_a_list": {"op": "in", "path": ["x"], "values": "a"}
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails every check as ill_formed and says why",
+        "rules": ["in.values", "value.nested", "written_wrong"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {"name": "count(checks)", "value": 4},
+              {"name": "require", "value": "every"},
+              {"name": "checks.deep_ref", "value": ["ref inside values"]},
+              {"name": "checks.literal_not_a_list", "value": ["invalid values"]},
+              {"name": "checks.no_values", "value": ["missing values"]},
+              {"name": "checks.not_a_list", "value": ["invalid values"]}
+            ]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "deep_ref", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "literal_not_a_list", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "no_values", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "not_a_list", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "expressions": {"s": {"literal_not_a_list": "x in <invalid values>", "no_values": "x in <missing values>", "not_a_list": "x in <invalid values>"}}
+      }
+    ]
+  }
+]

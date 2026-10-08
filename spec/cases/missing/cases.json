@@ -1,0 +1,149 @@
+[
+  {
+    "description": "missing on a field of the subject",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "missing", "path": ["x"]}}}},
+    "cases": [
+      {
+        "description": "passes when the field is missing",
+        "rules": ["missing.pass"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": null}]}
+        ],
+        "expressions": {"s": {"c": "x is missing"}}
+      },
+      {
+        "description": "passes when the field is null",
+        "rules": ["missing.pass"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as value on false, because the field is there",
+        "rules": ["missing.fail"],
+        "input": {"things": [{"id": "t1", "x": false}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": false}]}
+        ]
+      },
+      {
+        "description": "fails as value on an empty string",
+        "rules": ["missing.fail"],
+        "input": {"things": [{"id": "t1", "x": ""}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ""}]}
+        ]
+      },
+      {
+        "description": "fails as not_an_object when the subject isn't an object",
+        "rules": ["missing.fail", "path.not_an_object"],
+        "input": {"things": ["t1"]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "missing on a nested field",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "missing", "path": ["x", "y"]}}}},
+    "cases": [
+      {
+        "description": "passes when the parent is missing",
+        "rules": ["missing.pass", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x.y", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the parent can't hold the field",
+        "rules": ["missing.fail", "path.unusable"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x.y", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "missing through a selector",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "missing", "path": ["xs", {"where": {"k": "a"}}, "v"]}}}},
+    "cases": [
+      {
+        "description": "passes when the list to select from is missing",
+        "rules": ["missing.pass", "path.selector"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "xs.[k==\"a\"].v", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as unmatched when no item matches",
+        "rules": ["missing.fail", "path.unmatched"],
+        "input": {"things": [{"id": "t1", "xs": [{"k": "b"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unmatched", "inputs": [{"name": "xs.[k==\"a\"].v", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "missing on a param when the policy is run without params",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "missing", "path": ["$$params", "flag"]}}}},
+    "cases": [
+      {
+        "description": "fails as absent instead of passing, because the params weren't given",
+        "rules": ["missing.fail", "present.no_params"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "$$params.flag", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "missing on a param the params don't have",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "missing", "path": ["$$params", "flag"]}}}},
+    "params": {},
+    "cases": [
+      {
+        "description": "passes",
+        "rules": ["missing.pass"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "$$params.flag", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "missing as a filter",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "min_subjects": 0, "applies_to": {"unset": {"op": "missing", "path": ["x"]}}, "checks": {"c": {"op": "present", "path": ["id"]}}}},
+    "cases": [
+      {
+        "description": "rules out a subject whose field is there",
+        "rules": ["missing.filter"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "status": {"s": "not_applicable"},
+        "compliant": true,
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1}]}
+        ]
+      },
+      {
+        "description": "keeps a subject whose field is missing",
+        "rules": ["missing.filter"],
+        "input": {"things": [{"id": "t1"}]},
+        "status": {"s": "met"},
+        "compliant": true,
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "id", "value": "t1"}]}
+        ]
+      }
+    ]
+  }
+]

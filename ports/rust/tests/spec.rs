@@ -37,6 +37,26 @@ fn passes(group: &Value, case: &Value) -> Result<(), String> {
             return Err(format!("expected compliant to be {compliant}, but it is {}", report["compliant"]));
         }
     }
+    if let Some(expressions) = case.get("expressions").and_then(Value::as_object) {
+        for (name, checks) in expressions {
+            for (check, expression) in checks.as_object().unwrap() {
+                let actual = &report["requirements"][name]["checks"][check]["expression"];
+                if actual != expression {
+                    return Err(format!("expected {name}.{check} to render as {expression}, but it renders as {actual}"));
+                }
+            }
+        }
+    }
+    if let Some(refs) = case.get("refs").and_then(Value::as_object) {
+        for (name, checks) in refs {
+            for (check, expected) in checks.as_object().unwrap() {
+                let actual = report["requirements"][name]["checks"][check].get("$refs").cloned().unwrap_or(Value::Array(vec![]));
+                if !same(&actual, expected) {
+                    return Err(format!("expected {name}.{check} to have the refs {expected}, but it has {actual}"));
+                }
+            }
+        }
+    }
     Ok(())
 }
 

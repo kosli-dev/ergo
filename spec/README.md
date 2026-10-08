@@ -9,7 +9,7 @@ Draft 0.1. ergo is three specs, and `ergo.rego` and the Rust port in `ports/rust
 
 When an implementation and the spec disagree, the implementation is wrong. A change to ergo's behaviour starts here, with the rule and its cases, and then goes into each implementation.
 
-The spec only covers reading values, causes and `present` so far. [REFERENCE.md](../REFERENCE.md) still describes everything else. The spec will change while it's 0.x.
+The spec only covers reading values, causes, expressions and the operators `present`, `missing`, `equals` and `in` so far. [REFERENCE.md](../REFERENCE.md) still describes everything else. The spec will change while it's 0.x.
 
 ## Cases
 
@@ -21,6 +21,8 @@ A topic's `cases.json` holds a list of groups. A group has a `description`, a `p
 - `results`: the rows the report must have
 - `status` (optional): the `status` some requirements must have, like `{"s": "not_applicable"}`
 - `compliant` (optional): what `compliant` must be
+- `expressions` (optional): the `expression` some checks must have, like `{"s": {"c": "x is present"}}`
+- `refs` (optional): the `$refs` some checks must have, `[]` for none
 
 Here is one case, from `cases/present`, whose group checks `{"op": "present", "path": ["x"]}`:
 

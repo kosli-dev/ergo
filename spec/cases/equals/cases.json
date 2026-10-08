@@ -1,0 +1,233 @@
+[
+  {
+    "description": "equals a string",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["x"], "value": "a"}}}},
+    "cases": [
+      {
+        "description": "passes on the same string",
+        "rules": ["equals.pass"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "expressions": {"s": {"c": "x == \"a\""}}
+      },
+      {
+        "description": "fails as value on another string",
+        "rules": ["equals.fail"],
+        "input": {"things": [{"id": "t1", "x": "b"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "b"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["equals.fail", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["equals.fail", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "equals a number",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["x"], "value": 1}}}},
+    "cases": [
+      {
+        "description": "passes on 1.0, because numbers compare by value",
+        "rules": ["equals.pass", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": 1.0}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+        ],
+        "expressions": {"s": {"c": "x == 1"}}
+      },
+      {
+        "description": "fails as value on the string \"1\", because the type must match",
+        "rules": ["equals.fail", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": "1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "1"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "equals a number written with an exponent",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["x"], "value": 150.0}}}},
+    "cases": [
+      {
+        "description": "shows the number in plain decimal",
+        "rules": ["render.value", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": 150}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 150}]}
+        ],
+        "expressions": {"s": {"c": "x == 150"}}
+      }
+    ]
+  },
+  {
+    "description": "equals null",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["x"], "value": null}}}},
+    "cases": [
+      {
+        "description": "passes on a field that is there and null",
+        "rules": ["equals.pass"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": null}]}
+        ],
+        "expressions": {"s": {"c": "x == null"}}
+      },
+      {
+        "description": "fails as absent on a missing field",
+        "rules": ["equals.fail"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "equals an object",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["x"], "value": {"a": "x", "b": [1, 2]}}}}},
+    "cases": [
+      {
+        "description": "passes on an equal object whose keys are in another order",
+        "rules": ["equals.pass", "value.equal", "render.value"],
+        "input": {"things": [{"id": "t1", "x": {"a": "x", "b": [1, 2.0]}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": {"a": "x", "b": [1, 2]}}]}
+        ],
+        "expressions": {"s": {"c": "x == {\"a\": \"x\", \"b\": [1, 2]}"}}
+      },
+      {
+        "description": "fails as value when a list inside is in another order",
+        "rules": ["equals.fail", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": {"a": "x", "b": [2, 1]}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": {"a": "x", "b": [2, 1]}}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "equals a literal that looks like a ref",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["x"], "value": {"literal": {"ref": ["a"]}}}}}},
+    "cases": [
+      {
+        "description": "compares the object as written",
+        "rules": ["value.literal", "render.value"],
+        "input": {"things": [{"id": "t1", "x": {"ref": ["a"]}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": {"ref": ["a"]}}]}
+        ],
+        "expressions": {"s": {"c": "x == {\"ref\": [\"a\"]}"}}
+      }
+    ]
+  },
+  {
+    "description": "equals a ref",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["x"], "value": {"ref": ["$$params", "want"]}}}}},
+    "params": {"want": "a"},
+    "cases": [
+      {
+        "description": "passes when the field equals the param",
+        "rules": ["value.ref", "equals.pass"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "expressions": {"s": {"c": "x == $$params.want"}},
+        "refs": {"s": {"c": [{"name": "$$params.want", "value": "a"}]}}
+      }
+    ]
+  },
+  {
+    "description": "equals a ref to a param that is missing",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["x"], "value": {"ref": ["$$params", "want"]}}}}},
+    "params": {},
+    "cases": [
+      {
+        "description": "fails as absent whatever the field holds",
+        "rules": ["value.ref"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.want", "value": null}]}}
+      }
+    ]
+  },
+  {
+    "description": "equals a ref to a param that is null",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["x"], "value": {"ref": ["$$params", "want"]}}}}},
+    "params": {"want": null},
+    "cases": [
+      {
+        "description": "fails as null even when the field is null too",
+        "rules": ["value.ref"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "equals written wrong",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["things"],
+        "id": ["id"],
+        "checks": {
+          "deep_ref": {"op": "equals", "path": ["x"], "value": [{"ref": ["$$params", "want"]}]},
+          "no_value": {"op": "equals", "path": ["x"]},
+          "ref_and_more": {"op": "equals", "path": ["x"], "value": {"note": "n", "ref": ["$$params", "want"]}},
+          "ref_elsewhere": {"op": "equals", "path": ["x"], "value": {"ref": ["things"]}}
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails every check as ill_formed and says why",
+        "rules": ["equals.fail", "value.nested", "written_wrong", "render.missing"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {"name": "count(checks)", "value": 4},
+              {"name": "require", "value": "every"},
+              {"name": "checks.deep_ref", "value": ["ref inside value"]},
+              {"name": "checks.no_value", "value": ["missing value"]},
+              {"name": "checks.ref_and_more", "value": ["invalid ref"]},
+              {"name": "checks.ref_elsewhere", "value": ["invalid ref"]}
+            ]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "deep_ref", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "no_value", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "ref_and_more", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "ref_elsewhere", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "expressions": {"s": {"deep_ref": "x == [{\"ref\": [\"$$params\", \"want\"]}]", "no_value": "x == <missing value>", "ref_and_more": "x == <invalid ref>", "ref_elsewhere": "x == <invalid ref>"}}
+      }
+    ]
+  }
+]

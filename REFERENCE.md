@@ -283,7 +283,7 @@ ergo.report_with_params(doc, params, requirements)
 
 That works like `ergo.report`, except `$$params` reads `params` instead of `data.params`. If what you pass can be missing, give it a default first, with a rule like `default config := {}`. Rego doesn't call a function with an argument that isn't defined, so the whole report would be undefined, with no rows to say why. The same goes for the document given to `ergo.report`.
 
-Params aren't part of the document, so `$$input.params` doesn't reach them, and `$$params` doesn't read the document. With no `data.params`, or one that isn't an object, every `$$params` read fails as `absent`, even for `present`, which otherwise fails a missing field as `value`. So a `present` filter on a param fails the requirement when the policy runs without its params, instead of ruling every subject out. ergo has no defaults, so a policy run without its params fails instead of checking something nobody configured.
+Params aren't part of the document, so `$$input.params` doesn't reach them, and `$$params` doesn't read the document. With no `data.params`, or one that isn't an object, every `$$params` read fails as `absent`, even for `present`, which otherwise fails a missing field as `value`, and for `missing`, which otherwise passes. So a `present` or `missing` check on a param fails when the policy runs without its params, and a filter like that fails the requirement instead of deciding the scope. ergo has no defaults, so a policy run without its params fails instead of checking something nobody configured.
 
 A policy that calls `ergo.report` can't itself be in a package called `params` (or under one), because the report would then read its own rules. OPA rejects that as recursive when it loads the policy.
 

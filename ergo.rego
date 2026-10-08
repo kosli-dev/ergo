@@ -1135,6 +1135,7 @@ _leaf_op_passed("non_empty_string", check, subj) if {
 
 _leaf_op_passed("missing", check, subj) if {
 	_missing_at(subj, check.path)
+	not _params_not_given(check.path)
 }
 
 _leaf_op_passed("empty", check, subj) if {

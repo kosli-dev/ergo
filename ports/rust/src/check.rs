@@ -389,7 +389,7 @@ impl<'a> Leaf<'a> {
                 }
             }
             "present" => v.is_some(),
-            "missing" => matches!(reads[0], Read::Absent | Read::Null),
+            "missing" => matches!(reads[0], Read::Absent | Read::Null) && !self.params_not_given(ctx),
             "non_empty_string" => v.and_then(Value::as_str).is_some_and(|s| !s.is_empty()),
             "empty" => v.and_then(Value::as_array).is_some_and(Vec::is_empty),
             "in" => {
@@ -464,13 +464,16 @@ impl<'a> Leaf<'a> {
         }
     }
 
+    fn params_not_given(&self, ctx: &Ctx<'a>) -> bool {
+        self.paths[0].as_array().and_then(|p| p.first()).and_then(Value::as_str) == Some("$$params") && !ctx.params.is_object()
+    }
+
     fn cause(&self, x: &'a Value, ctx: &Ctx<'a>) -> Cause {
         if self.passed(x, ctx) {
             return Cause::Satisfied;
         }
         let reads: Vec<Read> = self.paths.iter().map(|p| crate::render::read_raw(ctx, x, p)).collect();
-        let params_not_given = self.paths[0].as_array().and_then(|p| p.first()).and_then(Value::as_str) == Some("$$params") && !ctx.params.is_object();
-        if self.op == "present" && matches!(reads[0], Read::Absent | Read::Null) && !params_not_given {
+        if self.op == "present" && matches!(reads[0], Read::Absent | Read::Null) && !self.params_not_given(ctx) {
             return Cause::Missing;
         }
         let states: Vec<Option<Cause>> = reads.iter().map(Read::problem).collect();
