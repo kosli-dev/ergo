@@ -28,12 +28,15 @@ package deploy
 
 import data.ergo
 
-requirements := {"prod_deploy": {
-	"description": "Every production deployment is approved",
-	"subject_type": "deployment",
+subjects := {"deployment": {
 	"from": ["deployments"],
 	"id": ["id"],
 	"applies_to": {"is_prod": {"op": "equals", "path": ["environment"], "value": "prod"}},
+}}
+
+requirements := {"prod_deploy": {
+	"description": "Every production deployment is approved",
+	"subject": "deployment",
 	"checks": {"approved": {
 		"description": "Someone approved the deployment",
 		"op": "non_empty_string",
@@ -41,16 +44,15 @@ requirements := {"prod_deploy": {
 	}},
 }}
 
-report := ergo.report(input, {"requirements": requirements}, {})
+report := ergo.report(input, {"subjects": subjects, "requirements": requirements}, {})
 
 violations := ergo.violations(report)
 ```
 
-`ergo.report` takes the input, the policy and the params. The policy holds the requirements, and this one has no params, so they're `{}`.
+`ergo.report` takes the input, the policy and the params. The policy holds the subjects and the requirements, and this one has no params, so they're `{}`.
 
-A requirement describes what to check, not how to check it. Its `description` says what it requires, in words anyone can read. Then it says what the policy is about, the things we call _subjects_:
+A policy describes what to check, not how to check it. First it says what it's about, the things we call _subjects_. Each kind of subject gets a name, here `deployment`, that the report uses for each one, and says where to find them:
 
-- `subject_type` is a human-friendly name for them.
 - `from` is the path to the subjects in the input. `["deployments"]` means `input.deployments`, and `["release", "deployments"]` would mean `input.release.deployments`.
 - `id` is the field that uniquely identifies each subject.
 
@@ -58,21 +60,21 @@ Then we can optionally keep only the subjects that are relevant to this policy:
 
 - `applies_to`: in this case, we define one filter that selects only the deployments whose `environment` is `prod`.
 
-And finally we define the actual checks for this policy:
+And finally the requirement says what must be true of them. Its `description` says what it requires, in words anyone can read, and `subject` names the subject it checks:
 
 - `checks` are the rules each subject must pass. Here, `approved_by` must be a non-empty string.
 
-#### Or write the requirements in YAML
+Several requirements can check the same subject. Each one gets its own rows in the report.
 
-Requirements are plain data, so you can keep them in a YAML file instead. OPA reads every YAML and JSON file in the directory you pass with `-d`, so this file becomes `data.requirements`.
+#### Or write the policy in YAML
 
-`policy/requirements.yaml`:
+Subjects and requirements are plain data, so you can keep them in a YAML file instead. OPA reads every YAML and JSON file in the directory you pass with `-d`, so this file becomes `data.subjects` and `data.requirements`.
+
+`policy/policy.yaml`:
 
 ```yaml
-requirements:
-  prod_deploy:
-    description: Every production deployment is approved
-    subject_type: deployment
+subjects:
+  deployment:
     from: [deployments]
     id: [id]
     applies_to:
@@ -80,6 +82,10 @@ requirements:
         op: equals
         path: [environment]
         value: prod
+requirements:
+  prod_deploy:
+    description: Every production deployment is approved
+    subject: deployment
     checks:
       approved:
         description: Someone approved the deployment
@@ -96,16 +102,20 @@ package deploy
 
 import data.ergo
 
+default subjects := {}
+
+subjects := data.subjects
+
 default requirements := {}
 
 requirements := data.requirements
 
-report := ergo.report(input, {"requirements": requirements}, {})
+report := ergo.report(input, {"subjects": subjects, "requirements": requirements}, {})
 
 violations := ergo.violations(report)
 ```
 
-The default keeps the report defined when the file has no `requirements:`, or spells it wrong. That report has no requirements, so it isn't compliant.
+The defaults keep the report defined when the file leaves out `subjects:` or `requirements:`, or spells one wrong. That report still fails: with no requirements it isn't compliant, and with no subjects the requirement names one that isn't there.
 
 The report and the violations below come out the same either way.
 
