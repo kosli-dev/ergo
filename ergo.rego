@@ -3233,21 +3233,20 @@ _repeats(sorted) := {x |
 	x == sorted[i - 1]
 }
 
-_applies_rows(raw, refs, req, req_name) := [{
+_applies_rows(raw, refs, matches, req, req_name) := [{
 	"requirement": req_name,
 	"subject": refs[i],
 	"check": "$applies",
 	"inputs": _applies_inputs(entry.subject, req),
-	"passed": matches,
-	"cause": _applies_cause(entry.subject, req, matches),
+	"passed": matches[i],
+	"cause": _applies_cause(entry.subject, req, matches[i]),
 } |
 	some i, entry in raw
-	matches := _subject_matches(entry.subject, req)
 ] if {
 	_size(_applies_to_of(req)) > 0
 }
 
-_applies_rows(raw, refs, req, req_name) := [{
+_applies_rows(raw, refs, _, req, req_name) := [{
 	"requirement": req_name,
 	"subject": refs[i],
 	"check": "$applies",
@@ -3258,7 +3257,7 @@ _applies_rows(raw, refs, req, req_name) := [{
 	some i, _ in raw
 ] if _bad_applies_to(req)
 
-_applies_rows(_, _, req, _) := [] if {
+_applies_rows(_, _, _, req, _) := [] if {
 	_size(_applies_to_of(req)) == 0
 	not _bad_applies_to(req)
 }
@@ -3276,17 +3275,34 @@ _evaluation(doc, req, name) := {
 	"subject_rows": groups,
 	"total": count(raw),
 	"matching": count(matching),
+	"scope_readable": _scope_readable(raw, applies, req),
+	"rows_complete": _rows_complete(groups, matching, req),
 } if {
 	raw := _raw_entries(doc, req)
-	refs := [_entry_ref(entry, req) | some entry in raw]
-	applies := _applies_rows(raw, refs, req, name)
-	matching := _in_scope(raw, applies)
+	refs := {i: _entry_ref(entry, req) | some i, entry in raw}
+	matches := {i: _subject_matches(entry.subject, req) | some i, entry in raw}
+	applies := _applies_rows(raw, refs, matches, req, name)
+	matching := [raw[i] | some i, _ in raw; matches[i]]
 	groups := _subject_row_groups(matching, req, name)
 }
 
-_in_scope(raw, applies) := [raw[i] | some i, row in applies; row.passed] if count(applies) > 0
+default _scope_readable(_, _, _) := false
 
-_in_scope(raw, applies) := raw if count(applies) == 0
+_scope_readable(_, _, req) if {
+	_size(_applies_to_of(req)) == 0
+	not _bad_applies_to(req)
+}
+
+_scope_readable(raw, applies, _) if count([row | some row in applies; row.cause in {"satisfied", "value"}]) == count(raw)
+
+default _rows_complete(_, _, _) := false
+
+_rows_complete(groups, matching, req) if {
+	count(groups) == count(matching)
+	every group in groups {
+		count(group) == count(_checks_of(req))
+	}
+}
 
 default _holds(_, _) := false
 
@@ -3294,9 +3310,8 @@ _holds(req, e) if {
 	e.well_formed.passed
 	e.unique_ids.passed
 	e.min_subjects.passed
-	every row in e.applies {
-		row.cause in {"satisfied", "value"}
-	}
+	e.scope_readable
+	e.rows_complete
 	_required(_require_of(req), e.subject_rows)
 }
 

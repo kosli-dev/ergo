@@ -7368,3 +7368,38 @@ test_subject_keys_that_are_not_strings_get_a_name_each if {
 		{"name": "subjects.i.<invalid key 2>", "value": ["unknown field"]},
 	]
 }
+
+two_checks_req := {"subject": "s", "require": "some", "checks": {
+	"a": {"op": "present", "path": ["a"]},
+	"b": {"op": "present", "path": ["b"]},
+}}
+
+passing_row := {"passed": true, "cause": "satisfied"}
+
+evaluation_with(rows, matching, scope_readable) := {
+	"well_formed": passing_row,
+	"unique_ids": passing_row,
+	"min_subjects": passing_row,
+	"scope_readable": scope_readable,
+	"rows_complete": ergo._rows_complete(rows, matching, two_checks_req),
+	"subject_rows": rows,
+	"matching": count(matching),
+}
+
+test_a_subject_missing_a_check_row_does_not_count_as_passing if {
+	ergo._holds(two_checks_req, evaluation_with([[passing_row, passing_row]], [{"subject": {}}], true))
+	not ergo._holds(two_checks_req, evaluation_with([[passing_row]], [{"subject": {}}], true))
+}
+
+test_a_subject_in_scope_without_rows_does_not_let_some_pass_on_nothing if {
+	ergo._holds(two_checks_req, evaluation_with([], [], true))
+	not ergo._holds(two_checks_req, evaluation_with([], [{"subject": {}}], true))
+}
+
+test_a_subject_without_an_applies_row_leaves_the_scope_unknown if {
+	subjects := {"s": {"from": ["items"], "applies_to": {"f": {"op": "present", "path": ["a"]}}}}
+	resolved := ergo._resolved_subjects with data.ergo_subjects as subjects
+	ergo._scope_readable([{"subject": {}}, {"subject": {}}], [passing_row, passing_row], two_checks_req) with data.ergo_subjects as subjects with data.ergo_resolved as resolved
+	not ergo._scope_readable([{"subject": {}}, {"subject": {}}], [passing_row], two_checks_req) with data.ergo_subjects as subjects with data.ergo_resolved as resolved
+	not ergo._scope_readable([{"subject": {}}], [{"passed": false, "cause": "absent"}], two_checks_req) with data.ergo_subjects as subjects with data.ergo_resolved as resolved
+}
