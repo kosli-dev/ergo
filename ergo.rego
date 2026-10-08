@@ -640,15 +640,6 @@ _keyed(doc, req) := coll if {
 
 _keyed(doc, req) := {} if not is_object(_target(doc, req))
 
-_raw_subjects(doc, req) := [entry.subject | some entry in _raw_entries(doc, req)]
-
-_matching_entries(doc, req) := [entry |
-	some entry in _raw_entries(doc, req)
-	_subject_matches(entry.subject, req)
-]
-
-_matching_subjects(doc, req) := [entry.subject | some entry in _matching_entries(doc, req)]
-
 _scope_of(req, subj) := {"ergo/names": {_each_step(req).each_as: subj}} if _from_well_formed(req)
 
 _passes(req, check, subj) := _check_passed(check, subj, _flaw(check, _from_names(req))) if not _has_step(req)
@@ -2519,9 +2510,9 @@ _verdict_cause(passed) := "satisfied" if passed
 
 _verdict_cause(passed) := "value" if not passed
 
-_applies_cause(subj, req) := "satisfied" if {
-	_subject_matches(subj, req)
-} else := _scope_cause(_failed_filter_causes(subj, req))
+_applies_cause(_, _, true) := "satisfied"
+
+_applies_cause(subj, req, false) := _scope_cause(_failed_filter_causes(subj, req))
 
 _scope_cause(causes) := "ill_formed" if {
 	"ill_formed" in causes
@@ -2560,21 +2551,6 @@ _answers_presence(check, subj, "") if {
 	not _unreadable_ref(check)
 	_substitute_unusable(check, subj) == set()
 	_read_state(subj, check.path) in {"absent", "null"}
-}
-
-_ruled_out(subj, req) if _scope_cause(_failed_filter_causes(subj, req)) == "value"
-
-_scope_unreadable(subj, req) if {
-	not _subject_matches(subj, req)
-	not _ruled_out(subj, req)
-}
-
-_scope_readable(doc, req) if {
-	not _from_unreadable(req)
-	not _target_cause(doc, req)
-	every subj in _raw_subjects(doc, req) {
-		not _scope_unreadable(subj, req)
-	}
 }
 
 _nested_describe(check, item) := _leaf_describe(check, item) if not _misplaced(check)
@@ -3181,25 +3157,19 @@ _requirement_checks_written_or_added(req) := object.union(
 	object.union(_applies_def(req), _well_formed_def(req)),
 )
 
-_subject_passed(req, subj) if {
-	every _, check in _checks_of(req) {
-		_passes(req, check, subj)
-	}
-}
-
-_subject_rows(doc, req, req_name) := [row |
-	some entry in _matching_entries(doc, req)
+_subject_row_groups(matching, req, req_name) := [[row |
 	some check_name in _names(_checks_of(req))
-	check := _checks_of(req)[check_name]
-	outcome := _outcome(req, check, entry.subject)
 	row := object.union(
 		{
 			"requirement": req_name,
-			"subject": _entry_ref(entry, req),
+			"subject": ref,
 			"check": check_name,
 		},
-		outcome,
+		_outcome(req, _checks_of(req)[check_name], entry.subject),
 	)
+] |
+	some entry in matching
+	ref := _entry_ref(entry, req)
 ]
 
 _well_formed_row(req, req_name) := row if {
@@ -3214,48 +3184,48 @@ _well_formed_row(req, req_name) := row if {
 	}
 }
 
-_min_subjects_row(doc, req, req_name) := {
+_min_subjects_row(doc, req, req_name, matching) := {
 	"requirement": req_name,
 	"subject": {"type": _subject_type_of(req), "id": null},
 	"check": "$min_subjects",
-	"inputs": array.concat([{"name": _subject_count_name(req), "value": count(_matching_subjects(doc, req))}], data.ergo_unreadable),
-	"passed": _enough_subjects(doc, req),
-	"cause": _min_subjects_cause(doc, req),
+	"inputs": array.concat([{"name": _subject_count_name(req), "value": matching}], data.ergo_unreadable),
+	"passed": _enough_subjects(doc, req, matching),
+	"cause": _min_subjects_cause(doc, req, matching),
 }
 
-default _enough_subjects(_, _) := false
+default _enough_subjects(_, _, _) := false
 
-_enough_subjects(doc, req) if {
+_enough_subjects(doc, req, matching) if {
 	not _from_unreadable(req)
 	not _target_cause(doc, req)
 	is_number(_min_subjects_of(req))
-	count(_matching_subjects(doc, req)) >= _min_subjects_of(req)
+	matching >= _min_subjects_of(req)
 }
 
-_min_subjects_cause(doc, req) := _verdict_cause(_enough_subjects(doc, req)) if {
+_min_subjects_cause(doc, req, matching) := _verdict_cause(_enough_subjects(doc, req, matching)) if {
 	not _from_unreadable(req)
 	not _target_cause(doc, req)
 }
 
-_min_subjects_cause(doc, req) := _target_cause(doc, req)
+_min_subjects_cause(doc, req, _) := _target_cause(doc, req)
 
-_min_subjects_cause(_, req) := _from_cause(req) if {
+_min_subjects_cause(_, req, _) := _from_cause(req) if {
 	_from_well_formed(req)
 	_from_unreadable(req)
 }
 
-_unique_ids_row(doc, req, req_name) := {
+_unique_ids_row(refs, req, req_name) := {
 	"requirement": req_name,
 	"subject": {"type": _subject_type_of(req), "id": null},
 	"check": "$unique_ids",
-	"inputs": [{"name": _repeated_ids_name(req), "value": _repeated_ids(doc, req)}],
-	"passed": _ids_unique(doc, req),
-	"cause": _verdict_cause(_ids_unique(doc, req)),
+	"inputs": [{"name": _repeated_ids_name(req), "value": repeated}],
+	"passed": count(repeated) == 0,
+	"cause": _verdict_cause(count(repeated) == 0),
+} if {
+	repeated := _repeated_ids(refs)
 }
 
-_repeated_ids(doc, req) := [pair[1] | some pair in sort({[_literal_text(id), id] | some id in _repeats(sort(_subject_ids(doc, req)))})]
-
-_subject_ids(doc, req) := [_entry_ref(entry, req).id | some entry in _raw_entries(doc, req)]
+_repeated_ids(refs) := [pair[1] | some pair in sort({[_literal_text(id), id] | some id in _repeats(sort([ref.id | some ref in refs]))})]
 
 _repeats(sorted) := {x |
 	some i, x in sorted
@@ -3263,35 +3233,32 @@ _repeats(sorted) := {x |
 	x == sorted[i - 1]
 }
 
-default _ids_unique(_, _) := false
-
-_ids_unique(doc, req) if count(_repeated_ids(doc, req)) == 0
-
-_applies_rows(doc, req, req_name) := [{
+_applies_rows(raw, refs, req, req_name) := [{
 	"requirement": req_name,
-	"subject": _entry_ref(entry, req),
+	"subject": refs[i],
 	"check": "$applies",
 	"inputs": _applies_inputs(entry.subject, req),
-	"passed": _subject_matches(entry.subject, req),
-	"cause": _applies_cause(entry.subject, req),
+	"passed": matches,
+	"cause": _applies_cause(entry.subject, req, matches),
 } |
-	some entry in _raw_entries(doc, req)
+	some i, entry in raw
+	matches := _subject_matches(entry.subject, req)
 ] if {
 	_size(_applies_to_of(req)) > 0
 }
 
-_applies_rows(doc, req, req_name) := [{
+_applies_rows(raw, refs, req, req_name) := [{
 	"requirement": req_name,
-	"subject": _entry_ref(entry, req),
+	"subject": refs[i],
 	"check": "$applies",
 	"inputs": [],
 	"passed": false,
 	"cause": "ill_formed",
 } |
-	some entry in _raw_entries(doc, req)
+	some i, _ in raw
 ] if _bad_applies_to(req)
 
-_applies_rows(_, req, _) := [] if {
+_applies_rows(_, _, req, _) := [] if {
 	_size(_applies_to_of(req)) == 0
 	not _bad_applies_to(req)
 }
@@ -3301,81 +3268,90 @@ _applies_inputs(subj, req) := [inp |
 	some inp in _inputs_in(req, _applies_to_of(req)[name], subj)
 ]
 
-_named_requirement_holds(doc, req, name) if {
-	is_string(name)
-	_requirement_holds(doc, req)
+_evaluation(doc, req, name) := {
+	"well_formed": _well_formed_row(req, name),
+	"min_subjects": _min_subjects_row(doc, req, name, count(matching)),
+	"unique_ids": _unique_ids_row(refs, req, name),
+	"applies": applies,
+	"subject_rows": groups,
+	"total": count(raw),
+	"matching": count(matching),
+} if {
+	raw := _raw_entries(doc, req)
+	refs := [_entry_ref(entry, req) | some entry in raw]
+	applies := _applies_rows(raw, refs, req, name)
+	matching := _in_scope(raw, applies)
+	groups := _subject_row_groups(matching, req, name)
 }
 
-default _requirement_holds(_, _) := false
+_in_scope(raw, applies) := [raw[i] | some i, row in applies; row.passed] if count(applies) > 0
 
-_requirement_holds(doc, req) if {
-	_well_formed(req)
-	_ids_unique(doc, req)
-	_well_formed_requirement_holds(doc, req)
+_in_scope(raw, applies) := raw if count(applies) == 0
+
+default _holds(_, _) := false
+
+_holds(req, e) if {
+	e.well_formed.passed
+	e.unique_ids.passed
+	e.min_subjects.passed
+	every row in e.applies {
+		row.cause in {"satisfied", "value"}
+	}
+	_required(_require_of(req), e.subject_rows)
 }
 
-_well_formed_requirement_holds(doc, req) if {
-	_require_of(req) == "every"
-	_scope_readable(doc, req)
-	count(_matching_subjects(doc, req)) >= _min_subjects_of(req)
-	every subj in _matching_subjects(doc, req) {
-		_subject_passed(req, subj)
+_required("every", groups) if {
+	every group in groups {
+		_all_passed(group)
 	}
 }
 
-_well_formed_requirement_holds(doc, req) if {
-	_require_of(req) == "some"
-	_scope_readable(doc, req)
-	count(_matching_subjects(doc, req)) >= _min_subjects_of(req)
-	some subj in _matching_subjects(doc, req)
-	_subject_passed(req, subj)
+_required("some", groups) if {
+	some group in groups
+	_all_passed(group)
 }
 
-_well_formed_requirement_holds(doc, req) if {
-	_require_of(req) == "some"
-	_scope_readable(doc, req)
-	_min_subjects_of(req) == 0
-	count(_matching_subjects(doc, req)) == 0
+_required("some", groups) if count(groups) == 0
+
+_all_passed(rows) if {
+	every row in rows {
+		row.passed
+	}
 }
 
-_named_requirement_status(doc, req, name) := _requirement_status(doc, req) if is_string(name)
-
-_named_requirement_status(_, _, name) := "not_met" if not is_string(name)
-
-default _requirement_status(_, _) := "not_met"
-
-_requirement_status(doc, req) := "met" if {
-	_requirement_holds(doc, req)
-	count(_matching_subjects(doc, req)) > 0
+_status(req, e) := "met" if {
+	_holds(req, e)
+	e.matching > 0
 }
 
-_requirement_status(doc, req) := "not_applicable" if {
-	_requirement_holds(doc, req)
-	count(_matching_subjects(doc, req)) == 0
+_status(req, e) := "not_applicable" if {
+	_holds(req, e)
+	e.matching == 0
 }
+
+_status(req, e) := "not_met" if not _holds(req, e)
 
 default _policy_compliant(_, _) := false
 
-_policy_compliant(doc, policy) if {
+_policy_compliant(policy, evaluations) if {
 	is_object(policy)
 	_size(policy) > 0
-	count([name |
-		some name, req in policy
-		not _named_requirement_holds(doc, req, name)
-	]) == 0
+	every name, req in policy {
+		_holds(req, evaluations[name])
+	}
 }
 
-_results(doc, policy) := array.concat(
+_results(policy, evaluations) := array.concat(
 	array.concat(
-		[_well_formed_row(policy[name], name) | some name in _names(policy)],
+		[evaluations[name].well_formed | some name in _names(policy)],
 		array.concat(
-			[_min_subjects_row(doc, policy[name], name) | some name in _names(policy)],
-			[_unique_ids_row(doc, policy[name], name) | some name in _names(policy)],
+			[evaluations[name].min_subjects | some name in _names(policy)],
+			[evaluations[name].unique_ids | some name in _names(policy)],
 		),
 	),
 	array.concat(
-		[row | some name in _names(policy); some row in _applies_rows(doc, policy[name], name)],
-		[row | some name in _names(policy); some row in _subject_rows(doc, policy[name], name)],
+		[row | some name in _names(policy); some row in evaluations[name].applies],
+		[row | some name in _names(policy); some group in evaluations[name].subject_rows; some row in group],
 	),
 )
 
@@ -3417,18 +3393,20 @@ _unreadable_inputs(doc, params) := [{"name": name, "value": sort(_json_problems(
 ]
 
 _report_of(doc, policy) := {
-	"compliant": _policy_compliant(doc, policy),
+	"compliant": _policy_compliant(policy, evaluations),
 	"requirements": {name: {
 		"description": _reported_description(req),
 		"meta": _reported_meta(req),
 		"require": _require_of(req),
-		"status": _named_requirement_status(doc, req, name),
-		"subjects": {"total": count(_raw_subjects(doc, req)), "matching": count(_matching_subjects(doc, req))},
+		"status": _status(req, evaluations[name]),
+		"subjects": {"total": evaluations[name].total, "matching": evaluations[name].matching},
 		"checks": _requirement_check_defs(req),
 	} |
 		some name, req in policy
 	},
-	"results": _results(doc, policy),
+	"results": _results(policy, evaluations),
+} if {
+	evaluations := {name: _evaluation(doc, policy[name], name) | some name in _names(policy)}
 }
 
 violations(report) := [object.union(
