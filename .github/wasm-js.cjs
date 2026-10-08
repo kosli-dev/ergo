@@ -19,7 +19,7 @@ execFileSync("tar", ["-xzf", bundle, "-C", runtimeDir, "/policy.wasm", "/data.js
 
 const ergoDir = path.join(runtimeDir, "ergo");
 fs.mkdirSync(ergoDir, { recursive: true });
-fs.writeFileSync(path.join(ergoDir, "entrypoint.rego"), "package entrypoint\n\nreport := data.ergo.report(input.document, input.policy)\n\nviolations := data.ergo.violations(input.report)\n");
+fs.writeFileSync(path.join(ergoDir, "entrypoint.rego"), "package entrypoint\n\nreport := data.ergo.report(input.document, input.policy, input.params)\n\nviolations := data.ergo.violations(input.report)\n");
 execFileSync("opa", ["build", "-t", "wasm", "-e", "entrypoint/report", "-e", "entrypoint/violations", "-o", path.join(ergoDir, "ergo.tar.gz"), "ergo.rego", path.join(ergoDir, "entrypoint.rego")]);
 execFileSync("tar", ["-xzf", path.join(ergoDir, "ergo.tar.gz"), "-C", ergoDir, "/policy.wasm"]);
 

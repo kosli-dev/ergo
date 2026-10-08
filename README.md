@@ -41,10 +41,12 @@ requirements := {"prod_deploy": {
 	}},
 }}
 
-report := ergo.report(input, requirements)
+report := ergo.report(input, {"requirements": requirements}, {})
 
 violations := ergo.violations(report)
 ```
+
+`ergo.report` takes the input, the policy and the params. The policy holds the requirements, and this one has no params, so they're `{}`.
 
 A requirement describes what to check, not how to check it. Its `description` says what it requires, in words anyone can read. Then it says what the policy is about, the things we call _subjects_:
 
@@ -94,10 +96,16 @@ package deploy
 
 import data.ergo
 
-report := ergo.report(input, data.requirements)
+default requirements := {}
+
+requirements := data.requirements
+
+report := ergo.report(input, {"requirements": requirements}, {})
 
 violations := ergo.violations(report)
 ```
+
+The default keeps the report defined when the file has no `requirements:`, or spells it wrong. That report has no requirements, so it isn't compliant.
 
 The report and the violations below come out the same either way.
 

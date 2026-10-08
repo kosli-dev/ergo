@@ -3154,6 +3154,7 @@ _requirement_status(doc, req) := "not_applicable" if {
 default _policy_compliant(_, _) := false
 
 _policy_compliant(doc, policy) if {
+	is_object(policy)
 	_size(policy) > 0
 	count([name |
 		some name, req in policy
@@ -3181,17 +3182,16 @@ _names(x) := [i | some i, _ in x] if is_array(x)
 
 _names(x) := sort(x) if is_set(x)
 
-report(doc, policy) := report_with_params(doc, _configured_params, policy)
-
-_configured_params := data.params
-
-default _configured_params := {}
-
-report_with_params(doc, params, policy) := r if {
+report(doc, policy, params) := r if {
+	reqs := _requirements_section(policy)
 	unreadable := _unreadable_inputs(doc, params)
-	written := _report_of(doc, policy) with data.ergo_document as doc with data.ergo_params as params with data.ergo_unreadable as unreadable with input as {"ergo/names": {}}
-	r := _reported(written, unreadable, policy)
+	written := _report_of(doc, reqs) with data.ergo_document as doc with data.ergo_params as params with data.ergo_unreadable as unreadable with input as {"ergo/names": {}}
+	r := _reported(written, unreadable, reqs)
 }
+
+_requirements_section(policy) := object.get(policy, "requirements", {}) if is_object(policy)
+
+_requirements_section(policy) := null if not is_object(policy)
 
 _reported(written, unreadable, policy) := _plain_numbers(written) if {
 	count(unreadable) == 0
