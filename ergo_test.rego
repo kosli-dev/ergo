@@ -7456,3 +7456,208 @@ test_causes_count_the_rows_violations_returns if {
 	]
 	sum([e.rows | some e in rep.requirements.r.causes]) == count(vs)
 }
+
+derived_row(subj, check) := [r.passed, r.cause, r.inputs] if {
+	r := rows_for(ergo.report({"items": [object.union({"id": 1}, subj)]}, lifted({"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}}), {}), "s", "c")[0]
+}
+
+derived_verdict(subj, check) := array.slice(derived_row(subj, check), 0, 2)
+
+derived_expression(check) := ergo.report({"items": []}, lifted({"s": {"from": ["items"], "id": ["id"], "min_subjects": 0, "checks": {"c": check}}}), {}).requirements.s.checks.c.expression
+
+derived_problems(check) := [i | some i in rows_for(ergo.report({"items": [{"id": 1}]}, lifted({"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}}), {}), "s", "$well_formed")[0].inputs; startswith(i.name, "checks.")]
+
+at_least_one := {"op": "compare", "left": {"count": ["personas"]}, "right": {"literal": 1}, "cmp": "gte"}
+
+test_count_compares_the_length_of_a_list_with_a_fixed_number if {
+	derived_expression(at_least_one) == "count(personas) gte 1"
+	derived_row({"personas": ["security"]}, at_least_one) == [true, "satisfied", [{"name": "count(personas)", "value": 1}, {"name": "personas", "value": ["security"]}]]
+	derived_row({"personas": []}, at_least_one) == [false, "value", [{"name": "count(personas)", "value": 0}, {"name": "personas", "value": []}]]
+}
+
+test_count_fails_closed_on_a_list_it_cannot_read if {
+	derived_row({}, at_least_one) == [false, "absent", [{"name": "count(personas)", "value": null}, {"name": "personas", "value": null}]]
+	derived_row({"personas": null}, at_least_one) == [false, "null", [{"name": "count(personas)", "value": null}, {"name": "personas", "value": null}]]
+	derived_verdict({"personas": "security"}, at_least_one) == [false, "unusable"]
+	derived_verdict({"personas": {"a": 1}}, at_least_one) == [false, "unusable"]
+}
+
+test_count_compares_with_another_field if {
+	check := {"op": "compare", "left": {"count": ["resolutions"]}, "right": ["found"], "cmp": "gte"}
+	derived_expression(check) == "count(resolutions) gte found"
+	derived_verdict({"resolutions": ["a", "b"], "found": 2}, check) == [true, "satisfied"]
+	derived_verdict({"resolutions": ["a"], "found": 2}, check) == [false, "value"]
+	derived_verdict({"resolutions": ["a"]}, check) == [false, "absent"]
+}
+
+claude_findings := {"op": "compare", "left": {"count": ["raw"], "where": {"op": "equals", "path": ["source"], "value": "claude"}}, "right": {"add": [["a"], ["b"]]}, "cmp": "eq"}
+
+test_count_where_only_counts_the_items_that_pass_the_condition if {
+	derived_expression(claude_findings) == `count(raw where source == "claude") eq a + b`
+	subj := {"raw": [{"source": "claude"}, {"source": "gpt"}, {"source": "claude"}], "a": 1, "b": 1}
+	derived_row(subj, claude_findings) == [true, "satisfied", [
+		{"name": `count(raw where source == "claude")`, "value": 2},
+		{"name": "raw", "value": subj.raw},
+		{"name": "a + b", "value": 2},
+		{"name": "a", "value": 1},
+		{"name": "b", "value": 1},
+	]]
+}
+
+test_count_where_fails_with_the_cause_of_an_item_it_cannot_decide if {
+	r := derived_row({"raw": [{"source": "claude"}, {"origin": "x"}], "a": 1, "b": 0}, claude_findings)
+	array.slice(r, 0, 2) == [false, "absent"]
+	r[2][0] == {"name": `count(raw where source == "claude")`, "value": null}
+}
+
+stage_costs := {"op": "compare", "left": {"sum": ["stages"], "each": ["usd"], "where": {"op": "equals", "path": ["kind"], "value": "model"}}, "right": ["total"], "cmp": "eq", "within": 0.01}
+
+test_sum_totals_a_field_across_the_items_that_pass_the_condition_within_a_tolerance if {
+	derived_expression(stage_costs) == `sum(stages[].usd where kind == "model") eq total, within 0.01`
+	stages := [{"kind": "model", "usd": 0.5}, {"kind": "model", "usd": 0.255}, {"kind": "tool", "usd": "n/a"}]
+	derived_row({"stages": stages, "total": 0.75}, stage_costs) == [true, "satisfied", [
+		{"name": `sum(stages[].usd where kind == "model")`, "value": 0.755},
+		{"name": "stages[].usd", "value": [0.5, 0.255, "n/a"]},
+		{"name": "total", "value": 0.75},
+	]]
+	derived_verdict({"stages": stages, "total": 0.7}, stage_costs) == [false, "value"]
+}
+
+test_sum_fails_closed_on_an_item_it_cannot_add if {
+	derived_verdict({"stages": [{"kind": "model", "usd": "1"}], "total": 1}, stage_costs) == [false, "unusable"]
+	derived_verdict({"stages": [{"kind": "model"}], "total": 1}, stage_costs) == [false, "absent"]
+	derived_verdict({"stages": [{"kind": "model", "usd": null}], "total": 1}, stage_costs) == [false, "null"]
+	derived_verdict({"stages": [{"usd": 1}], "total": 1}, stage_costs) == [false, "absent"]
+}
+
+test_within_needs_two_numbers if {
+	check := {"op": "compare", "left": ["a"], "right": ["b"], "cmp": "eq", "within": 1}
+	derived_verdict({"a": 1, "b": 1.5}, check) == [true, "satisfied"]
+	derived_verdict({"a": 1, "b": 2.5}, check) == [false, "value"]
+	derived_verdict({"a": "1", "b": "1"}, check) == [false, "unusable"]
+}
+
+test_add_needs_numbers if {
+	check := {"op": "compare", "left": {"add": [{"count": ["records"]}, ["skipped"]]}, "right": ["found"], "cmp": "eq"}
+	derived_expression(check) == "count(records) + skipped eq found"
+	derived_verdict({"records": [1, 2], "skipped": 1, "found": 3}, check) == [true, "satisfied"]
+	derived_verdict({"records": [1, 2], "skipped": "1", "found": 3}, check) == [false, "unusable"]
+	derived_verdict({"records": [1, 2], "found": 3}, check) == [false, "absent"]
+}
+
+test_a_literal_side_works_inside_a_list_check_too if {
+	check := {"op": "all", "path": ["xs"], "check": {"op": "compare", "left": ["n"], "right": {"literal": 2}, "cmp": "lte"}}
+	derived_expression(check) == "every xs: n lte 2"
+	derived_verdict({"xs": [{"n": 1}, {"n": 2}]}, check) == [true, "satisfied"]
+	derived_verdict({"xs": [{"n": 3}]}, check) == [false, "value"]
+}
+
+test_a_side_written_wrong_is_ill_formed if {
+	every case in [
+		["personas", "invalid left"],
+		[{"a": 1}, "invalid left"],
+		[{"count": "personas"}, "invalid left"],
+		[{"count": ["personas"], "zz": 1}, "invalid left"],
+		[{"sum": ["stages"]}, "invalid left"],
+		[{"add": []}, "invalid left"],
+		[{"add": [{"literal": "1"}]}, "invalid left"],
+		[{"add": [{"add": [["a"]]}]}, "invalid left"],
+		[{"literal": 1, "zz": 2}, "invalid left"],
+	] {
+		[side, problem] := case
+		check := {"op": "compare", "left": side, "right": ["n"], "cmp": "gte"}
+		derived_verdict({"personas": [], "n": 1}, check) == [false, "ill_formed"]
+		problem in derived_problems(check)[0].value
+	}
+}
+
+test_within_is_written_wrong_unless_it_is_a_number_of_zero_or_more_on_eq if {
+	every case in [["1", "eq", "invalid within"], [-1, "eq", "invalid within"], [1, "lt", "within needs cmp eq"]] {
+		[within, cmp, problem] := case
+		check := {"op": "compare", "left": ["a"], "right": ["b"], "cmp": cmp, "within": within}
+		problem in derived_problems(check)[0].value
+	}
+	derived_problems({"op": "compare_time", "left": ["a"], "right": ["b"], "cmp": "eq", "within": 1})[0].value == ["unknown field within"]
+}
+
+test_a_derived_value_only_goes_in_a_check_of_its_own if {
+	inner := {"op": "compare", "left": {"count": ["ys"]}, "right": {"literal": 1}, "cmp": "gte"}
+	derived_problems({"op": "all", "path": ["xs"], "check": inner}) == [{"name": "checks.c.check", "value": ["count can't go here"]}]
+	derived_problems({"op": "compare_time", "left": {"count": ["ys"]}, "right": ["t"], "cmp": "lt"}) == [{"name": "checks.c", "value": ["invalid left"]}]
+}
+
+test_a_where_condition_is_one_basic_check if {
+	nested := {"op": "compare", "left": {"count": ["raw"], "where": {"op": "any", "path": ["tags"], "check": {"op": "present", "path": []}}}, "right": {"literal": 1}, "cmp": "gte"}
+	derived_problems(nested) == [{"name": "checks.c.left.where", "value": ["nested too deep"]}]
+	typo := {"op": "compare", "left": {"count": ["raw"], "where": {"op": "equls", "path": ["source"], "value": "x"}}, "right": {"literal": 1}, "cmp": "gte"}
+	derived_problems(typo) == [{"name": "checks.c.left.where", "value": ["unknown op equls"]}]
+}
+
+test_add_takes_fixed_numbers if {
+	check := {"op": "compare", "left": {"add": [{"count": ["records"]}, {"literal": 1}]}, "right": ["found"], "cmp": "eq"}
+	derived_expression(check) == "count(records) + 1 eq found"
+	derived_verdict({"records": [1, 2], "found": 3}, check) == [true, "satisfied"]
+	derived_verdict({"records": [1, 2], "found": 9}, check) == [false, "value"]
+}
+
+test_a_where_condition_can_say_what_it_means if {
+	check := {"op": "compare", "left": {"count": ["raw"], "where": {"op": "equals", "path": ["source"], "value": "claude", "expression": "from Claude"}}, "right": {"literal": 1}, "cmp": "gte"}
+	derived_expression(check) == "count(raw where from Claude) gte 1"
+}
+
+test_a_derived_check_with_a_bad_other_side_is_ill_formed_and_says_which if {
+	invalid := {"op": "compare", "left": {"count": ["xs"]}, "right": "n", "cmp": "eq"}
+	derived_expression(invalid) == "count(xs) eq <invalid right>"
+	derived_verdict({"xs": [1], "n": 1}, invalid) == [false, "ill_formed"]
+	missing := {"op": "compare", "left": {"count": ["xs"]}, "cmp": "eq"}
+	derived_expression(missing) == "count(xs) eq <missing right>"
+	derived_verdict({"xs": [1]}, missing) == [false, "ill_formed"]
+}
+
+test_a_derived_value_reads_the_input_and_the_params_like_any_path if {
+	check := {"op": "compare", "left": {"count": ["$$params", "suites"]}, "right": {"count": ["$$input", "runs"]}, "cmp": "eq"}
+	policy := lifted({"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
+	r := rows_for(ergo.report({"runs": ["unit", "e2e"], "items": [{"id": 1}]}, policy, {"suites": ["unit", "e2e"]}), "s", "c")[0]
+	[r.passed, r.cause] == [true, "satisfied"]
+	ergo.report({"runs": ["unit", "e2e"], "items": [{"id": 1}]}, policy, {}).requirements.s.causes == [{"cause": "absent", "rows": 1}]
+}
+
+test_a_derived_check_can_have_a_substitute if {
+	check := {"op": "compare", "left": {"count": ["approvals"]}, "right": {"literal": 2}, "cmp": "gte", "substitute": {"op": "equals", "path": ["emergency"], "value": true}}
+	derived_verdict({"approvals": ["ann"], "emergency": true}, check) == [true, "substituted"]
+	derived_verdict({"approvals": ["ann"]}, check) == [false, "value"]
+}
+
+test_a_derived_check_works_as_a_filter if {
+	subjects := {"pr": {"from": ["prs"], "id": ["n"], "applies_to": {"big": {"op": "compare", "left": {"count": ["files"]}, "right": {"literal": 10}, "cmp": "gt"}}}}
+	reqs := {"r": {"subject": "pr", "checks": {"reviewed": {"op": "present", "path": ["reviewer"]}}}}
+	rep := ergo.report({"prs": [{"n": 1, "files": array.concat(numbers.range(1, 11), []), "reviewer": "ann"}, {"n": 2, "files": [1]}, {"n": 3}]}, subject_policy(subjects, reqs), {})
+	[[r.subject.id, r.passed, r.cause] | some r in rep.results; r.check == "$applies"] == [[1, true, "satisfied"], [2, false, "value"], [3, false, "absent"]]
+	rep.requirements.r.status == "not_met"
+}
+
+test_a_substitute_can_be_a_derived_check if {
+	check := {"op": "compare", "left": {"count": ["approvals"]}, "right": {"literal": 2}, "cmp": "gte", "substitute": {"op": "compare", "left": {"count": ["backups"]}, "right": {"literal": 2}, "cmp": "gte"}}
+	derived_verdict({"approvals": ["a"], "backups": ["x", "y"]}, check) == [true, "substituted"]
+	derived_verdict({"approvals": ["a"], "backups": ["x"]}, check) == [false, "value"]
+}
+
+test_a_where_condition_has_no_substitute_because_it_would_change_what_is_counted if {
+	check := {"op": "compare", "left": {"count": ["raw"], "where": {"op": "present", "path": ["s"], "substitute": {"op": "present", "path": ["t"]}}}, "right": {"literal": 1}, "cmp": "gte"}
+	derived_problems(check) == [{"name": "checks.c.left.where", "value": ["substitute can't go here"]}]
+}
+
+test_a_present_condition_leaves_out_items_whose_field_is_missing if {
+	check := {"op": "compare", "left": {"count": ["raw"], "where": {"op": "present", "path": ["s"]}}, "right": {"literal": 1}, "cmp": "eq"}
+	derived_row({"raw": [{"s": 1}, {}, {"s": null}]}, check) == [true, "satisfied", [{"name": "count(raw where s is present)", "value": 1}, {"name": "raw", "value": [{"s": 1}, {}, {"s": null}]}]]
+}
+
+test_a_derived_value_reads_a_name_given_by_from if {
+	check := {"op": "compare", "left": {"count": ["$it", "xs"]}, "right": {"literal": 2}, "cmp": "eq"}
+	policy := {"subjects": {"i": {"from": ["items", {"each_as": "it"}], "id": ["id"]}}, "requirements": {"r": {"subject": "i", "checks": {"c": check}}}}
+	rep := ergo.report({"items": [{"id": 1, "xs": [1, 2]}]}, policy, {})
+	[[r.check, r.passed, r.cause] | some r in rep.results; r.check == "c"] == [["c", true, "satisfied"]]
+	rep.requirements.r.checks.c.expression == "count($it.xs) eq 2"
+	unknown := object.union(check, {"left": {"count": ["$other", "xs"]}})
+	[[r.check, r.cause] | some r in ergo.report({"items": [{"id": 1, "xs": [1, 2]}]}, object.union(policy, {"requirements": {"r": {"subject": "i", "checks": {"c": unknown}}}}), {}).results; r.check == "c"] == [["c", "ill_formed"]]
+}

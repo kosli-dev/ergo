@@ -1396,11 +1396,23 @@ _leaf_op_passed("not_matches_any", check, subj) if {
 }
 
 _leaf_op_passed("compare", check, subj) if {
-	l := value_at(subj, check.left)
-	r := value_at(subj, check.right)
+	l := _simple_value(subj, check.left)
+	r := _simple_value(subj, check.right)
+	_compared(check, l, r)
+}
+
+_compared(check, l, r) if {
+	not "within" in object.keys(check)
 	_comparable(l, r)
 	_orderable(check.cmp, l)
 	_cmp(check.cmp, l, r)
+}
+
+_compared(check, l, r) if {
+	"within" in object.keys(check)
+	is_number(l)
+	is_number(r)
+	abs(l - r) <= check.within
 }
 
 _leaf_op_passed("compare_time", check, subj) if {
@@ -1470,9 +1482,31 @@ _unusable(leaf, x) if {
 
 _unusable(leaf, x) if {
 	leaf.op == "compare"
-	l := _found(x, leaf.left)
-	r := _found(x, leaf.right)
+	not "within" in object.keys(leaf)
+	l := _simple_found(x, leaf.left)
+	r := _simple_found(x, leaf.right)
 	not _usable_pair(leaf.cmp, l, r)
+}
+
+_unusable(leaf, x) if {
+	leaf.op == "compare"
+	"within" in object.keys(leaf)
+	l := _simple_found(x, leaf.left)
+	r := _simple_found(x, leaf.right)
+	not _numbers(l, r)
+}
+
+_numbers(l, r) if {
+	is_number(l)
+	is_number(r)
+}
+
+_simple_found(x, side) := _found(x, side) if is_array(side)
+
+_simple_found(_, side) := v if {
+	_basic_form(side) == "literal"
+	v := _written(side)
+	v != null
 }
 
 _unusable(leaf, x) if {
@@ -1611,7 +1645,7 @@ _too_deep(node, kinds) if {
 	not node.op in _allowed_ops(kinds)
 }
 
-_children(node, names) := array.concat(_inner_child(node, names), _option_children(node, names))
+_children(node, names) := array.concat(array.concat(_inner_child(node, names), _option_children(node, names)), _where_children(node, names))
 
 default _inner_child(_, _) := []
 
@@ -1630,7 +1664,7 @@ _option_children(node, names) := [[leaf, ["options", nm, i], "option", names] |
 
 _node_problems(node, _, _) := {"invalid check"} if not is_object(node)
 
-_node_problems(node, kinds, names) := ((_op_problems(node, kinds) | _field_problems(node)) | _step_problems(node)) | _name_problems(node, names) if is_object(node)
+_node_problems(node, kinds, names) := (((_op_problems(node, kinds) | _field_problems(node)) | _step_problems(node)) | _name_problems(node, names)) | _derived_placement_problem(node, kinds) if is_object(node)
 
 default _op_problems(_, _) := set()
 
@@ -1656,9 +1690,10 @@ _allowed_ops(kinds) := object.get(_nested_ops, [kinds[count(kinds) - 1], count([
 _nested_ops := {
 	"option": [(_leaf_ops | {"all", "any"}), (_leaf_ops | {"all", "any"}), _leaf_ops],
 	"check": [set(), (_leaf_ops | {"all", "any", "any_of"}), (_leaf_ops | {"any_of"})],
+	"where": [_leaf_ops],
 }
 
-_field_problems(node) := union({_wording_problem(node), _unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _each_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node), _json_problem(node)})
+_field_problems(node) := union({_side_problem(node), _within_problem(node), _wording_problem(node), _unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _each_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node), _json_problem(node)})
 
 _json_problem(node) := _json_problems(object.remove(_own_fields(node), ["meta"]))
 
@@ -1695,6 +1730,7 @@ _wording_problem(node) := ({"invalid description" |
 }
 
 _op_fields := object.union(_required_fields, {
+	"compare": {"left", "right", "cmp", "within"},
 	"excludes": {"path", "value", "values"},
 	"includes": {"path", "value", "values"},
 	"all": {"path", "check", "each", "as"},
@@ -1867,6 +1903,15 @@ _step_problems(node) := {concat("", ["step that can't be a key in ", f]) |
 _own_paths(node, f) := [node[f]] if {
 	f != "inputs"
 	f in object.keys(node)
+	not _side_field(node, f)
+}
+
+_own_paths(node, f) := _side_paths(node[f]) if _side_field(node, f)
+
+_side_field(node, f) if {
+	node.op == "compare"
+	f in {"left", "right"}
+	f in object.keys(node)
 }
 
 _own_paths(node, "inputs") := [p | some spec in node.inputs; some p in _input_paths(spec)] if is_array(node.inputs)
@@ -2005,6 +2050,13 @@ op_passed(check, subj) if {
 }
 
 op_passed(check, subj) if _list_passed(check, subj)
+
+op_passed(check, subj) if {
+	_derived_sides(check) != []
+	l := _side_value(subj, check.left)
+	r := _side_value(subj, check.right)
+	_compared(check, l, r)
+}
 
 default _list_passed(_, _) := false
 
@@ -2171,7 +2223,7 @@ default _read_paths(_) := []
 
 _read_paths(check) := [_input_spec_path(spec) | some spec in check.inputs] if check.inputs
 
-_read_paths(check) := [check.left, check.right] if {
+_read_paths(check) := [side | some side in [check.left, check.right]; is_array(side)] if {
 	not check.inputs
 	_two_sided(check)
 }
@@ -2278,7 +2330,7 @@ _has_inputs(check) if check.inputs
 
 _check_states(check, subj) := {_read_state(subj, p) | some p in _read_paths(check)} if _has_inputs(check)
 
-_check_states(check, subj) := _answered(check, subj, {_read_state(subj, p) | some p in _read_paths(check)}) | _unusable_states(check, subj) if {
+_check_states(check, subj) := (_answered(check, subj, {_read_state(subj, p) | some p in _read_paths(check)}) | _unusable_states(check, subj)) | _derived_states(check, subj) if {
 	not _has_inputs(check)
 	not _quantified(check)
 	not _combinator(check)
@@ -2630,7 +2682,9 @@ _pattern_list(check) := _list_text(check.patterns, "patterns") if "patterns" in 
 
 _pattern_list(check) := "<missing patterns>" if not "patterns" in object.keys(check)
 
-_leaf_describe(check, item) := concat("", [_path_text(item, check, "left"), " ", _cmp_text(check), " ", _path_text(item, check, "right")]) if check.op in {"compare", "compare_time"}
+_leaf_describe(check, item) := concat("", [_path_text(item, check, "left"), " ", _cmp_text(check), " ", _path_text(item, check, "right")]) if check.op == "compare_time"
+
+_leaf_describe(check, item) := concat("", [_simple_side_text(item, check, "left"), " ", _cmp_text(check), " ", _simple_side_text(item, check, "right"), _within_text(check)]) if check.op == "compare"
 
 _one_value_text(check) := _value_text(check.value) if {
 	"value" in object.keys(check)
@@ -2678,6 +2732,12 @@ _expression_of(check, item) := _leaf_describe(check, item) if {
 	not _written_expression(check)
 	not _quantified(check)
 	not _combinator(check)
+	_derived_sides(check) == []
+}
+
+_expression_of(check, item) := concat("", [_compare_side_text(item, check, "left"), " ", _cmp_text(check), " ", _compare_side_text(item, check, "right"), _within_text(check)]) if {
+	not _written_expression(check)
+	_derived_sides(check) != []
 }
 
 _expression_of(check, item) := _list_describe(check, _item_given(item)) if {
@@ -2829,7 +2889,12 @@ _check_inputs(subj, check, item) := [
 	{"name": _item_path_name(item, check.right), "value": value_at(subj, check.right)},
 ] if {
 	not check.inputs
-	_two_sided(check)
+	check.op == "compare_time"
+}
+
+_check_inputs(subj, check, item) := array.concat(_side_inputs(subj, object.get(check, "left", null), item), _side_inputs(subj, object.get(check, "right", null), item)) if {
+	not check.inputs
+	check.op == "compare"
 }
 
 _check_inputs(subj, check, _) := array.concat(_quantified_inputs(subj, check), _name_inputs(subj, check)) if {
@@ -2938,7 +3003,7 @@ _any_of_reads(subj, check, item) := {[_item_path_name(item, p), value_at(subj, p
 	some p in _check_reads(leaf)
 }
 
-_leaf_paths(leaf) := [leaf.left, leaf.right] if _two_sided(leaf)
+_leaf_paths(leaf) := [side | some side in [leaf.left, leaf.right]; is_array(side)] if _two_sided(leaf)
 
 _leaf_paths(leaf) := [leaf.path] if {
 	not _two_sided(leaf)
@@ -3485,3 +3550,312 @@ _definition_field(requirements, row, key) := object.get(
 	[row.requirement, "checks", row.check, key],
 	"",
 )
+
+_basic_form(side) := "path" if is_array(side)
+
+_basic_form(side) := "literal" if {
+	is_object(side)
+	object.keys(side) == {"literal"}
+}
+
+_basic_form(side) := "count" if {
+	is_object(side)
+	"count" in object.keys(side)
+	object.keys(side) - {"count", "where"} == set()
+	is_array(side.count)
+	_where_shaped(side)
+}
+
+_basic_form(side) := "sum" if {
+	is_object(side)
+	"sum" in object.keys(side)
+	object.keys(side) - {"sum", "each", "where"} == set()
+	is_array(side.sum)
+	is_array(object.get(side, "each", null))
+	_where_shaped(side)
+}
+
+_side_form(side) := _basic_form(side)
+
+_side_form(side) := "add" if {
+	is_object(side)
+	object.keys(side) == {"add"}
+	is_array(side.add)
+	count(side.add) > 0
+	every operand in side.add {
+		_operand(operand)
+	}
+}
+
+_where_shaped(side) if not "where" in object.keys(side)
+
+_where_shaped(side) if is_object(side.where)
+
+_operand(x) if _basic_form(x) in {"path", "count", "sum"}
+
+_operand(x) if {
+	_basic_form(x) == "literal"
+	is_number(_written(x))
+}
+
+default _derived(_) := false
+
+_derived(side) if _side_form(side) in {"count", "sum", "add"}
+
+default _derived_sides(_) := []
+
+_derived_sides(check) := [check[f] | some f in ["left", "right"]; f in object.keys(check); _derived(check[f])] if check.op == "compare"
+
+_simple_value(subj, side) := value_at(subj, side) if is_array(side)
+
+_simple_value(_, side) := _written(side) if _basic_form(side) == "literal"
+
+_basic_value(subj, side) := _simple_value(subj, side) if _basic_form(side) in {"path", "literal"}
+
+_basic_value(subj, side) := count(_counted(subj, side, side.count)) if {
+	_basic_form(side) == "count"
+	_list_decided(subj, side, side.count)
+}
+
+_basic_value(subj, side) := sum(nums) if {
+	_basic_form(side) == "sum"
+	_list_decided(subj, side, side.sum)
+	nums := [value_at(item, side.each) | some item in _counted(subj, side, side.sum)]
+	every n in nums {
+		is_number(n)
+	}
+}
+
+_side_value(subj, side) := _basic_value(subj, side) if _basic_form(side)
+
+_side_value(subj, side) := sum(nums) if {
+	_side_form(side) == "add"
+	nums := [n | some operand in side.add; n := _basic_value(subj, operand)]
+	count(nums) == count(side.add)
+	every n in nums {
+		is_number(n)
+	}
+}
+
+_counted(subj, side, path) := [item | some item in value_at(subj, path); _where_passes(side, item)]
+
+_list_decided(subj, side, path) if {
+	is_array(value_at(subj, path))
+	every item in value_at(subj, path) {
+		_where_cause(side, item) in {"satisfied", "value", "missing"}
+	}
+}
+
+_where_passes(side, _) if not "where" in object.keys(side)
+
+_where_passes(side, item) if leaf_passed(side.where, item)
+
+_where_cause(side, _) := "satisfied" if not "where" in object.keys(side)
+
+_where_cause(side, item) := _leaf_cause(side.where, item) if "where" in object.keys(side)
+
+_basic_states(_, side) := set() if _basic_form(side) == "literal"
+
+_basic_states(subj, side) := _counted_states(subj, side, side.count) if _basic_form(side) == "count"
+
+_basic_states(subj, side) := _counted_states(subj, side, side.sum) | {s |
+	is_array(value_at(subj, side.sum))
+	some item in _counted(subj, side, side.sum)
+	some s in _number_states(item, side.each)
+} if _basic_form(side) == "sum"
+
+_side_states(subj, side) := _basic_states(subj, side) if _basic_form(side)
+
+_side_states(subj, side) := union({_operand_states(subj, operand) | some operand in side.add}) if _side_form(side) == "add"
+
+_operand_states(subj, operand) := _number_states(subj, operand) if _basic_form(operand) == "path"
+
+_operand_states(subj, operand) := _basic_states(subj, operand) if _basic_form(operand) != "path"
+
+_number_states(x, path) := {s} if {
+	s := _read_state(x, path)
+	s != "value"
+}
+
+_number_states(x, path) := {"unusable"} if {
+	_read_state(x, path) == "value"
+	not is_number(value_at(x, path))
+}
+
+_number_states(x, path) := set() if {
+	_read_state(x, path) == "value"
+	is_number(value_at(x, path))
+}
+
+_counted_states(subj, _, path) := {s} if {
+	s := _read_state(subj, path)
+	s != "value"
+}
+
+_counted_states(subj, _, path) := {"unusable"} if {
+	_read_state(subj, path) == "value"
+	not is_array(value_at(subj, path))
+}
+
+_counted_states(subj, side, path) := {c |
+	some item in value_at(subj, path)
+	c := _where_cause(side, item)
+	not c in {"satisfied", "value", "missing"}
+} if {
+	_read_state(subj, path) == "value"
+	is_array(value_at(subj, path))
+}
+
+_derived_states(check, subj) := union({_side_states(subj, side) | some side in _derived_sides(check)}) | {"unusable" |
+	_derived_sides(check) != []
+	l := _side_found(subj, check.left)
+	r := _side_found(subj, check.right)
+	not _usable_sides(check, l, r)
+}
+
+_side_found(subj, side) := _simple_found(subj, side) if _basic_form(side) in {"path", "literal"}
+
+_side_found(subj, side) := _side_value(subj, side) if _derived(side)
+
+_usable_sides(check, l, r) if {
+	not "within" in object.keys(check)
+	_usable_pair(check.cmp, l, r)
+}
+
+_usable_sides(check, l, r) if {
+	"within" in object.keys(check)
+	_numbers(l, r)
+}
+
+_basic_inputs(subj, side, item) := [{"name": _item_path_name(item, side), "value": value_at(subj, side)}] if _basic_form(side) == "path"
+
+_basic_inputs(_, side, _) := [] if _basic_form(side) == "literal"
+
+_basic_inputs(subj, side, item) := [_derived_input(subj, side, _basic_text(item, side)), {"name": _item_path_name(item, side.count), "value": value_at(subj, side.count)}] if _basic_form(side) == "count"
+
+_basic_inputs(subj, side, item) := [_derived_input(subj, side, _basic_text(item, side)), {"name": _projection_name(side.sum, side.each), "value": [value_at(x, side.each) | some x in _list_at(subj, side.sum)]}] if _basic_form(side) == "sum"
+
+_side_inputs(subj, side, item) := _basic_inputs(subj, side, item) if _basic_form(side)
+
+_side_inputs(subj, side, item) := array.concat([_derived_input(subj, side, _side_text(item, side))], [i | some operand in side.add; some i in _basic_inputs(subj, operand, item)]) if _side_form(side) == "add"
+
+_side_inputs(_, side, _) := [] if not _side_form(side)
+
+_derived_input(subj, side, name) := {"name": name, "value": v} if v := _side_value(subj, side)
+
+_derived_input(subj, side, name) := {"name": name, "value": null} if not _has_side_value(subj, side)
+
+default _has_side_value(_, _) := false
+
+_has_side_value(subj, side) if _ = _side_value(subj, side)
+
+_basic_text(item, side) := _item_path_name(item, side) if _basic_form(side) == "path"
+
+_basic_text(_, side) := _value_text(side) if _basic_form(side) == "literal"
+
+_basic_text(item, side) := concat("", ["count(", _item_path_name(item, side.count), _where_text(side, side.count), ")"]) if _basic_form(side) == "count"
+
+_basic_text(_, side) := concat("", ["sum(", _projection_name(side.sum, side.each), _where_text(side, side.sum), ")"]) if _basic_form(side) == "sum"
+
+_side_text(item, side) := _basic_text(item, side) if _basic_form(side)
+
+_side_text(item, side) := concat(" + ", [_basic_text(item, operand) | some operand in side.add]) if _side_form(side) == "add"
+
+_where_text(side, _) := "" if not "where" in object.keys(side)
+
+_where_text(side, path) := concat("", [" where ", _where_describe(side.where, concat("", [_path_name(path), "[]"]))]) if "where" in object.keys(side)
+
+_where_describe(check, _) := check.expression if _written_expression(check)
+
+_where_describe(check, item) := _leaf_describe(check, item) if not _written_expression(check)
+
+_compare_side_text(item, check, f) := _side_text(item, check[f]) if {
+	f in object.keys(check)
+	_side_form(check[f])
+}
+
+_compare_side_text(_, check, f) := concat("", ["<invalid ", f, ">"]) if {
+	f in object.keys(check)
+	not _side_form(check[f])
+}
+
+_compare_side_text(_, check, f) := concat("", ["<missing ", f, ">"]) if not f in object.keys(check)
+
+_simple_side_text(item, check, f) := _item_path_name(item, check[f]) if {
+	f in object.keys(check)
+	is_array(check[f])
+}
+
+_simple_side_text(_, check, f) := _value_text(check[f]) if {
+	f in object.keys(check)
+	_basic_form(check[f]) == "literal"
+}
+
+_simple_side_text(_, check, f) := concat("", ["<invalid ", f, ">"]) if {
+	f in object.keys(check)
+	not _basic_form(check[f]) in {"path", "literal"}
+}
+
+_simple_side_text(_, check, f) := concat("", ["<missing ", f, ">"]) if not f in object.keys(check)
+
+_within_text(check) := concat("", [", within ", _value_text(check.within)]) if "within" in object.keys(check)
+
+_within_text(check) := "" if not "within" in object.keys(check)
+
+_basic_paths(side) := [side] if _basic_form(side) == "path"
+
+_basic_paths(side) := [side.count] if _basic_form(side) == "count"
+
+_basic_paths(side) := [side.sum, side.each] if _basic_form(side) == "sum"
+
+_basic_paths(side) := [] if _basic_form(side) == "literal"
+
+_side_paths(side) := _basic_paths(side) if _basic_form(side)
+
+_side_paths(side) := [p | some operand in side.add; some p in _basic_paths(operand)] if _side_form(side) == "add"
+
+_side_paths(side) := [] if not _side_form(side)
+
+_where_children(node, names) := [[node[f].where, [f, "where"], "where", names] |
+	node.op == "compare"
+	some f in ["left", "right"]
+	f in object.keys(node)
+	_basic_form(node[f]) in {"count", "sum"}
+	"where" in object.keys(node[f])
+]
+
+_side_problem(node) := {concat("", ["invalid ", f]) |
+	node.op == "compare"
+	some f in ["left", "right"]
+	f in object.keys(node)
+	not _side_form(node[f])
+} | {concat("", ["invalid ", f]) |
+	node.op == "compare_time"
+	some f in ["left", "right"]
+	f in object.keys(node)
+	not is_array(node[f])
+}
+
+_within_problem(node) := {"invalid within" |
+	node.op == "compare"
+	"within" in object.keys(node)
+	not _non_negative(node.within)
+} | {"within needs cmp eq" |
+	node.op == "compare"
+	"within" in object.keys(node)
+	object.get(node, "cmp", null) != "eq"
+}
+
+_non_negative(n) if {
+	is_number(n)
+	n >= 0
+}
+
+_derived_placement_problem(node, kinds) := {concat("", [_side_form(side), " can't go here"]) |
+	kinds != []
+	some side in _derived_sides(node)
+} | {"substitute can't go here" |
+	kinds != []
+	kinds[count(kinds) - 1] == "where"
+	"substitute" in object.keys(node)
+}
