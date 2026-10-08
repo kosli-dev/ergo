@@ -3044,15 +3044,10 @@ _unique_ids_def(req) := {"$unique_ids": _with_refs(
 
 _repeated_ids_name(req) := concat(" ", ["repeated", _text(_subject_type_of(req)), "ids"])
 
-_well_formed_def(req) := {"$well_formed": {
+_well_formed_def := {"$well_formed": {
 	"description": "The requirement is written correctly",
-	"expression": `subject in subjects and fields are known and have the right types and count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float and checks are written right`,
-}} if not _stepped(req)
-
-_well_formed_def(req) := {"$well_formed": {
-	"description": "The requirement is written correctly",
-	"expression": `subject in subjects and fields are known and have the right types and count(checks) >= 1 and require in ["every", "some"] and from is well formed and steps are keys and numbers fit a float and checks are written right`,
-}} if _stepped(req)
+	"expression": "count(problems) == 0",
+}}
 
 default _well_formed_named(_, _) := false
 
@@ -3149,7 +3144,7 @@ _requirement_checks_written_or_added(req) := object.union(
 		{name: _check_def(check, _subject_item_name(req)) | some name, check in _checks_of(req)},
 		object.union(_min_subjects_def(req), _unique_ids_def(req)),
 	),
-	object.union(_applies_def(req), _well_formed_def(req)),
+	object.union(_applies_def(req), _well_formed_def),
 )
 
 _subject_row_groups(matching, req, req_name, flaws, item) := [[row |
