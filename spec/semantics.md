@@ -1,6 +1,6 @@
 # How ergo turns a policy and an input into a report
 
-Draft 0.1. This covers reading values, causes, expressions and the operators `present`, `missing`, `equals`, `in`, `non_empty_string`, `empty`, `range`, `matches_any` and `not_matches_any` so far. Everything else is still described only in [REFERENCE.md](../REFERENCE.md).
+Draft 0.1. This covers reading values, causes, expressions and the operators `present`, `missing`, `equals`, `in`, `non_empty_string`, `empty`, `range`, `matches_any`, `not_matches_any`, `includes`, `excludes`, `compare` and `compare_time` so far. Everything else is still described only in [REFERENCE.md](../REFERENCE.md).
 
 Each rule has a name in brackets, like **[present.missing]**. The cases in [`cases/`](cases) list the rules they test, so you can find the cases for a rule and the rule behind a case. An implementation follows every rule here, and where it does something else, it's wrong, whatever `ergo.rego` does.
 
@@ -85,7 +85,7 @@ Each check's definition in the report has an `expression` that says what it chec
 
 **[render.path]** A path is shown with its name, as in [Naming a path](#naming-a-path).
 
-**[render.missing]** A parameter that's missing is shown as `<missing value>`, `<missing values>` and so on, and a ref written wrong as `<invalid ref>`.
+**[render.missing]** A parameter that's missing is shown as `<missing value>`, `<missing values>` and so on, and a ref written wrong as `<invalid ref>`. A `path`, `left` or `right` that isn't a list is shown as `<invalid path>`, `<invalid left>` or `<invalid right>`.
 
 ## Checks written wrong
 
@@ -190,3 +190,39 @@ Each check's definition in the report has an `expression` that says what it chec
 **[patterns.fail]** Both fail with the path's outcome as their cause when the path ends anything but `found`, and with `unusable` when the value isn't a string. Otherwise they fail with `value`.
 
 **[patterns.expression]** Their expressions are `<path> matches one of [<patterns>]` and `<path> matches none of [<patterns>]`, with the patterns shown as values and sorted by the text they're shown as, as for `in`. Patterns read through a ref are shown as the ref's name.
+
+## `includes` and `excludes`
+
+`{"op": "includes", "path": [...], "value": v}` asks whether a field is a list that contains a value, and `excludes` whether it's a list that doesn't. With `"values": [...]` in place of `value`, `includes` asks for every one of them and `excludes` for none.
+
+**[contains.value]** `value` is one value, so a list given as `value` is looked for as a list inside the field. `values` is a list, a literal holding a list, or a ref, and its items can be refs or literals. Giving both, or neither, is written wrong, as `both value and values` or `missing value or values`. An empty `values` would pass every list, so it's written wrong as `empty values`, and a `values` that isn't a list as `invalid values`. When a ref reads something other than a non-empty list for `values`, the check fails as `unusable`.
+
+**[contains.pass]** `includes` passes when its path ends `found`, the value is a list, and an item [equals](#values-in-a-check) `value`, or with `values`, when each of them equals an item. `excludes` passes when its path ends `found`, the value is a list, and no item equals `value`, or any of `values`. So an empty list fails `includes` and passes `excludes`.
+
+**[contains.fail]** Both fail with the path's outcome as their cause when the path ends anything but `found`, and with `unusable` when the value isn't a list, a string or an object included. Otherwise they fail with `value`.
+
+**[contains.expression]** With `value`, the expressions are `contains(<path>, <value>)` and `not contains(<path>, <value>)`. With `values`, they're `contains_all(<path>, [<values>])` and `contains_none(<path>, [<values>])`, with the values sorted as for `in`. When both or neither are given, `<both value and values>` or `<missing value or values>` takes the value's place.
+
+## `compare`
+
+`{"op": "compare", "left": [...], "right": [...], "cmp": c}` compares two fields of the same subject. `cmp` is one of `eq`, `ne`, `gt`, `gte`, `lt` and `lte`. Anything else is written wrong as `invalid cmp`, and a missing `left`, `right` or `cmp` as `missing left` and so on. A `compare` check has no `path`.
+
+**[compare.pass]** It passes when both paths end `found`, the two values have the same type, and `left cmp right` holds. `eq` and `ne` use [equality](#values-in-a-check) and work on any type. `gt`, `gte`, `lt` and `lte` only work on two numbers, compared by value, or two strings, compared code point by code point, so `"Z"` comes before `"a"` and `"！"` (U+FF01) before `"😀"` (U+1F600).
+
+**[compare.fail]** It fails with the worse of the two paths' outcomes when either ends anything but `found`, so two `null` fields fail as `null`, even with `eq`. When both were read, it fails with `unusable` when their types differ, even with `ne`, and when `gt`, `gte`, `lt` or `lte` is used on anything but two numbers or two strings. Otherwise it fails with `value`.
+
+**[compare.inputs]** Its row has two entries in `inputs`, `left` then `right`. When either is missing or isn't a list, `inputs` is `[]`.
+
+**[compare.expression]** Its expression is `<left> <cmp> <right>`, like `a lt $$input.limit`, with `cmp` as written.
+
+## `compare_time`
+
+`{"op": "compare_time", "left": [...], "right": [...], "cmp": c}` compares two times. It's written like `compare`.
+
+**[time.format]** A time is either a number or an RFC 3339 string. A string has the form `YYYY-MM-DDTHH:MM:SS`, then optionally `.` and one or more digits, then `Z` or an offset `+HH:MM` or `-HH:MM`. The `T` and `Z` are uppercase. The date must exist, so `2024-02-30` and `1900-02-29` don't. The hour is 00 to 23, minutes and seconds 00 to 59, and the offset 00:00 to 23:59. The year, as written, is 1678 to 2261. Only the first nine digits of the fraction count. Any other string isn't a time.
+
+**[time.pass]** It passes when both paths end `found`, both values are RFC 3339 strings or both are numbers, and `left cmp right` holds. Strings are compared as the instants they name, so `2024-01-01T01:00:00+01:00` equals `2024-01-01T00:00:00Z`. Numbers are compared by value, with no unit attached.
+
+**[time.fail]** It fails with the worse of the two paths' outcomes when either ends anything but `found`, and with `unusable` when the values aren't two times in the same format, a number and a string included. Otherwise it fails with `value`.
+
+**[time.expression]** Its expression is written like `compare`'s.

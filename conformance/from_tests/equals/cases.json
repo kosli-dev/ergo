@@ -15471,7 +15471,7 @@
                 },
                 "c": {
                   "description": "",
-                  "expression": " == \"OPEN\"",
+                  "expression": "\u003cinvalid path\u003e == \"OPEN\"",
                   "meta": {},
                   "op": "equals",
                   "path": "state",
@@ -15592,7 +15592,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": " == \"OPEN\"",
+            "expression": "\u003cinvalid path\u003e == \"OPEN\"",
             "inputs": [],
             "requirement": "s",
             "subject": {
@@ -15658,7 +15658,7 @@
                 },
                 "c": {
                   "description": "",
-                  "expression": " == \"OPEN\"",
+                  "expression": "\u003cinvalid path\u003e == \"OPEN\"",
                   "meta": {},
                   "op": "equals",
                   "path": "$$input",
@@ -15779,7 +15779,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": " == \"OPEN\"",
+            "expression": "\u003cinvalid path\u003e == \"OPEN\"",
             "inputs": [],
             "requirement": "s",
             "subject": {
@@ -15845,7 +15845,7 @@
                 },
                 "c": {
                   "description": "",
-                  "expression": " == \"OPEN\"",
+                  "expression": "\u003cinvalid path\u003e == \"OPEN\"",
                   "meta": {},
                   "op": "equals",
                   "path": 3,
@@ -15966,7 +15966,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": " == \"OPEN\"",
+            "expression": "\u003cinvalid path\u003e == \"OPEN\"",
             "inputs": [],
             "requirement": "s",
             "subject": {
@@ -16032,7 +16032,7 @@
                 },
                 "c": {
                   "description": "",
-                  "expression": "1 == \"OPEN\"",
+                  "expression": "\u003cinvalid path\u003e == \"OPEN\"",
                   "meta": {},
                   "op": "equals",
                   "path": {
@@ -16155,7 +16155,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "1 == \"OPEN\"",
+            "expression": "\u003cinvalid path\u003e == \"OPEN\"",
             "inputs": [],
             "requirement": "s",
             "subject": {

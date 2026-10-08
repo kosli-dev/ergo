@@ -1,0 +1,374 @@
+[
+  {
+    "description": "compare_time with lt",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "compare_time", "cmp": "lt", "left": ["a"], "right": ["b"]}}}},
+    "cases": [
+      {
+        "description": "passes on two times in order",
+        "rules": ["time.pass"],
+        "input": {"things": [{"a": "2024-01-01T00:00:00Z", "b": "2024-01-01T00:00:01Z", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "a", "value": "2024-01-01T00:00:00Z"}, {"name": "b", "value": "2024-01-01T00:00:01Z"}]
+          }
+        ],
+        "expressions": {"s": {"c": "a lt b"}}
+      },
+      {
+        "description": "compares fractions of a second",
+        "rules": ["time.pass", "time.format"],
+        "input": {"things": [{"a": "2024-01-01T00:00:00.000000001Z", "b": "2024-01-01T00:00:00.00000001Z", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "a", "value": "2024-01-01T00:00:00.000000001Z"}, {"name": "b", "value": "2024-01-01T00:00:00.00000001Z"}]
+          }
+        ]
+      },
+      {
+        "description": "passes on two numbers in order, decimals included",
+        "rules": ["time.pass"],
+        "input": {"things": [{"a": 1.5, "b": 2, "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "a", "value": 1.5}, {"name": "b", "value": 2}]}
+        ]
+      },
+      {
+        "description": "passes on 29 February in a leap year",
+        "rules": ["time.format"],
+        "input": {"things": [{"a": "2000-02-29T00:00:00Z", "b": "2024-01-01T00:00:00Z", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "a", "value": "2000-02-29T00:00:00Z"}, {"name": "b", "value": "2024-01-01T00:00:00Z"}]
+          }
+        ]
+      },
+      {
+        "description": "passes on the last year allowed",
+        "rules": ["time.format"],
+        "input": {"things": [{"a": "2024-01-01T00:00:00Z", "b": "2261-12-31T23:59:59-05:00", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "a", "value": "2024-01-01T00:00:00Z"}, {"name": "b", "value": "2261-12-31T23:59:59-05:00"}]
+          }
+        ]
+      },
+      {
+        "description": "passes on the first year allowed",
+        "rules": ["time.format"],
+        "input": {"things": [{"a": "1678-01-01T00:00:00+05:00", "b": "2024-01-01T00:00:00Z", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "a", "value": "1678-01-01T00:00:00+05:00"}, {"name": "b", "value": "2024-01-01T00:00:00Z"}]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable on a number and a string",
+        "rules": ["time.fail"],
+        "input": {"things": [{"a": "2024-01-01T00:00:00Z", "b": 1, "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [{"name": "a", "value": "2024-01-01T00:00:00Z"}, {"name": "b", "value": 1}]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable on a lowercase t and z",
+        "rules": ["time.format", "time.fail"],
+        "input": {"things": [{"a": "2024-01-01t00:00:00z", "b": "2024-01-01T00:00:01Z", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [{"name": "a", "value": "2024-01-01t00:00:00z"}, {"name": "b", "value": "2024-01-01T00:00:01Z"}]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable on a date that doesn't exist",
+        "rules": ["time.format"],
+        "input": {"things": [{"a": "2024-02-30T00:00:00Z", "b": "2024-03-02T00:00:01Z", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [{"name": "a", "value": "2024-02-30T00:00:00Z"}, {"name": "b", "value": "2024-03-02T00:00:01Z"}]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable on 29 February in a century that isn't a leap year",
+        "rules": ["time.format"],
+        "input": {"things": [{"a": "1900-02-29T00:00:00Z", "b": "2024-03-02T00:00:01Z", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [{"name": "a", "value": "1900-02-29T00:00:00Z"}, {"name": "b", "value": "2024-03-02T00:00:01Z"}]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable on a year before 1678",
+        "rules": ["time.format"],
+        "input": {"things": [{"a": "1677-12-31T23:59:59Z", "b": "2024-03-02T00:00:01Z", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [{"name": "a", "value": "1677-12-31T23:59:59Z"}, {"name": "b", "value": "2024-03-02T00:00:01Z"}]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable on a year after 2261",
+        "rules": ["time.format"],
+        "input": {"things": [{"a": "2024-03-02T00:00:01Z", "b": "2262-01-01T00:00:00Z", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [{"name": "a", "value": "2024-03-02T00:00:01Z"}, {"name": "b", "value": "2262-01-01T00:00:00Z"}]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable on a date with no time",
+        "rules": ["time.format"],
+        "input": {"things": [{"a": "2024-01-01", "b": "2024-01-02", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [{"name": "a", "value": "2024-01-01"}, {"name": "b", "value": "2024-01-02"}]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable on a time with no zone",
+        "rules": ["time.format"],
+        "input": {"things": [{"a": "2024-01-01T00:00:00", "b": "2024-01-02T00:00:00", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [{"name": "a", "value": "2024-01-01T00:00:00"}, {"name": "b", "value": "2024-01-02T00:00:00"}]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable on a leap second",
+        "rules": ["time.format"],
+        "input": {"things": [{"a": "2016-12-31T23:59:60Z", "b": "2017-01-02T00:00:00Z", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [{"name": "a", "value": "2016-12-31T23:59:60Z"}, {"name": "b", "value": "2017-01-02T00:00:00Z"}]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable on hour 24",
+        "rules": ["time.format"],
+        "input": {"things": [{"a": "2024-01-01T24:00:00Z", "b": "2024-01-03T00:00:00Z", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [{"name": "a", "value": "2024-01-01T24:00:00Z"}, {"name": "b", "value": "2024-01-03T00:00:00Z"}]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable on a space instead of T",
+        "rules": ["time.format"],
+        "input": {"things": [{"a": "2024-01-01 00:00:00Z", "b": "2024-01-02T00:00:00Z", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [{"name": "a", "value": "2024-01-01 00:00:00Z"}, {"name": "b", "value": "2024-01-02T00:00:00Z"}]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable on an offset with no colon",
+        "rules": ["time.format"],
+        "input": {"things": [{"a": "2024-01-01T00:00:00+0100", "b": "2024-01-02T00:00:00Z", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [{"name": "a", "value": "2024-01-01T00:00:00+0100"}, {"name": "b", "value": "2024-01-02T00:00:00Z"}]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable on a dot with no digits after it",
+        "rules": ["time.format"],
+        "input": {"things": [{"a": "2024-01-01T00:00:00.Z", "b": "2024-01-03T00:00:00Z", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [{"name": "a", "value": "2024-01-01T00:00:00.Z"}, {"name": "b", "value": "2024-01-03T00:00:00Z"}]
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when one is missing",
+        "rules": ["time.fail"],
+        "input": {"things": [{"b": "2017-01-02T00:00:00Z", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [{"name": "a", "value": null}, {"name": "b", "value": "2017-01-02T00:00:00Z"}]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "compare_time with eq",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "compare_time", "cmp": "eq", "left": ["a"], "right": ["b"]}}}},
+    "cases": [
+      {
+        "description": "passes on the same instant in two offsets",
+        "rules": ["time.pass"],
+        "input": {"things": [{"a": "2024-01-01T01:00:00+01:00", "b": "2024-01-01T00:00:00Z", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "a", "value": "2024-01-01T01:00:00+01:00"}, {"name": "b", "value": "2024-01-01T00:00:00Z"}]
+          }
+        ]
+      },
+      {
+        "description": "passes on -00:00 and Z",
+        "rules": ["time.pass", "time.format"],
+        "input": {"things": [{"a": "2024-01-01T00:00:00-00:00", "b": "2024-01-01T00:00:00Z", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "a", "value": "2024-01-01T00:00:00-00:00"}, {"name": "b", "value": "2024-01-01T00:00:00Z"}]
+          }
+        ]
+      },
+      {
+        "description": "ignores fraction digits after the ninth",
+        "rules": ["time.format"],
+        "input": {"things": [{"a": "2024-01-01T00:00:00.0000000009Z", "b": "2024-01-01T00:00:00Z", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "a", "value": "2024-01-01T00:00:00.0000000009Z"}, {"name": "b", "value": "2024-01-01T00:00:00Z"}]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "compare_time with ne",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "compare_time", "cmp": "ne", "left": ["a"], "right": ["b"]}}}},
+    "cases": [
+      {
+        "description": "fails as value on the same instant in two offsets",
+        "rules": ["time.pass", "time.fail"],
+        "input": {"things": [{"a": "2024-01-01T01:00:00+01:00", "b": "2024-01-01T00:00:00Z", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "a", "value": "2024-01-01T01:00:00+01:00"}, {"name": "b", "value": "2024-01-01T00:00:00Z"}]
+          }
+        ]
+      }
+    ]
+  }
+]

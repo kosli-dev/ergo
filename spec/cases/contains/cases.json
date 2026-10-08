@@ -1,0 +1,306 @@
+[
+  {
+    "description": "includes a value",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "includes", "path": ["x"], "value": "a"}}}},
+    "cases": [
+      {
+        "description": "passes when the list contains it",
+        "rules": ["contains.pass"],
+        "input": {"things": [{"id": "t1", "x": ["b", "a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["b", "a"]}]}
+        ],
+        "expressions": {"s": {"c": "contains(x, \"a\")"}}
+      },
+      {
+        "description": "fails as value when it doesn't",
+        "rules": ["contains.fail"],
+        "input": {"things": [{"id": "t1", "x": ["b"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["b"]}]}
+        ]
+      },
+      {
+        "description": "fails as value on an empty list",
+        "rules": ["contains.pass", "contains.fail"],
+        "input": {"things": [{"id": "t1", "x": []}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": []}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on a string that holds it",
+        "rules": ["contains.fail"],
+        "input": {"things": [{"id": "t1", "x": "abc"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "abc"}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on an object that holds it",
+        "rules": ["contains.fail"],
+        "input": {"things": [{"id": "t1", "x": {"a": "a"}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": {"a": "a"}}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["contains.fail", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["contains.fail", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "includes a number",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "includes", "path": ["x"], "value": 1}}}},
+    "cases": [
+      {
+        "description": "passes on 1.0, because numbers compare by value",
+        "rules": ["contains.pass", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": ["1", 1.0]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["1", 1]}]}
+        ]
+      },
+      {
+        "description": "fails as value on the string \"1\"",
+        "rules": ["contains.fail", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": ["1"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["1"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "includes a list given as value",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "includes", "path": ["x"], "value": ["a", "b"]}}}},
+    "cases": [
+      {
+        "description": "looks for the list as one item",
+        "rules": ["contains.value"],
+        "input": {"things": [{"id": "t1", "x": [["a", "b"]]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": [["a", "b"]]}]}
+        ],
+        "expressions": {"s": {"c": "contains(x, [\"a\", \"b\"])"}}
+      },
+      {
+        "description": "fails as value when the list only holds its items",
+        "rules": ["contains.value", "contains.fail"],
+        "input": {"things": [{"id": "t1", "x": ["a", "b"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["a", "b"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "includes values",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "includes", "path": ["x"], "values": ["b", "a"]}}}},
+    "cases": [
+      {
+        "description": "passes when the list contains every one",
+        "rules": ["contains.pass"],
+        "input": {"things": [{"id": "t1", "x": ["a", "c", "b"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["a", "c", "b"]}]}
+        ],
+        "expressions": {"s": {"c": "contains_all(x, [\"a\", \"b\"])"}}
+      },
+      {
+        "description": "fails as value when one is missing",
+        "rules": ["contains.fail"],
+        "input": {"things": [{"id": "t1", "x": ["a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["a"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "excludes a value",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "excludes", "path": ["x"], "value": "a"}}}},
+    "cases": [
+      {
+        "description": "passes when the list doesn't contain it",
+        "rules": ["contains.pass"],
+        "input": {"things": [{"id": "t1", "x": ["b"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["b"]}]}
+        ],
+        "expressions": {"s": {"c": "not contains(x, \"a\")"}}
+      },
+      {
+        "description": "passes on an empty list",
+        "rules": ["contains.pass"],
+        "input": {"things": [{"id": "t1", "x": []}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": []}]}
+        ]
+      },
+      {
+        "description": "fails as value when it does",
+        "rules": ["contains.fail"],
+        "input": {"things": [{"id": "t1", "x": ["a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["a"]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on a string",
+        "rules": ["contains.fail"],
+        "input": {"things": [{"id": "t1", "x": "b"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "b"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing, instead of passing",
+        "rules": ["contains.fail", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "excludes values",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "excludes", "path": ["x"], "values": ["nuts", "garlic"]}}}},
+    "cases": [
+      {
+        "description": "passes when the list contains none of them",
+        "rules": ["contains.pass"],
+        "input": {"things": [{"id": "t1", "x": ["salt"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["salt"]}]}
+        ],
+        "expressions": {"s": {"c": "contains_none(x, [\"garlic\", \"nuts\"])"}}
+      },
+      {
+        "description": "fails as value when it contains one",
+        "rules": ["contains.fail"],
+        "input": {"things": [{"id": "t1", "x": ["garlic"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["garlic"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "excludes a value read through a ref",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "excludes", "path": ["x"], "value": {"ref": ["$$params", "banned"]}}}}},
+    "params": {},
+    "cases": [
+      {
+        "description": "fails as absent when the param is missing, instead of passing",
+        "rules": ["value.ref"],
+        "input": {"things": [{"id": "t1", "x": ["a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": ["a"]}]}
+        ],
+        "expressions": {"s": {"c": "not contains(x, $$params.banned)"}}
+      }
+    ]
+  },
+  {
+    "description": "excludes values read through a ref to an empty list",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "excludes", "path": ["x"], "values": {"ref": ["$$params", "banned"]}}}}},
+    "params": {"banned": []},
+    "cases": [
+      {
+        "description": "fails as unusable, because an empty list would pass anything",
+        "rules": ["contains.value"],
+        "input": {"things": [{"id": "t1", "x": ["a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["a"]}]}
+        ],
+        "expressions": {"s": {"c": "contains_none(x, $$params.banned)"}}
+      }
+    ]
+  },
+  {
+    "description": "excludes values read through a ref that isn't a list",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "excludes", "path": ["x"], "values": {"ref": ["$$params", "banned"]}}}}},
+    "params": {"banned": "a"},
+    "cases": [
+      {
+        "description": "fails as unusable",
+        "rules": ["contains.value"],
+        "input": {"things": [{"id": "t1", "x": ["a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["a"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "includes and excludes written wrong",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["things"],
+        "id": ["id"],
+        "checks": {
+          "both": {"op": "includes", "path": ["x"], "value": "a", "values": ["a"]},
+          "empty_values": {"op": "includes", "path": ["x"], "values": []},
+          "excludes_both": {"op": "excludes", "path": ["x"], "value": "a", "values": ["a"]},
+          "neither": {"op": "includes", "path": ["x"]},
+          "not_a_list": {"op": "excludes", "path": ["x"], "values": "a"}
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails every check as ill_formed and says why",
+        "rules": ["contains.value", "contains.expression", "written_wrong"],
+        "input": {"things": [{"id": "t1", "x": ["a"]}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {"name": "count(checks)", "value": 5},
+              {"name": "require", "value": "every"},
+              {"name": "checks.both", "value": ["both value and values"]},
+              {"name": "checks.empty_values", "value": ["empty values"]},
+              {"name": "checks.excludes_both", "value": ["both value and values"]},
+              {"name": "checks.neither", "value": ["missing value or values"]},
+              {"name": "checks.not_a_list", "value": ["invalid values"]}
+            ]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "both", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": ["a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "empty_values", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": ["a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "excludes_both", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": ["a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "neither", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": ["a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "not_a_list", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": ["a"]}]}
+        ],
+        "expressions": {
+          "s": {
+            "both": "contains(x, <both value and values>)",
+            "empty_values": "contains_all(x, [])",
+            "excludes_both": "not contains(x, <both value and values>)",
+            "neither": "contains(x, <missing value or values>)",
+            "not_a_list": "contains_none(x, <invalid values>)"
+          }
+        }
+      }
+    ]
+  }
+]

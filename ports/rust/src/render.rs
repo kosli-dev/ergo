@@ -297,7 +297,8 @@ fn names_of(v: &Value) -> Vec<(Value, &Value)> {
 
 fn path_text(item: &str, check: &Value, f: &str) -> Option<String> {
     match check.get(f) {
-        Some(p) => item_path_name(item, p),
+        Some(p) if p.is_array() => item_path_name(item, p),
+        Some(_) => Some(format!("<invalid {f}>")),
         None => Some(format!("<missing {f}>")),
     }
 }
@@ -623,7 +624,7 @@ fn check_inputs<'a>(ctx: &Ctx<'a>, subject: &'a Value, check: &Value, item: &str
     }
     if two_sided(check) {
         let side = |f: &str| -> Option<Value> {
-            let p = m.get(f)?;
+            let p = m.get(f).filter(|p| p.is_array())?;
             Some(entry(item_path_name(item, p)?, value_at(ctx, subject, p)))
         };
         return Some(vec![side("left")?, side("right")?]);

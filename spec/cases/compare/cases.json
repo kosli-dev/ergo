@@ -1,0 +1,237 @@
+[
+  {
+    "description": "compare with eq",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "compare", "cmp": "eq", "left": ["a"], "right": ["b"]}}}},
+    "cases": [
+      {
+        "description": "passes on 1 and 1.0",
+        "rules": ["compare.pass", "value.equal"],
+        "input": {"things": [{"a": 1, "b": 1.0, "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "a", "value": 1}, {"name": "b", "value": 1}]}
+        ],
+        "expressions": {"s": {"c": "a eq b"}}
+      },
+      {
+        "description": "passes on equal objects",
+        "rules": ["compare.pass", "value.equal"],
+        "input": {"things": [{"a": {"n": 1}, "b": {"n": 1.0}, "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "a", "value": {"n": 1}}, {"name": "b", "value": {"n": 1}}]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when the types differ",
+        "rules": ["compare.fail"],
+        "input": {"things": [{"a": "1", "b": 1, "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "a", "value": "1"}, {"name": "b", "value": 1}]}
+        ]
+      },
+      {
+        "description": "fails as null when both are null",
+        "rules": ["compare.fail"],
+        "input": {"things": [{"a": null, "b": null, "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "a", "value": null}, {"name": "b", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as absent when one is missing and the other null",
+        "rules": ["compare.fail"],
+        "input": {"things": [{"b": null, "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "a", "value": null}, {"name": "b", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "compare with ne",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "compare", "cmp": "ne", "left": ["a"], "right": ["b"]}}}},
+    "cases": [
+      {
+        "description": "passes on two different strings",
+        "rules": ["compare.pass"],
+        "input": {"things": [{"a": "x", "b": "y", "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "a", "value": "x"}, {"name": "b", "value": "y"}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the types differ, though they aren't equal",
+        "rules": ["compare.fail"],
+        "input": {"things": [{"a": "1", "b": 1, "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "a", "value": "1"}, {"name": "b", "value": 1}]}
+        ]
+      },
+      {
+        "description": "fails as absent when both are missing",
+        "rules": ["compare.fail"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "a", "value": null}, {"name": "b", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "compare with lt",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "compare", "cmp": "lt", "left": ["a"], "right": ["b"]}}}},
+    "cases": [
+      {
+        "description": "passes on two numbers in order",
+        "rules": ["compare.pass"],
+        "input": {"things": [{"a": 1, "b": 2, "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "a", "value": 1}, {"name": "b", "value": 2}]}
+        ],
+        "expressions": {"s": {"c": "a lt b"}}
+      },
+      {
+        "description": "fails as value on two numbers out of order",
+        "rules": ["compare.fail"],
+        "input": {"things": [{"a": 2, "b": 1, "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "a", "value": 2}, {"name": "b", "value": 1}]}
+        ]
+      },
+      {
+        "description": "orders strings by code point, so Z comes before a",
+        "rules": ["compare.pass"],
+        "input": {"things": [{"a": "Z", "b": "a", "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "a", "value": "Z"}, {"name": "b", "value": "a"}]}
+        ]
+      },
+      {
+        "description": "orders a character above U+FFFF after one below it",
+        "rules": ["compare.pass"],
+        "input": {"things": [{"a": "！", "b": "😀", "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "a", "value": "！"}, {"name": "b", "value": "😀"}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on booleans",
+        "rules": ["compare.fail"],
+        "input": {"things": [{"a": false, "b": true, "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "a", "value": false}, {"name": "b", "value": true}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on objects",
+        "rules": ["compare.fail"],
+        "input": {"things": [{"a": {"n": 1}, "b": {"o": 1}, "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [{"name": "a", "value": {"n": 1}}, {"name": "b", "value": {"o": 1}}]
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when one is missing",
+        "rules": ["compare.fail"],
+        "input": {"things": [{"b": 5, "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "a", "value": null}, {"name": "b", "value": 5}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "compare with gte",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "compare", "cmp": "gte", "left": ["a"], "right": ["b"]}}}},
+    "cases": [
+      {
+        "description": "passes on 2 and 2.0",
+        "rules": ["compare.pass", "value.equal"],
+        "input": {"things": [{"a": 2, "b": 2.0, "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "a", "value": 2}, {"name": "b", "value": 2}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "compare against the input",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "compare", "cmp": "lt", "left": ["a"], "right": ["$$input", "limit"]}}}},
+    "cases": [
+      {
+        "description": "names the path into the input",
+        "rules": ["compare.inputs", "compare.expression", "path.start"],
+        "input": {"limit": 5, "things": [{"a": 1, "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "a", "value": 1}, {"name": "$$input.limit", "value": 5}]
+          }
+        ],
+        "expressions": {"s": {"c": "a lt $$input.limit"}}
+      }
+    ]
+  },
+  {
+    "description": "compare written wrong",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["things"],
+        "id": ["id"],
+        "checks": {
+          "bad_cmp": {"op": "compare", "cmp": "le", "left": ["a"], "right": ["b"]},
+          "left_string": {"op": "compare", "cmp": "lt", "left": "a", "right": ["b"]},
+          "no_right": {"op": "compare", "cmp": "lt", "left": ["a"]},
+          "with_path": {"op": "compare", "path": ["a"], "cmp": "lt", "left": ["a"], "right": ["b"]}
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails every check as ill_formed and says why",
+        "rules": ["compare.inputs", "render.missing", "written_wrong"],
+        "input": {"things": [{"a": 1, "b": 2, "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {"name": "count(checks)", "value": 4},
+              {"name": "require", "value": "every"},
+              {"name": "checks.bad_cmp", "value": ["invalid cmp"]},
+              {"name": "checks.left_string", "value": ["left not a list"]},
+              {"name": "checks.no_right", "value": ["missing right"]},
+              {"name": "checks.with_path", "value": ["unknown field path"]}
+            ]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "bad_cmp", "passed": false, "cause": "ill_formed", "inputs": [{"name": "a", "value": 1}, {"name": "b", "value": 2}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "left_string", "passed": false, "cause": "ill_formed", "inputs": []},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "no_right", "passed": false, "cause": "ill_formed", "inputs": []},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "with_path", "passed": false, "cause": "ill_formed", "inputs": [{"name": "a", "value": 1}, {"name": "b", "value": 2}]}
+        ],
+        "expressions": {"s": {"bad_cmp": "a le b", "left_string": "<invalid left> lt b", "no_right": "a lt <missing right>"}}
+      }
+    ]
+  }
+]

@@ -4408,7 +4408,7 @@
                 "c": {
                   "cmp": "eq",
                   "description": "",
-                  "expression": " eq b",
+                  "expression": "\u003cinvalid left\u003e eq b",
                   "left": "a",
                   "meta": {},
                   "op": "compare",
@@ -4419,7 +4419,7 @@
                 "d": {
                   "cmp": "eq",
                   "description": "",
-                  "expression": "a eq ",
+                  "expression": "a eq \u003cinvalid right\u003e",
                   "left": [
                     "a"
                   ],
@@ -4444,7 +4444,7 @@
                 },
                 "f": {
                   "description": "",
-                  "expression": " is present",
+                  "expression": "\u003cinvalid path\u003e is present",
                   "meta": {},
                   "op": "present",
                   "path": "a"
@@ -4540,16 +4540,7 @@
             {
               "cause": "ill_formed",
               "check": "c",
-              "inputs": [
-                {
-                  "name": "",
-                  "value": null
-                },
-                {
-                  "name": "b",
-                  "value": null
-                }
-              ],
+              "inputs": [],
               "passed": false,
               "requirement": "s",
               "subject": {
@@ -4560,16 +4551,7 @@
             {
               "cause": "ill_formed",
               "check": "d",
-              "inputs": [
-                {
-                  "name": "a",
-                  "value": null
-                },
-                {
-                  "name": "",
-                  "value": null
-                }
-              ],
+              "inputs": [],
               "passed": false,
               "requirement": "s",
               "subject": {
@@ -4657,17 +4639,8 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": " eq b",
-            "inputs": [
-              {
-                "name": "",
-                "value": null
-              },
-              {
-                "name": "b",
-                "value": null
-              }
-            ],
+            "expression": "\u003cinvalid left\u003e eq b",
+            "inputs": [],
             "requirement": "s",
             "subject": {
               "id": 1,
@@ -4678,17 +4651,8 @@
             "cause": "ill_formed",
             "check": "d",
             "description": "",
-            "expression": "a eq ",
-            "inputs": [
-              {
-                "name": "a",
-                "value": null
-              },
-              {
-                "name": "",
-                "value": null
-              }
-            ],
+            "expression": "a eq \u003cinvalid right\u003e",
+            "inputs": [],
             "requirement": "s",
             "subject": {
               "id": 1,
@@ -4717,7 +4681,7 @@
             "cause": "ill_formed",
             "check": "f",
             "description": "",
-            "expression": " is present",
+            "expression": "\u003cinvalid path\u003e is present",
             "inputs": [],
             "requirement": "s",
             "subject": {
@@ -31503,7 +31467,7 @@
               "checks": {
                 "$applies": {
                   "description": "The subject is in scope",
-                  "expression": "1 is present",
+                  "expression": "\u003cinvalid path\u003e is present",
                   "meta": {}
                 },
                 "$min_subjects": {
@@ -31646,7 +31610,7 @@
             "cause": "ill_formed",
             "check": "$applies",
             "description": "The subject is in scope",
-            "expression": "1 is present",
+            "expression": "\u003cinvalid path\u003e is present",
             "inputs": [],
             "requirement": "s",
             "subject": {
