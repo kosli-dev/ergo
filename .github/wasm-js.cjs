@@ -62,5 +62,21 @@ Promise.all([load(runtimeDir), load(ergoDir)]).then(([policy, ergo]) => {
   });
   failed.forEach((test) => console.error(`FAIL ${test}`));
   console.log(`PASS: ${tests.length - failed.length}/${tests.length} with the Wasm JS runtime`);
-  process.exit(failed.length > 0 ? 1 : 0);
+
+  const budgetMB = 50;
+  const document = { deployments: Array.from({ length: 100 }, (_, i) => ({ id: `d-${i}`, environment: i % 3 ? "prod" : "staging", ...(i % 2 ? { approved_by: "a" } : {}), tests: [{ ok: i % 5 > 0 }, { ok: true }] })) };
+  const budgetPolicy = {
+    subjects: { deployment: { from: ["deployments"], id: ["id"], applies_to: { is_prod: { op: "equals", path: ["environment"], value: "prod" } } } },
+    requirements: {
+      approved: { subject: "deployment", checks: { approved: { op: "non_empty_string", path: ["approved_by"] } } },
+      tested: { subject: "deployment", require: "some", checks: { tested: { op: "all", path: ["tests"], check: { op: "equals", path: ["ok"], value: true } } } },
+    },
+  };
+  const report = ergo.evaluate({ document, policy: budgetPolicy, params: {} }, "entrypoint/report")[0].result;
+  const usedMB = (ergo.wasmInstance.exports.opa_heap_ptr_get() - ergo.baseHeapPtr) / 1e6;
+  const sound = report.results.length === 338 && report.requirements.approved.subjects.matching === 66;
+  console.log(`A report on 100 deployments used ${usedMB.toFixed(1)} MB of Wasm memory (budget ${budgetMB} MB)`);
+  if (!sound) console.error("The memory budget's report didn't come out as expected, so its measurement can't be trusted");
+  if (usedMB > budgetMB) console.error(`That's over the budget. Wasm doesn't cache function calls and frees nothing until the report is done, so look for something worked out again per row.`);
+  process.exit(failed.length > 0 || !sound || usedMB > budgetMB ? 1 : 0);
 });
