@@ -6,7 +6,7 @@ sitemap:
   disable: true
 ---
 
-In this introduction to ergo, we'll show how to define control decisions with rego and ergo through the example of a bakery's allergen requirements (hat tip to Toby Weston for [the original inspiration](https://baddotrobot.com/blog/2026-10-02-baking-in-evidence/)). You'll learn how to validate cake batches against three compliance rules and produce explanatory reports of decisions. No deep technical expertise or prior experience with rego is required.
+In this introduction to ergo, we'll show how to define policy decisions with rego and ergo through the example of a bakery's allergen requirements (hat tip to Toby Weston for [the original inspiration](https://baddotrobot.com/blog/2026-10-02-baking-in-evidence/)). You'll learn how to validate cake batches against three compliance rules and produce explanatory reports of decisions. No deep technical expertise or prior experience with rego is required.
 
 We will look at the same policy written two ways, in plain Rego and with ergo, and compare the results. You can follow along. The files are in [`examples/baking`](https://github.com/kosli-dev/ergo/tree/main/examples/baking).
 
@@ -124,7 +124,8 @@ The report has a row for every check it ran on every batch, with the value it re
 | batch | check           | value read                               | passed  | cause       |
 | ----- | --------------- | ---------------------------------------- | ------- | ----------- |
 |       | `$well_formed`  | `count(checks) = 3`, `require = "every"` | `true`  | `satisfied` |
-|       | `$min_subjects` | `count(matching(batches)) = 4`           | `true`  | `satisfied` |
+|       | `$min_subjects` | `in-scope batch count = 4`               | `true`  | `satisfied` |
+|       | `$unique_ids`   | `repeated batch ids = []`                | `true`  | `satisfied` |
 | 001   | `nut_free`      | `allergens = ["milk","eggs"]`            | `true`  | `satisfied` |
 | 001   | `temp_ok`       | `bake.temp_c = 180`                      | `true`  | `satisfied` |
 | 001   | `time_ok`       | `bake.minutes = 32`                      | `true`  | `satisfied` |
@@ -138,7 +139,7 @@ The report has a row for every check it ran on every batch, with the value it re
 | 004   | `temp_ok`       | `bake.temp_c = 180`                      | `true`  | `satisfied` |
 | 004   | `time_ok`       | `bake.minutes = 32`                      | `true`  | `satisfied` |
 
-An ergo report, some checks are reported by default (those starting with `$`). They tell you if requirements are well formed, and that there was at least one input subject to check.
+ergo adds the checks that start with `$` to every report itself. They make sure the requirement is well formed, that there was at least one batch to check, and that no two batches share an id.
 
 In this example, Batch 003 fails because ergo's `excludes` needs a list, and `"nuts"` isn't one. All three batches fail, but you can see the different reasons. `cause: value` means ergo read the value and it didn't pass (allergens contain nuts), `cause: unusable` means the value was there but not the kind the check needs, and `cause: absent` means there was no value at all.
 

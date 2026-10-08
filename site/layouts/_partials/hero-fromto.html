@@ -1,4 +1,4 @@
-{{/* The hero's from → to: each example goes Rego policy → Rego result → ergo control → ergo report.
+{{/* The hero's from → to: each example goes Rego policy → Rego result → ergo policy → ergo report.
      Data and results match README.md, REFERENCE.md and the fixtures in ergo_test.rego. */}}
 {{- $c := .Params.hero }}
 <figure class="term ft" data-fromto aria-roledescription="carousel" aria-label="{{ $c.fromto.label }}">
@@ -45,7 +45,7 @@ deny <span class="kw">contains</span> msg <span class="kw">if</span> {
     {{- end }}
 
     <div class="ft__view" data-ex="deploy" data-step="2" data-file="policy/requirements.yaml" data-hold="6500">
-      <p class="ft__label mono"><span class="ft__who ft__who--ergo">ergo</span> the control</p>
+      <p class="ft__label mono"><span class="ft__who ft__who--ergo">ergo</span> the policy</p>
 <pre class="code ft__code"><code><span class="k">requirements</span>:
   <span class="k">prod_deploy</span>:
     <span class="k">subject_type</span>: <span class="s">deployment</span>
@@ -81,7 +81,8 @@ deny <span class="kw">contains</span> msg <span class="kw">if</span> {
       <div class="report ft__report">
         <div class="report__head"><span>subject</span><span>check</span><span>value read</span><span>passed</span><span>cause</span></div>
         <div class="report__row is-sys"><span></span><span class="sys">$well_formed</span><span>count(checks) = 1</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row is-sys"><span></span><span class="sys">$min_subjects</span><span>count(matching) = 2</span><span class="t">true</span><span>satisfied</span></div>
+        <div class="report__row is-sys"><span></span><span class="sys">$min_subjects</span><span>in-scope deployment count = 2</span><span class="t">true</span><span>satisfied</span></div>
+        <div class="report__row is-sys"><span></span><span class="sys">$unique_ids</span><span>repeated deployment ids = []</span><span class="t">true</span><span>satisfied</span></div>
         <div class="report__row"><span>d-1</span><span class="sys">$applies</span><span>environment = "prod"</span><span class="t">true</span><span>satisfied</span></div>
         <div class="report__row"><span>d-2</span><span class="sys">$applies</span><span>environment = "prod"</span><span class="t">true</span><span>satisfied</span></div>
         <div class="report__row is-scope"><span>d-3</span><span class="sys">$applies</span><span>environment = "staging"</span><span class="f">false</span><span>value</span></div>
@@ -129,7 +130,7 @@ peer_approved(pr) <span class="kw">if</span> {
     {{- end }}
 
     <div class="ft__view" data-ex="review" data-step="2" data-file="policy/requirements.yaml" data-hold="6500">
-      <p class="ft__label mono"><span class="ft__who ft__who--ergo">ergo</span> the control</p>
+      <p class="ft__label mono"><span class="ft__who ft__who--ergo">ergo</span> the policy</p>
 <pre class="code ft__code"><code><span class="k">requirements</span>:
   <span class="k">peer_reviewed</span>:
     <span class="k">subject_type</span>: <span class="s">pull request</span>
@@ -167,7 +168,8 @@ peer_approved(pr) <span class="kw">if</span> {
       <div class="report ft__report">
         <div class="report__head"><span>subject</span><span>check</span><span>value read</span><span>passed</span><span>cause</span></div>
         <div class="report__row is-sys"><span></span><span class="sys">$well_formed</span><span>count(checks) = 1</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row is-sys"><span></span><span class="sys">$min_subjects</span><span>count(matching) = 3</span><span class="t">true</span><span>satisfied</span></div>
+        <div class="report__row is-sys"><span></span><span class="sys">$min_subjects</span><span>in-scope pull request count = 3</span><span class="t">true</span><span>satisfied</span></div>
+        <div class="report__row is-sys"><span></span><span class="sys">$unique_ids</span><span>repeated pull request ids = []</span><span class="t">true</span><span>satisfied</span></div>
         <div class="report__row"><span>1</span><span>peer</span><span><span class="sys">$pr</span>.author = "ann"<br><span class="n">approvers: ann, bob</span></span><span class="t">true</span><span>satisfied</span></div>
         <div class="report__row is-fail"><span>2</span><span>peer</span><span><span class="sys">$pr</span>.author = "bob"<br><span class="n">approvers: bob</span></span><span class="f">false</span><span class="f">value</span></div>
         <div class="report__row is-fail"><span>3</span><span>peer</span><span><span class="sys">$pr</span>.author = null<br><span class="n">approvers: bob</span></span><span class="f">false</span><span class="f">absent</span></div>

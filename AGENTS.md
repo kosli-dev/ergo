@@ -9,6 +9,9 @@ ergo is a Rego library that turns policy evaluation into a structured report. Us
 - `custom_op_test.rego` defines custom operators that only the tests use.
 - `README.md` walks a new user through a first policy.
 - `REFERENCE.md` describes every field, operator, cause and report entry.
+- `CONTRIBUTING.md` tells people how to report bugs and send changes, and points them here for the rules.
+- `CODE_OF_CONDUCT.md` is the Contributor Covenant 2.1, unchanged apart from the contact address.
+- `.github/ISSUE_TEMPLATE/` and `.github/pull_request_template.md` are the forms GitHub shows for new issues and pull requests.
 - `examples/` holds worked examples. Each one has an input, the same policy in plain Rego and with ergo, and tests that pin what both versions report.
 
 ## Checks
@@ -33,13 +36,19 @@ OPA loads every JSON and YAML file it finds as data. The workflow files under `.
 
 CI runs these checks on pull requests and on pushes to `main` (`.github/workflows/test.yml`), using the OPA version the README names and Regal 0.43.0. When you change the OPA version, change it in the README, in every job of the workflow, in `.github/workflows/pages.yml` and in the Docker command below.
 
+A second job runs `opa check --strict`, `opa fmt --list` and `opa test` with OPA 1.20.2, the version the Kosli CLI embeds. Repos that copy `ergo.rego` lint their copy with it, and the two versions don't always format the same way. To run them yourself:
+
+```sh
+docker run --rm -v "$PWD":/src:ro -w /src openpolicyagent/opa:1.20.2 fmt --list .
+```
+
 CI also runs every test compiled to Wasm, with `opa test . --ignore .github --target wasm`, because Wasm walks objects and sets in a different order from `opa eval`, so anything that ends up in the report has to be sorted. That needs the Linux build of OPA. The macOS one says `engine not found`, so on a Mac run it in Docker:
 
 ```sh
 docker run --rm -v "$PWD":/src:ro -w /src openpolicyagent/opa:1.19.0 test . --ignore .github --target wasm
 ```
 
-CI also runs every test with OPA's JavaScript runtime, `@open-policy-agent/opa-wasm` (`.github/wasm-js.cjs`), because that runtime brings its own versions of some built-ins, like a `sprintf` that formats lists and objects differently, and lacks others. The script compiles each test as a Wasm entrypoint, fails if ergo uses a built-in the runtime doesn't have (apart from `time.parse_rfc3339_ns`, which it passes in, as `REFERENCE.md` tells Wasm users to), and then runs every test. So pass `sprintf` only strings: write anything else with `_text`.
+CI also runs every test with OPA's JavaScript runtime, `@open-policy-agent/opa-wasm` (`.github/wasm-js.cjs`), because that runtime brings its own versions of some built-ins, like a `sprintf` that formats lists and objects differently, and lacks others. The script compiles each test as a Wasm entrypoint, fails if ergo uses a built-in the runtime doesn't have (apart from `time.parse_rfc3339_ns`, which it passes in, as `REFERENCE.md` tells Wasm users to), and then runs every test. It also fails if `ergo.report` or `ergo.violations` needs any built-in that OPA's Wasm build runs outside the module. OPA reads the arguments of those built-ins back as Rego, so a string holding a byte-order mark fails the whole evaluation. `time.parse_rfc3339_ns` is allowed because ergo only passes it strings that already match the RFC 3339 pattern. If you add a function for users to call, add it to the entrypoint the script writes, so the check covers it. `sprintf` is one of them, so build text with `concat` instead. `concat` takes only strings, so write anything else with `_text` first.
 
 CI also fails when a line of Rego isn't reached by any test. To list those lines yourself:
 
@@ -102,7 +111,7 @@ When talking to people:
 The first line names the part of the repo that changed, then says what the change does, in the imperative and in lowercase:
 
 - `core:` the library and its tests
-- `docs:` `README.md`, `REFERENCE.md` and `AGENTS.md`
+- `docs:` `README.md`, `REFERENCE.md`, `AGENTS.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md` and the issue and pull request templates
 - `site:` the website in `site/`
 - `ci:` workflows and Dependabot
 - `examples:` the worked examples in `examples/`

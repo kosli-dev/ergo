@@ -6,7 +6,7 @@ ergo is brand new and still changing a lot before its first alpha, so expect bre
 
 ergo is a single Rego file, so using it is as simple as copying it into your project.
 
-You'll need [OPA](https://www.openpolicyagent.org/docs/#1-download-opa) to run it. We test ergo with OPA 1.19. Older versions may not load it: OPA 1.2, for example, stops with `rego_parse_error: unexpected as keyword`. Run `opa version` to see which one you have.
+You'll need [OPA](https://www.openpolicyagent.org/docs/#1-download-opa) to run it. We test ergo with OPA 1.19 and 1.20.2. Older versions may not load it: OPA 1.2, for example, stops with `rego_parse_error: unexpected as keyword`. Run `opa version` to see which one you have.
 
 ### 1. Copy the library
 
@@ -28,11 +28,15 @@ package deploy
 
 import data.ergo
 
-requirements := {"prod_deploy": {
-	"subject_type": "deployment",
+subjects := {"deployment": {
 	"from": ["deployments"],
 	"id": ["id"],
 	"applies_to": {"is_prod": {"op": "equals", "path": ["environment"], "value": "prod"}},
+}}
+
+requirements := {"prod_deploy": {
+	"description": "Every production deployment is approved",
+	"subject": "deployment",
 	"checks": {"approved": {
 		"description": "Someone approved the deployment",
 		"op": "non_empty_string",
@@ -40,14 +44,15 @@ requirements := {"prod_deploy": {
 	}},
 }}
 
-report := ergo.report(input, requirements)
+report := ergo.report(input, {"subjects": subjects, "requirements": requirements}, {})
 
 violations := ergo.violations(report)
 ```
 
-A requirement describes what to check, not how to check it. It starts by saying what the policy is about, the things we call _subjects_:
+`ergo.report` takes the input, the policy and the params. The policy holds the subjects and the requirements, and this one has no params, so they're `{}`.
 
-- `subject_type` is a human-friendly name for them.
+A policy describes what to check, not how to check it. First it says what it's about, the things we call _subjects_. Each kind of subject gets a name, here `deployment`, that the report uses for each one, and says where to find them:
+
 - `from` is the path to the subjects in the input. `["deployments"]` means `input.deployments`, and `["release", "deployments"]` would mean `input.release.deployments`.
 - `id` is the field that uniquely identifies each subject.
 
@@ -55,20 +60,21 @@ Then we can optionally keep only the subjects that are relevant to this policy:
 
 - `applies_to`: in this case, we define one filter that selects only the deployments whose `environment` is `prod`.
 
-And finally we define the actual checks for this policy:
+And finally the requirement says what must be true of them. Its `description` says what it requires, in words anyone can read, and `subject` names the subject it checks:
 
 - `checks` are the rules each subject must pass. Here, `approved_by` must be a non-empty string.
 
-#### Or write the requirements in YAML
+Several requirements can check the same subject. Each one gets its own rows in the report.
 
-Requirements are plain data, so you can keep them in a YAML file instead. OPA reads every YAML and JSON file in the directory you pass with `-d`, so this file becomes `data.requirements`.
+#### Or write the policy in YAML
 
-`policy/requirements.yaml`:
+Subjects and requirements are plain data, so you can keep them in a YAML file instead. OPA reads every YAML and JSON file in the directory you pass with `-d`, so this file becomes `data.subjects` and `data.requirements`.
+
+`policy/policy.yaml`:
 
 ```yaml
-requirements:
-  prod_deploy:
-    subject_type: deployment
+subjects:
+  deployment:
     from: [deployments]
     id: [id]
     applies_to:
@@ -76,6 +82,10 @@ requirements:
         op: equals
         path: [environment]
         value: prod
+requirements:
+  prod_deploy:
+    description: Every production deployment is approved
+    subject: deployment
     checks:
       approved:
         description: Someone approved the deployment
@@ -92,10 +102,20 @@ package deploy
 
 import data.ergo
 
-report := ergo.report(input, data.requirements)
+default subjects := {}
+
+subjects := data.subjects
+
+default requirements := {}
+
+requirements := data.requirements
+
+report := ergo.report(input, {"subjects": subjects, "requirements": requirements}, {})
 
 violations := ergo.violations(report)
 ```
+
+The defaults keep the report defined when the file leaves out `subjects:` or `requirements:`, or spells one wrong. That report still fails: with no requirements it isn't compliant, and with no subjects the requirement names one that isn't there.
 
 The report and the violations below come out the same either way.
 
@@ -130,7 +150,7 @@ The report records every check ergo ran, including the ones that passed. It come
 ```
 
 - `compliant` is the overall answer. When you need a plain yes or no to allow or block something, this is the one to use: `allow := report.compliant`.
-- `requirements` has an entry for each requirement. It tells you whether the requirement is satisfied and how many subjects were found and kept. It also lists every check with a readable `expression`, such as `approved_by is a non-empty string`.
+- `requirements` has an entry for each requirement. It repeats the requirement's `description`, and its `status` is `met`, `not_met`, or `not_applicable` when no subject was left to check. It also says how many subjects were found and kept, and lists every check with a readable `expression`, such as `approved_by is a non-empty string`.
 - `results` has one row per subject and check, with the value ergo read, whether the check passed, and a `cause`.
 
 Here's what those rows look like for our example:
@@ -138,7 +158,8 @@ Here's what those rows look like for our example:
 | subject | check           | value read                               | passed  | cause       |
 | ------- | --------------- | ---------------------------------------- | ------- | ----------- |
 |         | `$well_formed`  | `count(checks) = 1`, `require = "every"` | `true`  | `satisfied` |
-|         | `$min_subjects` | `count(matching(deployments)) = 2`       | `true`  | `satisfied` |
+|         | `$min_subjects` | `in-scope deployment count = 2`          | `true`  | `satisfied` |
+|         | `$unique_ids`   | `repeated deployment ids = []`           | `true`  | `satisfied` |
 | `d-1`   | `$applies`      | `environment = "prod"`                   | `true`  | `satisfied` |
 | `d-2`   | `$applies`      | `environment = "prod"`                   | `true`  | `satisfied` |
 | `d-3`   | `$applies`      | `environment = "staging"`                | `false` | `value`     |
@@ -149,6 +170,7 @@ You didn't write the checks starting with `$`. ergo adds them for you:
 
 - `$well_formed` makes sure the requirement itself makes sense, for example that it has at least one check.
 - `$min_subjects` makes sure at least one subject was found. If `from` points to nothing, this check fails, so the policy can't pass without checking anything.
+- `$unique_ids` makes sure no two deployments share an id. Otherwise their rows could look the same, and you couldn't tell which one failed.
 - `$applies` records whether each subject passed the `applies_to` filter. `d-3` didn't, and the report says so rather than leaving it out. A deployment with no `environment` at all would fail `$applies` with the cause `absent`, and the requirement would fail with it, because ergo can't tell whether it's a production deployment.
 
 When a check fails, `cause` tells you why. `d-2` failed with `absent` because it has no `approved_by` field at all: no approval was ever recorded. Had `approved_by` been `""`, the cause would be `value` instead, since an approval was recorded but it's empty. Both fail, but they're different problems and you'd fix them differently.
@@ -186,6 +208,10 @@ The [reference](REFERENCE.md) covers every field, operator and cause, including 
 ### Updating
 
 Copy the new `ergo.rego` over the old one and run your policy's tests.
+
+## Contributing
+
+Bug reports, ideas and pull requests are welcome. [`CONTRIBUTING.md`](https://github.com/kosli-dev/ergo/blob/main/CONTRIBUTING.md) explains how, and everyone taking part follows the [code of conduct](https://github.com/kosli-dev/ergo/blob/main/CODE_OF_CONDUCT.md).
 
 ## License
 

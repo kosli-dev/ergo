@@ -3,7 +3,7 @@ package baking
 import data.ergo
 import data.workings
 
-report := ergo.report(input, data.baking.requirements)
+report := ergo.report(input, {"subjects": data.baking.subjects, "requirements": data.baking.requirements}, {})
 
 violations := ergo.violations(report)
 

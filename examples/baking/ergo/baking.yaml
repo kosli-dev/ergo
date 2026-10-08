@@ -1,9 +1,11 @@
 baking:
-  requirements:
-    cake_batch:
-      subject_type: batch
+  subjects:
+    batch:
       from: [batches]
       id: [id]
+  requirements:
+    cake_batch:
+      subject: batch
       checks:
         nut_free:
           description: Must not contain nut allergens

@@ -1,0 +1,30 @@
+name: Feature request
+description: Something ergo can't check or report yet
+labels: [enhancement]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: What you want to check
+      description: Describe the requirement in plain words, as you'd explain it to an auditor.
+    validations:
+      required: true
+  - type: textarea
+    id: input
+    attributes:
+      label: Example input
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: What the report should say
+      description: Which checks should pass or fail for that input, and why.
+    validations:
+      required: true
+  - type: textarea
+    id: today
+    attributes:
+      label: How you do it today
+      description: A workaround in ergo or plain Rego, if you have one.

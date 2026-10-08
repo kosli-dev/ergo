@@ -5,12 +5,14 @@ import data.baking
 report := r if {
 	r := baking.report
 		with input as {"batches": data.examples.baking.batches}
+		with data.baking.subjects as data.examples.baking.ergo.baking.subjects
 		with data.baking.requirements as data.examples.baking.ergo.baking.requirements
 }
 
 violations := v if {
 	v := baking.violations
 		with input as {"batches": data.examples.baking.batches}
+		with data.baking.subjects as data.examples.baking.ergo.baking.subjects
 		with data.baking.requirements as data.examples.baking.ergo.baking.requirements
 }
 
@@ -50,6 +52,7 @@ test_only_the_nut_check_is_violated if {
 workings_table := w if {
 	w := baking.workings_table
 		with input as {"batches": data.examples.baking.batches}
+		with data.baking.subjects as data.examples.baking.ergo.baking.subjects
 		with data.baking.requirements as data.examples.baking.ergo.baking.requirements
 }
 
@@ -102,15 +105,17 @@ test_workings_table_shows_a_missing_allergen_record_as_null if {
 }
 
 test_workings_table_leaves_out_the_checks_ergo_adds if {
-	requirements := {"cake_batch": object.union(
-		data.examples.baking.ergo.baking.requirements.cake_batch,
+	subjects := {"batch": object.union(
+		data.examples.baking.ergo.baking.subjects.batch,
 		{"applies_to": {"is_cake": {"op": "present", "path": ["bake"]}}},
 	)}
 	w := baking.workings_table
 		with input as {"batches": data.examples.baking.batches}
-		with data.baking.requirements as requirements
+		with data.baking.subjects as subjects
+		with data.baking.requirements as data.examples.baking.ergo.baking.requirements
 	some r in baking.report.results with input as {"batches": data.examples.baking.batches}
-		with data.baking.requirements as requirements
+		with data.baking.subjects as subjects
+		with data.baking.requirements as data.examples.baking.ergo.baking.requirements
 	r.check == "$applies"
 	every rows in w {
 		{row.check | some row in rows} == {"nut_free", "temp_ok", "time_ok"}
