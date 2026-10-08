@@ -124,7 +124,7 @@ requirements:
       licence_known: { op: any, path: [licences], check: { op: non_empty_string, path: [] } }
 ```
 
-A subject with `of` reads `from` and `id` from the subject it names, and keeps only the items that pass that subject's filters and its own. Everything else about it is its own: its rows and descriptions use its name, like `locked SBOM package`. It reports exactly what the same subject written out in full would.
+A subject with `of` reads `from` and `id` from the subject it names, and keeps only the items that pass that subject's filters and its own. Everything else about it is its own: its rows and descriptions use its name, like `locked SBOM package`. It reports what the same subject written out in full would, except that `$well_formed` names a problem, or a `from` with a [naming step](#naming-subjects), after the subject it's written in.
 
 - A subject can build on one that builds on another, and so on. The chain ends at the one subject without `of`, which gives `from` and `id`, and a subject keeps the items that pass the filters of every subject along its chain.
 - A subject with `of` can't have its own `from` or `id`. They fail as `not allowed with of`.

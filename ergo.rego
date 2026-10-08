@@ -356,12 +356,22 @@ _field_problem_inputs(req) := [{"name": _field_name(f), "value": sort({p[1] | so
 
 _field_name(f) := _path_name([f]) if is_string(f)
 
-_field_name(f) := _path_name(f) if is_array(f)
+_field_name(f) := _path_name(f) if {
+	is_array(f)
+	is_string(f[count(f) - 1])
+}
 
-_field_name(f) := concat("", ["<invalid key ", _literal_text(f), ">"]) if {
+_field_name(f) := concat(".", [_path_name(array.slice(f, 0, count(f) - 1)), _invalid_key_name(f[count(f) - 1])]) if {
+	is_array(f)
+	not is_string(f[count(f) - 1])
+}
+
+_field_name(f) := _invalid_key_name(f) if {
 	not is_string(f)
 	not is_array(f)
 }
+
+_invalid_key_name(k) := concat("", ["<invalid key ", _literal_text(k), ">"])
 
 _has_problems(req, f) if {
 	some p in _req_problems(req)
@@ -3362,8 +3372,11 @@ report(doc, policy, params) := r if {
 	subjects := _section(policy, "subjects")
 	unreadable := _unreadable_inputs(doc, params)
 	written := _report_of(doc, reqs) with data.ergo_document as doc with data.ergo_params as params with data.ergo_subjects as subjects with data.ergo_unreadable as unreadable with input as {"ergo/names": {}}
-	r := _reported(written, unreadable, [reqs, subjects])
+	used := _used_subjects(reqs) with data.ergo_subjects as subjects
+	r := _reported(written, unreadable, [reqs, used])
 }
+
+_used_subjects(reqs) := {name: data.ergo_subjects[name] | some req in reqs; some name in _members(req)}
 
 _section(policy, name) := object.get(policy, name, {}) if is_object(policy)
 

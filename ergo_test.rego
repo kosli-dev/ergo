@@ -7347,3 +7347,19 @@ test_filters_that_are_not_an_object_on_either_subject_rule_no_one_out if {
 		{[r.check, r.cause] | some r in rep.results; r.subject.id != null} == {["$applies", "ill_formed"]}
 	}
 }
+
+test_a_subject_no_requirement_names_does_not_change_how_numbers_are_written if {
+	policy := subject_policy({"i": {"from": ["items"], "id": ["id"]}}, {"r": {"subject": "i", "checks": {"c": {"op": "equals", "path": ["n"], "value": 1.50}}}})
+	with_unused := object.union(policy, {"subjects": {"unused": {"from": [{"where": {"k": {1}}}]}}})
+	json.marshal(ergo.report({"items": [{"id": 1, "n": 1.5}]}, with_unused, {})) == json.marshal(ergo.report({"items": [{"id": 1, "n": 1.5}]}, policy, {}))
+}
+
+test_subject_keys_that_are_not_strings_get_a_name_each if {
+	subjects := {"i": {"from": ["items"], "id": ["id"], true: 1, false: 2, 2: 3}}
+	rep := ergo.report({"items": [{"id": 1}]}, subject_policy(subjects, {"r": {"subject": "i", "checks": {"c": {"op": "present", "path": ["id"]}}}}), {})
+	well_formed_problems(rep, "r") == [
+		{"name": "subjects.i.<invalid key false>", "value": ["unknown field"]},
+		{"name": "subjects.i.<invalid key true>", "value": ["unknown field"]},
+		{"name": "subjects.i.<invalid key 2>", "value": ["unknown field"]},
+	]
+}
