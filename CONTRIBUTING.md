@@ -28,7 +28,7 @@ You'll need [OPA](https://www.openpolicyagent.org/docs/#1-download-opa) 1.19 and
 The title becomes the commit on `main`, so it names the area that changed and says what the change does, in lowercase:
 
 ```
-core: fail compare when either side is missing
+spec: fail compare when either side is missing
 ```
 
 The areas are listed in [`AGENTS.md`](AGENTS.md#commits), and CI checks the title against them. If the change alters the report for an existing policy, say so in the description.

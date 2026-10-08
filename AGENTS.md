@@ -132,17 +132,20 @@ When talking to people:
 
 The first line names the part of the repo that changed, then says what the change does, in the imperative and in lowercase:
 
-- `core:` the library and its tests
+- `spec:` the spec in `spec/`, along with the changes to `ergo.rego` and the Rust port that it needs
+- `rego:` `ergo.rego` and its tests, when the spec doesn't change
+- `rust:` the Rust port in `ports/rust`, when the spec doesn't change
+- `python:` the Python package in `ports/python`
 - `docs:` `README.md`, `REFERENCE.md`, `AGENTS.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md` and the issue and pull request templates
 - `site:` the website in `site/`
 - `ci:` workflows and Dependabot
 - `examples:` the worked examples in `examples/`
 
-For example, `core: fail compare when either side is missing`.
+For example, `spec: fail compare when either side is missing`.
 
-One area per commit. A `core:` change that updates `REFERENCE.md` with it stays `core:`.
+One area per commit. A change in behaviour starts in the spec, so it's `spec:`, even though it also changes `ergo.rego`, the Rust port and `REFERENCE.md`. `rego:` and `rust:` are for changes that keep the behaviour, like a speed-up, or that fix one of that implementation's known differences from the spec.
 
-When a `core:` change alters the report for an existing policy, say so in the body, on a line starting with `Changes the report:`.
+When a `spec:` change alters the report for an existing policy, say so in the body, on a line starting with `Changes the report:`.
 
 Add a body when the reason isn't obvious from the first line. PR titles follow the same rules, because they become the commit on `main`. Issue titles do too, so an issue reads like the change that will fix it.
 

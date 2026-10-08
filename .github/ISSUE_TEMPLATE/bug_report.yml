@@ -1,6 +1,6 @@
 name: Bug report
 description: ergo gave the wrong report, or failed to run
-title: "core: "
+title: "rego: "
 labels: [bug]
 body:
   - type: markdown
