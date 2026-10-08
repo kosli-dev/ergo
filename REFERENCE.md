@@ -638,6 +638,7 @@ and the check from above, `every pull_requests[].commits: signed == true`, the r
 
 - `path` is written like a path in an expression, with the item's position added: `pull_requests[0].commits[1]` is the second commit of the first pull request. A path that starts with a name keeps it, as in `$pr.commits[1]`.
 - With `each`, an inner list that's missing, `null`, not a list or empty fails the check, so it's listed in place of its items, like `pull_requests[1].commits` above.
+- An item whose field a `present` check finds missing or `null` is listed with cause `value`, the same as the row, because `present` read the field fine and found nothing there.
 - When the check passes, it's `[]`. A passing `any` can have items that failed, but none of them is why the row came out the way it did.
 - It's `[]` when the list itself can't be read, because there are no items to blame. The row's `cause` says what's wrong with the list.
 - When the check is [written wrong](#basic-operators), every item, and every inner list that's missing, `null`, not a list or empty, is listed with cause `ill_formed`, because none of them could be checked. When a [`ref`](#reading-from-the-input) in it can't be read, every item that fails is listed with the ref's cause, as the row is.
