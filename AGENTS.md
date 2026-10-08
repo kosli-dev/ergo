@@ -34,7 +34,7 @@ The `regal lint` command runs [Regal](https://www.openpolicyagent.org/projects/r
 
 OPA loads every JSON and YAML file it finds as data. The workflow files under `.github` clash with each other, so the checks ignore that folder.
 
-CI runs these checks on pull requests and on pushes to `main` (`.github/workflows/test.yml`), using the OPA version the README names and Regal 0.43.0. When you change the OPA version, change it in the README, in every job of the workflow and in the Docker command below.
+CI runs these checks on pull requests and on pushes to `main` (`.github/workflows/test.yml`), using the OPA version the README names and Regal 0.43.0. When you change the OPA version, change it in the README, in every job of the workflow, in `.github/workflows/pages.yml` and in the Docker command below.
 
 A second job runs `opa check --strict`, `opa fmt --list` and `opa test` with OPA 1.20.2, the version the Kosli CLI embeds. Repos that copy `ergo.rego` lint their copy with it, and the two versions don't always format the same way. To run them yourself:
 
