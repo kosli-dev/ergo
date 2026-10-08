@@ -1,6 +1,6 @@
 # How ergo turns a policy and an input into a report
 
-Draft 0.1. This covers reading values, causes, expressions and the operators `present`, `missing`, `equals` and `in` so far. Everything else is still described only in [REFERENCE.md](../REFERENCE.md).
+Draft 0.1. This covers reading values, causes, expressions and the operators `present`, `missing`, `equals`, `in`, `non_empty_string`, `empty`, `range`, `matches_any` and `not_matches_any` so far. Everything else is still described only in [REFERENCE.md](../REFERENCE.md).
 
 Each rule has a name in brackets, like **[present.missing]**. The cases in [`cases/`](cases) list the rules they test, so you can find the cases for a rule and the rule behind a case. An implementation follows every rule here, and where it does something else, it's wrong, whatever `ergo.rego` does.
 
@@ -107,7 +107,7 @@ Each check's definition in the report has an `expression` that says what it chec
 
 **[present.expression]** Its expression is `<path> is present`.
 
-**[present.written_wrong]** It's [written wrong](#checks-written-wrong) when `path` is missing, isn't a list, or has a step that can't be a key, or when the check has a field besides `op`, `path`, `description`, `meta`, `expression`, `substitute` and `inputs`. What's wrong is written `missing path`, `path not a list`, `step that can't be a key in path` or `unknown field <name>`. The same goes for `missing`, `equals` and `in`, which also take the fields they need: `value` for `equals` and `values` for `in`.
+**[present.written_wrong]** It's [written wrong](#checks-written-wrong) when `path` is missing, isn't a list, or has a step that can't be a key, or when the check has a field besides `op`, `path`, `description`, `meta`, `expression`, `substitute` and `inputs`. What's wrong is written `missing path`, `path not a list`, `step that can't be a key in path` or `unknown field <name>`. The same goes for every operator in this document, which also take the fields they need, like `value` for `equals`, `values` for `in`, `min` and `max` for `range`, and `patterns` for `matches_any` and `not_matches_any`. A missing one is written `missing <field>`.
 
 **[present.filter]** In `applies_to`, a `present` filter that fails with cause `value` rules the subject out, whatever the other filters give. Its `$applies` row fails with cause `value`, and the subject gets no other rows. Any other cause fails the requirement, as it does for every filter. **[applies.inputs]** The `$applies` row lists each path its filters read once, sorted by name.
 
@@ -144,3 +144,49 @@ Each check's definition in the report has an `expression` that says what it chec
 **[in.fail]** It fails with the path's outcome as its cause when the path ends anything but `found`, so a missing or `null` field fails even when `values` holds `null`. When the field was read, it fails with `value`, an empty `values` included.
 
 **[in.expression]** Its expression is `<path> in [<values>]`, with each value shown as in [Expressions](#expressions) and sorted by the text it's shown as, in code point order. A `values` read through a ref is shown as the ref's name: `x in $$params.allowed`.
+
+## `non_empty_string`
+
+`{"op": "non_empty_string", "path": [...]}` asks whether a field is a string with something in it.
+
+**[non_empty_string.pass]** It passes when its path ends `found` and the value is a string other than `""`. A string of spaces passes.
+
+**[non_empty_string.fail]** It fails with the path's outcome as its cause when the path ends anything but `found`. When the field was read, it fails with `value`, whatever its type, because checking the type is what it's for.
+
+**[non_empty_string.expression]** Its expression is `<path> is a non-empty string`.
+
+## `empty`
+
+`{"op": "empty", "path": [...]}` asks whether a field is an empty list.
+
+**[empty.pass]** It passes when its path ends `found` and the value is `[]`.
+
+**[empty.fail]** It fails with the path's outcome as its cause when the path ends anything but `found`. A list with items fails with `value`. Anything else that was read, `""` and `{}` included, fails with `unusable`.
+
+**[empty.expression]** Its expression is `<path> is empty`.
+
+## `range`
+
+`{"op": "range", "path": [...], "min": a, "max": b}` asks whether a field is a number between two others, both included.
+
+**[range.bounds]** `min` and `max` are numbers, or refs. A bound that isn't a number, or a `min` above `max`, is written wrong, as `invalid min`, `invalid max` or `min above max`. When a ref reads something other than a number, or the bounds it reads put `min` above `max`, the check fails with `unusable`.
+
+**[range.pass]** It passes when its path ends `found`, the value is a number, and `min <= value <= max`, compared by value.
+
+**[range.fail]** It fails with the path's outcome as its cause when the path ends anything but `found`, and with `unusable` when the value isn't a number. A number outside the range fails with `value`.
+
+**[range.expression]** Its expression is `<path> >= <min> and <path> <= <max>`.
+
+## `matches_any` and `not_matches_any`
+
+`{"op": "matches_any", "path": [...], "patterns": [...]}` asks whether a field is a string that matches at least one regular expression. `not_matches_any` asks whether it matches none of them.
+
+**[patterns.syntax]** A pattern is a regular expression in [RE2 syntax](https://github.com/google/re2/wiki/Syntax), run on code points. So there's no lookahead and no backreference. `.` doesn't match a newline, `$` only matches at the very end of the string, and `(?i)` turns on case-insensitive matching. A pattern isn't anchored: `svc_` matches `my_svc_account`.
+
+**[patterns.list]** `patterns` is a list, a literal holding a list, or a ref, and each item of a list written in the policy can be a ref or a literal. A missing `patterns` is written wrong, as `missing patterns`. When it isn't a list, or an item isn't a string that's a valid pattern, it's written wrong as `invalid patterns`, even when another pattern would match. When a ref reads something other than a list, or a pattern that isn't a string or isn't valid, the check fails with `unusable`.
+
+**[patterns.pass]** `matches_any` passes when its path ends `found`, the value is a string, and at least one pattern matches it. `not_matches_any` passes when its path ends `found`, the value is a string, and no pattern matches it. So with an empty `patterns`, `matches_any` always fails and `not_matches_any` passes on any string.
+
+**[patterns.fail]** Both fail with the path's outcome as their cause when the path ends anything but `found`, and with `unusable` when the value isn't a string. Otherwise they fail with `value`.
+
+**[patterns.expression]** Their expressions are `<path> matches one of [<patterns>]` and `<path> matches none of [<patterns>]`, with the patterns shown as values and sorted by the text they're shown as, as for `in`. Patterns read through a ref are shown as the ref's name.

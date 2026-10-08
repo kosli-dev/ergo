@@ -1,0 +1,57 @@
+[
+  {
+    "description": "empty",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "empty", "path": ["x"]}}}},
+    "cases": [
+      {
+        "description": "passes on an empty list",
+        "rules": ["empty.pass"],
+        "input": {"things": [{"id": "t1", "x": []}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": []}]}
+        ],
+        "expressions": {"s": {"c": "x is empty"}}
+      },
+      {
+        "description": "fails as value on a list with items",
+        "rules": ["empty.fail"],
+        "input": {"things": [{"id": "t1", "x": [1]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": [1]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on an empty string",
+        "rules": ["empty.fail"],
+        "input": {"things": [{"id": "t1", "x": ""}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ""}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on an empty object",
+        "rules": ["empty.fail"],
+        "input": {"things": [{"id": "t1", "x": {}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": {}}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["empty.fail", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["empty.fail", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,278 @@
+[
+  {
+    "description": "matches_any",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": ["z", "^b", "svc_"]}}}},
+    "cases": [
+      {
+        "description": "passes when one pattern matches anywhere in the string",
+        "rules": ["patterns.pass", "patterns.syntax"],
+        "input": {"things": [{"id": "t1", "x": "my_svc_x"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "my_svc_x"}]}
+        ],
+        "expressions": {"s": {"c": "x matches one of [\"^b\", \"svc_\", \"z\"]"}}
+      },
+      {
+        "description": "fails as value when none matches",
+        "rules": ["patterns.fail"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a"}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on a number",
+        "rules": ["patterns.fail"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 1}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["patterns.fail", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "not_matches_any",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "not_matches_any", "path": ["x"], "patterns": ["^b"]}}}},
+    "cases": [
+      {
+        "description": "passes when no pattern matches",
+        "rules": ["patterns.pass"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "expressions": {"s": {"c": "x matches none of [\"^b\"]"}}
+      },
+      {
+        "description": "fails as value when a pattern matches",
+        "rules": ["patterns.fail"],
+        "input": {"things": [{"id": "t1", "x": "bob"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "bob"}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on a number",
+        "rules": ["patterns.fail"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 1}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["patterns.fail", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "matches_any with no patterns",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": []}}}},
+    "cases": [
+      {
+        "description": "fails as value",
+        "rules": ["patterns.pass", "patterns.fail"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "expressions": {"s": {"c": "x matches one of []"}}
+      }
+    ]
+  },
+  {
+    "description": "not_matches_any with no patterns",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "not_matches_any", "path": ["x"], "patterns": []}}}},
+    "cases": [
+      {
+        "description": "passes on any string",
+        "rules": ["patterns.pass"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a pattern with a dot",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": ["^a.b$"]}}}},
+    "cases": [
+      {
+        "description": "doesn't match a newline",
+        "rules": ["patterns.syntax"],
+        "input": {"things": [{"id": "t1", "x": "a\nb"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a\nb"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a pattern ending with a dollar",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": ["a$"]}}}},
+    "cases": [
+      {
+        "description": "doesn't match before a final newline",
+        "rules": ["patterns.syntax"],
+        "input": {"things": [{"id": "t1", "x": "a\n"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a\n"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a case-insensitive pattern",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": ["(?i)^A"]}}}},
+    "cases": [
+      {
+        "description": "matches the other case",
+        "rules": ["patterns.syntax"],
+        "input": {"things": [{"id": "t1", "x": "abc"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "abc"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a pattern with a Unicode class",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": ["^\\p{L}+$"]}}}},
+    "cases": [
+      {
+        "description": "matches letters outside ASCII",
+        "rules": ["patterns.syntax"],
+        "input": {"things": [{"id": "t1", "x": "été"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "été"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "patterns read through refs",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": [{"ref": ["$$params", "p"]}]}}}},
+    "params": {"p": "b"},
+    "cases": [
+      {
+        "description": "passes when the pattern read matches",
+        "rules": ["patterns.list", "value.ref"],
+        "input": {"things": [{"id": "t1", "x": "abc"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "abc"}]}
+        ],
+        "expressions": {"s": {"c": "x matches one of [$$params.p]"}}
+      }
+    ]
+  },
+  {
+    "description": "a pattern read through a ref that isn't valid",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": [{"ref": ["$$params", "p"]}]}}}},
+    "params": {"p": "("},
+    "cases": [
+      {
+        "description": "fails as unusable",
+        "rules": ["patterns.list"],
+        "input": {"things": [{"id": "t1", "x": "abc"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "abc"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "patterns read through a ref to a list",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": {"ref": ["$$params", "ps"]}}}}},
+    "params": {"ps": ["c"]},
+    "cases": [
+      {
+        "description": "passes when one matches",
+        "rules": ["patterns.list"],
+        "input": {"things": [{"id": "t1", "x": "abc"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "abc"}]}
+        ],
+        "expressions": {"s": {"c": "x matches one of $$params.ps"}}
+      }
+    ]
+  },
+  {
+    "description": "patterns read through a ref that isn't a list",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": {"ref": ["$$params", "ps"]}}}}},
+    "params": {"ps": "c"},
+    "cases": [
+      {
+        "description": "fails as unusable",
+        "rules": ["patterns.list"],
+        "input": {"things": [{"id": "t1", "x": "abc"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "abc"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "matches_any written wrong",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["things"],
+        "id": ["id"],
+        "checks": {
+          "backreference": {"op": "matches_any", "path": ["x"], "patterns": ["(a)\\1"]},
+          "lookahead": {"op": "matches_any", "path": ["x"], "patterns": ["a(?=b)"]},
+          "no_patterns": {"op": "matches_any", "path": ["x"]},
+          "not_a_list": {"op": "matches_any", "path": ["x"], "patterns": "a"},
+          "not_a_string": {"op": "matches_any", "path": ["x"], "patterns": ["a", 42]},
+          "unclosed": {"op": "matches_any", "path": ["x"], "patterns": ["a", "("]}
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails every check as ill_formed and says why",
+        "rules": ["patterns.list", "patterns.syntax", "written_wrong"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {"name": "count(checks)", "value": 6},
+              {"name": "require", "value": "every"},
+              {"name": "checks.backreference", "value": ["invalid patterns"]},
+              {"name": "checks.lookahead", "value": ["invalid patterns"]},
+              {"name": "checks.no_patterns", "value": ["missing patterns"]},
+              {"name": "checks.not_a_list", "value": ["invalid patterns"]},
+              {"name": "checks.not_a_string", "value": ["invalid patterns"]},
+              {"name": "checks.unclosed", "value": ["invalid patterns"]}
+            ]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "backreference", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "lookahead", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "no_patterns", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "not_a_list", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "not_a_string", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "unclosed", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "expressions": {"s": {"no_patterns": "x matches one of <missing patterns>", "not_a_list": "x matches one of <invalid patterns>"}}
+      }
+    ]
+  }
+]

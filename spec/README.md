@@ -9,7 +9,7 @@ Draft 0.1. ergo is three specs, and `ergo.rego` and the Rust port in `ports/rust
 
 When an implementation and the spec disagree, the implementation is wrong. A change to ergo's behaviour starts here, with the rule and its cases, and then goes into each implementation.
 
-The spec only covers reading values, causes, expressions and the operators `present`, `missing`, `equals` and `in` so far. [REFERENCE.md](../REFERENCE.md) still describes everything else. The spec will change while it's 0.x.
+The spec only covers reading values, causes, expressions and the operators `present`, `missing`, `equals`, `in`, `non_empty_string`, `empty`, `range`, `matches_any` and `not_matches_any` so far. [REFERENCE.md](../REFERENCE.md) still describes everything else. The spec will change while it's 0.x.
 
 ## Cases
 
