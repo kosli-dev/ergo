@@ -1375,10 +1375,6 @@
                 {
                   "name": "status",
                   "value": null
-                },
-                {
-                  "name": "status",
-                  "value": null
                 }
               ],
               "passed": false,
@@ -1505,10 +1501,6 @@
               "cause": "value",
               "check": "$applies",
               "inputs": [
-                {
-                  "name": "status",
-                  "value": null
-                },
                 {
                   "name": "status",
                   "value": null
@@ -1641,10 +1633,6 @@
                 {
                   "name": "status",
                   "value": "PENDING"
-                },
-                {
-                  "name": "status",
-                  "value": "PENDING"
                 }
               ],
               "passed": false,
@@ -1771,10 +1759,6 @@
               "cause": "satisfied",
               "check": "$applies",
               "inputs": [
-                {
-                  "name": "status",
-                  "value": "COMPLETE"
-                },
                 {
                   "name": "status",
                   "value": "COMPLETE"

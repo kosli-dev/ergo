@@ -6,16 +6,15 @@
         "input": {
           "items": [
             {
-              "approvers": [
-                {
-                  "state": "APPROVED"
-                }
+              "allergens": [
+                "garlic",
+                "milk"
               ]
             }
           ]
         },
         "report": {
-          "compliant": false,
+          "compliant": true,
           "requirements": {
             "s": {
               "checks": {
@@ -35,19 +34,27 @@
                   "meta": {}
                 },
                 "c": {
+                  "check": {
+                    "op": "in",
+                    "path": [],
+                    "values": [
+                      "nuts",
+                      "garlic"
+                    ]
+                  },
                   "description": "",
-                  "expression": "some approvers: \u003cmissing check\u003e",
+                  "expression": "some allergens: allergens[] in [\"garlic\", \"nuts\"]",
                   "meta": {},
                   "op": "any",
                   "path": [
-                    "approvers"
+                    "allergens"
                   ]
                 }
               },
               "description": "",
               "meta": {},
               "require": "every",
-              "status": "not_met",
+              "status": "met",
               "subjects": {
                 "matching": 1,
                 "total": 1
@@ -56,7 +63,7 @@
           },
           "results": [
             {
-              "cause": "value",
+              "cause": "satisfied",
               "check": "$well_formed",
               "inputs": [
                 {
@@ -66,15 +73,9 @@
                 {
                   "name": "require",
                   "value": "every"
-                },
-                {
-                  "name": "checks.c",
-                  "value": [
-                    "missing check"
-                  ]
                 }
               ],
-              "passed": false,
+              "passed": true,
               "requirement": "s",
               "subject": {
                 "id": null,
@@ -114,18 +115,159 @@
               }
             },
             {
-              "cause": "ill_formed",
+              "cause": "satisfied",
+              "check": "c",
+              "failed_items": [],
+              "inputs": [
+                {
+                  "name": "allergens[]",
+                  "value": [
+                    "garlic",
+                    "milk"
+                  ]
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": []
+      },
+      {
+        "description": "input 2",
+        "input": {
+          "items": [
+            {
+              "allergens": [
+                "milk"
+              ]
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "check": {
+                    "op": "in",
+                    "path": [],
+                    "values": [
+                      "nuts",
+                      "garlic"
+                    ]
+                  },
+                  "description": "",
+                  "expression": "some allergens: allergens[] in [\"garlic\", \"nuts\"]",
+                  "meta": {},
+                  "op": "any",
+                  "path": [
+                    "allergens"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
               "check": "c",
               "failed_items": [
                 {
-                  "cause": "ill_formed",
-                  "path": "approvers[0]",
-                  "value": {
-                    "state": "APPROVED"
-                  }
+                  "cause": "value",
+                  "path": "allergens[0]",
+                  "value": "milk"
                 }
               ],
-              "inputs": [],
+              "inputs": [
+                {
+                  "name": "allergens[]",
+                  "value": [
+                    "milk"
+                  ]
+                }
+              ],
               "passed": false,
               "requirement": "s",
               "subject": {
@@ -138,22 +280,21 @@
         "violations": [
           {
             "cause": "value",
-            "check": "$well_formed",
-            "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "check": "c",
+            "description": "",
+            "expression": "some allergens: allergens[] in [\"garlic\", \"nuts\"]",
+            "failed_items": [
+              {
+                "cause": "value",
+                "path": "allergens[0]",
+                "value": "milk"
+              }
+            ],
             "inputs": [
               {
-                "name": "count(checks)",
-                "value": 1
-              },
-              {
-                "name": "require",
-                "value": "every"
-              },
-              {
-                "name": "checks.c",
+                "name": "allergens[]",
                 "value": [
-                  "missing check"
+                  "milk"
                 ]
               }
             ],
@@ -162,22 +303,151 @@
               "id": null,
               "type": "thing"
             }
+          }
+        ]
+      },
+      {
+        "description": "input 3",
+        "input": {
+          "items": [
+            {
+              "allergens": []
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "check": {
+                    "op": "in",
+                    "path": [],
+                    "values": [
+                      "nuts",
+                      "garlic"
+                    ]
+                  },
+                  "description": "",
+                  "expression": "some allergens: allergens[] in [\"garlic\", \"nuts\"]",
+                  "meta": {},
+                  "op": "any",
+                  "path": [
+                    "allergens"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
           },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "c",
+              "failed_items": [],
+              "inputs": [
+                {
+                  "name": "allergens[]",
+                  "value": []
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": [
           {
-            "cause": "ill_formed",
+            "cause": "value",
             "check": "c",
             "description": "",
-            "expression": "some approvers: \u003cmissing check\u003e",
-            "failed_items": [
+            "expression": "some allergens: allergens[] in [\"garlic\", \"nuts\"]",
+            "failed_items": [],
+            "inputs": [
               {
-                "cause": "ill_formed",
-                "path": "approvers[0]",
-                "value": {
-                  "state": "APPROVED"
-                }
+                "name": "allergens[]",
+                "value": []
               }
             ],
-            "inputs": [],
             "requirement": "s",
             "subject": {
               "id": null,
@@ -187,14 +457,22 @@
         ]
       }
     ],
-    "description": "any without a nested check fails",
+    "description": "any with in is how to say includes any of",
     "requirements": {
       "s": {
         "checks": {
           "c": {
+            "check": {
+              "op": "in",
+              "path": [],
+              "values": [
+                "nuts",
+                "garlic"
+              ]
+            },
             "op": "any",
             "path": [
-              "approvers"
+              "allergens"
             ]
           }
         },
@@ -352,364 +630,6 @@
       }
     ],
     "description": "any when one element passes",
-    "requirements": {
-      "s": {
-        "checks": {
-          "c": {
-            "check": {
-              "op": "equals",
-              "path": [
-                "state"
-              ],
-              "value": "APPROVED"
-            },
-            "op": "any",
-            "path": [
-              "approvers"
-            ]
-          }
-        },
-        "from": [
-          "items"
-        ],
-        "id": [
-          "id"
-        ],
-        "subject_type": "thing"
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "items": [
-            {
-              "approvers": []
-            }
-          ]
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) \u003e= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every thing id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "check": {
-                    "op": "equals",
-                    "path": [
-                      "state"
-                    ],
-                    "value": "APPROVED"
-                  },
-                  "description": "",
-                  "expression": "some approvers: state == \"APPROVED\"",
-                  "meta": {},
-                  "op": "any",
-                  "path": [
-                    "approvers"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "satisfied",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope thing count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated thing ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "value",
-              "check": "c",
-              "failed_items": [],
-              "inputs": [
-                {
-                  "name": "approvers[].state",
-                  "value": []
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "value",
-            "check": "c",
-            "description": "",
-            "expression": "some approvers: state == \"APPROVED\"",
-            "failed_items": [],
-            "inputs": [
-              {
-                "name": "approvers[].state",
-                "value": []
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "thing"
-            }
-          }
-        ]
-      }
-    ],
-    "description": "any over empty collection",
-    "requirements": {
-      "s": {
-        "checks": {
-          "c": {
-            "check": {
-              "op": "equals",
-              "path": [
-                "state"
-              ],
-              "value": "APPROVED"
-            },
-            "op": "any",
-            "path": [
-              "approvers"
-            ]
-          }
-        },
-        "from": [
-          "items"
-        ],
-        "id": [
-          "id"
-        ],
-        "subject_type": "thing"
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "items": [
-            {}
-          ]
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) \u003e= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every thing id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "check": {
-                    "op": "equals",
-                    "path": [
-                      "state"
-                    ],
-                    "value": "APPROVED"
-                  },
-                  "description": "",
-                  "expression": "some approvers: state == \"APPROVED\"",
-                  "meta": {},
-                  "op": "any",
-                  "path": [
-                    "approvers"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "satisfied",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope thing count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated thing ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "absent",
-              "check": "c",
-              "failed_items": [],
-              "inputs": [
-                {
-                  "name": "approvers[].state",
-                  "value": []
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "absent",
-            "check": "c",
-            "description": "",
-            "expression": "some approvers: state == \"APPROVED\"",
-            "failed_items": [],
-            "inputs": [
-              {
-                "name": "approvers[].state",
-                "value": []
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "thing"
-            }
-          }
-        ]
-      }
-    ],
-    "description": "any rejects missing path",
     "requirements": {
       "s": {
         "checks": {
@@ -925,6 +845,573 @@
               ],
               "value": "APPROVED"
             },
+            "op": "any",
+            "path": [
+              "approvers"
+            ]
+          }
+        },
+        "from": [
+          "items"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "items": [
+            {}
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "check": {
+                    "op": "equals",
+                    "path": [
+                      "state"
+                    ],
+                    "value": "APPROVED"
+                  },
+                  "description": "",
+                  "expression": "some approvers: state == \"APPROVED\"",
+                  "meta": {},
+                  "op": "any",
+                  "path": [
+                    "approvers"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "c",
+              "failed_items": [],
+              "inputs": [
+                {
+                  "name": "approvers[].state",
+                  "value": []
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "description": "",
+            "expression": "some approvers: state == \"APPROVED\"",
+            "failed_items": [],
+            "inputs": [
+              {
+                "name": "approvers[].state",
+                "value": []
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "any rejects missing path",
+    "requirements": {
+      "s": {
+        "checks": {
+          "c": {
+            "check": {
+              "op": "equals",
+              "path": [
+                "state"
+              ],
+              "value": "APPROVED"
+            },
+            "op": "any",
+            "path": [
+              "approvers"
+            ]
+          }
+        },
+        "from": [
+          "items"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "items": [
+            {
+              "approvers": []
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "check": {
+                    "op": "equals",
+                    "path": [
+                      "state"
+                    ],
+                    "value": "APPROVED"
+                  },
+                  "description": "",
+                  "expression": "some approvers: state == \"APPROVED\"",
+                  "meta": {},
+                  "op": "any",
+                  "path": [
+                    "approvers"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "c",
+              "failed_items": [],
+              "inputs": [
+                {
+                  "name": "approvers[].state",
+                  "value": []
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "c",
+            "description": "",
+            "expression": "some approvers: state == \"APPROVED\"",
+            "failed_items": [],
+            "inputs": [
+              {
+                "name": "approvers[].state",
+                "value": []
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "any over empty collection",
+    "requirements": {
+      "s": {
+        "checks": {
+          "c": {
+            "check": {
+              "op": "equals",
+              "path": [
+                "state"
+              ],
+              "value": "APPROVED"
+            },
+            "op": "any",
+            "path": [
+              "approvers"
+            ]
+          }
+        },
+        "from": [
+          "items"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "items": [
+            {
+              "approvers": [
+                {
+                  "state": "APPROVED"
+                }
+              ]
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "description": "",
+                  "expression": "some approvers: \u003cmissing check\u003e",
+                  "meta": {},
+                  "op": "any",
+                  "path": [
+                    "approvers"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "value",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                },
+                {
+                  "name": "checks.c",
+                  "value": [
+                    "missing check"
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "ill_formed",
+              "check": "c",
+              "failed_items": [
+                {
+                  "cause": "ill_formed",
+                  "path": "approvers[0]",
+                  "value": {
+                    "state": "APPROVED"
+                  }
+                }
+              ],
+              "inputs": [],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "description": "The requirement is written correctly",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "missing check"
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "c",
+            "description": "",
+            "expression": "some approvers: \u003cmissing check\u003e",
+            "failed_items": [
+              {
+                "cause": "ill_formed",
+                "path": "approvers[0]",
+                "value": {
+                  "state": "APPROVED"
+                }
+              }
+            ],
+            "inputs": [],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "any without a nested check fails",
+    "requirements": {
+      "s": {
+        "checks": {
+          "c": {
             "op": "any",
             "path": [
               "approvers"
@@ -1343,6 +1830,412 @@
             "op": "any",
             "path": [
               "prs"
+            ]
+          }
+        },
+        "from": [
+          "items"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "items": [
+            {
+              "approvers": [
+                {
+                  "username": "renovate[bot]"
+                },
+                {}
+              ]
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "check": {
+                    "op": "any_of",
+                    "options": {
+                      "person": [
+                        {
+                          "op": "present",
+                          "path": [
+                            "username"
+                          ]
+                        },
+                        {
+                          "op": "not_matches_any",
+                          "path": [
+                            "username"
+                          ],
+                          "patterns": [
+                            "\\[bot\\]$"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "description": "",
+                  "expression": "some approvers: one of: person(username is present and username matches none of [\"\\\\[bot\\\\]$\"])",
+                  "meta": {},
+                  "op": "any",
+                  "path": [
+                    "approvers"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "c",
+              "failed_items": [
+                {
+                  "cause": "value",
+                  "path": "approvers[0]",
+                  "value": {
+                    "username": "renovate[bot]"
+                  }
+                },
+                {
+                  "cause": "value",
+                  "path": "approvers[1]",
+                  "value": {}
+                }
+              ],
+              "inputs": [
+                {
+                  "name": "approvers[]",
+                  "value": [
+                    {
+                      "username": "renovate[bot]"
+                    },
+                    {}
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "c",
+            "description": "",
+            "expression": "some approvers: one of: person(username is present and username matches none of [\"\\\\[bot\\\\]$\"])",
+            "failed_items": [
+              {
+                "cause": "value",
+                "path": "approvers[0]",
+                "value": {
+                  "username": "renovate[bot]"
+                }
+              },
+              {
+                "cause": "value",
+                "path": "approvers[1]",
+                "value": {}
+              }
+            ],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "renovate[bot]"
+                  },
+                  {}
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "input 2",
+        "input": {
+          "items": [
+            {
+              "approvers": [
+                {
+                  "username": "ann"
+                },
+                {}
+              ]
+            }
+          ]
+        },
+        "report": {
+          "compliant": true,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "check": {
+                    "op": "any_of",
+                    "options": {
+                      "person": [
+                        {
+                          "op": "present",
+                          "path": [
+                            "username"
+                          ]
+                        },
+                        {
+                          "op": "not_matches_any",
+                          "path": [
+                            "username"
+                          ],
+                          "patterns": [
+                            "\\[bot\\]$"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "description": "",
+                  "expression": "some approvers: one of: person(username is present and username matches none of [\"\\\\[bot\\\\]$\"])",
+                  "meta": {},
+                  "op": "any",
+                  "path": [
+                    "approvers"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "c",
+              "failed_items": [],
+              "inputs": [
+                {
+                  "name": "approvers[]",
+                  "value": [
+                    {
+                      "username": "ann"
+                    },
+                    {}
+                  ]
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": []
+      }
+    ],
+    "description": "present skips an item in any by failing it cleanly",
+    "requirements": {
+      "s": {
+        "checks": {
+          "c": {
+            "check": {
+              "op": "any_of",
+              "options": {
+                "person": [
+                  {
+                    "op": "present",
+                    "path": [
+                      "username"
+                    ]
+                  },
+                  {
+                    "op": "not_matches_any",
+                    "path": [
+                      "username"
+                    ],
+                    "patterns": [
+                      "\\[bot\\]$"
+                    ]
+                  }
+                ]
+              }
+            },
+            "op": "any",
+            "path": [
+              "approvers"
             ]
           }
         },
@@ -4805,7 +5698,7 @@
         ]
       }
     ],
-    "description": "a check on a list item can read its subject by name",
+    "description": "a name read inside a list check is shown in the row",
     "requirements": {
       "s": {
         "checks": {
@@ -5415,7 +6308,7 @@
         ]
       }
     ],
-    "description": "a check inside a list check can read the item by its name",
+    "description": "a nested list check renders both levels",
     "requirements": {
       "s": {
         "checks": {
@@ -9829,739 +10722,6 @@
             {
               "approvers": [
                 {
-                  "state": "APPROVED",
-                  "timestamp": "2026-10-01T11:00:00Z",
-                  "username": "bob"
-                }
-              ],
-              "author": "ann",
-              "commits": [
-                {
-                  "timestamp": "2026-10-01T10:00:00Z"
-                }
-              ],
-              "number": 1
-            },
-            {
-              "approvers": [
-                {
-                  "state": "APPROVED",
-                  "timestamp": "2026-10-01T11:00:00Z",
-                  "username": "bob"
-                }
-              ],
-              "author": "ann",
-              "commits": [
-                {
-                  "timestamp": "2026-10-01T12:00:00Z"
-                }
-              ],
-              "number": 2
-            },
-            {
-              "approvers": [
-                {
-                  "state": "APPROVED",
-                  "timestamp": "2026-10-01T11:00:00Z",
-                  "username": "ann"
-                },
-                {
-                  "state": "COMMENTED",
-                  "timestamp": "2026-10-01T11:00:00Z",
-                  "username": "bob"
-                }
-              ],
-              "author": "ann",
-              "commits": [
-                {
-                  "timestamp": "2026-10-01T10:00:00Z"
-                }
-              ],
-              "number": 3
-            },
-            {
-              "approvers": [
-                {
-                  "state": "APPROVED",
-                  "timestamp": "2026-10-01T11:00:00Z",
-                  "username": "bob"
-                }
-              ],
-              "commits": [
-                {
-                  "timestamp": "2026-10-01T10:00:00Z"
-                }
-              ],
-              "number": 4
-            },
-            {
-              "approvers": [
-                {
-                  "state": "APPROVED",
-                  "timestamp": "2026-10-01T11:00:00Z",
-                  "username": "bob"
-                }
-              ],
-              "author": "ann",
-              "commits": [
-                {}
-              ],
-              "number": 5
-            }
-          ]
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope pull request count is at least 1",
-                  "expression": "count(matching(pull_requests)) \u003e= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every pull request id is unique",
-                  "expression": "count(repeated(ids(pull_requests))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and from is well formed and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "as": "approver",
-                  "check": {
-                    "op": "any_of",
-                    "options": {
-                      "peer": [
-                        {
-                          "op": "equals",
-                          "path": [
-                            "state"
-                          ],
-                          "value": "APPROVED"
-                        },
-                        {
-                          "cmp": "ne",
-                          "left": [
-                            "username"
-                          ],
-                          "op": "compare",
-                          "right": [
-                            "$pr",
-                            "author"
-                          ]
-                        },
-                        {
-                          "check": {
-                            "cmp": "gt",
-                            "left": [
-                              "$approver",
-                              "timestamp"
-                            ],
-                            "op": "compare",
-                            "right": [
-                              "timestamp"
-                            ]
-                          },
-                          "op": "all",
-                          "path": [
-                            "$pr",
-                            "commits"
-                          ]
-                        }
-                      ]
-                    }
-                  },
-                  "description": "",
-                  "expression": "some approvers as $approver: one of: peer(state == \"APPROVED\" and username ne $pr.author and every $pr.commits: $approver.timestamp gt timestamp)",
-                  "meta": {},
-                  "op": "any",
-                  "path": [
-                    "approvers"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 5,
-                "total": 5
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "satisfied",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                },
-                {
-                  "name": "from",
-                  "value": [
-                    "pull_requests",
-                    {
-                      "each_as": "pr"
-                    }
-                  ]
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "pull request"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope pull request count",
-                  "value": 5
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "pull request"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated pull request ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "pull request"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "c",
-              "failed_items": [],
-              "inputs": [
-                {
-                  "name": "approvers[]",
-                  "value": [
-                    {
-                      "state": "APPROVED",
-                      "timestamp": "2026-10-01T11:00:00Z",
-                      "username": "bob"
-                    }
-                  ]
-                },
-                {
-                  "name": "$pr.author",
-                  "value": "ann"
-                },
-                {
-                  "name": "$pr.commits",
-                  "value": [
-                    {
-                      "timestamp": "2026-10-01T10:00:00Z"
-                    }
-                  ]
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": 1,
-                "type": "pull request"
-              }
-            },
-            {
-              "cause": "value",
-              "check": "c",
-              "failed_items": [
-                {
-                  "cause": "value",
-                  "path": "approvers[0]",
-                  "value": {
-                    "state": "APPROVED",
-                    "timestamp": "2026-10-01T11:00:00Z",
-                    "username": "bob"
-                  }
-                }
-              ],
-              "inputs": [
-                {
-                  "name": "approvers[]",
-                  "value": [
-                    {
-                      "state": "APPROVED",
-                      "timestamp": "2026-10-01T11:00:00Z",
-                      "username": "bob"
-                    }
-                  ]
-                },
-                {
-                  "name": "$pr.author",
-                  "value": "ann"
-                },
-                {
-                  "name": "$pr.commits",
-                  "value": [
-                    {
-                      "timestamp": "2026-10-01T12:00:00Z"
-                    }
-                  ]
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": 2,
-                "type": "pull request"
-              }
-            },
-            {
-              "cause": "value",
-              "check": "c",
-              "failed_items": [
-                {
-                  "cause": "value",
-                  "path": "approvers[0]",
-                  "value": {
-                    "state": "APPROVED",
-                    "timestamp": "2026-10-01T11:00:00Z",
-                    "username": "ann"
-                  }
-                },
-                {
-                  "cause": "value",
-                  "path": "approvers[1]",
-                  "value": {
-                    "state": "COMMENTED",
-                    "timestamp": "2026-10-01T11:00:00Z",
-                    "username": "bob"
-                  }
-                }
-              ],
-              "inputs": [
-                {
-                  "name": "approvers[]",
-                  "value": [
-                    {
-                      "state": "APPROVED",
-                      "timestamp": "2026-10-01T11:00:00Z",
-                      "username": "ann"
-                    },
-                    {
-                      "state": "COMMENTED",
-                      "timestamp": "2026-10-01T11:00:00Z",
-                      "username": "bob"
-                    }
-                  ]
-                },
-                {
-                  "name": "$pr.author",
-                  "value": "ann"
-                },
-                {
-                  "name": "$pr.commits",
-                  "value": [
-                    {
-                      "timestamp": "2026-10-01T10:00:00Z"
-                    }
-                  ]
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": 3,
-                "type": "pull request"
-              }
-            },
-            {
-              "cause": "absent",
-              "check": "c",
-              "failed_items": [
-                {
-                  "cause": "absent",
-                  "path": "approvers[0]",
-                  "value": {
-                    "state": "APPROVED",
-                    "timestamp": "2026-10-01T11:00:00Z",
-                    "username": "bob"
-                  }
-                }
-              ],
-              "inputs": [
-                {
-                  "name": "approvers[]",
-                  "value": [
-                    {
-                      "state": "APPROVED",
-                      "timestamp": "2026-10-01T11:00:00Z",
-                      "username": "bob"
-                    }
-                  ]
-                },
-                {
-                  "name": "$pr.author",
-                  "value": null
-                },
-                {
-                  "name": "$pr.commits",
-                  "value": [
-                    {
-                      "timestamp": "2026-10-01T10:00:00Z"
-                    }
-                  ]
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": 4,
-                "type": "pull request"
-              }
-            },
-            {
-              "cause": "absent",
-              "check": "c",
-              "failed_items": [
-                {
-                  "cause": "absent",
-                  "path": "approvers[0]",
-                  "value": {
-                    "state": "APPROVED",
-                    "timestamp": "2026-10-01T11:00:00Z",
-                    "username": "bob"
-                  }
-                }
-              ],
-              "inputs": [
-                {
-                  "name": "approvers[]",
-                  "value": [
-                    {
-                      "state": "APPROVED",
-                      "timestamp": "2026-10-01T11:00:00Z",
-                      "username": "bob"
-                    }
-                  ]
-                },
-                {
-                  "name": "$pr.author",
-                  "value": "ann"
-                },
-                {
-                  "name": "$pr.commits",
-                  "value": [
-                    {}
-                  ]
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": 5,
-                "type": "pull request"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "value",
-            "check": "c",
-            "description": "",
-            "expression": "some approvers as $approver: one of: peer(state == \"APPROVED\" and username ne $pr.author and every $pr.commits: $approver.timestamp gt timestamp)",
-            "failed_items": [
-              {
-                "cause": "value",
-                "path": "approvers[0]",
-                "value": {
-                  "state": "APPROVED",
-                  "timestamp": "2026-10-01T11:00:00Z",
-                  "username": "bob"
-                }
-              }
-            ],
-            "inputs": [
-              {
-                "name": "approvers[]",
-                "value": [
-                  {
-                    "state": "APPROVED",
-                    "timestamp": "2026-10-01T11:00:00Z",
-                    "username": "bob"
-                  }
-                ]
-              },
-              {
-                "name": "$pr.author",
-                "value": "ann"
-              },
-              {
-                "name": "$pr.commits",
-                "value": [
-                  {
-                    "timestamp": "2026-10-01T12:00:00Z"
-                  }
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": 2,
-              "type": "pull request"
-            }
-          },
-          {
-            "cause": "value",
-            "check": "c",
-            "description": "",
-            "expression": "some approvers as $approver: one of: peer(state == \"APPROVED\" and username ne $pr.author and every $pr.commits: $approver.timestamp gt timestamp)",
-            "failed_items": [
-              {
-                "cause": "value",
-                "path": "approvers[0]",
-                "value": {
-                  "state": "APPROVED",
-                  "timestamp": "2026-10-01T11:00:00Z",
-                  "username": "ann"
-                }
-              },
-              {
-                "cause": "value",
-                "path": "approvers[1]",
-                "value": {
-                  "state": "COMMENTED",
-                  "timestamp": "2026-10-01T11:00:00Z",
-                  "username": "bob"
-                }
-              }
-            ],
-            "inputs": [
-              {
-                "name": "approvers[]",
-                "value": [
-                  {
-                    "state": "APPROVED",
-                    "timestamp": "2026-10-01T11:00:00Z",
-                    "username": "ann"
-                  },
-                  {
-                    "state": "COMMENTED",
-                    "timestamp": "2026-10-01T11:00:00Z",
-                    "username": "bob"
-                  }
-                ]
-              },
-              {
-                "name": "$pr.author",
-                "value": "ann"
-              },
-              {
-                "name": "$pr.commits",
-                "value": [
-                  {
-                    "timestamp": "2026-10-01T10:00:00Z"
-                  }
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": 3,
-              "type": "pull request"
-            }
-          },
-          {
-            "cause": "absent",
-            "check": "c",
-            "description": "",
-            "expression": "some approvers as $approver: one of: peer(state == \"APPROVED\" and username ne $pr.author and every $pr.commits: $approver.timestamp gt timestamp)",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "path": "approvers[0]",
-                "value": {
-                  "state": "APPROVED",
-                  "timestamp": "2026-10-01T11:00:00Z",
-                  "username": "bob"
-                }
-              }
-            ],
-            "inputs": [
-              {
-                "name": "approvers[]",
-                "value": [
-                  {
-                    "state": "APPROVED",
-                    "timestamp": "2026-10-01T11:00:00Z",
-                    "username": "bob"
-                  }
-                ]
-              },
-              {
-                "name": "$pr.author",
-                "value": null
-              },
-              {
-                "name": "$pr.commits",
-                "value": [
-                  {
-                    "timestamp": "2026-10-01T10:00:00Z"
-                  }
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": 4,
-              "type": "pull request"
-            }
-          },
-          {
-            "cause": "absent",
-            "check": "c",
-            "description": "",
-            "expression": "some approvers as $approver: one of: peer(state == \"APPROVED\" and username ne $pr.author and every $pr.commits: $approver.timestamp gt timestamp)",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "path": "approvers[0]",
-                "value": {
-                  "state": "APPROVED",
-                  "timestamp": "2026-10-01T11:00:00Z",
-                  "username": "bob"
-                }
-              }
-            ],
-            "inputs": [
-              {
-                "name": "approvers[]",
-                "value": [
-                  {
-                    "state": "APPROVED",
-                    "timestamp": "2026-10-01T11:00:00Z",
-                    "username": "bob"
-                  }
-                ]
-              },
-              {
-                "name": "$pr.author",
-                "value": "ann"
-              },
-              {
-                "name": "$pr.commits",
-                "value": [
-                  {}
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": 5,
-              "type": "pull request"
-            }
-          }
-        ]
-      }
-    ],
-    "description": "a list check inside an any of renders in its option",
-    "requirements": {
-      "s": {
-        "checks": {
-          "c": {
-            "as": "approver",
-            "check": {
-              "op": "any_of",
-              "options": {
-                "peer": [
-                  {
-                    "op": "equals",
-                    "path": [
-                      "state"
-                    ],
-                    "value": "APPROVED"
-                  },
-                  {
-                    "cmp": "ne",
-                    "left": [
-                      "username"
-                    ],
-                    "op": "compare",
-                    "right": [
-                      "$pr",
-                      "author"
-                    ]
-                  },
-                  {
-                    "check": {
-                      "cmp": "gt",
-                      "left": [
-                        "$approver",
-                        "timestamp"
-                      ],
-                      "op": "compare",
-                      "right": [
-                        "timestamp"
-                      ]
-                    },
-                    "op": "all",
-                    "path": [
-                      "$pr",
-                      "commits"
-                    ]
-                  }
-                ]
-              }
-            },
-            "op": "any",
-            "path": [
-              "approvers"
-            ]
-          }
-        },
-        "from": [
-          "pull_requests",
-          {
-            "each_as": "pr"
-          }
-        ],
-        "id": [
-          "number"
-        ],
-        "subject_type": "pull request"
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "pull_requests": [
-            {
-              "approvers": [
-                {
                   "timestamp": "2026-10-01T11:00:00Z",
                   "username": "bob"
                 },
@@ -11856,6 +12016,739 @@
                     "options": {
                       "peer": [
                         {
+                          "op": "equals",
+                          "path": [
+                            "state"
+                          ],
+                          "value": "APPROVED"
+                        },
+                        {
+                          "cmp": "ne",
+                          "left": [
+                            "username"
+                          ],
+                          "op": "compare",
+                          "right": [
+                            "$pr",
+                            "author"
+                          ]
+                        },
+                        {
+                          "check": {
+                            "cmp": "gt",
+                            "left": [
+                              "$approver",
+                              "timestamp"
+                            ],
+                            "op": "compare",
+                            "right": [
+                              "timestamp"
+                            ]
+                          },
+                          "op": "all",
+                          "path": [
+                            "$pr",
+                            "commits"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "description": "",
+                  "expression": "some approvers as $approver: one of: peer(state == \"APPROVED\" and username ne $pr.author and every $pr.commits: $approver.timestamp gt timestamp)",
+                  "meta": {},
+                  "op": "any",
+                  "path": [
+                    "approvers"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 5,
+                "total": 5
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                },
+                {
+                  "name": "from",
+                  "value": [
+                    "pull_requests",
+                    {
+                      "each_as": "pr"
+                    }
+                  ]
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope pull request count",
+                  "value": 5
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated pull request ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "c",
+              "failed_items": [],
+              "inputs": [
+                {
+                  "name": "approvers[]",
+                  "value": [
+                    {
+                      "state": "APPROVED",
+                      "timestamp": "2026-10-01T11:00:00Z",
+                      "username": "bob"
+                    }
+                  ]
+                },
+                {
+                  "name": "$pr.author",
+                  "value": "ann"
+                },
+                {
+                  "name": "$pr.commits",
+                  "value": [
+                    {
+                      "timestamp": "2026-10-01T10:00:00Z"
+                    }
+                  ]
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": 1,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "c",
+              "failed_items": [
+                {
+                  "cause": "value",
+                  "path": "approvers[0]",
+                  "value": {
+                    "state": "APPROVED",
+                    "timestamp": "2026-10-01T11:00:00Z",
+                    "username": "bob"
+                  }
+                }
+              ],
+              "inputs": [
+                {
+                  "name": "approvers[]",
+                  "value": [
+                    {
+                      "state": "APPROVED",
+                      "timestamp": "2026-10-01T11:00:00Z",
+                      "username": "bob"
+                    }
+                  ]
+                },
+                {
+                  "name": "$pr.author",
+                  "value": "ann"
+                },
+                {
+                  "name": "$pr.commits",
+                  "value": [
+                    {
+                      "timestamp": "2026-10-01T12:00:00Z"
+                    }
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": 2,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "c",
+              "failed_items": [
+                {
+                  "cause": "value",
+                  "path": "approvers[0]",
+                  "value": {
+                    "state": "APPROVED",
+                    "timestamp": "2026-10-01T11:00:00Z",
+                    "username": "ann"
+                  }
+                },
+                {
+                  "cause": "value",
+                  "path": "approvers[1]",
+                  "value": {
+                    "state": "COMMENTED",
+                    "timestamp": "2026-10-01T11:00:00Z",
+                    "username": "bob"
+                  }
+                }
+              ],
+              "inputs": [
+                {
+                  "name": "approvers[]",
+                  "value": [
+                    {
+                      "state": "APPROVED",
+                      "timestamp": "2026-10-01T11:00:00Z",
+                      "username": "ann"
+                    },
+                    {
+                      "state": "COMMENTED",
+                      "timestamp": "2026-10-01T11:00:00Z",
+                      "username": "bob"
+                    }
+                  ]
+                },
+                {
+                  "name": "$pr.author",
+                  "value": "ann"
+                },
+                {
+                  "name": "$pr.commits",
+                  "value": [
+                    {
+                      "timestamp": "2026-10-01T10:00:00Z"
+                    }
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": 3,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "c",
+              "failed_items": [
+                {
+                  "cause": "absent",
+                  "path": "approvers[0]",
+                  "value": {
+                    "state": "APPROVED",
+                    "timestamp": "2026-10-01T11:00:00Z",
+                    "username": "bob"
+                  }
+                }
+              ],
+              "inputs": [
+                {
+                  "name": "approvers[]",
+                  "value": [
+                    {
+                      "state": "APPROVED",
+                      "timestamp": "2026-10-01T11:00:00Z",
+                      "username": "bob"
+                    }
+                  ]
+                },
+                {
+                  "name": "$pr.author",
+                  "value": null
+                },
+                {
+                  "name": "$pr.commits",
+                  "value": [
+                    {
+                      "timestamp": "2026-10-01T10:00:00Z"
+                    }
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": 4,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "c",
+              "failed_items": [
+                {
+                  "cause": "absent",
+                  "path": "approvers[0]",
+                  "value": {
+                    "state": "APPROVED",
+                    "timestamp": "2026-10-01T11:00:00Z",
+                    "username": "bob"
+                  }
+                }
+              ],
+              "inputs": [
+                {
+                  "name": "approvers[]",
+                  "value": [
+                    {
+                      "state": "APPROVED",
+                      "timestamp": "2026-10-01T11:00:00Z",
+                      "username": "bob"
+                    }
+                  ]
+                },
+                {
+                  "name": "$pr.author",
+                  "value": "ann"
+                },
+                {
+                  "name": "$pr.commits",
+                  "value": [
+                    {}
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": 5,
+                "type": "pull request"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "c",
+            "description": "",
+            "expression": "some approvers as $approver: one of: peer(state == \"APPROVED\" and username ne $pr.author and every $pr.commits: $approver.timestamp gt timestamp)",
+            "failed_items": [
+              {
+                "cause": "value",
+                "path": "approvers[0]",
+                "value": {
+                  "state": "APPROVED",
+                  "timestamp": "2026-10-01T11:00:00Z",
+                  "username": "bob"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "timestamp": "2026-10-01T11:00:00Z",
+                    "username": "bob"
+                  }
+                ]
+              },
+              {
+                "name": "$pr.author",
+                "value": "ann"
+              },
+              {
+                "name": "$pr.commits",
+                "value": [
+                  {
+                    "timestamp": "2026-10-01T12:00:00Z"
+                  }
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": 2,
+              "type": "pull request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "c",
+            "description": "",
+            "expression": "some approvers as $approver: one of: peer(state == \"APPROVED\" and username ne $pr.author and every $pr.commits: $approver.timestamp gt timestamp)",
+            "failed_items": [
+              {
+                "cause": "value",
+                "path": "approvers[0]",
+                "value": {
+                  "state": "APPROVED",
+                  "timestamp": "2026-10-01T11:00:00Z",
+                  "username": "ann"
+                }
+              },
+              {
+                "cause": "value",
+                "path": "approvers[1]",
+                "value": {
+                  "state": "COMMENTED",
+                  "timestamp": "2026-10-01T11:00:00Z",
+                  "username": "bob"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "timestamp": "2026-10-01T11:00:00Z",
+                    "username": "ann"
+                  },
+                  {
+                    "state": "COMMENTED",
+                    "timestamp": "2026-10-01T11:00:00Z",
+                    "username": "bob"
+                  }
+                ]
+              },
+              {
+                "name": "$pr.author",
+                "value": "ann"
+              },
+              {
+                "name": "$pr.commits",
+                "value": [
+                  {
+                    "timestamp": "2026-10-01T10:00:00Z"
+                  }
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": 3,
+              "type": "pull request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "description": "",
+            "expression": "some approvers as $approver: one of: peer(state == \"APPROVED\" and username ne $pr.author and every $pr.commits: $approver.timestamp gt timestamp)",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "path": "approvers[0]",
+                "value": {
+                  "state": "APPROVED",
+                  "timestamp": "2026-10-01T11:00:00Z",
+                  "username": "bob"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "timestamp": "2026-10-01T11:00:00Z",
+                    "username": "bob"
+                  }
+                ]
+              },
+              {
+                "name": "$pr.author",
+                "value": null
+              },
+              {
+                "name": "$pr.commits",
+                "value": [
+                  {
+                    "timestamp": "2026-10-01T10:00:00Z"
+                  }
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": 4,
+              "type": "pull request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "description": "",
+            "expression": "some approvers as $approver: one of: peer(state == \"APPROVED\" and username ne $pr.author and every $pr.commits: $approver.timestamp gt timestamp)",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "path": "approvers[0]",
+                "value": {
+                  "state": "APPROVED",
+                  "timestamp": "2026-10-01T11:00:00Z",
+                  "username": "bob"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "timestamp": "2026-10-01T11:00:00Z",
+                    "username": "bob"
+                  }
+                ]
+              },
+              {
+                "name": "$pr.author",
+                "value": "ann"
+              },
+              {
+                "name": "$pr.commits",
+                "value": [
+                  {}
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": 5,
+              "type": "pull request"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "an any of inside a list check can hold a list check",
+    "requirements": {
+      "s": {
+        "checks": {
+          "c": {
+            "as": "approver",
+            "check": {
+              "op": "any_of",
+              "options": {
+                "peer": [
+                  {
+                    "op": "equals",
+                    "path": [
+                      "state"
+                    ],
+                    "value": "APPROVED"
+                  },
+                  {
+                    "cmp": "ne",
+                    "left": [
+                      "username"
+                    ],
+                    "op": "compare",
+                    "right": [
+                      "$pr",
+                      "author"
+                    ]
+                  },
+                  {
+                    "check": {
+                      "cmp": "gt",
+                      "left": [
+                        "$approver",
+                        "timestamp"
+                      ],
+                      "op": "compare",
+                      "right": [
+                        "timestamp"
+                      ]
+                    },
+                    "op": "all",
+                    "path": [
+                      "$pr",
+                      "commits"
+                    ]
+                  }
+                ]
+              }
+            },
+            "op": "any",
+            "path": [
+              "approvers"
+            ]
+          }
+        },
+        "from": [
+          "pull_requests",
+          {
+            "each_as": "pr"
+          }
+        ],
+        "id": [
+          "number"
+        ],
+        "subject_type": "pull request"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "pull_requests": [
+            {
+              "approvers": [
+                {
+                  "state": "APPROVED",
+                  "timestamp": "2026-10-01T11:00:00Z",
+                  "username": "bob"
+                }
+              ],
+              "author": "ann",
+              "commits": [
+                {
+                  "timestamp": "2026-10-01T10:00:00Z"
+                }
+              ],
+              "number": 1
+            },
+            {
+              "approvers": [
+                {
+                  "state": "APPROVED",
+                  "timestamp": "2026-10-01T11:00:00Z",
+                  "username": "bob"
+                }
+              ],
+              "author": "ann",
+              "commits": [
+                {
+                  "timestamp": "2026-10-01T12:00:00Z"
+                }
+              ],
+              "number": 2
+            },
+            {
+              "approvers": [
+                {
+                  "state": "APPROVED",
+                  "timestamp": "2026-10-01T11:00:00Z",
+                  "username": "ann"
+                },
+                {
+                  "state": "COMMENTED",
+                  "timestamp": "2026-10-01T11:00:00Z",
+                  "username": "bob"
+                }
+              ],
+              "author": "ann",
+              "commits": [
+                {
+                  "timestamp": "2026-10-01T10:00:00Z"
+                }
+              ],
+              "number": 3
+            },
+            {
+              "approvers": [
+                {
+                  "state": "APPROVED",
+                  "timestamp": "2026-10-01T11:00:00Z",
+                  "username": "bob"
+                }
+              ],
+              "commits": [
+                {
+                  "timestamp": "2026-10-01T10:00:00Z"
+                }
+              ],
+              "number": 4
+            },
+            {
+              "approvers": [
+                {
+                  "state": "APPROVED",
+                  "timestamp": "2026-10-01T11:00:00Z",
+                  "username": "bob"
+                }
+              ],
+              "author": "ann",
+              "commits": [
+                {}
+              ],
+              "number": 5
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope pull request count is at least 1",
+                  "expression": "count(matching(pull_requests)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every pull request id is unique",
+                  "expression": "count(repeated(ids(pull_requests))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and from is well formed and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "as": "approver",
+                  "check": {
+                    "op": "any_of",
+                    "options": {
+                      "peer": [
+                        {
                           "as": "approver",
                           "check": {
                             "op": "present",
@@ -12483,908 +13376,6 @@
           "number"
         ],
         "subject_type": "pull request"
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "pull_requests": [
-            {
-              "approvers": [
-                {
-                  "timestamp": "2026-10-01T11:00:00Z",
-                  "username": "bob"
-                },
-                {
-                  "timestamp": "2026-10-01T13:00:00Z",
-                  "username": "cat"
-                }
-              ],
-              "author": "ann",
-              "commits": [
-                {
-                  "sha": "c1",
-                  "timestamp": "2026-10-01T10:00:00Z"
-                },
-                {
-                  "sha": "c2",
-                  "timestamp": "2026-10-01T12:00:00Z"
-                }
-              ],
-              "number": 41
-            },
-            {
-              "approvers": [
-                {
-                  "timestamp": "2026-10-01T11:00:00Z",
-                  "username": "bob"
-                }
-              ],
-              "author": "ann",
-              "commits": [
-                {
-                  "sha": "c1",
-                  "timestamp": "2026-10-01T10:00:00Z"
-                },
-                {
-                  "sha": "c2",
-                  "timestamp": "2026-10-01T12:00:00Z"
-                }
-              ],
-              "number": 42
-            },
-            {
-              "approvers": [
-                {
-                  "timestamp": "2026-10-01T11:00:00Z",
-                  "username": "bob"
-                }
-              ],
-              "author": "ann",
-              "commits": [
-                {
-                  "sha": "c1"
-                }
-              ],
-              "number": 43
-            },
-            {
-              "approvers": [
-                {
-                  "timestamp": "2026-10-01T11:00:00Z",
-                  "username": "bob"
-                }
-              ],
-              "author": "ann",
-              "commits": [],
-              "number": 44
-            },
-            {
-              "approvers": [
-                {
-                  "username": "bob"
-                }
-              ],
-              "author": "ann",
-              "commits": [
-                {
-                  "sha": "c1",
-                  "timestamp": "2026-10-01T10:00:00Z"
-                }
-              ],
-              "number": 45
-            }
-          ]
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope pull request count is at least 1",
-                  "expression": "count(matching(pull_requests)) \u003e= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every pull request id is unique",
-                  "expression": "count(repeated(ids(pull_requests))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and from is well formed and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "as": "a",
-                  "check": {
-                    "as": "pr",
-                    "check": {
-                      "op": "present",
-                      "path": [
-                        "sha"
-                      ]
-                    },
-                    "op": "all",
-                    "path": [
-                      "$pr",
-                      "commits"
-                    ]
-                  },
-                  "description": "",
-                  "expression": "some approvers as $a: every $pr.commits as \u003cname given twice\u003e: sha is present",
-                  "meta": {},
-                  "op": "any",
-                  "path": [
-                    "approvers"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 5,
-                "total": 5
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "value",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                },
-                {
-                  "name": "from",
-                  "value": [
-                    "pull_requests",
-                    {
-                      "each_as": "pr"
-                    }
-                  ]
-                },
-                {
-                  "name": "checks.c.check",
-                  "value": [
-                    "name given twice"
-                  ]
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "pull request"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope pull request count",
-                  "value": 5
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "pull request"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated pull request ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "pull request"
-              }
-            },
-            {
-              "cause": "ill_formed",
-              "check": "c",
-              "failed_items": [
-                {
-                  "cause": "ill_formed",
-                  "path": "approvers[0]",
-                  "value": {
-                    "timestamp": "2026-10-01T11:00:00Z",
-                    "username": "bob"
-                  }
-                },
-                {
-                  "cause": "ill_formed",
-                  "path": "approvers[1]",
-                  "value": {
-                    "timestamp": "2026-10-01T13:00:00Z",
-                    "username": "cat"
-                  }
-                }
-              ],
-              "inputs": [
-                {
-                  "name": "approvers[]",
-                  "value": [
-                    {
-                      "timestamp": "2026-10-01T11:00:00Z",
-                      "username": "bob"
-                    },
-                    {
-                      "timestamp": "2026-10-01T13:00:00Z",
-                      "username": "cat"
-                    }
-                  ]
-                },
-                {
-                  "name": "$pr.commits",
-                  "value": [
-                    {
-                      "sha": "c1",
-                      "timestamp": "2026-10-01T10:00:00Z"
-                    },
-                    {
-                      "sha": "c2",
-                      "timestamp": "2026-10-01T12:00:00Z"
-                    }
-                  ]
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": 41,
-                "type": "pull request"
-              }
-            },
-            {
-              "cause": "ill_formed",
-              "check": "c",
-              "failed_items": [
-                {
-                  "cause": "ill_formed",
-                  "path": "approvers[0]",
-                  "value": {
-                    "timestamp": "2026-10-01T11:00:00Z",
-                    "username": "bob"
-                  }
-                }
-              ],
-              "inputs": [
-                {
-                  "name": "approvers[]",
-                  "value": [
-                    {
-                      "timestamp": "2026-10-01T11:00:00Z",
-                      "username": "bob"
-                    }
-                  ]
-                },
-                {
-                  "name": "$pr.commits",
-                  "value": [
-                    {
-                      "sha": "c1",
-                      "timestamp": "2026-10-01T10:00:00Z"
-                    },
-                    {
-                      "sha": "c2",
-                      "timestamp": "2026-10-01T12:00:00Z"
-                    }
-                  ]
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": 42,
-                "type": "pull request"
-              }
-            },
-            {
-              "cause": "ill_formed",
-              "check": "c",
-              "failed_items": [
-                {
-                  "cause": "ill_formed",
-                  "path": "approvers[0]",
-                  "value": {
-                    "timestamp": "2026-10-01T11:00:00Z",
-                    "username": "bob"
-                  }
-                }
-              ],
-              "inputs": [
-                {
-                  "name": "approvers[]",
-                  "value": [
-                    {
-                      "timestamp": "2026-10-01T11:00:00Z",
-                      "username": "bob"
-                    }
-                  ]
-                },
-                {
-                  "name": "$pr.commits",
-                  "value": [
-                    {
-                      "sha": "c1"
-                    }
-                  ]
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": 43,
-                "type": "pull request"
-              }
-            },
-            {
-              "cause": "ill_formed",
-              "check": "c",
-              "failed_items": [
-                {
-                  "cause": "ill_formed",
-                  "path": "approvers[0]",
-                  "value": {
-                    "timestamp": "2026-10-01T11:00:00Z",
-                    "username": "bob"
-                  }
-                }
-              ],
-              "inputs": [
-                {
-                  "name": "approvers[]",
-                  "value": [
-                    {
-                      "timestamp": "2026-10-01T11:00:00Z",
-                      "username": "bob"
-                    }
-                  ]
-                },
-                {
-                  "name": "$pr.commits",
-                  "value": []
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": 44,
-                "type": "pull request"
-              }
-            },
-            {
-              "cause": "ill_formed",
-              "check": "c",
-              "failed_items": [
-                {
-                  "cause": "ill_formed",
-                  "path": "approvers[0]",
-                  "value": {
-                    "username": "bob"
-                  }
-                }
-              ],
-              "inputs": [
-                {
-                  "name": "approvers[]",
-                  "value": [
-                    {
-                      "username": "bob"
-                    }
-                  ]
-                },
-                {
-                  "name": "$pr.commits",
-                  "value": [
-                    {
-                      "sha": "c1",
-                      "timestamp": "2026-10-01T10:00:00Z"
-                    }
-                  ]
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": 45,
-                "type": "pull request"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "value",
-            "check": "$well_formed",
-            "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and from is well formed and steps are keys and numbers fit a float and checks are written right",
-            "inputs": [
-              {
-                "name": "count(checks)",
-                "value": 1
-              },
-              {
-                "name": "require",
-                "value": "every"
-              },
-              {
-                "name": "from",
-                "value": [
-                  "pull_requests",
-                  {
-                    "each_as": "pr"
-                  }
-                ]
-              },
-              {
-                "name": "checks.c.check",
-                "value": [
-                  "name given twice"
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "pull request"
-            }
-          },
-          {
-            "cause": "ill_formed",
-            "check": "c",
-            "description": "",
-            "expression": "some approvers as $a: every $pr.commits as \u003cname given twice\u003e: sha is present",
-            "failed_items": [
-              {
-                "cause": "ill_formed",
-                "path": "approvers[0]",
-                "value": {
-                  "timestamp": "2026-10-01T11:00:00Z",
-                  "username": "bob"
-                }
-              },
-              {
-                "cause": "ill_formed",
-                "path": "approvers[1]",
-                "value": {
-                  "timestamp": "2026-10-01T13:00:00Z",
-                  "username": "cat"
-                }
-              }
-            ],
-            "inputs": [
-              {
-                "name": "approvers[]",
-                "value": [
-                  {
-                    "timestamp": "2026-10-01T11:00:00Z",
-                    "username": "bob"
-                  },
-                  {
-                    "timestamp": "2026-10-01T13:00:00Z",
-                    "username": "cat"
-                  }
-                ]
-              },
-              {
-                "name": "$pr.commits",
-                "value": [
-                  {
-                    "sha": "c1",
-                    "timestamp": "2026-10-01T10:00:00Z"
-                  },
-                  {
-                    "sha": "c2",
-                    "timestamp": "2026-10-01T12:00:00Z"
-                  }
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": 41,
-              "type": "pull request"
-            }
-          },
-          {
-            "cause": "ill_formed",
-            "check": "c",
-            "description": "",
-            "expression": "some approvers as $a: every $pr.commits as \u003cname given twice\u003e: sha is present",
-            "failed_items": [
-              {
-                "cause": "ill_formed",
-                "path": "approvers[0]",
-                "value": {
-                  "timestamp": "2026-10-01T11:00:00Z",
-                  "username": "bob"
-                }
-              }
-            ],
-            "inputs": [
-              {
-                "name": "approvers[]",
-                "value": [
-                  {
-                    "timestamp": "2026-10-01T11:00:00Z",
-                    "username": "bob"
-                  }
-                ]
-              },
-              {
-                "name": "$pr.commits",
-                "value": [
-                  {
-                    "sha": "c1",
-                    "timestamp": "2026-10-01T10:00:00Z"
-                  },
-                  {
-                    "sha": "c2",
-                    "timestamp": "2026-10-01T12:00:00Z"
-                  }
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": 42,
-              "type": "pull request"
-            }
-          },
-          {
-            "cause": "ill_formed",
-            "check": "c",
-            "description": "",
-            "expression": "some approvers as $a: every $pr.commits as \u003cname given twice\u003e: sha is present",
-            "failed_items": [
-              {
-                "cause": "ill_formed",
-                "path": "approvers[0]",
-                "value": {
-                  "timestamp": "2026-10-01T11:00:00Z",
-                  "username": "bob"
-                }
-              }
-            ],
-            "inputs": [
-              {
-                "name": "approvers[]",
-                "value": [
-                  {
-                    "timestamp": "2026-10-01T11:00:00Z",
-                    "username": "bob"
-                  }
-                ]
-              },
-              {
-                "name": "$pr.commits",
-                "value": [
-                  {
-                    "sha": "c1"
-                  }
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": 43,
-              "type": "pull request"
-            }
-          },
-          {
-            "cause": "ill_formed",
-            "check": "c",
-            "description": "",
-            "expression": "some approvers as $a: every $pr.commits as \u003cname given twice\u003e: sha is present",
-            "failed_items": [
-              {
-                "cause": "ill_formed",
-                "path": "approvers[0]",
-                "value": {
-                  "timestamp": "2026-10-01T11:00:00Z",
-                  "username": "bob"
-                }
-              }
-            ],
-            "inputs": [
-              {
-                "name": "approvers[]",
-                "value": [
-                  {
-                    "timestamp": "2026-10-01T11:00:00Z",
-                    "username": "bob"
-                  }
-                ]
-              },
-              {
-                "name": "$pr.commits",
-                "value": []
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": 44,
-              "type": "pull request"
-            }
-          },
-          {
-            "cause": "ill_formed",
-            "check": "c",
-            "description": "",
-            "expression": "some approvers as $a: every $pr.commits as \u003cname given twice\u003e: sha is present",
-            "failed_items": [
-              {
-                "cause": "ill_formed",
-                "path": "approvers[0]",
-                "value": {
-                  "username": "bob"
-                }
-              }
-            ],
-            "inputs": [
-              {
-                "name": "approvers[]",
-                "value": [
-                  {
-                    "username": "bob"
-                  }
-                ]
-              },
-              {
-                "name": "$pr.commits",
-                "value": [
-                  {
-                    "sha": "c1",
-                    "timestamp": "2026-10-01T10:00:00Z"
-                  }
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": 45,
-              "type": "pull request"
-            }
-          }
-        ]
-      }
-    ],
-    "description": "a name given twice shows in the expression",
-    "requirements": {
-      "s": {
-        "checks": {
-          "c": {
-            "as": "a",
-            "check": {
-              "as": "pr",
-              "check": {
-                "op": "present",
-                "path": [
-                  "sha"
-                ]
-              },
-              "op": "all",
-              "path": [
-                "$pr",
-                "commits"
-              ]
-            },
-            "op": "any",
-            "path": [
-              "approvers"
-            ]
-          }
-        },
-        "from": [
-          "pull_requests",
-          {
-            "each_as": "pr"
-          }
-        ],
-        "id": [
-          "number"
-        ],
-        "subject_type": "pull request"
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "items": [
-            {
-              "id": 1
-            }
-          ]
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) \u003e= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every thing id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "as": "items",
-                  "check": {
-                    "op": "present",
-                    "path": []
-                  },
-                  "description": "",
-                  "expression": "some xs as $items: $items is present",
-                  "meta": {},
-                  "op": "any",
-                  "path": [
-                    "xs"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "satisfied",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope thing count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated thing ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "absent",
-              "check": "c",
-              "failed_items": [],
-              "inputs": [
-                {
-                  "name": "xs[]",
-                  "value": []
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": 1,
-                "type": "thing"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "absent",
-            "check": "c",
-            "description": "",
-            "expression": "some xs as $items: $items is present",
-            "failed_items": [],
-            "inputs": [
-              {
-                "name": "xs[]",
-                "value": []
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": 1,
-              "type": "thing"
-            }
-          }
-        ]
-      }
-    ],
-    "description": "a name given twice shows in the expression (2)",
-    "requirements": {
-      "s": {
-        "checks": {
-          "c": {
-            "as": "items",
-            "check": {
-              "op": "present",
-              "path": []
-            },
-            "op": "any",
-            "path": [
-              "xs"
-            ]
-          }
-        },
-        "from": [
-          "items"
-        ],
-        "id": [
-          "id"
-        ],
-        "subject_type": "thing"
       }
     }
   },
@@ -16412,6 +16403,908 @@
                   "meta": {}
                 },
                 "c": {
+                  "as": "a",
+                  "check": {
+                    "as": "pr",
+                    "check": {
+                      "op": "present",
+                      "path": [
+                        "sha"
+                      ]
+                    },
+                    "op": "all",
+                    "path": [
+                      "$pr",
+                      "commits"
+                    ]
+                  },
+                  "description": "",
+                  "expression": "some approvers as $a: every $pr.commits as \u003cname given twice\u003e: sha is present",
+                  "meta": {},
+                  "op": "any",
+                  "path": [
+                    "approvers"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 5,
+                "total": 5
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "value",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                },
+                {
+                  "name": "from",
+                  "value": [
+                    "pull_requests",
+                    {
+                      "each_as": "pr"
+                    }
+                  ]
+                },
+                {
+                  "name": "checks.c.check",
+                  "value": [
+                    "name given twice"
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope pull request count",
+                  "value": 5
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated pull request ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "ill_formed",
+              "check": "c",
+              "failed_items": [
+                {
+                  "cause": "ill_formed",
+                  "path": "approvers[0]",
+                  "value": {
+                    "timestamp": "2026-10-01T11:00:00Z",
+                    "username": "bob"
+                  }
+                },
+                {
+                  "cause": "ill_formed",
+                  "path": "approvers[1]",
+                  "value": {
+                    "timestamp": "2026-10-01T13:00:00Z",
+                    "username": "cat"
+                  }
+                }
+              ],
+              "inputs": [
+                {
+                  "name": "approvers[]",
+                  "value": [
+                    {
+                      "timestamp": "2026-10-01T11:00:00Z",
+                      "username": "bob"
+                    },
+                    {
+                      "timestamp": "2026-10-01T13:00:00Z",
+                      "username": "cat"
+                    }
+                  ]
+                },
+                {
+                  "name": "$pr.commits",
+                  "value": [
+                    {
+                      "sha": "c1",
+                      "timestamp": "2026-10-01T10:00:00Z"
+                    },
+                    {
+                      "sha": "c2",
+                      "timestamp": "2026-10-01T12:00:00Z"
+                    }
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": 41,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "ill_formed",
+              "check": "c",
+              "failed_items": [
+                {
+                  "cause": "ill_formed",
+                  "path": "approvers[0]",
+                  "value": {
+                    "timestamp": "2026-10-01T11:00:00Z",
+                    "username": "bob"
+                  }
+                }
+              ],
+              "inputs": [
+                {
+                  "name": "approvers[]",
+                  "value": [
+                    {
+                      "timestamp": "2026-10-01T11:00:00Z",
+                      "username": "bob"
+                    }
+                  ]
+                },
+                {
+                  "name": "$pr.commits",
+                  "value": [
+                    {
+                      "sha": "c1",
+                      "timestamp": "2026-10-01T10:00:00Z"
+                    },
+                    {
+                      "sha": "c2",
+                      "timestamp": "2026-10-01T12:00:00Z"
+                    }
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": 42,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "ill_formed",
+              "check": "c",
+              "failed_items": [
+                {
+                  "cause": "ill_formed",
+                  "path": "approvers[0]",
+                  "value": {
+                    "timestamp": "2026-10-01T11:00:00Z",
+                    "username": "bob"
+                  }
+                }
+              ],
+              "inputs": [
+                {
+                  "name": "approvers[]",
+                  "value": [
+                    {
+                      "timestamp": "2026-10-01T11:00:00Z",
+                      "username": "bob"
+                    }
+                  ]
+                },
+                {
+                  "name": "$pr.commits",
+                  "value": [
+                    {
+                      "sha": "c1"
+                    }
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": 43,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "ill_formed",
+              "check": "c",
+              "failed_items": [
+                {
+                  "cause": "ill_formed",
+                  "path": "approvers[0]",
+                  "value": {
+                    "timestamp": "2026-10-01T11:00:00Z",
+                    "username": "bob"
+                  }
+                }
+              ],
+              "inputs": [
+                {
+                  "name": "approvers[]",
+                  "value": [
+                    {
+                      "timestamp": "2026-10-01T11:00:00Z",
+                      "username": "bob"
+                    }
+                  ]
+                },
+                {
+                  "name": "$pr.commits",
+                  "value": []
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": 44,
+                "type": "pull request"
+              }
+            },
+            {
+              "cause": "ill_formed",
+              "check": "c",
+              "failed_items": [
+                {
+                  "cause": "ill_formed",
+                  "path": "approvers[0]",
+                  "value": {
+                    "username": "bob"
+                  }
+                }
+              ],
+              "inputs": [
+                {
+                  "name": "approvers[]",
+                  "value": [
+                    {
+                      "username": "bob"
+                    }
+                  ]
+                },
+                {
+                  "name": "$pr.commits",
+                  "value": [
+                    {
+                      "sha": "c1",
+                      "timestamp": "2026-10-01T10:00:00Z"
+                    }
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": 45,
+                "type": "pull request"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "description": "The requirement is written correctly",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and from is well formed and steps are keys and numbers fit a float and checks are written right",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "from",
+                "value": [
+                  "pull_requests",
+                  {
+                    "each_as": "pr"
+                  }
+                ]
+              },
+              {
+                "name": "checks.c.check",
+                "value": [
+                  "name given twice"
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "pull request"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "c",
+            "description": "",
+            "expression": "some approvers as $a: every $pr.commits as \u003cname given twice\u003e: sha is present",
+            "failed_items": [
+              {
+                "cause": "ill_formed",
+                "path": "approvers[0]",
+                "value": {
+                  "timestamp": "2026-10-01T11:00:00Z",
+                  "username": "bob"
+                }
+              },
+              {
+                "cause": "ill_formed",
+                "path": "approvers[1]",
+                "value": {
+                  "timestamp": "2026-10-01T13:00:00Z",
+                  "username": "cat"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "timestamp": "2026-10-01T11:00:00Z",
+                    "username": "bob"
+                  },
+                  {
+                    "timestamp": "2026-10-01T13:00:00Z",
+                    "username": "cat"
+                  }
+                ]
+              },
+              {
+                "name": "$pr.commits",
+                "value": [
+                  {
+                    "sha": "c1",
+                    "timestamp": "2026-10-01T10:00:00Z"
+                  },
+                  {
+                    "sha": "c2",
+                    "timestamp": "2026-10-01T12:00:00Z"
+                  }
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": 41,
+              "type": "pull request"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "c",
+            "description": "",
+            "expression": "some approvers as $a: every $pr.commits as \u003cname given twice\u003e: sha is present",
+            "failed_items": [
+              {
+                "cause": "ill_formed",
+                "path": "approvers[0]",
+                "value": {
+                  "timestamp": "2026-10-01T11:00:00Z",
+                  "username": "bob"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "timestamp": "2026-10-01T11:00:00Z",
+                    "username": "bob"
+                  }
+                ]
+              },
+              {
+                "name": "$pr.commits",
+                "value": [
+                  {
+                    "sha": "c1",
+                    "timestamp": "2026-10-01T10:00:00Z"
+                  },
+                  {
+                    "sha": "c2",
+                    "timestamp": "2026-10-01T12:00:00Z"
+                  }
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": 42,
+              "type": "pull request"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "c",
+            "description": "",
+            "expression": "some approvers as $a: every $pr.commits as \u003cname given twice\u003e: sha is present",
+            "failed_items": [
+              {
+                "cause": "ill_formed",
+                "path": "approvers[0]",
+                "value": {
+                  "timestamp": "2026-10-01T11:00:00Z",
+                  "username": "bob"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "timestamp": "2026-10-01T11:00:00Z",
+                    "username": "bob"
+                  }
+                ]
+              },
+              {
+                "name": "$pr.commits",
+                "value": [
+                  {
+                    "sha": "c1"
+                  }
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": 43,
+              "type": "pull request"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "c",
+            "description": "",
+            "expression": "some approvers as $a: every $pr.commits as \u003cname given twice\u003e: sha is present",
+            "failed_items": [
+              {
+                "cause": "ill_formed",
+                "path": "approvers[0]",
+                "value": {
+                  "timestamp": "2026-10-01T11:00:00Z",
+                  "username": "bob"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "timestamp": "2026-10-01T11:00:00Z",
+                    "username": "bob"
+                  }
+                ]
+              },
+              {
+                "name": "$pr.commits",
+                "value": []
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": 44,
+              "type": "pull request"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "c",
+            "description": "",
+            "expression": "some approvers as $a: every $pr.commits as \u003cname given twice\u003e: sha is present",
+            "failed_items": [
+              {
+                "cause": "ill_formed",
+                "path": "approvers[0]",
+                "value": {
+                  "username": "bob"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "bob"
+                  }
+                ]
+              },
+              {
+                "name": "$pr.commits",
+                "value": [
+                  {
+                    "sha": "c1",
+                    "timestamp": "2026-10-01T10:00:00Z"
+                  }
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": 45,
+              "type": "pull request"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "a name given twice shows in the expression",
+    "requirements": {
+      "s": {
+        "checks": {
+          "c": {
+            "as": "a",
+            "check": {
+              "as": "pr",
+              "check": {
+                "op": "present",
+                "path": [
+                  "sha"
+                ]
+              },
+              "op": "all",
+              "path": [
+                "$pr",
+                "commits"
+              ]
+            },
+            "op": "any",
+            "path": [
+              "approvers"
+            ]
+          }
+        },
+        "from": [
+          "pull_requests",
+          {
+            "each_as": "pr"
+          }
+        ],
+        "id": [
+          "number"
+        ],
+        "subject_type": "pull request"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "items": [
+            {
+              "id": 1
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope thing count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every thing id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
+                  "as": "items",
+                  "check": {
+                    "op": "present",
+                    "path": []
+                  },
+                  "description": "",
+                  "expression": "some xs as $items: $items is present",
+                  "meta": {},
+                  "op": "any",
+                  "path": [
+                    "xs"
+                  ]
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "satisfied",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 1
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope thing count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated thing ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "thing"
+              }
+            },
+            {
+              "cause": "absent",
+              "check": "c",
+              "failed_items": [],
+              "inputs": [
+                {
+                  "name": "xs[]",
+                  "value": []
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": 1,
+                "type": "thing"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "description": "",
+            "expression": "some xs as $items: $items is present",
+            "failed_items": [],
+            "inputs": [
+              {
+                "name": "xs[]",
+                "value": []
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": 1,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "a name given twice shows in the expression (2)",
+    "requirements": {
+      "s": {
+        "checks": {
+          "c": {
+            "as": "items",
+            "check": {
+              "op": "present",
+              "path": []
+            },
+            "op": "any",
+            "path": [
+              "xs"
+            ]
+          }
+        },
+        "from": [
+          "items"
+        ],
+        "id": [
+          "id"
+        ],
+        "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "pull_requests": [
+            {
+              "approvers": [
+                {
+                  "timestamp": "2026-10-01T11:00:00Z",
+                  "username": "bob"
+                },
+                {
+                  "timestamp": "2026-10-01T13:00:00Z",
+                  "username": "cat"
+                }
+              ],
+              "author": "ann",
+              "commits": [
+                {
+                  "sha": "c1",
+                  "timestamp": "2026-10-01T10:00:00Z"
+                },
+                {
+                  "sha": "c2",
+                  "timestamp": "2026-10-01T12:00:00Z"
+                }
+              ],
+              "number": 41
+            },
+            {
+              "approvers": [
+                {
+                  "timestamp": "2026-10-01T11:00:00Z",
+                  "username": "bob"
+                }
+              ],
+              "author": "ann",
+              "commits": [
+                {
+                  "sha": "c1",
+                  "timestamp": "2026-10-01T10:00:00Z"
+                },
+                {
+                  "sha": "c2",
+                  "timestamp": "2026-10-01T12:00:00Z"
+                }
+              ],
+              "number": 42
+            },
+            {
+              "approvers": [
+                {
+                  "timestamp": "2026-10-01T11:00:00Z",
+                  "username": "bob"
+                }
+              ],
+              "author": "ann",
+              "commits": [
+                {
+                  "sha": "c1"
+                }
+              ],
+              "number": 43
+            },
+            {
+              "approvers": [
+                {
+                  "timestamp": "2026-10-01T11:00:00Z",
+                  "username": "bob"
+                }
+              ],
+              "author": "ann",
+              "commits": [],
+              "number": 44
+            },
+            {
+              "approvers": [
+                {
+                  "username": "bob"
+                }
+              ],
+              "author": "ann",
+              "commits": [
+                {
+                  "sha": "c1",
+                  "timestamp": "2026-10-01T10:00:00Z"
+                }
+              ],
+              "number": 45
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope pull request count is at least 1",
+                  "expression": "count(matching(pull_requests)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every pull request id is unique",
+                  "expression": "count(repeated(ids(pull_requests))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and from is well formed and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                },
+                "c": {
                   "check": {
                     "as": 3,
                     "check": {
@@ -17739,628 +18632,6 @@
         "input": {
           "items": [
             {
-              "commits": [
-                {},
-                {
-                  "sha": null
-                }
-              ],
-              "id": 1
-            }
-          ]
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) \u003e= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every thing id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "check": {
-                    "op": "present",
-                    "path": [
-                      "sha"
-                    ]
-                  },
-                  "description": "",
-                  "expression": "some commits: sha is present",
-                  "meta": {},
-                  "op": "any",
-                  "path": [
-                    "commits"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "satisfied",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope thing count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated thing ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "value",
-              "check": "c",
-              "failed_items": [
-                {
-                  "cause": "value",
-                  "path": "commits[0]",
-                  "value": {}
-                },
-                {
-                  "cause": "value",
-                  "path": "commits[1]",
-                  "value": {
-                    "sha": null
-                  }
-                }
-              ],
-              "inputs": [
-                {
-                  "name": "commits[].sha",
-                  "value": [
-                    null,
-                    null
-                  ]
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": 1,
-                "type": "thing"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "value",
-            "check": "c",
-            "description": "",
-            "expression": "some commits: sha is present",
-            "failed_items": [
-              {
-                "cause": "value",
-                "path": "commits[0]",
-                "value": {}
-              },
-              {
-                "cause": "value",
-                "path": "commits[1]",
-                "value": {
-                  "sha": null
-                }
-              }
-            ],
-            "inputs": [
-              {
-                "name": "commits[].sha",
-                "value": [
-                  null,
-                  null
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": 1,
-              "type": "thing"
-            }
-          }
-        ]
-      }
-    ],
-    "description": "an item whose field present finds missing is listed as value like its row because missing is not a cause",
-    "requirements": {
-      "s": {
-        "checks": {
-          "c": {
-            "check": {
-              "op": "present",
-              "path": [
-                "sha"
-              ]
-            },
-            "op": "any",
-            "path": [
-              "commits"
-            ]
-          }
-        },
-        "from": [
-          "items"
-        ],
-        "id": [
-          "id"
-        ],
-        "subject_type": "thing"
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "items": [
-            {
-              "approvers": [
-                {
-                  "username": "renovate[bot]"
-                },
-                {}
-              ]
-            }
-          ]
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) \u003e= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every thing id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "check": {
-                    "op": "any_of",
-                    "options": {
-                      "person": [
-                        {
-                          "op": "present",
-                          "path": [
-                            "username"
-                          ]
-                        },
-                        {
-                          "op": "not_matches_any",
-                          "path": [
-                            "username"
-                          ],
-                          "patterns": [
-                            "\\[bot\\]$"
-                          ]
-                        }
-                      ]
-                    }
-                  },
-                  "description": "",
-                  "expression": "some approvers: one of: person(username is present and username matches none of [\"\\\\[bot\\\\]$\"])",
-                  "meta": {},
-                  "op": "any",
-                  "path": [
-                    "approvers"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "satisfied",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope thing count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated thing ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "value",
-              "check": "c",
-              "failed_items": [
-                {
-                  "cause": "value",
-                  "path": "approvers[0]",
-                  "value": {
-                    "username": "renovate[bot]"
-                  }
-                },
-                {
-                  "cause": "value",
-                  "path": "approvers[1]",
-                  "value": {}
-                }
-              ],
-              "inputs": [
-                {
-                  "name": "approvers[]",
-                  "value": [
-                    {
-                      "username": "renovate[bot]"
-                    },
-                    {}
-                  ]
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "value",
-            "check": "c",
-            "description": "",
-            "expression": "some approvers: one of: person(username is present and username matches none of [\"\\\\[bot\\\\]$\"])",
-            "failed_items": [
-              {
-                "cause": "value",
-                "path": "approvers[0]",
-                "value": {
-                  "username": "renovate[bot]"
-                }
-              },
-              {
-                "cause": "value",
-                "path": "approvers[1]",
-                "value": {}
-              }
-            ],
-            "inputs": [
-              {
-                "name": "approvers[]",
-                "value": [
-                  {
-                    "username": "renovate[bot]"
-                  },
-                  {}
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "thing"
-            }
-          }
-        ]
-      },
-      {
-        "description": "input 2",
-        "input": {
-          "items": [
-            {
-              "approvers": [
-                {
-                  "username": "ann"
-                },
-                {}
-              ]
-            }
-          ]
-        },
-        "report": {
-          "compliant": true,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) \u003e= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every thing id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "check": {
-                    "op": "any_of",
-                    "options": {
-                      "person": [
-                        {
-                          "op": "present",
-                          "path": [
-                            "username"
-                          ]
-                        },
-                        {
-                          "op": "not_matches_any",
-                          "path": [
-                            "username"
-                          ],
-                          "patterns": [
-                            "\\[bot\\]$"
-                          ]
-                        }
-                      ]
-                    }
-                  },
-                  "description": "",
-                  "expression": "some approvers: one of: person(username is present and username matches none of [\"\\\\[bot\\\\]$\"])",
-                  "meta": {},
-                  "op": "any",
-                  "path": [
-                    "approvers"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "satisfied",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope thing count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated thing ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "c",
-              "failed_items": [],
-              "inputs": [
-                {
-                  "name": "approvers[]",
-                  "value": [
-                    {
-                      "username": "ann"
-                    },
-                    {}
-                  ]
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            }
-          ]
-        },
-        "violations": []
-      }
-    ],
-    "description": "present skips an item in any by failing it cleanly",
-    "requirements": {
-      "s": {
-        "checks": {
-          "c": {
-            "check": {
-              "op": "any_of",
-              "options": {
-                "person": [
-                  {
-                    "op": "present",
-                    "path": [
-                      "username"
-                    ]
-                  },
-                  {
-                    "op": "not_matches_any",
-                    "path": [
-                      "username"
-                    ],
-                    "patterns": [
-                      "\\[bot\\]$"
-                    ]
-                  }
-                ]
-              }
-            },
-            "op": "any",
-            "path": [
-              "approvers"
-            ]
-          }
-        },
-        "from": [
-          "items"
-        ],
-        "id": [
-          "id"
-        ],
-        "subject_type": "thing"
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "items": [
-            {
               "id": 1,
               "xs": [
                 {
@@ -19120,146 +19391,13 @@
         "input": {
           "items": [
             {
-              "allergens": [
-                "garlic",
-                "milk"
-              ]
-            }
-          ]
-        },
-        "report": {
-          "compliant": true,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) \u003e= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every thing id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "check": {
-                    "op": "in",
-                    "path": [],
-                    "values": [
-                      "nuts",
-                      "garlic"
-                    ]
-                  },
-                  "description": "",
-                  "expression": "some allergens: allergens[] in [\"garlic\", \"nuts\"]",
-                  "meta": {},
-                  "op": "any",
-                  "path": [
-                    "allergens"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "satisfied",
-              "check": "$well_formed",
-              "inputs": [
+              "commits": [
+                {},
                 {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
+                  "sha": null
                 }
               ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope thing count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated thing ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "c",
-              "failed_items": [],
-              "inputs": [
-                {
-                  "name": "allergens[]",
-                  "value": [
-                    "garlic",
-                    "milk"
-                  ]
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            }
-          ]
-        },
-        "violations": []
-      },
-      {
-        "description": "input 2",
-        "input": {
-          "items": [
-            {
-              "allergens": [
-                "milk"
-              ]
+              "id": 1
             }
           ]
         },
@@ -19285,19 +19423,17 @@
                 },
                 "c": {
                   "check": {
-                    "op": "in",
-                    "path": [],
-                    "values": [
-                      "nuts",
-                      "garlic"
+                    "op": "present",
+                    "path": [
+                      "sha"
                     ]
                   },
                   "description": "",
-                  "expression": "some allergens: allergens[] in [\"garlic\", \"nuts\"]",
+                  "expression": "some commits: sha is present",
                   "meta": {},
                   "op": "any",
                   "path": [
-                    "allergens"
+                    "commits"
                   ]
                 }
               },
@@ -19370,22 +19506,30 @@
               "failed_items": [
                 {
                   "cause": "value",
-                  "path": "allergens[0]",
-                  "value": "milk"
+                  "path": "commits[0]",
+                  "value": {}
+                },
+                {
+                  "cause": "value",
+                  "path": "commits[1]",
+                  "value": {
+                    "sha": null
+                  }
                 }
               ],
               "inputs": [
                 {
-                  "name": "allergens[]",
+                  "name": "commits[].sha",
                   "value": [
-                    "milk"
+                    null,
+                    null
                   ]
                 }
               ],
               "passed": false,
               "requirement": "s",
               "subject": {
-                "id": null,
+                "id": 1,
                 "type": "thing"
               }
             }
@@ -19396,197 +19540,53 @@
             "cause": "value",
             "check": "c",
             "description": "",
-            "expression": "some allergens: allergens[] in [\"garlic\", \"nuts\"]",
+            "expression": "some commits: sha is present",
             "failed_items": [
               {
                 "cause": "value",
-                "path": "allergens[0]",
-                "value": "milk"
+                "path": "commits[0]",
+                "value": {}
+              },
+              {
+                "cause": "value",
+                "path": "commits[1]",
+                "value": {
+                  "sha": null
+                }
               }
             ],
             "inputs": [
               {
-                "name": "allergens[]",
+                "name": "commits[].sha",
                 "value": [
-                  "milk"
+                  null,
+                  null
                 ]
               }
             ],
             "requirement": "s",
             "subject": {
-              "id": null,
-              "type": "thing"
-            }
-          }
-        ]
-      },
-      {
-        "description": "input 3",
-        "input": {
-          "items": [
-            {
-              "allergens": []
-            }
-          ]
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope thing count is at least 1",
-                  "expression": "count(matching(items)) \u003e= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every thing id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                },
-                "c": {
-                  "check": {
-                    "op": "in",
-                    "path": [],
-                    "values": [
-                      "nuts",
-                      "garlic"
-                    ]
-                  },
-                  "description": "",
-                  "expression": "some allergens: allergens[] in [\"garlic\", \"nuts\"]",
-                  "meta": {},
-                  "op": "any",
-                  "path": [
-                    "allergens"
-                  ]
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "satisfied",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 1
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope thing count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated thing ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            },
-            {
-              "cause": "value",
-              "check": "c",
-              "failed_items": [],
-              "inputs": [
-                {
-                  "name": "allergens[]",
-                  "value": []
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "thing"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "value",
-            "check": "c",
-            "description": "",
-            "expression": "some allergens: allergens[] in [\"garlic\", \"nuts\"]",
-            "failed_items": [],
-            "inputs": [
-              {
-                "name": "allergens[]",
-                "value": []
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
+              "id": 1,
               "type": "thing"
             }
           }
         ]
       }
     ],
-    "description": "any with in is how to say includes any of",
+    "description": "an item whose field present finds missing is listed as value like its row because missing is not a cause",
     "requirements": {
       "s": {
         "checks": {
           "c": {
             "check": {
-              "op": "in",
-              "path": [],
-              "values": [
-                "nuts",
-                "garlic"
+              "op": "present",
+              "path": [
+                "sha"
               ]
             },
             "op": "any",
             "path": [
-              "allergens"
+              "commits"
             ]
           }
         },
@@ -19683,8 +19683,8 @@
                 {
                   "name": "checks.c",
                   "value": [
-                    "invalid each",
-                    "step that can't be a key in each"
+                    "each not a list",
+                    "invalid each"
                   ]
                 }
               ],
@@ -19772,8 +19772,8 @@
               {
                 "name": "checks.c",
                 "value": [
-                  "invalid each",
-                  "step that can't be a key in each"
+                  "each not a list",
+                  "invalid each"
                 ]
               }
             ],

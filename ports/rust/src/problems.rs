@@ -149,7 +149,7 @@ fn own_paths<'a>(node: &'a Map<String, Value>, f: &str) -> Vec<&'a Value> {
         };
     }
     if f != "inputs" {
-        return node.get(f).into_iter().collect();
+        return node.get(f).filter(|p| p.is_array()).into_iter().collect();
     }
     match node.get("inputs") {
         Some(Value::Array(specs)) => specs
@@ -447,6 +447,11 @@ fn node_problems(node: &Node) -> BTreeSet<String> {
     }
     if check_refs(&own).iter().any(|r| !known_ref(r)) {
         out.insert("invalid ref".into());
+    }
+    for f in ["path", "left", "right", "each"] {
+        if m.get(f).is_some_and(|p| !p.is_array()) {
+            out.insert(format!("{f} not a list"));
+        }
     }
     for f in path_fields(m) {
         if own_paths(m, &f).iter().any(|p| badly_stepped(p)) {

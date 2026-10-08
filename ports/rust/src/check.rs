@@ -469,7 +469,8 @@ impl<'a> Leaf<'a> {
             return Cause::Satisfied;
         }
         let reads: Vec<Read> = self.paths.iter().map(|p| crate::render::read_raw(ctx, x, p)).collect();
-        if self.op == "present" && matches!(reads[0], Read::Absent | Read::Null) {
+        let params_not_given = self.paths[0].as_array().and_then(|p| p.first()).and_then(Value::as_str) == Some("$$params") && !ctx.params.is_object();
+        if self.op == "present" && matches!(reads[0], Read::Absent | Read::Null) && !params_not_given {
             return Cause::Missing;
         }
         let states: Vec<Option<Cause>> = reads.iter().map(Read::problem).collect();

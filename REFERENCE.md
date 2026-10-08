@@ -283,7 +283,7 @@ ergo.report_with_params(doc, params, requirements)
 
 That works like `ergo.report`, except `$$params` reads `params` instead of `data.params`. If what you pass can be missing, give it a default first, with a rule like `default config := {}`. Rego doesn't call a function with an argument that isn't defined, so the whole report would be undefined, with no rows to say why. The same goes for the document given to `ergo.report`.
 
-Params aren't part of the document, so `$$input.params` doesn't reach them, and `$$params` doesn't read the document. With no `data.params`, or one that isn't an object, every `$$params` read fails as `absent`. ergo has no defaults, so a policy run without its params fails instead of checking something nobody configured.
+Params aren't part of the document, so `$$input.params` doesn't reach them, and `$$params` doesn't read the document. With no `data.params`, or one that isn't an object, every `$$params` read fails as `absent`, even for `present`, which otherwise fails a missing field as `value`. So a `present` filter on a param fails the requirement when the policy runs without its params, instead of ruling every subject out. ergo has no defaults, so a policy run without its params fails instead of checking something nobody configured.
 
 A policy that calls `ergo.report` can't itself be in a package called `params` (or under one), because the report would then read its own rules. OPA rejects that as recursive when it loads the policy.
 
@@ -452,7 +452,7 @@ Some things worth knowing:
   - an `op` ergo doesn't know, a missing `op`, or a missing parameter
   - a `cmp` that isn't in the list above
   - `values` that isn't a list, an empty `values` for `includes` or `excludes`, both `value` and `values`, a `min` or `max` that isn't a number, a `min` above `max`, or `patterns` that isn't a list of valid regular expressions
-  - an `each` that isn't a path, or `as` or `each` on an operator other than `all` or `any`
+  - a `path`, `left`, `right` or `each` that isn't a list, even a string like `"state"` that names one key, or `as` or `each` on an operator other than `all` or `any`. The `$well_formed` row says `path not a list`, and the check's row has no `inputs`
   - a step that can't be a [key](#paths), a number out of range, a badly written [ref](#reading-from-the-input), a ref or `literal` deeper inside a value than ergo reads, or a path that starts with a [name](#naming-subjects) nothing gave
   - an `all` or `any` [nested](#nesting) too deep, or a name given twice or badly written
   - a check that isn't an object, or one where it can't go, like a custom operator inside `all`
@@ -974,7 +974,7 @@ When a check reads several fields, the row shows the first cause in this table's
 
 - For `all` and `any`, a list that isn't there gives `absent`, and one that isn't a list gives `unusable`. An empty list gives `value`, since it was read fine and just has nothing in it. Otherwise the cause is the first, in this table's order, among the items that failed. So when one approver is a bot and another has no `username`, a check that some approver isn't a bot fails as `absent`, because the second one might not be. An `any_of` works the same way across its options, and so does `each` across its inner lists.
 - For a custom operator, the cause is worked out from its `inputs`, or from its `path` if it has no `inputs`. With neither, the cause is always `value`.
-- `$well_formed` and `$min_subjects` don't read the subject, so their cause is `satisfied` or `value`, except that `$min_subjects` fails as `absent`, `null` or `unusable` when a ref in `from` or `keys` can't be read, or when `from` doesn't lead to a list or an object. `$applies` reports the state of the fields read by the filters that failed. For example, a subject whose filter field is missing says `absent`, and that fails the requirement. A filter that's written wrong gives `ill_formed`, even when another filter rules the subject out, because the scope can't be trusted.
+- `$well_formed` and `$min_subjects` don't read the subject, so their cause is `satisfied` or `value`, except that `$min_subjects` fails as `absent`, `null` or `unusable` when a ref in `from` or `keys` can't be read, or when `from` doesn't lead to a list or an object. `$applies` reports the state of the fields read by the filters that failed. Its `inputs` list each field its filters read once, sorted by name, so two filters on `status` show `status` once. For example, a subject whose filter field is missing says `absent`, and that fails the requirement. A filter that's written wrong gives `ill_formed`, even when another filter rules the subject out, because the scope can't be trusted.
 
 ## Violations
 

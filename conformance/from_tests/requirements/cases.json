@@ -778,6 +778,158 @@
               "checks": {
                 "$min_subjects": {
                   "description": "The in-scope subject count is at least 1",
+                  "expression": "count(matching(\u003cinvalid from\u003e)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every subject id is unique",
+                  "expression": "count(repeated(ids(\u003cinvalid from\u003e))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 0,
+                "total": 0
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "value",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 0
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                },
+                {
+                  "name": "requirement",
+                  "value": 5
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            },
+            {
+              "cause": "value",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope subject count",
+                  "value": 0
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated subject ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "description": "The requirement is written correctly",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 0
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "requirement",
+                "value": 5
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$min_subjects",
+            "description": "The in-scope subject count is at least 1",
+            "expression": "count(matching(\u003cinvalid from\u003e)) \u003e= 1",
+            "inputs": [
+              {
+                "name": "in-scope subject count",
+                "value": 0
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "a requirement that is not an object reports an empty description and meta",
+    "requirements": {
+      "s": 5
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "items": [
+            {
+              "id": 1
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope subject count is at least 1",
                   "expression": "count(matching(items)) \u003e= 1",
                   "meta": {}
                 },
@@ -1122,13 +1274,13 @@
             "s": {
               "checks": {
                 "$min_subjects": {
-                  "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(\u003cinvalid from\u003e)) \u003e= 1",
+                  "description": "The subject list can be read",
+                  "expression": "items can be read",
                   "meta": {}
                 },
                 "$unique_ids": {
                   "description": "Every subject id is unique",
-                  "expression": "count(repeated(ids(\u003cinvalid from\u003e))) == 0",
+                  "expression": "count(repeated(ids(items))) == 0",
                   "meta": {}
                 },
                 "$well_formed": {
@@ -1142,8 +1294,8 @@
               "require": "every",
               "status": "not_met",
               "subjects": {
-                "matching": 0,
-                "total": 0
+                "matching": 1,
+                "total": 1
               }
             }
           },
@@ -1161,8 +1313,10 @@
                   "value": "every"
                 },
                 {
-                  "name": "requirement",
-                  "value": 5
+                  "name": "checks",
+                  "value": [
+                    "not an object"
+                  ]
                 }
               ],
               "passed": false,
@@ -1173,15 +1327,15 @@
               }
             },
             {
-              "cause": "value",
+              "cause": "satisfied",
               "check": "$min_subjects",
               "inputs": [
                 {
                   "name": "in-scope subject count",
-                  "value": 0
+                  "value": 1
                 }
               ],
-              "passed": false,
+              "passed": true,
               "requirement": "s",
               "subject": {
                 "id": null,
@@ -1222,25 +1376,10 @@
                 "value": "every"
               },
               {
-                "name": "requirement",
-                "value": 5
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "subject"
-            }
-          },
-          {
-            "cause": "value",
-            "check": "$min_subjects",
-            "description": "The in-scope subject count is at least 1",
-            "expression": "count(matching(\u003cinvalid from\u003e)) \u003e= 1",
-            "inputs": [
-              {
-                "name": "in-scope subject count",
-                "value": 0
+                "name": "checks",
+                "value": [
+                  "not an object"
+                ]
               }
             ],
             "requirement": "s",
@@ -1252,9 +1391,25 @@
         ]
       }
     ],
-    "description": "a requirement that is not an object reports an empty description and meta",
+    "description": "checks that are not an object give no rows named by list index",
     "requirements": {
-      "s": 5
+      "s": {
+        "checks": [
+          {
+            "op": "present",
+            "path": [
+              "id"
+            ]
+          }
+        ],
+        "from": [
+          "items"
+        ],
+        "id": [
+          "id"
+        ],
+        "min_subjects": 0
+      }
     }
   },
   {
@@ -1401,161 +1556,6 @@
         "id": [
           "id"
         ]
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "items": [
-            {
-              "id": 1
-            }
-          ]
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The subject list can be read",
-                  "expression": "items can be read",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every subject id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "value",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 0
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                },
-                {
-                  "name": "checks",
-                  "value": [
-                    "not an object"
-                  ]
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope subject count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated subject ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "value",
-            "check": "$well_formed",
-            "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-            "inputs": [
-              {
-                "name": "count(checks)",
-                "value": 0
-              },
-              {
-                "name": "require",
-                "value": "every"
-              },
-              {
-                "name": "checks",
-                "value": [
-                  "not an object"
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "subject"
-            }
-          }
-        ]
-      }
-    ],
-    "description": "checks that are not an object give no rows named by list index",
-    "requirements": {
-      "s": {
-        "checks": [
-          {
-            "op": "present",
-            "path": [
-              "id"
-            ]
-          }
-        ],
-        "from": [
-          "items"
-        ],
-        "id": [
-          "id"
-        ],
-        "min_subjects": 0
       }
     }
   },
@@ -7404,7 +7404,7 @@
         ]
       }
     ],
-    "description": "an not met report always explains itself under a bad require",
+    "description": "a malformed requirement is never met under a bad require",
     "requirements": {
       "s": {
         "applies_to": {},
@@ -8120,7 +8120,7 @@
         ]
       }
     ],
-    "description": "an not met report always explains itself under a bad require (2)",
+    "description": "a malformed requirement is never met under a bad require (2)",
     "requirements": {
       "s": {
         "applies_to": {},
@@ -8887,7 +8887,7 @@
         ]
       }
     ],
-    "description": "an not met report always explains itself under a bad require (3)",
+    "description": "a malformed requirement is never met under a bad require (3)",
     "requirements": {
       "s": {
         "applies_to": {},
@@ -9077,6 +9077,150 @@
           "id"
         ],
         "subject_type": "thing"
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "input 1",
+        "input": {
+          "items": [
+            {
+              "id": 1
+            }
+          ]
+        },
+        "report": {
+          "compliant": false,
+          "requirements": {
+            "s": {
+              "checks": {
+                "$min_subjects": {
+                  "description": "The in-scope subject count is at least 1",
+                  "expression": "count(matching(items)) \u003e= 1",
+                  "meta": {}
+                },
+                "$unique_ids": {
+                  "description": "Every subject id is unique",
+                  "expression": "count(repeated(ids(items))) == 0",
+                  "meta": {}
+                },
+                "$well_formed": {
+                  "description": "The requirement is written correctly",
+                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                  "meta": {}
+                }
+              },
+              "description": "",
+              "meta": {},
+              "require": "every",
+              "status": "not_met",
+              "subjects": {
+                "matching": 1,
+                "total": 1
+              }
+            }
+          },
+          "results": [
+            {
+              "cause": "value",
+              "check": "$well_formed",
+              "inputs": [
+                {
+                  "name": "count(checks)",
+                  "value": 0
+                },
+                {
+                  "name": "require",
+                  "value": "every"
+                },
+                {
+                  "name": "checks",
+                  "value": [
+                    "not an object"
+                  ]
+                }
+              ],
+              "passed": false,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$min_subjects",
+              "inputs": [
+                {
+                  "name": "in-scope subject count",
+                  "value": 1
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            },
+            {
+              "cause": "satisfied",
+              "check": "$unique_ids",
+              "inputs": [
+                {
+                  "name": "repeated subject ids",
+                  "value": []
+                }
+              ],
+              "passed": true,
+              "requirement": "s",
+              "subject": {
+                "id": null,
+                "type": "subject"
+              }
+            }
+          ]
+        },
+        "violations": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "description": "The requirement is written correctly",
+            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 0
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks",
+                "value": [
+                  "not an object"
+                ]
+              }
+            ],
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          }
+        ]
+      }
+    ],
+    "description": "checks that are not an object are not compliant",
+    "requirements": {
+      "s": {
+        "checks": 5,
+        "from": [
+          "items"
+        ]
       }
     }
   },
@@ -9465,150 +9609,6 @@
           "id"
         ],
         "subject_type": "thing"
-      }
-    }
-  },
-  {
-    "cases": [
-      {
-        "description": "input 1",
-        "input": {
-          "items": [
-            {
-              "id": 1
-            }
-          ]
-        },
-        "report": {
-          "compliant": false,
-          "requirements": {
-            "s": {
-              "checks": {
-                "$min_subjects": {
-                  "description": "The in-scope subject count is at least 1",
-                  "expression": "count(matching(items)) \u003e= 1",
-                  "meta": {}
-                },
-                "$unique_ids": {
-                  "description": "Every subject id is unique",
-                  "expression": "count(repeated(ids(items))) == 0",
-                  "meta": {}
-                },
-                "$well_formed": {
-                  "description": "The requirement is written correctly",
-                  "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-                  "meta": {}
-                }
-              },
-              "description": "",
-              "meta": {},
-              "require": "every",
-              "status": "not_met",
-              "subjects": {
-                "matching": 1,
-                "total": 1
-              }
-            }
-          },
-          "results": [
-            {
-              "cause": "value",
-              "check": "$well_formed",
-              "inputs": [
-                {
-                  "name": "count(checks)",
-                  "value": 0
-                },
-                {
-                  "name": "require",
-                  "value": "every"
-                },
-                {
-                  "name": "checks",
-                  "value": [
-                    "not an object"
-                  ]
-                }
-              ],
-              "passed": false,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$min_subjects",
-              "inputs": [
-                {
-                  "name": "in-scope subject count",
-                  "value": 1
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            },
-            {
-              "cause": "satisfied",
-              "check": "$unique_ids",
-              "inputs": [
-                {
-                  "name": "repeated subject ids",
-                  "value": []
-                }
-              ],
-              "passed": true,
-              "requirement": "s",
-              "subject": {
-                "id": null,
-                "type": "subject"
-              }
-            }
-          ]
-        },
-        "violations": [
-          {
-            "cause": "value",
-            "check": "$well_formed",
-            "description": "The requirement is written correctly",
-            "expression": "fields are known and have the right types and count(checks) \u003e= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
-            "inputs": [
-              {
-                "name": "count(checks)",
-                "value": 0
-              },
-              {
-                "name": "require",
-                "value": "every"
-              },
-              {
-                "name": "checks",
-                "value": [
-                  "not an object"
-                ]
-              }
-            ],
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "subject"
-            }
-          }
-        ]
-      }
-    ],
-    "description": "checks that are not an object are not compliant",
-    "requirements": {
-      "s": {
-        "checks": 5,
-        "from": [
-          "items"
-        ]
       }
     }
   },

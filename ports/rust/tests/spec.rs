@@ -3,12 +3,7 @@ use std::collections::BTreeSet;
 use std::fs;
 use std::path::Path;
 
-const KNOWN_DIFFERENCES: &[&str] = &[
-    "present / present written wrong / fails every check as ill_formed whatever the subject holds",
-    "present / present as a filter / rules a subject out when the field is missing, even though the other filter can't read it",
-    "present / present as a filter / rules a subject out when the field is null",
-    "present / present as a filter / keeps a subject in scope when the field is there",
-];
+const KNOWN_DIFFERENCES: &[&str] = &[];
 
 fn same(a: &Value, b: &Value) -> bool {
     match (a, b) {

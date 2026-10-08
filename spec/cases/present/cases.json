@@ -428,5 +428,74 @@
         ]
       }
     ]
+  },
+  {
+    "description": "present on a param when the policy is run without params",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["$$params", "flag"]}}}},
+    "cases": [
+      {
+        "description": "fails as absent, not value, because the params weren't given",
+        "rules": ["present.no_params", "path.start"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "$$params.flag", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "present on a param when the params are null",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["$$params", "flag"]}}}},
+    "params": null,
+    "cases": [
+      {
+        "description": "fails as absent, because params that aren't an object weren't given either",
+        "rules": ["present.no_params", "path.start"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "$$params.flag", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "present on a param the params don't have",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["$$params", "flag"]}}}},
+    "params": {},
+    "cases": [
+      {
+        "description": "fails as value, because the params were given and the field isn't in them",
+        "rules": ["present.missing", "present.no_params"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "$$params.flag", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "present as a filter on a param when the policy is run without params",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["things"],
+        "id": ["id"],
+        "min_subjects": 0,
+        "applies_to": {"enabled": {"op": "present", "path": ["$$params", "flag"]}},
+        "checks": {"c": {"op": "present", "path": ["x"]}}
+      }
+    },
+    "cases": [
+      {
+        "description": "fails the requirement instead of ruling every subject out",
+        "rules": ["present.no_params", "present.filter"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "status": {"s": "not_met"},
+        "compliant": false,
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": false, "cause": "absent", "inputs": [{"name": "$$params.flag", "value": null}]}
+        ]
+      }
+    ]
   }
 ]

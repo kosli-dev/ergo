@@ -28,7 +28,7 @@ Reading a path ends in one of these outcomes. Each one except `found` is also a 
 | `unmatched` | A selector found no item in a list that's there. |
 | `ambiguous` | A selector found more than one item. |
 
-**[path.start]** A path starts at the subject, unless its first step is `$$input`, which starts at the input, or `$$params`, which starts at the params. With no params, a `$$params` path ends `absent`.
+**[path.start]** A path starts at the subject, unless its first step is `$$input`, which starts at the input, or `$$params`, which starts at the params. With no params, or params that aren't an object, a `$$params` path ends `absent`.
 
 **[path.empty]** An empty path reads its starting value itself, so on a subject it never ends `not_an_object`. A `null` subject ends `null`.
 
@@ -77,6 +77,8 @@ A row's `inputs` name each path it read. **[name.keys]** Keys are joined with `.
 
 **[present.missing]** It fails with cause `value` when its path ends `absent` or `null`. Whether the field is there is the question it asks, so "it isn't" is a sound answer, and the cause says so.
 
+**[present.no_params]** On a `$$params` path, it fails with cause `absent` instead when there are no params, or they aren't an object. Then the params weren't given at all, so ergo can't tell whether the field would be there, and a policy run without its params fails instead of ruling every subject out. When the params are an object without the field, it fails with `value` as usual.
+
 **[present.other]** It fails with the outcome as its cause when its path ends any other way: `not_an_object`, `unusable`, `unmatched` or `ambiguous`. A ref step whose ref can't be read keeps the ref's cause too, even `absent` or `null`, because then the field it looks for is unknown, not missing.
 
 **[present.inputs]** Its row has one entry in `inputs`: the path's name and the value read, or `null` when nothing was. When `path` is missing or isn't a list, there's nothing to name, so `inputs` is `[]`.
@@ -84,7 +86,3 @@ A row's `inputs` name each path it read. **[name.keys]** Keys are joined with `.
 **[present.written_wrong]** It's [written wrong](#checks-written-wrong) when `path` is missing, isn't a list, or has a step that can't be a key, or when the check has a field besides `op`, `path`, `description`, `meta`, `expression`, `substitute` and `inputs`. What's wrong is written `missing path`, `path not a list`, `step that can't be a key in path` or `unknown field <name>`.
 
 **[present.filter]** In `applies_to`, a `present` filter that fails with cause `value` rules the subject out, whatever the other filters give. Its `$applies` row fails with cause `value`, and the subject gets no other rows. Any other cause fails the requirement, as it does for every filter. **[applies.inputs]** The `$applies` row lists each path its filters read once, sorted by name.
-
-## Open questions
-
-- With no params at all, a `present` filter on a `$$params` path ends `absent`, so it fails as `value` and rules every subject out. A policy run without its params can then be `not_applicable` instead of failing. `ergo.rego` does this today. Should a `$$params` read fail as `absent` under `present` when there are no params, rather than only when the key is missing?

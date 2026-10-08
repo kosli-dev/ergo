@@ -382,7 +382,14 @@ fn evaluate<'a>(name: &'a str, raw: &'a Map<String, Value>, base: &Ctx<'a>) -> E
             })
             .collect();
         let passed = !bad_applies && rows.iter().all(|(r, _)| r.passed);
-        let inputs = if bad_applies { vec![] } else { rows.iter().flat_map(|(r, _)| r.inputs.clone()).collect() };
+        let inputs = if bad_applies {
+            vec![]
+        } else {
+            let mut read: Vec<Value> = rows.iter().flat_map(|(r, _)| r.inputs.clone()).collect();
+            read.sort_by(|a, b| a["name"].as_str().cmp(&b["name"].as_str()));
+            read.dedup();
+            read
+        };
         let failed: Vec<&(Row, bool)> = rows.iter().filter(|(r, _)| !r.passed).collect();
         let cause = if passed {
             Cause::Satisfied
@@ -550,7 +557,7 @@ pub fn report_with(document: &Value, params: Option<&Value>, requirements: &Valu
 }
 
 pub fn report(document: &Value, params: Option<&Value>, requirements: &Value) -> Value {
-    let no_params = json!({});
+    let no_params = Value::Null;
     let ctx = Ctx { doc: document, params: params.unwrap_or(&no_params), names: vec![] };
     static NOT_AN_OBJECT: std::sync::OnceLock<Map<String, Value>> = std::sync::OnceLock::new();
     let placeholder = NOT_AN_OBJECT.get_or_init(|| {

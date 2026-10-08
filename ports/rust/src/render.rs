@@ -653,7 +653,7 @@ fn check_inputs<'a>(ctx: &Ctx<'a>, subject: &'a Value, check: &Value, item: &str
     if op_of(check).is_some_and(|o| !is_builtin(o) && crate::operators::find(o).is_some()) {
         return custom_paths(check).into_iter().map(|p| Some(entry(item_path_name(item, p)?, value_at(ctx, subject, p)))).collect();
     }
-    let p = m.get("path").filter(|p| truthy(Some(p)))?;
+    let p = m.get("path").filter(|p| p.is_array())?;
     Some(vec![entry(item_path_name(item, p)?, value_at(ctx, subject, p))])
 }
 

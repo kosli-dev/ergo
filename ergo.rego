@@ -1671,7 +1671,11 @@ _valid_patterns(v) if {
 
 _own_fields(node) := object.remove(node, ["check", "options", "substitute"])
 
-_step_problems(node) := {concat("", ["step that can't be a key in ", f]) |
+_step_problems(node) := {concat("", [f, " not a list"]) |
+	some f in ["path", "left", "right", "each"]
+	f in object.keys(node)
+	not is_array(node[f])
+} | {concat("", ["step that can't be a key in ", f]) |
 	some f in ["path", "left", "right", "each", "inputs"]
 	some p in _own_paths(node, f)
 	_badly_stepped(p)
@@ -1680,6 +1684,7 @@ _step_problems(node) := {concat("", ["step that can't be a key in ", f]) |
 _own_paths(node, f) := [node[f]] if {
 	f != "inputs"
 	f in object.keys(node)
+	is_array(node[f])
 }
 
 _own_paths(node, "inputs") := [p | some spec in node.inputs; some p in _input_paths(spec)] if is_array(node.inputs)
@@ -2029,6 +2034,7 @@ _any_read_state(subj, path) := "not_an_object" if {
 	start := _start_of(subj, path)
 	not is_object(start)
 	not _reads_itself(path)
+	not _params_not_given(path)
 }
 
 _reads_itself(path) if _keys_of(path) == []
@@ -2134,6 +2140,12 @@ _asks_presence(check, x) if {
 	check.op == "present"
 	_keys_of(check.path)
 	_ := _start_of(x, check.path)
+	not _params_not_given(check.path)
+}
+
+_params_not_given(path) if {
+	path[0] == "$$params"
+	not is_object(data.ergo_params)
 }
 
 _presence_state(s) := "missing" if s in {"absent", "null"}
@@ -2360,6 +2372,7 @@ _answers_presence(check, subj, "") if {
 	_keys_of(check.path)
 	_ := _start_of(subj, check.path)
 	not _unreadable_ref(check)
+	not _params_not_given(check.path)
 	_substitute_unusable(check, subj) == set()
 	_read_state(subj, check.path) in {"absent", "null"}
 }
@@ -2755,7 +2768,7 @@ _check_inputs(subj, check, item) := [{"name": _item_path_name(item, check.path),
 	not _two_sided(check)
 	not _quantified(check)
 	not _combinator(check)
-	check.path
+	is_array(check.path)
 }
 
 _check_inputs(subj, check, item) := [{"name": r[0], "value": r[1]} | some r in sort(_any_of_reads(subj, check, item))] if {
@@ -3094,8 +3107,13 @@ _applies_rows(_, req, _) := [] if {
 }
 
 _applies_inputs(subj, req) := [inp |
-	some name in _applies_to_names(req)
-	some inp in _inputs_in(req, _applies_to_of(req)[name], subj)
+	read := {inp |
+		some name in _applies_to_names(req)
+		some inp in _inputs_in(req, _applies_to_of(req)[name], subj)
+	}
+	some name in sort({inp.name | some inp in read})
+	some inp in read
+	inp.name == name
 ]
 
 _named_requirement_holds(doc, req, name) if {
@@ -3185,7 +3203,7 @@ report(doc, policy) := report_with_params(doc, _configured_params, policy)
 
 _configured_params := data.params
 
-default _configured_params := {}
+default _configured_params := null
 
 report_with_params(doc, params, policy) := r if {
 	unreadable := _unreadable_inputs(doc, params)

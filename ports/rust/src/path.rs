@@ -246,6 +246,7 @@ impl<'a> Ctx<'a> {
     pub fn read(&self, subject: &'a Value, path: &[Value]) -> Read<'a> {
         let (start, rest): (&'a Value, &[Value]) = match path.first().and_then(Value::as_str) {
             Some("$$input") => (self.doc, &path[1..]),
+            Some("$$params") if !self.params.is_object() => return Read::Absent,
             Some("$$params") => (self.params, &path[1..]),
             Some(s) if s.starts_with('$') => match self.name(&s[1..]) {
                 Some(v) => (v, &path[1..]),
