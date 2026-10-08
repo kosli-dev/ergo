@@ -6888,7 +6888,7 @@ test_an_any_of_with_a_stray_path_is_written_wrong_instead_of_stopping_the_report
 	rep.compliant == false
 }
 
-test_an_item_present_finds_empty_is_listed_as_value_like_its_row_because_missing_is_not_a_cause if {
+test_an_item_whose_field_present_finds_missing_is_listed_as_value_like_its_row_because_missing_is_not_a_cause if {
 	every op in ["all", "any"] {
 		check := {"op": op, "path": ["commits"], "check": {"op": "present", "path": ["sha"]}}
 		subj := {"id": 1, "commits": [{}, {"sha": null}]}
@@ -6900,7 +6900,7 @@ test_an_item_present_finds_empty_is_listed_as_value_like_its_row_because_missing
 	}
 }
 
-test_an_inner_list_present_finds_empty_is_listed_as_value_too if {
+test_an_inner_list_item_whose_field_present_finds_missing_is_listed_as_value_too if {
 	check := {"op": "all", "path": ["prs"], "each": ["commits"], "check": {"op": "present", "path": ["sha"]}}
 	failed_of({"id": 1, "prs": [{"commits": [{"sha": "a"}, {}]}]}, check) == [{"path": "prs[0].commits[1]", "cause": "value", "value": {}}]
 }
