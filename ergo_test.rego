@@ -6904,3 +6904,58 @@ test_an_inner_list_item_whose_field_present_finds_missing_is_listed_as_value_too
 	check := {"op": "all", "path": ["prs"], "each": ["commits"], "check": {"op": "present", "path": ["sha"]}}
 	failed_of({"id": 1, "prs": [{"commits": [{"sha": "a"}, {}]}]}, check) == [{"path": "prs[0].commits[1]", "cause": "value", "value": {}}]
 }
+
+absent_lookalike := {"ergo/absent": true}
+
+lookalike_rows(doc, req) := [[r.check, r.subject.id, r.passed, r.cause, r.inputs] |
+	some r in ergo.report(doc, req).results
+	not startswith(r.check, "$")
+]
+
+lookalike_req(from, checks) := {"s": {"from": from, "id": ["id"], "checks": checks}}
+
+test_a_field_holding_an_object_like_ergos_absent_marker_is_there if {
+	lookalike_rows({"items": [{"id": 1, "o": absent_lookalike}]}, lookalike_req(["items"], {
+		"m": {"op": "missing", "path": ["o"]},
+		"p": {"op": "present", "path": ["o"]},
+	})) == [
+		["m", 1, false, "value", [{"name": "o", "value": absent_lookalike}]],
+		["p", 1, true, "satisfied", [{"name": "o", "value": absent_lookalike}]],
+	]
+}
+
+test_a_named_field_holding_an_object_like_ergos_absent_marker_is_there if {
+	lookalike_rows({"items": [{"id": 1, "o": absent_lookalike}]}, lookalike_req(["items", {"each_as": "it"}], {"m": {"op": "missing", "path": ["$it", "o"]}})) == [["m", 1, false, "value", [{"name": "$it.o", "value": absent_lookalike}]]]
+}
+
+test_a_selected_field_holding_an_object_like_ergos_absent_marker_is_there if {
+	lookalike_rows({"items": [{"id": 1, "xs": [{"k": 1, "v": absent_lookalike}]}]}, lookalike_req(["items"], {"m": {"op": "missing", "path": ["xs", {"where": {"k": 1}}, "v"]}})) == [["m", 1, false, "value", [{"name": "xs.[k==1].v", "value": absent_lookalike}]]]
+}
+
+test_a_selector_looking_for_an_object_like_ergos_absent_marker_does_not_match_a_missing_key if {
+	lookalike_rows({"items": [{"id": 1, "xs": [{"v": 1}]}]}, lookalike_req(["items"], {"p": {"op": "present", "path": ["xs", {"where": {"k": {"literal": absent_lookalike}}}, "v"]}})) == [["p", 1, false, "unmatched", [{"name": "xs.[k=={\"ergo/absent\": true}].v", "value": null}]]]
+}
+
+test_a_ref_to_an_object_like_ergos_absent_marker_reads_it if {
+	rows := lookalike_rows({"items": [{"id": 1, "a": absent_lookalike}]}, lookalike_req(["items"], {"e": {"op": "equals", "path": ["a"], "value": {"ref": ["$$params", "x"]}}})) with data.params as {"x": absent_lookalike}
+	rows == [["e", 1, true, "satisfied", [{"name": "a", "value": absent_lookalike}]]]
+}
+
+test_a_from_leading_to_an_object_like_ergos_absent_marker_finds_it if {
+	rep := ergo.report({"items": absent_lookalike}, {"s": {"from": ["items"], "checks": {"p": {"op": "present", "path": []}}}})
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "$min_subjects")] == [[true, "satisfied"]]
+	[[r.subject.id, r.passed, r.cause] | some r in rows_for(rep, "s", "p")] == [[absent_lookalike, true, "satisfied"]]
+}
+
+test_a_key_holding_an_object_like_ergos_absent_marker_is_a_subject_that_is_there if {
+	rep := ergo.report({"t": {"a": absent_lookalike}}, {"s": {"from": ["t", {"each_as": "e", "keys": ["a"]}], "checks": {"p": {"op": "present", "path": []}}}})
+	[[r.subject.id, r.passed, r.cause, r.inputs] | some r in rows_for(rep, "s", "p")] == [["a", true, "satisfied", [{"name": "$e", "value": absent_lookalike}]]]
+}
+
+test_ergos_absent_marker_is_something_only_an_input_that_fails_closed_can_hold if {
+	req := lookalike_req(["items"], {"m": {"op": "missing", "path": ["o"]}})
+	rep := ergo.report({"items": [{"id": 1, "o": ergo._absent}]}, req)
+	[[r.check, r.passed, r.cause] | some r in rep.results; r.check in {"$min_subjects", "m"}] == [["$min_subjects", false, "unusable"], ["m", false, "unusable"]]
+	from_params := ergo.report({"items": [{"id": 1}]}, req) with data.params as {"x": ergo._absent}
+	[[r.check, r.passed, r.cause] | some r in from_params.results; r.check in {"$min_subjects", "m"}] == [["$min_subjects", false, "unusable"], ["m", false, "unusable"]]
+}
