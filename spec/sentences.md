@@ -71,6 +71,21 @@ The `and` between assertions can't be confused with the `and` of `where` or of `
 
 **[sentence.path.keys]** In `from`, `<path> named by each of <list>` makes each listed key a subject, as `keys` does today: `artifact.attestations named by each of $params.required_scans`. There is no bracket form for it, because `a[x]` picks one thing in every language, and a parameter meant to be one name that arrives as a list would turn one subject into several instead of failing. `from` doesn't name its subjects: the checks that used `each_as` names have a `for` line, where the subject's fields are bare.
 
+## Subjects
+
+**[sentence.subject.from]** A subject's `from` takes the shape of a `for` item without `every` or `as`: a path, optionally `named by each of` a list, optionally `where` with conditions joined by `and`. `applies_to` goes. The conditions read the subject, as a `where` reads its item:
+
+```yaml
+subjects:
+  emergency change:
+    from: deployments where environment is "prod" and change_type is "emergency"
+    id: id
+```
+
+**[sentence.subject.condition]** A condition in that `where` is a path and a phrase, like any `where` condition, so it can't be a `count of` or `sum of`. pr-reviewer's six `count of x is at least 1` filters become two conditions each, `x is a list and x is not empty`, with the same meaning.
+
+**[sentence.subject.applies]** The `$applies` row stays. Its `expression` is the conditions as written, joined with ` and `, like `environment is "prod" and change_type is "emergency"`, and its `inputs` hold each path they read. A subject a condition can't decide about, like a deployment with no `change_type`, fails the requirement as `absent` rather than dropping out of it. The filter's name and its description go.
+
 ## Values
 
 **[sentence.value.scalar]** A value is written as JSON writes a scalar: a string in double quotes, a number, `true`, `false` or `null`. A string can also be in single quotes, which keeps backslashes as written, so a regular expression doesn't need them doubled: `'^\s*FROM'` is `"^\\s*FROM"`. Inside single quotes, `\'` is a quote and `\\` a backslash.

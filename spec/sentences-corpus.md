@@ -18,7 +18,7 @@ Notes in the last column:
 - **widens ""** (6): `empty` or `equals []` becomes `is empty`, which also passes `""`.
 - **cause only** (4): the same values pass, and only the cause of a failure changes. `range` from 0 to 0 becomes `is 0`, so a value that isn't a number fails as `value` instead of `unusable`. `equals` with a ref becomes `equals $params.x`, so a value of another type fails as `unusable` instead of `value`.
 - **no default** (37): a Rego variable with a default became `$params.x`, which ergo can't default.
-- **Rego-shaped** (24): Rego works the value out before ergo sees it. The sentence covers what ergo checks afterwards.
+- **Rego-shaped** (26): Rego works the value out before ergo sees it. The sentence covers what ergo checks afterwards.
 - **narrows** (7): fails closed where today passes.
 
 ## sdlc-policies
@@ -67,17 +67,18 @@ Notes in the last column:
 | `lockfile_attested` | `{op: equals, path: [attestations_statuses, <lock_attestation_name>, status], value: COMPLETE}` | `attestations_statuses named by $params.lock_attestation_name.status is "COMPLETE"` | no default |
 | `dockerfile_attested` | `{op: equals, path: [attestations_statuses, <dockerfile_attestation_name>, status], value: COMPLETE}` | `attestations_statuses named by $params.dockerfile_attestation_name.status is "COMPLETE"` | no default |
 | `sbom_attested` | `{op: equals, path: [attestations_statuses, <sbom_attestation_name>, status], value: COMPLETE}` | `attestations_statuses named by $params.sbom_attestation_name.status is "COMPLETE"` | no default |
-| `from` of lockfile | `[lockfile]` | `lockfile` | Rego-shaped |
-| filter `recorded` | `{op: present, path: [status]}` | `status exists` |  |
-| filter `attested` | `{op: equals, path: [status], value: COMPLETE}` | `status is "COMPLETE"` |  |
+| `from` of lockfile | `[lockfile], applies_to: {recorded, attested}` | `lockfile where status exists and status is "COMPLETE"` | Rego-shaped. `$applies` prints `status exists and status is "COMPLETE"` |
+| filter `recorded` | `{op: present, path: [status]}` | `status exists` | In the `where` of lockfile's `from`, so its name goes |
+| filter `attested` | `{op: equals, path: [status], value: COMPLETE}` | `status is "COMPLETE"` | In the `where` of lockfile's `from`, so its name goes |
 | `exact_pins` | `{op: range, path: [exact_pins], min: 1, max: 1000000}` | `exact_pins is between 1 and 1000000` | The 1000000 only stands in for "no upper bound". `exact_pins is at least 1` says what was meant, but passes above a million. |
 | `hashes` | `{op: equals, path: [hashed], value: true}` | `hashed is true` |  |
 | `from` of lockfile entry | `[lock_entries]` | `lock_entries` | Rego-shaped |
 | `exact_pin` | `{op: not_matches_any, path: [entry], patterns: ['^[A-Za-z0-9._-]+\s*(>=\|<=\|~=\|!=\|<\|>)']}` | `entry does not match '^[A-Za-z0-9._-]+\s*(>=\|<=\|~=\|!=\|<\|>)'` | Single quotes keep the backslash as written. In double quotes, JSON escapes apply and `\s` would have to be `\\s`. |
-| `from` of SBOM package | `[components]` | `components` | Rego-shaped |
-| filter `locked` | `{op: present, path: [lock_release]}` | `lock_release exists` |  |
+| `from` of SBOM package | `[components], applies_to: {locked}` | `components where lock_release exists` | Rego-shaped. `$applies` prints `lock_release exists` |
+| filter `locked` | `{op: present, path: [lock_release]}` | `lock_release exists` | In the `where` of SBOM package's `from`, so its name goes |
 | `matches_lock` | `{op: compare, left: [sbom_release], right: [lock_release], cmp: eq}` | `sbom_release equals lock_release` |  |
-| filter `not_exempt` | `{op: equals, path: [exempt], value: false}` | `exempt is false` |  |
+| `from` of non-exempt SBOM package | `[components], applies_to: {not_exempt}` | `components where exempt is false` | Rego-shaped. `$applies` prints `exempt is false`. A subject of its own, because licences filters on `exempt` and sbom_versions on `lock_release`. |
+| filter `not_exempt` | `{op: equals, path: [exempt], value: false}` | `exempt is false` | In the `where` of non-exempt SBOM package's `from`, so its name goes |
 | `licence_known` | `{op: any, path: [licences], check: {op: non_empty_string, path: []}}` | `some licences is not empty` | widens |
 | `licence_approved` | `{op: any, path: [licences], check: {op: in, path: [], values: {ref: [$$params, allowed_licenses]}}}` | `some licences is in $params.allowed_licenses` |  |
 | `from` of base image | `[base_images]` | `base_images` | Rego-shaped |
@@ -118,7 +119,8 @@ Same as SDLC-CTRL-0004 dependencies, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| filter `attested` | `{op: equals, path: [status], value: COMPLETE}` | `status is "COMPLETE"` | This copy has no `recorded` filter, only `attested`. |
+| `from` of lockfile | `[lockfile], applies_to: {attested}` | `lockfile where status is "COMPLETE"` | Rego-shaped. `$applies` prints `status is "COMPLETE"` |
+| filter `attested` | `{op: equals, path: [status], value: COMPLETE}` | `status is "COMPLETE"` | In the `where` of lockfile's `from`, so its name goes. This copy has no `recorded` filter, only `attested`. |
 | `licence_known` | `{op: any, path: [licences], check: {op: non_empty_string, path: [id]}}` | `some licences.id is not empty` | widens |
 | `licence_approved` | `{op: any, path: [licences], check: {op: equals, path: [allowed], value: true}}` | `some licences.allowed is true` | Rego-shaped. Rego works out `allowed` from the params before ergo sees it. |
 
@@ -228,51 +230,64 @@ Same as SDLC-CTRL-0004 dependencies, except:
 | `round_cost_sums_its_stages` | `{op: sum_eq, path: [..., final-verdict, attestation_data, cost, by_stage], field: usd, only: {}, total: [..., cost, total_usd], tolerance: 0.000001, expression: ...}` | `sum of compliance_status.attestations_statuses.final-verdict.attestation_data.cost.by_stage.usd equals compliance_status.attestations_statuses.final-verdict.attestation_data.cost.total_usd within 0.000001` | replaces custom `sum_eq` |
 | `verifier_cost_matches_its_stage` | `{op: sum_eq, path: [..., final-verdict, attestation_data, cost, by_stage], field: usd, only: {stage: verifier}, total: [compliance_status, attestations_statuses, finding-verifier, attestation_data, cost_usd], tolerance: 0.000001, expression: ...}` | `sum of compliance_status.attestations_statuses.final-verdict.attestation_data.cost.by_stage.usd where stage is "verifier" equals compliance_status.attestations_statuses.finding-verifier.attestation_data.cost_usd within 0.000001` | narrows. replaces custom `sum_eq`. A sum over no rows is 0, as the custom operator gives (checked on `main`). A stage row with no `stage` field is skipped by the custom operator and fails the sentence as `absent`. |
 | `dispatched_personas_recorded` | `{op: keys_match, keys: [compliance_status, attestations_statuses, classifier, attestation_data, personas_dispatched], path: [compliance_status, attestations_statuses, preflight, attestation_data, persona_blob_shas], patterns: ['^[0-9a-f]{40}$'], expression: ..., inputs: [...]}` | `for: every compliance_status.attestations_statuses.classifier.attestation_data.personas_dispatched as persona`<br>`assert: compliance_status.attestations_statuses.preflight.attestation_data.persona_blob_shas named by persona matches "^[0-9a-f]{40}$"` | replaces custom `keys_match`. **misfit**, see below |
-| `from` of finding (verifier_record, confirmed_finding) | `[trail, compliance_status, attestations_statuses, finding-verifier, attestation_data, per_finding_records]` | `trail.compliance_status.attestations_statuses.finding-verifier.attestation_data.per_finding_records` |  |
+| `from` of finding (verifier_record) | `[trail, compliance_status, attestations_statuses, finding-verifier, attestation_data, per_finding_records]` | `trail.compliance_status.attestations_statuses.finding-verifier.attestation_data.per_finding_records` |  |
 | `known_decision` | `{op: in, path: [decision], values: [CONFIRMED, UNSURE, SUGGESTION, REFUTED]}` | `decision is one of "CONFIRMED", "UNSURE", "SUGGESTION", "REFUTED"` |  |
-| filter `confirmed` | `{op: equals, path: [decision], value: CONFIRMED}` | `decision is "CONFIRMED"` |  |
+| `from` of confirmed finding | `[trail, compliance_status, attestations_statuses, finding-verifier, attestation_data, per_finding_records], applies_to: {confirmed}` | `trail.compliance_status.attestations_statuses.finding-verifier.attestation_data.per_finding_records where decision is "CONFIRMED"` | `$applies` prints `decision is "CONFIRMED"`. A subject of its own, because confirmed_finding filters the findings and verifier_record doesn't. |
+| filter `confirmed` | `{op: equals, path: [decision], value: CONFIRMED}` | `decision is "CONFIRMED"` | In the `where` of confirmed finding's `from`, so its name goes |
 | `inspected` | `{op: any, path: [tools_called], check: {op: equals, path: [ok], value: true}}` | `some tools_called.ok is true` |  |
-| filter `resolved` | `{op: equals, path: [compliance_status, attestations_statuses, verdict, attestation_data, moderator_status], value: resolved}` | `compliance_status.attestations_statuses.verdict.attestation_data.moderator_status is "resolved"` |  |
+| `from` of review round (resolution_per_disagreement) | `[trail], applies_to: {resolved}` | `trail where compliance_status.attestations_statuses.verdict.attestation_data.moderator_status is "resolved"` | `$applies` prints `compliance_status.attestations_statuses.verdict.attestation_data.moderator_status is "resolved"`. The subject of resolution_per_disagreement: the round, with that requirement's filters. |
+| filter `resolved` | `{op: equals, path: [compliance_status, attestations_statuses, verdict, attestation_data, moderator_status], value: resolved}` | `compliance_status.attestations_statuses.verdict.attestation_data.moderator_status is "resolved"` | In the `where` of review round (resolution_per_disagreement)'s `from`, so its name goes |
 | `counted` | `{op: min_length_at, path: [compliance_status, attestations_statuses, verdict, attestation_data, debate_resolutions], min_path: [compliance_status, attestations_statuses, verdict, attestation_data, debate_disagreements_found], expression: ..., inputs: [...]}` | `count of compliance_status.attestations_statuses.verdict.attestation_data.debate_resolutions is at least compliance_status.attestations_statuses.verdict.attestation_data.debate_disagreements_found` | replaces custom `min_length_at` |
-| filter `moderator_failed` | `{op: not_matches_any, path: [compliance_status, attestations_statuses, verdict, attestation_data, moderator_status], patterns: ['^(resolved\|no_disagreements\|single_reviewer\|disabled)$']}` | `compliance_status.attestations_statuses.verdict.attestation_data.moderator_status does not match "^(resolved\|no_disagreements\|single_reviewer\|disabled)$"` | `is not one of "resolved", "no_disagreements", "single_reviewer", "disabled"` reads better, but would put a status that isn't a string in scope, where today it fails the requirement as `unusable`. |
+| `from` of review round (moderator_failure_recorded) | `[trail], applies_to: {moderator_failed}` | `trail where compliance_status.attestations_statuses.verdict.attestation_data.moderator_status does not match "^(resolved\|no_disagreements\|single_reviewer\|disabled)$"` | `$applies` prints `compliance_status.attestations_statuses.verdict.attestation_data.moderator_status does not match "^(resolved\|no_disagreements\|single_reviewer\|disabled)$"`. The subject of moderator_failure_recorded: the round, with that requirement's filters. |
+| filter `moderator_failed` | `{op: not_matches_any, path: [compliance_status, attestations_statuses, verdict, attestation_data, moderator_status], patterns: ['^(resolved\|no_disagreements\|single_reviewer\|disabled)$']}` | `compliance_status.attestations_statuses.verdict.attestation_data.moderator_status does not match "^(resolved\|no_disagreements\|single_reviewer\|disabled)$"` | In the `where` of review round (moderator_failure_recorded)'s `from`, so its name goes. `is not one of "resolved", "no_disagreements", "single_reviewer", "disabled"` reads better, but would put a status that isn't a string in scope, where today it fails the requirement as `unusable`. |
 | `recorded (moderator failure)` | `{op: equals, path: [..., final-verdict, attestation_data, inputs, moderator_failed], value: true}` | `compliance_status.attestations_statuses.final-verdict.attestation_data.inputs.moderator_failed is true` |  |
 | `from` of resolution | `[trail, ..., verdict, attestation_data, debate_resolutions]` | `trail.compliance_status.attestations_statuses.verdict.attestation_data.debate_resolutions` |  |
 | `reasoned` | `{op: non_empty_string, path: [reasoning]}` | `reasoning is not empty` | widens |
-| filter `gap` | `{op: min_length, path: [..., before_second_pass, uncovered], min: 1}` | `count of compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.uncovered is at least 1` | replaces custom `min_length` |
-| filter `not_capped` | `{op: equals, path: [..., before_second_pass, cost_capped], value: false}` | `compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.cost_capped is false` |  |
+| `from` of review round (coverage_gap_rereviewed) | `[trail], applies_to: {gap, not_capped}` | `trail where compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.uncovered is a list and compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.uncovered is not empty and compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.cost_capped is false` | `$applies` prints `compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.uncovered is a list and compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.uncovered is not empty and compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.cost_capped is false`. The subject of coverage_gap_rereviewed: the round, with that requirement's filters. |
+| filter `gap` | `{op: min_length, path: [..., before_second_pass, uncovered], min: 1}` | `compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.uncovered is a list`<br>`compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.uncovered is not empty` | . replaces custom `min_length`. In the `where` of review round (coverage_gap_rereviewed)'s `from`, so its name goes. Two conditions, because a `where` condition is a path and a phrase, and `count of` isn't: the same values pass as with today's `min_length` |
+| filter `not_capped` | `{op: equals, path: [..., before_second_pass, cost_capped], value: false}` | `compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.cost_capped is false` | In the `where` of review round (coverage_gap_rereviewed)'s `from`, so its name goes |
 | `targeted` | `{op: contains_all, path: [compliance_status, attestations_statuses, second-pass, attestation_data, files_targeted], of: [..., before_second_pass, uncovered], expression: ..., inputs: [...]}` | `compliance_status.attestations_statuses.second-pass.attestation_data.files_targeted contains all of compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.uncovered` | replaces custom `contains_all`. The custom operator passes when the list it checks against is empty, and `includes` with `values` fails then. The `gap` filter keeps that list non-empty, so nothing in scope changes. |
-| filter `gap` | `{op: min_length, path: [..., before_second_pass, uncovered], min: 1}` | `count of compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.uncovered is at least 1` | replaces custom `min_length` |
-| filter `capped` | `{op: equals, path: [..., before_second_pass, cost_capped], value: true}` | `compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.cost_capped is true` |  |
+| `from` of review round (coverage_gap_cost_capped) | `[trail], applies_to: {gap, capped}` | `trail where compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.uncovered is a list and compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.uncovered is not empty and compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.cost_capped is true` | `$applies` prints `compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.uncovered is a list and compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.uncovered is not empty and compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.cost_capped is true`. The subject of coverage_gap_cost_capped: the round, with that requirement's filters. |
+| filter `gap` | `{op: min_length, path: [..., before_second_pass, uncovered], min: 1}` | `compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.uncovered is a list`<br>`compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.uncovered is not empty` | . replaces custom `min_length`. In the `where` of review round (coverage_gap_cost_capped)'s `from`, so its name goes. Two conditions, because a `where` condition is a path and a phrase, and `count of` isn't: the same values pass as with today's `min_length` |
+| filter `capped` | `{op: equals, path: [..., before_second_pass, cost_capped], value: true}` | `compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.cost_capped is true` | In the `where` of review round (coverage_gap_cost_capped)'s `from`, so its name goes |
 | `cap_recorded` | `{op: equals, path: [compliance_status, attestations_statuses, second-pass, attestation_data, skip_reason], value: cost_cap}` | `compliance_status.attestations_statuses.second-pass.attestation_data.skip_reason is "cost_cap"` |  |
 | `from` of file | `[trail, ..., coverage-verification, attestation_data, files]` | `trail.compliance_status.attestations_statuses.coverage-verification.attestation_data.files` |  |
 | `acknowledged` | `{op: equals, path: [status], value: reviewed_ok}` | `status is "reviewed_ok"` |  |
-| filter `triggered` | `{op: equals, path: [compliance_status, attestations_statuses, second-pass, attestation_data, triggered], value: true}` | `compliance_status.attestations_statuses.second-pass.attestation_data.triggered is true` |  |
+| `from` of review round (second_pass_findings_recorded) | `[trail], applies_to: {triggered}` | `trail where compliance_status.attestations_statuses.second-pass.attestation_data.triggered is true` | `$applies` prints `compliance_status.attestations_statuses.second-pass.attestation_data.triggered is true`. The subject of second_pass_findings_recorded: the round, with that requirement's filters. |
+| filter `triggered` | `{op: equals, path: [compliance_status, attestations_statuses, second-pass, attestation_data, triggered], value: true}` | `compliance_status.attestations_statuses.second-pass.attestation_data.triggered is true` | In the `where` of review round (second_pass_findings_recorded)'s `from`, so its name goes |
 | `recorded (second pass findings)` | `{op: count_where_eq_sum, path: [compliance_status, attestations_statuses, findings, attestation_data, raw], field: source, value: second_pass, sum: [[compliance_status, attestations_statuses, second-pass, attestation_data, findings_added]], ...}` | `count of compliance_status.attestations_statuses.findings.attestation_data.raw where source is "second_pass" equals compliance_status.attestations_statuses.second-pass.attestation_data.findings_added` | narrows. replaces custom `count_where_eq_sum` |
 | `from` of finding (raw_finding) | `[trail, ..., findings, attestation_data, raw]` | `trail.compliance_status.attestations_statuses.findings.attestation_data.raw` |  |
 | `disposed` | `{op: in, path: [disposition], values: [posted, merged, refuted_by_codebase_check, suppressed_by_moderator, dropped_by_citation_check, dropped_out_of_diff, refuted_by_verifier, demoted_to_suggestion]}` | `disposition is one of "posted", "merged", "refuted_by_codebase_check", "suppressed_by_moderator", "dropped_by_citation_check", "dropped_out_of_diff", "refuted_by_verifier", "demoted_to_suggestion"` |  |
-| `from` of finding (posted_finding) | `[trail, ..., findings, attestation_data, posted]` | `trail.compliance_status.attestations_statuses.findings.attestation_data.posted` |  |
-| filter `from_a_model` | `{op: not_matches_any, path: [source], patterns: ['^empty_file$']}` | `source is not "empty_file"` | Same passes as the pattern: both fail a missing source as `absent` and one that isn't a string as `unusable`. |
+| `from` of finding (posted_finding) | `[trail, ..., findings, attestation_data, posted], applies_to: {from_a_model}` | `trail.compliance_status.attestations_statuses.findings.attestation_data.posted where source is not "empty_file"` | `$applies` prints `source is not "empty_file"` |
+| filter `from_a_model` | `{op: not_matches_any, path: [source], patterns: ['^empty_file$']}` | `source is not "empty_file"` | In the `where` of finding (posted_finding)'s `from`, so its name goes. Same passes as the pattern: both fail a missing source as `absent` and one that isn't a string as `unusable`. |
 | `in_file` | `{op: equals, path: [in_file], value: true}` | `in_file is true` |  |
-| filter `claude-review_ran_some` | `{op: min_length, path: [compliance_status, attestations_statuses, claude-review, attestation_data, personas_ran], min: 1}` | `count of compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is at least 1` | replaces custom `min_length` |
+| `from` of review round (claude_ran_dispatched) | `[trail], applies_to: {claude-review_ran_some}` | `trail where compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is a list and compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is not empty` | `$applies` prints `compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is a list and compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is not empty`. The subject of claude_ran_dispatched: the round, with that requirement's filters. |
+| filter `claude-review_ran_some` | `{op: min_length, path: [compliance_status, attestations_statuses, claude-review, attestation_data, personas_ran], min: 1}` | `compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is a list`<br>`compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is not empty` | . replaces custom `min_length`. In the `where` of review round (claude_ran_dispatched)'s `from`, so its name goes. Two conditions, because a `where` condition is a path and a phrase, and `count of` isn't: the same values pass as with today's `min_length` |
 | `personas_match (claude_ran_dispatched)` | `{op: compare, left: [compliance_status, attestations_statuses, classifier, attestation_data, personas_dispatched], right: [compliance_status, attestations_statuses, claude-review, attestation_data, personas_ran], cmp: eq}` | `compliance_status.attestations_statuses.classifier.attestation_data.personas_dispatched equals compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran` |  |
-| filter `gemini-review_ran_some` | `{op: min_length, path: [compliance_status, attestations_statuses, gemini-review, attestation_data, personas_ran], min: 1}` | `count of compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran is at least 1` | replaces custom `min_length` |
+| `from` of review round (gemini_ran_dispatched) | `[trail], applies_to: {gemini-review_ran_some}` | `trail where compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran is a list and compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran is not empty` | `$applies` prints `compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran is a list and compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran is not empty`. The subject of gemini_ran_dispatched: the round, with that requirement's filters. |
+| filter `gemini-review_ran_some` | `{op: min_length, path: [compliance_status, attestations_statuses, gemini-review, attestation_data, personas_ran], min: 1}` | `compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran is a list`<br>`compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran is not empty` | . replaces custom `min_length`. In the `where` of review round (gemini_ran_dispatched)'s `from`, so its name goes. Two conditions, because a `where` condition is a path and a phrase, and `count of` isn't: the same values pass as with today's `min_length` |
 | `personas_match (gemini_ran_dispatched)` | `{op: compare, left: [compliance_status, attestations_statuses, classifier, attestation_data, personas_dispatched], right: [compliance_status, attestations_statuses, gemini-review, attestation_data, personas_ran], cmp: eq}` | `compliance_status.attestations_statuses.classifier.attestation_data.personas_dispatched equals compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran` |  |
-| filter `claude-review_degraded_true` | `{op: equals, path: [compliance_status, attestations_statuses, claude-review, attestation_data, degraded], value: true}` | `compliance_status.attestations_statuses.claude-review.attestation_data.degraded is true` |  |
-| filter `claude-review_ran_none` | `{op: equals, path: [compliance_status, attestations_statuses, claude-review, attestation_data, personas_ran], value: []}` | `compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is empty` | widens "" |
+| `from` of review round (claude_only_degraded) | `[trail], applies_to: {claude-review_degraded_true, claude-review_ran_none}` | `trail where compliance_status.attestations_statuses.claude-review.attestation_data.degraded is true and compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is empty` | `$applies` prints `compliance_status.attestations_statuses.claude-review.attestation_data.degraded is true and compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is empty`. The subject of claude_only_degraded: the round, with that requirement's filters. |
+| filter `claude-review_degraded_true` | `{op: equals, path: [compliance_status, attestations_statuses, claude-review, attestation_data, degraded], value: true}` | `compliance_status.attestations_statuses.claude-review.attestation_data.degraded is true` | In the `where` of review round (claude_only_degraded)'s `from`, so its name goes |
+| filter `claude-review_ran_none` | `{op: equals, path: [compliance_status, attestations_statuses, claude-review, attestation_data, personas_ran], value: []}` | `compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is empty` | widens "". In the `where` of review round (claude_only_degraded)'s `from`, so its name goes |
 | `reason_recorded (claude_only_degraded)` | `{op: any_of, options: {single_model: [{op: includes, path: [..., final-verdict, attestation_data, inputs, degraded_reasons], value: single_model}], no_models: [{op: includes, path: [...], value: no_models}]}}` | `some compliance_status.attestations_statuses.final-verdict.attestation_data.inputs.degraded_reasons is one of "single_model", "no_models"` | An `any_of` of two `includes` becomes `some` over the list. Both fail an empty list as `value` and a missing one as `absent`. The row loses the option names. |
-| filter `gemini-review_degraded_true` | `{op: equals, path: [compliance_status, attestations_statuses, gemini-review, attestation_data, degraded], value: true}` | `compliance_status.attestations_statuses.gemini-review.attestation_data.degraded is true` |  |
-| filter `gemini-review_ran_none` | `{op: equals, path: [compliance_status, attestations_statuses, gemini-review, attestation_data, personas_ran], value: []}` | `compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran is empty` | widens "" |
+| `from` of review round (gemini_only_degraded) | `[trail], applies_to: {gemini-review_degraded_true, gemini-review_ran_none}` | `trail where compliance_status.attestations_statuses.gemini-review.attestation_data.degraded is true and compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran is empty` | `$applies` prints `compliance_status.attestations_statuses.gemini-review.attestation_data.degraded is true and compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran is empty`. The subject of gemini_only_degraded: the round, with that requirement's filters. |
+| filter `gemini-review_degraded_true` | `{op: equals, path: [compliance_status, attestations_statuses, gemini-review, attestation_data, degraded], value: true}` | `compliance_status.attestations_statuses.gemini-review.attestation_data.degraded is true` | In the `where` of review round (gemini_only_degraded)'s `from`, so its name goes |
+| filter `gemini-review_ran_none` | `{op: equals, path: [compliance_status, attestations_statuses, gemini-review, attestation_data, personas_ran], value: []}` | `compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran is empty` | widens "". In the `where` of review round (gemini_only_degraded)'s `from`, so its name goes |
 | `reason_recorded (gemini_only_degraded)` | `{op: any_of, options: {single_model: [{op: includes, path: [..., final-verdict, attestation_data, inputs, degraded_reasons], value: single_model}], no_models: [{op: includes, path: [...], value: no_models}]}}` | `some compliance_status.attestations_statuses.final-verdict.attestation_data.inputs.degraded_reasons is one of "single_model", "no_models"` | An `any_of` of two `includes` becomes `some` over the list. Both fail an empty list as `value` and a missing one as `absent`. The row loses the option names. |
-| filter `claude-review_degraded_true` | `{op: equals, path: [compliance_status, attestations_statuses, claude-review, attestation_data, degraded], value: true}` | `compliance_status.attestations_statuses.claude-review.attestation_data.degraded is true` |  |
-| filter `gemini-review_degraded_true` | `{op: equals, path: [compliance_status, attestations_statuses, gemini-review, attestation_data, degraded], value: true}` | `compliance_status.attestations_statuses.gemini-review.attestation_data.degraded is true` |  |
-| filter `claude-review_ran_none` | `{op: equals, path: [compliance_status, attestations_statuses, claude-review, attestation_data, personas_ran], value: []}` | `compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is empty` | widens "" |
-| filter `gemini-review_ran_none` | `{op: equals, path: [compliance_status, attestations_statuses, gemini-review, attestation_data, personas_ran], value: []}` | `compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran is empty` | widens "" |
+| `from` of review round (both_models_degraded) | `[trail], applies_to: {claude-review_degraded_true, gemini-review_degraded_true, claude-review_ran_none, gemini-review_ran_none}` | `trail where compliance_status.attestations_statuses.claude-review.attestation_data.degraded is true and compliance_status.attestations_statuses.gemini-review.attestation_data.degraded is true and compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is empty and compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran is empty` | `$applies` prints `compliance_status.attestations_statuses.claude-review.attestation_data.degraded is true and compliance_status.attestations_statuses.gemini-review.attestation_data.degraded is true and compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is empty and compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran is empty`. The subject of both_models_degraded: the round, with that requirement's filters. |
+| filter `claude-review_degraded_true` | `{op: equals, path: [compliance_status, attestations_statuses, claude-review, attestation_data, degraded], value: true}` | `compliance_status.attestations_statuses.claude-review.attestation_data.degraded is true` | In the `where` of review round (both_models_degraded)'s `from`, so its name goes |
+| filter `gemini-review_degraded_true` | `{op: equals, path: [compliance_status, attestations_statuses, gemini-review, attestation_data, degraded], value: true}` | `compliance_status.attestations_statuses.gemini-review.attestation_data.degraded is true` | In the `where` of review round (both_models_degraded)'s `from`, so its name goes |
+| filter `claude-review_ran_none` | `{op: equals, path: [compliance_status, attestations_statuses, claude-review, attestation_data, personas_ran], value: []}` | `compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is empty` | widens "". In the `where` of review round (both_models_degraded)'s `from`, so its name goes |
+| filter `gemini-review_ran_none` | `{op: equals, path: [compliance_status, attestations_statuses, gemini-review, attestation_data, personas_ran], value: []}` | `compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran is empty` | widens "". In the `where` of review round (both_models_degraded)'s `from`, so its name goes |
 | `reason_recorded (both_models_degraded)` | `{op: any_of, options: {no_models: [{op: includes, path: [..., final-verdict, attestation_data, inputs, degraded_reasons], value: no_models}]}}` | `compliance_status.attestations_statuses.final-verdict.attestation_data.inputs.degraded_reasons contains "no_models"` |  |
-| filter `claude-review_degraded_true` | `{op: equals, path: [compliance_status, attestations_statuses, claude-review, attestation_data, degraded], value: true}` | `compliance_status.attestations_statuses.claude-review.attestation_data.degraded is true` |  |
-| filter `claude-review_ran_some` | `{op: min_length, path: [compliance_status, attestations_statuses, claude-review, attestation_data, personas_ran], min: 1}` | `count of compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is at least 1` | replaces custom `min_length` |
+| `from` of review round (claude_persona_failed) | `[trail], applies_to: {claude-review_degraded_true, claude-review_ran_some}` | `trail where compliance_status.attestations_statuses.claude-review.attestation_data.degraded is true and compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is a list and compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is not empty` | `$applies` prints `compliance_status.attestations_statuses.claude-review.attestation_data.degraded is true and compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is a list and compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is not empty`. The subject of claude_persona_failed: the round, with that requirement's filters. |
+| filter `claude-review_degraded_true` | `{op: equals, path: [compliance_status, attestations_statuses, claude-review, attestation_data, degraded], value: true}` | `compliance_status.attestations_statuses.claude-review.attestation_data.degraded is true` | In the `where` of review round (claude_persona_failed)'s `from`, so its name goes |
+| filter `claude-review_ran_some` | `{op: min_length, path: [compliance_status, attestations_statuses, claude-review, attestation_data, personas_ran], min: 1}` | `compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is a list`<br>`compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is not empty` | . replaces custom `min_length`. In the `where` of review round (claude_persona_failed)'s `from`, so its name goes. Two conditions, because a `where` condition is a path and a phrase, and `count of` isn't: the same values pass as with today's `min_length` |
 | `reason_recorded (claude_persona_failed)` | `{op: any_of, options: {persona_failed: [{op: includes, path: [..., final-verdict, attestation_data, inputs, degraded_reasons], value: persona_failed}]}}` | `compliance_status.attestations_statuses.final-verdict.attestation_data.inputs.degraded_reasons contains "persona_failed"` |  |
-| filter `gemini-review_degraded_true` | `{op: equals, path: [compliance_status, attestations_statuses, gemini-review, attestation_data, degraded], value: true}` | `compliance_status.attestations_statuses.gemini-review.attestation_data.degraded is true` |  |
-| filter `gemini-review_ran_some` | `{op: min_length, path: [compliance_status, attestations_statuses, gemini-review, attestation_data, personas_ran], min: 1}` | `count of compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran is at least 1` | replaces custom `min_length` |
+| `from` of review round (gemini_persona_failed) | `[trail], applies_to: {gemini-review_degraded_true, gemini-review_ran_some}` | `trail where compliance_status.attestations_statuses.gemini-review.attestation_data.degraded is true and compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran is a list and compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran is not empty` | `$applies` prints `compliance_status.attestations_statuses.gemini-review.attestation_data.degraded is true and compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran is a list and compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran is not empty`. The subject of gemini_persona_failed: the round, with that requirement's filters. |
+| filter `gemini-review_degraded_true` | `{op: equals, path: [compliance_status, attestations_statuses, gemini-review, attestation_data, degraded], value: true}` | `compliance_status.attestations_statuses.gemini-review.attestation_data.degraded is true` | In the `where` of review round (gemini_persona_failed)'s `from`, so its name goes |
+| filter `gemini-review_ran_some` | `{op: min_length, path: [compliance_status, attestations_statuses, gemini-review, attestation_data, personas_ran], min: 1}` | `compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran is a list`<br>`compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran is not empty` | . replaces custom `min_length`. In the `where` of review round (gemini_persona_failed)'s `from`, so its name goes. Two conditions, because a `where` condition is a path and a phrase, and `count of` isn't: the same values pass as with today's `min_length` |
 | `reason_recorded (gemini_persona_failed)` | `{op: any_of, options: {persona_failed: [{op: includes, path: [..., final-verdict, attestation_data, inputs, degraded_reasons], value: persona_failed}]}}` | `compliance_status.attestations_statuses.final-verdict.attestation_data.inputs.degraded_reasons contains "persona_failed"` |  |
 
 ## ergo
@@ -290,8 +305,8 @@ Same as SDLC-CTRL-0004 dependencies, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of deployment | `[deployments]` | `deployments` |  |
-| filter `is_prod` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
+| `from` of deployment | `[deployments], applies_to: {is_prod}` | `deployments where environment is "prod"` | `$applies` prints `environment is "prod"` |
+| filter `is_prod` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` | In the `where` of deployment's `from`, so its name goes |
 | `approved` | `{op: non_empty_string, path: [approved_by]}` | `approved_by is not empty` | widens |
 
 ## DEV controls
@@ -310,9 +325,9 @@ Same as SDLC-CTRL-0004 dependencies, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of production deployment | `[deployments]` | `deployments` |  |
-| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
-| filter `in_scope` | `{op: equals, path: [change_type], value: new_development}` | `change_type is "new_development"` |  |
+| `from` of production deployment | `[deployments], applies_to: {production, in_scope}` | `deployments where environment is "prod" and change_type is "new_development"` | `$applies` prints `environment is "prod" and change_type is "new_development"` |
+| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` | In the `where` of production deployment's `from`, so its name goes |
+| filter `in_scope` | `{op: equals, path: [change_type], value: new_development}` | `change_type is "new_development"` | In the `where` of production deployment's `from`, so its name goes |
 | `performed` | `{op: non_empty_string, path: [impact_analysis, document_url]}` | `impact_analysis.document_url is not empty` | widens |
 | `business_owner_approved` | `{op: equals, path: [impact_analysis, approved_by_role], value: business_owner}` | `impact_analysis.approved_by_role is "business_owner"` |  |
 | `approved_before_production` | `{op: compare_time, left: [impact_analysis, approved_at], right: [started_at], cmp: lt}` | `impact_analysis.approved_at is before started_at` |  |
@@ -323,14 +338,15 @@ Same as DEV-0102 impact analysis, new features, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| filter `in_scope` | `{op: equals, path: [change_type], value: normal}` | `change_type is "normal"` |  |
+| `from` of production deployment | `[deployments], applies_to: {production, in_scope}` | `deployments where environment is "prod" and change_type is "normal"` | `$applies` prints `environment is "prod" and change_type is "normal"` |
+| filter `in_scope` | `{op: equals, path: [change_type], value: normal}` | `change_type is "normal"` | In the `where` of production deployment's `from`, so its name goes |
 
 ### DEV-0104 changes tracked
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of production deployment | `[deployments]` | `deployments` |  |
-| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
+| `from` of production deployment | `[deployments], applies_to: {production}` | `deployments where environment is "prod"` | `$applies` prints `environment is "prod"` |
+| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` | In the `where` of production deployment's `from`, so its name goes |
 | `ticket_referenced` | `{op: all, path: [pull_requests], check: {op: matches_any, path: [ticket, key], patterns: ['^[A-Z][A-Z0-9]+-[0-9]+$']}}` | `every pull_requests.ticket.key matches "^[A-Z][A-Z0-9]+-[0-9]+$"` |  |
 | `ticket_in_tracker` | `{op: all, path: [pull_requests], check: {op: present, path: [ticket, status]}}` | `every pull_requests.ticket.status exists` |  |
 
@@ -338,8 +354,8 @@ Same as DEV-0102 impact analysis, new features, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of production deployment | `[deployments]` | `deployments` |  |
-| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
+| `from` of production deployment | `[deployments], applies_to: {production}` | `deployments where environment is "prod"` | `$applies` prints `environment is "prod"` |
+| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` | In the `where` of production deployment's `from`, so its name goes |
 | `approved_repository` | `{op: matches_any, path: [artifact, source, repo_url], patterns: {ref: [$$params, repository_patterns]}}` | `artifact.source.repo_url matches $params.repository_patterns` |  |
 | `commit_in_repository` | `{op: non_empty_string, path: [artifact, source, commit_sha]}` | `artifact.source.commit_sha is not empty` | widens |
 | `protected_branch` | `{op: equals, path: [artifact, source, branch_protected], value: true}` | `artifact.source.branch_protected is true` |  |
@@ -348,8 +364,8 @@ Same as DEV-0102 impact analysis, new features, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of production deployment | `[deployments]` | `deployments` |  |
-| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
+| `from` of production deployment | `[deployments], applies_to: {production}` | `deployments where environment is "prod"` | `$applies` prints `environment is "prod"` |
+| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` | In the `where` of production deployment's `from`, so its name goes |
 | `branch_protected` | `{op: equals, path: [source, branch_protection, enabled], value: true}` | `source.branch_protection.enabled is true` |  |
 | `signed_commits_required` | `{op: equals, path: [source, branch_protection, require_signed_commits], value: true}` | `source.branch_protection.require_signed_commits is true` |  |
 | `no_force_pushes` | `{op: equals, path: [source, branch_protection, allow_force_pushes], value: false}` | `source.branch_protection.allow_force_pushes is false` |  |
@@ -359,8 +375,8 @@ Same as DEV-0102 impact analysis, new features, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of production deployment | `[deployments]` | `deployments` |  |
-| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
+| `from` of production deployment | `[deployments], applies_to: {production}` | `deployments where environment is "prod"` | `$applies` prints `environment is "prod"` |
+| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` | In the `where` of production deployment's `from`, so its name goes |
 | `scanned` | `{op: equals, path: [artifact, attestations, secrets-scan, status], value: COMPLETE}` | `artifact.attestations.secrets-scan.status is "COMPLETE"` |  |
 | `no_secrets` | `{op: equals, path: [artifact, attestations, secrets-scan, findings], value: 0}` | `artifact.attestations.secrets-scan.findings is 0` |  |
 
@@ -385,8 +401,8 @@ Same as DEV-0102 impact analysis, new features, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of production deployment | `[deployments]` | `deployments` |  |
-| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
+| `from` of production deployment | `[deployments], applies_to: {production}` | `deployments where environment is "prod"` | `$applies` prints `environment is "prod"` |
+| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` | In the `where` of production deployment's `from`, so its name goes |
 | `scanned` | `{op: equals, path: [iac_scan, status], value: COMPLETE}` | `iac_scan.status is "COMPLETE"` |  |
 | `no_high_findings` | `{op: equals, path: [iac_scan, critical_or_high_findings], value: 0}` | `iac_scan.critical_or_high_findings is 0` |  |
 
@@ -400,24 +416,24 @@ Same as DEV-0102 impact analysis, new features, except:
 | `from` of pull request | `[artifact, attestations, pull-request, pull_requests, {each_as: pr}]` | `artifact.attestations.pull-request.pull_requests` | The name `pr` goes, as in DEV-0501. |
 | `merged` | `{op: equals, path: [state], value: MERGED}` | `state is "MERGED"` |  |
 | `peer_approved` | `{op: any, path: [approvers], check: {op: any_of, options: {peer: [{op: equals, path: [state], value: APPROVED}, {op: compare, left: [username], right: [$pr, author], cmp: ne}]}}}` | `for: some approvers where state is "APPROVED" as approver`<br>`assert: approver.username is not author` | `for` line |
-| `from` of vulnerability | `[artifact, vulnerabilities]` | `artifact.vulnerabilities` | Rego-shaped |
-| filter `open` | `{op: equals, path: [status], value: open}` | `status is "open"` |  |
+| `from` of vulnerability | `[artifact, vulnerabilities], applies_to: {open}` | `artifact.vulnerabilities where status is "open"` | Rego-shaped. `$applies` prints `status is "open"` |
+| filter `open` | `{op: equals, path: [status], value: open}` | `status is "open"` | In the `where` of vulnerability's `from`, so its name goes |
 | `within_sla` | `{op: compare_time, left: [remediate_by], right: [$$input, evaluated_at], cmp: gte}` | `remediate_by is on or after $input.evaluated_at` | Rego-shaped. Rego works out `remediate_by` as `first_seen` plus the params' days for the severity. Saying that in a sentence needs date arithmetic (#140) and a param key read from the subject, `$params.sla_days named by severity`. |
 
 ### DEV-0402 patches in time
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of missing patch | `[environment, missing_patches]` | `environment.missing_patches` | Rego-shaped |
-| filter `critical_or_high` | `{op: in, path: [severity], values: [critical, high]}` | `severity is one of "critical", "high"` |  |
+| `from` of missing patch | `[environment, missing_patches], applies_to: {critical_or_high}` | `environment.missing_patches where severity is one of "critical", "high"` | Rego-shaped. `$applies` prints `severity is one of "critical", "high"` |
+| filter `critical_or_high` | `{op: in, path: [severity], values: [critical, high]}` | `severity is one of "critical", "high"` | In the `where` of missing patch's `from`, so its name goes |
 | `within_deadline` | `{op: compare_time, left: [install_by], right: [$$input, evaluated_at], cmp: gte}` | `install_by is on or after $input.evaluated_at` | Rego-shaped. Rego works out `install_by` as `released_at` plus `$params.patch_days`. |
 
 ### DEV-0403 features tested
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of test run | `[artifact, attestations, {each_as: run, keys: {ref: [$$params, required_tests]}}]` | `artifact.attestations named by each of $params.required_tests` |  |
-| filter `new_development` | `{op: equals, path: [$$input, deployment, change_type], value: new_development}` | `$input.deployment.change_type is "new_development"` |  |
+| `from` of test run | `[artifact, attestations, {each_as: run, keys: {ref: [$$params, required_tests]}}], applies_to: {new_development}` | `artifact.attestations named by each of $params.required_tests where $input.deployment.change_type is "new_development"` | `$applies` prints `$input.deployment.change_type is "new_development"` |
+| filter `new_development` | `{op: equals, path: [$$input, deployment, change_type], value: new_development}` | `$input.deployment.change_type is "new_development"` | In the `where` of test run's `from`, so its name goes |
 | `passed` | `{op: equals, path: [is_compliant], value: true}` | `is_compliant is true` |  |
 | `before_production` | `{op: compare_time, left: [finished_at], right: [$$input, deployment, started_at], cmp: lt}` | `finished_at is before $input.deployment.started_at` |  |
 
@@ -427,15 +443,16 @@ Same as DEV-0403 features tested, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| filter `new_development` | `{op: equals, path: [$$input, deployment, change_type], value: normal}` | `$input.deployment.change_type is "normal"` |  |
+| `from` of test run | `[artifact, attestations, {each_as: run, keys: {ref: [$$params, required_tests]}}], applies_to: {new_development}` | `artifact.attestations named by each of $params.required_tests where $input.deployment.change_type is "normal"` | `$applies` prints `$input.deployment.change_type is "normal"` |
+| filter `new_development` | `{op: equals, path: [$$input, deployment, change_type], value: normal}` | `$input.deployment.change_type is "normal"` | In the `where` of test run's `from`, so its name goes |
 
 ### DEV-0405 data migration
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of production deployment | `[deployments]` | `deployments` |  |
-| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
-| filter `migrates_data` | `{op: equals, path: [includes_data_migration], value: true}` | `includes_data_migration is true` |  |
+| `from` of production deployment | `[deployments], applies_to: {production, migrates_data}` | `deployments where environment is "prod" and includes_data_migration is true` | `$applies` prints `environment is "prod" and includes_data_migration is true` |
+| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` | In the `where` of production deployment's `from`, so its name goes |
+| filter `migrates_data` | `{op: equals, path: [includes_data_migration], value: true}` | `includes_data_migration is true` | In the `where` of production deployment's `from`, so its name goes |
 | `passed` | `{op: equals, path: [migration_test, is_compliant], value: true}` | `migration_test.is_compliant is true` |  |
 | `complete` | `{op: compare, left: [migration_test, migrated_records], right: [migration_test, source_records], cmp: eq}` | `migration_test.migrated_records equals migration_test.source_records` |  |
 | `accurate` | `{op: range, path: [migration_test, mismatched_records], min: 0, max: 0}` | `migration_test.mismatched_records is 0` | cause only |
@@ -469,8 +486,8 @@ Same as DEV-0403 features tested, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of environment | `[environments]` | `environments` |  |
-| filter `non_production` | `{op: in, path: [type], values: [development, test, staging]}` | `type is one of "development", "test", "staging"` |  |
+| `from` of environment | `[environments], applies_to: {non_production}` | `environments where type is one of "development", "test", "staging"` | `$applies` prints `type is one of "development", "test", "staging"` |
+| filter `non_production` | `{op: in, path: [type], values: [development, test, staging]}` | `type is one of "development", "test", "staging"` | In the `where` of environment's `from`, so its name goes |
 | `safe_data_source` | `{op: in, path: [data_source], values: [synthetic, masked]}` | `data_source is one of "synthetic", "masked"` |  |
 | `no_production_connection` | `{op: equals, path: [connects_to_production_data], value: false}` | `connects_to_production_data is false` |  |
 
@@ -479,9 +496,9 @@ Same as DEV-0403 features tested, except:
 | | today | sentence | notes |
 | --- | --- | --- | --- |
 | `from` of defect | `[release, defects]` | `release.defects` |  |
-| `from` of critical defect | `of: defect` | — | `of` names another subject. Nothing to write as a path. |
-| filter `critical` | `{op: equals, path: [severity], value: critical}` | `severity is "critical"` |  |
-| filter `unresolved` | `{op: in, path: [status], values: [open, in_progress]}` | `status is one of "open", "in_progress"` |  |
+| `from` of critical defect | `of: defect, applies_to: {critical, unresolved}` | `defect where severity is "critical" and status is one of "open", "in_progress"` | `$applies` prints `severity is "critical" and status is one of "open", "in_progress"`. chain that narrows. Narrows the `defect` subject: its rows are rows of a defect, with the same id. Today's `of`. |
+| filter `critical` | `{op: equals, path: [severity], value: critical}` | `severity is "critical"` | In the `where` of critical defect's `from`, so its name goes |
+| filter `unresolved` | `{op: in, path: [status], values: [open, in_progress]}` | `status is one of "open", "in_progress"` | In the `where` of critical defect's `from`, so its name goes |
 | `severity_set` | `{op: in, path: [severity], values: [critical, high, medium, low]}` | `severity is one of "critical", "high", "medium", "low"` |  |
 | `assigned` | `{op: non_empty_string, path: [assignee]}` | `assignee is not empty` | widens |
 | `impact_reviewed` | `{op: non_empty_string, path: [impact_review, reviewed_by]}` | `impact_review.reviewed_by is not empty` | widens |
@@ -495,9 +512,9 @@ Same as DEV-0409 defects triaged, new features.
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of production deployment | `[deployments, {each_as: deploy}]` | `deployments` | The name `deploy` goes: the checks that used it have a `for` line, where the subject's fields are bare. |
-| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
-| filter `normal_change` | `{op: equals, path: [change_type], value: normal}` | `change_type is "normal"` |  |
+| `from` of production deployment | `[deployments, {each_as: deploy}], applies_to: {production, normal_change}` | `deployments where environment is "prod" and change_type is "normal"` | `$applies` prints `environment is "prod" and change_type is "normal"`. The name `deploy` goes: the checks that used it have a `for` line, where the subject's fields are bare. |
+| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` | In the `where` of production deployment's `from`, so its name goes |
+| filter `normal_change` | `{op: equals, path: [change_type], value: normal}` | `change_type is "normal"` | In the `where` of production deployment's `from`, so its name goes |
 | `installer_did_not_write_code` | `{op: all, path: [pull_requests], check: {op: all, path: [commits], check: {op: compare, left: [author], right: [$deploy, deployed_by], cmp: ne}}}` | `for: every pull_requests.commits as commit`<br>`assert: commit.author is not deployed_by` | `for` line |
 | `peer_approved` | `{op: all, path: [pull_requests], as: pr, check: {op: any, path: [approvers], check: {op: any_of, options: {peer: [{op: equals, path: [state], value: APPROVED}, {op: compare, left: [username], right: [$pr, author], cmp: ne}]}}}}` | `for: every pull_requests as pr, some pr.approvers where state is "APPROVED" as approver`<br>`assert: approver.username is not pr.author` | `for` line. The example #174 gives for `for`. Rows stay one per deployment. |
 
@@ -505,9 +522,9 @@ Same as DEV-0409 defects triaged, new features.
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of production deployment | `[deployments, {each_as: deploy}]` | `deployments` | The name `deploy` goes: the checks that used it have a `for` line, where the subject's fields are bare. |
-| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
-| filter `new_development` | `{op: equals, path: [change_type], value: new_development}` | `change_type is "new_development"` |  |
+| `from` of production deployment | `[deployments, {each_as: deploy}], applies_to: {production, new_development}` | `deployments where environment is "prod" and change_type is "new_development"` | `$applies` prints `environment is "prod" and change_type is "new_development"`. The name `deploy` goes: the checks that used it have a `for` line, where the subject's fields are bare. |
+| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` | In the `where` of production deployment's `from`, so its name goes |
+| filter `new_development` | `{op: equals, path: [change_type], value: new_development}` | `change_type is "new_development"` | In the `where` of production deployment's `from`, so its name goes |
 | `business_owner_approved` | `{op: any, path: [approvals], check: {op: any_of, options: {before_deploy: [{op: equals, path: [role], value: business_owner}, {op: equals, path: [decision], value: approved}, {op: compare_time, left: [approved_at], right: [$deploy, started_at], cmp: lt}]}}}` | `for: some approvals where role is "business_owner" and decision is "approved" as approval`<br>`assert: approval.approved_at is before started_at` | `for` line |
 | `qa_signed_off` | `{op: any, path: [approvals], check: {op: any_of, options: {before_deploy: [{op: equals, path: [role], value: qa}, {op: equals, path: [decision], value: approved}, {op: compare_time, left: [approved_at], right: [$deploy, started_at], cmp: lt}]}}}` | `for: some approvals where role is "qa" and decision is "approved" as approval`<br>`assert: approval.approved_at is before started_at` | `for` line |
 | `development_signed_off` | `{op: any, path: [approvals], check: {op: any_of, options: {before_deploy: [{op: equals, path: [role], value: development}, {op: equals, path: [decision], value: approved}, {op: compare_time, left: [approved_at], right: [$deploy, started_at], cmp: lt}]}}}` | `for: some approvals where role is "development" and decision is "approved" as approval`<br>`assert: approval.approved_at is before started_at` | `for` line |
@@ -516,9 +533,9 @@ Same as DEV-0409 defects triaged, new features.
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of production deployment | `[deployments, {each_as: deploy}]` | `deployments` | The name `deploy` goes: the checks that used it have a `for` line, where the subject's fields are bare. |
-| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
-| filter `normal` | `{op: equals, path: [change_type], value: normal}` | `change_type is "normal"` |  |
+| `from` of production deployment | `[deployments, {each_as: deploy}], applies_to: {production, normal}` | `deployments where environment is "prod" and change_type is "normal"` | `$applies` prints `environment is "prod" and change_type is "normal"`. The name `deploy` goes: the checks that used it have a `for` line, where the subject's fields are bare. |
+| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` | In the `where` of production deployment's `from`, so its name goes |
+| filter `normal` | `{op: equals, path: [change_type], value: normal}` | `change_type is "normal"` | In the `where` of production deployment's `from`, so its name goes |
 | `business_owner_approved` | `{op: any, path: [approvals], check: {op: any_of, options: {before_deploy: [{op: equals, path: [role], value: business_owner}, {op: equals, path: [decision], value: approved}, {op: compare_time, left: [approved_at], right: [$deploy, started_at], cmp: lt}]}}}` | `for: some approvals where role is "business_owner" and decision is "approved" as approval`<br>`assert: approval.approved_at is before started_at` | `for` line |
 | `qa_signed_off` | `{op: any, path: [approvals], check: {op: any_of, options: {before_deploy: [{op: equals, path: [role], value: qa}, {op: equals, path: [decision], value: approved}, {op: compare_time, left: [approved_at], right: [$deploy, started_at], cmp: lt}]}}}` | `for: some approvals where role is "qa" and decision is "approved" as approval`<br>`assert: approval.approved_at is before started_at` | `for` line |
 | `development_signed_off` | `{op: any, path: [approvals], check: {op: any_of, options: {before_deploy: [{op: equals, path: [role], value: development}, {op: equals, path: [decision], value: approved}, {op: compare_time, left: [approved_at], right: [$deploy, started_at], cmp: lt}]}}}` | `for: some approvals where role is "development" and decision is "approved" as approval`<br>`assert: approval.approved_at is before started_at` | `for` line |
@@ -527,9 +544,9 @@ Same as DEV-0409 defects triaged, new features.
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of production deployment | `[deployments]` | `deployments` |  |
-| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
-| filter `in_scope` | `{op: equals, path: [change_type], value: new_development}` | `change_type is "new_development"` |  |
+| `from` of production deployment | `[deployments], applies_to: {production, in_scope}` | `deployments where environment is "prod" and change_type is "new_development"` | `$applies` prints `environment is "prod" and change_type is "new_development"` |
+| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` | In the `where` of production deployment's `from`, so its name goes |
+| filter `in_scope` | `{op: equals, path: [change_type], value: new_development}` | `change_type is "new_development"` | In the `where` of production deployment's `from`, so its name goes |
 | `documented` | `{op: non_empty_string, path: [rollback_plan, document_url]}` | `rollback_plan.document_url is not empty` | widens |
 | `approved_before_production` | `{op: compare_time, left: [rollback_plan, approved_at], right: [started_at], cmp: lt}` | `rollback_plan.approved_at is before started_at` |  |
 | `previous_version_kept` | `{op: non_empty_string, path: [previous_artifact, fingerprint]}` | `previous_artifact.fingerprint is not empty` | widens |
@@ -541,14 +558,15 @@ Same as DEV-0504 roll-back ready, new features, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| filter `in_scope` | `{op: equals, path: [change_type], value: normal}` | `change_type is "normal"` |  |
+| `from` of production deployment | `[deployments], applies_to: {production, in_scope}` | `deployments where environment is "prod" and change_type is "normal"` | `$applies` prints `environment is "prod" and change_type is "normal"` |
+| filter `in_scope` | `{op: equals, path: [change_type], value: normal}` | `change_type is "normal"` | In the `where` of production deployment's `from`, so its name goes |
 
 ### DEV-0601 environments segregated
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of production deployment | `[deployments, {each_as: deploy}]` | `deployments` | The name `deploy` goes: the checks that used it have a `for` line, where the subject's fields are bare. |
-| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
+| `from` of production deployment | `[deployments, {each_as: deploy}], applies_to: {production}` | `deployments where environment is "prod"` | `$applies` prints `environment is "prod"`. The name `deploy` goes: the checks that used it have a `for` line, where the subject's fields are bare. |
+| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` | In the `where` of production deployment's `from`, so its name goes |
 | `promoted_through_staging` | `{op: any, path: [artifact, environment_history], check: {op: any_of, options: {staging_first: [{op: equals, path: [environment], value: staging}, {op: compare_time, left: [deployed_at], right: [$deploy, started_at], cmp: lt}]}}}` | `for: some artifact.environment_history where environment is "staging" as run`<br>`assert: run.deployed_at is before started_at` | `for` line |
 | `production_identity` | `{op: in, path: [deployed_with_identity], values: {ref: [$$params, production_identities]}}` | `deployed_with_identity is in $params.production_identities` |  |
 
@@ -564,8 +582,8 @@ Same as DEV-0504 roll-back ready, new features, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of environment | `[environments]` | `environments` |  |
-| filter `user_facing` | `{op: equals, path: [user_facing], value: true}` | `user_facing is true` |  |
+| `from` of environment | `[environments], applies_to: {user_facing}` | `environments where user_facing is true` | `$applies` prints `user_facing is true` |
+| filter `user_facing` | `{op: equals, path: [user_facing], value: true}` | `user_facing is true` | In the `where` of environment's `from`, so its name goes |
 | `from` of release | `[latest_release]` | `latest_release` |  |
 | `latest_version` | `{op: compare, left: [running_version], right: [$$input, latest_release, version], cmp: eq}` | `running_version equals $input.latest_release.version` |  |
 | `release_notes` | `{op: non_empty_string, path: [release_notes_url]}` | `release_notes_url is not empty` | widens |
@@ -575,9 +593,9 @@ Same as DEV-0504 roll-back ready, new features, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of production deployment | `[deployments]` | `deployments` |  |
-| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
-| filter `emergency` | `{op: equals, path: [change_type], value: emergency}` | `change_type is "emergency"` |  |
+| `from` of production deployment | `[deployments], applies_to: {production, emergency}` | `deployments where environment is "prod" and change_type is "emergency"` | `$applies` prints `environment is "prod" and change_type is "emergency"` |
+| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` | In the `where` of production deployment's `from`, so its name goes |
+| filter `emergency` | `{op: equals, path: [change_type], value: emergency}` | `change_type is "emergency"` | In the `where` of production deployment's `from`, so its name goes |
 | `approved` | `{op: non_empty_string, path: [retro_approval, approved_by]}` | `retro_approval.approved_by is not empty` | widens |
 | `independent` | `{op: compare, left: [retro_approval, approved_by], right: [deployed_by], cmp: ne}` | `retro_approval.approved_by is not deployed_by` |  |
 | `after_deployment` | `{op: compare_time, left: [retro_approval, approved_at], right: [started_at], cmp: gt}` | `retro_approval.approved_at is after started_at` |  |
@@ -586,9 +604,9 @@ Same as DEV-0504 roll-back ready, new features, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of production deployment | `[deployments]` | `deployments` |  |
-| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
-| filter `emergency` | `{op: equals, path: [change_type], value: emergency}` | `change_type is "emergency"` |  |
+| `from` of production deployment | `[deployments], applies_to: {production, emergency}` | `deployments where environment is "prod" and change_type is "emergency"` | `$applies` prints `environment is "prod" and change_type is "emergency"` |
+| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` | In the `where` of production deployment's `from`, so its name goes |
+| filter `emergency` | `{op: equals, path: [change_type], value: emergency}` | `change_type is "emergency"` | In the `where` of production deployment's `from`, so its name goes |
 | `lessons_learned` | `{op: non_empty_string, path: [review, lessons_learned]}` | `review.lessons_learned is not empty` | widens |
 | `incidents_have_actions` | `{op: any_of, options: {no_incidents: [{op: empty, path: [review, incidents]}], all_actioned: [{op: all, path: [review, incidents], check: {op: non_empty_string, path: [action_ticket]}}]}}` | `every review.incidents.action_ticket, if any, is not empty` | widens |
 | `business_owner_approved` | `{op: equals, path: [review, approved_by_role], value: business_owner}` | `review.approved_by_role is "business_owner"` |  |
@@ -598,9 +616,9 @@ Same as DEV-0504 roll-back ready, new features, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of production deployment | `[deployments]` | `deployments` |  |
-| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
-| filter `in_scope` | `{op: equals, path: [change_type], value: new_development}` | `change_type is "new_development"` |  |
+| `from` of production deployment | `[deployments], applies_to: {production, in_scope}` | `deployments where environment is "prod" and change_type is "new_development"` | `$applies` prints `environment is "prod" and change_type is "new_development"` |
+| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` | In the `where` of production deployment's `from`, so its name goes |
+| filter `in_scope` | `{op: equals, path: [change_type], value: new_development}` | `change_type is "new_development"` | In the `where` of production deployment's `from`, so its name goes |
 | `lessons_learned` | `{op: non_empty_string, path: [review, lessons_learned]}` | `review.lessons_learned is not empty` | widens |
 | `incidents_have_actions` | `{op: any_of, options: {no_incidents: [{op: empty, path: [review, incidents]}], all_actioned: [{op: all, path: [review, incidents], check: {op: non_empty_string, path: [action_ticket]}}]}}` | `every review.incidents.action_ticket, if any, is not empty` | widens |
 | `business_owner_approved` | `{op: equals, path: [review, approved_by_role], value: business_owner}` | `review.approved_by_role is "business_owner"` |  |
@@ -610,9 +628,9 @@ Same as DEV-0504 roll-back ready, new features, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of production deployment | `[deployments]` | `deployments` |  |
-| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
-| filter `in_scope` | `{op: equals, path: [change_type], value: normal}` | `change_type is "normal"` |  |
+| `from` of production deployment | `[deployments], applies_to: {production, in_scope}` | `deployments where environment is "prod" and change_type is "normal"` | `$applies` prints `environment is "prod" and change_type is "normal"` |
+| filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` | In the `where` of production deployment's `from`, so its name goes |
+| filter `in_scope` | `{op: equals, path: [change_type], value: normal}` | `change_type is "normal"` | In the `where` of production deployment's `from`, so its name goes |
 | `lessons_learned` | `{op: non_empty_string, path: [review, lessons_learned]}` | `review.lessons_learned is not empty` | widens |
 | `incidents_have_actions` | `{op: any_of, options: {no_incidents: [{op: empty, path: [review, incidents]}], all_actioned: [{op: all, path: [review, incidents], check: {op: non_empty_string, path: [action_ticket]}}]}}` | `every review.incidents.action_ticket, if any, is not empty` | widens |
 | `test_accounts_removed` | `{op: empty, path: [review, test_accounts_in_production]}` | `review.test_accounts_in_production is empty` | widens "" |
@@ -631,9 +649,9 @@ Same as DEV-0504 roll-back ready, new features, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of vulnerability | `[vulnerabilities]` | `vulnerabilities` |  |
-| filter `critical` | `{op: equals, path: [severity], value: critical}` | `severity is "critical"` |  |
-| filter `fixed` | `{op: equals, path: [status], value: fixed}` | `status is "fixed"` |  |
+| `from` of vulnerability | `[vulnerabilities], applies_to: {critical, fixed}` | `vulnerabilities where severity is "critical" and status is "fixed"` | `$applies` prints `severity is "critical" and status is "fixed"` |
+| filter `critical` | `{op: equals, path: [severity], value: critical}` | `severity is "critical"` | In the `where` of vulnerability's `from`, so its name goes |
+| filter `fixed` | `{op: equals, path: [status], value: fixed}` | `status is "fixed"` | In the `where` of vulnerability's `from`, so its name goes |
 | `analysed` | `{op: non_empty_string, path: [root_cause_analysis, document_url]}` | `root_cause_analysis.document_url is not empty` | widens |
 | `fed_back` | `{op: all, path: [root_cause_analysis, actions], check: {op: non_empty_string, path: [ticket]}}` | `every root_cause_analysis.actions.ticket is not empty` | widens |
 
@@ -641,8 +659,8 @@ Same as DEV-0504 roll-back ready, new features, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of pull request | `[pull_requests]` | `pull_requests` |  |
-| filter `external_author` | `{op: in, path: [author], values: {ref: [$$params, external_contributors]}}` | `author is in $params.external_contributors` |  |
+| `from` of pull request | `[pull_requests], applies_to: {external_author}` | `pull_requests where author is in $params.external_contributors` | `$applies` prints `author is in $params.external_contributors` |
+| filter `external_author` | `{op: in, path: [author], values: {ref: [$$params, external_contributors]}}` | `author is in $params.external_contributors` | In the `where` of pull request's `from`, so its name goes |
 | `internal_review` | `{op: any, path: [approvers], check: {op: any_of, options: {internal: [{op: equals, path: [state], value: APPROVED}, {op: in, path: [username], values: {ref: [$$params, internal_staff]}}]}}}` | `some approvers.username where state is "APPROVED" is in $params.internal_staff` |  |
 
 ### DEV-0802 security training
@@ -654,14 +672,16 @@ Same as DEV-0504 roll-back ready, new features, except:
 
 ## Tally
 
-Every phrase, counted from the parses, twins included: 229 checks and 74 filters, 14 of the checks with a `for` line, plus 74 `from` lines. That's 393 lines in all.
+Every phrase, counted from the parses, twins included: 229 checks and 74 filters, 14 of the checks with a `for` line, plus 91 `from` lines. That's 336 lines in all.
 
 | phrase | sdlc-policies | server | pr-reviewer | ergo | DEV controls | total |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | `is` | 14 | 34 | 23 | 1 | 79 | 151 |
+| `is not empty` | 9 | 11 | 8 | 1 | 31 | 60 |
 | `$params` | 13 | 36 |  |  | 9 | 58 |
-| `is not empty` | 9 | 11 | 2 | 1 | 31 | 54 |
+| `where` (in `from`) | 3 | 3 | 14 | 1 | 28 | 49 |
 | `named by $params.x` | 10 | 34 |  |  |  | 44 |
+| `and` (in `where`) | 1 | 1 | 15 |  | 21 | 38 |
 | `is before` |  |  |  |  | 21 | 21 |
 | `some` | 3 | 4 | 3 |  | 10 | 20 |
 | `is one of` |  |  | 9 |  | 9 | 18 |
@@ -671,10 +691,9 @@ Every phrase, counted from the parses, twins included: 229 checks and 74 filters
 | `where` | 1 | 1 | 3 |  | 10 | 15 |
 | `equals` | 2 | 2 | 7 |  | 3 | 14 |
 | `for` line | 1 | 1 | 1 |  | 11 | 14 |
-| `count of` |  |  | 12 |  |  | 12 |
 | `is not` | 1 | 2 | 2 |  | 5 | 10 |
-| `is at least` |  |  | 9 |  |  | 9 |
-| `and` (in `where`) |  | 1 |  |  | 6 | 7 |
+| `is a` |  |  | 7 |  |  | 7 |
+| `count of` |  |  | 6 |  |  | 6 |
 | `is after` | 1 | 1 |  |  | 4 | 6 |
 | `is empty` |  | 1 | 4 |  | 1 | 6 |
 | `is in` | 1 |  |  |  | 5 | 6 |
@@ -686,12 +705,12 @@ Every phrase, counted from the parses, twins included: 229 checks and 74 filters
 | `, if any,` |  |  |  |  | 3 | 3 |
 | `contains` |  |  | 3 |  |  | 3 |
 | `does not match` | 1 | 1 | 1 |  |  | 3 |
+| `is at least` |  |  | 3 |  |  | 3 |
 | `contains all of` |  |  | 1 |  | 1 | 2 |
 | `does not contain` |  |  |  | 1 | 1 | 2 |
 | `equals ... within` |  |  | 2 |  |  | 2 |
 | `plus` |  |  | 2 |  |  | 2 |
 | `sum of` |  |  | 2 |  |  | 2 |
-| `is a` |  |  | 1 |  |  | 1 |
 | `named by <name>` |  |  | 1 |  |  | 1 |
 
 Not used anywhere: `is not one of`, `does not exist`, `contains none of`, `starts with`, `ends with`, `is at most`, `is more than`, `is less than`, `is on or before`, `is ... within`, `is not one of`, `ignoring case`, `first of`, `item 3 of` and `items[2]`.
@@ -727,7 +746,7 @@ Fits on one line, but changes what passes:
 - **Rego's `!=` and `!= ""`** (server 0010 `approved_by_non_author`, require-artifact-provenance `fingerprint`). Rego passes values of another type, the sentence fails them as `unusable`.
 - **Rego defaults** (37 paths in the server demos and sdlc-policies 0004). A Rego variable like `artifact_name` with a default of `"artifact"` becomes `$params.artifact_name`, which fails without the param. sdlc-policies already made that choice.
 
-Fits, but only after Rego reshapes the input (24 entries): sdlc-policies 0004 builds every subject from attested text, the server demos copy fields between objects, and DEV-0401, 0402, 0705 and 0802 compute deadlines with date arithmetic (#140). Sentences don't change that. A deadline as a sentence would need date arithmetic and a param key read from the subject, `$params.sla_days at severity`.
+Fits, but only after Rego reshapes the input (26 entries): sdlc-policies 0004 builds every subject from attested text, the server demos copy fields between objects, and DEV-0401, 0402, 0705 and 0802 compute deadlines with date arithmetic (#140). Sentences don't change that. A deadline as a sentence would need date arithmetic and a param key read from the subject, `$params.sla_days at severity`.
 
 ## `is`, never `must`
 
@@ -739,7 +758,7 @@ What the corpus says about each decision the brief left open.
 
 **Looking up by key.** #174 settled it as `named by`, with brackets as the other spelling. It appears 44 times, all in sdlc-policies and the server demos, and 32 of those have more path after the key, like `artifacts_statuses named by $params.artifact_name.attestations_statuses`. Every reference after `named by` in the corpus is `$params` plus one key, or a name from a `for` line, so the issue's rule takes nothing away. Whether the report prints the word form or brackets waits for the readability test.
 
-**`where` in `from` or `applies_to`.** 74 filters on 32 policies, and every one sits on the subject or in a requirement's scope. No policy filters inside `from`, and nothing in the corpus needs `from: deployments where environment is "prod"` that `applies_to` can't say. The grammar can say either, so it's #113's call.
+**`from` with `where`, and `$applies`.** #174 folds `applies_to` into `from`. The 74 filters became 80 `where` conditions on 49 `from` lines. 0 of those lines are new: in pr-reviewer and sdlc-policies 0004, several requirements shared one subject with different filters, and each filter set is now a subject of its own. Six pr-reviewer filters were `count of x is at least 1`, which isn't a `where` condition, so each became two conditions, `x is a list and x is not empty`, with the same meaning. The `$applies` row prints the conditions as written, joined with `and`. Each `from` row above says what it prints.
 
 **Two quantifiers and a subject with a parent.** The `for` line #174 added while this was written does the job Tore's subject move for DEV-0501 was for. 14 checks use one: DEV-0501 `peer_approved`, every comparison of an item with its subject (DEV-0401, 0407, 0502, 0503, 0601 and server 0010), and pr-reviewer `dispatched_personas_recorded`. None of them needs a subject that starts at another subject, so #52 isn't on this path any more. What `for` can't do is hold two assertions about the same items, which is sdlc-policies 0007's misfit.
 
