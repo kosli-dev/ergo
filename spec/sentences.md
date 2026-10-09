@@ -143,15 +143,17 @@ The gaps:
 
 **[sentence.phrase.is]**
 ```
-<path> is <value or field>
+<path> is <value>
+<path> equals <field>
 <path> is not <value or field>
 ```
 
-The field equals, or doesn't equal, the argument, as [value.equal](semantics.md#values) says. Missing: `absent`. `null`: passes `is null`, otherwise fails as `null`. Wrong type: with a value as the argument, `is` fails as `value`, because `"5"` isn't `5` is a sound answer, as today's `equals`. With a path, or with `is not`, two values of different types fail as `unusable`, as today's `compare`.
+The field equals, or doesn't equal, what's on the right, as [value.equal](semantics.md#values) says. `is`, `equals` and `is equal to` mean the same, and the report prints `is` before a value and `equals` before a field, so a field on the right side shows as one: `environment is "prod"`, `subject_digest equals fingerprint`. Missing: `absent`. `null`: passes `is null`, otherwise fails as `null`. Wrong type: with a value on the right, `is` fails as `value`, because `"5"` isn't `5` is a sound answer, as today's `equals`. With a field on the right, or with `is not`, two values of different types fail as `unusable`, as today's `compare`.
 
 **[sentence.phrase.within]**
 ```
-<path> is <value or field> within <number>
+<path> is <value> within <number>
+<path> equals <field> within <number>
 ```
 
 Two numbers at most that far apart. The number is 0 or more. Missing: `absent`. `null`: `null`. Wrong type: `unusable`.
@@ -257,12 +259,11 @@ Both sides are timestamps in the same format, both RFC 3339 strings or both numb
 
 **[sentence.phrase.aliases]**
 ```
-<path> equals <value or field>
 <path> is equal to <value or field>
 <path> does not equal <value or field>
 ```
 
-The first two are read as `is`, the third as `is not`. With them in the grammar, every sentence in the corpus still has exactly one reading.
+The first is read as `is` or `equals`, the second as `is not`. The report prints `is`, `equals` and `is not`. With them in the grammar, every sentence in the corpus still has exactly one reading.
 
 **[sentence.derived.fail]** `count of` and `sum of` over a list that's missing, `null` or not a list fail as `absent`, `null` or `unusable`. A number to add that isn't a number fails as `unusable`. `every` and `some` fail the same way on the list they walk.
 
@@ -283,7 +284,7 @@ The first two are read as `is`, the third as `is not`. With them in the grammar,
 
 ## Printing the sentence
 
-**[sentence.print.canonical]** The report's `expression` is the sentence printed from its parse in one spelling: single spaces, the first phrase in each rule above rather than an alias, strings in double quotes with JSON escapes, numbers in their plain form, and values separated by `, `. Parsing the printed sentence gives the same parse.
+**[sentence.print.canonical]** The report's `expression` is the sentence printed from its parse in one spelling: single spaces, `is` before a value and `equals` before a field, no alias, strings in double quotes with JSON escapes, numbers in their plain form, and values separated by `, `. Parsing the printed sentence gives the same parse.
 
 **[sentence.print.same]** For a sentence written that way, the printed form is byte for byte what the author wrote. In the corpus, 301 of the 303 one-line sentences and assertions print back unchanged. The other two are the same check written with single quotes, `entry does not match '^[A-Za-z0-9._-]+\s*(>=|<=|~=|!=|<|>)'`, which prints as `"^[A-Za-z0-9._-]+\\s*(>=|<=|~=|!=|<|>)"`. Whether the canonical form keeps single quotes for a string with a backslash is open.
 

@@ -16,7 +16,7 @@ Notes in the last column:
 
 - **widens** (52 checks): `non_empty_string` becomes `is not empty`, which also passes a list with items in it.
 - **widens ""** (6): `empty` or `equals []` becomes `is empty`, which also passes `""`.
-- **cause only** (2): `range` from 0 to 0 becomes `is 0`. The same values pass, and a value that isn't a number fails as `value` instead of `unusable`.
+- **cause only** (4): the same values pass, and only the cause of a failure changes. `range` from 0 to 0 becomes `is 0`, so a value that isn't a number fails as `value` instead of `unusable`. `equals` with a ref becomes `equals $params.x`, so a value of another type fails as `unusable` instead of `value`.
 - **no default** (37): a Rego variable with a default became `$params.x`, which ergo can't default.
 - **Rego-shaped** (24): Rego works the value out before ergo sees it. The sentence covers what ergo checks afterwards.
 - **narrows** (6): fails closed where today passes.
@@ -43,7 +43,7 @@ Notes in the last column:
 | `pr_attestation` | `{op: equals, path: [attestations_statuses, {ref: [$$params, pr_attestation_name]}, status], value: COMPLETE}` | `attestations_statuses named by $params.pr_attestation_name.status is "COMPLETE"` |  |
 | `from` of pull request | `[trail, compliance_status, artifacts_statuses, {ref: [$$params, artifact_name]}, attestations_statuses, {ref: [$$params, pr_attestation_name]}, pull_requests, {each_as: pr}]` | `trail.compliance_status.artifacts_statuses named by $params.artifact_name.attestations_statuses named by $params.pr_attestation_name.pull_requests` | The name `pr` goes: #174 now names things in a `for` line, and the subject's fields are bare there. |
 | `merged` | `{op: equals, path: [state], value: MERGED}` | `state is "MERGED"` |  |
-| `protected_branch` | `{op: equals, path: [base_ref], value: {ref: [$$params, protected_branch]}}` | `base_ref is $params.protected_branch` |  |
+| `protected_branch` | `{op: equals, path: [base_ref], value: {ref: [$$params, protected_branch]}}` | `base_ref equals $params.protected_branch` | cause only. Today a branch name of another type fails as `value`. With a path on the right, the sentence fails it as `unusable`. The same values pass. |
 | `signed_commits` | `{op: all, path: [commits], check: {op: equals, path: [verified], value: true}}` | `every commits.verified is true` |  |
 | `peer_approval` | `{op: any, path: [approvers], as: approver, check: {op: any_of, options: {peer: [{op: equals, path: [state], value: APPROVED}, {op: compare, left: [username], right: [$pr, author], cmp: ne}, {op: all, path: [$pr, commits], check: {op: compare, left: [$approver, timestamp], right: [timestamp], cmp: gt}}]}}}` | — | **misfit**, see below |
 
@@ -76,7 +76,7 @@ Notes in the last column:
 | `exact_pin` | `{op: not_matches_any, path: [entry], patterns: ['^[A-Za-z0-9._-]+\s*(>=\|<=\|~=\|!=\|<\|>)']}` | `entry does not match '^[A-Za-z0-9._-]+\s*(>=\|<=\|~=\|!=\|<\|>)'` | Single quotes keep the backslash as written. In double quotes, JSON escapes apply and `\s` would have to be `\\s`. |
 | `from` of SBOM package | `[components]` | `components` | Rego-shaped |
 | filter `locked` | `{op: present, path: [lock_release]}` | `lock_release exists` |  |
-| `matches_lock` | `{op: compare, left: [sbom_release], right: [lock_release], cmp: eq}` | `sbom_release is lock_release` |  |
+| `matches_lock` | `{op: compare, left: [sbom_release], right: [lock_release], cmp: eq}` | `sbom_release equals lock_release` |  |
 | filter `not_exempt` | `{op: equals, path: [exempt], value: false}` | `exempt is false` |  |
 | `licence_known` | `{op: any, path: [licences], check: {op: non_empty_string, path: []}}` | `some licences is not empty` | widens |
 | `licence_approved` | `{op: any, path: [licences], check: {op: in, path: [], values: {ref: [$$params, allowed_licenses]}}}` | `some licences is in $params.allowed_licenses` |  |
@@ -131,7 +131,7 @@ Same as SDLC-CTRL-0004 dependencies, except:
 | `pr_attestation` | `{op: equals, path: [attestations_statuses, <pr_attestation_name>, status], value: COMPLETE}` | `attestations_statuses named by $params.pr_attestation_name.status is "COMPLETE"` | no default |
 | `from` of pull request | `[pull_requests]` | `pull_requests` | Rego-shaped. Rego copies each pull request's author and last commit time onto every approver, so the check needs no `$pr` and no inner `all`. |
 | `merged` | `{op: equals, path: [state], value: MERGED}` | `state is "MERGED"` |  |
-| `protected_branch` | `{op: equals, path: [base_ref], value: <protected_branch>}` | `base_ref is $params.protected_branch` | no default |
+| `protected_branch` | `{op: equals, path: [base_ref], value: <protected_branch>}` | `base_ref equals $params.protected_branch` | no default. cause only |
 | `signed_commits` | `{op: all, path: [commits], check: {op: equals, path: [verified], value: true}}` | `every commits.verified is true` |  |
 | `peer_approval` | `{op: any, path: [approvers], check: {op: any_of, options: {peer: [{op: equals, path: [state], value: APPROVED}, {op: compare, left: [username], right: [pr_author], cmp: ne}, {op: compare, left: [timestamp], right: [last_commit_timestamp], cmp: gt}]}}}` | `some approvers.timestamp where state is "APPROVED" and username is not pr_author is after last_commit_timestamp` | Rego-shaped. narrows. Today compares timestamps as text. `is after` compares them as times, so a timestamp that isn't RFC 3339 fails instead of being ordered as text. `is more than` keeps today's meaning and reads worse. |
 
@@ -205,7 +205,7 @@ Same as SDLC-CTRL-0004 dependencies, except:
 | | today | sentence | notes |
 | --- | --- | --- | --- |
 | `from` of review_round | `[trail]` | `trail` | Ten requirements read the same round. Every path below starts with `compliance_status.attestations_statuses`, because the subject is the whole trail. |
-| `every_hunk_acknowledged` | `{op: compare, left: [compliance_status, attestations_statuses, coverage-verification, attestation_data, hunks_acknowledged], right: [compliance_status, attestations_statuses, coverage-verification, attestation_data, hunks_total], cmp: eq}` | `compliance_status.attestations_statuses.coverage-verification.attestation_data.hunks_acknowledged is compliance_status.attestations_statuses.coverage-verification.attestation_data.hunks_total` |  |
+| `every_hunk_acknowledged` | `{op: compare, left: [compliance_status, attestations_statuses, coverage-verification, attestation_data, hunks_acknowledged], right: [compliance_status, attestations_statuses, coverage-verification, attestation_data, hunks_total], cmp: eq}` | `compliance_status.attestations_statuses.coverage-verification.attestation_data.hunks_acknowledged equals compliance_status.attestations_statuses.coverage-verification.attestation_data.hunks_total` |  |
 | `two_vendors` | `{op: compare, left: [compliance_status, attestations_statuses, claude-review, attestation_data, model_type], right: [compliance_status, attestations_statuses, gemini-review, attestation_data, model_type], cmp: ne}` | `compliance_status.attestations_statuses.claude-review.attestation_data.model_type is not compliance_status.attestations_statuses.gemini-review.attestation_data.model_type` |  |
 | `both_models_contributed` | `{op: equals, path: [compliance_status, attestations_statuses, cross-model-comparison, attestation_data, both_models_ran], value: true}` | `compliance_status.attestations_statuses.cross-model-comparison.attestation_data.both_models_ran is true` |  |
 | `personas_dispatched` | `{op: min_length, path: [compliance_status, attestations_statuses, classifier, attestation_data, personas_dispatched], min: 1, expression: ...}` | `count of compliance_status.attestations_statuses.classifier.attestation_data.personas_dispatched is at least 1` | replaces custom `min_length`. `is not empty` reads better, but also passes a non-empty string, where `min_length` fails. |
@@ -213,8 +213,8 @@ Same as SDLC-CTRL-0004 dependencies, except:
 | `claude_degraded_recorded` | `{op: in, path: [compliance_status, attestations_statuses, claude-review, attestation_data, degraded], values: [true, false]}` | `compliance_status.attestations_statuses.claude-review.attestation_data.degraded is one of true, false` |  |
 | `gemini_degraded_recorded` | `{op: in, path: [compliance_status, attestations_statuses, gemini-review, attestation_data, degraded], values: [true, false]}` | `compliance_status.attestations_statuses.gemini-review.attestation_data.degraded is one of true, false` |  |
 | `verifier_degraded_recorded` | `{op: in, path: [compliance_status, attestations_statuses, finding-verifier, attestation_data, degraded], values: [true, false]}` | `compliance_status.attestations_statuses.finding-verifier.attestation_data.degraded is one of true, false` |  |
-| `one_verifier_record_per_finding` | `{op: length_eq_difference, left: [compliance_status, attestations_statuses, finding-verifier, attestation_data, per_finding_records], right: [compliance_status, attestations_statuses, finding-verifier, attestation_data, findings_in], minus: [compliance_status, attestations_statuses, finding-verifier, attestation_data, findings_unverified_cost_cap], expression: ..., inputs: [...]}` | `count of compliance_status.attestations_statuses.finding-verifier.attestation_data.per_finding_records plus compliance_status.attestations_statuses.finding-verifier.attestation_data.findings_unverified_cost_cap is compliance_status.attestations_statuses.finding-verifier.attestation_data.findings_in` | replaces custom `length_eq_difference`. The control says "minus". With only `plus`, the sentence moves the term across. Its custom `inputs` showed each record's `finding_id` rather than the records, and the sentence has no way to say that. |
-| `verifier_degraded_input` | `{op: compare, left: [compliance_status, attestations_statuses, finding-verifier, attestation_data, degraded], right: [..., final-verdict, attestation_data, inputs, verifier_degraded], cmp: eq}` | `compliance_status.attestations_statuses.finding-verifier.attestation_data.degraded is compliance_status.attestations_statuses.final-verdict.attestation_data.inputs.verifier_degraded` |  |
+| `one_verifier_record_per_finding` | `{op: length_eq_difference, left: [compliance_status, attestations_statuses, finding-verifier, attestation_data, per_finding_records], right: [compliance_status, attestations_statuses, finding-verifier, attestation_data, findings_in], minus: [compliance_status, attestations_statuses, finding-verifier, attestation_data, findings_unverified_cost_cap], expression: ..., inputs: [...]}` | `count of compliance_status.attestations_statuses.finding-verifier.attestation_data.per_finding_records plus compliance_status.attestations_statuses.finding-verifier.attestation_data.findings_unverified_cost_cap equals compliance_status.attestations_statuses.finding-verifier.attestation_data.findings_in` | replaces custom `length_eq_difference`. The control says "minus". With only `plus`, the sentence moves the term across. Its custom `inputs` showed each record's `finding_id` rather than the records, and the sentence has no way to say that. |
+| `verifier_degraded_input` | `{op: compare, left: [compliance_status, attestations_statuses, finding-verifier, attestation_data, degraded], right: [..., final-verdict, attestation_data, inputs, verifier_degraded], cmp: eq}` | `compliance_status.attestations_statuses.finding-verifier.attestation_data.degraded equals compliance_status.attestations_statuses.final-verdict.attestation_data.inputs.verifier_degraded` |  |
 | `final_verdict_rules_hold` | `{op: equals, path: [compliance_status, attestations_statuses, final-verdict, is_compliant], value: true}` | `compliance_status.attestations_statuses.final-verdict.is_compliant is true` |  |
 | `verifier_enabled` | `{op: equals, path: [compliance_status, attestations_statuses, finding-verifier, attestation_data, verifier_enabled], value: true}` | `compliance_status.attestations_statuses.finding-verifier.attestation_data.verifier_enabled is true` |  |
 | `context_recorded` | `{op: non_empty_string, path: [compliance_status, attestations_statuses, review-context-manifest, attestation_id]}` | `compliance_status.attestations_statuses.review-context-manifest.attestation_id is not empty` | widens |
@@ -223,10 +223,10 @@ Same as SDLC-CTRL-0004 dependencies, except:
 | `uncovered_before_second_pass_recorded` | `{op: min_length, path: [..., coverage-verification, attestation_data, before_second_pass, uncovered], min: 0, expression: ...}` | `compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.uncovered is a list` | replaces custom `min_length` |
 | `cost_cap_state_recorded` | `{op: in, path: [..., coverage-verification, attestation_data, before_second_pass, cost_capped], values: [true, false]}` | `compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.cost_capped is one of true, false` |  |
 | `per_file_coverage_recorded` | `{op: min_length_at, path: [compliance_status, attestations_statuses, coverage-verification, attestation_data, files], min_path: [compliance_status, attestations_statuses, coverage-verification, attestation_data, total_files], expression: ..., inputs: [...]}` | `count of compliance_status.attestations_statuses.coverage-verification.attestation_data.files is at least compliance_status.attestations_statuses.coverage-verification.attestation_data.total_files` | replaces custom `min_length_at` |
-| `first_pass_findings_recorded` | `{op: count_where_eq_sum, path: [compliance_status, attestations_statuses, findings, attestation_data, raw], field: source, value: first_pass, sum: [[compliance_status, attestations_statuses, claude-review, attestation_data, total_findings], [compliance_status, attestations_statuses, gemini-review, attestation_data, total_findings]], expression: ..., inputs: [...]}` | `count of compliance_status.attestations_statuses.findings.attestation_data.raw where source is "first_pass" is compliance_status.attestations_statuses.claude-review.attestation_data.total_findings plus compliance_status.attestations_statuses.gemini-review.attestation_data.total_findings` | narrows. replaces custom `count_where_eq_sum`. A raw finding with no `source` is skipped by the custom operator and fails the sentence as `absent`, as #173 found on 12 of 800 inputs. |
+| `first_pass_findings_recorded` | `{op: count_where_eq_sum, path: [compliance_status, attestations_statuses, findings, attestation_data, raw], field: source, value: first_pass, sum: [[compliance_status, attestations_statuses, claude-review, attestation_data, total_findings], [compliance_status, attestations_statuses, gemini-review, attestation_data, total_findings]], expression: ..., inputs: [...]}` | `count of compliance_status.attestations_statuses.findings.attestation_data.raw where source is "first_pass" equals compliance_status.attestations_statuses.claude-review.attestation_data.total_findings plus compliance_status.attestations_statuses.gemini-review.attestation_data.total_findings` | narrows. replaces custom `count_where_eq_sum`. A raw finding with no `source` is skipped by the custom operator and fails the sentence as `absent`, as #173 found on 12 of 800 inputs. |
 | `findings_complete` | `{op: equals, path: [compliance_status, attestations_statuses, findings, attestation_data, truncated], value: false}` | `compliance_status.attestations_statuses.findings.attestation_data.truncated is false` | `must`: `truncated is false` reads like a status. |
-| `round_cost_sums_its_stages` | `{op: sum_eq, path: [..., final-verdict, attestation_data, cost, by_stage], field: usd, only: {}, total: [..., cost, total_usd], tolerance: 0.000001, expression: ...}` | `sum of compliance_status.attestations_statuses.final-verdict.attestation_data.cost.by_stage.usd is compliance_status.attestations_statuses.final-verdict.attestation_data.cost.total_usd within 0.000001` | replaces custom `sum_eq` |
-| `verifier_cost_matches_its_stage` | `{op: sum_eq, path: [..., final-verdict, attestation_data, cost, by_stage], field: usd, only: {stage: verifier}, total: [compliance_status, attestations_statuses, finding-verifier, attestation_data, cost_usd], tolerance: 0.000001, expression: ...}` | `sum of compliance_status.attestations_statuses.final-verdict.attestation_data.cost.by_stage.usd where stage is "verifier" is compliance_status.attestations_statuses.finding-verifier.attestation_data.cost_usd within 0.000001` | narrows. replaces custom `sum_eq`. A sum over no rows is 0, as the custom operator gives (checked on `main`). A stage row with no `stage` field is skipped by the custom operator and fails the sentence as `absent`. |
+| `round_cost_sums_its_stages` | `{op: sum_eq, path: [..., final-verdict, attestation_data, cost, by_stage], field: usd, only: {}, total: [..., cost, total_usd], tolerance: 0.000001, expression: ...}` | `sum of compliance_status.attestations_statuses.final-verdict.attestation_data.cost.by_stage.usd equals compliance_status.attestations_statuses.final-verdict.attestation_data.cost.total_usd within 0.000001` | replaces custom `sum_eq` |
+| `verifier_cost_matches_its_stage` | `{op: sum_eq, path: [..., final-verdict, attestation_data, cost, by_stage], field: usd, only: {stage: verifier}, total: [compliance_status, attestations_statuses, finding-verifier, attestation_data, cost_usd], tolerance: 0.000001, expression: ...}` | `sum of compliance_status.attestations_statuses.final-verdict.attestation_data.cost.by_stage.usd where stage is "verifier" equals compliance_status.attestations_statuses.finding-verifier.attestation_data.cost_usd within 0.000001` | narrows. replaces custom `sum_eq`. A sum over no rows is 0, as the custom operator gives (checked on `main`). A stage row with no `stage` field is skipped by the custom operator and fails the sentence as `absent`. |
 | `dispatched_personas_recorded` | `{op: keys_match, keys: [compliance_status, attestations_statuses, classifier, attestation_data, personas_dispatched], path: [compliance_status, attestations_statuses, preflight, attestation_data, persona_blob_shas], patterns: ['^[0-9a-f]{40}$'], expression: ..., inputs: [...]}` | `for: every compliance_status.attestations_statuses.classifier.attestation_data.personas_dispatched as persona`<br>`assert: compliance_status.attestations_statuses.preflight.attestation_data.persona_blob_shas named by persona matches "^[0-9a-f]{40}$"` | replaces custom `keys_match`. **misfit**, see below |
 | `from` of finding (verifier_record, confirmed_finding) | `[trail, compliance_status, attestations_statuses, finding-verifier, attestation_data, per_finding_records]` | `trail.compliance_status.attestations_statuses.finding-verifier.attestation_data.per_finding_records` |  |
 | `known_decision` | `{op: in, path: [decision], values: [CONFIRMED, UNSURE, SUGGESTION, REFUTED]}` | `decision is one of "CONFIRMED", "UNSURE", "SUGGESTION", "REFUTED"` |  |
@@ -247,16 +247,16 @@ Same as SDLC-CTRL-0004 dependencies, except:
 | `from` of file | `[trail, ..., coverage-verification, attestation_data, files]` | `trail.compliance_status.attestations_statuses.coverage-verification.attestation_data.files` |  |
 | `acknowledged` | `{op: equals, path: [status], value: reviewed_ok}` | `status is "reviewed_ok"` |  |
 | filter `triggered` | `{op: equals, path: [compliance_status, attestations_statuses, second-pass, attestation_data, triggered], value: true}` | `compliance_status.attestations_statuses.second-pass.attestation_data.triggered is true` |  |
-| `recorded (second pass findings)` | `{op: count_where_eq_sum, path: [compliance_status, attestations_statuses, findings, attestation_data, raw], field: source, value: second_pass, sum: [[compliance_status, attestations_statuses, second-pass, attestation_data, findings_added]], ...}` | `count of compliance_status.attestations_statuses.findings.attestation_data.raw where source is "second_pass" is compliance_status.attestations_statuses.second-pass.attestation_data.findings_added` | narrows. replaces custom `count_where_eq_sum` |
+| `recorded (second pass findings)` | `{op: count_where_eq_sum, path: [compliance_status, attestations_statuses, findings, attestation_data, raw], field: source, value: second_pass, sum: [[compliance_status, attestations_statuses, second-pass, attestation_data, findings_added]], ...}` | `count of compliance_status.attestations_statuses.findings.attestation_data.raw where source is "second_pass" equals compliance_status.attestations_statuses.second-pass.attestation_data.findings_added` | narrows. replaces custom `count_where_eq_sum` |
 | `from` of finding (raw_finding) | `[trail, ..., findings, attestation_data, raw]` | `trail.compliance_status.attestations_statuses.findings.attestation_data.raw` |  |
 | `disposed` | `{op: in, path: [disposition], values: [posted, merged, refuted_by_codebase_check, suppressed_by_moderator, dropped_by_citation_check, dropped_out_of_diff, refuted_by_verifier, demoted_to_suggestion]}` | `disposition is one of "posted", "merged", "refuted_by_codebase_check", "suppressed_by_moderator", "dropped_by_citation_check", "dropped_out_of_diff", "refuted_by_verifier", "demoted_to_suggestion"` |  |
 | `from` of finding (posted_finding) | `[trail, ..., findings, attestation_data, posted]` | `trail.compliance_status.attestations_statuses.findings.attestation_data.posted` |  |
 | filter `from_a_model` | `{op: not_matches_any, path: [source], patterns: ['^empty_file$']}` | `source is not "empty_file"` | Same passes as the pattern: both fail a missing source as `absent` and one that isn't a string as `unusable`. |
 | `in_file` | `{op: equals, path: [in_file], value: true}` | `in_file is true` |  |
 | filter `claude-review_ran_some` | `{op: min_length, path: [compliance_status, attestations_statuses, claude-review, attestation_data, personas_ran], min: 1}` | `count of compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is at least 1` | replaces custom `min_length` |
-| `personas_match (claude_ran_dispatched)` | `{op: compare, left: [compliance_status, attestations_statuses, classifier, attestation_data, personas_dispatched], right: [compliance_status, attestations_statuses, claude-review, attestation_data, personas_ran], cmp: eq}` | `compliance_status.attestations_statuses.classifier.attestation_data.personas_dispatched is compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran` |  |
+| `personas_match (claude_ran_dispatched)` | `{op: compare, left: [compliance_status, attestations_statuses, classifier, attestation_data, personas_dispatched], right: [compliance_status, attestations_statuses, claude-review, attestation_data, personas_ran], cmp: eq}` | `compliance_status.attestations_statuses.classifier.attestation_data.personas_dispatched equals compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran` |  |
 | filter `gemini-review_ran_some` | `{op: min_length, path: [compliance_status, attestations_statuses, gemini-review, attestation_data, personas_ran], min: 1}` | `count of compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran is at least 1` | replaces custom `min_length` |
-| `personas_match (gemini_ran_dispatched)` | `{op: compare, left: [compliance_status, attestations_statuses, classifier, attestation_data, personas_dispatched], right: [compliance_status, attestations_statuses, gemini-review, attestation_data, personas_ran], cmp: eq}` | `compliance_status.attestations_statuses.classifier.attestation_data.personas_dispatched is compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran` |  |
+| `personas_match (gemini_ran_dispatched)` | `{op: compare, left: [compliance_status, attestations_statuses, classifier, attestation_data, personas_dispatched], right: [compliance_status, attestations_statuses, gemini-review, attestation_data, personas_ran], cmp: eq}` | `compliance_status.attestations_statuses.classifier.attestation_data.personas_dispatched equals compliance_status.attestations_statuses.gemini-review.attestation_data.personas_ran` |  |
 | filter `claude-review_degraded_true` | `{op: equals, path: [compliance_status, attestations_statuses, claude-review, attestation_data, degraded], value: true}` | `compliance_status.attestations_statuses.claude-review.attestation_data.degraded is true` |  |
 | filter `claude-review_ran_none` | `{op: equals, path: [compliance_status, attestations_statuses, claude-review, attestation_data, personas_ran], value: []}` | `compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is empty` | widens "" |
 | `reason_recorded (claude_only_degraded)` | `{op: any_of, options: {single_model: [{op: includes, path: [..., final-verdict, attestation_data, inputs, degraded_reasons], value: single_model}], no_models: [{op: includes, path: [...], value: no_models}]}}` | `some compliance_status.attestations_statuses.final-verdict.attestation_data.inputs.degraded_reasons is one of "single_model", "no_models"` | An `any_of` of two `includes` becomes `some` over the list. Both fail an empty list as `value` and a missing one as `absent`. The row loses the option names. |
@@ -371,7 +371,7 @@ Same as DEV-0102 impact analysis, new features, except:
 | `from` of artifact | `[artifacts]` | `artifacts` |  |
 | `trusted_builder` | `{op: in, path: [provenance, builder_id], values: {ref: [$$params, trusted_builders]}}` | `provenance.builder_id is in $params.trusted_builders` |  |
 | `signature_verified` | `{op: equals, path: [signature, verified], value: true}` | `signature.verified is true` |  |
-| `provenance_matches` | `{op: compare, left: [provenance, subject_digest], right: [fingerprint], cmp: eq}` | `provenance.subject_digest is fingerprint` |  |
+| `provenance_matches` | `{op: compare, left: [provenance, subject_digest], right: [fingerprint], cmp: eq}` | `provenance.subject_digest equals fingerprint` |  |
 
 ### DEV-0302 SBOM recorded
 
@@ -437,7 +437,7 @@ Same as DEV-0403 features tested, except:
 | filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
 | filter `migrates_data` | `{op: equals, path: [includes_data_migration], value: true}` | `includes_data_migration is true` |  |
 | `passed` | `{op: equals, path: [migration_test, is_compliant], value: true}` | `migration_test.is_compliant is true` |  |
-| `complete` | `{op: compare, left: [migration_test, migrated_records], right: [migration_test, source_records], cmp: eq}` | `migration_test.migrated_records is migration_test.source_records` |  |
+| `complete` | `{op: compare, left: [migration_test, migrated_records], right: [migration_test, source_records], cmp: eq}` | `migration_test.migrated_records equals migration_test.source_records` |  |
 | `accurate` | `{op: range, path: [migration_test, mismatched_records], min: 0, max: 0}` | `migration_test.mismatched_records is 0` | cause only. `must`: `mismatched_records is 0` reads like a test result. |
 | `before_production` | `{op: compare_time, left: [migration_test, finished_at], right: [started_at], cmp: lt}` | `migration_test.finished_at is before started_at` |  |
 
@@ -567,7 +567,7 @@ Same as DEV-0504 roll-back ready, new features, except:
 | `from` of environment | `[environments]` | `environments` |  |
 | filter `user_facing` | `{op: equals, path: [user_facing], value: true}` | `user_facing is true` |  |
 | `from` of release | `[latest_release]` | `latest_release` |  |
-| `latest_version` | `{op: compare, left: [running_version], right: [$$input, latest_release, version], cmp: eq}` | `running_version is $input.latest_release.version` |  |
+| `latest_version` | `{op: compare, left: [running_version], right: [$$input, latest_release, version], cmp: eq}` | `running_version equals $input.latest_release.version` |  |
 | `release_notes` | `{op: non_empty_string, path: [release_notes_url]}` | `release_notes_url is not empty` | widens |
 | `announced` | `{op: non_empty_string, path: [announcement_url]}` | `announcement_url is not empty` | widens |
 
@@ -658,7 +658,7 @@ Every phrase, counted from the parses, twins included: 228 checks and 74 filters
 
 | phrase | sdlc-policies | server | pr-reviewer | ergo | DEV controls | total |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| `is` | 15 | 36 | 30 | 1 | 82 | 164 |
+| `is` | 13 | 34 | 23 | 1 | 79 | 150 |
 | `$params` | 13 | 36 |  |  | 9 | 58 |
 | `is not empty` | 9 | 11 | 2 | 1 | 31 | 54 |
 | `named by $params.x` | 10 | 34 |  |  |  | 44 |
@@ -668,6 +668,7 @@ Every phrase, counted from the parses, twins included: 228 checks and 74 filters
 | `$input` |  |  |  |  | 17 | 17 |
 | `every` | 1 | 1 | 1 |  | 12 | 15 |
 | `as` |  | 1 | 1 |  | 12 | 14 |
+| `equals` | 2 | 2 | 7 |  | 3 | 14 |
 | `where` |  | 1 | 3 |  | 10 | 14 |
 | `for` line |  | 1 | 1 |  | 11 | 13 |
 | `count of` |  |  | 12 |  |  | 12 |
@@ -686,7 +687,7 @@ Every phrase, counted from the parses, twins included: 228 checks and 74 filters
 | `contains` |  |  | 3 |  |  | 3 |
 | `does not match` | 1 | 1 | 1 |  |  | 3 |
 | `contains all of` |  |  | 1 |  | 1 | 2 |
-| `is ... within` |  |  | 2 |  |  | 2 |
+| `equals ... within` |  |  | 2 |  |  | 2 |
 | `plus` |  |  | 2 |  |  | 2 |
 | `sum of` |  |  | 2 |  |  | 2 |
 | `does not contain` |  |  |  | 1 |  | 1 |
@@ -694,7 +695,7 @@ Every phrase, counted from the parses, twins included: 228 checks and 74 filters
 | `is not in` |  |  |  |  | 1 | 1 |
 | `named by <name>` |  |  | 1 |  |  | 1 |
 
-Not used anywhere: `is not one of`, `does not exist`, `contains none of`, `starts with`, `ends with`, `is at most`, `is more than`, `is less than`, `is on or before`, `equals ... within`, `is not one of`, `ignoring case`, `first of`, `item 3 of` and `items[2]`.
+Not used anywhere: `is not one of`, `does not exist`, `contains none of`, `starts with`, `ends with`, `is at most`, `is more than`, `is less than`, `is on or before`, `is ... within`, `is not one of`, `ignoring case`, `first of`, `item 3 of` and `items[2]`.
 
 ## pr-reviewer's custom operators
 
