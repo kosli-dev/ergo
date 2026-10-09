@@ -1,67 +1,150 @@
-Steps 1 and 3 of the plan are on the [`spec/sentences`](https://github.com/kosli-dev/ergo/tree/spec/sentences/spec) branch. Step 2, the readability test, needs a person who hasn't seen ergo, so it isn't done. There's no PR.
+# Sentence corpus and grammar: findings
 
-- [`sentences-corpus.md`](https://github.com/kosli-dev/ergo/blob/spec/sentences/spec/sentences-corpus.md) rewrites every check, filter and `from` as sentences, with today's form beside each. That covers sdlc-policies, the server's demo and npm-bump policies, pr-reviewer, ergo's examples and all 36 DEV controls, which are in [kosli-playground/dev-process-controls](https://github.com/kosli-playground/dev-process-controls). In all, 229 checks and 74 filters.
-- [`sentences.md`](https://github.com/kosli-dev/ergo/blob/spec/sentences/spec/sentences.md) is the grammar. Each phrase is a Cucumber Expression, with what it does on missing, `null` and wrong-typed input.
+This file goes with [`sentences-corpus.md`](sentences-corpus.md) and [`sentences.md`](sentences.md). Both now follow [#174](https://github.com/kosli-dev/ergo/issues/174) as its body stood on 9 October 2026 at 11:43 UTC. The issue had changed in sixteen places since the first version of these files. Step 2 of the plan, the readability test with someone who hasn't seen ergo, still isn't done.
 
-It follows the issue as of 10:28 today, `for` lines and names without `$` included. 13 checks moved to a `for` line, and with that DEV-0501 fits.
+## What changed
 
-## Phrase tally
+Each numbered change from the issue is its own commit on this branch.
 
-Counted from the parses, twins included: `is` 164, `is not empty` 54, `at $params.x` 44, `is before` 21, `some` 19, `is one of` 18, `every` 15, `where` 14 (7 with `and`), `for` 13, `count of` 12, `is at least` 9, `is not` 9, `at each of` 6, `is empty` 6, `is in` 6, `is not before` 6, `is after` 5, `matches` 5, `exists` 4, `is between` 4, `, if any,` 3, `contains` 3, `does not match` 3, `contains all of` 2, `sum of` 2, `plus` 2, `within` 2, `does not contain` 1, `is a` 1, `is not in` 1.
+1. **Right side.** A quoted string on the right side is text. A grammar word is never a field there, and a field with such a name is written `.empty`, not `."empty"`. The corpus had no such field, so only the draft changed.
+2. **No Cucumber Expressions.** The draft lists each phrase as a plain pattern, one line per form, like `<path> is not empty`, with a table of what each gap holds.
+3. **`assert` as a list.** sdlc-policies 0007 `peer_approval` is no longer a misfit. It has a `for` line with two items and two assertions. DEV-0302 is now one check with two assertions instead of two checks, so it keeps its one row.
+4. **Bare names in a one-line `every` or `some` are the item's.** The draft already said so. The corpus agrees: its only one-line check with a bare field on the right is server 0007, where Rego copied the fields onto each approver.
+5. **Time phrases.** The six `is not before` became `is on or after`. Nothing used `is not after`.
+6. **`named by`.** 37 lookups by a param, 6 by `named by each of`, and 1 by a name (`persona_blob_shas named by persona`). There were 44 lookups by a param before item 11 turned some of them into chains.
+7. **`is empty` on strings and lists.** None of the 52 `is not empty` checks needs `is a non-empty string`. The 6 `is empty` checks pass `""` too. To keep today's meaning, each would need `is a list` beside it. The corpus marks them and leaves them.
+8. **`is` everywhere.** The `is` or `must` section is one line now.
+9. **Printing strings.** Single quotes when a string holds a backslash and no single quote. Every line in the corpus now prints back exactly as written.
+12. **Hyphens.** The corpus already wrote `secrets-scan` bare. The draft had also allowed `$` after the first character, as the report's path names do today. It now follows the issue: letters, digits, `_` and `-`.
+13. **`contains all of` and `contains none of`.** The corpus already used `contains all of`. `contains "a", "b"` on its own doesn't parse.
+14. **`every` over strings.** DEV-0406 now reads `$input.artifact.developers does not contain tested_by`, as the issue and Tore write it. DEV-0407 keeps a `for` line, because `does not contain` would pass an empty developer list, which fails today.
+15. **Narrowing.** DEV-0409 and DEV-0410's `critical defect` is `from: defect where severity is "critical" and status is one of "open", "in_progress"`.
+16. **`equals` before a field.** 16 lines changed from `is <field>` to `equals <field>`. The two that compare `base_ref` with a param now fail a value of another type as `unusable`, not `value`. The same values pass.
+10. **`from` with `where`.** The 74 filters became 80 `where` conditions on 49 `from` lines. 15 of those lines are new, counting the server's copy of sdlc-policies 0004: in pr-reviewer and sdlc-policies 0004, requirements that shared a subject with different filters now each have their own. The `$applies` text for each is [below](#what-applies-prints).
+11. **Chains.** See [Chains](#chains).
 
-Nothing uses `is not one of`, `does not exist`, `contains none of`, `starts with`, `ends with`, `is at most`, `is more than`, `is less than`, `is not after`, `ignoring case` or the index words.
+## Parse counts
 
-## Misfits
+The tokenizer was updated for every rule above and run over the whole corpus: 337 lines, made of 231 assertions, 14 `for` lines and 92 `from` lines. All 337 parse. With the issue's rules, none parses more than one way. Without them, 196 do:
 
-These don't fit:
-
-- **sdlc-policies 0007 `peer_approval`.** It needs an approver who approved, isn't the author, and approved after every commit. A `for` line handles the two quantifiers, but that's two assertions about the same approver and `for` has one `assert`. The smallest addition is a list under `assert`, all holding for the same items. That's what today's `any_of` option means.
-- **pr-reviewer `keys_match`.** The key to look up comes from the item: `for: every …personas_dispatched as persona` with `assert: …persona_blob_shas at persona matches "^[0-9a-f]{40}$"`. That needs `at <name>`, which ergo can't do today, so it stays custom. The other six custom operators all become sentences.
-- **DEV-0302 `components_listed`** becomes two checks, so it has two rows.
-- **server demo 0008** builds one requirement per suite in Rego. sdlc-policies' version already says the same thing with `at each of`.
-
-These fit, but change what passes:
-
-- `is not empty` passes a non-empty list where `non_empty_string` fails (52 checks).
-- `is empty` passes `""` where `empty` fails (6 checks), and that one passes quietly.
-- No input in these repos hits either. Making each phrase strict about type fixes both, but then `is empty` and `is not empty` aren't opposites on strings.
-- Two checks compare timestamps as text today. With `is after`, a timestamp that isn't RFC 3339 fails.
-- Three pr-reviewer custom operators skipped items with a missing field. The sentences fail them as `absent`, as #173 already does.
-- 37 paths lose a Rego default, like `artifact_name` defaulting to `"artifact"`.
-
-## Ambiguities the tokenizer found
-
-With the rules as the issue states them, all 390 lines parse, but 215 parse more than one way. Four rules bring that to 0:
-
-| what reads two ways | lines | rule |
+| what reads two ways | lines | rule that removes it |
 | --- | ---: | --- |
-| `is "prod"`: text, or a quoted key | 95 | a quoted string in an argument is a value, and a quoted key there is written `."$schema"`, as jq does |
-| `is not empty`: a phrase, or `is not` a field called `empty` | 60 | phrase words can't start a path in an argument, so that field is written `."empty"` |
-| `is true`: a value, or a field called `true` | 55 | the same two rules |
-| `artifacts_statuses at $params.artifact_name.attestations_statuses`: where does the ref end? | 31 | the ref after `at` is `$params` or `$input` plus one key, which every ref in the corpus already is |
+| `is "prod"`: text, or a quoted key | 84 | a quoted string on the right side is text |
+| `is not empty`: a phrase, or `is not` and a field called `empty` | 65 | grammar words are never a field on the right side |
+| `is true`: a value, or a field called `true` | 46 | the same two rules |
+| `named by $params.artifact_name.attestations_statuses`: where does the reference end? | 24 | the reference after `named by` is `$params` or `$input` plus one key |
 
-Made-up probes found two more: `count of x where n is m plus k is t` reads three ways, so `plus` can't follow `where`, and `between 1 and 5` inside `where` means an implementation can't just split `where` on ` and `.
+Some lines have two causes. Of 15 made-up lines, `count of x where n is m plus k is t` reads three ways, which is why `plus` can't follow `where`. The `and` between assertions never clashes with the `and` of `where` or of `between`.
 
-The issue's `{path} contains/does not contain {json}` doesn't work as a Cucumber Expression either. `/` only alternates single words, so it compiles to `(contains|does) not contain` and never matches `contains`. Also, `( not)` matches both forms without saying which one it matched. The draft has one expression for each form.
+## Chains
 
-## Open decisions
+6 `from` lines chain, twins included:
 
-- **`is` or `must`.** 74 filters and 21 `where` conditions need `is` whatever checks use. Of the checks, 9 read better with `must`, and all of them say something bad is absent: `findings is 0`, `allow_force_pushes is false`, `open_bump_prs is empty`. The rest read the same either way.
-- **The dynamic key.** It appears 44 times, all in sdlc-policies and the server demos, and mostly in `from` to pick one artifact out of a trail. 32 of them have more path after the key. `at` is still a placeholder.
-- **`where` in `from` or `applies_to`.** All 74 filters sit on the subject, and no policy filters inside `from`. That's #113's call.
-- **A subject with a parent.** The `for` line covers everything that reached for it: DEV-0501, the item-against-subject comparisons in DEV-0401, 0407, 0502, 0503, 0601 and server 0010, and pr-reviewer's `keys_match`. None of them needs #52 now.
-- **Time phrases.** 21 `is before`, 5 `is after`, 6 `is not before`. The last one is a double negative for "on or after", and `is on or after` would read better. Four of them compare a deadline that Rego computed (#140).
-- **One-line `every`/`some`, or always `for`.** 20 checks use the one-line form and 13 need `for`. 18 of the 20 read nothing after the path except a value or `$params`, so the second scoping rule only matters in 2 of them. But the 3 `count of`/`sum of ... where` checks read the item in their `where` either way, because a `for` line can't produce a number.
+- 4 descend from an `artifact` subject instead of repeating its lookup: sdlc-policies 0007's pull requests and 0008's test suites, the server's copy of 0008, and server 0010's approval attestation.
+- 2 narrow: DEV-0409's `critical defect` and its twin in DEV-0410.
+
+No `for` line existed only to reach a parent. Each one compares an item with its subject, or walks two lists. Server 0010's `for` line stays after the chain, but its assertion shrinks from a path with two lookups to `approver is not author`.
+
+Depth: no chain is more than two subjects deep. The deepest check is sdlc-policies 0007 `peer_approval`. It has two chained subjects, `artifact` then `pull request`, then two `for` items, `approvers` and `commits`. That's four levels and three list walks. Today the same check walks the same three lists, one in `from` and two in the check. So the ceiling the spec has to name can stay at three list walks, if it counts list walks rather than subjects.
+
+## What `$applies` prints
+
+The `$applies` row's `expression` is the `where` conditions as written, joined with ` and `. Its `inputs` hold each path they read. `…` stands for `compliance_status.attestations_statuses.`. Twins are left out.
+
+| repo | policy | subject | `$applies` |
+| --- | --- | --- | --- |
+| sdlc-policies | SDLC-CTRL-0004 dependencies | lockfile | `status exists and status is "COMPLETE"` |
+| sdlc-policies | SDLC-CTRL-0004 dependencies | SBOM package | `lock_release exists` |
+| sdlc-policies | SDLC-CTRL-0004 dependencies | non-exempt SBOM package | `exempt is false` |
+| pr-reviewer | review-controls | confirmed finding | `decision is "CONFIRMED"` |
+| pr-reviewer | review-controls | review round (resolution_per_disagreement) | `…verdict.attestation_data.moderator_status is "resolved"` |
+| pr-reviewer | review-controls | review round (moderator_failure_recorded) | `…verdict.attestation_data.moderator_status does not match "^(resolved\|no_disagreements\|single_reviewer\|disabled)$"` |
+| pr-reviewer | review-controls | review round (coverage_gap_rereviewed) | `…coverage-verification.attestation_data.before_second_pass.uncovered is a list and …coverage-verification.attestation_data.before_second_pass.uncovered is not empty and …coverage-verification.attestation_data.before_second_pass.cost_capped is false` |
+| pr-reviewer | review-controls | review round (coverage_gap_cost_capped) | `…coverage-verification.attestation_data.before_second_pass.uncovered is a list and …coverage-verification.attestation_data.before_second_pass.uncovered is not empty and …coverage-verification.attestation_data.before_second_pass.cost_capped is true` |
+| pr-reviewer | review-controls | review round (second_pass_findings_recorded) | `…second-pass.attestation_data.triggered is true` |
+| pr-reviewer | review-controls | finding (posted_finding) | `source is not "empty_file"` |
+| pr-reviewer | review-controls | review round (claude_ran_dispatched) | `…claude-review.attestation_data.personas_ran is a list and …claude-review.attestation_data.personas_ran is not empty` |
+| pr-reviewer | review-controls | review round (gemini_ran_dispatched) | `…gemini-review.attestation_data.personas_ran is a list and …gemini-review.attestation_data.personas_ran is not empty` |
+| pr-reviewer | review-controls | review round (claude_only_degraded) | `…claude-review.attestation_data.degraded is true and …claude-review.attestation_data.personas_ran is empty` |
+| pr-reviewer | review-controls | review round (gemini_only_degraded) | `…gemini-review.attestation_data.degraded is true and …gemini-review.attestation_data.personas_ran is empty` |
+| pr-reviewer | review-controls | review round (both_models_degraded) | `…claude-review.attestation_data.degraded is true and …gemini-review.attestation_data.degraded is true and …claude-review.attestation_data.personas_ran is empty and …gemini-review.attestation_data.personas_ran is empty` |
+| pr-reviewer | review-controls | review round (claude_persona_failed) | `…claude-review.attestation_data.degraded is true and …claude-review.attestation_data.personas_ran is a list and …claude-review.attestation_data.personas_ran is not empty` |
+| pr-reviewer | review-controls | review round (gemini_persona_failed) | `…gemini-review.attestation_data.degraded is true and …gemini-review.attestation_data.personas_ran is a list and …gemini-review.attestation_data.personas_ran is not empty` |
+| ergo | README | deployment | `environment is "prod"` |
+| DEV controls | DEV-0102 impact analysis, new features | production deployment | `environment is "prod" and change_type is "new_development"` |
+| DEV controls | DEV-0104 changes tracked | production deployment | `environment is "prod"` |
+| DEV controls | DEV-0201 source managed | production deployment | `environment is "prod"` |
+| DEV controls | DEV-0202 tamper protection | production deployment | `environment is "prod"` |
+| DEV controls | DEV-0203 secrets scanned | production deployment | `environment is "prod"` |
+| DEV controls | DEV-0303 configuration scanned | production deployment | `environment is "prod"` |
+| DEV controls | DEV-0401 security testing | vulnerability | `status is "open"` |
+| DEV controls | DEV-0402 patches in time | missing patch | `severity is one of "critical", "high"` |
+| DEV controls | DEV-0403 features tested | test run | `$input.deployment.change_type is "new_development"` |
+| DEV controls | DEV-0405 data migration | production deployment | `environment is "prod" and includes_data_migration is true` |
+| DEV controls | DEV-0408 no production data in test | environment | `type is one of "development", "test", "staging"` |
+| DEV controls | DEV-0409 defects triaged, new features | critical defect | `severity is "critical" and status is one of "open", "in_progress"` |
+| DEV controls | DEV-0501 segregation of duties | production deployment | `environment is "prod" and change_type is "normal"` |
+| DEV controls | DEV-0502 sign-off, new features | production deployment | `environment is "prod" and change_type is "new_development"` |
+| DEV controls | DEV-0503 sign-off, normal changes | production deployment | `environment is "prod" and change_type is "normal"` |
+| DEV controls | DEV-0504 roll-back ready, new features | production deployment | `environment is "prod" and change_type is "new_development"` |
+| DEV controls | DEV-0601 environments segregated | production deployment | `environment is "prod"` |
+| DEV controls | DEV-0603 current version | environment | `user_facing is true` |
+| DEV controls | DEV-0701 emergency approved after | production deployment | `environment is "prod" and change_type is "emergency"` |
+| DEV controls | DEV-0702 emergency change reviewed | production deployment | `environment is "prod" and change_type is "emergency"` |
+| DEV controls | DEV-0703 new features reviewed | production deployment | `environment is "prod" and change_type is "new_development"` |
+| DEV controls | DEV-0704 normal changes reviewed | production deployment | `environment is "prod" and change_type is "normal"` |
+| DEV controls | DEV-0706 root cause analysed | vulnerability | `severity is "critical" and status is "fixed"` |
+| DEV controls | DEV-0801 outsourced work reviewed | pull request | `author is in $params.external_contributors` |
+
+## Where Tore's rewrite and the corpus differ
+
+Tore's rewrite of the 36 DEV controls is on the `174-feedback` branch of kosli-playground/dev-process-controls, in `issue-174-findings`. The issue decides each difference:
+
+- **Lists of values.** Tore writes `is in "spdx", "cyclonedx"`. The corpus writes `is one of`, as the issue's Literal or field section does, and keeps `is in` for a list read from a path. The issue itself uses both, see below.
+- **Keys from a param.** Tore writes `artifact.attestations at $params.required_scans as scan`. The corpus writes `named by each of $params.required_scans`, as the issue now does (DEV-0401, 0403, 0404, 0705).
+- **Time.** Tore's `is not before` is `is on or after` in the corpus (DEV-0401, 0402, 0406, 0407, 0705, 0802).
+- **Names.** Tore writes `$deploy.started_at` and `$pr.author` in one-line checks, with `from: deployments as deploy`. The issue has no `$` names and names things on a `for` line, so DEV-0401, 0501, 0502, 0503 and 0601 have `for` lines in the corpus.
+- **DEV-0501 `peer_approved`.** Tore makes the pull request a subject, with `from: $deploy.pull_requests as pr`. The corpus uses the issue's own example, a `for` line with two items, which keeps one row per deployment.
+- **DEV-0407.** Tore writes `every $input.artifact.developers is not tested_by`. The issue rules that out, and its suggestion `does not contain` passes an empty developer list. The corpus keeps today's meaning with a `for` line.
+- **DEV-0302.** Tore writes two checks. The corpus has one check with two assertions, which the issue now allows.
+- **Filters.** Tore keeps `applies_to` and `of`. The corpus puts the conditions in `from`, and DEV-0409's `critical defect` narrows `defect`.
+
+The rest of Tore's sentences match the corpus word for word, `equals` before a field included.
+
+## Where the corpus and #174 disagree
+
+- **`is in` with values.** The Subjects section writes `status is in "open", "in_progress"`. The Literal or field section writes `is one of "staging", "prod"`, and keeps `is in` for a path. The corpus follows Literal or field.
+- **`is` before a field.** The Report section prints `equals` when the right side is a field. But the issue's own examples write `sum of stages.usd where kind is "model" is total_usd within 0.01` in The proposal and `... is total_usd within` under Errors. Printed, those are `equals total_usd within 0.01`.
+- **`and` at the top of a sentence.** The grammar stays flat says `and` never joins `where` to the assertion and never sits at the top of a sentence. Two quantifiers then allows one `assert` line with `and` between assertions. The draft says `and` joins `where` conditions and whole assertions, nothing else.
+- **A bare name after that `and`.** In `every items.price where kind is "a" is at least 2 and owner is "x"`, the issue doesn't say whether `owner` is the item's, as in the `where`, or the subject's. The draft reads it as the subject's, because the `every` belongs to the first assertion only.
+- **`count of` in `from`.** A `from` takes the shape of a `for` item, whose `where` holds a path and a phrase. Six pr-reviewer filters are `count of x is at least 1`. Each became `x is a list and x is not empty`, which keeps the meaning but isn't what the issue shows.
+- **What `$applies` shows.** The issue says the row "says which condition failed, like `change_type is \"bug_fix\"`". That reads like the value that was read, not a condition the policy wrote. The draft prints the conditions as written, with values in `inputs`, as today. The issue should say which one it means.
+- **The order of conditions.** Today filters are named, so `$applies` lists them sorted by name and the report is the same whatever order they were written in. A `where` is a sentence, so it keeps the order written, and two policies that differ only in that order give different reports. Either the printed form sorts conditions, or the spec accepts this.
+- **A subject's name or an input field.** sdlc-policies 0004 has subjects `artifact` and `lockfile` whose `from` is `artifact` and `lockfile`, input fields with the same names. Chaining by name could read those as a subject starting from itself. The draft reads a subject's own name in its own `from` as the input field.
+- **Subject names with spaces.** 19 subject names in the corpus have a space, like `production deployment`, so they can't start a chain without quotes. The issue's example uses `deployment`. No chain in the corpus needs quotes.
+- **Bare keys and the report.** The issue allows letters, digits, `_` and `-` in a bare key. Today's report also allows `$` after the first character (`syntax.md`, [name.keys]). The two should agree, or a path from a report row may not paste back into a policy.
+- **`is not` before a field.** The issue says how `is` and `equals` print, but not how the negated form prints before a field. The draft prints `is not` either way.
+
+## Misfits left
+
+One: server demo 0008 builds one requirement per suite in Rego. sdlc-policies 0008 already says the same thing with `named by each of`.
+
+pr-reviewer's `keys_match` is now a sentence, `persona_blob_shas named by persona`, but ergo can't run it until a ref can start with a name, so the policy keeps its custom operator until then. Its other six custom operators become sentences that run today.
+
+## Changes in what passes
+
+The corpus marks each one:
+
+- `is not empty` passes a non-empty list where `non_empty_string` fails: 52 checks.
+- `is empty` passes `""` where `empty` and `equals []` fail: 6 checks.
+- Timestamps compared as text today fail when they aren't RFC 3339: sdlc-policies and server 0007 `peer_approval`.
+- Three pr-reviewer custom operators skipped items with a missing field. The sentences fail them as `absent`.
+- Rego's `!=` and `!= ""` pass values of another type, and the sentences don't: server 0010, require-artifact-provenance.
+- 34 paths lose a Rego default, like `artifact_name` defaulting to `"artifact"`.
+- Server 0010 now has one row per approval attestation instead of per artifact. It allows the same inputs.
+
+Cause only, with the same values passing: `range` from 0 to 0 as `is 0` (2 checks), and `base_ref equals $params.protected_branch` (2 checks).
 
 ## Rego spike
 
-This one is outside the repo. It's not ergo, just one evaluator fed checks as objects or as sentences parsed with the full phrase table: 3,000 deployments, 8 checks, all three giving the same counts.
-
-| | `opa eval` | Wasm JS runtime | Wasm heap |
-| --- | ---: | ---: | ---: |
-| checks as objects | 382 ms | 41 ms | 51.0 MB |
-| sentences parsed once per check | 388 ms | 44 ms | 51.9 MB |
-| sentences parsed per subject | 424 ms | 1,907 ms | 739 MB |
-
-Parsing once per check costs about what today's objects do. Parsing per subject is out of the question in Wasm. The spike also hit the `is not empty` ambiguity: two phrases matched, and OPA refused to pick one until the table took the first match in order.
-
+Not run again: the grammar's size didn't change much. The numbers from the first run still stand: sentences parsed once per check cost what today's objects cost, and parsing per subject took 739 MB of Wasm memory on 3,000 subjects.
