@@ -30,9 +30,9 @@ A check that walks two lists, or compares an item with its subject, puts the wal
 **[sentence.flat]** The grammar is flat, because Rego can't recurse. So:
 
 - one assertion per sentence
-- one `every`, `some`, `count of` or `sum of` per sentence, and only at the start. A second one goes on a `for` line
+- one `every`, `some`, `count of` or `sum of` per line, and only at the start. A second one goes on a `for` line
 - `where` holds one or more conditions joined by `and`, and each condition is a path and a phrase, never another `every` or `where`
-- `and` joins conditions inside `where`, and whole assertions on an `assert` line (see [sentence.assert.list](#the-shape-of-a-sentence)). It never joins `where` to the assertion
+- `and` does two jobs and nothing else: it joins the conditions of a `where`, and it joins whole assertions, see [sentence.assert.list](#the-shape-of-a-sentence). Each side of an `and` is a whole condition or a whole assertion, so the result is a flat list, not a tree. An `and` never joins a `where` to its assertion
 - no `or`, and no brackets except the lookups in [sentence.path.brackets](#paths)
 
 "Or" is an `any_of` in the policy around the sentence, because each option has a name and the report says which one passed. Every expression language gets asked for `or` and brackets, and the answer here is no.
