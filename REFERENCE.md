@@ -532,7 +532,7 @@ These read one or two fields of a subject.
 | `range`            | `path`, `min`, `max`        | the field is a number between `min` and `max`, both included.                                                        |
 | `includes`         | `path`, `value` or `values` | the field is a list that contains `value`. With `values` in place of `value`, it contains every one of them.         |
 | `excludes`         | `path`, `value` or `values` | the field is a list that doesn't contain `value`. With `values` in place of `value`, it contains none of them.       |
-| `compare`          | `left`, `right`, `cmp`      | both fields exist, have the same type, and `left cmp right` is true.                                                 |
+| `compare`          | `left`, `right`, `cmp`      | both sides can be read, have the same type, and `left cmp right` is true. A side is a field, a fixed value or a [derived value](#derived-values). |
 | `compare_time`     | `left`, `right`, `cmp`      | both fields are timestamps in the same format (both RFC 3339 strings, or both numbers) and `left cmp right` is true. |
 
 `cmp` is one of `eq`, `ne`, `gt`, `gte`, `lt` or `lte`.
@@ -542,6 +542,8 @@ Some things worth knowing:
 - A check that's written wrong fails `$well_formed`, and its rows fail with cause `ill_formed`, whatever the subject holds. So in `applies_to` it fails the requirement instead of ruling every subject out. Written wrong means:
   - an `op` ergo doesn't know, a missing `op`, or a missing parameter
   - a `cmp` that isn't in the list above
+  - a `compare` side that isn't a path, a `literal` or a [derived value](#derived-values) written as below, or a `compare_time` side that isn't a path. The `$well_formed` row says `invalid left` or `invalid right`
+  - a `within` that isn't a number of 0 or more, or that's on a `cmp` other than `eq`
   - `values` that isn't a list, an empty `values` for `includes` or `excludes`, both `value` and `values`, a `min` or `max` that isn't a number, a `min` above `max`, or `patterns` that isn't a list of valid regular expressions
   - an `each` that isn't a path, or `as` or `each` on an operator other than `all` or `any`
   - a step that can't be a [key](#paths), a number out of range, a badly written [ref](#reading-from-the-input), a ref or `literal` deeper inside a value than ergo reads, or a path that starts with a [name](#naming-subjects) nothing gave
@@ -564,13 +566,81 @@ Some things worth knowing:
 - `includes` and `excludes` take `value` or `values`. Giving both, or neither, is written wrong, and the expression shows `not contains(xs, <both value and values>)` or `contains(xs, <missing value or values>)`. `values` works as one check per value: `"op": "excludes", "values": ["nuts", "garlic"]` passes when neither is in the list, and `includes` with the same `values` passes when both are. The expression shows `contains_none(allergens, ["garlic", "nuts"])` or `contains_all(allergens, ["garlic", "nuts"])`. An empty `values` would pass every list, so it's written wrong.
 - Each item in `values`, for `in` too, and in `patterns` can be a [`ref`](#reading-from-the-input) or a `literal`, as `value` can, so `"values": [{"ref": ["$$params", "nut"]}, "garlic"]` reads the param, and a param that's missing or `null` fails the check instead of being skipped. A ref in `patterns` that reads something other than a valid regular expression fails the check with cause `unusable`. A list read through a `ref`, or wrapped in a `literal`, is data, so an item in it that looks like a ref is compared as it is. A `value` that's a list is still one value, so `"value": ["a", "b"]` looks for the list `["a", "b"]` inside the field. Write separate checks instead when you want a row and a description for each value.
 - To check that a list holds at least one of several values, use [`any`](#all-and-any) with `in`: `{"op": "any", "path": ["allergens"], "check": {"op": "in", "path": [], "values": ["nuts", "garlic"]}}`. Its expression is `some allergens: allergens[] in ["garlic", "nuts"]`. Keep this in mind in `applies_to`, where `includes` with `values` only keeps subjects that have every one of them.
-- `compare` and `compare_time` compare two fields of the same subject. To compare a field with a fixed number, use `range`.
+- `compare` and `compare_time` compare two fields of the same subject. A `compare` side can also be a fixed value, written `{"literal": 1}`, or a [derived value](#derived-values), like the length of a list.
 - `compare` with `lt`, `lte`, `gt` or `gte` needs both fields to be numbers or both to be strings. Ordering objects, lists or booleans fails with cause `unusable`, because Rego's order for them means nothing in a policy: `{"name": "ann"}` comes before `{"owner": "bob"}` only because `name` sorts before `owner`. You'd usually hit this by leaving the field off the end of a path. `eq` and `ne` work on any type. A substitute that orders objects, lists or booleans gives its check the same cause, and so does an item inside `all` or `any`.
 - `compare_time` never converts between formats, so a number against a string fails as `unusable`. With numbers, ergo can't tell seconds from milliseconds, so make sure both sides use the same unit.
 - An RFC 3339 string needs an uppercase `T` and `Z`, a date that exists, and a year from 1678 to 2261, which keeps its nanoseconds since 1970 inside a 64-bit integer. Anything else fails `compare_time` as `unusable`, so `2024-02-30T00:00:00Z` isn't read as 1 March, and `2024-01-01t00:00:00z` isn't read at all.
 - Patterns in `matches_any` and `not_matches_any` aren't anchored: `svc_` matches `my_svc_account`. Use `^` and `$` when you need a full match. A pattern that isn't a string, or isn't a valid regular expression, fails either operator, even when another pattern matches. With an empty `patterns` list, `matches_any` fails and `not_matches_any` passes. When `patterns` isn't a list, both fail and the expression shows `author matches one of <invalid patterns>` or `author matches none of <invalid patterns>`. When it's missing, the expression shows `<missing patterns>` instead.
 
 These two are useful in `applies_to`, for example to leave bot accounts out of a review rule. If the author field is missing, ergo can't tell whether the subject is in scope, so the requirement fails. See [Checks ergo adds](#checks-ergo-adds).
+
+### Derived values
+
+A side of `compare` can be worked out from the subject instead of read from one field. That's how a check says "at least one persona ran", "the findings from Claude match the number it reported" or "the stage costs add up to the total":
+
+| Side | Value |
+| --- | --- |
+| `{"literal": 1}` | the value as written |
+| `{"count": path}` | the number of items in the list at `path` |
+| `{"count": path, "where": check}` | the number of those items that pass `check` |
+| `{"sum": path, "each": path}` | the numbers at `each` in every item of the list at `path`, added up. With `where`, only the items that pass it. |
+| `{"add": [side, ...]}` | the sides added up. Each one is a path, a number written as a `literal`, a `count` or a `sum`. |
+
+`compare` also takes `within` with `cmp: eq`, so two numbers pass when they're at most that far apart. Money and durations rarely add up to the exact cent.
+
+With this input:
+
+```json
+{
+  "reviews": [
+    {
+      "id": "pr-7",
+      "personas_ran": ["security"],
+      "findings": [{ "source": "claude" }, { "source": "gpt" }, { "source": "claude" }],
+      "claude_found": 2,
+      "stages": [{ "kind": "model", "usd": 0.5 }, { "kind": "model", "usd": 0.25 }, { "kind": "tool", "usd": 0 }],
+      "total_usd": 0.76
+    }
+  ]
+}
+```
+
+and these checks on a `review` subject read from `reviews`:
+
+```yaml
+some_persona:
+  op: compare
+  left: { count: [personas_ran] }
+  right: { literal: 1 }
+  cmp: gte
+claude_findings:
+  op: compare
+  left: { count: [findings], where: { op: equals, path: [source], value: claude } }
+  right: [claude_found]
+  cmp: eq
+costs_add_up:
+  op: compare
+  left: { sum: [stages], each: [usd], where: { op: equals, path: [kind], value: model } }
+  right: [total_usd]
+  cmp: eq
+  within: 0.01
+```
+
+all three pass. Each row shows the value ergo worked out, named after the side, beside the list it came from:
+
+| check | expression | inputs |
+| --- | --- | --- |
+| `some_persona` | `count(personas_ran) gte 1` | `count(personas_ran) = 1`, `personas_ran = ["security"]` |
+| `claude_findings` | `count(findings where source == "claude") eq claude_found` | `count(findings where source == "claude") = 2`, `findings = [...]`, `claude_found = 2` |
+| `costs_add_up` | `sum(stages[].usd where kind == "model") eq total_usd, within 0.01` | `sum(stages[].usd where kind == "model") = 0.75`, `stages[].usd = [0.5, 0.25, 0]`, `total_usd = 0.76` |
+
+Some things worth knowing:
+
+- A list that isn't there fails the check as `absent`, a `null` one as `null`, and anything that isn't a list as `unusable`. A number to add that isn't a number, like `"0.5"`, fails it as `unusable` too, and so does a `within` comparison where either side isn't a number.
+- An item that `where` can't decide about doesn't just go uncounted. If the second finding above had no `source`, ergo couldn't tell whether it came from Claude, so the check would fail as `absent`, with `count(findings where source == "claude") = null`. A `present` condition is the exception, as everywhere: a missing field is its answer.
+- `where` is one [basic operator](#basic-operators), without a substitute. Its paths start at each item, like the inner check of `all`. It can't be `all`, `any` or `any_of`, and a check inside it that's written wrong makes the whole check written wrong.
+- Derived values only go in a check of their own, a filter or a substitute, not inside `all`, `any` or `any_of`. A `literal` side can go anywhere a `compare` can.
+- Paths in a derived value read like any other: they can start with `$$input`, `$$params` or a [name](#naming-subjects).
 
 ### `all` and `any`
 
@@ -1103,6 +1173,7 @@ When a check reads several fields, the row shows the first cause in this table's
 
 - For `all` and `any`, a list that isn't there gives `absent`, and one that isn't a list gives `unusable`. An empty list gives `value`, since it was read fine and just has nothing in it. Otherwise the cause is the first, in this table's order, among the items that failed. So when one approver is a bot and another has no `username`, a check that some approver isn't a bot fails as `absent`, because the second one might not be. An `any_of` works the same way across its options, and so does `each` across its inner lists.
 - For a custom operator, the cause is worked out from its `inputs`, or from its `path` if it has no `inputs`. With neither, the cause is always `value`.
+- A built-in operator can have `inputs` too, to choose what its row shows, but its cause still comes from what the check reads. So `{"op": "equals", "path": ["a"], "value": 1, "inputs": [["b"]]}` fails as `absent` when `a` is missing, whatever `b` holds.
 - `$well_formed` and `$min_subjects` don't read the subject, so their cause is `satisfied` or `value`, except that `$min_subjects` fails as `absent`, `null` or `unusable` when a ref in `from` or `keys` can't be read, or when `from` doesn't lead to a list or an object. `$applies` reports the state of the fields read by the filters that failed. For example, a subject whose filter field is missing says `absent`, and that fails the requirement. A filter that's written wrong gives `ill_formed`, even when another filter rules the subject out, because the scope can't be trusted.
 
 ## Violations
