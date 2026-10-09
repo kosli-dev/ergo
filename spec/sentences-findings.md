@@ -1,19 +1,25 @@
 # Sentence corpus and grammar: findings
 
-This file goes with [`sentences-corpus.md`](sentences-corpus.md) and [`sentences.md`](sentences.md). Both now follow [#174](https://github.com/kosli-dev/ergo/issues/174) as its body stood on 9 October 2026 at 14:29 UTC. This is the third pass. The second pass listed eleven places where the issue disagreed with itself or left something unsaid. The issue now decides all eleven, and this pass applies them. Step 2 of the plan, the readability test with someone who hasn't seen ergo, still isn't done.
+This file goes with [`sentences-corpus.md`](sentences-corpus.md) and [`sentences.md`](sentences.md). Both now follow [#174](https://github.com/kosli-dev/ergo/issues/174) as its body stood on 9 October 2026 at 15:22 UTC. This is the fourth pass. The third pass left one disagreement with the issue and filled three gaps. The issue now decides them, and this pass applies that. Step 2 of the plan, the readability test with someone who hasn't seen ergo, still isn't done.
 
 ## What changed in this pass
 
 Each numbered item is its own commit on this branch.
 
+1. **`and` means what a new line under `assert` means.** Each assertion starts from the subject, or from the `for` names, whether it's on its own line or after an `and`. A one-line `every` or `some` ends at the `and`, so in `every items.price is at least 2 and owner is "x"`, `owner` is the subject's. This reverses item 4 of the third pass. Any assertion can now start with a quantifier, so `state is "MERGED" and every commits.verified is true` is two assertions on one line, and `and` after `count of` or `sum of` needs no rule of its own. The report shows the list form whichever was written, and its joined `expression` is always a sentence the policy could have written. No line in the corpus joins assertions with `and`, so no policy changes.
+2. **`count of` and `sum of` are list walks**, in a `where` too. The draft already said so. It now also gives the issue's example: `for: every pull_requests as pr` with `assert: count of pr.reviews is at least 2` walks two lists.
+3. **The one-line `subjects` is gone.** The map is the only spelling, and a simple subject is a name with nothing under it. The corpus note on sdlc-policies 0004 and the grammar no longer mention it. What the third pass found still holds: a subject with no `from` reads the input field of its name, and every subject in the corpus has an `id`.
+
+## What changed in the third pass
+
 1. **`is one of` and `is in` mean the same.** Either takes written values or a path. The report prints `is one of` before written values and `is in` before a path. Nothing in the corpus needed to change. Tore's `is in "spdx", "cyclonedx"` now parses, and prints as `is one of`.
 2. **`equals` before a field.** The corpus had no `is <field>` left. Five examples in the draft and three in the corpus's table of custom operators did, like `sum of stages.usd where kind is "model" is total_usd within 0.01`. They now say `equals`.
 3. **`and` does two jobs.** The flat section says `and` joins the conditions of a `where` and joins whole assertions, nothing else.
-4. **Assertions joined with `and` after a one-line `every` or `some` are about the item.** The draft read them as the subject's, and now reads them as the item's. Only the first assertion on the line can start with a quantifier, so `state is "MERGED" and every commits.verified is true` is written wrong. After `count of` or `sum of`, the assertions that follow are about the subject, because the first one is about a number. No line in the corpus joins assertions with `and`, so no policy changes.
+4. **Assertions joined with `and` after a one-line `every` or `some` were about the item.** Reversed in this pass, see item 1 above.
 5. **`count of` and `sum of` in a `where`.** The six pr-reviewer filters are `where count of x is at least 1` again. One thing changes: a value that isn't a list now fails the requirement as `unusable`, where today's custom `min_length` rules the subject out. The corpus marks the six as narrowing.
 6. **`$applies`.** It prints the conditions as written, with the values read in `inputs`. The table [below](#what-applies-prints) is regenerated from the corpus, and the six filters from item 5 now print as `count of`.
 7. **Order as written.** `where` conditions and joined assertions print in the order the author wrote them, and `inputs` stay sorted by name. The draft says that the byte-for-byte rule is for the same policy run again, not for two policies that mean the same.
-8. **Subjects.** A subject's own name in its own `from` is the input field, and any other subject's name starts a chain. Run over every `from` line, those two rules find exactly the six chains the corpus marks. sdlc-policies 0004's `artifact` now has no `from`, and the corpus shows the policy's whole `subjects` section. **No policy can use the one-line `subjects: artifact, lockfile`**, because every subject in the corpus has an `id`. Four would fit if their subjects were renamed after their fields and lost their ids: ergo's baking example, DEV-0301, DEV-0302 and DEV-0802. That would change the subject type and the ids the report prints.
+8. **Subjects.** A subject's own name in its own `from` is the input field, and any other subject's name starts a chain. Run over every `from` line, those two rules find exactly the six chains the corpus marks. sdlc-policies 0004's `artifact` now has no `from`, and the corpus shows the policy's whole `subjects` section. Every subject in the corpus has an `id`.
 9. **Quoted subject names.** The draft gives the rule, `from: '"production deployment".pull_requests'`, and the tokenizer reads it one way. No policy needs it.
 10. **Bare keys.** The draft now quotes any key with a `$` in it, and says the report prints keys by the same rule. When this is built, `syntax.md` ([name.keys]) needs the same change, because today it allows `$` after the first character.
 11. **`does not equal` before a field.** Nine lines changed from `is not <field>` to `does not equal <field>`, twins included, like `approver.username does not equal author`. `is not` stays before a value.
@@ -22,7 +28,7 @@ Each numbered item is its own commit on this branch.
 
 ## Parse counts
 
-The tokenizer was updated for items 1, 3, 4, 5, 8, 9, 10 and 11 and run over the whole corpus: 335 lines, made of 231 assertions, 14 `for` lines and 90 `from` lines. That's two `from` lines fewer than before, because sdlc-policies 0004's `artifact` and its server copy have none now. All 335 parse. With the issue's rules, **no line reads two ways**, and every line, `from` lines included, prints back exactly as written. Without those rules, 194 lines read more than one way:
+The tokenizer was updated for item 1 of this pass, and for items 1, 3, 5, 8, 9, 10 and 11 of the third, and run over the whole corpus: 335 lines, made of 231 assertions, 14 `for` lines and 90 `from` lines. That's two `from` lines fewer than before, because sdlc-policies 0004's `artifact` and its server copy have none now. All 335 parse. With the issue's rules, **no line reads two ways**, and every line, `from` lines included, prints back exactly as written. Without those rules, 194 lines read more than one way:
 
 | what reads two ways | lines | rule that removes it |
 | --- | ---: | --- |
@@ -33,7 +39,9 @@ The tokenizer was updated for items 1, 3, 4, 5, 8, 9, 10 and 11 and run over the
 
 Some lines have two causes. The grammar-word row went down by 6 and the `true` row up by 4, because the six pr-reviewer filters no longer say `is a list and ... is not empty`.
 
-27 made-up lines test what the corpus doesn't reach. The new ones: `count of` and `sum of` in a `where` read one way, and `where count of x is empty` reads no way. The `and` after a one-line `some` reads one way, on the item. A quantifier after `and` reads no way, and so does the bare key `foo$bar`. `is in` with values prints `is one of`, `is one of` with a path prints `is in`, `is not author` prints `does not equal author`, and `does not equal "prod"` prints `is not "prod"`. `"production deployment".pull_requests` reads one way.
+The counts are the same as in the third pass, because no line in the corpus joins assertions with `and`, so item 1 changes no line's reading.
+
+28 made-up lines test what the corpus doesn't reach. The ones this pass changed: `state is "MERGED" and every commits.verified is true` now reads one way, as two assertions, and so does `every items.price where kind is "a" is at least 2 and some items.owner is "x"`, which is new. `every items.price where kind is "a" and qty is 1 is at least 2 and owner is "x"` still reads one way, now with `owner` on the subject. The others: `count of` and `sum of` in a `where` read one way, `where count of x is empty` reads no way, and so does the bare key `foo$bar`. `is in` with values prints `is one of`, `is one of` with a path prints `is in`, `is not author` prints `does not equal author`, and `does not equal "prod"` prints `is not "prod"`. `"production deployment".pull_requests` reads one way.
 
 ## Chains
 
@@ -104,17 +112,11 @@ Tore's rewrite of the 36 DEV controls is on the `174-feedback` branch of kosli-p
 
 ## Where the corpus and #174 disagree
 
-One place is still open, and three are gaps the draft fills on its own.
+Nothing is left. The issue now decides the one disagreement and the three gaps the third pass listed: an `and` line and a list mean the same, a quantifier after `and` is allowed, `and` after `count of` or `sum of` needs no rule, and `count of` and `sum of` are walks.
 
-- **A list under `assert` and an `and` line don't always mean the same.** The issue says both forms "mean the same", and that the report "shows the list form whichever was written" with `expression` joining the lines with `and`. Since item 4, that isn't true for a line that starts with a one-line `every` or `some`. In `every items.price is at least 2 and owner is "x"`, `owner` is the item's. Written as two lines under `assert`, `owner is "x"` is the subject's. So the report can't turn that line into a list, and a list whose first line is a one-line `every` or `some` can't be joined with `and` without changing what the next line reads. The draft prints such a line as written, on one line. The issue should say the same, or drop the list form from the report.
+One small thing: the issue says one of 56 corpus subjects would fit the one-line `subjects`. The corpus has 93 subjects counting twins, 81 without them, and 67 without the subjects added when filters became `where`, so it's unclear which count 56 is. It doesn't change the decision.
 
-Gaps the draft fills:
-
-- **A quantifier after `and`.** The issue doesn't say whether `state is "MERGED" and every commits.verified is true` is allowed. The draft makes it written wrong, from "one `where` or `every` per sentence", since everything joined with `and` is read as one sentence.
-- **`and` after `count of` or `sum of`.** The issue only says what follows a one-line `every` or `some`. The draft reads what follows `count of` or `sum of` as the subject's, since the first assertion is about a number, not an item.
-- **`count of` and `sum of` as walks.** The issue counts list walks toward the limit of three, but doesn't say whether a `count of` or `sum of` is one. The draft counts them, in a `where` too. No check in the corpus comes near the limit that way: its six `count of` conditions are on subjects that walk no list.
-
-Nothing else in the corpus contradicts the issue.
+One change is still needed outside these files when this is built: `syntax.md` ([name.keys]) allows `$` after the first character of a bare key, and has to quote such keys, as the draft now does.
 
 ## Misfits left
 
