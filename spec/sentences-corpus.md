@@ -60,14 +60,37 @@ Notes in the last column:
 
 ### SDLC-CTRL-0004 dependencies
 
+Its subjects, with the ids from the policy. `artifact` has no `from`, so it reads the input field `artifact`. `lockfile` names itself in its own `from`, which is the input field `lockfile` too. The other names differ from their fields, so they keep `from`. Every subject has an `id`, so the one-line `subjects: artifact, lockfile` doesn't fit.
+
+```yaml
+subjects:
+  artifact:
+    id: artifact_fingerprint
+  lockfile:
+    from: lockfile where status exists and status is "COMPLETE"
+    id: name
+  lockfile entry:
+    from: lock_entries
+    id: entry
+  SBOM package:
+    from: components where lock_release exists
+    id: name
+  non-exempt SBOM package:
+    from: components where exempt is false
+    id: name
+  base image:
+    from: base_images
+    id: ref
+```
+
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of artifact | `[artifact]` | `artifact` | Rego-shaped. Every subject in this policy is built by Rego from the attested lockfile, Dockerfile and SBOM text. The sentences only cover what ergo checks after that. |
+| `from` of artifact | `[artifact]` | no `from` | Rego-shaped. No `from`: a subject without one reads the input field of its own name, `artifact`. Every subject in this policy is built by Rego from the attested lockfile, Dockerfile and SBOM text. The sentences only cover what ergo checks after that. |
 | `fingerprint` | `{op: non_empty_string, path: [artifact_fingerprint]}` | `artifact_fingerprint is not empty` | widens |
 | `lockfile_attested` | `{op: equals, path: [attestations_statuses, <lock_attestation_name>, status], value: COMPLETE}` | `attestations_statuses named by $params.lock_attestation_name.status is "COMPLETE"` | no default |
 | `dockerfile_attested` | `{op: equals, path: [attestations_statuses, <dockerfile_attestation_name>, status], value: COMPLETE}` | `attestations_statuses named by $params.dockerfile_attestation_name.status is "COMPLETE"` | no default |
 | `sbom_attested` | `{op: equals, path: [attestations_statuses, <sbom_attestation_name>, status], value: COMPLETE}` | `attestations_statuses named by $params.sbom_attestation_name.status is "COMPLETE"` | no default |
-| `from` of lockfile | `[lockfile], applies_to: {recorded, attested}` | `lockfile where status exists and status is "COMPLETE"` | Rego-shaped. `$applies` prints `status exists and status is "COMPLETE"` |
+| `from` of lockfile | `[lockfile], applies_to: {recorded, attested}` | `lockfile where status exists and status is "COMPLETE"` | Rego-shaped. `$applies` prints `status exists and status is "COMPLETE"`. A subject's own name in its own `from` is the input field, so this reads `lockfile` from the input and isn't a chain. |
 | filter `recorded` | `{op: present, path: [status]}` | `status exists` | In the `where` of lockfile's `from`, so its name goes |
 | filter `attested` | `{op: equals, path: [status], value: COMPLETE}` | `status is "COMPLETE"` | In the `where` of lockfile's `from`, so its name goes |
 | `exact_pins` | `{op: range, path: [exact_pins], min: 1, max: 1000000}` | `exact_pins is between 1 and 1000000` | The 1000000 only stands in for "no upper bound". `exact_pins is at least 1` says what was meant, but passes above a million. |
@@ -119,7 +142,7 @@ Same as SDLC-CTRL-0004 dependencies, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of lockfile | `[lockfile], applies_to: {attested}` | `lockfile where status is "COMPLETE"` | Rego-shaped. `$applies` prints `status is "COMPLETE"` |
+| `from` of lockfile | `[lockfile], applies_to: {attested}` | `lockfile where status is "COMPLETE"` | Rego-shaped. `$applies` prints `status is "COMPLETE"`. A subject's own name in its own `from` is the input field, so this reads `lockfile` from the input and isn't a chain. |
 | filter `attested` | `{op: equals, path: [status], value: COMPLETE}` | `status is "COMPLETE"` | In the `where` of lockfile's `from`, so its name goes. This copy has no `recorded` filter, only `attested`. |
 | `licence_known` | `{op: any, path: [licences], check: {op: non_empty_string, path: [id]}}` | `some licences.id is not empty` | widens |
 | `licence_approved` | `{op: any, path: [licences], check: {op: equals, path: [allowed], value: true}}` | `some licences.allowed is true` | Rego-shaped. Rego works out `allowed` from the params before ergo sees it. |
@@ -673,7 +696,7 @@ Same as DEV-0504 roll-back ready, new features, except:
 
 ## Tally
 
-Every phrase, counted from the parses, twins included: 229 checks and 74 filters, 14 of the checks with a `for` line, plus 92 `from` lines. That's 337 lines in all.
+Every phrase, counted from the parses, twins included: 229 checks and 74 filters, 14 of the checks with a `for` line, plus 90 `from` lines. That's 335 lines in all.
 
 | phrase | sdlc-policies | server | pr-reviewer | ergo | DEV controls | total |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -765,6 +788,8 @@ What the corpus says about each decision the brief left open.
 
 **One-line `every` and `some`, or always `for`.** #174 asks whether the one-line form earns its second scoping rule. 20 assertions use a one-line `every` or `some` (11 `every`, 9 `some`) and 14 checks have a `for` line, so most walks don't need one. 18 of the 20 read nothing after the path but a value or `$params`, like `every commits.verified is true` or `some licences is in $params.allowed_licenses`, so for them the second rule never comes up. It only matters for a bare field read on the item, which happens in 2: DEV-0801's `where state is "APPROVED"`, and server 0007, whose `where` and argument read fields Rego copied onto each approver. A one-line form without `where` and without bare fields in its argument would keep the 18 on one line and move those 2 to `for`. But `count of ... where` and `sum of ... where` (3 checks, all pr-reviewer) read the item in their `where` whatever happens, because a `for` line can't produce a number, so the item-scoped `where` stays in the grammar either way.
 
-**Chains.** #174 lets a subject start from another subject by name. 6 `from` lines chain, twins included. 4 descend from `artifact` instead of repeating its lookup: sdlc-policies 0007's pull requests and 0008's test suites, the server's copy of 0008, and server 0010's approval attestation. 2 narrow, DEV-0409's `critical defect` and its twin. No chain is more than two subjects deep. The deepest check is sdlc-policies 0007 `peer_approval`: two chained subjects, then two `for` items, so four levels and three list walks, the same three walks it has today. Two things the corpus shows that #174 doesn't settle: sdlc-policies 0004 has subjects named `artifact` and `lockfile` whose `from` is `artifact` and `lockfile`, input fields with the same names, which chaining by name could read as a subject starting from itself. And 19 subject names have a space, like `production deployment`, so they can't start a chain without quotes. None of the corpus's chains needs that.
+**Chains.** #174 lets a subject start from another subject by name. 6 `from` lines chain, twins included. 4 descend from `artifact` instead of repeating its lookup: sdlc-policies 0007's pull requests and 0008's test suites, the server's copy of 0008, and server 0010's approval attestation. 2 narrow, DEV-0409's `critical defect` and its twin. No chain is more than two subjects deep. The deepest check is sdlc-policies 0007 `peer_approval`: two chained subjects, then two `for` items, so four levels and three list walks, the same three walks it has today. A subject's own name in its own `from` is the input field, so sdlc-policies 0004's `lockfile` reads `input.lockfile`, and its `artifact` drops `from` altogether. The tokenizer applied that rule and the other one, that any other subject's name starts a chain, to every `from` line, and it finds exactly the 6 chains above. 19 subject names have a space, like `production deployment`. One of those can start a chain quoted, but no chain in the corpus needs it.
+
+**One-line `subjects`.** No policy in the corpus can use `subjects: artifact, lockfile`. Every subject in every policy has an `id`, and outside sdlc-policies 0004 and its server copy every subject's name differs from its input field, like `pull request` from `pull_requests`. Four policies would fit if their subjects were renamed after their fields and lost their ids: ergo's baking example, DEV-0301, DEV-0302 and DEV-0802. Renaming changes the subject type the report prints.
 
 **Time phrases.** Settled in #174 as `is before`, `is after`, `is on or after` and `is on or before`. The corpus has 33 time comparisons: 21 `is before`, 6 `is after` and 6 `is on or after`, which were `is not before` before. 4 of the `is on or after` compare a deadline Rego worked out with `$input.evaluated_at` (#140). Two checks compare timestamps as text today, and the time phrases fail a timestamp that isn't RFC 3339.

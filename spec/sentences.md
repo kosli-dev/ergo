@@ -94,7 +94,20 @@ subjects:
 
 **[sentence.subject.depth]** Each level of walking is written out in Rego, not recursion, so the levels from the input to the assertion have a fixed ceiling. Counted as list walks, today's is three: one in `from` and two in a check. No chain in the corpus is more than two subjects deep, and its deepest check, sdlc-policies 0007's peer approval, walks three lists: pull requests in `from`, then approvers and commits on its `for` line. So three list walks is enough for the corpus, whichever subjects they're spread over.
 
-**[sentence.subject.name]** Two points #174 doesn't settle. A `from` whose first key is both a subject's name and an input field can be read either way: sdlc-policies 0004 has subjects `artifact` and `lockfile` reading the input fields `artifact` and `lockfile`. The draft reads a subject's own name in its own `from` as the input field, and `$input.artifact` says the same with no doubt. And a subject name with a space, like `production deployment`, can't start a path without quotes. No chain in the corpus needs one.
+**[sentence.subject.own]** A subject's own name in its own `from` is the input field, never the subject, so sdlc-policies 0004's `lockfile` subject can have `from: lockfile where status is "COMPLETE"`. Any other subject's name starts a chain. `$input.artifact` reaches the input field `artifact` even when a subject named `artifact` exists. The tokenizer applied these two rules to every `from` line in the corpus and found exactly the six chains it has.
+
+**[sentence.subject.short]** A subject with no `from` reads the input field of its own name. It can still have an `id`:
+
+```yaml
+subjects:
+  artifact:
+    id: artifact_fingerprint
+  lockfile:
+    from: lockfile where status exists and status is "COMPLETE"
+    id: name
+```
+
+When every subject is a top-level input field and nothing more, with no `where`, no `id` and no chain, the section is one line: `subjects: artifact, lockfile`. Anything else uses the map. YAML can't mix the two, so a policy with both kinds uses the map, where a plain subject is a name with nothing under it. No policy in the corpus can use the one-line form, because every subject in it has an `id`.
 
 ## Values
 
