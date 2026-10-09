@@ -19,7 +19,7 @@ Notes in the last column:
 - **cause only** (4): the same values pass, and only the cause of a failure changes. `range` from 0 to 0 becomes `is 0`, so a value that isn't a number fails as `value` instead of `unusable`. `equals` with a ref becomes `equals $params.x`, so a value of another type fails as `unusable` instead of `value`.
 - **no default** (37): a Rego variable with a default became `$params.x`, which ergo can't default.
 - **Rego-shaped** (24): Rego works the value out before ergo sees it. The sentence covers what ergo checks afterwards.
-- **narrows** (6): fails closed where today passes.
+- **narrows** (7): fails closed where today passes.
 
 ## sdlc-policies
 
@@ -45,7 +45,7 @@ Notes in the last column:
 | `merged` | `{op: equals, path: [state], value: MERGED}` | `state is "MERGED"` |  |
 | `protected_branch` | `{op: equals, path: [base_ref], value: {ref: [$$params, protected_branch]}}` | `base_ref equals $params.protected_branch` | cause only. Today a branch name of another type fails as `value`. With a path on the right, the sentence fails it as `unusable`. The same values pass. |
 | `signed_commits` | `{op: all, path: [commits], check: {op: equals, path: [verified], value: true}}` | `every commits.verified is true` |  |
-| `peer_approval` | `{op: any, path: [approvers], as: approver, check: {op: any_of, options: {peer: [{op: equals, path: [state], value: APPROVED}, {op: compare, left: [username], right: [$pr, author], cmp: ne}, {op: all, path: [$pr, commits], check: {op: compare, left: [$approver, timestamp], right: [timestamp], cmp: gt}}]}}}` | — | **misfit**, see below |
+| `peer_approval` | `{op: any, path: [approvers], as: approver, check: {op: any_of, options: {peer: [{op: equals, path: [state], value: APPROVED}, {op: compare, left: [username], right: [$pr, author], cmp: ne}, {op: all, path: [$pr, commits], check: {op: compare, left: [$approver, timestamp], right: [timestamp], cmp: gt}}]}}}` | `for: some approvers where state is "APPROVED" as approver, every commits as commit`<br>`assert:`<br>`  - approver.username is not author`<br>`  - approver.timestamp is after commit.timestamp` | narrows. `for` line. The example #174 gives for a list under `assert`: both lines hold for the same approver and commit. `author` is the pull request's, since a bare name in `assert` is the subject's. Today's `compare` orders timestamps as text, and `is after` fails one that isn't RFC 3339. |
 
 ### SDLC-CTRL-0008 quality assurance
 
@@ -654,32 +654,32 @@ Same as DEV-0504 roll-back ready, new features, except:
 
 ## Tally
 
-Every phrase, counted from the parses, twins included: 228 checks and 74 filters, 13 of the checks with a `for` line, plus 74 `from` lines. That's 390 lines in all.
+Every phrase, counted from the parses, twins included: 229 checks and 74 filters, 14 of the checks with a `for` line, plus 74 `from` lines. That's 393 lines in all.
 
 | phrase | sdlc-policies | server | pr-reviewer | ergo | DEV controls | total |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| `is` | 13 | 34 | 23 | 1 | 79 | 150 |
+| `is` | 14 | 34 | 23 | 1 | 79 | 151 |
 | `$params` | 13 | 36 |  |  | 9 | 58 |
 | `is not empty` | 9 | 11 | 2 | 1 | 31 | 54 |
 | `named by $params.x` | 10 | 34 |  |  |  | 44 |
 | `is before` |  |  |  |  | 21 | 21 |
-| `some` | 2 | 4 | 3 |  | 10 | 19 |
+| `some` | 3 | 4 | 3 |  | 10 | 20 |
 | `is one of` |  |  | 9 |  | 9 | 18 |
 | `$input` |  |  |  |  | 17 | 17 |
-| `every` | 1 | 1 | 1 |  | 12 | 15 |
-| `as` |  | 1 | 1 |  | 12 | 14 |
+| `as` | 2 | 1 | 1 |  | 12 | 16 |
+| `every` | 2 | 1 | 1 |  | 12 | 16 |
+| `where` | 1 | 1 | 3 |  | 10 | 15 |
 | `equals` | 2 | 2 | 7 |  | 3 | 14 |
-| `where` |  | 1 | 3 |  | 10 | 14 |
-| `for` line |  | 1 | 1 |  | 11 | 13 |
+| `for` line | 1 | 1 | 1 |  | 11 | 14 |
 | `count of` |  |  | 12 |  |  | 12 |
+| `is not` | 1 | 2 | 2 |  | 5 | 10 |
 | `is at least` |  |  | 9 |  |  | 9 |
-| `is not` |  | 2 | 2 |  | 5 | 9 |
 | `and` (in `where`) |  | 1 |  |  | 6 | 7 |
+| `is after` | 1 | 1 |  |  | 4 | 6 |
 | `is empty` |  | 1 | 4 |  | 1 | 6 |
 | `is in` | 1 |  |  |  | 5 | 6 |
 | `is on or after` |  |  |  |  | 6 | 6 |
 | `named by each of` | 1 | 1 |  |  | 4 | 6 |
-| `is after` |  | 1 |  |  | 4 | 5 |
 | `matches` |  |  | 3 |  | 2 | 5 |
 | `exists` | 2 | 1 |  |  | 1 | 4 |
 | `is between` | 1 | 1 |  | 2 |  | 4 |
@@ -715,7 +715,6 @@ Six of the seven go, as #173 found for the five numeric ones. The sentences also
 
 Checks that don't fit on one line, or fit only by changing what passes. This is the grammar's edge.
 
-- **SDLC-CTRL-0007 code review `peer_approval`** (sdlc-policies, misfit). Three conditions on the same approver: approved, not the author, and after every commit. A `for` line gets the two quantifiers, `for: some approvers where state is "APPROVED" as approver, every commits as commit` with `assert: approver.timestamp is after commit.timestamp`, but that leaves "not the author" with nowhere to go: a `where` reads the approver, so it can't reach the pull request's `author`, and there's one `assert`. Smallest addition: a list of assertions under one `for`, all holding for the same items, which is what today's `any_of` option with three checks means: `for: some approvers where state is "APPROVED" as approver, every commits as commit`, then `approver.username is not author` and `approver.timestamp is after commit.timestamp` under `assert`. The second also turns today's text comparison of timestamps into a time comparison, which fails a timestamp that isn't RFC 3339.
 - **demo SDLC-CTRL-0008 quality assurance `test suite`** (server, misfit). Rego writes one requirement per suite name. The sentence form can't loop over names to make requirements. Smallest addition: none, because sdlc-policies 0008 already says the same with `at each of`, one requirement whose subjects are the suites. This one should move to that shape.
 - **review-controls `dispatched_personas_recorded`** (pr-reviewer, misfit). Each dispatched persona's name is a key to look up in another object, so the key comes from the item being checked. Smallest addition: none any more: #174 has `named by persona`, a key read from a name the `for` line gave. Today a ref can't start with a name, so until ergo has it this stays custom.
 - **DEV-0302 SBOM recorded `components_listed`** (DEV controls, two lines). Two assertions about each component. Two checks pass and fail together exactly as the one `all` does, but the report has two rows.
@@ -733,7 +732,7 @@ Fits, but only after Rego reshapes the input (24 entries): sdlc-policies 0004 bu
 
 ## `is` or `must`
 
-The corpus is written with `is`. 74 filters and 21 `where` conditions are conditions, not rules, so they need `is` whatever checks use: `where state is "APPROVED"` can't be `where state must be "APPROVED"`. With `must` in checks, the grammar has two verbs for the same phrases, and the same leaf reads differently in a filter and in a check. 228 checks could take `must`. Most read the same either way, like `signature.verified is true` or `state is "MERGED"`. The ones where `must` reads better all say that something bad is absent: a zero, a `false` or an empty list. With `is`, they read like a result rather than a rule:
+The corpus is written with `is`. 74 filters and 22 `where` conditions are conditions, not rules, so they need `is` whatever checks use: `where state is "APPROVED"` can't be `where state must be "APPROVED"`. With `must` in checks, the grammar has two verbs for the same phrases, and the same leaf reads differently in a filter and in a check. 229 checks could take `must`. Most read the same either way, like `signature.verified is true` or `state is "MERGED"`. The ones where `must` reads better all say that something bad is absent: a zero, a `false` or an empty list. With `is`, they read like a result rather than a rule:
 
 - flow-templates npm-bump `no_open_bump_pr`: `open_bump_prs is empty` reads like a status.
 - review-controls `findings_complete`: `truncated is false` reads like a status.
@@ -749,14 +748,14 @@ The corpus is written with `is`. 74 filters and 21 `where` conditions are condit
 
 What the corpus says about each decision the brief left open.
 
-**`is` or `must`.** See above. 74 filters and 21 `where` conditions need `is`. 9 checks read better with `must`, and all of them say something bad is absent. The others read the same either way. Inside an `assert:` key, even those 9 are clear, so the case for `must` is a sentence quoted on its own, in a report or a markdown policy (#18).
+**`is` or `must`.** See above. 74 filters and 22 `where` conditions need `is`. 9 checks read better with `must`, and all of them say something bad is absent. The others read the same either way. Inside an `assert:` key, even those 9 are clear, so the case for `must` is a sentence quoted on its own, in a report or a markdown policy (#18).
 
 **Looking up by key.** #174 settled it as `named by`, with brackets as the other spelling. It appears 44 times, all in sdlc-policies and the server demos, and 32 of those have more path after the key, like `artifacts_statuses named by $params.artifact_name.attestations_statuses`. Every reference after `named by` in the corpus is `$params` plus one key, or a name from a `for` line, so the issue's rule takes nothing away. Whether the report prints the word form or brackets waits for the readability test.
 
 **`where` in `from` or `applies_to`.** 74 filters on 32 policies, and every one sits on the subject or in a requirement's scope. No policy filters inside `from`, and nothing in the corpus needs `from: deployments where environment is "prod"` that `applies_to` can't say. The grammar can say either, so it's #113's call.
 
-**Two quantifiers and a subject with a parent.** The `for` line #174 added while this was written does the job Tore's subject move for DEV-0501 was for. 13 checks use one: DEV-0501 `peer_approved`, every comparison of an item with its subject (DEV-0401, 0407, 0502, 0503, 0601 and server 0010), and pr-reviewer `dispatched_personas_recorded`. None of them needs a subject that starts at another subject, so #52 isn't on this path any more. What `for` can't do is hold two assertions about the same items, which is sdlc-policies 0007's misfit.
+**Two quantifiers and a subject with a parent.** The `for` line #174 added while this was written does the job Tore's subject move for DEV-0501 was for. 14 checks use one: DEV-0501 `peer_approved`, every comparison of an item with its subject (DEV-0401, 0407, 0502, 0503, 0601 and server 0010), and pr-reviewer `dispatched_personas_recorded`. None of them needs a subject that starts at another subject, so #52 isn't on this path any more. What `for` can't do is hold two assertions about the same items, which is sdlc-policies 0007's misfit.
 
 **One-line `every` and `some`, or always `for`.** #174 asks whether the one-line form earns its second scoping rule. 20 checks use a one-line `every` or `some` (11 `every`, 9 `some`) and 13 need a `for` line, so most walks don't need one. 18 of the 20 read nothing after the path but a value or `$params`, like `every commits.verified is true` or `some licences is in $params.allowed_licenses`, so for them the second rule never comes up. It only matters for a bare field read on the item, which happens in 2: DEV-0801's `where state is "APPROVED"`, and server 0007, whose `where` and argument read fields Rego copied onto each approver. A one-line form without `where` and without bare fields in its argument would keep the 18 on one line and move those 2 to `for`. But `count of ... where` and `sum of ... where` (3 checks, all pr-reviewer) read the item in their `where` whatever happens, because a `for` line can't produce a number, so the item-scoped `where` stays in the grammar either way.
 
-**Time phrases.** Settled in #174 as `is before`, `is after`, `is on or after` and `is on or before`. The corpus has 32 time comparisons: 21 `is before`, 5 `is after` and 6 `is on or after`, which were `is not before` before. 4 of the `is on or after` compare a deadline Rego worked out with `$input.evaluated_at` (#140). Two checks compare timestamps as text today, and the time phrases fail a timestamp that isn't RFC 3339.
+**Time phrases.** Settled in #174 as `is before`, `is after`, `is on or after` and `is on or before`. The corpus has 33 time comparisons: 21 `is before`, 6 `is after` and 6 `is on or after`, which were `is not before` before. 4 of the `is on or after` compare a deadline Rego worked out with `$input.evaluated_at` (#140). Two checks compare timestamps as text today, and the time phrases fail a timestamp that isn't RFC 3339.

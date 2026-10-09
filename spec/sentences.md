@@ -29,13 +29,26 @@ A check that walks two lists, or compares an item with its subject, puts the wal
 
 **[sentence.flat]** The grammar is flat, because Rego can't recurse. So:
 
-- one assertion per line
+- one assertion per sentence
 - one `every`, `some`, `count of` or `sum of` per sentence, and only at the start. A second one goes on a `for` line
 - `where` holds one or more conditions joined by `and`, and each condition is a path and a phrase, never another `every` or `where`
-- `and` joins conditions inside `where` only, never two assertions and never at the top of a sentence
-- no `or`, and no brackets except `items[2]`
+- `and` joins conditions inside `where`, and whole assertions on an `assert` line (see [sentence.assert.list](#the-shape-of-a-sentence)). It never joins `where` to the assertion
+- no `or`, and no brackets except the lookups in [sentence.path.brackets](#paths)
 
-Two assertions are two checks. "Or" is an `any_of` in the policy around the sentence, because each option has a name and the report says which one passed. Every expression language gets asked for `or` and brackets, and the answer here is no.
+"Or" is an `any_of` in the policy around the sentence, because each option has a name and the report says which one passed. Every expression language gets asked for `or` and brackets, and the answer here is no.
+
+**[sentence.assert.list]** `assert` can be a list, or one line with `and` between assertions. Both mean the same: every assertion is true for the same subject, or for the same items when the check has a `for` line. The report shows the list form whichever was written, and its `expression` joins the lines with `and`, so a failed row can say which line failed:
+
+```yaml
+peer_approval:
+  description: A peer approved the pull request after its last commit
+  for: some approvers where state is "APPROVED" as approver, every commits as commit
+  assert:
+    - approver.username is not author
+    - approver.timestamp is after commit.timestamp
+```
+
+The `and` between assertions can't be confused with the `and` of `where` or of `between`: the tokenizer reads `every items.price where kind is "a" and qty is 1 is at least 2 and owner is "x"` one way. #174 doesn't say whether `owner` there is the item's, as the `where` before it is, or the subject's, as a plain assertion is. The draft reads it as the subject's, because the `every` belongs to the first assertion only.
 
 ## Paths
 
@@ -121,7 +134,7 @@ Items nest left to right, so a later one can use an earlier name, as `pr.approve
 
 **[sentence.for.comma]** The `, ` between items can't be confused with the `, ` between values, because the next item starts with `every` or `some` and a value can't. The tokenizer reads `for: some approvals where role is one of "qa", "dev" as approval, every commits as commit` one way.
 
-**[sentence.for.one_assert]** A `for` line has one `assert`. sdlc-policies 0007's peer approval needs an approver who approved, isn't the author and approved after every commit, which is two assertions about the same items, and doesn't fit. A list under `assert`, all holding for the same items, is the smallest addition that would fit it.
+**[sentence.for.assert]** A `for` line can have several assertions under `assert`, as [sentence.assert.list](#the-shape-of-a-sentence) says. sdlc-policies 0007's peer approval needs that: an approver who approved, isn't the author and approved after every commit.
 
 ## Phrases
 
