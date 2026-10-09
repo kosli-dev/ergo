@@ -47,6 +47,29 @@ fn passes(group: &Value, case: &Value) -> Result<(), String> {
             }
         }
     }
+    if let Some(requirements) = case.get("requirements").and_then(Value::as_object) {
+        for (name, want) in requirements {
+            let entry = &report["requirements"][name];
+            for (field, value) in want.as_object().unwrap() {
+                let matches = if field == "checks" {
+                    value.as_object().unwrap().iter().all(|(check, fields)| {
+                        fields.as_object().unwrap().iter().all(|(f, v)| same(&entry["checks"][check][f], v))
+                    })
+                } else {
+                    same(&entry[field], value)
+                };
+                if !matches {
+                    return Err(format!("expected {name}.{field} to match {value}, but the entry is {entry}"));
+                }
+            }
+        }
+    }
+    if let Some(expected) = case.get("violations") {
+        let actual = ergo::violations(&report);
+        if !same(&actual, expected) {
+            return Err(format!("expected violations: {expected}\n  actual violations:   {actual}"));
+        }
+    }
     if let Some(refs) = case.get("refs").and_then(Value::as_object) {
         for (name, checks) in refs {
             for (check, expected) in checks.as_object().unwrap() {

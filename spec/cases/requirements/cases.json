@@ -1,0 +1,677 @@
+[
+  {
+    "description": "subjects from a list",
+    "policy": {"s": {"from": ["t"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["x"]}}}},
+    "cases": [
+      {
+        "description": "each item is a subject, in list order",
+        "rules": ["subjects.from", "subjects.id", "order"],
+        "input": {"t": [{"id": 2, "x": 1}, {"id": 1}]},
+        "requirements": {"s": {"status": "not_met", "subjects": {"matching": 2, "total": 2}}},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "subject", "id": null},
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}]
+          },
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope subject count", "value": 2}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": []}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null}]}
+        ],
+        "violations": [{"cause": "value", "check": "c", "description": "", "expression": "x is present", "inputs": [{"name": "x", "value": null}], "requirement": "s", "subject": {"id": 1, "type": "subject"}}]
+      },
+      {
+        "description": "fails min_subjects as value on an empty list",
+        "rules": ["subjects.from", "min_subjects", "status"],
+        "input": {"t": []},
+        "compliant": false,
+        "requirements": {"s": {"status": "not_met", "subjects": {"matching": 0, "total": 0}}},
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 0}]}
+        ],
+        "violations": [
+          {
+            "cause": "value",
+            "check": "$min_subjects",
+            "description": "The in-scope subject count is at least 1",
+            "expression": "count(matching(t)) >= 1",
+            "inputs": [{"name": "in-scope subject count", "value": 0}],
+            "requirement": "s",
+            "subject": {"id": null, "type": "subject"}
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as absent when the list is missing",
+        "rules": ["subjects.from"],
+        "input": {},
+        "requirements": {"s": {"status": "not_met"}},
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "absent", "inputs": [{"name": "in-scope subject count", "value": 0}]}
+        ]
+      },
+      {
+        "description": "fails min_subjects as null when the list is null",
+        "rules": ["subjects.from"],
+        "input": {"t": null},
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "null", "inputs": [{"name": "in-scope subject count", "value": 0}]}
+        ]
+      },
+      {
+        "description": "fails min_subjects as unusable on a string",
+        "rules": ["subjects.from"],
+        "input": {"t": "a"},
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "unusable", "inputs": [{"name": "in-scope subject count", "value": 0}]}
+        ]
+      },
+      {
+        "description": "takes an object as the only subject",
+        "rules": ["subjects.from"],
+        "input": {"t": {"id": 1, "x": 1}},
+        "requirements": {"s": {"subjects": {"matching": 1, "total": 1}}},
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope subject count", "value": 1}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+        ]
+      },
+      {
+        "description": "takes items that aren't objects as subjects, each its own id when it has no id field",
+        "rules": ["subjects.not_an_object", "subjects.id"],
+        "input": {"t": ["a", null]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": "a"}, "check": "c", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "c", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "subjects from a list with min_subjects 0",
+    "policy": {"s": {"from": ["t"], "id": ["id"], "min_subjects": 0, "checks": {"c": {"op": "present", "path": ["x"]}}}},
+    "cases": [
+      {
+        "description": "is not applicable on an empty list",
+        "rules": ["min_subjects", "status", "compliant"],
+        "input": {"t": []},
+        "compliant": true,
+        "requirements": {"s": {"status": "not_applicable"}},
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope subject count", "value": 0}]}
+        ],
+        "violations": []
+      },
+      {
+        "description": "still fails min_subjects as absent when the list is missing",
+        "rules": ["subjects.from", "min_subjects"],
+        "input": {},
+        "compliant": false,
+        "requirements": {"s": {"status": "not_met"}},
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "absent", "inputs": [{"name": "in-scope subject count", "value": 0}]}
+        ]
+      },
+      {
+        "description": "is not met when a subject fails",
+        "rules": ["status"],
+        "input": {"t": [{"id": 1}]},
+        "compliant": false,
+        "requirements": {"s": {"status": "not_met"}},
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "the whole input as the subject",
+    "policy": {"s": {"checks": {"c": {"op": "present", "path": ["x"]}}}},
+    "cases": [
+      {
+        "description": "checks the input itself, with itself as its id",
+        "rules": ["subjects.from", "subjects.id"],
+        "input": {"x": 1},
+        "requirements": {"s": {"status": "met"}},
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope subject count", "value": 1}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+        ]
+      },
+      {
+        "description": "fails min_subjects as null on a null input",
+        "rules": ["subjects.from"],
+        "input": null,
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "null", "inputs": [{"name": "in-scope subject count", "value": 0}]}
+        ]
+      },
+      {
+        "description": "fails min_subjects as unusable on a list",
+        "rules": ["subjects.from"],
+        "input": [1],
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "unusable", "inputs": [{"name": "in-scope subject count", "value": 0}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "min_subjects 2",
+    "policy": {"s": {"from": ["t"], "id": ["id"], "min_subjects": 2, "checks": {"c": {"op": "present", "path": ["x"]}}}},
+    "cases": [
+      {
+        "description": "fails as value with one subject, though it passes",
+        "rules": ["min_subjects"],
+        "input": {"t": [{"id": 1, "x": 1}]},
+        "requirements": {"s": {"status": "not_met"}},
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 1}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "ids",
+    "policy": {"s": {"from": ["t"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["x"]}}}},
+    "cases": [
+      {
+        "description": "lists each repeated id once, sorted by its JSON text",
+        "rules": ["unique_ids", "status"],
+        "input": {"t": [{"id": "b", "x": 1}, {"id": 10, "x": 1}, {"id": "b", "x": 1}, {"id": 3, "x": 1}, {"id": 10, "x": 1}, {"id": 3, "x": 1}]},
+        "requirements": {"s": {"status": "not_met"}},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "subject", "id": null},
+            "check": "$unique_ids",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "repeated subject ids", "value": ["b", 10, 3]}]
+          },
+          {"requirement": "s", "subject": {"type": "subject", "id": "b"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 10}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": "b"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 3}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 10}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 3}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+        ]
+      },
+      {
+        "description": "treats null as an id, so two subjects with none clash",
+        "rules": ["unique_ids", "subjects.id"],
+        "input": {"t": [{"x": 1}, {"x": 2}]},
+        "requirements": {"s": {"status": "not_met"}},
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": false, "cause": "value", "inputs": [{"name": "repeated subject ids", "value": [null]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "ids of subjects out of scope",
+    "policy": {"s": {"from": ["t"], "id": ["id"], "applies_to": {"f": {"op": "equals", "path": ["e"], "value": "p"}}, "checks": {"c": {"op": "present", "path": ["x"]}}}},
+    "cases": [
+      {
+        "description": "still count",
+        "rules": ["unique_ids"],
+        "input": {"t": [{"e": "p", "id": 1, "x": 1}, {"e": "q", "id": 1}]},
+        "requirements": {"s": {"status": "not_met", "subjects": {"matching": 1, "total": 2}}},
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": false, "cause": "value", "inputs": [{"name": "repeated subject ids", "value": [1]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "e", "value": "p"}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "e", "value": "q"}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "require some",
+    "policy": {"s": {"from": ["t"], "id": ["id"], "require": "some", "checks": {"a": {"op": "present", "path": ["a"]}, "b": {"op": "present", "path": ["b"]}}}},
+    "cases": [
+      {
+        "description": "is met when one subject passes every check, and the others aren't violations",
+        "rules": ["require", "violations"],
+        "input": {"t": [{"a": 1, "id": 1}, {"b": 1, "id": 2}, {"a": 1, "b": 1, "id": 3}]},
+        "requirements": {"s": {"require": "some", "status": "met"}},
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": "a", "value": 1}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "b", "passed": false, "cause": "value", "inputs": [{"name": "b", "value": null}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "a", "passed": false, "cause": "value", "inputs": [{"name": "a", "value": null}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "b", "passed": true, "cause": "satisfied", "inputs": [{"name": "b", "value": 1}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 3}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": "a", "value": 1}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 3}, "check": "b", "passed": true, "cause": "satisfied", "inputs": [{"name": "b", "value": 1}]}
+        ],
+        "violations": []
+      },
+      {
+        "description": "isn't met by two subjects that each pass half the checks",
+        "rules": ["require", "violations"],
+        "input": {"t": [{"a": 1, "id": 1}, {"b": 1, "id": 2}]},
+        "requirements": {"s": {"status": "not_met"}},
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": "a", "value": 1}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "b", "passed": false, "cause": "value", "inputs": [{"name": "b", "value": null}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "a", "passed": false, "cause": "value", "inputs": [{"name": "a", "value": null}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "b", "passed": true, "cause": "satisfied", "inputs": [{"name": "b", "value": 1}]}
+        ],
+        "violations": [
+          {"cause": "value", "check": "b", "description": "", "expression": "b is present", "inputs": [{"name": "b", "value": null}], "requirement": "s", "subject": {"id": 1, "type": "subject"}},
+          {"cause": "value", "check": "a", "description": "", "expression": "a is present", "inputs": [{"name": "a", "value": null}], "requirement": "s", "subject": {"id": 2, "type": "subject"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a filter",
+    "policy": {"s": {"from": ["t"], "id": ["id"], "applies_to": {"prod": {"op": "equals", "path": ["e"], "value": "p"}}, "checks": {"c": {"op": "present", "path": ["x"]}}}},
+    "cases": [
+      {
+        "description": "leaves out a subject that fails it on value, and fails one it can't read",
+        "rules": ["scope.filters", "scope.out", "scope.unreadable", "status", "violations"],
+        "input": {"t": [{"e": "p", "id": 1, "x": 1}, {"e": "q", "id": 2}, {"id": 3}]},
+        "requirements": {"s": {"status": "not_met", "subjects": {"matching": 1, "total": 3}}},
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "e", "value": "p"}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "e", "value": "q"}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 3}, "check": "$applies", "passed": false, "cause": "absent", "inputs": [{"name": "e", "value": null}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+        ],
+        "violations": [
+          {
+            "cause": "absent",
+            "check": "$applies",
+            "description": "The subject is in scope",
+            "expression": "e == \"p\"",
+            "inputs": [{"name": "e", "value": null}],
+            "requirement": "s",
+            "subject": {"id": 3, "type": "subject"}
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects when every subject is out of scope",
+        "rules": ["scope.out", "min_subjects"],
+        "input": {"t": [{"e": "q", "id": 2}]},
+        "requirements": {"s": {"status": "not_met", "subjects": {"matching": 0, "total": 1}}},
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 0}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "e", "value": "q"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a filter with min_subjects 0",
+    "policy": {"s": {"from": ["t"], "id": ["id"], "min_subjects": 0, "applies_to": {"prod": {"op": "equals", "path": ["e"], "value": "p"}}, "checks": {"c": {"op": "present", "path": ["x"]}}}},
+    "cases": [
+      {
+        "description": "is not applicable when every subject is out of scope",
+        "rules": ["scope.out", "status"],
+        "input": {"t": [{"e": "q", "id": 2}]},
+        "compliant": true,
+        "requirements": {"s": {"status": "not_applicable", "subjects": {"matching": 0, "total": 1}}},
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "e", "value": "q"}]}
+        ],
+        "violations": []
+      },
+      {
+        "description": "isn't met when a filter can't be read",
+        "rules": ["scope.unreadable"],
+        "input": {"t": [{"id": 2}]},
+        "compliant": false,
+        "requirements": {"s": {"status": "not_met"}},
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "$applies", "passed": false, "cause": "absent", "inputs": [{"name": "e", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "two filters",
+    "policy": {
+      "s": {
+        "from": ["t"],
+        "id": ["id"],
+        "min_subjects": 0,
+        "applies_to": {"a": {"op": "equals", "path": ["e"], "value": "p"}, "b": {"op": "equals", "path": ["k"], "value": 1}},
+        "checks": {"c": {"op": "present", "path": ["x"]}}
+      }
+    },
+    "cases": [
+      {
+        "description": "fail the requirement when one rules the subject out and the other can't be read",
+        "rules": ["scope.unreadable"],
+        "input": {"t": [{"e": "q", "id": 1}]},
+        "requirements": {"s": {"status": "not_met"}},
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": false, "cause": "absent", "inputs": [{"name": "e", "value": "q"}, {"name": "k", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a filter written wrong beside one that rules the subject out",
+    "policy": {"s": {"from": ["t"], "id": ["id"], "min_subjects": 0, "applies_to": {"a": {"op": "nope"}, "b": {"op": "equals", "path": ["e"], "value": "p"}}, "checks": {"c": {"op": "present", "path": ["x"]}}}},
+    "cases": [
+      {
+        "description": "fails the subject's $applies row as ill_formed",
+        "rules": ["scope.unreadable", "written_wrong"],
+        "input": {"t": [{"e": "q", "id": 1}]},
+        "requirements": {"s": {"status": "not_met"}},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "subject", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "applies_to.a", "value": ["unknown op nope"]}]
+          },
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": false, "cause": "ill_formed", "inputs": [{"name": "e", "value": "q"}]}
+        ],
+        "violations": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "description": "The requirement is written correctly",
+            "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "applies_to.a", "value": ["unknown op nope"]}],
+            "requirement": "s",
+            "subject": {"id": null, "type": "subject"}
+          },
+          {
+            "cause": "ill_formed",
+            "check": "$applies",
+            "description": "The subject is in scope",
+            "expression": "<unknown op nope> and e == \"p\"",
+            "inputs": [{"name": "e", "value": "q"}],
+            "requirement": "s",
+            "subject": {"id": 1, "type": "subject"}
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a requirement with no checks",
+    "policy": {"s": {"from": ["t"], "checks": {}}},
+    "cases": [
+      {
+        "description": "is never met",
+        "rules": ["well_formed", "added.inputs"],
+        "input": {"t": [{"x": 1}]},
+        "requirements": {"s": {"status": "not_met"}},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "subject", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "count(checks)", "value": 0}, {"name": "require", "value": "every"}, {"name": "checks", "value": ["empty"]}]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a requirement with an unknown require",
+    "policy": {"s": {"from": ["t"], "require": "most", "checks": {"c": {"op": "present", "path": ["x"]}}}},
+    "cases": [
+      {
+        "description": "is never met, but its subjects still get rows",
+        "rules": ["well_formed", "added.inputs"],
+        "input": {"t": [{"x": 1}]},
+        "requirements": {"s": {"require": "most", "status": "not_met"}},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "subject", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": ["neither every nor some"]}]
+          },
+          {"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a requirement with a field ergo doesn't know",
+    "policy": {"s": {"from": ["t"], "checks": {"c": {"op": "present", "path": ["x"]}}, "subject": "x"}},
+    "cases": [
+      {
+        "description": "is never met",
+        "rules": ["well_formed", "added.inputs"],
+        "input": {"t": [{"x": 1}]},
+        "requirements": {"s": {"status": "not_met"}},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "subject", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "subject", "value": ["unknown field"]}]
+          },
+          {"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a requirement with a description, meta and a subject type",
+    "policy": {
+      "s": {
+        "description": "Every deployment is approved",
+        "subject_type": "deployment",
+        "from": ["t"],
+        "id": ["id"],
+        "applies_to": {"p": {"op": "present", "path": ["e"]}},
+        "checks": {"c": {"op": "present", "path": ["x"], "description": "Approved", "meta": {"k": 1}}},
+        "meta": {"control": "C-1", "v": 1.5}
+      }
+    },
+    "cases": [
+      {
+        "description": "copies them into the report and names the checks ergo adds after the type",
+        "rules": ["report.requirements", "added.text", "added.inputs"],
+        "input": {"t": [{"e": 1, "id": 1, "x": 1}]},
+        "requirements": {
+          "s": {
+            "checks": {
+              "$applies": {"description": "The deployment is in scope", "expression": "e is present", "meta": {}},
+              "$min_subjects": {"description": "The in-scope deployment count is at least 1", "expression": "count(matching(t)) >= 1", "meta": {}},
+              "$unique_ids": {"description": "Every deployment id is unique", "expression": "count(repeated(ids(t))) == 0", "meta": {}},
+              "$well_formed": {
+                "description": "The requirement is written correctly",
+                "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                "meta": {}
+              },
+              "c": {"description": "Approved", "expression": "x is present", "meta": {"k": 1}, "op": "present", "path": ["x"]}
+            },
+            "description": "Every deployment is approved",
+            "meta": {"control": "C-1", "v": 1.5},
+            "require": "every",
+            "status": "met",
+            "subjects": {"matching": 1, "total": 1}
+          }
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "deployment", "id": null},
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}]
+          },
+          {
+            "requirement": "s",
+            "subject": {"type": "deployment", "id": null},
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "in-scope deployment count", "value": 1}]
+          },
+          {
+            "requirement": "s",
+            "subject": {"type": "deployment", "id": null},
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "repeated deployment ids", "value": []}]
+          },
+          {"requirement": "s", "subject": {"type": "deployment", "id": 1}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "e", "value": 1}]},
+          {"requirement": "s", "subject": {"type": "deployment", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a requirement with min_subjects 0, described",
+    "policy": {"s": {"from": ["t"], "id": ["id"], "min_subjects": 0, "checks": {"c": {"op": "present", "path": ["x"]}}}},
+    "cases": [
+      {
+        "description": "describes min_subjects as reading the list",
+        "rules": ["added.text"],
+        "input": {"t": [{"id": 1, "x": 1}]},
+        "requirements": {
+          "s": {
+            "checks": {
+              "$min_subjects": {"description": "The subject list can be read", "expression": "t can be read", "meta": {}},
+              "$unique_ids": {"description": "Every subject id is unique", "expression": "count(repeated(ids(t))) == 0", "meta": {}},
+              "$well_formed": {
+                "description": "The requirement is written correctly",
+                "expression": "fields are known and have the right types and count(checks) >= 1 and require in [\"every\", \"some\"] and steps are keys and numbers fit a float and checks are written right",
+                "meta": {}
+              },
+              "c": {"description": "", "expression": "x is present", "meta": {}, "op": "present", "path": ["x"]}
+            }
+          }
+        },
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a requirement with no description or meta",
+    "policy": {"s": {"from": ["t"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["x"]}}}},
+    "cases": [
+      {
+        "description": "gets an empty description and meta",
+        "rules": ["report.requirements"],
+        "input": {"t": [{"id": 1, "x": 1}]},
+        "requirements": {"s": {"description": "", "meta": {}}},
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a policy with no requirements",
+    "policy": {},
+    "cases": [
+      {"description": "is never compliant", "rules": ["compliant"], "input": {"t": []}, "compliant": false, "results": [], "violations": []}
+    ]
+  },
+  {
+    "description": "two requirements",
+    "policy": {
+      "a": {"from": ["t"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["x"]}}},
+      "b": {"from": ["t"], "id": ["id"], "applies_to": {"f": {"op": "present", "path": ["id"]}}, "checks": {"a": {"op": "present", "path": ["x"]}, "z": {"op": "present", "path": ["x"]}}}
+    },
+    "cases": [
+      {
+        "description": "put rows in order: added checks by kind, then filters, then checks, by requirement, subject and check",
+        "rules": ["order", "violations"],
+        "input": {"t": [{"id": 2}, {"id": 1, "x": 1}]},
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "a",
+            "subject": {"type": "subject", "id": null},
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}]
+          },
+          {
+            "requirement": "b",
+            "subject": {"type": "subject", "id": null},
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "count(checks)", "value": 2}, {"name": "require", "value": "every"}]
+          },
+          {"requirement": "a", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope subject count", "value": 2}]},
+          {"requirement": "b", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope subject count", "value": 2}]},
+          {"requirement": "a", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": []}]},
+          {"requirement": "b", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": []}]},
+          {"requirement": "b", "subject": {"type": "subject", "id": 2}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "id", "value": 2}]},
+          {"requirement": "b", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "id", "value": 1}]},
+          {"requirement": "a", "subject": {"type": "subject", "id": 2}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null}]},
+          {"requirement": "a", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]},
+          {"requirement": "b", "subject": {"type": "subject", "id": 2}, "check": "a", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null}]},
+          {"requirement": "b", "subject": {"type": "subject", "id": 2}, "check": "z", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null}]},
+          {"requirement": "b", "subject": {"type": "subject", "id": 1}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]},
+          {"requirement": "b", "subject": {"type": "subject", "id": 1}, "check": "z", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+        ],
+        "violations": [
+          {"cause": "value", "check": "c", "description": "", "expression": "x is present", "inputs": [{"name": "x", "value": null}], "requirement": "a", "subject": {"id": 2, "type": "subject"}},
+          {"cause": "value", "check": "a", "description": "", "expression": "x is present", "inputs": [{"name": "x", "value": null}], "requirement": "b", "subject": {"id": 2, "type": "subject"}},
+          {"cause": "value", "check": "z", "description": "", "expression": "x is present", "inputs": [{"name": "x", "value": null}], "requirement": "b", "subject": {"id": 2, "type": "subject"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "violations with refs and failed items",
+    "policy": {"s": {"from": ["t"], "id": ["id"], "checks": {"c": {"op": "all", "path": ["cs"], "check": {"op": "in", "path": ["v"], "values": {"ref": ["$$params", "ok"]}}}}}},
+    "params": {"ok": ["a", "b"]},
+    "cases": [
+      {
+        "description": "add the check's description, expression and refs, and keep failed_items",
+        "rules": ["violations"],
+        "input": {"t": [{"cs": [{"v": "a"}, {"v": "z"}], "id": 1}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "subject", "id": 1},
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "cs[].v", "value": ["a", "z"]}],
+            "failed_items": [{"cause": "value", "path": "cs[1]", "value": {"v": "z"}}]
+          }
+        ],
+        "violations": [
+          {
+            "cause": "value",
+            "check": "c",
+            "description": "",
+            "expression": "every cs: v in $$params.ok",
+            "failed_items": [{"cause": "value", "path": "cs[1]", "value": {"v": "z"}}],
+            "inputs": [{"name": "cs[].v", "value": ["a", "z"]}, {"name": "$$params.ok", "value": ["a", "b"]}],
+            "requirement": "s",
+            "subject": {"id": 1, "type": "subject"}
+          }
+        ]
+      }
+    ]
+  }
+]

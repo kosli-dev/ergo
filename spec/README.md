@@ -10,7 +10,7 @@ Draft 0.1. ergo is three specs, and `ergo.rego` and the Rust port in `ports/rust
 
 When an implementation and the spec disagree, the implementation is wrong. A change to ergo's behaviour starts here, with the rule and its cases, and then goes into each implementation.
 
-The spec only covers reading values, causes, expressions and the operators `present`, `missing`, `equals`, `in`, `non_empty_string`, `empty`, `range`, `matches_any`, `not_matches_any`, `includes`, `excludes`, `compare`, `compare_time`, `all`, `any` and `any_of` so far. [REFERENCE.md](../REFERENCE.md) still describes everything else. The spec will change while it's 0.x.
+The spec covers reading values, causes, expressions, every built-in operator, requirements, scope, statuses, row order and violations. How `from` names subjects (`each_as` and `keys`), substitutes, params passed in, custom operators and values JSON can't hold are still described only in [REFERENCE.md](../REFERENCE.md). `from` waits for [#174](https://github.com/kosli-dev/ergo/issues/174) and [#113](https://github.com/kosli-dev/ergo/issues/113), which may change how it's written. The spec will change while it's 0.x.
 
 ## Cases
 
@@ -24,6 +24,8 @@ A topic's `cases.json` holds a list of groups. A group has a `description`, a `p
 - `compliant` (optional): what `compliant` must be
 - `expressions` (optional): the `expression` some checks must have, like `{"s": {"c": "x is present"}}`
 - `refs` (optional): the `$refs` some checks must have, `[]` for none
+- `requirements` (optional): fields some requirement entries must have, like `{"s": {"subjects": {"matching": 1, "total": 2}}}`. Only the fields listed are compared, and under `checks`, only the listed fields of the listed checks.
+- `violations` (optional): the violations the report must give, all of them, in order
 
 Here is one case, from `cases/present`, whose group checks `{"op": "present", "path": ["x"]}`:
 

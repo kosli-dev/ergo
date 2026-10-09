@@ -54,6 +54,30 @@ test_a_case_with_the_wrong_refs_is_listed_by_name if {
 	}]}
 }
 
+test_a_case_with_the_wrong_requirement_entry_is_listed_by_name if {
+	every want in [{"subjects": {"matching": 2, "total": 1}}, {"checks": {"$min_subjects": {"description": "nope"}}}] {
+		failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
+			"description": "group",
+			"policy": {"s": {"checks": {"c": {"op": "present", "path": ["x"]}}}},
+			"cases": [{"description": "case", "input": {"x": 1}, "requirements": {"s": want}, "results": [{
+				"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c",
+				"passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}],
+			}]}],
+		}]}
+	}
+}
+
+test_a_case_with_the_wrong_violations_is_listed_by_name if {
+	failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
+		"description": "group",
+		"policy": {"s": {"checks": {"c": {"op": "present", "path": ["x"]}}}},
+		"cases": [{"description": "case", "input": {"x": 1}, "violations": [{}], "results": [{
+			"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c",
+			"passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}],
+		}]}],
+	}]}
+}
+
 test_a_case_with_the_wrong_compliant_is_listed_by_name if {
 	failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
 		"description": "group",
@@ -77,11 +101,30 @@ _passes(group, c) if {
 			report.requirements[name].checks[check].expression == expression
 		}
 	}
+	every name, want in object.get(c, "requirements", {}) {
+		every field, value in want {
+			_field_matches(report.requirements[name], field, value)
+		}
+	}
+	object.get(c, "violations", ergo.violations(report)) == ergo.violations(report)
 	every name, checks in object.get(c, "refs", {}) {
 		every check, refs in checks {
 			object.get(report.requirements[name].checks[check], "$refs", []) == refs
 		}
 	}
+}
+
+_field_matches(entry, "checks", value) if {
+	every check, fields in value {
+		every field, value in fields {
+			entry.checks[check][field] == value
+		}
+	}
+}
+
+_field_matches(entry, field, value) if {
+	field != "checks"
+	entry[field] == value
 }
 
 _report(group, c) := ergo.report_with_params(c.input, group.params, group.policy) if "params" in object.keys(group)

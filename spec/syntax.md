@@ -91,3 +91,16 @@ Each check's definition in the report has an `expression` that says what it chec
 **[list.expression]** `every <list>: <inner>` or `some <list>: <inner>`, with the inner check's paths named inside the item. With `each`, the list is shown as `<list>[].<each>`, and with `as`, it's followed by ` as $<name>`. A path with no steps in the inner check is named `<list>[]`, like `every bs: bs[] matches one of ["^main$"]`. A missing or badly written inner check is shown as `<missing check>`, `<invalid check>`, `<nested too deep>` or `<op can't go here>`, and a bad name as `<invalid name>` or `<name given twice>`.
 
 **[any_of.expression]** `one of: ` followed by the options, sorted by name as text and joined with ` | `, each written `<name>(<check> and <check>)` with its checks in the order written. A missing `options` is shown as `<missing options>`, an empty one as `<empty options>`, an empty option as `<name>(<empty option>)` and one that isn't a list as `<name>(<invalid option>)`.
+
+## Checks ergo adds
+
+**[added.text]** The checks ergo adds have these descriptions and expressions, where `<type>` is the requirement's `subject_type`, `subject` by default, and `<from>` is the name of `from`, or `$$input` when it has no steps:
+
+| Check | Description | Expression |
+| --- | --- | --- |
+| `$well_formed` | `The requirement is written correctly` | `fields are known and have the right types and count(checks) >= 1 and require in ["every", "some"] and steps are keys and numbers fit a float and checks are written right` |
+| `$min_subjects` | `The in-scope <type> count is at least <n>`, or with `min_subjects: 0`, `The <type> list can be read` | `count(matching(<from>)) >= <n>`, or `<from> can be read` |
+| `$unique_ids` | `Every <type> id is unique` | `count(repeated(ids(<from>))) == 0` |
+| `$applies` | `The <type> is in scope` | the filters' expressions in name order, joined with ` and ` |
+
+**[added.inputs]** `$min_subjects` names its input `in-scope <type> count`, and `$unique_ids` names its input `repeated <type> ids`. `$well_formed` names its first two `count(checks)` and `require`, and when `require` is written wrong, its value is `["neither every nor some"]`. A field ergo doesn't know is listed with `["unknown field"]`, and `checks: {}` with `["empty"]`.

@@ -1,6 +1,6 @@
 # How ergo turns a policy and an input into a report
 
-Draft 0.1. This file says what a check means, whatever syntax it's written in. [syntax.md](syntax.md) says how today's policies write checks, how they can be written wrong, and how the report shows them. It covers reading values, causes and every built-in operator so far. Requirements, `from`, scope and the rest are still described only in [REFERENCE.md](../REFERENCE.md).
+Draft 0.1. This file says what a check means, whatever syntax it's written in. [syntax.md](syntax.md) says how today's policies write checks, how they can be written wrong, and how the report shows them. It covers reading values, causes, every built-in operator, and how requirements, scope, statuses and violations work. How `from` names subjects, substitutes and custom operators are still described only in [REFERENCE.md](../REFERENCE.md).
 
 Each rule has a name in brackets, like `[present.missing]`. The cases in [`cases/`](cases) list the rules they test, so you can find the cases for a rule and the rule behind a case. An implementation follows every rule here, and where it does something else, it's wrong, whatever `ergo.rego` does.
 
@@ -228,3 +228,56 @@ Every row has a cause. When a check reads several values, the row takes the firs
 **[any_of.inputs]** The row shows every path any option reads, once each, sorted by name. For an `all` or `any` in an option, that's its list, with the whole items, and the names it reads.
 
 **[any_of.no_failed_items]** An `any_of` row has no `failed_items`, even with an `all` or `any` inside it.
+
+## Requirements
+
+A policy is a set of named requirements. A requirement has a way to find its subjects (`from`), a path to each subject's id (`id`), `require`, `min_subjects`, filters (`applies_to`) and checks. It can also have a `description` and `meta`, which ergo copies into the report and never reads.
+
+**[subjects.from]** `from` is a path into the input. When it ends `found` on a list, each item is a subject, in list order. When it ends `found` on an object, that object is the only subject. With no steps, it reads the whole input. Anything else gives no subjects, and the requirement's `$min_subjects` row fails with the path's outcome, or with `unusable` when it read something that's neither a list nor an object, a `null` input included as `null`. That holds even with `min_subjects: 0`, because that's what a typo in `from` looks like.
+
+**[subjects.id]** `id` is a path inside each subject. Its value is the subject's id, or `null` when the path doesn't end `found`. With no steps, the id is the whole subject, so an item that isn't an object is its own id. A subject without an id still gets its rows.
+
+**[subjects.not_an_object]** An item that isn't an object is still a subject, and its checks fail as the [paths](#reading-a-path) they read say, usually `not_an_object`.
+
+**[require]** `require` is `every` or `some`, and `every` by default. Under `every`, every subject in scope must pass every check. Under `some`, at least one subject in scope must pass every check by itself, so two subjects that each pass half the checks don't meet it.
+
+**[min_subjects]** `min_subjects` is a whole number of 0 or more, and 1 by default. The `$min_subjects` row passes when `from` could be read and at least that many subjects are left after `applies_to`. Its input is the number left. Otherwise it fails with `value`, or with the cause in [subjects.from].
+
+**[unique_ids]** No two subjects can share an id, counting the ones `applies_to` leaves out, and `null` counts as an id like any other. The `$unique_ids` row fails with `value` when two do. Its input lists each id more than one subject has, once, sorted by its JSON text as shown in [syntax.md](syntax.md#expressions), so `"b"` comes before `10`, and `10` before `3`.
+
+**[well_formed]** The `$well_formed` row passes when the requirement can be read into the model and has at least one check. Otherwise it fails with `value`, and the requirement is never met. Its inputs start with `count(checks)` and `require`. A requirement that's written wrong still gets its rows for its subjects.
+
+## Scope
+
+**[scope.filters]** A subject is in scope when it passes every filter in `applies_to`. Each subject gets one `$applies` row when the requirement has filters, and a subject that's out of scope gets no other rows, but its `$applies` row stays.
+
+**[scope.out]** A subject is out of scope only when every filter it fails fails with `value`, or one of them is a `present` filter that found its field missing ([present.filter]). Then its `$applies` row fails with `value`.
+
+**[scope.unreadable]** When a filter fails with any other cause, ergo can't tell whether the subject is in scope. Its `$applies` row fails with the first such cause, in the order of [causes](#causes), even when another filter would rule it out, and the requirement isn't met, even with `min_subjects: 0`. A filter written wrong gives `ill_formed`, whatever the others give.
+
+## Statuses
+
+**[status]** Each requirement has a `status`:
+
+- `not_met` when its `$well_formed`, `$min_subjects` or `$unique_ids` row fails, when an `$applies` row fails with anything but `value`, or when its checks fail under `require`
+- `not_applicable` when it would otherwise be met but no subject is in scope, which only happens with `min_subjects: 0`
+- `met` otherwise
+
+**[compliant]** The report is `compliant` when it has at least one requirement and none is `not_met`. A policy with no requirements is never compliant, because it doesn't check anything.
+
+**[report.requirements]** The report has an entry for each requirement, with its `description` and `meta`, or `""` and `{}` when it has none, its `require`, its `status`, `subjects` with `total`, the number found by `from`, and `matching`, the number in scope, and `checks`, each check as written with its `description`, `meta` and `expression`, plus the checks ergo adds. All the filters share one `$applies` entry.
+
+## Row order
+
+**[order]** Rows come in this order, whatever order the policy was written in:
+
+1. all the `$well_formed` rows, then all the `$min_subjects` rows, then all the `$unique_ids` rows, then all the `$applies` rows, then the requirements' own checks
+2. within each of those, requirements in name order
+3. within a requirement, subjects in the order `from` found them
+4. within a subject, checks in name order
+
+Names are sorted by code point.
+
+## Violations
+
+**[violations]** The violations of a report are its rows that are real problems, in the order of `results`, each with its check's `description` and `expression` added and its `$refs` added at the end of its `inputs`. A row of an `all` or `any` check keeps its `failed_items`. The violations leave out rows that passed, `$applies` rows that failed with `value`, and every row of a requirement that's `met` or `not_applicable`, so under `require: some` the subjects that failed aren't violations when another one passed. They're worked out from the report alone.
