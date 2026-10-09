@@ -45,7 +45,12 @@ Two assertions are two checks. "Or" is an `any_of` in the policy around the sent
 
 **[sentence.path.index]** `items[2]` reads the third item of `items`. `item 3 of items`, `first of items` and `last of items` are proposed in #174 as the word forms, and no policy in the corpus needs them.
 
-**[sentence.path.argument]** In an argument, where a phrase expects a value or a path, a quoted string is a value, so a path whose first key is quoted is written with a leading `.`, as jq does: `id is ."$schema"`. The same goes for a field named like a phrase word or a value (see [sentence.words](#words-a-field-cant-be-called)): `state is ."empty"`.
+**[sentence.path.argument]** The left side of a sentence is always a path. The right side can be a value or a path, and these rules decide which:
+
+- A quoted string on the right side is text. `is "prod"` compares with the text prod, never with a field called `"prod"`.
+- A word of the grammar on the right side is never a field name (see [sentence.words](#words-a-field-cant-be-called)). `is empty` is the phrase, `is true` is the value.
+- A field with one of those names is written with a dot in front: `is .empty`, `is .true`. The dot is allowed on any field on the right side, so `is .total_usd` means `is total_usd`, and the report prints it only where it's needed.
+- A key that has to be quoted, like `$schema`, is written with the dot too: `is ."$schema"`.
 
 **[sentence.path.dynamic]** `<path> at $params.<key>` reads the key named by the param, as a ref step does today, and the path can go on after it: `artifacts_statuses at $params.artifact_name.attestations_statuses`. The ref after `at` is `$params` or `$input` and one key. Without that limit, `at $params.a.b` could end its ref after `a` or after `b`, and the tokenizer found 31 lines in the corpus that read two ways because of it. Proposed: `at <name>`, with a name from a `for` line, which pr-reviewer's `keys_match` needs. The word `at`, and whether a ref can go deeper, are open.
 
@@ -61,7 +66,7 @@ Two assertions are two checks. "Or" is an `any_of` in the policy around the sent
 
 ## Words a field can't be called
 
-**[sentence.words]** In an argument, these words are read as part of a phrase or as a value, never as the first key of a path: `a`, `after`, `an`, `at`, `before`, `between`, `count`, `empty`, `equal`, `every`, `false`, `in`, `less`, `more`, `not`, `null`, `one`, `some`, `sum`, `true`. Without this, `x is empty` could also compare `x` with a field called `empty`, and `x is true` with a field called `true`. A field with one of these names is written `."empty"`.
+**[sentence.words]** On the right side, these words are read as part of a phrase or as a value, never as the first key of a path: `a`, `after`, `an`, `and`, `as`, `at`, `before`, `between`, `count`, `each`, `empty`, `equal`, `every`, `false`, `in`, `less`, `more`, `named`, `not`, `null`, `of`, `on`, `one`, `or`, `plus`, `some`, `sum`, `true`, `where`, `within`. Without this, `x is empty` could also compare `x` with a field called `empty`, and `x is true` with a field called `true`. A field with one of these names is written `.empty`.
 
 ## `every`, `some` and `where`
 
