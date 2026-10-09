@@ -107,7 +107,7 @@ subjects:
     id: name
 ```
 
-When every subject is a top-level input field and nothing more, with no `where`, no `id` and no chain, the section is one line: `subjects: artifact, lockfile`. Anything else uses the map. YAML can't mix the two, so a policy with both kinds uses the map, where a plain subject is a name with nothing under it. No policy in the corpus can use the one-line form, because every subject in it has an `id`.
+The map is the only way to write `subjects`, and a simple subject is a name with nothing under it.
 
 ## Values
 
