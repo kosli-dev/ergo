@@ -30,14 +30,14 @@ A check that walks two lists, or compares an item with its subject, puts the wal
 **[sentence.flat]** The grammar is flat, because Rego can't recurse. So:
 
 - one assertion per sentence
-- one `every`, `some`, `count of` or `sum of` per line, and only at the start. A second one goes on a `for` line
+- one `every`, `some`, `count of` or `sum of` per assertion, and only at its start. A second one in the same assertion goes on a `for` line
 - `where` holds one or more conditions joined by `and`, and each condition is a path and a phrase, never another `every` or `where`. A condition can start with `count of` or `sum of`, like `where count of findings is at least 1`, because that's still one condition with a phrase. Its path has no `where` of its own
 - `and` does two jobs and nothing else: it joins the conditions of a `where`, and it joins whole assertions, see [sentence.assert.list](#the-shape-of-a-sentence). Each side of an `and` is a whole condition or a whole assertion, so the result is a flat list, not a tree. An `and` never joins a `where` to its assertion
 - no `or`, and no brackets except the lookups in [sentence.path.brackets](#paths)
 
 "Or" is an `any_of` in the policy around the sentence, because each option has a name and the report says which one passed. Every expression language gets asked for `or` and brackets, and the answer here is no.
 
-**[sentence.assert.list]** `assert` can be a list, or one line with `and` between assertions. Both mean the same, every assertion is true for the same subject, or for the same items when the check has a `for` line, unless the line starts with a one-line `every` or `some`, see [sentence.assert.item](#the-shape-of-a-sentence). The report shows the list form whichever was written, and its `expression` joins the lines with `and`, so a failed row can say which line failed:
+**[sentence.assert.list]** `assert` can be a list, or one line with `and` between assertions. Both mean the same: each assertion starts from the subject, or from the `for` names, whether it's on its own line or after an `and`, see [sentence.assert.and](#the-shape-of-a-sentence). The report shows the list form whichever was written, and its `expression` joins the lines with `and`, so a failed row can say which line failed:
 
 ```yaml
 peer_approval:
@@ -48,9 +48,7 @@ peer_approval:
     - approver.timestamp is after commit.timestamp
 ```
 
-**[sentence.assert.item]** After a one-line `every` or `some`, the assertions joined to it with `and` are about the item too. `every items.price where kind is "a" is at least 2 and owner is "x"` reads `price` and `owner` from each item, and passes when every item of kind `a` has both. Only the first assertion of the line can start with `every`, `some`, `count of` or `sum of`, so `state is "MERGED" and every commits.verified is true` is written wrong. After `count of` and `sum of`, the assertion is about a number, so the ones joined to it are about the subject. A new line under `assert` is a new sentence, starting from the subject again.
-
-So a line that starts with a one-line `every` or `some` and goes on with `and` can't be written as a list without changing what it reads, and the report prints it as written, on one line. The `and` between assertions can't be confused with the `and` of `where` or of `between`: the tokenizer reads `every items.price where kind is "a" and qty is 1 is at least 2 and owner is "x"` one way.
+**[sentence.assert.and]** An `and` between assertions means exactly what a new line under `assert` means. A one-line `every` or `some` ends at the `and`, and the assertion after it starts from the subject again, or from the `for` names. So in `every items.price where kind is "a" is at least 2 and owner is "x"`, `price` is read on each item and `owner` on the subject. Any assertion can start with `every`, `some`, `count of` or `sum of`, so `state is "MERGED" and every commits.verified is true` is two assertions on one line. A list and the joined line never read differently, so the report's `expression`, which joins the list with `and`, is always a sentence the policy could have written. The `and` between assertions can't be confused with the `and` of `where` or of `between`: the tokenizer reads `every items.price where kind is "a" and qty is 1 is at least 2 and owner is "x"` one way.
 
 ## Paths
 
@@ -139,7 +137,7 @@ When every subject is a top-level input field and nothing more, with no `where`,
 
 **[sentence.where.every]** Under `every`, an item that `where` leaves out isn't checked. When `where` leaves no items, the check fails with `value`, unless it has `if any`. No policy in the corpus uses `every ... where` yet.
 
-**[sentence.argument.item]** In a one-line `every` or `some`, a path in the argument starts at the item too, so the item can be compared with its own fields: server 0007's `some approvers.timestamp where state is "APPROVED" and username does not equal pr_author is after last_commit_timestamp` reads both from each approver. #174 says the same: in a one-line `every` or `some`, every bare name is the item's, in `where`, on the right side and in the assertions joined to it with `and`, see [sentence.assert.item](#the-shape-of-a-sentence). To compare an item with the subject, use a `for` line. To reach the input, start with `$input`.
+**[sentence.argument.item]** In a one-line `every` or `some`, a path in the argument starts at the item too, so the item can be compared with its own fields: server 0007's `some approvers.timestamp where state is "APPROVED" and username does not equal pr_author is after last_commit_timestamp` reads both from each approver. #174 says the same: in a one-line `every` or `some`, every bare name is the item's, in `where` and on the right side alike. It ends at an `and`, see [sentence.assert.and](#the-shape-of-a-sentence). To compare an item with the subject, use a `for` line. To reach the input, start with `$input`.
 
 **[sentence.argument.subject]** After `count of` and `sum of`, the assertion is about one number for the subject, so a path in the argument starts at the subject: in `sum of stages.usd equals total_usd`, `total_usd` is the subject's.
 
@@ -355,12 +353,12 @@ The corpus has 335 lines: 231 assertions, 14 `for` lines and 90 `from` lines. sd
 
 Some lines have two causes. The tokenizer also applied [sentence.subject.own](#subjects) to every `from` line, and found the same six chains the corpus marks.
 
-27 made-up lines test what the corpus doesn't reach:
+28 made-up lines test what the corpus doesn't reach:
 
 - `plus` after `where` reads three ways until [sentence.derived.plus](#derived-values) forbids it, and a `for` item named `every` reads one way until [sentence.for.name](#the-for-line) forbids it.
-- `if any` with `some`, two quantifiers in one sentence, `count of ... is empty`, a quantifier after `and`, `where count of reviews is empty` and the bare key `foo$bar` parse no way, as they should.
+- `if any` with `some`, two quantifiers in one sentence, `count of ... is empty`, `where count of reviews is empty` and the bare key `foo$bar` parse no way, as they should.
 - `where count of reviews is at least 1 and state is "open"` and `some orders.id where sum of items.price is more than 100 is not empty` read one way.
-- After `every items.price where kind is "a" and qty is 1 is at least 2`, the `and owner is "x"` that follows reads one way, on the item. After `count of` or a plain assertion, it's on the subject.
+- `every items.price where kind is "a" and qty is 1 is at least 2 and owner is "x"` reads one way, with `owner` on the subject. So do `state is "MERGED" and every commits.verified is true` and `every items.price where kind is "a" is at least 2 and some items.owner is "x"`, two quantified assertions on one line.
 - `format is in "spdx", "cyclonedx"` prints as `is one of`, `username is one of $params.internal_staff` as `is in`, `approved_by is not author` as `does not equal`, and `environment does not equal "prod"` as `is not`.
 - `"production deployment".pull_requests` reads one way, as a chain from that subject.
 
