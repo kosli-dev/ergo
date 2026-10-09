@@ -15,7 +15,7 @@ every commits.verified is true
 every review.incidents.action_ticket, if any, is not empty
 some approvers.username where state is "APPROVED" is in $params.internal_staff
 count of findings where source is "claude" is claude_found
-sum of stages.usd where kind is "model" is total_usd within 0.01
+sum of stages.usd where kind is "model" equals total_usd within 0.01
 ```
 
 **[sentence.forms]** The thing is one of:
@@ -62,7 +62,7 @@ The `and` between assertions can't be confused with the `and` of `where` or of `
 
 - A quoted string on the right side is text. `is "prod"` compares with the text prod, never with a field called `"prod"`.
 - A word of the grammar on the right side is never a field name (see [sentence.words](#words-a-field-cant-be-called)). `is empty` is the phrase, `is true` is the value.
-- A field with one of those names is written with a dot in front: `is .empty`, `is .true`. The dot is allowed on any field on the right side, so `is .total_usd` means `is total_usd`, and the report prints it only where it's needed.
+- A field with one of those names is written with a dot in front: `is .empty`, `is .true`. The dot is allowed on any field on the right side, so `equals .total_usd` means `equals total_usd`, and the report prints it only where it's needed.
 - A key that has to be quoted, like `$schema`, is written with the dot too: `is ."$schema"`.
 
 **[sentence.path.dynamic]** `<path> named by <reference>` reads the key that the reference holds, as a ref step does today, and the path can go on after it: `artifacts_statuses named by $params.artifact_name.attestations_statuses`. The reference is `$params` or `$input` plus one key, or a name from a `for` line, like `persona_blob_shas named by persona`. Without that limit, `named by $params.a.b` could end the reference after `a` or after `b`, and the tokenizer found 24 lines in the corpus that read two ways because of it.
@@ -100,7 +100,7 @@ subjects:
 
 **[sentence.value.list]** A list of values is the values separated by `, `, with no brackets: `is one of "staging", "prod"`. A value can hold a comma, `matches "^fix(, |: )"`, because commas inside quotes don't separate.
 
-**[sentence.value.path]** An argument that isn't a value is a path. So `is "prod"` compares with text and `is total_usd` with a field, which is what today's `equals` and `compare` split was for.
+**[sentence.value.path]** An argument that isn't a value is a path. So `is "prod"` compares with text and `equals total_usd` with a field, which is what today's `equals` and `compare` split was for. `is` before a field is read the same, and printed as `equals`.
 
 ## Words a field can't be called
 
@@ -124,7 +124,7 @@ subjects:
 
 **[sentence.argument.item]** In a one-line `every` or `some`, a path in the argument starts at the item too, so the item can be compared with its own fields: server 0007's `some approvers.timestamp where state is "APPROVED" and username is not pr_author is after last_commit_timestamp` reads both from each approver. #174 says the same: in a one-line `every` or `some`, every bare name is the item's, in `where` and on the right side alike. To compare an item with the subject, use a `for` line. To reach the input, start with `$input`.
 
-**[sentence.argument.subject]** After `count of` and `sum of`, the assertion is about one number for the subject, so a path in the argument starts at the subject: in `sum of stages.usd is total_usd`, `total_usd` is the subject's.
+**[sentence.argument.subject]** After `count of` and `sum of`, the assertion is about one number for the subject, so a path in the argument starts at the subject: in `sum of stages.usd equals total_usd`, `total_usd` is the subject's.
 
 ## Derived values
 
@@ -134,7 +134,7 @@ subjects:
 
 **[sentence.derived.plus]** `<term> plus <term>` adds numbers. A term is a path, a number, a `count of` or a `sum of`. `plus` can't follow a `where`, because `count of x where n is m plus k is t` would read two ways: the tokenizer found three parses for it. Put the `where` on the last term instead.
 
-**[sentence.derived.compare]** A derived value only goes with `is`, `is not`, `is ... within`, `is at least`, `is at most`, `is more than`, `is less than` and `is between`. `count of approvers is empty` is written wrong.
+**[sentence.derived.compare]** A derived value only goes with `is`, `equals`, `is not`, `does not equal`, `is ... within`, `equals ... within`, `is at least`, `is at most`, `is more than`, `is less than` and `is between`. `count of approvers is empty` is written wrong.
 
 ## The `for` line
 
@@ -307,7 +307,7 @@ The first is read as `is` or `equals`, the second as `is not`. The report prints
 | `approved_by is empy` | `unknown phrase "is empy" at column 13, expected one of: is empty, is not empty, is one of, ...` |
 | `environment is "prod` | `unclosed quote at column 16` |
 | `every commits.signed` | `nothing after the path at column 21: expected a phrase, like "is" or "exists"` |
-| `sum of stages.usd is total within` | `"within" needs a number after it` |
+| `sum of stages.usd equals total within` | `"within" needs a number after it` |
 | `some approvers, if any, is not empty` | `if any can't go with some` |
 | `every pull_requests some approvers.state is "APPROVED"` | `two quantifiers in one sentence: put them on a for line` |
 

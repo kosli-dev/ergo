@@ -723,9 +723,9 @@ Not used anywhere: `is not one of`, `does not exist`, `contains none of`, `start
 | --- | ---: | --- |
 | `min_length` | 8 | with `min: 1`, `count of x is at least 1`. With `min: 0`, `x is a list` |
 | `min_length_at` | 2 | `count of x is at least y` |
-| `length_eq_difference` | 1 | `count of x plus z is y`, moving the minus across |
-| `count_where_eq_sum` | 2 | `count of x where field is "v" is a plus b` |
-| `sum_eq` | 2 | `sum of x.usd where stage is "v" is total within 0.000001` |
+| `length_eq_difference` | 1 | `count of x plus z equals y`, moving the minus across |
+| `count_where_eq_sum` | 2 | `count of x where field is "v" equals a plus b` |
+| `sum_eq` | 2 | `sum of x.usd where stage is "v" equals total within 0.000001` |
 | `contains_all` | 1 | `x contains all of y` |
 | `keys_match` | 1 | `for: every x as persona` with `assert: y named by persona matches "..."`. A sentence under #174, but ergo can't run it until a ref can start with a name |
 
