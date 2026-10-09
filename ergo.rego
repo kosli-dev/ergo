@@ -2510,16 +2510,37 @@ _step_refs(check) := {x.ref |
 	_is_ref(x)
 	not _under_literal(check, p)
 	count(p) >= 2
-	_step_position(p)
+	_step_position(check, p)
 	is_number(p[count(p) - 1])
 }
 
-_step_position(p) if p[count(p) - 2] in {"path", "left", "right", "each", "count", "sum"}
+_step_position(_, p) if p[count(p) - 2] in {"path", "left", "right", "each"}
 
-_step_position(p) if {
+_step_position(check, p) if {
+	p[count(p) - 2] in {"count", "sum"}
+	_in_compare_side(check, array.slice(p, 0, count(p) - 2))
+}
+
+_step_position(check, p) if {
 	count(p) >= 3
 	p[count(p) - 3] == "add"
 	is_number(p[count(p) - 2])
+	_in_compare_side(check, array.slice(p, 0, count(p) - 3))
+}
+
+_step_position(check, p) if {
+	count(p) >= 4
+	p[count(p) - 2] in {"count", "sum"}
+	p[count(p) - 4] == "add"
+	_in_compare_side(check, array.slice(p, 0, count(p) - 4))
+}
+
+_in_compare_side(check, side_path) if {
+	count(side_path) >= 1
+	side_path[count(side_path) - 1] in {"left", "right"}
+	walk(check, [q, node])
+	q == array.slice(side_path, 0, count(side_path) - 1)
+	object.get(node, "op", null) == "compare"
 }
 
 _used_ref_state(check, r) := "unusable" if _wrong_step(check, r)
