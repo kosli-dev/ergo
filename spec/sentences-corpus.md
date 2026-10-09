@@ -10,7 +10,7 @@ The sources, as of 9 October 2026:
 - ergo's `examples/baking` and the README example
 - Tore's DEV controls, all 36 of them, from [kosli-playground/dev-process-controls](https://github.com/kosli-playground/dev-process-controls). They're invented to exercise ergo, so a check only they need weighs less.
 
-Paths are written as the sentence writes them. `$params.x` is today's `{ref: [$$params, x]}`, `$input` is `$$input`, and `at $params.x` is the placeholder for a dynamic key, a ref step today (see [open questions](#open-questions)). The subject's `id` is one key in every policy here, so it's left out.
+Paths are written as the sentence writes them. `$params.x` is today's `{ref: [$$params, x]}`, `$input` is `$$input`, and `named by $params.x` reads a key named by a param, a ref step today. Brackets are the other spelling, `artifacts_statuses[$params.artifact_name]`, and the corpus uses the word form, as the report prints it. The subject's `id` is one key in every policy here, so it's left out.
 
 Notes in the last column:
 
@@ -27,7 +27,7 @@ Notes in the last column:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of artifact | `[trail, compliance_status, artifacts_statuses, {ref: [$$params, artifact_name]}]` | `trail.compliance_status.artifacts_statuses at $params.artifact_name` |  |
+| `from` of artifact | `[trail, compliance_status, artifacts_statuses, {ref: [$$params, artifact_name]}]` | `trail.compliance_status.artifacts_statuses named by $params.artifact_name` |  |
 | `fingerprint` | `{op: non_empty_string, path: [artifact_fingerprint]}` | `artifact_fingerprint is not empty` | widens |
 | `name` | `{op: non_empty_string, path: [name]}` | `name is not empty` | widens |
 | `commit` | `{op: non_empty_string, path: [git_commit_info, sha1]}` | `git_commit_info.sha1 is not empty` | widens |
@@ -38,10 +38,10 @@ Notes in the last column:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of artifact | `[trail, compliance_status, artifacts_statuses, {ref: [$$params, artifact_name]}]` | `trail.compliance_status.artifacts_statuses at $params.artifact_name` |  |
+| `from` of artifact | `[trail, compliance_status, artifacts_statuses, {ref: [$$params, artifact_name]}]` | `trail.compliance_status.artifacts_statuses named by $params.artifact_name` |  |
 | `fingerprint` | `{op: non_empty_string, path: [artifact_fingerprint]}` | `artifact_fingerprint is not empty` | widens |
-| `pr_attestation` | `{op: equals, path: [attestations_statuses, {ref: [$$params, pr_attestation_name]}, status], value: COMPLETE}` | `attestations_statuses at $params.pr_attestation_name.status is "COMPLETE"` |  |
-| `from` of pull request | `[trail, compliance_status, artifacts_statuses, {ref: [$$params, artifact_name]}, attestations_statuses, {ref: [$$params, pr_attestation_name]}, pull_requests, {each_as: pr}]` | `trail.compliance_status.artifacts_statuses at $params.artifact_name.attestations_statuses at $params.pr_attestation_name.pull_requests` | The name `pr` goes: #174 now names things in a `for` line, and the subject's fields are bare there. |
+| `pr_attestation` | `{op: equals, path: [attestations_statuses, {ref: [$$params, pr_attestation_name]}, status], value: COMPLETE}` | `attestations_statuses named by $params.pr_attestation_name.status is "COMPLETE"` |  |
+| `from` of pull request | `[trail, compliance_status, artifacts_statuses, {ref: [$$params, artifact_name]}, attestations_statuses, {ref: [$$params, pr_attestation_name]}, pull_requests, {each_as: pr}]` | `trail.compliance_status.artifacts_statuses named by $params.artifact_name.attestations_statuses named by $params.pr_attestation_name.pull_requests` | The name `pr` goes: #174 now names things in a `for` line, and the subject's fields are bare there. |
 | `merged` | `{op: equals, path: [state], value: MERGED}` | `state is "MERGED"` |  |
 | `protected_branch` | `{op: equals, path: [base_ref], value: {ref: [$$params, protected_branch]}}` | `base_ref is $params.protected_branch` |  |
 | `signed_commits` | `{op: all, path: [commits], check: {op: equals, path: [verified], value: true}}` | `every commits.verified is true` |  |
@@ -51,9 +51,9 @@ Notes in the last column:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of artifact | `[trail, compliance_status, artifacts_statuses, {ref: [$$params, artifact_name]}]` | `trail.compliance_status.artifacts_statuses at $params.artifact_name` |  |
+| `from` of artifact | `[trail, compliance_status, artifacts_statuses, {ref: [$$params, artifact_name]}]` | `trail.compliance_status.artifacts_statuses named by $params.artifact_name` |  |
 | `fingerprint` | `{op: non_empty_string, path: [artifact_fingerprint]}` | `artifact_fingerprint is not empty` | widens |
-| `from` of test suite | `[trail, compliance_status, artifacts_statuses, {ref: [$$params, artifact_name]}, attestations_statuses, {each_as: suite, keys: {ref: [$$params, test_attestation_names]}}]` | `trail.compliance_status.artifacts_statuses at $params.artifact_name.attestations_statuses at each of $params.test_attestation_names` | The name `suite` is never read, so it goes. |
+| `from` of test suite | `[trail, compliance_status, artifacts_statuses, {ref: [$$params, artifact_name]}, attestations_statuses, {each_as: suite, keys: {ref: [$$params, test_attestation_names]}}]` | `trail.compliance_status.artifacts_statuses named by $params.artifact_name.attestations_statuses named by each of $params.test_attestation_names` | The name `suite` is never read, so it goes. |
 | `recorded` | `{op: equals, path: [status], value: COMPLETE}` | `status is "COMPLETE"` |  |
 | `passed` | `{op: equals, path: [is_compliant], value: true}` | `is_compliant is true` |  |
 | `attached` | `{op: equals, path: [has_audit_package], value: true}` | `has_audit_package is true` |  |
@@ -64,9 +64,9 @@ Notes in the last column:
 | --- | --- | --- | --- |
 | `from` of artifact | `[artifact]` | `artifact` | Rego-shaped. Every subject in this policy is built by Rego from the attested lockfile, Dockerfile and SBOM text. The sentences only cover what ergo checks after that. |
 | `fingerprint` | `{op: non_empty_string, path: [artifact_fingerprint]}` | `artifact_fingerprint is not empty` | widens |
-| `lockfile_attested` | `{op: equals, path: [attestations_statuses, <lock_attestation_name>, status], value: COMPLETE}` | `attestations_statuses at $params.lock_attestation_name.status is "COMPLETE"` | no default |
-| `dockerfile_attested` | `{op: equals, path: [attestations_statuses, <dockerfile_attestation_name>, status], value: COMPLETE}` | `attestations_statuses at $params.dockerfile_attestation_name.status is "COMPLETE"` | no default |
-| `sbom_attested` | `{op: equals, path: [attestations_statuses, <sbom_attestation_name>, status], value: COMPLETE}` | `attestations_statuses at $params.sbom_attestation_name.status is "COMPLETE"` | no default |
+| `lockfile_attested` | `{op: equals, path: [attestations_statuses, <lock_attestation_name>, status], value: COMPLETE}` | `attestations_statuses named by $params.lock_attestation_name.status is "COMPLETE"` | no default |
+| `dockerfile_attested` | `{op: equals, path: [attestations_statuses, <dockerfile_attestation_name>, status], value: COMPLETE}` | `attestations_statuses named by $params.dockerfile_attestation_name.status is "COMPLETE"` | no default |
+| `sbom_attested` | `{op: equals, path: [attestations_statuses, <sbom_attestation_name>, status], value: COMPLETE}` | `attestations_statuses named by $params.sbom_attestation_name.status is "COMPLETE"` | no default |
 | `from` of lockfile | `[lockfile]` | `lockfile` | Rego-shaped |
 | filter `recorded` | `{op: present, path: [status]}` | `status exists` |  |
 | filter `attested` | `{op: equals, path: [status], value: COMPLETE}` | `status is "COMPLETE"` |  |
@@ -91,26 +91,26 @@ Same as SDLC-CTRL-0002 binary provenance, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of artifact | `[trail, compliance_status, artifacts_statuses, <artifact_name>]` | `trail.compliance_status.artifacts_statuses at $params.artifact_name` | no default |
+| `from` of artifact | `[trail, compliance_status, artifacts_statuses, <artifact_name>]` | `trail.compliance_status.artifacts_statuses named by $params.artifact_name` | no default |
 
 ### demo SDLC-CTRL-0003 controlled build (plain Rego)
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of artifact | `input.trail.compliance_status.artifacts_statuses[artifact_name]` | `trail.compliance_status.artifacts_statuses at $params.artifact_name` | no default |
+| `from` of artifact | `input.trail.compliance_status.artifacts_statuses[artifact_name]` | `trail.compliance_status.artifacts_statuses named by $params.artifact_name` | no default |
 | `fingerprint` | `is_string(artifact.artifact_fingerprint); artifact.artifact_fingerprint != ""` | `artifact_fingerprint is not empty` | widens |
-| `build_complete` | `artifact.attestations_statuses[build_attestation_name].status == "COMPLETE"` | `attestations_statuses at $params.build_attestation_name.status is "COMPLETE"` | no default |
-| `build_compliant` | `artifact.attestations_statuses[build_attestation_name].is_compliant == true` | `attestations_statuses at $params.build_attestation_name.is_compliant is true` | no default |
-| `build_has_attachment` | `artifact.attestations_statuses[build_attestation_name].has_audit_package == true` | `attestations_statuses at $params.build_attestation_name.has_audit_package is true` | no default |
+| `build_complete` | `artifact.attestations_statuses[build_attestation_name].status == "COMPLETE"` | `attestations_statuses named by $params.build_attestation_name.status is "COMPLETE"` | no default |
+| `build_compliant` | `artifact.attestations_statuses[build_attestation_name].is_compliant == true` | `attestations_statuses named by $params.build_attestation_name.is_compliant is true` | no default |
+| `build_has_attachment` | `artifact.attestations_statuses[build_attestation_name].has_audit_package == true` | `attestations_statuses named by $params.build_attestation_name.has_audit_package is true` | no default |
 
 ### demo SDLC-CTRL-0006 secrets scanning (plain Rego)
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of artifact | `input.trail.compliance_status.artifacts_statuses[artifact_name]` | `trail.compliance_status.artifacts_statuses at $params.artifact_name` | no default |
-| `scan_complete` | `artifact.attestations_statuses[scan_attestation_name].status == "COMPLETE"` | `attestations_statuses at $params.scan_attestation_name.status is "COMPLETE"` | no default |
-| `scan_compliant` | `artifact.attestations_statuses[scan_attestation_name].is_compliant == true` | `attestations_statuses at $params.scan_attestation_name.is_compliant is true` | no default |
-| `scan_has_attachment` | `artifact.attestations_statuses[scan_attestation_name].has_audit_package == true` | `attestations_statuses at $params.scan_attestation_name.has_audit_package is true` | no default |
+| `from` of artifact | `input.trail.compliance_status.artifacts_statuses[artifact_name]` | `trail.compliance_status.artifacts_statuses named by $params.artifact_name` | no default |
+| `scan_complete` | `artifact.attestations_statuses[scan_attestation_name].status == "COMPLETE"` | `attestations_statuses named by $params.scan_attestation_name.status is "COMPLETE"` | no default |
+| `scan_compliant` | `artifact.attestations_statuses[scan_attestation_name].is_compliant == true` | `attestations_statuses named by $params.scan_attestation_name.is_compliant is true` | no default |
+| `scan_has_attachment` | `artifact.attestations_statuses[scan_attestation_name].has_audit_package == true` | `attestations_statuses named by $params.scan_attestation_name.has_audit_package is true` | no default |
 
 ### demo SDLC-CTRL-0004 dependencies
 
@@ -126,9 +126,9 @@ Same as SDLC-CTRL-0004 dependencies, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of artifact | `[trail, compliance_status, artifacts_statuses, <artifact_name>]` | `trail.compliance_status.artifacts_statuses at $params.artifact_name` | no default |
+| `from` of artifact | `[trail, compliance_status, artifacts_statuses, <artifact_name>]` | `trail.compliance_status.artifacts_statuses named by $params.artifact_name` | no default |
 | `fingerprint` | `{op: non_empty_string, path: [artifact_fingerprint]}` | `artifact_fingerprint is not empty` | widens |
-| `pr_attestation` | `{op: equals, path: [attestations_statuses, <pr_attestation_name>, status], value: COMPLETE}` | `attestations_statuses at $params.pr_attestation_name.status is "COMPLETE"` | no default |
+| `pr_attestation` | `{op: equals, path: [attestations_statuses, <pr_attestation_name>, status], value: COMPLETE}` | `attestations_statuses named by $params.pr_attestation_name.status is "COMPLETE"` | no default |
 | `from` of pull request | `[pull_requests]` | `pull_requests` | Rego-shaped. Rego copies each pull request's author and last commit time onto every approver, so the check needs no `$pr` and no inner `all`. |
 | `merged` | `{op: equals, path: [state], value: MERGED}` | `state is "MERGED"` |  |
 | `protected_branch` | `{op: equals, path: [base_ref], value: <protected_branch>}` | `base_ref is $params.protected_branch` | no default |
@@ -139,9 +139,9 @@ Same as SDLC-CTRL-0004 dependencies, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of artifact | `[trail, compliance_status, artifacts_statuses, <artifact_name>]` | `trail.compliance_status.artifacts_statuses at $params.artifact_name` | no default |
+| `from` of artifact | `[trail, compliance_status, artifacts_statuses, <artifact_name>]` | `trail.compliance_status.artifacts_statuses named by $params.artifact_name` | no default |
 | `fingerprint` | `{op: non_empty_string, path: [artifact_fingerprint]}` | `artifact_fingerprint is not empty` | widens |
-| `from` of test suite | `[suites, <name>], one requirement per name in Rego` | `trail.compliance_status.artifacts_statuses at $params.artifact_name.attestations_statuses at each of $params.test_attestation_names` | Rego-shaped. no default. **misfit**, see below |
+| `from` of test suite | `[suites, <name>], one requirement per name in Rego` | `trail.compliance_status.artifacts_statuses named by $params.artifact_name.attestations_statuses named by each of $params.test_attestation_names` | Rego-shaped. no default. **misfit**, see below |
 | `recorded` | `{op: equals, path: [attestation, status], value: COMPLETE}` | `status is "COMPLETE"` | Written against the sdlc-policies subject, where the suite is the attestation itself. |
 | `passed` | `{op: equals, path: [attestation, is_compliant], value: true}` | `is_compliant is true` |  |
 | `attached` | `{op: equals, path: [attestation, has_audit_package], value: true}` | `has_audit_package is true` |  |
@@ -150,38 +150,38 @@ Same as SDLC-CTRL-0004 dependencies, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of artifact | `input.trail.compliance_status.artifacts_statuses[artifact_name]` | `trail.compliance_status.artifacts_statuses at $params.artifact_name` | no default |
-| `approval_complete` | `artifact.attestations_statuses[approval_attestation_name].status == "COMPLETE"` | `attestations_statuses at $params.approval_attestation_name.status is "COMPLETE"` | no default |
-| `approval_compliant` | `artifact.attestations_statuses[approval_attestation_name].is_compliant == true` | `attestations_statuses at $params.approval_attestation_name.is_compliant is true` | no default |
-| `approval_has_attachment` | `artifact.attestations_statuses[approval_attestation_name].has_audit_package == true` | `attestations_statuses at $params.approval_attestation_name.has_audit_package is true` | no default |
-| `approved_by_non_author` | `some approver in attestation.approvers; approver != attestation.author` | `for: some attestations_statuses at $params.approval_attestation_name.approvers as approver`<br>`assert: approver is not attestations_statuses at $params.approval_attestation_name.author` | no default. narrows. `for` line. The approver is compared with a field of the attestation, so it takes a `for` line. Rego's `!=` passes when the types differ, `is not` fails as `unusable`. |
+| `from` of artifact | `input.trail.compliance_status.artifacts_statuses[artifact_name]` | `trail.compliance_status.artifacts_statuses named by $params.artifact_name` | no default |
+| `approval_complete` | `artifact.attestations_statuses[approval_attestation_name].status == "COMPLETE"` | `attestations_statuses named by $params.approval_attestation_name.status is "COMPLETE"` | no default |
+| `approval_compliant` | `artifact.attestations_statuses[approval_attestation_name].is_compliant == true` | `attestations_statuses named by $params.approval_attestation_name.is_compliant is true` | no default |
+| `approval_has_attachment` | `artifact.attestations_statuses[approval_attestation_name].has_audit_package == true` | `attestations_statuses named by $params.approval_attestation_name.has_audit_package is true` | no default |
+| `approved_by_non_author` | `some approver in attestation.approvers; approver != attestation.author` | `for: some attestations_statuses named by $params.approval_attestation_name.approvers as approver`<br>`assert: approver is not attestations_statuses named by $params.approval_attestation_name.author` | no default. narrows. `for` line. The approver is compared with a field of the attestation, so it takes a `for` line. Rego's `!=` passes when the types differ, `is not` fails as `unusable`. |
 
 ### demo SDLC-CTRL-0020 SAST (plain Rego)
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of artifact | `input.trail.compliance_status.artifacts_statuses[artifact_name]` | `trail.compliance_status.artifacts_statuses at $params.artifact_name` | no default |
-| `scan_complete` | `artifact.attestations_statuses[scan_attestation_name].status == "COMPLETE"` | `attestations_statuses at $params.scan_attestation_name.status is "COMPLETE"` | no default |
-| `scan_compliant` | `artifact.attestations_statuses[scan_attestation_name].is_compliant == true` | `attestations_statuses at $params.scan_attestation_name.is_compliant is true` | no default |
-| `scan_has_attachment` | `artifact.attestations_statuses[scan_attestation_name].has_audit_package == true` | `attestations_statuses at $params.scan_attestation_name.has_audit_package is true` | no default |
+| `from` of artifact | `input.trail.compliance_status.artifacts_statuses[artifact_name]` | `trail.compliance_status.artifacts_statuses named by $params.artifact_name` | no default |
+| `scan_complete` | `artifact.attestations_statuses[scan_attestation_name].status == "COMPLETE"` | `attestations_statuses named by $params.scan_attestation_name.status is "COMPLETE"` | no default |
+| `scan_compliant` | `artifact.attestations_statuses[scan_attestation_name].is_compliant == true` | `attestations_statuses named by $params.scan_attestation_name.is_compliant is true` | no default |
+| `scan_has_attachment` | `artifact.attestations_statuses[scan_attestation_name].has_audit_package == true` | `attestations_statuses named by $params.scan_attestation_name.has_audit_package is true` | no default |
 
 ### demo SDLC-CTRL-0021 SCA (plain Rego)
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of artifact | `input.trail.compliance_status.artifacts_statuses[artifact_name]` | `trail.compliance_status.artifacts_statuses at $params.artifact_name` | no default |
-| `scan_complete` | `artifact.attestations_statuses[scan_attestation_name].status == "COMPLETE"` | `attestations_statuses at $params.scan_attestation_name.status is "COMPLETE"` | no default |
-| `scan_compliant` | `artifact.attestations_statuses[scan_attestation_name].is_compliant == true` | `attestations_statuses at $params.scan_attestation_name.is_compliant is true` | no default |
-| `scan_has_attachment` | `artifact.attestations_statuses[scan_attestation_name].has_audit_package == true` | `attestations_statuses at $params.scan_attestation_name.has_audit_package is true` | no default |
+| `from` of artifact | `input.trail.compliance_status.artifacts_statuses[artifact_name]` | `trail.compliance_status.artifacts_statuses named by $params.artifact_name` | no default |
+| `scan_complete` | `artifact.attestations_statuses[scan_attestation_name].status == "COMPLETE"` | `attestations_statuses named by $params.scan_attestation_name.status is "COMPLETE"` | no default |
+| `scan_compliant` | `artifact.attestations_statuses[scan_attestation_name].is_compliant == true` | `attestations_statuses named by $params.scan_attestation_name.is_compliant is true` | no default |
+| `scan_has_attachment` | `artifact.attestations_statuses[scan_attestation_name].has_audit_package == true` | `attestations_statuses named by $params.scan_attestation_name.has_audit_package is true` | no default |
 
 ### demo SDLC-CTRL-0022 container scan (plain Rego)
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of artifact | `input.trail.compliance_status.artifacts_statuses[artifact_name]` | `trail.compliance_status.artifacts_statuses at $params.artifact_name` | no default |
-| `scan_complete` | `artifact.attestations_statuses[scan_attestation_name].status == "COMPLETE"` | `attestations_statuses at $params.scan_attestation_name.status is "COMPLETE"` | no default |
-| `scan_compliant` | `artifact.attestations_statuses[scan_attestation_name].is_compliant == true` | `attestations_statuses at $params.scan_attestation_name.is_compliant is true` | no default |
-| `scan_has_attachment` | `artifact.attestations_statuses[scan_attestation_name].has_audit_package == true` | `attestations_statuses at $params.scan_attestation_name.has_audit_package is true` | no default |
+| `from` of artifact | `input.trail.compliance_status.artifacts_statuses[artifact_name]` | `trail.compliance_status.artifacts_statuses named by $params.artifact_name` | no default |
+| `scan_complete` | `artifact.attestations_statuses[scan_attestation_name].status == "COMPLETE"` | `attestations_statuses named by $params.scan_attestation_name.status is "COMPLETE"` | no default |
+| `scan_compliant` | `artifact.attestations_statuses[scan_attestation_name].is_compliant == true` | `attestations_statuses named by $params.scan_attestation_name.is_compliant is true` | no default |
+| `scan_has_attachment` | `artifact.attestations_statuses[scan_attestation_name].has_audit_package == true` | `attestations_statuses named by $params.scan_attestation_name.has_audit_package is true` | no default |
 
 ### demo require-artifact-provenance (plain Rego)
 
@@ -227,7 +227,7 @@ Same as SDLC-CTRL-0004 dependencies, except:
 | `findings_complete` | `{op: equals, path: [compliance_status, attestations_statuses, findings, attestation_data, truncated], value: false}` | `compliance_status.attestations_statuses.findings.attestation_data.truncated is false` | `must`: `truncated is false` reads like a status. |
 | `round_cost_sums_its_stages` | `{op: sum_eq, path: [..., final-verdict, attestation_data, cost, by_stage], field: usd, only: {}, total: [..., cost, total_usd], tolerance: 0.000001, expression: ...}` | `sum of compliance_status.attestations_statuses.final-verdict.attestation_data.cost.by_stage.usd is compliance_status.attestations_statuses.final-verdict.attestation_data.cost.total_usd within 0.000001` | replaces custom `sum_eq` |
 | `verifier_cost_matches_its_stage` | `{op: sum_eq, path: [..., final-verdict, attestation_data, cost, by_stage], field: usd, only: {stage: verifier}, total: [compliance_status, attestations_statuses, finding-verifier, attestation_data, cost_usd], tolerance: 0.000001, expression: ...}` | `sum of compliance_status.attestations_statuses.final-verdict.attestation_data.cost.by_stage.usd where stage is "verifier" is compliance_status.attestations_statuses.finding-verifier.attestation_data.cost_usd within 0.000001` | narrows. replaces custom `sum_eq`. A sum over no rows is 0, as the custom operator gives (checked on `main`). A stage row with no `stage` field is skipped by the custom operator and fails the sentence as `absent`. |
-| `dispatched_personas_recorded` | `{op: keys_match, keys: [compliance_status, attestations_statuses, classifier, attestation_data, personas_dispatched], path: [compliance_status, attestations_statuses, preflight, attestation_data, persona_blob_shas], patterns: ['^[0-9a-f]{40}$'], expression: ..., inputs: [...]}` | `for: every compliance_status.attestations_statuses.classifier.attestation_data.personas_dispatched as persona`<br>`assert: compliance_status.attestations_statuses.preflight.attestation_data.persona_blob_shas at persona matches "^[0-9a-f]{40}$"` | replaces custom `keys_match`. **misfit**, see below |
+| `dispatched_personas_recorded` | `{op: keys_match, keys: [compliance_status, attestations_statuses, classifier, attestation_data, personas_dispatched], path: [compliance_status, attestations_statuses, preflight, attestation_data, persona_blob_shas], patterns: ['^[0-9a-f]{40}$'], expression: ..., inputs: [...]}` | `for: every compliance_status.attestations_statuses.classifier.attestation_data.personas_dispatched as persona`<br>`assert: compliance_status.attestations_statuses.preflight.attestation_data.persona_blob_shas named by persona matches "^[0-9a-f]{40}$"` | replaces custom `keys_match`. **misfit**, see below |
 | `from` of finding (verifier_record, confirmed_finding) | `[trail, compliance_status, attestations_statuses, finding-verifier, attestation_data, per_finding_records]` | `trail.compliance_status.attestations_statuses.finding-verifier.attestation_data.per_finding_records` |  |
 | `known_decision` | `{op: in, path: [decision], values: [CONFIRMED, UNSURE, SUGGESTION, REFUTED]}` | `decision is one of "CONFIRMED", "UNSURE", "SUGGESTION", "REFUTED"` |  |
 | filter `confirmed` | `{op: equals, path: [decision], value: CONFIRMED}` | `decision is "CONFIRMED"` |  |
@@ -394,7 +394,7 @@ Same as DEV-0102 impact analysis, new features, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of security scan | `[artifact, attestations, {each_as: scan, keys: {ref: [$$params, required_scans]}}]` | `artifact.attestations at each of $params.required_scans` |  |
+| `from` of security scan | `[artifact, attestations, {each_as: scan, keys: {ref: [$$params, required_scans]}}]` | `artifact.attestations named by each of $params.required_scans` |  |
 | `completed` | `{op: equals, path: [status], value: COMPLETE}` | `status is "COMPLETE"` |  |
 | `passed` | `{op: equals, path: [is_compliant], value: true}` | `is_compliant is true` |  |
 | `from` of pull request | `[artifact, attestations, pull-request, pull_requests, {each_as: pr}]` | `artifact.attestations.pull-request.pull_requests` | The name `pr` goes, as in DEV-0501. |
@@ -402,7 +402,7 @@ Same as DEV-0102 impact analysis, new features, except:
 | `peer_approved` | `{op: any, path: [approvers], check: {op: any_of, options: {peer: [{op: equals, path: [state], value: APPROVED}, {op: compare, left: [username], right: [$pr, author], cmp: ne}]}}}` | `for: some approvers where state is "APPROVED" as approver`<br>`assert: approver.username is not author` | `for` line |
 | `from` of vulnerability | `[artifact, vulnerabilities]` | `artifact.vulnerabilities` | Rego-shaped |
 | filter `open` | `{op: equals, path: [status], value: open}` | `status is "open"` |  |
-| `within_sla` | `{op: compare_time, left: [remediate_by], right: [$$input, evaluated_at], cmp: gte}` | `remediate_by is not before $input.evaluated_at` | Rego-shaped. Rego works out `remediate_by` as `first_seen` plus the params' days for the severity. Saying that in a sentence needs date arithmetic (#140) and a param key read from the subject, `$params.sla_days at severity`. |
+| `within_sla` | `{op: compare_time, left: [remediate_by], right: [$$input, evaluated_at], cmp: gte}` | `remediate_by is not before $input.evaluated_at` | Rego-shaped. Rego works out `remediate_by` as `first_seen` plus the params' days for the severity. Saying that in a sentence needs date arithmetic (#140) and a param key read from the subject, `$params.sla_days named by severity`. |
 
 ### DEV-0402 patches in time
 
@@ -416,7 +416,7 @@ Same as DEV-0102 impact analysis, new features, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of test run | `[artifact, attestations, {each_as: run, keys: {ref: [$$params, required_tests]}}]` | `artifact.attestations at each of $params.required_tests` |  |
+| `from` of test run | `[artifact, attestations, {each_as: run, keys: {ref: [$$params, required_tests]}}]` | `artifact.attestations named by each of $params.required_tests` |  |
 | filter `new_development` | `{op: equals, path: [$$input, deployment, change_type], value: new_development}` | `$input.deployment.change_type is "new_development"` |  |
 | `passed` | `{op: equals, path: [is_compliant], value: true}` | `is_compliant is true` |  |
 | `before_production` | `{op: compare_time, left: [finished_at], right: [$$input, deployment, started_at], cmp: lt}` | `finished_at is before $input.deployment.started_at` |  |
@@ -622,7 +622,7 @@ Same as DEV-0504 roll-back ready, new features, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of security test | `[application, security_tests, {each_as: test, keys: {ref: [$$params, required_tests]}}]` | `application.security_tests at each of $params.required_tests` | Rego-shaped |
+| `from` of security test | `[application, security_tests, {each_as: test, keys: {ref: [$$params, required_tests]}}]` | `application.security_tests named by each of $params.required_tests` | Rego-shaped |
 | `run_recently` | `{op: compare_time, left: [due_by], right: [$$input, evaluated_at], cmp: gte}` | `due_by is not before $input.evaluated_at` | Rego-shaped. Rego works out `due_by` as `last_run` plus `$params.interval_days` for the test, keyed by the test's name. |
 | `production_like` | `{op: in, path: [environment], values: [prod, prod-equivalent]}` | `environment is one of "prod", "prod-equivalent"` |  |
 | `findings_remediated` | `{op: range, path: [open_critical_or_high_findings], min: 0, max: 0}` | `open_critical_or_high_findings is 0` | cause only. `must`: `open_critical_or_high_findings is 0` reads like a report. |
@@ -661,7 +661,7 @@ Every phrase, counted from the parses, twins included: 228 checks and 74 filters
 | `is` | 15 | 36 | 30 | 1 | 82 | 164 |
 | `$params` | 13 | 36 |  |  | 9 | 58 |
 | `is not empty` | 9 | 11 | 2 | 1 | 31 | 54 |
-| `at` (dynamic key) | 10 | 34 |  |  |  | 44 |
+| `named by $params.x` | 10 | 34 |  |  |  | 44 |
 | `is before` |  |  |  |  | 21 | 21 |
 | `some` | 2 | 4 | 3 |  | 10 | 19 |
 | `is one of` |  |  | 9 |  | 9 | 18 |
@@ -674,10 +674,10 @@ Every phrase, counted from the parses, twins included: 228 checks and 74 filters
 | `is at least` |  |  | 9 |  |  | 9 |
 | `is not` |  | 2 | 2 |  | 5 | 9 |
 | `and` (in `where`) |  | 1 |  |  | 6 | 7 |
-| `at each of` | 1 | 1 |  |  | 4 | 6 |
 | `is empty` |  | 1 | 4 |  | 1 | 6 |
 | `is in` | 1 |  |  |  | 5 | 6 |
 | `is not before` |  |  |  |  | 6 | 6 |
+| `named by each of` | 1 | 1 |  |  | 4 | 6 |
 | `is after` |  | 1 |  |  | 4 | 5 |
 | `matches` |  |  | 3 |  | 2 | 5 |
 | `exists` | 2 | 1 |  |  | 1 | 4 |
@@ -689,10 +689,10 @@ Every phrase, counted from the parses, twins included: 228 checks and 74 filters
 | `is ... within` |  |  | 2 |  |  | 2 |
 | `plus` |  |  | 2 |  |  | 2 |
 | `sum of` |  |  | 2 |  |  | 2 |
-| `at <name>` (proposed) |  |  | 1 |  |  | 1 |
 | `does not contain` |  |  |  | 1 |  | 1 |
 | `is a` |  |  | 1 |  |  | 1 |
 | `is not in` |  |  |  |  | 1 | 1 |
+| `named by <name>` |  |  | 1 |  |  | 1 |
 
 Not used anywhere: `is not one of`, `does not exist`, `contains none of`, `starts with`, `ends with`, `is at most`, `is more than`, `is less than`, `is not after`, `ignoring case`, `first of`, `item 3 of` and `items[2]`.
 
@@ -716,7 +716,7 @@ Checks that don't fit on one line, or fit only by changing what passes. This is 
 
 - **SDLC-CTRL-0007 code review `peer_approval`** (sdlc-policies, misfit). Three conditions on the same approver: approved, not the author, and after every commit. A `for` line gets the two quantifiers, `for: some approvers where state is "APPROVED" as approver, every commits as commit` with `assert: approver.timestamp is after commit.timestamp`, but that leaves "not the author" with nowhere to go: a `where` reads the approver, so it can't reach the pull request's `author`, and there's one `assert`. Smallest addition: a list of assertions under one `for`, all holding for the same items, which is what today's `any_of` option with three checks means: `for: some approvers where state is "APPROVED" as approver, every commits as commit`, then `approver.username is not author` and `approver.timestamp is after commit.timestamp` under `assert`. The second also turns today's text comparison of timestamps into a time comparison, which fails a timestamp that isn't RFC 3339.
 - **demo SDLC-CTRL-0008 quality assurance `test suite`** (server, misfit). Rego writes one requirement per suite name. The sentence form can't loop over names to make requirements. Smallest addition: none, because sdlc-policies 0008 already says the same with `at each of`, one requirement whose subjects are the suites. This one should move to that shape.
-- **review-controls `dispatched_personas_recorded`** (pr-reviewer, misfit). Each dispatched persona's name is a key to look up in another object, so the key comes from the item being checked. Smallest addition: `at <name>`, a dynamic key read from a name the `for` line gave, as written here. Today a ref can't start with a name, so until then this stays custom.
+- **review-controls `dispatched_personas_recorded`** (pr-reviewer, misfit). Each dispatched persona's name is a key to look up in another object, so the key comes from the item being checked. Smallest addition: none any more: #174 has `named by persona`, a key read from a name the `for` line gave. Today a ref can't start with a name, so until ergo has it this stays custom.
 - **DEV-0302 SBOM recorded `components_listed`** (DEV controls, two lines). Two assertions about each component. Two checks pass and fail together exactly as the one `all` does, but the report has two rows.
 
 Fits on one line, but changes what passes:
@@ -750,7 +750,7 @@ What the corpus says about each decision the brief left open.
 
 **`is` or `must`.** See above. 74 filters and 21 `where` conditions need `is`. 9 checks read better with `must`, and all of them say something bad is absent. The others read the same either way. Inside an `assert:` key, even those 9 are clear, so the case for `must` is a sentence quoted on its own, in a report or a markdown policy (#18).
 
-**The dynamic key.** `at $params.x` appears 44 times, all in sdlc-policies and the server demos, and 32 of those have more path after the key, like `artifacts_statuses at $params.artifact_name.attestations_statuses`. As #174 writes refs, the ref there could end after `artifact_name` or after `attestations_statuses`, so the tokenizer reads those sentences two ways. Every ref in the corpus is `$params` and one key, so the draft makes that the rule. Whether `at` is the word, and whether a ref can go deeper, is open. Most uses are in `from`, to pick one artifact out of a trail.
+**Looking up by key.** #174 settled it as `named by`, with brackets as the other spelling. It appears 44 times, all in sdlc-policies and the server demos, and 32 of those have more path after the key, like `artifacts_statuses named by $params.artifact_name.attestations_statuses`. Every reference after `named by` in the corpus is `$params` plus one key, or a name from a `for` line, so the issue's rule takes nothing away. Whether the report prints the word form or brackets waits for the readability test.
 
 **`where` in `from` or `applies_to`.** 74 filters on 32 policies, and every one sits on the subject or in a requirement's scope. No policy filters inside `from`, and nothing in the corpus needs `from: deployments where environment is "prod"` that `applies_to` can't say. The grammar can say either, so it's #113's call.
 

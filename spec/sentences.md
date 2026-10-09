@@ -43,7 +43,7 @@ Two assertions are two checks. "Or" is an `any_of` in the policy around the sent
 
 **[sentence.path.start]** A bare first key is a field of the subject. Inside `where`, and in the argument of a one-line `every` or `some`, it's a field of the item instead (see [sentence.argument.item](#every-some-and-where)). A name given by `as` on a `for` line is a bare word too, and it shadows a field with the same name. `$params` starts at the params and `$input` at the input. Any other `$<word>` is written wrong, with `unknown name $<word>`.
 
-**[sentence.path.index]** `items[2]` reads the third item of `items`. `item 3 of items`, `first of items` and `last of items` are proposed in #174 as the word forms, and no policy in the corpus needs them.
+**[sentence.path.index]** `items[2]` reads the third item of `items`, as [sentence.path.brackets](#paths) says. `item 3 of items`, `first of items` and `last of items` are proposed in #174 as the word forms, and no policy in the corpus needs them.
 
 **[sentence.path.argument]** The left side of a sentence is always a path. The right side can be a value or a path, and these rules decide which:
 
@@ -52,9 +52,11 @@ Two assertions are two checks. "Or" is an `any_of` in the policy around the sent
 - A field with one of those names is written with a dot in front: `is .empty`, `is .true`. The dot is allowed on any field on the right side, so `is .total_usd` means `is total_usd`, and the report prints it only where it's needed.
 - A key that has to be quoted, like `$schema`, is written with the dot too: `is ."$schema"`.
 
-**[sentence.path.dynamic]** `<path> at $params.<key>` reads the key named by the param, as a ref step does today, and the path can go on after it: `artifacts_statuses at $params.artifact_name.attestations_statuses`. The ref after `at` is `$params` or `$input` and one key. Without that limit, `at $params.a.b` could end its ref after `a` or after `b`, and the tokenizer found 31 lines in the corpus that read two ways because of it. Proposed: `at <name>`, with a name from a `for` line, which pr-reviewer's `keys_match` needs. The word `at`, and whether a ref can go deeper, are open.
+**[sentence.path.dynamic]** `<path> named by <reference>` reads the key that the reference holds, as a ref step does today, and the path can go on after it: `artifacts_statuses named by $params.artifact_name.attestations_statuses`. The reference is `$params` or `$input` plus one key, or a name from a `for` line, like `persona_blob_shas named by persona`. Without that limit, `named by $params.a.b` could end the reference after `a` or after `b`, and the tokenizer found 31 lines in the corpus that read two ways because of it.
 
-**[sentence.path.keys]** In `from`, `<path> at each of <values>` makes each listed key a subject, as `keys` does today: `artifact.attestations at each of $params.required_scans`. `from` doesn't name its subjects any more: the checks that used `each_as` names have a `for` line, where the subject's fields are bare.
+**[sentence.path.brackets]** Brackets are the other spelling: `artifacts_statuses[$params.artifact_name]`, `persona_blob_shas[persona]`, and `items[2]` for a position. In brackets the type decides, as in JSON: a string picks a key and a number picks a position. The report prints the word form.
+
+**[sentence.path.keys]** In `from`, `<path> named by each of <list>` makes each listed key a subject, as `keys` does today: `artifact.attestations named by each of $params.required_scans`. There is no bracket form for it, because `a[x]` picks one thing in every language, and a parameter meant to be one name that arrives as a list would turn one subject into several instead of failing. `from` doesn't name its subjects: the checks that used `each_as` names have a `for` line, where the subject's fields are bare.
 
 ## Values
 
