@@ -249,11 +249,11 @@ A number from the first to the second, both included. The bounds are numbers, an
 ```
 <path> is before <value or field>
 <path> is after <value or field>
-<path> is not before <value or field>
-<path> is not after <value or field>
+<path> is on or after <value or field>
+<path> is on or before <value or field>
 ```
 
-Both sides are timestamps in the same format, both RFC 3339 strings or both numbers, as today's `compare_time`. `is not before` means "on or after": it still fails when either side isn't a timestamp. Missing: `absent`. `null`: `null`. Wrong type or format: `unusable`. These words are open: `is on or after` and `is on or before` might read better.
+Both sides are timestamps in the same format, both RFC 3339 strings or both numbers, as today's `compare_time`. A timestamp that isn't RFC 3339 fails the check rather than being compared as text. Missing: `absent`. `null`: `null`. Wrong type or format: `unusable`. `is on or after` replaces `is not before`, a double negative the corpus used six times.
 
 **[sentence.phrase.aliases]**
 ```

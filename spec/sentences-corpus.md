@@ -402,7 +402,7 @@ Same as DEV-0102 impact analysis, new features, except:
 | `peer_approved` | `{op: any, path: [approvers], check: {op: any_of, options: {peer: [{op: equals, path: [state], value: APPROVED}, {op: compare, left: [username], right: [$pr, author], cmp: ne}]}}}` | `for: some approvers where state is "APPROVED" as approver`<br>`assert: approver.username is not author` | `for` line |
 | `from` of vulnerability | `[artifact, vulnerabilities]` | `artifact.vulnerabilities` | Rego-shaped |
 | filter `open` | `{op: equals, path: [status], value: open}` | `status is "open"` |  |
-| `within_sla` | `{op: compare_time, left: [remediate_by], right: [$$input, evaluated_at], cmp: gte}` | `remediate_by is not before $input.evaluated_at` | Rego-shaped. Rego works out `remediate_by` as `first_seen` plus the params' days for the severity. Saying that in a sentence needs date arithmetic (#140) and a param key read from the subject, `$params.sla_days named by severity`. |
+| `within_sla` | `{op: compare_time, left: [remediate_by], right: [$$input, evaluated_at], cmp: gte}` | `remediate_by is on or after $input.evaluated_at` | Rego-shaped. Rego works out `remediate_by` as `first_seen` plus the params' days for the severity. Saying that in a sentence needs date arithmetic (#140) and a param key read from the subject, `$params.sla_days named by severity`. |
 
 ### DEV-0402 patches in time
 
@@ -410,7 +410,7 @@ Same as DEV-0102 impact analysis, new features, except:
 | --- | --- | --- | --- |
 | `from` of missing patch | `[environment, missing_patches]` | `environment.missing_patches` | Rego-shaped |
 | filter `critical_or_high` | `{op: in, path: [severity], values: [critical, high]}` | `severity is one of "critical", "high"` |  |
-| `within_deadline` | `{op: compare_time, left: [install_by], right: [$$input, evaluated_at], cmp: gte}` | `install_by is not before $input.evaluated_at` | Rego-shaped. Rego works out `install_by` as `released_at` plus `$params.patch_days`. |
+| `within_deadline` | `{op: compare_time, left: [install_by], right: [$$input, evaluated_at], cmp: gte}` | `install_by is on or after $input.evaluated_at` | Rego-shaped. Rego works out `install_by` as `released_at` plus `$params.patch_days`. |
 
 ### DEV-0403 features tested
 
@@ -450,7 +450,7 @@ Same as DEV-0403 features tested, except:
 | `independent_tester` | `{op: excludes, path: [$$input, artifact, developers], value: {ref: [$$input, artifact, attestations, uat, tested_by]}}` | `tested_by is not in $input.artifact.developers` | Same passes and causes as `excludes` with a ref: missing, `null` and non-list cases fail the same way on both. |
 | `documented` | `{op: non_empty_string, path: [report_url]}` | `report_url is not empty` | widens |
 | `approved` | `{op: non_empty_string, path: [approved_by]}` | `approved_by is not empty` | widens |
-| `approved_after_testing` | `{op: compare_time, left: [approved_at], right: [tested_at], cmp: gte}` | `approved_at is not before tested_at` |  |
+| `approved_after_testing` | `{op: compare_time, left: [approved_at], right: [tested_at], cmp: gte}` | `approved_at is on or after tested_at` |  |
 | `approved_before_production` | `{op: compare_time, left: [approved_at], right: [$$input, artifact, production_deployment, started_at], cmp: lt}` | `approved_at is before $input.artifact.production_deployment.started_at` |  |
 
 ### DEV-0407 acceptance testing, normal changes
@@ -462,7 +462,7 @@ Same as DEV-0403 features tested, except:
 | `independent_tester` | `{op: all, path: [$$input, artifact, developers], check: {op: compare, left: [], right: [$$input, artifact, attestations, uat, tested_by], cmp: ne}}` | `for: every $input.artifact.developers as developer`<br>`assert: developer is not tested_by` | `for` line. Unlike DEV-0406, an empty developer list fails here, as `all` does. Today's policy reaches the tester through `$$input` because inside `all` paths start at the developer. With `for`, `tested_by` is the subject's. |
 | `documented` | `{op: non_empty_string, path: [report_url]}` | `report_url is not empty` | widens |
 | `approved` | `{op: non_empty_string, path: [approved_by]}` | `approved_by is not empty` | widens |
-| `approved_after_testing` | `{op: compare_time, left: [approved_at], right: [tested_at], cmp: gte}` | `approved_at is not before tested_at` |  |
+| `approved_after_testing` | `{op: compare_time, left: [approved_at], right: [tested_at], cmp: gte}` | `approved_at is on or after tested_at` |  |
 | `approved_before_production` | `{op: compare_time, left: [approved_at], right: [$$input, artifact, production_deployment, started_at], cmp: lt}` | `approved_at is before $input.artifact.production_deployment.started_at` |  |
 
 ### DEV-0408 no production data in test
@@ -623,7 +623,7 @@ Same as DEV-0504 roll-back ready, new features, except:
 | | today | sentence | notes |
 | --- | --- | --- | --- |
 | `from` of security test | `[application, security_tests, {each_as: test, keys: {ref: [$$params, required_tests]}}]` | `application.security_tests named by each of $params.required_tests` | Rego-shaped |
-| `run_recently` | `{op: compare_time, left: [due_by], right: [$$input, evaluated_at], cmp: gte}` | `due_by is not before $input.evaluated_at` | Rego-shaped. Rego works out `due_by` as `last_run` plus `$params.interval_days` for the test, keyed by the test's name. |
+| `run_recently` | `{op: compare_time, left: [due_by], right: [$$input, evaluated_at], cmp: gte}` | `due_by is on or after $input.evaluated_at` | Rego-shaped. Rego works out `due_by` as `last_run` plus `$params.interval_days` for the test, keyed by the test's name. |
 | `production_like` | `{op: in, path: [environment], values: [prod, prod-equivalent]}` | `environment is one of "prod", "prod-equivalent"` |  |
 | `findings_remediated` | `{op: range, path: [open_critical_or_high_findings], min: 0, max: 0}` | `open_critical_or_high_findings is 0` | cause only. `must`: `open_critical_or_high_findings is 0` reads like a report. |
 
@@ -650,7 +650,7 @@ Same as DEV-0504 roll-back ready, new features, except:
 | | today | sentence | notes |
 | --- | --- | --- | --- |
 | `from` of developer | `[developers]` | `developers` | Rego-shaped |
-| `training_current` | `{op: compare_time, left: [training_valid_until], right: [$$input, evaluated_at], cmp: gte}` | `training_valid_until is not before $input.evaluated_at` | Rego-shaped. Rego builds a developer per commit author, with `training_valid_until` as completion plus `$params.training_valid_days`. |
+| `training_current` | `{op: compare_time, left: [training_valid_until], right: [$$input, evaluated_at], cmp: gte}` | `training_valid_until is on or after $input.evaluated_at` | Rego-shaped. Rego builds a developer per commit author, with `training_valid_until` as completion plus `$params.training_valid_days`. |
 
 ## Tally
 
@@ -676,7 +676,7 @@ Every phrase, counted from the parses, twins included: 228 checks and 74 filters
 | `and` (in `where`) |  | 1 |  |  | 6 | 7 |
 | `is empty` |  | 1 | 4 |  | 1 | 6 |
 | `is in` | 1 |  |  |  | 5 | 6 |
-| `is not before` |  |  |  |  | 6 | 6 |
+| `is on or after` |  |  |  |  | 6 | 6 |
 | `named by each of` | 1 | 1 |  |  | 4 | 6 |
 | `is after` |  | 1 |  |  | 4 | 5 |
 | `matches` |  |  | 3 |  | 2 | 5 |
@@ -694,7 +694,7 @@ Every phrase, counted from the parses, twins included: 228 checks and 74 filters
 | `is not in` |  |  |  |  | 1 | 1 |
 | `named by <name>` |  |  | 1 |  |  | 1 |
 
-Not used anywhere: `is not one of`, `does not exist`, `contains none of`, `starts with`, `ends with`, `is at most`, `is more than`, `is less than`, `is not after`, `ignoring case`, `first of`, `item 3 of` and `items[2]`.
+Not used anywhere: `is not one of`, `does not exist`, `contains none of`, `starts with`, `ends with`, `is at most`, `is more than`, `is less than`, `is on or before`, `equals ... within`, `is not one of`, `ignoring case`, `first of`, `item 3 of` and `items[2]`.
 
 ## pr-reviewer's custom operators
 
@@ -758,4 +758,4 @@ What the corpus says about each decision the brief left open.
 
 **One-line `every` and `some`, or always `for`.** #174 asks whether the one-line form earns its second scoping rule. 20 checks use a one-line `every` or `some` (11 `every`, 9 `some`) and 13 need a `for` line, so most walks don't need one. 18 of the 20 read nothing after the path but a value or `$params`, like `every commits.verified is true` or `some licences is in $params.allowed_licenses`, so for them the second rule never comes up. It only matters for a bare field read on the item, which happens in 2: DEV-0801's `where state is "APPROVED"`, and server 0007, whose `where` and argument read fields Rego copied onto each approver. A one-line form without `where` and without bare fields in its argument would keep the 18 on one line and move those 2 to `for`. But `count of ... where` and `sum of ... where` (3 checks, all pr-reviewer) read the item in their `where` whatever happens, because a `for` line can't produce a number, so the item-scoped `where` stays in the grammar either way.
 
-**Time phrases.** 32 time comparisons: 21 `is before`, 5 `is after` and 6 `is not before`, which says "on or after" as a double negative (DEV-0406 `approved_after_testing`). 4 of the `is not before` compare a deadline Rego worked out with `$input.evaluated_at`. Two checks compare timestamps as text today. `is on or after` and `is on or before` would read better than `is not before` and `is not after`.
+**Time phrases.** Settled in #174 as `is before`, `is after`, `is on or after` and `is on or before`. The corpus has 32 time comparisons: 21 `is before`, 5 `is after` and 6 `is on or after`, which were `is not before` before. 4 of the `is on or after` compare a deadline Rego worked out with `$input.evaluated_at` (#140). Two checks compare timestamps as text today, and the time phrases fail a timestamp that isn't RFC 3339.
