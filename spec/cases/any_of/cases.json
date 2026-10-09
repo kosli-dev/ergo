@@ -1,0 +1,326 @@
+[
+  {
+    "description": "any_of",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["things"],
+        "id": ["id"],
+        "checks": {
+          "c": {
+            "op": "any_of",
+            "options": {"safe": [{"op": "equals", "path": ["type"], "value": "Chore"}], "standard": [{"op": "equals", "path": ["type"], "value": "Story"}, {"op": "equals", "path": ["state"], "value": "Done"}]}
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes when every check of one option passes",
+        "rules": ["any_of.pass", "any_of.inputs"],
+        "input": {"things": [{"id": "t1", "type": "Chore"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "state", "value": null}, {"name": "type", "value": "Chore"}]
+          }
+        ],
+        "expressions": {"s": {"c": "one of: safe(type == \"Chore\") | standard(type == \"Story\" and state == \"Done\")"}}
+      },
+      {
+        "description": "fails as value when no option passes",
+        "rules": ["any_of.cause"],
+        "input": {"things": [{"id": "t1", "state": "Open", "type": "Story"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "state", "value": "Open"}, {"name": "type", "value": "Story"}]
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when a field an option needs is missing",
+        "rules": ["any_of.cause"],
+        "input": {"things": [{"id": "t1", "state": "Done"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [{"name": "state", "value": "Done"}, {"name": "type", "value": null}]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "any_of with a present check in an option",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["things"],
+        "id": ["id"],
+        "checks": {"c": {"op": "any_of", "options": {"a": [{"op": "present", "path": ["x"]}, {"op": "equals", "path": ["x"], "value": 1}], "b": [{"op": "equals", "path": ["y"], "value": 1}]}}}
+      }
+    },
+    "cases": [
+      {
+        "description": "settles that option as value when the field is missing",
+        "rules": ["any_of.cause", "present.missing"],
+        "input": {"things": [{"id": "t1", "y": 2}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null}, {"name": "y", "value": 2}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "any_of with options in a list",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["things"],
+        "id": ["id"],
+        "checks": {"c": {"op": "any_of", "options": [[{"op": "equals", "path": ["type"], "value": "Story"}], [{"op": "missing", "path": ["type"]}]]}}
+      }
+    },
+    "cases": [
+      {
+        "description": "names options by position",
+        "rules": ["any_of.options", "any_of.expression"],
+        "input": {"things": [{"id": "t1", "type": "Bug"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "type", "value": "Bug"}]}
+        ],
+        "expressions": {"s": {"c": "one of: 0(type == \"Story\") | 1(type is missing)"}}
+      }
+    ]
+  },
+  {
+    "description": "any_of with eleven options in a list",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["things"],
+        "id": ["id"],
+        "checks": {
+          "c": {
+            "op": "any_of",
+            "options": [
+              [{"op": "present", "path": ["a"]}],
+              [{"op": "present", "path": ["b"]}],
+              [{"op": "present", "path": ["c"]}],
+              [{"op": "present", "path": ["d"]}],
+              [{"op": "present", "path": ["e"]}],
+              [{"op": "present", "path": ["f"]}],
+              [{"op": "present", "path": ["g"]}],
+              [{"op": "present", "path": ["h"]}],
+              [{"op": "present", "path": ["i"]}],
+              [{"op": "present", "path": ["j"]}],
+              [{"op": "present", "path": ["k"]}]
+            ]
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "sorts the positions as text",
+        "rules": ["any_of.expression"],
+        "input": {"things": [{"id": "t1", "k": 1}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {"name": "a", "value": null},
+              {"name": "b", "value": null},
+              {"name": "c", "value": null},
+              {"name": "d", "value": null},
+              {"name": "e", "value": null},
+              {"name": "f", "value": null},
+              {"name": "g", "value": null},
+              {"name": "h", "value": null},
+              {"name": "i", "value": null},
+              {"name": "j", "value": null},
+              {"name": "k", "value": 1}
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "one of: 0(a is present) | 1(b is present) | 10(k is present) | 2(c is present) | 3(d is present) | 4(e is present) | 5(f is present) | 6(g is present) | 7(h is present) | 8(i is present) | 9(j is present)"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "any_of with all in an option",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["things"],
+        "id": ["id"],
+        "checks": {"c": {"op": "any_of", "options": {"none": [{"op": "empty", "path": ["cs"]}], "signed": [{"op": "all", "path": ["cs"], "check": {"op": "equals", "path": ["s"], "value": true}}]}}}
+      }
+    },
+    "cases": [
+      {
+        "description": "shows the whole list and has no failed items",
+        "rules": ["any_of.inputs", "any_of.no_failed_items"],
+        "input": {"things": [{"cs": [{"s": false}], "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "cs", "value": [{"s": false}]}]}
+        ],
+        "expressions": {"s": {"c": "one of: none(cs is empty) | signed(every cs: s == true)"}}
+      }
+    ]
+  },
+  {
+    "description": "any_of inside all",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["things"],
+        "id": ["id"],
+        "checks": {"c": {"op": "all", "path": ["cs"], "check": {"op": "any_of", "options": {"a": [{"op": "equals", "path": ["s"], "value": true}], "b": [{"op": "missing", "path": ["s"]}]}}}}
+      }
+    },
+    "cases": [
+      {
+        "description": "lets an item pass on either option",
+        "rules": ["list.items", "any_of.pass", "list.inputs"],
+        "input": {"things": [{"cs": [{"s": true}, {}, {"s": false}], "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "cs[]", "value": [{"s": true}, {}, {"s": false}]}],
+            "failed_items": [{"cause": "value", "path": "cs[2]", "value": {"s": false}}]
+          }
+        ],
+        "expressions": {"s": {"c": "every cs: one of: a(s == true) | b(s is missing)"}}
+      }
+    ]
+  },
+  {
+    "description": "any_of with names in an option",
+    "policy": {
+      "s": {
+        "subject_type": "pull request",
+        "from": ["prs", {"each_as": "pr"}],
+        "id": ["n"],
+        "checks": {
+          "c": {
+            "op": "any",
+            "path": ["approvers"],
+            "as": "ap",
+            "check": {"op": "any_of", "options": {"peer": [{"op": "equals", "path": ["state"], "value": "APPROVED"}, {"op": "compare", "cmp": "ne", "left": ["u"], "right": ["$pr", "author"]}]}}
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "shows the name read beside the items",
+        "rules": ["list.inputs", "any_of.inputs"],
+        "input": {"prs": [{"approvers": [{"state": "APPROVED", "u": "b"}], "author": "a", "n": 1}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "pull request", "id": 1},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "approvers[]", "value": [{"state": "APPROVED", "u": "b"}]}, {"name": "$pr.author", "value": "a"}],
+            "failed_items": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "any_of written wrong",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["things"],
+        "id": ["id"],
+        "checks": {
+          "any_of_inside": {"op": "any_of", "options": {"a": [{"op": "any_of", "options": {"b": [{"op": "present", "path": ["x"]}]}}]}},
+          "empty_option": {"op": "any_of", "options": {"a": []}},
+          "empty_options": {"op": "any_of", "options": {}},
+          "name_from_sibling": {"op": "any_of", "options": {"a": [{"op": "all", "path": ["cs"], "as": "x", "check": {"op": "present", "path": ["v"]}}], "b": [{"op": "equals", "path": ["$x", "v"], "value": 1}]}},
+          "no_options": {"op": "any_of"},
+          "option_object": {"op": "any_of", "options": {"a": {"op": "present", "path": ["x"]}}}
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails every check as ill_formed and says why",
+        "rules": ["any_of.options", "any_of.expression", "list.as", "written_wrong"],
+        "input": {"things": [{"cs": [{"v": 1}], "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {"name": "count(checks)", "value": 6},
+              {"name": "require", "value": "every"},
+              {"name": "checks.any_of_inside.options.a.0", "value": ["any_of can't go here"]},
+              {"name": "checks.empty_option", "value": ["empty option a"]},
+              {"name": "checks.empty_options", "value": ["empty options"]},
+              {"name": "checks.name_from_sibling.options.b.0", "value": ["unknown name $x"]},
+              {"name": "checks.no_options", "value": ["missing options"]},
+              {"name": "checks.option_object", "value": ["option a not a list"]}
+            ]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "any_of_inside", "passed": false, "cause": "ill_formed", "inputs": []},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "empty_option", "passed": false, "cause": "ill_formed", "inputs": []},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "empty_options", "passed": false, "cause": "ill_formed", "inputs": []},
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "name_from_sibling",
+            "passed": false,
+            "cause": "ill_formed",
+            "inputs": [{"name": "$x.v", "value": null}, {"name": "cs", "value": [{"v": 1}]}]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "no_options", "passed": false, "cause": "ill_formed", "inputs": []},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "option_object", "passed": false, "cause": "ill_formed", "inputs": []}
+        ],
+        "expressions": {
+          "s": {
+            "any_of_inside": "one of: a(<any_of can't go here>)",
+            "empty_option": "one of: a(<empty option>)",
+            "empty_options": "one of: <empty options>",
+            "name_from_sibling": "one of: a(every cs as $x: v is present) | b($x.v == 1)",
+            "no_options": "one of: <missing options>",
+            "option_object": "one of: a(<invalid option>)"
+          }
+        }
+      }
+    ]
+  }
+]

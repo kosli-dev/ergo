@@ -1641,7 +1641,12 @@ _empty_option_problem(node) := {concat("", ["empty option ", _text(nm)]) |
 	_combinator(node)
 	_option_list(node.options)
 	some nm, group in node.options
-	not _filled_list(group)
+	group == []
+} | {concat("", ["option ", _text(nm), " not a list"]) |
+	_combinator(node)
+	_option_list(node.options)
+	some nm, group in node.options
+	not is_array(group)
 }
 
 _out_of_range_problem(node) := {"number out of range" | _out_of_range(_own_fields(node))}
@@ -1792,11 +1797,6 @@ _path_shaped(p) if is_string(p)
 _option_list(options) if is_object(options)
 
 _option_list(options) if is_array(options)
-
-_filled_list(group) if {
-	is_array(group)
-	count(group) > 0
-}
 
 _valid_pattern(p) if {
 	is_string(p)
@@ -2580,7 +2580,7 @@ _expression_of(check, _) := "one of: <missing options>" if {
 	not "options" in object.keys(check)
 }
 
-_expression_of(check, item) := concat("", ["one of: ", concat(" | ", sort([concat("", [_text(nm), "(", concat(" and ", [_top_option_describe(group[k], item) | some k in _names(group)]), ")"]) | some nm, group in check.options]))]) if {
+_expression_of(check, item) := _one_of([_option_text(nm, group, [_top_option_describe(group[k], item) | some k in _names(group)]) | some nm, group in check.options]) if {
 	not _written_expression(check)
 	check.op == "any_of"
 	"options" in object.keys(check)
@@ -2615,7 +2615,7 @@ _element_describe(check, item, _) := _nested_describe(check, item) if {
 	not _quantified(check)
 }
 
-_element_describe(check, item, given) := concat("", ["one of: ", concat(" | ", sort([concat("", [_text(nm), "(", concat(" and ", [_element_option_describe(group[k], item, given) | some k in _names(group)]), ")"]) | some nm, group in check.options]))]) if _combinator(check)
+_element_describe(check, item, given) := _one_of([_option_text(nm, group, [_element_option_describe(group[k], item, given) | some k in _names(group)]) | some nm, group in check.options]) if _combinator(check)
 
 _element_describe(check, item, given) := _element_list_describe(check, item, given) if _quantified(check)
 
@@ -2645,9 +2645,22 @@ _inner_describe(check, item) := _any_of_describe(check, item) if _combinator(che
 
 _inner_describe(check, _) := "<nested too deep>" if _quantified(check)
 
-_any_of_describe(check, item) := concat("", ["one of: ", concat(" | ", sort([_variant_describe(nm, group, item) | some nm, group in check.options]))])
+_any_of_describe(check, item) := _one_of([_option_text(nm, group, [_inner_option_describe(group[k], item) | some k in _names(group)]) | some nm, group in check.options])
 
-_variant_describe(nm, group, item) := concat("", [_text(nm), "(", concat(" and ", [_inner_option_describe(group[k], item) | some k in _names(group)]), ")"])
+_one_of(parts) := "one of: <empty options>" if count(parts) == 0
+
+_one_of(parts) := concat("", ["one of: ", concat(" | ", sort(parts))]) if count(parts) > 0
+
+_option_text(nm, group, texts) := concat("", [_text(nm), "(", _option_body(group, texts), ")"])
+
+_option_body(group, _) := "<invalid option>" if not is_array(group)
+
+_option_body([], _) := "<empty option>"
+
+_option_body(group, texts) := concat(" and ", texts) if {
+	is_array(group)
+	count(group) > 0
+}
 
 _inner_option_describe(leaf, item) := _nested_describe(leaf, item) if not _quantified(leaf)
 

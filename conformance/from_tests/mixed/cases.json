@@ -46875,7 +46875,7 @@
               "checks": {
                 "$applies": {
                   "description": "The subject is in scope",
-                  "expression": "one of: o()",
+                  "expression": "one of: o(\u003cempty option\u003e)",
                   "meta": {}
                 },
                 "$min_subjects": {
@@ -47018,7 +47018,7 @@
             "cause": "ill_formed",
             "check": "$applies",
             "description": "The subject is in scope",
-            "expression": "one of: o()",
+            "expression": "one of: o(\u003cempty option\u003e)",
             "inputs": [],
             "requirement": "s",
             "subject": {
@@ -47088,7 +47088,7 @@
               "checks": {
                 "$applies": {
                   "description": "The subject is in scope",
-                  "expression": "one of: o(\u003cinvalid check\u003e and \u003cinvalid check\u003e)",
+                  "expression": "one of: o(\u003cinvalid option\u003e)",
                   "meta": {}
                 },
                 "$min_subjects": {
@@ -47143,7 +47143,7 @@
                 {
                   "name": "applies_to.f",
                   "value": [
-                    "empty option o"
+                    "option o not a list"
                   ]
                 }
               ],
@@ -47217,7 +47217,7 @@
               {
                 "name": "applies_to.f",
                 "value": [
-                  "empty option o"
+                  "option o not a list"
                 ]
               }
             ],
@@ -47231,7 +47231,7 @@
             "cause": "ill_formed",
             "check": "$applies",
             "description": "The subject is in scope",
-            "expression": "one of: o(\u003cinvalid check\u003e and \u003cinvalid check\u003e)",
+            "expression": "one of: o(\u003cinvalid option\u003e)",
             "inputs": [],
             "requirement": "s",
             "subject": {
@@ -47306,7 +47306,7 @@
               "checks": {
                 "$applies": {
                   "description": "The subject is in scope",
-                  "expression": "one of: ",
+                  "expression": "one of: \u003cempty options\u003e",
                   "meta": {}
                 },
                 "$min_subjects": {
@@ -47449,7 +47449,7 @@
             "cause": "ill_formed",
             "check": "$applies",
             "description": "The subject is in scope",
-            "expression": "one of: ",
+            "expression": "one of: \u003cempty options\u003e",
             "inputs": [],
             "requirement": "s",
             "subject": {
@@ -47517,7 +47517,7 @@
               "checks": {
                 "$applies": {
                   "description": "The subject is in scope",
-                  "expression": "one of: 0(n is present) | 1()",
+                  "expression": "one of: 0(n is present) | 1(\u003cempty option\u003e)",
                   "meta": {}
                 },
                 "$min_subjects": {
@@ -47665,7 +47665,7 @@
             "cause": "ill_formed",
             "check": "$applies",
             "description": "The subject is in scope",
-            "expression": "one of: 0(n is present) | 1()",
+            "expression": "one of: 0(n is present) | 1(\u003cempty option\u003e)",
             "inputs": [
               {
                 "name": "n",
@@ -47748,7 +47748,7 @@
               "checks": {
                 "$applies": {
                   "description": "The subject is in scope",
-                  "expression": "one of: ",
+                  "expression": "one of: \u003cempty options\u003e",
                   "meta": {}
                 },
                 "$min_subjects": {
@@ -47891,7 +47891,7 @@
             "cause": "ill_formed",
             "check": "$applies",
             "description": "The subject is in scope",
-            "expression": "one of: ",
+            "expression": "one of: \u003cempty options\u003e",
             "inputs": [],
             "requirement": "s",
             "subject": {

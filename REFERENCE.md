@@ -667,7 +667,7 @@ This is the only way to say that two fields must agree with each other. Two sepa
 
 - Name your options. The names show up in the rendered expression: `one of: safe(type == "Chore") | standard(type == "Story" and state == "Done")`. A list of options works too, and they're shown by position.
 - Options can hold basic checks and `all` or `any`, but not another `any_of`, because Rego doesn't allow recursion. An `all` or `any` in an option counts as being where the `any_of` is, so it can nest as deep as it could there (see [Nesting](#nesting)).
-- An empty `options` is written wrong, and so is an empty option, an option written as an object instead of a list, or an `any_of` inside an option. Each fails `$well_formed`, and the check fails with cause `ill_formed`.
+- An empty `options` is written wrong, and so is an empty option, an option written as an object instead of a list, or an `any_of` inside an option. Each fails `$well_formed`, and the check fails with cause `ill_formed`. The expression shows `one of: <empty options>`, `standard(<empty option>)` or `standard(<invalid option>)`, and `$well_formed` says `empty options`, `empty option standard` or `option standard not a list`.
 - To let a missing field pass, give `missing` an option of its own. "No label is `do-not-merge`" then passes on a pull request with no `labels`, and renders as `one of: clean(not contains(labels, "do-not-merge")) | no_labels(labels is missing)`:
 
   ```rego

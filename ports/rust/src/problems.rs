@@ -415,8 +415,14 @@ fn node_problems(node: &Node) -> BTreeSet<String> {
                     out.insert("empty options".into());
                 }
                 for (nm, group) in names_of(o) {
-                    if !matches!(group, Value::Array(a) if !a.is_empty()) {
-                        out.insert(format!("empty option {}", text(&nm)));
+                    match group {
+                        Value::Array(a) if a.is_empty() => {
+                            out.insert(format!("empty option {}", text(&nm)));
+                        }
+                        Value::Array(_) => {}
+                        _ => {
+                            out.insert(format!("option {} not a list", text(&nm)));
+                        }
                     }
                 }
             }

@@ -410,8 +410,18 @@ fn list_describe(check: &Value, given: &[String]) -> Option<String> {
 fn options_describe(check: &Value, item: &str, describe: &dyn Fn(&Value, &str) -> Option<String>) -> Option<String> {
     let mut parts = vec![];
     for (nm, group) in names_of(check.get("options").unwrap_or(&Value::Null)) {
-        let inner: Option<Vec<String>> = names_of(group).into_iter().map(|(_, leaf)| describe(leaf, item)).collect();
-        parts.push(format!("{}({})", text(&nm), inner?.join(" and ")));
+        let body = match group {
+            Value::Array(a) if a.is_empty() => "<empty option>".to_string(),
+            Value::Array(_) => {
+                let inner: Option<Vec<String>> = names_of(group).into_iter().map(|(_, leaf)| describe(leaf, item)).collect();
+                inner?.join(" and ")
+            }
+            _ => "<invalid option>".to_string(),
+        };
+        parts.push(format!("{}({body})", text(&nm)));
+    }
+    if parts.is_empty() {
+        return Some("one of: <empty options>".into());
     }
     parts.sort();
     Some(format!("one of: {}", parts.join(" | ")))

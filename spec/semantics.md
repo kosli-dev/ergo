@@ -1,6 +1,6 @@
 # How ergo turns a policy and an input into a report
 
-Draft 0.1. This covers reading values, causes, expressions and the operators `present`, `missing`, `equals`, `in`, `non_empty_string`, `empty`, `range`, `matches_any`, `not_matches_any`, `includes`, `excludes`, `compare` and `compare_time` so far. Everything else is still described only in [REFERENCE.md](../REFERENCE.md).
+Draft 0.1. This covers reading values, causes, expressions and the operators `present`, `missing`, `equals`, `in`, `non_empty_string`, `empty`, `range`, `matches_any`, `not_matches_any`, `includes`, `excludes`, `compare`, `compare_time`, `all`, `any` and `any_of` so far. Everything else is still described only in [REFERENCE.md](../REFERENCE.md).
 
 Each rule has a name in brackets, like **[present.missing]**. The cases in [`cases/`](cases) list the rules they test, so you can find the cases for a rule and the rule behind a case. An implementation follows every rule here, and where it does something else, it's wrong, whatever `ergo.rego` does.
 
@@ -226,3 +226,43 @@ Each check's definition in the report has an `expression` that says what it chec
 **[time.fail]** It fails with the worse of the two paths' outcomes when either ends anything but `found`, and with `unusable` when the values aren't two times in the same format, a number and a string included. Otherwise it fails with `value`.
 
 **[time.expression]** Its expression is written like `compare`'s.
+
+## `all` and `any`
+
+`{"op": "all", "path": [...], "check": {...}}` asks whether every item of a list passes a check, and `any` whether at least one does.
+
+**[list.read]** The path must end `found` on a list. A list that's missing fails the check as `absent`, a `null` one as `null`, and anything else, an object included, as `unusable`. An empty list fails as `value`, because no items isn't proof of anything.
+
+**[list.items]** The inner `check` runs on each item, with the item as its subject, so its paths start inside the item. An empty path reads the item itself, and an item that isn't an object fails a non-empty path as `not_an_object`.
+
+**[list.pass]** `all` passes when the list isn't empty and every item passes. `any` passes when it isn't empty and at least one item does.
+
+**[list.cause]** When the items decide the result and it fails, the cause is the first, in the order of [causes](#causes), among the items that failed. So when one item fails as `value` and another is missing its field, the check fails as `absent`, because the second one might have passed.
+
+**[list.each]** With `each`, a path inside each item of the list, the check runs on every item of every inner list. Every inner list must be readable, a list and not empty, for `all` and `any` alike. One that isn't fails the check with the cause it would give as a list, even when an item elsewhere passes.
+
+**[list.as]** `as` names each item, so a check nested inside can still read it as `$name` once its own paths start somewhere else. The name is a string that doesn't start with `$`. Otherwise it's written wrong as `invalid name`, and a name already given by `from` or an outer check as `name given twice`. A path that starts with a name nothing gave, or one given in a neighbouring `any_of` option, is written wrong as `unknown name $name`. `as` or `each` on any operator other than `all` and `any` is written wrong as `as can't go here` or `each can't go here`.
+
+**[list.inner]** The inner check is a basic operator, an `any_of`, or another `all` or `any`. One `all` or `any` can sit inside another, but a third is written wrong as `nested too deep`. An `any_of` doesn't count as a level, but an `all` or `any` in one of its options does. A missing check is written wrong as `missing check`, one that isn't an object as `invalid check`, and a custom operator as `<op> can't go here` (see [REFERENCE.md](../REFERENCE.md#custom-operators)).
+
+**[list.inputs]** When the inner check has a `path` that starts inside the item, not with `$$input`, `$$params` or a name, the row shows that path for every item, named `<list>[].<path>`, like `cs[].s` with `[true, false, null]`. That holds for an inner `all` or `any` too, so its lists are shown. An empty path shows the items themselves, named `<list>[]`. Any other inner check, like `compare` or `any_of`, shows the whole items, named `<list>[]`. In both cases, each `$$input`, `$$params` or `$name` path the inner check reads follows, except names the check itself gives. With `each`, the items are the inner lists, named `<list>[].<each>`. A list that can't be read shows `[]` as its value. When the inner check is missing or isn't an object, `inputs` is `[]`.
+
+**[list.failed_items]** The row also has `failed_items`, the items that made it fail, in list order. Each one has its `path`, like `cs[1]` or, with `each`, `prs[0].cs[1]`, its own `cause`, and its `value`. With `each`, an inner list that can't be read or is empty is listed in place of its items, like `prs[1].cs` with the value it read, or `null`. An item that a `present` check finds missing is listed with cause `value`. For a nested check, only the outer items are listed. `failed_items` is `[]` when the check passes, even for an `any` with items that failed, and when the list itself can't be read. When the check is written wrong, every item is listed as `ill_formed`, and when a ref can't be read, every failing item is listed with the ref's cause.
+
+**[list.expression]** The expression is `every <list>: <inner>` or `some <list>: <inner>`, with the inner check rendered with paths named inside the item. With `each`, the list is shown as `<list>[].<each>`, and with `as`, it's followed by ` as $<name>`. An empty path in the inner check is named `<list>[]`, like `every bs: bs[] matches one of ["^main$"]`. A missing or badly written inner check is shown as `<missing check>`, `<invalid check>`, `<nested too deep>` or `<op can't go here>`, and a bad name as `<invalid name>` or `<name given twice>`.
+
+## `any_of`
+
+`{"op": "any_of", "options": {...}}` passes when one of its options passes. Each option is a list of checks that must all pass.
+
+**[any_of.options]** `options` is an object of named options, or a list of them, named by their position. Each option is a non-empty list of basic checks, `all` or `any`. A missing `options` is written wrong as `missing options`, an empty one as `empty options`, an empty option as `empty option <name>`, one that isn't a list as `option <name> not a list`, and an `any_of` or a custom operator inside an option as `<op> can't go here`.
+
+**[any_of.pass]** It passes when every check of at least one option passes.
+
+**[any_of.cause]** Each option that fails has a cause: `value` when one of its `present` checks found its field missing, and otherwise the first, in the order of [causes](#causes), among its checks, or `value`. The row takes the first among its options.
+
+**[any_of.inputs]** The row shows every path any option reads, once each, sorted by name. For an `all` or `any` in an option, that's its list, with the whole items, and the names it reads.
+
+**[any_of.expression]** The expression is `one of: ` followed by the options, sorted by name and joined with ` | `, each written `<name>(<check> and <check>)` with its checks in the order written. A missing `options` is shown as `<missing options>`, an empty one as `<empty options>`, an empty option as `<name>(<empty option>)` and one that isn't a list as `<name>(<invalid option>)`.
+
+**[any_of.no_failed_items]** An `any_of` row has no `failed_items`, even with an `all` or `any` inside it.

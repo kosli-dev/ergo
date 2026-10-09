@@ -1430,7 +1430,8 @@ test_any_of_rendering_is_order_independent if {
 }
 
 test_any_of_renders_an_empty_option_group_instead_of_dropping_it if {
-	rendered({}, {"op": "any_of", "options": {"standard": []}}) == "one of: standard()"
+	rendered({}, {"op": "any_of", "options": {"standard": []}}) == "one of: standard(<empty option>)"
+	rendered({}, {"op": "any_of", "options": {}}) == "one of: <empty options>"
 }
 
 test_any_of_echoes_every_field_it_read_once_each if {
@@ -3855,15 +3856,13 @@ test_inputs_written_as_an_object_come_out_in_key_order if {
 	[i.name | some i in inputs_of({"a": 1, "b": 2, "c": 3, "d": 4}, check)] == ["a", "b", "d", "c"]
 }
 
-test_an_option_written_as_an_object_is_rendered_in_key_order if {
+test_an_option_written_as_an_object_is_shown_as_invalid if {
 	check := {"op": "any_of", "options": {"o": {
 		"alpha": {"op": "present", "path": ["a"]},
 		"beta": {"op": "present", "path": ["b"]},
-		"gamma": {"op": "present", "path": ["c"]},
-		"delta": {"op": "present", "path": ["d"]},
 	}}}
-	rendered({}, check) == "one of: o(a is present and b is present and d is present and c is present)"
-	rendered({"xs": []}, {"op": "all", "path": ["xs"], "check": check}) == "every xs: one of: o(a is present and b is present and d is present and c is present)"
+	rendered({}, check) == "one of: o(<invalid option>)"
+	rendered({"xs": []}, {"op": "all", "path": ["xs"], "check": check}) == "every xs: one of: o(<invalid option>)"
 }
 
 test_an_op_that_is_not_a_string_is_written_as_json_in_every_runtime if {

@@ -14849,7 +14849,7 @@
                     }
                   },
                   "description": "",
-                  "expression": "every xs: one of: o(a is present and b is present and d is present and c is present)",
+                  "expression": "every xs: one of: o(\u003cinvalid option\u003e)",
                   "meta": {},
                   "op": "all",
                   "path": [
@@ -14883,7 +14883,7 @@
                 {
                   "name": "checks.c.check",
                   "value": [
-                    "empty option o"
+                    "option o not a list"
                   ]
                 }
               ],
@@ -14963,7 +14963,7 @@
               {
                 "name": "checks.c.check",
                 "value": [
-                  "empty option o"
+                  "option o not a list"
                 ]
               }
             ],
@@ -14977,7 +14977,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "every xs: one of: o(a is present and b is present and d is present and c is present)",
+            "expression": "every xs: one of: o(\u003cinvalid option\u003e)",
             "failed_items": [],
             "inputs": [
               {

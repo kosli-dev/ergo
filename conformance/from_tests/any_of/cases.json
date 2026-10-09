@@ -2647,7 +2647,7 @@
                 },
                 "c": {
                   "description": "",
-                  "expression": "one of: standard()",
+                  "expression": "one of: standard(\u003cempty option\u003e)",
                   "meta": {},
                   "op": "any_of",
                   "options": {
@@ -2769,7 +2769,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "one of: standard()",
+            "expression": "one of: standard(\u003cempty option\u003e)",
             "inputs": [],
             "requirement": "s",
             "subject": {
@@ -4317,7 +4317,7 @@
                 },
                 "c": {
                   "description": "",
-                  "expression": "one of: bad(\u003cinvalid check\u003e and \u003cinvalid check\u003e and \u003cinvalid check\u003e)",
+                  "expression": "one of: bad(\u003cinvalid option\u003e)",
                   "meta": {},
                   "op": "any_of",
                   "options": {
@@ -4359,7 +4359,7 @@
                 {
                   "name": "checks.c",
                   "value": [
-                    "empty option bad"
+                    "option bad not a list"
                   ]
                 }
               ],
@@ -4433,7 +4433,7 @@
               {
                 "name": "checks.c",
                 "value": [
-                  "empty option bad"
+                  "option bad not a list"
                 ]
               }
             ],
@@ -4447,7 +4447,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "one of: bad(\u003cinvalid check\u003e and \u003cinvalid check\u003e and \u003cinvalid check\u003e)",
+            "expression": "one of: bad(\u003cinvalid option\u003e)",
             "inputs": [],
             "requirement": "s",
             "subject": {
@@ -4520,7 +4520,7 @@
                 },
                 "c": {
                   "description": "",
-                  "expression": "one of: empty()",
+                  "expression": "one of: empty(\u003cempty option\u003e)",
                   "meta": {},
                   "op": "any_of",
                   "options": {
@@ -4642,7 +4642,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "one of: empty()",
+            "expression": "one of: empty(\u003cempty option\u003e)",
             "inputs": [],
             "requirement": "s",
             "subject": {
@@ -4707,7 +4707,7 @@
                 },
                 "c": {
                   "description": "",
-                  "expression": "one of: ",
+                  "expression": "one of: \u003cempty options\u003e",
                   "meta": {},
                   "op": "any_of",
                   "options": {}
@@ -4827,7 +4827,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "one of: ",
+            "expression": "one of: \u003cempty options\u003e",
             "inputs": [],
             "requirement": "s",
             "subject": {
@@ -5360,7 +5360,7 @@
                 },
                 "c": {
                   "description": "",
-                  "expression": "one of: standard(state matches one of [\"^CLOSED$\"] and type matches one of [\"^Story$\"])",
+                  "expression": "one of: standard(\u003cinvalid option\u003e)",
                   "meta": {},
                   "op": "any_of",
                   "options": {
@@ -5413,7 +5413,7 @@
                 {
                   "name": "checks.c",
                   "value": [
-                    "empty option standard"
+                    "option standard not a list"
                   ]
                 }
               ],
@@ -5496,7 +5496,7 @@
               {
                 "name": "checks.c",
                 "value": [
-                  "empty option standard"
+                  "option standard not a list"
                 ]
               }
             ],
@@ -5510,7 +5510,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "one of: standard(state matches one of [\"^CLOSED$\"] and type matches one of [\"^Story$\"])",
+            "expression": "one of: standard(\u003cinvalid option\u003e)",
             "inputs": [
               {
                 "name": "state",
@@ -6473,7 +6473,7 @@
                 },
                 "c": {
                   "description": "",
-                  "expression": "one of: o(a is present and b is present and d is present and c is present)",
+                  "expression": "one of: o(\u003cinvalid option\u003e)",
                   "meta": {},
                   "op": "any_of",
                   "options": {
@@ -6532,7 +6532,7 @@
                 {
                   "name": "checks.c",
                   "value": [
-                    "empty option o"
+                    "option o not a list"
                   ]
                 }
               ],
@@ -6623,7 +6623,7 @@
               {
                 "name": "checks.c",
                 "value": [
-                  "empty option o"
+                  "option o not a list"
                 ]
               }
             ],
@@ -6637,7 +6637,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "one of: o(a is present and b is present and d is present and c is present)",
+            "expression": "one of: o(\u003cinvalid option\u003e)",
             "inputs": [
               {
                 "name": "a",
@@ -12554,7 +12554,7 @@
                 },
                 "c": {
                   "description": "",
-                  "expression": "one of: o()",
+                  "expression": "one of: o(\u003cempty option\u003e)",
                   "meta": {},
                   "op": "any_of",
                   "options": {
@@ -12676,7 +12676,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "one of: o()",
+            "expression": "one of: o(\u003cempty option\u003e)",
             "inputs": [],
             "requirement": "s",
             "subject": {
@@ -12751,7 +12751,7 @@
                 },
                 "c": {
                   "description": "",
-                  "expression": "one of: o(\u003cinvalid check\u003e and \u003cinvalid check\u003e)",
+                  "expression": "one of: o(\u003cinvalid option\u003e)",
                   "meta": {},
                   "op": "any_of",
                   "options": {
@@ -12790,7 +12790,7 @@
                 {
                   "name": "checks.c",
                   "value": [
-                    "empty option o"
+                    "option o not a list"
                   ]
                 }
               ],
@@ -12864,7 +12864,7 @@
               {
                 "name": "checks.c",
                 "value": [
-                  "empty option o"
+                  "option o not a list"
                 ]
               }
             ],
@@ -12878,7 +12878,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "one of: o(\u003cinvalid check\u003e and \u003cinvalid check\u003e)",
+            "expression": "one of: o(\u003cinvalid option\u003e)",
             "inputs": [],
             "requirement": "s",
             "subject": {
@@ -12958,7 +12958,7 @@
                 },
                 "c": {
                   "description": "",
-                  "expression": "one of: ",
+                  "expression": "one of: \u003cempty options\u003e",
                   "meta": {},
                   "op": "any_of",
                   "options": {}
@@ -13078,7 +13078,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "one of: ",
+            "expression": "one of: \u003cempty options\u003e",
             "inputs": [],
             "requirement": "s",
             "subject": {
@@ -13151,7 +13151,7 @@
                 },
                 "c": {
                   "description": "",
-                  "expression": "one of: 0(n is present) | 1()",
+                  "expression": "one of: 0(n is present) | 1(\u003cempty option\u003e)",
                   "meta": {},
                   "op": "any_of",
                   "options": [
@@ -13286,7 +13286,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "one of: 0(n is present) | 1()",
+            "expression": "one of: 0(n is present) | 1(\u003cempty option\u003e)",
             "inputs": [
               {
                 "name": "n",
@@ -13374,7 +13374,7 @@
                 },
                 "c": {
                   "description": "",
-                  "expression": "one of: ",
+                  "expression": "one of: \u003cempty options\u003e",
                   "meta": {},
                   "op": "any_of",
                   "options": "o"
@@ -13494,7 +13494,7 @@
             "cause": "ill_formed",
             "check": "c",
             "description": "",
-            "expression": "one of: ",
+            "expression": "one of: \u003cempty options\u003e",
             "inputs": [],
             "requirement": "s",
             "subject": {

@@ -1,0 +1,559 @@
+[
+  {
+    "description": "all",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "all", "path": ["cs"], "check": {"op": "equals", "path": ["s"], "value": true}}}}},
+    "cases": [
+      {
+        "description": "passes when every item passes",
+        "rules": ["list.pass", "list.inputs"],
+        "input": {"things": [{"cs": [{"s": true}, {"s": true}], "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "cs[].s", "value": [true, true]}], "failed_items": []}
+        ],
+        "expressions": {"s": {"c": "every cs: s == true"}}
+      },
+      {
+        "description": "fails with the worst cause among the items that failed, and lists them",
+        "rules": ["list.cause", "list.failed_items"],
+        "input": {"things": [{"cs": [{"s": true}, {"s": false}, {}], "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [{"name": "cs[].s", "value": [true, false, null]}],
+            "failed_items": [{"cause": "value", "path": "cs[1]", "value": {"s": false}}, {"cause": "absent", "path": "cs[2]", "value": {}}]
+          }
+        ]
+      },
+      {
+        "description": "fails as value on an empty list",
+        "rules": ["list.read"],
+        "input": {"things": [{"cs": [], "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "cs[].s", "value": []}], "failed_items": []}
+        ]
+      },
+      {
+        "description": "fails as absent when the list is missing, with no failed items",
+        "rules": ["list.read", "list.failed_items"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "cs[].s", "value": []}], "failed_items": []}
+        ]
+      },
+      {
+        "description": "fails as null when the list is null",
+        "rules": ["list.read"],
+        "input": {"things": [{"cs": null, "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "cs[].s", "value": []}], "failed_items": []}
+        ]
+      },
+      {
+        "description": "fails as unusable on an object",
+        "rules": ["list.read"],
+        "input": {"things": [{"cs": {"a": {"s": true}}, "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "cs[].s", "value": []}], "failed_items": []}
+        ]
+      },
+      {
+        "description": "fails as unusable on a string",
+        "rules": ["list.read"],
+        "input": {"things": [{"cs": "x", "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "cs[].s", "value": []}], "failed_items": []}
+        ]
+      },
+      {
+        "description": "fails as not_an_object on items that aren't objects",
+        "rules": ["list.items"],
+        "input": {"things": [{"cs": ["a", 1], "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [{"name": "cs[].s", "value": [null, null]}],
+            "failed_items": [{"cause": "not_an_object", "path": "cs[0]", "value": "a"}, {"cause": "not_an_object", "path": "cs[1]", "value": 1}]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "any",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "any", "path": ["cs"], "check": {"op": "non_empty_string", "path": ["u"]}}}}},
+    "cases": [
+      {
+        "description": "passes when one item passes, with no failed items",
+        "rules": ["list.pass", "list.failed_items"],
+        "input": {"things": [{"cs": [{"u": ""}, {"u": "bob"}, {}], "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "cs[].u", "value": ["", "bob", null]}],
+            "failed_items": []
+          }
+        ],
+        "expressions": {"s": {"c": "some cs: u is a non-empty string"}}
+      },
+      {
+        "description": "fails as absent when one item fails as value and another is missing its field",
+        "rules": ["list.cause"],
+        "input": {"things": [{"cs": [{"u": ""}, {}], "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [{"name": "cs[].u", "value": ["", null]}],
+            "failed_items": [{"cause": "value", "path": "cs[0]", "value": {"u": ""}}, {"cause": "absent", "path": "cs[1]", "value": {}}]
+          }
+        ]
+      },
+      {
+        "description": "fails as value on an empty list",
+        "rules": ["list.read"],
+        "input": {"things": [{"cs": [], "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "cs[].u", "value": []}], "failed_items": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "all with present inside",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "all", "path": ["cs"], "check": {"op": "present", "path": ["x"]}}}}},
+    "cases": [
+      {
+        "description": "lists an item missing the field with cause value",
+        "rules": ["list.failed_items", "present.missing"],
+        "input": {"things": [{"cs": [{"x": 1}, {}], "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "cs[].x", "value": [1, null]}],
+            "failed_items": [{"cause": "value", "path": "cs[1]", "value": {}}]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "all with an empty path inside",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "all", "path": ["bs"], "check": {"op": "matches_any", "path": [], "patterns": ["^main$"]}}}}},
+    "cases": [
+      {
+        "description": "reads each item itself and names it after the list",
+        "rules": ["list.items", "list.inputs", "list.expression"],
+        "input": {"things": [{"bs": ["main", "dev"], "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "bs[]", "value": ["main", "dev"]}],
+            "failed_items": [{"cause": "value", "path": "bs[1]", "value": "dev"}]
+          }
+        ],
+        "expressions": {"s": {"c": "every bs: bs[] matches one of [\"^main$\"]"}}
+      }
+    ]
+  },
+  {
+    "description": "all with compare inside",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["things"],
+        "id": ["id"],
+        "checks": {"c": {"op": "all", "path": ["as"], "check": {"op": "compare", "cmp": "ne", "left": ["u"], "right": ["$$input", "author"]}}}
+      }
+    },
+    "cases": [
+      {
+        "description": "shows the whole items and the input path it reads",
+        "rules": ["list.inputs"],
+        "input": {"author": "ann", "things": [{"as": [{"u": "ann"}, {"u": "bob"}], "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "as[]", "value": [{"u": "ann"}, {"u": "bob"}]}, {"name": "$$input.author", "value": "ann"}],
+            "failed_items": [{"cause": "value", "path": "as[0]", "value": {"u": "ann"}}]
+          }
+        ],
+        "expressions": {"s": {"c": "every as: u ne $$input.author"}}
+      }
+    ]
+  },
+  {
+    "description": "all with a ref that can't be read",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "all", "path": ["cs"], "check": {"op": "equals", "path": ["x"], "value": {"ref": ["$$params", "want"]}}}}}},
+    "params": {},
+    "cases": [
+      {
+        "description": "fails every item with the ref's cause",
+        "rules": ["list.failed_items", "value.ref"],
+        "input": {"things": [{"cs": [{"x": 1}, {"x": 2}], "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [{"name": "cs[].x", "value": [1, 2]}],
+            "failed_items": [{"cause": "absent", "path": "cs[0]", "value": {"x": 1}}, {"cause": "absent", "path": "cs[1]", "value": {"x": 2}}]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "all with each",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "all", "path": ["prs"], "check": {"op": "equals", "path": ["s"], "value": true}, "each": ["cs"]}}}},
+    "cases": [
+      {
+        "description": "passes when every item of every inner list passes",
+        "rules": ["list.each", "list.inputs"],
+        "input": {"things": [{"id": "t1", "prs": [{"cs": [{"s": true}]}, {"cs": [{"s": true}]}]}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "prs[].cs", "value": [[{"s": true}], [{"s": true}]]}],
+            "failed_items": []
+          }
+        ],
+        "expressions": {"s": {"c": "every prs[].cs: s == true"}}
+      },
+      {
+        "description": "lists the inner lists that can't be read or are empty in place of their items",
+        "rules": ["list.each", "list.failed_items"],
+        "input": {"things": [{"id": "t1", "prs": [{"cs": [{"s": true}, {"s": false}]}, {}, {"cs": []}, {"cs": [{}]}]}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [{"name": "prs[].cs", "value": [[{"s": true}, {"s": false}], null, [], [{}]]}],
+            "failed_items": [
+              {"cause": "value", "path": "prs[0].cs[1]", "value": {"s": false}},
+              {"cause": "absent", "path": "prs[1].cs", "value": null},
+              {"cause": "value", "path": "prs[2].cs", "value": []},
+              {"cause": "absent", "path": "prs[3].cs[0]", "value": {}}
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "any with each",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "any", "path": ["prs"], "check": {"op": "equals", "path": ["s"], "value": true}, "each": ["cs"]}}}},
+    "cases": [
+      {
+        "description": "passes when an item of any inner list passes",
+        "rules": ["list.each", "list.pass"],
+        "input": {"things": [{"id": "t1", "prs": [{"cs": [{"s": false}]}, {"cs": [{"s": true}]}]}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "prs[].cs", "value": [[{"s": false}], [{"s": true}]]}],
+            "failed_items": []
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when an inner list is missing, even though another item passes",
+        "rules": ["list.each"],
+        "input": {"things": [{"id": "t1", "prs": [{"cs": [{"s": true}]}, {}]}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [{"name": "prs[].cs", "value": [[{"s": true}], null]}],
+            "failed_items": [{"cause": "absent", "path": "prs[1].cs", "value": null}]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "all with an empty each",
+    "policy": {"s": {"subject_type": "thing", "from": ["things"], "id": ["id"], "checks": {"c": {"op": "all", "path": ["xss"], "check": {"op": "equals", "path": [], "value": 1}, "each": []}}}},
+    "cases": [
+      {
+        "description": "checks the items of a list of lists",
+        "rules": ["list.each", "list.expression"],
+        "input": {"things": [{"id": "t1", "xss": [[1], [1, 2]]}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "xss[]", "value": [[1], [1, 2]]}],
+            "failed_items": [{"cause": "value", "path": "xss[1][1]", "value": 2}]
+          }
+        ],
+        "expressions": {"s": {"c": "every xss[]: xss[][] == 1"}}
+      }
+    ]
+  },
+  {
+    "description": "a nested list check",
+    "policy": {
+      "s": {
+        "subject_type": "pull request",
+        "from": ["prs", {"each_as": "pr"}],
+        "id": ["n"],
+        "checks": {"c": {"op": "any", "path": ["approvers"], "as": "ap", "check": {"op": "all", "path": ["$pr", "commits"], "check": {"op": "compare_time", "cmp": "gt", "left": ["$ap", "t"], "right": ["t"]}}}}
+      }
+    },
+    "cases": [
+      {
+        "description": "fails when no approver approved after every commit, and lists only the approvers",
+        "rules": ["list.as", "list.inner", "list.failed_items", "list.inputs"],
+        "input": {"prs": [{"approvers": [{"t": "2026-10-01T11:00:00Z", "u": "bob"}], "commits": [{"t": "2026-10-01T10:00:00Z"}, {"t": "2026-10-01T12:00:00Z"}], "n": 42}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "pull request", "id": 42},
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "approvers[]", "value": [{"t": "2026-10-01T11:00:00Z", "u": "bob"}]}, {"name": "$pr.commits", "value": [{"t": "2026-10-01T10:00:00Z"}, {"t": "2026-10-01T12:00:00Z"}]}],
+            "failed_items": [{"cause": "value", "path": "approvers[0]", "value": {"t": "2026-10-01T11:00:00Z", "u": "bob"}}]
+          }
+        ],
+        "expressions": {"s": {"c": "some approvers as $ap: every $pr.commits: $ap.t gt t"}}
+      },
+      {
+        "description": "passes when one approved after every commit",
+        "rules": ["list.as", "list.pass"],
+        "input": {"prs": [{"approvers": [{"t": "2026-10-01T11:00:00Z", "u": "bob"}], "commits": [{"t": "2026-10-01T10:00:00Z"}], "n": 42}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "pull request", "id": 42},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "approvers[]", "value": [{"t": "2026-10-01T11:00:00Z", "u": "bob"}]}, {"name": "$pr.commits", "value": [{"t": "2026-10-01T10:00:00Z"}]}],
+            "failed_items": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a list check reading a name from from",
+    "policy": {
+      "s": {
+        "subject_type": "pull request",
+        "from": ["prs", {"each_as": "pr"}],
+        "id": ["n"],
+        "checks": {"c": {"op": "any", "path": ["approvers"], "check": {"op": "compare", "cmp": "ne", "left": ["u"], "right": ["$pr", "author"]}}}
+      }
+    },
+    "cases": [
+      {
+        "description": "shows the value read through the name beside the items",
+        "rules": ["list.inputs"],
+        "input": {"prs": [{"approvers": [{"u": "ann"}], "author": "ann", "n": 42}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "pull request", "id": 42},
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "approvers[]", "value": [{"u": "ann"}]}, {"name": "$pr.author", "value": "ann"}],
+            "failed_items": [{"cause": "value", "path": "approvers[0]", "value": {"u": "ann"}}]
+          }
+        ],
+        "expressions": {"s": {"c": "some approvers: u ne $pr.author"}}
+      }
+    ]
+  },
+  {
+    "description": "a nested list check on an empty path",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["things"],
+        "id": ["id"],
+        "checks": {"c": {"op": "all", "path": ["xs"], "check": {"op": "all", "path": [], "check": {"op": "equals", "path": [], "value": "a"}}}}
+      }
+    },
+    "cases": [
+      {
+        "description": "names each level after its list",
+        "rules": ["list.expression"],
+        "input": {"things": [{"id": "t1", "xs": [["a"], ["b", "c"]]}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "xs[]", "value": [["a"], ["b", "c"]]}],
+            "failed_items": [{"cause": "value", "path": "xs[1]", "value": ["b", "c"]}]
+          }
+        ],
+        "expressions": {"s": {"c": "every xs: every xs[]: xs[][] == \"a\""}}
+      }
+    ]
+  },
+  {
+    "description": "all and any written wrong",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["things"],
+        "id": ["id"],
+        "checks": {
+          "as_on_equals": {"op": "equals", "path": ["cs"], "value": 1, "as": "x"},
+          "check_not_object": {"op": "all", "path": ["cs"], "check": 3},
+          "each_on_equals": {"op": "equals", "path": ["cs"], "value": 1, "each": ["b"]},
+          "invalid_name": {"op": "all", "path": ["cs"], "as": "$x", "check": {"op": "present", "path": []}},
+          "name_twice": {"op": "all", "path": ["cs"], "as": "x", "check": {"op": "all", "path": ["b"], "as": "x", "check": {"op": "present", "path": []}}},
+          "no_check": {"op": "all", "path": ["cs"]},
+          "too_deep": {"op": "all", "path": ["cs"], "check": {"op": "all", "path": ["b"], "check": {"op": "all", "path": ["c"], "check": {"op": "present", "path": []}}}},
+          "unknown_name": {"op": "all", "path": ["cs"], "check": {"op": "equals", "path": ["$q", "v"], "value": 1}}
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails every check as ill_formed and says why",
+        "rules": ["list.inner", "list.as", "list.expression", "list.failed_items", "written_wrong"],
+        "input": {"things": [{"cs": [1], "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {"name": "count(checks)", "value": 8},
+              {"name": "require", "value": "every"},
+              {"name": "checks.as_on_equals", "value": ["as can't go here"]},
+              {"name": "checks.check_not_object.check", "value": ["invalid check"]},
+              {"name": "checks.each_on_equals", "value": ["each can't go here"]},
+              {"name": "checks.invalid_name", "value": ["invalid name"]},
+              {"name": "checks.name_twice.check", "value": ["name given twice"]},
+              {"name": "checks.no_check", "value": ["missing check"]},
+              {"name": "checks.too_deep.check.check", "value": ["nested too deep"]},
+              {"name": "checks.unknown_name.check", "value": ["unknown name $q"]}
+            ]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "as_on_equals", "passed": false, "cause": "ill_formed", "inputs": [{"name": "cs", "value": [1]}]},
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "check_not_object",
+            "passed": false,
+            "cause": "ill_formed",
+            "inputs": [],
+            "failed_items": [{"cause": "ill_formed", "path": "cs[0]", "value": 1}]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "each_on_equals", "passed": false, "cause": "ill_formed", "inputs": [{"name": "cs", "value": [1]}]},
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "invalid_name",
+            "passed": false,
+            "cause": "ill_formed",
+            "inputs": [{"name": "cs[]", "value": [1]}],
+            "failed_items": [{"cause": "ill_formed", "path": "cs[0]", "value": 1}]
+          },
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "name_twice",
+            "passed": false,
+            "cause": "ill_formed",
+            "inputs": [{"name": "cs[].b", "value": [null]}],
+            "failed_items": [{"cause": "ill_formed", "path": "cs[0]", "value": 1}]
+          },
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "no_check",
+            "passed": false,
+            "cause": "ill_formed",
+            "inputs": [],
+            "failed_items": [{"cause": "ill_formed", "path": "cs[0]", "value": 1}]
+          },
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "too_deep",
+            "passed": false,
+            "cause": "ill_formed",
+            "inputs": [{"name": "cs[].b", "value": [null]}],
+            "failed_items": [{"cause": "ill_formed", "path": "cs[0]", "value": 1}]
+          },
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "unknown_name",
+            "passed": false,
+            "cause": "ill_formed",
+            "inputs": [{"name": "cs[]", "value": [1]}, {"name": "$q.v", "value": null}],
+            "failed_items": [{"cause": "ill_formed", "path": "cs[0]", "value": 1}]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "check_not_object": "every cs: <invalid check>",
+            "invalid_name": "every cs as <invalid name>: cs[] is present",
+            "name_twice": "every cs as $x: every b as <name given twice>: $x is present",
+            "no_check": "every cs: <missing check>",
+            "too_deep": "every cs: every b: <nested too deep>",
+            "unknown_name": "every cs: $q.v == 1"
+          }
+        }
+      }
+    ]
+  }
+]
