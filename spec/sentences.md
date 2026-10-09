@@ -284,9 +284,9 @@ The first is read as `is` or `equals`, the second as `is not`. The report prints
 
 ## Printing the sentence
 
-**[sentence.print.canonical]** The report's `expression` is the sentence printed from its parse in one spelling: single spaces, `is` before a value and `equals` before a field, no alias, strings in double quotes with JSON escapes, numbers in their plain form, and values separated by `, `. Parsing the printed sentence gives the same parse.
+**[sentence.print.canonical]** The report's `expression` is the sentence printed from its parse in one spelling: single spaces, `is` before a value and `equals` before a field, no alias, a string in single quotes when it holds a backslash and no single quote and in double quotes with JSON escapes otherwise, a dot in front of a right-side field only where [sentence.path.argument](#paths) needs one, numbers in their plain form, and values separated by `, `. Parsing the printed sentence gives the same parse.
 
-**[sentence.print.same]** For a sentence written that way, the printed form is byte for byte what the author wrote. In the corpus, 301 of the 303 one-line sentences and assertions print back unchanged. The other two are the same check written with single quotes, `entry does not match '^[A-Za-z0-9._-]+\s*(>=|<=|~=|!=|<|>)'`, which prints as `"^[A-Za-z0-9._-]+\\s*(>=|<=|~=|!=|<|>)"`. Whether the canonical form keeps single quotes for a string with a backslash is open.
+**[sentence.print.same]** For a sentence written that way, the printed form is byte for byte what the author wrote. Every line in the corpus prints back unchanged, the regular expression `entry does not match '^[A-Za-z0-9._-]+\s*(>=|<=|~=|!=|<|>)'` included, because its single quotes are the canonical spelling.
 
 ## How this was checked
 
