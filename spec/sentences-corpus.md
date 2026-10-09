@@ -712,9 +712,10 @@ Every phrase, counted from the parses, twins included: 229 checks and 74 filters
 | `equals ... within` |  |  | 2 |  |  | 2 |
 | `plus` |  |  | 2 |  |  | 2 |
 | `sum of` |  |  | 2 |  |  | 2 |
+| list under `assert` | 1 |  |  |  | 1 | 2 |
 | `named by <name>` |  |  | 1 |  |  | 1 |
 
-Not used anywhere: `is not one of`, `does not exist`, `contains none of`, `starts with`, `ends with`, `is at most`, `is more than`, `is less than`, `is on or before`, `is ... within`, `is not one of`, `ignoring case`, `first of`, `item 3 of` and `items[2]`.
+Not used anywhere: `is not one of`, `does not exist`, `contains none of`, `starts with`, `ends with`, `is at most`, `is more than`, `is less than`, `is on or before`, `is ... within`, `ignoring case`, `first of`, `item 3 of` and `items[2]`.
 
 ## pr-reviewer's custom operators
 
@@ -726,9 +727,9 @@ Not used anywhere: `is not one of`, `does not exist`, `contains none of`, `start
 | `count_where_eq_sum` | 2 | `count of x where field is "v" is a plus b` |
 | `sum_eq` | 2 | `sum of x.usd where stage is "v" is total within 0.000001` |
 | `contains_all` | 1 | `x contains all of y` |
-| `keys_match` | 1 | nothing: it stays custom, see below |
+| `keys_match` | 1 | `for: every x as persona` with `assert: y named by persona matches "..."`. A sentence under #174, but ergo can't run it until a ref can start with a name |
 
-Six of the seven go, as #173 found for the five numeric ones. The sentences also drop the `expression` and `inputs` each custom check had to carry.
+Six of the seven go today, as #173 found for the five numeric ones, and the seventh is a sentence ergo can't run yet. The sentences also drop the `expression` and `inputs` each custom check had to carry.
 
 ## Misfits
 
@@ -761,7 +762,7 @@ What the corpus says about each decision the brief left open.
 
 **Two quantifiers and a subject with a parent.** The `for` line #174 added while this was written does the job Tore's subject move for DEV-0501 was for. 14 checks use one: DEV-0501 `peer_approved`, every comparison of an item with its subject (DEV-0401, 0407, 0502, 0503, 0601 and server 0010), and pr-reviewer `dispatched_personas_recorded`. None of them needs a subject that starts at another subject, so #52 isn't on this path any more. What `for` can't do is hold two assertions about the same items, which is sdlc-policies 0007's misfit.
 
-**One-line `every` and `some`, or always `for`.** #174 asks whether the one-line form earns its second scoping rule. 20 checks use a one-line `every` or `some` (11 `every`, 9 `some`) and 13 need a `for` line, so most walks don't need one. 18 of the 20 read nothing after the path but a value or `$params`, like `every commits.verified is true` or `some licences is in $params.allowed_licenses`, so for them the second rule never comes up. It only matters for a bare field read on the item, which happens in 2: DEV-0801's `where state is "APPROVED"`, and server 0007, whose `where` and argument read fields Rego copied onto each approver. A one-line form without `where` and without bare fields in its argument would keep the 18 on one line and move those 2 to `for`. But `count of ... where` and `sum of ... where` (3 checks, all pr-reviewer) read the item in their `where` whatever happens, because a `for` line can't produce a number, so the item-scoped `where` stays in the grammar either way.
+**One-line `every` and `some`, or always `for`.** #174 asks whether the one-line form earns its second scoping rule. 20 assertions use a one-line `every` or `some` (11 `every`, 9 `some`) and 14 checks have a `for` line, so most walks don't need one. 18 of the 20 read nothing after the path but a value or `$params`, like `every commits.verified is true` or `some licences is in $params.allowed_licenses`, so for them the second rule never comes up. It only matters for a bare field read on the item, which happens in 2: DEV-0801's `where state is "APPROVED"`, and server 0007, whose `where` and argument read fields Rego copied onto each approver. A one-line form without `where` and without bare fields in its argument would keep the 18 on one line and move those 2 to `for`. But `count of ... where` and `sum of ... where` (3 checks, all pr-reviewer) read the item in their `where` whatever happens, because a `for` line can't produce a number, so the item-scoped `where` stays in the grammar either way.
 
 **Chains.** #174 lets a subject start from another subject by name. 6 `from` lines chain, twins included. 4 descend from `artifact` instead of repeating its lookup: sdlc-policies 0007's pull requests and 0008's test suites, the server's copy of 0008, and server 0010's approval attestation. 2 narrow, DEV-0409's `critical defect` and its twin. No chain is more than two subjects deep. The deepest check is sdlc-policies 0007 `peer_approval`: two chained subjects, then two `for` items, so four levels and three list walks, the same three walks it has today. Two things the corpus shows that #174 doesn't settle: sdlc-policies 0004 has subjects named `artifact` and `lockfile` whose `from` is `artifact` and `lockfile`, input fields with the same names, which chaining by name could read as a subject starting from itself. And 19 subject names have a space, like `production deployment`, so they can't start a chain without quotes. None of the corpus's chains needs that.
 
