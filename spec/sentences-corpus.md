@@ -196,7 +196,7 @@ Same as SDLC-CTRL-0004 dependencies, except:
 | | today | sentence | notes |
 | --- | --- | --- | --- |
 | `from` of repository | `[trail, compliance_status, artifacts_statuses, artifact, attestations_statuses, npm-bump-prs, attestation_data]` | `trail.compliance_status.artifacts_statuses.artifact.attestations_statuses.npm-bump-prs.attestation_data` |  |
-| `no_open_bump_pr` | `{op: equals, path: [open_bump_prs], value: []}` | `open_bump_prs is empty` | widens "". `must`: `open_bump_prs is empty` reads like a status. |
+| `no_open_bump_pr` | `{op: equals, path: [open_bump_prs], value: []}` | `open_bump_prs is empty` | widens "" |
 
 ## pr-reviewer
 
@@ -224,7 +224,7 @@ Same as SDLC-CTRL-0004 dependencies, except:
 | `cost_cap_state_recorded` | `{op: in, path: [..., coverage-verification, attestation_data, before_second_pass, cost_capped], values: [true, false]}` | `compliance_status.attestations_statuses.coverage-verification.attestation_data.before_second_pass.cost_capped is one of true, false` |  |
 | `per_file_coverage_recorded` | `{op: min_length_at, path: [compliance_status, attestations_statuses, coverage-verification, attestation_data, files], min_path: [compliance_status, attestations_statuses, coverage-verification, attestation_data, total_files], expression: ..., inputs: [...]}` | `count of compliance_status.attestations_statuses.coverage-verification.attestation_data.files is at least compliance_status.attestations_statuses.coverage-verification.attestation_data.total_files` | replaces custom `min_length_at` |
 | `first_pass_findings_recorded` | `{op: count_where_eq_sum, path: [compliance_status, attestations_statuses, findings, attestation_data, raw], field: source, value: first_pass, sum: [[compliance_status, attestations_statuses, claude-review, attestation_data, total_findings], [compliance_status, attestations_statuses, gemini-review, attestation_data, total_findings]], expression: ..., inputs: [...]}` | `count of compliance_status.attestations_statuses.findings.attestation_data.raw where source is "first_pass" equals compliance_status.attestations_statuses.claude-review.attestation_data.total_findings plus compliance_status.attestations_statuses.gemini-review.attestation_data.total_findings` | narrows. replaces custom `count_where_eq_sum`. A raw finding with no `source` is skipped by the custom operator and fails the sentence as `absent`, as #173 found on 12 of 800 inputs. |
-| `findings_complete` | `{op: equals, path: [compliance_status, attestations_statuses, findings, attestation_data, truncated], value: false}` | `compliance_status.attestations_statuses.findings.attestation_data.truncated is false` | `must`: `truncated is false` reads like a status. |
+| `findings_complete` | `{op: equals, path: [compliance_status, attestations_statuses, findings, attestation_data, truncated], value: false}` | `compliance_status.attestations_statuses.findings.attestation_data.truncated is false` |  |
 | `round_cost_sums_its_stages` | `{op: sum_eq, path: [..., final-verdict, attestation_data, cost, by_stage], field: usd, only: {}, total: [..., cost, total_usd], tolerance: 0.000001, expression: ...}` | `sum of compliance_status.attestations_statuses.final-verdict.attestation_data.cost.by_stage.usd equals compliance_status.attestations_statuses.final-verdict.attestation_data.cost.total_usd within 0.000001` | replaces custom `sum_eq` |
 | `verifier_cost_matches_its_stage` | `{op: sum_eq, path: [..., final-verdict, attestation_data, cost, by_stage], field: usd, only: {stage: verifier}, total: [compliance_status, attestations_statuses, finding-verifier, attestation_data, cost_usd], tolerance: 0.000001, expression: ...}` | `sum of compliance_status.attestations_statuses.final-verdict.attestation_data.cost.by_stage.usd where stage is "verifier" equals compliance_status.attestations_statuses.finding-verifier.attestation_data.cost_usd within 0.000001` | narrows. replaces custom `sum_eq`. A sum over no rows is 0, as the custom operator gives (checked on `main`). A stage row with no `stage` field is skipped by the custom operator and fails the sentence as `absent`. |
 | `dispatched_personas_recorded` | `{op: keys_match, keys: [compliance_status, attestations_statuses, classifier, attestation_data, personas_dispatched], path: [compliance_status, attestations_statuses, preflight, attestation_data, persona_blob_shas], patterns: ['^[0-9a-f]{40}$'], expression: ..., inputs: [...]}` | `for: every compliance_status.attestations_statuses.classifier.attestation_data.personas_dispatched as persona`<br>`assert: compliance_status.attestations_statuses.preflight.attestation_data.persona_blob_shas named by persona matches "^[0-9a-f]{40}$"` | replaces custom `keys_match`. **misfit**, see below |
@@ -352,7 +352,7 @@ Same as DEV-0102 impact analysis, new features, except:
 | filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
 | `branch_protected` | `{op: equals, path: [source, branch_protection, enabled], value: true}` | `source.branch_protection.enabled is true` |  |
 | `signed_commits_required` | `{op: equals, path: [source, branch_protection, require_signed_commits], value: true}` | `source.branch_protection.require_signed_commits is true` |  |
-| `no_force_pushes` | `{op: equals, path: [source, branch_protection, allow_force_pushes], value: false}` | `source.branch_protection.allow_force_pushes is false` | `must`: `allow_force_pushes is false` reads like a description of the branch. `must be false` says it's the rule. |
+| `no_force_pushes` | `{op: equals, path: [source, branch_protection, allow_force_pushes], value: false}` | `source.branch_protection.allow_force_pushes is false` |  |
 | `commits_verified` | `{op: all, path: [source, commits], check: {op: equals, path: [verified], value: true}}` | `every source.commits.verified is true` |  |
 
 ### DEV-0203 secrets scanned
@@ -362,7 +362,7 @@ Same as DEV-0102 impact analysis, new features, except:
 | `from` of production deployment | `[deployments]` | `deployments` |  |
 | filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
 | `scanned` | `{op: equals, path: [artifact, attestations, secrets-scan, status], value: COMPLETE}` | `artifact.attestations.secrets-scan.status is "COMPLETE"` |  |
-| `no_secrets` | `{op: equals, path: [artifact, attestations, secrets-scan, findings], value: 0}` | `artifact.attestations.secrets-scan.findings is 0` | `must`: `findings is 0` reads like a result. `findings must be 0` reads like the rule. |
+| `no_secrets` | `{op: equals, path: [artifact, attestations, secrets-scan, findings], value: 0}` | `artifact.attestations.secrets-scan.findings is 0` |  |
 
 ### DEV-0301 build provenance
 
@@ -388,7 +388,7 @@ Same as DEV-0102 impact analysis, new features, except:
 | `from` of production deployment | `[deployments]` | `deployments` |  |
 | filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
 | `scanned` | `{op: equals, path: [iac_scan, status], value: COMPLETE}` | `iac_scan.status is "COMPLETE"` |  |
-| `no_high_findings` | `{op: equals, path: [iac_scan, critical_or_high_findings], value: 0}` | `iac_scan.critical_or_high_findings is 0` | `must`: `critical_or_high_findings is 0` reads like a scan result. |
+| `no_high_findings` | `{op: equals, path: [iac_scan, critical_or_high_findings], value: 0}` | `iac_scan.critical_or_high_findings is 0` |  |
 
 ### DEV-0401 security testing
 
@@ -438,7 +438,7 @@ Same as DEV-0403 features tested, except:
 | filter `migrates_data` | `{op: equals, path: [includes_data_migration], value: true}` | `includes_data_migration is true` |  |
 | `passed` | `{op: equals, path: [migration_test, is_compliant], value: true}` | `migration_test.is_compliant is true` |  |
 | `complete` | `{op: compare, left: [migration_test, migrated_records], right: [migration_test, source_records], cmp: eq}` | `migration_test.migrated_records equals migration_test.source_records` |  |
-| `accurate` | `{op: range, path: [migration_test, mismatched_records], min: 0, max: 0}` | `migration_test.mismatched_records is 0` | cause only. `must`: `mismatched_records is 0` reads like a test result. |
+| `accurate` | `{op: range, path: [migration_test, mismatched_records], min: 0, max: 0}` | `migration_test.mismatched_records is 0` | cause only |
 | `before_production` | `{op: compare_time, left: [migration_test, finished_at], right: [started_at], cmp: lt}` | `migration_test.finished_at is before started_at` |  |
 
 ### DEV-0406 acceptance testing, new features
@@ -472,7 +472,7 @@ Same as DEV-0403 features tested, except:
 | `from` of environment | `[environments]` | `environments` |  |
 | filter `non_production` | `{op: in, path: [type], values: [development, test, staging]}` | `type is one of "development", "test", "staging"` |  |
 | `safe_data_source` | `{op: in, path: [data_source], values: [synthetic, masked]}` | `data_source is one of "synthetic", "masked"` |  |
-| `no_production_connection` | `{op: equals, path: [connects_to_production_data], value: false}` | `connects_to_production_data is false` | `must`: `connects_to_production_data is false` reads like a description of the environment. |
+| `no_production_connection` | `{op: equals, path: [connects_to_production_data], value: false}` | `connects_to_production_data is false` |  |
 
 ### DEV-0409 defects triaged, new features
 
@@ -615,7 +615,7 @@ Same as DEV-0504 roll-back ready, new features, except:
 | filter `in_scope` | `{op: equals, path: [change_type], value: normal}` | `change_type is "normal"` |  |
 | `lessons_learned` | `{op: non_empty_string, path: [review, lessons_learned]}` | `review.lessons_learned is not empty` | widens |
 | `incidents_have_actions` | `{op: any_of, options: {no_incidents: [{op: empty, path: [review, incidents]}], all_actioned: [{op: all, path: [review, incidents], check: {op: non_empty_string, path: [action_ticket]}}]}}` | `every review.incidents.action_ticket, if any, is not empty` | widens |
-| `test_accounts_removed` | `{op: empty, path: [review, test_accounts_in_production]}` | `review.test_accounts_in_production is empty` | widens "". `must`: `test_accounts_in_production is empty` reads like a finding of the review. |
+| `test_accounts_removed` | `{op: empty, path: [review, test_accounts_in_production]}` | `review.test_accounts_in_production is empty` | widens "" |
 | `reviewed_after_change` | `{op: compare_time, left: [review, completed_at], right: [started_at], cmp: gt}` | `review.completed_at is after started_at` |  |
 
 ### DEV-0705 periodic security testing
@@ -625,7 +625,7 @@ Same as DEV-0504 roll-back ready, new features, except:
 | `from` of security test | `[application, security_tests, {each_as: test, keys: {ref: [$$params, required_tests]}}]` | `application.security_tests named by each of $params.required_tests` | Rego-shaped |
 | `run_recently` | `{op: compare_time, left: [due_by], right: [$$input, evaluated_at], cmp: gte}` | `due_by is on or after $input.evaluated_at` | Rego-shaped. Rego works out `due_by` as `last_run` plus `$params.interval_days` for the test, keyed by the test's name. |
 | `production_like` | `{op: in, path: [environment], values: [prod, prod-equivalent]}` | `environment is one of "prod", "prod-equivalent"` |  |
-| `findings_remediated` | `{op: range, path: [open_critical_or_high_findings], min: 0, max: 0}` | `open_critical_or_high_findings is 0` | cause only. `must`: `open_critical_or_high_findings is 0` reads like a report. |
+| `findings_remediated` | `{op: range, path: [open_critical_or_high_findings], min: 0, max: 0}` | `open_critical_or_high_findings is 0` | cause only |
 
 ### DEV-0706 root cause analysed
 
@@ -729,25 +729,13 @@ Fits on one line, but changes what passes:
 
 Fits, but only after Rego reshapes the input (24 entries): sdlc-policies 0004 builds every subject from attested text, the server demos copy fields between objects, and DEV-0401, 0402, 0705 and 0802 compute deadlines with date arithmetic (#140). Sentences don't change that. A deadline as a sentence would need date arithmetic and a param key read from the subject, `$params.sla_days at severity`.
 
-## `is` or `must`
+## `is`, never `must`
 
-The corpus is written with `is`. 74 filters and 22 `where` conditions are conditions, not rules, so they need `is` whatever checks use: `where state is "APPROVED"` can't be `where state must be "APPROVED"`. With `must` in checks, the grammar has two verbs for the same phrases, and the same leaf reads differently in a filter and in a check. 229 checks could take `must`. Most read the same either way, like `signature.verified is true` or `state is "MERGED"`. The ones where `must` reads better all say that something bad is absent: a zero, a `false` or an empty list. With `is`, they read like a result rather than a rule:
-
-- flow-templates npm-bump `no_open_bump_pr`: `open_bump_prs is empty` reads like a status.
-- review-controls `findings_complete`: `truncated is false` reads like a status.
-- DEV-0202 tamper protection `no_force_pushes`: `allow_force_pushes is false` reads like a description of the branch. `must be false` says it's the rule.
-- DEV-0203 secrets scanned `no_secrets`: `findings is 0` reads like a result. `findings must be 0` reads like the rule.
-- DEV-0303 configuration scanned `no_high_findings`: `critical_or_high_findings is 0` reads like a scan result.
-- DEV-0405 data migration `accurate`: `mismatched_records is 0` reads like a test result.
-- DEV-0408 no production data in test `no_production_connection`: `connects_to_production_data is false` reads like a description of the environment.
-- DEV-0704 normal changes reviewed `test_accounts_removed`: `test_accounts_in_production is empty` reads like a finding of the review.
-- DEV-0705 periodic security testing `findings_remediated`: `open_critical_or_high_findings is 0` reads like a report.
+The question is closed: [#174](https://github.com/kosli-dev/ergo/issues/174#the-proposal) uses `is` in checks, filters and `where` alike.
 
 ## Open questions
 
 What the corpus says about each decision the brief left open.
-
-**`is` or `must`.** See above. 74 filters and 22 `where` conditions need `is`. 9 checks read better with `must`, and all of them say something bad is absent. The others read the same either way. Inside an `assert:` key, even those 9 are clear, so the case for `must` is a sentence quoted on its own, in a report or a markdown policy (#18).
 
 **Looking up by key.** #174 settled it as `named by`, with brackets as the other spelling. It appears 44 times, all in sdlc-policies and the server demos, and 32 of those have more path after the key, like `artifacts_statuses named by $params.artifact_name.attestations_statuses`. Every reference after `named by` in the corpus is `$params` plus one key, or a name from a `for` line, so the issue's rule takes nothing away. Whether the report prints the word form or brackets waits for the readability test.
 
