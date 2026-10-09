@@ -198,17 +198,11 @@ Two numbers at most that far apart. The number is 0 or more. Missing: `absent`. 
 ```
 <path> is one of <values>
 <path> is not one of <values>
-```
-
-The field equals one of the values, or none of them. Missing: `absent`. `null`: `null`, even when the values include `null`. Wrong type: `is one of` fails as `value`, and `is not one of` passes, since a number isn't one of three strings. An empty list can't be written.
-
-**[sentence.phrase.in]**
-```
 <path> is in <path>
 <path> is not in <path>
 ```
 
-The same, with the list read from a path, usually `$params`. Missing: `absent`. `null`: `null`. A list that isn't a list: `unusable`. An empty list fails `is in` as `value`, and passes `is not in`.
+The field equals one of the values, or none of them. `is one of` and `is in` mean the same, and so do their negated forms, so either can take written values or a path. The report prints `is one of` before written values and `is in` before a path, usually `$params`: `type is one of "development", "test"`, `author is in $params.external_contributors`. Missing: `absent`. `null`: `null`, even when the values include `null`. Wrong type: `is one of` fails as `value`, and `is not one of` passes, since a number isn't one of three strings. An empty list can't be written. A list read from a path that isn't a list fails as `unusable`, and an empty one fails `is in` as `value` and passes `is not in`.
 
 **[sentence.phrase.exists]**
 ```
@@ -321,7 +315,7 @@ The first is read as `is` or `equals`, the second as `is not`. The report prints
 
 ## Printing the sentence
 
-**[sentence.print.canonical]** The report's `expression` is the sentence printed from its parse in one spelling: single spaces, `is` before a value and `equals` before a field, no alias, a string in single quotes when it holds a backslash and no single quote and in double quotes with JSON escapes otherwise, a dot in front of a right-side field only where [sentence.path.argument](#paths) needs one, numbers in their plain form, and values separated by `, `. Parsing the printed sentence gives the same parse.
+**[sentence.print.canonical]** The report's `expression` is the sentence printed from its parse in one spelling: single spaces, `is` before a value and `equals` before a field, `is one of` before written values and `is in` before a path, no alias, a string in single quotes when it holds a backslash and no single quote and in double quotes with JSON escapes otherwise, a dot in front of a right-side field only where [sentence.path.argument](#paths) needs one, numbers in their plain form, and values separated by `, `. Parsing the printed sentence gives the same parse.
 
 **[sentence.print.same]** For a sentence written that way, the printed form is byte for byte what the author wrote. Every line in the corpus prints back unchanged, the regular expression `entry does not match '^[A-Za-z0-9._-]+\s*(>=|<=|~=|!=|<|>)'` included, because its single quotes are the canonical spelling.
 
