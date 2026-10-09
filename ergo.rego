@@ -2221,10 +2221,10 @@ _substitute_of(check) := object.get(check, "substitute", {})
 
 default _read_paths(_) := []
 
-_read_paths(check) := [_input_spec_path(spec) | some spec in check.inputs] if check.inputs
+_read_paths(check) := [_input_spec_path(spec) | some spec in check.inputs] if _cause_from_inputs(check)
 
 _read_paths(check) := [side | some side in [check.left, check.right]; is_array(side)] if {
-	not check.inputs
+	not _cause_from_inputs(check)
 	_two_sided(check)
 }
 
@@ -2235,7 +2235,7 @@ _named_each(check) := [check.each] if _named(object.get(check, "each", []))
 _named_each(check) := [] if not _named(object.get(check, "each", []))
 
 _read_paths(check) := [check.path] if {
-	not check.inputs
+	not _cause_from_inputs(check)
 	not _two_sided(check)
 	not _quantified(check)
 	not _combinator(check)
@@ -2328,21 +2328,28 @@ default _has_inputs(_) := false
 
 _has_inputs(check) if check.inputs
 
-_check_states(check, subj) := {_read_state(subj, p) | some p in _read_paths(check)} if _has_inputs(check)
+default _cause_from_inputs(_) := false
+
+_cause_from_inputs(check) if {
+	_has_inputs(check)
+	not check.op in (_leaf_ops | {"all", "any", "any_of"})
+}
+
+_check_states(check, subj) := {_read_state(subj, p) | some p in _read_paths(check)} if _cause_from_inputs(check)
 
 _check_states(check, subj) := (_answered(check, subj, {_read_state(subj, p) | some p in _read_paths(check)}) | _unusable_states(check, subj)) | _derived_states(check, subj) if {
-	not _has_inputs(check)
+	not _cause_from_inputs(check)
 	not _quantified(check)
 	not _combinator(check)
 }
 
 _check_states(check, subj) := {_list_cause(check, subj)} if {
-	not _has_inputs(check)
+	not _cause_from_inputs(check)
 	_quantified(check)
 }
 
 _check_states(check, subj) := {_option_cause(group, subj) | some group in check.options} if {
-	not _has_inputs(check)
+	not _cause_from_inputs(check)
 	_combinator(check)
 }
 

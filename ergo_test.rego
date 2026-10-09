@@ -2144,7 +2144,7 @@ test_every_read_fails_as_unusable_when_a_step_before_the_field_cannot_hold_it if
 		[{"a": "x"}, {"op": "all", "path": ["a", "b"], "check": {"op": "present", "path": []}}],
 		[{"xs": [{"b": 1}]}, {"op": "all", "path": ["xs"], "each": ["b", "c"], "check": {"op": "present", "path": []}}],
 		[{"xs": [{"v": "s"}]}, {"op": "all", "path": ["xs"], "check": {"op": "equals", "path": ["v", "w"], "value": 1}}],
-		[{"a": 3}, {"op": "equals", "path": ["id"], "value": 0, "inputs": [["a", "b"]]}],
+		[{"a": 3}, {"op": "even", "path": ["id"], "inputs": [["a", "b"]]}],
 		[{"a": "x", "b": 1}, {"op": "compare", "left": ["a", "z"], "right": ["b"], "cmp": "eq"}],
 		[{"a": [1]}, {"op": "equals", "path": ["a", "b"], "value": 1}],
 	] {
@@ -7682,4 +7682,14 @@ test_a_custom_operators_own_count_field_is_not_read_as_a_derived_path if {
 	check := {"op": "even", "path": ["n"], "count": ["xs", {"ref": ["$$params", "k"]}]}
 	[r.cause | some r in rows_for(ergo.report({"items": [{"id": 1, "n": 3}]}, one_check_policy(check), {"k": ["a"]}), "s", "c")] == ["value"]
 	[r.cause | some r in rows_for(ergo.report({"items": [{"id": 1, "n": 3}]}, one_check_policy(object.union(check, {"count": [{"literal": 1}]})), {"k": ["a"]}), "s", "c")] == ["value"]
+}
+
+test_a_built_in_check_takes_its_cause_from_what_it_reads_whatever_inputs_it_shows if {
+	every check in [
+		{"op": "equals", "path": ["a"], "value": 1, "inputs": [["b"]]},
+		{"op": "compare", "left": {"count": ["a"]}, "right": {"literal": 1}, "cmp": "gte", "inputs": [["b"]]},
+		{"op": "all", "path": ["a"], "check": {"op": "present", "path": ["x"]}, "inputs": [["b"]]},
+	] {
+		derived_row({"b": 1}, check) == [false, "absent", [{"name": "b", "value": 1}]]
+	}
 }
