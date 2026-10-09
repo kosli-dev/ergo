@@ -85,7 +85,7 @@ The `and` between assertions can't be confused with the `and` of `where` or of `
 
 ## `every`, `some` and `where`
 
-**[sentence.every.walk]** `every <path>` walks into every list along the path, the last one included, and the assertion applies to each value it ends at. `every pull_requests.commits.author` reads the author of every commit of every pull request, and `every branches matches "^release/"` reads each branch of a list of strings. It passes when every value passes. Because the last list is walked too, `every pull_requests.labels is not empty` checks each label, not that each pull request has labels.
+**[sentence.every.walk]** `every <path>` walks into every list along the path, the last one included, and the assertion applies to each value it ends at. `every pull_requests.commits.author` reads the author of every commit of every pull request, and `every branches matches "^release/"` reads each branch of a list of strings. It passes when every value passes. Because the last list is walked too, `every pull_requests.labels is not empty` checks each label, not that each pull request has labels. And because a bare name on the right of a one-line `every` is the item's, `every $input.artifact.developers is not tested_by` reads `tested_by` on each developer string, which isn't what it means. To compare each string with a field of the subject, use a `for` line: `for: every $input.artifact.developers as developer` with `assert: developer is not tested_by`.
 
 **[sentence.every.empty]** `every` over an empty list fails with cause `value`, because no commits isn't proof that every commit is signed. Over nested lists, each inner list must have an item too, as `each` does today.
 

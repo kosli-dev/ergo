@@ -447,7 +447,7 @@ Same as DEV-0403 features tested, except:
 | --- | --- | --- | --- |
 | `from` of user acceptance test | `[artifact, attestations, uat]` | `artifact.attestations.uat` | Rego-shaped. Rego adds `artifact.developers`, every author of a pull request or commit. |
 | `passed` | `{op: equals, path: [result], value: passed}` | `result is "passed"` |  |
-| `independent_tester` | `{op: excludes, path: [$$input, artifact, developers], value: {ref: [$$input, artifact, attestations, uat, tested_by]}}` | `tested_by is not in $input.artifact.developers` | Same passes and causes as `excludes` with a ref: missing, `null` and non-list cases fail the same way on both. |
+| `independent_tester` | `{op: excludes, path: [$$input, artifact, developers], value: {ref: [$$input, artifact, attestations, uat, tested_by]}}` | `$input.artifact.developers does not contain tested_by` | Today's `excludes` word for word, and the form #174 and Tore use. `tested_by is not in $input.artifact.developers` passes and fails the same way. |
 | `documented` | `{op: non_empty_string, path: [report_url]}` | `report_url is not empty` | widens |
 | `approved` | `{op: non_empty_string, path: [approved_by]}` | `approved_by is not empty` | widens |
 | `approved_after_testing` | `{op: compare_time, left: [approved_at], right: [tested_at], cmp: gte}` | `approved_at is on or after tested_at` |  |
@@ -459,7 +459,7 @@ Same as DEV-0403 features tested, except:
 | --- | --- | --- | --- |
 | `from` of user acceptance test | `[artifact, attestations, uat]` | `artifact.attestations.uat` | Rego-shaped. Rego adds `artifact.developers`, every author of a pull request or commit. |
 | `passed` | `{op: equals, path: [result], value: passed}` | `result is "passed"` |  |
-| `independent_tester` | `{op: all, path: [$$input, artifact, developers], check: {op: compare, left: [], right: [$$input, artifact, attestations, uat, tested_by], cmp: ne}}` | `for: every $input.artifact.developers as developer`<br>`assert: developer is not tested_by` | `for` line. Unlike DEV-0406, an empty developer list fails here, as `all` does. Today's policy reaches the tester through `$$input` because inside `all` paths start at the developer. With `for`, `tested_by` is the subject's. |
+| `independent_tester` | `{op: all, path: [$$input, artifact, developers], check: {op: compare, left: [], right: [$$input, artifact, attestations, uat, tested_by], cmp: ne}}` | `for: every $input.artifact.developers as developer`<br>`assert: developer is not tested_by` | `for` line. Unlike DEV-0406, an empty developer list fails here, as `all` does today. Tore wrote `every $input.artifact.developers is not tested_by`, which #174 rules out: in a one-line `every`, the bare `tested_by` would be read on each developer string. #174 suggests DEV-0406's `$input.artifact.developers does not contain tested_by` instead, but that passes an empty list, so it changes what passes here. The `for` line keeps today's meaning. |
 | `documented` | `{op: non_empty_string, path: [report_url]}` | `report_url is not empty` | widens |
 | `approved` | `{op: non_empty_string, path: [approved_by]}` | `approved_by is not empty` | widens |
 | `approved_after_testing` | `{op: compare_time, left: [approved_at], right: [tested_at], cmp: gte}` | `approved_at is on or after tested_at` |  |
@@ -687,12 +687,11 @@ Every phrase, counted from the parses, twins included: 229 checks and 74 filters
 | `contains` |  |  | 3 |  |  | 3 |
 | `does not match` | 1 | 1 | 1 |  |  | 3 |
 | `contains all of` |  |  | 1 |  | 1 | 2 |
+| `does not contain` |  |  |  | 1 | 1 | 2 |
 | `equals ... within` |  |  | 2 |  |  | 2 |
 | `plus` |  |  | 2 |  |  | 2 |
 | `sum of` |  |  | 2 |  |  | 2 |
-| `does not contain` |  |  |  | 1 |  | 1 |
 | `is a` |  |  | 1 |  |  | 1 |
-| `is not in` |  |  |  |  | 1 | 1 |
 | `named by <name>` |  |  | 1 |  |  | 1 |
 
 Not used anywhere: `is not one of`, `does not exist`, `contains none of`, `starts with`, `ends with`, `is at most`, `is more than`, `is less than`, `is on or before`, `is ... within`, `is not one of`, `ignoring case`, `first of`, `item 3 of` and `items[2]`.
