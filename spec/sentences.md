@@ -166,7 +166,7 @@ peer_approved:
 
 Items nest left to right, so a later one can use an earlier name, as `pr.approvers` does. A third item is written wrong, because two is the one level of nesting Rego gives today.
 
-**[sentence.for.depth]** A check walks three lists at most, from the input to its assertion, counted as list walks and not as subjects. Walks in `from`, in a parent subject's `from`, on the `for` line and in a one-line `every` or `some` all count, and a fourth is written wrong. sdlc-policies 0007's peer approval reaches the limit: pull requests in its `from`, then approvers and commits on its `for` line. Its `artifact` parent picks one artifact by name and walks no list.
+**[sentence.for.depth]** A check walks three lists at most, from the input to its assertion, counted as list walks and not as subjects. Walks in `from`, in a parent subject's `from`, on the `for` line, in a one-line `every` or `some`, and in a `count of` or `sum of`, in a `where` too, all count, and a fourth is written wrong. sdlc-policies 0007's peer approval reaches the limit: pull requests in its `from`, then approvers and commits on its `for` line. Its `artifact` parent picks one artifact by name and walks no list.
 
 **[sentence.for.scope]** In `assert` and in a later item, a bare first key is the subject's field and a named item is reached by its name. Inside an item's own `where`, a bare key is that item's field. So in `for: some approvals where role is "qa" as approval` with `assert: approval.approved_at is before started_at`, `role` is the approval's and `started_at` the subject's.
 
