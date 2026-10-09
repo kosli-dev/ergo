@@ -25,10 +25,12 @@ sum of stages.usd where kind is "model" is total_usd within 0.01
 - `count of <path>` or `sum of <path>`, optionally with `where`, and the assertion is about the number
 - a path, a `count of` or a `sum of` joined to more terms with `plus`, as in `count of records plus capped is findings_in`
 
+A check that walks two lists, or compares an item with its subject, puts the walking on a [`for` line](#the-for-line) and keeps the assertion flat.
+
 **[sentence.flat]** The grammar is flat, because Rego can't recurse. So:
 
 - one assertion per line
-- one `every`, `some`, `count of` or `sum of` per sentence, and only at the start
+- one `every`, `some`, `count of` or `sum of` per sentence, and only at the start. A second one goes on a `for` line
 - `where` holds one or more conditions joined by `and`, and each condition is a path and a phrase, never another `every` or `where`
 - `and` joins conditions inside `where` only, never two assertions and never at the top of a sentence
 - no `or`, and no brackets except `items[2]`
@@ -39,15 +41,15 @@ Two assertions are two checks. "Or" is an `any_of` in the policy around the sent
 
 **[sentence.path.string]** A path is keys joined by `.`, like `git_commit_info.sha1`. A key is written bare when it starts with an ASCII letter or `_` and the rest is ASCII letters, digits, `_`, `$` and `-`, like `coverage-verification`. Any other key is quoted as a JSON string, like `metadata.labels."app.kubernetes.io/name"`, and so is a key that starts with `$`, like `"$schema"`. This is how [syntax.md](syntax.md#naming-a-path) already names paths in the report, so a path from a row can be pasted into a policy.
 
-**[sentence.path.start]** A bare first key is a field of the subject. Inside `where`, and in the argument of `every` and `some`, it's a field of the item instead (see [sentence.argument.item](#every-some-and-where)). `$params` starts at the params, `$input` at the input, and `$<name>` at a name given by `as`. Any other `$<word>` is written wrong, with `unknown name $<word>`.
+**[sentence.path.start]** A bare first key is a field of the subject. Inside `where`, and in the argument of a one-line `every` or `some`, it's a field of the item instead (see [sentence.argument.item](#every-some-and-where)). A name given by `as` on a `for` line is a bare word too, and it shadows a field with the same name. `$params` starts at the params and `$input` at the input. Any other `$<word>` is written wrong, with `unknown name $<word>`.
 
 **[sentence.path.index]** `items[2]` reads the third item of `items`. `item 3 of items`, `first of items` and `last of items` are proposed in #174 as the word forms, and no policy in the corpus needs them.
 
 **[sentence.path.argument]** In an argument, where a phrase expects a value or a path, a quoted string is a value, so a path whose first key is quoted is written with a leading `.`, as jq does: `id is ."$schema"`. The same goes for a field named like a phrase word or a value (see [sentence.words](#words-a-field-cant-be-called)): `state is ."empty"`.
 
-**[sentence.path.dynamic]** `<path> at $params.<key>` reads the key named by the param, as a ref step does today, and the path can go on after it: `artifacts_statuses at $params.artifact_name.attestations_statuses`. The ref after `at` is `$params` or `$input` and one key, or a bare `$<name>`. Without that limit, `at $params.a.b` could end its ref after `a` or after `b`, and the tokenizer found 30 sentences in the corpus that read two ways because of it. The word `at`, and whether a ref can go deeper, are open.
+**[sentence.path.dynamic]** `<path> at $params.<key>` reads the key named by the param, as a ref step does today, and the path can go on after it: `artifacts_statuses at $params.artifact_name.attestations_statuses`. The ref after `at` is `$params` or `$input` and one key. Without that limit, `at $params.a.b` could end its ref after `a` or after `b`, and the tokenizer found 31 lines in the corpus that read two ways because of it. Proposed: `at <name>`, with a name from a `for` line, which pr-reviewer's `keys_match` needs. The word `at`, and whether a ref can go deeper, are open.
 
-**[sentence.path.keys]** In `from`, `<path> at each of <values>` makes each listed key a subject, as `keys` does today: `artifact.attestations at each of $params.required_scans`. `<path> as $<name>` names each subject, as `each_as` does. Both go at the end, `at each of` first.
+**[sentence.path.keys]** In `from`, `<path> at each of <values>` makes each listed key a subject, as `keys` does today: `artifact.attestations at each of $params.required_scans`. `from` doesn't name its subjects any more: the checks that used `each_as` names have a `for` line, where the subject's fields are bare.
 
 ## Values
 
@@ -59,7 +61,7 @@ Two assertions are two checks. "Or" is an `any_of` in the policy around the sent
 
 ## Words a field can't be called
 
-**[sentence.words]** In an argument, these words are read as part of a phrase or as a value, never as the first key of a path: `a`, `after`, `an`, `at`, `before`, `between`, `count`, `earliest`, `empty`, `equal`, `every`, `false`, `in`, `latest`, `less`, `more`, `not`, `null`, `one`, `some`, `sum`, `true`. Without this, `x is empty` could also compare `x` with a field called `empty`, and `x is true` with a field called `true`. A field with one of these names is written `."empty"`.
+**[sentence.words]** In an argument, these words are read as part of a phrase or as a value, never as the first key of a path: `a`, `after`, `an`, `at`, `before`, `between`, `count`, `empty`, `equal`, `every`, `false`, `in`, `less`, `more`, `not`, `null`, `one`, `some`, `sum`, `true`. Without this, `x is empty` could also compare `x` with a field called `empty`, and `x is true` with a field called `true`. A field with one of these names is written `."empty"`.
 
 ## `every`, `some` and `where`
 
@@ -77,7 +79,7 @@ Two assertions are two checks. "Or" is an `any_of` in the policy around the sent
 
 **[sentence.where.every]** Under `every`, an item that `where` leaves out isn't checked. When `where` leaves no items, the check fails with `value`, unless it has `if any`. No policy in the corpus uses `every ... where` yet.
 
-**[sentence.argument.item]** Inside `every` and `some`, a path in the argument starts at the item too, so the item can be compared with its own fields. To reach the subject, name it with `as` in `from`: `some approvers.username where state is "APPROVED" is not $pr.author`. To reach the input, start with `$input`.
+**[sentence.argument.item]** In a one-line `every` or `some`, a path in the argument starts at the item too, so the item can be compared with its own fields: server 0007's `some approvers.timestamp where state is "APPROVED" and username is not pr_author is after last_commit_timestamp` reads both from each approver. #174 says this for `where` and leaves the argument open. To compare an item with the subject, use a `for` line. To reach the input, start with `$input`.
 
 **[sentence.argument.subject]** After `count of` and `sum of`, the assertion is about one number for the subject, so a path in the argument starts at the subject: in `sum of stages.usd is total_usd`, `total_usd` is the subject's.
 
@@ -91,7 +93,28 @@ Two assertions are two checks. "Or" is an `any_of` in the policy around the sent
 
 **[sentence.derived.compare]** A derived value only goes with `is`, `is not`, `is ... within`, `is at least`, `is at most`, `is more than`, `is less than` and `is between`. `count of approvers is empty` is written wrong.
 
-**[sentence.derived.latest]** Proposed: `latest of <path>` and `earliest of <path>` as an argument, the latest or earliest timestamp in a list. It's the one addition the corpus asks for, to say sdlc-policies' "approved after the last commit" without a second quantifier: `some approvers.timestamp where state is "APPROVED" and username is not $pr.author is after latest of $pr.commits.timestamp`.
+## The `for` line
+
+**[sentence.for.line]** A check can have a `for` line before its `assert`. It holds one or two items separated by `, `, and each item is `every` or `some`, a path, an optional `where` with `and`, and `as` a name:
+
+```yaml
+peer_approved:
+  description: Someone other than the author approved every pull request
+  for: every pull_requests as pr, some pr.approvers where state is "APPROVED" as approver
+  assert: approver.username is not pr.author
+```
+
+Items nest left to right, so a later one can use an earlier name, as `pr.approvers` does. A third item is written wrong, because two is the one level of nesting Rego gives today.
+
+**[sentence.for.scope]** In `assert` and in a later item, a bare first key is the subject's field and a named item is reached by its name. Inside an item's own `where`, a bare key is that item's field. So in `for: some approvals where role is "qa" as approval` with `assert: approval.approved_at is before started_at`, `role` is the approval's and `started_at` the subject's.
+
+**[sentence.for.name]** A name is a bare word that isn't `params`, `input` or a word of the grammar, like `every`, `as` or `empty`. For the rest of the check it shadows a field of the subject with the same name. A name given twice is written wrong.
+
+**[sentence.for.fail]** Each item fails closed as a one-line `every` or `some` does: `some` over an empty list fails, `every` over one fails unless the item says `if any`, a missing or non-list path fails as `absent`, `null` or `unusable`, and an item a `where` can't decide fails the try with its cause.
+
+**[sentence.for.comma]** The `, ` between items can't be confused with the `, ` between values, because the next item starts with `every` or `some` and a value can't. The tokenizer reads `for: some approvals where role is one of "qa", "dev" as approval, every commits as commit` one way.
+
+**[sentence.for.one_assert]** A `for` line has one `assert`. sdlc-policies 0007's peer approval needs an approver who approved, isn't the author and approved after every commit, which is two assertions about the same items, and doesn't fit. A list under `assert`, all holding for the same items, is the smallest addition that would fit it.
 
 ## Phrases
 
@@ -144,7 +167,7 @@ Each polarity is its own expression. Cucumber's `( not)` matches both but doesn'
 | `every commits.signed` | `nothing after the path at column 21: expected a phrase, like "is" or "exists"` |
 | `sum of stages.usd is total within` | `"within" needs a number after it` |
 | `some approvers, if any, is not empty` | `if any can't go with some` |
-| `every pull_requests some approvers.state is "APPROVED"` | `two quantifiers in one sentence: put the inner list in its own subject` |
+| `every pull_requests some approvers.state is "APPROVED"` | `two quantifiers in one sentence: put them on a for line` |
 
 `environment is prod` parses, as a comparison with a field called `prod`, unless the subject has no such field. That's the one mistake the grammar can't catch, so the message for a missing field in an `is` argument should suggest quotes.
 
@@ -152,19 +175,19 @@ Each polarity is its own expression. Cucumber's `( not)` matches both but doesn'
 
 **[sentence.print.canonical]** The report's `expression` is the sentence printed from its parse in one spelling: single spaces, the first phrase in each rule above rather than an alias, strings in double quotes with JSON escapes, numbers in their plain form, and values separated by `, `. Parsing the printed sentence gives the same parse.
 
-**[sentence.print.same]** For a sentence written that way, the printed form is byte for byte what the author wrote. In the corpus, 374 of 376 sentences print back unchanged. The other two are the same check written with single quotes, `entry does not match '^[A-Za-z0-9._-]+\s*(>=|<=|~=|!=|<|>)'`, which prints as `"^[A-Za-z0-9._-]+\\s*(>=|<=|~=|!=|<|>)"`. Whether the canonical form keeps single quotes for a string with a backslash is open.
+**[sentence.print.same]** For a sentence written that way, the printed form is byte for byte what the author wrote. In the corpus, 301 of the 303 one-line sentences and assertions print back unchanged. The other two are the same check written with single quotes, `entry does not match '^[A-Za-z0-9._-]+\s*(>=|<=|~=|!=|<|>)'`, which prints as `"^[A-Za-z0-9._-]+\\s*(>=|<=|~=|!=|<|>)"`. Whether the canonical form keeps single quotes for a string with a backslash is open.
 
 ## How this was checked
 
 A throwaway tokenizer in JavaScript, outside the repo, compiled each phrase above with `@cucumber/cucumber-expressions` 18.0.1 and tried every way to cut each sentence into a quantifier, a path, `where` conditions and a phrase. It counted every reading.
 
-With the rules as #174 states them, all 376 sentences in the corpus parse, and 213 parse more than one way:
+The corpus has 390 lines: 303 one-line sentences and assertions, 13 `for` lines and 74 `from` lines. With the rules as #174 states them, all of them parse, and 215 parse more than one way:
 
 | cause | sentences | rule that removes it |
 | --- | ---: | --- |
-| a quoted string could be text or a quoted key, `is "prod"` | 94 | [sentence.path.argument](#paths) |
+| a quoted string could be text or a quoted key, `is "prod"` | 95 | [sentence.path.argument](#paths) |
 | a phrase word could be a field, `is empty` against `is <field empty>` | 60 | [sentence.words](#words-a-field-cant-be-called) |
 | `true`, `false` or `null` could be a field | 55 | both of the above |
-| a dynamic key's ref could end at more than one key | 30 | [sentence.path.dynamic](#paths) |
+| a dynamic key's ref could end at more than one key | 31 | [sentence.path.dynamic](#paths) |
 
-Some sentences have two causes. With the rules in this file, every sentence parses exactly one way. Ten made-up sentences test what the corpus doesn't reach: `plus` after `where` read three ways until [sentence.derived.plus](#derived-values) forbade it, and `if any` with `some`, two quantifiers and `count of ... is empty` parse no way, as they should.
+Some lines have two causes. With the rules in this file, every line parses exactly one way. Twelve made-up lines test what the corpus doesn't reach: `plus` after `where` read three ways until [sentence.derived.plus](#derived-values) forbade it, a `for` item named `every` read one way until [sentence.for.name](#the-for-line) forbade it, and `if any` with `some`, two quantifiers in one sentence and `count of ... is empty` parse no way, as they should.

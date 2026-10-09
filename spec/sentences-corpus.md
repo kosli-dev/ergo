@@ -41,11 +41,11 @@ Notes in the last column:
 | `from` of artifact | `[trail, compliance_status, artifacts_statuses, {ref: [$$params, artifact_name]}]` | `trail.compliance_status.artifacts_statuses at $params.artifact_name` |  |
 | `fingerprint` | `{op: non_empty_string, path: [artifact_fingerprint]}` | `artifact_fingerprint is not empty` | widens |
 | `pr_attestation` | `{op: equals, path: [attestations_statuses, {ref: [$$params, pr_attestation_name]}, status], value: COMPLETE}` | `attestations_statuses at $params.pr_attestation_name.status is "COMPLETE"` |  |
-| `from` of pull request | `[trail, compliance_status, artifacts_statuses, {ref: [$$params, artifact_name]}, attestations_statuses, {ref: [$$params, pr_attestation_name]}, pull_requests, {each_as: pr}]` | `trail.compliance_status.artifacts_statuses at $params.artifact_name.attestations_statuses at $params.pr_attestation_name.pull_requests as $pr` |  |
+| `from` of pull request | `[trail, compliance_status, artifacts_statuses, {ref: [$$params, artifact_name]}, attestations_statuses, {ref: [$$params, pr_attestation_name]}, pull_requests, {each_as: pr}]` | `trail.compliance_status.artifacts_statuses at $params.artifact_name.attestations_statuses at $params.pr_attestation_name.pull_requests` | The name `pr` goes: #174 now names things in a `for` line, and the subject's fields are bare there. |
 | `merged` | `{op: equals, path: [state], value: MERGED}` | `state is "MERGED"` |  |
 | `protected_branch` | `{op: equals, path: [base_ref], value: {ref: [$$params, protected_branch]}}` | `base_ref is $params.protected_branch` |  |
 | `signed_commits` | `{op: all, path: [commits], check: {op: equals, path: [verified], value: true}}` | `every commits.verified is true` |  |
-| `peer_approval` | `{op: any, path: [approvers], as: approver, check: {op: any_of, options: {peer: [{op: equals, path: [state], value: APPROVED}, {op: compare, left: [username], right: [$pr, author], cmp: ne}, {op: all, path: [$pr, commits], check: {op: compare, left: [$approver, timestamp], right: [timestamp], cmp: gt}}]}}}` | `some approvers.timestamp where state is "APPROVED" and username is not $pr.author is after latest of $pr.commits.timestamp` | **misfit**, see below |
+| `peer_approval` | `{op: any, path: [approvers], as: approver, check: {op: any_of, options: {peer: [{op: equals, path: [state], value: APPROVED}, {op: compare, left: [username], right: [$pr, author], cmp: ne}, {op: all, path: [$pr, commits], check: {op: compare, left: [$approver, timestamp], right: [timestamp], cmp: gt}}]}}}` | — | **misfit**, see below |
 
 ### SDLC-CTRL-0008 quality assurance
 
@@ -154,7 +154,7 @@ Same as SDLC-CTRL-0004 dependencies, except:
 | `approval_complete` | `artifact.attestations_statuses[approval_attestation_name].status == "COMPLETE"` | `attestations_statuses at $params.approval_attestation_name.status is "COMPLETE"` | no default |
 | `approval_compliant` | `artifact.attestations_statuses[approval_attestation_name].is_compliant == true` | `attestations_statuses at $params.approval_attestation_name.is_compliant is true` | no default |
 | `approval_has_attachment` | `artifact.attestations_statuses[approval_attestation_name].has_audit_package == true` | `attestations_statuses at $params.approval_attestation_name.has_audit_package is true` | no default |
-| `approved_by_non_author` | `some approver in attestation.approvers; approver != attestation.author` | `some attestations_statuses at $params.approval_attestation_name.approvers is not $input.trail.compliance_status.artifacts_statuses at $params.artifact_name.attestations_statuses at $params.approval_attestation_name.author` | no default. narrows. One line, but the argument starts at each approver, so the author has to be reached from `$input` with both dynamic keys again. Naming the attestation (#52) would make it `some approvers is not $approval.author`. Rego's `!=` passes when the types differ, `is not` fails as `unusable`. |
+| `approved_by_non_author` | `some approver in attestation.approvers; approver != attestation.author` | `for: some attestations_statuses at $params.approval_attestation_name.approvers as approver`<br>`assert: approver is not attestations_statuses at $params.approval_attestation_name.author` | no default. narrows. `for` line. The approver is compared with a field of the attestation, so it takes a `for` line. Rego's `!=` passes when the types differ, `is not` fails as `unusable`. |
 
 ### demo SDLC-CTRL-0020 SAST (plain Rego)
 
@@ -227,7 +227,7 @@ Same as SDLC-CTRL-0004 dependencies, except:
 | `findings_complete` | `{op: equals, path: [compliance_status, attestations_statuses, findings, attestation_data, truncated], value: false}` | `compliance_status.attestations_statuses.findings.attestation_data.truncated is false` | `must`: `truncated is false` reads like a status. |
 | `round_cost_sums_its_stages` | `{op: sum_eq, path: [..., final-verdict, attestation_data, cost, by_stage], field: usd, only: {}, total: [..., cost, total_usd], tolerance: 0.000001, expression: ...}` | `sum of compliance_status.attestations_statuses.final-verdict.attestation_data.cost.by_stage.usd is compliance_status.attestations_statuses.final-verdict.attestation_data.cost.total_usd within 0.000001` | replaces custom `sum_eq` |
 | `verifier_cost_matches_its_stage` | `{op: sum_eq, path: [..., final-verdict, attestation_data, cost, by_stage], field: usd, only: {stage: verifier}, total: [compliance_status, attestations_statuses, finding-verifier, attestation_data, cost_usd], tolerance: 0.000001, expression: ...}` | `sum of compliance_status.attestations_statuses.final-verdict.attestation_data.cost.by_stage.usd where stage is "verifier" is compliance_status.attestations_statuses.finding-verifier.attestation_data.cost_usd within 0.000001` | narrows. replaces custom `sum_eq`. A sum over no rows is 0, as the custom operator gives (checked on `main`). A stage row with no `stage` field is skipped by the custom operator and fails the sentence as `absent`. |
-| `dispatched_personas_recorded` | `{op: keys_match, keys: [compliance_status, attestations_statuses, classifier, attestation_data, personas_dispatched], path: [compliance_status, attestations_statuses, preflight, attestation_data, persona_blob_shas], patterns: ['^[0-9a-f]{40}$'], expression: ..., inputs: [...]}` | — | replaces custom `keys_match`. **stays custom**, see below |
+| `dispatched_personas_recorded` | `{op: keys_match, keys: [compliance_status, attestations_statuses, classifier, attestation_data, personas_dispatched], path: [compliance_status, attestations_statuses, preflight, attestation_data, persona_blob_shas], patterns: ['^[0-9a-f]{40}$'], expression: ..., inputs: [...]}` | `for: every compliance_status.attestations_statuses.classifier.attestation_data.personas_dispatched as persona`<br>`assert: compliance_status.attestations_statuses.preflight.attestation_data.persona_blob_shas at persona matches "^[0-9a-f]{40}$"` | replaces custom `keys_match`. **misfit**, see below |
 | `from` of finding (verifier_record, confirmed_finding) | `[trail, compliance_status, attestations_statuses, finding-verifier, attestation_data, per_finding_records]` | `trail.compliance_status.attestations_statuses.finding-verifier.attestation_data.per_finding_records` |  |
 | `known_decision` | `{op: in, path: [decision], values: [CONFIRMED, UNSURE, SUGGESTION, REFUTED]}` | `decision is one of "CONFIRMED", "UNSURE", "SUGGESTION", "REFUTED"` |  |
 | filter `confirmed` | `{op: equals, path: [decision], value: CONFIRMED}` | `decision is "CONFIRMED"` |  |
@@ -397,9 +397,9 @@ Same as DEV-0102 impact analysis, new features, except:
 | `from` of security scan | `[artifact, attestations, {each_as: scan, keys: {ref: [$$params, required_scans]}}]` | `artifact.attestations at each of $params.required_scans` |  |
 | `completed` | `{op: equals, path: [status], value: COMPLETE}` | `status is "COMPLETE"` |  |
 | `passed` | `{op: equals, path: [is_compliant], value: true}` | `is_compliant is true` |  |
-| `from` of pull request | `[artifact, attestations, pull-request, pull_requests, {each_as: pr}]` | `artifact.attestations.pull-request.pull_requests as $pr` |  |
+| `from` of pull request | `[artifact, attestations, pull-request, pull_requests, {each_as: pr}]` | `artifact.attestations.pull-request.pull_requests` | The name `pr` goes, as in DEV-0501. |
 | `merged` | `{op: equals, path: [state], value: MERGED}` | `state is "MERGED"` |  |
-| `peer_approved` | `{op: any, path: [approvers], check: {op: any_of, options: {peer: [{op: equals, path: [state], value: APPROVED}, {op: compare, left: [username], right: [$pr, author], cmp: ne}]}}}` | `some approvers.username where state is "APPROVED" is not $pr.author` |  |
+| `peer_approved` | `{op: any, path: [approvers], check: {op: any_of, options: {peer: [{op: equals, path: [state], value: APPROVED}, {op: compare, left: [username], right: [$pr, author], cmp: ne}]}}}` | `for: some approvers where state is "APPROVED" as approver`<br>`assert: approver.username is not author` | `for` line |
 | `from` of vulnerability | `[artifact, vulnerabilities]` | `artifact.vulnerabilities` | Rego-shaped |
 | filter `open` | `{op: equals, path: [status], value: open}` | `status is "open"` |  |
 | `within_sla` | `{op: compare_time, left: [remediate_by], right: [$$input, evaluated_at], cmp: gte}` | `remediate_by is not before $input.evaluated_at` | Rego-shaped. Rego works out `remediate_by` as `first_seen` plus the params' days for the severity. Saying that in a sentence needs date arithmetic (#140) and a param key read from the subject, `$params.sla_days at severity`. |
@@ -459,7 +459,7 @@ Same as DEV-0403 features tested, except:
 | --- | --- | --- | --- |
 | `from` of user acceptance test | `[artifact, attestations, uat]` | `artifact.attestations.uat` | Rego-shaped. Rego adds `artifact.developers`, every author of a pull request or commit. |
 | `passed` | `{op: equals, path: [result], value: passed}` | `result is "passed"` |  |
-| `independent_tester` | `{op: all, path: [$$input, artifact, developers], check: {op: compare, left: [], right: [$$input, artifact, attestations, uat, tested_by], cmp: ne}}` | `every $input.artifact.developers is not $input.artifact.attestations.uat.tested_by` | Unlike DEV-0406, an empty developer list fails here, as `all` does. The argument starts at each developer, so the tester is reached from `$input`. |
+| `independent_tester` | `{op: all, path: [$$input, artifact, developers], check: {op: compare, left: [], right: [$$input, artifact, attestations, uat, tested_by], cmp: ne}}` | `for: every $input.artifact.developers as developer`<br>`assert: developer is not tested_by` | `for` line. Unlike DEV-0406, an empty developer list fails here, as `all` does. Today's policy reaches the tester through `$$input` because inside `all` paths start at the developer. With `for`, `tested_by` is the subject's. |
 | `documented` | `{op: non_empty_string, path: [report_url]}` | `report_url is not empty` | widens |
 | `approved` | `{op: non_empty_string, path: [approved_by]}` | `approved_by is not empty` | widens |
 | `approved_after_testing` | `{op: compare_time, left: [approved_at], right: [tested_at], cmp: gte}` | `approved_at is not before tested_at` |  |
@@ -495,33 +495,33 @@ Same as DEV-0409 defects triaged, new features.
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of production deployment | `[deployments, {each_as: deploy}]` | `deployments as $deploy` |  |
+| `from` of production deployment | `[deployments, {each_as: deploy}]` | `deployments` | The name `deploy` goes: the checks that used it have a `for` line, where the subject's fields are bare. |
 | filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
 | filter `normal_change` | `{op: equals, path: [change_type], value: normal}` | `change_type is "normal"` |  |
-| `installer_did_not_write_code` | `{op: all, path: [pull_requests], check: {op: all, path: [commits], check: {op: compare, left: [author], right: [$deploy, deployed_by], cmp: ne}}}` | `every pull_requests.commits.author is not $deploy.deployed_by` |  |
-| `peer_approved` | `{op: all, path: [pull_requests], as: pr, check: {op: any, path: [approvers], check: {op: any_of, options: {peer: [{op: equals, path: [state], value: APPROVED}, {op: compare, left: [username], right: [$pr, author], cmp: ne}]}}}}` | — | **misfit**, see below |
+| `installer_did_not_write_code` | `{op: all, path: [pull_requests], check: {op: all, path: [commits], check: {op: compare, left: [author], right: [$deploy, deployed_by], cmp: ne}}}` | `for: every pull_requests.commits as commit`<br>`assert: commit.author is not deployed_by` | `for` line |
+| `peer_approved` | `{op: all, path: [pull_requests], as: pr, check: {op: any, path: [approvers], check: {op: any_of, options: {peer: [{op: equals, path: [state], value: APPROVED}, {op: compare, left: [username], right: [$pr, author], cmp: ne}]}}}}` | `for: every pull_requests as pr, some pr.approvers where state is "APPROVED" as approver`<br>`assert: approver.username is not pr.author` | `for` line. The example #174 gives for `for`. Rows stay one per deployment. |
 
 ### DEV-0502 sign-off, new features
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of production deployment | `[deployments, {each_as: deploy}]` | `deployments as $deploy` |  |
+| `from` of production deployment | `[deployments, {each_as: deploy}]` | `deployments` | The name `deploy` goes: the checks that used it have a `for` line, where the subject's fields are bare. |
 | filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
 | filter `new_development` | `{op: equals, path: [change_type], value: new_development}` | `change_type is "new_development"` |  |
-| `business_owner_approved` | `{op: any, path: [approvals], check: {op: any_of, options: {before_deploy: [{op: equals, path: [role], value: business_owner}, {op: equals, path: [decision], value: approved}, {op: compare_time, left: [approved_at], right: [$deploy, started_at], cmp: lt}]}}}` | `some approvals.approved_at where role is "business_owner" and decision is "approved" is before $deploy.started_at` |  |
-| `qa_signed_off` | `{op: any, path: [approvals], check: {op: any_of, options: {before_deploy: [{op: equals, path: [role], value: qa}, {op: equals, path: [decision], value: approved}, {op: compare_time, left: [approved_at], right: [$deploy, started_at], cmp: lt}]}}}` | `some approvals.approved_at where role is "qa" and decision is "approved" is before $deploy.started_at` |  |
-| `development_signed_off` | `{op: any, path: [approvals], check: {op: any_of, options: {before_deploy: [{op: equals, path: [role], value: development}, {op: equals, path: [decision], value: approved}, {op: compare_time, left: [approved_at], right: [$deploy, started_at], cmp: lt}]}}}` | `some approvals.approved_at where role is "development" and decision is "approved" is before $deploy.started_at` |  |
+| `business_owner_approved` | `{op: any, path: [approvals], check: {op: any_of, options: {before_deploy: [{op: equals, path: [role], value: business_owner}, {op: equals, path: [decision], value: approved}, {op: compare_time, left: [approved_at], right: [$deploy, started_at], cmp: lt}]}}}` | `for: some approvals where role is "business_owner" and decision is "approved" as approval`<br>`assert: approval.approved_at is before started_at` | `for` line |
+| `qa_signed_off` | `{op: any, path: [approvals], check: {op: any_of, options: {before_deploy: [{op: equals, path: [role], value: qa}, {op: equals, path: [decision], value: approved}, {op: compare_time, left: [approved_at], right: [$deploy, started_at], cmp: lt}]}}}` | `for: some approvals where role is "qa" and decision is "approved" as approval`<br>`assert: approval.approved_at is before started_at` | `for` line |
+| `development_signed_off` | `{op: any, path: [approvals], check: {op: any_of, options: {before_deploy: [{op: equals, path: [role], value: development}, {op: equals, path: [decision], value: approved}, {op: compare_time, left: [approved_at], right: [$deploy, started_at], cmp: lt}]}}}` | `for: some approvals where role is "development" and decision is "approved" as approval`<br>`assert: approval.approved_at is before started_at` | `for` line |
 
 ### DEV-0503 sign-off, normal changes
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of production deployment | `[deployments, {each_as: deploy}]` | `deployments as $deploy` |  |
+| `from` of production deployment | `[deployments, {each_as: deploy}]` | `deployments` | The name `deploy` goes: the checks that used it have a `for` line, where the subject's fields are bare. |
 | filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
 | filter `normal` | `{op: equals, path: [change_type], value: normal}` | `change_type is "normal"` |  |
-| `business_owner_approved` | `{op: any, path: [approvals], check: {op: any_of, options: {before_deploy: [{op: equals, path: [role], value: business_owner}, {op: equals, path: [decision], value: approved}, {op: compare_time, left: [approved_at], right: [$deploy, started_at], cmp: lt}]}}}` | `some approvals.approved_at where role is "business_owner" and decision is "approved" is before $deploy.started_at` |  |
-| `qa_signed_off` | `{op: any, path: [approvals], check: {op: any_of, options: {before_deploy: [{op: equals, path: [role], value: qa}, {op: equals, path: [decision], value: approved}, {op: compare_time, left: [approved_at], right: [$deploy, started_at], cmp: lt}]}}}` | `some approvals.approved_at where role is "qa" and decision is "approved" is before $deploy.started_at` |  |
-| `development_signed_off` | `{op: any, path: [approvals], check: {op: any_of, options: {before_deploy: [{op: equals, path: [role], value: development}, {op: equals, path: [decision], value: approved}, {op: compare_time, left: [approved_at], right: [$deploy, started_at], cmp: lt}]}}}` | `some approvals.approved_at where role is "development" and decision is "approved" is before $deploy.started_at` |  |
+| `business_owner_approved` | `{op: any, path: [approvals], check: {op: any_of, options: {before_deploy: [{op: equals, path: [role], value: business_owner}, {op: equals, path: [decision], value: approved}, {op: compare_time, left: [approved_at], right: [$deploy, started_at], cmp: lt}]}}}` | `for: some approvals where role is "business_owner" and decision is "approved" as approval`<br>`assert: approval.approved_at is before started_at` | `for` line |
+| `qa_signed_off` | `{op: any, path: [approvals], check: {op: any_of, options: {before_deploy: [{op: equals, path: [role], value: qa}, {op: equals, path: [decision], value: approved}, {op: compare_time, left: [approved_at], right: [$deploy, started_at], cmp: lt}]}}}` | `for: some approvals where role is "qa" and decision is "approved" as approval`<br>`assert: approval.approved_at is before started_at` | `for` line |
+| `development_signed_off` | `{op: any, path: [approvals], check: {op: any_of, options: {before_deploy: [{op: equals, path: [role], value: development}, {op: equals, path: [decision], value: approved}, {op: compare_time, left: [approved_at], right: [$deploy, started_at], cmp: lt}]}}}` | `for: some approvals where role is "development" and decision is "approved" as approval`<br>`assert: approval.approved_at is before started_at` | `for` line |
 
 ### DEV-0504 roll-back ready, new features
 
@@ -547,9 +547,9 @@ Same as DEV-0504 roll-back ready, new features, except:
 
 | | today | sentence | notes |
 | --- | --- | --- | --- |
-| `from` of production deployment | `[deployments, {each_as: deploy}]` | `deployments as $deploy` |  |
+| `from` of production deployment | `[deployments, {each_as: deploy}]` | `deployments` | The name `deploy` goes: the checks that used it have a `for` line, where the subject's fields are bare. |
 | filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` |  |
-| `promoted_through_staging` | `{op: any, path: [artifact, environment_history], check: {op: any_of, options: {staging_first: [{op: equals, path: [environment], value: staging}, {op: compare_time, left: [deployed_at], right: [$deploy, started_at], cmp: lt}]}}}` | `some artifact.environment_history.deployed_at where environment is "staging" is before $deploy.started_at` |  |
+| `promoted_through_staging` | `{op: any, path: [artifact, environment_history], check: {op: any_of, options: {staging_first: [{op: equals, path: [environment], value: staging}, {op: compare_time, left: [deployed_at], right: [$deploy, started_at], cmp: lt}]}}}` | `for: some artifact.environment_history where environment is "staging" as run`<br>`assert: run.deployed_at is before started_at` | `for` line |
 | `production_identity` | `{op: in, path: [deployed_with_identity], values: {ref: [$$params, production_identities]}}` | `deployed_with_identity is in $params.production_identities` |  |
 
 ### DEV-0602 no drift
@@ -654,34 +654,34 @@ Same as DEV-0504 roll-back ready, new features, except:
 
 ## Tally
 
-Every phrase, counted from the parses, twins included. 228 checks and 74 filters, plus the `from` lines.
+Every phrase, counted from the parses, twins included: 228 checks and 74 filters, 13 of the checks with a `for` line, plus 74 `from` lines. That's 390 lines in all.
 
 | phrase | sdlc-policies | server | pr-reviewer | ergo | DEV controls | total |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| `is` | 16 | 36 | 30 | 1 | 81 | 164 |
-| `$params` | 13 | 37 |  |  | 9 | 59 |
+| `is` | 15 | 36 | 30 | 1 | 82 | 164 |
+| `$params` | 13 | 36 |  |  | 9 | 58 |
 | `is not empty` | 9 | 11 | 2 | 1 | 31 | 54 |
-| `at` (dynamic key) | 10 | 35 |  |  |  | 45 |
+| `at` (dynamic key) | 10 | 34 |  |  |  | 44 |
 | `is before` |  |  |  |  | 21 | 21 |
-| `$input` |  | 1 |  |  | 18 | 19 |
-| `some` | 3 | 4 | 3 |  | 9 | 19 |
+| `some` | 2 | 4 | 3 |  | 10 | 19 |
 | `is one of` |  |  | 9 |  | 9 | 18 |
-| `$name` (from `as`) | 3 |  |  |  | 14 | 17 |
-| `where` | 1 | 1 | 3 |  | 9 | 14 |
-| `every` | 1 | 1 |  |  | 11 | 13 |
+| `$input` |  |  |  |  | 17 | 17 |
+| `every` | 1 | 1 | 1 |  | 12 | 15 |
+| `as` |  | 1 | 1 |  | 12 | 14 |
+| `where` |  | 1 | 3 |  | 10 | 14 |
+| `for` line |  | 1 | 1 |  | 11 | 13 |
 | `count of` |  |  | 12 |  |  | 12 |
 | `is at least` |  |  | 9 |  |  | 9 |
-| `is not` | 1 | 2 | 2 |  | 4 | 9 |
-| `and` (in `where`) | 1 | 1 |  |  | 6 | 8 |
-| `as $name` | 1 |  |  |  | 5 | 6 |
+| `is not` |  | 2 | 2 |  | 5 | 9 |
+| `and` (in `where`) |  | 1 |  |  | 6 | 7 |
 | `at each of` | 1 | 1 |  |  | 4 | 6 |
-| `is after` | 1 | 1 |  |  | 4 | 6 |
 | `is empty` |  | 1 | 4 |  | 1 | 6 |
 | `is in` | 1 |  |  |  | 5 | 6 |
 | `is not before` |  |  |  |  | 6 | 6 |
+| `is after` |  | 1 |  |  | 4 | 5 |
+| `matches` |  |  | 3 |  | 2 | 5 |
 | `exists` | 2 | 1 |  |  | 1 | 4 |
 | `is between` | 1 | 1 |  | 2 |  | 4 |
-| `matches` |  |  | 2 |  | 2 | 4 |
 | `, if any,` |  |  |  |  | 3 | 3 |
 | `contains` |  |  | 3 |  |  | 3 |
 | `does not match` | 1 | 1 | 1 |  |  | 3 |
@@ -689,10 +689,10 @@ Every phrase, counted from the parses, twins included. 228 checks and 74 filters
 | `is ... within` |  |  | 2 |  |  | 2 |
 | `plus` |  |  | 2 |  |  | 2 |
 | `sum of` |  |  | 2 |  |  | 2 |
+| `at <name>` (proposed) |  |  | 1 |  |  | 1 |
 | `does not contain` |  |  |  | 1 |  | 1 |
 | `is a` |  |  | 1 |  |  | 1 |
 | `is not in` |  |  |  |  | 1 | 1 |
-| `latest of` (proposed) | 1 |  |  |  |  | 1 |
 
 Not used anywhere: `is not one of`, `does not exist`, `contains none of`, `starts with`, `ends with`, `is at most`, `is more than`, `is less than`, `is not after`, `ignoring case`, `first of`, `item 3 of` and `items[2]`.
 
@@ -714,11 +714,10 @@ Six of the seven go, as #173 found for the five numeric ones. The sentences also
 
 Checks that don't fit on one line, or fit only by changing what passes. This is the grammar's edge.
 
-- **SDLC-CTRL-0007 code review `peer_approval`** (sdlc-policies, misfit). Three conditions on one approver, and the third is itself "every commit". Two quantifiers in one sentence is outside the grammar. Smallest addition: `latest of`, a derived value like `count of`, allowed as the argument of a quantified sentence. It also turns today's text comparison of timestamps into a time comparison, which fails closed on a timestamp that isn't RFC 3339 instead of ordering it as text.
+- **SDLC-CTRL-0007 code review `peer_approval`** (sdlc-policies, misfit). Three conditions on the same approver: approved, not the author, and after every commit. A `for` line gets the two quantifiers, `for: some approvers where state is "APPROVED" as approver, every commits as commit` with `assert: approver.timestamp is after commit.timestamp`, but that leaves "not the author" with nowhere to go: a `where` reads the approver, so it can't reach the pull request's `author`, and there's one `assert`. Smallest addition: a list of assertions under one `for`, all holding for the same items, which is what today's `any_of` option with three checks means: `for: some approvers where state is "APPROVED" as approver, every commits as commit`, then `approver.username is not author` and `approver.timestamp is after commit.timestamp` under `assert`. The second also turns today's text comparison of timestamps into a time comparison, which fails a timestamp that isn't RFC 3339.
 - **demo SDLC-CTRL-0008 quality assurance `test suite`** (server, misfit). Rego writes one requirement per suite name. The sentence form can't loop over names to make requirements. Smallest addition: none, because sdlc-policies 0008 already says the same with `at each of`, one requirement whose subjects are the suites. This one should move to that shape.
-- **review-controls `dispatched_personas_recorded`** (pr-reviewer, stays custom). Each dispatched persona's name is a key to look up in another object. The key comes from the item being checked, which no path can say. Smallest addition: a subject per dispatched persona, and a dynamic key that can come from a name: `from: trail.compliance_status.attestations_statuses.classifier.attestation_data.personas_dispatched as $persona` and `$input.trail.compliance_status.attestations_statuses.preflight.attestation_data.persona_blob_shas at $persona matches "^[0-9a-f]{40}$"`. Today a ref can't start with a name, so this stays custom.
+- **review-controls `dispatched_personas_recorded`** (pr-reviewer, misfit). Each dispatched persona's name is a key to look up in another object, so the key comes from the item being checked. Smallest addition: `at <name>`, a dynamic key read from a name the `for` line gave, as written here. Today a ref can't start with a name, so until then this stays custom.
 - **DEV-0302 SBOM recorded `components_listed`** (DEV controls, two lines). Two assertions about each component. Two checks pass and fail together exactly as the one `all` does, but the report has two rows.
-- **DEV-0501 segregation of duties `peer_approved`** (DEV controls, misfit). `every` pull request with `some` approver inside, and the approver compared with its own pull request's author. Two quantifiers in one sentence is outside the grammar. Smallest addition: make the pull request the subject, as DEV-0401 does, with `from: $deploy.pull_requests as $pr` and `some approvers.username where state is "APPROVED" is not $pr.author`. That needs `from` to start at another subject with its filters (#52), and changes the rows from one per deployment to one per pull request.
 
 Fits on one line, but changes what passes:
 
@@ -733,7 +732,7 @@ Fits, but only after Rego reshapes the input (24 entries): sdlc-policies 0004 bu
 
 ## `is` or `must`
 
-The corpus is written with `is`. 74 filters and 22 `where` conditions are conditions, not rules, so they need `is` whatever checks use: `where state is "APPROVED"` can't be `where state must be "APPROVED"`. With `must` in checks, the grammar has two verbs for the same phrases, and the same leaf reads differently in a filter and in a check. 228 checks could take `must`. Most read the same either way, like `signature.verified is true` or `state is "MERGED"`. The ones where `must` reads better all say that something bad is absent: a zero, a `false` or an empty list. With `is`, they read like a result rather than a rule:
+The corpus is written with `is`. 74 filters and 21 `where` conditions are conditions, not rules, so they need `is` whatever checks use: `where state is "APPROVED"` can't be `where state must be "APPROVED"`. With `must` in checks, the grammar has two verbs for the same phrases, and the same leaf reads differently in a filter and in a check. 228 checks could take `must`. Most read the same either way, like `signature.verified is true` or `state is "MERGED"`. The ones where `must` reads better all say that something bad is absent: a zero, a `false` or an empty list. With `is`, they read like a result rather than a rule:
 
 - flow-templates npm-bump `no_open_bump_pr`: `open_bump_prs is empty` reads like a status.
 - review-controls `findings_complete`: `truncated is false` reads like a status.
@@ -749,12 +748,12 @@ The corpus is written with `is`. 74 filters and 22 `where` conditions are condit
 
 What the corpus says about each decision the brief left open.
 
-**`is` or `must`.** See above. 74 filters and 22 `where` conditions need `is`. 9 checks read better with `must`, and all of them say something bad is absent. The others read the same either way. Inside an `assert:` key, even those 9 are clear, so the case for `must` is a sentence quoted on its own, in a report or a markdown policy (#18).
+**`is` or `must`.** See above. 74 filters and 21 `where` conditions need `is`. 9 checks read better with `must`, and all of them say something bad is absent. The others read the same either way. Inside an `assert:` key, even those 9 are clear, so the case for `must` is a sentence quoted on its own, in a report or a markdown policy (#18).
 
-**The dynamic key.** `at $params.x` appears 45 times, in sdlc-policies, the server demos and Tore's DEV controls, and 33 of those have more path after the key, like `artifacts_statuses at $params.artifact_name.attestations_statuses`. As #174 writes refs, the ref there could end after `artifact_name` or after `attestations_statuses`, so the tokenizer reads those sentences two ways. Every ref in the corpus is `$params` and one key, so the draft makes that the rule. Whether `at` is the word, and whether a ref can go deeper, is open. Most uses are in `from`, to pick one artifact out of a trail.
+**The dynamic key.** `at $params.x` appears 44 times, in sdlc-policies, the server demos and Tore's DEV controls, and 32 of those have more path after the key, like `artifacts_statuses at $params.artifact_name.attestations_statuses`. As #174 writes refs, the ref there could end after `artifact_name` or after `attestations_statuses`, so the tokenizer reads those sentences two ways. Every ref in the corpus is `$params` and one key, so the draft makes that the rule. Whether `at` is the word, and whether a ref can go deeper, is open. Most uses are in `from`, to pick one artifact out of a trail.
 
 **`where` in `from` or `applies_to`.** 74 filters on 32 policies, and every one sits on the subject or in a requirement's scope. No policy filters inside `from`, and nothing in the corpus needs `from: deployments where environment is "prod"` that `applies_to` can't say. The grammar can say either, so it's #113's call.
 
-**A subject with a parent.** Three checks would fit, or read better, if a subject could start at another subject: DEV-0501 `peer_approved` can't be written without it, server 0010 `approved_by_non_author` needs a long `$input` path to reach the attestation's author, and pr-reviewer `dispatched_personas_recorded` needs one subject per persona. Each is #52, not a grammar gap. DEV-0801, the case that started the thread, fits without it.
+**Two quantifiers and a subject with a parent.** The `for` line #174 added while this was written does the job Tore's subject move for DEV-0501 was for. 13 checks use one: DEV-0501 `peer_approved`, every comparison of an item with its subject (DEV-0401, 0407, 0502, 0503, 0601 and server 0010), and pr-reviewer `dispatched_personas_recorded`. None of them needs a subject that starts at another subject, so #52 isn't on this path any more. What `for` can't do is hold two assertions about the same items, which is sdlc-policies 0007's misfit.
 
-**Time phrases.** 33 time comparisons: 21 `is before`, 6 `is after` and 6 `is not before`, which says "on or after" as a double negative (DEV-0406 `approved_after_testing`). 4 of the `is not before` compare a deadline Rego worked out with `$input.evaluated_at`. Two checks compare timestamps as text today, and `latest of` is the one addition the corpus asks for, to say "after every commit" without a second quantifier. `is on or after` and `is on or before` would read better than `is not before` and `is not after`.
+**Time phrases.** 32 time comparisons: 21 `is before`, 5 `is after` and 6 `is not before`, which says "on or after" as a double negative (DEV-0406 `approved_after_testing`). 4 of the `is not before` compare a deadline Rego worked out with `$input.evaluated_at`. Two checks compare timestamps as text today. `is on or after` and `is on or before` would read better than `is not before` and `is not after`.
