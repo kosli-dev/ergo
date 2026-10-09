@@ -319,6 +319,8 @@ The first is read as `is` or `equals`, the second as `is not`. The report prints
 
 **[sentence.print.canonical]** The report's `expression` is the sentence printed from its parse in one spelling: single spaces, `is` before a value and `equals` before a field, `is one of` before written values and `is in` before a path, no alias, a string in single quotes when it holds a backslash and no single quote and in double quotes with JSON escapes otherwise, a dot in front of a right-side field only where [sentence.path.argument](#paths) needs one, numbers in their plain form, and values separated by `, `. Parsing the printed sentence gives the same parse.
 
+**[sentence.print.order]** `where` conditions and assertions joined with `and` print in the order the author wrote them. The report stays byte for byte the same when the same policy runs again on the same input. That rule is for the same policy, not for two policies that mean the same: `A and B` and `B and A` print differently, because the order changes neither what passes nor the cause, and sorting would have to reach `assert` lists too, and could never reach `for` items, whose order is their nesting. A row's `inputs` stay sorted by name, as today, because they're values that were read, not a sentence.
+
 **[sentence.print.same]** For a sentence written that way, the printed form is byte for byte what the author wrote. Every line in the corpus prints back unchanged, the regular expression `entry does not match '^[A-Za-z0-9._-]+\s*(>=|<=|~=|!=|<|>)'` included, because its single quotes are the canonical spelling.
 
 ## How this was checked
