@@ -7661,3 +7661,18 @@ test_a_derived_value_reads_a_name_given_by_from if {
 	unknown := object.union(check, {"left": {"count": ["$other", "xs"]}})
 	[[r.check, r.cause] | some r in ergo.report({"items": [{"id": 1, "xs": [1, 2]}]}, object.union(policy, {"requirements": {"r": {"subject": "i", "checks": {"c": unknown}}}}), {}).results; r.check == "c"] == [["c", "ill_formed"]]
 }
+
+one_check_policy(check) := lifted({"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
+
+test_a_ref_step_in_a_derived_value_reads_its_param_like_in_any_path if {
+	counted := {"op": "compare", "left": {"count": ["groups", {"ref": ["$$params", "g"]}]}, "right": {"literal": 2}, "cmp": "eq"}
+	added := {"op": "compare", "left": {"add": [["sizes", {"ref": ["$$params", "g"]}]]}, "right": {"literal": 2}, "cmp": "eq"}
+	doc := {"items": [{"id": 1, "groups": {"a": [1, 2]}, "sizes": {"a": 2}}]}
+	every check in [counted, added] {
+		ok := ergo.report(doc, one_check_policy(check), {"g": "a"})
+		[[r.passed, r.cause] | some r in rows_for(ok, "s", "c")] == [[true, "satisfied"]]
+		ok.requirements.s.checks.c["$refs"] == [{"name": "$$params.g", "value": "a"}]
+		[r.cause | some r in rows_for(ergo.report(doc, one_check_policy(check), {}), "s", "c")] == ["absent"]
+		[r.cause | some r in rows_for(ergo.report(doc, one_check_policy(check), {"g": ["a"]}), "s", "c")] == ["unusable"]
+	}
+}

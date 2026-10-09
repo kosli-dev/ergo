@@ -2510,8 +2510,16 @@ _step_refs(check) := {x.ref |
 	_is_ref(x)
 	not _under_literal(check, p)
 	count(p) >= 2
-	p[count(p) - 2] in {"path", "left", "right", "each"}
+	_step_position(p)
 	is_number(p[count(p) - 1])
+}
+
+_step_position(p) if p[count(p) - 2] in {"path", "left", "right", "each", "count", "sum"}
+
+_step_position(p) if {
+	count(p) >= 3
+	p[count(p) - 3] == "add"
+	is_number(p[count(p) - 2])
 }
 
 _used_ref_state(check, r) := "unusable" if _wrong_step(check, r)
@@ -3612,17 +3620,27 @@ _simple_value(_, side) := _written(side) if _basic_form(side) == "literal"
 
 _basic_value(subj, side) := _simple_value(subj, side) if _basic_form(side) in {"path", "literal"}
 
-_basic_value(subj, side) := count(_counted(subj, side, side.count)) if {
+_basic_value(subj, side) := count([c | some c in causes; c == "satisfied"]) if {
 	_basic_form(side) == "count"
-	_list_decided(subj, side, side.count)
+	causes := _item_causes(subj, side, side.count)
+	_all_decided(causes)
 }
 
 _basic_value(subj, side) := sum(nums) if {
 	_basic_form(side) == "sum"
-	_list_decided(subj, side, side.sum)
-	nums := [value_at(item, side.each) | some item in _counted(subj, side, side.sum)]
+	causes := _item_causes(subj, side, side.sum)
+	_all_decided(causes)
+	nums := [value_at(item, side.each) | some i, item in value_at(subj, side.sum); causes[i] == "satisfied"]
 	every n in nums {
 		is_number(n)
+	}
+}
+
+_item_causes(subj, side, path) := [_where_cause(side, item) | some item in value_at(subj, path)] if is_array(value_at(subj, path))
+
+_all_decided(causes) if {
+	every c in causes {
+		c in {"satisfied", "value", "missing"}
 	}
 }
 
@@ -3637,19 +3655,6 @@ _side_value(subj, side) := sum(nums) if {
 	}
 }
 
-_counted(subj, side, path) := [item | some item in value_at(subj, path); _where_passes(side, item)]
-
-_list_decided(subj, side, path) if {
-	is_array(value_at(subj, path))
-	every item in value_at(subj, path) {
-		_where_cause(side, item) in {"satisfied", "value", "missing"}
-	}
-}
-
-_where_passes(side, _) if not "where" in object.keys(side)
-
-_where_passes(side, item) if leaf_passed(side.where, item)
-
 _where_cause(side, _) := "satisfied" if not "where" in object.keys(side)
 
 _where_cause(side, item) := _leaf_cause(side.where, item) if "where" in object.keys(side)
@@ -3659,8 +3664,9 @@ _basic_states(_, side) := set() if _basic_form(side) == "literal"
 _basic_states(subj, side) := _counted_states(subj, side, side.count) if _basic_form(side) == "count"
 
 _basic_states(subj, side) := _counted_states(subj, side, side.sum) | {s |
-	is_array(value_at(subj, side.sum))
-	some item in _counted(subj, side, side.sum)
+	causes := _item_causes(subj, side, side.sum)
+	some i, item in value_at(subj, side.sum)
+	causes[i] == "satisfied"
 	some s in _number_states(item, side.each)
 } if _basic_form(side) == "sum"
 
@@ -3698,8 +3704,7 @@ _counted_states(subj, _, path) := {"unusable"} if {
 }
 
 _counted_states(subj, side, path) := {c |
-	some item in value_at(subj, path)
-	c := _where_cause(side, item)
+	some c in _item_causes(subj, side, path)
 	not c in {"satisfied", "value", "missing"}
 } if {
 	_read_state(subj, path) == "value"
@@ -3741,13 +3746,9 @@ _side_inputs(subj, side, item) := array.concat([_derived_input(subj, side, _side
 
 _side_inputs(_, side, _) := [] if not _side_form(side)
 
-_derived_input(subj, side, name) := {"name": name, "value": v} if v := _side_value(subj, side)
-
-_derived_input(subj, side, name) := {"name": name, "value": null} if not _has_side_value(subj, side)
-
-default _has_side_value(_, _) := false
-
-_has_side_value(subj, side) if _ = _side_value(subj, side)
+_derived_input(subj, side, name) := {"name": name, "value": v} if {
+	v := _side_value(subj, side)
+} else := {"name": name, "value": null}
 
 _basic_text(item, side) := _item_path_name(item, side) if _basic_form(side) == "path"
 
