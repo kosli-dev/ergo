@@ -65,7 +65,7 @@ The `and` between assertions can't be confused with the `and` of `where` or of `
 - A field with one of those names is written with a dot in front: `is .empty`, `is .true`. The dot is allowed on any field on the right side, so `is .total_usd` means `is total_usd`, and the report prints it only where it's needed.
 - A key that has to be quoted, like `$schema`, is written with the dot too: `is ."$schema"`.
 
-**[sentence.path.dynamic]** `<path> named by <reference>` reads the key that the reference holds, as a ref step does today, and the path can go on after it: `artifacts_statuses named by $params.artifact_name.attestations_statuses`. The reference is `$params` or `$input` plus one key, or a name from a `for` line, like `persona_blob_shas named by persona`. Without that limit, `named by $params.a.b` could end the reference after `a` or after `b`, and the tokenizer found 31 lines in the corpus that read two ways because of it.
+**[sentence.path.dynamic]** `<path> named by <reference>` reads the key that the reference holds, as a ref step does today, and the path can go on after it: `artifacts_statuses named by $params.artifact_name.attestations_statuses`. The reference is `$params` or `$input` plus one key, or a name from a `for` line, like `persona_blob_shas named by persona`. Without that limit, `named by $params.a.b` could end the reference after `a` or after `b`, and the tokenizer found 24 lines in the corpus that read two ways because of it.
 
 **[sentence.path.brackets]** Brackets are the other spelling: `artifacts_statuses[$params.artifact_name]`, `persona_blob_shas[persona]`, and `items[2]` for a position. In brackets the type decides, as in JSON: a string picks a key and a number picks a position. The report prints the word form.
 
@@ -327,15 +327,17 @@ The first is read as `is` or `equals`, the second as `is not`. The report prints
 
 ## How this was checked
 
-A throwaway tokenizer in JavaScript, outside the repo, turned each phrase above into a regular expression and tried every way to cut each sentence into a quantifier, a path, `where` conditions and a phrase. It counted every reading.
+A throwaway tokenizer in JavaScript, outside the repo, turned each phrase above into a regular expression and tried every way to cut each line into a quantifier, a path, `where` conditions, assertions joined with `and`, and a phrase. It counted every reading.
 
-The corpus has 390 lines: 303 one-line sentences and assertions, 13 `for` lines and 74 `from` lines. With the rules as #174 states them, all of them parse, and 215 parse more than one way:
+The corpus has 337 lines: 231 assertions, 14 `for` lines and 92 `from` lines. There are fewer than before because the 74 filters are now part of the `from` lines. With the rules in this file, which are the rules #174 now states, every line parses exactly one way. Without them, 196 lines parse more than one way:
 
-| cause | sentences | rule that removes it |
+| cause | lines | rule that removes it |
 | --- | ---: | --- |
-| a quoted string could be text or a quoted key, `is "prod"` | 95 | [sentence.path.argument](#paths) |
-| a phrase word could be a field, `is empty` against `is <field empty>` | 60 | [sentence.words](#words-a-field-cant-be-called) |
-| `true`, `false` or `null` could be a field | 55 | both of the above |
-| a dynamic key's ref could end at more than one key | 31 | [sentence.path.dynamic](#paths) |
+| a quoted string could be text or a quoted key, `is "prod"` | 84 | [sentence.path.argument](#paths) |
+| a grammar word could be a field, `is empty` against `is <field empty>` | 65 | [sentence.words](#words-a-field-cant-be-called) |
+| `true`, `false` or `null` could be a field | 46 | both of the above |
+| the reference after `named by` could end at more than one key | 24 | [sentence.path.dynamic](#paths) |
 
-Some lines have two causes. With the rules in this file, every line parses exactly one way. Twelve made-up lines test what the corpus doesn't reach: `plus` after `where` read three ways until [sentence.derived.plus](#derived-values) forbade it, a `for` item named `every` read one way until [sentence.for.name](#the-for-line) forbade it, and `if any` with `some`, two quantifiers in one sentence and `count of ... is empty` parse no way, as they should.
+Some lines have two causes. Fifteen made-up lines test what the corpus doesn't reach. `plus` after `where` reads three ways until [sentence.derived.plus](#derived-values) forbids it, and a `for` item named `every` reads one way until [sentence.for.name](#the-for-line) forbids it. `if any` with `some`, two quantifiers in one sentence and `count of ... is empty` parse no way, as they should. The `and` between assertions never clashes with the `and` of `where` or of `between`: `every items.price where kind is "a" and qty is 1 is at least 2 and owner is "x"` reads one way.
+
+Every line also prints back exactly as written.
