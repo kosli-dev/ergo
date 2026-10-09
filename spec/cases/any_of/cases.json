@@ -17,7 +17,7 @@
     "cases": [
       {
         "description": "passes when every check of one option passes",
-        "rules": ["any_of.pass", "any_of.inputs"],
+        "rules": ["any_of.pass", "any_of.inputs", "render.path", "any_of.expression"],
         "input": {"things": [{"id": "t1", "type": "Chore"}]},
         "results": [
           {
@@ -97,7 +97,7 @@
     "cases": [
       {
         "description": "names options by position",
-        "rules": ["any_of.options", "any_of.expression"],
+        "rules": ["any_of.options", "any_of.expression", "render.path"],
         "input": {"things": [{"id": "t1", "type": "Bug"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "type", "value": "Bug"}]}
@@ -136,7 +136,7 @@
     "cases": [
       {
         "description": "sorts the positions as text",
-        "rules": ["any_of.expression"],
+        "rules": ["any_of.expression", "render.path"],
         "input": {"things": [{"id": "t1", "k": 1}]},
         "results": [
           {
@@ -181,7 +181,7 @@
     "cases": [
       {
         "description": "shows the whole list and has no failed items",
-        "rules": ["any_of.inputs", "any_of.no_failed_items"],
+        "rules": ["any_of.inputs", "any_of.no_failed_items", "render.path", "any_of.expression"],
         "input": {"things": [{"cs": [{"s": false}], "id": "t1"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "cs", "value": [{"s": false}]}]}
@@ -203,7 +203,7 @@
     "cases": [
       {
         "description": "lets an item pass on either option",
-        "rules": ["list.items", "any_of.pass", "list.inputs"],
+        "rules": ["list.items", "any_of.pass", "list.inputs", "render.path", "list.expression"],
         "input": {"things": [{"cs": [{"s": true}, {}, {"s": false}], "id": "t1"}]},
         "results": [
           {
@@ -276,7 +276,7 @@
     "cases": [
       {
         "description": "fails every check as ill_formed and says why",
-        "rules": ["any_of.options", "any_of.expression", "list.as", "written_wrong"],
+        "rules": ["any_of.options", "any_of.expression", "list.as", "written_wrong", "written_wrong.row", "any_of.written_wrong", "render.path", "tree.inputs"],
         "input": {"things": [{"cs": [{"v": 1}], "id": "t1"}]},
         "results": [
           {

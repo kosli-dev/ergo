@@ -5,7 +5,7 @@
     "cases": [
       {
         "description": "passes when the field is one of the values",
-        "rules": ["in.pass"],
+        "rules": ["in.pass", "render.path", "in.expression", "present.inputs"],
         "input": {"things": [{"id": "t1", "x": "b"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "b"}]}
@@ -44,7 +44,7 @@
     "cases": [
       {
         "description": "fails as absent on a missing field",
-        "rules": ["in.fail"],
+        "rules": ["in.fail", "present.inputs"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
@@ -66,7 +66,7 @@
     "cases": [
       {
         "description": "fails as value",
-        "rules": ["in.fail"],
+        "rules": ["in.fail", "render.path", "in.expression", "present.inputs"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a"}]}
@@ -89,7 +89,7 @@
     "cases": [
       {
         "description": "are shown sorted by the text they're shown as",
-        "rules": ["in.expression"],
+        "rules": ["in.expression", "render.path", "present.inputs"],
         "input": {"things": [{"id": "t1", "x": "B"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "B"}]}
@@ -105,7 +105,7 @@
     "cases": [
       {
         "description": "fails as absent when the ref can't be read, even when another value matches",
-        "rules": ["value.ref", "in.values"],
+        "rules": ["value.ref", "in.values", "present.inputs"],
         "input": {"things": [{"id": "t1", "x": "z"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": "z"}]}
@@ -120,7 +120,7 @@
     "cases": [
       {
         "description": "passes when the field is in the list",
-        "rules": ["in.values", "in.pass"],
+        "rules": ["in.values", "in.pass", "render.path", "in.expression", "present.inputs"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
@@ -136,7 +136,7 @@
     "cases": [
       {
         "description": "fails as unusable",
-        "rules": ["in.values"],
+        "rules": ["in.values", "present.inputs"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a"}]}
@@ -151,7 +151,7 @@
     "cases": [
       {
         "description": "compares the object as it is",
-        "rules": ["in.values"],
+        "rules": ["in.values", "present.inputs"],
         "input": {"things": [{"id": "t1", "x": {"ref": ["q"]}}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": {"ref": ["q"]}}]}
@@ -165,7 +165,7 @@
     "cases": [
       {
         "description": "compares the object as it is",
-        "rules": ["in.values", "value.literal"],
+        "rules": ["in.values", "value.literal", "render.path", "in.expression", "present.inputs"],
         "input": {"things": [{"id": "t1", "x": {"ref": ["q"]}}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": {"ref": ["q"]}}]}
@@ -192,7 +192,7 @@
     "cases": [
       {
         "description": "fails every check as ill_formed and says why",
-        "rules": ["in.values", "value.nested", "written_wrong"],
+        "rules": ["in.values", "value.nested", "written_wrong", "written_wrong.row", "in.written_wrong", "render.path", "in.expression", "present.inputs"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
           {

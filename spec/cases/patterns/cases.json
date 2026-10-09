@@ -5,7 +5,7 @@
     "cases": [
       {
         "description": "passes when one pattern matches anywhere in the string",
-        "rules": ["patterns.pass", "patterns.syntax"],
+        "rules": ["patterns.pass", "patterns.syntax", "render.path", "patterns.expression"],
         "input": {"things": [{"id": "t1", "x": "my_svc_x"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "my_svc_x"}]}
@@ -44,7 +44,7 @@
     "cases": [
       {
         "description": "passes when no pattern matches",
-        "rules": ["patterns.pass"],
+        "rules": ["patterns.pass", "render.path", "patterns.expression"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
@@ -83,7 +83,7 @@
     "cases": [
       {
         "description": "fails as value",
-        "rules": ["patterns.pass", "patterns.fail"],
+        "rules": ["patterns.pass", "patterns.fail", "render.path", "patterns.expression"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a"}]}
@@ -169,7 +169,7 @@
     "cases": [
       {
         "description": "passes when the pattern read matches",
-        "rules": ["patterns.list", "value.ref"],
+        "rules": ["patterns.list", "value.ref", "render.path", "patterns.expression"],
         "input": {"things": [{"id": "t1", "x": "abc"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "abc"}]}
@@ -200,7 +200,7 @@
     "cases": [
       {
         "description": "passes when one matches",
-        "rules": ["patterns.list"],
+        "rules": ["patterns.list", "render.path", "patterns.expression"],
         "input": {"things": [{"id": "t1", "x": "abc"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "abc"}]}
@@ -244,7 +244,7 @@
     "cases": [
       {
         "description": "fails every check as ill_formed and says why",
-        "rules": ["patterns.list", "patterns.syntax", "written_wrong"],
+        "rules": ["patterns.list", "patterns.syntax", "written_wrong", "written_wrong.row", "patterns.written_wrong", "render.path", "patterns.expression"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
           {

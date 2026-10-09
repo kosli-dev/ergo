@@ -5,7 +5,7 @@
     "cases": [
       {
         "description": "passes on 1 and 1.0",
-        "rules": ["compare.pass", "value.equal"],
+        "rules": ["compare.pass", "value.equal", "render.path", "compare.expression"],
         "input": {"things": [{"a": 1, "b": 1.0, "id": "t1"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "a", "value": 1}, {"name": "b", "value": 1}]}
@@ -89,7 +89,7 @@
     "cases": [
       {
         "description": "passes on two numbers in order",
-        "rules": ["compare.pass"],
+        "rules": ["compare.pass", "render.path", "compare.expression"],
         "input": {"things": [{"a": 1, "b": 2, "id": "t1"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "a", "value": 1}, {"name": "b", "value": 2}]}
@@ -173,7 +173,7 @@
     "cases": [
       {
         "description": "names the path into the input",
-        "rules": ["compare.inputs", "compare.expression", "path.start"],
+        "rules": ["compare.inputs", "compare.expression", "path.start", "render.path", "path.steps"],
         "input": {"limit": 5, "things": [{"a": 1, "id": "t1"}]},
         "results": [
           {
@@ -207,7 +207,7 @@
     "cases": [
       {
         "description": "fails every check as ill_formed and says why",
-        "rules": ["compare.inputs", "render.missing", "written_wrong"],
+        "rules": ["compare.inputs", "render.missing", "written_wrong", "written_wrong.row", "compare.written_wrong", "render.path", "compare.expression", "tree.inputs"],
         "input": {"things": [{"a": 1, "b": 2, "id": "t1"}]},
         "results": [
           {

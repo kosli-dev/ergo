@@ -5,7 +5,7 @@
     "cases": [
       {
         "description": "passes when every item passes",
-        "rules": ["list.pass", "list.inputs"],
+        "rules": ["list.pass", "list.inputs", "render.path", "list.expression", "name.list"],
         "input": {"things": [{"cs": [{"s": true}, {"s": true}], "id": "t1"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "cs[].s", "value": [true, true]}], "failed_items": []}
@@ -14,7 +14,7 @@
       },
       {
         "description": "fails with the worst cause among the items that failed, and lists them",
-        "rules": ["list.cause", "list.failed_items"],
+        "rules": ["list.cause", "list.failed_items", "name.list"],
         "input": {"things": [{"cs": [{"s": true}, {"s": false}, {}], "id": "t1"}]},
         "results": [
           {
@@ -30,7 +30,7 @@
       },
       {
         "description": "fails as value on an empty list",
-        "rules": ["list.read"],
+        "rules": ["list.read", "name.list"],
         "input": {"things": [{"cs": [], "id": "t1"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "cs[].s", "value": []}], "failed_items": []}
@@ -38,7 +38,7 @@
       },
       {
         "description": "fails as absent when the list is missing, with no failed items",
-        "rules": ["list.read", "list.failed_items"],
+        "rules": ["list.read", "list.failed_items", "name.list"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "cs[].s", "value": []}], "failed_items": []}
@@ -46,7 +46,7 @@
       },
       {
         "description": "fails as null when the list is null",
-        "rules": ["list.read"],
+        "rules": ["list.read", "name.list"],
         "input": {"things": [{"cs": null, "id": "t1"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "cs[].s", "value": []}], "failed_items": []}
@@ -54,7 +54,7 @@
       },
       {
         "description": "fails as unusable on an object",
-        "rules": ["list.read"],
+        "rules": ["list.read", "name.list"],
         "input": {"things": [{"cs": {"a": {"s": true}}, "id": "t1"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "cs[].s", "value": []}], "failed_items": []}
@@ -62,7 +62,7 @@
       },
       {
         "description": "fails as unusable on a string",
-        "rules": ["list.read"],
+        "rules": ["list.read", "name.list"],
         "input": {"things": [{"cs": "x", "id": "t1"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "cs[].s", "value": []}], "failed_items": []}
@@ -70,7 +70,7 @@
       },
       {
         "description": "fails as not_an_object on items that aren't objects",
-        "rules": ["list.items"],
+        "rules": ["list.items", "name.list"],
         "input": {"things": [{"cs": ["a", 1], "id": "t1"}]},
         "results": [
           {
@@ -92,7 +92,7 @@
     "cases": [
       {
         "description": "passes when one item passes, with no failed items",
-        "rules": ["list.pass", "list.failed_items"],
+        "rules": ["list.pass", "list.failed_items", "render.path", "list.expression", "name.list"],
         "input": {"things": [{"cs": [{"u": ""}, {"u": "bob"}, {}], "id": "t1"}]},
         "results": [
           {
@@ -109,7 +109,7 @@
       },
       {
         "description": "fails as absent when one item fails as value and another is missing its field",
-        "rules": ["list.cause"],
+        "rules": ["list.cause", "name.list"],
         "input": {"things": [{"cs": [{"u": ""}, {}], "id": "t1"}]},
         "results": [
           {
@@ -125,7 +125,7 @@
       },
       {
         "description": "fails as value on an empty list",
-        "rules": ["list.read"],
+        "rules": ["list.read", "name.list"],
         "input": {"things": [{"cs": [], "id": "t1"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "cs[].u", "value": []}], "failed_items": []}
@@ -139,7 +139,7 @@
     "cases": [
       {
         "description": "lists an item missing the field with cause value",
-        "rules": ["list.failed_items", "present.missing"],
+        "rules": ["list.failed_items", "present.missing", "name.list"],
         "input": {"things": [{"cs": [{"x": 1}, {}], "id": "t1"}]},
         "results": [
           {
@@ -161,7 +161,7 @@
     "cases": [
       {
         "description": "reads each item itself and names it after the list",
-        "rules": ["list.items", "list.inputs", "list.expression"],
+        "rules": ["list.items", "list.inputs", "list.expression", "render.path", "name.list"],
         "input": {"things": [{"bs": ["main", "dev"], "id": "t1"}]},
         "results": [
           {
@@ -191,7 +191,7 @@
     "cases": [
       {
         "description": "shows the whole items and the input path it reads",
-        "rules": ["list.inputs"],
+        "rules": ["list.inputs", "render.path", "list.expression", "name.list", "path.steps"],
         "input": {"author": "ann", "things": [{"as": [{"u": "ann"}, {"u": "bob"}], "id": "t1"}]},
         "results": [
           {
@@ -215,7 +215,7 @@
     "cases": [
       {
         "description": "fails every item with the ref's cause",
-        "rules": ["list.failed_items", "value.ref"],
+        "rules": ["list.failed_items", "value.ref", "name.list"],
         "input": {"things": [{"cs": [{"x": 1}, {"x": 2}], "id": "t1"}]},
         "results": [
           {
@@ -237,7 +237,7 @@
     "cases": [
       {
         "description": "passes when every item of every inner list passes",
-        "rules": ["list.each", "list.inputs"],
+        "rules": ["list.each", "list.inputs", "render.path", "list.expression", "name.list"],
         "input": {"things": [{"id": "t1", "prs": [{"cs": [{"s": true}]}, {"cs": [{"s": true}]}]}]},
         "results": [
           {
@@ -254,7 +254,7 @@
       },
       {
         "description": "lists the inner lists that can't be read or are empty in place of their items",
-        "rules": ["list.each", "list.failed_items"],
+        "rules": ["list.each", "list.failed_items", "name.list"],
         "input": {"things": [{"id": "t1", "prs": [{"cs": [{"s": true}, {"s": false}]}, {}, {"cs": []}, {"cs": [{}]}]}]},
         "results": [
           {
@@ -281,7 +281,7 @@
     "cases": [
       {
         "description": "passes when an item of any inner list passes",
-        "rules": ["list.each", "list.pass"],
+        "rules": ["list.each", "list.pass", "name.list"],
         "input": {"things": [{"id": "t1", "prs": [{"cs": [{"s": false}]}, {"cs": [{"s": true}]}]}]},
         "results": [
           {
@@ -297,7 +297,7 @@
       },
       {
         "description": "fails as absent when an inner list is missing, even though another item passes",
-        "rules": ["list.each"],
+        "rules": ["list.each", "name.list"],
         "input": {"things": [{"id": "t1", "prs": [{"cs": [{"s": true}]}, {}]}]},
         "results": [
           {
@@ -319,7 +319,7 @@
     "cases": [
       {
         "description": "checks the items of a list of lists",
-        "rules": ["list.each", "list.expression"],
+        "rules": ["list.each", "list.expression", "render.path", "name.list"],
         "input": {"things": [{"id": "t1", "xss": [[1], [1, 2]]}]},
         "results": [
           {
@@ -349,7 +349,7 @@
     "cases": [
       {
         "description": "fails when no approver approved after every commit, and lists only the approvers",
-        "rules": ["list.as", "list.inner", "list.failed_items", "list.inputs"],
+        "rules": ["list.as", "list.inner", "list.failed_items", "list.inputs", "render.path", "list.expression", "name.list"],
         "input": {"prs": [{"approvers": [{"t": "2026-10-01T11:00:00Z", "u": "bob"}], "commits": [{"t": "2026-10-01T10:00:00Z"}, {"t": "2026-10-01T12:00:00Z"}], "n": 42}]},
         "results": [
           {
@@ -366,7 +366,7 @@
       },
       {
         "description": "passes when one approved after every commit",
-        "rules": ["list.as", "list.pass"],
+        "rules": ["list.as", "list.pass", "name.list"],
         "input": {"prs": [{"approvers": [{"t": "2026-10-01T11:00:00Z", "u": "bob"}], "commits": [{"t": "2026-10-01T10:00:00Z"}], "n": 42}]},
         "results": [
           {
@@ -395,7 +395,7 @@
     "cases": [
       {
         "description": "shows the value read through the name beside the items",
-        "rules": ["list.inputs"],
+        "rules": ["list.inputs", "render.path", "list.expression", "name.list"],
         "input": {"prs": [{"approvers": [{"u": "ann"}], "author": "ann", "n": 42}]},
         "results": [
           {
@@ -425,7 +425,7 @@
     "cases": [
       {
         "description": "names each level after its list",
-        "rules": ["list.expression"],
+        "rules": ["list.expression", "render.path", "name.list"],
         "input": {"things": [{"id": "t1", "xs": [["a"], ["b", "c"]]}]},
         "results": [
           {
@@ -464,7 +464,7 @@
     "cases": [
       {
         "description": "fails every check as ill_formed and says why",
-        "rules": ["list.inner", "list.as", "list.expression", "list.failed_items", "written_wrong"],
+        "rules": ["list.inner", "list.as", "list.expression", "list.failed_items", "written_wrong", "written_wrong.row", "list.written_wrong", "render.path", "name.list", "tree.inputs"],
         "input": {"things": [{"cs": [1], "id": "t1"}]},
         "results": [
           {

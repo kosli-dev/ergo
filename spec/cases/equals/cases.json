@@ -5,7 +5,7 @@
     "cases": [
       {
         "description": "passes on the same string",
-        "rules": ["equals.pass"],
+        "rules": ["equals.pass", "render.path", "equals.expression", "present.inputs"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
@@ -44,7 +44,7 @@
     "cases": [
       {
         "description": "passes on 1.0, because numbers compare by value",
-        "rules": ["equals.pass", "value.equal"],
+        "rules": ["equals.pass", "value.equal", "render.path", "equals.expression", "present.inputs"],
         "input": {"things": [{"id": "t1", "x": 1.0}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
@@ -67,7 +67,7 @@
     "cases": [
       {
         "description": "shows the number in plain decimal",
-        "rules": ["render.value", "value.equal"],
+        "rules": ["render.value", "value.equal", "render.path", "equals.expression", "present.inputs"],
         "input": {"things": [{"id": "t1", "x": 150}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 150}]}
@@ -82,7 +82,7 @@
     "cases": [
       {
         "description": "passes on a field that is there and null",
-        "rules": ["equals.pass"],
+        "rules": ["equals.pass", "render.path", "equals.expression", "present.inputs"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": null}]}
@@ -105,7 +105,7 @@
     "cases": [
       {
         "description": "passes on an equal object whose keys are in another order",
-        "rules": ["equals.pass", "value.equal", "render.value"],
+        "rules": ["equals.pass", "value.equal", "render.value", "render.path", "equals.expression", "present.inputs"],
         "input": {"things": [{"id": "t1", "x": {"a": "x", "b": [1, 2.0]}}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": {"a": "x", "b": [1, 2]}}]}
@@ -128,7 +128,7 @@
     "cases": [
       {
         "description": "compares the object as written",
-        "rules": ["value.literal", "render.value"],
+        "rules": ["value.literal", "render.value", "render.path", "equals.expression", "present.inputs", "value.syntax"],
         "input": {"things": [{"id": "t1", "x": {"ref": ["a"]}}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": {"ref": ["a"]}}]}
@@ -144,7 +144,7 @@
     "cases": [
       {
         "description": "passes when the field equals the param",
-        "rules": ["value.ref", "equals.pass"],
+        "rules": ["value.ref", "equals.pass", "render.path", "equals.expression", "value.refs", "present.inputs", "value.syntax"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
@@ -161,7 +161,7 @@
     "cases": [
       {
         "description": "fails as absent whatever the field holds",
-        "rules": ["value.ref"],
+        "rules": ["value.ref", "value.refs", "present.inputs", "value.syntax"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": "a"}]}
@@ -177,7 +177,7 @@
     "cases": [
       {
         "description": "fails as null even when the field is null too",
-        "rules": ["value.ref"],
+        "rules": ["value.ref", "present.inputs", "value.syntax"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
@@ -203,7 +203,7 @@
     "cases": [
       {
         "description": "fails every check as ill_formed and says why",
-        "rules": ["equals.fail", "value.nested", "written_wrong", "render.missing"],
+        "rules": ["equals.fail", "value.nested", "written_wrong", "render.missing", "written_wrong.row", "present.written_wrong", "render.path", "equals.expression", "present.inputs"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
           {

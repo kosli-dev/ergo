@@ -5,7 +5,7 @@
     "cases": [
       {
         "description": "passes on an empty list",
-        "rules": ["empty.pass"],
+        "rules": ["empty.pass", "render.path", "empty.expression"],
         "input": {"things": [{"id": "t1", "x": []}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": []}]}

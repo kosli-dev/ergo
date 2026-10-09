@@ -5,7 +5,7 @@
     "cases": [
       {
         "description": "passes inside the range",
-        "rules": ["range.pass"],
+        "rules": ["range.pass", "render.path", "range.expression"],
         "input": {"things": [{"id": "t1", "x": 2}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2}]}
@@ -68,7 +68,7 @@
     "cases": [
       {
         "description": "shows them in plain decimal",
-        "rules": ["render.value"],
+        "rules": ["render.value", "render.path", "range.expression"],
         "input": {"things": [{"id": "t1", "x": 2}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2}]}
@@ -84,7 +84,7 @@
     "cases": [
       {
         "description": "passes inside the range read",
-        "rules": ["range.bounds", "range.pass", "value.ref"],
+        "rules": ["range.bounds", "range.pass", "value.ref", "render.path", "range.expression", "value.refs"],
         "input": {"things": [{"id": "t1", "x": 2}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2}]}
@@ -137,7 +137,7 @@
     "cases": [
       {
         "description": "fails every check as ill_formed and says why",
-        "rules": ["range.bounds", "written_wrong"],
+        "rules": ["range.bounds", "written_wrong", "written_wrong.row", "range.written_wrong", "render.path", "range.expression"],
         "input": {"things": [{"id": "t1", "x": 2}]},
         "results": [
           {

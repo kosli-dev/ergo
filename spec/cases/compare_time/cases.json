@@ -5,7 +5,7 @@
     "cases": [
       {
         "description": "passes on two times in order",
-        "rules": ["time.pass"],
+        "rules": ["time.pass", "render.path", "time.expression"],
         "input": {"things": [{"a": "2024-01-01T00:00:00Z", "b": "2024-01-01T00:00:01Z", "id": "t1"}]},
         "results": [
           {

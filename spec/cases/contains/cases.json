@@ -5,7 +5,7 @@
     "cases": [
       {
         "description": "passes when the list contains it",
-        "rules": ["contains.pass"],
+        "rules": ["contains.pass", "render.path", "contains.expression"],
         "input": {"things": [{"id": "t1", "x": ["b", "a"]}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["b", "a"]}]}
@@ -90,7 +90,7 @@
     "cases": [
       {
         "description": "looks for the list as one item",
-        "rules": ["contains.value"],
+        "rules": ["contains.value", "render.path", "contains.expression"],
         "input": {"things": [{"id": "t1", "x": [["a", "b"]]}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": [["a", "b"]]}]}
@@ -113,7 +113,7 @@
     "cases": [
       {
         "description": "passes when the list contains every one",
-        "rules": ["contains.pass"],
+        "rules": ["contains.pass", "render.path", "contains.expression"],
         "input": {"things": [{"id": "t1", "x": ["a", "c", "b"]}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["a", "c", "b"]}]}
@@ -136,7 +136,7 @@
     "cases": [
       {
         "description": "passes when the list doesn't contain it",
-        "rules": ["contains.pass"],
+        "rules": ["contains.pass", "render.path", "contains.expression"],
         "input": {"things": [{"id": "t1", "x": ["b"]}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["b"]}]}
@@ -183,7 +183,7 @@
     "cases": [
       {
         "description": "passes when the list contains none of them",
-        "rules": ["contains.pass"],
+        "rules": ["contains.pass", "render.path", "contains.expression"],
         "input": {"things": [{"id": "t1", "x": ["salt"]}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["salt"]}]}
@@ -207,7 +207,7 @@
     "cases": [
       {
         "description": "fails as absent when the param is missing, instead of passing",
-        "rules": ["value.ref"],
+        "rules": ["value.ref", "render.path", "contains.expression"],
         "input": {"things": [{"id": "t1", "x": ["a"]}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": ["a"]}]}
@@ -223,7 +223,7 @@
     "cases": [
       {
         "description": "fails as unusable, because an empty list would pass anything",
-        "rules": ["contains.value"],
+        "rules": ["contains.value", "render.path", "contains.expression"],
         "input": {"things": [{"id": "t1", "x": ["a"]}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["a"]}]}
@@ -266,7 +266,7 @@
     "cases": [
       {
         "description": "fails every check as ill_formed and says why",
-        "rules": ["contains.value", "contains.expression", "written_wrong"],
+        "rules": ["contains.value", "contains.expression", "written_wrong", "written_wrong.row", "contains.written_wrong", "render.path"],
         "input": {"things": [{"id": "t1", "x": ["a"]}]},
         "results": [
           {
