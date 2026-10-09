@@ -45,7 +45,7 @@ deny <span class="kw">contains</span> msg <span class="kw">if</span> {
     {{- end }}
 
     <div class="ft__view" data-ex="deploy" data-step="2" data-file="policy/policy.yaml" data-hold="6500">
-      <p class="ft__label mono"><span class="ft__who ft__who--ergo">ergo</span> the policy</p>
+      <p class="ft__label mono"><span class="ft__who ft__who--ergo">Ergo</span> the policy</p>
 <pre class="code ft__code"><code><span class="k">subjects</span>:
   <span class="k">deployment</span>:
     <span class="k">from</span>: [<span class="s">deployments</span>]
@@ -66,7 +66,7 @@ deny <span class="kw">contains</span> msg <span class="kw">if</span> {
     </div>
 
     <div class="ft__view" data-ex="deploy" data-step="3" data-file="deployments.json" data-hold="6000">
-      <p class="ft__label mono"><span class="ft__who ft__who--ergo">ergo</span> the evaluation, reading this input</p>
+      <p class="ft__label mono"><span class="ft__who ft__who--ergo">Ergo</span> the evaluation, reading this input</p>
 <pre class="code ft__code"><code>{
   <span class="k">"deployments"</span>: [
     {<span class="k">"id"</span>: <span class="s">"d-1"</span>, <span class="k">"environment"</span>: <span class="s">"prod"</span>,
@@ -79,7 +79,7 @@ deny <span class="kw">contains</span> msg <span class="kw">if</span> {
     </div>
 
     <div class="ft__view" data-ex="deploy" data-step="4" data-file="opa eval ... data.deploy.report" data-hold="8500">
-      <p class="ft__label mono"><span class="ft__who ft__who--ergo">ergo</span> the report</p>
+      <p class="ft__label mono"><span class="ft__who ft__who--ergo">Ergo</span> the report</p>
       <div class="report ft__report">
         <div class="report__head"><span>subject</span><span>check</span><span>value read</span><span>passed</span><span>cause</span></div>
         <div class="report__row is-sys"><span></span><span class="sys">$well_formed</span><span>count(checks) = 1</span><span class="t">true</span><span>satisfied</span></div>
@@ -132,7 +132,7 @@ peer_approved(pr) <span class="kw">if</span> {
     {{- end }}
 
     <div class="ft__view" data-ex="review" data-step="2" data-file="policy/policy.yaml" data-hold="6500">
-      <p class="ft__label mono"><span class="ft__who ft__who--ergo">ergo</span> the policy</p>
+      <p class="ft__label mono"><span class="ft__who ft__who--ergo">Ergo</span> the policy</p>
 <pre class="code ft__code"><code><span class="k">subjects</span>:
   <span class="k">pull request</span>:
     <span class="k">from</span>: [<span class="s">pull_requests</span>, {<span class="k">each_as</span>: <span class="s">pr</span>}]
@@ -153,7 +153,7 @@ peer_approved(pr) <span class="kw">if</span> {
     </div>
 
     <div class="ft__view" data-ex="review" data-step="3" data-file="pull_requests.json" data-hold="6000">
-      <p class="ft__label mono"><span class="ft__who ft__who--ergo">ergo</span> the evaluation, reading this input</p>
+      <p class="ft__label mono"><span class="ft__who ft__who--ergo">Ergo</span> the evaluation, reading this input</p>
 <pre class="code ft__code"><code>{
   <span class="k">"pull_requests"</span>: [
     {<span class="k">"number"</span>: <span class="n">1</span>, <span class="k">"author"</span>: <span class="s">"ann"</span>,
@@ -168,7 +168,7 @@ peer_approved(pr) <span class="kw">if</span> {
     </div>
 
     <div class="ft__view" data-ex="review" data-step="4" data-file="opa eval ... data.review.report" data-hold="8500">
-      <p class="ft__label mono"><span class="ft__who ft__who--ergo">ergo</span> the report</p>
+      <p class="ft__label mono"><span class="ft__who ft__who--ergo">Ergo</span> the report</p>
       <div class="report ft__report">
         <div class="report__head"><span>subject</span><span>check</span><span>value read</span><span>passed</span><span>cause</span></div>
         <div class="report__row is-sys"><span></span><span class="sys">$well_formed</span><span>count(checks) = 1</span><span class="t">true</span><span>satisfied</span></div>

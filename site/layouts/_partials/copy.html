@@ -1,2 +1,2 @@
-{{- $html := replace . "==ergo==" `<span class="ergo-mark">ergo</span>` | markdownify -}}
+{{- $html := replace . "==ergo==" `<span class="ergo-mark">Ergo</span>` | markdownify -}}
 {{- replace $html "&rsquo;" "'" | safeHTML -}}
