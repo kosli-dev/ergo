@@ -86,6 +86,14 @@ subjects:
 
 **[sentence.subject.applies]** The `$applies` row stays. Its `expression` is the conditions as written, joined with ` and `, like `environment is "prod" and change_type is "emergency"`, and its `inputs` hold each path they read. A subject a condition can't decide about, like a deployment with no `change_type`, fails the requirement as `absent` rather than dropping out of it. The filter's name and its description go.
 
+**[sentence.subject.chain]** A subject can start from another subject, by that subject's name: `from: artifact.attestations_statuses named by $params.pr_attestation_name.pull_requests`, where `artifact` is a subject of the same policy. Its rows carry the parent's id under `in`, like `{"type": "pull request", "id": "…/pull/8", "in": {"artifact": "sha256:…"}}`, `min_subjects` counts per parent, and a check reads the parent by its name, like `artifact.name`. In the corpus, four `from` lines descend this way, all from an `artifact` subject: sdlc-policies 0007 and 0008, the server's copy of 0008, and server 0010.
+
+**[sentence.subject.narrow]** A chain can narrow instead of descending: `from: defect where severity is "critical" and status is one of "open", "in_progress"` is a `defect` with two more conditions. Its rows are rows of the parent, with the same id and no `in`. This is today's `of`. DEV-0409 and DEV-0410 use it.
+
+**[sentence.subject.depth]** Each level of walking is written out in Rego, not recursion, so the levels from the input to the assertion have a fixed ceiling. Counted as list walks, today's is three: one in `from` and two in a check. No chain in the corpus is more than two subjects deep, and its deepest check, sdlc-policies 0007's peer approval, walks three lists: pull requests in `from`, then approvers and commits on its `for` line. So three list walks is enough for the corpus, whichever subjects they're spread over.
+
+**[sentence.subject.name]** Two points #174 doesn't settle. A `from` whose first key is both a subject's name and an input field can be read either way: sdlc-policies 0004 has subjects `artifact` and `lockfile` reading the input fields `artifact` and `lockfile`. The draft reads a subject's own name in its own `from` as the input field, and `$input.artifact` says the same with no doubt. And a subject name with a space, like `production deployment`, can't start a path without quotes. No chain in the corpus needs one.
+
 ## Values
 
 **[sentence.value.scalar]** A value is written as JSON writes a scalar: a string in double quotes, a number, `true`, `false` or `null`. A string can also be in single quotes, which keeps backslashes as written, so a regular expression doesn't need them doubled: `'^\s*FROM'` is `"^\\s*FROM"`. Inside single quotes, `\'` is a quote and `\\` a backslash.
