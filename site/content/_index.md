@@ -1,5 +1,5 @@
 ---
-title: "ergo - Explainable policies that run on Open Policy Agent and Rego."
+title: "Ergo - Explainable policies that run on Open Policy Agent and Rego."
 
 hero:
   title: Explainable policies that run on Open Policy Agent and Rego.
@@ -8,8 +8,8 @@ hero:
   secondary: GitHub
   verdict: d-3 is out of scope. d-2 was never approved... and the report says so.
   fromto:
-    label: The same policy written in Rego and in ergo, and what each returns
-    steps: [Rego policy, Rego result, ergo policy, evaluation, report]
+    label: The same policy written in Rego and in Ergo, and what each returns
+    steps: [Rego policy, Rego result, Ergo policy, evaluation, report]
     # Set to true to bring back the Rego policy and Rego result steps.
     show_rego: false
     examples:
@@ -33,7 +33,7 @@ problem:
     label: "**Rego** provides decisions"
     note: Useful. But why was it false?
   with:
-    label: With **ergo** you get explanations
+    label: With **Ergo** you get explanations
     note: Same decision. Now you can see why.
 
 declaration:
