@@ -118,41 +118,144 @@ Items nest left to right, so a later one can use an earlier name, as `pr.approve
 
 ## Phrases
 
-Each phrase is a [Cucumber Expression](https://github.com/cucumber/cucumber-expressions), so a port in Go, Java, JavaScript, Python or Ruby gets a matcher for it from the library. The parameters are `{lhs}` (a path, or a derived value with `plus`), `{path}`, `{value}`, `{values}` (values separated by `, `), `{list}` (values, or a path to a list), `{operand}` (a value, or a path with `plus`), `{number}` and `{type}` (`list`, `string`, `number`, `boolean` or `object`).
+Each phrase is a plain pattern: fixed words with gaps. One line is one form, and a negated form is a line of its own. An implementation matches them its own way. In Rego that's one regular expression per line, matched with `regex.find_all_string_submatch_n`, as ergo does today. No library or notation is needed.
 
-Each polarity is its own expression. Cucumber's `( not)` matches both but doesn't say which, and its `/` alternates single words only, so `{path} contains/does not contain {value}`, as #174 wrote it, compiles to `(contains|does) not contain` and never matches `contains`.
+The gaps:
 
-"Missing", "`null`" and "wrong type" say what a check does when a value it reads is in that state. Everything a phrase reads fails that way, the argument's path or ref included. Every failure that isn't `value` makes a filter fail the requirement instead of ruling the subject out.
+| gap | holds |
+| --- | --- |
+| `<path>` | a path. On the left of a comparison, also a `count of`, a `sum of` or terms joined with `plus` |
+| `<value>` | one value: text in quotes, a number, `true`, `false` or `null` |
+| `<values>` | one or more values separated by `, ` |
+| `<value or field>` | a value, or a path, or terms joined with `plus`. See [sentence.value.path](#values) for how to tell them apart |
+| `<list>` | values separated by `, `, or a path to a list |
+| `<number>` | a number |
+| `<type>` | `list`, `string`, `number`, `boolean` or `object` |
 
-**[sentence.phrase.is]** `{lhs} is {operand}` and `{lhs} is not {operand}`. The field equals, or doesn't equal, the argument, as [value.equal](semantics.md#values) says. Missing: `absent`. `null`: passes `is null`, otherwise fails as `null`. Wrong type: with a value as the argument, `is` fails as `value`, because `"5"` isn't `5` is a sound answer, as today's `equals`. With a path, or with `is not`, two values of different types fail as `unusable`, as today's `compare`.
+"Missing", "`null`" and "wrong type" say what a check does when a value it reads is in that state. Everything a phrase reads fails that way, the path on the right and any reference included. Every failure that isn't `value` makes a filter fail the requirement instead of ruling the subject out.
 
-**[sentence.phrase.within]** `{lhs} is {operand} within {number}`. Two numbers at most that far apart. The number is 0 or more. Missing: `absent`. `null`: `null`. Wrong type: `unusable`.
+**[sentence.phrase.is]**
+```
+<path> is <value or field>
+<path> is not <value or field>
+```
 
-**[sentence.phrase.one_of]** `{lhs} is one of {values}` and `{lhs} is not one of {values}`. The field equals one of the values, or none of them. Missing: `absent`. `null`: `null`, even when the values include `null`. Wrong type: `is one of` fails as `value`, and `is not one of` passes, since a number isn't one of three strings. An empty list can't be written.
+The field equals, or doesn't equal, the argument, as [value.equal](semantics.md#values) says. Missing: `absent`. `null`: passes `is null`, otherwise fails as `null`. Wrong type: with a value as the argument, `is` fails as `value`, because `"5"` isn't `5` is a sound answer, as today's `equals`. With a path, or with `is not`, two values of different types fail as `unusable`, as today's `compare`.
 
-**[sentence.phrase.in]** `{lhs} is in {path}` and `{lhs} is not in {path}`. The same, with the list read from a path, usually `$params`. Missing: `absent`. `null`: `null`. A list that isn't a list: `unusable`. An empty list fails `is in` as `value`, and passes `is not in`.
+**[sentence.phrase.within]**
+```
+<path> is <value or field> within <number>
+```
 
-**[sentence.phrase.exists]** `{lhs} exists` and `{lhs} does not exist`. As today's `present` and `missing`: a field that's missing or `null` fails `exists` with `value` and passes `does not exist`. Wrong type: never, since any value exists. A parent that can't hold the field fails both as `unusable`.
+Two numbers at most that far apart. The number is 0 or more. Missing: `absent`. `null`: `null`. Wrong type: `unusable`.
 
-**[sentence.phrase.empty]** `{lhs} is empty` and `{lhs} is not empty`. `is empty` passes on `[]` and `""`. `is not empty` passes on a list with an item or a string with a character. Missing: `absent`. `null`: `null`. Wrong type, a number, a boolean or an object: `unusable`. This is wider than today on two counts, both open: `is not empty` passes a non-empty list where `non_empty_string` fails, and `is empty` passes `""` where `empty` fails.
+**[sentence.phrase.one_of]**
+```
+<path> is one of <values>
+<path> is not one of <values>
+```
 
-**[sentence.phrase.type]** `{lhs} is a {type}` and `{lhs} is an {type}`. The field has that JSON type. Missing: `absent`. `null`: `null`. Wrong type: `value`, because checking the type is the phrase's job.
+The field equals one of the values, or none of them. Missing: `absent`. `null`: `null`, even when the values include `null`. Wrong type: `is one of` fails as `value`, and `is not one of` passes, since a number isn't one of three strings. An empty list can't be written.
 
-**[sentence.phrase.contains]** `{lhs} contains {operand}` and `{lhs} does not contain {operand}`. The field is a list that holds the value, or doesn't. Missing: `absent`. `null`: `null`. Not a list: `unusable`. `does not contain` passes on an empty list.
+**[sentence.phrase.in]**
+```
+<path> is in <path>
+<path> is not in <path>
+```
 
-**[sentence.phrase.contains_all]** `{lhs} contains all of {list}` and `{lhs} contains none of {list}`. The field is a list that holds every value, or none of them. Missing, `null` and not a list as `contains`. An empty list written in the sentence can't be written, and one read from a path fails as `unusable`, because it would pass every list.
+The same, with the list read from a path, usually `$params`. Missing: `absent`. `null`: `null`. A list that isn't a list: `unusable`. An empty list fails `is in` as `value`, and passes `is not in`.
 
-**[sentence.phrase.matches]** `{lhs} matches {list}` and `{lhs} does not match {list}`. The field is a string that matches at least one of the regular expressions, or none of them. They aren't anchored. Missing: `absent`. `null`: `null`. Not a string: `unusable`. A pattern that isn't a valid regular expression is written wrong when it's in the sentence and fails as `unusable` when it's read from a path.
+**[sentence.phrase.exists]**
+```
+<path> exists
+<path> does not exist
+```
 
-**[sentence.phrase.starts]** `{lhs} starts with {operand}` and `{lhs} ends with {operand}`. New, and unused in the corpus. Both sides are strings. Missing: `absent`. `null`: `null`. Not a string: `unusable`.
+As today's `present` and `missing`: a field that's missing or `null` fails `exists` with `value` and passes `does not exist`. Wrong type: never, since any value exists. A parent that can't hold the field fails both as `unusable`.
 
-**[sentence.phrase.order]** `{lhs} is at least {operand}`, `is at most`, `is more than` and `is less than`. Both sides are numbers, or both are strings. Missing: `absent`. `null`: `null`. Anything else, two types that differ included: `unusable`.
+**[sentence.phrase.empty]**
+```
+<path> is empty
+<path> is not empty
+```
 
-**[sentence.phrase.between]** `{lhs} is between {value} and {value}`. A number from the first to the second, both included. The bounds are numbers, and the first isn't above the second, or it's written wrong. Missing: `absent`. `null`: `null`. Not a number: `unusable`. Its `and` belongs to `between`, so `where qty is between 1 and 5 and kind is "a"` has two conditions. An implementation that splits `where` on ` and ` has to skip the one after `between <value>`.
+`is empty` passes on `[]` and `""`. `is not empty` passes on a list with an item or a string with a character. Missing: `absent`. `null`: `null`. Wrong type, a number, a boolean or an object: `unusable`. This is wider than today on two counts, both open: `is not empty` passes a non-empty list where `non_empty_string` fails, and `is empty` passes `""` where `empty` fails.
 
-**[sentence.phrase.time]** `{lhs} is before {operand}`, `is after`, `is not before` and `is not after`. Both sides are timestamps in the same format, both RFC 3339 strings or both numbers, as today's `compare_time`. `is not before` means "on or after": it still fails when either side isn't a timestamp. Missing: `absent`. `null`: `null`. Wrong type or format: `unusable`. These words are open: `is on or after` and `is on or before` might read better.
+**[sentence.phrase.type]**
+```
+<path> is a <type>
+<path> is an <type>
+```
 
-**[sentence.phrase.aliases]** `{lhs} equals {operand}` and `{lhs} is equal to {operand}` are read as `is`, and `{lhs} does not equal {operand}` as `is not`. With them in the grammar, every sentence in the corpus still has exactly one reading.
+The field has that JSON type. Missing: `absent`. `null`: `null`. Wrong type: `value`, because checking the type is the phrase's job.
+
+**[sentence.phrase.contains]**
+```
+<path> contains <value or field>
+<path> does not contain <value or field>
+```
+
+The field is a list that holds the value, or doesn't. Missing: `absent`. `null`: `null`. Not a list: `unusable`. `does not contain` passes on an empty list.
+
+**[sentence.phrase.contains_all]**
+```
+<path> contains all of <list>
+<path> contains none of <list>
+```
+
+The field is a list that holds every value, or none of them. Missing, `null` and not a list as `contains`. An empty list written in the sentence can't be written, and one read from a path fails as `unusable`, because it would pass every list.
+
+**[sentence.phrase.matches]**
+```
+<path> matches <list>
+<path> does not match <list>
+```
+
+The field is a string that matches at least one of the regular expressions, or none of them. They aren't anchored. Missing: `absent`. `null`: `null`. Not a string: `unusable`. A pattern that isn't a valid regular expression is written wrong when it's in the sentence and fails as `unusable` when it's read from a path.
+
+**[sentence.phrase.starts]**
+```
+<path> starts with <value or field>
+<path> ends with <value or field>
+```
+
+New, and unused in the corpus. Both sides are strings. Missing: `absent`. `null`: `null`. Not a string: `unusable`.
+
+**[sentence.phrase.order]**
+```
+<path> is at least <value or field>
+<path> is at most <value or field>
+<path> is more than <value or field>
+<path> is less than <value or field>
+```
+
+Both sides are numbers, or both are strings. Missing: `absent`. `null`: `null`. Anything else, two types that differ included: `unusable`.
+
+**[sentence.phrase.between]**
+```
+<path> is between <value> and <value>
+```
+
+A number from the first to the second, both included. The bounds are numbers, and the first isn't above the second, or it's written wrong. Missing: `absent`. `null`: `null`. Not a number: `unusable`. Its `and` belongs to `between`, so `where qty is between 1 and 5 and kind is "a"` has two conditions. An implementation that splits `where` on ` and ` has to skip the one after `between <value>`.
+
+**[sentence.phrase.time]**
+```
+<path> is before <value or field>
+<path> is after <value or field>
+<path> is not before <value or field>
+<path> is not after <value or field>
+```
+
+Both sides are timestamps in the same format, both RFC 3339 strings or both numbers, as today's `compare_time`. `is not before` means "on or after": it still fails when either side isn't a timestamp. Missing: `absent`. `null`: `null`. Wrong type or format: `unusable`. These words are open: `is on or after` and `is on or before` might read better.
+
+**[sentence.phrase.aliases]**
+```
+<path> equals <value or field>
+<path> is equal to <value or field>
+<path> does not equal <value or field>
+```
+
+The first two are read as `is`, the third as `is not`. With them in the grammar, every sentence in the corpus still has exactly one reading.
 
 **[sentence.derived.fail]** `count of` and `sum of` over a list that's missing, `null` or not a list fail as `absent`, `null` or `unusable`. A number to add that isn't a number fails as `unusable`. `every` and `some` fail the same way on the list they walk.
 
@@ -179,7 +282,7 @@ Each polarity is its own expression. Cucumber's `( not)` matches both but doesn'
 
 ## How this was checked
 
-A throwaway tokenizer in JavaScript, outside the repo, compiled each phrase above with `@cucumber/cucumber-expressions` 18.0.1 and tried every way to cut each sentence into a quantifier, a path, `where` conditions and a phrase. It counted every reading.
+A throwaway tokenizer in JavaScript, outside the repo, turned each phrase above into a regular expression and tried every way to cut each sentence into a quantifier, a path, `where` conditions and a phrase. It counted every reading.
 
 The corpus has 390 lines: 303 one-line sentences and assertions, 13 `for` lines and 74 `from` lines. With the rules as #174 states them, all of them parse, and 215 parse more than one way:
 
