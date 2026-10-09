@@ -44,7 +44,7 @@ peer_approval:
   description: A peer approved the pull request after its last commit
   for: some approvers where state is "APPROVED" as approver, every commits as commit
   assert:
-    - approver.username is not author
+    - approver.username does not equal author
     - approver.timestamp is after commit.timestamp
 ```
 
@@ -125,7 +125,7 @@ When every subject is a top-level input field and nothing more, with no `where`,
 
 ## `every`, `some` and `where`
 
-**[sentence.every.walk]** `every <path>` walks into every list along the path, the last one included, and the assertion applies to each value it ends at. `every pull_requests.commits.author` reads the author of every commit of every pull request, and `every branches matches "^release/"` reads each branch of a list of strings. It passes when every value passes. Because the last list is walked too, `every pull_requests.labels is not empty` checks each label, not that each pull request has labels. And because a bare name on the right of a one-line `every` is the item's, `every $input.artifact.developers is not tested_by` reads `tested_by` on each developer string, which isn't what it means. To compare each string with a field of the subject, use a `for` line: `for: every $input.artifact.developers as developer` with `assert: developer is not tested_by`.
+**[sentence.every.walk]** `every <path>` walks into every list along the path, the last one included, and the assertion applies to each value it ends at. `every pull_requests.commits.author` reads the author of every commit of every pull request, and `every branches matches "^release/"` reads each branch of a list of strings. It passes when every value passes. Because the last list is walked too, `every pull_requests.labels is not empty` checks each label, not that each pull request has labels. And because a bare name on the right of a one-line `every` is the item's, `every $input.artifact.developers does not equal tested_by` reads `tested_by` on each developer string, which isn't what it means. To compare each string with a field of the subject, use a `for` line: `for: every $input.artifact.developers as developer` with `assert: developer does not equal tested_by`.
 
 **[sentence.every.empty]** `every` over an empty list fails with cause `value`, because no commits isn't proof that every commit is signed. Over nested lists, each inner list must have an item too, as `each` does today.
 
@@ -139,7 +139,7 @@ When every subject is a top-level input field and nothing more, with no `where`,
 
 **[sentence.where.every]** Under `every`, an item that `where` leaves out isn't checked. When `where` leaves no items, the check fails with `value`, unless it has `if any`. No policy in the corpus uses `every ... where` yet.
 
-**[sentence.argument.item]** In a one-line `every` or `some`, a path in the argument starts at the item too, so the item can be compared with its own fields: server 0007's `some approvers.timestamp where state is "APPROVED" and username is not pr_author is after last_commit_timestamp` reads both from each approver. #174 says the same: in a one-line `every` or `some`, every bare name is the item's, in `where`, on the right side and in the assertions joined to it with `and`, see [sentence.assert.item](#the-shape-of-a-sentence). To compare an item with the subject, use a `for` line. To reach the input, start with `$input`.
+**[sentence.argument.item]** In a one-line `every` or `some`, a path in the argument starts at the item too, so the item can be compared with its own fields: server 0007's `some approvers.timestamp where state is "APPROVED" and username does not equal pr_author is after last_commit_timestamp` reads both from each approver. #174 says the same: in a one-line `every` or `some`, every bare name is the item's, in `where`, on the right side and in the assertions joined to it with `and`, see [sentence.assert.item](#the-shape-of-a-sentence). To compare an item with the subject, use a `for` line. To reach the input, start with `$input`.
 
 **[sentence.argument.subject]** After `count of` and `sum of`, the assertion is about one number for the subject, so a path in the argument starts at the subject: in `sum of stages.usd equals total_usd`, `total_usd` is the subject's.
 
@@ -161,7 +161,7 @@ When every subject is a top-level input field and nothing more, with no `where`,
 peer_approved:
   description: Someone other than the author approved every pull request
   for: every pull_requests as pr, some pr.approvers where state is "APPROVED" as approver
-  assert: approver.username is not pr.author
+  assert: approver.username does not equal pr.author
 ```
 
 Items nest left to right, so a later one can use an earlier name, as `pr.approvers` does. A third item is written wrong, because two is the one level of nesting Rego gives today.
@@ -198,10 +198,11 @@ The gaps:
 ```
 <path> is <value>
 <path> equals <field>
-<path> is not <value or field>
+<path> is not <value>
+<path> does not equal <field>
 ```
 
-The field equals, or doesn't equal, what's on the right, as [value.equal](semantics.md#values) says. `is`, `equals` and `is equal to` mean the same, and the report prints `is` before a value and `equals` before a field, so a field on the right side shows as one: `environment is "prod"`, `subject_digest equals fingerprint`. Missing: `absent`. `null`: passes `is null`, otherwise fails as `null`. Wrong type: with a value on the right, `is` fails as `value`, because `"5"` isn't `5` is a sound answer, as today's `equals`. With a field on the right, or with `is not`, two values of different types fail as `unusable`, as today's `compare`.
+The field equals, or doesn't equal, what's on the right, as [value.equal](semantics.md#values) says. `is`, `equals` and `is equal to` mean the same, and so do `is not` and `does not equal`. The report prints `is` and `is not` before a value, and `equals` and `does not equal` before a field, so a field on the right side shows as one: `environment is "prod"`, `subject_digest equals fingerprint`, `approver.username does not equal author`. Missing: `absent`. `null`: passes `is null`, otherwise fails as `null`. Wrong type: with a value on the right, `is` fails as `value`, because `"5"` isn't `5` is a sound answer, as today's `equals`. With a field on the right, or with `is not` or `does not equal`, two values of different types fail as `unusable`, as today's `compare`.
 
 **[sentence.phrase.within]**
 ```
@@ -308,10 +309,9 @@ Both sides are timestamps in the same format, both RFC 3339 strings or both numb
 **[sentence.phrase.aliases]**
 ```
 <path> is equal to <value or field>
-<path> does not equal <value or field>
 ```
 
-The first is read as `is` or `equals`, the second as `is not`. The report prints `is`, `equals` and `is not`. With them in the grammar, every sentence in the corpus still has exactly one reading.
+Read as `is` or `equals`, and printed as one of them. With it in the grammar, every sentence in the corpus still has exactly one reading.
 
 **[sentence.derived.fail]** `count of` and `sum of` over a list that's missing, `null` or not a list fail as `absent`, `null` or `unusable`. A number to add that isn't a number fails as `unusable`. `every` and `some` fail the same way on the list they walk.
 
@@ -332,7 +332,7 @@ The first is read as `is` or `equals`, the second as `is not`. The report prints
 
 ## Printing the sentence
 
-**[sentence.print.canonical]** The report's `expression` is the sentence printed from its parse in one spelling: single spaces, `is` before a value and `equals` before a field, `is one of` before written values and `is in` before a path, no alias, a string in single quotes when it holds a backslash and no single quote and in double quotes with JSON escapes otherwise, a dot in front of a right-side field only where [sentence.path.argument](#paths) needs one, numbers in their plain form, and values separated by `, `. Parsing the printed sentence gives the same parse.
+**[sentence.print.canonical]** The report's `expression` is the sentence printed from its parse in one spelling: single spaces, `is` and `is not` before a value and `equals` and `does not equal` before a field, `is one of` before written values and `is in` before a path, no alias, a string in single quotes when it holds a backslash and no single quote and in double quotes with JSON escapes otherwise, a dot in front of a right-side field only where [sentence.path.argument](#paths) needs one, numbers in their plain form, and values separated by `, `. Parsing the printed sentence gives the same parse.
 
 **[sentence.print.order]** `where` conditions and assertions joined with `and` print in the order the author wrote them. The report stays byte for byte the same when the same policy runs again on the same input. That rule is for the same policy, not for two policies that mean the same: `A and B` and `B and A` print differently, because the order changes neither what passes nor the cause, and sorting would have to reach `assert` lists too, and could never reach `for` items, whose order is their nesting. A row's `inputs` stay sorted by name, as today, because they're values that were read, not a sentence.
 

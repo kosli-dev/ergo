@@ -45,7 +45,7 @@ Notes in the last column:
 | `merged` | `{op: equals, path: [state], value: MERGED}` | `state is "MERGED"` |  |
 | `protected_branch` | `{op: equals, path: [base_ref], value: {ref: [$$params, protected_branch]}}` | `base_ref equals $params.protected_branch` | cause only. Today a branch name of another type fails as `value`. With a path on the right, the sentence fails it as `unusable`. The same values pass. |
 | `signed_commits` | `{op: all, path: [commits], check: {op: equals, path: [verified], value: true}}` | `every commits.verified is true` |  |
-| `peer_approval` | `{op: any, path: [approvers], as: approver, check: {op: any_of, options: {peer: [{op: equals, path: [state], value: APPROVED}, {op: compare, left: [username], right: [$pr, author], cmp: ne}, {op: all, path: [$pr, commits], check: {op: compare, left: [$approver, timestamp], right: [timestamp], cmp: gt}}]}}}` | `for: some approvers where state is "APPROVED" as approver, every commits as commit`<br>`assert:`<br>`  - approver.username is not author`<br>`  - approver.timestamp is after commit.timestamp` | narrows. `for` line. The example #174 gives for a list under `assert`: both lines hold for the same approver and commit. `author` is the pull request's, since a bare name in `assert` is the subject's. Today's `compare` orders timestamps as text, and `is after` fails one that isn't RFC 3339. |
+| `peer_approval` | `{op: any, path: [approvers], as: approver, check: {op: any_of, options: {peer: [{op: equals, path: [state], value: APPROVED}, {op: compare, left: [username], right: [$pr, author], cmp: ne}, {op: all, path: [$pr, commits], check: {op: compare, left: [$approver, timestamp], right: [timestamp], cmp: gt}}]}}}` | `for: some approvers where state is "APPROVED" as approver, every commits as commit`<br>`assert:`<br>`  - approver.username does not equal author`<br>`  - approver.timestamp is after commit.timestamp` | narrows. `for` line. The example #174 gives for a list under `assert`: both lines hold for the same approver and commit. `author` is the pull request's, since a bare name in `assert` is the subject's. Today's `compare` orders timestamps as text, and `is after` fails one that isn't RFC 3339. |
 
 ### SDLC-CTRL-0008 quality assurance
 
@@ -158,7 +158,7 @@ Same as SDLC-CTRL-0004 dependencies, except:
 | `merged` | `{op: equals, path: [state], value: MERGED}` | `state is "MERGED"` |  |
 | `protected_branch` | `{op: equals, path: [base_ref], value: <protected_branch>}` | `base_ref equals $params.protected_branch` | no default. cause only |
 | `signed_commits` | `{op: all, path: [commits], check: {op: equals, path: [verified], value: true}}` | `every commits.verified is true` |  |
-| `peer_approval` | `{op: any, path: [approvers], check: {op: any_of, options: {peer: [{op: equals, path: [state], value: APPROVED}, {op: compare, left: [username], right: [pr_author], cmp: ne}, {op: compare, left: [timestamp], right: [last_commit_timestamp], cmp: gt}]}}}` | `some approvers.timestamp where state is "APPROVED" and username is not pr_author is after last_commit_timestamp` | Rego-shaped. narrows. Today compares timestamps as text. `is after` compares them as times, so a timestamp that isn't RFC 3339 fails instead of being ordered as text. `is more than` keeps today's meaning and reads worse. |
+| `peer_approval` | `{op: any, path: [approvers], check: {op: any_of, options: {peer: [{op: equals, path: [state], value: APPROVED}, {op: compare, left: [username], right: [pr_author], cmp: ne}, {op: compare, left: [timestamp], right: [last_commit_timestamp], cmp: gt}]}}}` | `some approvers.timestamp where state is "APPROVED" and username does not equal pr_author is after last_commit_timestamp` | Rego-shaped. narrows. Today compares timestamps as text. `is after` compares them as times, so a timestamp that isn't RFC 3339 fails instead of being ordered as text. `is more than` keeps today's meaning and reads worse. |
 
 ### demo SDLC-CTRL-0008 quality assurance
 
@@ -180,7 +180,7 @@ Same as SDLC-CTRL-0004 dependencies, except:
 | `approval_complete` | `artifact.attestations_statuses[approval_attestation_name].status == "COMPLETE"` | `status is "COMPLETE"` |  |
 | `approval_compliant` | `artifact.attestations_statuses[approval_attestation_name].is_compliant == true` | `is_compliant is true` |  |
 | `approval_has_attachment` | `artifact.attestations_statuses[approval_attestation_name].has_audit_package == true` | `has_audit_package is true` |  |
-| `approved_by_non_author` | `some approver in attestation.approvers; approver != attestation.author` | `for: some approvers as approver`<br>`assert: approver is not author` | narrows. `for` line. The `for` line stays, because each approver is compared with a field of the subject. Rego's `!=` passes when the types differ, `is not` fails as `unusable`. |
+| `approved_by_non_author` | `some approver in attestation.approvers; approver != attestation.author` | `for: some approvers as approver`<br>`assert: approver does not equal author` | narrows. `for` line. The `for` line stays, because each approver is compared with a field of the subject. Rego's `!=` passes when the types differ, `does not equal` fails as `unusable`. |
 
 ### demo SDLC-CTRL-0020 SAST (plain Rego)
 
@@ -232,7 +232,7 @@ Same as SDLC-CTRL-0004 dependencies, except:
 | --- | --- | --- | --- |
 | `from` of review_round | `[trail]` | `trail` | Ten requirements read the same round. Every path below starts with `compliance_status.attestations_statuses`, because the subject is the whole trail. |
 | `every_hunk_acknowledged` | `{op: compare, left: [compliance_status, attestations_statuses, coverage-verification, attestation_data, hunks_acknowledged], right: [compliance_status, attestations_statuses, coverage-verification, attestation_data, hunks_total], cmp: eq}` | `compliance_status.attestations_statuses.coverage-verification.attestation_data.hunks_acknowledged equals compliance_status.attestations_statuses.coverage-verification.attestation_data.hunks_total` |  |
-| `two_vendors` | `{op: compare, left: [compliance_status, attestations_statuses, claude-review, attestation_data, model_type], right: [compliance_status, attestations_statuses, gemini-review, attestation_data, model_type], cmp: ne}` | `compliance_status.attestations_statuses.claude-review.attestation_data.model_type is not compliance_status.attestations_statuses.gemini-review.attestation_data.model_type` |  |
+| `two_vendors` | `{op: compare, left: [compliance_status, attestations_statuses, claude-review, attestation_data, model_type], right: [compliance_status, attestations_statuses, gemini-review, attestation_data, model_type], cmp: ne}` | `compliance_status.attestations_statuses.claude-review.attestation_data.model_type does not equal compliance_status.attestations_statuses.gemini-review.attestation_data.model_type` |  |
 | `both_models_contributed` | `{op: equals, path: [compliance_status, attestations_statuses, cross-model-comparison, attestation_data, both_models_ran], value: true}` | `compliance_status.attestations_statuses.cross-model-comparison.attestation_data.both_models_ran is true` |  |
 | `personas_dispatched` | `{op: min_length, path: [compliance_status, attestations_statuses, classifier, attestation_data, personas_dispatched], min: 1, expression: ...}` | `count of compliance_status.attestations_statuses.classifier.attestation_data.personas_dispatched is at least 1` | replaces custom `min_length`. `is not empty` reads better, but also passes a non-empty string, where `min_length` fails. |
 | `moderator_succeeded` | `{op: in, path: [compliance_status, attestations_statuses, verdict, attestation_data, moderator_status], values: [resolved, no_disagreements, single_reviewer]}` | `compliance_status.attestations_statuses.verdict.attestation_data.moderator_status is one of "resolved", "no_disagreements", "single_reviewer"` |  |
@@ -439,7 +439,7 @@ Same as DEV-0102 impact analysis, new features, except:
 | `passed` | `{op: equals, path: [is_compliant], value: true}` | `is_compliant is true` |  |
 | `from` of pull request | `[artifact, attestations, pull-request, pull_requests, {each_as: pr}]` | `artifact.attestations.pull-request.pull_requests` | The name `pr` goes, as in DEV-0501. |
 | `merged` | `{op: equals, path: [state], value: MERGED}` | `state is "MERGED"` |  |
-| `peer_approved` | `{op: any, path: [approvers], check: {op: any_of, options: {peer: [{op: equals, path: [state], value: APPROVED}, {op: compare, left: [username], right: [$pr, author], cmp: ne}]}}}` | `for: some approvers where state is "APPROVED" as approver`<br>`assert: approver.username is not author` | `for` line |
+| `peer_approved` | `{op: any, path: [approvers], check: {op: any_of, options: {peer: [{op: equals, path: [state], value: APPROVED}, {op: compare, left: [username], right: [$pr, author], cmp: ne}]}}}` | `for: some approvers where state is "APPROVED" as approver`<br>`assert: approver.username does not equal author` | `for` line |
 | `from` of vulnerability | `[artifact, vulnerabilities], applies_to: {open}` | `artifact.vulnerabilities where status is "open"` | Rego-shaped. `$applies` prints `status is "open"` |
 | filter `open` | `{op: equals, path: [status], value: open}` | `status is "open"` | In the `where` of vulnerability's `from`, so its name goes |
 | `within_sla` | `{op: compare_time, left: [remediate_by], right: [$$input, evaluated_at], cmp: gte}` | `remediate_by is on or after $input.evaluated_at` | Rego-shaped. Rego works out `remediate_by` as `first_seen` plus the params' days for the severity. Saying that in a sentence needs date arithmetic (#140) and a param key read from the subject, `$params.sla_days named by severity`. |
@@ -500,7 +500,7 @@ Same as DEV-0403 features tested, except:
 | --- | --- | --- | --- |
 | `from` of user acceptance test | `[artifact, attestations, uat]` | `artifact.attestations.uat` | Rego-shaped. Rego adds `artifact.developers`, every author of a pull request or commit. |
 | `passed` | `{op: equals, path: [result], value: passed}` | `result is "passed"` |  |
-| `independent_tester` | `{op: all, path: [$$input, artifact, developers], check: {op: compare, left: [], right: [$$input, artifact, attestations, uat, tested_by], cmp: ne}}` | `for: every $input.artifact.developers as developer`<br>`assert: developer is not tested_by` | `for` line. Unlike DEV-0406, an empty developer list fails here, as `all` does today. Tore wrote `every $input.artifact.developers is not tested_by`, which #174 rules out: in a one-line `every`, the bare `tested_by` would be read on each developer string. #174 suggests DEV-0406's `$input.artifact.developers does not contain tested_by` instead, but that passes an empty list, so it changes what passes here. The `for` line keeps today's meaning. |
+| `independent_tester` | `{op: all, path: [$$input, artifact, developers], check: {op: compare, left: [], right: [$$input, artifact, attestations, uat, tested_by], cmp: ne}}` | `for: every $input.artifact.developers as developer`<br>`assert: developer does not equal tested_by` | `for` line. Unlike DEV-0406, an empty developer list fails here, as `all` does today. Tore wrote `every $input.artifact.developers does not equal tested_by`, which #174 rules out: in a one-line `every`, the bare `tested_by` would be read on each developer string. #174 suggests DEV-0406's `$input.artifact.developers does not contain tested_by` instead, but that passes an empty list, so it changes what passes here. The `for` line keeps today's meaning. |
 | `documented` | `{op: non_empty_string, path: [report_url]}` | `report_url is not empty` | widens |
 | `approved` | `{op: non_empty_string, path: [approved_by]}` | `approved_by is not empty` | widens |
 | `approved_after_testing` | `{op: compare_time, left: [approved_at], right: [tested_at], cmp: gte}` | `approved_at is on or after tested_at` |  |
@@ -539,8 +539,8 @@ Same as DEV-0409 defects triaged, new features.
 | `from` of production deployment | `[deployments, {each_as: deploy}], applies_to: {production, normal_change}` | `deployments where environment is "prod" and change_type is "normal"` | `$applies` prints `environment is "prod" and change_type is "normal"`. The name `deploy` goes: the checks that used it have a `for` line, where the subject's fields are bare. |
 | filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` | In the `where` of production deployment's `from`, so its name goes |
 | filter `normal_change` | `{op: equals, path: [change_type], value: normal}` | `change_type is "normal"` | In the `where` of production deployment's `from`, so its name goes |
-| `installer_did_not_write_code` | `{op: all, path: [pull_requests], check: {op: all, path: [commits], check: {op: compare, left: [author], right: [$deploy, deployed_by], cmp: ne}}}` | `for: every pull_requests.commits as commit`<br>`assert: commit.author is not deployed_by` | `for` line |
-| `peer_approved` | `{op: all, path: [pull_requests], as: pr, check: {op: any, path: [approvers], check: {op: any_of, options: {peer: [{op: equals, path: [state], value: APPROVED}, {op: compare, left: [username], right: [$pr, author], cmp: ne}]}}}}` | `for: every pull_requests as pr, some pr.approvers where state is "APPROVED" as approver`<br>`assert: approver.username is not pr.author` | `for` line. The example #174 gives for `for`. Rows stay one per deployment. |
+| `installer_did_not_write_code` | `{op: all, path: [pull_requests], check: {op: all, path: [commits], check: {op: compare, left: [author], right: [$deploy, deployed_by], cmp: ne}}}` | `for: every pull_requests.commits as commit`<br>`assert: commit.author does not equal deployed_by` | `for` line |
+| `peer_approved` | `{op: all, path: [pull_requests], as: pr, check: {op: any, path: [approvers], check: {op: any_of, options: {peer: [{op: equals, path: [state], value: APPROVED}, {op: compare, left: [username], right: [$pr, author], cmp: ne}]}}}}` | `for: every pull_requests as pr, some pr.approvers where state is "APPROVED" as approver`<br>`assert: approver.username does not equal pr.author` | `for` line. The example #174 gives for `for`. Rows stay one per deployment. |
 
 ### DEV-0502 sign-off, new features
 
@@ -621,7 +621,7 @@ Same as DEV-0504 roll-back ready, new features, except:
 | filter `production` | `{op: equals, path: [environment], value: prod}` | `environment is "prod"` | In the `where` of production deployment's `from`, so its name goes |
 | filter `emergency` | `{op: equals, path: [change_type], value: emergency}` | `change_type is "emergency"` | In the `where` of production deployment's `from`, so its name goes |
 | `approved` | `{op: non_empty_string, path: [retro_approval, approved_by]}` | `retro_approval.approved_by is not empty` | widens |
-| `independent` | `{op: compare, left: [retro_approval, approved_by], right: [deployed_by], cmp: ne}` | `retro_approval.approved_by is not deployed_by` |  |
+| `independent` | `{op: compare, left: [retro_approval, approved_by], right: [deployed_by], cmp: ne}` | `retro_approval.approved_by does not equal deployed_by` |  |
 | `after_deployment` | `{op: compare_time, left: [retro_approval, approved_at], right: [started_at], cmp: gt}` | `retro_approval.approved_at is after started_at` |  |
 
 ### DEV-0702 emergency change reviewed
@@ -715,7 +715,7 @@ Every phrase, counted from the parses, twins included: 229 checks and 74 filters
 | `where` | 1 | 1 | 3 |  | 10 | 15 |
 | `equals` | 2 | 2 | 7 |  | 3 | 14 |
 | `for` line | 1 | 1 | 1 |  | 11 | 14 |
-| `is not` | 1 | 2 | 2 |  | 5 | 10 |
+| `does not equal` | 1 | 2 | 1 |  | 5 | 9 |
 | `is at least` |  |  | 9 |  |  | 9 |
 | `count of` |  |  | 6 |  |  | 6 |
 | `count of` (in `where`) |  |  | 6 |  |  | 6 |
@@ -737,6 +737,7 @@ Every phrase, counted from the parses, twins included: 229 checks and 74 filters
 | `sum of` |  |  | 2 |  |  | 2 |
 | list under `assert` | 1 |  |  |  | 1 | 2 |
 | `is a` |  |  | 1 |  |  | 1 |
+| `is not` |  |  | 1 |  |  | 1 |
 | `named by <name>` |  |  | 1 |  |  | 1 |
 
 Not used anywhere: `is not one of`, `does not exist`, `contains none of`, `starts with`, `ends with`, `is at most`, `is more than`, `is less than`, `is on or before`, `is ... within`, `ignoring case`, `first of`, `item 3 of` and `items[2]`.
