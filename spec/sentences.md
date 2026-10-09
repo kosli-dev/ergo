@@ -52,7 +52,7 @@ The `and` between assertions can't be confused with the `and` of `where` or of `
 
 ## Paths
 
-**[sentence.path.string]** A path is keys joined by `.`, like `git_commit_info.sha1`. A key is written bare when it starts with an ASCII letter or `_` and the rest is ASCII letters, digits, `_`, `$` and `-`, like `coverage-verification`. Any other key is quoted as a JSON string, like `metadata.labels."app.kubernetes.io/name"`, and so is a key that starts with `$`, like `"$schema"`. This is how [syntax.md](syntax.md#naming-a-path) already names paths in the report, so a path from a row can be pasted into a policy.
+**[sentence.path.string]** A path is keys joined by `.`, like `git_commit_info.sha1`. A key is written bare when it starts with an ASCII letter or `_` and the rest is ASCII letters, digits, `_` and `-`, so Kosli's `secrets-scan`, `pull-request` and `coverage-verification` need no quotes. Any other key is quoted as a JSON string, like `metadata.labels."app.kubernetes.io/name"`, and so is a key that starts with `$`, like `"$schema"`. That's how [syntax.md](syntax.md#naming-a-path) names paths in the report today, except that it also allows `$` after the first character. The two should agree, so a path from a row can be pasted into a policy.
 
 **[sentence.path.start]** A bare first key is a field of the subject. Inside `where`, and in the argument of a one-line `every` or `some`, it's a field of the item instead (see [sentence.argument.item](#every-some-and-where)). A name given by `as` on a `for` line is a bare word too, and it shadows a field with the same name. `$params` starts at the params and `$input` at the input. Any other `$<word>` is written wrong, with `unknown name $<word>`.
 
