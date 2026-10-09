@@ -1,6 +1,6 @@
 # How ergo turns a policy and an input into a report
 
-Draft 0.1. This file says what a check means, whatever syntax it's written in. [syntax.md](syntax.md) says how today's policies write checks, how they can be written wrong, and how the report shows them. It covers reading values, causes, every built-in operator, and how requirements, scope, statuses and violations work. How `from` names subjects, substitutes and custom operators are still described only in [REFERENCE.md](../REFERENCE.md).
+Draft 0.1. This file says what a check means, whatever syntax it's written in. [syntax.md](syntax.md) says how today's policies write checks, how they can be written wrong, and how the report shows them. It covers reading values, causes, every built-in operator, and how requirements, scope, statuses and violations work. How `from` names subjects and custom operators are still described only in [REFERENCE.md](../REFERENCE.md).
 
 Each rule has a name in brackets, like `[present.missing]`. The cases in [`cases/`](cases) list the rules they test, so you can find the cases for a rule and the rule behind a case. An implementation follows every rule here, and where it does something else, it's wrong, whatever `ergo.rego` does.
 
@@ -228,6 +228,20 @@ Every row has a cause. When a check reads several values, the row takes the firs
 **[any_of.inputs]** The row shows every path any option reads, once each, sorted by name. For an `all` or `any` in an option, that's its list, with the whole items, and the names it reads.
 
 **[any_of.no_failed_items]** An `any_of` row has no `failed_items`, even with an `all` or `any` inside it.
+
+## Substitutes
+
+A check in `checks` or `applies_to` can have a substitute: another check that satisfies it when the first one fails. It's for other evidence that the same requirement was met, like an attestation from a verified committer standing in for the pull request a repository's first commit can't have.
+
+**[substitute.pass]** When the check passes, the row passes with `satisfied`. When it fails and the substitute passes, the row passes with `substituted`.
+
+**[substitute.cause]** When both fail, the row takes the first cause, in the order of [causes](#causes), among the check's own cause and the substitute's, except that the substitute's `absent`, `null` and `value` don't count, because a substitute is usually missing. A substitute whose path runs into the wrong kind of value, whose selector matches nothing or several items, or whose values are the wrong kind for its operator gives its cause to the row. So does a ref in it that can't be read. In `applies_to`, a substitute that's missing doesn't stop a filter from ruling the subject out, but one with any other problem does.
+
+**[substitute.written_wrong]** A substitute that's written wrong makes the check written wrong, so its row fails as `ill_formed` even when the check itself passes.
+
+**[substitute.where]** A substitute's own substitute is ignored, and so is a substitute on the inner check of an `all` or `any`, or on a check in an `any_of` option. A substitute can be any check that can go in `checks`, an `all`, `any` or `any_of` included.
+
+**[substitute.inputs]** The row shows the check's inputs, then the substitute's, leaving out a path already shown. An `all` or `any` row keeps the `failed_items` of the check itself, even when the substitute passed.
 
 ## Requirements
 

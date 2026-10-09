@@ -373,7 +373,7 @@ fn evaluate<'a>(name: &'a str, raw: &'a Map<String, Value>, base: &Ctx<'a>) -> E
                 match &f.check {
                     Some(c) if !f.flawed => {
                         let row = c.row(entry.subject, &ctx, &refs_of(f.raw, &ctx), inputs, vec![]);
-                        let missing = !row.passed && c.substitute.is_none() && matches!(&c.kind, check::Kind::Leaf(l) if l.op == "present") && c.cause(entry.subject, &ctx) == Cause::Missing;
+                        let missing = !row.passed && c.substitute_problems(entry.subject, &ctx).is_empty() && matches!(&c.kind, check::Kind::Leaf(l) if l.op == "present") && c.cause(entry.subject, &ctx) == Cause::Missing;
                         let row = Row { failed_items: None, ..row };
                         (row, missing)
                     }

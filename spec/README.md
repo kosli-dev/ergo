@@ -10,7 +10,7 @@ Draft 0.1. ergo is three specs, and `ergo.rego` and the Rust port in `ports/rust
 
 When an implementation and the spec disagree, the implementation is wrong. A change to ergo's behaviour starts here, with the rule and its cases, and then goes into each implementation.
 
-The spec covers reading values, causes, expressions, every built-in operator, requirements, scope, statuses, row order and violations. How `from` names subjects (`each_as` and `keys`), substitutes, params passed in, custom operators and values JSON can't hold are still described only in [REFERENCE.md](../REFERENCE.md). `from` waits for [#174](https://github.com/kosli-dev/ergo/issues/174) and [#113](https://github.com/kosli-dev/ergo/issues/113), which may change how it's written. The spec will change while it's 0.x.
+The spec covers reading values, causes, expressions, every built-in operator, requirements, scope, substitutes, statuses, row order and violations. How `from` names subjects (`each_as` and `keys`), params passed in, custom operators and values JSON can't hold are still described only in [REFERENCE.md](../REFERENCE.md). `from` waits for [#174](https://github.com/kosli-dev/ergo/issues/174) and [#113](https://github.com/kosli-dev/ergo/issues/113), which may change how it's written. The spec will change while it's 0.x.
 
 ## Cases
 

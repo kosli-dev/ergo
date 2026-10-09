@@ -708,7 +708,8 @@ That's different from `applies_to`. A subject left out by `applies_to` isn't cov
 - Substitutes work on checks in `checks` and in `applies_to`. They're ignored on the inner check of `all` and `any`, and on the checks inside an `any_of` option.
 - A substitute's own substitute is ignored.
 - The rendered expression shows both: `reviewed == true, or substitute: verified == true`.
-- When both fail, the row's cause is about the main check, not the substitute.
+- When both fail, the row takes the worse of the two causes, except that the substitute's `absent`, `null` and `value` don't count, because substitutes are usually missing. So a substitute whose selector matches nothing or several items, whose path runs into the wrong kind of value, or that compares values of the wrong kind gives the row its cause, and in `applies_to` it stops the filter ruling the subject out.
+- The row shows the check's inputs, then the substitute's, leaving out a path already shown.
 
 A substitute with a wrong path looks just like a substitute whose evidence is missing: it's never used, and the main check keeps failing. Test each substitute with an input that should pass on it.
 

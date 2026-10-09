@@ -2077,15 +2077,17 @@ _is_collection(v) if is_object(v)
 
 _cause_precedence := ["ill_formed", "not_an_object", "ambiguous", "unmatched", "unusable", "absent", "null"]
 
-_worst_read(subj, check) := _worst_or_value(_check_states(check, subj) | _substitute_unusable(check, subj)) if not _unreadable_ref(check)
+_worst_read(subj, check) := _worst_or_value(_check_states(check, subj) | _substitute_problems(check, subj)) if not _unreadable_ref(check)
 
 _worst_or_value(states) := c if {
 	c := _worst_of(states)
 } else := "value"
 
-_substitute_unusable(check, subj) := {"unusable" |
-	some leaf in _element_leaves(_substitute_of(check))
-	_unusable(leaf, subj)
+_substitute_problems(check, subj) := {c |
+	sub := _substitute_of(check)
+	is_object(sub)
+	some c in _check_states(sub, subj)
+	not c in {"absent", "null", "missing", "value"}
 }
 
 default _has_inputs(_) := false
@@ -2370,7 +2372,7 @@ _answers_presence(check, subj, "") if {
 	_ := _start_of(subj, check.path)
 	not _unreadable_ref(check)
 	not _params_not_given(check.path)
-	_substitute_unusable(check, subj) == set()
+	_substitute_problems(check, subj) == set()
 	_read_state(subj, check.path) in {"absent", "null"}
 }
 
@@ -2808,10 +2810,12 @@ _leaf_paths(leaf) := [leaf.path] if {
 
 _row_inputs(subj, check, item) := _check_inputs(subj, check, item) if not check.substitute
 
-_row_inputs(subj, check, item) := array.concat(
+_row_inputs(subj, check, item) := _once(array.concat(
 	_check_inputs(subj, check, item),
 	_check_inputs(subj, check.substitute, item),
-) if check.substitute
+)) if check.substitute
+
+_once(xs) := [x | some i, x in xs; not x in array.slice(xs, 0, i)]
 
 _check_def(check, item) := _with_refs(object.union(object.remove(_described(check, item), {"description", "meta"}), {"description": _reported_description(check), "meta": _reported_meta(check)}), check)
 

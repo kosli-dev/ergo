@@ -1,0 +1,412 @@
+[
+  {
+    "description": "a check with a substitute",
+    "policy": {"s": {"subject_type": "thing", "from": ["t"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["pull_request"], "substitute": {"op": "equals", "path": ["verified"], "value": true}}}}},
+    "cases": [
+      {
+        "description": "passes as satisfied when the check passes",
+        "rules": ["substitute.pass", "substitute.inputs", "substitute.expression", "substitute.syntax", "render.path"],
+        "input": {"t": [{"id": "t1", "pull_request": 7}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "pull_request", "value": 7}, {"name": "verified", "value": null}]
+          }
+        ],
+        "expressions": {"s": {"c": "pull_request is present, or substitute: verified == true"}}
+      },
+      {
+        "description": "passes as substituted when only the substitute passes",
+        "rules": ["substitute.pass"],
+        "input": {"t": [{"id": "t1", "verified": true}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "substituted",
+            "inputs": [{"name": "pull_request", "value": null}, {"name": "verified", "value": true}]
+          }
+        ]
+      },
+      {
+        "description": "fails as value when both fail on value",
+        "rules": ["substitute.cause"],
+        "input": {"t": [{"id": "t1", "verified": false}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "pull_request", "value": null}, {"name": "verified", "value": false}]
+          }
+        ]
+      },
+      {
+        "description": "fails as value when the substitute's field is missing",
+        "rules": ["substitute.cause"],
+        "input": {"t": [{"id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "pull_request", "value": null}, {"name": "verified", "value": null}]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a substitute whose field is null",
+    "policy": {"s": {"subject_type": "thing", "from": ["t"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["s"], "value": "M", "substitute": {"op": "equals", "path": ["w"], "value": true}}}}},
+    "cases": [
+      {
+        "description": "doesn't change the cause",
+        "rules": ["substitute.cause"],
+        "input": {"t": [{"id": "t1", "s": "O", "w": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "s", "value": "O"}, {"name": "w", "value": null}]}
+        ]
+      },
+      {
+        "description": "leaves the check's own cause when the check's field is missing",
+        "rules": ["substitute.cause"],
+        "input": {"t": [{"id": "t1", "w": false}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "s", "value": null}, {"name": "w", "value": false}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a substitute whose path runs into a string",
+    "policy": {"s": {"subject_type": "thing", "from": ["t"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["s"], "value": "M", "substitute": {"op": "equals", "path": ["w", "x"], "value": true}}}}},
+    "cases": [
+      {
+        "description": "gives the row its unusable cause",
+        "rules": ["substitute.cause"],
+        "input": {"t": [{"id": "t1", "s": "O", "w": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "s", "value": "O"}, {"name": "w.x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a substitute whose selector matches several items",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["t"],
+        "id": ["id"],
+        "checks": {"c": {"op": "equals", "path": ["s"], "value": "M", "substitute": {"op": "present", "path": ["xs", {"where": {"k": "a"}}, "v"]}}}
+      }
+    },
+    "cases": [
+      {
+        "description": "gives the row its ambiguous cause",
+        "rules": ["substitute.cause"],
+        "input": {"t": [{"id": "t1", "s": "O", "xs": [{"k": "a"}, {"k": "a"}]}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "ambiguous",
+            "inputs": [{"name": "s", "value": "O"}, {"name": "xs.[k==\"a\"].v", "value": null}]
+          }
+        ]
+      },
+      {
+        "description": "gives the row its unmatched cause when it matches nothing",
+        "rules": ["substitute.cause"],
+        "input": {"t": [{"id": "t1", "s": "O", "xs": [{"k": "b"}]}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "unmatched",
+            "inputs": [{"name": "s", "value": "O"}, {"name": "xs.[k==\"a\"].v", "value": null}]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a substitute ordering two objects",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["t"],
+        "id": ["id"],
+        "checks": {"c": {"op": "equals", "path": ["s"], "value": "M", "substitute": {"op": "compare", "cmp": "lt", "left": ["a"], "right": ["b"]}}}
+      }
+    },
+    "cases": [
+      {
+        "description": "gives the row its unusable cause",
+        "rules": ["substitute.cause"],
+        "input": {"t": [{"a": {"n": 1}, "b": {"o": 1}, "id": "t1", "s": "O"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [{"name": "s", "value": "O"}, {"name": "a", "value": {"n": 1}}, {"name": "b", "value": {"o": 1}}]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a substitute with a ref that can't be read",
+    "policy": {"s": {"subject_type": "thing", "from": ["t"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["a"], "substitute": {"op": "equals", "path": ["b"], "value": {"ref": ["$$params", "w"]}}}}}},
+    "params": {},
+    "cases": [
+      {
+        "description": "gives the row the ref's cause",
+        "rules": ["substitute.cause", "value.ref"],
+        "input": {"t": [{"b": 1, "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "a", "value": null}, {"name": "b", "value": 1}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.w", "value": null}]}}
+      }
+    ]
+  },
+  {
+    "description": "a substitute reading the same path as its check",
+    "policy": {"s": {"subject_type": "thing", "from": ["t"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["s"], "value": "M", "substitute": {"op": "equals", "path": ["s"], "value": "N"}}}}},
+    "cases": [
+      {
+        "description": "shows the path once",
+        "rules": ["substitute.inputs"],
+        "input": {"t": [{"id": "t1", "s": "O"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "s", "value": "O"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a substitute written wrong",
+    "policy": {"s": {"subject_type": "thing", "from": ["t"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["n"], "substitute": {"op": "nope", "path": ["n"]}}}}},
+    "cases": [
+      {
+        "description": "fails the check as ill_formed even though the check passes",
+        "rules": ["substitute.written_wrong", "written_wrong", "substitute.expression", "substitute.syntax", "render.path"],
+        "input": {"t": [{"id": "t1", "n": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": [{"name": "n", "value": 1}]}
+        ],
+        "expressions": {"s": {"c": "n is present, or substitute: <unknown op nope>"}}
+      }
+    ]
+  },
+  {
+    "description": "a substitute with a substitute of its own",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["t"],
+        "id": ["id"],
+        "checks": {"c": {"op": "present", "path": ["a"], "substitute": {"op": "present", "path": ["b"], "substitute": {"op": "present", "path": ["c"]}}}}
+      }
+    },
+    "cases": [
+      {
+        "description": "ignores the second one",
+        "rules": ["substitute.where", "substitute.expression", "substitute.syntax", "render.path"],
+        "input": {"t": [{"c": 1, "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "a", "value": null}, {"name": "b", "value": null}]}
+        ],
+        "expressions": {"s": {"c": "a is present, or substitute: b is present"}}
+      }
+    ]
+  },
+  {
+    "description": "a substitute on the inner check of all",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["t"],
+        "id": ["id"],
+        "checks": {"c": {"op": "all", "path": ["cs"], "check": {"op": "equals", "path": ["s"], "value": true, "substitute": {"op": "present", "path": ["w"]}}}}
+      }
+    },
+    "cases": [
+      {
+        "description": "is ignored",
+        "rules": ["substitute.where"],
+        "input": {"t": [{"cs": [{"s": false, "w": 1}], "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "cs[].s", "value": [false]}],
+            "failed_items": [{"cause": "value", "path": "cs[0]", "value": {"s": false, "w": 1}}]
+          }
+        ],
+        "expressions": {"s": {"c": "every cs: s == true"}}
+      }
+    ]
+  },
+  {
+    "description": "a substitute on a check in an any_of option",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["t"],
+        "id": ["id"],
+        "checks": {"c": {"op": "any_of", "options": {"a": [{"op": "equals", "path": ["s"], "value": true, "substitute": {"op": "present", "path": ["w"]}}]}}}
+      }
+    },
+    "cases": [
+      {
+        "description": "is ignored",
+        "rules": ["substitute.where"],
+        "input": {"t": [{"id": "t1", "s": false, "w": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "s", "value": false}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a substitute on all",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["t"],
+        "id": ["id"],
+        "checks": {"c": {"op": "all", "path": ["cs"], "check": {"op": "equals", "path": ["s"], "value": true}, "substitute": {"op": "present", "path": ["waiver"]}}}
+      }
+    },
+    "cases": [
+      {
+        "description": "passes the row as substituted and keeps the items the check failed on",
+        "rules": ["substitute.where", "substitute.inputs", "substitute.pass", "substitute.expression", "substitute.syntax", "render.path"],
+        "input": {"t": [{"cs": [{"s": false}], "id": "t1", "waiver": "w"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "substituted",
+            "inputs": [{"name": "cs[].s", "value": [false]}, {"name": "waiver", "value": "w"}],
+            "failed_items": [{"cause": "value", "path": "cs[0]", "value": {"s": false}}]
+          }
+        ],
+        "expressions": {"s": {"c": "every cs: s == true, or substitute: waiver is present"}}
+      }
+    ]
+  },
+  {
+    "description": "an any_of as a substitute",
+    "policy": {
+      "s": {"subject_type": "thing", "from": ["t"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["a"], "substitute": {"op": "any_of", "options": {"x": [{"op": "present", "path": ["b"]}]}}}}}
+    },
+    "cases": [
+      {
+        "description": "can stand in for the check",
+        "rules": ["substitute.where", "substitute.pass"],
+        "input": {"t": [{"b": 1, "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "substituted", "inputs": [{"name": "a", "value": null}, {"name": "b", "value": 1}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a filter whose substitute is missing",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["t"],
+        "id": ["id"],
+        "min_subjects": 0,
+        "applies_to": {"f": {"op": "equals", "path": ["s"], "value": "M", "substitute": {"op": "equals", "path": ["w"], "value": true}}},
+        "checks": {"c": {"op": "present", "path": ["id"]}}
+      }
+    },
+    "cases": [
+      {
+        "description": "still rules the subject out",
+        "rules": ["substitute.cause", "scope.out"],
+        "input": {"t": [{"id": "t1", "s": "O"}]},
+        "status": {"s": "not_applicable"},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "s", "value": "O"}, {"name": "w", "value": null}]}
+        ]
+      },
+      {
+        "description": "keeps the subject in scope when the substitute passes",
+        "rules": ["substitute.pass", "scope.filters"],
+        "input": {"t": [{"id": "t1", "s": "O", "w": true}]},
+        "status": {"s": "met"},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "$applies",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "s", "value": "O"}, {"name": "w", "value": true}]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "id", "value": "t1"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a present filter whose substitute orders a number and a string",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["t"],
+        "id": ["id"],
+        "min_subjects": 0,
+        "applies_to": {"f": {"op": "present", "path": ["e"], "substitute": {"op": "compare", "cmp": "lt", "left": ["a"], "right": ["b"]}}},
+        "checks": {"c": {"op": "present", "path": ["id"]}}
+      }
+    },
+    "cases": [
+      {
+        "description": "can't rule the subject out",
+        "rules": ["substitute.cause", "scope.unreadable"],
+        "input": {"t": [{"a": 1, "b": "x", "id": "t1"}]},
+        "status": {"s": "not_met"},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "$applies",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [{"name": "a", "value": 1}, {"name": "b", "value": "x"}, {"name": "e", "value": null}]
+          }
+        ]
+      }
+    ]
+  }
+]

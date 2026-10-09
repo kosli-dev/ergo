@@ -1257,7 +1257,7 @@ test_an_empty_path_on_a_subject_is_named_after_from_in_every_kind_of_check if {
 		"either": [{"name": "branches[]", "value": "main"}],
 		"same": [{"name": "branches[]", "value": "main"}, {"name": "branches[]", "value": "main"}],
 		"custom": [{"name": "branches[]", "value": "main"}],
-		"backed": [{"name": "branches[]", "value": "main"}, {"name": "branches[]", "value": "main"}],
+		"backed": [{"name": "branches[]", "value": "main"}],
 	}
 }
 

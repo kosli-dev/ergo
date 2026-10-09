@@ -18,6 +18,10 @@ Draft 0.1. This file covers the syntax policies use today, where a check is a JS
 
 **[value.nested]** A ref or literal anywhere deeper inside a value, like `[{"ref": [...]}]`, is written wrong, because it would be compared as an object. So is an object with a `ref` or `literal` key and any other key, or a ref whose path doesn't start with `$$input` or `$$params`. What's wrong is written `ref inside <field>`, `literal inside <field>` or `invalid ref`.
 
+## Substitutes
+
+**[substitute.syntax]** A check's `substitute` field holds its substitute, written like any other check.
+
 ## Checks written wrong
 
 **[written_wrong.row]** A check [written wrong](semantics.md#the-model-of-a-check) makes the `$well_formed` row list it in its `inputs`, named `checks.<name>` or `applies_to.<name>`, after `count(checks)` and `require`, sorted by name, with the list of what's wrong, sorted.
@@ -87,6 +91,8 @@ Each check's definition in the report has an `expression` that says what it chec
 **[compare.expression]** `<left> <cmp> <right>`, like `a lt $$input.limit`, with `cmp` as written.
 
 **[time.expression]** Written like `compare`'s.
+
+**[substitute.expression]** A check with a substitute is shown as `<check>, or substitute: <substitute>`, like `pull_request is present, or substitute: verified == true`.
 
 **[list.expression]** `every <list>: <inner>` or `some <list>: <inner>`, with the inner check's paths named inside the item. With `each`, the list is shown as `<list>[].<each>`, and with `as`, it's followed by ` as $<name>`. A path with no steps in the inner check is named `<list>[]`, like `every bs: bs[] matches one of ["^main$"]`. A missing or badly written inner check is shown as `<missing check>`, `<invalid check>`, `<nested too deep>` or `<op can't go here>`, and a bad name as `<invalid name>` or `<name given twice>`.
 

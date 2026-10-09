@@ -681,13 +681,6 @@ impl<'a> Check<'a> {
         }
     }
 
-    fn leaves(&self) -> Vec<&Check<'a>> {
-        match &self.kind {
-            Kind::AnyOf(options) => options.iter().flat_map(|g| g.iter()).collect(),
-            _ => vec![self],
-        }
-    }
-
     fn all_leaves(&self) -> Vec<&Leaf<'a>> {
         let mut out = vec![];
         match &self.kind {
@@ -725,6 +718,14 @@ impl<'a> Check<'a> {
         }
     }
 
+    pub fn substitute_problems(&self, x: &'a Value, ctx: &Ctx<'a>) -> Vec<Cause> {
+        self.substitute
+            .iter()
+            .map(|s| s.base_cause(x, ctx))
+            .filter(|c| !matches!(c, Cause::Absent | Cause::Null | Cause::Missing | Cause::Value))
+            .collect()
+    }
+
     pub fn row(&self, x: &'a Value, ctx: &Ctx<'a>, refs: &[(String, Value, Option<Cause>)], inputs: Vec<Value>, entries: Vec<crate::render::Entry<'a>>) -> Row {
         let flaw = self.param_broken(ctx).then_some(Cause::Unusable);
         let unreadable: Vec<Cause> = refs.iter().filter_map(|r| r.2).collect();
@@ -740,11 +741,7 @@ impl<'a> Check<'a> {
             unreadable.iter().copied().min().unwrap()
         } else {
             let mut causes = vec![self.base_cause(x, ctx)];
-            if let Some(s) = &self.substitute {
-                if s.leaves().iter().any(|l| matches!(&l.kind, Kind::Leaf(leaf) if leaf.unusable(x, ctx))) {
-                    causes.push(Cause::Unusable);
-                }
-            }
+            causes.extend(self.substitute_problems(x, ctx));
             worst_or_value(causes)
         };
         let failed_items = match &self.kind {

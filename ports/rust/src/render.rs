@@ -671,7 +671,11 @@ fn check_inputs<'a>(ctx: &Ctx<'a>, subject: &'a Value, check: &Value, item: &str
 pub fn row_inputs<'a>(ctx: &Ctx<'a>, subject: &'a Value, check: &Value, item: &str) -> Vec<Value> {
     let mut all = check_inputs(ctx, subject, check, item).unwrap_or_default();
     if let Some(s) = check.get("substitute").filter(|s| truthy(Some(s))) {
-        all.extend(check_inputs(ctx, subject, s, item).unwrap_or_default());
+        for input in check_inputs(ctx, subject, s, item).unwrap_or_default() {
+            if !all.contains(&input) {
+                all.push(input);
+            }
+        }
     }
     all
 }
