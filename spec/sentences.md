@@ -37,7 +37,7 @@ A check that walks two lists, or compares an item with its subject, puts the wal
 
 "Or" is an `any_of` in the policy around the sentence, because each option has a name and the report says which one passed. Every expression language gets asked for `or` and brackets, and the answer here is no.
 
-**[sentence.assert.list]** `assert` can be a list, or one line with `and` between assertions. Both mean the same: every assertion is true for the same subject, or for the same items when the check has a `for` line. The report shows the list form whichever was written, and its `expression` joins the lines with `and`, so a failed row can say which line failed:
+**[sentence.assert.list]** `assert` can be a list, or one line with `and` between assertions. Both mean the same, every assertion is true for the same subject, or for the same items when the check has a `for` line, unless the line starts with a one-line `every` or `some`, see [sentence.assert.item](#the-shape-of-a-sentence). The report shows the list form whichever was written, and its `expression` joins the lines with `and`, so a failed row can say which line failed:
 
 ```yaml
 peer_approval:
@@ -48,7 +48,9 @@ peer_approval:
     - approver.timestamp is after commit.timestamp
 ```
 
-The `and` between assertions can't be confused with the `and` of `where` or of `between`: the tokenizer reads `every items.price where kind is "a" and qty is 1 is at least 2 and owner is "x"` one way. #174 doesn't say whether `owner` there is the item's, as the `where` before it is, or the subject's, as a plain assertion is. The draft reads it as the subject's, because the `every` belongs to the first assertion only.
+**[sentence.assert.item]** After a one-line `every` or `some`, the assertions joined to it with `and` are about the item too. `every items.price where kind is "a" is at least 2 and owner is "x"` reads `price` and `owner` from each item, and passes when every item of kind `a` has both. Only the first assertion of the line can start with `every`, `some`, `count of` or `sum of`, so `state is "MERGED" and every commits.verified is true` is written wrong. After `count of` and `sum of`, the assertion is about a number, so the ones joined to it are about the subject. A new line under `assert` is a new sentence, starting from the subject again.
+
+So a line that starts with a one-line `every` or `some` and goes on with `and` can't be written as a list without changing what it reads, and the report prints it as written, on one line. The `and` between assertions can't be confused with the `and` of `where` or of `between`: the tokenizer reads `every items.price where kind is "a" and qty is 1 is at least 2 and owner is "x"` one way.
 
 ## Paths
 
@@ -122,7 +124,7 @@ subjects:
 
 **[sentence.where.every]** Under `every`, an item that `where` leaves out isn't checked. When `where` leaves no items, the check fails with `value`, unless it has `if any`. No policy in the corpus uses `every ... where` yet.
 
-**[sentence.argument.item]** In a one-line `every` or `some`, a path in the argument starts at the item too, so the item can be compared with its own fields: server 0007's `some approvers.timestamp where state is "APPROVED" and username is not pr_author is after last_commit_timestamp` reads both from each approver. #174 says the same: in a one-line `every` or `some`, every bare name is the item's, in `where` and on the right side alike. To compare an item with the subject, use a `for` line. To reach the input, start with `$input`.
+**[sentence.argument.item]** In a one-line `every` or `some`, a path in the argument starts at the item too, so the item can be compared with its own fields: server 0007's `some approvers.timestamp where state is "APPROVED" and username is not pr_author is after last_commit_timestamp` reads both from each approver. #174 says the same: in a one-line `every` or `some`, every bare name is the item's, in `where`, on the right side and in the assertions joined to it with `and`, see [sentence.assert.item](#the-shape-of-a-sentence). To compare an item with the subject, use a `for` line. To reach the input, start with `$input`.
 
 **[sentence.argument.subject]** After `count of` and `sum of`, the assertion is about one number for the subject, so a path in the argument starts at the subject: in `sum of stages.usd equals total_usd`, `total_usd` is the subject's.
 
