@@ -1,6 +1,6 @@
 # How ergo turns a policy and an input into a report
 
-Draft 0.1. This file says what a check means, whatever syntax it's written in. [syntax.md](syntax.md) says how today's policies write checks, how they can be written wrong, and how the report shows them. It covers reading values, causes, every built-in operator, and how requirements, scope, statuses and violations work. How `from` names subjects and custom operators are still described only in [REFERENCE.md](../REFERENCE.md).
+Draft 0.1. This file says what a check means, whatever syntax it's written in. [syntax.md](syntax.md) says how today's policies write checks, how they can be written wrong, and how the report shows them. It covers reading values, causes, every built-in operator, and how requirements, scope, statuses and violations work. How `from` names subjects is still described only in [REFERENCE.md](../REFERENCE.md). Questions the spec hasn't settled are in [OPEN.md](OPEN.md).
 
 Each rule has a name in brackets, like `[present.missing]`. The cases in [`cases/`](cases) list the rules they test, so you can find the cases for a rule and the rule behind a case. An implementation follows every rule here, and where it does something else, it's wrong, whatever `ergo.rego` does.
 
@@ -242,6 +242,26 @@ A check in `checks` or `applies_to` can have a substitute: another check that sa
 **[substitute.where]** A substitute's own substitute is ignored, and so is a substitute on the inner check of an `all` or `any`, or on a check in an `any_of` option. A substitute can be any check that can go in `checks`, an `all`, `any` or `any_of` included.
 
 **[substitute.inputs]** The row shows the check's inputs, then the substitute's, leaving out a path already shown. An `all` or `any` row keeps the `failed_items` of the check itself, even when the substitute passed.
+
+## Custom operators
+
+A custom operator is for a check the built-in operators can't express. The policy uses it by name, with its own parameters, and doesn't say how it works: whoever runs the policy supplies it, the way Cucumber is given step definitions that feature files never mention. How it's written depends on the engine, like a Rego rule or a CEL expression, so this section only covers what the policy and the report see. [OPEN.md](OPEN.md#custom-operators) lists what the engines don't agree on yet.
+
+**[custom.use]** A check uses a custom operator like any other, with `op` set to its name and any parameters the operator takes.
+
+**[custom.unknown]** An operator that isn't built in and that nobody supplied is [written wrong](#the-model-of-a-check), so a misspelt operator fails, and in `applies_to` it fails the requirement instead of ruling every subject out.
+
+**[custom.pass]** The check passes when the operator says it does, given the values its parameters hold.
+
+**[custom.fail]** When the operator says it doesn't and every field it reads was found, the check fails with `value`.
+
+**[custom.cause]** When it fails, the cause is the first, in the order of [causes](#causes), among the outcomes of the paths it reads, so a missing field fails it as `absent` and a `null` one as `null`.
+
+**[custom.refs]** ergo reads the refs in a custom operator's parameters itself, so the operator gets the values. They're recorded under `$refs` like any other, and one that can't be read fails the check with its cause.
+
+**[custom.inputs]** The row shows each path the operator reads, in order. It has no `failed_items`.
+
+**[custom.where]** A custom operator works in `checks`, in `applies_to` and as a substitute, and as a filter it follows the same [scope](#scope) rules as any other.
 
 ## Requirements
 

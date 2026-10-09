@@ -1,4 +1,4 @@
-use serde_json::Value;
+use serde_json::{Value, json};
 use std::collections::BTreeSet;
 use std::fs;
 use std::path::Path;
@@ -18,8 +18,17 @@ fn compared(check: &str, expected: &[Value]) -> bool {
     !check.starts_with('$') || check == "$applies" || expected.iter().any(|r| r["check"] == check)
 }
 
-fn passes(group: &Value, case: &Value) -> Result<(), String> {
-    let report = ergo::report(&case["input"], group.get("params"), &group["policy"]);
+fn test_operators() -> ergo::Operators {
+    ergo::Operators::load(&json!({
+        "even": {"params": {"path": "path"}, "passes": "int(path) % 2 == 0"},
+        "multiple_of": {"params": {"path": "path", "by": "number"}, "passes": "int(path) % int(by) == 0"},
+        "both_present": {"params": {"paths": "paths"}, "passes": "true"}
+    }))
+    .unwrap()
+}
+
+fn passes(group: &Value, case: &Value, operators: &ergo::Operators) -> Result<(), String> {
+    let report = ergo::report_with(&case["input"], group.get("params"), &group["policy"], operators);
     let expected = case["results"].as_array().unwrap();
     let rows: Vec<Value> = report["results"].as_array().unwrap().iter().filter(|r| compared(r["check"].as_str().unwrap(), expected)).cloned().collect();
     if !same(&Value::Array(rows.clone()), &case["results"]) {
@@ -90,6 +99,7 @@ fn every_spec_case_passes_except_the_known_differences() {
     topics.sort();
     assert!(!topics.is_empty(), "no topics under {}", root.display());
 
+    let operators = test_operators();
     let mut failed = BTreeSet::new();
     let mut messages = vec![];
     for dir in topics {
@@ -98,7 +108,7 @@ fn every_spec_case_passes_except_the_known_differences() {
         for group in &groups {
             for case in group["cases"].as_array().unwrap() {
                 let name = format!("{topic} / {} / {}", group["description"].as_str().unwrap(), case["description"].as_str().unwrap());
-                if let Err(why) = passes(group, case) {
+                if let Err(why) = passes(group, case, &operators) {
                     messages.push(format!("{name}\n  {why}"));
                     failed.insert(name);
                 }

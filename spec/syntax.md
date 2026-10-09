@@ -22,6 +22,10 @@ Draft 0.1. This file covers the syntax policies use today, where a check is a JS
 
 **[substitute.syntax]** A check's `substitute` field holds its substitute, written like any other check.
 
+## Custom operators
+
+**[custom.syntax]** A custom operator check can have any fields, besides `op`. Because ergo can't work out what the operator reads or how to describe it, the check also gives `expression`, the text the report shows, and `inputs`, a list of the paths it reads. An entry in `inputs` can be a path, or `{"path": [...], "each": [...]}` to read one field from every item of a list. `ergo.rego` needs them. An engine that knows more about the operator, like the Rust port, uses them when they're there.
+
 ## Checks written wrong
 
 **[written_wrong.row]** A check [written wrong](semantics.md#the-model-of-a-check) makes the `$well_formed` row list it in its `inputs`, named `checks.<name>` or `applies_to.<name>`, after `count(checks)` and `require`, sorted by name, with the list of what's wrong, sorted.

@@ -1,0 +1,195 @@
+[
+  {
+    "description": "a custom operator",
+    "policy": {"s": {"subject_type": "thing", "from": ["t"], "id": ["id"], "checks": {"c": {"op": "even", "path": ["n"], "expression": "n is even", "inputs": [["n"]]}}}},
+    "cases": [
+      {
+        "description": "passes when the operator says so",
+        "rules": ["custom.use", "custom.pass", "custom.syntax", "render.path"],
+        "input": {"t": [{"id": "t1", "n": 4}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "n", "value": 4}]}
+        ],
+        "expressions": {"s": {"c": "n is even"}}
+      },
+      {
+        "description": "fails as value when it doesn't",
+        "rules": ["custom.fail"],
+        "input": {"t": [{"id": "t1", "n": 3}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "n", "value": 3}]}
+        ]
+      },
+      {
+        "description": "fails as absent when a field it reads is missing",
+        "rules": ["custom.cause"],
+        "input": {"t": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "n", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when a field it reads is null",
+        "rules": ["custom.cause"],
+        "input": {"t": [{"id": "t1", "n": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "n", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a custom operator with a parameter read through a ref",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["t"],
+        "id": ["id"],
+        "checks": {"c": {"op": "multiple_of", "path": ["n"], "by": {"ref": ["$$params", "batch"]}, "expression": "n is a multiple of the batch size", "inputs": [["n"]]}}
+      }
+    },
+    "params": {"batch": 3},
+    "cases": [
+      {
+        "description": "passes with the value the ref reads, and records it",
+        "rules": ["custom.refs", "value.refs"],
+        "input": {"t": [{"id": "t1", "n": 6}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "n", "value": 6}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.batch", "value": 3}]}}
+      },
+      {
+        "description": "fails as value when the operator says no",
+        "rules": ["custom.fail"],
+        "input": {"t": [{"id": "t1", "n": 7}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "n", "value": 7}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a custom operator with a ref that can't be read",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["t"],
+        "id": ["id"],
+        "checks": {"c": {"op": "multiple_of", "path": ["n"], "by": {"ref": ["$$params", "batch"]}, "expression": "n is a multiple of the batch size", "inputs": [["n"]]}}
+      }
+    },
+    "params": {},
+    "cases": [
+      {
+        "description": "fails with the ref's cause",
+        "rules": ["custom.refs", "value.ref"],
+        "input": {"t": [{"id": "t1", "n": 6}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "n", "value": 6}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.batch", "value": null}]}}
+      }
+    ]
+  },
+  {
+    "description": "a custom operator reading two fields",
+    "policy": {"s": {"subject_type": "thing", "from": ["t"], "id": ["id"], "checks": {"c": {"op": "both_present", "expression": "a and b are present", "inputs": [["a"], ["b"]], "paths": [["a"], ["b"]]}}}},
+    "cases": [
+      {
+        "description": "shows each field it reads",
+        "rules": ["custom.inputs"],
+        "input": {"t": [{"a": 1, "b": 2, "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "a", "value": 1}, {"name": "b", "value": 2}]}
+        ]
+      },
+      {
+        "description": "fails with the worst cause among the fields it reads",
+        "rules": ["custom.cause"],
+        "input": {"t": [{"a": 1, "b": null, "id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "a", "value": 1}, {"name": "b", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an operator nobody supplied",
+    "policy": {"s": {"subject_type": "thing", "from": ["t"], "id": ["id"], "checks": {"c": {"op": "nope", "path": ["n"]}}}},
+    "cases": [
+      {
+        "description": "is written wrong, so a typo can't pass",
+        "rules": ["custom.unknown", "written_wrong", "written_wrong.row"],
+        "input": {"t": [{"id": "t1", "n": 4}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["unknown op nope"]}]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": [{"name": "n", "value": 4}]}
+        ],
+        "expressions": {"s": {"c": "<unknown op nope>"}}
+      }
+    ]
+  },
+  {
+    "description": "a custom operator as a filter",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["t"],
+        "id": ["id"],
+        "min_subjects": 0,
+        "applies_to": {"f": {"op": "even", "path": ["n"], "expression": "n is even", "inputs": [["n"]]}},
+        "checks": {"c": {"op": "present", "path": ["id"]}}
+      }
+    },
+    "cases": [
+      {
+        "description": "rules a subject out when it fails as value",
+        "rules": ["custom.where", "scope.out"],
+        "input": {"t": [{"id": "t1", "n": 3}]},
+        "status": {"s": "not_applicable"},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "n", "value": 3}]}
+        ]
+      },
+      {
+        "description": "fails the requirement when a field it reads is missing",
+        "rules": ["custom.where", "scope.unreadable"],
+        "input": {"t": [{"id": "t1"}]},
+        "status": {"s": "not_met"},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": false, "cause": "absent", "inputs": [{"name": "n", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a custom operator as a substitute",
+    "policy": {
+      "s": {
+        "subject_type": "thing",
+        "from": ["t"],
+        "id": ["id"],
+        "checks": {"c": {"op": "present", "path": ["x"], "substitute": {"op": "even", "path": ["n"], "expression": "n is even", "inputs": [["n"]]}}}
+      }
+    },
+    "cases": [
+      {
+        "description": "can stand in for the check",
+        "rules": ["custom.where", "substitute.pass"],
+        "input": {"t": [{"id": "t1", "n": 2}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "substituted", "inputs": [{"name": "x", "value": null}, {"name": "n", "value": 2}]}
+        ],
+        "expressions": {"s": {"c": "x is present, or substitute: n is even"}}
+      }
+    ]
+  }
+]
