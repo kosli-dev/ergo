@@ -201,15 +201,16 @@ As today's `present` and `missing`: a field that's missing or `null` fails `exis
 <path> is not empty
 ```
 
-`is empty` passes on `[]` and `""`. `is not empty` passes on a list with an item or a string with a character. Missing: `absent`. `null`: `null`. Wrong type, a number, a boolean or an object: `unusable`. This is wider than today on two counts, both open: `is not empty` passes a non-empty list where `non_empty_string` fails, and `is empty` passes `""` where `empty` fails.
+`is empty` passes on `[]` and `""`. `is not empty` passes on a list with an item or a string with a character. Missing: `absent`. `null`: `null`. Wrong type, a number, a boolean or an object: `unusable`. This is wider than today's `empty` and `non_empty_string`, which each took one type. When the type matters, say it with [sentence.phrase.type](#phrases): `is a non-empty string`, or `is a list` as a second check.
 
 **[sentence.phrase.type]**
 ```
 <path> is a <type>
 <path> is an <type>
+<path> is a non-empty string
 ```
 
-The field has that JSON type. Missing: `absent`. `null`: `null`. Wrong type: `value`, because checking the type is the phrase's job.
+The field has that JSON type. `is a non-empty string` is today's `non_empty_string`: a string with at least one character. Missing: `absent`. `null`: `null`. Wrong type: `value`, because checking the type is the phrase's job.
 
 **[sentence.phrase.contains]**
 ```
