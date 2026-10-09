@@ -226,7 +226,7 @@ The field is a list that holds the value, or doesn't. Missing: `absent`. `null`:
 <path> contains none of <list>
 ```
 
-The field is a list that holds every value, or none of them. Missing, `null` and not a list as `contains`. An empty list written in the sentence can't be written, and one read from a path fails as `unusable`, because it would pass every list.
+The field is a list that holds every value, or none of them. Missing, `null` and not a list as `contains`. An empty list written in the sentence can't be written, and one read from a path fails as `unusable`, because it would pass every list. `contains "a", "b"` on its own is written wrong, because it could mean all of them or any of them, so a list always takes `all of` or `none of`.
 
 **[sentence.phrase.matches]**
 ```
