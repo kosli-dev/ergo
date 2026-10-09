@@ -344,15 +344,24 @@ Read as `is` or `equals`, and printed as one of them. With it in the grammar, ev
 
 A throwaway tokenizer in JavaScript, outside the repo, turned each phrase above into a regular expression and tried every way to cut each line into a quantifier, a path, `where` conditions, assertions joined with `and`, and a phrase. It counted every reading.
 
-The corpus has 337 lines: 231 assertions, 14 `for` lines and 92 `from` lines. There are fewer than before because the 74 filters are now part of the `from` lines. With the rules in this file, which are the rules #174 now states, every line parses exactly one way. Without them, 196 lines parse more than one way:
+The corpus has 335 lines: 231 assertions, 14 `for` lines and 90 `from` lines. sdlc-policies 0004's `artifact` and its server copy have no `from` any more. With the rules in this file, which are the rules #174 now states, every line parses exactly one way. Without them, 194 lines parse more than one way:
 
 | cause | lines | rule that removes it |
 | --- | ---: | --- |
 | a quoted string could be text or a quoted key, `is "prod"` | 84 | [sentence.path.argument](#paths) |
-| a grammar word could be a field, `is empty` against `is <field empty>` | 65 | [sentence.words](#words-a-field-cant-be-called) |
-| `true`, `false` or `null` could be a field | 46 | both of the above |
+| a grammar word could be a field, `is empty` against `is <field empty>` | 59 | [sentence.words](#words-a-field-cant-be-called) |
+| `true`, `false` or `null` could be a field | 50 | both of the above |
 | the reference after `named by` could end at more than one key | 24 | [sentence.path.dynamic](#paths) |
 
-Some lines have two causes. Fifteen made-up lines test what the corpus doesn't reach. `plus` after `where` reads three ways until [sentence.derived.plus](#derived-values) forbids it, and a `for` item named `every` reads one way until [sentence.for.name](#the-for-line) forbids it. `if any` with `some`, two quantifiers in one sentence and `count of ... is empty` parse no way, as they should. The `and` between assertions never clashes with the `and` of `where` or of `between`: `every items.price where kind is "a" and qty is 1 is at least 2 and owner is "x"` reads one way.
+Some lines have two causes. The tokenizer also applied [sentence.subject.own](#subjects) to every `from` line, and found the same six chains the corpus marks.
 
-Every line also prints back exactly as written.
+27 made-up lines test what the corpus doesn't reach:
+
+- `plus` after `where` reads three ways until [sentence.derived.plus](#derived-values) forbids it, and a `for` item named `every` reads one way until [sentence.for.name](#the-for-line) forbids it.
+- `if any` with `some`, two quantifiers in one sentence, `count of ... is empty`, a quantifier after `and`, `where count of reviews is empty` and the bare key `foo$bar` parse no way, as they should.
+- `where count of reviews is at least 1 and state is "open"` and `some orders.id where sum of items.price is more than 100 is not empty` read one way.
+- After `every items.price where kind is "a" and qty is 1 is at least 2`, the `and owner is "x"` that follows reads one way, on the item. After `count of` or a plain assertion, it's on the subject.
+- `format is in "spdx", "cyclonedx"` prints as `is one of`, `username is one of $params.internal_staff` as `is in`, `approved_by is not author` as `does not equal`, and `environment does not equal "prod"` as `is not`.
+- `"production deployment".pull_requests` reads one way, as a chain from that subject.
+
+Every line also prints back exactly as written, `from` lines included.
