@@ -31,7 +31,7 @@ A check that walks two lists, or compares an item with its subject, puts the wal
 
 - one assertion per sentence
 - one `every`, `some`, `count of` or `sum of` per line, and only at the start. A second one goes on a `for` line
-- `where` holds one or more conditions joined by `and`, and each condition is a path and a phrase, never another `every` or `where`
+- `where` holds one or more conditions joined by `and`, and each condition is a path and a phrase, never another `every` or `where`. A condition can start with `count of` or `sum of`, like `where count of findings is at least 1`, because that's still one condition with a phrase. Its path has no `where` of its own
 - `and` does two jobs and nothing else: it joins the conditions of a `where`, and it joins whole assertions, see [sentence.assert.list](#the-shape-of-a-sentence). Each side of an `and` is a whole condition or a whole assertion, so the result is a flat list, not a tree. An `and` never joins a `where` to its assertion
 - no `or`, and no brackets except the lookups in [sentence.path.brackets](#paths)
 
@@ -84,7 +84,7 @@ subjects:
     id: id
 ```
 
-**[sentence.subject.condition]** A condition in that `where` is a path and a phrase, like any `where` condition, so it can't be a `count of` or `sum of`. pr-reviewer's six `count of x is at least 1` filters become two conditions each, `x is a list and x is not empty`, with the same meaning.
+**[sentence.subject.condition]** A condition in that `where` is like any `where` condition: a path and a phrase, or a `count of` or `sum of` and a comparison. pr-reviewer has six, like `where count of compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is at least 1`.
 
 **[sentence.subject.applies]** The `$applies` row stays. Its `expression` is the conditions as written, joined with ` and `, like `environment is "prod" and change_type is "emergency"`, and its `inputs` hold each path they read. A subject a condition can't decide about, like a deployment with no `change_type`, fails the requirement as `absent` rather than dropping out of it. The filter's name and its description go.
 
