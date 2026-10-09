@@ -13,7 +13,7 @@ ergo is a Rego library that turns policy evaluation into a structured report. Us
 - `CODE_OF_CONDUCT.md` is the Contributor Covenant 2.1, unchanged apart from the contact address.
 - `.github/ISSUE_TEMPLATE/` and `.github/pull_request_template.md` are the forms GitHub shows for new issues and pull requests.
 - `examples/` holds worked examples. Each one has an input, the same policy in plain Rego and with ergo, and tests that pin what both versions report.
-- `spec/` holds the spec that `ergo.rego` and the Rust port implement: the policy and report schemas, the rules in `semantics.md`, and cases written from those rules. `spec_test.rego` runs the cases against `ergo.rego`.
+- `spec/` holds the spec that `ergo.rego` and the Rust port implement: what checks mean in `semantics.md`, how today's policies write them in `syntax.md`, the policy and report schemas, and cases written from those rules. `spec_test.rego` runs the cases against `ergo.rego`.
 - `conformance/` holds tests in plain JSON that any implementation of ergo can run, not just this one. `conformance_test.rego` runs them against `ergo.rego`.
 
 ## Checks
@@ -60,9 +60,9 @@ opa test . --ignore .github --coverage | jq -r '.files | to_entries[] | .key as 
 
 ## Spec
 
-A change to ergo's behaviour starts in `spec/`: write the rule in `semantics.md`, then a case for it in `spec/cases/<topic>/cases.json` that names the rule, then change `ergo.rego` and the Rust port. When an implementation and the spec disagree, the implementation is wrong. If it can't be fixed in the same change, add the case to that implementation's known differences, in `spec_test.rego` or `ports/rust/tests/spec.rs`. See `spec/README.md` for the case format.
+A change to ergo's behaviour starts in `spec/`: write the rule in `semantics.md`, or in `syntax.md` when it's about how a check is written or shown, then a case for it in `spec/cases/<topic>/cases.json` that names the rule, then change `ergo.rego` and the Rust port. When an implementation and the spec disagree, the implementation is wrong. If it can't be fixed in the same change, add the case to that implementation's known differences, in `spec_test.rego` or `ports/rust/tests/spec.rs`. See `spec/README.md` for the case format.
 
-Write the expected rows from the rules, not by copying what `ergo.rego` reports.
+Write the expected rows from the rules, not by copying what `ergo.rego` reports. `python3 spec/check_rules.py` should print nothing: it lists rules no case cites, and cases that cite rules that don't exist.
 
 ## Conformance suite
 
