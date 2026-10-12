@@ -28,7 +28,7 @@ condition         = path WS phrase / derived WS compare-phrase
 
 ; Derived values: count of, sum of, and terms added with plus.
 ; Only the last term on the left can carry a where, and none on the right.
-derived           = ("count" / "sum") WS "of" WS plain-path
+derived           = ("count" / "sum") WS "of" WS path
 term              = right-path / derived / number
 derived-left      = derived [WS where]
                   / 1*(term WS "plus" WS) (term / derived WS where)
