@@ -1284,7 +1284,7 @@ test_an_empty_path_on_a_subject_is_named_after_from_in_every_kind_of_check if {
 		"either": [{"name": "branches[]", "value": "main"}],
 		"same": [{"name": "branches[]", "value": "main"}, {"name": "branches[]", "value": "main"}],
 		"custom": [{"name": "branches[]", "value": "main"}],
-		"backed": [{"name": "branches[]", "value": "main"}, {"name": "branches[]", "value": "main"}],
+		"backed": [{"name": "branches[]", "value": "main"}],
 	}
 }
 
@@ -1457,7 +1457,8 @@ test_any_of_rendering_is_order_independent if {
 }
 
 test_any_of_renders_an_empty_option_group_instead_of_dropping_it if {
-	rendered({}, {"op": "any_of", "options": {"standard": []}}) == "one of: standard()"
+	rendered({}, {"op": "any_of", "options": {"standard": []}}) == "one of: standard(<empty option>)"
+	rendered({}, {"op": "any_of", "options": {}}) == "one of: <empty options>"
 }
 
 test_any_of_echoes_every_field_it_read_once_each if {
@@ -1598,6 +1599,42 @@ test_a_substitute_works_in_an_applies_to_filter if {
 		"checks": {"c": {"op": "equals", "path": ["signed"], "value": true}},
 	}})
 	rep.requirements.s.subjects.matching == 1
+}
+
+with_range_substitute := {
+	"op": "equals",
+	"path": ["reviewed"],
+	"value": true,
+	"substitute": {"op": "range", "path": ["score"], "min": 1, "max": 9},
+}
+
+test_a_substitute_that_reads_the_wrong_kind_of_value_gives_the_row_its_cause if {
+	cause_of({"score": "high"}, with_range_substitute) == "unusable"
+}
+
+test_a_substitute_that_is_only_missing_leaves_the_cause_of_the_main_check if {
+	cause_of({"reviewed": false}, with_range_substitute) == "value"
+	cause_of({"reviewed": null}, with_range_substitute) == "null"
+}
+
+test_a_substitute_that_reads_the_wrong_kind_of_value_stops_a_filter_ruling_a_subject_out if {
+	rep := report({"items": [{"id": "a", "production": false, "score": "high"}]}, {"s": {
+		"subject_type": "thing",
+		"from": ["items"],
+		"id": ["id"],
+		"applies_to": {"in_scope": {
+			"op": "equals",
+			"path": ["production"],
+			"value": true,
+			"substitute": {"op": "range", "path": ["score"], "min": 1, "max": 9},
+		}},
+		"checks": {"c": {"op": "equals", "path": ["signed"], "value": true}},
+	}})
+	rep.requirements.s.status == "not_met"
+}
+
+test_a_substitute_that_reads_the_same_path_shows_it_once if {
+	inputs_of({"reviewed": true}, {"op": "equals", "path": ["reviewed"], "value": true, "substitute": {"op": "present", "path": ["reviewed"]}}) == [{"name": "reviewed", "value": true}]
 }
 
 test_a_substitute_renders_both_sides if {
@@ -3122,6 +3159,57 @@ test_a_problem_inside_a_check_is_named_by_where_it_sits if {
 	]
 }
 
+test_a_path_that_is_not_a_list_is_written_wrong_even_when_it_names_one_key if {
+	every path in ["state", "$$input", 3, {"a": 1}] {
+		row_in({}, {"id": 1, "state": "OPEN", "$$input": "OPEN"}, {"op": "equals", "path": path, "value": "OPEN"}).cause == "ill_formed"
+	}
+}
+
+test_a_path_that_is_not_a_list_is_ill_formed_even_on_a_subject_that_is_not_an_object if {
+	row_in({}, "str", {"op": "present", "path": {"a": 1}}).cause == "ill_formed"
+}
+
+test_the_expression_of_a_check_whose_path_is_not_a_list_says_the_path_is_invalid if {
+	every path in ["state", 3, {"a": 1}] {
+		expression_in({}, {"id": 1, "state": "OPEN"}, {"op": "present", "path": path}) == "<invalid path> is present"
+		expression_in({}, {"id": 1, "state": "OPEN"}, {"op": "in", "path": path, "values": ["a"]}) == "<invalid path> in [\"a\"]"
+	}
+}
+
+test_a_compare_time_whose_sides_are_not_lists_reads_nothing if {
+	row_in({}, {"id": 1, "a": "2026-01-01T00:00:00Z"}, {"op": "compare_time", "left": "a", "right": ["a"], "cmp": "eq"}).inputs == []
+	row_in({}, {"id": 1, "a": "2026-01-01T00:00:00Z"}, {"op": "compare_time", "left": ["a"], "right": "a", "cmp": "eq"}).inputs == []
+}
+
+test_a_check_whose_path_is_not_a_list_reads_nothing if {
+	row_in({}, {"id": 1, "state": "OPEN"}, {"op": "present", "path": "state"}).inputs == []
+}
+
+test_a_custom_input_that_is_not_a_list_is_a_step_that_cannot_be_a_key if {
+	rep := report({"items": [{"id": 1, "n": 2}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "even", "path": ["n"], "expression": "n is even", "inputs": [true]}}}})
+	problem_inputs(rep) == [{"name": "checks.c", "value": ["step that can't be a key in inputs"]}]
+}
+
+test_well_formed_says_which_path_is_not_a_list if {
+	rep := report({"items": [{"id": 1}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {
+		"c": {"op": "even", "left": "a", "right": ["b"]},
+		"d": {"op": "even", "left": ["a"], "right": 1},
+		"e": {"op": "all", "path": ["xs"], "each": "a", "check": {"op": "equals", "path": [], "value": 1}},
+		"f": {"op": "present", "path": "a"},
+	}}})
+	problem_inputs(rep) == [
+		{"name": "checks.c", "value": ["left not a list"]},
+		{"name": "checks.d", "value": ["right not a list"]},
+		{"name": "checks.e", "value": ["each not a list"]},
+		{"name": "checks.f", "value": ["path not a list"]},
+	]
+}
+
+test_well_formed_says_which_option_is_not_a_list if {
+	rep := report({"items": [{"id": 1}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "any_of", "options": {"standard": {"a": {"op": "present", "path": ["a"]}}, "other": []}}}}})
+	problem_inputs(rep) == [{"name": "checks.c", "value": ["empty option other", "option standard not a list"]}]
+}
+
 test_a_check_with_several_problems_lists_them_in_order if {
 	rep := report({"items": [{"id": 1}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "range", "path": ["n", 1e400], "min": 9, "max": 1}}}})
 	problem_inputs(rep) == [{"name": "checks.c", "value": ["min above max", "number out of range", "step that can't be a key in path"]}]
@@ -3894,15 +3982,13 @@ test_inputs_written_as_an_object_come_out_in_key_order if {
 	[i.name | some i in inputs_of({"a": 1, "b": 2, "c": 3, "d": 4}, check)] == ["a", "b", "d", "c"]
 }
 
-test_an_option_written_as_an_object_is_rendered_in_key_order if {
+test_an_option_written_as_an_object_is_shown_as_invalid if {
 	check := {"op": "any_of", "options": {"o": {
 		"alpha": {"op": "present", "path": ["a"]},
 		"beta": {"op": "present", "path": ["b"]},
-		"gamma": {"op": "present", "path": ["c"]},
-		"delta": {"op": "present", "path": ["d"]},
 	}}}
-	rendered({}, check) == "one of: o(a is present and b is present and d is present and c is present)"
-	rendered({"xs": []}, {"op": "all", "path": ["xs"], "check": check}) == "every xs: one of: o(a is present and b is present and d is present and c is present)"
+	rendered({}, check) == "one of: o(<invalid option>)"
+	rendered({"xs": []}, {"op": "all", "path": ["xs"], "check": check}) == "every xs: one of: o(<invalid option>)"
 }
 
 test_an_op_that_is_not_a_string_is_written_as_json_in_every_runtime if {
@@ -5067,26 +5153,6 @@ test_a_custom_op_reads_a_ref_with_arg if {
 	refs_in({"params": {"m": 2}}, {"id": 1, "n": 4}, check) == [{"name": "$$input.params.m", "value": 2}]
 }
 
-test_a_path_written_as_a_string_reads_that_one_key if {
-	row_in({}, {"id": 1}, {"op": "present", "path": "state"}).passed == false
-	row_in({}, {"id": 1}, {"op": "present", "path": "state"}).cause == "value"
-	row_in({}, {"id": 1, "state": "OPEN"}, {"op": "equals", "path": "state", "value": "OPEN"}).passed == true
-	row_in({}, {"id": 1}, {"op": "present", "path": 3}).passed == false
-}
-
-test_a_path_written_as_an_object_reads_nothing if {
-	r := row_in({}, {"id": 1, "a": 1}, {"op": "present", "path": {"a": 1}})
-	[r.passed, r.cause] == [false, "absent"]
-}
-
-test_a_string_that_starts_with_two_dollars_is_not_a_name_when_it_is_the_whole_path if {
-	row_in({"mode": "strict"}, {"id": 1, "$$input": "own"}, {"op": "equals", "path": "$$input", "value": "own"}).passed == true
-}
-
-test_a_path_written_as_an_object_on_a_subject_that_is_not_an_object_is_not_an_object if {
-	row_in({}, "str", {"op": "present", "path": {"a": 1}}).cause == "not_an_object"
-}
-
 suite_doc := {"build": {"test_runs": {
 	"unit-test": {"result": "passed"},
 	"smoke-test": {"result": "failed"},
@@ -5911,6 +5977,49 @@ test_params_that_are_missing_fail_closed if {
 	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "null", [{"name": "licences", "value": ["MIT"]}]]] with data.params as {"banned": null}
 }
 
+test_a_present_check_on_a_param_fails_as_absent_when_the_params_are_not_an_object if {
+	check := {"op": "present", "path": ["$$params", "x"]}
+	every params in ["not an object", 1, null, [1]] {
+		params_rows({"items": [{"id": 1}]}, check) == [[false, "absent", [{"name": "$$params.x", "value": null}]]] with data.params as params
+	}
+	params_rows({"items": [{"id": 1}]}, check) == [[false, "value", [{"name": "$$params.x", "value": null}]]] with data.params as {}
+}
+
+test_a_missing_check_on_a_param_fails_as_absent_when_the_params_are_not_an_object if {
+	check := {"op": "missing", "path": ["$$params", "x"]}
+	every params in ["not an object", 1, null, [1]] {
+		params_rows({"items": [{"id": 1}]}, check) == [[false, "absent", [{"name": "$$params.x", "value": null}]]] with data.params as params
+	}
+	params_rows({"items": [{"id": 1}]}, check) == [[true, "satisfied", [{"name": "$$params.x", "value": null}]]] with data.params as {}
+}
+
+test_a_present_filter_on_a_param_fails_the_requirement_when_the_params_are_not_an_object if {
+	req := {"s": {
+		"from": ["items"],
+		"id": ["id"],
+		"applies_to": {"f": {"op": "present", "path": ["$$params", "x"]}},
+		"checks": {"c": {"op": "present", "path": ["id"]}},
+	}}
+	rep := report({"items": [{"id": 1}]}, req) with data.params as "not an object"
+	rep.requirements.s.status == "not_met"
+	rows_for(rep, "s", "$applies")[0].cause == "absent"
+}
+
+test_the_applies_row_lists_each_field_its_filters_read_once_in_name_order if {
+	req := {"s": {
+		"from": ["items"],
+		"id": ["id"],
+		"applies_to": {
+			"a": {"op": "present", "path": ["status"]},
+			"b": {"op": "equals", "path": ["status"], "value": "open"},
+			"c": {"op": "present", "path": ["kind"]},
+		},
+		"checks": {"c": {"op": "present", "path": ["id"]}},
+	}}
+	rep := report({"items": [{"id": 1, "status": "open", "kind": "x"}]}, req)
+	[i.name | some i in rows_for(rep, "s", "$applies")[0].inputs] == ["kind", "status"]
+}
+
 test_the_report_never_reads_data_params if {
 	check := {"op": "equals", "path": ["name"], "value": {"ref": ["$$params", "artifact_name"]}}
 	rep := ergo.report({"items": [{"id": 1, "name": "app"}]}, lifted(params_req(check)), {"artifact_name": "app"}) with data.params as {"artifact_name": "web"}
@@ -6522,10 +6631,6 @@ test_an_empty_list_in_a_filter_rules_subjects_out_because_nobody_can_be_meant if
 		rep.requirements.s.status == "not_applicable"
 		[r.cause | some r in rows_for(rep, "s", "$applies")] == ["value"]
 	}
-}
-
-test_an_each_written_as_one_key_still_reads_the_inner_lists if {
-	verdict({"xs": [{"a": [1]}]}, {"op": "all", "path": ["xs"], "each": "a", "check": {"op": "equals", "path": [], "value": 1}}) == true
 }
 
 test_a_range_with_equal_bounds_is_well_written if {

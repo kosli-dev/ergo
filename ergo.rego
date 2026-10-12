@@ -867,10 +867,6 @@ _keys_of(path) := ks if {
 	count(ks) == count(path)
 }
 
-_keys_of(path) := [path] if is_string(path)
-
-_keys_of(path) := [path] if is_number(path)
-
 _keys_of(path) := ks if {
 	_named(path)
 	rest := array.slice(path, 1, count(path))
@@ -1322,6 +1318,7 @@ _leaf_op_passed("non_empty_string", check, subj) if {
 
 _leaf_op_passed("missing", check, subj) if {
 	_missing_at(subj, check.path)
+	not _params_not_given(check.path)
 }
 
 _leaf_op_passed("empty", check, subj) if {
@@ -1693,7 +1690,7 @@ _nested_ops := {
 	"where": [_leaf_ops],
 }
 
-_field_problems(node) := union({_side_problem(node), _within_problem(node), _wording_problem(node), _unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _each_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node), _json_problem(node)})
+_field_problems(node) := union({_side_problem(node), _within_problem(node), _wording_problem(node), _unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node), _json_problem(node)})
 
 _json_problem(node) := _json_problems(object.remove(_own_fields(node), ["meta"]))
 
@@ -1845,12 +1842,6 @@ _misplaced_fields_problem(node) := {concat("", [f, " can't go here"]) |
 	f in object.keys(node)
 }
 
-_each_problem(node) := {"invalid each" |
-	_quantified(node)
-	"each" in object.keys(node)
-	not _path_shaped(node.each)
-}
-
 _options_problem(node) := {"invalid options" |
 	_combinator(node)
 	"options" in object.keys(node)
@@ -1867,7 +1858,12 @@ _empty_option_problem(node) := {concat("", ["empty option ", _text(nm)]) |
 	_combinator(node)
 	_option_list(node.options)
 	some nm, group in node.options
-	not _filled_list(group)
+	group == []
+} | {concat("", ["option ", _text(nm), " not a list"]) |
+	_combinator(node)
+	_option_list(node.options)
+	some nm, group in node.options
+	not is_array(group)
 }
 
 _out_of_range_problem(node) := {"number out of range" | _out_of_range(_own_fields(node))}
@@ -1894,16 +1890,28 @@ _valid_patterns(v) if {
 
 _own_fields(node) := object.remove(node, ["check", "options", "substitute"])
 
-_step_problems(node) := {concat("", ["step that can't be a key in ", f]) |
+_step_problems(node) := {concat("", [f, " not a list"]) |
+	some f in ["path", "left", "right", "each"]
+	f in object.keys(node)
+	not _side_field(node, f)
+	not _checked_as_side(node, f)
+	not is_array(node[f])
+} | {concat("", ["step that can't be a key in ", f]) |
 	some f in ["path", "left", "right", "each", "inputs"]
 	some p in _own_paths(node, f)
 	_badly_stepped(p)
+}
+
+_checked_as_side(node, f) if {
+	node.op == "compare_time"
+	f in {"left", "right"}
 }
 
 _own_paths(node, f) := [node[f]] if {
 	f != "inputs"
 	f in object.keys(node)
 	not _side_field(node, f)
+	is_array(node[f])
 }
 
 _own_paths(node, f) := _side_paths(node[f]) if _side_field(node, f)
@@ -2015,18 +2023,9 @@ _node_param_broken(node) if {
 	not _valid_patterns(v)
 }
 
-_path_shaped(p) if is_array(p)
-
-_path_shaped(p) if is_string(p)
-
 _option_list(options) if is_object(options)
 
 _option_list(options) if is_array(options)
-
-_filled_list(group) if {
-	is_array(group)
-	count(group) > 0
-}
 
 _valid_pattern(p) if {
 	is_string(p)
@@ -2268,6 +2267,7 @@ _any_read_state(subj, path) := "not_an_object" if {
 	start := _start_of(subj, path)
 	not is_object(start)
 	not _reads_itself(path)
+	not _params_not_given(path)
 }
 
 _reads_itself(path) if _keys_of(path) == []
@@ -2313,15 +2313,17 @@ _is_collection(v) if is_object(v)
 
 _cause_precedence := ["ill_formed", "not_an_object", "ambiguous", "unmatched", "unusable", "absent", "null"]
 
-_worst_read(subj, check) := _worst_or_value(_check_states(check, subj) | _substitute_unusable(check, subj)) if not _unreadable_ref(check)
+_worst_read(subj, check) := _worst_or_value(_check_states(check, subj) | _substitute_problems(check, subj)) if not _unreadable_ref(check)
 
 _worst_or_value(states) := c if {
 	c := _worst_of(states)
 } else := "value"
 
-_substitute_unusable(check, subj) := {"unusable" |
-	some leaf in _element_leaves(_substitute_of(check))
-	_unusable(leaf, subj)
+_substitute_problems(check, subj) := {c |
+	sub := _substitute_of(check)
+	is_object(sub)
+	some c in _check_states(sub, subj)
+	not c in {"absent", "null", "missing", "value"}
 }
 
 default _has_inputs(_) := false
@@ -2380,6 +2382,12 @@ _asks_presence(check, x) if {
 	check.op == "present"
 	_keys_of(check.path)
 	_ := _start_of(x, check.path)
+	not _params_not_given(check.path)
+}
+
+_params_not_given(path) if {
+	path[0] == "$$params"
+	not is_object(data.ergo_params)
 }
 
 _presence_state(s) := "missing" if s in {"absent", "null"}
@@ -2632,7 +2640,8 @@ _answers_presence(check, subj, "") if {
 	_keys_of(check.path)
 	_ := _start_of(subj, check.path)
 	not _unreadable_ref(check)
-	_substitute_unusable(check, subj) == set()
+	not _params_not_given(check.path)
+	_substitute_problems(check, subj) == set()
 	_read_state(subj, check.path) in {"absent", "null"}
 }
 
@@ -2662,7 +2671,12 @@ _leaf_describe(check, item) := concat("", [n, " >= ", _param_text(check, "min"),
 	n := _path_text(item, check, "path")
 }
 
-_path_text(item, check, f) := _item_path_name(item, check[f]) if f in object.keys(check)
+_path_text(item, check, f) := _item_path_name(item, check[f]) if is_array(object.get(check, f, null))
+
+_path_text(_, check, f) := concat("", ["<invalid ", f, ">"]) if {
+	f in object.keys(check)
+	not is_array(check[f])
+}
 
 _path_text(_, check, f) := concat("", ["<missing ", f, ">"]) if not f in object.keys(check)
 
@@ -2830,7 +2844,7 @@ _expression_of(check, _) := "one of: <missing options>" if {
 	not "options" in object.keys(check)
 }
 
-_expression_of(check, item) := concat("", ["one of: ", concat(" | ", sort([concat("", [_text(nm), "(", concat(" and ", [_top_option_describe(group[k], item) | some k in _names(group)]), ")"]) | some nm, group in check.options]))]) if {
+_expression_of(check, item) := _one_of([_option_text(nm, group, [_top_option_describe(group[k], item) | some k in _names(group)]) | some nm, group in check.options]) if {
 	not _written_expression(check)
 	check.op == "any_of"
 	"options" in object.keys(check)
@@ -2865,7 +2879,7 @@ _element_describe(check, item, _) := _nested_describe(check, item) if {
 	not _quantified(check)
 }
 
-_element_describe(check, item, given) := concat("", ["one of: ", concat(" | ", sort([concat("", [_text(nm), "(", concat(" and ", [_element_option_describe(group[k], item, given) | some k in _names(group)]), ")"]) | some nm, group in check.options]))]) if _combinator(check)
+_element_describe(check, item, given) := _one_of([_option_text(nm, group, [_element_option_describe(group[k], item, given) | some k in _names(group)]) | some nm, group in check.options]) if _combinator(check)
 
 _element_describe(check, item, given) := _element_list_describe(check, item, given) if _quantified(check)
 
@@ -2895,9 +2909,22 @@ _inner_describe(check, item) := _any_of_describe(check, item) if _combinator(che
 
 _inner_describe(check, _) := "<nested too deep>" if _quantified(check)
 
-_any_of_describe(check, item) := concat("", ["one of: ", concat(" | ", sort([_variant_describe(nm, group, item) | some nm, group in check.options]))])
+_any_of_describe(check, item) := _one_of([_option_text(nm, group, [_inner_option_describe(group[k], item) | some k in _names(group)]) | some nm, group in check.options])
 
-_variant_describe(nm, group, item) := concat("", [_text(nm), "(", concat(" and ", [_inner_option_describe(group[k], item) | some k in _names(group)]), ")"])
+_one_of(parts) := "one of: <empty options>" if count(parts) == 0
+
+_one_of(parts) := concat("", ["one of: ", concat(" | ", sort(parts))]) if count(parts) > 0
+
+_option_text(nm, group, texts) := concat("", [_text(nm), "(", _option_body(group, texts), ")"])
+
+_option_body(group, _) := "<invalid option>" if not is_array(group)
+
+_option_body([], _) := "<empty option>"
+
+_option_body(group, texts) := concat(" and ", texts) if {
+	is_array(group)
+	count(group) > 0
+}
 
 _inner_option_describe(leaf, item) := _nested_describe(leaf, item) if not _quantified(leaf)
 
@@ -2926,6 +2953,8 @@ _check_inputs(subj, check, item) := [
 ] if {
 	not check.inputs
 	check.op == "compare_time"
+	is_array(check.left)
+	is_array(check.right)
 }
 
 _check_inputs(subj, check, item) := array.concat(_side_inputs(subj, object.get(check, "left", null), item), _side_inputs(subj, object.get(check, "right", null), item)) if {
@@ -3025,7 +3054,7 @@ _check_inputs(subj, check, item) := [{"name": _item_path_name(item, check.path),
 	not _two_sided(check)
 	not _quantified(check)
 	not _combinator(check)
-	check.path
+	is_array(check.path)
 }
 
 _check_inputs(subj, check, item) := [{"name": r[0], "value": r[1]} | some r in sort(_any_of_reads(subj, check, item))] if {
@@ -3048,10 +3077,12 @@ _leaf_paths(leaf) := [leaf.path] if {
 
 _row_inputs(subj, check, item) := _check_inputs(subj, check, item) if not check.substitute
 
-_row_inputs(subj, check, item) := array.concat(
+_row_inputs(subj, check, item) := _once(array.concat(
 	_check_inputs(subj, check, item),
 	_check_inputs(subj, check.substitute, item),
-) if check.substitute
+)) if check.substitute
+
+_once(xs) := [x | some i, x in xs; not x in array.slice(xs, 0, i)]
 
 _check_def(check, item) := _with_refs(object.union(object.remove(_described(check, item), {"description", "meta"}), {"description": _reported_description(check), "meta": _reported_meta(check)}), check)
 
@@ -3354,8 +3385,13 @@ _applies_rows(_, _, _, req, _, _, _) := [] if {
 }
 
 _applies_inputs(subj, req, item) := [inp |
-	some name in _applies_to_names(req)
-	some inp in _inputs_in(req, _applies_to_of(req)[name], subj, item)
+	read := {inp |
+		some name in _applies_to_names(req)
+		some inp in _inputs_in(req, _applies_to_of(req)[name], subj, item)
+	}
+	some name in sort({inp.name | some inp in read})
+	some inp in read
+	inp.name == name
 ]
 
 _evaluation(doc, req, name) := {

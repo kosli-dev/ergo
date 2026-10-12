@@ -371,7 +371,7 @@ The expression says where the value comes from. What it was goes in the check's 
 
 Params are the third argument to `ergo.report`. ergo doesn't look for them anywhere else, so the policy that calls it picks where they come from. Reading them from `data.params`, as in [Policies](#policies), means `opa eval -d params.json` passes them in when the file holds `{"params": ...}`, and a test can write `with data.params as {...}`.
 
-Params aren't part of the document, so `$$input.params` doesn't reach them, and `$$params` doesn't read the document. With params of `{}`, or params that aren't an object, every `$$params` read fails as `absent`. ergo has no defaults, so a policy run without its params fails instead of checking something nobody configured.
+Params aren't part of the document, so `$$input.params` doesn't reach them, and `$$params` doesn't read the document. With params of `{}`, or params that aren't an object, every `$$params` read fails as `absent`. When the params aren't an object, that includes `present`, which otherwise fails a missing field as `value`, and `missing`, which otherwise passes. So a `present` or `missing` check on a param fails, and a filter like that fails the requirement instead of deciding the scope. ergo has no defaults, so a policy run without its params fails instead of checking something nobody configured.
 
 Some things worth knowing:
 
@@ -545,7 +545,7 @@ Some things worth knowing:
   - a `compare` side that isn't a path, a `literal` or a [derived value](#derived-values) written as below, or a `compare_time` side that isn't a path. The `$well_formed` row says `invalid left` or `invalid right`
   - a `within` that isn't a number of 0 or more, or that's on a `cmp` other than `eq`
   - `values` that isn't a list, an empty `values` for `includes` or `excludes`, both `value` and `values`, a `min` or `max` that isn't a number, a `min` above `max`, or `patterns` that isn't a list of valid regular expressions
-  - an `each` that isn't a path, or `as` or `each` on an operator other than `all` or `any`
+  - a `path`, an `each` or, on other operators than `compare` and `compare_time`, a `left` or `right` that isn't a list, even a string like `"state"` that names one key, or `as` or `each` on an operator other than `all` or `any`. The `$well_formed` row says `path not a list` (or `each not a list`), and the check's row has no `inputs`
   - a step that can't be a [key](#paths), a number out of range, a badly written [ref](#reading-from-the-input), a ref or `literal` deeper inside a value than ergo reads, or a path that starts with a [name](#naming-subjects) nothing gave
   - an `all` or `any` [nested](#nesting) too deep, or a name given twice or badly written
   - a check that isn't an object, or one where it can't go, like a custom operator inside `all`
@@ -553,7 +553,7 @@ Some things worth knowing:
   - a set, or an object key that isn't a string, anywhere in the check or in a selector in `from` or `id`. Rego can write both, but JSON can't hold either. The `$well_formed` row shows `holds a set` or `holds a key that isn't a string`.
   - a `description` that isn't a string, or a `meta` that isn't an object or holds something JSON can't, as on a [requirement](#requirements). A `null` one counts as not written. This holds for a custom operator too, and for a check inside another one. The expression doesn't show it, but the `$well_formed` row does, as `invalid description`, `invalid meta`, `meta holds a set` or `meta holds a key that isn't a string`. A number in `meta` that's out of range shows as `number out of range`.
 
-  The expression says what's wrong: `<unknown op nope>`, `<missing op>`, `<invalid check>` for a check that isn't an object, `<even can't go here>` for a check where it can't go, or `<missing value>` in place of a missing parameter, as in `state == <missing value>`. The [`$well_formed` row](#checks-ergo-adds) lists each check that's written wrong, and what's wrong with it.
+  The expression says what's wrong: `<unknown op nope>`, `<missing op>`, `<invalid check>` for a check that isn't an object, `<even can't go here>` for a check where it can't go, `<missing value>` in place of a missing parameter, as in `state == <missing value>`, or `<invalid path>` in place of a `path`, `left` or `right` that isn't a list, as in `<invalid path> is present`. The [`$well_formed` row](#checks-ergo-adds) lists each check that's written wrong, and what's wrong with it.
 
   A [`ref`](#reading-from-the-input) that reads the wrong kind of value from the params, like `values` read from a param that holds `3`, or an empty list read as the `values` of `includes` or `excludes`, isn't a mistake in the policy, so it doesn't fail `$well_formed`. The check fails with cause `unusable`.
 - A field with the wrong kind of value for the operator fails with cause `unusable`, not `value`: a field that isn't a number for `range`, isn't a string for `matches_any` or `not_matches_any`, or isn't a list for `includes`, `excludes`, `all` or `any`, two fields of different types for `compare`, or anything but two timestamps in the same format for `compare_time`. So a filter fails the requirement instead of quietly ruling the subject out. `equals` and `in` are different: `"5"` isn't `5`, which is a sound answer, so that fails with `value`. So does `non_empty_string` on a number, since checking the type is its job.
@@ -831,7 +831,7 @@ This is the only way to say that two fields must agree with each other. Two sepa
 
 - Name your options. The names show up in the rendered expression: `one of: safe(type == "Chore") | standard(type == "Story" and state == "Done")`. A list of options works too, and they're shown by position.
 - Options can hold basic checks and `all` or `any`, but not another `any_of`, because Rego doesn't allow recursion. An `all` or `any` in an option counts as being where the `any_of` is, so it can nest as deep as it could there (see [Nesting](#nesting)).
-- An empty `options` is written wrong, and so is an empty option, an option written as an object instead of a list, or an `any_of` inside an option. Each fails `$well_formed`, and the check fails with cause `ill_formed`.
+- An empty `options` is written wrong, and so is an empty option, an option written as an object instead of a list, or an `any_of` inside an option. Each fails `$well_formed`, and the check fails with cause `ill_formed`. The expression shows `one of: <empty options>`, `standard(<empty option>)` or `standard(<invalid option>)`, and `$well_formed` says `empty options`, `empty option standard` or `option standard not a list`.
 - To let a missing field pass, give `missing` an option of its own. "No label is `do-not-merge`" then passes on a pull request with no `labels`, and renders as `one of: clean(not contains(labels, "do-not-merge")) | no_labels(labels is missing)`:
 
   ```rego
@@ -872,7 +872,8 @@ That's different from `applies_to`. A subject left out by `applies_to` isn't cov
 - Substitutes work on checks in `checks` and in `applies_to`. They're ignored on the inner check of `all` and `any`, and on the checks inside an `any_of` option.
 - A substitute's own substitute is ignored.
 - The rendered expression shows both: `reviewed == true, or substitute: verified == true`.
-- When both fail, the row's cause is about the main check, not the substitute.
+- When both fail, the row takes the worse of the two causes, except that the substitute's `absent`, `null` and `value` don't count, because substitutes are usually missing. So a substitute whose selector matches nothing or several items, whose path runs into the wrong kind of value, or that compares values of the wrong kind gives the row its cause, and in `applies_to` it stops the filter ruling the subject out.
+- The row shows the check's inputs, then the substitute's, leaving out a path already shown.
 
 A substitute with a wrong path looks just like a substitute whose evidence is missing: it's never used, and the main check keeps failing. Test each substitute with an input that should pass on it.
 
@@ -1174,7 +1175,7 @@ When a check reads several fields, the row shows the first cause in this table's
 - For `all` and `any`, a list that isn't there gives `absent`, and one that isn't a list gives `unusable`. An empty list gives `value`, since it was read fine and just has nothing in it. Otherwise the cause is the first, in this table's order, among the items that failed. So when one approver is a bot and another has no `username`, a check that some approver isn't a bot fails as `absent`, because the second one might not be. An `any_of` works the same way across its options, and so does `each` across its inner lists.
 - For a custom operator, the cause is worked out from its `inputs`, or from its `path` if it has no `inputs`. With neither, the cause is always `value`.
 - A built-in operator can have `inputs` too, to choose what its row shows, but its cause still comes from what the check reads. So `{"op": "equals", "path": ["a"], "value": 1, "inputs": [["b"]]}` fails as `absent` when `a` is missing, whatever `b` holds.
-- `$well_formed` and `$min_subjects` don't read the subject, so their cause is `satisfied` or `value`, except that `$min_subjects` fails as `absent`, `null` or `unusable` when a ref in `from` or `keys` can't be read, or when `from` doesn't lead to a list or an object. `$applies` reports the state of the fields read by the filters that failed. For example, a subject whose filter field is missing says `absent`, and that fails the requirement. A filter that's written wrong gives `ill_formed`, even when another filter rules the subject out, because the scope can't be trusted.
+- `$well_formed` and `$min_subjects` don't read the subject, so their cause is `satisfied` or `value`, except that `$min_subjects` fails as `absent`, `null` or `unusable` when a ref in `from` or `keys` can't be read, or when `from` doesn't lead to a list or an object. `$applies` reports the state of the fields read by the filters that failed. Its `inputs` list each field its filters read once, sorted by name, so two filters on `status` show `status` once. For example, a subject whose filter field is missing says `absent`, and that fails the requirement. A filter that's written wrong gives `ill_formed`, even when another filter rules the subject out, because the scope can't be trusted.
 
 ## Violations
 
