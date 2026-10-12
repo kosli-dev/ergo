@@ -8025,6 +8025,8 @@ test_a_sentence_written_wrong_says_what_is_wrong if {
 	_read(`x is "a	b"`) == {"problems": ["invalid string at column 6"]}
 	_read(`x is 'a	b'`) == {"problems": ["invalid string at column 6"]}
 	_read(`"\q" is 1`) == {"problems": ["invalid string at column 1"]}
+	_read(`x is "\q" and y is "\q"`) == {"problems": ["invalid string at column 20", "invalid string at column 6"]}
+	_read(`x is 'a"\q"b' and y is "\q"`) == {"problems": ["invalid string at column 24"]}
 	_read(`x is "cost $usd" and`) == {"problems": ["doesn't parse"]}
 	_read(`$foo is $bar and $foo exists`) == {"problems": ["unknown name $bar", "unknown name $foo"]}
 	_read(`some x, if any, is 1`) == {"problems": ["if any can't go with some"]}

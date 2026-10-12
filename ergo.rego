@@ -4295,7 +4295,12 @@ _s_problems(text, pat) := [concat("", ["unclosed quote at column ", _json_text(c
 	closed := regex.find_all_string_submatch_n(pat.quotes, text, 1)[0][0]
 	count(closed) < count(text)
 } else := invalid if {
-	invalid := [concat("", ["invalid string at column ", _json_text(indexof(text, m[0]) + 1)]) | some m in regex.find_all_string_submatch_n(pat.strings, text, -1); not regex.match(pat.string, m[0])]
+	tokens := [m[0] | some m in regex.find_all_string_submatch_n(concat("", [pat.strings, `|[^"']+`]), text, -1)]
+	invalid := [concat("", ["invalid string at column ", _json_text(count(concat("", array.slice(tokens, 0, i))) + 1)]) |
+		some i, token in tokens
+		regex.match(`^["']`, token)
+		not regex.match(pat.string, token)
+	]
 	count(invalid) > 0
 } else := problems if {
 	problems := _s_sentence_problems(_s_parsed_anyway(text, pat))
