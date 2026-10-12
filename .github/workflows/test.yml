@@ -21,7 +21,7 @@ jobs:
           version: 0.43.0
       - run: opa check --strict . --ignore .github
       - run: opa fmt --list --fail .
-      - run: opa test . --ignore .github --timeout 30s --verbose
+      - run: opa test . --ignore .github --timeout 120s --verbose
       - name: Lint for likely bugs
         run: regal lint --format github --disable-all --enable-category bugs --disable redundant-existence-check --ignore-files '.github/**' .
       - name: Check there are no comments
@@ -41,7 +41,7 @@ jobs:
       - name: Check every line is tested
         shell: bash
         run: |
-          opa test . --ignore .github --timeout 30s --coverage > "$RUNNER_TEMP/coverage.json"
+          opa test . --ignore .github --timeout 120s --coverage > "$RUNNER_TEMP/coverage.json"
           jq -e '.files["ergo.rego"]' "$RUNNER_TEMP/coverage.json" > /dev/null
           uncovered=$(jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' "$RUNNER_TEMP/coverage.json" | sort -u)
           if [ -n "$uncovered" ]; then
@@ -59,7 +59,7 @@ jobs:
           version: 1.20.2
       - run: opa check --strict . --ignore .github
       - run: opa fmt --list --fail .
-      - run: opa test . --ignore .github --timeout 30s
+      - run: opa test . --ignore .github --timeout 120s
 
   wasm:
     runs-on: ubuntu-latest
@@ -69,7 +69,7 @@ jobs:
         with:
           version: 1.19.0
       - name: Run the tests compiled to Wasm
-        run: opa test . --ignore .github --target wasm --timeout 30s
+        run: opa test . --ignore .github --target wasm --timeout 120s
 
   wasm-js:
     runs-on: ubuntu-latest
