@@ -7995,6 +7995,8 @@ test_the_report_prints_one_spelling_for_each_phrase if {
 	_printed(`some x where count of y is 1 is 2`) == "some x where count of y is 1 is 2"
 	_printed(`count of x where n is 1 is 2`) == "count of x where n is 1 is 2"
 	_printed(`sum of x.n plus 1 plus count of y is 2`) == "sum of x.n plus 1 plus count of y is 2"
+	_printed(`count of x[0] is 1 and y equals sum of z[1].n`) == "count of item 1 of x is 1 and y equals sum of z[1].n"
+	_read(_printed(`count of x[0] is 1`)) == _read(`count of x[0] is 1`)
 }
 
 test_a_for_line_reads_its_items if {
@@ -8019,10 +8021,12 @@ test_a_from_line_reads_its_path_keys_and_where if {
 test_a_sentence_written_wrong_says_what_is_wrong if {
 	_read(`x is "a`) == {"problems": ["unclosed quote at column 6"]}
 	_read(`x is 'a' and y is 'b`) == {"problems": ["unclosed quote at column 19"]}
-	_read(`x is "\q"`) == {"problems": [`invalid string "\q"`]}
-	_read(`x is "a	b"`) == {"problems": [`invalid string "a	b"`]}
-	_read(`x is 'a	b'`) == {"problems": [`invalid string 'a	b'`]}
-	_read(`"\q" is 1`) == {"problems": [`invalid string "\q"`]}
+	_read(`x is "\q"`) == {"problems": ["invalid string at column 6"]}
+	_read(`x is "a	b"`) == {"problems": ["invalid string at column 6"]}
+	_read(`x is 'a	b'`) == {"problems": ["invalid string at column 6"]}
+	_read(`"\q" is 1`) == {"problems": ["invalid string at column 1"]}
+	_read(`x is "cost $usd" and`) == {"problems": ["doesn't parse"]}
+	_read(`$foo is $bar and $foo exists`) == {"problems": ["unknown name $bar", "unknown name $foo"]}
 	_read(`some x, if any, is 1`) == {"problems": ["if any can't go with some"]}
 	_read(`every x some y is 1`) == {"problems": ["two quantifiers in one sentence: put them on a for line"]}
 	_read(`count is 1`) == {"problems": ["count is a word of the grammar: write .count"]}
@@ -8038,7 +8042,7 @@ test_a_sentence_written_wrong_says_what_is_wrong if {
 	_read(`commits[01] is "x"`) == {"problems": ["doesn't parse"]}
 	_read(`$foo is 1`) == {"problems": ["unknown name $foo"]}
 	_read(`x is $params`).assertions[0].phrase.terms == [{"start": "params", "steps": []}]
-	_read(`every commits.signed`) == {"problems": ["nothing after the path at column 21: expected a phrase, like is or exists"]}
+	_read(`every commits.signed`) == {"problems": [`nothing after the path at column 21: expected a phrase, like "is" or "exists"`]}
 	_read(`sum of stages.usd equals total within`) == {"problems": [`"within" needs a number after it`]}
 	_read(`every  pull_requests  some approvers.state is "APPROVED"`) == {"problems": ["two quantifiers in one sentence: put them on a for line"]}
 	_read(`x is equal to 1 within 2`).assertions[0].phrase == {"op": "is", "value": 1, "within": 2}

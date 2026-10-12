@@ -3943,7 +3943,7 @@ _s_patterns := {
 	"steps": concat("", [`\.(`, key, `|`, dq, `)| +named +by +(`, ref, `)|\[(`, ref, `)\]|\[(`, dq, `)\]|\[(0|[1-9][0-9]*)\]`]),
 	"terms": concat("", [`(`, term, `)(?: +plus +|$)`]),
 	"number": concat("", [`^`, num, `$`]),
-	"derived": concat("", [`^(count|sum) +of +(`, plain, `)$`]),
+	"derived": concat("", [`^(count|sum) +of +(`, path, `)$`]),
 	"value": concat("", [`^`, value, `$`]),
 	"values": concat("", [`^`, values, `$`]),
 	"each_value": value,
@@ -3966,7 +3966,7 @@ _s_patterns := {
 	plain := concat("", [`(?:`, start, `)(?:`, step, `)*`])
 	path := concat("", [`(?:`, pos, `)?`, plain])
 	rpath := concat("", [`(?:`, pos, `)?(?:`, rstart, `)(?:`, step, `)*`])
-	derived := concat("", [`(?:count|sum) +of +`, plain])
+	derived := concat("", [`(?:count|sum) +of +`, path])
 	term := concat("", [`(?:`, derived, `|`, rpath, `|`, num, `)`])
 	terms := concat("", [term, `(?: +plus +`, term, `)*`])
 	left := concat("", [`(?:`, path, `|`, terms, `)`])
@@ -4295,19 +4295,19 @@ _s_problems(text, pat) := [concat("", ["unclosed quote at column ", _json_text(c
 	closed := regex.find_all_string_submatch_n(pat.quotes, text, 1)[0][0]
 	count(closed) < count(text)
 } else := invalid if {
-	invalid := [concat("", ["invalid string ", m[0]]) | some m in regex.find_all_string_submatch_n(pat.strings, text, -1); not regex.match(pat.string, m[0])]
+	invalid := [concat("", ["invalid string at column ", _json_text(indexof(text, m[0]) + 1)]) | some m in regex.find_all_string_submatch_n(pat.strings, text, -1); not regex.match(pat.string, m[0])]
 	count(invalid) > 0
 } else := problems if {
 	problems := _s_sentence_problems(_s_parsed_anyway(text, pat))
 	count(problems) > 0
 } else := names if {
-	names := [concat("", ["unknown name ", m[1]]) | some m in regex.find_all_string_submatch_n(`(?:^|[ ,\[])(\$[A-Za-z_][A-Za-z0-9_]*)`, text, -1); not m[1] in {"$params", "$input"}]
+	names := sort({concat("", ["unknown name ", m[1]]) | some m in regex.find_all_string_submatch_n(`(?:^|[ ,\[])(\$[A-Za-z_][A-Za-z0-9_]*)`, regex.replace(text, pat.strings, ""), -1); not m[1] in {"$params", "$input"}})
 	count(names) > 0
 } else := ["two quantifiers in one sentence: put them on a for line"] if {
 	regex.match(`^(?:every|some) +\S+ +(?:every|some) `, text)
 } else := [`"within" needs a number after it`] if {
 	regex.match(` within$`, text)
-} else := [concat("", ["nothing after the path at column ", _json_text(count(text) + 1), ": expected a phrase, like is or exists"])] if {
+} else := [concat("", ["nothing after the path at column ", _json_text(count(text) + 1), `: expected a phrase, like "is" or "exists"`])] if {
 	regex.match(pat.quantified_path, text)
 } else := ["doesn't parse"]
 
