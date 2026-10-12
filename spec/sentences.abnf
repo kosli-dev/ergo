@@ -1,0 +1,102 @@
+; The grammar of checks written as sentences, in ABNF (RFC 5234).
+; sentences.md says what each form means and what it can't say here.
+; Every quoted string is case-sensitive, as if written with RFC 7405's %s.
+; WS between two words is one space when the report prints a sentence.
+
+; A check is one assertion, or several joined with "and". Under assert:,
+; a YAML list holds one assertion per item and means the same.
+check             = assertion *(WS "and" WS assertion)
+
+assertion         = plain / quantified / derived-assertion
+plain             = path WS phrase
+quantified        = quantifier WS path [WS where] [if-any] WS phrase
+quantifier        = "every" / "some"
+if-any            = "," WS "if any,"
+derived-assertion = derived-left WS compare-phrase
+
+; A for: line walks one or two lists and names each item.
+for-line          = for-item ["," WS for-item]
+for-item          = quantifier WS path [WS where] [if-any] WS "as" WS name
+name              = bare-key
+
+; A subject's from: line.
+from-line         = path [WS "named by each of" WS path] [WS where]
+
+; where keeps the items that pass every condition.
+where             = "where" WS condition *(WS "and" WS condition)
+condition         = path WS phrase / derived WS compare-phrase
+
+; Derived values: count of, sum of, and terms added with plus.
+; Only the last term on the left can carry a where, and none on the right.
+derived           = ("count" / "sum") WS "of" WS plain-path
+term              = right-path / derived / number
+derived-left      = derived [WS where]
+                  / 1*(term WS "plus" WS) (term / derived WS where)
+field             = (right-path / derived) *(WS "plus" WS term)
+                  / number 1*(WS "plus" WS term)
+operand           = value / field
+
+; Phrases. compare-phrase is the subset a derived value can take.
+phrase            = one-of-phrase / exists-phrase / empty-phrase / type-phrase
+                  / contains-phrase / contains-all-phrase / matches-phrase
+                  / starts-phrase / time-phrase / compare-phrase
+compare-phrase    = within-phrase / order-phrase / between-phrase / is-phrase
+
+is-phrase         = ("is not" / "does not equal") WS operand
+                  / ("is equal to" / "equals" / "is") WS operand
+within-phrase     = ("equals" / "is") WS operand WS "within" WS number
+order-phrase      = ("is at least" / "is at most" / "is more than" / "is less than") WS operand
+between-phrase    = "is between" WS number WS "and" WS number
+one-of-phrase     = ("is one of" / "is in") WS list
+                  / ("is not one of" / "is not in") WS list
+exists-phrase     = "exists" / "does not exist"
+empty-phrase      = "is empty" / "is not empty"
+type-phrase       = "is a non-empty string" / "is" WS ("a" / "an") WS type
+type              = "list" / "string" / "number" / "boolean" / "object"
+contains-phrase   = ("contains" / "does not contain") WS operand
+contains-all-phrase = ("contains all of" / "contains none of") WS list
+matches-phrase    = ("matches" / "does not match") WS list
+starts-phrase     = ("starts with" / "ends with") WS operand
+time-phrase       = ("is before" / "is after" / "is on or after" / "is on or before") WS operand
+
+list              = values / right-path
+values            = value *("," WS value)
+value             = string / number / "true" / "false" / "null"
+
+; Paths. The first key of a path, when bare, is never a word of the
+; grammar (sentences.md lists them); "." in front of it lifts that.
+; On the right side of a phrase a quoted string is a value, so a path
+; there can't start with a quoted key unless a "." is in front of it.
+; A position picks one item of the list a path ends at, counting from 1:
+; item 3 of items, first of items, last of items. items[2] is the same
+; item as item 3 of items.
+path              = plain-path / position WS "of" WS plain-path
+plain-path        = start *step
+right-path        = plain-right / position WS "of" WS plain-right
+plain-right       = ("$params" / "$input" / bare-key / "." key) *step
+position          = "item" WS positive / "first" / "last"
+positive          = %x31-39 *DIGIT
+start             = "$params" / "$input" / first-key
+first-key         = bare-key / "." key / quoted-key
+step              = "." key / WS "named by" WS reference
+                  / "[" reference "]" / "[" quoted-key "]" / "[" int "]"
+key               = bare-key / quoted-key
+reference         = ("$params" / "$input") "." key / name
+bare-key          = (ALPHA / "_") *(ALPHA / DIGIT / "_" / "-")
+quoted-key        = dq-string
+
+; Values are written as JSON writes a scalar. A single-quoted string keeps
+; backslashes as written, except before a quote or another backslash.
+string            = dq-string / sq-string
+dq-string         = DQUOTE *dq-char DQUOTE
+dq-char           = %x20-21 / %x23-5B / %x5D-10FFFF / "\" dq-escape
+dq-escape         = DQUOTE / "\" / "/" / "b" / "f" / "n" / "r" / "t" / "u" 4HEXDIG
+sq-string         = "'" *sq-char "'"
+sq-char           = %x20-26 / %x28-5B / %x5D-10FFFF / "\" %x20-10FFFF
+number            = ["-"] int [frac] [exp]
+int               = "0" / (%x31-39 *DIGIT)
+frac              = "." 1*DIGIT
+exp               = ("e" / "E") ["+" / "-"] 1*DIGIT
+
+; ALPHA, DIGIT, HEXDIG, SP and DQUOTE are the core rules of RFC 5234 appendix B.
+WS                = 1*SP
