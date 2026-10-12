@@ -5933,6 +5933,14 @@ test_a_present_check_on_a_param_fails_as_absent_when_the_params_are_not_an_objec
 	params_rows({"items": [{"id": 1}]}, check) == [[false, "value", [{"name": "$$params.x", "value": null}]]] with data.params as {}
 }
 
+test_a_missing_check_on_a_param_fails_as_absent_when_the_params_are_not_an_object if {
+	check := {"op": "missing", "path": ["$$params", "x"]}
+	every params in ["not an object", 1, null, [1]] {
+		params_rows({"items": [{"id": 1}]}, check) == [[false, "absent", [{"name": "$$params.x", "value": null}]]] with data.params as params
+	}
+	params_rows({"items": [{"id": 1}]}, check) == [[true, "satisfied", [{"name": "$$params.x", "value": null}]]] with data.params as {}
+}
+
 test_a_present_filter_on_a_param_fails_the_requirement_when_the_params_are_not_an_object if {
 	req := {"s": {
 		"from": ["items"],

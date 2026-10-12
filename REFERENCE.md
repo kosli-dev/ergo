@@ -371,7 +371,7 @@ The expression says where the value comes from. What it was goes in the check's 
 
 Params are the third argument to `ergo.report`. ergo doesn't look for them anywhere else, so the policy that calls it picks where they come from. Reading them from `data.params`, as in [Policies](#policies), means `opa eval -d params.json` passes them in when the file holds `{"params": ...}`, and a test can write `with data.params as {...}`.
 
-Params aren't part of the document, so `$$input.params` doesn't reach them, and `$$params` doesn't read the document. With params of `{}`, or params that aren't an object, every `$$params` read fails as `absent`. When the params aren't an object, that includes `present`, which otherwise fails a missing field as `value`, so a `present` filter on a param fails the requirement instead of ruling every subject out. ergo has no defaults, so a policy run without its params fails instead of checking something nobody configured.
+Params aren't part of the document, so `$$input.params` doesn't reach them, and `$$params` doesn't read the document. With params of `{}`, or params that aren't an object, every `$$params` read fails as `absent`. When the params aren't an object, that includes `present`, which otherwise fails a missing field as `value`, and `missing`, which otherwise passes. So a `present` or `missing` check on a param fails, and a filter like that fails the requirement instead of deciding the scope. ergo has no defaults, so a policy run without its params fails instead of checking something nobody configured.
 
 Some things worth knowing:
 
