@@ -85,3 +85,18 @@ jobs:
         run: |
           npm install --silent --no-save --prefix "$RUNNER_TEMP" @open-policy-agent/opa-wasm@1.10.0
           node .github/wasm-js.cjs "$RUNNER_TEMP"
+
+  spec:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.19.0
+      - name: Check every rule a case cites exists, and every rule has a case
+        run: python3 spec/check_rules.py
+      - name: Check the cases' policies and reports match the schemas
+        run: |
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet jsonschema==4.26.0
+          "$RUNNER_TEMP/venv/bin/python" .github/spec-schemas.py

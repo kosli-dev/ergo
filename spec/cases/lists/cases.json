@@ -494,7 +494,7 @@
     "cases": [
       {
         "description": "fails every check as ill_formed and says why",
-        "rules": ["list.inner", "list.as", "list.expression", "list.failed_items", "written_wrong", "written_wrong.row", "list.written_wrong", "render.path", "name.list", "tree.inputs"],
+        "rules": ["list.inner", "list.as", "list.expression", "list.failed_items", "written_wrong", "written_wrong.row", "list.written_wrong", "render.path", "name.list", "written_wrong.inputs"],
         "input": {"things": [{"cs": [1], "id": "t1"}]},
         "results": [
           {
