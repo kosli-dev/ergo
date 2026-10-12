@@ -1284,7 +1284,7 @@ test_an_empty_path_on_a_subject_is_named_after_from_in_every_kind_of_check if {
 		"either": [{"name": "branches[]", "value": "main"}],
 		"same": [{"name": "branches[]", "value": "main"}, {"name": "branches[]", "value": "main"}],
 		"custom": [{"name": "branches[]", "value": "main"}],
-		"backed": [{"name": "branches[]", "value": "main"}, {"name": "branches[]", "value": "main"}],
+		"backed": [{"name": "branches[]", "value": "main"}],
 	}
 }
 
@@ -1599,6 +1599,42 @@ test_a_substitute_works_in_an_applies_to_filter if {
 		"checks": {"c": {"op": "equals", "path": ["signed"], "value": true}},
 	}})
 	rep.requirements.s.subjects.matching == 1
+}
+
+with_range_substitute := {
+	"op": "equals",
+	"path": ["reviewed"],
+	"value": true,
+	"substitute": {"op": "range", "path": ["score"], "min": 1, "max": 9},
+}
+
+test_a_substitute_that_reads_the_wrong_kind_of_value_gives_the_row_its_cause if {
+	cause_of({"score": "high"}, with_range_substitute) == "unusable"
+}
+
+test_a_substitute_that_is_only_missing_leaves_the_cause_of_the_main_check if {
+	cause_of({"reviewed": false}, with_range_substitute) == "value"
+	cause_of({"reviewed": null}, with_range_substitute) == "null"
+}
+
+test_a_substitute_that_reads_the_wrong_kind_of_value_stops_a_filter_ruling_a_subject_out if {
+	rep := report({"items": [{"id": "a", "production": false, "score": "high"}]}, {"s": {
+		"subject_type": "thing",
+		"from": ["items"],
+		"id": ["id"],
+		"applies_to": {"in_scope": {
+			"op": "equals",
+			"path": ["production"],
+			"value": true,
+			"substitute": {"op": "range", "path": ["score"], "min": 1, "max": 9},
+		}},
+		"checks": {"c": {"op": "equals", "path": ["signed"], "value": true}},
+	}})
+	rep.requirements.s.status == "not_met"
+}
+
+test_a_substitute_that_reads_the_same_path_shows_it_once if {
+	inputs_of({"reviewed": true}, {"op": "equals", "path": ["reviewed"], "value": true, "substitute": {"op": "present", "path": ["reviewed"]}}) == [{"name": "reviewed", "value": true}]
 }
 
 test_a_substitute_renders_both_sides if {
