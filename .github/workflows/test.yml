@@ -22,7 +22,6 @@ jobs:
       - run: opa check --strict . --ignore .github
       - run: opa fmt --list --fail .
       - run: opa test . --ignore .github --timeout 120s --verbose
-      - run: python3 spec/sentences_corpus.py --check
       - name: Lint for likely bugs
         run: regal lint --format github --disable-all --enable-category bugs --disable redundant-existence-check --ignore-files '.github/**' .
       - name: Check there are no comments
@@ -96,6 +95,8 @@ jobs:
           version: 1.19.0
       - name: Check every rule a case cites exists, and every rule has a case
         run: python3 spec/check_rules.py
+      - name: Check the corpus JSON matches the markdown
+        run: python3 spec/sentences_corpus.py --check
       - name: Check the cases' policies and reports match the schemas
         run: |
           python3 -m venv "$RUNNER_TEMP/venv"
