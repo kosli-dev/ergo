@@ -26,7 +26,11 @@ opa fmt --list .
 opa test . --ignore .github --timeout 120s
 opa eval --strict-builtin-errors --ignore .github -d . --format raw 'count(data) > 0'
 regal lint --disable-all --enable-category bugs --disable redundant-existence-check --ignore-files '.github/**' .
+python3 spec/check_rules.py
+python3 -m venv /tmp/ergo-venv && /tmp/ergo-venv/bin/pip install --quiet jsonschema==4.26.0 && /tmp/ergo-venv/bin/python .github/spec-schemas.py
 ```
+
+Run them from the repo root. The last line puts `jsonschema` in a virtual environment outside the repo, because some Pythons, like Homebrew's, refuse `pip install` outside one.
 
 `opa fmt --list .` should print nothing. If it prints file names, run `opa fmt -w .`.
 
@@ -52,7 +56,7 @@ docker run --rm -v "$PWD":/src:ro -w /src openpolicyagent/opa:1.19.0 test . --ig
 
 CI also runs every test with OPA's JavaScript runtime, `@open-policy-agent/opa-wasm` (`.github/wasm-js.cjs`), because that runtime brings its own versions of some built-ins, like a `sprintf` that formats lists and objects differently, and lacks others. The script compiles each test as a Wasm entrypoint, fails if ergo uses a built-in the runtime doesn't have (apart from `time.parse_rfc3339_ns`, which it passes in, as `REFERENCE.md` tells Wasm users to), and then runs every test. It also fails if `ergo.report` or `ergo.violations` needs any built-in that OPA's Wasm build runs outside the module. OPA reads the arguments of those built-ins back as Rego, so a string holding a byte-order mark fails the whole evaluation. `time.parse_rfc3339_ns` is allowed because ergo only passes it strings that already match the RFC 3339 pattern. If you add a function for users to call, add it to the entrypoint the script writes, so the check covers it. `sprintf` is one of them, so build text with `concat` instead. `concat` takes only strings, so write anything else with `_text` first. Last, it builds one report on 100 deployments and fails if that uses more than 20 MB of Wasm memory. Wasm doesn't cache function calls and frees nothing until the report is done, so something worked out again for every row shows up there long before it slows down `opa eval`.
 
-A `spec` job checks the spec. `python3 spec/check_rules.py` fails when a case cites a rule that doesn't exist, or when a rule has no case and isn't listed under "Rules without cases" in `spec/OPEN.md`. `.github/spec-schemas.py` builds the report for every case and fails when a report doesn't match `spec/report/schema.json`, or when ergo reads a policy as written correctly but it doesn't match `spec/policy/schema.json`. It needs `pip install jsonschema`.
+A `spec` job checks the spec. `python3 spec/check_rules.py` fails when a case cites a rule that doesn't exist, or when a rule has no case and isn't listed under "Rules without cases" in `spec/OPEN.md`. `.github/spec-schemas.py` builds the report for every case and fails when a report doesn't match `spec/report/schema.json`, or when ergo reads a policy as written correctly but it doesn't match `spec/policy/schema.json`.
 
 CI also fails when a line of Rego isn't reached by any test. To list those lines yourself:
 
@@ -88,7 +92,7 @@ The report must stay byte-identical for the same policy and input, whatever orde
 
 ## Docs
 
-When behaviour changes, update the rule and its cases in `spec/`, and `REFERENCE.md`, in the same change. `spec_test.rego` fails until the cases match. When it affects the getting-started example, update `README.md` too.
+When behaviour changes, update its rule in `spec/` and add or change cases for it, so `spec_test.rego` fails when one no longer matches. When a policy or a report changes shape, update `spec/policy/schema.json` or `spec/report/schema.json` too. Update `REFERENCE.md` in the same change. When it affects the getting-started example, update `README.md` too.
 
 Every output shown in the docs must come from actually running it, not from memory.
 
