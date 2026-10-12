@@ -54,7 +54,7 @@ and this is the case:
 
 ## Checking the rules
 
-`python3 spec/check_rules.py` fails when a case cites a rule that doesn't exist, or when no case cites a rule. A rule can go without cases only while [OPEN.md](OPEN.md) names it in backticks, like `compare.derived`.
+`python3 spec/check_rules.py` fails when a case cites a rule that doesn't exist, or when no case cites a rule. A rule can go without cases only while it's listed under [Rules without cases](OPEN.md#rules-without-cases) in `OPEN.md`, and the script also fails when a rule on that list has a case or doesn't exist.
 
 ## Running the cases
 

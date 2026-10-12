@@ -1,6 +1,6 @@
 # Open questions
 
-Things the spec doesn't settle yet, because they need a decision first.
+Things the spec doesn't settle yet, because they need a decision first. Open questions about the spec live here, not in issues.
 
 ## Custom operators
 
@@ -30,4 +30,10 @@ A subject with `of` (see [REFERENCE.md](../REFERENCE.md#a-subject-built-on-anoth
 
 ## Time limits
 
-`[time.format]` only takes years 1678 to 2261 and only counts the first nine digits of a fraction. Both limits come from OPA, which holds a time as nanoseconds since 1970 in a 64-bit integer. A port in another language would have to add them on purpose. Either they stay, and the spec keeps them as a rule every implementation follows, or the spec drops them and `ergo.rego` has to compare times some other way outside that range.
+`time.format` only takes years 1678 to 2261 and only counts the first nine digits of a fraction. Both limits come from OPA, which holds a time as nanoseconds since 1970 in a 64-bit integer. A port in another language would have to add them on purpose. Either they stay, and the spec keeps them as a rule every implementation follows, or the spec drops them and `ergo.rego` has to compare times some other way outside that range.
+
+## Rules without cases
+
+Every rule needs a case, apart from the ones listed here. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.
+
+- `compare.derived`

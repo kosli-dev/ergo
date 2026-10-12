@@ -5,7 +5,7 @@
     "cases": [
       {
         "description": "passes when the field is missing",
-        "rules": ["missing.pass", "render.path", "missing.expression", "row.inputs"],
+        "rules": ["missing.pass", "render.path", "missing.expression", "path.inputs"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": null}]}
@@ -52,7 +52,7 @@
     "cases": [
       {
         "description": "passes when the parent is missing",
-        "rules": ["missing.pass", "path.absent", "row.inputs"],
+        "rules": ["missing.pass", "path.absent", "path.inputs"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x.y", "value": null}]}
@@ -74,7 +74,7 @@
     "cases": [
       {
         "description": "passes when the list to select from is missing",
-        "rules": ["missing.pass", "path.selector", "row.inputs"],
+        "rules": ["missing.pass", "path.selector", "path.inputs"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "xs.[k==\"a\"].v", "value": null}]}
@@ -97,7 +97,7 @@
     "cases": [
       {
         "description": "passes",
-        "rules": ["missing.pass", "row.inputs", "path.steps"],
+        "rules": ["missing.pass", "path.inputs", "path.steps"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "$$params.flag", "value": null}]}
