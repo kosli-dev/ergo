@@ -3132,6 +3132,18 @@ test_a_path_that_is_not_a_list_is_ill_formed_even_on_a_subject_that_is_not_an_ob
 	row_in({}, "str", {"op": "present", "path": {"a": 1}}).cause == "ill_formed"
 }
 
+test_the_expression_of_a_check_whose_path_is_not_a_list_says_the_path_is_invalid if {
+	every path in ["state", 3, {"a": 1}] {
+		expression_in({}, {"id": 1, "state": "OPEN"}, {"op": "present", "path": path}) == "<invalid path> is present"
+		expression_in({}, {"id": 1, "state": "OPEN"}, {"op": "in", "path": path, "values": ["a"]}) == "<invalid path> in [\"a\"]"
+	}
+}
+
+test_a_compare_time_whose_sides_are_not_lists_reads_nothing if {
+	row_in({}, {"id": 1, "a": "2026-01-01T00:00:00Z"}, {"op": "compare_time", "left": "a", "right": ["a"], "cmp": "eq"}).inputs == []
+	row_in({}, {"id": 1, "a": "2026-01-01T00:00:00Z"}, {"op": "compare_time", "left": ["a"], "right": "a", "cmp": "eq"}).inputs == []
+}
+
 test_a_check_whose_path_is_not_a_list_reads_nothing if {
 	row_in({}, {"id": 1, "state": "OPEN"}, {"op": "present", "path": "state"}).inputs == []
 }

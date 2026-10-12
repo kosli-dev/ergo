@@ -867,10 +867,6 @@ _keys_of(path) := ks if {
 	count(ks) == count(path)
 }
 
-_keys_of(path) := [path] if is_string(path)
-
-_keys_of(path) := [path] if is_number(path)
-
 _keys_of(path) := ks if {
 	_named(path)
 	rest := array.slice(path, 1, count(path))
@@ -2673,7 +2669,12 @@ _leaf_describe(check, item) := concat("", [n, " >= ", _param_text(check, "min"),
 	n := _path_text(item, check, "path")
 }
 
-_path_text(item, check, f) := _item_path_name(item, check[f]) if f in object.keys(check)
+_path_text(item, check, f) := _item_path_name(item, check[f]) if is_array(object.get(check, f, null))
+
+_path_text(_, check, f) := concat("", ["<invalid ", f, ">"]) if {
+	f in object.keys(check)
+	not is_array(check[f])
+}
 
 _path_text(_, check, f) := concat("", ["<missing ", f, ">"]) if not f in object.keys(check)
 
@@ -2937,6 +2938,8 @@ _check_inputs(subj, check, item) := [
 ] if {
 	not check.inputs
 	check.op == "compare_time"
+	is_array(check.left)
+	is_array(check.right)
 }
 
 _check_inputs(subj, check, item) := array.concat(_side_inputs(subj, object.get(check, "left", null), item), _side_inputs(subj, object.get(check, "right", null), item)) if {
