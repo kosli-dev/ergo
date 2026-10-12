@@ -3181,6 +3181,40 @@ test_a_compare_time_whose_sides_are_not_lists_reads_nothing if {
 	row_in({}, {"id": 1, "a": "2026-01-01T00:00:00Z"}, {"op": "compare_time", "left": ["a"], "right": "a", "cmp": "eq"}).inputs == []
 }
 
+test_the_expression_of_a_compare_with_an_invalid_side_says_which_side if {
+	subj := {"id": 1, "a": 1, "b": 2, "l": [1, 2]}
+	every bad in ["a", 3, {"a": 1}, {"literal": 1, "x": 2}] {
+		expression_in({}, subj, {"op": "compare", "left": bad, "right": ["b"], "cmp": "lt"}) == "<invalid left> lt b"
+		expression_in({}, subj, {"op": "compare", "left": ["a"], "right": bad, "cmp": "lt"}) == "a lt <invalid right>"
+		expression_in({}, subj, {"op": "compare", "left": bad, "right": ["b"], "cmp": "lt", "within": 1}) == "<invalid left> lt b, within 1"
+	}
+}
+
+test_the_expression_of_a_compare_with_an_invalid_side_next_to_a_derived_value_says_which_side if {
+	subj := {"id": 1, "a": 1, "b": 2, "l": [1, 2]}
+	expression_in({}, subj, {"op": "compare", "left": {"count": ["l"]}, "right": "b", "cmp": "lt"}) == "count(l) lt <invalid right>"
+	expression_in({}, subj, {"op": "compare", "left": "b", "right": {"count": ["l"]}, "cmp": "lt", "within": 1}) == "<invalid left> lt count(l), within 1"
+	expression_in({}, subj, {"op": "compare", "left": {"add": [["a"], ["b"]]}, "right": 5, "cmp": "lt"}) == "a + b lt <invalid right>"
+	expression_in({}, subj, {"op": "compare", "left": "a", "right": {"sum": ["l"], "each": []}, "cmp": "lt"}) == "<invalid left> lt sum(l[])"
+}
+
+test_a_compare_with_an_invalid_side_reads_nothing if {
+	subj := {"id": 1, "a": 1, "b": 2, "l": [1, 2]}
+	row_in({}, subj, {"op": "compare", "left": "a", "right": ["b"], "cmp": "lt"}).inputs == []
+	row_in({}, subj, {"op": "compare", "left": ["a"], "right": "b", "cmp": "lt"}).inputs == []
+	row_in({}, subj, {"op": "compare", "left": {"count": ["l"]}, "right": "b", "cmp": "lt"}).inputs == []
+	row_in({}, subj, {"op": "compare", "left": "b", "right": {"add": [["a"], ["b"]]}, "cmp": "lt"}).inputs == []
+	row_in({}, subj, {"op": "compare", "left": ["a"], "cmp": "lt"}).inputs == []
+}
+
+test_the_expression_of_a_compare_time_with_an_invalid_side_says_which_side if {
+	subj := {"id": 1, "a": "2026-01-01T00:00:00Z", "b": "2026-01-02T00:00:00Z"}
+	every bad in ["a", 3, {"a": 1}] {
+		expression_in({}, subj, {"op": "compare_time", "left": bad, "right": ["b"], "cmp": "lt"}) == "<invalid left> lt b"
+		expression_in({}, subj, {"op": "compare_time", "left": ["a"], "right": bad, "cmp": "lt"}) == "a lt <invalid right>"
+	}
+}
+
 test_a_check_whose_path_is_not_a_list_reads_nothing if {
 	row_in({}, {"id": 1, "state": "OPEN"}, {"op": "present", "path": "state"}).inputs == []
 }
