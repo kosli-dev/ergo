@@ -197,15 +197,15 @@ Each phrase is a plain pattern: fixed words with gaps. One line is one form, and
 
 The gaps:
 
-| gap | holds |
-| --- | --- |
-| `<path>` | a path. On the left of a comparison, also a `count of`, a `sum of` or terms joined with `plus` |
-| `<value>` | one value: text in quotes, a number, `true`, `false` or `null` |
-| `<values>` | one or more values separated by `, ` |
+| gap                | holds                                                                                                          |
+| ------------------ | -------------------------------------------------------------------------------------------------------------- |
+| `<path>`           | a path. On the left of a comparison, also a `count of`, a `sum of` or terms joined with `plus`                 |
+| `<value>`          | one value: text in quotes, a number, `true`, `false` or `null`                                                 |
+| `<values>`         | one or more values separated by `, `                                                                           |
 | `<value or field>` | a value, or a path, or terms joined with `plus`. See [sentence.value.path](#values) for how to tell them apart |
-| `<list>` | values separated by `, `, or a path to a list |
-| `<number>` | a number |
-| `<type>` | `list`, `string`, `number`, `boolean` or `object` |
+| `<list>`           | values separated by `, `, or a path to a list                                                                  |
+| `<number>`         | a number                                                                                                       |
+| `<type>`           | `list`, `string`, `number`, `boolean` or `object`                                                              |
 
 "Missing", "`null`" and "wrong type" say what a check does when a value it reads is in that state. Everything a phrase reads fails that way, the path on the right and any reference included. Every failure that isn't `value` makes a filter fail the requirement instead of ruling the subject out.
 
@@ -334,14 +334,14 @@ Read as `is` or `equals`, and printed as one of them. With it in the grammar, ev
 
 **[sentence.written_wrong.slot]** A sentence that doesn't parse is written wrong, as a check that can't be read into the model is today. Its rows fail with `ill_formed` and `$well_formed` lists it. Because the grammar is flat, the message can name the slot, what it expected and the column:
 
-| sentence | `$well_formed` says |
-| --- | --- |
-| `approved_by is empy` | `unknown phrase "is empy" at column 13, expected one of: is empty, is not empty, is one of, ...` |
-| `environment is "prod` | `unclosed quote at column 16` |
-| `every commits.signed` | `nothing after the path at column 21: expected a phrase, like "is" or "exists"` |
-| `sum of stages.usd equals total within` | `"within" needs a number after it` |
-| `some approvers, if any, is not empty` | `if any can't go with some` |
-| `every pull_requests some approvers.state is "APPROVED"` | `two quantifiers in one sentence: put them on a for line` |
+| sentence                                                 | `$well_formed` says                                                                              |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `approved_by is empy`                                    | `unknown phrase "is empy" at column 13, expected one of: is empty, is not empty, is one of, ...` |
+| `environment is "prod`                                   | `unclosed quote at column 16`                                                                    |
+| `every commits.signed`                                   | `nothing after the path at column 21: expected a phrase, like "is" or "exists"`                  |
+| `sum of stages.usd equals total within`                  | `"within" needs a number after it`                                                               |
+| `some approvers, if any, is not empty`                   | `if any can't go with some`                                                                      |
+| `every pull_requests some approvers.state is "APPROVED"` | `two quantifiers in one sentence: put them on a for line`                                        |
 
 `environment is prod` parses, as a comparison with a field called `prod`, unless the subject has no such field. That's the one mistake the grammar can't catch, so the message for a missing field in an `is` argument should suggest quotes.
 
@@ -359,12 +359,12 @@ A throwaway tokenizer in JavaScript, outside the repo, turned each phrase above 
 
 The corpus has 335 lines: 231 assertions, 14 `for` lines and 90 `from` lines. sdlc-policies 0004's `artifact` and its server copy have no `from` any more. With the rules in this file, which are the rules #174 now states, every line parses exactly one way. Without them, 194 lines parse more than one way:
 
-| cause | lines | rule that removes it |
-| --- | ---: | --- |
-| a quoted string could be text or a quoted key, `is "prod"` | 84 | [sentence.path.argument](#paths) |
-| a grammar word could be a field, `is empty` against `is <field empty>` | 59 | [sentence.words](#words-a-field-cant-be-called) |
-| `true`, `false` or `null` could be a field | 50 | both of the above |
-| the reference after `named by` could end at more than one key | 24 | [sentence.path.dynamic](#paths) |
+| cause                                                                  | lines | rule that removes it                            |
+| ---------------------------------------------------------------------- | ----: | ----------------------------------------------- |
+| a quoted string could be text or a quoted key, `is "prod"`             | 84    | [sentence.path.argument](#paths)                |
+| a grammar word could be a field, `is empty` against `is <field empty>` | 59    | [sentence.words](#words-a-field-cant-be-called) |
+| `true`, `false` or `null` could be a field                             | 50    | both of the above                               |
+| the reference after `named by` could end at more than one key          | 24    | [sentence.path.dynamic](#paths)                 |
 
 Some lines have two causes. The tokenizer also applied [sentence.subject.own](#subjects) to every `from` line, and found the same six chains the corpus marks.
 
