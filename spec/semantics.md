@@ -28,15 +28,15 @@ A syntax reads each check into this model. Everything below is said in terms of 
 
 Reading a path ends in one of these outcomes. Each one except `found` is also a [cause](#causes).
 
-| Outcome | When |
-| --- | --- |
-| `found` | Every step was read, and the value at the end isn't `null`. |
-| `null` | Every step was read, and the value at the end is `null`. |
-| `absent` | A key isn't in its object, an index is past the end of its list, or a step comes after a value that's missing or `null`. |
-| `unusable` | A step comes after a value that can't hold it. |
-| `not_an_object` | The path reads a field of a subject that isn't an object. |
-| `unmatched` | A selector found no item in a list that's there. |
-| `ambiguous` | A selector found more than one item. |
+| Outcome         | When                                                                                                                     |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `found`         | Every step was read, and the value at the end isn't `null`.                                                              |
+| `null`          | Every step was read, and the value at the end is `null`.                                                                 |
+| `absent`        | A key isn't in its object, an index is past the end of its list, or a step comes after a value that's missing or `null`. |
+| `unusable`      | A step comes after a value that can't hold it.                                                                           |
+| `not_an_object` | The path reads a field of a subject that isn't an object.                                                                |
+| `unmatched`     | A selector found no item in a list that's there.                                                                         |
+| `ambiguous`     | A selector found more than one item.                                                                                     |
 
 **[path.start]** A path starts at the subject, the input, the params or a name. With no params, or params that aren't an object, a path into the params ends `absent`.
 

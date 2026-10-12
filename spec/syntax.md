@@ -116,12 +116,12 @@ Each check's definition in the report has an `expression` that says what it chec
 
 **[added.text]** The checks ergo adds have these descriptions and expressions, where `<type>` is the name of the requirement's subject, and `<from>` is the name of the subject's `from`, or `$$input` when it has no steps:
 
-| Check | Description | Expression |
-| --- | --- | --- |
-| `$well_formed` | `The requirement is written correctly` | `count(problems) == 0` |
-| `$min_subjects` | `The in-scope <type> count is at least <n>`, or with `min_subjects: 0`, `The <type> list can be read` | `count(matching(<from>)) >= <n>`, or `<from> can be read` |
-| `$unique_ids` | `Every <type> id is unique` | `count(repeated(ids(<from>))) == 0` |
-| `$applies` | `The <type> is in scope` | the filters' expressions in name order, joined with ` and ` |
+| Check           | Description                                                                                           | Expression                                                  |
+| --------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| `$well_formed`  | `The requirement is written correctly`                                                                | `count(problems) == 0`                                      |
+| `$min_subjects` | `The in-scope <type> count is at least <n>`, or with `min_subjects: 0`, `The <type> list can be read` | `count(matching(<from>)) >= <n>`, or `<from> can be read`   |
+| `$unique_ids`   | `Every <type> id is unique`                                                                           | `count(repeated(ids(<from>))) == 0`                         |
+| `$applies`      | `The <type> is in scope`                                                                              | the filters' expressions in name order, joined with ` and ` |
 
 **[added.inputs]** `$min_subjects` names its input `in-scope <type> count`, and `$unique_ids` names its input `repeated <type> ids`. `$well_formed` names its first two `count(checks)` and `require`, and when `require` is written wrong, its value is `["neither every nor some"]`. A field ergo doesn't know is listed with `["unknown field"]`, and `checks: {}` with `["empty"]`. A requirement without a `subject` has `{"name": "subject", "value": ["missing"]}`, and one whose `subject` isn't in `subjects` has `["not in subjects"]`.
 
