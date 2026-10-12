@@ -4301,7 +4301,7 @@ _s_problems(text, pat) := [concat("", ["unclosed quote at column ", _json_text(c
 	problems := _s_sentence_problems(_s_parsed_anyway(text, pat))
 	count(problems) > 0
 } else := names if {
-	names := sort({concat("", ["unknown name ", m[1]]) | some m in regex.find_all_string_submatch_n(`(?:^|[ ,\[])(\$[A-Za-z_][A-Za-z0-9_]*)`, regex.replace(text, pat.strings, ""), -1); not m[1] in {"$params", "$input"}})
+	names := sort({concat("", ["unknown name ", m[1]]) | some m in regex.find_all_string_submatch_n(concat("", [pat.strings, `|(?:^|[ ,\[])(\$[A-Za-z_][A-Za-z0-9_]*)`]), text, -1); not m[1] in {"", "$params", "$input"}})
 	count(names) > 0
 } else := ["two quantifiers in one sentence: put them on a for line"] if {
 	regex.match(`^(?:every|some) +\S+ +(?:every|some) `, text)
