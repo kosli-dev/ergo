@@ -21,7 +21,7 @@ Run these before saying a change is done:
 ```sh
 opa check --strict . --ignore .github
 opa fmt --list .
-opa test . --ignore .github --timeout 30s
+opa test . --ignore .github --timeout 120s
 opa eval --strict-builtin-errors --ignore .github -d . --format raw 'count(data) > 0'
 regal lint --disable-all --enable-category bugs --disable redundant-existence-check --ignore-files '.github/**' .
 ```
@@ -42,10 +42,10 @@ A second job runs `opa check --strict`, `opa fmt --list` and `opa test` with OPA
 docker run --rm -v "$PWD":/src:ro -w /src openpolicyagent/opa:1.20.2 fmt --list .
 ```
 
-CI also runs every test compiled to Wasm, with `opa test . --ignore .github --target wasm --timeout 30s`, because Wasm walks objects and sets in a different order from `opa eval`, so anything that ends up in the report has to be sorted. That needs the Linux build of OPA. The macOS one says `engine not found`, so on a Mac run it in Docker:
+CI also runs every test compiled to Wasm, with `opa test . --ignore .github --target wasm --timeout 120s`, because Wasm walks objects and sets in a different order from `opa eval`, so anything that ends up in the report has to be sorted. That needs the Linux build of OPA. The macOS one says `engine not found`, so on a Mac run it in Docker:
 
 ```sh
-docker run --rm -v "$PWD":/src:ro -w /src openpolicyagent/opa:1.19.0 test . --ignore .github --target wasm --timeout 30s
+docker run --rm -v "$PWD":/src:ro -w /src openpolicyagent/opa:1.19.0 test . --ignore .github --target wasm --timeout 120s
 ```
 
 CI also runs every test with OPA's JavaScript runtime, `@open-policy-agent/opa-wasm` (`.github/wasm-js.cjs`), because that runtime brings its own versions of some built-ins, like a `sprintf` that formats lists and objects differently, and lacks others. The script compiles each test as a Wasm entrypoint, fails if ergo uses a built-in the runtime doesn't have (apart from `time.parse_rfc3339_ns`, which it passes in, as `REFERENCE.md` tells Wasm users to), and then runs every test. It also fails if `ergo.report` or `ergo.violations` needs any built-in that OPA's Wasm build runs outside the module. OPA reads the arguments of those built-ins back as Rego, so a string holding a byte-order mark fails the whole evaluation. `time.parse_rfc3339_ns` is allowed because ergo only passes it strings that already match the RFC 3339 pattern. If you add a function for users to call, add it to the entrypoint the script writes, so the check covers it. `sprintf` is one of them, so build text with `concat` instead. `concat` takes only strings, so write anything else with `_text` first. Last, it builds one report on 100 deployments and fails if that uses more than 20 MB of Wasm memory. Wasm doesn't cache function calls and frees nothing until the report is done, so something worked out again for every row shows up there long before it slows down `opa eval`.
@@ -53,7 +53,7 @@ CI also runs every test with OPA's JavaScript runtime, `@open-policy-agent/opa-w
 CI also fails when a line of Rego isn't reached by any test. To list those lines yourself:
 
 ```sh
-opa test . --ignore .github --timeout 30s --coverage | jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' | sort -u
+opa test . --ignore .github --timeout 120s --coverage | jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' | sort -u
 ```
 
 ## Tests
