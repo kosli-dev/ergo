@@ -2960,6 +2960,9 @@ _check_inputs(subj, check, item) := [
 _check_inputs(subj, check, item) := array.concat(_side_inputs(subj, object.get(check, "left", null), item), _side_inputs(subj, object.get(check, "right", null), item)) if {
 	not check.inputs
 	check.op == "compare"
+	every f in ["left", "right"] {
+		_side_form(object.get(check, f, null))
+	}
 }
 
 _check_inputs(subj, check, _) := array.concat(_quantified_inputs(subj, check), _name_inputs(subj, check)) if {
@@ -3808,8 +3811,6 @@ _side_inputs(subj, side, item) := _basic_inputs(subj, side, item) if _basic_form
 
 _side_inputs(subj, side, item) := array.concat([_derived_input(subj, side, _side_text(item, side))], [i | some operand in side.add; some i in _basic_inputs(subj, operand, item)]) if _side_form(side) == "add"
 
-_side_inputs(_, side, _) := [] if not _side_form(side)
-
 _derived_input(subj, side, name) := {"name": name, "value": v} if {
 	v := _side_value(subj, side)
 } else := {"name": name, "value": null}
@@ -3846,6 +3847,8 @@ _compare_side_text(_, check, f) := concat("", ["<invalid ", f, ">"]) if {
 
 _compare_side_text(_, check, f) := concat("", ["<missing ", f, ">"]) if not f in object.keys(check)
 
+_simple_side(side) if _basic_form(side) in {"path", "literal"}
+
 _simple_side_text(item, check, f) := _item_path_name(item, check[f]) if {
 	f in object.keys(check)
 	is_array(check[f])
@@ -3858,7 +3861,7 @@ _simple_side_text(_, check, f) := _value_text(check[f]) if {
 
 _simple_side_text(_, check, f) := concat("", ["<invalid ", f, ">"]) if {
 	f in object.keys(check)
-	not _basic_form(check[f]) in {"path", "literal"}
+	not _simple_side(check[f])
 }
 
 _simple_side_text(_, check, f) := concat("", ["<missing ", f, ">"]) if not f in object.keys(check)
