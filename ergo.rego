@@ -3929,19 +3929,19 @@ _derived_placement_problem(node, kinds) := {concat("", [_side_form(side), " can'
 }
 
 _s_patterns := {
-	"assertions": concat("", [`(?:^| +and +)(`, assertion, `)`]),
+	"assertions": concat("", [`(`, assertion, `)(?: +and +|$)`]),
 	"assertion": concat("", [`^(?:(every|some) +(`, path, `)|(`, left, `))(?: +where +(`, conds, `))?(, +if +any,)? +(`, phrase, `)$`]),
-	"for_items": concat("", [`(?:^|, +)(`, for_item, `)`]),
+	"for_items": concat("", [`(`, for_item, `)(?:, +|$)`]),
 	"for_item": concat("", [`^(every|some) +(`, path, `)(?: +where +(`, conds, `))?(, +if +any,)? +as +(`, key, `)$`]),
 	"from": concat("", [`^(`, path, `)(?: +named +by +each +of +(`, rpath, `))?(?: +where +(`, conds, `))?$`]),
-	"conds": concat("", [`(?:^| +and +)(`, cond, `)`]),
+	"conds": concat("", [`(`, cond, `)(?: +and +|$)`]),
 	"cond": concat("", [`^(`, left, `) +(`, phrase, `)$`]),
-	"leads": concat("", [`^(?:`, concat("|", [concat("", [`(`, ph[1], `)`]) | some ph in phrases]), `)`]),
+	"phrase": concat("", [`^(?:`, concat("|", [concat("", [`(`, ph[1], ph[2], `)`]) | some ph in phrases]), `)$`]),
 	"phrases": phrases,
 	"path": concat("", [`^`, path, `$`]),
 	"path_parts": concat("", [`^(?:(item +([1-9][0-9]*)|first|last) +of +)?(`, start, `)((?:`, step, `)*)$`]),
-	"steps": concat("", [`\.(`, key, `|`, dq, `)| +named +by +(`, ref, `)|\[(`, ref, `)\]|\[(`, dq, `)\]|\[([0-9]+)\]`]),
-	"terms": concat("", [`(?:^| +plus +)(`, term, `)`]),
+	"steps": concat("", [`\.(`, key, `|`, dq, `)| +named +by +(`, ref, `)|\[(`, ref, `)\]|\[(`, dq, `)\]|\[(0|[1-9][0-9]*)\]`]),
+	"terms": concat("", [`(`, term, `)(?: +plus +|$)`]),
 	"number": concat("", [`^`, num, `$`]),
 	"derived": concat("", [`^(count|sum) +of +(`, plain, `)$`]),
 	"value": concat("", [`^`, value, `$`]),
@@ -3949,14 +3949,17 @@ _s_patterns := {
 	"each_value": value,
 	"range": concat("", [`^(`, num, `) +and +(`, num, `)$`]),
 	"operand_within": concat("", [`^(`, operand, `)(?: +within +(`, num, `))?$`]),
-	"quotes": concat("", [`^(?:`, dq, `|`, sq, `|[^"']+)*$`]),
+	"quotes": `^(?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|[^"']+)*`,
+	"strings": `"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'`,
+	"string": concat("", [`^(?:`, dq, `|`, sq, `)$`]),
+	"quantified_path": concat("", [`^(?:(?:every|some) +)?`, path, `$`]),
 } if {
 	key := `[A-Za-z_][A-Za-z0-9_-]*`
-	dq := `"(?:[^"\\]|\\.)*"`
-	sq := `'(?:[^'\\]|\\.)*'`
+	dq := `"(?:[^"\\\x00-\x1f]|\\["\\/bfnrt]|\\u[0-9a-fA-F]{4})*"`
+	sq := `'(?:[^'\\\x00-\x1f]|\\[^\x00-\x1f])*'`
 	num := `-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?`
 	ref := concat("", [`(?:\$params|\$input)\.(?:`, key, `|`, dq, `)|`, key])
-	step := concat("", [`\.(?:`, key, `|`, dq, `)| +named +by +(?:`, ref, `)|\[(?:`, ref, `|`, dq, `|[0-9]+)\]`])
+	step := concat("", [`\.(?:`, key, `|`, dq, `)| +named +by +(?:`, ref, `)|\[(?:`, ref, `|`, dq, `|0|[1-9][0-9]*)\]`])
 	start := concat("", [`\$params|\$input|\.?(?:`, key, `|`, dq, `)`])
 	rstart := concat("", [`\$params|\$input|`, key, `|\.(?:`, key, `|`, dq, `)`])
 	pos := `(?:item +[1-9][0-9]*|first|last) +of +`
@@ -3967,20 +3970,20 @@ _s_patterns := {
 	term := concat("", [`(?:`, derived, `|`, rpath, `|`, num, `)`])
 	terms := concat("", [term, `(?: +plus +`, term, `)*`])
 	left := concat("", [`(?:`, path, `|`, terms, `)`])
-	value := concat("", [`(?:`, dq, `|`, sq, `|`, num, `|(?:true|false|null)\b)`])
-	values := concat("", [value, `(?:,\s*`, value, `)*`])
+	value := concat("", [`(?:`, dq, `|`, sq, `|`, num, `|true|false|null)`])
+	values := concat("", [value, `(?:, *`, value, `)*`])
 	operand := concat("", [`(?:`, num, `(?: +plus +`, term, `)+|`, value, `|(?:`, derived, `|`, rpath, `)(?: +plus +`, term, `)*)`])
 	list := concat("", [`(?:`, values, `|`, rpath, `)`])
-	type := `(?:list|string|number|boolean|object)\b`
+	type := `(?:list|string|number|boolean|object)`
 	phrases := [
 		["is not one of", `is +not +(?:one +of|in) +`, list, "list"],
 		["is one of", `is +(?:one +of|in) +`, list, "list"],
-		["is a non-empty string", `is +a +non-empty +string\b`, ``, "none"],
+		["is a non-empty string", `is +a +non-empty +string`, ``, "none"],
 		["is a", `is +an? +`, type, "type"],
-		["is not empty", `is +not +empty\b`, ``, "none"],
-		["is empty", `is +empty\b`, ``, "none"],
-		["does not exist", `does +not +exist\b`, ``, "none"],
-		["exists", `exists\b`, ``, "none"],
+		["is not empty", `is +not +empty`, ``, "none"],
+		["is empty", `is +empty`, ``, "none"],
+		["does not exist", `does +not +exist`, ``, "none"],
+		["exists", `exists`, ``, "none"],
 		["contains all of", `contains +all +of +`, list, "list"],
 		["contains none of", `contains +none +of +`, list, "list"],
 		["does not contain", `does +not +contain +`, operand, "operand"],
@@ -4115,9 +4118,16 @@ _s_term_of(text, pat) := to_number(text) if {
 	m := regex.find_all_string_submatch_n(pat.derived, text, 1)[0]
 } else := _s_path_of(text, pat)
 
-_s_path_of(text, pat) := object.union(_s_position_of(m[1], m[2]), _s_start_of(m[3], _s_steps_of(m[4], pat))) if {
+_s_path_of(text, pat) := _s_lifted(object.union(_s_position_of(m[1], m[2]), _s_start_of(m[3], _s_steps_of(m[4], pat)))) if {
 	m := regex.find_all_string_submatch_n(pat.path_parts, text, 1)[0]
 }
+
+_s_lifted(path) := object.union(object.remove(path, ["steps"]), {"position": last.index + 1, "steps": array.slice(path.steps, 0, count(path.steps) - 1)}) if {
+	not "position" in object.keys(path)
+	last := path.steps[count(path.steps) - 1]
+	is_object(last)
+	"index" in object.keys(last)
+} else := path
 
 _s_position_of("", _) := {}
 
@@ -4129,18 +4139,24 @@ _s_start_of("$params", steps) := {"start": "params", "steps": steps}
 
 _s_start_of("$input", steps) := {"start": "input", "steps": steps}
 
+_s_start_of(key, steps) := {"steps": array.concat([key], steps), "bare_word": key} if key in _s_words
+
 _s_start_of(key, steps) := {"steps": array.concat([_s_key_of(key)], steps)} if {
+	not key in _s_words
 	not startswith(key, "$")
 	not startswith(key, ".")
 }
 
-_s_start_of(key, steps) := {"steps": array.concat([_s_key_of(substring(key, 1, -1))], steps), "dotted": true} if startswith(key, ".")
+_s_start_of(key, steps) := {"steps": array.concat([_s_key_of(substring(key, 1, -1))], steps)} if startswith(key, ".")
 
 _s_key_of(text) := json.unmarshal(text) if startswith(text, `"`)
 
 _s_key_of(text) := text if not startswith(text, `"`)
 
-_s_steps_of(text, pat) := [_s_step_of(m) | some m in regex.find_all_string_submatch_n(pat.steps, text, -1)]
+_s_steps_of(text, pat) := [_s_step_of(m) | some m in matches] if {
+	matches := regex.find_all_string_submatch_n(pat.steps, text, -1)
+	concat("", [m[0] | some m in matches]) == text
+}
 
 _s_step_of(m) := _s_key_of(m[1]) if m[1] != ""
 
@@ -4156,10 +4172,15 @@ _s_ref_of(text) := {"start": "params", "steps": [_s_key_of(substring(text, 8, -1
 
 _s_ref_of(text) := {"start": "input", "steps": [_s_key_of(substring(text, 7, -1))]} if startswith(text, "$input.")
 
-_s_ref_of(text) := {"steps": [text]} if not startswith(text, "$")
+_s_ref_of(text) := {"steps": [text]} if {
+	not startswith(text, "$")
+	not _s_bad_name(text)
+}
+
+_s_ref_of(text) := {"steps": [text], "bad_name": text} if _s_bad_name(text)
 
 _s_phrase_of(text, pat) := object.union({"op": ph[0]}, _s_args_of(ph[3], m[1], pat)) if {
-	groups := regex.find_all_string_submatch_n(pat.leads, text, 1)[0]
+	groups := regex.find_all_string_submatch_n(pat.phrase, text, 1)[0]
 	ph := pat.phrases[min({i | some i in numbers.range(1, count(pat.phrases)); groups[i] != ""}) - 1]
 	m := regex.find_all_string_submatch_n(concat("", [`^(?:`, ph[1], `)(`, ph[2], `)$`]), text, 1)[0]
 }
@@ -4184,7 +4205,7 @@ _s_args_of("operand_within", text, pat) := object.union(_s_operand_of(m[1], pat)
 
 _s_within_of("") := {}
 
-_s_within_of(digits) := {"within": to_number(digits)} if digits != ""
+_s_within_of(number) := {"within": to_number(number)} if number != ""
 
 _s_operand_of(text, pat) := {"value": _s_value_of(text)} if {
 	regex.match(pat.value, text)
@@ -4202,31 +4223,45 @@ _s_sq_char(`\\`) := `\`
 
 _s_sq_char(c) := c if not c in {`\'`, `\\`}
 
-_s_sentence_problems(parsed) := (((({concat("", [key, " is a word of the grammar: write .", key]) |
+_s_sentence_problems(parsed) := (((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
-	"steps" in object.keys(node)
-	not "start" in object.keys(node)
-	not object.get(node, "dotted", false)
-	key := node.steps[0]
-	key in _s_words
-} | {"if any can't go with some" |
+	"bare_word" in object.keys(node)
+} | {concat("", [node.bad_name, " can't be a name"]) |
+	some node in _s_nodes(parsed)
+	is_object(node)
+	"bad_name" in object.keys(node)
+}) | {concat("", [node.as, " can't be a name"]) |
+	some node in _s_nodes(parsed)
+	is_object(node)
+	_s_bad_name(object.get(node, "as", ""))
+}) | {concat("", [name, " is given twice"]) |
+	some i, item in object.get(parsed, "items", [])
+	name := item.as
+	parsed.items[j].as == name
+	j < i
+}) | {"if any can't go with some" |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"some" in object.keys(node)
 	object.get(node, "if_any", false) == true
-}) | {concat("", [node.as, " can't be a name"]) |
+}) | {"a where goes after every, some, count of or sum of" |
 	some node in _s_nodes(parsed)
+	node != parsed
 	is_object(node)
-	name := object.get(node, "as", "")
-	_s_bad_name(name)
-}) | {"a where after plus goes on a count of or a sum of" |
+	"where" in object.keys(node)
+	object.keys(node) & {"every", "some"} == set()
+	not _s_derived_term(object.get(node, "terms", [null])[count(object.get(node, "terms", [null])) - 1])
+}) | {concat("", [node.phrase.op, " can't follow a count of, a sum of or a plus"]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"terms" in object.keys(node)
-	"where" in object.keys(node)
-	last := node.terms[count(node.terms) - 1]
-	not _s_derived_term(last)
+	not node.phrase.op in {"is", "is not", "is at least", "is at most", "is more than", "is less than", "is between"}
+}) | {"a number can't start a sentence" |
+	some node in _s_nodes(parsed)
+	is_object(node)
+	node.terms == [node.terms[0]]
+	is_number(node.terms[0])
 }) | {"min above max" |
 	some node in _s_nodes(parsed)
 	is_object(node)
@@ -4256,13 +4291,24 @@ _s_bad_name(name) if name in {"params", "input"}
 
 _s_nodes(x) := {y | walk(x, [_, y])}
 
-_s_problems(text, pat) := ["unclosed quote"] if {
-	not regex.match(pat.quotes, text)
+_s_problems(text, pat) := [concat("", ["unclosed quote at column ", _json_text(count(closed) + 1)])] if {
+	closed := regex.find_all_string_submatch_n(pat.quotes, text, 1)[0][0]
+	count(closed) < count(text)
+} else := invalid if {
+	invalid := [concat("", ["invalid string ", m[0]]) | some m in regex.find_all_string_submatch_n(pat.strings, text, -1); not regex.match(pat.string, m[0])]
+	count(invalid) > 0
 } else := problems if {
 	problems := _s_sentence_problems(_s_parsed_anyway(text, pat))
 	count(problems) > 0
+} else := names if {
+	names := [concat("", ["unknown name ", m[1]]) | some m in regex.find_all_string_submatch_n(`(?:^|[ ,\[])(\$[A-Za-z_][A-Za-z0-9_]*)`, text, -1); not m[1] in {"$params", "$input"}]
+	count(names) > 0
 } else := ["two quantifiers in one sentence: put them on a for line"] if {
-	regex.match(`^(?:every|some) [^ ]+ (?:every|some) `, text)
+	regex.match(`^(?:every|some) +\S+ +(?:every|some) `, text)
+} else := [`"within" needs a number after it`] if {
+	regex.match(` within$`, text)
+} else := [concat("", ["nothing after the path at column ", _json_text(count(text) + 1), ": expected a phrase, like is or exists"])] if {
+	regex.match(pat.quantified_path, text)
 } else := ["doesn't parse"]
 
 _s_parsed_anyway(text, pat) := {"assertions": assertions} if {
@@ -4356,22 +4402,13 @@ _s_start_text(p, _) := "$input" if object.get(p, "start", "") == "input"
 
 _s_start_text(p, side) := concat("", [_s_dot(p.steps[0], side), _s_key_text(p.steps[0])]) if not "start" in object.keys(p)
 
-_s_dot(key, _) := "." if key in _s_words
+_s_dot(key, side) := "." if {
+	_s_needs_dot(key, side)
+} else := ""
 
-_s_dot(key, "right") := "." if {
-	not key in _s_words
-	not _s_bare_key(key)
-}
+_s_needs_dot(key, _) if key in _s_words
 
-_s_dot(key, _) := "" if {
-	not key in _s_words
-	_s_bare_key(key)
-}
-
-_s_dot(key, "left") := "" if {
-	not key in _s_words
-	not _s_bare_key(key)
-}
+_s_needs_dot(key, "right") if not _s_bare_key(key)
 
 _s_bare_key(key) if regex.match(`^[A-Za-z_][A-Za-z0-9_-]*$`, key)
 
@@ -4473,15 +4510,14 @@ _s_operand_text(ph) := _s_path_text(ph.path, "right") if "path" in object.keys(p
 _s_operand_text(ph) := "" if object.keys(ph) & {"value", "terms", "values", "path"} == set()
 
 _s_value_text(v) := concat("", ["'", v, "'"]) if {
-	is_string(v)
-	contains(v, `\`)
-	not contains(v, "'")
-}
-
-_s_value_text(v) := _json_text(v) if not _s_single_quoted(v)
+	_s_single_quoted(v)
+} else := _json_text(v)
 
 _s_single_quoted(v) if {
 	is_string(v)
 	contains(v, `\`)
 	not contains(v, "'")
+	not contains(v, `\\`)
+	not endswith(v, `\`)
+	regex.match(`^[^\x00-\x1f]*$`, v)
 }

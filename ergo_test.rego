@@ -7844,7 +7844,7 @@ test_a_sentence_reads_into_one_assertion_per_and if {
 	]}
 }
 
-test_every_corpus_line_reads_one_way_and_prints_back_unchanged if {
+test_every_corpus_line_parses_and_prints_back_unchanged if {
 	every text in data.spec.sentence_corpus {
 		_prints_back(text)
 	}
@@ -7888,7 +7888,10 @@ test_a_count_with_a_where_keeps_the_where_on_the_assertion_and_plus_inside_the_c
 }
 
 test_a_path_reads_params_input_lookups_positions_and_quoted_keys if {
-	_read(`$params.k."b c"[2] is 1`).assertions[0].path == {"start": "params", "steps": ["k", "b c", {"index": 2}]}
+	_read(`$params.k."b c"[2].d is 1`).assertions[0].path == {"start": "params", "steps": ["k", "b c", {"index": 2}, "d"]}
+	_read(`$params.k."b c"[2] is 1`).assertions[0].path == {"start": "params", "position": 3, "steps": ["k", "b c"]}
+	_read(`item 3 of k."b c" is 1`).assertions[0].path == {"position": 3, "steps": ["k", "b c"]}
+	_read(`item 3 of k[0] is 1`).assertions[0].path == {"position": 3, "steps": ["k", {"index": 0}]}
 	_read(`$input.x named by persona.y is 1`).assertions[0].path == {"start": "input", "steps": ["x", {"named_by": {"steps": ["persona"]}}, "y"]}
 	_read(`b[$params.k] is 1`).assertions[0].path == {"steps": ["b", {"named_by": {"start": "params", "steps": ["k"]}}]}
 	_read(`b[$input."k"] is 1`).assertions[0].path == {"steps": ["b", {"named_by": {"start": "input", "steps": ["k"]}}]}
@@ -7898,8 +7901,11 @@ test_a_path_reads_params_input_lookups_positions_and_quoted_keys if {
 	_read(`first of b is 1`).assertions[0].path == {"position": "first", "steps": ["b"]}
 	_read(`last of b is 1`).assertions[0].path == {"position": "last", "steps": ["b"]}
 	_read(`"$schema" is 1`).assertions[0].path == {"steps": ["$schema"]}
-	_read(`.count is 1`).assertions[0].path == {"dotted": true, "steps": ["count"]}
-	_read(`x is ."$schema"`).assertions[0].phrase == {"op": "is", "terms": [{"dotted": true, "steps": ["$schema"]}]}
+	_read(`.count is 1`).assertions[0].path == {"steps": ["count"]}
+	_read(`"empty" is 1`).assertions[0].path == {"steps": ["empty"]}
+	_read(`x is ."$schema"`).assertions[0].phrase == {"op": "is", "terms": [{"steps": ["$schema"]}]}
+	_read(`.x is 1`) == _read(`x is 1`)
+	_read(`x equals .total`) == _read(`x equals total`)
 }
 
 test_a_value_reads_as_json_and_a_single_quoted_string_keeps_its_backslashes if {
@@ -7908,6 +7914,12 @@ test_a_value_reads_as_json_and_a_single_quoted_string_keeps_its_backslashes if {
 	_read(`x is 1e2`).assertions[0].phrase.value == 100
 	_read(`x is null`).assertions[0].phrase == {"op": "is", "value": null}
 	_read(`x is one of "a", 1, false`).assertions[0].phrase == {"op": "is one of", "values": ["a", 1, false]}
+	_read(`x is false-positive`).assertions[0].phrase == {"op": "is", "terms": [{"steps": ["false-positive"]}]}
+	_read(`x is true-ish and y is null-x`).assertions[1].phrase == {"op": "is", "terms": [{"steps": ["null-x"]}]}
+	_read(`x is empty-thing`).assertions[0].phrase == {"op": "is", "terms": [{"steps": ["empty-thing"]}]}
+	_read(`x is not empty-ish`).assertions[0].phrase == {"op": "is not", "terms": [{"steps": ["empty-ish"]}]}
+	_read(`x is a listing`) == {"problems": ["doesn't parse"]}
+	_read(`x is -0.5`).assertions[0].phrase == {"op": "is", "value": -0.5}
 }
 
 test_each_phrase_reads_into_its_op if {
@@ -7961,15 +7973,23 @@ test_the_report_prints_one_spelling_for_each_phrase if {
 	_printed(`  x  is one of  "a",   "b" `) == `x is one of "a", "b"`
 	_printed(`x is '^\s'`) == `x is '^\s'`
 	_printed(`x is "^\\s"`) == `x is '^\s'`
+	_printed(`x is "a\\\\b"`) == `x is "a\\\\b"`
+	_printed(`x is "a\\"`) == `x is "a\\"`
+	_printed(`x is "a\\\tb"`) == `x is "a\\\tb"`
+	_printed(`x is '^\s'`) == _printed(_printed(`x is '^\s'`))
 	_printed(`x is 'it\'s'`) == `x is "it's"`
 	_printed(`x is "<"`) == `x is "<"`
 	_printed(`b[$params.k] is 1`) == "b named by $params.k is 1"
-	_printed(`b[persona][2] is 1`) == "b named by persona[2] is 1"
+	_printed(`b[persona][2].c is 1`) == "b named by persona[2].c is 1"
+	_printed(`b[persona][2] is 1`) == "item 3 of b named by persona is 1"
+	_printed(`commits[0] is "x"`) == `item 1 of commits is "x"`
+	_printed(`.x is 1`) == "x is 1"
 	_printed(`b["k"] is 1`) == "b.k is 1"
 	_printed(`b."c d" is 1`) == `b."c d" is 1`
 	_printed(`"$schema" is 1`) == `"$schema" is 1`
 	_printed(`x is ."$schema"`) == `x equals ."$schema"`
 	_printed(`.count is .sum`) == ".count equals .sum"
+	_printed(`"count" is 1`) == ".count is 1"
 	_printed(`item 3 of b is 1 and first of c is 2 and last of d is 3`) == "item 3 of b is 1 and first of c is 2 and last of d is 3"
 	_printed(`every x where n is 1, if any, is 2`) == "every x where n is 1, if any, is 2"
 	_printed(`some x where count of y is 1 is 2`) == "some x where count of y is 1 is 2"
@@ -7997,13 +8017,35 @@ test_a_from_line_reads_its_path_keys_and_where if {
 }
 
 test_a_sentence_written_wrong_says_what_is_wrong if {
-	_read(`x is "a`) == {"problems": ["unclosed quote"]}
-	_read(`x is 'a`) == {"problems": ["unclosed quote"]}
+	_read(`x is "a`) == {"problems": ["unclosed quote at column 6"]}
+	_read(`x is 'a' and y is 'b`) == {"problems": ["unclosed quote at column 19"]}
+	_read(`x is "\q"`) == {"problems": [`invalid string "\q"`]}
+	_read(`x is "a	b"`) == {"problems": [`invalid string "a	b"`]}
+	_read(`x is 'a	b'`) == {"problems": [`invalid string 'a	b'`]}
+	_read(`"\q" is 1`) == {"problems": [`invalid string "\q"`]}
 	_read(`some x, if any, is 1`) == {"problems": ["if any can't go with some"]}
 	_read(`every x some y is 1`) == {"problems": ["two quantifiers in one sentence: put them on a for line"]}
 	_read(`count is 1`) == {"problems": ["count is a word of the grammar: write .count"]}
 	_read(`x is empty_`) == {"assertions": [{"path": {"steps": ["x"]}, "phrase": {"op": "is", "terms": [{"steps": ["empty_"]}]}}]}
-	_read(`a plus b where c is 1 is 2`) == {"problems": ["a is a word of the grammar: write .a", "a where after plus goes on a count of or a sum of"]}
+	_read(`a plus b where c is 1 is 2`) == {"problems": ["a is a word of the grammar: write .a", "a where goes after every, some, count of or sum of"]}
+	_read(`x where k is 1 is 2`) == {"problems": ["a where goes after every, some, count of or sum of"]}
+	_read(`count of approvers is empty`) == {"problems": ["is empty can't follow a count of, a sum of or a plus"]}
+	_read(`x plus y matches "a"`) == {"problems": ["matches can't follow a count of, a sum of or a plus"]}
+	_read(`5 is 5`) == {"problems": ["a number can't start a sentence"]}
+	_read(`1 plus x is 5`).assertions[0].terms == [1, {"steps": ["x"]}]
+	_read(`x named by every is 1`) == {"problems": ["every can't be a name"]}
+	_read(`x[params] is 1`) == {"problems": ["params can't be a name"]}
+	_read(`commits[01] is "x"`) == {"problems": ["doesn't parse"]}
+	_read(`$foo is 1`) == {"problems": ["unknown name $foo"]}
+	_read(`x is $params`).assertions[0].phrase.terms == [{"start": "params", "steps": []}]
+	_read(`every commits.signed`) == {"problems": ["nothing after the path at column 21: expected a phrase, like is or exists"]}
+	_read(`sum of stages.usd equals total within`) == {"problems": [`"within" needs a number after it`]}
+	_read(`every  pull_requests  some approvers.state is "APPROVED"`) == {"problems": ["two quantifiers in one sentence: put them on a for line"]}
+	_read(`x is equal to 1 within 2`).assertions[0].phrase == {"op": "is", "value": 1, "within": 2}
+	_read(`x is one of "a",	"b"`) == {"problems": ["doesn't parse"]}
+	ergo._for_line(`every xs as x, every ys as x`) == {"problems": ["x is given twice"]}
+	ergo._from_line(`xs[01]`) == {"problems": ["doesn't parse"]}
+	ergo._from_line(`xs where k is 1`) == {"path": {"steps": ["xs"]}, "where": [{"path": {"steps": ["k"]}, "phrase": {"op": "is", "value": 1}}]}
 	_read(`x is between 5 and 1`) == {"problems": ["min above max"]}
 	_read(`x matches "("`) == {"problems": [`invalid pattern "("`]}
 	_read(`x is`) == {"problems": ["doesn't parse"]}
