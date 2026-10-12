@@ -213,7 +213,7 @@
     "cases": [
       {
         "description": "fails every check as ill_formed and says why",
-        "rules": ["compare.inputs", "render.missing", "written_wrong", "written_wrong.row", "compare.written_wrong", "render.path", "compare.expression", "tree.inputs"],
+        "rules": ["compare.inputs", "render.missing", "written_wrong", "written_wrong.row", "compare.written_wrong", "render.path", "compare.expression", "written_wrong.inputs"],
         "input": {"things": [{"a": 1, "b": 2, "id": "t1"}]},
         "results": [
           {

@@ -5,7 +5,7 @@
     "cases": [
       {
         "description": "passes on a string",
-        "rules": ["present.pass", "present.inputs", "present.expression", "render.path"],
+        "rules": ["present.pass", "row.inputs", "present.expression", "render.path"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
@@ -92,7 +92,7 @@
     "cases": [
       {
         "description": "fails as value when the parent is missing",
-        "rules": ["present.missing", "path.absent", "present.inputs"],
+        "rules": ["present.missing", "path.absent", "row.inputs"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x.y", "value": null}]}
@@ -130,7 +130,7 @@
     "cases": [
       {
         "description": "passes when the item is there",
-        "rules": ["present.pass", "present.inputs"],
+        "rules": ["present.pass", "row.inputs"],
         "input": {"things": [{"id": "t1", "x": ["a", "b"]}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x.1", "value": "b"}]}
@@ -168,7 +168,7 @@
     "cases": [
       {
         "description": "passes on a subject that isn't an object, because an empty path reads the subject itself",
-        "rules": ["present.pass", "path.empty", "present.inputs", "name.subject"],
+        "rules": ["present.pass", "path.empty", "row.inputs", "name.subject"],
         "input": {"things": ["a"]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "a"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "things[]", "value": "a"}]}
@@ -190,7 +190,7 @@
     "cases": [
       {
         "description": "passes when the one matching item has the field",
-        "rules": ["present.pass", "path.selector", "present.inputs"],
+        "rules": ["present.pass", "path.selector", "row.inputs"],
         "input": {"things": [{"id": "t1", "xs": [{"k": "a", "v": 1}, {"k": "b"}]}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "xs.[k==\"a\"].v", "value": 1}]}
@@ -236,7 +236,7 @@
     "cases": [
       {
         "description": "names the selector's fields in order and quotes the key",
-        "rules": ["present.pass", "name.selector", "name.keys", "present.inputs"],
+        "rules": ["present.pass", "name.selector", "name.keys", "row.inputs"],
         "input": {"things": [{"id": "t1", "xs": [{"k": "a", "b": 2, "a.b": 1}, {"k": "a", "b": 3}]}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "xs.[b==2 and k==\"a\"].\"a.b\"", "value": 1}]}
@@ -264,7 +264,7 @@
     "cases": [
       {
         "description": "both pass when the fields are there",
-        "rules": ["present.pass", "path.start", "path.ref_step", "present.inputs", "name.ref_step", "path.steps"],
+        "rules": ["present.pass", "path.start", "path.ref_step", "row.inputs", "name.ref_step", "path.steps"],
         "input": {"flag": true, "things": [{"id": "t1", "x": {"a": 1}}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "by_ref", "passed": true, "cause": "satisfied", "inputs": [{"name": "x.[$$params.key]", "value": 1}]},
@@ -289,7 +289,7 @@
     "cases": [
       {
         "description": "fails as unusable when the ref reads something that can't be a key",
-        "rules": ["present.other", "path.ref_step", "present.inputs", "name.ref_step"],
+        "rules": ["present.other", "path.ref_step", "row.inputs", "name.ref_step"],
         "input": {"things": [{"id": "t1", "x": {"a": 1}}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x.[$$params.key]", "value": null}]}
@@ -304,7 +304,7 @@
     "cases": [
       {
         "description": "fails as absent, not value, because the field it looks for is unknown, not missing",
-        "rules": ["present.other", "path.ref_step", "present.inputs", "name.ref_step"],
+        "rules": ["present.other", "path.ref_step", "row.inputs", "name.ref_step"],
         "input": {"things": [{"id": "t1", "x": {"a": 1}}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x.[$$params.key]", "value": null}]}
@@ -331,7 +331,7 @@
     "cases": [
       {
         "description": "fails every check as ill_formed whatever the subject holds",
-        "rules": ["present.written_wrong", "written_wrong", "written_wrong.row", "present.inputs", "name.invalid_step", "tree.inputs", "path.not_a_list", "path.steps"],
+        "rules": ["written_wrong.fields", "written_wrong", "written_wrong.row", "row.inputs", "name.invalid_step", "written_wrong.inputs", "path.not_a_list", "path.steps"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
           {
@@ -446,7 +446,7 @@
     "cases": [
       {
         "description": "fails as value",
-        "rules": ["present.missing", "present.inputs"],
+        "rules": ["present.missing", "row.inputs"],
         "input": {"runs": {}},
         "results": [
           {"requirement": "s", "subject": {"type": "test run", "id": "unit"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "result", "value": null}]}
@@ -461,7 +461,7 @@
     "cases": [
       {
         "description": "fails as absent, because params that aren't an object weren't given either",
-        "rules": ["present.no_params", "path.start", "present.inputs", "path.steps"],
+        "rules": ["present.no_params", "path.start", "row.inputs", "path.steps"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "$$params.flag", "value": null}]}
@@ -476,7 +476,7 @@
     "cases": [
       {
         "description": "fails as value, because the params were given and the field isn't in them",
-        "rules": ["present.missing", "present.no_params", "present.inputs", "path.steps"],
+        "rules": ["present.missing", "present.no_params", "row.inputs", "path.steps"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "$$params.flag", "value": null}]}

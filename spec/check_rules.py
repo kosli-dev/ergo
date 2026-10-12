@@ -18,6 +18,8 @@ for f in sorted(glob.glob("spec/cases/*/cases.json")):
                     unknown.append(f"{f}: {group['description']} / {case['description']} cites {name}")
 for line in unknown:
     print(line)
-for name in sorted(set(rules) - cited):
+waiting = open("spec/OPEN.md").read()
+uncited = [name for name in sorted(set(rules) - cited) if f"`{name}`" not in waiting]
+for name in uncited:
     print(f"{rules[name]}: no case cites {name}")
-sys.exit(1 if unknown else 0)
+sys.exit(1 if unknown or uncited else 0)
