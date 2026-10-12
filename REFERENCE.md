@@ -84,13 +84,13 @@ A subject is the kind of thing a requirement checks, like a deployment or a pull
 }
 ```
 
-| Field         | Meaning                                                                                                | Default           |
-| ------------- | ------------------------------------------------------------------------------------------------------ | ----------------- |
-| `description` | What the subject is, in words anyone can read. ergo doesn't copy it into the report.                   | `""`              |
-| `from`        | The [path](#paths) to the subjects in the input. It can end with a [naming step](#naming-subjects).    | the whole input   |
-| `id`          | The path, inside one subject, to the value that identifies it.                                         | the whole subject |
-| `applies_to`  | Named checks that pick which of them are in scope. A subject must pass all of them.                    | no filter         |
-| `of`          | The name of another subject this one [builds on](#a-subject-built-on-another).                          | none              |
+| Field         | Meaning                                                                                             | Default           |
+| ------------- | --------------------------------------------------------------------------------------------------- | ----------------- |
+| `description` | What the subject is, in words anyone can read. ergo doesn't copy it into the report.                | `""`              |
+| `from`        | The [path](#paths) to the subjects in the input. It can end with a [naming step](#naming-subjects). | the whole input   |
+| `id`          | The path, inside one subject, to the value that identifies it.                                      | the whole subject |
+| `applies_to`  | Named checks that pick which of them are in scope. A subject must pass all of them.                 | no filter         |
+| `of`          | The name of another subject this one [builds on](#a-subject-built-on-another).                      | none              |
 
 The subject's name is what the report calls each one, in every row, like `"subject": {"type": "deployment", "id": "d-2"}`, and in the descriptions of the [checks ergo adds](#checks-ergo-adds), like `The in-scope deployment count is at least 1`. So name it the way a reader would, like `deployment` or `pull request`.
 
@@ -157,14 +157,14 @@ A subject with `of` reads `from` and `id` from the subject it names, and keeps o
 }
 ```
 
-| Field          | Meaning                                                                                               | Default   |
-| -------------- | ----------------------------------------------------------------------------------------------------- | --------- |
-| `description`  | What the requirement asks for, in words anyone can read. It's copied into the report.                 | `""`      |
+| Field          | Meaning                                                                                                                               | Default   |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| `description`  | What the requirement asks for, in words anyone can read. It's copied into the report.                                                 | `""`      |
 | `meta`         | Anything else you want to keep with the requirement, like a control id or an owner. It's copied into the report. ergo never reads it. | `{}`      |
-| `subject`      | The name of the [subject](#subjects) it checks.                                                       | required  |
-| `require`      | `"every"`: every subject must pass every check. `"some"`: at least one subject must pass every check. | `"every"` |
-| `min_subjects` | How many subjects must be left after the subject's `applies_to` for the requirement to be met.        | `1`       |
-| `checks`       | Named checks that each subject must pass.                                                             | required  |
+| `subject`      | The name of the [subject](#subjects) it checks.                                                                                       | required  |
+| `require`      | `"every"`: every subject must pass every check. `"some"`: at least one subject must pass every check.                                 | `"every"` |
+| `min_subjects` | How many subjects must be left after the subject's `applies_to` for the requirement to be met.                                        | `1`       |
+| `checks`       | Named checks that each subject must pass.                                                                                             | required  |
 
 A few details:
 
@@ -519,21 +519,21 @@ Every check has an `op` and the parameters that operator needs. A field the oper
 
 These read one or two fields of a subject.
 
-| `op`               | Parameters                  | Passes when                                                                                                          |
-| ------------------ | --------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `equals`           | `path`, `value`             | the field equals `value`. The type must match too, so `"1"` doesn't equal `1`.                                       |
-| `in`               | `path`, `values`            | the field is one of `values`. The type must match too, as for `equals`.                                              |
-| `present`          | `path`                      | the field exists and isn't `null`. An empty string or `false` still counts as present.                               |
-| `missing`          | `path`                      | the field isn't there, or is `null`.                                                                                 |
-| `non_empty_string` | `path`                      | the field is a string, and not `""`.                                                                                 |
-| `empty`            | `path`                      | the field is an empty list.                                                                                          |
-| `matches_any`      | `path`, `patterns`          | the field is a string that matches at least one of the regular expressions.                                          |
-| `not_matches_any`  | `path`, `patterns`          | the field is a string that matches none of them.                                                                     |
-| `range`            | `path`, `min`, `max`        | the field is a number between `min` and `max`, both included.                                                        |
-| `includes`         | `path`, `value` or `values` | the field is a list that contains `value`. With `values` in place of `value`, it contains every one of them.         |
-| `excludes`         | `path`, `value` or `values` | the field is a list that doesn't contain `value`. With `values` in place of `value`, it contains none of them.       |
+| `op`               | Parameters                  | Passes when                                                                                                                                       |
+| ------------------ | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `equals`           | `path`, `value`             | the field equals `value`. The type must match too, so `"1"` doesn't equal `1`.                                                                    |
+| `in`               | `path`, `values`            | the field is one of `values`. The type must match too, as for `equals`.                                                                           |
+| `present`          | `path`                      | the field exists and isn't `null`. An empty string or `false` still counts as present.                                                            |
+| `missing`          | `path`                      | the field isn't there, or is `null`.                                                                                                              |
+| `non_empty_string` | `path`                      | the field is a string, and not `""`.                                                                                                              |
+| `empty`            | `path`                      | the field is an empty list.                                                                                                                       |
+| `matches_any`      | `path`, `patterns`          | the field is a string that matches at least one of the regular expressions.                                                                       |
+| `not_matches_any`  | `path`, `patterns`          | the field is a string that matches none of them.                                                                                                  |
+| `range`            | `path`, `min`, `max`        | the field is a number between `min` and `max`, both included.                                                                                     |
+| `includes`         | `path`, `value` or `values` | the field is a list that contains `value`. With `values` in place of `value`, it contains every one of them.                                      |
+| `excludes`         | `path`, `value` or `values` | the field is a list that doesn't contain `value`. With `values` in place of `value`, it contains none of them.                                    |
 | `compare`          | `left`, `right`, `cmp`      | both sides can be read, have the same type, and `left cmp right` is true. A side is a field, a fixed value or a [derived value](#derived-values). |
-| `compare_time`     | `left`, `right`, `cmp`      | both fields are timestamps in the same format (both RFC 3339 strings, or both numbers) and `left cmp right` is true. |
+| `compare_time`     | `left`, `right`, `cmp`      | both fields are timestamps in the same format (both RFC 3339 strings, or both numbers) and `left cmp right` is true.                              |
 
 `cmp` is one of `eq`, `ne`, `gt`, `gte`, `lt` or `lte`.
 
@@ -578,13 +578,13 @@ These two are useful in `applies_to`, for example to leave bot accounts out of a
 
 A side of `compare` can be worked out from the subject instead of read from one field. That's how a check says "at least one persona ran", "the findings from Claude match the number it reported" or "the stage costs add up to the total":
 
-| Side | Value |
-| --- | --- |
-| `{"literal": 1}` | the value as written |
-| `{"count": path}` | the number of items in the list at `path` |
-| `{"count": path, "where": check}` | the number of those items that pass `check` |
-| `{"sum": path, "each": path}` | the numbers at `each` in every item of the list at `path`, added up. With `where`, only the items that pass it. |
-| `{"add": [side, ...]}` | the sides added up. Each one is a path, a number written as a `literal`, a `count` or a `sum`. |
+| Side                              | Value                                                                                                           |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `{"literal": 1}`                  | the value as written                                                                                            |
+| `{"count": path}`                 | the number of items in the list at `path`                                                                       |
+| `{"count": path, "where": check}` | the number of those items that pass `check`                                                                     |
+| `{"sum": path, "each": path}`     | the numbers at `each` in every item of the list at `path`, added up. With `where`, only the items that pass it. |
+| `{"add": [side, ...]}`            | the sides added up. Each one is a path, a number written as a `literal`, a `count` or a `sum`.                  |
 
 `compare` also takes `within` with `cmp: eq`, so two numbers pass when they're at most that far apart. Money and durations rarely add up to the exact cent.
 
@@ -628,11 +628,11 @@ costs_add_up:
 
 all three pass. Each row shows the value ergo worked out, named after the side, beside the list it came from:
 
-| check | expression | inputs |
-| --- | --- | --- |
-| `some_persona` | `count(personas_ran) gte 1` | `count(personas_ran) = 1`, `personas_ran = ["security"]` |
-| `claude_findings` | `count(findings where source == "claude") eq claude_found` | `count(findings where source == "claude") = 2`, `findings = [...]`, `claude_found = 2` |
-| `costs_add_up` | `sum(stages[].usd where kind == "model") eq total_usd, within 0.01` | `sum(stages[].usd where kind == "model") = 0.75`, `stages[].usd = [0.5, 0.25, 0]`, `total_usd = 0.76` |
+| check             | expression                                                          | inputs                                                                                                |
+| ----------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `some_persona`    | `count(personas_ran) gte 1`                                         | `count(personas_ran) = 1`, `personas_ran = ["security"]`                                              |
+| `claude_findings` | `count(findings where source == "claude") eq claude_found`          | `count(findings where source == "claude") = 2`, `findings = [...]`, `claude_found = 2`                |
+| `costs_add_up`    | `sum(stages[].usd where kind == "model") eq total_usd, within 0.01` | `sum(stages[].usd where kind == "model") = 0.75`, `stages[].usd = [0.5, 0.25, 0]`, `total_usd = 0.76` |
 
 Some things worth knowing:
 
@@ -646,8 +646,8 @@ Some things worth knowing:
 
 These apply a check to each item of a list inside the subject.
 
-| `op`  | Parameters                                         | Passes when                                                |
-| ----- | -------------------------------------------------- | ---------------------------------------------------------- |
+| `op`  | Parameters                                          | Passes when                                                |
+| ----- | --------------------------------------------------- | ---------------------------------------------------------- |
 | `all` | `path`, `check`, `each` (optional), `as` (optional) | the list isn't empty and every item passes `check`.        |
 | `any` | `path`, `check`, `each` (optional), `as` (optional) | the list isn't empty and at least one item passes `check`. |
 
@@ -995,11 +995,11 @@ Three rules:
 
 `status` is one of:
 
-| `status`         | When                                                                                                    |
-| ---------------- | ------------------------------------------------------------------------------------------------------- |
-| `met`            | the requirement passed, and at least one subject was left to check                                      |
+| `status`         | When                                                                                                                                          |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `met`            | the requirement passed, and at least one subject was left to check                                                                            |
 | `not_met`        | anything else: a check failed, too few subjects were left, a filter couldn't be read, or the requirement is [written wrong](#basic-operators) |
-| `not_applicable` | the requirement would have passed, but no subject was left after `applies_to`, which only happens with `min_subjects: 0` |
+| `not_applicable` | the requirement would have passed, but no subject was left after `applies_to`, which only happens with `min_subjects: 0`                      |
 
 To tell whether a requirement passed, compare `status` with `"met"` (or `"not_applicable"`, if that counts as passing for you). Don't test for `"not_met"`, so a value you didn't expect counts as a failure.
 
@@ -1064,12 +1064,12 @@ Passing and failing rows have the same fields. A row of an `all` or `any` check 
 
 ergo adds four checks of its own. They start with `$`, so they can't clash with yours.
 
-| Check           | One row per | Passes when                                                                                                                            |
-| --------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Check           | One row per | Passes when                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| --------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `$well_formed`  | requirement | the requirement names a subject in `subjects`, the requirement and its subject have only the fields ergo knows and they have the right types, it has at least one check, a valid `require`, a well written naming step if `from` has one, no step in `from` or `id` that can't be a key, no number a 64-bit float can't hold in `from`, `id` or `min_subjects`, no set or key that isn't a string in `from` or `id` and no key that isn't a string in `checks` or `applies_to`, a name that's a string, and no check that's [written wrong](#basic-operators). This depends only on how the requirement and its subject are written, never on the input or the params. |
-| `$min_subjects` | requirement | `from` leads to a list or an object, unless it ends with a `keys` step, and at least `min_subjects` subjects are left after `applies_to`. |
-| `$unique_ids`   | requirement | no two subjects share an id, counting the ones `applies_to` leaves out.                                                                |
-| `$applies`      | subject     | the subject passes the `applies_to` filter. These rows only exist when the subject has a filter.                                       |
+| `$min_subjects` | requirement | `from` leads to a list or an object, unless it ends with a `keys` step, and at least `min_subjects` subjects are left after `applies_to`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `$unique_ids`   | requirement | no two subjects share an id, counting the ones `applies_to` leaves out.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `$applies`      | subject     | the subject passes the `applies_to` filter. These rows only exist when the subject has a filter.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 
 The `$well_formed` expression is `count(problems) == 0`. The problems are the inputs below, one for each check or field that's written wrong, so a requirement that's written correctly has none.
 
@@ -1099,23 +1099,23 @@ The fields of the requirement and its subject get an input of the same form when
 ]
 ```
 
-| Field                                     | What's wrong                                                                                                                     |
-| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| any field ergo doesn't know               | `unknown field`                                                                                                                  |
-| `checks`                                  | `not an object`, `holds a key that isn't a string`, `missing`, `empty`                                                           |
-| `require`                                 | `neither every nor some`                                                                                                         |
-| `min_subjects`                            | `not a whole number of 0 or more`, `number out of range`                                                                         |
-| `subject`                                 | `missing`, `empty or not a string`, `not in subjects`                                                                            |
-| `subjects`                                | `not an object`                                                                                                                  |
-| `subjects.deployment`                     | `not an object`                                                                                                                  |
-| `subjects.deployment.applies_to`          | `not an object`, `holds a key that isn't a string`                                                                               |
-| `subjects.deployment.from`, `...id`       | `not a list`, `step that can't be a key`, `number out of range`, `holds a set`, `holds a key that isn't a string`                |
-| `subjects.deployment.from`                | `object step before the last`, `object step without each_as`, `invalid name`, `invalid keys`, `unknown field foo in naming step` |
-| `subjects.deployment.id`                  | `ref inside where`, `literal inside where`                                                                                       |
-| `subjects.deployment.description`         | `not a string`                                                                                                                   |
-| `subjects.deployment.of`                  | `empty or not a string`, `not in subjects`, `leads to a loop`                                                                    |
-| `subjects.deployment.from`, `...id`       | `not allowed with of`                                                                                                            |
-| `subjects.deployment.applies_to.locked`   | `also a filter of a subject it builds on`                                                                                        |
+| Field                                   | What's wrong                                                                                                                     |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| any field ergo doesn't know             | `unknown field`                                                                                                                  |
+| `checks`                                | `not an object`, `holds a key that isn't a string`, `missing`, `empty`                                                           |
+| `require`                               | `neither every nor some`                                                                                                         |
+| `min_subjects`                          | `not a whole number of 0 or more`, `number out of range`                                                                         |
+| `subject`                               | `missing`, `empty or not a string`, `not in subjects`                                                                            |
+| `subjects`                              | `not an object`                                                                                                                  |
+| `subjects.deployment`                   | `not an object`                                                                                                                  |
+| `subjects.deployment.applies_to`        | `not an object`, `holds a key that isn't a string`                                                                               |
+| `subjects.deployment.from`, `...id`     | `not a list`, `step that can't be a key`, `number out of range`, `holds a set`, `holds a key that isn't a string`                |
+| `subjects.deployment.from`              | `object step before the last`, `object step without each_as`, `invalid name`, `invalid keys`, `unknown field foo in naming step` |
+| `subjects.deployment.id`                | `ref inside where`, `literal inside where`                                                                                       |
+| `subjects.deployment.description`       | `not a string`                                                                                                                   |
+| `subjects.deployment.of`                | `empty or not a string`, `not in subjects`, `leads to a loop`                                                                    |
+| `subjects.deployment.from`, `...id`     | `not allowed with of`                                                                                                            |
+| `subjects.deployment.applies_to.locked` | `also a filter of a subject it builds on`                                                                                        |
 
 A policy written in Rego can use a key that isn't a string, like `true` or `1.5`. ergo names it `<invalid key true>` or `<invalid key 1.5>`, so two such keys never share a name. A requirement whose own name isn't a string, like `1`, or every requirement of a policy written as a list, fails `$well_formed`, which then starts with `{"name": "requirement name", "value": ["not a string"]}`. The requirement is `not_met`, so the policy isn't compliant.
 
