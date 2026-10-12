@@ -81,7 +81,7 @@ Every row has a cause. When a check reads several values, the row takes the firs
 
 ## What a row shows
 
-**[present.inputs]** A check that reads one path, like `present`, `missing`, `equals` or `in`, has one entry in its row's `inputs`: the path's name and the value read, or `null` when nothing was.
+**[path.inputs]** A check that reads one path, like `present`, `missing`, `equals` or `in`, has one entry in its row's `inputs`: the path's name and the value read, or `null` when nothing was.
 
 ## `present`
 

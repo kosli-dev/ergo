@@ -1,10 +1,10 @@
 # Open questions
 
-Things the spec doesn't settle yet, because they need a decision first. This branch is experimental, so they're kept here rather than in issues.
+Things the spec doesn't settle yet, because they need a decision first. Open questions about the spec live here, not in issues.
 
 ## Custom operators
 
-The spec says what a custom operator looks like to a policy and a report. `ergo.rego` and the Rust port agree on that much, and differ on the rest:
+The spec says what a custom operator looks like to a policy and a report. `ergo.rego` and the Rust port, which is on the `core/conformance-suite` branch and not on `main` yet, agree on that much, and differ on the rest:
 
 |                                  | `ergo.rego`                                                                         | Rust port                                                                                                                                                        |
 | -------------------------------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -27,3 +27,13 @@ Derived values on a side of `compare` (`count`, `sum`, `add`, `literal`, and `wi
 ## Subjects built on another
 
 A subject with `of` (see [REFERENCE.md](../REFERENCE.md#a-subject-built-on-another)) has an entry in `policy/schema.json`, but no rules and no cases yet.
+
+## Time limits
+
+`time.format` only takes years 1678 to 2261 and only counts the first nine digits of a fraction. Both limits come from OPA, which holds a time as nanoseconds since 1970 in a 64-bit integer. A port in another language would have to add them on purpose. Either they stay, and the spec keeps them as a rule every implementation follows, or the spec drops them and `ergo.rego` has to compare times some other way outside that range.
+
+## Rules without cases
+
+Every rule needs a case, apart from the ones listed here. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.
+
+- `compare.derived`

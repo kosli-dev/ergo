@@ -30,7 +30,7 @@ Draft 0.1. This file covers the syntax policies use today, where a check is a JS
 
 ## Custom operators
 
-**[custom.syntax]** A custom operator check can have any fields, besides `op`. Because ergo can't work out what the operator reads or how to describe it, the check also gives `expression`, the text the report shows, and `inputs`, a list of the paths it reads. An entry in `inputs` can be a path, or `{"path": [...], "each": [...]}` to read one field from every item of a list. `ergo.rego` needs them. An engine that knows more about the operator, like the Rust port, uses them when they're there.
+**[custom.syntax]** A custom operator check can have any fields, besides `op`. Because ergo can't work out what the operator reads or how to describe it, the check also gives `expression`, the text the report shows, and `inputs`, a list of the paths it reads. An entry in `inputs` can be a path, or `{"path": [...], "each": [...]}` to read one field from every item of a list. `ergo.rego` needs them. An engine that knows more about the operator, like the Rust port on the `core/conformance-suite` branch, uses them when they're there.
 
 ## Compare
 
@@ -40,9 +40,9 @@ Draft 0.1. This file covers the syntax policies use today, where a check is a JS
 
 **[written_wrong.row]** A check [written wrong](semantics.md#the-model-of-a-check) makes the `$well_formed` row list it in its `inputs`, after `count(checks)` and `require`, sorted by name, with the list of what's wrong, sorted. A check of the requirement is named `checks.<name>`. A filter is named `subjects.<subject>.applies_to.<name>`, and a field of a subject definition `subjects.<subject>.<field>`, like `subjects.deployment.from`.
 
-**[present.written_wrong]** A check is written wrong when a parameter its operator needs is missing, which is written `missing <field>`, or when it has a field its operator doesn't take, written `unknown field <name>`. Besides its own parameters, any check can have `description`, `meta`, `expression`, `substitute` and `inputs`. A path that isn't a list is written `path not a list`, and one with a step that can't be a step is written `step that can't be a key in path`. The same goes for `left`, `right` and `each`.
+**[written_wrong.fields]** A check is written wrong when a parameter its operator needs is missing, which is written `missing <field>`, or when it has a field its operator doesn't take, written `unknown field <name>`. Besides its own parameters, any check can have `description`, `meta`, `expression`, `substitute` and `inputs`. A path that isn't a list is written `path not a list`, and one with a step that can't be a step is written `step that can't be a key in path`. The same goes for `left`, `right` and `each`.
 
-**[tree.inputs]** A check whose path is missing or isn't a list has nothing to name, so its row's `inputs` is `[]`. So does a `compare` or `compare_time` whose `left` or `right` is missing or isn't a list, and an `all` or `any` whose inner check is missing or isn't an object.
+**[written_wrong.inputs]** A check whose path is missing or isn't a list has nothing to name, so its row's `inputs` is `[]`. So does a `compare` or `compare_time` whose `left` or `right` is missing or isn't a list, and an `all` or `any` whose inner check is missing or isn't an object.
 
 **[range.written_wrong]** A `min` or `max` that isn't a number or a ref is written `invalid min` or `invalid max`, and a `min` above `max` is written `min above max`.
 
