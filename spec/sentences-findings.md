@@ -154,5 +154,7 @@ The grammar in [`sentences.abnf`](sentences.abnf) had to pick where the prose le
 - `is a list` and `is an object` take either article, and the report prints `an` before `object` and `a` before the rest.
 - Spaces: any run of spaces between two words reads as one, and a comma between values can have any number of spaces after it. The report prints one space and `, `.
 - The made-up corpus line `count of x where field is "v" equals a plus b` became `equals y plus z`, because `a` is a grammar word.
+- `count of x where n is m plus k is t` is no longer written wrong. It reads one way, with `m plus k` as the condition's right side. The prose had forbidden it because a tokenizer without a grammar found three readings.
+- A quoted string on the right side is a value, never a key, and that's in the grammar itself as `right-path`, not only in the prose. A field whose key needs quotes is written `."$schema"` on the right, as the prose already said.
 
-Still to do: count readings against the ABNF, as the tokenizer did against the prose rules, so that "every line parses exactly one way" is checked against the grammar and not only the rules it was written from.
+The count against the grammar is done, with Lark's Earley parser: all 306 corpus lines read exactly one way once the two rules the ABNF can't hold are applied, the grammar words and the `for` names. The scripts are outside the repo, like the tokenizer before them.

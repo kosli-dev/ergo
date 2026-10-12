@@ -29,10 +29,10 @@ condition         = path WS phrase / derived WS compare-phrase
 ; Derived values: count of, sum of, and terms added with plus.
 ; Only the last term on the left can carry a where, and none on the right.
 derived           = ("count" / "sum") WS "of" WS path
-term              = path / derived / number
+term              = right-path / derived / number
 derived-left      = derived [WS where]
                   / 1*(term WS "plus" WS) (term / derived WS where)
-field             = (path / derived) *(WS "plus" WS term)
+field             = (right-path / derived) *(WS "plus" WS term)
                   / number 1*(WS "plus" WS term)
 operand           = value / field
 
@@ -59,15 +59,18 @@ matches-phrase    = ("matches" / "does not match") WS list
 starts-phrase     = ("starts with" / "ends with") WS operand
 time-phrase       = ("is before" / "is after" / "is on or after" / "is on or before") WS operand
 
-list              = values / path
+list              = values / right-path
 values            = value *("," WS value)
 value             = string / number / "true" / "false" / "null"
 
 ; Paths. The first key of a path, when bare, is never a word of the
 ; grammar (sentences.md lists them); "." in front of it lifts that.
+; On the right side of a phrase a quoted string is a value, so a path
+; there can't start with a quoted key unless a "." is in front of it.
 path              = start *step
+right-path        = ("$params" / "$input" / bare-key / "." key) *step
 start             = "$params" / "$input" / first-key
-first-key         = bare-key / "." bare-key / quoted-key
+first-key         = bare-key / "." key / quoted-key
 step              = "." key / WS "named by" WS reference
                   / "[" reference "]" / "[" quoted-key "]" / "[" int "]"
 key               = bare-key / quoted-key
