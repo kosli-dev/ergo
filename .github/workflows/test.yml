@@ -22,6 +22,7 @@ jobs:
       - run: opa check --strict . --ignore .github
       - run: opa fmt --list --fail .
       - run: opa test . --ignore .github --timeout 120s --verbose
+      - run: python3 spec/sentences_corpus.py --check
       - name: Lint for likely bugs
         run: regal lint --format github --disable-all --enable-category bugs --disable redundant-existence-check --ignore-files '.github/**' .
       - name: Check there are no comments
