@@ -334,20 +334,19 @@ Read as `is` or `equals`, and printed as one of them. With it in the grammar, ev
 
 **[sentence.written_wrong.slot]** A sentence that doesn't parse is written wrong, as a check that can't be read into the model is today. Its rows fail with `ill_formed` and `$well_formed` lists it. Because the grammar is flat, the message can name the slot, what it expected and the column:
 
-| sentence                                                 | `$well_formed` says                                                                              |
-| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `approved_by is empy`                                    | `unknown phrase "is empy" at column 13, expected one of: is empty, is not empty, is one of, ...` |
-| `environment is "prod`                                   | `unclosed quote at column 16`                                                                    |
-| `every commits.signed`                                   | `nothing after the path at column 21: expected a phrase, like "is" or "exists"`                  |
-| `sum of stages.usd equals total within`                  | `"within" needs a number after it`                                                               |
-| `some approvers, if any, is not empty`                   | `if any can't go with some`                                                                      |
-| `every pull_requests some approvers.state is "APPROVED"` | `two quantifiers in one sentence: put them on a for line`                                        |
+| sentence                                                 | `$well_formed` says                                                             |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `environment is "prod`                                   | `unclosed quote at column 16`                                                   |
+| `every commits.signed`                                   | `nothing after the path at column 21: expected a phrase, like "is" or "exists"` |
+| `sum of stages.usd equals total within`                  | `"within" needs a number after it`                                              |
+| `some approvers, if any, is not empty`                   | `if any can't go with some`                                                     |
+| `every pull_requests some approvers.state is "APPROVED"` | `two quantifiers in one sentence: put them on a for line`                       |
 
-`environment is prod` parses, as a comparison with a field called `prod`, unless the subject has no such field. That's the one mistake the grammar can't catch, so the message for a missing field in an `is` argument should suggest quotes.
+`environment is prod` and `approved_by is empy` parse, as comparisons with a field called `prod` or `empy`, unless the subject has no such field. That's the one mistake the grammar can't catch, so the message for a missing field in an `is` argument should suggest quotes.
 
 ## Printing the sentence
 
-**[sentence.print.canonical]** The report's `expression` is the sentence printed from its parse in one spelling: single spaces, `is` and `is not` before a value and `equals` and `does not equal` before a field, `is one of` before written values and `is in` before a path, no alias, a string in single quotes when it holds a backslash and no single quote and in double quotes with JSON escapes otherwise, a dot in front of a right-side field only where [sentence.path.argument](#paths) needs one, numbers in their plain form, and values separated by `, `. Parsing the printed sentence gives the same parse.
+**[sentence.print.canonical]** The report's `expression` is the sentence printed from its parse in one spelling: single spaces, `is` and `is not` before a value and `equals` and `does not equal` before a field, `is one of` before written values and `is in` before a path, no alias, a string in single quotes when it holds a backslash but no single quote, no two backslashes in a row, no backslash at the end and no control character, and in double quotes with JSON escapes otherwise, a dot in front of a right-side field only where [sentence.path.argument](#paths) needs one, numbers in their plain form, and values separated by `, `. Parsing the printed sentence gives the same parse.
 
 **[sentence.print.order]** `where` conditions and assertions joined with `and` print in the order the author wrote them. The report stays byte for byte the same when the same policy runs again on the same input. That rule is for the same policy, not for two policies that mean the same: `A and B` and `B and A` print differently, because the order changes neither what passes nor the cause, and sorting would have to reach `assert` lists too, and could never reach `for` items, whose order is their nesting. A row's `inputs` stay sorted by name, as today, because they're values that were read, not a sentence.
 

@@ -44,7 +44,7 @@ compare-phrase    = within-phrase / order-phrase / between-phrase / is-phrase
 
 is-phrase         = ("is not" / "does not equal") WS operand
                   / ("is equal to" / "equals" / "is") WS operand
-within-phrase     = ("equals" / "is") WS operand WS "within" WS number
+within-phrase     = ("is equal to" / "equals" / "is") WS operand WS "within" WS number
 order-phrase      = ("is at least" / "is at most" / "is more than" / "is less than") WS operand
 between-phrase    = "is between" WS number WS "and" WS number
 one-of-phrase     = ("is one of" / "is in") WS list
