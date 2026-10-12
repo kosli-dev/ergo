@@ -1,6 +1,6 @@
 # How checks are written as sentences
 
-Draft 0.1, a proposal from [#174](https://github.com/kosli-dev/ergo/issues/174). Nothing implements it yet. This file says how a check written as a one-line sentence, like `approved_by is not empty`, reads into the [model](semantics.md#the-model-of-a-check), what counts as written wrong, and how the report prints it. What a check means once it's read is in [semantics.md](semantics.md), as for today's syntax in [syntax.md](syntax.md).
+Draft 0.1, a proposal from [#174](https://github.com/kosli-dev/ergo/issues/174). `ergo.rego` reads a sentence into its model, and prints it back, but no report runs on one yet. This file says how a check written as a one-line sentence, like `approved_by is not empty`, reads into the [model](semantics.md#the-model-of-a-check), what counts as written wrong, and how the report prints it. What a check means once it's read is in [semantics.md](semantics.md), as for today's syntax in [syntax.md](syntax.md).
 
 [`sentences-corpus.md`](sentences-corpus.md) has every check from sdlc-policies, the server's demo and npm-bump policies, pr-reviewer, ergo's examples and Tore's DEV controls written both ways. Every sentence in it parses exactly one way with the phrases below. The phrases, the tally and the misfits come from it.
 
