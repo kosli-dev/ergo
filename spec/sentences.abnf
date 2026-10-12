@@ -28,7 +28,7 @@ condition         = path WS phrase / derived WS compare-phrase
 
 ; Derived values: count of, sum of, and terms added with plus.
 ; Only the last term on the left can carry a where, and none on the right.
-derived           = ("count" / "sum") WS "of" WS path
+derived           = ("count" / "sum") WS "of" WS plain-path
 term              = right-path / derived / number
 derived-left      = derived [WS where]
                   / 1*(term WS "plus" WS) (term / derived WS where)
@@ -67,8 +67,15 @@ value             = string / number / "true" / "false" / "null"
 ; grammar (sentences.md lists them); "." in front of it lifts that.
 ; On the right side of a phrase a quoted string is a value, so a path
 ; there can't start with a quoted key unless a "." is in front of it.
-path              = start *step
-right-path        = ("$params" / "$input" / bare-key / "." key) *step
+; A position picks one item of the list a path ends at, counting from 1:
+; item 3 of items, first of items, last of items. items[2] is the same
+; item as item 3 of items.
+path              = plain-path / position WS "of" WS plain-path
+plain-path        = start *step
+right-path        = plain-right / position WS "of" WS plain-right
+plain-right       = ("$params" / "$input" / bare-key / "." key) *step
+position          = "item" WS positive / "first" / "last"
+positive          = %x31-39 *DIGIT
 start             = "$params" / "$input" / first-key
 first-key         = bare-key / "." key / quoted-key
 step              = "." key / WS "named by" WS reference

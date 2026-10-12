@@ -150,7 +150,7 @@ The grammar in [`sentences.abnf`](sentences.abnf) had to pick where the prose le
 - A grammar word can't be a bare first key on the left side either, not only on the right. `count is at least 1` would otherwise read as a field called `count` or the start of `count of`. Write `.count is at least 1`. One rule for both sides.
 - `, if any,` goes after the `where`, not before it: `every items where kind is "a", if any, is at least 2`. On a `for` line it goes before `as`.
 - A `count of` or `sum of` on the right side of a phrase takes no `where`, because `x is count of y where a is 1 and b is 2` could be one assertion or two.
-- A position is written `items[2]` only. The word forms `item 3 of items`, `first of` and `last of` are out, since no policy in the corpus needs a position.
+- A position has both spellings: `item 3 of items`, `first of items` and `last of items` count from 1, and `items[2]` from 0. The word form takes the whole rest of the path after `of`, so a field of the picked item needs the brackets, `commits[2].sha`, and the report prints brackets only then. `first`, `item` and `last` join the grammar words.
 - `is a list` and `is an object` take either article, and the report prints `an` before `object` and `a` before the rest.
 - Spaces: any run of spaces between two words reads as one, and a comma between values can have any number of spaces after it. The report prints one space and `, `.
 - The made-up corpus line `count of x where field is "v" equals a plus b` became `equals y plus z`, because `a` is a grammar word.
