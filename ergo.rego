@@ -1693,7 +1693,7 @@ _nested_ops := {
 	"where": [_leaf_ops],
 }
 
-_field_problems(node) := union({_side_problem(node), _within_problem(node), _wording_problem(node), _unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _each_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node), _json_problem(node)})
+_field_problems(node) := union({_side_problem(node), _within_problem(node), _wording_problem(node), _unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node), _json_problem(node)})
 
 _json_problem(node) := _json_problems(object.remove(_own_fields(node), ["meta"]))
 
@@ -1845,12 +1845,6 @@ _misplaced_fields_problem(node) := {concat("", [f, " can't go here"]) |
 	f in object.keys(node)
 }
 
-_each_problem(node) := {"invalid each" |
-	_quantified(node)
-	"each" in object.keys(node)
-	not _path_shaped(node.each)
-}
-
 _options_problem(node) := {"invalid options" |
 	_combinator(node)
 	"options" in object.keys(node)
@@ -1894,16 +1888,28 @@ _valid_patterns(v) if {
 
 _own_fields(node) := object.remove(node, ["check", "options", "substitute"])
 
-_step_problems(node) := {concat("", ["step that can't be a key in ", f]) |
+_step_problems(node) := {concat("", [f, " not a list"]) |
+	some f in ["path", "left", "right", "each"]
+	f in object.keys(node)
+	not _side_field(node, f)
+	not _checked_as_side(node, f)
+	not is_array(node[f])
+} | {concat("", ["step that can't be a key in ", f]) |
 	some f in ["path", "left", "right", "each", "inputs"]
 	some p in _own_paths(node, f)
 	_badly_stepped(p)
+}
+
+_checked_as_side(node, f) if {
+	node.op == "compare_time"
+	f in {"left", "right"}
 }
 
 _own_paths(node, f) := [node[f]] if {
 	f != "inputs"
 	f in object.keys(node)
 	not _side_field(node, f)
+	is_array(node[f])
 }
 
 _own_paths(node, f) := _side_paths(node[f]) if _side_field(node, f)
@@ -2014,10 +2020,6 @@ _node_param_broken(node) if {
 	v := _wants(node.patterns)
 	not _valid_patterns(v)
 }
-
-_path_shaped(p) if is_array(p)
-
-_path_shaped(p) if is_string(p)
 
 _option_list(options) if is_object(options)
 
@@ -2268,6 +2270,7 @@ _any_read_state(subj, path) := "not_an_object" if {
 	start := _start_of(subj, path)
 	not is_object(start)
 	not _reads_itself(path)
+	not _params_not_given(path)
 }
 
 _reads_itself(path) if _keys_of(path) == []
@@ -2380,6 +2383,12 @@ _asks_presence(check, x) if {
 	check.op == "present"
 	_keys_of(check.path)
 	_ := _start_of(x, check.path)
+	not _params_not_given(check.path)
+}
+
+_params_not_given(path) if {
+	path[0] == "$$params"
+	not is_object(data.ergo_params)
 }
 
 _presence_state(s) := "missing" if s in {"absent", "null"}
@@ -2632,6 +2641,7 @@ _answers_presence(check, subj, "") if {
 	_keys_of(check.path)
 	_ := _start_of(subj, check.path)
 	not _unreadable_ref(check)
+	not _params_not_given(check.path)
 	_substitute_unusable(check, subj) == set()
 	_read_state(subj, check.path) in {"absent", "null"}
 }
@@ -3025,7 +3035,7 @@ _check_inputs(subj, check, item) := [{"name": _item_path_name(item, check.path),
 	not _two_sided(check)
 	not _quantified(check)
 	not _combinator(check)
-	check.path
+	is_array(check.path)
 }
 
 _check_inputs(subj, check, item) := [{"name": r[0], "value": r[1]} | some r in sort(_any_of_reads(subj, check, item))] if {
@@ -3354,8 +3364,13 @@ _applies_rows(_, _, _, req, _, _, _) := [] if {
 }
 
 _applies_inputs(subj, req, item) := [inp |
-	some name in _applies_to_names(req)
-	some inp in _inputs_in(req, _applies_to_of(req)[name], subj, item)
+	read := {inp |
+		some name in _applies_to_names(req)
+		some inp in _inputs_in(req, _applies_to_of(req)[name], subj, item)
+	}
+	some name in sort({inp.name | some inp in read})
+	some inp in read
+	inp.name == name
 ]
 
 _evaluation(doc, req, name) := {
