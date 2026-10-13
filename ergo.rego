@@ -1661,7 +1661,12 @@ _option_children(node, names) := [[leaf, ["options", nm, i], "option", names] |
 
 _node_problems(node, _, _) := {"invalid check"} if not is_object(node)
 
-_node_problems(node, kinds, names) := (((_op_problems(node, kinds) | _field_problems(node)) | _step_problems(node)) | _name_problems(node, names)) | _derived_placement_problem(node, kinds) if is_object(node)
+_node_problems(node, kinds, names) := (((_op_problems(node, kinds) | _field_problems(node)) | _step_problems(node)) | _name_problems(node, names)) | _derived_placement_problem(node, kinds) if {
+	is_object(node)
+	not _s_unread(node)
+}
+
+_node_problems(node, _, _) := {p | some p in node["$sentence"]} | _wording_problem(node) if _s_unread(node)
 
 default _op_problems(_, _) := set()
 
@@ -3087,7 +3092,9 @@ _row_inputs(subj, check, item) := _once(array.concat(
 
 _once(xs) := [x | some i, x in xs; not x in array.slice(xs, 0, i)]
 
-_check_def(check, item) := _with_refs(object.union(object.remove(_described(check, item), {"description", "meta"}), {"description": _reported_description(check), "meta": _reported_meta(check)}), check)
+_check_def(check, _) := _with_refs({"description": _reported_description(check), "meta": _reported_meta(check), "expression": check.expression}, check) if _s_read(check)
+
+_check_def(check, item) := _with_refs(object.union(object.remove(_described(check, item), {"description", "meta"}), {"description": _reported_description(check), "meta": _reported_meta(check)}), check) if not _s_read(check)
 
 _with_refs(def, checked) := object.union(def, {"$refs": _ref_inputs(checked)}) if count(_check_refs(checked)) > 0
 
@@ -3529,13 +3536,15 @@ _names(x) := [i | some i, _ in x] if is_array(x)
 _names(x) := sort(x) if is_set(x)
 
 report(doc, policy, params) := r if {
-	reqs := _section(policy, "requirements")
+	raw := _section(policy, "requirements")
+	reqs := _s_requirements(raw)
+	sentences := _s_sentences(raw, reqs)
 	subjects := _section(policy, "subjects")
 	unreadable := _unreadable_inputs(doc, params)
 	resolved := _resolved_subjects with data.ergo_subjects as subjects
-	written := _report_of(doc, reqs) with data.ergo_document as doc with data.ergo_params as params with data.ergo_subjects as subjects with data.ergo_resolved as resolved with data.ergo_unreadable as unreadable with input as {"ergo/names": {}}
+	written := _report_of(doc, reqs) with data.ergo_document as doc with data.ergo_params as params with data.ergo_subjects as subjects with data.ergo_resolved as resolved with data.ergo_unreadable as unreadable with data.ergo_sentences as sentences with input as {"ergo/names": {}}
 	used := _used_subjects(reqs, subjects, resolved)
-	r := _reported(written, unreadable, [reqs, used])
+	r := _reported(written, unreadable, [raw, used])
 }
 
 _used_subjects(reqs, subjects, resolved) := {name: subjects[name] |
@@ -4225,8 +4234,8 @@ _s_value_of(text) := concat("", [_s_sq_char(m[0]) | some m in regex.find_all_str
 _s_number(text) := 0 if {
 	regex.match(`^-?[0.]+[eE]`, text)
 } else := n if {
-	_s_magnitude(text) >= -400
-	_s_magnitude(text) <= 400
+	not _s_above_max(text)
+	not _s_below_min(text)
 	n := to_number(text)
 	_fits_a_float(n)
 } else := {"out_of_range": text}
@@ -4236,13 +4245,40 @@ _s_magnitude(text) := (count(m[1]) + _exponent(m[3])) - (count(digits) - count(t
 	digits := concat("", [m[1], m[2]])
 }
 
+_s_above_max(text) if _s_magnitude(text) > 309
+
+_s_above_max(text) if {
+	_s_magnitude(text) == 309
+	digits := _s_significant(text)
+	width := max({count(digits), 17})
+	_s_padded(digits, width) > _s_padded("17976931348623157", width)
+}
+
+_s_below_min(text) if {
+	_s_significant(text) != ""
+	_s_magnitude(text) < -307
+}
+
+_s_below_min(text) if {
+	_s_magnitude(text) == -307
+	digits := _s_significant(text)
+	width := max({count(digits), 17})
+	_s_padded(digits, width) < _s_padded("22250738585072014", width)
+}
+
+_s_significant(text) := trim_right(trim_left(concat("", [m[1], m[2]]), "0"), "0") if {
+	m := regex.find_all_string_submatch_n(`^-?([0-9]+)(?:\.([0-9]*))?`, text, 1)[0]
+}
+
+_s_padded(digits, width) := concat("", array.concat([digits], ["0" | some i in numbers.range(count(digits), width); i < width]))
+
 _s_sq_char(`\'`) := "'"
 
 _s_sq_char(`\\`) := `\`
 
 _s_sq_char(c) := c if not c in {`\'`, `\\`}
 
-_s_sentence_problems(parsed) := (((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
+_s_sentence_problems(parsed) := (((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"bare_word" in object.keys(node)
@@ -4299,6 +4335,18 @@ _s_sentence_problems(parsed) := (((((((((({concat("", [node.bare_word, " is a wo
 	some v in object.get(node, "values", [])
 	not is_object(v)
 	not _s_valid_pattern(v)
+}) | {`"is not null" is written "exists"` |
+	some node in _s_nodes(parsed)
+	is_object(node)
+	node.op == "is not"
+	"value" in object.keys(node)
+	node.value == null
+}) | {`"within" only compares numbers` |
+	some node in _s_nodes(parsed)
+	is_object(node)
+	"within" in object.keys(node)
+	"value" in object.keys(node)
+	not is_number(node.value)
 }) | {`"within" needs a number of 0 or more` |
 	some node in _s_nodes(parsed)
 	is_object(node)
@@ -4557,3 +4605,265 @@ _s_single_quoted(v) if {
 	not endswith(v, `\`)
 	regex.match(`^[^\x00-\x1f]*$`, v)
 }
+
+_s_requirements(reqs) := {name: _s_requirement(req) | some name, req in reqs} if is_object(reqs)
+
+_s_requirements(reqs) := reqs if not is_object(reqs)
+
+_s_requirement(req) := object.union(object.remove(req, ["checks"]), {"checks": {name: _s_written_check(check) | some name, check in req.checks}}) if {
+	is_object(req)
+	is_object(object.get(req, "checks", null))
+} else := req
+
+_s_written_check(check) := _s_check(check, {}, set()) if is_string(check)
+
+_s_written_check(check) := _s_check(object.get(check, "assert", null), object.filter(check, {"description", "meta"}), _s_form_problems(check)) if _s_assert_form(check)
+
+_s_written_check(check) := check if not _s_written_as_sentence(check)
+
+_s_written_as_sentence(check) if is_string(check)
+
+_s_written_as_sentence(check) if _s_assert_form(check)
+
+_s_assert_form(check) if {
+	is_object(check)
+	"assert" in object.keys(check)
+	not "op" in object.keys(check)
+}
+
+_s_sentences(raw, reqs) := {reqs[name].checks[c] |
+	some name, req in raw
+	is_object(req)
+	checks := object.get(req, "checks", {})
+	is_object(checks)
+	some c, check in checks
+	_s_written_as_sentence(check)
+} if is_object(raw)
+
+else := set()
+
+_s_form_problems(check) := {_s_field_problem(f) | some f in object.keys(check); not f in {"assert", "description", "meta"}} | _s_assert_problem(check.assert)
+
+_s_field_problem("for") := `"for" isn't supported yet`
+
+_s_field_problem(f) := concat("", ["unknown field ", _text(f)]) if f != "for"
+
+_s_assert_problem(a) := set() if is_string(a)
+
+_s_assert_problem(a) := {"assert as a list isn't supported yet"} if is_array(a)
+
+_s_assert_problem(a) := {"invalid assert"} if {
+	not is_string(a)
+	not is_array(a)
+}
+
+_s_check(text, wording, problems) := object.union(wording, object.union(model, {"expression": _s_check_text(parsed)})) if {
+	count(problems) == 0
+	parsed := _sentence(text)
+	"assertions" in object.keys(parsed)
+	count(_s_unsupported(parsed)) == 0
+	model := _s_model(parsed.assertions[0])
+} else := object.union(wording, {"expression": _s_written_text(text), "$sentence": sort(_s_or_unrunnable(problems | _s_unread_problems(text)))})
+
+_s_or_unrunnable(problems) := problems if count(problems) > 0
+
+_s_or_unrunnable(problems) := {"can't be run"} if count(problems) == 0
+
+_s_written_text(text) := trim_space(text) if is_string(text)
+
+_s_written_text(text) := "<invalid assert>" if not is_string(text)
+
+_s_unread_problems(text) := set() if not is_string(text)
+
+_s_unread_problems(text) := {p | some p in object.get(parsed, "problems", [])} | _s_unsupported(parsed) if {
+	is_string(text)
+	parsed := _sentence(text)
+}
+
+_s_unread(node) if {
+	_s_read(node)
+	count(object.get(node, "$sentence", [])) > 0
+}
+
+_s_read(check) if check in data.ergo_sentences
+
+_s_unsupported(parsed) := set() if not "assertions" in object.keys(parsed)
+
+_s_unsupported(parsed) := {`"and" between assertions isn't supported yet`} if count(parsed.assertions) > 1
+
+_s_unsupported(parsed) := _s_assertion_unsupported(parsed.assertions[0]) if count(parsed.assertions) == 1
+
+_s_assertion_unsupported(a) := {"every and some aren't supported yet"} if object.keys(a) & {"every", "some"} != set()
+
+_s_assertion_unsupported(a) := {"count of, sum of and plus aren't supported yet"} if "terms" in object.keys(a)
+
+_s_assertion_unsupported(a) := _s_paths_unsupported(a) | _s_phrase_unsupported(a.phrase) if object.keys(a) & {"every", "some", "terms"} == set()
+
+_s_paths_unsupported(a) := {"last of isn't supported yet" |
+	some node in _s_nodes(a)
+	is_object(node)
+	object.get(node, "position", null) == "last"
+} | {concat("", ["unknown name ", ref.steps[0]]) |
+	some node in _s_nodes(a)
+	is_object(node)
+	ref := object.get(node, "named_by", {"start": ""})
+	not "start" in object.keys(ref)
+}
+
+_s_unrun_ops := {"is not one of", "is empty", "is not empty", "is a", "starts with", "ends with"}
+
+_s_phrase_unsupported(ph) := {concat("", [`"`, _s_unrun_words(ph), `" isn't supported yet`])} if ph.op in _s_unrun_ops
+
+_s_unrun_words(ph) := _s_phrase_text(ph) if ph.op == "is a"
+
+_s_unrun_words(ph) := _s_phrase_words(ph) if ph.op != "is a"
+
+_s_phrase_unsupported(ph) := _s_argument_unsupported(ph) if not ph.op in _s_unrun_ops
+
+_s_argument_unsupported(ph) := {"count of, sum of and plus aren't supported yet"} if {
+	terms := object.get(ph, "terms", [])
+	terms != []
+	not _s_one_path(terms)
+}
+
+_s_argument_unsupported(ph) := {concat("", [`"`, ph.op, `" with a value isn't supported yet: compare with a field`])} if {
+	ph.op in object.keys(_s_time_cmps)
+	"value" in object.keys(ph)
+}
+
+_s_argument_unsupported(ph) := {concat("", [`"`, _s_phrase_words(ph), `" with a field of the subject isn't supported yet`])} if {
+	ph.op in _s_list_ops
+	p := _s_list_path(ph)
+	not "start" in object.keys(p)
+}
+
+_s_argument_unsupported(ph) := {concat("", [`"`, _s_phrase_words(ph), `" with named by in its path isn't supported yet`])} if {
+	ph.op in _s_list_ops
+	p := _s_list_path(ph)
+	"start" in object.keys(p)
+	not _s_ref_steps(p)
+}
+
+default _s_argument_unsupported(_) := set()
+
+_s_one_path(terms) if {
+	count(terms) == 1
+	is_object(terms[0])
+	"steps" in object.keys(terms[0])
+}
+
+_s_list_ops := {"is one of", "contains", "does not contain", "contains all of", "contains none of", "matches", "does not match"}
+
+_s_list_path(ph) := ph.path if "path" in object.keys(ph)
+
+_s_list_path(ph) := ph.terms[0] if {
+	"terms" in object.keys(ph)
+	_s_one_path(ph.terms)
+}
+
+_s_ref_steps(p) if {
+	every s in p.steps {
+		_s_plain_step(s)
+	}
+}
+
+_s_plain_step(s) if is_string(s)
+
+_s_plain_step(s) if {
+	is_object(s)
+	is_number(object.get(s, "index", null))
+}
+
+_s_time_cmps := {"is before": "lt", "is after": "gt", "is on or after": "gte", "is on or before": "lte"}
+
+_s_order_cmps := {"is at least": "gte", "is at most": "lte", "is more than": "gt", "is less than": "lt"}
+
+_s_model(a) := {"op": "equals", "path": _s_model_path(a.path), "value": a.phrase.value} if {
+	a.phrase.op == "is"
+	"value" in object.keys(a.phrase)
+	not "within" in object.keys(a.phrase)
+}
+
+_s_model(a) := object.union({"op": "compare", "left": _s_model_path(a.path), "cmp": "eq", "right": _s_side(a.phrase)}, object.filter(a.phrase, {"within"})) if {
+	a.phrase.op == "is"
+	_s_side_given(a.phrase)
+}
+
+_s_model(a) := {"op": "compare", "left": _s_model_path(a.path), "cmp": "ne", "right": _s_side(a.phrase)} if a.phrase.op == "is not"
+
+_s_model(a) := {"op": _s_compare_ops[a.phrase.op][0], "left": _s_model_path(a.path), "cmp": _s_compare_ops[a.phrase.op][1], "right": _s_side(a.phrase)} if a.phrase.op in object.keys(_s_compare_ops)
+
+_s_model(a) := {"op": "in", "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if a.phrase.op == "is one of"
+
+_s_model(a) := {"op": "present", "path": _s_model_path(a.path)} if a.phrase.op == "exists"
+
+_s_model(a) := {"op": "missing", "path": _s_model_path(a.path)} if a.phrase.op == "does not exist"
+
+_s_model(a) := {"op": "non_empty_string", "path": _s_model_path(a.path)} if a.phrase.op == "is a non-empty string"
+
+_s_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "value": _s_one(a.phrase)} if a.phrase.op in {"contains", "does not contain"}
+
+_s_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if a.phrase.op in {"contains all of", "contains none of"}
+
+_s_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "patterns": _s_list(a.phrase)} if a.phrase.op in {"matches", "does not match"}
+
+_s_model(a) := {"op": "range", "path": _s_model_path(a.path), "min": a.phrase.min, "max": a.phrase.max} if a.phrase.op == "is between"
+
+_s_compare_ops := object.union({op: ["compare", cmp] | some op, cmp in _s_order_cmps}, {op: ["compare_time", cmp] | some op, cmp in _s_time_cmps})
+
+_s_contains_ops := {
+	"contains": "includes",
+	"does not contain": "excludes",
+	"contains all of": "includes",
+	"contains none of": "excludes",
+	"matches": "matches_any",
+	"does not match": "not_matches_any",
+}
+
+_s_side_given(ph) if "terms" in object.keys(ph)
+
+_s_side_given(ph) if "within" in object.keys(ph)
+
+_s_side(ph) := {"literal": ph.value} if "value" in object.keys(ph)
+
+_s_side(ph) := _s_model_path(ph.terms[0]) if "terms" in object.keys(ph)
+
+_s_one(ph) := ph.value if "value" in object.keys(ph)
+
+_s_one(ph) := {"ref": _s_model_path(ph.terms[0])} if "terms" in object.keys(ph)
+
+_s_list(ph) := ph.values if "values" in object.keys(ph)
+
+_s_list(ph) := {"ref": _s_model_path(ph.path)} if "path" in object.keys(ph)
+
+_s_model_path(p) := array.concat(array.concat(_s_model_start(p), [_s_model_step(s) | some s in array.slice(p.steps, _s_first_step(p), count(p.steps))]), _s_model_position(p))
+
+_s_model_start(p) := [concat("", ["$$", p.start])] if "start" in object.keys(p)
+
+_s_model_start(p) := [{"literal": p.steps[0]}] if {
+	not "start" in object.keys(p)
+	startswith(p.steps[0], "$")
+}
+
+_s_model_start(p) := [p.steps[0]] if {
+	not "start" in object.keys(p)
+	not startswith(p.steps[0], "$")
+}
+
+_s_model_step(s) := s if is_string(s)
+
+_s_model_step(s) := s.index if {
+	is_object(s)
+	is_number(object.get(s, "index", null))
+}
+
+_s_model_step(s) := {"ref": [concat("", ["$$", s.named_by.start]), s.named_by.steps[0]]} if {
+	is_object(s)
+	"named_by" in object.keys(s)
+}
+
+_s_model_position(p) := [p.position - 1] if is_number(object.get(p, "position", null))
+
+_s_model_position(p) := [0] if object.get(p, "position", null) == "first"
+
+_s_model_position(p) := [] if not "position" in object.keys(p)

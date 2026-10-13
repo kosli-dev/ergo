@@ -1,10 +1,24 @@
 # How checks are written as sentences
 
-Draft 0.1, a proposal from [#174](https://github.com/kosli-dev/ergo/issues/174). `ergo.rego` reads a sentence into its model, and prints it back, but no report runs on one yet. This file says how a check written as a one-line sentence, like `approved_by is not empty`, reads into the [model](semantics.md#the-model-of-a-check), what counts as written wrong, and how the report prints it. What a check means once it's read is in [semantics.md](semantics.md), as for today's syntax in [syntax.md](syntax.md).
+Draft 0.1, a proposal from [#174](https://github.com/kosli-dev/ergo/issues/174). This file says how a check written as a one-line sentence, like `approved_by is not empty`, reads into the [model](semantics.md#the-model-of-a-check), what counts as written wrong, and how the report prints it. What a check means once it's read is in [semantics.md](semantics.md), as for today's syntax in [syntax.md](syntax.md).
 
 [`sentences-corpus.md`](sentences-corpus.md) has every check from sdlc-policies, the server's demo and npm-bump policies, pr-reviewer, ergo's examples and Tore's DEV controls written both ways. Every sentence in it parses exactly one way with the phrases below. The phrases, the tally and the misfits come from it.
 
+`ergo.rego` runs a check written as one sentence that starts with a path, for every phrase except `is not one of`, `is empty`, `is not empty`, `is a <type>`, `starts with` and `ends with`. It doesn't run `and` between assertions, `assert` as a list, `every`, `some`, `count of`, `sum of`, `plus`, `last of`, `for` lines or `from` lines yet. Nor does it run a field of the subject after `contains`, `does not contain` or a phrase that takes a list, a list path with `named by` in it, or a value after a time phrase. A check that uses one of them is written wrong, with `isn't supported yet` in its message. `named by` a name, which a `for` line will give, is written wrong with `unknown name <name>`. A sentence can't be an `any_of` option or a substitute yet, and is written wrong there with `invalid check`. The report names the paths a row read as [syntax.md](syntax.md#naming-a-path) does, not as [sentence.path.string](#paths) says.
+
 ## The shape of a sentence
+
+**[sentence.check]** A check in a requirement's `checks` can be a sentence, or an object with the sentence under `assert` and optionally `description` and `meta`, which the report copies as it does for any check:
+
+```yaml
+checks:
+  approved: approved_by is not empty
+  signed:
+    description: Every commit is signed
+    assert: every commits.signed is true
+```
+
+An object with `assert` and any other field but `op` is written wrong, with `unknown field <name>`, and an `assert` that isn't a string or a list is written wrong, with `invalid assert`. An object without `assert`, or with `op`, is a check in the syntax of [syntax.md](syntax.md), so a custom operator can still take a parameter called `assert`. The report's entry for a sentence check has its `description`, its `meta` and its `expression`, and `$refs` for each `$params` or `$input` path it reads after `named by`, after a phrase that takes a list, or after `contains` or `does not contain`.
 
 **[sentence.line]** A check, a filter, or one condition of a `where`, is one line. It holds one assertion: a thing, then a phrase, then the phrase's arguments.
 
@@ -217,7 +231,7 @@ The gaps:
 <path> does not equal <field>
 ```
 
-The field equals, or doesn't equal, what's on the right, as [value.equal](semantics.md#values) says. `is`, `equals` and `is equal to` mean the same, and so do `is not` and `does not equal`. The report prints `is` and `is not` before a value, and `equals` and `does not equal` before a field, so a field on the right side shows as one: `environment is "prod"`, `subject_digest equals fingerprint`, `approver.username does not equal author`. Missing: `absent`. `null`: passes `is null`, otherwise fails as `null`. Wrong type: with a value on the right, `is` fails as `value`, because `"5"` isn't `5` is a sound answer, as today's `equals`. With a field on the right, or with `is not` or `does not equal`, two values of different types fail as `unusable`, as today's `compare`.
+The field equals, or doesn't equal, what's on the right, as [value.equal](semantics.md#values) says. `is not null` is written wrong, with `"is not null" is written "exists"`, because it could only fail: a field that's there and isn't `null` is a different type from `null`. `is`, `equals` and `is equal to` mean the same, and so do `is not` and `does not equal`. The report prints `is` and `is not` before a value, and `equals` and `does not equal` before a field, so a field on the right side shows as one: `environment is "prod"`, `subject_digest equals fingerprint`, `approver.username does not equal author`. Missing: `absent`. `null`: passes `is null`, otherwise fails as `null`. Wrong type: with a value on the right, `is` fails as `value`, because `"5"` isn't `5` is a sound answer, as today's `equals`. With a field on the right, or with `is not` or `does not equal`, two values of different types fail as `unusable`, as today's `compare`.
 
 **[sentence.phrase.within]**
 ```
@@ -225,7 +239,7 @@ The field equals, or doesn't equal, what's on the right, as [value.equal](semant
 <path> equals <field> within <number>
 ```
 
-Two numbers at most that far apart. The number is 0 or more. Missing: `absent`. `null`: `null`. Wrong type: `unusable`.
+Two numbers at most that far apart. The number is 0 or more. A value before `within` that isn't a number is written wrong, with `"within" only compares numbers`, because the check could only fail. Missing: `absent`. `null`: `null`. Wrong type: `unusable`.
 
 **[sentence.phrase.one_of]**
 ```
@@ -243,7 +257,7 @@ The field equals one of the values, or none of them. `is one of` and `is in` mea
 <path> does not exist
 ```
 
-As today's `present` and `missing`: a field that's missing or `null` fails `exists` with `value` and passes `does not exist`. Wrong type: never, since any value exists. A parent that can't hold the field fails both as `unusable`.
+These are [`present`](semantics.md#present) and [`missing`](semantics.md#missing), and fail as those rules say. Mostly, a field that's missing or `null` fails `exists` with `value` and passes `does not exist`, and any value that's there passes `exists`, whatever its type. A path into params that weren't given fails both as `absent`, and a parent that can't hold the field fails both with the cause the path gives, like `unusable`.
 
 **[sentence.phrase.empty]**
 ```
@@ -284,7 +298,7 @@ The field is a list that holds every value, or none of them. Missing, `null` and
 <path> does not match <list>
 ```
 
-The field is a string that matches at least one of the regular expressions, or none of them. They aren't anchored. Missing: `absent`. `null`: `null`. Not a string: `unusable`. A pattern that isn't a valid regular expression is written wrong when it's in the sentence and fails as `unusable` when it's read from a path.
+The field is a string that matches at least one of the regular expressions, or none of them. They aren't anchored. Missing: `absent`. `null`: `null`. Not a string: `unusable`. A pattern that isn't a valid regular expression is written wrong when it's in the sentence, with `invalid pattern <pattern>`, and fails as `unusable` when it's read from a path.
 
 **[sentence.phrase.starts]**
 ```

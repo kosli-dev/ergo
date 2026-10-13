@@ -6672,8 +6672,8 @@ test_a_range_with_equal_bounds_is_well_written if {
 }
 
 test_a_check_that_is_not_an_object_shows_in_the_expression if {
-	rendered({}, "present") == "<invalid check>"
-	[[r.passed, r.cause] | some r in solo({}, "present").results; r.check == "c"] == [[false, "ill_formed"]]
+	rendered({}, 1) == "<invalid check>"
+	[[r.passed, r.cause] | some r in solo({}, 1).results; r.check == "c"] == [[false, "ill_formed"]]
 	rendered({}, {"op": "any_of", "options": {"o": ["present"]}}) == "one of: o(<invalid check>)"
 	rendered({}, {"op": "all", "path": ["xs"], "check": "present"}) == "every xs: <invalid check>"
 }
@@ -8087,4 +8087,194 @@ test_a_sentence_written_wrong_says_what_is_wrong if {
 	ergo._from_line(`count where x is 1`) == {"problems": ["count is a word of the grammar: write .count"]}
 	ergo._from_line(`x is 1`) == {"problems": ["doesn't parse"]}
 	ergo._from_line(`$input named by each of "T"`) == {"problems": ["doesn't parse"]}
+}
+
+_sentence_policy(checks) := {
+	"subjects": {"thing": {"from": ["things"], "id": ["id"]}},
+	"requirements": {"s": {"subject": "thing", "checks": checks}},
+}
+
+_sentence_rows(checks, doc, params) := [[r.check, r.passed, r.cause, r.inputs] | some r in ergo.report(doc, _sentence_policy(checks), params).results; not startswith(r.check, "$")]
+
+_sentence_problems(check) := [i.value | some i in ergo.report({"things": []}, _sentence_policy({"c": check}), {}).results[0].inputs; i.name == "checks.c"][0]
+
+test_a_sentence_gives_the_rows_of_the_check_it_reads_into if {
+	doc := {"things": [
+		{"id": "t1", "x": "a", "n": 3, "m": 3, "l": ["a", "b"], "t": "2024-01-01T00:00:00Z", "u": "2024-02-01T00:00:00Z", "k": {"a": 1}, "q": null},
+		{"id": "t2", "x": 5, "n": "3", "l": "a", "t": 1, "k": {"b": 2}},
+		{"id": "t3"},
+	]}
+	params := {"allowed": ["a"], "key": "a", "pats": ["^a"], "groups": [["a"], {"names": [5]}]}
+	every pair in [
+		[`x is "a"`, {"op": "equals", "path": ["x"], "value": "a"}],
+		[`q is null`, {"op": "equals", "path": ["q"], "value": null}],
+		[`n equals m`, {"op": "compare", "left": ["n"], "cmp": "eq", "right": ["m"]}],
+		[`n is 3.05 within 0.1`, {"op": "compare", "left": ["n"], "cmp": "eq", "right": {"literal": 3.05}, "within": 0.1}],
+		[`n equals m within 0`, {"op": "compare", "left": ["n"], "cmp": "eq", "right": ["m"], "within": 0}],
+		[`x is not "a"`, {"op": "compare", "left": ["x"], "cmp": "ne", "right": {"literal": "a"}}],
+		[`n does not equal m`, {"op": "compare", "left": ["n"], "cmp": "ne", "right": ["m"]}],
+		[`x is one of "a", 5`, {"op": "in", "path": ["x"], "values": ["a", 5]}],
+		[`x is in $params.allowed`, {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}],
+		[`x is in $params.groups[0].names`, {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "groups", 0, "names"]}}],
+		[`x is in first of $params.groups`, {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "groups", 0]}}],
+		[`x exists`, {"op": "present", "path": ["x"]}],
+		[`x does not exist`, {"op": "missing", "path": ["x"]}],
+		[`x is a non-empty string`, {"op": "non_empty_string", "path": ["x"]}],
+		[`l contains "a"`, {"op": "includes", "path": ["l"], "value": "a"}],
+		[`l contains $params.key`, {"op": "includes", "path": ["l"], "value": {"ref": ["$$params", "key"]}}],
+		[`l does not contain "b"`, {"op": "excludes", "path": ["l"], "value": "b"}],
+		[`l contains all of "a", "b"`, {"op": "includes", "path": ["l"], "values": ["a", "b"]}],
+		[`l contains none of $params.allowed`, {"op": "excludes", "path": ["l"], "values": {"ref": ["$$params", "allowed"]}}],
+		[`x matches '^\w$'`, {"op": "matches_any", "path": ["x"], "patterns": ["^\\w$"]}],
+		[`x does not match $params.pats`, {"op": "not_matches_any", "path": ["x"], "patterns": {"ref": ["$$params", "pats"]}}],
+		[`n is at least 3`, {"op": "compare", "left": ["n"], "cmp": "gte", "right": {"literal": 3}}],
+		[`n is at most m`, {"op": "compare", "left": ["n"], "cmp": "lte", "right": ["m"]}],
+		[`n is more than 2`, {"op": "compare", "left": ["n"], "cmp": "gt", "right": {"literal": 2}}],
+		[`n is less than 2`, {"op": "compare", "left": ["n"], "cmp": "lt", "right": {"literal": 2}}],
+		[`n is between 1 and 3`, {"op": "range", "path": ["n"], "min": 1, "max": 3}],
+		[`t is before u`, {"op": "compare_time", "left": ["t"], "cmp": "lt", "right": ["u"]}],
+		[`t is after u`, {"op": "compare_time", "left": ["t"], "cmp": "gt", "right": ["u"]}],
+		[`t is on or after u`, {"op": "compare_time", "left": ["t"], "cmp": "gte", "right": ["u"]}],
+		[`t is on or before u`, {"op": "compare_time", "left": ["t"], "cmp": "lte", "right": ["u"]}],
+		[`k named by $params.key is 1`, {"op": "equals", "path": ["k", {"ref": ["$$params", "key"]}], "value": 1}],
+		[`k[$params.key] is 1`, {"op": "equals", "path": ["k", {"ref": ["$$params", "key"]}], "value": 1}],
+		[`item 2 of l is "b"`, {"op": "equals", "path": ["l", 1], "value": "b"}],
+		[`first of l is "a"`, {"op": "equals", "path": ["l", 0], "value": "a"}],
+		[`l[1] is "b"`, {"op": "equals", "path": ["l", 1], "value": "b"}],
+		[`$params.key is "a"`, {"op": "equals", "path": ["$$params", "key"], "value": "a"}],
+		[`$input.things[0].id is "t1"`, {"op": "equals", "path": ["$$input", "things", 0, "id"], "value": "t1"}],
+		[`"$schema" exists`, {"op": "present", "path": [{"literal": "$schema"}]}],
+		[`k."a" is 1`, {"op": "equals", "path": ["k", "a"], "value": 1}],
+	] {
+		_sentence_rows({"c": pair[0]}, doc, params) == _sentence_rows({"c": pair[1]}, doc, params)
+	}
+}
+
+test_a_sentence_check_reports_its_description_meta_and_printed_sentence_only if {
+	r := ergo.report(
+		{"things": [{"id": "t1", "x": "a"}]}, _sentence_policy({
+			"a": `x  is equal to 'a'`,
+			"b": {"description": "In the list", "meta": {"id": "B-1"}, "assert": "x is in $params.allowed"},
+		}),
+		{"allowed": ["a"]},
+	)
+	r.requirements.s.checks.a == {"description": "", "meta": {}, "expression": `x is "a"`}
+	r.requirements.s.checks.b == {"description": "In the list", "meta": {"id": "B-1"}, "expression": "x is in $params.allowed", "$refs": [{"name": "$$params.allowed", "value": ["a"]}]}
+	r.compliant
+}
+
+test_a_sentence_written_wrong_fails_its_rows_and_lists_its_problems if {
+	r := ergo.report({"things": [{"id": "t1", "x": "a"}]}, _sentence_policy({"c": `x is "a`}), {})
+	[[row.check, row.passed, row.cause, row.inputs] | some row in r.results; row.check in {"$well_formed", "c"}] == [
+		["$well_formed", false, "value", [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["unclosed quote at column 6"]}]],
+		["c", false, "ill_formed", []],
+	]
+	r.requirements.s.checks.c.expression == `x is "a`
+}
+
+test_an_assert_object_takes_only_description_and_meta if {
+	_sentence_problems({"assert": 1}) == ["invalid assert"]
+	_sentence_problems({"assert": 1, "description": 2}) == ["invalid assert", "invalid description"]
+	_sentence_problems({"assert": "x exists", "meta": []}) == ["invalid meta"]
+	ergo.report({"things": []}, _sentence_policy({"c": {"assert": 1}}), {}).requirements.s.checks.c.expression == "<invalid assert>"
+}
+
+test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
+	every pair in [
+		[`x exists and y exists`, `"and" between assertions isn't supported yet`],
+		[`every xs is 1`, "every and some aren't supported yet"],
+		[`count of xs is 1`, "count of, sum of and plus aren't supported yet"],
+		[`x is y plus 1`, "count of, sum of and plus aren't supported yet"],
+		[`x is not one of "a"`, `"is not one of" isn't supported yet`],
+		[`x is not in $params.a`, `"is not in" isn't supported yet`],
+		[`x is empty`, `"is empty" isn't supported yet`],
+		[`x is not empty`, `"is not empty" isn't supported yet`],
+		[`x is an object`, `"is an object" isn't supported yet`],
+		[`x starts with "a"`, `"starts with" isn't supported yet`],
+		[`x ends with y`, `"ends with" isn't supported yet`],
+		[`t is before "2024-01-01T00:00:00Z"`, `"is before" with a value isn't supported yet: compare with a field`],
+		[`x is in allowed`, `"is in" with a field of the subject isn't supported yet`],
+		[`l contains y`, `"contains" with a field of the subject isn't supported yet`],
+		[`x matches $params.a named by $params.b`, `"matches" with named by in its path isn't supported yet`],
+		[`last of xs is 1`, "last of isn't supported yet"],
+		[`x named by persona is 1`, "unknown name persona"],
+	] {
+		_sentence_problems(pair[0]) == [pair[1]]
+	}
+	_sentence_problems({"assert": ["x exists"]}) == ["assert as a list isn't supported yet"]
+	_sentence_problems({"assert": "x exists", "for": "every xs as x"}) == [`"for" isn't supported yet`]
+}
+
+test_a_check_written_as_a_string_is_read_as_a_sentence if {
+	rendered({}, "present") == "present"
+	[[r.passed, r.cause] | some r in solo({}, "present").results; r.check == "c"] == [[false, "ill_formed"]]
+	_sentence_problems("present") == [`nothing after the path at column 8: expected a phrase, like "is" or "exists"`]
+}
+
+test_is_not_null_is_written_wrong_because_it_could_only_fail if {
+	_sentence_problems(`x is not null`) == [`"is not null" is written "exists"`]
+	_sentence_problems(`x does not equal null`) == [`"is not null" is written "exists"`]
+}
+
+test_requirements_and_checks_that_are_not_objects_are_left_to_the_other_rules if {
+	ergo._s_requirements(null) == null
+	ergo._s_requirements({"r": 1}) == {"r": 1}
+	ergo._s_requirements({"r": {"checks": []}}) == {"r": {"checks": []}}
+	ergo._s_requirements({"r": {"checks": {"c": {"op": "present", "path": ["x"]}, "d": 1}}}) == {"r": {"checks": {"c": {"op": "present", "path": ["x"]}, "d": 1}}}
+}
+
+test_a_number_just_past_the_largest_float_is_written_wrong_before_opa_reads_it if {
+	every text in [`x is 1e309`, `x is 1.8e308`, `x is -1.7976931348623158e308`, `x is 0.00018e312`, `x is at least 1e350`, `x is between 1 and 2e308`, `x is 1 within 1e350`, `x is one of 1, 1e350`, `x contains 1e350`] {
+		count(_sentence_problems(text)) == 1
+		startswith(_sentence_problems(text)[0], "number out of range: ")
+	}
+	every text in [`x is 1.7976931348623157e308`, `x is 17976931348623157e292`, `x is 179769313486231570000e288`, `x is 1e308`] {
+		ergo.report({"things": [{"id": "t1", "x": 1}]}, _sentence_policy({"c": text}), {}).results[0].passed
+	}
+}
+
+test_a_sentence_marker_written_by_hand_is_an_unknown_field_like_any_other if {
+	every check in [
+		{"op": "present", "path": ["x"], "$sentence": [], "valeu": 1},
+		{"op": "present", "path": ["x"], "$sentence": "bad", "valeu": 1},
+		{"op": "present", "path": ["x"], "$sentence": null, "valeu": 1},
+	] {
+		_sentence_problems(check) == ["unknown field $sentence", "unknown field valeu"]
+		[[r.passed, r.cause] | some r in ergo.report({"things": [{"id": "t1", "x": 1}]}, _sentence_policy({"c": check}), {}).results; r.check == "c"] == [[false, "ill_formed"]]
+	}
+	ergo.report({"things": []}, _sentence_policy({"c": {"op": "all", "path": ["xs"], "check": {"op": "present", "path": [], "$sentence": []}}}), {}).results[0].inputs[2] == {"name": "checks.c.check", "value": ["unknown field $sentence"]}
+	ergo.report({"things": []}, _sentence_policy({"c": {"op": "present", "path": ["x"], "substitute": {"op": "present", "path": ["y"], "$sentence": []}}}), {}).results[0].inputs[2] == {"name": "checks.c.substitute", "value": ["unknown field $sentence"]}
+	ergo.report({"things": []}, _sentence_policy({"c": {"op": "present", "path": ["x"], "$sentence": []}}), {}).requirements.s.checks.c == {"description": "", "meta": {}, "op": "present", "path": ["x"], "$sentence": [], "expression": "x is present"}
+}
+
+test_a_check_is_read_as_a_sentence_only_when_the_report_translated_it if {
+	not ergo._s_read({"op": "present", "path": ["x"], "expression": "x exists"})
+	ergo._s_read({"op": "present", "path": ["x"], "expression": "x exists"}) with data.ergo_sentences as {{"op": "present", "path": ["x"], "expression": "x exists"}}
+	ergo._s_sentences({"r": {"checks": ["x exists"]}, "q": 1}, {"r": {"checks": ["x exists"]}, "q": 1}) == set()
+	ergo._s_sentences(null, null) == set()
+}
+
+test_a_sentence_that_reads_into_no_check_is_written_wrong_rather_than_run if {
+	ergo._s_or_unrunnable(set()) == {"can't be run"}
+	ergo._s_or_unrunnable({"x"}) == {"x"}
+}
+
+test_an_object_with_assert_and_op_is_a_check_in_the_old_syntax_so_a_custom_operator_can_take_assert if {
+	ergo._s_written_check({"op": "my_op", "assert": "x"}) == {"op": "my_op", "assert": "x"}
+	_sentence_problems({"op": "present", "path": ["x"], "assert": "x"}) == ["unknown field assert"]
+}
+
+test_within_only_compares_numbers_so_another_value_before_it_is_written_wrong if {
+	every text in [`x is null within 1`, `x is "a" within 1`, `x is true within 0`] {
+		_sentence_problems(text) == [`"within" only compares numbers`]
+	}
+}
+
+test_the_smallest_number_is_checked_by_its_digits_so_opa_rounding_it_up_doesnt_let_it_in if {
+	every text in [`x is 2.2250738585072013999999999e-308`, `x is 22250738585072013e-324`, `x is 1e-308`, `x is -1e-400`] {
+		startswith(_sentence_problems(text)[0], "number out of range: ")
+	}
+	every text in [`x is 2.2250738585072014e-308`, `x is 0.0`, `x is 0.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000`] {
+		count(ergo._sentence(text).assertions) == 1
+	}
 }

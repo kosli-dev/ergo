@@ -8,6 +8,7 @@ This page describes everything ergo accepts and everything it returns. If you ha
 - [Paths](#paths)
 - [Reading from the input](#reading-from-the-input)
 - [Naming subjects](#naming-subjects)
+- [Checks written as sentences](#checks-written-as-sentences)
 - [Operators](#operators)
 - [Substitutes](#substitutes)
 - [Custom operators](#custom-operators)
@@ -510,6 +511,109 @@ Some things worth knowing:
 - An empty path is named after the subject's name (`$run`), not after `from`.
 - A path that starts with a name nobody gave, like `["$runs", "result"]`, is written wrong: it fails `$well_formed`, and the check fails with cause `ill_formed`. That holds even when no subject is found, so a requirement can't pass by never running the check. To read a key that really starts with `$`, write it as `{"literal": "$schema"}`.
 - A `ref` can't start with a name yet, only with `$$input`. `{"ref": ["$pr", "author"]}` fails the check and shows `<invalid ref>`.
+
+## Checks written as sentences
+
+A check can be one line of English instead of an object with `op` and `path`. This is new and [spec/sentences.md](spec/sentences.md) is still a draft, so it may change. Write the sentence on its own, or under `assert` when the check has a `description` or `meta`:
+
+```yaml
+subjects:
+  deployment:
+    from: [deployments]
+    id: [id]
+requirements:
+  prod_deploy:
+    subject: deployment
+    checks:
+      approver: approved_by is a non-empty string
+      reviewed:
+        description: The change was reviewed before it was deployed
+        assert: reviewed_at is before deployed_at
+      region: region is in $params.regions
+      tickets: tickets contains all of 'OPS-1'
+```
+
+With the params `{"regions": ["eu-west-1"]}` and this input:
+
+```json
+{
+  "deployments": [
+    {"id": "d1", "approved_by": "ann", "reviewed_at": "2026-10-01T09:00:00Z", "deployed_at": "2026-10-01T10:00:00Z", "region": "eu-west-1", "tickets": ["OPS-1"]},
+    {"id": "d2", "approved_by": "", "reviewed_at": "2026-10-02T11:00:00Z", "deployed_at": "2026-10-02T10:00:00Z", "region": "us-east-1", "tickets": []}
+  ]
+}
+```
+
+`d1` passes every check and `d2` fails every one. Each check's entry in the report has its `description`, `meta` and `expression`, and the `expression` is the sentence:
+
+```json
+"reviewed": {
+  "description": "The change was reviewed before it was deployed",
+  "expression": "reviewed_at is before deployed_at",
+  "meta": {}
+},
+"tickets": {
+  "description": "",
+  "expression": "tickets contains all of \"OPS-1\"",
+  "meta": {}
+}
+```
+
+The report prints every sentence one way, so `'OPS-1'` shows as `"OPS-1"`, two spaces as one, `is equal to "a"` as `is "a"`, and `is` before a field as `equals`. The rows are the rows of the operator each sentence runs as, so `d2`'s `reviewed` row reads both fields:
+
+```json
+{
+  "cause": "value",
+  "check": "reviewed",
+  "inputs": [
+    {"name": "reviewed_at", "value": "2026-10-02T11:00:00Z"},
+    {"name": "deployed_at", "value": "2026-10-02T10:00:00Z"}
+  ],
+  "passed": false,
+  "requirement": "prod_deploy",
+  "subject": {"id": "d2", "type": "deployment"}
+}
+```
+
+A sentence is a path, then a phrase, then what the phrase takes:
+
+| Sentence                                                                             | Runs as                                                                  |
+| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| `env is "prod"`, also `equals` and `is equal to`                                     | `equals`                                                                 |
+| `digest equals fingerprint`, a field on the right                                    | `compare` with `eq`                                                      |
+| `cost is 2.5 within 0.01`, `cost equals total within 0.01`                           | `compare` with `eq` and `within`                                         |
+| `env is not "prod"`, `author does not equal approver`                                | `compare` with `ne`, so two values of different types fail as `unusable` |
+| `env is one of "dev", "test"`, `user is in $params.staff`                            | `in`                                                                     |
+| `ticket exists`, `ticket does not exist`                                             | `present`, `missing`                                                     |
+| `approved_by is a non-empty string`                                                  | `non_empty_string`                                                       |
+| `labels contains "bug"`, `labels does not contain "wip"`                             | `includes`, `excludes` with `value`                                      |
+| `labels contains all of "a", "b"`, `labels contains none of ...`                     | `includes`, `excludes` with `values`                                     |
+| `branch matches '^release/'`, `branch does not match ...`                            | `matches_any`, `not_matches_any`                                         |
+| `score is at least 3`, `is at most`, `is more than`, `is less than`                  | `compare` with `gte`, `lte`, `gt`, `lt`                                  |
+| `score is between 1 and 5`                                                           | `range`                                                                  |
+| `reviewed_at is before deployed_at`, `is after`, `is on or after`, `is on or before` | `compare_time` with `lt`, `gt`, `gte`, `lte`                             |
+
+The thing on the right is a value when it's in quotes, a number, `true`, `false` or `null`, and a field otherwise. A list of values is separated by `, `. A string can be in single quotes, which keep backslashes as written, so `'^\s*FROM'` needs no doubled backslash.
+
+A path is keys joined by `.`, like `build.commit.sha`. A key with anything but letters, digits, `_` and `-` goes in double quotes, like `labels."app.kubernetes.io/name"`. `$params.regions` reads the params and `$input.repo` the input. `artifacts named by $params.name` reads the key the param holds, as a [ref step](#ref-steps) does, and so does `artifacts[$params.name]`. `item 2 of commits`, `first of commits` and `commits[1]` read one item of a list. A path can't start with a word the sentences use, like `empty`, `count` or `true`. Put a dot in front, `.empty is 1`, to read a field with that name.
+
+In YAML, ` #` starts a comment, so `title does not match 'WIP' #, 'DRAFT'` loses everything after `'WIP'`. YAML also won't take a plain value that starts with a quote, or that has `: ` in it. Put the whole sentence in single quotes then, doubling any single quote inside: `'"$schema" exists'`.
+
+A sentence that can't be read is [written wrong](#basic-operators), and the `$well_formed` row says why, with the column when it can:
+
+```json
+{"name": "checks.prod", "value": ["unclosed quote at column 16"]}
+```
+
+for `prod: environment is "prod`. `x is not null` is written wrong too, because it could only fail: write `x exists`. So is a value that isn't a number before `within`, like `x is "a" within 1`. An object with both `assert` and `op` is read as a check with an `op`, so a [custom operator](#custom-operators) can still take `assert`.
+
+ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `is empty`, `is not empty`, `is not one of`, `is not in`, `is a <type>`, `starts with`, `ends with`, `and` between two assertions, `assert` as a list, `every`, `some`, `count of`, `sum of`, `plus`, `last of`, a `for` line, a value after `is before` and the other time phrases, a field of the subject after `is in`, `contains` and the other phrases that take a list, and a list path with `named by` in it. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `approved: approved_by is not empty` gives:
+
+```json
+{"name": "checks.approved", "value": ["\"is not empty\" isn't supported yet"]}
+```
+
+Until then, write those checks with an `op`. `from`, `id` and `applies_to` are still written as before.
 
 ## Operators
 
