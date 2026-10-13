@@ -4242,7 +4242,7 @@ _s_sq_char(`\\`) := `\`
 
 _s_sq_char(c) := c if not c in {`\'`, `\\`}
 
-_s_sentence_problems(parsed) := ((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
+_s_sentence_problems(parsed) := (((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"bare_word" in object.keys(node)
@@ -4299,6 +4299,11 @@ _s_sentence_problems(parsed) := ((((((((({concat("", [node.bare_word, " is a wor
 	some v in object.get(node, "values", [])
 	not is_object(v)
 	not _s_valid_pattern(v)
+}) | {`"within" needs a number of 0 or more` |
+	some node in _s_nodes(parsed)
+	is_object(node)
+	is_number(node.within)
+	node.within < 0
 }
 
 _s_valid_pattern(v) if {
