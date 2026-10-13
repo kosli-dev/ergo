@@ -8063,6 +8063,9 @@ test_a_sentence_written_wrong_says_what_is_wrong if {
 	_read(`sum of stages.usd equals total within`) == {"problems": [`"within" needs a number after it`]}
 	_read(`every  pull_requests  some approvers.state is "APPROVED"`) == {"problems": ["two quantifiers in one sentence: put them on a for line"]}
 	_read(`x is equal to 1 within 2`).assertions[0].phrase == {"op": "is", "value": 1, "within": 2}
+	_read(`x is 1 within -1`) == {"problems": [`"within" needs a number of 0 or more`]}
+	_read(`x equals y within -0.5`) == {"problems": [`"within" needs a number of 0 or more`]}
+	_read(`x is 1 within -0`).assertions[0].phrase.within == 0
 	_read(`x is one of "a",	"b"`) == {"problems": ["doesn't parse"]}
 	ergo._for_line(`every xs as x, every ys as x`) == {"problems": ["x is given twice"]}
 	ergo._from_line(`xs[01]`) == {"problems": ["doesn't parse"]}
