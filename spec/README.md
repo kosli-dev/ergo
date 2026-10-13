@@ -4,7 +4,7 @@ Draft 0.1. ergo is three specs, and `ergo.rego` is an implementation of them:
 
 - [`semantics.md`](semantics.md) says what a check means, as named rules about a model of checks that doesn't depend on how they're written.
 - [`syntax.md`](syntax.md) says how today's policies write checks, how they can be written wrong, and how the report shows paths and checks. A new way of writing checks would get a file like it, reading into the same model.
-- [`sentences.md`](sentences.md) is a draft of the next way, from [#174](https://github.com/kosli-dev/ergo/issues/174): every check a one-line sentence like `approved_by is not empty`. [`sentences.abnf`](sentences.abnf) is its grammar, [`sentences-corpus.md`](sentences-corpus.md) every real check written that way, and [`sentences-findings.md`](sentences-findings.md) what writing them found. Nothing implements it yet.
+- [`sentences.md`](sentences.md) is a draft of the next way, from [#174](https://github.com/kosli-dev/ergo/issues/174): every check a one-line sentence like `approved_by is not empty`. [`sentences.abnf`](sentences.abnf) is its grammar, [`sentences-corpus.md`](sentences-corpus.md) every real check written that way, and [`sentences-findings.md`](sentences-findings.md) what writing them found. `ergo.rego` reads sentences, but no report runs on one yet.
 - [`policy/schema.json`](policy/schema.json) describes today's syntax as a JSON Schema.
 - [`report/schema.json`](report/schema.json) says what a report looks like, as a JSON Schema.
 - [`cases/`](cases) holds the cases that pin the rules down, one folder per topic.
@@ -55,6 +55,8 @@ and this is the case:
 ## Checking the rules
 
 `python3 spec/check_rules.py` fails when a case cites a rule that doesn't exist, or when no case cites a rule. A rule can go without cases only while it's listed under [Rules without cases](OPEN.md#rules-without-cases) in `OPEN.md`, and the script also fails when a rule on that list has a case or doesn't exist.
+
+`spec/sentences-corpus.json` holds every sentence, `for` line and `from` line of `sentences-corpus.md` as a list, so that `ergo_test.rego` can parse each one. `python3 spec/sentences_corpus.py` writes it from the markdown, and `python3 spec/sentences_corpus.py --check` fails when it's out of date.
 
 ## Running the cases
 
