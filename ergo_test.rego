@@ -8018,6 +8018,19 @@ test_a_from_line_reads_its_path_keys_and_where if {
 	ergo._s_from_line_text(ergo._from_line(`artifact.attestations named by each of $params.names where status is "COMPLETE"`)) == `artifact.attestations named by each of $params.names where status is "COMPLETE"`
 }
 
+test_a_number_out_of_range_is_written_wrong_without_opa_comparing_it if {
+	_read(`x is between -6 and -80e-08923553`) == {"problems": ["number out of range: -80e-08923553"]}
+	_read(`x is between 1 and 1e400`) == {"problems": ["number out of range: 1e400"]}
+	_read(`x is at least 1e400`) == {"problems": ["number out of range: 1e400"]}
+	_read(`x is 2.2e-308`) == {"problems": ["number out of range: 2.2e-308"]}
+	_read(`x is one of 1, 2e400`) == {"problems": ["number out of range: 2e400"]}
+	_read(`x is 1 within 1e999`) == {"problems": ["number out of range: 1e999"]}
+	_read(`count of y plus 1e-9999999 is 3`) == {"problems": ["number out of range: 1e-9999999"]}
+	_read(`x is 1.7976931348623157e308`).assertions[0].phrase.value == 1.7976931348623157e308
+	_read(`x is 2.2250738585072014e-308`).assertions[0].phrase.value == 2.2250738585072014e-308
+	_read(`x is 0.0e-9999999`).assertions[0].phrase.value == 0
+}
+
 test_a_sentence_written_wrong_says_what_is_wrong if {
 	_read(`x is "a`) == {"problems": ["unclosed quote at column 6"]}
 	_read(`x is 'a' and y is 'b`) == {"problems": ["unclosed quote at column 19"]}
@@ -8025,7 +8038,7 @@ test_a_sentence_written_wrong_says_what_is_wrong if {
 	_read(`x is "a	b"`) == {"problems": ["invalid string at column 6"]}
 	_read(`x is 'a	b'`) == {"problems": ["invalid string at column 6"]}
 	_read(`"\q" is 1`) == {"problems": ["invalid string at column 1"]}
-	_read(`x is "\q" and y is "\q"`) == {"problems": ["invalid string at column 20", "invalid string at column 6"]}
+	_read(`x is "\q" and y is "\q"`) == {"problems": ["invalid string at column 6", "invalid string at column 20"]}
 	_read(`x is 'a"\q"b' and y is "\q"`) == {"problems": ["invalid string at column 24"]}
 	_read(`x is "cost $usd" and`) == {"problems": ["doesn't parse"]}
 	_read(`$foo is $bar and $foo exists`) == {"problems": ["unknown name $bar", "unknown name $foo"]}
@@ -8068,4 +8081,5 @@ test_a_sentence_written_wrong_says_what_is_wrong if {
 	ergo._for_line(`some x, if any, as y`) == {"problems": ["if any can't go with some"]}
 	ergo._from_line(`count where x is 1`) == {"problems": ["count is a word of the grammar: write .count"]}
 	ergo._from_line(`x is 1`) == {"problems": ["doesn't parse"]}
+	ergo._from_line(`$input named by each of "T"`) == {"problems": ["doesn't parse"]}
 }

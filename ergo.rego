@@ -4035,7 +4035,7 @@ _sentence(raw) := {"assertions": assertions} if {
 	count(assertions) == count(pieces)
 	count(pieces) > 0
 	count(_s_sentence_problems({"assertions": assertions})) == 0
-} else := {"problems": sort(_s_problems(trim_space(raw), _s_patterns))}
+} else := {"problems": _s_problems(trim_space(raw), _s_patterns)}
 
 _for_line(raw) := {"items": items} if {
 	pat := _s_patterns
@@ -4045,13 +4045,13 @@ _for_line(raw) := {"items": items} if {
 	count(items) == count(pieces)
 	count(pieces) in {1, 2}
 	count(_s_sentence_problems({"items": items})) == 0
-} else := {"problems": sort(_s_problems(trim_space(raw), _s_patterns))}
+} else := {"problems": _s_problems(trim_space(raw), _s_patterns)}
 
 _from_line(raw) := line if {
 	pat := _s_patterns
 	line := _s_from_of(trim_space(raw), pat)
 	count(_s_sentence_problems(line)) == 0
-} else := {"problems": sort(_s_problems(trim_space(raw), _s_patterns))}
+} else := {"problems": _s_problems(trim_space(raw), _s_patterns)}
 
 _s_from_of(text, pat) := object.union({"path": _s_path_of(m[1], pat)}, object.union(_s_each_of(m[2], pat), _s_where_of(m[3], pat))) if {
 	m := regex.find_all_string_submatch_n(pat.from, text, 1)[0]
@@ -4112,7 +4112,7 @@ _s_terms_of(text, pat) := terms if {
 	count(terms) == count(pieces)
 }
 
-_s_term_of(text, pat) := to_number(text) if {
+_s_term_of(text, pat) := _s_number(text) if {
 	regex.match(pat.number, text)
 } else := {m[1]: _s_path_of(m[2], pat)} if {
 	m := regex.find_all_string_submatch_n(pat.derived, text, 1)[0]
@@ -4195,7 +4195,7 @@ _s_args_of("list", text, pat) := {"values": _s_values_of(text, pat)} if {
 
 _s_args_of("operand", text, pat) := _s_operand_of(text, pat)
 
-_s_args_of("range", text, pat) := {"min": to_number(m[1]), "max": to_number(m[2])} if {
+_s_args_of("range", text, pat) := {"min": _s_number(m[1]), "max": _s_number(m[2])} if {
 	m := regex.find_all_string_submatch_n(pat.range, text, 1)[0]
 }
 
@@ -4205,7 +4205,7 @@ _s_args_of("operand_within", text, pat) := object.union(_s_operand_of(m[1], pat)
 
 _s_within_of("") := {}
 
-_s_within_of(number) := {"within": to_number(number)} if number != ""
+_s_within_of(number) := {"within": _s_number(number)} if number != ""
 
 _s_operand_of(text, pat) := {"value": _s_value_of(text)} if {
 	regex.match(pat.value, text)
@@ -4213,9 +4213,28 @@ _s_operand_of(text, pat) := {"value": _s_value_of(text)} if {
 
 _s_values_of(text, pat) := [_s_value_of(m[0]) | some m in regex.find_all_string_submatch_n(pat.each_value, text, -1)]
 
-_s_value_of(text) := json.unmarshal(text) if not startswith(text, "'")
+_s_value_of(text) := _s_number(text) if regex.match(`^-?[0-9]`, text)
+
+_s_value_of(text) := json.unmarshal(text) if {
+	not startswith(text, "'")
+	not regex.match(`^-?[0-9]`, text)
+}
 
 _s_value_of(text) := concat("", [_s_sq_char(m[0]) | some m in regex.find_all_string_submatch_n(`\\'|\\\\|\\.|[^\\]`, substring(text, 1, count(text) - 2), -1)]) if startswith(text, "'")
+
+_s_number(text) := 0 if {
+	regex.match(`^-?[0.]+[eE]`, text)
+} else := n if {
+	_s_magnitude(text) >= -400
+	_s_magnitude(text) <= 400
+	n := to_number(text)
+	_fits_a_float(n)
+} else := {"out_of_range": text}
+
+_s_magnitude(text) := (count(m[1]) + _exponent(m[3])) - (count(digits) - count(trim_left(digits, "0"))) if {
+	m := regex.find_all_string_submatch_n(`^-?([0-9]+)(?:\.([0-9]*))?(?:[eE]([+-]?[0-9]+))?$`, text, 1)[0]
+	digits := concat("", [m[1], m[2]])
+}
 
 _s_sq_char(`\'`) := "'"
 
@@ -4223,7 +4242,7 @@ _s_sq_char(`\\`) := `\`
 
 _s_sq_char(c) := c if not c in {`\'`, `\\`}
 
-_s_sentence_problems(parsed) := (((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
+_s_sentence_problems(parsed) := ((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"bare_word" in object.keys(node)
@@ -4267,6 +4286,10 @@ _s_sentence_problems(parsed) := (((((((({concat("", [node.bare_word, " is a word
 	is_object(node)
 	node.op == "is between"
 	node.min > node.max
+}) | {concat("", ["number out of range: ", node.out_of_range]) |
+	some node in _s_nodes(parsed)
+	is_object(node)
+	"out_of_range" in object.keys(node)
 }) | {concat("", ["invalid pattern ", _json_text(v)]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
@@ -4302,7 +4325,7 @@ _s_problems(text, pat) := [concat("", ["unclosed quote at column ", _json_text(c
 		not regex.match(pat.string, token)
 	]
 	count(invalid) > 0
-} else := problems if {
+} else := sort(problems) if {
 	problems := _s_sentence_problems(_s_parsed_anyway(text, pat))
 	count(problems) > 0
 } else := names if {

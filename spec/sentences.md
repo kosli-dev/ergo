@@ -111,7 +111,7 @@ The map is the only way to write `subjects`, and a simple subject is a name with
 
 ## Values
 
-**[sentence.value.scalar]** A value is written as JSON writes a scalar: a string in double quotes, a number, `true`, `false` or `null`. A string can also be in single quotes, which keeps backslashes as written, so a regular expression doesn't need them doubled: `'^\s*FROM'` is `"^\\s*FROM"`. Inside single quotes, `\'` is a quote and `\\` a backslash.
+**[sentence.value.scalar]** A value is written as JSON writes a scalar: a string in double quotes, a number, `true`, `false` or `null`. A string can also be in single quotes, which keeps backslashes as written, so a regular expression doesn't need them doubled: `'^\s*FROM'` is `"^\\s*FROM"`. Inside single quotes, `\'` is a quote and `\\` a backslash. A number has to be `0` or have a magnitude between `2.2250738585072014e-308` and `1.7976931348623157e308`, as a number in a policy does, so `x is at least 1e400` is written wrong.
 
 **[sentence.value.list]** A list of values is the values separated by `, `, with no brackets: `is one of "staging", "prod"`. A value can hold a comma, `matches "^fix(, |: )"`, because commas inside quotes don't separate.
 
@@ -341,6 +341,7 @@ Read as `is` or `equals`, and printed as one of them. With it in the grammar, ev
 | `sum of stages.usd equals total within`                  | `"within" needs a number after it`                                              |
 | `some approvers, if any, is not empty`                   | `if any can't go with some`                                                     |
 | `every pull_requests some approvers.state is "APPROVED"` | `two quantifiers in one sentence: put them on a for line`                       |
+| `x is at least 1e400`                                    | `number out of range: 1e400`                                                    |
 
 `environment is prod` and `approved_by is empy` parse, as comparisons with a field called `prod` or `empy`, unless the subject has no such field. That's the one mistake the grammar can't catch, so the message for a missing field in an `is` argument should suggest quotes.
 
