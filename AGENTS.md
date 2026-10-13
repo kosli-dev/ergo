@@ -27,6 +27,7 @@ opa test . --ignore .github --timeout 120s
 opa eval --strict-builtin-errors --ignore .github -d . --format raw 'count(data) > 0'
 regal lint --disable-all --enable-category bugs --disable redundant-existence-check --ignore-files '.github/**' .
 python3 spec/check_rules.py
+python3 spec/sentences_corpus.py --check
 python3 -m venv /tmp/ergo-venv && /tmp/ergo-venv/bin/pip install --quiet jsonschema==4.26.0 && /tmp/ergo-venv/bin/python .github/spec-schemas.py
 ```
 
@@ -56,7 +57,7 @@ docker run --rm -v "$PWD":/src:ro -w /src openpolicyagent/opa:1.19.0 test . --ig
 
 CI also runs every test with OPA's JavaScript runtime, `@open-policy-agent/opa-wasm` (`.github/wasm-js.cjs`), because that runtime brings its own versions of some built-ins, like a `sprintf` that formats lists and objects differently, and lacks others. The script compiles each test as a Wasm entrypoint, fails if ergo uses a built-in the runtime doesn't have (apart from `time.parse_rfc3339_ns`, which it passes in, as `REFERENCE.md` tells Wasm users to), and then runs every test. It also fails if `ergo.report` or `ergo.violations` needs any built-in that OPA's Wasm build runs outside the module. OPA reads the arguments of those built-ins back as Rego, so a string holding a byte-order mark fails the whole evaluation. `time.parse_rfc3339_ns` is allowed because ergo only passes it strings that already match the RFC 3339 pattern. If you add a function for users to call, add it to the entrypoint the script writes, so the check covers it. `sprintf` is one of them, so build text with `concat` instead. `concat` takes only strings, so write anything else with `_text` first. Last, it builds one report on 100 deployments and fails if that uses more than 20 MB of Wasm memory. Wasm doesn't cache function calls and frees nothing until the report is done, so something worked out again for every row shows up there long before it slows down `opa eval`.
 
-A `spec` job checks the spec. `python3 spec/check_rules.py` fails when a case cites a rule that doesn't exist, or when a rule has no case and isn't listed under "Rules without cases" in `spec/OPEN.md`. `.github/spec-schemas.py` builds the report for every case and fails when a report doesn't match `spec/report/schema.json`, or when ergo reads a policy as written correctly but it doesn't match `spec/policy/schema.json`.
+A `spec` job checks the spec. `python3 spec/check_rules.py` fails when a case cites a rule that doesn't exist, or when a rule has no case and isn't listed under "Rules without cases" in `spec/OPEN.md`. `.github/spec-schemas.py` builds the report for every case and fails when a report doesn't match `spec/report/schema.json`, or when ergo reads a policy as written correctly but it doesn't match `spec/policy/schema.json`. `python3 spec/sentences_corpus.py --check` fails when `spec/sentences-corpus.json` no longer holds every line of `spec/sentences-corpus.md`.
 
 CI also fails when a line of Rego isn't reached by any test. To list those lines yourself:
 
