@@ -20,7 +20,7 @@ for-item          = quantifier WS path [WS where] [if-any] WS "as" WS name
 name              = bare-key
 
 ; A subject's from: line.
-from-line         = path [WS "named by each of" WS path] [WS where]
+from-line         = path [WS "named by each of" WS right-path] [WS where]
 
 ; where keeps the items that pass every condition.
 where             = "where" WS condition *(WS "and" WS condition)
