@@ -41,18 +41,12 @@ The `regal lint` command runs [Regal](https://www.openpolicyagent.org/projects/r
 
 OPA loads every JSON and YAML file it finds as data. The workflow files under `.github` clash with each other, so the checks ignore that folder.
 
-CI runs these checks on pull requests and on pushes to `main` (`.github/workflows/test.yml`), using the OPA version the README names and Regal 0.43.0. When you change the OPA version, change it in the README, in every job of the workflow and in the Docker command below.
-
-A second job runs `opa check --strict`, `opa fmt --list` and `opa test` with OPA 1.20.2, the version the Kosli CLI embeds. Repos that copy `ergo.rego` lint their copy with it, and the two versions don't always format the same way. To run them yourself:
-
-```sh
-docker run --rm -v "$PWD":/src:ro -w /src openpolicyagent/opa:1.20.2 fmt --list .
-```
+CI runs these checks on pull requests and on pushes to `main` (`.github/workflows/test.yml`), using the OPA version the README names and Regal 0.43.0. That's OPA 1.20.2, the version the Kosli CLI embeds. When you change the OPA version, change it in the README, in `CONTRIBUTING.md`, in every job of the workflow, in the Docker command below and in `opaVersion` in `site/hugo.toml`.
 
 CI also runs every test compiled to Wasm, with `opa test . --ignore .github --target wasm --timeout 120s`, because Wasm walks objects and sets in a different order from `opa eval`, so anything that ends up in the report has to be sorted. That needs the Linux build of OPA. The macOS one says `engine not found`, so on a Mac run it in Docker:
 
 ```sh
-docker run --rm -v "$PWD":/src:ro -w /src openpolicyagent/opa:1.19.0 test . --ignore .github --target wasm --timeout 120s
+docker run --rm -v "$PWD":/src:ro -w /src openpolicyagent/opa:1.20.2 test . --ignore .github --target wasm --timeout 120s
 ```
 
 CI also runs every test with OPA's JavaScript runtime, `@open-policy-agent/opa-wasm` (`.github/wasm-js.cjs`), because that runtime brings its own versions of some built-ins, like a `sprintf` that formats lists and objects differently, and lacks others. The script compiles each test as a Wasm entrypoint, fails if ergo uses a built-in the runtime doesn't have (apart from `time.parse_rfc3339_ns`, which it passes in, as `REFERENCE.md` tells Wasm users to), and then runs every test. It also fails if `ergo.report` or `ergo.violations` needs any built-in that OPA's Wasm build runs outside the module. OPA reads the arguments of those built-ins back as Rego, so a string holding a byte-order mark fails the whole evaluation. `time.parse_rfc3339_ns` is allowed because ergo only passes it strings that already match the RFC 3339 pattern. If you add a function for users to call, add it to the entrypoint the script writes, so the check covers it. `sprintf` is one of them, so build text with `concat` instead. `concat` takes only strings, so write anything else with `_text` first. Last, it builds one report on 100 deployments and fails if that uses more than 20 MB of Wasm memory. Wasm doesn't cache function calls and frees nothing until the report is done, so something worked out again for every row shows up there long before it slows down `opa eval`.
