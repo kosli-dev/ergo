@@ -4285,6 +4285,8 @@ _s_sentence_problems(parsed) := ((((((((({concat("", [node.bare_word, " is a wor
 	some node in _s_nodes(parsed)
 	is_object(node)
 	node.op == "is between"
+	is_number(node.min)
+	is_number(node.max)
 	node.min > node.max
 }) | {concat("", ["number out of range: ", node.out_of_range]) |
 	some node in _s_nodes(parsed)
@@ -4295,6 +4297,7 @@ _s_sentence_problems(parsed) := ((((((((({concat("", [node.bare_word, " is a wor
 	is_object(node)
 	node.op in {"matches", "does not match"}
 	some v in object.get(node, "values", [])
+	not is_object(v)
 	not _s_valid_pattern(v)
 }
 

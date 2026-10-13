@@ -8021,6 +8021,8 @@ test_a_from_line_reads_its_path_keys_and_where if {
 test_a_number_out_of_range_is_written_wrong_without_opa_comparing_it if {
 	_read(`x is between -6 and -80e-08923553`) == {"problems": ["number out of range: -80e-08923553"]}
 	_read(`x is between 1 and 1e400`) == {"problems": ["number out of range: 1e400"]}
+	_read(`x is between 1e400 and 1`) == {"problems": ["number out of range: 1e400"]}
+	_read(`x matches 1e400`) == {"problems": ["number out of range: 1e400"]}
 	_read(`x is at least 1e400`) == {"problems": ["number out of range: 1e400"]}
 	_read(`x is 2.2e-308`) == {"problems": ["number out of range: 2.2e-308"]}
 	_read(`x is one of 1, 2e400`) == {"problems": ["number out of range: 2e400"]}
