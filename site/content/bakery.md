@@ -47,7 +47,7 @@ Only batch 001 should pass.
 
 {{< example "baking/plain-rego/baking.rego" "rego" >}}
 
-This is the example's policy with three changes. It reads every batch in the list instead of a single one, so it can say which batch each result is about. The rules need `if`, because OPA 1.19 won't load them without it. And the `contains` helper is renamed `has`, because it clashes with a function OPA now has built in.
+This is the example's policy with three changes. It reads every batch in the list instead of a single one, so it can say which batch each result is about. The rules need `if`, because OPA 1.20 won't load them without it. And the `contains` helper is renamed `has`, because it clashes with a function OPA now has built in.
 
 </div>
 <div class="side--ergo">

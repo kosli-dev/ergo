@@ -12,7 +12,7 @@ If the bug lets a check pass when it should fail, or you think it's a security p
 
 ## Making a change
 
-You'll need [OPA](https://www.openpolicyagent.org/docs/#1-download-opa) 1.19 and [Regal](https://www.openpolicyagent.org/projects/regal) 0.43.0. Some checks also need Docker.
+You'll need [OPA](https://www.openpolicyagent.org/docs/#1-download-opa) 1.20.2 and [Regal](https://www.openpolicyagent.org/projects/regal) 0.43.0. Some checks also need Docker.
 
 [`AGENTS.md`](AGENTS.md) has the full rules and the commands CI runs. It's written for coding agents, but it's the same guide for people. In short:
 

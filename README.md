@@ -6,7 +6,7 @@ ergo is brand new and still changing a lot before its first alpha, so expect bre
 
 ergo is a single Rego file, so using it is as simple as copying it into your project.
 
-You'll need [OPA](https://www.openpolicyagent.org/docs/#1-download-opa) to run it. We test ergo with OPA 1.19 and 1.20.2. Older versions may not load it: OPA 1.2, for example, stops with `rego_parse_error: unexpected as keyword`. Run `opa version` to see which one you have.
+You'll need [OPA](https://www.openpolicyagent.org/docs/#1-download-opa) 1.20.1 or later to run it, and we test ergo with OPA 1.20.2. Older versions give wrong results or don't load it: OPA 1.19 says `1 >= 100.0` is true, so a check can pass when it should fail, OPA 1.20.0 stops with `panic: illegal value` on `0.0 == 1.5`, and OPA 1.2 stops with `rego_parse_error: unexpected as keyword`. Run `opa version` to see which one you have.
 
 ### 1. Copy the library
 
