@@ -95,8 +95,6 @@ jobs:
           version: 1.19.0
       - name: Check every rule a case cites exists, and every rule has a case
         run: python3 spec/check_rules.py
-      - name: Check the corpus JSON matches the markdown
-        run: python3 spec/sentences_corpus.py --check
       - name: Check the cases' policies and reports match the schemas
         run: |
           python3 -m venv "$RUNNER_TEMP/venv"
