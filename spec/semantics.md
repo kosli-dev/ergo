@@ -207,6 +207,8 @@ Every row has a cause. When a check reads several values, the row takes the firs
 
 **[compare.inputs]** Its row has two entries in `inputs`, `left` then `right`.
 
+**[compare.text]** Two more comparisons, `starts_with` and `ends_with`, are what the sentences `starts with` and `ends with` read into, see [sentence.phrase.starts](sentences.md#phrases), and today's syntax can't use them (see [sentence_ops.syntax](syntax.md#policies)). They pass when both values are strings and the left one starts, or ends, with the right one, code point by code point. Anything but two strings, two numbers included, fails with `unusable`, and the rest is as [compare.fail](#compare) says.
+
 ## `compare_time`
 
 `compare_time` takes the same parameters as `compare`, and compares two times.
