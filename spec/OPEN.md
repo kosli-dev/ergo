@@ -34,7 +34,7 @@ A subject with `of` (see [REFERENCE.md](../REFERENCE.md#a-subject-built-on-anoth
 
 ## Where in the input a value was read
 
-A row's `inputs` give each value with a name, like `artifacts.[$$params.name].ok`, and the plan is to print names as sentences write paths, like `artifacts named by $params.name.ok`. A name is for people. A program has to parse it to find the value in the input, and even then it only gets the path inside the subject, with the ref still in it.
+A row's `inputs` give each value with a name, written the way a sentence writes the path, like `artifacts named by $params.name.ok`. A name is for people. A program has to parse it to find the value in the input, and even then it only gets the path inside the subject, with the ref still in it.
 
 A report could also give each input its exact location, counted from the root of the input, with every ref already read:
 
