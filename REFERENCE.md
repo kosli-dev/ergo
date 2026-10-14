@@ -612,10 +612,10 @@ A sentence that can't be read is [written wrong](#basic-operators), and the `$we
 
 for `prod: environment is "prod`. `x is not null` is written wrong too, because it could only fail: write `x exists`. So is a value that isn't a number before `within`, like `x is "a" within 1`. An object with both `assert` and `op` is read as a check with an `op`, so a [custom operator](#custom-operators) can still take `assert`.
 
-ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `starts with`, `ends with`, `and` between two assertions, `assert` as a list, `every`, `some`, `count of`, `sum of`, `plus`, `last of`, a `for` line, a value after `is before` and the other time phrases, a field of the subject after `is in`, `contains` and the other phrases that take a list, and a list path with `named by` in it. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `approved: approved_by is a string` gives:
+ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `starts with`, `ends with`, `and` between two assertions, `assert` as a list, `every`, `some`, `count of`, `sum of`, `plus`, `last of`, a `for` line, a value after `is before` and the other time phrases, a field of the subject after `is in`, `contains` and the other phrases that take a list, and a list path with `named by` in it. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `tickets: every tickets is not empty` gives:
 
 ```json
-{"name": "checks.approved", "value": ["\"is a string\" isn't supported yet"]}
+{"name": "checks.tickets", "value": ["every and some aren't supported yet"]}
 ```
 
 Until then, write those checks with an `op`. `from`, `id` and `applies_to` are still written as before.
