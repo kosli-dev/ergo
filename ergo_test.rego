@@ -8405,3 +8405,13 @@ test_is_empty_reads_through_params_named_by_and_a_parent_that_cant_hold_the_fiel
 	rows := _sentence_rows({"p": "$params.p is not empty", "n": "art named by $params.k is empty", "u": "s.y is empty"}, doc, {"p": [1], "k": "z"})
 	[[r[0], r[1], r[2]] | some r in rows] == [["n", true, "satisfied"], ["p", true, "satisfied"], ["u", false, "unusable"]]
 }
+
+test_a_phrase_lists_its_longer_wording_first_because_finding_a_phrase_never_goes_back_to_try_another_wording if {
+	_read(`x is equal to 1`) == {"assertions": [{"path": {"steps": ["x"]}, "phrase": {"op": "is", "value": 1}}]}
+	_read(`x is an object`).assertions[0].phrase == {"op": "is a", "type": "object"}
+	_read(`x is not in $params.a`).assertions[0].phrase.op == "is not one of"
+	_read(`x does not equal y`).assertions[0].phrase.op == "is not"
+	every ph in ergo._s_patterns.phrases {
+		ph[1] != `(?:is|is +equal +to|equals) +`
+	}
+}
