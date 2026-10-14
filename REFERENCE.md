@@ -584,6 +584,7 @@ A sentence is a path, then a phrase, then what the phrase takes:
 | `cost is 2.5 within 0.01`, `cost equals total within 0.01`                           | `compare` with `eq` and `within`                                         |
 | `env is not "prod"`, `author does not equal approver`                                | `compare` with `ne`, so two values of different types fail as `unusable` |
 | `env is one of "dev", "test"`, `user is in $params.staff`                            | `in`                                                                     |
+| `env is not one of "prod"`, `user is not in $params.bots`                            | `not_in`, so a value of another type passes                              |
 | `ticket exists`, `ticket does not exist`                                             | `present`, `missing`                                                     |
 | `approved_by is a non-empty string`                                                  | `non_empty_string`                                                       |
 | `findings is empty`, `tickets is not empty`                                          | `empty_string_or_list`, `not_empty_string_or_list`                       |
@@ -610,7 +611,7 @@ A sentence that can't be read is [written wrong](#basic-operators), and the `$we
 
 for `prod: environment is "prod`. `x is not null` is written wrong too, because it could only fail: write `x exists`. So is a value that isn't a number before `within`, like `x is "a" within 1`. An object with both `assert` and `op` is read as a check with an `op`, so a [custom operator](#custom-operators) can still take `assert`.
 
-ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `is not one of`, `is not in`, `is a <type>`, `starts with`, `ends with`, `and` between two assertions, `assert` as a list, `every`, `some`, `count of`, `sum of`, `plus`, `last of`, a `for` line, a value after `is before` and the other time phrases, a field of the subject after `is in`, `contains` and the other phrases that take a list, and a list path with `named by` in it. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `approved: approved_by is not one of "bot"` gives:
+ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `is a <type>`, `starts with`, `ends with`, `and` between two assertions, `assert` as a list, `every`, `some`, `count of`, `sum of`, `plus`, `last of`, a `for` line, a value after `is before` and the other time phrases, a field of the subject after `is in`, `contains` and the other phrases that take a list, and a list path with `named by` in it. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `approved: approved_by is not one of "bot"` gives:
 
 ```json
 {"name": "checks.approved", "value": ["\"is not one of\" isn't supported yet"]}
@@ -986,7 +987,7 @@ A substitute with a wrong path looks just like a substitute whose evidence is mi
 
 ## Custom operators
 
-When the built-in operators can't express a check, you can write your own. Don't name one after a built-in operator, or after `empty_string_or_list` or `not_empty_string_or_list`, which ergo keeps for [sentences](#checks-written-as-sentences). Add an `op_passed` rule to the `ergo` package from a file of your own:
+When the built-in operators can't express a check, you can write your own. Don't name one after a built-in operator, or after `empty_string_or_list`, `not_empty_string_or_list` or `not_in`, which ergo keeps for [sentences](#checks-written-as-sentences). Add an `op_passed` rule to the `ergo` package from a file of your own:
 
 ```rego
 package ergo
