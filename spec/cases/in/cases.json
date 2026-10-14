@@ -100,7 +100,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "B"}]}
         ],
-        "expressions": {"s": {"c": "x in [\"B\", \"a\", $$params.w, 1.5, 10, 2, [1], false, null, true, {\"b\": 1}]"}}
+        "expressions": {"s": {"c": "x in [\"B\", \"a\", $params.w, 1.5, 10, 2, [1], false, null, true, {\"b\": 1}]"}}
       }
     ]
   },
@@ -131,7 +131,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
         ],
-        "expressions": {"s": {"c": "x in $$params.allowed"}}
+        "expressions": {"s": {"c": "x in $params.allowed"}}
       }
     ]
   },

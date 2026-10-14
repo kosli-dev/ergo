@@ -14,7 +14,7 @@
       },
       {
         "description": "fails with the worst cause among the items that failed, and lists them",
-        "rules": ["list.cause", "list.failed_items", "name.list"],
+        "rules": ["list.cause", "list.failed_items", "name.list", "name.index"],
         "input": {"things": [{"cs": [{"s": true}, {"s": false}, {}], "id": "t1"}]},
         "results": [
           {
@@ -24,7 +24,7 @@
             "passed": false,
             "cause": "absent",
             "inputs": [{"name": "cs[].s", "value": [true, false, null]}],
-            "failed_items": [{"cause": "value", "path": "cs[1]", "value": {"s": false}}, {"cause": "absent", "path": "cs[2]", "value": {}}]
+            "failed_items": [{"cause": "value", "path": "item 2 of cs", "value": {"s": false}}, {"cause": "absent", "path": "item 3 of cs", "value": {}}]
           }
         ]
       },
@@ -70,7 +70,7 @@
       },
       {
         "description": "fails as not_an_object on items that aren't objects",
-        "rules": ["list.items", "name.list"],
+        "rules": ["list.items", "name.list", "name.index"],
         "input": {"things": [{"cs": ["a", 1], "id": "t1"}]},
         "results": [
           {
@@ -80,7 +80,7 @@
             "passed": false,
             "cause": "not_an_object",
             "inputs": [{"name": "cs[].s", "value": [null, null]}],
-            "failed_items": [{"cause": "not_an_object", "path": "cs[0]", "value": "a"}, {"cause": "not_an_object", "path": "cs[1]", "value": 1}]
+            "failed_items": [{"cause": "not_an_object", "path": "item 1 of cs", "value": "a"}, {"cause": "not_an_object", "path": "item 2 of cs", "value": 1}]
           }
         ]
       }
@@ -109,7 +109,7 @@
       },
       {
         "description": "fails as absent when one item fails as value and another is missing its field",
-        "rules": ["list.cause", "name.list"],
+        "rules": ["list.cause", "name.list", "name.index"],
         "input": {"things": [{"cs": [{"u": ""}, {}], "id": "t1"}]},
         "results": [
           {
@@ -119,7 +119,7 @@
             "passed": false,
             "cause": "absent",
             "inputs": [{"name": "cs[].u", "value": ["", null]}],
-            "failed_items": [{"cause": "value", "path": "cs[0]", "value": {"u": ""}}, {"cause": "absent", "path": "cs[1]", "value": {}}]
+            "failed_items": [{"cause": "value", "path": "item 1 of cs", "value": {"u": ""}}, {"cause": "absent", "path": "item 2 of cs", "value": {}}]
           }
         ]
       },
@@ -139,7 +139,7 @@
     "cases": [
       {
         "description": "lists an item missing the field with cause value",
-        "rules": ["list.failed_items", "present.missing", "name.list"],
+        "rules": ["list.failed_items", "present.missing", "name.list", "name.index"],
         "input": {"things": [{"cs": [{"x": 1}, {}], "id": "t1"}]},
         "results": [
           {
@@ -149,7 +149,7 @@
             "passed": false,
             "cause": "value",
             "inputs": [{"name": "cs[].x", "value": [1, null]}],
-            "failed_items": [{"cause": "value", "path": "cs[1]", "value": {}}]
+            "failed_items": [{"cause": "value", "path": "item 2 of cs", "value": {}}]
           }
         ]
       }
@@ -161,7 +161,7 @@
     "cases": [
       {
         "description": "reads each item itself and names it after the list",
-        "rules": ["list.items", "list.inputs", "list.expression", "render.path", "name.list"],
+        "rules": ["list.items", "list.inputs", "list.expression", "render.path", "name.list", "name.index"],
         "input": {"things": [{"bs": ["main", "dev"], "id": "t1"}]},
         "results": [
           {
@@ -171,7 +171,7 @@
             "passed": false,
             "cause": "value",
             "inputs": [{"name": "bs[]", "value": ["main", "dev"]}],
-            "failed_items": [{"cause": "value", "path": "bs[1]", "value": "dev"}]
+            "failed_items": [{"cause": "value", "path": "item 2 of bs", "value": "dev"}]
           }
         ],
         "expressions": {"s": {"c": "every bs: bs[] matches one of [\"^main$\"]"}}
@@ -197,7 +197,7 @@
     "cases": [
       {
         "description": "shows the whole items and the input path it reads",
-        "rules": ["list.inputs", "render.path", "list.expression", "name.list", "path.steps"],
+        "rules": ["list.inputs", "render.path", "list.expression", "name.list", "path.steps", "name.index"],
         "input": {"author": "ann", "things": [{"as": [{"u": "ann"}, {"u": "bob"}], "id": "t1"}]},
         "results": [
           {
@@ -206,11 +206,11 @@
             "check": "c",
             "passed": false,
             "cause": "value",
-            "inputs": [{"name": "as[]", "value": [{"u": "ann"}, {"u": "bob"}]}, {"name": "$$input.author", "value": "ann"}],
-            "failed_items": [{"cause": "value", "path": "as[0]", "value": {"u": "ann"}}]
+            "inputs": [{"name": ".as[]", "value": [{"u": "ann"}, {"u": "bob"}]}, {"name": "$input.author", "value": "ann"}],
+            "failed_items": [{"cause": "value", "path": "item 1 of .as", "value": {"u": "ann"}}]
           }
         ],
-        "expressions": {"s": {"c": "every as: u ne $$input.author"}}
+        "expressions": {"s": {"c": "every .as: u ne $input.author"}}
       }
     ]
   },
@@ -221,7 +221,7 @@
     "cases": [
       {
         "description": "fails every item with the ref's cause",
-        "rules": ["list.failed_items", "value.ref", "name.list"],
+        "rules": ["list.failed_items", "value.ref", "name.list", "name.index"],
         "input": {"things": [{"cs": [{"x": 1}, {"x": 2}], "id": "t1"}]},
         "results": [
           {
@@ -231,7 +231,7 @@
             "passed": false,
             "cause": "absent",
             "inputs": [{"name": "cs[].x", "value": [1, 2]}],
-            "failed_items": [{"cause": "absent", "path": "cs[0]", "value": {"x": 1}}, {"cause": "absent", "path": "cs[1]", "value": {"x": 2}}]
+            "failed_items": [{"cause": "absent", "path": "item 1 of cs", "value": {"x": 1}}, {"cause": "absent", "path": "item 2 of cs", "value": {"x": 2}}]
           }
         ]
       }
@@ -260,7 +260,7 @@
       },
       {
         "description": "lists the inner lists that can't be read or are empty in place of their items",
-        "rules": ["list.each", "list.failed_items", "name.list"],
+        "rules": ["list.each", "list.failed_items", "name.list", "name.index"],
         "input": {"things": [{"id": "t1", "prs": [{"cs": [{"s": true}, {"s": false}]}, {}, {"cs": []}, {"cs": [{}]}]}]},
         "results": [
           {
@@ -271,10 +271,10 @@
             "cause": "absent",
             "inputs": [{"name": "prs[].cs", "value": [[{"s": true}, {"s": false}], null, [], [{}]]}],
             "failed_items": [
-              {"cause": "value", "path": "prs[0].cs[1]", "value": {"s": false}},
+              {"cause": "value", "path": "item 2 of prs[0].cs", "value": {"s": false}},
               {"cause": "absent", "path": "prs[1].cs", "value": null},
               {"cause": "value", "path": "prs[2].cs", "value": []},
-              {"cause": "absent", "path": "prs[3].cs[0]", "value": {}}
+              {"cause": "absent", "path": "item 1 of prs[3].cs", "value": {}}
             ]
           }
         ]
@@ -303,7 +303,7 @@
       },
       {
         "description": "fails as absent when an inner list is missing, even though another item passes",
-        "rules": ["list.each", "name.list"],
+        "rules": ["list.each", "name.list", "name.index"],
         "input": {"things": [{"id": "t1", "prs": [{"cs": [{"s": true}]}, {}]}]},
         "results": [
           {
@@ -325,7 +325,7 @@
     "cases": [
       {
         "description": "checks the items of a list of lists",
-        "rules": ["list.each", "list.expression", "render.path", "name.list"],
+        "rules": ["list.each", "list.expression", "render.path", "name.list", "name.index"],
         "input": {"things": [{"id": "t1", "xss": [[1], [1, 2]]}]},
         "results": [
           {
@@ -335,7 +335,7 @@
             "passed": false,
             "cause": "value",
             "inputs": [{"name": "xss[]", "value": [[1], [1, 2]]}],
-            "failed_items": [{"cause": "value", "path": "xss[1][1]", "value": 2}]
+            "failed_items": [{"cause": "value", "path": "item 2 of xss[1]", "value": 2}]
           }
         ],
         "expressions": {"s": {"c": "every xss[]: xss[][] == 1"}}
@@ -361,7 +361,7 @@
     "cases": [
       {
         "description": "fails when no approver approved after every commit, and lists only the approvers",
-        "rules": ["list.as", "list.inner", "list.failed_items", "list.inputs", "render.path", "list.expression", "name.list"],
+        "rules": ["list.as", "list.inner", "list.failed_items", "list.inputs", "render.path", "list.expression", "name.list", "name.index"],
         "input": {"prs": [{"approvers": [{"t": "2026-10-01T11:00:00Z", "u": "bob"}], "commits": [{"t": "2026-10-01T10:00:00Z"}, {"t": "2026-10-01T12:00:00Z"}], "n": 42}]},
         "results": [
           {
@@ -371,7 +371,7 @@
             "passed": false,
             "cause": "value",
             "inputs": [{"name": "approvers[]", "value": [{"t": "2026-10-01T11:00:00Z", "u": "bob"}]}, {"name": "$pr.commits", "value": [{"t": "2026-10-01T10:00:00Z"}, {"t": "2026-10-01T12:00:00Z"}]}],
-            "failed_items": [{"cause": "value", "path": "approvers[0]", "value": {"t": "2026-10-01T11:00:00Z", "u": "bob"}}]
+            "failed_items": [{"cause": "value", "path": "item 1 of approvers", "value": {"t": "2026-10-01T11:00:00Z", "u": "bob"}}]
           }
         ],
         "expressions": {"s": {"c": "some approvers as $ap: every $pr.commits: $ap.t gt t"}}
@@ -413,7 +413,7 @@
     "cases": [
       {
         "description": "shows the value read through the name beside the items",
-        "rules": ["list.inputs", "render.path", "list.expression", "name.list"],
+        "rules": ["list.inputs", "render.path", "list.expression", "name.list", "name.index"],
         "input": {"prs": [{"approvers": [{"u": "ann"}], "author": "ann", "n": 42}]},
         "results": [
           {
@@ -423,7 +423,7 @@
             "passed": false,
             "cause": "value",
             "inputs": [{"name": "approvers[]", "value": [{"u": "ann"}]}, {"name": "$pr.author", "value": "ann"}],
-            "failed_items": [{"cause": "value", "path": "approvers[0]", "value": {"u": "ann"}}]
+            "failed_items": [{"cause": "value", "path": "item 1 of approvers", "value": {"u": "ann"}}]
           }
         ],
         "expressions": {"s": {"c": "some approvers: u ne $pr.author"}}
@@ -449,7 +449,7 @@
     "cases": [
       {
         "description": "names each level after its list",
-        "rules": ["list.expression", "render.path", "name.list"],
+        "rules": ["list.expression", "render.path", "name.list", "name.index"],
         "input": {"things": [{"id": "t1", "xs": [["a"], ["b", "c"]]}]},
         "results": [
           {
@@ -459,7 +459,7 @@
             "passed": false,
             "cause": "value",
             "inputs": [{"name": "xs[]", "value": [["a"], ["b", "c"]]}],
-            "failed_items": [{"cause": "value", "path": "xs[1]", "value": ["b", "c"]}]
+            "failed_items": [{"cause": "value", "path": "item 2 of xs", "value": ["b", "c"]}]
           }
         ],
         "expressions": {"s": {"c": "every xs: every xs[]: xs[][] == \"a\""}}
@@ -494,7 +494,7 @@
     "cases": [
       {
         "description": "fails every check as ill_formed and says why",
-        "rules": ["list.inner", "list.as", "list.expression", "list.failed_items", "written_wrong", "written_wrong.row", "list.written_wrong", "render.path", "name.list", "written_wrong.inputs"],
+        "rules": ["list.inner", "list.as", "list.expression", "list.failed_items", "written_wrong", "written_wrong.row", "list.written_wrong", "render.path", "name.list", "written_wrong.inputs", "name.index"],
         "input": {"things": [{"cs": [1], "id": "t1"}]},
         "results": [
           {
@@ -524,7 +524,7 @@
             "passed": false,
             "cause": "ill_formed",
             "inputs": [],
-            "failed_items": [{"cause": "ill_formed", "path": "cs[0]", "value": 1}]
+            "failed_items": [{"cause": "ill_formed", "path": "item 1 of cs", "value": 1}]
           },
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "each_on_equals", "passed": false, "cause": "ill_formed", "inputs": [{"name": "cs", "value": [1]}]},
           {
@@ -534,7 +534,7 @@
             "passed": false,
             "cause": "ill_formed",
             "inputs": [{"name": "cs[]", "value": [1]}],
-            "failed_items": [{"cause": "ill_formed", "path": "cs[0]", "value": 1}]
+            "failed_items": [{"cause": "ill_formed", "path": "item 1 of cs", "value": 1}]
           },
           {
             "requirement": "s",
@@ -543,7 +543,7 @@
             "passed": false,
             "cause": "ill_formed",
             "inputs": [{"name": "cs[].b", "value": [null]}],
-            "failed_items": [{"cause": "ill_formed", "path": "cs[0]", "value": 1}]
+            "failed_items": [{"cause": "ill_formed", "path": "item 1 of cs", "value": 1}]
           },
           {
             "requirement": "s",
@@ -552,7 +552,7 @@
             "passed": false,
             "cause": "ill_formed",
             "inputs": [],
-            "failed_items": [{"cause": "ill_formed", "path": "cs[0]", "value": 1}]
+            "failed_items": [{"cause": "ill_formed", "path": "item 1 of cs", "value": 1}]
           },
           {
             "requirement": "s",
@@ -561,7 +561,7 @@
             "passed": false,
             "cause": "ill_formed",
             "inputs": [{"name": "cs[].b", "value": [null]}],
-            "failed_items": [{"cause": "ill_formed", "path": "cs[0]", "value": 1}]
+            "failed_items": [{"cause": "ill_formed", "path": "item 1 of cs", "value": 1}]
           },
           {
             "requirement": "s",
@@ -570,7 +570,7 @@
             "passed": false,
             "cause": "ill_formed",
             "inputs": [{"name": "cs[]", "value": [1]}, {"name": "$q.v", "value": null}],
-            "failed_items": [{"cause": "ill_formed", "path": "cs[0]", "value": 1}]
+            "failed_items": [{"cause": "ill_formed", "path": "item 1 of cs", "value": 1}]
           }
         ],
         "expressions": {

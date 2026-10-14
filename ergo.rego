@@ -376,14 +376,14 @@ _field_problem_inputs(req) := [{"name": _field_name(f), "value": sort({p[1] | so
 	problems := _req_problems(req)
 }
 
-_field_name(f) := _path_name([f]) if is_string(f)
+_field_name(f) := _field_path_name([f]) if is_string(f)
 
-_field_name(f) := _path_name(f) if {
+_field_name(f) := _field_path_name(f) if {
 	is_array(f)
 	is_string(f[count(f) - 1])
 }
 
-_field_name(f) := concat(".", [_path_name(array.slice(f, 0, count(f) - 1)), _invalid_key_name(f[count(f) - 1])]) if {
+_field_name(f) := concat(".", [_field_path_name(array.slice(f, 0, count(f) - 1)), _invalid_key_name(f[count(f) - 1])]) if {
 	is_array(f)
 	not is_string(f[count(f) - 1])
 }
@@ -713,7 +713,7 @@ _shown_cause(c) := c if c != "missing"
 
 default _item_entries(_, _, _) := []
 
-_item_entries(subj, check, item) := [[concat("", [_item_path_name(item, check.path), "[", format_int(i, 10), "]"]), v] |
+_item_entries(subj, check, item) := [[_entry_name(item, check.path, [i]), v] |
 	some i, v in coll
 ] if {
 	not check.each
@@ -723,26 +723,27 @@ _item_entries(subj, check, item) := [[concat("", [_item_path_name(item, check.pa
 
 _item_entries(subj, check, item) := [e |
 	some i, outer in coll
-	some e in _outer_entries(outer, check, concat("", [_item_path_name(item, check.path), "[", format_int(i, 10), "]", _each_suffix(check.each)]))
+	some e in _outer_entries(outer, check, item, array.concat([i], check.each))
 ] if {
+	is_array(check.each)
 	check.each
 	coll := _field(subj, check.path)
 	is_array(coll)
 }
 
-_outer_entries(outer, check, name) := [[concat("", [name, "[", format_int(j, 10), "]"]), v] | some j, v in inner] if {
+_outer_entries(outer, check, item, rest) := [[_entry_name(item, check.path, array.concat(rest, [j])), v] | some j, v in inner] if {
 	inner := _field(outer, check.each)
 	is_array(inner)
 	count(inner) > 0
 }
 
-_outer_entries(outer, check, name) := [[name, [], "value"]] if _field(outer, check.each) == []
+_outer_entries(outer, check, item, rest) := [[_entry_name(item, check.path, rest), [], "value"]] if _field(outer, check.each) == []
 
-_outer_entries(outer, check, name) := [[name, value_at(outer, check.each), _each_state(outer, check.each)]] if not _is_list_at(outer, check.each)
+_outer_entries(outer, check, item, rest) := [[_entry_name(item, check.path, rest), value_at(outer, check.each), _each_state(outer, check.each)]] if not _is_list_at(outer, check.each)
 
-_each_suffix([]) := ""
+_entry_name(_, path, rest) := _path_name(array.concat(path, rest)) if path != []
 
-_each_suffix(each) := concat("", [".", _path_name(each)]) if each != []
+_entry_name(item, [], rest) := concat("", [item, _steps_name(rest)])
 
 _is_list_at(x, path) if is_array(_field(x, path))
 
@@ -959,12 +960,6 @@ _ref_read(path) := object.get(start, [_unliteral(seg) | some seg in array.slice(
 	is_object(start)
 }
 
-_ref_name(path) := concat(".", [_ref_segment_name(i, seg) | some i, seg in path]) if _builtin(path)
-
-_ref_segment_name(0, seg) := seg
-
-_ref_segment_name(i, seg) := _key_name(_unliteral(seg)) if i > 0
-
 _ref_name(path) := "<invalid ref>" if not _builtin(path)
 
 default _malformed(_) := false
@@ -1002,7 +997,106 @@ _selector_matches(v, sel) if {
 	}
 }
 
-_path_name(path) := concat(".", [_segment_name(i, path[i]) | some i in _names(path)])
+_field_path_name(path) := concat(".", [_segment_name(i, path[i]) | some i in _names(path)])
+
+_path_name(path) := concat("", ["item ", _literal_text(path[count(path) - 1] + 1), " of ", _steps_name(array.slice(path, 0, count(path) - 1))]) if {
+	is_array(path)
+	count(path) > 1
+	_index_step(path[count(path) - 1])
+} else := _steps_name(path)
+
+_ref_name(path) := concat("", ["item ", _literal_text(path[count(path) - 1] + 1), " of ", _plain_steps_name(array.slice(path, 0, count(path) - 1))]) if {
+	_builtin(path)
+	count(path) > 1
+	_index_step(path[count(path) - 1])
+} else := _plain_steps_name(path) if _builtin(path)
+
+_index_step(s) if {
+	is_number(s)
+	_is_key(s)
+}
+
+_steps_name(path) := concat("", [_step_name(i, path[i]) | some i in _names(path)])
+
+_plain_steps_name(path) := concat("", [_plain_step_name(i, path[i]) | some i in _names(path)])
+
+_step_name(i, p) := _plain_step_name(i, p) if _nameable_step(p)
+
+_step_name(i, p) := concat("", [" named by ", _ref_name(p.ref)]) if {
+	i > 0
+	_named_by(p)
+}
+
+_step_name(i, p) := concat("", ["[", _ref_name(p.ref), "]"]) if {
+	_is_ref(p)
+	not _named_by_after(i, p)
+}
+
+_named_by_after(i, p) if {
+	i > 0
+	_named_by(p)
+}
+
+_step_name(i, p) := concat("", [_step_dot(i), _segment_name(i, p)]) if {
+	not _nameable_step(p)
+	not _is_ref(p)
+}
+
+_nameable_step(p) if is_string(p)
+
+_nameable_step(p) if _index_step(p)
+
+_nameable_step(p) if {
+	_is_literal(p)
+	is_string(p.literal)
+}
+
+_plain_step_name(0, "$$input") := "$input"
+
+_plain_step_name(0, "$$params") := "$params"
+
+_plain_step_name(0, k) := k if {
+	is_string(k)
+	startswith(k, "$")
+	not k in {"$$input", "$$params"}
+}
+
+_plain_step_name(0, k) := concat("", [_s_dot(k, "left"), _s_key_text(k)]) if {
+	is_string(k)
+	not startswith(k, "$")
+}
+
+_plain_step_name(i, k) := concat("", [".", _s_key_text(k)]) if {
+	i > 0
+	is_string(k)
+}
+
+_plain_step_name(0, p) := concat("", [_s_dot(p.literal, "left"), _s_key_text(p.literal)]) if _string_literal(p)
+
+_plain_step_name(i, p) := concat("", [".", _s_key_text(p.literal)]) if {
+	i > 0
+	_string_literal(p)
+}
+
+_plain_step_name(_, k) := concat("", ["[", _literal_text(k), "]"]) if _index_step(k)
+
+_plain_step_name(i, p) := concat("", [_step_dot(i), _key_name(_unliteral(p))]) if not _nameable_step(p)
+
+_step_dot(0) := ""
+
+_step_dot(i) := "." if i > 0
+
+_string_literal(p) if {
+	_is_literal(p)
+	is_string(p.literal)
+}
+
+_named_by(p) if {
+	_is_ref(p)
+	_builtin(p.ref)
+	count(p.ref) == 2
+	is_string(_unliteral(p.ref[1]))
+}
 
 _item_path_name(item, []) := item
 
@@ -1014,15 +1108,7 @@ _projection_name(path, each) := concat("", [_path_name(path), "[].", _path_name(
 
 _segment_name(_, p) := _key_name(p) if not is_object(p)
 
-_segment_name(i, p) := _json_text(p.literal) if {
-	_is_literal(p)
-	_first_dollar_key(i, p.literal)
-}
-
-_segment_name(i, p) := _key_name(p.literal) if {
-	_is_literal(p)
-	not _first_dollar_key(i, p.literal)
-}
+_segment_name(_, p) := _key_name(p.literal) if _is_literal(p)
 
 _segment_name(_, p) := concat("", ["[", concat(" and ", sort([concat("", [_key_name(k), "==", _value_text(v)]) | some k, v in p.where])), "]"]) if {
 	is_object(p)
@@ -1030,8 +1116,6 @@ _segment_name(_, p) := concat("", ["[", concat(" and ", sort([concat("", [_key_n
 	not _is_ref(p)
 	not _malformed(p)
 }
-
-_segment_name(_, p) := concat("", ["[", _ref_name(p.ref), "]"]) if _is_ref(p)
 
 _segment_name(_, p) := "[<invalid ref>]" if _malformed(p)
 
@@ -3225,7 +3309,7 @@ _well_formed(req) if {
 }
 
 _check_problem_inputs(req) := [{"name": name, "value": sort({p[1] | some p in problems; p[0] == name})} | some name in sort({p[0] | some p in problems})] if {
-	problems := {[_path_name(array.concat(_checks_at(req, f, n), p[0])), p[1]] |
+	problems := {[_field_path_name(array.concat(_checks_at(req, f, n), p[0])), p[1]] |
 		some f in ["applies_to", "checks"]
 		some n, check in _req_checks(req, f)
 		some p in _check_problems(check, _from_names(req))

@@ -243,11 +243,11 @@
         "input": {"t": [{"a": 1, "id": 1}, {"b": 1, "id": 2}, {"a": 1, "b": 1, "id": 3}]},
         "requirements": {"s": {"require": "some", "status": "met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": "a", "value": 1}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": ".a", "value": 1}]},
           {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "b", "passed": false, "cause": "value", "inputs": [{"name": "b", "value": null}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "a", "passed": false, "cause": "value", "inputs": [{"name": "a", "value": null}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "a", "passed": false, "cause": "value", "inputs": [{"name": ".a", "value": null}]},
           {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "b", "passed": true, "cause": "satisfied", "inputs": [{"name": "b", "value": 1}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 3}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": "a", "value": 1}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 3}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": ".a", "value": 1}]},
           {"requirement": "s", "subject": {"type": "subject", "id": 3}, "check": "b", "passed": true, "cause": "satisfied", "inputs": [{"name": "b", "value": 1}]}
         ],
         "violations": []
@@ -258,14 +258,14 @@
         "input": {"t": [{"a": 1, "id": 1}, {"b": 1, "id": 2}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": "a", "value": 1}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": ".a", "value": 1}]},
           {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "b", "passed": false, "cause": "value", "inputs": [{"name": "b", "value": null}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "a", "passed": false, "cause": "value", "inputs": [{"name": "a", "value": null}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "a", "passed": false, "cause": "value", "inputs": [{"name": ".a", "value": null}]},
           {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "b", "passed": true, "cause": "satisfied", "inputs": [{"name": "b", "value": 1}]}
         ],
         "violations": [
           {"cause": "value", "check": "b", "description": "", "expression": "b is present", "inputs": [{"name": "b", "value": null}], "requirement": "s", "subject": {"id": 1, "type": "subject"}},
-          {"cause": "value", "check": "a", "description": "", "expression": "a is present", "inputs": [{"name": "a", "value": null}], "requirement": "s", "subject": {"id": 2, "type": "subject"}}
+          {"cause": "value", "check": "a", "description": "", "expression": ".a is present", "inputs": [{"name": ".a", "value": null}], "requirement": "s", "subject": {"id": 2, "type": "subject"}}
         ]
       }
     ]
@@ -652,7 +652,7 @@
     "cases": [
       {
         "description": "add the check's description, expression and refs, and keep failed_items",
-        "rules": ["violations"],
+        "rules": ["violations", "name.index"],
         "input": {"t": [{"cs": [{"v": "a"}, {"v": "z"}], "id": 1}]},
         "results": [
           {
@@ -662,7 +662,7 @@
             "passed": false,
             "cause": "value",
             "inputs": [{"name": "cs[].v", "value": ["a", "z"]}],
-            "failed_items": [{"cause": "value", "path": "cs[1]", "value": {"v": "z"}}]
+            "failed_items": [{"cause": "value", "path": "item 2 of cs", "value": {"v": "z"}}]
           }
         ],
         "violations": [
@@ -670,9 +670,9 @@
             "cause": "value",
             "check": "c",
             "description": "",
-            "expression": "every cs: v in $$params.ok",
-            "failed_items": [{"cause": "value", "path": "cs[1]", "value": {"v": "z"}}],
-            "inputs": [{"name": "cs[].v", "value": ["a", "z"]}, {"name": "$$params.ok", "value": ["a", "b"]}],
+            "expression": "every cs: v in $params.ok",
+            "failed_items": [{"cause": "value", "path": "item 2 of cs", "value": {"v": "z"}}],
+            "inputs": [{"name": "cs[].v", "value": ["a", "z"]}, {"name": "$params.ok", "value": ["a", "b"]}],
             "requirement": "s",
             "subject": {"id": 1, "type": "subject"}
           }

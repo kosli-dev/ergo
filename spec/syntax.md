@@ -60,13 +60,15 @@ Draft 0.1. This file covers the syntax policies use today, where a check is a JS
 
 ## Naming a path
 
-A row's `inputs`, a ref's entry in `$refs` and an item in `failed_items` name the paths they read.
+A row's `inputs`, a ref's entry in `$refs`, an item in `failed_items` and a path in an `expression` name the paths they read the way a sentence writes them (see [sentences.md](sentences.md#paths)), so a name from a row can be pasted into a sentence. The names `$well_formed` gives the policy's own fields, like `checks.c` or `subjects.deployment.from`, follow [written_wrong.row](#checks-written-wrong) instead.
 
-**[name.keys]** Keys are joined with `.`. A key is written as it is when it starts with an ASCII letter, `_` or `$` and the rest is ASCII letters, digits, `_`, `$` or `-`, and in double quotes otherwise. A first key that starts with `$` is in double quotes too, like `"$schema".x`, so it can't be taken for a name. An index is written as digits: `x.1`.
+**[name.keys]** Keys are joined with `.`. A key is written as it is when it starts with an ASCII letter or `_` and the rest is ASCII letters, digits, `_` or `-`, and in double quotes otherwise, so a key with a `$` in it is quoted, like `"$schema".x` or `x."$b"`. A first key that's a word of the sentence grammar (see [sentence.words](sentences.md#words-a-field-cant-be-called)) has a `.` in front, like `.empty` or `.a`. A path that starts at the input or the params starts with `$input` or `$params`, and one that starts at a name keeps it, like `$pr.author`.
+
+**[name.index]** An index at the end of a path is written `item <n> of <path>`, counting from 1, so `["xs", 1]` is `item 2 of xs`. An index with more steps after it, or with nothing before it, is written in brackets, counting from 0: `xs[1].k`, `[0]`.
 
 **[name.selector]** A selector is written `[k=="a"]`, its fields sorted and joined with ` and `.
 
-**[name.ref_step]** A ref step is written `[$$params.key]`.
+**[name.ref_step]** A ref step whose ref reads one key of the input or the params is written ` named by $params.key`, like `obj named by $params.k.v`. Any other ref step, and one that starts the path, is written in brackets, like `k[$params.a.b]` or `[$params.key]`.
 
 **[name.subject]** A path with no steps on a subject is named after the subject's `from` with `[]` added, like `things[]`.
 
@@ -78,7 +80,7 @@ A row's `inputs`, a ref's entry in `$refs` and an item in `failed_items` name th
 
 Each check's definition in the report has an `expression` that says what it checks.
 
-**[render.value]** A value is shown as JSON: a string in double quotes, escaping only `"`, `\` and control characters, a number in plain decimal with no exponent and no trailing zeros (`1.50` and `1e2` are shown as `1.5` and `100`), and lists and objects with `, ` after each item and `: ` after each key. An object's keys are sorted by code point. A literal is shown as the value it holds. A ref is shown as its path's name, without quotes, like `$$params.allowed`.
+**[render.value]** A value is shown as JSON: a string in double quotes, escaping only `"`, `\` and control characters, a number in plain decimal with no exponent and no trailing zeros (`1.50` and `1e2` are shown as `1.5` and `100`), and lists and objects with `, ` after each item and `: ` after each key. An object's keys are sorted by code point. A literal is shown as the value it holds. A ref is shown as its path's name, without quotes, like `$params.allowed`.
 
 **[render.path]** A path is shown with its [name](#naming-a-path).
 
@@ -90,7 +92,7 @@ Each check's definition in the report has an `expression` that says what it chec
 
 **[equals.expression]** `<path> == <value>`
 
-**[in.expression]** `<path> in [<values>]`, with each value sorted by the text it's shown as, in code point order. Values read through a ref are shown as the ref's name: `x in $$params.allowed`.
+**[in.expression]** `<path> in [<values>]`, with each value sorted by the text it's shown as, in code point order. Values read through a ref are shown as the ref's name: `x in $params.allowed`.
 
 **[non_empty_string.expression]** `<path> is a non-empty string`
 
@@ -102,7 +104,7 @@ Each check's definition in the report has an `expression` that says what it chec
 
 **[contains.expression]** `contains(<path>, <value>)` and `not contains(<path>, <value>)`, or with `values`, `contains_all(<path>, [<values>])` and `contains_none(<path>, [<values>])`, sorted as for `in`. When both or neither are given, `<both value and values>` or `<missing value or values>` takes the value's place.
 
-**[compare.expression]** `<left> <cmp> <right>`, like `a lt $$input.limit`, with `cmp` as written.
+**[compare.expression]** `<left> <cmp> <right>`, like `x lt $input.limit`, with `cmp` as written.
 
 **[time.expression]** Written like `compare`'s.
 

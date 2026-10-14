@@ -8,9 +8,9 @@
         "rules": ["compare.pass", "value.equal", "render.path", "compare.expression"],
         "input": {"things": [{"a": 1, "b": 1.0, "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "a", "value": 1}, {"name": "b", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": ".a", "value": 1}, {"name": "b", "value": 1}]}
         ],
-        "expressions": {"s": {"c": "a eq b"}}
+        "expressions": {"s": {"c": ".a eq b"}}
       },
       {
         "description": "passes on equal objects",
@@ -23,7 +23,7 @@
             "check": "c",
             "passed": true,
             "cause": "satisfied",
-            "inputs": [{"name": "a", "value": {"n": 1}}, {"name": "b", "value": {"n": 1}}]
+            "inputs": [{"name": ".a", "value": {"n": 1}}, {"name": "b", "value": {"n": 1}}]
           }
         ]
       },
@@ -32,7 +32,7 @@
         "rules": ["compare.fail"],
         "input": {"things": [{"a": "1", "b": 1, "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "a", "value": "1"}, {"name": "b", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": ".a", "value": "1"}, {"name": "b", "value": 1}]}
         ]
       },
       {
@@ -40,7 +40,7 @@
         "rules": ["compare.fail"],
         "input": {"things": [{"a": null, "b": null, "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "a", "value": null}, {"name": "b", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": ".a", "value": null}, {"name": "b", "value": null}]}
         ]
       },
       {
@@ -48,7 +48,7 @@
         "rules": ["compare.fail"],
         "input": {"things": [{"b": null, "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "a", "value": null}, {"name": "b", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": ".a", "value": null}, {"name": "b", "value": null}]}
         ]
       }
     ]
@@ -62,7 +62,7 @@
         "rules": ["compare.pass"],
         "input": {"things": [{"a": "x", "b": "y", "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "a", "value": "x"}, {"name": "b", "value": "y"}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": ".a", "value": "x"}, {"name": "b", "value": "y"}]}
         ]
       },
       {
@@ -70,7 +70,7 @@
         "rules": ["compare.fail"],
         "input": {"things": [{"a": "1", "b": 1, "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "a", "value": "1"}, {"name": "b", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": ".a", "value": "1"}, {"name": "b", "value": 1}]}
         ]
       },
       {
@@ -78,7 +78,7 @@
         "rules": ["compare.fail"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "a", "value": null}, {"name": "b", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": ".a", "value": null}, {"name": "b", "value": null}]}
         ]
       }
     ]
@@ -92,16 +92,16 @@
         "rules": ["compare.pass", "render.path", "compare.expression"],
         "input": {"things": [{"a": 1, "b": 2, "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "a", "value": 1}, {"name": "b", "value": 2}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": ".a", "value": 1}, {"name": "b", "value": 2}]}
         ],
-        "expressions": {"s": {"c": "a lt b"}}
+        "expressions": {"s": {"c": ".a lt b"}}
       },
       {
         "description": "fails as value on two numbers out of order",
         "rules": ["compare.fail"],
         "input": {"things": [{"a": 2, "b": 1, "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "a", "value": 2}, {"name": "b", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": ".a", "value": 2}, {"name": "b", "value": 1}]}
         ]
       },
       {
@@ -109,7 +109,7 @@
         "rules": ["compare.pass"],
         "input": {"things": [{"a": "Z", "b": "a", "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "a", "value": "Z"}, {"name": "b", "value": "a"}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": ".a", "value": "Z"}, {"name": "b", "value": "a"}]}
         ]
       },
       {
@@ -117,7 +117,7 @@
         "rules": ["compare.pass"],
         "input": {"things": [{"a": "！", "b": "😀", "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "a", "value": "！"}, {"name": "b", "value": "😀"}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": ".a", "value": "！"}, {"name": "b", "value": "😀"}]}
         ]
       },
       {
@@ -125,7 +125,7 @@
         "rules": ["compare.fail"],
         "input": {"things": [{"a": false, "b": true, "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "a", "value": false}, {"name": "b", "value": true}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": ".a", "value": false}, {"name": "b", "value": true}]}
         ]
       },
       {
@@ -139,7 +139,7 @@
             "check": "c",
             "passed": false,
             "cause": "unusable",
-            "inputs": [{"name": "a", "value": {"n": 1}}, {"name": "b", "value": {"o": 1}}]
+            "inputs": [{"name": ".a", "value": {"n": 1}}, {"name": "b", "value": {"o": 1}}]
           }
         ]
       },
@@ -148,7 +148,7 @@
         "rules": ["compare.fail"],
         "input": {"things": [{"b": 5, "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "a", "value": null}, {"name": "b", "value": 5}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": ".a", "value": null}, {"name": "b", "value": 5}]}
         ]
       }
     ]
@@ -162,7 +162,7 @@
         "rules": ["compare.pass", "value.equal"],
         "input": {"things": [{"a": 2, "b": 2.0, "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "a", "value": 2}, {"name": "b", "value": 2}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": ".a", "value": 2}, {"name": "b", "value": 2}]}
         ]
       }
     ]
@@ -182,10 +182,10 @@
             "check": "c",
             "passed": true,
             "cause": "satisfied",
-            "inputs": [{"name": "a", "value": 1}, {"name": "$$input.limit", "value": 5}]
+            "inputs": [{"name": ".a", "value": 1}, {"name": "$input.limit", "value": 5}]
           }
         ],
-        "expressions": {"s": {"c": "a lt $$input.limit"}}
+        "expressions": {"s": {"c": ".a lt $input.limit"}}
       }
     ]
   },
@@ -231,12 +231,12 @@
               {"name": "checks.with_path", "value": ["unknown field path"]}
             ]
           },
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "bad_cmp", "passed": false, "cause": "ill_formed", "inputs": [{"name": "a", "value": 1}, {"name": "b", "value": 2}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "bad_cmp", "passed": false, "cause": "ill_formed", "inputs": [{"name": ".a", "value": 1}, {"name": "b", "value": 2}]},
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "left_string", "passed": false, "cause": "ill_formed", "inputs": []},
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "no_right", "passed": false, "cause": "ill_formed", "inputs": []},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "with_path", "passed": false, "cause": "ill_formed", "inputs": [{"name": "a", "value": 1}, {"name": "b", "value": 2}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "with_path", "passed": false, "cause": "ill_formed", "inputs": [{"name": ".a", "value": 1}, {"name": "b", "value": 2}]}
         ],
-        "expressions": {"s": {"bad_cmp": "a le b", "left_string": "<invalid left> lt b", "no_right": "a lt <missing right>"}}
+        "expressions": {"s": {"bad_cmp": ".a le b", "left_string": "<invalid left> lt b", "no_right": ".a lt <missing right>"}}
       }
     ]
   }

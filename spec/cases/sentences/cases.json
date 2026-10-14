@@ -720,7 +720,7 @@
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "b"}]}
         ],
         "expressions": {"s": {"c": "x is in $params.k"}},
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": ["a", "b"]}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"]}]}}
       },
       {
         "description": "fails as value when it isn't",
@@ -729,7 +729,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "c"}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": ["a", "b"]}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"]}]}}
       },
       {
         "description": "fails as value on a number",
@@ -738,7 +738,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": ["a", "b"]}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"]}]}}
       },
       {
         "description": "fails as absent when the field is missing",
@@ -747,7 +747,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": ["a", "b"]}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"]}]}}
       },
       {
         "description": "fails as null when the field is null",
@@ -756,7 +756,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": ["a", "b"]}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"]}]}}
       }
     ]
   },
@@ -772,7 +772,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a"}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": []}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": []}]}}
       }
     ]
   },
@@ -788,7 +788,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a"}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": "a"}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": "a"}]}}
       }
     ]
   },
@@ -804,7 +804,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": "a"}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": null}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": null}]}}
       }
     ]
   },
@@ -820,7 +820,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": "a"}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": null}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": null}]}}
       }
     ]
   },
@@ -836,7 +836,7 @@
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
         ],
         "expressions": {"s": {"c": "x is in $input.allowed"}},
-        "refs": {"s": {"c": [{"name": "$$input.allowed", "value": ["a", "b"]}]}}
+        "refs": {"s": {"c": [{"name": "$input.allowed", "value": ["a", "b"]}]}}
       },
       {
         "description": "fails as value when it isn't",
@@ -845,7 +845,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "z"}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$input.allowed", "value": ["a", "b"]}]}}
+        "refs": {"s": {"c": [{"name": "$input.allowed", "value": ["a", "b"]}]}}
       }
     ]
   },
@@ -1135,7 +1135,7 @@
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["b", "a"]}]}
         ],
         "expressions": {"s": {"c": "x contains $params.k"}},
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": "a"}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": "a"}]}}
       },
       {
         "description": "fails as value when it doesn't",
@@ -1144,7 +1144,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["b"]}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": "a"}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": "a"}]}}
       },
       {
         "description": "fails as unusable when the field is a string",
@@ -1153,7 +1153,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a"}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": "a"}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": "a"}]}}
       }
     ]
   },
@@ -1169,7 +1169,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": ["a"]}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": null}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": null}]}}
       }
     ]
   },
@@ -1241,7 +1241,7 @@
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["b"]}]}
         ],
         "expressions": {"s": {"c": "x does not contain $params.k"}},
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": "a"}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": "a"}]}}
       },
       {
         "description": "fails as value when the list has it",
@@ -1250,7 +1250,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["a"]}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": "a"}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": "a"}]}}
       }
     ]
   },
@@ -1322,7 +1322,7 @@
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["a", "b", "c"]}]}
         ],
         "expressions": {"s": {"c": "x contains all of $params.k"}},
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": ["a", "b"]}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"]}]}}
       },
       {
         "description": "fails as value when one is missing",
@@ -1331,7 +1331,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["a"]}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": ["a", "b"]}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"]}]}}
       }
     ]
   },
@@ -1347,7 +1347,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["a"]}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": []}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": []}]}}
       }
     ]
   },
@@ -1363,7 +1363,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["a"]}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": "a"}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": "a"}]}}
       }
     ]
   },
@@ -1435,7 +1435,7 @@
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["c"]}]}
         ],
         "expressions": {"s": {"c": "x contains none of $params.k"}},
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": ["a", "b"]}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"]}]}}
       },
       {
         "description": "fails as value when the list has one",
@@ -1444,7 +1444,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["b"]}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": ["a", "b"]}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"]}]}}
       }
     ]
   },
@@ -1670,7 +1670,7 @@
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "abc"}]}
         ],
         "expressions": {"s": {"c": "x matches $params.p"}},
-        "refs": {"s": {"c": [{"name": "$$params.p", "value": ["^a", "^b"]}]}}
+        "refs": {"s": {"c": [{"name": "$params.p", "value": ["^a", "^b"]}]}}
       },
       {
         "description": "fails as value when none does",
@@ -1679,7 +1679,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "zzz"}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.p", "value": ["^a", "^b"]}]}}
+        "refs": {"s": {"c": [{"name": "$params.p", "value": ["^a", "^b"]}]}}
       }
     ]
   },
@@ -1695,7 +1695,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "abc"}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.p", "value": ["("]}]}}
+        "refs": {"s": {"c": [{"name": "$params.p", "value": ["("]}]}}
       }
     ]
   },
@@ -1712,7 +1712,7 @@
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "zzz"}]}
         ],
         "expressions": {"s": {"c": "x does not match $params.p"}},
-        "refs": {"s": {"c": [{"name": "$$params.p", "value": ["^a"]}]}}
+        "refs": {"s": {"c": [{"name": "$params.p", "value": ["^a"]}]}}
       },
       {
         "description": "fails as value when one matches",
@@ -1721,7 +1721,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "abc"}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.p", "value": ["^a"]}]}}
+        "refs": {"s": {"c": [{"name": "$params.p", "value": ["^a"]}]}}
       }
     ]
   },
@@ -2720,7 +2720,7 @@
         "rules": ["sentence.path.start", "sentence.phrase.is", "path.start", "path.inputs", "sentence.print.same"],
         "input": {"things": [{"id": "t1"}], "flag": true},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "$$input.flag", "value": true}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "$input.flag", "value": true}]}
         ],
         "expressions": {"s": {"c": "$input.flag is true"}}
       }
@@ -2735,7 +2735,7 @@
         "rules": ["sentence.path.start", "path.start", "path.absent"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "$$input.flag", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "$input.flag", "value": null}]}
         ]
       }
     ]
@@ -2750,7 +2750,7 @@
         "rules": ["sentence.path.start", "sentence.phrase.is", "path.start", "path.inputs"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "$$params.k", "value": "a"}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "$params.k", "value": "a"}]}
         ],
         "expressions": {"s": {"c": "$params.k is \"a\""}}
       }
@@ -2766,28 +2766,28 @@
         "rules": ["sentence.path.dynamic", "sentence.phrase.is", "path.ref_step", "name.ref_step", "value.refs", "path.inputs"],
         "input": {"things": [{"id": "t1", "obj": {"b": 1, "c": 2}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "obj.[$$params.k]", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "obj named by $params.k", "value": 1}]}
         ],
         "expressions": {"s": {"c": "obj named by $params.k is 1"}},
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": "b"}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": "b"}]}}
       },
       {
         "description": "fails as value when the other key holds another value",
         "rules": ["sentence.path.dynamic", "sentence.phrase.is", "path.ref_step", "name.ref_step", "value.refs"],
         "input": {"things": [{"id": "t1", "obj": {"b": 2}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "obj.[$$params.k]", "value": 2}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "obj named by $params.k", "value": 2}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": "b"}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": "b"}]}}
       },
       {
         "description": "fails as absent when the key isn't there",
         "rules": ["sentence.path.dynamic", "sentence.phrase.is", "path.ref_step", "name.ref_step", "value.refs", "path.absent"],
         "input": {"things": [{"id": "t1", "obj": {"c": 1}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "obj.[$$params.k]", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "obj named by $params.k", "value": null}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": "b"}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": "b"}]}}
       }
     ]
   },
@@ -2801,10 +2801,10 @@
         "rules": ["sentence.path.dynamic", "path.ref_step", "name.ref_step", "value.refs"],
         "input": {"things": [{"id": "t1", "obj": {"b": {"v": 1}}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "obj.[$$params.k].v", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "obj named by $params.k.v", "value": 1}]}
         ],
         "expressions": {"s": {"c": "obj named by $params.k.v is 1"}},
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": "b"}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": "b"}]}}
       }
     ]
   },
@@ -2818,9 +2818,9 @@
         "rules": ["sentence.path.dynamic", "path.ref_step", "value.refs", "path.absent"],
         "input": {"things": [{"id": "t1", "obj": {"b": 1}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "obj.[$$params.k]", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "obj named by $params.k", "value": null}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": null}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": null}]}}
       }
     ]
   },
@@ -2834,9 +2834,9 @@
         "rules": ["sentence.path.dynamic", "path.ref_step", "value.refs"],
         "input": {"things": [{"id": "t1", "obj": {"b": 1}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "obj.[$$params.k]", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "obj named by $params.k", "value": null}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": ["b"]}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": ["b"]}]}}
       }
     ]
   },
@@ -2850,10 +2850,10 @@
         "rules": ["sentence.path.brackets", "sentence.path.dynamic", "path.ref_step", "name.ref_step", "value.refs", "sentence.print.canonical"],
         "input": {"things": [{"id": "t1", "obj": {"b": 1}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "obj.[$$params.k]", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "obj named by $params.k", "value": 1}]}
         ],
         "expressions": {"s": {"c": "obj named by $params.k is 1"}},
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": "b"}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": "b"}]}}
       }
     ]
   },
@@ -2863,35 +2863,35 @@
     "cases": [
       {
         "description": "counts from 1",
-        "rules": ["sentence.path.index", "sentence.phrase.is", "name.keys", "path.inputs", "sentence.print.same"],
+        "rules": ["sentence.path.index", "sentence.phrase.is", "name.keys", "path.inputs", "sentence.print.same", "name.index"],
         "input": {"things": [{"id": "t1", "xs": ["obj", "b", "c"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "xs.1", "value": "b"}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "item 2 of xs", "value": "b"}]}
         ],
         "expressions": {"s": {"c": "item 2 of xs is \"b\""}}
       },
       {
         "description": "fails as value on another item",
-        "rules": ["sentence.path.index", "sentence.phrase.is", "name.keys"],
+        "rules": ["sentence.path.index", "sentence.phrase.is", "name.keys", "name.index"],
         "input": {"things": [{"id": "t1", "xs": ["b", "obj"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "xs.1", "value": "obj"}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "item 2 of xs", "value": "obj"}]}
         ]
       },
       {
         "description": "fails as absent when the list is too short",
-        "rules": ["sentence.path.index", "sentence.phrase.is", "name.keys", "path.absent"],
+        "rules": ["sentence.path.index", "sentence.phrase.is", "name.keys", "path.absent", "name.index"],
         "input": {"things": [{"id": "t1", "xs": ["a"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "xs.1", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "item 2 of xs", "value": null}]}
         ]
       },
       {
         "description": "fails as unusable when xs is a string",
-        "rules": ["sentence.path.index", "sentence.phrase.is", "name.keys"],
+        "rules": ["sentence.path.index", "sentence.phrase.is", "name.keys", "name.index"],
         "input": {"things": [{"id": "t1", "xs": "ab"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "xs.1", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "item 2 of xs", "value": null}]}
         ]
       }
     ]
@@ -2902,19 +2902,19 @@
     "cases": [
       {
         "description": "reads the item at position 0",
-        "rules": ["sentence.path.index", "sentence.phrase.is", "path.inputs", "sentence.print.same"],
+        "rules": ["sentence.path.index", "sentence.phrase.is", "path.inputs", "sentence.print.same", "name.index"],
         "input": {"things": [{"id": "t1", "xs": ["a", "b"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "xs.0", "value": "a"}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "item 1 of xs", "value": "a"}]}
         ],
         "expressions": {"s": {"c": "first of xs is \"a\""}}
       },
       {
         "description": "fails as absent on an empty list",
-        "rules": ["sentence.path.index", "sentence.phrase.is", "path.absent"],
+        "rules": ["sentence.path.index", "sentence.phrase.is", "path.absent", "name.index"],
         "input": {"things": [{"id": "t1", "xs": []}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "xs.0", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "item 1 of xs", "value": null}]}
         ]
       }
     ]
@@ -2925,19 +2925,19 @@
     "cases": [
       {
         "description": "counts from 0 and prints the word form",
-        "rules": ["sentence.path.brackets", "sentence.path.index", "sentence.phrase.is", "sentence.print.canonical"],
+        "rules": ["sentence.path.brackets", "sentence.path.index", "sentence.phrase.is", "sentence.print.canonical", "name.index"],
         "input": {"things": [{"id": "t1", "xs": ["a", "b"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "xs.1", "value": "b"}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "item 2 of xs", "value": "b"}]}
         ],
         "expressions": {"s": {"c": "item 2 of xs is \"b\""}}
       },
       {
         "description": "fails as absent when the list is too short",
-        "rules": ["sentence.path.brackets", "sentence.path.index", "sentence.phrase.is", "sentence.print.canonical", "path.absent"],
+        "rules": ["sentence.path.brackets", "sentence.path.index", "sentence.phrase.is", "sentence.print.canonical", "path.absent", "name.index"],
         "input": {"things": [{"id": "t1", "xs": ["a"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "xs.1", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "item 2 of xs", "value": null}]}
         ]
       }
     ]
@@ -2948,10 +2948,10 @@
     "cases": [
       {
         "description": "keeps the brackets when a key follows",
-        "rules": ["sentence.path.brackets", "sentence.path.index", "sentence.print.canonical", "sentence.print.same"],
+        "rules": ["sentence.path.brackets", "sentence.path.index", "sentence.print.canonical", "sentence.print.same", "name.index"],
         "input": {"things": [{"id": "t1", "xs": [{"k": 2}, {"k": 1}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "xs.1.k", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "xs[1].k", "value": 1}]}
         ],
         "expressions": {"s": {"c": "xs[1].k is 1"}}
       }
@@ -2966,7 +2966,7 @@
         "rules": ["sentence.path.argument", "sentence.words", "sentence.value.path", "sentence.print.canonical"],
         "input": {"things": [{"id": "t1", "x": 1, "empty": 1}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}, {"name": "empty", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}, {"name": ".empty", "value": 1}]}
         ],
         "expressions": {"s": {"c": "x equals .empty"}}
       },
@@ -2975,7 +2975,7 @@
         "rules": ["sentence.path.argument", "sentence.words", "sentence.value.path", "sentence.print.canonical"],
         "input": {"things": [{"id": "t1", "x": 1, "empty": 2}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1}, {"name": "empty", "value": 2}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1}, {"name": ".empty", "value": 2}]}
         ]
       },
       {
@@ -2983,7 +2983,7 @@
         "rules": ["sentence.path.argument", "sentence.words", "sentence.value.path", "sentence.print.canonical", "path.absent"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": 1}, {"name": "empty", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": 1}, {"name": ".empty", "value": null}]}
         ]
       }
     ]
@@ -2997,7 +2997,7 @@
         "rules": ["sentence.path.argument", "sentence.words", "sentence.value.path"],
         "input": {"things": [{"id": "t1", "x": 5, "true": 5}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 5}, {"name": "true", "value": 5}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 5}, {"name": ".true", "value": 5}]}
         ],
         "expressions": {"s": {"c": "x equals .true"}}
       },
@@ -3006,7 +3006,7 @@
         "rules": ["sentence.path.argument", "sentence.words", "sentence.value.path"],
         "input": {"things": [{"id": "t1", "x": true, "true": false}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": true}, {"name": "true", "value": false}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": true}, {"name": ".true", "value": false}]}
         ]
       }
     ]
@@ -3080,7 +3080,7 @@
         "rules": ["sentence.words", "sentence.path.string", "sentence.phrase.is"],
         "input": {"things": [{"id": "t1", "empty": 1}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "empty", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": ".empty", "value": 1}]}
         ],
         "expressions": {"s": {"c": ".empty is 1"}}
       }
@@ -3234,7 +3234,7 @@
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
         ],
         "expressions": {"s": {"c": "x is in $params.k"}},
-        "refs": {"s": {"c": [{"name": "$$params.k", "value": ["a"]}]}}
+        "refs": {"s": {"c": [{"name": "$params.k", "value": ["a"]}]}}
       }
     ]
   },
