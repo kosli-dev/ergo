@@ -7,24 +7,24 @@ This file goes with [`sentences-corpus.md`](sentences-corpus.md) and [`sentences
 Each numbered item is its own commit on this branch.
 
 1. **`and` means what a new line under `assert` means.** Each assertion starts from the subject, or from the `for` names, whether it's on its own line or after an `and`. A one-line `every` or `some` ends at the `and`, so in `every items.price is at least 2 and owner is "x"`, `owner` is the subject's. This reverses item 4 of the third pass. Any assertion can now start with a quantifier, so `state is "MERGED" and every commits.verified is true` is two assertions on one line, and `and` after `count of` or `sum of` needs no rule of its own. The report shows the list form whichever was written, and its joined `expression` is always a sentence the policy could have written. No line in the corpus joins assertions with `and`, so no policy changes.
-2. **`count of` and `sum of` are list walks**, in a `where` too. The draft already said so. It now also gives the issue's example: `for: every pull_requests as pr` with `assert: count of pr.reviews is at least 2` walks two lists.
+2. **`count of` and `sum of` are list walks**, in a `whose` too. The draft already said so. It now also gives the issue's example: `for: every pull_requests as pr` with `assert: count of pr.reviews is at least 2` walks two lists.
 3. **The one-line `subjects` is gone.** The map is the only spelling, and a simple subject is a name with nothing under it. The corpus note on sdlc-policies 0004 and the grammar no longer mention it. What the third pass found still holds: a subject with no `from` reads the input field of its name, and every subject in the corpus has an `id`.
 
 ## What changed in the third pass
 
 1. **`is one of` and `is in` mean the same.** Either takes written values or a path. The report prints `is one of` before written values and `is in` before a path. Nothing in the corpus needed to change. Tore's `is in "spdx", "cyclonedx"` now parses, and prints as `is one of`.
-2. **`equals` before a field.** The corpus had no `is <field>` left. Five examples in the draft and three in the corpus's table of custom operators did, like `sum of stages.usd where kind is "model" is total_usd within 0.01`. They now say `equals`.
-3. **`and` does two jobs.** The flat section says `and` joins the conditions of a `where` and joins whole assertions, nothing else.
+2. **`equals` before a field.** The corpus had no `is <field>` left. Five examples in the draft and three in the corpus's table of custom operators did, like `sum of stages.usd whose kind is "model" is total_usd within 0.01`. They now say `equals`.
+3. **`and` does two jobs.** The flat section says `and` joins the conditions of a `whose` and joins whole assertions, nothing else.
 4. **Assertions joined with `and` after a one-line `every` or `some` were about the item.** Reversed in this pass, see item 1 above.
-5. **`count of` and `sum of` in a `where`.** The six pr-reviewer filters are `where count of x is at least 1` again. One thing changes: a value that isn't a list now fails the requirement as `unusable`, where today's custom `min_length` rules the subject out. The corpus marks the six as narrowing.
+5. **`count of` and `sum of` in a `whose`.** The six pr-reviewer filters are `whose count of x is at least 1` again. One thing changes: a value that isn't a list now fails the requirement as `unusable`, where today's custom `min_length` rules the subject out. The corpus marks the six as narrowing.
 6. **`$applies`.** It prints the conditions as written, with the values read in `inputs`. The table [below](#what-applies-prints) is regenerated from the corpus, and the six filters from item 5 now print as `count of`.
-7. **Order as written.** `where` conditions and joined assertions print in the order the author wrote them, and `inputs` stay sorted by name. The draft says that the byte-for-byte rule is for the same policy run again, not for two policies that mean the same.
+7. **Order as written.** `whose` conditions and joined assertions print in the order the author wrote them, and `inputs` stay sorted by name. The draft says that the byte-for-byte rule is for the same policy run again, not for two policies that mean the same.
 8. **Subjects.** A subject's own name in its own `from` is the input field, and any other subject's name starts a chain. Run over every `from` line, those two rules find exactly the six chains the corpus marks. sdlc-policies 0004's `artifact` now has no `from`, and the corpus shows the policy's whole `subjects` section. Every subject in the corpus has an `id`.
 9. **Quoted subject names.** The draft gives the rule, `from: '"production deployment".pull_requests'`, and the tokenizer reads it one way. No policy needs it.
 10. **Bare keys.** The draft now quotes any key with a `$` in it, and says the report prints keys by the same rule. When this is built, `syntax.md` ([name.keys]) needs the same change, because today it allows `$` after the first character.
 11. **`does not equal` before a field.** Nine lines changed from `is not <field>` to `does not equal <field>`, twins included, like `approver.username does not equal author`. `is not` stays before a value.
 12. **DEV-0407.** It keeps its `for` line. Its note and the draft now say why: `does not contain` passes an empty list, and `every` fails one.
-13. **Depth.** The draft names three list walks as the limit, counted as walks, not subjects, next to the `for` limit. sdlc-policies 0007's peer approval reaches it. The draft also counts a `count of` or `sum of` as a walk, including one in a `where`, since it walks a list.
+13. **Depth.** The draft names three list walks as the limit, counted as walks, not subjects, next to the `for` limit. sdlc-policies 0007's peer approval reaches it. The draft also counts a `count of` or `sum of` as a walk, including one in a `whose`, since it walks a list.
 
 ## Parse counts
 
@@ -41,7 +41,7 @@ Some lines have two causes. The grammar-word row went down by 6 and the `true` r
 
 The counts are the same as in the third pass, because no line in the corpus joins assertions with `and`, so item 1 changes no line's reading.
 
-28 made-up lines test what the corpus doesn't reach. The ones this pass changed: `state is "MERGED" and every commits.verified is true` now reads one way, as two assertions, and so does `every items.price where kind is "a" is at least 2 and some items.owner is "x"`, which is new. `every items.price where kind is "a" and qty is 1 is at least 2 and owner is "x"` still reads one way, now with `owner` on the subject. The others: `count of` and `sum of` in a `where` read one way, `where count of x is empty` reads no way, and so does the bare key `foo$bar`. `is in` with values prints `is one of`, `is one of` with a path prints `is in`, `is not author` prints `does not equal author`, and `does not equal "prod"` prints `is not "prod"`. `"production deployment".pull_requests` reads one way.
+28 made-up lines test what the corpus doesn't reach. The ones this pass changed: `state is "MERGED" and every commits.verified is true` now reads one way, as two assertions, and so does `every items.price whose kind is "a" is at least 2 and some items.owner is "x"`, which is new. `every items.price whose kind is "a" and qty is 1 is at least 2 and owner is "x"` still reads one way, now with `owner` on the subject. The others: `count of` and `sum of` in a `whose` read one way, `whose count of x is empty` reads no way, and so does the bare key `foo$bar`. `is in` with values prints `is one of`, `is one of` with a path prints `is in`, `is not author` prints `does not equal author`, and `does not equal "prod"` prints `is not "prod"`. `"production deployment".pull_requests` reads one way.
 
 ## Chains
 
@@ -49,7 +49,7 @@ Unchanged: 6 `from` lines chain, twins included. 4 descend from an `artifact` su
 
 ## What `$applies` prints
 
-The `$applies` row's `expression` is the `where` conditions as written, joined with ` and `, in the order written. Its `inputs` hold each path they read. `…` stands for `compliance_status.attestations_statuses.`. Twins are left out.
+The `$applies` row's `expression` is the `whose` conditions as written, joined with ` and `, in the order written. Its `inputs` hold each path they read. `…` stands for `compliance_status.attestations_statuses.`. Twins are left out.
 
 | repo          | policy                                 | subject                                      | `$applies`                                                                                                                                                                                                                  |
 | ------------- | -------------------------------------- | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -130,7 +130,7 @@ The corpus marks each one:
 
 - `is not empty` passes a non-empty list where `non_empty_string` fails: 52 checks.
 - `is empty` passes `""` where `empty` and `equals []` fail: 6 checks.
-- Six pr-reviewer `where count of` filters fail the requirement as `unusable` on a value that isn't a list. Today's custom operator rules the subject out.
+- Six pr-reviewer `whose count of` filters fail the requirement as `unusable` on a value that isn't a list. Today's custom operator rules the subject out.
 - Timestamps compared as text today fail when they aren't RFC 3339: sdlc-policies and server 0007 `peer_approval`.
 - Three pr-reviewer custom operators skipped items with a missing field. The sentences fail them as `absent`.
 - Rego's `!=` and `!= ""` pass values of another type, and the sentences don't: server 0010, require-artifact-provenance.
@@ -141,20 +141,22 @@ Cause only, with the same values passing: `range` from 0 to 0 as `is 0` (2 check
 
 ## Rego spike
 
-Not run again. This pass adds `count of` and `sum of` to a `where` and changes how two phrases print, which doesn't change how sentences are parsed or how often. The numbers from the first run still stand: sentences parsed once per check cost what today's objects cost, and parsing per subject took 739 MB of Wasm memory on 3,000 subjects.
+Not run again. This pass adds `count of` and `sum of` to a `whose` and changes how two phrases print, which doesn't change how sentences are parsed or how often. The numbers from the first run still stand: sentences parsed once per check cost what today's objects cost, and parsing per subject took 739 MB of Wasm memory on 3,000 subjects.
 
 ## What writing the ABNF settled
 
 The grammar in [`sentences.abnf`](sentences.abnf) had to pick where the prose left room. Each of these is now in [`sentences.md`](sentences.md), and each can be undone before anything implements it:
 
 - A grammar word can't be a bare first key on the left side either, not only on the right. `count is at least 1` would otherwise read as a field called `count` or the start of `count of`. Write `.count is at least 1`. One rule for both sides.
-- `, if any,` goes after the `where`, not before it: `every items where kind is "a", if any, is at least 2`. On a `for` line it goes before `as`.
-- A `count of` or `sum of` on the right side of a phrase takes no `where`, because `x is count of y where a is 1 and b is 2` could be one assertion or two.
+- `, if any,` goes after the `whose`, not before it: `every items whose kind is "a", if any, is at least 2`. On a `for` line it goes before `as`.
+- A `count of` or `sum of` on the right side of a phrase takes no `whose`, because `x is count of y whose a is 1 and b is 2` could be one assertion or two.
 - A position has both spellings: `item 3 of items`, `first of items` and `last of items` count from 1, and `items[2]` from 0. The word form takes the whole rest of the path after `of`, so a field of the picked item needs the brackets, `commits[2].sha`, and the report prints brackets only then. `first`, `item` and `last` join the grammar words.
 - `is a list` and `is an object` take either article, and the report prints `an` before `object` and `a` before the rest.
 - Spaces: any run of spaces between two words reads as one, and a comma between values can have any number of spaces after it. The report prints one space and `, `.
-- The made-up corpus line `count of x where field is "v" equals a plus b` became `equals y plus z`, because `a` is a grammar word.
-- `count of x where n is m plus k is t` is no longer written wrong. It reads one way, with `m plus k` as the condition's right side. The prose had forbidden it because a tokenizer without a grammar found three readings.
+- The made-up corpus line `count of x whose field is "v" equals a plus b` became `equals y plus z`, because `a` is a grammar word.
+- `count of x whose n is m plus k is t` is no longer written wrong. It reads one way, with `m plus k` as the condition's right side. The prose had forbidden it because a tokenizer without a grammar found three readings.
 - A quoted string on the right side is a value, never a key, and that's in the grammar itself as `right-path`, not only in the prose. A field whose key needs quotes is written `."$schema"` on the right, as the prose already said.
 
 The count against the grammar is done, with Lark's Earley parser: all 306 corpus lines read exactly one way once the two rules the ABNF can't hold are applied, the grammar words and the `for` names. The scripts are outside the repo, like the tokenizer before them.
+
+On 2026-10-14 the word that filters items changed from `where` to `whose`: `deployments whose environment is "prod"`. In the readability test, both readers who don't program read `deployments where environment is "prod"` as all the deployments with a remark about them, and listed every one, while every engineer read it as a filter. A `whose` clause in English can only narrow.
