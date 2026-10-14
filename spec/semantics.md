@@ -265,7 +265,23 @@ Every row has a cause. When a check reads several values, the row takes the firs
 
 **[all_of.inputs]** The row shows every path any of its checks reads, once each, sorted by name.
 
-**[all_of.failed_assertions]** The row also has `failed_assertions`: one entry for each check that failed, in the order they were written, with its `assertion` and its own `cause`. It's `[]` when the check passes. When a ref one of them reads can't be used, that one is listed with cause `unusable` and the others with their own causes.
+**[all_of.failed_assertions]** The row also has `failed_assertions`: one entry for each check that failed, in the order they were written, with its `assertion` and its own `cause`. It's `[]` when the check passes, and the row has no `failed_items`, even when one of the sentences walks a list. When a ref one of them reads can't be used, that one is listed with cause `unusable` and the others with their own causes.
+
+## `every` and `some`
+
+`every` and `some` take a path, a basic check, `whose`, a list of basic checks, and `if_any`. They're what the sentences `every <path> …` and `some <path> …` read into, see [sentence.every.walk](sentences.md#every-some-and-whose), and today's syntax can't use them (see [sentence_ops.syntax](syntax.md#policies)).
+
+**[walk.lists]** The path is read one step at a time. At a step where at least one value read so far is a list, and the step isn't a position, every one of those values is walked: each of its items goes on along the path in its place. At that step, a value that's missing, `null` or not a list fails as `absent`, `null` or `unusable`, and an empty list fails as `value`, unless `if_any` is true, when it's skipped. After the last step, a value that's a list is walked the same way. A path where no step walks a list fails at the first value along it that isn't an object, with `absent` when it's missing, `null` when it's `null`, and `unusable` otherwise, or at the value the path ends at, as `unusable`, when every value along it is an object. That place is the one entry in `failed_items`, so a lone list that's `null` fails as `null`, as it does when another item's list is walked.
+
+**[walk.items]** The items of the innermost list walked are what the check is about. Each one is checked on its own: the `whose` checks and the basic check read their paths from the item, and the basic check reads the rest of the path, after the item, as its own. An item is undecided when a `whose` check fails with any cause but `value`, even when another one fails with `value`, as a filter that can't decide fails the requirement (see [scope.unreadable](#scope)). Otherwise it's left out when a `whose` check fails with `value`.
+
+**[walk.every]** `every` passes when nothing failed while walking, no item is undecided, every item left in passes, and at least one item is left in, or `if_any` is true. Otherwise it fails with the first, in the order of [causes](#causes), among what failed, or with `value` when the only problem is that no item was left in.
+
+**[walk.some]** `some` passes when at least one item left in passes. Otherwise it fails with the first, in the order of [causes](#causes), among what failed while walking, the undecided items and the items that failed, or with `value` when there were none.
+
+**[walk.inputs]** The row's `inputs` has one entry, named after the path with `[]` after each list walked, like `pull_requests[].commits[].signed`, holding the value each item's path ended at, in order, `null` where it ended missing. The items `whose` leaves out are there too. Where the walk stopped early, `[]` only follows the lists it walked.
+
+**[walk.failed_items]** The row's `failed_items` lists what failed, in path order, when the check fails, and is `[]` when it passes: each value that failed the basic check, with `path` the field, `item` the item and `value` what the path ended at, or `null`; each undecided item, with `path` the field of the first `whose` check that couldn't decide; and each list that failed while walking, with `path` and `item` both the list. An item that `whose` left out isn't listed.
 
 ## Substitutes
 
