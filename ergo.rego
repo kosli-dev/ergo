@@ -4599,7 +4599,7 @@ _s_sq_char(`\\`) := `\`
 
 _s_sq_char(c) := c if not c in {`\'`, `\\`}
 
-_s_sentence_problems(parsed) := ((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
+_s_sentence_problems(parsed) := (((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"bare_word" in object.keys(node)
@@ -4668,6 +4668,11 @@ _s_sentence_problems(parsed) := ((((((((((((({concat("", [node.bare_word, " is a
 	node.op in {"starts with", "ends with"}
 	"value" in object.keys(node)
 	not is_string(node.value)
+}) | {concat("", [`"`, node.phrase.op, `" after every or some would check each item of the last list, not the list: put the walk on a for line`]) |
+	some node in _s_nodes(parsed)
+	is_object(node)
+	object.keys(node) & {"every", "some"} != set()
+	node.phrase.op in {"contains", "does not contain", "contains all of", "contains none of"}
 }) | {`"within" only compares numbers` |
 	some node in _s_nodes(parsed)
 	is_object(node)

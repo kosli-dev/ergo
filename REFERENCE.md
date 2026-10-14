@@ -670,6 +670,7 @@ The check's `expression` is `approved_by is not empty and reviewed_at is before 
 - `whose` keeps the items that pass its conditions, read on each item: `some pull_requests.approvers whose state is "APPROVED" exists` passes above, with `bob`'s approval. An item a condition can't decide, because the field it reads is missing, fails the check rather than being left out.
 - In a one-line `every` or `some`, a field on the right of the phrase is the item's too, so `some approvers.timestamp whose state is "APPROVED" is after last_commit` reads both from each approver. A field of the subject can't be reached from there yet, since that needs a `for` line.
 - `every` and `some` paths can be ten steps long.
+- `contains` and the other list phrases can't follow `every` or `some`, because the last list is walked too, so `every pull_requests.labels does not contain "hotfix"` would ask each label. It's written wrong, and the message says to put the walk on a `for` line, which ergo doesn't run yet.
 
 A sentence that can't be read is [written wrong](#basic-operators), and the `$well_formed` row says why, with the column when it can:
 
