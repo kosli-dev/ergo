@@ -360,7 +360,7 @@ With those params, a package licensed `GPL-3.0` gives this violation:
     { "name": "$params.allowed_licences", "value": ["MIT", "Apache-2.0"] }
   ],
   "cause": "value",
-  "failed_items": [{ "path": "item 1 of licences", "value": "GPL-3.0", "cause": "value" }]
+  "failed_items": [{ "path": "item 1 of licences", "item": "item 1 of licences", "value": "GPL-3.0", "cause": "value" }]
 }
 ```
 
@@ -495,7 +495,7 @@ A pull request that only its author approved gives this violation. The row shows
     { "name": "$pr.author", "value": "ann" }
   ],
   "cause": "value",
-  "failed_items": [{ "path": "item 1 of approvers", "value": { "username": "ann" }, "cause": "value" }]
+  "failed_items": [{ "path": "item 1 of approvers", "item": "item 1 of approvers", "value": { "username": "ann" }, "cause": "value" }]
 }
 ```
 
@@ -889,7 +889,7 @@ The inner paths start at each commit, so `["timestamp"]` is the commit's. `$appr
     ] }
   ],
   "cause": "value",
-  "failed_items": [{ "path": "item 1 of approvers", "value": { "username": "bob", "timestamp": "2026-10-01T11:00:00Z" }, "cause": "value" }]
+  "failed_items": [{ "path": "item 1 of approvers", "item": "item 1 of approvers", "value": { "username": "bob", "timestamp": "2026-10-01T11:00:00Z" }, "cause": "value" }]
 }
 ```
 
@@ -920,7 +920,7 @@ Some things worth knowing:
 
 #### Which items failed
 
-A row of an `all` or `any` check also has `failed_items`: the items that made the check fail, in list order, each with its path, cause and value. With this input:
+A row of an `all` or `any` check also has `failed_items`: the items that made the check fail, in list order, each with its path, item, cause and value. With this input:
 
 ```json
 { "releases": [ { "id": "r-1", "pull_requests": [
@@ -935,15 +935,16 @@ and the check from above, `every pull_requests[].commits: signed == true`, the r
 ```json
 "cause": "absent",
 "failed_items": [
-  { "path": "item 2 of pull_requests[0].commits", "cause": "value", "value": { "sha": "a2", "signed": false } },
-  { "path": "pull_requests[1].commits", "cause": "absent", "value": null },
-  { "path": "item 1 of pull_requests[2].commits", "cause": "absent", "value": { "sha": "c1" } }
+  { "path": "item 2 of pull_requests[0].commits", "item": "item 2 of pull_requests[0].commits", "cause": "value", "value": { "sha": "a2", "signed": false } },
+  { "path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "absent", "value": null },
+  { "path": "item 1 of pull_requests[2].commits", "item": "item 1 of pull_requests[2].commits", "cause": "absent", "value": { "sha": "c1" } }
 ]
 ```
 
 `inputs` still shows the whole list, so the row records what was checked as well as what failed.
 
 - `path` is written like a path in an expression, with the item's position added: `item 2 of pull_requests[0].commits` is the second commit of the first pull request. The last position is written `item <n> of`, counting from 1, and one further in is in brackets, counting from 0, as in [sentences](#checks-written-as-sentences). A path that starts with a name keeps it, as in `item 2 of $pr.commits`.
+- `item` is the path of the list item the entry belongs to. Here every entry is a list item, so it's the same as `path`. It's there so a tool can find the item to show for any check, including [sentences](#checks-written-as-sentences), where an entry can point at a field inside the item.
 - With `each`, an inner list that's missing, `null`, not a list or empty fails the check, so it's listed in place of its items, like `pull_requests[1].commits` above.
 - An item whose field a `present` check finds missing or `null` is listed with cause `value`, the same as the row, because `present` read the field fine and found nothing there.
 - When the check passes, it's `[]`. A passing `any` can have items that failed, but none of them is why the row came out the way it did.

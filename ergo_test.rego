@@ -6822,7 +6822,7 @@ test_failed_items_name_only_the_items_of_an_all_that_failed if {
 		{"number": 8, "commits": [{"sha": "b1", "author": "ann"}, {"sha": "b2", "author": "bob"}]},
 	])
 	row.passed == false
-	row.failed_items == [{"path": "item 2 of pull_requests[1].commits", "cause": "value", "value": {"sha": "b2", "author": "bob"}}]
+	row.failed_items == [{"path": "item 2 of pull_requests[1].commits", "item": "item 2 of pull_requests[1].commits", "cause": "value", "value": {"sha": "b2", "author": "bob"}}]
 }
 
 test_failed_items_is_empty_when_every_item_passes if {
@@ -6840,9 +6840,9 @@ test_failed_items_name_an_inner_list_that_fails_the_check_because_it_is_empty_mi
 	])
 	row.passed == false
 	row.failed_items == [
-		{"path": "pull_requests[0].commits", "cause": "value", "value": []},
-		{"path": "pull_requests[1].commits", "cause": "absent", "value": null},
-		{"path": "pull_requests[2].commits", "cause": "unusable", "value": "x"},
+		{"path": "pull_requests[0].commits", "item": "pull_requests[0].commits", "cause": "value", "value": []},
+		{"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "absent", "value": null},
+		{"path": "pull_requests[2].commits", "item": "pull_requests[2].commits", "cause": "unusable", "value": "x"},
 	]
 }
 
@@ -6861,8 +6861,8 @@ test_failed_items_of_a_failing_any_list_every_item_with_its_own_cause if {
 	subj := {"id": 42, "author": "ann", "approvers": [{"username": "ann"}, {"name": "Bob"}]}
 	verdict(subj, check) == false
 	failed_of(subj, check) == [
-		{"path": "item 1 of approvers", "cause": "value", "value": {"username": "ann"}},
-		{"path": "item 2 of approvers", "cause": "absent", "value": {"name": "Bob"}},
+		{"path": "item 1 of approvers", "item": "item 1 of approvers", "cause": "value", "value": {"username": "ann"}},
+		{"path": "item 2 of approvers", "item": "item 2 of approvers", "cause": "absent", "value": {"name": "Bob"}},
 	]
 }
 
@@ -6884,16 +6884,16 @@ test_failed_items_of_a_check_written_wrong_name_every_item_as_ill_formed if {
 	subj := {"id": 1, "xs": [1, 2]}
 	cause_of(subj, check) == "ill_formed"
 	failed_of(subj, check) == [
-		{"path": "item 1 of xs", "cause": "ill_formed", "value": 1},
-		{"path": "item 2 of xs", "cause": "ill_formed", "value": 2},
+		{"path": "item 1 of xs", "item": "item 1 of xs", "cause": "ill_formed", "value": 1},
+		{"path": "item 2 of xs", "item": "item 2 of xs", "cause": "ill_formed", "value": 2},
 	]
 }
 
 test_failed_items_of_a_check_written_wrong_name_bad_inner_lists_as_ill_formed_too if {
 	check := {"op": "all", "path": ["prs"], "each": ["commits"], "check": {"op": "nope"}}
 	failed_of({"id": 1, "prs": [{"commits": [1]}, {}]}, check) == [
-		{"path": "item 1 of prs[0].commits", "cause": "ill_formed", "value": 1},
-		{"path": "prs[1].commits", "cause": "ill_formed", "value": null},
+		{"path": "item 1 of prs[0].commits", "item": "item 1 of prs[0].commits", "cause": "ill_formed", "value": 1},
+		{"path": "prs[1].commits", "item": "prs[1].commits", "cause": "ill_formed", "value": null},
 	]
 }
 
@@ -6901,15 +6901,15 @@ test_failed_items_take_the_cause_of_a_ref_that_cannot_be_read if {
 	check := {"op": "all", "path": ["xs"], "check": {"op": "in", "path": [], "values": {"ref": ["$$params", "allowed"]}}}
 	subj := {"id": 1, "xs": ["a", "b"]}
 	failed_of(subj, check) == [
-		{"path": "item 1 of xs", "cause": "absent", "value": "a"},
-		{"path": "item 2 of xs", "cause": "absent", "value": "b"},
+		{"path": "item 1 of xs", "item": "item 1 of xs", "cause": "absent", "value": "a"},
+		{"path": "item 2 of xs", "item": "item 2 of xs", "cause": "absent", "value": "b"},
 	]
 }
 
 test_failed_items_read_names_given_with_as if {
 	check := {"op": "all", "path": ["commits"], "as": "c", "check": {"op": "compare", "left": ["$c", "author"], "right": ["$$input", "items", 0, "owner"], "cmp": "ne"}}
 	subj := {"id": 1, "owner": "bob", "commits": [{"author": "bob"}, {"author": "ann"}]}
-	failed_of(subj, check) == [{"path": "item 1 of commits", "cause": "value", "value": {"author": "bob"}}]
+	failed_of(subj, check) == [{"path": "item 1 of commits", "item": "item 1 of commits", "cause": "value", "value": {"author": "bob"}}]
 }
 
 test_failed_items_write_paths_the_way_inputs_do if {
@@ -6925,7 +6925,7 @@ test_failed_items_of_a_named_path_start_with_the_name if {
 		"id": ["number"],
 		"checks": {"c": {"op": "all", "path": ["$pr", "commits"], "check": {"op": "present", "path": ["sha"]}}},
 	}})
-	rows_for(rep, "s", "c")[0].failed_items == [{"path": "item 2 of $pr.commits", "cause": "value", "value": {}}]
+	rows_for(rep, "s", "c")[0].failed_items == [{"path": "item 2 of $pr.commits", "item": "item 2 of $pr.commits", "cause": "value", "value": {}}]
 }
 
 test_failed_items_of_a_substituted_check_are_those_of_the_main_check if {
@@ -6935,7 +6935,7 @@ test_failed_items_of_a_substituted_check_are_those_of_the_main_check if {
 	}
 	subj := {"id": 1, "xs": [1, 2], "waiver": "ok"}
 	cause_of(subj, check) == "substituted"
-	failed_of(subj, check) == [{"path": "item 2 of xs", "cause": "value", "value": 2}]
+	failed_of(subj, check) == [{"path": "item 2 of xs", "item": "item 2 of xs", "cause": "value", "value": 2}]
 }
 
 test_only_rows_of_all_and_any_checks_have_failed_items if {
@@ -6962,7 +6962,7 @@ test_violations_carry_failed_items_and_other_checks_have_none if {
 		},
 	}})
 	[[v.check, object.get(v, "failed_items", "none")] | some v in ergo.violations(rep)] == [
-		["every", [{"path": "item 2 of xs", "cause": "value", "value": 2}]],
+		["every", [{"path": "item 2 of xs", "item": "item 2 of xs", "cause": "value", "value": 2}]],
 		["leaf", "none"],
 	]
 }
@@ -6985,7 +6985,7 @@ test_failed_items_of_a_nested_check_name_the_outer_item_only if {
 			}},
 		}},
 	)
-	rows_for(rep, "s", "c")[0].failed_items == [{"path": "item 1 of approvers", "cause": "value", "value": {"username": "bob", "timestamp": "2026-10-01T11:00:00Z"}}]
+	rows_for(rep, "s", "c")[0].failed_items == [{"path": "item 1 of approvers", "item": "item 1 of approvers", "cause": "value", "value": {"username": "bob", "timestamp": "2026-10-01T11:00:00Z"}}]
 }
 
 test_failed_items_leave_out_an_item_that_passes_another_option_when_a_ref_cannot_be_read if {
@@ -6995,14 +6995,14 @@ test_failed_items_leave_out_an_item_that_passes_another_option_when_a_ref_cannot
 	}}}
 	subj := {"id": 1, "xs": [1, 2]}
 	cause_of(subj, check) == "absent"
-	failed_of(subj, check) == [{"path": "item 2 of xs", "cause": "absent", "value": 2}]
+	failed_of(subj, check) == [{"path": "item 2 of xs", "item": "item 2 of xs", "cause": "absent", "value": 2}]
 }
 
 test_failed_items_of_an_empty_each_add_only_the_position if {
 	check := {"op": "all", "path": ["xs"], "each": [], "check": {"op": "equals", "path": [], "value": 1}}
 	failed_of({"id": 1, "xs": [[1, 2], {"v": 1}]}, check) == [
-		{"path": "item 2 of xs[0]", "cause": "value", "value": 2},
-		{"path": "item 2 of xs", "cause": "unusable", "value": {"v": 1}},
+		{"path": "item 2 of xs[0]", "item": "item 2 of xs[0]", "cause": "value", "value": 2},
+		{"path": "item 2 of xs", "item": "item 2 of xs", "cause": "unusable", "value": {"v": 1}},
 	]
 }
 
@@ -7136,15 +7136,15 @@ test_an_item_whose_field_present_finds_missing_is_listed_as_value_like_its_row_b
 		subj := {"id": 1, "commits": [{}, {"sha": null}]}
 		cause_of(subj, check) == "value"
 		failed_of(subj, check) == [
-			{"path": "item 1 of commits", "cause": "value", "value": {}},
-			{"path": "item 2 of commits", "cause": "value", "value": {"sha": null}},
+			{"path": "item 1 of commits", "item": "item 1 of commits", "cause": "value", "value": {}},
+			{"path": "item 2 of commits", "item": "item 2 of commits", "cause": "value", "value": {"sha": null}},
 		]
 	}
 }
 
 test_an_inner_list_item_whose_field_present_finds_missing_is_listed_as_value_too if {
 	check := {"op": "all", "path": ["prs"], "each": ["commits"], "check": {"op": "present", "path": ["sha"]}}
-	failed_of({"id": 1, "prs": [{"commits": [{"sha": "a"}, {}]}]}, check) == [{"path": "item 2 of prs[0].commits", "cause": "value", "value": {}}]
+	failed_of({"id": 1, "prs": [{"commits": [{"sha": "a"}, {}]}]}, check) == [{"path": "item 2 of prs[0].commits", "item": "item 2 of prs[0].commits", "cause": "value", "value": {}}]
 }
 
 absent_lookalike := {"ergo/absent": true}
@@ -8296,9 +8296,9 @@ test_a_name_from_the_report_reads_back_in_a_sentence_as_the_path_it_names if {
 
 test_a_failed_item_of_a_list_check_with_no_path_counts_from_one_like_every_other_list if {
 	policy := {"subjects": {"l": {"from": ["xss"]}}, "requirements": {"r": {"subject": "l", "checks": {"c": {"op": "all", "path": [], "check": {"op": "equals", "path": [], "value": 1}}}}}}
-	[r.failed_items | some r in ergo.report({"xss": [[1, 2]]}, policy, {}).results; r.check == "c"] == [[{"cause": "value", "path": "item 2 of xss[]", "value": 2}]]
+	[r.failed_items | some r in ergo.report({"xss": [[1, 2]]}, policy, {}).results; r.check == "c"] == [[{"cause": "value", "path": "item 2 of xss[]", "item": "item 2 of xss[]", "value": 2}]]
 	with_each := {"subjects": {"m": {"from": ["o"]}}, "requirements": {"q": {"subject": "m", "checks": {"c": {"op": "all", "path": [], "each": ["a"], "check": {"op": "equals", "path": [], "value": 1}}}}}}
-	[r.failed_items | some r in ergo.report({"o": [[{"a": [1]}, {"b": 2}]]}, with_each, {}).results; r.check == "c"] == [[{"cause": "absent", "path": "o[][1].a", "value": null}]]
+	[r.failed_items | some r in ergo.report({"o": [[{"a": [1]}, {"b": 2}]]}, with_each, {}).results; r.check == "c"] == [[{"cause": "absent", "path": "o[][1].a", "item": "o[][1].a", "value": null}]]
 }
 
 test_a_list_after_each_is_named_further_along_the_path_so_a_grammar_word_gets_no_dot if {
@@ -8348,8 +8348,8 @@ test_a_name_nothing_gave_never_prints_like_the_params_or_the_input if {
 test_an_each_that_isnt_a_list_still_lists_every_item_as_ill_formed if {
 	policy := {"subjects": {"t": {"from": ["items"], "id": ["id"]}}, "requirements": {"s": {"subject": "t", "checks": {"c": {"op": "all", "path": ["ys"], "each": "x", "check": {"op": "equals", "path": [], "value": 9}}}}}}
 	[r.failed_items | some r in ergo.report({"items": [{"id": "i", "ys": [[1], [2]]}]}, policy, {}).results; r.check == "c"] == [[
-		{"cause": "ill_formed", "path": "item 1 of ys", "value": [1]},
-		{"cause": "ill_formed", "path": "item 2 of ys", "value": [2]},
+		{"cause": "ill_formed", "path": "item 1 of ys", "item": "item 1 of ys", "value": [1]},
+		{"cause": "ill_formed", "path": "item 2 of ys", "item": "item 2 of ys", "value": [2]},
 	]]
 }
 
