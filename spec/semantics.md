@@ -279,6 +279,8 @@ Every row has a cause. When a check reads several values, the row takes the firs
 
 **[walk.some]** `some` passes when at least one item left in passes. Otherwise it fails with the first, in the order of [causes](#causes), among what failed while walking, the undecided items and the items that failed, or with `value` when there were none.
 
+**[walk.flaws]** When a ref the check reads, in its path, its `whose` checks or its phrase, can't be used, or the input or params hold something JSON can't, the check fails as `unusable` and `failed_items` is `[]`, whatever the items hold, as a plain check does. On a subject that isn't an object, with a path that starts at the subject, it fails as `not_an_object`. When a ref step in its path can't be read, it fails with the ref's cause, and its `inputs` hold `[]`.
+
 **[walk.inputs]** The row's `inputs` has one entry, named after the path with `[]` after each list walked, like `pull_requests[].commits[].signed`, holding the value each item's path ended at, in order, `null` where it ended missing. The items `whose` leaves out are there too. Where the walk stopped early, `[]` only follows the lists it walked.
 
 **[walk.failed_items]** The row's `failed_items` lists what failed, in path order, when the check fails, and is `[]` when it passes: each value that failed the basic check, with `path` the field, `item` the item and `value` what the path ended at, or `null`; each undecided item, with `path` the field of the first `whose` check that couldn't decide; and each list that failed while walking, with `path` and `item` both the list. An item that `whose` left out isn't listed.

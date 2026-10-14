@@ -721,11 +721,12 @@ _failed_assertions(check, subj, flaw) := [{"assertion": check.assertions[i], "ca
 
 _assertion_cause(c, subj, "") := _row_cause(c, subj, "") if not _walks(c)
 
-_assertion_cause(c, subj, "") := _walk_row(c, subj).cause if _walks(c)
+_assertion_cause(c, subj, _) := _walk_row(c, subj).cause if _walks(c)
 
 _assertion_cause(c, subj, "unusable") := "unusable" if {
+	not _walks(c)
 	_unusable_assertion(c)
-} else := _row_cause(c, subj, "")
+} else := _row_cause(c, subj, "") if not _walks(c)
 
 _unusable_assertion(_) if _unreadable_input
 
@@ -5058,7 +5059,7 @@ _s_cond_unsupported(c) := {"count of, sum of and plus aren't supported yet"} if 
 
 _s_cond_unsupported(c) := _s_argument_unsupported(c.phrase) if not "terms" in object.keys(c)
 
-_s_walk_too_long(a) := {"every and some over more than ten steps aren't supported yet" | count(_s_model_path(a[_s_quantifier_of(a)])) > 11}
+_s_walk_too_long(a) := {"every and some over more than ten steps aren't supported yet" | count(_walk_steps(_s_model_path(a[_s_quantifier_of(a)]))) > 10}
 
 _s_assertion_unsupported(a) := {"count of, sum of and plus aren't supported yet"} if "terms" in object.keys(a)
 
@@ -5249,12 +5250,23 @@ _s_model_position(p) := [] if not "position" in object.keys(p)
 
 _unusable_mark := {"ergo/unusable": set()}
 
-_walk_row(check, subj) := {"cause": state, "inputs": [{"name": _path_name(check.path), "value": null}], "failed": []} if {
+_walk_row(check, subj) := object.union(_walk_read_row(check, subj), {"cause": "unusable", "failed": []}) if {
+	_walk_flawed(check)
+} else := {"cause": "not_an_object", "inputs": [], "failed": []} if {
+	not _named(check.path)
+	not is_object(subj)
+} else := _walk_read_row(check, subj)
+
+_walk_flawed(check) if _param_broken(check, set())
+
+_walk_flawed(_) if _unreadable_input
+
+_walk_read_row(check, subj) := {"cause": state, "inputs": [{"name": _path_name(check.path), "value": []}], "failed": []} if {
 	state := _read_state(subj, check.path)
 	not _walk_keys(check, subj)
 }
 
-_walk_row(check, subj) := {"cause": cause, "inputs": inputs, "failed": failed} if {
+_walk_read_row(check, subj) := {"cause": cause, "inputs": inputs, "failed": failed} if {
 	keys := _walk_keys(check, subj)
 	w := _walk(_walk_start(check, subj), keys, check.if_any == true)
 	judged := [_walk_judge(check, e) | some e in w.items]

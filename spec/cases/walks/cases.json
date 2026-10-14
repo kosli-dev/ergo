@@ -759,5 +759,35 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a walk that can't be run as written",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every xs.v whose kind is not one of $params.l, if any, is 1", "n": "every xs named by $params.k is 1"}}}},
+    "params": {"l": "text"},
+    "cases": [
+      {
+        "description": "fails as unusable when a param its whose reads isn't a list, even with if any, and fails with the ref's cause when its named by can't be read",
+        "rules": ["walk.flaws", "sentence.every.if_any"],
+        "input": {"things": [{"id": "t1", "xs": [{"v": 2, "kind": "a"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "xs[].v", "value": [2]}], "failed_items": []},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "n", "passed": false, "cause": "absent", "inputs": [{"name": "xs named by $params.k", "value": []}], "failed_items": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a walk on a subject that isn't an object",
+    "policy": {"subjects": {"thing": {"from": ["things"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every xs is 1"}}}},
+    "cases": [
+      {
+        "description": "fails as not_an_object, as any path with steps does",
+        "rules": ["walk.flaws", "path.not_an_object"],
+        "input": {"things": ["text"]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "text"}, "check": "c", "passed": false, "cause": "not_an_object", "inputs": [], "failed_items": []}
+        ]
+      }
+    ]
   }
 ]

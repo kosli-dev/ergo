@@ -8598,3 +8598,40 @@ test_an_item_a_whose_condition_cant_decide_is_undecided_even_when_another_condit
 	doc := {"things": [{"id": "a", "xs": [{"kind": "b"}]}]}
 	_walk_rows({"e": `every xs whose kind is "a" and state is "open" is not empty`}, doc, {}) == [["a", "e", "absent", [{"path": "xs[0].state", "item": "item 1 of xs", "cause": "absent", "value": null}]]]
 }
+
+test_a_walk_whose_param_cant_be_used_fails_as_unusable_even_with_if_any if {
+	doc := {"things": [{"id": "a", "xs": [{"v": 2, "kind": "a"}]}]}
+	checks := {
+		"a": "every xs.v whose kind is not one of $params.l, if any, is 1",
+		"b": "every xs is not one of $params.l",
+		"c": "every xs.v is 2 and every xs.kind is in $params.l",
+	}
+	r := ergo.report(doc, _sentence_policy(checks), {"l": "text"})
+	[[row.check, row.cause, object.get(row, "failed_items", object.get(row, "failed_assertions", null))] | some row in r.results; row.check in {"a", "b", "c"}] == [
+		["a", "unusable", []],
+		["b", "unusable", []],
+		["c", "unusable", [{"assertion": "every xs.kind is in $params.l", "cause": "unusable"}]],
+	]
+	not r.compliant
+}
+
+test_a_walk_fails_as_unusable_when_the_input_holds_something_json_cant if {
+	r := ergo.report({"things": [{"id": "a", "xs": [1], "bad": {1}}]}, _sentence_policy({"c": "every xs is 1"}), {})
+	[row.cause | some row in r.results; row.check == "c"] == ["unusable"]
+}
+
+test_a_walk_on_a_subject_that_isnt_an_object_fails_like_any_path_does if {
+	r := ergo.report({"things": ["text", null]}, {"subjects": {"t": {"from": ["things"]}}, "requirements": {"s": {"subject": "t", "checks": {"c": "every xs is 1"}}}}, {})
+	[row.cause | some row in r.results; row.check == "c"] == ["not_an_object", "not_an_object"]
+}
+
+test_a_walk_of_exactly_ten_steps_walks_its_last_list_and_eleven_is_written_wrong if {
+	doc := {"things": [{"id": "a", "p0": [{"p1": {"p2": {"p3": {"p4": {"p5": {"p6": {"p7": {"p8": {"p9": [""]}}}}}}}}}]}]}
+	_walk_rows({"c": "every p0.p1.p2.p3.p4.p5.p6.p7.p8.p9 is not empty"}, doc, {})[0][2] == "value"
+	_sentence_problems("every p0.p1.p2.p3.p4.p5.p6.p7.p8.p9.p10 is not empty") == ["every and some over more than ten steps aren't supported yet"]
+}
+
+test_a_walk_whose_named_by_cant_be_read_shows_an_empty_list_in_its_inputs if {
+	r := ergo.report({"things": [{"id": "a", "xs": {"k": [1]}}]}, _sentence_policy({"c": "every xs named by $params.k is 1"}), {})
+	[[row.cause, row.inputs, row.failed_items] | some row in r.results; row.check == "c"] == [["absent", [{"name": "xs named by $params.k", "value": []}], []]]
+}
