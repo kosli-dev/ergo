@@ -20,6 +20,8 @@ jobs:
         with:
           version: 0.43.0
       - run: opa check --strict . --ignore .github
+      - name: Check ergo compiles where input is checked against a closed schema
+        run: opa check --strict --schema .github/closed-input-schema.json ergo.rego
       - run: opa fmt --list --fail .
       - run: opa test . --ignore .github --timeout 120s --verbose
       - name: Lint for likely bugs
@@ -29,7 +31,7 @@ jobs:
         run: |
           comments=$(git ls-files '*.rego' | while read -r f; do
             opa parse "$f" --format json --json-include comments,locations |
-              jq -r --arg f "$f" '.comments[]? | .Location.row as $r | select(($f == "ergo.rego" and $r <= 2) | not) | "\($f):\($r)"'
+              jq -r --arg f "$f" '.package.location.row as $p | .comments[]? | .Location.row as $r | select(($f == "ergo.rego" and $r < $p) | not) | "\($f):\($r)"'
           done)
           if [ -n "$comments" ]; then
             echo "These lines have comments:"
