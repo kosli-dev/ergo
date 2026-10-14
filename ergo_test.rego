@@ -8187,8 +8187,6 @@ test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
 		[`x is y plus 1`, "count of, sum of and plus aren't supported yet"],
 		[`x is not one of "a"`, `"is not one of" isn't supported yet`],
 		[`x is not in $params.a`, `"is not in" isn't supported yet`],
-		[`x is empty`, `"is empty" isn't supported yet`],
-		[`x is not empty`, `"is not empty" isn't supported yet`],
 		[`x is an object`, `"is an object" isn't supported yet`],
 		[`x starts with "a"`, `"starts with" isn't supported yet`],
 		[`x ends with y`, `"ends with" isn't supported yet`],
@@ -8360,4 +8358,24 @@ test_an_each_that_isnt_a_list_still_lists_every_item_as_ill_formed if {
 test_a_number_written_as_a_literal_is_named_like_the_index_it_reads if {
 	rendered({}, {"op": "present", "path": ["zs", {"literal": 1}]}) == "item 2 of zs is present"
 	rendered({}, {"op": "present", "path": ["zs", {"literal": 1}, "k"]}) == "zs[1].k is present"
+}
+
+test_the_operators_only_sentences_read_into_are_unknown_ops_anywhere_in_todays_syntax if {
+	every op in ["empty_string_or_list", "not_empty_string_or_list"] {
+		_sentence_problems({"op": op, "path": ["x"]}) == [concat("", ["unknown op ", op])]
+		ergo.report({"things": []}, _sentence_policy({"c": {"op": "all", "path": ["xs"], "check": {"op": op, "path": []}}}), {}).results[0].inputs[2] == {"name": "checks.c.check", "value": [concat("", ["unknown op ", op])]}
+	}
+}
+
+test_is_empty_and_is_not_empty_take_a_string_or_a_list if {
+	doc := {"things": [{"id": "a", "x": []}, {"id": "b", "x": ""}, {"id": "c", "x": "z"}, {"id": "d", "x": [1]}, {"id": "e", "x": {}}, {"id": "f", "x": null}, {"id": "g"}]}
+	[[r[0], r[1], r[2]] | some r in _sentence_rows({"e": "x is empty", "n": "x is not empty"}, doc, {})] == [
+		["e", true, "satisfied"], ["n", false, "value"],
+		["e", true, "satisfied"], ["n", false, "value"],
+		["e", false, "value"], ["n", true, "satisfied"],
+		["e", false, "value"], ["n", true, "satisfied"],
+		["e", false, "unusable"], ["n", false, "unusable"],
+		["e", false, "null"], ["n", false, "null"],
+		["e", false, "absent"], ["n", false, "absent"],
+	]
 }

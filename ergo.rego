@@ -1439,6 +1439,20 @@ _leaf_op_passed("empty", check, subj) if {
 	value_at(subj, check.path) == []
 }
 
+_leaf_op_passed("empty_string_or_list", check, subj) if {
+	value_at(subj, check.path) in {[], ""}
+}
+
+_leaf_op_passed("not_empty_string_or_list", check, subj) if {
+	v := value_at(subj, check.path)
+	_string_or_list(v)
+	count(v) > 0
+}
+
+_string_or_list(v) if is_string(v)
+
+_string_or_list(v) if is_array(v)
+
 _missing_at(x, path) if {
 	_keys_of(path)
 	_ := _start_of(x, path)
@@ -1592,6 +1606,12 @@ _unusable(leaf, x) if {
 }
 
 _unusable(leaf, x) if {
+	leaf.op in _sentence_ops
+	v := _found(x, leaf.path)
+	not _string_or_list(v)
+}
+
+_unusable(leaf, x) if {
 	leaf.op == "compare"
 	not "within" in object.keys(leaf)
 	l := _simple_found(x, leaf.left)
@@ -1699,6 +1719,8 @@ _required_fields := {
 	"missing": {"path"},
 	"non_empty_string": {"path"},
 	"empty": {"path"},
+	"empty_string_or_list": {"path"},
+	"not_empty_string_or_list": {"path"},
 	"matches_any": {"path", "patterns"},
 	"not_matches_any": {"path", "patterns"},
 	"compare": {"left", "right", "cmp"},
@@ -1789,6 +1811,14 @@ _op_problems(node, _) := {"missing op"} if not "op" in object.keys(node)
 _op_problems(node, _) := {concat("", ["unknown op ", _text(node.op)])} if {
 	"op" in object.keys(node)
 	not node.op in operators
+	not _sentence_op(node)
+}
+
+_sentence_ops := {"empty_string_or_list", "not_empty_string_or_list"}
+
+_sentence_op(node) if {
+	node.op in _sentence_ops
+	_s_read(node)
 }
 
 _op_problems(node, kinds) := {"nested too deep"} if _too_deep(node, kinds)
@@ -4852,7 +4882,7 @@ _s_paths_unsupported(a) := {"last of isn't supported yet" |
 	not "start" in object.keys(ref)
 }
 
-_s_unrun_ops := {"is not one of", "is empty", "is not empty", "is a", "starts with", "ends with"}
+_s_unrun_ops := {"is not one of", "is a", "starts with", "ends with"}
 
 _s_phrase_unsupported(ph) := {concat("", [`"`, _s_unrun_words(ph), `" isn't supported yet`])} if ph.op in _s_unrun_ops
 
@@ -4942,6 +4972,10 @@ _s_model(a) := {"op": "present", "path": _s_model_path(a.path)} if a.phrase.op =
 _s_model(a) := {"op": "missing", "path": _s_model_path(a.path)} if a.phrase.op == "does not exist"
 
 _s_model(a) := {"op": "non_empty_string", "path": _s_model_path(a.path)} if a.phrase.op == "is a non-empty string"
+
+_s_model(a) := {"op": "empty_string_or_list", "path": _s_model_path(a.path)} if a.phrase.op == "is empty"
+
+_s_model(a) := {"op": "not_empty_string_or_list", "path": _s_model_path(a.path)} if a.phrase.op == "is not empty"
 
 _s_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "value": _s_one(a.phrase)} if a.phrase.op in {"contains", "does not contain"}
 
