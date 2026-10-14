@@ -455,6 +455,7 @@ _valid_name(n) if {
 	is_string(n)
 	n != ""
 	not startswith(n, "$")
+	not n in {"params", "input"}
 }
 
 _keys_well_formed(step) if not "keys" in object.keys(step)
@@ -997,7 +998,7 @@ _selector_matches(v, sel) if {
 	}
 }
 
-_field_path_name(path) := concat(".", [_segment_name(i, path[i]) | some i in _names(path)])
+_field_path_name(path) := concat(".", [_segment_name(path[i]) | some i in _names(path)])
 
 _path_name(path) := concat("", ["item ", _literal_text(path[count(path) - 1] + 1), " of ", _steps_name(array.slice(path, 0, count(path) - 1))]) if {
 	is_array(path)
@@ -1037,7 +1038,7 @@ _named_by_after(i, p) if {
 	_named_by(p)
 }
 
-_step_name(i, p) := concat("", [_step_dot(i), _segment_name(i, p)]) if {
+_step_name(i, p) := concat("", [_step_dot(i), _segment_name(p)]) if {
 	not _nameable_step(p)
 	not _is_ref(p)
 }
@@ -1055,32 +1056,32 @@ _plain_step_name(0, "$$input") := "$input"
 
 _plain_step_name(0, "$$params") := "$params"
 
-_plain_step_name(0, k) := k if {
-	is_string(k)
-	startswith(k, "$")
-	not k in {"$$input", "$$params"}
+_plain_step_name(0, step) := step if {
+	is_string(step)
+	startswith(step, "$")
+	not step in {"$$input", "$$params"}
 }
 
-_plain_step_name(0, k) := concat("", [_s_dot(k, "left"), _s_key_text(k)]) if {
-	is_string(k)
-	not startswith(k, "$")
+_plain_step_name(0, step) := concat("", [_s_dot(step, "left"), _s_key_text(step)]) if {
+	is_string(step)
+	not startswith(step, "$")
 }
 
-_plain_step_name(i, k) := concat("", [".", _s_key_text(k)]) if {
+_plain_step_name(i, step) := concat("", [".", _s_key_text(step)]) if {
 	i > 0
-	is_string(k)
+	is_string(step)
 }
 
-_plain_step_name(0, p) := concat("", [_s_dot(p.literal, "left"), _s_key_text(p.literal)]) if _string_literal(p)
+_plain_step_name(0, step) := concat("", [_s_dot(step.literal, "left"), _s_key_text(step.literal)]) if _string_literal(step)
 
-_plain_step_name(i, p) := concat("", [".", _s_key_text(p.literal)]) if {
+_plain_step_name(i, step) := concat("", [".", _s_key_text(step.literal)]) if {
 	i > 0
-	_string_literal(p)
+	_string_literal(step)
 }
 
-_plain_step_name(_, k) := concat("", ["[", _literal_text(k), "]"]) if _index_step(k)
+_plain_step_name(_, step) := concat("", ["[", _literal_text(step), "]"]) if _index_step(step)
 
-_plain_step_name(i, p) := concat("", [_step_dot(i), _key_name(_unliteral(p))]) if not _nameable_step(p)
+_plain_step_name(i, step) := concat("", [_step_dot(i), _key_name(_unliteral(step))]) if not _nameable_step(step)
 
 _step_dot(0) := ""
 
@@ -1102,22 +1103,28 @@ _item_path_name(item, []) := item
 
 _item_path_name(_, path) := _path_name(path) if path != []
 
-_projection_name(path, []) := concat("", [_path_name(path), "[]"])
+_projection_name(path, each) := concat("", [_steps_name(path), "[]", _tail_name(each)])
 
-_projection_name(path, each) := concat("", [_path_name(path), "[].", _path_name(each)]) if each != []
+_tail_name(steps) := concat("", [_step_name(i + 1, steps[i]) | some i in _names(steps)]) if is_array(steps)
 
-_segment_name(_, p) := _key_name(p) if not is_object(p)
+_tail_name(steps) := ".<invalid each>" if not is_array(steps)
 
-_segment_name(_, p) := _key_name(p.literal) if _is_literal(p)
+_item_list_name(item, []) := item
 
-_segment_name(_, p) := concat("", ["[", concat(" and ", sort([concat("", [_key_name(k), "==", _value_text(v)]) | some k, v in p.where])), "]"]) if {
+_item_list_name(_, path) := _steps_name(path) if path != []
+
+_segment_name(p) := _key_name(p) if not is_object(p)
+
+_segment_name(p) := _key_name(p.literal) if _is_literal(p)
+
+_segment_name(p) := concat("", ["[", concat(" and ", sort([concat("", [_key_name(k), "==", _value_text(v)]) | some k, v in p.where])), "]"]) if {
 	is_object(p)
 	not _is_literal(p)
 	not _is_ref(p)
 	not _malformed(p)
 }
 
-_segment_name(_, p) := "[<invalid ref>]" if _malformed(p)
+_segment_name(p) := "[<invalid ref>]" if _malformed(p)
 
 _first_dollar_key(0, k) if {
 	is_string(k)
@@ -2921,6 +2928,7 @@ _as_text(check, _) := " as <invalid name>" if {
 _item_given(item) := {substring(item, 1, -1) |
 	startswith(item, "$")
 	not startswith(item, "$$")
+	item != "$input"
 }
 
 _given_with(check, given) := given | {check.as} if _valid_name(object.get(check, "as", null))
@@ -2953,17 +2961,42 @@ _collection_name(check) := _path_name(check.path) if not check.each
 
 _collection_name(check) := _projection_name(check.path, check.each) if check.each
 
-_item_name(check) := concat("", [_collection_name(check), "[]"]) if not _valid_name(object.get(check, "as", null))
+_item_name(check) := concat("", [_steps_name(check.path), "[]"]) if {
+	not _valid_name(object.get(check, "as", null))
+	not check.each
+}
+
+_item_name(check) := concat("", [_projection_name(check.path, check.each), "[]"]) if {
+	not _valid_name(object.get(check, "as", null))
+	check.each
+}
 
 _item_name(check) := concat("", ["$", check.as]) if _valid_name(object.get(check, "as", null))
+
+_item_name(check) := "<missing path>[]" if {
+	not _valid_name(object.get(check, "as", null))
+	not "path" in object.keys(check)
+}
 
 _inner_collection_name(check, _) := "<missing path>" if not "path" in object.keys(check)
 
 _inner_collection_name(check, item) := _item_path_name(item, check.path) if not check.each
 
-_inner_collection_name(check, item) := concat("", [_item_path_name(item, check.path), "[].", _path_name(check.each)]) if check.each
+_inner_collection_name(check, item) := concat("", [_item_list_name(item, check.path), "[]", _tail_name(check.each)]) if check.each
 
-_inner_item_name(check, item) := concat("", [_inner_collection_name(check, item), "[]"]) if not _valid_name(object.get(check, "as", null))
+_inner_list_name(check, item) := _item_list_name(item, check.path) if not check.each
+
+_inner_list_name(check, item) := _inner_collection_name(check, item) if check.each
+
+_inner_item_name(check, item) := concat("", [_inner_list_name(check, item), "[]"]) if {
+	not _valid_name(object.get(check, "as", null))
+	"path" in object.keys(check)
+}
+
+_inner_item_name(check, _) := "<missing path>[]" if {
+	not _valid_name(object.get(check, "as", null))
+	not "path" in object.keys(check)
+}
 
 _inner_item_name(check, _) := concat("", ["$", check.as]) if _valid_name(object.get(check, "as", null))
 
@@ -3203,13 +3236,13 @@ _described(check, item) := object.union(check, {"expression": concat("", [
 
 _subject_item_name(req) := concat("", ["$", _each_step(req).each_as]) if _from_well_formed(req)
 
-_subject_item_name(req) := concat("", [_from_name(_from_of(req)), "[]"]) if {
+_subject_item_name(req) := concat("", [_steps_name(_from_steps(_from_of(req))), "[]"]) if {
 	not _stepped(req)
 	_from_well_formed(req)
 	_from_of(req) != []
 }
 
-_subject_item_name(req) := "$$input" if {
+_subject_item_name(req) := "$input" if {
 	not _stepped(req)
 	_from_well_formed(req)
 	_from_of(req) == []
@@ -3224,16 +3257,18 @@ _from_text(req) := _from_name(_from_path(req)) if {
 	_from_path(req) != []
 }
 
-_from_text(req) := "$$input" if {
+_from_text(req) := "$input" if {
 	_from_well_formed(req)
 	_from_path(req) == []
 }
 
 _from_text(req) := "<invalid from>" if not _from_well_formed(req)
 
-_from_name(p) := _path_name(array.concat([{"literal": p[0]}], array.slice(p, 1, count(p)))) if _starts_with_dollar_key(p)
+_from_name(p) := _path_name(_from_steps(p))
 
-_from_name(p) := _path_name(p) if not _starts_with_dollar_key(p)
+_from_steps(p) := array.concat([{"literal": p[0]}], array.slice(p, 1, count(p))) if _starts_with_dollar_key(p)
+
+_from_steps(p) := p if not _starts_with_dollar_key(p)
 
 _starts_with_dollar_key(p) if _first_dollar_key(0, p[0])
 
@@ -3652,7 +3687,7 @@ _reported(written, unreadable, sections) := _plain_numbers(written) if {
 } else := written
 
 _unreadable_inputs(doc, params) := [{"name": name, "value": sort(_json_problems(v))} |
-	some [name, v] in [["$$input", doc], ["$$params", params]]
+	some [name, v] in [["$input", doc], ["$params", params]]
 	count(_json_problems(v)) > 0
 ]
 
@@ -3926,7 +3961,7 @@ _side_text(item, side) := concat(" + ", [_basic_text(item, operand) | some opera
 
 _where_text(side, _) := "" if not "where" in object.keys(side)
 
-_where_text(side, path) := concat("", [" where ", _where_describe(side.where, concat("", [_path_name(path), "[]"]))]) if "where" in object.keys(side)
+_where_text(side, path) := concat("", [" where ", _where_describe(side.where, concat("", [_steps_name(path), "[]"]))]) if "where" in object.keys(side)
 
 _where_describe(check, _) := check.expression if _written_expression(check)
 

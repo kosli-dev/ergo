@@ -585,5 +585,45 @@
         }
       }
     ]
+  },
+  {
+    "description": "as with params or input as the name",
+    "policy": {
+      "subjects": {"thing": {"from": ["things"], "id": ["id"]}},
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "input": {"op": "all", "path": ["cs"], "as": "input", "check": {"op": "present", "path": []}},
+            "params": {"op": "all", "path": ["cs"], "as": "params", "check": {"op": "present", "path": []}}
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, so a name never reads like the params or the input",
+        "rules": ["list.written_wrong", "list.as", "written_wrong", "written_wrong.row", "list.failed_items", "name.index"],
+        "input": {"things": [{"cs": [1], "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {"name": "count(checks)", "value": 2},
+              {"name": "require", "value": "every"},
+              {"name": "checks.input", "value": ["invalid name"]},
+              {"name": "checks.params", "value": ["invalid name"]}
+            ]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "input", "passed": false, "cause": "ill_formed", "inputs": [{"name": "cs[]", "value": [1]}], "failed_items": [{"path": "item 1 of cs", "cause": "ill_formed", "value": 1}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "params", "passed": false, "cause": "ill_formed", "inputs": [{"name": "cs[]", "value": [1]}], "failed_items": [{"path": "item 1 of cs", "cause": "ill_formed", "value": 1}]}
+        ],
+        "expressions": {"s": {"params": "every cs as <invalid name>: cs[] is present"}}
+      }
+    ]
   }
 ]

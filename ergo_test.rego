@@ -1247,10 +1247,10 @@ test_an_empty_path_on_a_subject_is_named_after_from if {
 	[r.inputs | some r in rows_for(rep, "s", "c")] == [[{"name": "branches[]", "value": "main"}]]
 }
 
-test_an_empty_path_on_the_whole_input_is_named_dollar_dollar_input if {
+test_an_empty_path_on_the_whole_input_is_named_dollar_input if {
 	rep := report({"state": "ok"}, {"s": {"checks": {"c": {"op": "present", "path": []}}}})
-	rep.requirements.s.checks.c.expression == "$$input is present"
-	[r.inputs | some r in rows_for(rep, "s", "c")] == [[{"name": "$$input", "value": {"state": "ok"}}]]
+	rep.requirements.s.checks.c.expression == "$input is present"
+	[r.inputs | some r in rows_for(rep, "s", "c")] == [[{"name": "$input", "value": {"state": "ok"}}]]
 }
 
 test_the_whole_input_is_not_named_like_a_key_called_input if {
@@ -1259,7 +1259,7 @@ test_the_whole_input_is_not_named_like_a_key_called_input if {
 		"b": [{"op": "present", "path": ["input"]}],
 	}}}}})
 	[r.inputs | some r in rows_for(rep, "s", "c")] == [[
-		{"name": "$$input", "value": {"input": "inner"}},
+		{"name": "$input", "value": {"input": "inner"}},
 		{"name": "input", "value": "inner"},
 	]]
 }
@@ -2455,7 +2455,7 @@ test_min_subjects_at_zero_says_it_only_checks_that_from_can_be_read if {
 
 test_min_subjects_at_zero_names_the_input_when_there_is_no_from if {
 	req := {"s": object.union(min_subjects_req(0).s, {"from": []})}
-	report({}, req).requirements.s.checks["$min_subjects"].expression == "$$input can be read"
+	report({}, req).requirements.s.checks["$min_subjects"].expression == "$input can be read"
 }
 
 test_min_subjects_at_zero_keeps_the_count_with_a_keys_step_because_from_is_not_read if {
@@ -2584,7 +2584,7 @@ test_unique_ids_definition_is_in_the_check_table if {
 	]
 	rows == [
 		["Every repo id is unique", "count(repeated(ids(repos))) == 0"],
-		["Every repo id is unique", "count(repeated(ids($$input))) == 0"],
+		["Every repo id is unique", "count(repeated(ids($input))) == 0"],
 		["Every repo id is unique", "count(repeated(ids(<invalid from>))) == 0"],
 	]
 }
@@ -3103,9 +3103,9 @@ test_min_subjects_names_the_whole_input_like_the_checks_do_when_from_reads_it if
 		some r in rows_for(rep, "s", "$min_subjects")
 	]
 	rows == [
-		["count(matching($$input)) >= 1", "in-scope subject count"],
-		["count(matching($$input)) >= 1", "in-scope subject count"],
-		["count(matching($$input)) >= 1", "in-scope subject count"],
+		["count(matching($input)) >= 1", "in-scope subject count"],
+		["count(matching($input)) >= 1", "in-scope subject count"],
+		["count(matching($input)) >= 1", "in-scope subject count"],
 	]
 }
 
@@ -7080,8 +7080,8 @@ test_min_subjects_says_what_the_input_and_params_hold_that_json_cannot if {
 	rep := ergo.report({"items": [{"id": "a", "x": 1}], "tags": {"prod"}, "k": {1: "a"}}, lifted(json_only_req), {"allowed": {"MIT"}})
 	rows_for(rep, "s", "$min_subjects")[0].inputs == [
 		{"name": "in-scope thing count", "value": 1},
-		{"name": "$$input", "value": ["holds a key that isn't a string", "holds a set"]},
-		{"name": "$$params", "value": ["holds a set"]},
+		{"name": "$input", "value": ["holds a key that isn't a string", "holds a set"]},
+		{"name": "$params", "value": ["holds a set"]},
 	]
 }
 
@@ -8301,4 +8301,38 @@ test_a_name_from_the_report_reads_back_in_a_sentence_as_the_path_it_names if {
 test_a_failed_item_of_a_list_check_with_no_path_is_named_after_the_subject_with_its_position_in_brackets if {
 	policy := {"subjects": {"l": {"from": ["xss"]}}, "requirements": {"r": {"subject": "l", "checks": {"c": {"op": "all", "path": [], "check": {"op": "equals", "path": [], "value": 1}}}}}}
 	[r.failed_items | some r in ergo.report({"xss": [[1, 2]]}, policy, {}).results; r.check == "c"] == [[{"cause": "value", "path": "xss[][1]", "value": 2}]]
+}
+
+test_a_list_after_each_is_named_further_along_the_path_so_a_grammar_word_gets_no_dot if {
+	doc := {"items": [{"id": "i", "o": [{"a": [1, 2]}, {"a": [3]}]}]}
+	policy := {"subjects": {"t": {"from": ["items"], "id": ["id"]}}, "requirements": {"s": {"subject": "t", "checks": {"c": {"op": "all", "path": ["o"], "each": ["a"], "check": {"op": "equals", "path": [], "value": 9}}}}}}
+	r := ergo.report(doc, policy, {})
+	r.requirements.s.checks.c.expression == "every o[].a: o[].a[] == 9"
+	[row.inputs[0].name | some row in r.results; row.check == "c"] == ["o[].a"]
+}
+
+test_a_list_whose_path_ends_in_an_index_keeps_the_index_in_brackets_before_its_items if {
+	doc := {"items": [{"id": "i", "ys": [[1, 2], [3]]}]}
+	checks := {
+		"c": {"op": "all", "path": ["ys", 0], "check": {"op": "equals", "path": [], "value": 9}},
+		"d": {"op": "all", "path": ["ys"], "each": [0], "check": {"op": "equals", "path": [], "value": 9}},
+	}
+	r := ergo.report(doc, {"subjects": {"t": {"from": ["items"], "id": ["id"]}}, "requirements": {"s": {"subject": "t", "checks": checks}}}, {})
+	r.requirements.s.checks.c.expression == "every item 1 of ys: ys[0][] == 9"
+	r.requirements.s.checks.d.expression == "every ys[][0]: ys[][0][] == 9"
+}
+
+test_params_and_input_cant_be_names_so_a_name_is_never_read_as_the_params_or_the_input if {
+	every name in ["params", "input"] {
+		policy := {"subjects": {"t": {"from": ["items", {"each_as": name}], "id": ["id"]}}, "requirements": {"s": {"subject": "t", "checks": {"c": {"op": "present", "path": ["id"]}}}}}
+		r := ergo.report({"items": [{"id": "a"}]}, policy, {})
+		not r.compliant
+		[row.cause | some row in r.results; row.check == "$well_formed"] == ["value"]
+	}
+	rendered({}, {"op": "all", "path": ["xs"], "as": "input", "check": {"op": "present", "path": ["v"]}}) == "every xs as <invalid name>: v is present"
+}
+
+test_an_each_that_isnt_a_list_shows_as_invalid_in_the_expression if {
+	rendered({"xs": [1]}, {"op": "all", "path": ["xs"], "each": {"x": 1}, "check": {"op": "present", "path": []}}) == "every xs[].<invalid each>: xs[].<invalid each>[] is present"
+	rendered({"xs": [1]}, {"op": "all", "path": ["xs"], "each": true, "check": {"op": "present", "path": []}}) == "every xs[].<invalid each>: xs[].<invalid each>[] is present"
 }

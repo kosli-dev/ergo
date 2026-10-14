@@ -54,7 +54,7 @@ Draft 0.1. This file covers the syntax policies use today, where a check is a JS
 
 **[compare.written_wrong]** A `cmp` that isn't one of `eq`, `ne`, `gt`, `gte`, `lt` and `lte` is written `invalid cmp`. A `compare` or `compare_time` check has no `path`.
 
-**[list.written_wrong]** A name in `as` must be a string that doesn't start with `$`, or it's written `invalid name`. A name already given is written `name given twice`, and a path starting with a name nothing gave is written `unknown name $<name>`. `as` or `each` on another operator is written `as can't go here` or `each can't go here`. A missing inner check is written `missing check`, one that isn't an object `invalid check`, a third level `nested too deep`, and a custom operator `<op> can't go here` (see [REFERENCE.md](../REFERENCE.md#custom-operators)).
+**[list.written_wrong]** A name in `as` must be a string that doesn't start with `$` and isn't `params` or `input`, which would name like the params and the input, or it's written `invalid name`. A name already given is written `name given twice`, and a path starting with a name nothing gave is written `unknown name $<name>`. `as` or `each` on another operator is written `as can't go here` or `each can't go here`. A missing inner check is written `missing check`, one that isn't an object `invalid check`, a third level `nested too deep`, and a custom operator `<op> can't go here` (see [REFERENCE.md](../REFERENCE.md#custom-operators)).
 
 **[any_of.written_wrong]** `options` is an object of named options, or a list of them, named by their position as text: `"0"`, `"1"` and so on. A missing `options` is written `missing options`, an empty one `empty options`, an empty option `empty option <name>`, an option that isn't a list `option <name> not a list`, and an `any_of` or custom operator inside an option `<op> can't go here`.
 
@@ -84,7 +84,7 @@ Each check's definition in the report has an `expression` that says what it chec
 
 **[render.path]** A path is shown with its [name](#naming-a-path).
 
-**[render.missing]** A parameter that's missing is shown as `<missing value>`, `<missing values>` and so on, and a ref written wrong as `<invalid ref>`. A `path`, `left` or `right` that isn't a list is shown as `<invalid path>`, `<invalid left>` or `<invalid right>`.
+**[render.missing]** A parameter that's missing is shown as `<missing value>`, `<missing values>` and so on, and a ref written wrong as `<invalid ref>`. A `path`, `left`, `right` or `each` that isn't a list is shown as `<invalid path>`, `<invalid left>`, `<invalid right>` or `<invalid each>`.
 
 **[present.expression]** `<path> is present`
 
@@ -116,7 +116,7 @@ Each check's definition in the report has an `expression` that says what it chec
 
 ## Checks ergo adds
 
-**[added.text]** The checks ergo adds have these descriptions and expressions, where `<type>` is the name of the requirement's subject, and `<from>` is the name of the subject's `from`, or `$$input` when it has no steps:
+**[added.text]** The checks ergo adds have these descriptions and expressions, where `<type>` is the name of the requirement's subject, and `<from>` is the name of the subject's `from`, or `$input` when it has no steps:
 
 | Check           | Description                                                                                           | Expression                                                  |
 | --------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
