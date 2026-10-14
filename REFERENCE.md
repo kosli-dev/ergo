@@ -605,6 +605,39 @@ A path is keys joined by `.`, like `build.commit.sha`. A key with anything but l
 
 In YAML, ` #` starts a comment, so `title does not match 'WIP' #, 'DRAFT'` loses everything after `'WIP'`. YAML also won't take a plain value that starts with a quote, or that has `: ` in it. Put the whole sentence in single quotes then, doubling any single quote inside: `'"$schema" exists'`.
 
+A check can hold more than one sentence, joined with `and` on one line or listed under `assert`. Both mean the same, and every sentence has to pass. With the input above:
+
+```yaml
+reviewed:
+  description: Someone approved and reviewed it before it was deployed
+  assert:
+    - approved_by is not empty
+    - reviewed_at is before deployed_at
+```
+
+The check's `expression` is `approved_by is not empty and reviewed_at is before deployed_at`, and it still has one row per deployment. That row reads every field the sentences read, and says which sentences failed, each with its own cause:
+
+```json
+{
+  "cause": "value",
+  "check": "reviewed",
+  "failed_assertions": [
+    {"assertion": "approved_by is not empty", "cause": "value"},
+    {"assertion": "reviewed_at is before deployed_at", "cause": "value"}
+  ],
+  "inputs": [
+    {"name": "approved_by", "value": ""},
+    {"name": "deployed_at", "value": "2026-10-02T10:00:00Z"},
+    {"name": "reviewed_at", "value": "2026-10-02T11:00:00Z"}
+  ],
+  "passed": false,
+  "requirement": "prod_deploy",
+  "subject": {"id": "d2", "type": "deployment"}
+}
+```
+
+`failed_assertions` is `[]` when the check passes. The row's cause is the first, in the order of [causes](#causes), among the sentences that failed. To get a row for each sentence, write them as separate checks. A problem with one line of a list starts with its number in the `$well_formed` row, like `line 2: unclosed quote at column 6`.
+
 A sentence that can't be read is [written wrong](#basic-operators), and the `$well_formed` row says why, with the column when it can:
 
 ```json
@@ -613,7 +646,7 @@ A sentence that can't be read is [written wrong](#basic-operators), and the `$we
 
 for `prod: environment is "prod`. `x is not null` is written wrong too, because it could only fail: write `x exists`. So is a value that isn't a number before `within`, like `x is "a" within 1`. An object with both `assert` and `op` is read as a check with an `op`, so a [custom operator](#custom-operators) can still take `assert`.
 
-ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `and` between two assertions, `assert` as a list, `every`, `some`, `count of`, `sum of`, `plus`, `last of`, a `for` line, a value after `is before` and the other time phrases, a field of the subject after `is in`, `contains` and the other phrases that take a list, and a list path with `named by` in it. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `tickets: every tickets is not empty` gives:
+ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `every`, `some`, `count of`, `sum of`, `plus`, `last of`, a `for` line, a value after `is before` and the other time phrases, a field of the subject after `is in`, `contains` and the other phrases that take a list, and a list path with `named by` in it. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `tickets: every tickets is not empty` gives:
 
 ```json
 {"name": "checks.tickets", "value": ["every and some aren't supported yet"]}
@@ -1305,7 +1338,7 @@ When a check reads several fields, the row shows the first cause in this table's
 ]
 ```
 
-A violation of an `all` or `any` check keeps its row's `failed_items`.
+A violation of an `all` or `any` check keeps its row's `failed_items`, and one of a check written as several sentences its `failed_assertions`.
 
 It leaves out:
 

@@ -4311,5 +4311,59 @@
         ]
       }
     ]
+  },
+  {
+    "description": "assertions joined with and, and listed under assert",
+    "policy": {"subjects": {"pr": {"from": ["prs"], "id": ["id"]}}, "requirements": {"s": {"subject": "pr", "checks": {"line": "username does not equal author and ts is after last_commit", "list": {"description": "A peer approved after the last commit", "assert": ["username does not equal author", "ts is after last_commit"]}}}}},
+    "cases": [
+      {
+        "description": "passes when every assertion passes, with no failed assertions, and prints both forms the same way",
+        "rules": ["sentence.assert.list", "sentence.assert.and", "all_of.pass", "all_of.cause", "all_of.inputs", "all_of.failed_assertions", "sentence.print.order", "sentence.print.canonical"],
+        "input": {"prs": [{"id": "p1", "username": "bob", "author": "ann", "ts": "2026-10-02T00:00:00Z", "last_commit": "2026-10-01T00:00:00Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "pr", "id": "p1"}, "check": "line", "passed": true, "cause": "satisfied", "inputs": [{"name": "author", "value": "ann"}, {"name": "last_commit", "value": "2026-10-01T00:00:00Z"}, {"name": "ts", "value": "2026-10-02T00:00:00Z"}, {"name": "username", "value": "bob"}], "failed_assertions": []},
+          {"requirement": "s", "subject": {"type": "pr", "id": "p1"}, "check": "list", "passed": true, "cause": "satisfied", "inputs": [{"name": "author", "value": "ann"}, {"name": "last_commit", "value": "2026-10-01T00:00:00Z"}, {"name": "ts", "value": "2026-10-02T00:00:00Z"}, {"name": "username", "value": "bob"}], "failed_assertions": []}
+        ],
+        "expressions": {"s": {"line": "username does not equal author and ts is after last_commit", "list": "username does not equal author and ts is after last_commit"}}
+      },
+      {
+        "description": "fails as value and names the one assertion that failed",
+        "rules": ["sentence.assert.list", "sentence.assert.and", "all_of.pass", "all_of.cause", "all_of.inputs", "all_of.failed_assertions"],
+        "input": {"prs": [{"id": "p1", "username": "bob", "author": "ann", "ts": "2026-09-01T00:00:00Z", "last_commit": "2026-10-01T00:00:00Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "pr", "id": "p1"}, "check": "line", "passed": false, "cause": "value", "inputs": [{"name": "author", "value": "ann"}, {"name": "last_commit", "value": "2026-10-01T00:00:00Z"}, {"name": "ts", "value": "2026-09-01T00:00:00Z"}, {"name": "username", "value": "bob"}], "failed_assertions": [{"assertion": "ts is after last_commit", "cause": "value"}]},
+          {"requirement": "s", "subject": {"type": "pr", "id": "p1"}, "check": "list", "passed": false, "cause": "value", "inputs": [{"name": "author", "value": "ann"}, {"name": "last_commit", "value": "2026-10-01T00:00:00Z"}, {"name": "ts", "value": "2026-09-01T00:00:00Z"}, {"name": "username", "value": "bob"}], "failed_assertions": [{"assertion": "ts is after last_commit", "cause": "value"}]}
+        ]
+      },
+      {
+        "description": "takes the first cause among the assertions that failed, and lists each with its own",
+        "rules": ["sentence.assert.list", "sentence.assert.and", "all_of.pass", "all_of.cause", "all_of.inputs", "all_of.failed_assertions", "path.absent"],
+        "input": {"prs": [{"id": "p1", "username": "ann", "author": "ann", "last_commit": "2026-10-01T00:00:00Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "pr", "id": "p1"}, "check": "line", "passed": false, "cause": "absent", "inputs": [{"name": "author", "value": "ann"}, {"name": "last_commit", "value": "2026-10-01T00:00:00Z"}, {"name": "ts", "value": null}, {"name": "username", "value": "ann"}], "failed_assertions": [{"assertion": "username does not equal author", "cause": "value"}, {"assertion": "ts is after last_commit", "cause": "absent"}]},
+          {"requirement": "s", "subject": {"type": "pr", "id": "p1"}, "check": "list", "passed": false, "cause": "absent", "inputs": [{"name": "author", "value": "ann"}, {"name": "last_commit", "value": "2026-10-01T00:00:00Z"}, {"name": "ts", "value": null}, {"name": "username", "value": "ann"}], "failed_assertions": [{"assertion": "username does not equal author", "cause": "value"}, {"assertion": "ts is after last_commit", "cause": "absent"}]}
+        ],
+        "violations": [
+          {"requirement": "s", "subject": {"type": "pr", "id": "p1"}, "check": "line", "description": "", "expression": "username does not equal author and ts is after last_commit", "inputs": [{"name": "author", "value": "ann"}, {"name": "last_commit", "value": "2026-10-01T00:00:00Z"}, {"name": "ts", "value": null}, {"name": "username", "value": "ann"}], "cause": "absent", "failed_assertions": [{"assertion": "username does not equal author", "cause": "value"}, {"assertion": "ts is after last_commit", "cause": "absent"}]},
+          {"requirement": "s", "subject": {"type": "pr", "id": "p1"}, "check": "list", "description": "A peer approved after the last commit", "expression": "username does not equal author and ts is after last_commit", "inputs": [{"name": "author", "value": "ann"}, {"name": "last_commit", "value": "2026-10-01T00:00:00Z"}, {"name": "ts", "value": null}, {"name": "username", "value": "ann"}], "cause": "absent", "failed_assertions": [{"assertion": "username does not equal author", "cause": "value"}, {"assertion": "ts is after last_commit", "cause": "absent"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an assert list written wrong",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"empty": {"assert": []}, "line2": {"assert": ["x exists", "y is \"a"]}}}}},
+    "cases": [
+      {
+        "description": "says which line is written wrong, and that an empty list is",
+        "rules": ["sentence.check", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 2}, {"name": "require", "value": "every"}, {"name": "checks.empty", "value": ["empty assert"]}, {"name": "checks.line2", "value": ["line 2: unclosed quote at column 6"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "empty", "passed": false, "cause": "ill_formed", "inputs": []},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "line2", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
   }
 ]

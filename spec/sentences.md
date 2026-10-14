@@ -4,7 +4,7 @@ Draft 0.1, a proposal from [#174](https://github.com/kosli-dev/ergo/issues/174).
 
 [`sentences-corpus.md`](sentences-corpus.md) has every check from sdlc-policies, the server's demo and npm-bump policies, pr-reviewer, ergo's examples and Tore's DEV controls written both ways. Every sentence in it parses exactly one way with the phrases below. The phrases, the tally and the misfits come from it.
 
-`ergo.rego` runs a check written as one sentence that starts with a path, for every phrase. It doesn't run `and` between assertions, `assert` as a list, `every`, `some`, `count of`, `sum of`, `plus`, `last of`, `for` lines or `from` lines yet. Nor does it run a field of the subject after `contains`, `does not contain` or a phrase that takes a list, a list path with `named by` in it, or a value after a time phrase. A check that uses one of them is written wrong, with `isn't supported yet` in its message. `named by` a name, which a `for` line will give, is written wrong with `unknown name <name>`. A sentence can't be an `any_of` option or a substitute yet, and is written wrong there with `invalid check`.
+`ergo.rego` runs a check written as one or more sentences that start with a path, for every phrase, joined with `and` or listed under `assert`. It doesn't run `every`, `some`, `count of`, `sum of`, `plus`, `last of`, `for` lines or `from` lines yet. Nor does it run a field of the subject after `contains`, `does not contain` or a phrase that takes a list, a list path with `named by` in it, or a value after a time phrase. A check that uses one of them is written wrong, with `isn't supported yet` in its message. `named by` a name, which a `for` line will give, is written wrong with `unknown name <name>`. A sentence can't be an `any_of` option or a substitute yet, and is written wrong there with `invalid check`.
 
 ## The shape of a sentence
 
@@ -18,7 +18,7 @@ checks:
     assert: every commits.signed is true
 ```
 
-An object with `assert` and any other field but `op` is written wrong, with `unknown field <name>`, and an `assert` that isn't a string or a list is written wrong, with `invalid assert`. An object without `assert`, or with `op`, is a check in the syntax of [syntax.md](syntax.md), so a custom operator can still take a parameter called `assert`. The report's entry for a sentence check has its `description`, its `meta` and its `expression`, and `$refs` for each `$params` or `$input` path it reads after `named by`, after a phrase that takes a list, or after `contains` or `does not contain`.
+An object with `assert` and any other field but `op` is written wrong, with `unknown field <name>`, and an `assert` that isn't a string or a list of strings is written wrong, with `invalid assert`, or with `empty assert` for an empty list. A problem with one line of a list of two or more starts with the line's number, like `line 2: unclosed quote at column 6`. An object without `assert`, or with `op`, is a check in the syntax of [syntax.md](syntax.md), so a custom operator can still take a parameter called `assert`. The report's entry for a sentence check has its `description`, its `meta` and its `expression`, and `$refs` for each `$params` or `$input` path it reads after `named by`, after a phrase that takes a list, or after `contains` or `does not contain`.
 
 **[sentence.line]** A check, a filter, or one condition of a `whose`, is one line. It holds one assertion: a thing, then a phrase, then the phrase's arguments.
 
@@ -51,7 +51,7 @@ A check that walks two lists, or compares an item with its subject, puts the wal
 
 "Or" is an `any_of` in the policy around the sentence, because each option has a name and the report says which one passed. Every expression language gets asked for `or` and brackets, and the answer here is no.
 
-**[sentence.assert.list]** `assert` can be a list, or one line with `and` between assertions. Both mean the same: each assertion starts from the subject, or from the `for` names, whether it's on its own line or after an `and`, see [sentence.assert.and](#the-shape-of-a-sentence). The report shows the list form whichever was written, and its `expression` joins the lines with `and`, so a failed row can say which line failed:
+**[sentence.assert.list]** `assert` can be a list, or one line with `and` between assertions. Both mean the same: each assertion starts from the subject, or from the `for` names, whether it's on its own line or after an `and`, see [sentence.assert.and](#the-shape-of-a-sentence). The report shows the list form whichever was written, and its `expression` joins the lines with `and`, so a failed row can say which line failed. Its row is one row for the check, and says which ones failed in `failed_assertions`, see [all_of.failed_assertions](semantics.md#all_of):
 
 ```yaml
 peer_approval:

@@ -255,6 +255,18 @@ Every row has a cause. When a check reads several values, the row takes the firs
 
 **[any_of.no_failed_items]** An `any_of` row has no `failed_items`, even with an `all` or `any` inside it.
 
+## `all_of`
+
+`all_of` takes `checks`, a list of basic checks, and `assertions`, the text of each one. It's what a check written as several sentences reads into, joined with `and` or listed under `assert`, see [sentence.assert.list](sentences.md#the-shape-of-a-sentence), and today's syntax can't use it (see [sentence_ops.syntax](syntax.md#policies)). It's one check, with one row per subject, because its sentences say one thing together, and a policy that wants a row for each writes them as separate checks.
+
+**[all_of.pass]** It passes when every one of its checks passes.
+
+**[all_of.cause]** When it fails, its cause is the first, in the order of [causes](#causes), among the checks that failed.
+
+**[all_of.inputs]** The row shows every path any of its checks reads, once each, sorted by name.
+
+**[all_of.failed_assertions]** The row also has `failed_assertions`: one entry for each check that failed, in the order they were written, with its `assertion` and its own `cause`. It's `[]` when the check passes. When a ref one of them reads can't be used, that one is listed with cause `unusable` and the others with their own causes.
+
 ## Substitutes
 
 A check in `checks` or `applies_to` can have a substitute: another check that satisfies it when the first one fails. It's for other evidence that the same requirement was met, like an attestation from a verified committer standing in for the pull request a repository's first commit can't have.
@@ -344,4 +356,4 @@ Names are sorted by code point.
 
 ## Violations
 
-**[violations]** The violations of a report are its rows that are real problems, in the order of `results`, each with its check's `description` and `expression` added and its `$refs` added at the end of its `inputs`. A row of an `all` or `any` check keeps its `failed_items`. The violations leave out rows that passed, `$applies` rows that failed with `value`, and every row of a requirement that's `met` or `not_applicable`, so under `require: some` the subjects that failed aren't violations when another one passed. They're worked out from the report alone.
+**[violations]** The violations of a report are its rows that are real problems, in the order of `results`, each with its check's `description` and `expression` added and its `$refs` added at the end of its `inputs`. A row of an `all` or `any` check keeps its `failed_items`, and a row of an `all_of` check its `failed_assertions`. The violations leave out rows that passed, `$applies` rows that failed with `value`, and every row of a requirement that's `met` or `not_applicable`, so under `require: some` the subjects that failed aren't violations when another one passed. They're worked out from the report alone.
