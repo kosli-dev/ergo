@@ -90,6 +90,16 @@
             "required": ["path", "cause", "value"],
             "additionalProperties": false
           }
+        },
+        "failed_assertions": {
+          "type": "array",
+          "description": "Only on rows of checks written as several sentences: the ones that failed, in the order written.",
+          "items": {
+            "type": "object",
+            "properties": {"assertion": {"type": "string"}, "cause": {"$ref": "#/$defs/cause"}},
+            "required": ["assertion", "cause"],
+            "additionalProperties": false
+          }
         }
       },
       "required": ["requirement", "subject", "check", "inputs", "passed", "cause"],

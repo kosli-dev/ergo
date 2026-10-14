@@ -8181,7 +8181,6 @@ test_an_assert_object_takes_only_description_and_meta if {
 
 test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
 	every pair in [
-		[`x exists and y exists`, `"and" between assertions isn't supported yet`],
 		[`every xs is 1`, "every and some aren't supported yet"],
 		[`count of xs is 1`, "count of, sum of and plus aren't supported yet"],
 		[`x is y plus 1`, "count of, sum of and plus aren't supported yet"],
@@ -8194,7 +8193,10 @@ test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
 	] {
 		_sentence_problems(pair[0]) == [pair[1]]
 	}
-	_sentence_problems({"assert": ["x exists"]}) == ["assert as a list isn't supported yet"]
+	_sentence_problems({"assert": []}) == ["empty assert"]
+	_sentence_problems({"assert": ["x exists", 1]}) == ["invalid assert"]
+	_sentence_problems({"assert": ["x exists", "y is \"a"]}) == ["line 2: unclosed quote at column 6"]
+	_sentence_problems({"assert": ["x exists", "every ys is 1"]}) == ["line 2: every and some aren't supported yet"]
 	_sentence_problems({"assert": "x exists", "for": "every xs as x"}) == [`"for" isn't supported yet`]
 }
 
@@ -8479,4 +8481,46 @@ test_an_op_that_is_a_list_is_only_an_unknown_op_because_a_list_would_be_read_as_
 		r.results[0].inputs[2] == {"name": "checks.c", "value": [pair[1]]}
 		[row.cause | some row in r.results; row.check == "c"] == ["ill_formed"]
 	}
+}
+
+test_assertions_joined_with_and_or_listed_under_assert_give_one_row_that_names_the_ones_that_failed if {
+	doc := {"prs": [{"id": "late", "username": "bob", "author": "ann", "ts": 1, "last_commit": 2}, {"id": "gone", "username": "ann", "author": "ann", "last_commit": 2}]}
+	policy := {"subjects": {"pr": {"from": ["prs"], "id": ["id"]}}, "requirements": {"s": {"subject": "pr", "checks": {
+		"line": "username does not equal author and ts is after last_commit",
+		"list": {"assert": ["username does not equal author", "ts is after last_commit"]},
+	}}}}
+	r := ergo.report(doc, policy, {})
+	r.requirements.s.checks.list.expression == "username does not equal author and ts is after last_commit"
+	rows := [[row.subject.id, row.check, row.cause, row.failed_assertions] | some row in r.results; row.check in {"line", "list"}]
+	rows == [
+		["late", "line", "value", [{"assertion": "ts is after last_commit", "cause": "value"}]],
+		["late", "list", "value", [{"assertion": "ts is after last_commit", "cause": "value"}]],
+		["gone", "line", "absent", [{"assertion": "username does not equal author", "cause": "value"}, {"assertion": "ts is after last_commit", "cause": "absent"}]],
+		["gone", "list", "absent", [{"assertion": "username does not equal author", "cause": "value"}, {"assertion": "ts is after last_commit", "cause": "absent"}]],
+	]
+	[v.failed_assertions | some v in ergo.violations(r); v.check == "list"][0] == [{"assertion": "ts is after last_commit", "cause": "value"}]
+}
+
+test_a_check_with_several_assertions_that_passes_has_no_failed_assertions_and_reads_every_input_once if {
+	r := ergo.report({"things": [{"id": "a", "x": 1, "y": 2}]}, _sentence_policy({"c": "x is 1 and y is 2 and x is at least 1"}), {})
+	[[row.cause, row.failed_assertions, row.inputs] | some row in r.results; row.check == "c"] == [["satisfied", [], [{"name": "x", "value": 1}, {"name": "y", "value": 2}]]]
+}
+
+test_all_of_is_an_unknown_op_in_todays_syntax if {
+	_sentence_problems({"op": "all_of", "checks": [{"op": "present", "path": ["x"]}], "assertions": ["x exists"]}) == ["unknown op all_of"]
+}
+
+test_an_assertion_whose_param_cant_be_read_is_the_only_one_listed_as_unusable if {
+	r := ergo.report({"things": [{"id": "a", "x": "p", "y": 1}]}, _sentence_policy({"c": "x is in $params.l and y exists and y is 2"}), {"l": "text"})
+	[[row.cause, row.failed_assertions] | some row in r.results; row.check == "c"] == [["unusable", [{"assertion": "x is in $params.l", "cause": "unusable"}, {"assertion": "y is 2", "cause": "value"}]]]
+}
+
+test_an_all_of_written_wrong_still_lists_every_assertion_so_its_row_never_goes_missing if {
+	check := {"op": "all_of", "checks": [{"op": "present", "path": ["x"]}, {"op": "present", "path": ["y"]}], "assertions": ["x exists", "y exists"]}
+	ergo._failed_assertions(check, {}, "ill_formed") == [{"assertion": "x exists", "cause": "ill_formed"}, {"assertion": "y exists", "cause": "ill_formed"}]
+}
+
+test_every_assertion_is_unusable_when_the_input_holds_something_json_cant if {
+	r := ergo.report({"things": [{"id": "a", "x": 1, "s": {1}}]}, _sentence_policy({"c": "x is 1 and x exists"}), {})
+	[[row.cause, row.failed_assertions] | some row in r.results; row.check == "c"] == [["unusable", [{"assertion": "x is 1", "cause": "unusable"}, {"assertion": "x exists", "cause": "unusable"}]]]
 }

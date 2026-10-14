@@ -131,7 +131,18 @@
           "type": "object",
           "properties": {
             "assert": {
-              "type": "string"
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 1
+                }
+              ]
             },
             "description": {
               "type": [

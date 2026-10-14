@@ -51,8 +51,6 @@ Every rule needs a case, apart from the ones listed here. The `sentence` rules h
 - `compare.derived`
 - `sentence.forms`
 - `sentence.flat`
-- `sentence.assert.list`
-- `sentence.assert.and`
 - `sentence.path.keys`
 - `sentence.subject.from`
 - `sentence.subject.condition`
@@ -84,4 +82,3 @@ Every rule needs a case, apart from the ones listed here. The `sentence` rules h
 - `sentence.for.comma`
 - `sentence.for.assert`
 - `sentence.derived.fail`
-- `sentence.print.order`

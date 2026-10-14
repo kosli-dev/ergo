@@ -678,7 +678,41 @@ _check_outcome(check, subj, flaw, item) := object.union(
 		"cause": _row_cause(check, subj, flaw),
 	},
 	_failed_items_field(check, subj, flaw, item),
-)
+) if not _all_of(check)
+
+_all_of(check) if check.op == "all_of"
+
+_check_outcome(check, subj, flaw, item) := {
+	"inputs": [{"name": pair[0], "value": pair[1]} | some pair in sort({[i.name, i.value] | some c in check.checks; some i in _row_inputs(subj, c, item)})],
+	"passed": count(failed) == 0,
+	"cause": _all_of_cause(failed),
+	"failed_assertions": failed,
+} if {
+	_all_of(check)
+	failed := _failed_assertions(check, subj, flaw)
+}
+
+_failed_assertions(check, subj, flaw) := [{"assertion": check.assertions[i], "cause": cause} |
+	some i, c in check.checks
+	cause := _assertion_cause(c, subj, flaw)
+	cause != "satisfied"
+]
+
+_assertion_cause(c, subj, "") := _row_cause(c, subj, "")
+
+_assertion_cause(_, _, "ill_formed") := "ill_formed"
+
+_assertion_cause(c, subj, "unusable") := "unusable" if {
+	_unusable_assertion(c)
+} else := _row_cause(c, subj, "")
+
+_unusable_assertion(_) if _unreadable_input
+
+_unusable_assertion(c) if _node_param_broken(c)
+
+_all_of_cause([]) := "satisfied"
+
+_all_of_cause(failed) := [c | some c in array.concat(_cause_precedence, ["value"]); c in {f.cause | some f in failed}][0] if failed != []
 
 _failed_items_field(check, subj, flaw, item) := {"failed_items": _failed_items(subj, check, flaw, item)} if _quantified(check)
 
@@ -1755,6 +1789,7 @@ _required_fields := {
 	"empty_string_or_list": {"path"},
 	"not_in": {"path", "values"},
 	"has_type": {"path", "type"},
+	"all_of": {"checks", "assertions"},
 	"not_empty_string_or_list": {"path"},
 	"matches_any": {"path", "patterns"},
 	"not_matches_any": {"path", "patterns"},
@@ -1813,7 +1848,14 @@ _too_deep(node, kinds) if {
 	not node.op in _allowed_ops(kinds)
 }
 
-_children(node, names) := array.concat(array.concat(_inner_child(node, names), _option_children(node, names)), _where_children(node, names))
+_children(node, names) := array.concat(array.concat(array.concat(_inner_child(node, names), _option_children(node, names)), _where_children(node, names)), _assertion_children(node, names))
+
+default _assertion_children(_, _) := []
+
+_assertion_children(node, names) := [[c, ["checks", i], "assertion", names] | some i, c in node.checks] if {
+	node.op == "all_of"
+	is_array(node.checks)
+}
 
 default _inner_child(_, _) := []
 
@@ -1849,7 +1891,7 @@ _op_problems(node, _) := {concat("", ["unknown op ", _text(node.op)])} if {
 	not _sentence_op(node)
 }
 
-_sentence_ops := {"empty_string_or_list", "not_empty_string_or_list", "not_in", "has_type"}
+_sentence_ops := {"empty_string_or_list", "not_empty_string_or_list", "not_in", "has_type", "all_of"}
 
 _sentence_op(node) if {
 	node.op in _sentence_ops
@@ -1872,6 +1914,7 @@ _nested_ops := {
 	"option": [(_leaf_ops | {"all", "any"}), (_leaf_ops | {"all", "any"}), _leaf_ops],
 	"check": [set(), (_leaf_ops | {"all", "any", "any_of"}), (_leaf_ops | {"any_of"})],
 	"where": [_leaf_ops],
+	"assertion": [_leaf_ops],
 }
 
 _field_problems(node) := union({_side_problem(node), _within_problem(node), _wording_problem(node), _unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node), _json_problem(node)})
@@ -3821,7 +3864,7 @@ violations(report) := [object.union(
 		"inputs": array.concat(row.inputs, _recorded_refs(report.requirements, row)),
 		"cause": row.cause,
 	},
-	_failed_items_of(row),
+	object.union(_failed_items_of(row), _failed_assertions_of(row)),
 ) |
 	some row in report.results
 	_is_violation(report.requirements, row)
@@ -3830,6 +3873,10 @@ violations(report) := [object.union(
 _failed_items_of(row) := {"failed_items": row.failed_items} if "failed_items" in object.keys(row)
 
 _failed_items_of(row) := {} if not "failed_items" in object.keys(row)
+
+_failed_assertions_of(row) := {"failed_assertions": row.failed_assertions} if "failed_assertions" in object.keys(row)
+
+_failed_assertions_of(row) := {} if not "failed_assertions" in object.keys(row)
 
 default _recorded_refs(_, _) := []
 
@@ -4853,9 +4900,13 @@ _s_requirement(req) := object.union(object.remove(req, ["checks"]), {"checks": {
 	is_object(object.get(req, "checks", null))
 } else := req
 
-_s_written_check(check) := _s_check(check, {}, set()) if is_string(check)
+_s_written_check(check) := _s_check([check], {}, set()) if is_string(check)
 
-_s_written_check(check) := _s_check(object.get(check, "assert", null), object.filter(check, {"description", "meta"}), _s_form_problems(check)) if _s_assert_form(check)
+_s_written_check(check) := _s_check(_s_lines(check.assert), object.filter(check, {"description", "meta"}), _s_form_problems(check)) if _s_assert_form(check)
+
+_s_lines(a) := a if is_array(a)
+
+_s_lines(a) := [a] if not is_array(a)
 
 _s_written_check(check) := check if not _s_written_as_sentence(check)
 
@@ -4888,20 +4939,42 @@ _s_field_problem(f) := concat("", ["unknown field ", _text(f)]) if f != "for"
 
 _s_assert_problem(a) := set() if is_string(a)
 
-_s_assert_problem(a) := {"assert as a list isn't supported yet"} if is_array(a)
+_s_assert_problem(a) := {"empty assert"} if a == []
+
+_s_assert_problem(a) := {"invalid assert" | some line in a; not is_string(line)} if {
+	is_array(a)
+	a != []
+}
 
 _s_assert_problem(a) := {"invalid assert"} if {
 	not is_string(a)
 	not is_array(a)
 }
 
-_s_check(text, wording, problems) := object.union(wording, object.union(model, {"expression": _s_check_text(parsed)})) if {
+_s_check(lines, wording, problems) := object.union(wording, object.union(model, {"expression": _s_check_text({"assertions": assertions})})) if {
 	count(problems) == 0
-	parsed := _sentence(text)
-	"assertions" in object.keys(parsed)
-	count(_s_unsupported(parsed)) == 0
-	model := _s_model(parsed.assertions[0])
-} else := object.union(wording, {"expression": _s_written_text(text), "$sentence": sort(_s_or_unrunnable(problems | _s_unread_problems(text)))})
+	parsed := [_sentence(line) | some line in lines]
+	every p in parsed {
+		"assertions" in object.keys(p)
+	}
+	assertions := [a | some p in parsed; some a in p.assertions]
+	count({u | some a in assertions; some u in _s_assertion_unsupported(a)}) == 0
+	model := _s_model_of(assertions)
+} else := object.union(wording, {"expression": concat(" and ", [_s_written_text(line) | some line in lines]), "$sentence": sort(_s_or_unrunnable(problems | _s_lines_problems(lines)))})
+
+_s_model_of([a]) := _s_model(a)
+
+_s_model_of(assertions) := {"op": "all_of", "checks": models, "assertions": [_s_assertion_text(a) | some a in assertions]} if {
+	count(assertions) > 1
+	models := [_s_model(a) | some a in assertions]
+	count(models) == count(assertions)
+}
+
+_s_lines_problems([line]) := _s_unread_problems(line)
+
+_s_lines_problems(lines) := {concat("", ["line ", _literal_text(i + 1), ": ", p]) | some i, line in lines; some p in _s_unread_problems(line)} if count(lines) > 1
+
+_s_lines_problems([]) := set()
 
 _s_or_unrunnable(problems) := problems if count(problems) > 0
 
@@ -4936,9 +5009,7 @@ _s_written_here(_, "applies_to", _) := false
 
 _s_unsupported(parsed) := set() if not "assertions" in object.keys(parsed)
 
-_s_unsupported(parsed) := {`"and" between assertions isn't supported yet`} if count(parsed.assertions) > 1
-
-_s_unsupported(parsed) := _s_assertion_unsupported(parsed.assertions[0]) if count(parsed.assertions) == 1
+_s_unsupported(parsed) := {u | some a in parsed.assertions; some u in _s_assertion_unsupported(a)} if "assertions" in object.keys(parsed)
 
 _s_assertion_unsupported(a) := {"every and some aren't supported yet"} if object.keys(a) & {"every", "some"} != set()
 
