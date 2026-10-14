@@ -8185,8 +8185,6 @@ test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
 		[`every xs is 1`, "every and some aren't supported yet"],
 		[`count of xs is 1`, "count of, sum of and plus aren't supported yet"],
 		[`x is y plus 1`, "count of, sum of and plus aren't supported yet"],
-		[`x is not one of "a"`, `"is not one of" isn't supported yet`],
-		[`x is not in $params.a`, `"is not in" isn't supported yet`],
 		[`x is an object`, `"is an object" isn't supported yet`],
 		[`x starts with "a"`, `"starts with" isn't supported yet`],
 		[`x ends with y`, `"ends with" isn't supported yet`],
@@ -8414,4 +8412,25 @@ test_a_phrase_lists_its_longer_wording_first_because_finding_a_phrase_never_goes
 	every ph in ergo._s_patterns.phrases {
 		ph[1] != `(?:is|is +equal +to|equals) +`
 	}
+}
+
+test_is_not_one_of_passes_on_any_value_that_is_there_and_not_listed_a_value_of_another_type_included if {
+	doc := {"things": [{"id": "a", "x": "dev"}, {"id": "b", "x": "prod"}, {"id": "c", "x": 5}, {"id": "d", "x": null}, {"id": "e"}]}
+	[[r[0], r[2]] | some r in _sentence_rows({"v": `x is not one of "prod", "staging"`, "p": "x is not in $params.blocked"}, doc, {"blocked": ["prod"]})] == [
+		["p", "satisfied"], ["v", "satisfied"],
+		["p", "value"], ["v", "value"],
+		["p", "satisfied"], ["v", "satisfied"],
+		["p", "null"], ["v", "null"],
+		["p", "absent"], ["v", "absent"],
+	]
+}
+
+test_is_not_in_a_list_read_from_the_params_fails_when_the_params_dont_hold_a_list if {
+	doc := {"things": [{"id": "a", "x": "dev"}]}
+	checks := {"e": "x is not in $params.empty", "m": "x is not in $params.none", "t": "x is not in $params.text"}
+	[[r[0], r[2]] | some r in _sentence_rows(checks, doc, {"empty": [], "text": "prod"})] == [["e", "satisfied"], ["m", "absent"], ["t", "unusable"]]
+}
+
+test_not_in_is_an_unknown_op_in_todays_syntax if {
+	_sentence_problems({"op": "not_in", "path": ["x"], "values": ["a"]}) == ["unknown op not_in"]
 }

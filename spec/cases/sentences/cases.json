@@ -3899,5 +3899,159 @@
         ]
       }
     ]
+  },
+  {
+    "description": "is not one of values",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not one of \"prod\", \"staging\""}}}},
+    "cases": [
+      {
+        "description": "passes on a value that isn't listed",
+        "rules": ["sentence.phrase.one_of", "not_in.pass", "path.inputs"],
+        "input": {"things": [{"id": "t1", "x": "dev"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "dev"}]}
+        ],
+        "expressions": {"s": {"c": "x is not one of \"prod\", \"staging\""}}
+      },
+      {
+        "description": "passes on a value of another type, since 5 isn't one of two strings",
+        "rules": ["sentence.phrase.one_of", "not_in.pass"],
+        "input": {"things": [{"id": "t1", "x": 5}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 5}]}
+        ]
+      },
+      {
+        "description": "fails as value on a listed value",
+        "rules": ["sentence.phrase.one_of", "not_in.fail"],
+        "input": {"things": [{"id": "t1", "x": "prod"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "prod"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.one_of", "not_in.fail", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["sentence.phrase.one_of", "not_in.fail", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is not in a list from the params",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not in $params.blocked"}}}},
+    "params": {"blocked": ["prod"]},
+    "cases": [
+      {
+        "description": "passes on a value the list doesn't hold, and records the list",
+        "rules": ["sentence.phrase.one_of", "not_in.pass", "value.refs"],
+        "input": {"things": [{"id": "t1", "x": "dev"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "dev"}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$params.blocked", "value": ["prod"]}]}}
+      },
+      {
+        "description": "fails as value on a value the list holds",
+        "rules": ["sentence.phrase.one_of", "not_in.fail"],
+        "input": {"things": [{"id": "t1", "x": "prod"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "prod"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is not in a list from the params that isn't a list",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not in $params.blocked"}}}},
+    "params": {"blocked": "prod"},
+    "cases": [
+      {
+        "description": "fails as unusable",
+        "rules": ["sentence.phrase.one_of", "not_in.fail"],
+        "input": {"things": [{"id": "t1", "x": "dev"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "dev"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is not in an empty list from the params",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not in $params.blocked"}}}},
+    "params": {"blocked": []},
+    "cases": [
+      {
+        "description": "passes, since the field is none of no values",
+        "rules": ["sentence.phrase.one_of", "not_in.pass"],
+        "input": {"things": [{"id": "t1", "x": "dev"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "dev"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is not in a param that's missing",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not in $params.blocked"}}}},
+    "params": {"other": 1},
+    "cases": [
+      {
+        "description": "fails as absent, whatever the field holds",
+        "rules": ["sentence.phrase.one_of", "not_in.fail", "value.ref"],
+        "input": {"things": [{"id": "t1", "x": "dev"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": "dev"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is not in a param that's null",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not in $params.blocked"}}}},
+    "params": {"blocked": null},
+    "cases": [
+      {
+        "description": "fails as null, whatever the field holds",
+        "rules": ["sentence.phrase.one_of", "not_in.fail", "value.ref"],
+        "input": {"things": [{"id": "t1", "x": "dev"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": "dev"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is not in a list of strings, on a field that's a list or an object",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not in $params.blocked"}}}},
+    "params": {"blocked": ["prod"]},
+    "cases": [
+      {
+        "description": "passes on a list, which isn't one of the strings",
+        "rules": ["sentence.phrase.one_of", "not_in.pass"],
+        "input": {"things": [{"id": "t1", "x": ["prod"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["prod"]}]}
+        ]
+      },
+      {
+        "description": "passes on an object",
+        "rules": ["sentence.phrase.one_of", "not_in.pass"],
+        "input": {"things": [{"id": "t1", "x": {"a": 1}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": {"a": 1}}]}
+        ]
+      }
+    ]
   }
 ]

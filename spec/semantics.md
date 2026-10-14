@@ -125,6 +125,14 @@ Every row has a cause. When a check reads several values, the row takes the firs
 
 **[in.fail]** It fails with the path's outcome as its cause when the path ends anything but `found`, so a missing or `null` field fails even when the values hold `null`. When the field was read, it fails with `value`, an empty list of values included.
 
+## `not_in`
+
+`not_in` takes a path and a list of values, written like the values of [`in`](#in), and asks whether the field is none of them. It's what the sentences `is not one of` and `is not in` read into, see [sentence.phrase.one_of](sentences.md#phrases), and today's syntax can't use it (see [sentence_ops.syntax](syntax.md#policies)).
+
+**[not_in.pass]** It passes when its path ends `found` and the value read [equals](#values) none of the values. So a value of another type passes, since `5` isn't one of `"prod"` and `"staging"`, and so does any value when the list is empty.
+
+**[not_in.fail]** It fails with the path's outcome as its cause when the path ends anything but `found`, so a missing or `null` field fails even when the values hold `null`. When a ref reads something other than a list, it fails as `unusable`, as `in` does. When the field equals one of the values, it fails with `value`.
+
 ## `non_empty_string`
 
 `non_empty_string` takes a path and asks whether the field is a string with something in it.
