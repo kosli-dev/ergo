@@ -8472,3 +8472,11 @@ test_a_written_value_after_starts_with_that_isnt_text_is_written_wrong_because_i
 		_sentence_problems(pair[0]) == [pair[1]]
 	}
 }
+
+test_an_op_that_is_a_list_is_only_an_unknown_op_because_a_list_would_be_read_as_a_path_into_the_table_of_operators if {
+	every pair in [[[], "unknown op []"], [["range"], `unknown op ["range"]`], [{"a": 1}, `unknown op {"a": 1}`]] {
+		r := ergo.report({"things": [{"id": "t1", "x": 1}]}, _sentence_policy({"c": {"op": pair[0], "path": ["x"]}}), {})
+		r.results[0].inputs[2] == {"name": "checks.c", "value": [pair[1]]}
+		[row.cause | some row in r.results; row.check == "c"] == ["ill_formed"]
+	}
+}

@@ -215,5 +215,20 @@
         "expressions": {"s": {"c": "x is present, or substitute: n is even"}}
       }
     ]
+  },
+  {
+    "description": "an op that isn't a string",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": ["range"], "path": ["x"]}}}}},
+    "cases": [
+      {
+        "description": "is an unknown op and nothing else, though a list names an operator's entry in the table of operators",
+        "rules": ["custom.unknown", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["unknown op [\"range\"]"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": 1}]}
+        ]
+      }
+    ]
   }
 ]
