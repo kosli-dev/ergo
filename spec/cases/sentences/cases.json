@@ -4258,5 +4258,58 @@
         ]
       }
     ]
+  },
+  {
+    "description": "starts with a field on the right",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"f": "x starts with p"}}}},
+    "cases": [
+      {
+        "description": "fails as null when the field on the right is null",
+        "rules": ["sentence.phrase.starts", "compare.text", "compare.fail"],
+        "input": {"things": [{"id": "t1", "x": "ab", "p": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "f", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": "ab"}, {"name": "p", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field on the right is missing",
+        "rules": ["sentence.phrase.starts", "compare.text", "compare.fail"],
+        "input": {"things": [{"id": "t1", "x": "ab"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "f", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": "ab"}, {"name": "p", "value": null}]}
+        ]
+      },
+      {
+        "description": "passes on an empty string on the right",
+        "rules": ["sentence.phrase.starts", "compare.text"],
+        "input": {"things": [{"id": "t1", "x": "ab", "p": ""}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "f", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "ab"}, {"name": "p", "value": ""}]}
+        ]
+      },
+      {
+        "description": "fails as value when the right side is longer",
+        "rules": ["sentence.phrase.starts", "compare.text"],
+        "input": {"things": [{"id": "t1", "x": "ab", "p": "abc"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "f", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "ab"}, {"name": "p", "value": "abc"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "starts with a written value that isn't text",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x starts with null"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, because it could only fail",
+        "rules": ["sentence.phrase.starts", "sentence.written_wrong.slot", "written_wrong"],
+        "input": {"things": [{"id": "t1", "x": "ab"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["\"starts with\" takes text"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
   }
 ]

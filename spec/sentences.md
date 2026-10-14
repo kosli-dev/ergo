@@ -306,7 +306,7 @@ The field is a string that matches at least one of the regular expressions, or n
 <path> ends with <value or field>
 ```
 
-New, and unused in the corpus. Both sides are strings. Missing: `absent`. `null`: `null`. Not a string: `unusable`.
+New, and unused in the corpus. Both sides are strings, and a written value that isn't one is written wrong, with `"starts with" takes text`, because the check could only fail. Missing: `absent`. `null`: `null`. Not a string: `unusable`.
 
 **[sentence.phrase.order]**
 ```

@@ -8461,3 +8461,14 @@ test_starts_with_is_an_invalid_cmp_in_todays_syntax_even_when_it_copies_a_senten
 	r := ergo.report({"things": [{"id": "t1", "x": "ab", "xs": ["ab"]}]}, _sentence_policy({"a": `x starts with "a"`, "b": {"op": "all", "path": ["xs"], "check": object.union(copy, {"left": []})}}), {})
 	[row.cause | some row in r.results; row.check in {"a", "b"}] == ["satisfied", "ill_formed"]
 }
+
+test_starts_with_only_ever_compares_two_strings_even_through_leaf_passed if {
+	not ergo.leaf_passed({"op": "compare_time", "left": ["n"], "cmp": "starts_with", "right": ["m"]}, {"n": 15, "m": 1})
+	not ergo.leaf_passed({"op": "compare_time", "left": ["n"], "cmp": "ends_with", "right": ["m"]}, {"n": 15, "m": 1})
+}
+
+test_a_written_value_after_starts_with_that_isnt_text_is_written_wrong_because_it_could_only_fail if {
+	every pair in [[`x starts with null`, `"starts with" takes text`], [`x ends with 1`, `"ends with" takes text`], [`x starts with true`, `"starts with" takes text`]] {
+		_sentence_problems(pair[0]) == [pair[1]]
+	}
+}

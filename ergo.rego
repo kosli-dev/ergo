@@ -1726,9 +1726,17 @@ _cmp("lt", l, r) if l < r
 
 _cmp("lte", l, r) if l <= r
 
-_cmp("starts_with", l, r) if startswith(l, r)
+_cmp("starts_with", l, r) if {
+	is_string(l)
+	is_string(r)
+	startswith(l, r)
+}
 
-_cmp("ends_with", l, r) if endswith(l, r)
+_cmp("ends_with", l, r) if {
+	is_string(l)
+	is_string(r)
+	endswith(l, r)
+}
 
 _leaf_ops := {"range", "excludes", "includes", "in", "equals", "present", "missing", "non_empty_string", "empty", "matches_any", "not_matches_any", "compare", "compare_time"}
 
@@ -4501,7 +4509,7 @@ _s_sq_char(`\\`) := `\`
 
 _s_sq_char(c) := c if not c in {`\'`, `\\`}
 
-_s_sentence_problems(parsed) := (((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
+_s_sentence_problems(parsed) := ((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"bare_word" in object.keys(node)
@@ -4564,6 +4572,12 @@ _s_sentence_problems(parsed) := (((((((((((({concat("", [node.bare_word, " is a 
 	node.op == "is not"
 	"value" in object.keys(node)
 	node.value == null
+}) | {concat("", [`"`, node.op, `" takes text`]) |
+	some node in _s_nodes(parsed)
+	is_object(node)
+	node.op in {"starts with", "ends with"}
+	"value" in object.keys(node)
+	not is_string(node.value)
 }) | {`"within" only compares numbers` |
 	some node in _s_nodes(parsed)
 	is_object(node)
