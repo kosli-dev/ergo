@@ -145,9 +145,9 @@ Every row has a cause. When a check reads several values, the row takes the firs
 
 `empty_string_or_list` takes a path and asks whether the field is `""` or `[]`. `not_empty_string_or_list` asks whether it's a string or a list with something in it. They're what the sentences `is empty` and `is not empty` read into, see [sentence.phrase.empty](sentences.md#phrases), and today's syntax can't use them (see [sentence_ops.syntax](syntax.md#policies)).
 
-**[string_or_list.pass]** `empty_string_or_list` passes when its path ends `found` and the value is `""` or `[]`. `not_empty_string_or_list` passes when its path ends `found` and the value is a string with at least one character or a list with at least one item.
+**[empty_string_or_list.pass]** `empty_string_or_list` passes when its path ends `found` and the value is `""` or `[]`. `not_empty_string_or_list` passes when its path ends `found` and the value is a string with at least one character or a list with at least one item.
 
-**[string_or_list.fail]** Both fail with the path's outcome as their cause when the path ends anything but `found`. A value that's neither a string nor a list, like a number, a boolean or an object, fails with `unusable`. Otherwise they fail with `value`.
+**[empty_string_or_list.fail]** Both fail with the path's outcome as their cause when the path ends anything but `found`. A value that's neither a string nor a list, like a number, a boolean or an object, fails with `unusable`. Otherwise they fail with `value`.
 
 ## `range`
 

@@ -986,7 +986,7 @@ A substitute with a wrong path looks just like a substitute whose evidence is mi
 
 ## Custom operators
 
-When the built-in operators can't express a check, you can write your own. Add an `op_passed` rule to the `ergo` package from a file of your own:
+When the built-in operators can't express a check, you can write your own. Don't name one after a built-in operator, or after `empty_string_or_list` or `not_empty_string_or_list`, which ergo keeps for [sentences](#checks-written-as-sentences). Add an `op_passed` rule to the `ergo` package from a file of your own:
 
 ```rego
 package ergo

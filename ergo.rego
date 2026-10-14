@@ -1606,7 +1606,7 @@ _unusable(leaf, x) if {
 }
 
 _unusable(leaf, x) if {
-	leaf.op in _sentence_ops
+	leaf.op in {"empty_string_or_list", "not_empty_string_or_list"}
 	v := _found(x, leaf.path)
 	not _string_or_list(v)
 }
@@ -3396,7 +3396,8 @@ _check_problem_inputs(req) := [{"name": name, "value": sort({p[1] | some p in pr
 	problems := {[_field_path_name(array.concat(_checks_at(req, f, n), p[0])), p[1]] |
 		some f in ["applies_to", "checks"]
 		some n, check in _req_checks(req, f)
-		some p in _check_problems(check, _from_names(req))
+		found := _check_problems(check, _from_names(req)) with data.ergo_sentence_here as _s_written_here(req, f, n)
+		some p in found
 	}
 }
 
@@ -3455,7 +3456,10 @@ _requirement_check_defs(req) := {name: object.union({"meta": {}}, def) | some na
 
 _requirement_checks_written_or_added(req) := object.union(
 	object.union(
-		{name: _check_def(check, _subject_item_name(req)) | some name, check in _checks_of(req)},
+		{name: def |
+			some name, check in _checks_of(req)
+			def := _check_def(check, _subject_item_name(req)) with data.ergo_sentence_here as _s_written_here(req, "checks", name)
+		},
 		object.union(_min_subjects_def(req), _unique_ids_def(req)),
 	),
 	object.union(_applies_def(req), _well_formed_def),
@@ -3590,7 +3594,10 @@ _evaluation(doc, req, name) := {
 	raw := _raw_entries(doc, req)
 	names := _from_names(req)
 	filter_flaws := {n: _flaw(check, names) | some n, check in _applies_to_of(req)}
-	check_flaws := {n: _flaw(check, names) | some n, check in _checks_of(req)}
+	check_flaws := {n: flaw |
+		some n, check in _checks_of(req)
+		flaw := _flaw(check, names) with data.ergo_sentence_here as _s_written_here(req, "checks", n)
+	}
 	item := _subject_item_name(req)
 	refs := {i: _entry_ref(entry, req) | some i, entry in raw}
 	matches := {i: _subject_matches(entry.subject, req, filter_flaws) | some i, entry in raw}
@@ -4803,7 +4810,7 @@ _s_assert_form(check) if {
 	not "op" in object.keys(check)
 }
 
-_s_sentences(raw, reqs) := {reqs[name].checks[c] |
+_s_sentences(raw, reqs) := {[reqs[name], c] |
 	some name, req in raw
 	is_object(req)
 	checks := object.get(req, "checks", {})
@@ -4857,7 +4864,16 @@ _s_unread(node) if {
 	count(object.get(node, "$sentence", [])) > 0
 }
 
-_s_read(check) if check in data.ergo_sentences
+_s_read(node) if {
+	is_object(node)
+	data.ergo_sentence_here == true
+}
+
+_s_written_here(req, "checks", n) if {
+	[req, n] in data.ergo_sentences
+} else := false
+
+_s_written_here(_, "applies_to", _) := false
 
 _s_unsupported(parsed) := set() if not "assertions" in object.keys(parsed)
 
