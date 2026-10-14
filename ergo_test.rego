@@ -6751,7 +6751,7 @@ test_a_present_filter_with_a_substitute_ordering_numbers_still_rules_subjects_ou
 
 one_item := {"items": [{"id": 1}]}
 
-test_a_policy_that_is_not_an_object_is_not_compliant if {
+test_requirements_written_as_a_number_are_not_compliant if {
 	report(one_item, 5).compliant == false
 }
 
