@@ -37,7 +37,7 @@ const builtinsOf = (policy) => {
   return Object.keys(JSON.parse(Buffer.from(memory.slice(start, memory.indexOf(0, start))).toString()));
 };
 
-Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(([policy, ergo]) => {
+Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([policy, ergo]) => {
   const outside = builtinsOf(ergo).filter((b) => b !== "time.parse_rfc3339_ns");
   if (outside.length > 0) {
     console.error(`ergo uses built-ins that OPA's Wasm build runs outside the module: ${outside.join(", ")}`);
@@ -63,7 +63,6 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(([policy, e
   failed.forEach((test) => console.error(`FAIL ${test}`));
   console.log(`PASS: ${tests.length - failed.length}/${tests.length} with the Wasm JS runtime`);
 
-  const budgetMB = 20;
   const document = { deployments: Array.from({ length: 100 }, (_, i) => ({ id: `d-${i}`, environment: i % 3 ? "prod" : "staging", ...(i % 2 ? { approved_by: "a" } : {}), tests: [{ ok: i % 5 > 0 }, { ok: true }] })) };
   const budgetPolicy = {
     subjects: { deployment: { from: ["deployments"], id: ["id"], applies_to: { is_prod: { op: "equals", path: ["environment"], value: "prod" } } } },
@@ -72,11 +71,30 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(([policy, e
       tested: { subject: "deployment", require: "some", checks: { tested: { op: "all", path: ["tests"], check: { op: "equals", path: ["ok"], value: true } } } },
     },
   };
-  const report = ergo.evaluate({ document, policy: budgetPolicy, params: {} }, "entrypoint/report")[0].result;
-  const usedMB = (ergo.wasmInstance.exports.opa_heap_ptr_get() - ergo.baseHeapPtr) / 1e6;
-  const sound = report.results.length === 338 && report.requirements.approved.subjects.matching === 66;
-  console.log(`A report on 100 deployments used ${usedMB.toFixed(1)} MB of Wasm memory (budget ${budgetMB} MB)`);
-  if (!sound) console.error("The memory budget's report didn't come out as expected, so its measurement can't be trusted");
-  if (usedMB > budgetMB) console.error(`That's over the budget. Wasm doesn't cache function calls and frees nothing until the report is done, so look for something worked out again per row.`);
-  process.exit(failed.length > 0 || !sound || usedMB > budgetMB ? 1 : 0);
+  const sentencePolicy = {
+    subjects: budgetPolicy.subjects,
+    requirements: {
+      approved: {
+        subject: "deployment",
+        checks: {
+          approved: "approved_by is a non-empty string",
+          environment: 'environment is one of "prod", "staging"',
+          tests: "tests is not empty",
+        },
+      },
+    },
+  };
+  const measure = async (name, policy, rows, matching, budgetMB) => {
+    const fresh = await load(ergoDir);
+    const report = fresh.evaluate({ document, policy, params: {} }, "entrypoint/report")[0].result;
+    const usedMB = (fresh.wasmInstance.exports.opa_heap_ptr_get() - fresh.baseHeapPtr) / 1e6;
+    const sound = report.results.length === rows && report.requirements.approved.subjects.matching === matching;
+    console.log(`A report on 100 deployments ${name} used ${usedMB.toFixed(1)} MB of Wasm memory (budget ${budgetMB} MB)`);
+    if (!sound) console.error("The memory budget's report didn't come out as expected, so its measurement can't be trusted");
+    if (usedMB > budgetMB) console.error(`That's over the budget. Wasm doesn't cache function calls and frees nothing until the report is done, so look for something worked out again per row, or a large regular expression compiled for every report.`);
+    return sound && usedMB <= budgetMB;
+  };
+  const withOps = await measure("with checks written with op", budgetPolicy, 338, 66, 20);
+  const withSentences = await measure("with checks written as sentences", sentencePolicy, 301, 66, 12);
+  process.exit(failed.length > 0 || !withOps || !withSentences ? 1 : 0);
 });
