@@ -58,7 +58,7 @@ jobs:
         with:
           version: 1.20.2
       - name: Run the tests compiled to Wasm
-        run: opa test . --ignore .github --target wasm --timeout 120s
+        run: .github/wasm-tests.sh
 
   wasm-js:
     runs-on: ubuntu-latest
