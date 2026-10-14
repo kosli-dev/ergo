@@ -125,6 +125,14 @@ Every row has a cause. When a check reads several values, the row takes the firs
 
 **[in.fail]** It fails with the path's outcome as its cause when the path ends anything but `found`, so a missing or `null` field fails even when the values hold `null`. When the field was read, it fails with `value`, an empty list of values included.
 
+## `has_type`
+
+`has_type` takes a path and a `type`, one of `list`, `string`, `number`, `boolean` and `object`, and asks whether the field has that JSON type. It's what the sentence `is a <type>` reads into, see [sentence.phrase.type](sentences.md#phrases), and today's syntax can't use it (see [sentence_ops.syntax](syntax.md#policies)).
+
+**[has_type.pass]** It passes when its path ends `found` and the value has the type.
+
+**[has_type.fail]** It fails with the path's outcome as its cause when the path ends anything but `found`. A value of any other type fails with `value`, because checking the type is what it's for.
+
 ## `not_in`
 
 `not_in` takes a path and a list of values, written like the values of [`in`](#in), and asks whether the field is none of them. It's what the sentences `is not one of` and `is not in` read into, see [sentence.phrase.one_of](sentences.md#phrases), and today's syntax can't use it (see [sentence_ops.syntax](syntax.md#policies)).

@@ -1416,6 +1416,14 @@ _leaf_op_passed("in", check, subj) if {
 	want == v
 }
 
+_leaf_op_passed("has_type", check, subj) if {
+	v := value_at(subj, check.path)
+	v != null
+	type_name(v) == _json_types[check.type]
+}
+
+_json_types := {"list": "array", "string": "string", "number": "number", "boolean": "boolean", "object": "object"}
+
 _leaf_op_passed("not_in", check, subj) if {
 	v := value_at(subj, check.path)
 	v != null
@@ -1731,6 +1739,7 @@ _required_fields := {
 	"empty": {"path"},
 	"empty_string_or_list": {"path"},
 	"not_in": {"path", "values"},
+	"has_type": {"path", "type"},
 	"not_empty_string_or_list": {"path"},
 	"matches_any": {"path", "patterns"},
 	"not_matches_any": {"path", "patterns"},
@@ -1825,7 +1834,7 @@ _op_problems(node, _) := {concat("", ["unknown op ", _text(node.op)])} if {
 	not _sentence_op(node)
 }
 
-_sentence_ops := {"empty_string_or_list", "not_empty_string_or_list", "not_in"}
+_sentence_ops := {"empty_string_or_list", "not_empty_string_or_list", "not_in", "has_type"}
 
 _sentence_op(node) if {
 	node.op in _sentence_ops
@@ -4917,13 +4926,9 @@ _s_paths_unsupported(a) := {"last of isn't supported yet" |
 	not "start" in object.keys(ref)
 }
 
-_s_unrun_ops := {"is a", "starts with", "ends with"}
+_s_unrun_ops := {"starts with", "ends with"}
 
-_s_phrase_unsupported(ph) := {concat("", [`"`, _s_unrun_words(ph), `" isn't supported yet`])} if ph.op in _s_unrun_ops
-
-_s_unrun_words(ph) := _s_phrase_text(ph) if ph.op == "is a"
-
-_s_unrun_words(ph) := _s_phrase_words(ph) if ph.op != "is a"
+_s_phrase_unsupported(ph) := {concat("", [`"`, _s_phrase_words(ph), `" isn't supported yet`])} if ph.op in _s_unrun_ops
 
 _s_phrase_unsupported(ph) := _s_argument_unsupported(ph) if not ph.op in _s_unrun_ops
 
@@ -5001,6 +5006,8 @@ _s_model(a) := {"op": "compare", "left": _s_model_path(a.path), "cmp": "ne", "ri
 _s_model(a) := {"op": _s_compare_ops[a.phrase.op][0], "left": _s_model_path(a.path), "cmp": _s_compare_ops[a.phrase.op][1], "right": _s_side(a.phrase)} if a.phrase.op in object.keys(_s_compare_ops)
 
 _s_model(a) := {"op": "in", "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if a.phrase.op == "is one of"
+
+_s_model(a) := {"op": "has_type", "path": _s_model_path(a.path), "type": a.phrase.type} if a.phrase.op == "is a"
 
 _s_model(a) := {"op": "not_in", "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if a.phrase.op == "is not one of"
 
