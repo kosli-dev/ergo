@@ -3718,5 +3718,186 @@
         ]
       }
     ]
+  },
+  {
+    "description": "is empty",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is empty"}}}},
+    "cases": [
+      {
+        "description": "passes on an empty list",
+        "rules": ["sentence.phrase.empty", "empty_string_or_list.pass", "path.inputs"],
+        "input": {"things": [{"id": "t1", "x": []}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": []}]}
+        ],
+        "expressions": {"s": {"c": "x is empty"}}
+      },
+      {
+        "description": "passes on an empty string",
+        "rules": ["sentence.phrase.empty", "empty_string_or_list.pass"],
+        "input": {"things": [{"id": "t1", "x": ""}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ""}]}
+        ]
+      },
+      {
+        "description": "fails as value on a list with an item",
+        "rules": ["sentence.phrase.empty", "empty_string_or_list.fail"],
+        "input": {"things": [{"id": "t1", "x": [1]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": [1]}]}
+        ]
+      },
+      {
+        "description": "fails as value on a string with a character",
+        "rules": ["sentence.phrase.empty", "empty_string_or_list.fail"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.empty", "empty_string_or_list.fail", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["sentence.phrase.empty", "empty_string_or_list.fail", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on a number",
+        "rules": ["sentence.phrase.empty", "empty_string_or_list.fail"],
+        "input": {"things": [{"id": "t1", "x": 0}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 0}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on an object, even an empty one",
+        "rules": ["sentence.phrase.empty", "empty_string_or_list.fail"],
+        "input": {"things": [{"id": "t1", "x": {}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": {}}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on false",
+        "rules": ["sentence.phrase.empty", "empty_string_or_list.fail"],
+        "input": {"things": [{"id": "t1", "x": false}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": false}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is not empty",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not empty"}}}},
+    "cases": [
+      {
+        "description": "passes on a list with an item",
+        "rules": ["sentence.phrase.empty", "empty_string_or_list.pass", "path.inputs"],
+        "input": {"things": [{"id": "t1", "x": [0]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": [0]}]}
+        ],
+        "expressions": {"s": {"c": "x is not empty"}}
+      },
+      {
+        "description": "passes on a string with a character, even a space",
+        "rules": ["sentence.phrase.empty", "empty_string_or_list.pass"],
+        "input": {"things": [{"id": "t1", "x": "  "}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "  "}]}
+        ]
+      },
+      {
+        "description": "fails as value on an empty list",
+        "rules": ["sentence.phrase.empty", "empty_string_or_list.fail"],
+        "input": {"things": [{"id": "t1", "x": []}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": []}]}
+        ]
+      },
+      {
+        "description": "fails as value on an empty string",
+        "rules": ["sentence.phrase.empty", "empty_string_or_list.fail"],
+        "input": {"things": [{"id": "t1", "x": ""}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ""}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.empty", "empty_string_or_list.fail", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["sentence.phrase.empty", "empty_string_or_list.fail", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on a number",
+        "rules": ["sentence.phrase.empty", "empty_string_or_list.fail"],
+        "input": {"things": [{"id": "t1", "x": 5}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 5}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on an object with keys",
+        "rules": ["sentence.phrase.empty", "empty_string_or_list.fail"],
+        "input": {"things": [{"id": "t1", "x": {"a": 1}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": {"a": 1}}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an operator only sentences read into, written in today's syntax",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "empty_string_or_list", "path": ["x"]}}}}},
+    "cases": [
+      {
+        "description": "is an unknown op, so it fails as ill_formed",
+        "rules": ["sentence_ops.syntax", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": []}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["unknown op empty_string_or_list"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": []}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a check in today's syntax that copies a sentence's translation",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "x is empty", "b": {"op": "empty_string_or_list", "path": ["x"], "expression": "x is empty"}}}}},
+    "cases": [
+      {
+        "description": "still can't use the operator, because the check wasn't written as a sentence",
+        "rules": ["sentence_ops.syntax", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": ""}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 2}, {"name": "require", "value": "every"}, {"name": "checks.b", "value": ["unknown op empty_string_or_list"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ""}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "b", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": ""}]}
+        ]
+      }
+    ]
   }
 ]

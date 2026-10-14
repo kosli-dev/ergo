@@ -83,7 +83,6 @@ Every rule needs a case, apart from the ones listed here. The `sentence` rules h
 - `sentence.for.fail`
 - `sentence.for.comma`
 - `sentence.for.assert`
-- `sentence.phrase.empty`
 - `sentence.phrase.starts`
 - `sentence.derived.fail`
 - `sentence.print.order`

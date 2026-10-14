@@ -1439,6 +1439,20 @@ _leaf_op_passed("empty", check, subj) if {
 	value_at(subj, check.path) == []
 }
 
+_leaf_op_passed("empty_string_or_list", check, subj) if {
+	value_at(subj, check.path) in {[], ""}
+}
+
+_leaf_op_passed("not_empty_string_or_list", check, subj) if {
+	v := value_at(subj, check.path)
+	_string_or_list(v)
+	count(v) > 0
+}
+
+_string_or_list(v) if is_string(v)
+
+_string_or_list(v) if is_array(v)
+
 _missing_at(x, path) if {
 	_keys_of(path)
 	_ := _start_of(x, path)
@@ -1592,6 +1606,12 @@ _unusable(leaf, x) if {
 }
 
 _unusable(leaf, x) if {
+	leaf.op in {"empty_string_or_list", "not_empty_string_or_list"}
+	v := _found(x, leaf.path)
+	not _string_or_list(v)
+}
+
+_unusable(leaf, x) if {
 	leaf.op == "compare"
 	not "within" in object.keys(leaf)
 	l := _simple_found(x, leaf.left)
@@ -1699,6 +1719,8 @@ _required_fields := {
 	"missing": {"path"},
 	"non_empty_string": {"path"},
 	"empty": {"path"},
+	"empty_string_or_list": {"path"},
+	"not_empty_string_or_list": {"path"},
 	"matches_any": {"path", "patterns"},
 	"not_matches_any": {"path", "patterns"},
 	"compare": {"left", "right", "cmp"},
@@ -1789,6 +1811,14 @@ _op_problems(node, _) := {"missing op"} if not "op" in object.keys(node)
 _op_problems(node, _) := {concat("", ["unknown op ", _text(node.op)])} if {
 	"op" in object.keys(node)
 	not node.op in operators
+	not _sentence_op(node)
+}
+
+_sentence_ops := {"empty_string_or_list", "not_empty_string_or_list"}
+
+_sentence_op(node) if {
+	node.op in _sentence_ops
+	_s_read(node)
 }
 
 _op_problems(node, kinds) := {"nested too deep"} if _too_deep(node, kinds)
@@ -3366,7 +3396,8 @@ _check_problem_inputs(req) := [{"name": name, "value": sort({p[1] | some p in pr
 	problems := {[_field_path_name(array.concat(_checks_at(req, f, n), p[0])), p[1]] |
 		some f in ["applies_to", "checks"]
 		some n, check in _req_checks(req, f)
-		some p in _check_problems(check, _from_names(req))
+		found := _check_problems(check, _from_names(req)) with data.ergo_sentence_here as _s_written_here(req, f, n)
+		some p in found
 	}
 }
 
@@ -3425,7 +3456,10 @@ _requirement_check_defs(req) := {name: object.union({"meta": {}}, def) | some na
 
 _requirement_checks_written_or_added(req) := object.union(
 	object.union(
-		{name: _check_def(check, _subject_item_name(req)) | some name, check in _checks_of(req)},
+		{name: def |
+			some name, check in _checks_of(req)
+			def := _check_def(check, _subject_item_name(req)) with data.ergo_sentence_here as _s_written_here(req, "checks", name)
+		},
 		object.union(_min_subjects_def(req), _unique_ids_def(req)),
 	),
 	object.union(_applies_def(req), _well_formed_def),
@@ -3560,7 +3594,10 @@ _evaluation(doc, req, name) := {
 	raw := _raw_entries(doc, req)
 	names := _from_names(req)
 	filter_flaws := {n: _flaw(check, names) | some n, check in _applies_to_of(req)}
-	check_flaws := {n: _flaw(check, names) | some n, check in _checks_of(req)}
+	check_flaws := {n: flaw |
+		some n, check in _checks_of(req)
+		flaw := _flaw(check, names) with data.ergo_sentence_here as _s_written_here(req, "checks", n)
+	}
 	item := _subject_item_name(req)
 	refs := {i: _entry_ref(entry, req) | some i, entry in raw}
 	matches := {i: _subject_matches(entry.subject, req, filter_flaws) | some i, entry in raw}
@@ -4773,7 +4810,7 @@ _s_assert_form(check) if {
 	not "op" in object.keys(check)
 }
 
-_s_sentences(raw, reqs) := {reqs[name].checks[c] |
+_s_sentences(raw, reqs) := {[reqs[name], c] |
 	some name, req in raw
 	is_object(req)
 	checks := object.get(req, "checks", {})
@@ -4827,7 +4864,16 @@ _s_unread(node) if {
 	count(object.get(node, "$sentence", [])) > 0
 }
 
-_s_read(check) if check in data.ergo_sentences
+_s_read(node) if {
+	is_object(node)
+	data.ergo_sentence_here == true
+}
+
+_s_written_here(req, "checks", n) if {
+	[req, n] in data.ergo_sentences
+} else := false
+
+_s_written_here(_, "applies_to", _) := false
 
 _s_unsupported(parsed) := set() if not "assertions" in object.keys(parsed)
 
@@ -4852,7 +4898,7 @@ _s_paths_unsupported(a) := {"last of isn't supported yet" |
 	not "start" in object.keys(ref)
 }
 
-_s_unrun_ops := {"is not one of", "is empty", "is not empty", "is a", "starts with", "ends with"}
+_s_unrun_ops := {"is not one of", "is a", "starts with", "ends with"}
 
 _s_phrase_unsupported(ph) := {concat("", [`"`, _s_unrun_words(ph), `" isn't supported yet`])} if ph.op in _s_unrun_ops
 
@@ -4942,6 +4988,10 @@ _s_model(a) := {"op": "present", "path": _s_model_path(a.path)} if a.phrase.op =
 _s_model(a) := {"op": "missing", "path": _s_model_path(a.path)} if a.phrase.op == "does not exist"
 
 _s_model(a) := {"op": "non_empty_string", "path": _s_model_path(a.path)} if a.phrase.op == "is a non-empty string"
+
+_s_model(a) := {"op": "empty_string_or_list", "path": _s_model_path(a.path)} if a.phrase.op == "is empty"
+
+_s_model(a) := {"op": "not_empty_string_or_list", "path": _s_model_path(a.path)} if a.phrase.op == "is not empty"
 
 _s_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "value": _s_one(a.phrase)} if a.phrase.op in {"contains", "does not contain"}
 

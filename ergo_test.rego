@@ -8187,8 +8187,6 @@ test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
 		[`x is y plus 1`, "count of, sum of and plus aren't supported yet"],
 		[`x is not one of "a"`, `"is not one of" isn't supported yet`],
 		[`x is not in $params.a`, `"is not in" isn't supported yet`],
-		[`x is empty`, `"is empty" isn't supported yet`],
-		[`x is not empty`, `"is not empty" isn't supported yet`],
 		[`x is an object`, `"is an object" isn't supported yet`],
 		[`x starts with "a"`, `"starts with" isn't supported yet`],
 		[`x ends with y`, `"ends with" isn't supported yet`],
@@ -8247,11 +8245,12 @@ test_a_sentence_marker_written_by_hand_is_an_unknown_field_like_any_other if {
 	ergo.report({"things": []}, _sentence_policy({"c": {"op": "present", "path": ["x"], "$sentence": []}}), {}).requirements.s.checks.c == {"description": "", "meta": {}, "op": "present", "path": ["x"], "$sentence": [], "expression": "x is present"}
 }
 
-test_a_check_is_read_as_a_sentence_only_when_the_report_translated_it if {
+test_a_check_is_read_as_a_sentence_only_where_the_policy_wrote_one if {
 	not ergo._s_read({"op": "present", "path": ["x"], "expression": "x exists"})
-	ergo._s_read({"op": "present", "path": ["x"], "expression": "x exists"}) with data.ergo_sentences as {{"op": "present", "path": ["x"], "expression": "x exists"}}
+	ergo._s_read({"op": "present", "path": ["x"], "expression": "x exists"}) with data.ergo_sentence_here as true
 	ergo._s_sentences({"r": {"checks": ["x exists"]}, "q": 1}, {"r": {"checks": ["x exists"]}, "q": 1}) == set()
 	ergo._s_sentences(null, null) == set()
+	ergo._s_written_here({}, "applies_to", "f") == false
 }
 
 test_a_sentence_that_reads_into_no_check_is_written_wrong_rather_than_run if {
@@ -8360,4 +8359,49 @@ test_an_each_that_isnt_a_list_still_lists_every_item_as_ill_formed if {
 test_a_number_written_as_a_literal_is_named_like_the_index_it_reads if {
 	rendered({}, {"op": "present", "path": ["zs", {"literal": 1}]}) == "item 2 of zs is present"
 	rendered({}, {"op": "present", "path": ["zs", {"literal": 1}, "k"]}) == "zs[1].k is present"
+}
+
+test_the_operators_only_sentences_read_into_are_unknown_ops_anywhere_in_todays_syntax if {
+	every op in ["empty_string_or_list", "not_empty_string_or_list"] {
+		_sentence_problems({"op": op, "path": ["x"]}) == [concat("", ["unknown op ", op])]
+		ergo.report({"things": []}, _sentence_policy({"c": {"op": "all", "path": ["xs"], "check": {"op": op, "path": []}}}), {}).results[0].inputs[2] == {"name": "checks.c.check", "value": [concat("", ["unknown op ", op])]}
+	}
+}
+
+test_is_empty_and_is_not_empty_take_a_string_or_a_list if {
+	doc := {"things": [{"id": "a", "x": []}, {"id": "b", "x": ""}, {"id": "c", "x": "z"}, {"id": "d", "x": [1]}, {"id": "e", "x": {}}, {"id": "f", "x": null}, {"id": "g"}]}
+	[[r[0], r[1], r[2]] | some r in _sentence_rows({"e": "x is empty", "n": "x is not empty"}, doc, {})] == [
+		["e", true, "satisfied"], ["n", false, "value"],
+		["e", true, "satisfied"], ["n", false, "value"],
+		["e", false, "value"], ["n", true, "satisfied"],
+		["e", false, "value"], ["n", true, "satisfied"],
+		["e", false, "unusable"], ["n", false, "unusable"],
+		["e", false, "null"], ["n", false, "null"],
+		["e", false, "absent"], ["n", false, "absent"],
+	]
+}
+
+test_a_check_that_copies_a_sentences_translation_still_cant_use_its_operator if {
+	copy := {"op": "empty_string_or_list", "path": ["x"], "expression": "x is empty"}
+	every check in [
+		copy,
+		{"op": "all", "path": ["items"], "check": copy},
+		{"op": "any_of", "options": [[copy]]},
+		{"op": "present", "path": ["x"], "substitute": copy},
+	] {
+		r := ergo.report({"things": [{"id": "t1", "x": "", "items": [{"x": ""}]}]}, _sentence_policy({"a": "x is empty", "b": check}), {})
+		not r.compliant
+		[row.cause | some row in r.results; row.check == "b"] == ["ill_formed"]
+	}
+	filtered := {
+		"subjects": {"thing": {"from": ["things"], "id": ["id"], "applies_to": {"f": copy}}},
+		"requirements": {"s": {"subject": "thing", "checks": {"a": "x is empty"}}},
+	}
+	[row.cause | some row in ergo.report({"things": [{"id": "t1", "x": ""}]}, filtered, {}).results; row.check == "$applies"] == ["ill_formed"]
+}
+
+test_is_empty_reads_through_params_named_by_and_a_parent_that_cant_hold_the_field if {
+	doc := {"things": [{"id": "a", "art": {"z": ""}, "s": "text"}]}
+	rows := _sentence_rows({"p": "$params.p is not empty", "n": "art named by $params.k is empty", "u": "s.y is empty"}, doc, {"p": [1], "k": "z"})
+	[[r[0], r[1], r[2]] | some r in rows] == [["n", true, "satisfied"], ["p", true, "satisfied"], ["u", false, "unusable"]]
 }
