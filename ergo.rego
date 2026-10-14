@@ -1879,6 +1879,7 @@ _field_problems(node) := union({_side_problem(node), _within_problem(node), _wor
 _json_problem(node) := _json_problems(object.remove(_own_fields(node), ["meta"]))
 
 _missing_fields_problem(node) := {concat("", ["missing ", f]) |
+	is_string(node.op)
 	some f in object.get(_required_fields, node.op, set())
 	not f in object.keys(node)
 }
