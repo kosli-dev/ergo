@@ -32,6 +32,18 @@ A subject with `of` (see [REFERENCE.md](../REFERENCE.md#a-subject-built-on-anoth
 
 `time.format` only takes years 1678 to 2261 and only counts the first nine digits of a fraction. Both limits come from OPA, which holds a time as nanoseconds since 1970 in a 64-bit integer. A port in another language would have to add them on purpose. Either they stay, and the spec keeps them as a rule every implementation follows, or the spec drops them and `ergo.rego` has to compare times some other way outside that range.
 
+## Where in the input a value was read
+
+A row's `inputs` give each value with a name, like `artifacts.[$$params.name].ok`, and the plan is to print names as sentences write paths, like `artifacts named by $params.name.ok`. A name is for people. A program has to parse it to find the value in the input, and even then it only gets the path inside the subject, with the ref still in it.
+
+A report could also give each input its exact location, counted from the root of the input, with every ref already read:
+
+```json
+{"name": "artifacts named by $params.name.ok", "location": ["deployments", 0, "artifacts", "web", "ok"], "value": true}
+```
+
+A tool could then point at the value itself, like a report viewer that highlights the spot in the input when you hover a row. The open questions are whether it's worth the size it adds to every report, what a value read from the params or worked out from several values (a `count of`, a `sum of`) gets, and whether `failed_items` and `$refs` get one too.
+
 ## Rules without cases
 
 Every rule needs a case, apart from the ones listed here. The `sentence` rules here are for forms `ergo.rego` doesn't run yet. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.
