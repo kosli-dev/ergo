@@ -1599,7 +1599,10 @@ _comparable(l, r) if {
 
 _orderable(c, _) if c in {"eq", "ne"}
 
-_orderable(_, v) if is_number(v)
+_orderable(c, v) if {
+	is_number(v)
+	not c in _text_cmps
+}
 
 _orderable(_, v) if is_string(v)
 
@@ -1722,6 +1725,18 @@ _cmp("gte", l, r) if l >= r
 _cmp("lt", l, r) if l < r
 
 _cmp("lte", l, r) if l <= r
+
+_cmp("starts_with", l, r) if {
+	is_string(l)
+	is_string(r)
+	startswith(l, r)
+}
+
+_cmp("ends_with", l, r) if {
+	is_string(l)
+	is_string(r)
+	endswith(l, r)
+}
 
 _leaf_ops := {"range", "excludes", "includes", "in", "equals", "present", "missing", "non_empty_string", "empty", "matches_any", "not_matches_any", "compare", "compare_time"}
 
@@ -2003,6 +2018,15 @@ _cmp_problem(node) := {"invalid cmp" |
 	_two_sided(node)
 	"cmp" in object.keys(node)
 	not node.cmp in {"eq", "ne", "gt", "gte", "lt", "lte"}
+	not _sentence_cmp(node)
+}
+
+_text_cmps := {"starts_with", "ends_with"}
+
+_sentence_cmp(node) if {
+	node.op == "compare"
+	node.cmp in _text_cmps
+	_s_read(node)
 }
 
 _misplaced_fields_problem(node) := {concat("", [f, " can't go here"]) |
@@ -4485,7 +4509,7 @@ _s_sq_char(`\\`) := `\`
 
 _s_sq_char(c) := c if not c in {`\'`, `\\`}
 
-_s_sentence_problems(parsed) := (((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
+_s_sentence_problems(parsed) := ((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"bare_word" in object.keys(node)
@@ -4548,6 +4572,12 @@ _s_sentence_problems(parsed) := (((((((((((({concat("", [node.bare_word, " is a 
 	node.op == "is not"
 	"value" in object.keys(node)
 	node.value == null
+}) | {concat("", [`"`, node.op, `" takes text`]) |
+	some node in _s_nodes(parsed)
+	is_object(node)
+	node.op in {"starts with", "ends with"}
+	"value" in object.keys(node)
+	not is_string(node.value)
 }) | {`"within" only compares numbers` |
 	some node in _s_nodes(parsed)
 	is_object(node)
@@ -4913,7 +4943,7 @@ _s_assertion_unsupported(a) := {"every and some aren't supported yet"} if object
 
 _s_assertion_unsupported(a) := {"count of, sum of and plus aren't supported yet"} if "terms" in object.keys(a)
 
-_s_assertion_unsupported(a) := _s_paths_unsupported(a) | _s_phrase_unsupported(a.phrase) if object.keys(a) & {"every", "some", "terms"} == set()
+_s_assertion_unsupported(a) := _s_paths_unsupported(a) | _s_argument_unsupported(a.phrase) if object.keys(a) & {"every", "some", "terms"} == set()
 
 _s_paths_unsupported(a) := {"last of isn't supported yet" |
 	some node in _s_nodes(a)
@@ -4925,12 +4955,6 @@ _s_paths_unsupported(a) := {"last of isn't supported yet" |
 	ref := object.get(node, "named_by", {"start": ""})
 	not "start" in object.keys(ref)
 }
-
-_s_unrun_ops := {"starts with", "ends with"}
-
-_s_phrase_unsupported(ph) := {concat("", [`"`, _s_phrase_words(ph), `" isn't supported yet`])} if ph.op in _s_unrun_ops
-
-_s_phrase_unsupported(ph) := _s_argument_unsupported(ph) if not ph.op in _s_unrun_ops
 
 _s_argument_unsupported(ph) := {"count of, sum of and plus aren't supported yet"} if {
 	terms := object.get(ph, "terms", [])
@@ -5029,7 +5053,10 @@ _s_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path
 
 _s_model(a) := {"op": "range", "path": _s_model_path(a.path), "min": a.phrase.min, "max": a.phrase.max} if a.phrase.op == "is between"
 
-_s_compare_ops := object.union({op: ["compare", cmp] | some op, cmp in _s_order_cmps}, {op: ["compare_time", cmp] | some op, cmp in _s_time_cmps})
+_s_compare_ops := object.union(
+	object.union({op: ["compare", cmp] | some op, cmp in _s_order_cmps}, {op: ["compare_time", cmp] | some op, cmp in _s_time_cmps}),
+	{"starts with": ["compare", "starts_with"], "ends with": ["compare", "ends_with"]},
+)
 
 _s_contains_ops := {
 	"contains": "includes",

@@ -8185,8 +8185,6 @@ test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
 		[`every xs is 1`, "every and some aren't supported yet"],
 		[`count of xs is 1`, "count of, sum of and plus aren't supported yet"],
 		[`x is y plus 1`, "count of, sum of and plus aren't supported yet"],
-		[`x starts with "a"`, `"starts with" isn't supported yet`],
-		[`x ends with y`, `"ends with" isn't supported yet`],
 		[`t is before "2024-01-01T00:00:00Z"`, `"is before" with a value isn't supported yet: compare with a field`],
 		[`x is in allowed`, `"is in" with a field of the subject isn't supported yet`],
 		[`l contains y`, `"contains" with a field of the subject isn't supported yet`],
@@ -8443,4 +8441,34 @@ test_is_a_type_passes_on_that_json_type_and_fails_any_other_as_value if {
 
 test_has_type_is_an_unknown_op_in_todays_syntax if {
 	_sentence_problems({"op": "has_type", "path": ["x"], "type": "list"}) == ["unknown op has_type"]
+}
+
+test_starts_with_and_ends_with_take_two_strings if {
+	doc := {"things": [{"id": "a", "x": "release/1.2", "p": "release/"}, {"id": "b", "x": "main", "p": "release/"}, {"id": "c", "x": 15, "p": 1}, {"id": "d", "x": null, "p": "r"}, {"id": "e", "p": "r"}]}
+	checks := {"e": `x ends with ".2"`, "f": "x starts with p", "v": `x starts with "release/"`}
+	[[r[0], r[2]] | some r in _sentence_rows(checks, doc, {})] == [
+		["e", "satisfied"], ["f", "satisfied"], ["v", "satisfied"],
+		["e", "value"], ["f", "value"], ["v", "value"],
+		["e", "unusable"], ["f", "unusable"], ["v", "unusable"],
+		["e", "null"], ["f", "null"], ["v", "null"],
+		["e", "absent"], ["f", "absent"], ["v", "absent"],
+	]
+}
+
+test_starts_with_is_an_invalid_cmp_in_todays_syntax_even_when_it_copies_a_sentence if {
+	copy := {"op": "compare", "left": ["x"], "cmp": "starts_with", "right": {"literal": "a"}, "expression": `x starts with "a"`}
+	_sentence_problems(copy) == ["invalid cmp"]
+	r := ergo.report({"things": [{"id": "t1", "x": "ab", "xs": ["ab"]}]}, _sentence_policy({"a": `x starts with "a"`, "b": {"op": "all", "path": ["xs"], "check": object.union(copy, {"left": []})}}), {})
+	[row.cause | some row in r.results; row.check in {"a", "b"}] == ["satisfied", "ill_formed"]
+}
+
+test_starts_with_only_ever_compares_two_strings_even_through_leaf_passed if {
+	not ergo.leaf_passed({"op": "compare_time", "left": ["n"], "cmp": "starts_with", "right": ["m"]}, {"n": 15, "m": 1})
+	not ergo.leaf_passed({"op": "compare_time", "left": ["n"], "cmp": "ends_with", "right": ["m"]}, {"n": 15, "m": 1})
+}
+
+test_a_written_value_after_starts_with_that_isnt_text_is_written_wrong_because_it_could_only_fail if {
+	every pair in [[`x starts with null`, `"starts with" takes text`], [`x ends with 1`, `"ends with" takes text`], [`x starts with true`, `"starts with" takes text`]] {
+		_sentence_problems(pair[0]) == [pair[1]]
+	}
 }

@@ -592,11 +592,12 @@ A sentence is a path, then a phrase, then what the phrase takes:
 | `labels contains "bug"`, `labels does not contain "wip"`                             | `includes`, `excludes` with `value`                                      |
 | `labels contains all of "a", "b"`, `labels contains none of ...`                     | `includes`, `excludes` with `values`                                     |
 | `branch matches '^release/'`, `branch does not match ...`                            | `matches_any`, `not_matches_any`                                         |
+| `branch starts with "release/"`, `file ends with suffix`                             | `compare` with `starts_with`, `ends_with`                                |
 | `score is at least 3`, `is at most`, `is more than`, `is less than`                  | `compare` with `gte`, `lte`, `gt`, `lt`                                  |
 | `score is between 1 and 5`                                                           | `range`                                                                  |
 | `reviewed_at is before deployed_at`, `is after`, `is on or after`, `is on or before` | `compare_time` with `lt`, `gt`, `gte`, `lte`                             |
 
-`is empty` passes on `""` or `[]` and `is not empty` on a string or a list with something in it. Anything else that's there, like a number or an object, fails both as `unusable`. Their operators only exist for sentences.
+`is empty` passes on `""` or `[]` and `is not empty` on a string or a list with something in it. Anything else that's there, like a number or an object, fails both as `unusable`. Their operators only exist for sentences. `starts with` and `ends with` compare two strings: anything else, two numbers included, fails as `unusable`, and a written value after them that isn't text, like `x starts with 1`, is written wrong.
 
 The thing on the right is a value when it's in quotes, a number, `true`, `false` or `null`, and a field otherwise. A list of values is separated by `, `. A string can be in single quotes, which keep backslashes as written, so `'^\s*FROM'` needs no doubled backslash.
 
@@ -612,7 +613,7 @@ A sentence that can't be read is [written wrong](#basic-operators), and the `$we
 
 for `prod: environment is "prod`. `x is not null` is written wrong too, because it could only fail: write `x exists`. So is a value that isn't a number before `within`, like `x is "a" within 1`. An object with both `assert` and `op` is read as a check with an `op`, so a [custom operator](#custom-operators) can still take `assert`.
 
-ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `starts with`, `ends with`, `and` between two assertions, `assert` as a list, `every`, `some`, `count of`, `sum of`, `plus`, `last of`, a `for` line, a value after `is before` and the other time phrases, a field of the subject after `is in`, `contains` and the other phrases that take a list, and a list path with `named by` in it. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `tickets: every tickets is not empty` gives:
+ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `and` between two assertions, `assert` as a list, `every`, `some`, `count of`, `sum of`, `plus`, `last of`, a `for` line, a value after `is before` and the other time phrases, a field of the subject after `is in`, `contains` and the other phrases that take a list, and a list path with `named by` in it. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `tickets: every tickets is not empty` gives:
 
 ```json
 {"name": "checks.tickets", "value": ["every and some aren't supported yet"]}

@@ -4186,5 +4186,130 @@
         ]
       }
     ]
+  },
+  {
+    "description": "starts with and ends with",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"e": "x ends with \".2\"", "f": "x starts with p", "v": "x starts with \"release/\""}}}},
+    "cases": [
+      {
+        "description": "passes when the field starts or ends with the value or the field",
+        "rules": ["sentence.phrase.starts", "compare.text", "compare.inputs"],
+        "input": {"things": [{"id": "t1", "x": "release/1.2", "p": "release/"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "e", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "release/1.2"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "f", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "release/1.2"}, {"name": "p", "value": "release/"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "v", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "release/1.2"}]}
+        ],
+        "expressions": {"s": {"e": "x ends with \".2\"", "f": "x starts with p"}}
+      },
+      {
+        "description": "fails as value when it doesn't",
+        "rules": ["sentence.phrase.starts", "compare.text"],
+        "input": {"things": [{"id": "t1", "x": "main", "p": "release/"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "e", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "main"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "f", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "main"}, {"name": "p", "value": "release/"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "v", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "main"}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on numbers, even two of them",
+        "rules": ["sentence.phrase.starts", "compare.text"],
+        "input": {"things": [{"id": "t1", "x": 15, "p": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "e", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 15}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "f", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 15}, {"name": "p", "value": 1}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "v", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 15}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["sentence.phrase.starts", "compare.text", "compare.fail", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null, "p": "r"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "e", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "f", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}, {"name": "p", "value": "r"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "v", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.starts", "compare.text", "compare.fail", "path.absent"],
+        "input": {"things": [{"id": "t1", "p": "r"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "e", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "f", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}, {"name": "p", "value": "r"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "v", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "starts_with written in today's syntax",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "compare", "left": ["x"], "cmp": "starts_with", "right": {"literal": "a"}}}}}},
+    "cases": [
+      {
+        "description": "is an invalid cmp",
+        "rules": ["sentence_ops.syntax", "compare.written_wrong"],
+        "input": {"things": [{"id": "t1", "x": "ab"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["invalid cmp"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": "ab"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "starts with a field on the right",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"f": "x starts with p"}}}},
+    "cases": [
+      {
+        "description": "fails as null when the field on the right is null",
+        "rules": ["sentence.phrase.starts", "compare.text", "compare.fail"],
+        "input": {"things": [{"id": "t1", "x": "ab", "p": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "f", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": "ab"}, {"name": "p", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field on the right is missing",
+        "rules": ["sentence.phrase.starts", "compare.text", "compare.fail"],
+        "input": {"things": [{"id": "t1", "x": "ab"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "f", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": "ab"}, {"name": "p", "value": null}]}
+        ]
+      },
+      {
+        "description": "passes on an empty string on the right",
+        "rules": ["sentence.phrase.starts", "compare.text"],
+        "input": {"things": [{"id": "t1", "x": "ab", "p": ""}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "f", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "ab"}, {"name": "p", "value": ""}]}
+        ]
+      },
+      {
+        "description": "fails as value when the right side is longer",
+        "rules": ["sentence.phrase.starts", "compare.text"],
+        "input": {"things": [{"id": "t1", "x": "ab", "p": "abc"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "f", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "ab"}, {"name": "p", "value": "abc"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "starts with a written value that isn't text",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x starts with null"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, because it could only fail",
+        "rules": ["sentence.phrase.starts", "sentence.written_wrong.slot", "written_wrong"],
+        "input": {"things": [{"id": "t1", "x": "ab"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["\"starts with\" takes text"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
   }
 ]
