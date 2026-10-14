@@ -209,7 +209,7 @@ With `{"deployment": {"change_type": "bug_fix"}, "test_runs": []}`, the deployme
     ...
 ```
 
-The `$applies` entry in `checks` records the value the ref read, under `$refs`: `{"name": "$$input.deployment.change_type", "value": "bug_fix"}`. A new feature with no test runs fails `tested` and `passed`, and so does a change type that isn't listed, like `hotfix`, so a new or misspelt type has to be tested until someone adds it to the list. A deployment with no `change_type` fails the requirement, because ergo can't tell whether it applies.
+The `$applies` entry in `checks` records the value the ref read, under `$refs`: `{"name": "$input.deployment.change_type", "value": "bug_fix"}`. A new feature with no test runs fails `tested` and `passed`, and so does a change type that isn't listed, like `hotfix`, so a new or misspelt type has to be tested until someone adds it to the list. A deployment with no `change_type` fails the requirement, because ergo can't tell whether it applies.
 
 The filter lists the types that don't need tests, rather than the ones that do. Listing `new_development` with `in` would also work, but then any other type, misspelt ones included, would quietly skip the tests.
 
@@ -291,7 +291,7 @@ A path is a list of keys that ergo follows one step at a time. `["release", "app
 
 A key is a string, or a list index written as digits alone, like `0` or `12`. A string only picks a key of an object and a number only picks an item of a list, so `["a", "0"]` reads nothing when `a` is a list, and `["o", 0]` reads nothing when `o` is `{"0": "zero"}`. JavaScript reads both, so an implementation there has to check the type. A path that runs into something that can't hold its next key, like these, or a string, number or boolean where an object or list should be, fails its check with cause `unusable`, so `["pr", "state"]` on `"pr": "none"` isn't reported as a missing field. A parent that isn't there, or is `null`, is different: the field is just missing. A step that can't be a key, like `true`, `null`, a list, `-1`, `1.5`, or even `1.0`, which OPA doesn't read as `1` but JavaScript does, can never read anything. So a check with one is written wrong: it fails `$well_formed`, its rows fail with cause `ill_formed`, even as a `present` filter, and the step is shown as `<invalid step>`. The same goes for the paths in a check's `inputs`. One in `from` or `id` fails `$well_formed`.
 
-In expressions and `inputs`, a key is written as it is when it starts with an ASCII letter (`a` to `z` or `A` to `Z`), `_` or `$`, and the rest is ASCII letters, digits, `_`, `$` and `-`. Any other key is quoted, so a key with a dot, a space or an accented letter, one that starts with a digit or `-`, and the empty key are all written in quotes. So `["metadata", "labels", "app.kubernetes.io/name"]` is named `metadata.labels."app.kubernetes.io/name"`, and doesn't look like a path four keys deep. The string key `["xs", "0"]` is named `xs."0"`, unlike the list index `["xs", 0]`, named `xs.0`. A first step written as `{"literal": "$schema"}` is named `"$schema"`, so it doesn't look like a [name](#naming-subjects). `from` takes no names and no `$$input`, so there a first key that starts with `$` is always quoted: `["$$input"]` is named `"$$input"`, and can't be mistaken for the whole input.
+In expressions, `inputs`, `$refs` and `failed_items`, a path is named the way a [sentence](#checks-written-as-sentences) writes it. A name made of keys, positions and `named by` one key can be pasted into a sentence. Names from `each_as` or `as`, like `$pr.author`, selectors, `[]` lists and refs of more than one key can't, because sentences don't have those yet. A key is written as it is when it starts with an ASCII letter (`a` to `z` or `A` to `Z`) or `_`, and the rest is ASCII letters, digits, `_` and `-`. Any other key is quoted, so a key with a dot, a space, a `$` or an accented letter, one that starts with a digit or `-`, and the empty key are all written in quotes. So `["metadata", "labels", "app.kubernetes.io/name"]` is named `metadata.labels."app.kubernetes.io/name"`, and doesn't look like a path four keys deep, and `["x", "$b"]` is named `x."$b"`. A first key that's a word the sentences use, like `empty` or `a`, gets a dot in front: `.empty`. A path into the params or the input starts with `$params` or `$input`, like `$params.allowed`. A list index at the end of a path is written `item <n> of`, counting from 1, and one with more after it in brackets, counting from 0: `["xs", 1]` is `item 2 of xs`, `["xs", 1, "k"]` is `xs[1].k`, and the string key `["xs", "0"]` is `xs."0"`. A first step written as `{"literal": "$schema"}` is named `"$schema"`, so it doesn't look like a [name](#naming-subjects). `from` takes no names and no `$$input`, so there a first key that starts with `$` is always quoted: `["$$input"]` is named `"$$input"`, and can't be mistaken for the whole input.
 
 `from` is a path into the input. Every other path (`id`, a check's `path`, `left` and `right`) is a path into one subject, unless it starts with [`$$input`](#reading-from-the-input) or a [name](#naming-subjects).
 
@@ -307,7 +307,7 @@ An empty path, `[]`, reads the item itself. Use it inside `all` or `any` when th
 
 ergo names the item after its list, so this renders as `every branches: branches[] matches one of ["^main$", "^release/"]`, and the row's input is `branches[]`. An empty `each` works the same way, for a list of lists.
 
-An empty path also reads a subject that isn't an object, like each string of `"from": ["branches"]`. There, the item is named after `from` (`branches[]`), or `$$input` when there's no `from`, because then the subject is the input and `["$$input"]` reads the same thing. That keeps it apart from a key called `input`. `$min_subjects` names it the same way, as `count(matching($$input))`, when `from` reads the whole input. Any other path on such a subject fails with cause `not_an_object`.
+An empty path also reads a subject that isn't an object, like each string of `"from": ["branches"]`. There, the item is named after `from` (`branches[]`), or `$input` when there's no `from`, because then the subject is the input and `["$$input"]` reads the same thing. That keeps it apart from a key called `input`, which is named `input`. `$min_subjects` names it the same way, as `count(matching($input))`, when `from` reads the whole input. Any other path on such a subject fails with cause `not_an_object`.
 
 One step in a path can be a **selector** instead of a key. It picks the single item in a list (or an object's values) whose fields match:
 
@@ -354,13 +354,13 @@ With those params, a package licensed `GPL-3.0` gives this violation:
   "subject": { "type": "package", "id": "gpl-lib" },
   "check": "approved",
   "description": "",
-  "expression": "some licences: licences[] in $$params.allowed_licences",
+  "expression": "some licences: licences[] in $params.allowed_licences",
   "inputs": [
     { "name": "licences[]", "value": ["GPL-3.0"] },
-    { "name": "$$params.allowed_licences", "value": ["MIT", "Apache-2.0"] }
+    { "name": "$params.allowed_licences", "value": ["MIT", "Apache-2.0"] }
   ],
   "cause": "value",
-  "failed_items": [{ "path": "licences[0]", "value": "GPL-3.0", "cause": "value" }]
+  "failed_items": [{ "path": "item 1 of licences", "value": "GPL-3.0", "cause": "value" }]
 }
 ```
 
@@ -395,7 +395,7 @@ A ref can also be one step of a path. It's replaced by the value it reads, which
 }},
 ```
 
-With `artifact_name` set to `app` and `attestation_name` to `pull-request`, this reads `trail.artifacts.app.attestations.pull-request.status`. The expression shows where the key came from: `attestations.[$$params.attestation_name].status == "COMPLETE"`, and the value used is recorded under `$refs`, like any ref.
+With `artifact_name` set to `app` and `attestation_name` to `pull-request`, this reads `trail.artifacts.app.attestations.pull-request.status`. The expression shows where the key came from: `attestations named by $params.attestation_name.status == "COMPLETE"`, and the value used is recorded under `$refs`, like any ref.
 
 A ref step works anywhere in any path: first, in the middle or last, after a name or `$$input`, before a selector, and in `from`, `id`, `each`, `left` and `right`.
 
@@ -495,7 +495,7 @@ A pull request that only its author approved gives this violation. The row shows
     { "name": "$pr.author", "value": "ann" }
   ],
   "cause": "value",
-  "failed_items": [{ "path": "approvers[0]", "value": { "username": "ann" }, "cause": "value" }]
+  "failed_items": [{ "path": "item 1 of approvers", "value": { "username": "ann" }, "cause": "value" }]
 }
 ```
 
@@ -503,7 +503,7 @@ If `author` were missing, the cause would be `absent`.
 
 Some things worth knowing:
 
-- The step must be the last one in `from`, and there can only be one. The name must be a string that doesn't start with `$`. `keys` must be a list, a `literal` holding a list, or a [`ref`](#reading-from-the-input), and a key in the list can't be a ref with another key beside it. A step with any other field, or one that breaks these rules, fails `$well_formed` and gives no subjects, so the requirement is never met, even with `min_subjects: 0`.
+- The step must be the last one in `from`, and there can only be one. The name must be a string that doesn't start with `$` and isn't `params` or `input`, which would look like the params and the input in the report. `keys` must be a list, a `literal` holding a list, or a [`ref`](#reading-from-the-input), and a key in the list can't be a ref with another key beside it. A step with any other field, or one that breaks these rules, fails `$well_formed` and gives no subjects, so the requirement is never met, even with `min_subjects: 0`.
 - Any other object in `from`, like a selector or a `literal`, fails `$well_formed` the same way. `from` has never read them, so a requirement with `min_subjects: 0` used to find nothing and pass.
 - Keys are sorted and duplicates dropped, so the order you list them in doesn't change the report. If `from` doesn't lead to an object, every key is still a subject, and its checks fail as `absent` (or `value`, for a `present` check). An empty `keys` list gives no subjects, so `$min_subjects` fails.
 - `keys` can come from the params: `"keys": {"ref": ["$$params", "required_suites"]}`. The list it reads works exactly like one written in the policy. A single key can be a ref too: `[{"ref": ["$$params", "suite"]}, "unit-test"]`, as can a `literal` like `{"literal": "$x"}`. If a ref can't be read, or reads the wrong type (anything but a list for the whole of `keys`, or a string or number for one key), there are no subjects and `$min_subjects` fails as `absent`, `null` or, for the wrong type, `unusable`, even with `min_subjects: 0`. A key is never just left out. The definition of `$min_subjects` records the ref under `$refs`.
@@ -850,7 +850,7 @@ The inner paths start at each commit, so `["timestamp"]` is the commit's. `$appr
     ] }
   ],
   "cause": "value",
-  "failed_items": [{ "path": "approvers[0]", "value": { "username": "bob", "timestamp": "2026-10-01T11:00:00Z" }, "cause": "value" }]
+  "failed_items": [{ "path": "item 1 of approvers", "value": { "username": "bob", "timestamp": "2026-10-01T11:00:00Z" }, "cause": "value" }]
 }
 ```
 
@@ -873,7 +873,7 @@ It renders as `some approvers as $approver: one of: peer(state == "APPROVED" and
 
 Some things worth knowing:
 
-- `as` takes the same names as a [naming step](#naming-subjects): a string that doesn't start with `$`. Without `each`, `$approver` reads the same as a path inside the item, so `as` only matters for a check nested inside. With `each`, it names the inner item.
+- `as` takes the same names as a [naming step](#naming-subjects): a string that doesn't start with `$` and isn't `params` or `input`. Without `each`, `$approver` reads the same as a path inside the item, so `as` only matters for a check nested inside. With `each`, it names the inner item.
 - A name can only be given once along a chain of checks. `as` with a name that `from` or an outer check already gave is written wrong: it fails `$well_formed`, the check fails with cause `ill_formed`, and it shows as `<name given twice>`. A badly written name fails the same way and shows as `<invalid name>`. The cause isn't `value`, so a filter written like this fails the requirement rather than ruling every subject out. Two separate checks can use the same name.
 - A name given by `as` belongs to one item, so the row doesn't show it in its `inputs`. It still decides that item's cause, so an approver with no `timestamp` makes the check fail as `absent`. Paths that start with it are shown as paths inside the item, like `approvers[].timestamp`. That only holds inside the list check that gives the name. Anywhere else, like a neighbouring `any_of` option, nothing gives it, so reading it there is written wrong and fails as `ill_formed`.
 - Inner lists follow the same rules as outer ones. If an approver is tried against an empty or missing list of commits, that try fails.
@@ -896,15 +896,15 @@ and the check from above, `every pull_requests[].commits: signed == true`, the r
 ```json
 "cause": "absent",
 "failed_items": [
-  { "path": "pull_requests[0].commits[1]", "cause": "value", "value": { "sha": "a2", "signed": false } },
+  { "path": "item 2 of pull_requests[0].commits", "cause": "value", "value": { "sha": "a2", "signed": false } },
   { "path": "pull_requests[1].commits", "cause": "absent", "value": null },
-  { "path": "pull_requests[2].commits[0]", "cause": "absent", "value": { "sha": "c1" } }
+  { "path": "item 1 of pull_requests[2].commits", "cause": "absent", "value": { "sha": "c1" } }
 ]
 ```
 
 `inputs` still shows the whole list, so the row records what was checked as well as what failed.
 
-- `path` is written like a path in an expression, with the item's position added: `pull_requests[0].commits[1]` is the second commit of the first pull request. A path that starts with a name keeps it, as in `$pr.commits[1]`.
+- `path` is written like a path in an expression, with the item's position added: `item 2 of pull_requests[0].commits` is the second commit of the first pull request. The last position is written `item <n> of`, counting from 1, and one further in is in brackets, counting from 0, as in [sentences](#checks-written-as-sentences). A path that starts with a name keeps it, as in `item 2 of $pr.commits`.
 - With `each`, an inner list that's missing, `null`, not a list or empty fails the check, so it's listed in place of its items, like `pull_requests[1].commits` above.
 - An item whose field a `present` check finds missing or `null` is listed with cause `value`, the same as the row, because `present` read the field fine and found nothing there.
 - When the check passes, it's `[]`. A passing `any` can have items that failed, but none of them is why the row came out the way it did.
@@ -1142,7 +1142,7 @@ In an expression, a value written in the policy is shown as JSON, written the sa
 - A string is always in quotes: `state == "MERGED"`, `n == "1"` and `x == ""` compare against strings, and `n == 1`, `ok == true` and `x == null` don't. Only `"`, `\` and control characters are escaped, as `\"`, `\\`, `\b`, `\f`, `\n`, `\r`, `\t` or `\u0001` and so on, so `"a<b"` stays as it is.
 - A number is a plain decimal, with no exponent and no trailing zeros: `1.0`, `1.50`, `1e2` and `2.5e-3` are shown as `1`, `1.5`, `100` and `0.0025`, and `-0` as `0`. A number keeps every digit the policy wrote, so it's only shown the same by every implementation when it has at most 15 significant digits, which is as many as any language's 64-bit floating point number is sure to keep. The same goes for a number copied from the input into the report: a runtime that reads JSON into 64-bit numbers, like JavaScript, turns `12345678901234567890` into `12345678901234567000` before ergo sees it. A number in the policy has to be `0` or have a magnitude between `2.2250738585072014e-308` and `1.7976931348623157e308`, the range those numbers hold without losing digits. Elsewhere, a language like JavaScript turns `1e400` into `Infinity` and `1e-400` into `0`, so a check could pass there and fail here. A check holding such a number anywhere is written wrong: it fails `$well_formed`, the check fails with cause `ill_formed`, and the number is shown as `<number out of range>`. One in `from`, `id` or `min_subjects` fails `$well_formed`.
 - A list or object has one space after each comma and colon, and its keys are sorted: `["a", 1.5, {"a": "x", "b": [true, null]}]`.
-- A ref is shown without quotes, as `$$params.x`, so it can't be mistaken for the string `"$$params.x"`.
+- A ref is shown without quotes, as `$params.x`, so it can't be mistaken for the string `"$params.x"`.
 - Something that should be a string but isn't, like an `op` or `cmp` written as an object, is shown as JSON too: `<unknown op {"ref": ["a"]}>`. A string there is shown as it is, without quotes: `<unknown op nope>`.
 
 Keys in paths are only quoted when needed, as described in [Paths](#paths), and are escaped the same way.

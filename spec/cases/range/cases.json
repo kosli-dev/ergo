@@ -89,8 +89,8 @@
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2}]}
         ],
-        "expressions": {"s": {"c": "x >= $$params.lo and x <= $$params.hi"}},
-        "refs": {"s": {"c": [{"name": "$$params.hi", "value": 3}, {"name": "$$params.lo", "value": 1}]}}
+        "expressions": {"s": {"c": "x >= $params.lo and x <= $params.hi"}},
+        "refs": {"s": {"c": [{"name": "$params.hi", "value": 3}, {"name": "$params.lo", "value": 1}]}}
       }
     ]
   },

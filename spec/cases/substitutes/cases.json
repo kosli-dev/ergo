@@ -179,7 +179,7 @@
             "check": "c",
             "passed": false,
             "cause": "unusable",
-            "inputs": [{"name": "s", "value": "O"}, {"name": "a", "value": {"n": 1}}, {"name": "b", "value": {"o": 1}}]
+            "inputs": [{"name": "s", "value": "O"}, {"name": ".a", "value": {"n": 1}}, {"name": "b", "value": {"o": 1}}]
           }
         ]
       }
@@ -195,9 +195,9 @@
         "rules": ["substitute.cause", "value.ref"],
         "input": {"t": [{"b": 1, "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "a", "value": null}, {"name": "b", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": ".a", "value": null}, {"name": "b", "value": 1}]}
         ],
-        "refs": {"s": {"c": [{"name": "$$params.w", "value": null}]}}
+        "refs": {"s": {"c": [{"name": "$params.w", "value": null}]}}
       }
     ]
   },
@@ -252,9 +252,9 @@
         "rules": ["substitute.where", "substitute.expression", "substitute.syntax", "render.path"],
         "input": {"t": [{"c": 1, "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "a", "value": null}, {"name": "b", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": ".a", "value": null}, {"name": "b", "value": null}]}
         ],
-        "expressions": {"s": {"c": "a is present, or substitute: b is present"}}
+        "expressions": {"s": {"c": ".a is present, or substitute: b is present"}}
       }
     ]
   },
@@ -277,7 +277,7 @@
     "cases": [
       {
         "description": "is ignored",
-        "rules": ["substitute.where"],
+        "rules": ["substitute.where", "name.index"],
         "input": {"t": [{"cs": [{"s": false, "w": 1}], "id": "t1"}]},
         "results": [
           {
@@ -287,7 +287,7 @@
             "passed": false,
             "cause": "value",
             "inputs": [{"name": "cs[].s", "value": [false]}],
-            "failed_items": [{"cause": "value", "path": "cs[0]", "value": {"s": false, "w": 1}}]
+            "failed_items": [{"cause": "value", "path": "item 1 of cs", "value": {"s": false, "w": 1}}]
           }
         ],
         "expressions": {"s": {"c": "every cs: s == true"}}
@@ -340,7 +340,7 @@
     "cases": [
       {
         "description": "passes the row as substituted and keeps the items the check failed on",
-        "rules": ["substitute.where", "substitute.inputs", "substitute.pass", "substitute.expression", "substitute.syntax", "render.path"],
+        "rules": ["substitute.where", "substitute.inputs", "substitute.pass", "substitute.expression", "substitute.syntax", "render.path", "name.index"],
         "input": {"t": [{"cs": [{"s": false}], "id": "t1", "waiver": "w"}]},
         "results": [
           {
@@ -350,7 +350,7 @@
             "passed": true,
             "cause": "substituted",
             "inputs": [{"name": "cs[].s", "value": [false]}, {"name": "waiver", "value": "w"}],
-            "failed_items": [{"cause": "value", "path": "cs[0]", "value": {"s": false}}]
+            "failed_items": [{"cause": "value", "path": "item 1 of cs", "value": {"s": false}}]
           }
         ],
         "expressions": {"s": {"c": "every cs: s == true, or substitute: waiver is present"}}
@@ -373,7 +373,7 @@
         "rules": ["substitute.where", "substitute.pass"],
         "input": {"t": [{"b": 1, "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "substituted", "inputs": [{"name": "a", "value": null}, {"name": "b", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "substituted", "inputs": [{"name": ".a", "value": null}, {"name": "b", "value": 1}]}
         ]
       }
     ]
@@ -456,7 +456,7 @@
             "check": "$applies",
             "passed": false,
             "cause": "unusable",
-            "inputs": [{"name": "a", "value": 1}, {"name": "b", "value": "x"}, {"name": "e", "value": null}]
+            "inputs": [{"name": ".a", "value": 1}, {"name": "b", "value": "x"}, {"name": "e", "value": null}]
           }
         ]
       }

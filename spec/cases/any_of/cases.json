@@ -170,7 +170,7 @@
             "passed": true,
             "cause": "satisfied",
             "inputs": [
-              {"name": "a", "value": null},
+              {"name": ".a", "value": null},
               {"name": "b", "value": null},
               {"name": "c", "value": null},
               {"name": "d", "value": null},
@@ -186,7 +186,7 @@
         ],
         "expressions": {
           "s": {
-            "c": "one of: 0(a is present) | 1(b is present) | 10(k is present) | 2(c is present) | 3(d is present) | 4(e is present) | 5(f is present) | 6(g is present) | 7(h is present) | 8(i is present) | 9(j is present)"
+            "c": "one of: 0(.a is present) | 1(b is present) | 10(k is present) | 2(c is present) | 3(d is present) | 4(e is present) | 5(f is present) | 6(g is present) | 7(h is present) | 8(i is present) | 9(j is present)"
           }
         }
       }
@@ -239,7 +239,7 @@
     "cases": [
       {
         "description": "lets an item pass on either option",
-        "rules": ["list.items", "any_of.pass", "list.inputs", "render.path", "list.expression"],
+        "rules": ["list.items", "any_of.pass", "list.inputs", "render.path", "list.expression", "name.index"],
         "input": {"things": [{"cs": [{"s": true}, {}, {"s": false}], "id": "t1"}]},
         "results": [
           {
@@ -249,7 +249,7 @@
             "passed": false,
             "cause": "value",
             "inputs": [{"name": "cs[]", "value": [{"s": true}, {}, {"s": false}]}],
-            "failed_items": [{"cause": "value", "path": "cs[2]", "value": {"s": false}}]
+            "failed_items": [{"cause": "value", "path": "item 3 of cs", "value": {"s": false}}]
           }
         ],
         "expressions": {"s": {"c": "every cs: one of: a(s == true) | b(s is missing)"}}
