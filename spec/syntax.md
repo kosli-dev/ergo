@@ -60,15 +60,15 @@ Draft 0.1. This file covers the syntax policies use today, where a check is a JS
 
 ## Naming a path
 
-A row's `inputs`, a ref's entry in `$refs`, an item in `failed_items` and a path in an `expression` name the paths they read the way a sentence writes them (see [sentences.md](sentences.md#paths)), so a name from a row can be pasted into a sentence. The names `$well_formed` gives the policy's own fields, like `checks.c` or `subjects.deployment.from`, follow [written_wrong.row](#checks-written-wrong) instead.
+A row's `inputs`, a ref's entry in `$refs`, an item in `failed_items` and a path in an `expression` name the paths they read the way a sentence writes them (see [sentences.md](sentences.md#paths)). A name made of keys, positions and `named by` one key, starting at the subject, `$params` or `$input`, can be pasted into a sentence. Names given by `each_as` or `as`, like `$pr.author`, selectors, the `[]` of a list's items and refs of more than one key have no sentence spelling yet, so those can't. The names `$well_formed` gives the policy's own fields, like `checks.c` or `subjects.deployment.from`, follow [written_wrong.row](#checks-written-wrong) instead.
 
-**[name.keys]** Keys are joined with `.`. A key is written as it is when it starts with an ASCII letter or `_` and the rest is ASCII letters, digits, `_` or `-`, and in double quotes otherwise, so a key with a `$` in it is quoted, like `"$schema".x` or `x."$b"`. A first key that's a word of the sentence grammar (see [sentence.words](sentences.md#words-a-field-cant-be-called)) has a `.` in front, like `.empty` or `.a`. A path that starts at the input or the params starts with `$input` or `$params`, and one that starts at a name keeps it, like `$pr.author`.
+**[name.keys]** Keys are joined with `.`. A key is written as it is when it starts with an ASCII letter or `_` and the rest is ASCII letters, digits, `_` or `-`, and in double quotes otherwise, so a key with a `$` in it is quoted, like `"$schema".x` or `x."$b"`. A first key that's a word of the sentence grammar (see [sentence.words](sentences.md#words-a-field-cant-be-called)) has a `.` in front, like `.empty` or `.a`. A path that starts at the input or the params starts with `$input` or `$params`, and one that starts at a name keeps it, like `$pr.author`. Since `params` and `input` can't be names, a path that starts with `$params` or `$input` in today's syntax names nothing and is shown as `<unknown name $params>`, so it never looks like the params or the input.
 
-**[name.index]** An index at the end of a path is written `item <n> of <path>`, counting from 1, so `["xs", 1]` is `item 2 of xs`. An index with more steps after it, or with nothing before it, is written in brackets, counting from 0: `xs[1].k`, `[0]`.
+**[name.index]** An index at the end of a path is written `item <n> of <path>`, counting from 1, so `["xs", 1]` is `item 2 of xs`, and so is a position in a list check's `failed_items` whose path is empty: `item 2 of xss[]`. A number written as a `literal` is named like the index it reads. An index with more steps after it, or with nothing before it, is written in brackets, counting from 0: `xs[1].k`, `[0]`.
 
 **[name.selector]** A selector is written `[k=="a"]`, its fields sorted and joined with ` and `.
 
-**[name.ref_step]** A ref step whose ref reads one key of the input or the params is written ` named by $params.key`, like `obj named by $params.k.v`. Any other ref step, and one that starts the path, is written in brackets, like `k[$params.a.b]` or `[$params.key]`.
+**[name.ref_step]** A ref step whose ref reads one string key of the input or the params is written ` named by $params.key`, like `obj named by $params.k.v`. Any other ref step, and one that starts the path, is written in brackets, like `k[$params.a.b]` or `[$params.key]`.
 
 **[name.subject]** A path with no steps on a subject is named after the subject's `from` with `[]` added, like `things[]`.
 

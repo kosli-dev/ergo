@@ -8298,9 +8298,11 @@ test_a_name_from_the_report_reads_back_in_a_sentence_as_the_path_it_names if {
 	}
 }
 
-test_a_failed_item_of_a_list_check_with_no_path_is_named_after_the_subject_with_its_position_in_brackets if {
+test_a_failed_item_of_a_list_check_with_no_path_counts_from_one_like_every_other_list if {
 	policy := {"subjects": {"l": {"from": ["xss"]}}, "requirements": {"r": {"subject": "l", "checks": {"c": {"op": "all", "path": [], "check": {"op": "equals", "path": [], "value": 1}}}}}}
-	[r.failed_items | some r in ergo.report({"xss": [[1, 2]]}, policy, {}).results; r.check == "c"] == [[{"cause": "value", "path": "xss[][1]", "value": 2}]]
+	[r.failed_items | some r in ergo.report({"xss": [[1, 2]]}, policy, {}).results; r.check == "c"] == [[{"cause": "value", "path": "item 2 of xss[]", "value": 2}]]
+	with_each := {"subjects": {"m": {"from": ["o"]}}, "requirements": {"q": {"subject": "m", "checks": {"c": {"op": "all", "path": [], "each": ["a"], "check": {"op": "equals", "path": [], "value": 1}}}}}}
+	[r.failed_items | some r in ergo.report({"o": [[{"a": [1]}, {"b": 2}]]}, with_each, {}).results; r.check == "c"] == [[{"cause": "absent", "path": "o[][1].a", "value": null}]]
 }
 
 test_a_list_after_each_is_named_further_along_the_path_so_a_grammar_word_gets_no_dot if {
@@ -8335,4 +8337,27 @@ test_params_and_input_cant_be_names_so_a_name_is_never_read_as_the_params_or_the
 test_an_each_that_isnt_a_list_shows_as_invalid_in_the_expression if {
 	rendered({"xs": [1]}, {"op": "all", "path": ["xs"], "each": {"x": 1}, "check": {"op": "present", "path": []}}) == "every xs[].<invalid each>: xs[].<invalid each>[] is present"
 	rendered({"xs": [1]}, {"op": "all", "path": ["xs"], "each": true, "check": {"op": "present", "path": []}}) == "every xs[].<invalid each>: xs[].<invalid each>[] is present"
+}
+
+test_a_name_nothing_gave_never_prints_like_the_params_or_the_input if {
+	policy := {"subjects": {"t": {"from": ["items"], "id": ["id"]}}, "requirements": {"s": {"subject": "t", "checks": {
+		"a": {"op": "equals", "path": ["$params", "x"], "value": 1},
+		"b": {"op": "equals", "path": ["$$params", "x"], "value": 1},
+		"c": {"op": "present", "path": ["$input", "x"]},
+	}}}}
+	checks := ergo.report({"items": [{"id": "i"}]}, policy, {"x": 1}).requirements.s.checks
+	[checks.a.expression, checks.b.expression, checks.c.expression] == ["<unknown name $params>.x == 1", "$params.x == 1", "<unknown name $input>.x is present"]
+}
+
+test_an_each_that_isnt_a_list_still_lists_every_item_as_ill_formed if {
+	policy := {"subjects": {"t": {"from": ["items"], "id": ["id"]}}, "requirements": {"s": {"subject": "t", "checks": {"c": {"op": "all", "path": ["ys"], "each": "x", "check": {"op": "equals", "path": [], "value": 9}}}}}}
+	[r.failed_items | some r in ergo.report({"items": [{"id": "i", "ys": [[1], [2]]}]}, policy, {}).results; r.check == "c"] == [[
+		{"cause": "ill_formed", "path": "item 1 of ys", "value": [1]},
+		{"cause": "ill_formed", "path": "item 2 of ys", "value": [2]},
+	]]
+}
+
+test_a_number_written_as_a_literal_is_named_like_the_index_it_reads if {
+	rendered({}, {"op": "present", "path": ["zs", {"literal": 1}]}) == "item 2 of zs is present"
+	rendered({}, {"op": "present", "path": ["zs", {"literal": 1}, "k"]}) == "zs[1].k is present"
 }

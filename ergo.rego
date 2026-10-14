@@ -722,6 +722,15 @@ _item_entries(subj, check, item) := [[_entry_name(item, check.path, [i]), v] |
 	is_array(coll)
 }
 
+_item_entries(subj, check, item) := [[_entry_name(item, check.path, [i]), v] |
+	some i, v in coll
+] if {
+	check.each
+	not is_array(check.each)
+	coll := _field(subj, check.path)
+	is_array(coll)
+}
+
 _item_entries(subj, check, item) := [e |
 	some i, outer in coll
 	some e in _outer_entries(outer, check, item, array.concat([i], check.each))
@@ -744,7 +753,9 @@ _outer_entries(outer, check, item, rest) := [[_entry_name(item, check.path, rest
 
 _entry_name(_, path, rest) := _path_name(array.concat(path, rest)) if path != []
 
-_entry_name(item, [], rest) := concat("", [item, _steps_name(rest)])
+_entry_name(item, [], rest) := concat("", ["item ", _literal_text(rest[count(rest) - 1] + 1), " of ", item, _steps_name(array.slice(rest, 0, count(rest) - 1))]) if {
+	_index_step(rest[count(rest) - 1])
+} else := concat("", [item, _steps_name(rest)])
 
 _is_list_at(x, path) if is_array(_field(x, path))
 
@@ -1000,13 +1011,13 @@ _selector_matches(v, sel) if {
 
 _field_path_name(path) := concat(".", [_segment_name(path[i]) | some i in _names(path)])
 
-_path_name(path) := concat("", ["item ", _literal_text(path[count(path) - 1] + 1), " of ", _steps_name(array.slice(path, 0, count(path) - 1))]) if {
+_path_name(path) := concat("", ["item ", _literal_text(_unliteral(path[count(path) - 1]) + 1), " of ", _steps_name(array.slice(path, 0, count(path) - 1))]) if {
 	is_array(path)
 	count(path) > 1
 	_index_step(path[count(path) - 1])
 } else := _steps_name(path)
 
-_ref_name(path) := concat("", ["item ", _literal_text(path[count(path) - 1] + 1), " of ", _plain_steps_name(array.slice(path, 0, count(path) - 1))]) if {
+_ref_name(path) := concat("", ["item ", _literal_text(_unliteral(path[count(path) - 1]) + 1), " of ", _plain_steps_name(array.slice(path, 0, count(path) - 1))]) if {
 	_builtin(path)
 	count(path) > 1
 	_index_step(path[count(path) - 1])
@@ -1015,6 +1026,12 @@ _ref_name(path) := concat("", ["item ", _literal_text(path[count(path) - 1] + 1)
 _index_step(s) if {
 	is_number(s)
 	_is_key(s)
+}
+
+_index_step(s) if {
+	_is_literal(s)
+	is_number(s.literal)
+	_is_key(s.literal)
 }
 
 _steps_name(path) := concat("", [_step_name(i, path[i]) | some i in _names(path)])
@@ -1059,8 +1076,10 @@ _plain_step_name(0, "$$params") := "$params"
 _plain_step_name(0, step) := step if {
 	is_string(step)
 	startswith(step, "$")
-	not step in {"$$input", "$$params"}
+	not step in {"$$input", "$$params", "$input", "$params"}
 }
+
+_plain_step_name(0, step) := concat("", ["<unknown name ", step, ">"]) if step in {"$input", "$params"}
 
 _plain_step_name(0, step) := concat("", [_s_dot(step, "left"), _s_key_text(step)]) if {
 	is_string(step)
@@ -1079,7 +1098,7 @@ _plain_step_name(i, step) := concat("", [".", _s_key_text(step.literal)]) if {
 	_string_literal(step)
 }
 
-_plain_step_name(_, step) := concat("", ["[", _literal_text(step), "]"]) if _index_step(step)
+_plain_step_name(_, step) := concat("", ["[", _literal_text(_unliteral(step)), "]"]) if _index_step(step)
 
 _plain_step_name(i, step) := concat("", [_step_dot(i), _key_name(_unliteral(step))]) if not _nameable_step(step)
 
