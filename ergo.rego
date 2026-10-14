@@ -678,9 +678,12 @@ _check_outcome(check, subj, flaw, item) := object.union(
 		"cause": _row_cause(check, subj, flaw),
 	},
 	_failed_items_field(check, subj, flaw, item),
-) if not _all_of(check)
+) if not _all_of_run(check, flaw)
 
-_all_of(check) if check.op == "all_of"
+_all_of_run(check, flaw) if {
+	check.op == "all_of"
+	flaw != "ill_formed"
+}
 
 _check_outcome(check, subj, flaw, item) := {
 	"inputs": [{"name": pair[0], "value": pair[1]} | some pair in sort({[i.name, i.value] | some c in check.checks; some i in _row_inputs(subj, c, item)})],
@@ -688,7 +691,7 @@ _check_outcome(check, subj, flaw, item) := {
 	"cause": _all_of_cause(failed),
 	"failed_assertions": failed,
 } if {
-	_all_of(check)
+	_all_of_run(check, flaw)
 	failed := _failed_assertions(check, subj, flaw)
 }
 
@@ -699,8 +702,6 @@ _failed_assertions(check, subj, flaw) := [{"assertion": check.assertions[i], "ca
 ]
 
 _assertion_cause(c, subj, "") := _row_cause(c, subj, "")
-
-_assertion_cause(_, _, "ill_formed") := "ill_formed"
 
 _assertion_cause(c, subj, "unusable") := "unusable" if {
 	_unusable_assertion(c)

@@ -8515,9 +8515,18 @@ test_an_assertion_whose_param_cant_be_read_is_the_only_one_listed_as_unusable if
 	[[row.cause, row.failed_assertions] | some row in r.results; row.check == "c"] == [["unusable", [{"assertion": "x is in $params.l", "cause": "unusable"}, {"assertion": "y is 2", "cause": "value"}]]]
 }
 
-test_an_all_of_written_wrong_still_lists_every_assertion_so_its_row_never_goes_missing if {
-	check := {"op": "all_of", "checks": [{"op": "present", "path": ["x"]}, {"op": "present", "path": ["y"]}], "assertions": ["x exists", "y exists"]}
-	ergo._failed_assertions(check, {}, "ill_formed") == [{"assertion": "x exists", "cause": "ill_formed"}, {"assertion": "y exists", "cause": "ill_formed"}]
+test_an_all_of_written_by_hand_fails_as_ill_formed_like_any_unknown_op_whatever_shape_it_has if {
+	every check in [
+		{"op": "all_of", "checks": [], "assertions": []},
+		{"op": "all_of"},
+		{"op": "all_of", "checks": "x", "assertions": "y"},
+		{"op": "all_of", "checks": [{"op": "present", "path": ["zz"]}], "assertions": []},
+		{"op": "all_of", "checks": [{"op": "present", "path": ["zz"]}], "assertions": [{"evil": 1}]},
+	] {
+		r := ergo.report({"things": [{"id": "a", "x": 1}]}, _sentence_policy({"c": check}), {})
+		[row | some row in r.results; row.check == "c"] == [{"requirement": "s", "subject": {"type": "thing", "id": "a"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}]
+		[v.check | some v in ergo.violations(r)] == ["$well_formed", "c"]
+	}
 }
 
 test_every_assertion_is_unusable_when_the_input_holds_something_json_cant if {
