@@ -8185,7 +8185,6 @@ test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
 		[`every xs is 1`, "every and some aren't supported yet"],
 		[`count of xs is 1`, "count of, sum of and plus aren't supported yet"],
 		[`x is y plus 1`, "count of, sum of and plus aren't supported yet"],
-		[`x is an object`, `"is an object" isn't supported yet`],
 		[`x starts with "a"`, `"starts with" isn't supported yet`],
 		[`x ends with y`, `"ends with" isn't supported yet`],
 		[`t is before "2024-01-01T00:00:00Z"`, `"is before" with a value isn't supported yet: compare with a field`],
@@ -8433,4 +8432,15 @@ test_is_not_in_a_list_read_from_the_params_fails_when_the_params_dont_hold_a_lis
 
 test_not_in_is_an_unknown_op_in_todays_syntax if {
 	_sentence_problems({"op": "not_in", "path": ["x"], "values": ["a"]}) == ["unknown op not_in"]
+}
+
+test_is_a_type_passes_on_that_json_type_and_fails_any_other_as_value if {
+	doc := {"things": [{"id": "a", "x": []}, {"id": "b", "x": ""}, {"id": "c", "x": 0}, {"id": "d", "x": false}, {"id": "e", "x": {}}, {"id": "f", "x": null}, {"id": "g"}]}
+	checks := {"b": "x is a boolean", "l": "x is a list", "n": "x is a number", "o": "x is an object", "s": "x is a string"}
+	[[r[0], r[2]] | some r in _sentence_rows(checks, doc, {}); r[1]] == [["l", "satisfied"], ["s", "satisfied"], ["n", "satisfied"], ["b", "satisfied"], ["o", "satisfied"]]
+	{r[2] | some r in _sentence_rows(checks, doc, {}); not r[1]} == {"value", "null", "absent"}
+}
+
+test_has_type_is_an_unknown_op_in_todays_syntax if {
+	_sentence_problems({"op": "has_type", "path": ["x"], "type": "list"}) == ["unknown op has_type"]
 }
