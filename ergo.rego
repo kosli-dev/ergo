@@ -4081,10 +4081,10 @@ _derived_placement_problem(node, kinds) := {concat("", [_side_form(side), " can'
 
 _s_patterns := {
 	"assertions": concat("", [`(`, assertion, `)(?: +and +|$)`]),
-	"assertion": concat("", [`^(?:(every|some) +(`, path, `)|(`, left, `))(?: +where +(`, conds, `))?(, +if +any,)? +(`, phrase, `)$`]),
+	"assertion": concat("", [`^(?:(every|some) +(`, path, `)|(`, left, `))(?: +whose +(`, conds, `))?(, +if +any,)? +(`, phrase, `)$`]),
 	"for_items": concat("", [`(`, for_item, `)(?:, +|$)`]),
-	"for_item": concat("", [`^(every|some) +(`, path, `)(?: +where +(`, conds, `))?(, +if +any,)? +as +(`, key, `)$`]),
-	"from": concat("", [`^(`, path, `)(?: +named +by +each +of +(`, rpath, `))?(?: +where +(`, conds, `))?$`]),
+	"for_item": concat("", [`^(every|some) +(`, path, `)(?: +whose +(`, conds, `))?(, +if +any,)? +as +(`, key, `)$`]),
+	"from": concat("", [`^(`, path, `)(?: +named +by +each +of +(`, rpath, `))?(?: +whose +(`, conds, `))?$`]),
 	"conds": concat("", [`(`, cond, `)(?: +and +|$)`]),
 	"cond": concat("", [`^(`, left, `) +(`, phrase, `)$`]),
 	"phrase": concat("", [`^(?:`, concat("|", [concat("", [`(`, ph[1], ph[2], `)`]) | some ph in phrases]), `)$`]),
@@ -4167,11 +4167,11 @@ _s_patterns := {
 	])
 	cond := concat("", [`(?:`, derived, `|`, path, `) +(?:`, phrase, `)`])
 	conds := concat("", [cond, `(?: +and +`, cond, `)*`])
-	assertion := concat("", [`(?:(?:every|some) +`, path, `|`, left, `)(?: +where +`, conds, `)?(?:, +if +any,)? +(?:`, phrase, `)`])
-	for_item := concat("", [`(?:every|some) +`, path, `(?: +where +`, conds, `)?(?:, +if +any,)? +as +`, key])
+	assertion := concat("", [`(?:(?:every|some) +`, path, `|`, left, `)(?: +whose +`, conds, `)?(?:, +if +any,)? +(?:`, phrase, `)`])
+	for_item := concat("", [`(?:every|some) +`, path, `(?: +whose +`, conds, `)?(?:, +if +any,)? +as +`, key])
 }
 
-_s_words := {"a", "after", "an", "and", "as", "at", "before", "between", "count", "each", "empty", "equal", "every", "false", "first", "in", "item", "last", "less", "more", "named", "not", "null", "of", "on", "one", "or", "plus", "some", "sum", "true", "where", "within"}
+_s_words := {"a", "after", "an", "and", "as", "at", "before", "between", "count", "each", "empty", "equal", "every", "false", "first", "in", "item", "last", "less", "more", "named", "not", "null", "of", "on", "one", "or", "plus", "some", "sum", "true", "whose", "within"}
 
 _s_pieces(pattern, text) := [m[1] | some m in matches] if {
 	matches := regex.find_all_string_submatch_n(pattern, text, -1)
@@ -4442,7 +4442,7 @@ _s_sentence_problems(parsed) := (((((((((((({concat("", [node.bare_word, " is a 
 	is_object(node)
 	"some" in object.keys(node)
 	object.get(node, "if_any", false) == true
-}) | {"a where goes after every, some, count of or sum of" |
+}) | {"a whose goes after every, some, count of or sum of" |
 	some node in _s_nodes(parsed)
 	node != parsed
 	is_object(node)
@@ -4581,7 +4581,7 @@ _s_if_any_text(a) := ", if any," if object.get(a, "if_any", false) == true
 
 _s_if_any_text(a) := "" if not object.get(a, "if_any", false)
 
-_s_where_text(a) := concat("", [" where ", concat(" and ", [_s_cond_text(c) | some c in a.where])]) if "where" in object.keys(a)
+_s_where_text(a) := concat("", [" whose ", concat(" and ", [_s_cond_text(c) | some c in a.where])]) if "where" in object.keys(a)
 
 _s_where_text(a) := "" if not "where" in object.keys(a)
 

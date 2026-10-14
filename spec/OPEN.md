@@ -67,9 +67,9 @@ Every rule needs a case, apart from the ones listed here. The `sentence` rules h
 - `sentence.every.empty`
 - `sentence.every.if_any`
 - `sentence.some.walk`
-- `sentence.where.item`
-- `sentence.where.undecided`
-- `sentence.where.every`
+- `sentence.whose.item`
+- `sentence.whose.undecided`
+- `sentence.whose.every`
 - `sentence.argument.item`
 - `sentence.argument.subject`
 - `sentence.derived.count`

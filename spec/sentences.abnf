@@ -9,29 +9,29 @@ check             = assertion *(WS "and" WS assertion)
 
 assertion         = plain / quantified / derived-assertion
 plain             = path WS phrase
-quantified        = quantifier WS path [WS where] [if-any] WS phrase
+quantified        = quantifier WS path [WS whose] [if-any] WS phrase
 quantifier        = "every" / "some"
 if-any            = "," WS "if any,"
 derived-assertion = derived-left WS compare-phrase
 
 ; A for: line walks one or two lists and names each item.
 for-line          = for-item ["," WS for-item]
-for-item          = quantifier WS path [WS where] [if-any] WS "as" WS name
+for-item          = quantifier WS path [WS whose] [if-any] WS "as" WS name
 name              = bare-key
 
 ; A subject's from: line.
-from-line         = path [WS "named by each of" WS right-path] [WS where]
+from-line         = path [WS "named by each of" WS right-path] [WS whose]
 
-; where keeps the items that pass every condition.
-where             = "where" WS condition *(WS "and" WS condition)
+; whose keeps the items that pass every condition.
+whose             = "whose" WS condition *(WS "and" WS condition)
 condition         = path WS phrase / derived WS compare-phrase
 
 ; Derived values: count of, sum of, and terms added with plus.
-; Only the last term on the left can carry a where, and none on the right.
+; Only the last term on the left can carry a whose, and none on the right.
 derived           = ("count" / "sum") WS "of" WS path
 term              = right-path / derived / number
-derived-left      = derived [WS where]
-                  / 1*(term WS "plus" WS) (term / derived WS where)
+derived-left      = derived [WS whose]
+                  / 1*(term WS "plus" WS) (term / derived WS whose)
 field             = (right-path / derived) *(WS "plus" WS term)
                   / number 1*(WS "plus" WS term)
 operand           = value / field

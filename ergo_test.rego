@@ -7857,8 +7857,8 @@ _prints_back(text) if ergo._s_for_line_text(ergo._for_line(text)) == text
 
 _prints_back(text) if ergo._s_from_line_text(ergo._from_line(text)) == text
 
-test_a_where_belongs_to_the_quantifier_and_an_and_after_the_phrase_starts_a_new_assertion if {
-	_read(`every items.price where kind is "a" and qty is 1 is at least 2 and owner is "x"`) == {"assertions": [
+test_a_whose_belongs_to_the_quantifier_and_an_and_after_the_phrase_starts_a_new_assertion if {
+	_read(`every items.price whose kind is "a" and qty is 1 is at least 2 and owner is "x"`) == {"assertions": [
 		{
 			"every": {"steps": ["items", "price"]},
 			"where": [
@@ -7876,13 +7876,13 @@ test_the_and_of_between_is_not_the_and_between_assertions if {
 	count(_read(`qty is between 1 and 5 and kind is "a"`).assertions) == 2
 }
 
-test_a_count_with_a_where_keeps_the_where_on_the_assertion_and_plus_inside_the_condition if {
-	_read(`count of x where n is m plus k is t`) == {"assertions": [{
+test_a_count_with_a_whose_keeps_the_whose_on_the_assertion_and_plus_inside_the_condition if {
+	_read(`count of x whose n is m plus k is t`) == {"assertions": [{
 		"terms": [{"count": {"steps": ["x"]}}],
 		"where": [{"path": {"steps": ["n"]}, "phrase": {"op": "is", "terms": [{"steps": ["m"]}, {"steps": ["k"]}]}}],
 		"phrase": {"op": "is", "terms": [{"steps": ["t"]}]},
 	}]}
-	_read(`k plus count of x where n is m is t`).assertions[0].terms == [{"steps": ["k"]}, {"count": {"steps": ["x"]}}]
+	_read(`k plus count of x whose n is m is t`).assertions[0].terms == [{"steps": ["k"]}, {"count": {"steps": ["x"]}}]
 	_read(`sum of stages.usd equals total_usd within 0.01`).assertions[0].phrase == {"op": "is", "terms": [{"steps": ["total_usd"]}], "within": 0.01}
 	_read(`x is 1 plus 2`).assertions[0].phrase == {"op": "is", "terms": [1, 2]}
 }
@@ -7991,16 +7991,16 @@ test_the_report_prints_one_spelling_for_each_phrase if {
 	_printed(`.count is .sum`) == ".count equals .sum"
 	_printed(`"count" is 1`) == ".count is 1"
 	_printed(`item 3 of b is 1 and first of c is 2 and last of d is 3`) == "item 3 of b is 1 and first of c is 2 and last of d is 3"
-	_printed(`every x where n is 1, if any, is 2`) == "every x where n is 1, if any, is 2"
-	_printed(`some x where count of y is 1 is 2`) == "some x where count of y is 1 is 2"
-	_printed(`count of x where n is 1 is 2`) == "count of x where n is 1 is 2"
+	_printed(`every x whose n is 1, if any, is 2`) == "every x whose n is 1, if any, is 2"
+	_printed(`some x whose count of y is 1 is 2`) == "some x whose count of y is 1 is 2"
+	_printed(`count of x whose n is 1 is 2`) == "count of x whose n is 1 is 2"
 	_printed(`sum of x.n plus 1 plus count of y is 2`) == "sum of x.n plus 1 plus count of y is 2"
 	_printed(`count of x[0] is 1 and y equals sum of z[1].n`) == "count of item 1 of x is 1 and y equals sum of z[1].n"
 	_read(_printed(`count of x[0] is 1`)) == _read(`count of x[0] is 1`)
 }
 
 test_a_for_line_reads_its_items if {
-	ergo._for_line(`every pull_requests as pr, some pr.approvers where state is "APPROVED" as approver`) == {"items": [
+	ergo._for_line(`every pull_requests as pr, some pr.approvers whose state is "APPROVED" as approver`) == {"items": [
 		{"every": {"steps": ["pull_requests"]}, "as": "pr"},
 		{"some": {"steps": ["pr", "approvers"]}, "where": [{"path": {"steps": ["state"]}, "phrase": {"op": "is", "value": "APPROVED"}}], "as": "approver"},
 	]}
@@ -8008,14 +8008,14 @@ test_a_for_line_reads_its_items if {
 	ergo._s_for_line_text(ergo._for_line(`every commits, if any, as commit`)) == "every commits, if any, as commit"
 }
 
-test_a_from_line_reads_its_path_keys_and_where if {
-	ergo._from_line(`artifact.attestations named by each of $params.names where status is "COMPLETE"`) == {
+test_a_from_line_reads_its_path_keys_and_whose if {
+	ergo._from_line(`artifact.attestations named by each of $params.names whose status is "COMPLETE"`) == {
 		"path": {"steps": ["artifact", "attestations"]},
 		"named_by_each_of": {"start": "params", "steps": ["names"]},
 		"where": [{"path": {"steps": ["status"]}, "phrase": {"op": "is", "value": "COMPLETE"}}],
 	}
 	ergo._from_line(`trail`) == {"path": {"steps": ["trail"]}}
-	ergo._s_from_line_text(ergo._from_line(`artifact.attestations named by each of $params.names where status is "COMPLETE"`)) == `artifact.attestations named by each of $params.names where status is "COMPLETE"`
+	ergo._s_from_line_text(ergo._from_line(`artifact.attestations named by each of $params.names whose status is "COMPLETE"`)) == `artifact.attestations named by each of $params.names whose status is "COMPLETE"`
 }
 
 test_a_number_out_of_range_is_written_wrong_without_opa_comparing_it if {
@@ -8048,8 +8048,8 @@ test_a_sentence_written_wrong_says_what_is_wrong if {
 	_read(`every x some y is 1`) == {"problems": ["two quantifiers in one sentence: put them on a for line"]}
 	_read(`count is 1`) == {"problems": ["count is a word of the grammar: write .count"]}
 	_read(`x is empty_`) == {"assertions": [{"path": {"steps": ["x"]}, "phrase": {"op": "is", "terms": [{"steps": ["empty_"]}]}}]}
-	_read(`a plus b where c is 1 is 2`) == {"problems": ["a is a word of the grammar: write .a", "a where goes after every, some, count of or sum of"]}
-	_read(`x where k is 1 is 2`) == {"problems": ["a where goes after every, some, count of or sum of"]}
+	_read(`a plus b whose c is 1 is 2`) == {"problems": ["a is a word of the grammar: write .a", "a whose goes after every, some, count of or sum of"]}
+	_read(`x whose k is 1 is 2`) == {"problems": ["a whose goes after every, some, count of or sum of"]}
 	_read(`count of approvers is empty`) == {"problems": ["is empty can't follow a count of, a sum of or a plus"]}
 	_read(`x plus y matches "a"`) == {"problems": ["matches can't follow a count of, a sum of or a plus"]}
 	_read(`5 is 5`) == {"problems": ["a number can't start a sentence"]}
@@ -8069,14 +8069,14 @@ test_a_sentence_written_wrong_says_what_is_wrong if {
 	_read(`x is one of "a",	"b"`) == {"problems": ["doesn't parse"]}
 	ergo._for_line(`every xs as x, every ys as x`) == {"problems": ["x is given twice"]}
 	ergo._from_line(`xs[01]`) == {"problems": ["doesn't parse"]}
-	ergo._from_line(`xs where k is 1`) == {"path": {"steps": ["xs"]}, "where": [{"path": {"steps": ["k"]}, "phrase": {"op": "is", "value": 1}}]}
+	ergo._from_line(`xs whose k is 1`) == {"path": {"steps": ["xs"]}, "where": [{"path": {"steps": ["k"]}, "phrase": {"op": "is", "value": 1}}]}
 	_read(`x is between 5 and 1`) == {"problems": ["min above max"]}
 	_read(`x matches "("`) == {"problems": [`invalid pattern "("`]}
 	_read(`x is`) == {"problems": ["doesn't parse"]}
 	_read(``) == {"problems": ["doesn't parse"]}
 	_read(`x is 1 and`) == {"problems": ["doesn't parse"]}
-	_read(`every x where a is 1`) == {"problems": ["doesn't parse"]}
-	_read(`x is count of y where a is 1`) == {"problems": ["doesn't parse"]}
+	_read(`every x whose a is 1`) == {"problems": ["doesn't parse"]}
+	_read(`x is count of y whose a is 1`) == {"problems": ["doesn't parse"]}
 	_read(`item 0 of x is 1`) == {"problems": ["doesn't parse"]}
 	_read(`foo$bar is 1`) == {"problems": ["doesn't parse"]}
 	_read(`x is "$schema"`) == {"assertions": [{"path": {"steps": ["x"]}, "phrase": {"op": "is", "value": "$schema"}}]}
@@ -8084,7 +8084,7 @@ test_a_sentence_written_wrong_says_what_is_wrong if {
 	ergo._for_line(`every x as params`) == {"problems": ["params can't be a name"]}
 	ergo._for_line(`every x as a, every y as b, every z as c`) == {"problems": ["doesn't parse"]}
 	ergo._for_line(`some x, if any, as y`) == {"problems": ["if any can't go with some"]}
-	ergo._from_line(`count where x is 1`) == {"problems": ["count is a word of the grammar: write .count"]}
+	ergo._from_line(`count whose x is 1`) == {"problems": ["count is a word of the grammar: write .count"]}
 	ergo._from_line(`x is 1`) == {"problems": ["doesn't parse"]}
 	ergo._from_line(`$input named by each of "T"`) == {"problems": ["doesn't parse"]}
 }
