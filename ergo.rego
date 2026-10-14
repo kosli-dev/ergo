@@ -4124,8 +4124,9 @@ _s_patterns := {
 	"from": concat("", [`^(`, path, `)(?: +named +by +each +of +(`, rpath, `))?(?: +whose +(`, conds, `))?$`]),
 	"conds": concat("", [`(`, cond, `)(?: +and +|$)`]),
 	"cond": concat("", [`^(`, left, `) +(`, phrase, `)$`]),
-	"phrase": concat("", [`^(?:`, concat("|", [concat("", [`(`, ph[1], ph[2], `)`]) | some ph in phrases]), `)$`]),
 	"phrases": phrases,
+	"kinds": {kind[0]: concat("", [`^(?:`, kind[1], `)$`]) | some kind in kinds},
+	"plain": concat("", [`^(`, path, `) +(\S.*)$`]),
 	"path": concat("", [`^`, path, `$`]),
 	"path_parts": concat("", [`^(?:(item +([1-9][0-9]*)|first|last) +of +)?(`, start, `)((?:`, step, `)*)$`]),
 	"steps": concat("", [`\.(`, key, `|`, dq, `)| +named +by +(`, ref, `)|\[(`, ref, `)\]|\[(`, dq, `)\]|\[(0|[1-9][0-9]*)\]`]),
@@ -4192,16 +4193,15 @@ _s_patterns := {
 		["is not", `(?:is +not|does +not +equal) +`, operand, "operand"],
 		["is", `(?:is +equal +to|equals|is) +`, concat("", [operand, `(?: +within +`, num, `)?`]), "operand_within"],
 	]
-	phrase := concat("|", [concat("", [`(?:`, concat("|", [ph[1] | some ph in phrases; ph[3] == kind[0]]), `)`, kind[1]]) |
-		some kind in [
-			["none", ``],
-			["type", type],
-			["range", concat("", [num, ` +and +`, num])],
-			["list", list],
-			["operand", operand],
-			["operand_within", concat("", [operand, `(?: +within +`, num, `)?`])],
-		]
-	])
+	kinds := [
+		["none", ``],
+		["type", type],
+		["range", concat("", [num, ` +and +`, num])],
+		["list", list],
+		["operand", operand],
+		["operand_within", concat("", [operand, `(?: +within +`, num, `)?`])],
+	]
+	phrase := concat("|", [concat("", [`(?:`, concat("|", [ph[1] | some ph in phrases; ph[3] == kind[0]]), `)`, kind[1]]) | some kind in kinds])
 	cond := concat("", [`(?:`, derived, `|`, path, `) +(?:`, phrase, `)`])
 	conds := concat("", [cond, `(?: +and +`, cond, `)*`])
 	assertion := concat("", [`(?:(?:every|some) +`, path, `|`, left, `)(?: +whose +`, conds, `)?(?:, +if +any,)? +(?:`, phrase, `)`])
@@ -4215,7 +4215,12 @@ _s_pieces(pattern, text) := [m[1] | some m in matches] if {
 	concat("", [m[0] | some m in matches]) == text
 }
 
-_sentence(raw) := {"assertions": assertions} if {
+_sentence(raw) := {"assertions": [assertion]} if {
+	pat := _s_patterns
+	m := regex.find_all_string_submatch_n(pat.plain, trim_space(raw), 1)[0]
+	assertion := {"path": _s_path_of(m[1], pat), "phrase": _s_phrase_of(m[2], pat)}
+	count(_s_sentence_problems({"assertions": [assertion]})) == 0
+} else := {"assertions": assertions} if {
 	pat := _s_patterns
 	text := trim_space(raw)
 	pieces := _s_pieces(pat.assertions, text)
@@ -4367,10 +4372,13 @@ _s_ref_of(text) := {"steps": [text]} if {
 
 _s_ref_of(text) := {"steps": [text], "bad_name": text} if _s_bad_name(text)
 
-_s_phrase_of(text, pat) := object.union({"op": ph[0]}, _s_args_of(ph[3], m[1], pat)) if {
-	groups := regex.find_all_string_submatch_n(pat.phrase, text, 1)[0]
-	ph := pat.phrases[min({i | some i in numbers.range(1, count(pat.phrases)); groups[i] != ""}) - 1]
-	m := regex.find_all_string_submatch_n(concat("", [`^(?:`, ph[1], `)(`, ph[2], `)$`]), text, 1)[0]
+_s_phrase_of(text, pat) := object.union({"op": pat.phrases[hit[0]][0]}, _s_args_of(pat.phrases[hit[0]][3], hit[1], pat)) if {
+	hits := [[i, m[1]] |
+		some i, ph in pat.phrases
+		m := regex.find_all_string_submatch_n(concat("", [`^(?:`, ph[1], `)(.*)$`]), text, 1)[0]
+		regex.match(pat.kinds[ph[3]], m[1])
+	]
+	hit := hits[0]
 }
 
 _s_args_of("none", _, _) := {}
