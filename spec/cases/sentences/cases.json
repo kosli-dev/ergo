@@ -1,0 +1,3722 @@
+[
+  {
+    "description": "a plain sentence and an object with assert",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"object": {"description": "X is a", "meta": {"owner": "qa"}, "assert": "x is \"a\""}, "plain": "x is \"a\""}}}},
+    "cases": [
+      {
+        "description": "both forms run the same sentence and the report shows only description, meta and expression",
+        "rules": ["sentence.check", "sentence.line", "sentence.print.same", "sentence.path.string", "sentence.phrase.is", "path.inputs"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "object", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "plain", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "requirements": {"s": {"checks": {"object": {"description": "X is a", "meta": {"owner": "qa"}, "expression": "x is \"a\""}, "plain": {"description": "", "meta": {}, "expression": "x is \"a\""}}}}
+      },
+      {
+        "description": "both fail the same way",
+        "rules": ["sentence.check", "sentence.phrase.is"],
+        "input": {"things": [{"id": "t1", "x": "b"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "object", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "b"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "plain", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "b"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an object with assert and a field that isn't description or meta",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"assert": "x is \"a\"", "path": ["x"]}}}}},
+    "cases": [
+      {
+        "description": "is written wrong, and the row fails as ill_formed with no inputs",
+        "rules": ["sentence.check", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["unknown field path"]}]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an object with an assert that is a number",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"assert": 5}}}}},
+    "cases": [
+      {
+        "description": "is written wrong as invalid assert",
+        "rules": ["sentence.check", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["invalid assert"]}]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is with a string",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is \"a\""}}}},
+    "cases": [
+      {
+        "description": "passes on the same string",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar", "value.equal", "path.inputs", "sentence.print.same"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "expressions": {"s": {"c": "x is \"a\""}}
+      },
+      {
+        "description": "fails as value on another string",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": "b"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "b"}]}
+        ]
+      },
+      {
+        "description": "fails as value on a number, because a number isn't the text",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": 5}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 5}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar", "value.equal", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar", "value.equal", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is with a number",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 1"}}}},
+    "cases": [
+      {
+        "description": "passes on 1.0, because numbers compare by value",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": 1.0}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+        ],
+        "expressions": {"s": {"c": "x is 1"}}
+      },
+      {
+        "description": "fails as value on the string \"1\"",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": "1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "1"}]}
+        ]
+      },
+      {
+        "description": "fails as value on another number",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": 2}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 2}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is with true",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is true"}}}},
+    "cases": [
+      {
+        "description": "passes on true",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar", "sentence.words"],
+        "input": {"things": [{"id": "t1", "x": true}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": true}]}
+        ],
+        "expressions": {"s": {"c": "x is true"}}
+      },
+      {
+        "description": "fails as value on false",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar", "sentence.words"],
+        "input": {"things": [{"id": "t1", "x": false}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": false}]}
+        ]
+      },
+      {
+        "description": "fails as value on the string \"true\"",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar", "sentence.words"],
+        "input": {"things": [{"id": "t1", "x": "true"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "true"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is with false",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is false"}}}},
+    "cases": [
+      {
+        "description": "passes on false, which is a value and not a missing field",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": false}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": false}]}
+        ],
+        "expressions": {"s": {"c": "x is false"}}
+      },
+      {
+        "description": "fails as value on true",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": true}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": true}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is with null",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is null"}}}},
+    "cases": [
+      {
+        "description": "passes when the field is there and null",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar", "value.equal", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": null}]}
+        ],
+        "expressions": {"s": {"c": "x is null"}}
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar", "value.equal", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as value on any other value",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": 0}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 0}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is not with a string",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not \"a\""}}}},
+    "cases": [
+      {
+        "description": "passes on another string",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": "b"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "b"}]}
+        ],
+        "expressions": {"s": {"c": "x is not \"a\""}}
+      },
+      {
+        "description": "fails as value on the same string",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a"}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on a number, because two types differ",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": 5}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 5}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is not with a number",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not 1"}}}},
+    "cases": [
+      {
+        "description": "passes on 2",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": 2}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2}]}
+        ],
+        "expressions": {"s": {"c": "x is not 1"}}
+      },
+      {
+        "description": "fails as value on 1.0",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": 1.0}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on the string \"2\"",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": "2"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "2"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is not with true",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not true"}}}},
+    "cases": [
+      {
+        "description": "passes on false",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": false}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": false}]}
+        ],
+        "expressions": {"s": {"c": "x is not true"}}
+      },
+      {
+        "description": "fails as value on true",
+        "rules": ["sentence.phrase.is", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": true}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": true}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "equals a field",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals y"}}}},
+    "cases": [
+      {
+        "description": "passes on 1 and 1.0",
+        "rules": ["sentence.phrase.is", "sentence.value.path", "value.equal", "compare.inputs"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": 1.0}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": 1}]}
+        ],
+        "expressions": {"s": {"c": "x equals y"}}
+      },
+      {
+        "description": "fails as value on two different strings",
+        "rules": ["sentence.phrase.is", "sentence.value.path", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": "a", "y": "b"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a"}, {"name": "y", "value": "b"}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the types differ",
+        "rules": ["sentence.phrase.is", "sentence.value.path", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": "1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": "1"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the left is missing",
+        "rules": ["sentence.phrase.is", "sentence.value.path", "value.equal", "path.absent"],
+        "input": {"things": [{"id": "t1", "y": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}, {"name": "y", "value": 1}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the right is missing",
+        "rules": ["sentence.phrase.is", "sentence.value.path", "value.equal", "path.absent"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the left is null",
+        "rules": ["sentence.phrase.is", "sentence.value.path", "value.equal", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null, "y": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}, {"name": "y", "value": 1}]}
+        ]
+      },
+      {
+        "description": "fails as null when both are null",
+        "rules": ["sentence.phrase.is", "sentence.value.path", "value.equal", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null, "y": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}, {"name": "y", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as absent when one is missing and the other null",
+        "rules": ["sentence.phrase.is", "sentence.value.path", "value.equal", "path.absent", "path.null"],
+        "input": {"things": [{"id": "t1", "y": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}, {"name": "y", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "does not equal a field",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not equal y"}}}},
+    "cases": [
+      {
+        "description": "passes on two different strings",
+        "rules": ["sentence.phrase.is", "sentence.value.path", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": "a", "y": "b"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}, {"name": "y", "value": "b"}]}
+        ],
+        "expressions": {"s": {"c": "x does not equal y"}}
+      },
+      {
+        "description": "fails as value on 1 and 1.0",
+        "rules": ["sentence.phrase.is", "sentence.value.path", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": 1.0}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": 1}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the types differ",
+        "rules": ["sentence.phrase.is", "sentence.value.path", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": "1", "y": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "1"}, {"name": "y", "value": 1}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the right is missing",
+        "rules": ["sentence.phrase.is", "sentence.value.path", "value.equal", "path.absent"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the left is null",
+        "rules": ["sentence.phrase.is", "sentence.value.path", "value.equal", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null, "y": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}, {"name": "y", "value": 1}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is with a value within a number",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 100 within 0.5"}}}},
+    "cases": [
+      {
+        "description": "passes on the same number",
+        "rules": ["sentence.phrase.within", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": 100}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 100}]}
+        ],
+        "expressions": {"s": {"c": "x is 100 within 0.5"}}
+      },
+      {
+        "description": "passes when exactly that far apart",
+        "rules": ["sentence.phrase.within", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": 99.5}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 99.5}]}
+        ]
+      },
+      {
+        "description": "fails as value when further apart",
+        "rules": ["sentence.phrase.within", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": 100.6}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 100.6}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on a string",
+        "rules": ["sentence.phrase.within", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": "100"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "100"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.within", "sentence.value.scalar", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["sentence.phrase.within", "sentence.value.scalar", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is with a string value within a number",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is \"a\" within 1"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, because within only compares numbers",
+        "rules": ["sentence.phrase.within", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["\"within\" only compares numbers"]}]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ],
+        "expressions": {"s": {"c": "x is \"a\" within 1"}}
+      }
+    ]
+  },
+  {
+    "description": "equals a field within a number",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals y within 0.5"}}}},
+    "cases": [
+      {
+        "description": "passes when the numbers are close",
+        "rules": ["sentence.phrase.within", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": 1.2}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": 1.2}]}
+        ],
+        "expressions": {"s": {"c": "x equals y within 0.5"}}
+      },
+      {
+        "description": "fails as value when they are far apart",
+        "rules": ["sentence.phrase.within", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": 2}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": 2}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the right is a string",
+        "rules": ["sentence.phrase.within", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": "1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": "1"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the right is missing",
+        "rules": ["sentence.phrase.within", "sentence.value.path", "path.absent"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the left is null",
+        "rules": ["sentence.phrase.within", "sentence.value.path", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null, "y": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}, {"name": "y", "value": 1}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is within 0",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 5 within 0"}}}},
+    "cases": [
+      {
+        "description": "passes on the same number",
+        "rules": ["sentence.phrase.within"],
+        "input": {"things": [{"id": "t1", "x": 5.0}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 5}]}
+        ],
+        "expressions": {"s": {"c": "x is 5 within 0"}}
+      },
+      {
+        "description": "fails as value on another number",
+        "rules": ["sentence.phrase.within"],
+        "input": {"things": [{"id": "t1", "x": 5.1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 5.1}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is one of values",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of \"a\", \"b\""}}}},
+    "cases": [
+      {
+        "description": "passes on the first value",
+        "rules": ["sentence.phrase.one_of", "sentence.value.list", "sentence.value.scalar", "path.inputs"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "expressions": {"s": {"c": "x is one of \"a\", \"b\""}}
+      },
+      {
+        "description": "passes on the second value",
+        "rules": ["sentence.phrase.one_of", "sentence.value.list", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": "b"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "b"}]}
+        ]
+      },
+      {
+        "description": "fails as value on another string",
+        "rules": ["sentence.phrase.one_of", "sentence.value.list", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": "c"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "c"}]}
+        ]
+      },
+      {
+        "description": "fails as value on a number",
+        "rules": ["sentence.phrase.one_of", "sentence.value.list", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.one_of", "sentence.value.list", "sentence.value.scalar", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["sentence.phrase.one_of", "sentence.value.list", "sentence.value.scalar", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is one of values that include null",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of \"a\", null"}}}},
+    "cases": [
+      {
+        "description": "fails as null when the field is null, even though null is listed",
+        "rules": ["sentence.phrase.one_of", "sentence.value.list", "sentence.value.scalar", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ],
+        "expressions": {"s": {"c": "x is one of \"a\", null"}}
+      },
+      {
+        "description": "passes on the other value",
+        "rules": ["sentence.phrase.one_of", "sentence.value.list", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is one of numbers",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of 1, 2.5"}}}},
+    "cases": [
+      {
+        "description": "passes on 1.0",
+        "rules": ["sentence.phrase.one_of", "sentence.value.list"],
+        "input": {"things": [{"id": "t1", "x": 1.0}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+        ],
+        "expressions": {"s": {"c": "x is one of 1, 2.5"}}
+      },
+      {
+        "description": "passes on 2.5",
+        "rules": ["sentence.phrase.one_of", "sentence.value.list"],
+        "input": {"things": [{"id": "t1", "x": 2.5}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2.5}]}
+        ]
+      },
+      {
+        "description": "fails as value on the string \"1\"",
+        "rules": ["sentence.phrase.one_of", "sentence.value.list"],
+        "input": {"things": [{"id": "t1", "x": "1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "1"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is in a list of params",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $params.k"}}}},
+    "params": {"k": ["a", "b"]},
+    "cases": [
+      {
+        "description": "passes when the field is in the list",
+        "rules": ["sentence.phrase.one_of", "sentence.value.path", "value.ref", "value.refs", "path.inputs"],
+        "input": {"things": [{"id": "t1", "x": "b"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "b"}]}
+        ],
+        "expressions": {"s": {"c": "x is in $params.k"}},
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": ["a", "b"]}]}}
+      },
+      {
+        "description": "fails as value when it isn't",
+        "rules": ["sentence.phrase.one_of", "sentence.value.path", "value.ref", "value.refs"],
+        "input": {"things": [{"id": "t1", "x": "c"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "c"}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": ["a", "b"]}]}}
+      },
+      {
+        "description": "fails as value on a number",
+        "rules": ["sentence.phrase.one_of", "sentence.value.path", "value.ref", "value.refs"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": ["a", "b"]}]}}
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.one_of", "sentence.value.path", "value.ref", "value.refs", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": ["a", "b"]}]}}
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["sentence.phrase.one_of", "sentence.value.path", "value.ref", "value.refs", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": ["a", "b"]}]}}
+      }
+    ]
+  },
+  {
+    "description": "is in an empty list of params",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $params.k"}}}},
+    "params": {"k": []},
+    "cases": [
+      {
+        "description": "fails as value, because nothing is in an empty list",
+        "rules": ["sentence.phrase.one_of", "in.fail", "value.refs"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": []}]}}
+      }
+    ]
+  },
+  {
+    "description": "is in a param that isn't a list",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $params.k"}}}},
+    "params": {"k": "a"},
+    "cases": [
+      {
+        "description": "fails as unusable",
+        "rules": ["sentence.phrase.one_of", "in.values", "value.refs"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": "a"}]}}
+      }
+    ]
+  },
+  {
+    "description": "is in a param that is missing",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $params.k"}}}},
+    "params": {},
+    "cases": [
+      {
+        "description": "fails as absent whatever the field holds",
+        "rules": ["sentence.phrase.one_of", "value.ref", "value.refs", "path.absent"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": null}]}}
+      }
+    ]
+  },
+  {
+    "description": "is in a param that is null",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $params.k"}}}},
+    "params": {"k": null},
+    "cases": [
+      {
+        "description": "fails as null whatever the field holds",
+        "rules": ["sentence.phrase.one_of", "value.ref", "value.refs", "path.null"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": null}]}}
+      }
+    ]
+  },
+  {
+    "description": "is in a list in the input",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $input.allowed"}}}},
+    "cases": [
+      {
+        "description": "passes when the field is in the list",
+        "rules": ["sentence.phrase.one_of", "sentence.path.start", "value.refs"],
+        "input": {"things": [{"id": "t1", "x": "a"}], "allowed": ["a", "b"]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "expressions": {"s": {"c": "x is in $input.allowed"}},
+        "refs": {"s": {"c": [{"name": "$$input.allowed", "value": ["a", "b"]}]}}
+      },
+      {
+        "description": "fails as value when it isn't",
+        "rules": ["sentence.phrase.one_of", "sentence.path.start", "value.refs"],
+        "input": {"things": [{"id": "t1", "x": "z"}], "allowed": ["a", "b"]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "z"}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$input.allowed", "value": ["a", "b"]}]}}
+      }
+    ]
+  },
+  {
+    "description": "exists",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "passes on a string",
+        "rules": ["sentence.phrase.exists", "present.pass", "present.missing", "path.inputs"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "expressions": {"s": {"c": "x exists"}}
+      },
+      {
+        "description": "passes on false",
+        "rules": ["sentence.phrase.exists", "present.pass", "present.missing"],
+        "input": {"things": [{"id": "t1", "x": false}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": false}]}
+        ]
+      },
+      {
+        "description": "passes on 0",
+        "rules": ["sentence.phrase.exists", "present.pass", "present.missing"],
+        "input": {"things": [{"id": "t1", "x": 0}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 0}]}
+        ]
+      },
+      {
+        "description": "passes on an empty string",
+        "rules": ["sentence.phrase.exists", "present.pass", "present.missing"],
+        "input": {"things": [{"id": "t1", "x": ""}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ""}]}
+        ]
+      },
+      {
+        "description": "fails as value when the field is missing",
+        "rules": ["sentence.phrase.exists", "present.pass", "present.missing", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as value when the field is null",
+        "rules": ["sentence.phrase.exists", "present.pass", "present.missing", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "exists on a path below a value that can't hold it",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x.y exists"}}}},
+    "cases": [
+      {
+        "description": "fails as unusable when x is a string",
+        "rules": ["sentence.phrase.exists", "present.other", "path.unusable"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x.y", "value": null}]}
+        ],
+        "expressions": {"s": {"c": "x.y exists"}}
+      },
+      {
+        "description": "fails as value when x is missing",
+        "rules": ["sentence.phrase.exists", "present.other", "path.unusable", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x.y", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "does not exist",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not exist"}}}},
+    "cases": [
+      {
+        "description": "passes when the field is missing",
+        "rules": ["sentence.phrase.exists", "missing.pass", "missing.fail", "path.absent", "path.inputs"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": null}]}
+        ],
+        "expressions": {"s": {"c": "x does not exist"}}
+      },
+      {
+        "description": "passes when the field is null",
+        "rules": ["sentence.phrase.exists", "missing.pass", "missing.fail", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as value on a string",
+        "rules": ["sentence.phrase.exists", "missing.pass", "missing.fail"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a"}]}
+        ]
+      },
+      {
+        "description": "fails as value on false",
+        "rules": ["sentence.phrase.exists", "missing.pass", "missing.fail"],
+        "input": {"things": [{"id": "t1", "x": false}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": false}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "does not exist on a path below a value that can't hold it",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x.y does not exist"}}}},
+    "cases": [
+      {
+        "description": "fails as unusable when x is a string",
+        "rules": ["sentence.phrase.exists", "missing.fail", "path.unusable"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x.y", "value": null}]}
+        ],
+        "expressions": {"s": {"c": "x.y does not exist"}}
+      }
+    ]
+  },
+  {
+    "description": "is a non-empty string",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is a non-empty string"}}}},
+    "cases": [
+      {
+        "description": "passes on a string",
+        "rules": ["sentence.phrase.type", "non_empty_string.pass", "path.inputs"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "expressions": {"s": {"c": "x is a non-empty string"}}
+      },
+      {
+        "description": "passes on a string of spaces",
+        "rules": ["sentence.phrase.type", "non_empty_string.pass"],
+        "input": {"things": [{"id": "t1", "x": " "}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": " "}]}
+        ]
+      },
+      {
+        "description": "fails as value on an empty string",
+        "rules": ["sentence.phrase.type", "non_empty_string.pass"],
+        "input": {"things": [{"id": "t1", "x": ""}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ""}]}
+        ]
+      },
+      {
+        "description": "fails as value on a number",
+        "rules": ["sentence.phrase.type", "non_empty_string.pass"],
+        "input": {"things": [{"id": "t1", "x": 5}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 5}]}
+        ]
+      },
+      {
+        "description": "fails as value on a list",
+        "rules": ["sentence.phrase.type", "non_empty_string.pass"],
+        "input": {"things": [{"id": "t1", "x": ["a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["a"]}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.type", "non_empty_string.pass", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["sentence.phrase.type", "non_empty_string.pass", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "contains a value",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains \"a\""}}}},
+    "cases": [
+      {
+        "description": "passes when the list has it",
+        "rules": ["sentence.phrase.contains", "sentence.value.scalar", "contains.pass", "path.inputs"],
+        "input": {"things": [{"id": "t1", "x": ["b", "a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["b", "a"]}]}
+        ],
+        "expressions": {"s": {"c": "x contains \"a\""}}
+      },
+      {
+        "description": "fails as value when the list doesn't",
+        "rules": ["sentence.phrase.contains", "sentence.value.scalar", "contains.pass"],
+        "input": {"things": [{"id": "t1", "x": ["b"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["b"]}]}
+        ]
+      },
+      {
+        "description": "fails as value on an empty list",
+        "rules": ["sentence.phrase.contains", "sentence.value.scalar", "contains.pass"],
+        "input": {"things": [{"id": "t1", "x": []}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": []}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the field is a string",
+        "rules": ["sentence.phrase.contains", "sentence.value.scalar", "contains.pass"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.contains", "sentence.value.scalar", "contains.pass", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["sentence.phrase.contains", "sentence.value.scalar", "contains.pass", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "contains a number",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains 1"}}}},
+    "cases": [
+      {
+        "description": "passes on 1.0 in the list",
+        "rules": ["sentence.phrase.contains", "sentence.value.scalar", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": [1.0]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": [1]}]}
+        ],
+        "expressions": {"s": {"c": "x contains 1"}}
+      },
+      {
+        "description": "fails as value on the string \"1\" in the list",
+        "rules": ["sentence.phrase.contains", "sentence.value.scalar", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": ["1"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["1"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "contains a param",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains $params.k"}}}},
+    "params": {"k": "a"},
+    "cases": [
+      {
+        "description": "passes when the list has the param's value",
+        "rules": ["sentence.phrase.contains", "sentence.value.path", "value.ref", "value.refs"],
+        "input": {"things": [{"id": "t1", "x": ["b", "a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["b", "a"]}]}
+        ],
+        "expressions": {"s": {"c": "x contains $params.k"}},
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": "a"}]}}
+      },
+      {
+        "description": "fails as value when it doesn't",
+        "rules": ["sentence.phrase.contains", "sentence.value.path", "value.ref", "value.refs"],
+        "input": {"things": [{"id": "t1", "x": ["b"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["b"]}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": "a"}]}}
+      },
+      {
+        "description": "fails as unusable when the field is a string",
+        "rules": ["sentence.phrase.contains", "sentence.value.path", "value.ref", "value.refs"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": "a"}]}}
+      }
+    ]
+  },
+  {
+    "description": "contains a param that is missing",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains $params.k"}}}},
+    "params": {},
+    "cases": [
+      {
+        "description": "fails as absent whatever the field holds",
+        "rules": ["sentence.phrase.contains", "value.ref", "value.refs", "path.absent"],
+        "input": {"things": [{"id": "t1", "x": ["a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": ["a"]}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": null}]}}
+      }
+    ]
+  },
+  {
+    "description": "does not contain a value",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not contain \"a\""}}}},
+    "cases": [
+      {
+        "description": "passes when the list doesn't have it",
+        "rules": ["sentence.phrase.contains", "contains.pass"],
+        "input": {"things": [{"id": "t1", "x": ["b"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["b"]}]}
+        ],
+        "expressions": {"s": {"c": "x does not contain \"a\""}}
+      },
+      {
+        "description": "passes on an empty list",
+        "rules": ["sentence.phrase.contains", "contains.pass"],
+        "input": {"things": [{"id": "t1", "x": []}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": []}]}
+        ]
+      },
+      {
+        "description": "fails as value when the list has it",
+        "rules": ["sentence.phrase.contains", "contains.pass"],
+        "input": {"things": [{"id": "t1", "x": ["a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["a"]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the field is a string",
+        "rules": ["sentence.phrase.contains", "contains.pass"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.contains", "contains.pass", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["sentence.phrase.contains", "contains.pass", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "does not contain a param",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not contain $params.k"}}}},
+    "params": {"k": "a"},
+    "cases": [
+      {
+        "description": "passes when the list doesn't have it",
+        "rules": ["sentence.phrase.contains", "value.ref", "value.refs"],
+        "input": {"things": [{"id": "t1", "x": ["b"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["b"]}]}
+        ],
+        "expressions": {"s": {"c": "x does not contain $params.k"}},
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": "a"}]}}
+      },
+      {
+        "description": "fails as value when the list has it",
+        "rules": ["sentence.phrase.contains", "value.ref", "value.refs"],
+        "input": {"things": [{"id": "t1", "x": ["a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["a"]}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": "a"}]}}
+      }
+    ]
+  },
+  {
+    "description": "contains all of values",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains all of \"b\", \"a\""}}}},
+    "cases": [
+      {
+        "description": "passes when the list has every value",
+        "rules": ["sentence.phrase.contains_all", "sentence.value.list", "contains.pass", "path.inputs", "sentence.print.same"],
+        "input": {"things": [{"id": "t1", "x": ["a", "c", "b"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["a", "c", "b"]}]}
+        ],
+        "expressions": {"s": {"c": "x contains all of \"b\", \"a\""}}
+      },
+      {
+        "description": "fails as value when one is missing",
+        "rules": ["sentence.phrase.contains_all", "sentence.value.list", "contains.pass"],
+        "input": {"things": [{"id": "t1", "x": ["a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["a"]}]}
+        ]
+      },
+      {
+        "description": "fails as value on an empty list",
+        "rules": ["sentence.phrase.contains_all", "sentence.value.list", "contains.pass"],
+        "input": {"things": [{"id": "t1", "x": []}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": []}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the field is a string",
+        "rules": ["sentence.phrase.contains_all", "sentence.value.list", "contains.pass"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.contains_all", "sentence.value.list", "contains.pass", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["sentence.phrase.contains_all", "sentence.value.list", "contains.pass", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "contains all of a list of params",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains all of $params.k"}}}},
+    "params": {"k": ["a", "b"]},
+    "cases": [
+      {
+        "description": "passes when the list has every value",
+        "rules": ["sentence.phrase.contains_all", "value.ref", "value.refs"],
+        "input": {"things": [{"id": "t1", "x": ["a", "b", "c"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["a", "b", "c"]}]}
+        ],
+        "expressions": {"s": {"c": "x contains all of $params.k"}},
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": ["a", "b"]}]}}
+      },
+      {
+        "description": "fails as value when one is missing",
+        "rules": ["sentence.phrase.contains_all", "value.ref", "value.refs"],
+        "input": {"things": [{"id": "t1", "x": ["a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["a"]}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": ["a", "b"]}]}}
+      }
+    ]
+  },
+  {
+    "description": "contains all of an empty list of params",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains all of $params.k"}}}},
+    "params": {"k": []},
+    "cases": [
+      {
+        "description": "fails as unusable, because an empty list would pass every field",
+        "rules": ["sentence.phrase.contains_all", "contains.value", "value.refs"],
+        "input": {"things": [{"id": "t1", "x": ["a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["a"]}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": []}]}}
+      }
+    ]
+  },
+  {
+    "description": "contains all of a param that isn't a list",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains all of $params.k"}}}},
+    "params": {"k": "a"},
+    "cases": [
+      {
+        "description": "fails as unusable",
+        "rules": ["sentence.phrase.contains_all", "contains.value", "value.refs"],
+        "input": {"things": [{"id": "t1", "x": ["a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["a"]}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": "a"}]}}
+      }
+    ]
+  },
+  {
+    "description": "contains none of values",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of \"a\", \"b\""}}}},
+    "cases": [
+      {
+        "description": "passes when the list has none",
+        "rules": ["sentence.phrase.contains_all", "sentence.value.list", "contains.pass"],
+        "input": {"things": [{"id": "t1", "x": ["c"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["c"]}]}
+        ],
+        "expressions": {"s": {"c": "x contains none of \"a\", \"b\""}}
+      },
+      {
+        "description": "passes on an empty list",
+        "rules": ["sentence.phrase.contains_all", "sentence.value.list", "contains.pass"],
+        "input": {"things": [{"id": "t1", "x": []}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": []}]}
+        ]
+      },
+      {
+        "description": "fails as value when the list has one",
+        "rules": ["sentence.phrase.contains_all", "sentence.value.list", "contains.pass"],
+        "input": {"things": [{"id": "t1", "x": ["c", "b"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["c", "b"]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the field is a string",
+        "rules": ["sentence.phrase.contains_all", "sentence.value.list", "contains.pass"],
+        "input": {"things": [{"id": "t1", "x": "c"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "c"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.contains_all", "sentence.value.list", "contains.pass", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["sentence.phrase.contains_all", "sentence.value.list", "contains.pass", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "contains none of a list of params",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of $params.k"}}}},
+    "params": {"k": ["a", "b"]},
+    "cases": [
+      {
+        "description": "passes when the list has none",
+        "rules": ["sentence.phrase.contains_all", "value.ref", "value.refs"],
+        "input": {"things": [{"id": "t1", "x": ["c"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["c"]}]}
+        ],
+        "expressions": {"s": {"c": "x contains none of $params.k"}},
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": ["a", "b"]}]}}
+      },
+      {
+        "description": "fails as value when the list has one",
+        "rules": ["sentence.phrase.contains_all", "value.ref", "value.refs"],
+        "input": {"things": [{"id": "t1", "x": ["b"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["b"]}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": ["a", "b"]}]}}
+      }
+    ]
+  },
+  {
+    "description": "matches a pattern",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"^a\""}}}},
+    "cases": [
+      {
+        "description": "passes on a string that matches",
+        "rules": ["sentence.phrase.matches", "sentence.value.scalar", "patterns.pass", "path.inputs"],
+        "input": {"things": [{"id": "t1", "x": "abc"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "abc"}]}
+        ],
+        "expressions": {"s": {"c": "x matches \"^a\""}}
+      },
+      {
+        "description": "fails as value on a string that doesn't",
+        "rules": ["sentence.phrase.matches", "sentence.value.scalar", "patterns.pass"],
+        "input": {"things": [{"id": "t1", "x": "bcd"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "bcd"}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on a number",
+        "rules": ["sentence.phrase.matches", "sentence.value.scalar", "patterns.pass"],
+        "input": {"things": [{"id": "t1", "x": 5}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 5}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.matches", "sentence.value.scalar", "patterns.pass", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["sentence.phrase.matches", "sentence.value.scalar", "patterns.pass", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "matches one of several patterns",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"^a\", \"^b\""}}}},
+    "cases": [
+      {
+        "description": "passes when the second matches",
+        "rules": ["sentence.phrase.matches", "sentence.value.list", "patterns.pass"],
+        "input": {"things": [{"id": "t1", "x": "bcd"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "bcd"}]}
+        ],
+        "expressions": {"s": {"c": "x matches \"^a\", \"^b\""}}
+      },
+      {
+        "description": "fails as value when none matches",
+        "rules": ["sentence.phrase.matches", "sentence.value.list", "patterns.pass"],
+        "input": {"things": [{"id": "t1", "x": "cde"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "cde"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "matches is not anchored",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"svc_\""}}}},
+    "cases": [
+      {
+        "description": "passes in the middle of a string",
+        "rules": ["sentence.phrase.matches", "patterns.syntax"],
+        "input": {"things": [{"id": "t1", "x": "my_svc_account"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "my_svc_account"}]}
+        ],
+        "expressions": {"s": {"c": "x matches \"svc_\""}}
+      }
+    ]
+  },
+  {
+    "description": "matches a pattern with a comma in it",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"^fix(, |: )\""}}}},
+    "cases": [
+      {
+        "description": "passes on a string with the comma",
+        "rules": ["sentence.phrase.matches", "sentence.value.list", "sentence.print.same"],
+        "input": {"things": [{"id": "t1", "x": "fix, y"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "fix, y"}]}
+        ],
+        "expressions": {"s": {"c": "x matches \"^fix(, |: )\""}}
+      },
+      {
+        "description": "passes on a string with the colon",
+        "rules": ["sentence.phrase.matches", "sentence.value.list", "sentence.print.same"],
+        "input": {"things": [{"id": "t1", "x": "fix: y"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "fix: y"}]}
+        ]
+      },
+      {
+        "description": "fails as value on a string with neither",
+        "rules": ["sentence.phrase.matches", "sentence.value.list", "sentence.print.same"],
+        "input": {"things": [{"id": "t1", "x": "fix y"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "fix y"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "matches a single-quoted pattern",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches '^\\s*FROM'"}}}},
+    "cases": [
+      {
+        "description": "keeps the backslash as written",
+        "rules": ["sentence.phrase.matches", "sentence.value.scalar", "sentence.print.same", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": "  FROM alpine"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "  FROM alpine"}]}
+        ],
+        "expressions": {"s": {"c": "x matches '^\\s*FROM'"}}
+      },
+      {
+        "description": "fails as value when the string doesn't start with FROM",
+        "rules": ["sentence.phrase.matches", "sentence.value.scalar", "sentence.print.same", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": "RUN FROM"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "RUN FROM"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "does not match a pattern",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not match \"^a\""}}}},
+    "cases": [
+      {
+        "description": "passes on a string that doesn't match",
+        "rules": ["sentence.phrase.matches", "patterns.pass"],
+        "input": {"things": [{"id": "t1", "x": "bcd"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "bcd"}]}
+        ],
+        "expressions": {"s": {"c": "x does not match \"^a\""}}
+      },
+      {
+        "description": "fails as value on a string that matches",
+        "rules": ["sentence.phrase.matches", "patterns.pass"],
+        "input": {"things": [{"id": "t1", "x": "abc"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "abc"}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on a number",
+        "rules": ["sentence.phrase.matches", "patterns.pass"],
+        "input": {"things": [{"id": "t1", "x": 5}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 5}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.matches", "patterns.pass", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["sentence.phrase.matches", "patterns.pass", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "does not match several patterns",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not match \"^a\", \"^b\""}}}},
+    "cases": [
+      {
+        "description": "passes when none matches",
+        "rules": ["sentence.phrase.matches", "sentence.value.list"],
+        "input": {"things": [{"id": "t1", "x": "cde"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "cde"}]}
+        ],
+        "expressions": {"s": {"c": "x does not match \"^a\", \"^b\""}}
+      },
+      {
+        "description": "fails as value when the second matches",
+        "rules": ["sentence.phrase.matches", "sentence.value.list"],
+        "input": {"things": [{"id": "t1", "x": "bcd"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "bcd"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "matches patterns from params",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches $params.p"}}}},
+    "params": {"p": ["^a", "^b"]},
+    "cases": [
+      {
+        "description": "passes when a pattern matches",
+        "rules": ["sentence.phrase.matches", "value.ref", "value.refs", "patterns.list"],
+        "input": {"things": [{"id": "t1", "x": "abc"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "abc"}]}
+        ],
+        "expressions": {"s": {"c": "x matches $params.p"}},
+        "refs": {"s": {"c": [{"name": "$$params.p", "value": ["^a", "^b"]}]}}
+      },
+      {
+        "description": "fails as value when none does",
+        "rules": ["sentence.phrase.matches", "value.ref", "value.refs", "patterns.list"],
+        "input": {"things": [{"id": "t1", "x": "zzz"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "zzz"}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.p", "value": ["^a", "^b"]}]}}
+      }
+    ]
+  },
+  {
+    "description": "matches a pattern from params that isn't a valid regular expression",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches $params.p"}}}},
+    "params": {"p": ["("]},
+    "cases": [
+      {
+        "description": "fails as unusable",
+        "rules": ["sentence.phrase.matches", "patterns.list", "value.refs"],
+        "input": {"things": [{"id": "t1", "x": "abc"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "abc"}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.p", "value": ["("]}]}}
+      }
+    ]
+  },
+  {
+    "description": "does not match patterns from params",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not match $params.p"}}}},
+    "params": {"p": ["^a"]},
+    "cases": [
+      {
+        "description": "passes when none matches",
+        "rules": ["sentence.phrase.matches", "value.ref", "value.refs"],
+        "input": {"things": [{"id": "t1", "x": "zzz"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "zzz"}]}
+        ],
+        "expressions": {"s": {"c": "x does not match $params.p"}},
+        "refs": {"s": {"c": [{"name": "$$params.p", "value": ["^a"]}]}}
+      },
+      {
+        "description": "fails as value when one matches",
+        "rules": ["sentence.phrase.matches", "value.ref", "value.refs"],
+        "input": {"things": [{"id": "t1", "x": "abc"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "abc"}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.p", "value": ["^a"]}]}}
+      }
+    ]
+  },
+  {
+    "description": "is at least a number",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least 5"}}}},
+    "cases": [
+      {
+        "description": "passes on 6",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar", "path.inputs"],
+        "input": {"things": [{"id": "t1", "x": 6}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 6}]}
+        ],
+        "expressions": {"s": {"c": "x is at least 5"}}
+      },
+      {
+        "description": "fails as value on 4",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": 4}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 4}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on the string \"5\"",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": "5"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "5"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "passes on 5",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": 5}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 5}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is at most a number",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at most 5"}}}},
+    "cases": [
+      {
+        "description": "passes on 4",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar", "path.inputs"],
+        "input": {"things": [{"id": "t1", "x": 4}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 4}]}
+        ],
+        "expressions": {"s": {"c": "x is at most 5"}}
+      },
+      {
+        "description": "fails as value on 6",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": 6}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 6}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on the string \"5\"",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": "5"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "5"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "passes on 5",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": 5}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 5}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is more than a number",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is more than 5"}}}},
+    "cases": [
+      {
+        "description": "passes on 6",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar", "path.inputs"],
+        "input": {"things": [{"id": "t1", "x": 6}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 6}]}
+        ],
+        "expressions": {"s": {"c": "x is more than 5"}}
+      },
+      {
+        "description": "fails as value on 5",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": 5}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 5}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on the string \"5\"",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": "5"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "5"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is less than a number",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is less than 5"}}}},
+    "cases": [
+      {
+        "description": "passes on 4",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar", "path.inputs"],
+        "input": {"things": [{"id": "t1", "x": 4}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 4}]}
+        ],
+        "expressions": {"s": {"c": "x is less than 5"}}
+      },
+      {
+        "description": "fails as value on 5",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": 5}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 5}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on the string \"5\"",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": "5"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "5"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is at least a string",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least \"b\""}}}},
+    "cases": [
+      {
+        "description": "passes on a later string",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar", "compare.pass"],
+        "input": {"things": [{"id": "t1", "x": "c"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "c"}]}
+        ],
+        "expressions": {"s": {"c": "x is at least \"b\""}}
+      },
+      {
+        "description": "passes on the same string",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar", "compare.pass"],
+        "input": {"things": [{"id": "t1", "x": "b"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "b"}]}
+        ]
+      },
+      {
+        "description": "fails as value on an earlier string",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar", "compare.pass"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a"}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on a number",
+        "rules": ["sentence.phrase.order", "sentence.value.scalar", "compare.pass"],
+        "input": {"things": [{"id": "t1", "x": 5}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 5}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is more than a string compares by code point",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is more than \"a\""}}}},
+    "cases": [
+      {
+        "description": "passes on \"b\"",
+        "rules": ["sentence.phrase.order", "compare.pass"],
+        "input": {"things": [{"id": "t1", "x": "b"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "b"}]}
+        ],
+        "expressions": {"s": {"c": "x is more than \"a\""}}
+      },
+      {
+        "description": "fails as value on \"Z\", which comes before \"a\"",
+        "rules": ["sentence.phrase.order", "compare.pass"],
+        "input": {"things": [{"id": "t1", "x": "Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "Z"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is at least a field",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least y"}}}},
+    "cases": [
+      {
+        "description": "passes when the order holds",
+        "rules": ["sentence.phrase.order", "sentence.value.path", "compare.inputs"],
+        "input": {"things": [{"id": "t1", "x": 2, "y": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2}, {"name": "y", "value": 1}]}
+        ],
+        "expressions": {"s": {"c": "x is at least y"}}
+      },
+      {
+        "description": "fails as value when it doesn't",
+        "rules": ["sentence.phrase.order", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": 2}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": 2}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the types differ",
+        "rules": ["sentence.phrase.order", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": "1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": "1"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the right is missing",
+        "rules": ["sentence.phrase.order", "sentence.value.path", "path.absent"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the left is null",
+        "rules": ["sentence.phrase.order", "sentence.value.path", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null, "y": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}, {"name": "y", "value": 1}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is at most a field",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at most y"}}}},
+    "cases": [
+      {
+        "description": "passes when the order holds",
+        "rules": ["sentence.phrase.order", "sentence.value.path", "compare.inputs"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": 2}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": 2}]}
+        ],
+        "expressions": {"s": {"c": "x is at most y"}}
+      },
+      {
+        "description": "fails as value when it doesn't",
+        "rules": ["sentence.phrase.order", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 2, "y": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 2}, {"name": "y", "value": 1}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the types differ",
+        "rules": ["sentence.phrase.order", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": "1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": "1"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the right is missing",
+        "rules": ["sentence.phrase.order", "sentence.value.path", "path.absent"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the left is null",
+        "rules": ["sentence.phrase.order", "sentence.value.path", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null, "y": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}, {"name": "y", "value": 1}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is more than a field",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is more than y"}}}},
+    "cases": [
+      {
+        "description": "passes when the order holds",
+        "rules": ["sentence.phrase.order", "sentence.value.path", "compare.inputs"],
+        "input": {"things": [{"id": "t1", "x": 2, "y": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2}, {"name": "y", "value": 1}]}
+        ],
+        "expressions": {"s": {"c": "x is more than y"}}
+      },
+      {
+        "description": "fails as value when it doesn't",
+        "rules": ["sentence.phrase.order", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": 1}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the types differ",
+        "rules": ["sentence.phrase.order", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": "1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": "1"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the right is missing",
+        "rules": ["sentence.phrase.order", "sentence.value.path", "path.absent"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the left is null",
+        "rules": ["sentence.phrase.order", "sentence.value.path", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null, "y": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}, {"name": "y", "value": 1}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is less than a field",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is less than y"}}}},
+    "cases": [
+      {
+        "description": "passes when the order holds",
+        "rules": ["sentence.phrase.order", "sentence.value.path", "compare.inputs"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": 2}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": 2}]}
+        ],
+        "expressions": {"s": {"c": "x is less than y"}}
+      },
+      {
+        "description": "fails as value when it doesn't",
+        "rules": ["sentence.phrase.order", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 2, "y": 2}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 2}, {"name": "y", "value": 2}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the types differ",
+        "rules": ["sentence.phrase.order", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": "1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": "1"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the right is missing",
+        "rules": ["sentence.phrase.order", "sentence.value.path", "path.absent"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the left is null",
+        "rules": ["sentence.phrase.order", "sentence.value.path", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null, "y": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}, {"name": "y", "value": 1}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is at least a field holding strings",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least y"}}}},
+    "cases": [
+      {
+        "description": "passes when the left string is later",
+        "rules": ["sentence.phrase.order", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": "b", "y": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "b"}, {"name": "y", "value": "a"}]}
+        ],
+        "expressions": {"s": {"c": "x is at least y"}}
+      },
+      {
+        "description": "fails as unusable when both are lists",
+        "rules": ["sentence.phrase.order", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": [2], "y": [1]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": [2]}, {"name": "y", "value": [1]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is between two numbers",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is between 1 and 5"}}}},
+    "cases": [
+      {
+        "description": "passes inside the range",
+        "rules": ["sentence.phrase.between", "sentence.value.scalar", "range.pass", "path.inputs"],
+        "input": {"things": [{"id": "t1", "x": 3}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 3}]}
+        ],
+        "expressions": {"s": {"c": "x is between 1 and 5"}}
+      },
+      {
+        "description": "passes on the lower bound",
+        "rules": ["sentence.phrase.between", "sentence.value.scalar", "range.pass"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+        ]
+      },
+      {
+        "description": "passes on the upper bound",
+        "rules": ["sentence.phrase.between", "sentence.value.scalar", "range.pass"],
+        "input": {"things": [{"id": "t1", "x": 5.0}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 5}]}
+        ]
+      },
+      {
+        "description": "fails as value below the range",
+        "rules": ["sentence.phrase.between", "sentence.value.scalar", "range.pass"],
+        "input": {"things": [{"id": "t1", "x": 0}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 0}]}
+        ]
+      },
+      {
+        "description": "fails as value above the range",
+        "rules": ["sentence.phrase.between", "sentence.value.scalar", "range.pass"],
+        "input": {"things": [{"id": "t1", "x": 6}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 6}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on a string",
+        "rules": ["sentence.phrase.between", "sentence.value.scalar", "range.pass"],
+        "input": {"things": [{"id": "t1", "x": "3"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "3"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.between", "sentence.value.scalar", "range.pass", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["sentence.phrase.between", "sentence.value.scalar", "range.pass", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is between two decimals",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is between 0.5 and 1.5"}}}},
+    "cases": [
+      {
+        "description": "passes on 1",
+        "rules": ["sentence.phrase.between", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+        ],
+        "expressions": {"s": {"c": "x is between 0.5 and 1.5"}}
+      },
+      {
+        "description": "fails as value on 1.6",
+        "rules": ["sentence.phrase.between", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": 1.6}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1.6}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is between the same number twice",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is between 2 and 2"}}}},
+    "cases": [
+      {
+        "description": "passes on that number",
+        "rules": ["sentence.phrase.between"],
+        "input": {"things": [{"id": "t1", "x": 2}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2}]}
+        ],
+        "expressions": {"s": {"c": "x is between 2 and 2"}}
+      },
+      {
+        "description": "fails as value on another",
+        "rules": ["sentence.phrase.between"],
+        "input": {"things": [{"id": "t1", "x": 3}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 3}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a time is before another",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "opened is before closed"}}}},
+    "cases": [
+      {
+        "description": "passes when the order holds",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass", "compare.inputs"],
+        "input": {"things": [{"id": "t1", "opened": "2024-01-01T00:00:00Z", "closed": "2024-01-01T00:00:01Z"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "opened", "value": "2024-01-01T00:00:00Z"}, {"name": "closed", "value": "2024-01-01T00:00:01Z"}]
+          }
+        ],
+        "expressions": {"s": {"c": "opened is before closed"}}
+      },
+      {
+        "description": "fails as value on the same instant written in another offset",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass"],
+        "input": {"things": [{"id": "t1", "opened": "2024-01-01T01:00:00+01:00", "closed": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "opened", "value": "2024-01-01T01:00:00+01:00"}, {"name": "closed", "value": "2024-01-01T00:00:00Z"}]
+          }
+        ]
+      },
+      {
+        "description": "fails as value when it doesn't",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass"],
+        "input": {"things": [{"id": "t1", "opened": "2024-01-01T00:00:01Z", "closed": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "opened", "value": "2024-01-01T00:00:01Z"}, {"name": "closed", "value": "2024-01-01T00:00:00Z"}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on a string that isn't a time",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass"],
+        "input": {"things": [{"id": "t1", "opened": "yesterday", "closed": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "opened", "value": "yesterday"}, {"name": "closed", "value": "2024-01-01T00:00:00Z"}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when one is a number and the other a string",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass"],
+        "input": {"things": [{"id": "t1", "opened": 1, "closed": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "opened", "value": 1}, {"name": "closed", "value": "2024-01-01T00:00:00Z"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the right is missing",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass", "path.absent"],
+        "input": {"things": [{"id": "t1", "opened": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "opened", "value": "2024-01-01T00:00:00Z"}, {"name": "closed", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the left is null",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass", "path.null"],
+        "input": {"things": [{"id": "t1", "opened": null, "closed": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "opened", "value": null}, {"name": "closed", "value": "2024-01-01T00:00:00Z"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a time is after another",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "opened is after closed"}}}},
+    "cases": [
+      {
+        "description": "passes when the order holds",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass", "compare.inputs"],
+        "input": {"things": [{"id": "t1", "opened": "2024-01-01T00:00:01Z", "closed": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "opened", "value": "2024-01-01T00:00:01Z"}, {"name": "closed", "value": "2024-01-01T00:00:00Z"}]
+          }
+        ],
+        "expressions": {"s": {"c": "opened is after closed"}}
+      },
+      {
+        "description": "fails as value on the same instant written in another offset",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass"],
+        "input": {"things": [{"id": "t1", "opened": "2024-01-01T01:00:00+01:00", "closed": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "opened", "value": "2024-01-01T01:00:00+01:00"}, {"name": "closed", "value": "2024-01-01T00:00:00Z"}]
+          }
+        ]
+      },
+      {
+        "description": "fails as value when it doesn't",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass"],
+        "input": {"things": [{"id": "t1", "opened": "2024-01-01T00:00:00Z", "closed": "2024-01-01T00:00:01Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "opened", "value": "2024-01-01T00:00:00Z"}, {"name": "closed", "value": "2024-01-01T00:00:01Z"}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on a string that isn't a time",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass"],
+        "input": {"things": [{"id": "t1", "opened": "yesterday", "closed": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "opened", "value": "yesterday"}, {"name": "closed", "value": "2024-01-01T00:00:00Z"}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when one is a number and the other a string",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass"],
+        "input": {"things": [{"id": "t1", "opened": 1, "closed": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "opened", "value": 1}, {"name": "closed", "value": "2024-01-01T00:00:00Z"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the right is missing",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass", "path.absent"],
+        "input": {"things": [{"id": "t1", "opened": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "opened", "value": "2024-01-01T00:00:00Z"}, {"name": "closed", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the left is null",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass", "path.null"],
+        "input": {"things": [{"id": "t1", "opened": null, "closed": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "opened", "value": null}, {"name": "closed", "value": "2024-01-01T00:00:00Z"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a time is on or after another",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "opened is on or after closed"}}}},
+    "cases": [
+      {
+        "description": "passes when the order holds",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass", "compare.inputs"],
+        "input": {"things": [{"id": "t1", "opened": "2024-01-01T00:00:01Z", "closed": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "opened", "value": "2024-01-01T00:00:01Z"}, {"name": "closed", "value": "2024-01-01T00:00:00Z"}]
+          }
+        ],
+        "expressions": {"s": {"c": "opened is on or after closed"}}
+      },
+      {
+        "description": "passes on the same instant written in another offset",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass"],
+        "input": {"things": [{"id": "t1", "opened": "2024-01-01T01:00:00+01:00", "closed": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "opened", "value": "2024-01-01T01:00:00+01:00"}, {"name": "closed", "value": "2024-01-01T00:00:00Z"}]
+          }
+        ]
+      },
+      {
+        "description": "fails as value when it doesn't",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass"],
+        "input": {"things": [{"id": "t1", "opened": "2024-01-01T00:00:00Z", "closed": "2024-01-01T00:00:01Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "opened", "value": "2024-01-01T00:00:00Z"}, {"name": "closed", "value": "2024-01-01T00:00:01Z"}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on a string that isn't a time",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass"],
+        "input": {"things": [{"id": "t1", "opened": "yesterday", "closed": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "opened", "value": "yesterday"}, {"name": "closed", "value": "2024-01-01T00:00:00Z"}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when one is a number and the other a string",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass"],
+        "input": {"things": [{"id": "t1", "opened": 1, "closed": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "opened", "value": 1}, {"name": "closed", "value": "2024-01-01T00:00:00Z"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the right is missing",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass", "path.absent"],
+        "input": {"things": [{"id": "t1", "opened": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "opened", "value": "2024-01-01T00:00:00Z"}, {"name": "closed", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the left is null",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass", "path.null"],
+        "input": {"things": [{"id": "t1", "opened": null, "closed": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "opened", "value": null}, {"name": "closed", "value": "2024-01-01T00:00:00Z"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a time is on or before another",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "opened is on or before closed"}}}},
+    "cases": [
+      {
+        "description": "passes when the order holds",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass", "compare.inputs"],
+        "input": {"things": [{"id": "t1", "opened": "2024-01-01T00:00:00Z", "closed": "2024-01-01T00:00:01Z"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "opened", "value": "2024-01-01T00:00:00Z"}, {"name": "closed", "value": "2024-01-01T00:00:01Z"}]
+          }
+        ],
+        "expressions": {"s": {"c": "opened is on or before closed"}}
+      },
+      {
+        "description": "passes on the same instant written in another offset",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass"],
+        "input": {"things": [{"id": "t1", "opened": "2024-01-01T01:00:00+01:00", "closed": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "opened", "value": "2024-01-01T01:00:00+01:00"}, {"name": "closed", "value": "2024-01-01T00:00:00Z"}]
+          }
+        ]
+      },
+      {
+        "description": "fails as value when it doesn't",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass"],
+        "input": {"things": [{"id": "t1", "opened": "2024-01-01T00:00:01Z", "closed": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "opened", "value": "2024-01-01T00:00:01Z"}, {"name": "closed", "value": "2024-01-01T00:00:00Z"}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on a string that isn't a time",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass"],
+        "input": {"things": [{"id": "t1", "opened": "yesterday", "closed": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "opened", "value": "yesterday"}, {"name": "closed", "value": "2024-01-01T00:00:00Z"}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when one is a number and the other a string",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass"],
+        "input": {"things": [{"id": "t1", "opened": 1, "closed": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "opened", "value": 1}, {"name": "closed", "value": "2024-01-01T00:00:00Z"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the right is missing",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass", "path.absent"],
+        "input": {"things": [{"id": "t1", "opened": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "opened", "value": "2024-01-01T00:00:00Z"}, {"name": "closed", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the left is null",
+        "rules": ["sentence.phrase.time", "sentence.value.path", "time.pass", "path.null"],
+        "input": {"things": [{"id": "t1", "opened": null, "closed": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "opened", "value": null}, {"name": "closed", "value": "2024-01-01T00:00:00Z"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "two numbers are compared as times",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "opened is before closed"}}}},
+    "cases": [
+      {
+        "description": "passes when both are numbers in order",
+        "rules": ["sentence.phrase.time", "time.pass"],
+        "input": {"things": [{"id": "t1", "opened": 1, "closed": 2}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "opened", "value": 1}, {"name": "closed", "value": 2}]}
+        ],
+        "expressions": {"s": {"c": "opened is before closed"}}
+      },
+      {
+        "description": "fails as value when both are numbers out of order",
+        "rules": ["sentence.phrase.time", "time.pass"],
+        "input": {"things": [{"id": "t1", "opened": 2, "closed": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "opened", "value": 2}, {"name": "closed", "value": 1}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a quoted key with a dot in it",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "metadata.\"app.kubernetes.io/name\" is \"web\""}}}},
+    "cases": [
+      {
+        "description": "reads the key as one key",
+        "rules": ["sentence.path.string", "sentence.phrase.is", "name.keys", "path.inputs", "sentence.print.same"],
+        "input": {"things": [{"id": "t1", "metadata": {"app.kubernetes.io/name": "web"}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "metadata.\"app.kubernetes.io/name\"", "value": "web"}]}
+        ],
+        "expressions": {"s": {"c": "metadata.\"app.kubernetes.io/name\" is \"web\""}}
+      },
+      {
+        "description": "fails as absent when the key is missing",
+        "rules": ["sentence.path.string", "sentence.phrase.is", "name.keys", "path.absent"],
+        "input": {"things": [{"id": "t1", "metadata": {"app": "web"}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "metadata.\"app.kubernetes.io/name\"", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a bare key with a dash",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "pull-request.state is \"OPEN\""}}}},
+    "cases": [
+      {
+        "description": "reads the key with the dash",
+        "rules": ["sentence.path.string", "sentence.phrase.is", "name.keys"],
+        "input": {"things": [{"id": "t1", "pull-request": {"state": "OPEN"}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "pull-request.state", "value": "OPEN"}]}
+        ],
+        "expressions": {"s": {"c": "pull-request.state is \"OPEN\""}}
+      }
+    ]
+  },
+  {
+    "description": "a quoted first key",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "\"$schema\" is \"v1\""}}}},
+    "cases": [
+      {
+        "description": "reads the key $schema, named as syntax.md names it",
+        "rules": ["sentence.path.string", "sentence.phrase.is", "name.keys", "path.inputs", "sentence.print.same"],
+        "input": {"things": [{"id": "t1", "$schema": "v1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "\"$schema\"", "value": "v1"}]}
+        ],
+        "expressions": {"s": {"c": "\"$schema\" is \"v1\""}}
+      },
+      {
+        "description": "fails as absent when it's missing",
+        "rules": ["sentence.path.string", "sentence.phrase.is", "name.keys", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "\"$schema\"", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a path that starts at the input",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$input.flag is true"}}}},
+    "cases": [
+      {
+        "description": "reads the input",
+        "rules": ["sentence.path.start", "sentence.phrase.is", "path.start", "path.inputs", "sentence.print.same"],
+        "input": {"things": [{"id": "t1"}], "flag": true},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "$$input.flag", "value": true}]}
+        ],
+        "expressions": {"s": {"c": "$input.flag is true"}}
+      }
+    ]
+  },
+  {
+    "description": "a path that starts at the input and is missing",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$input.flag is true"}}}},
+    "cases": [
+      {
+        "description": "fails as absent when the input has no such key",
+        "rules": ["sentence.path.start", "path.start", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "$$input.flag", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a path that starts at the params",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$params.k is \"a\""}}}},
+    "params": {"k": "a"},
+    "cases": [
+      {
+        "description": "reads the params",
+        "rules": ["sentence.path.start", "sentence.phrase.is", "path.start", "path.inputs"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "$$params.k", "value": "a"}]}
+        ],
+        "expressions": {"s": {"c": "$params.k is \"a\""}}
+      }
+    ]
+  },
+  {
+    "description": "a key chosen by a param",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "obj named by $params.k is 1"}}}},
+    "params": {"k": "b"},
+    "cases": [
+      {
+        "description": "reads the key the param holds",
+        "rules": ["sentence.path.dynamic", "sentence.phrase.is", "path.ref_step", "name.ref_step", "value.refs", "path.inputs"],
+        "input": {"things": [{"id": "t1", "obj": {"b": 1, "c": 2}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "obj.[$$params.k]", "value": 1}]}
+        ],
+        "expressions": {"s": {"c": "obj named by $params.k is 1"}},
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": "b"}]}}
+      },
+      {
+        "description": "fails as value when the other key holds another value",
+        "rules": ["sentence.path.dynamic", "sentence.phrase.is", "path.ref_step", "name.ref_step", "value.refs"],
+        "input": {"things": [{"id": "t1", "obj": {"b": 2}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "obj.[$$params.k]", "value": 2}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": "b"}]}}
+      },
+      {
+        "description": "fails as absent when the key isn't there",
+        "rules": ["sentence.path.dynamic", "sentence.phrase.is", "path.ref_step", "name.ref_step", "value.refs", "path.absent"],
+        "input": {"things": [{"id": "t1", "obj": {"c": 1}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "obj.[$$params.k]", "value": null}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": "b"}]}}
+      }
+    ]
+  },
+  {
+    "description": "a key chosen by a param, then more keys",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "obj named by $params.k.v is 1"}}}},
+    "params": {"k": "b"},
+    "cases": [
+      {
+        "description": "reads the keys after it",
+        "rules": ["sentence.path.dynamic", "path.ref_step", "name.ref_step", "value.refs"],
+        "input": {"things": [{"id": "t1", "obj": {"b": {"v": 1}}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "obj.[$$params.k].v", "value": 1}]}
+        ],
+        "expressions": {"s": {"c": "obj named by $params.k.v is 1"}},
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": "b"}]}}
+      }
+    ]
+  },
+  {
+    "description": "a key chosen by a param that is missing",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "obj named by $params.k is 1"}}}},
+    "params": {},
+    "cases": [
+      {
+        "description": "fails as absent",
+        "rules": ["sentence.path.dynamic", "path.ref_step", "value.refs", "path.absent"],
+        "input": {"things": [{"id": "t1", "obj": {"b": 1}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "obj.[$$params.k]", "value": null}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": null}]}}
+      }
+    ]
+  },
+  {
+    "description": "a key chosen by a param that isn't a key",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "obj named by $params.k is 1"}}}},
+    "params": {"k": ["b"]},
+    "cases": [
+      {
+        "description": "fails as unusable when the param is a list",
+        "rules": ["sentence.path.dynamic", "path.ref_step", "value.refs"],
+        "input": {"things": [{"id": "t1", "obj": {"b": 1}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "obj.[$$params.k]", "value": null}]}
+        ],
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": ["b"]}]}}
+      }
+    ]
+  },
+  {
+    "description": "a key chosen by a param in brackets",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "obj[$params.k] is 1"}}}},
+    "params": {"k": "b"},
+    "cases": [
+      {
+        "description": "reads the key the param holds and prints named by",
+        "rules": ["sentence.path.brackets", "sentence.path.dynamic", "path.ref_step", "name.ref_step", "value.refs", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "obj": {"b": 1}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "obj.[$$params.k]", "value": 1}]}
+        ],
+        "expressions": {"s": {"c": "obj named by $params.k is 1"}},
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": "b"}]}}
+      }
+    ]
+  },
+  {
+    "description": "the second item of a list",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "item 2 of xs is \"b\""}}}},
+    "cases": [
+      {
+        "description": "counts from 1",
+        "rules": ["sentence.path.index", "sentence.phrase.is", "name.keys", "path.inputs", "sentence.print.same"],
+        "input": {"things": [{"id": "t1", "xs": ["obj", "b", "c"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "xs.1", "value": "b"}]}
+        ],
+        "expressions": {"s": {"c": "item 2 of xs is \"b\""}}
+      },
+      {
+        "description": "fails as value on another item",
+        "rules": ["sentence.path.index", "sentence.phrase.is", "name.keys"],
+        "input": {"things": [{"id": "t1", "xs": ["b", "obj"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "xs.1", "value": "obj"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the list is too short",
+        "rules": ["sentence.path.index", "sentence.phrase.is", "name.keys", "path.absent"],
+        "input": {"things": [{"id": "t1", "xs": ["a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "xs.1", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when xs is a string",
+        "rules": ["sentence.path.index", "sentence.phrase.is", "name.keys"],
+        "input": {"things": [{"id": "t1", "xs": "ab"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "xs.1", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "the first item of a list",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "first of xs is \"a\""}}}},
+    "cases": [
+      {
+        "description": "reads the item at position 0",
+        "rules": ["sentence.path.index", "sentence.phrase.is", "path.inputs", "sentence.print.same"],
+        "input": {"things": [{"id": "t1", "xs": ["a", "b"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "xs.0", "value": "a"}]}
+        ],
+        "expressions": {"s": {"c": "first of xs is \"a\""}}
+      },
+      {
+        "description": "fails as absent on an empty list",
+        "rules": ["sentence.path.index", "sentence.phrase.is", "path.absent"],
+        "input": {"things": [{"id": "t1", "xs": []}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "xs.0", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an item of a list in brackets",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "xs[1] is \"b\""}}}},
+    "cases": [
+      {
+        "description": "counts from 0 and prints the word form",
+        "rules": ["sentence.path.brackets", "sentence.path.index", "sentence.phrase.is", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "xs": ["a", "b"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "xs.1", "value": "b"}]}
+        ],
+        "expressions": {"s": {"c": "item 2 of xs is \"b\""}}
+      },
+      {
+        "description": "fails as absent when the list is too short",
+        "rules": ["sentence.path.brackets", "sentence.path.index", "sentence.phrase.is", "sentence.print.canonical", "path.absent"],
+        "input": {"things": [{"id": "t1", "xs": ["a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "xs.1", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a field of an item in brackets",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "xs[1].k is 1"}}}},
+    "cases": [
+      {
+        "description": "keeps the brackets when a key follows",
+        "rules": ["sentence.path.brackets", "sentence.path.index", "sentence.print.canonical", "sentence.print.same"],
+        "input": {"things": [{"id": "t1", "xs": [{"k": 2}, {"k": 1}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "xs.1.k", "value": 1}]}
+        ],
+        "expressions": {"s": {"c": "xs[1].k is 1"}}
+      }
+    ]
+  },
+  {
+    "description": "a field on the right with a dot in front",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is .empty"}}}},
+    "cases": [
+      {
+        "description": "compares with the field called empty and prints equals",
+        "rules": ["sentence.path.argument", "sentence.words", "sentence.value.path", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": 1, "empty": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}, {"name": "empty", "value": 1}]}
+        ],
+        "expressions": {"s": {"c": "x equals .empty"}}
+      },
+      {
+        "description": "fails as value when the field holds another value",
+        "rules": ["sentence.path.argument", "sentence.words", "sentence.value.path", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": 1, "empty": 2}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1}, {"name": "empty", "value": 2}]}
+        ]
+      },
+      {
+        "description": "fails as absent when there is no field called empty",
+        "rules": ["sentence.path.argument", "sentence.words", "sentence.value.path", "sentence.print.canonical", "path.absent"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": 1}, {"name": "empty", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a field called true on the right",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is .true"}}}},
+    "cases": [
+      {
+        "description": "compares with the field, not with the value true",
+        "rules": ["sentence.path.argument", "sentence.words", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 5, "true": 5}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 5}, {"name": "true", "value": 5}]}
+        ],
+        "expressions": {"s": {"c": "x equals .true"}}
+      },
+      {
+        "description": "fails as value when it holds another value",
+        "rules": ["sentence.path.argument", "sentence.words", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": true, "true": false}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": true}, {"name": "true", "value": false}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a quoted string on the right is text",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is \"y\""}}}},
+    "cases": [
+      {
+        "description": "compares with the text, not with a field called y",
+        "rules": ["sentence.path.argument", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": "y", "y": "z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "y"}]}
+        ],
+        "expressions": {"s": {"c": "x is \"y\""}}
+      }
+    ]
+  },
+  {
+    "description": "a quoted key on the right with a dot in front",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is .\"$schema\""}}}},
+    "cases": [
+      {
+        "description": "compares with the field $schema",
+        "rules": ["sentence.path.argument", "sentence.value.path", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": "v1", "$schema": "v1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "v1"}, {"name": "\"$schema\"", "value": "v1"}]}
+        ],
+        "expressions": {"s": {"c": "x equals .\"$schema\""}}
+      }
+    ]
+  },
+  {
+    "description": "a field on the right without a dot",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals total"}}}},
+    "cases": [
+      {
+        "description": "compares with the field",
+        "rules": ["sentence.path.argument", "sentence.value.path", "sentence.print.same"],
+        "input": {"things": [{"id": "t1", "x": 1, "total": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}, {"name": "total", "value": 1}]}
+        ],
+        "expressions": {"s": {"c": "x equals total"}}
+      }
+    ]
+  },
+  {
+    "description": "a field with a dot in front that doesn't need it",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals .total"}}}},
+    "cases": [
+      {
+        "description": "prints without the dot",
+        "rules": ["sentence.path.argument", "sentence.value.path", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": 1, "total": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}, {"name": "total", "value": 1}]}
+        ],
+        "expressions": {"s": {"c": "x equals total"}}
+      }
+    ]
+  },
+  {
+    "description": "a field called empty on the left with a dot in front",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".empty is 1"}}}},
+    "cases": [
+      {
+        "description": "reads the field called empty",
+        "rules": ["sentence.words", "sentence.path.string", "sentence.phrase.is"],
+        "input": {"things": [{"id": "t1", "empty": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "empty", "value": 1}]}
+        ],
+        "expressions": {"s": {"c": ".empty is 1"}}
+      }
+    ]
+  },
+  {
+    "description": "a grammar word after the first key",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "review.count is 2"}}}},
+    "cases": [
+      {
+        "description": "needs no dot",
+        "rules": ["sentence.words", "sentence.path.string"],
+        "input": {"things": [{"id": "t1", "review": {"count": 2}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "review.count", "value": 2}]}
+        ],
+        "expressions": {"s": {"c": "review.count is 2"}}
+      }
+    ]
+  },
+  {
+    "description": "is equal to prints as is",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is equal to \"a\""}}}},
+    "cases": [
+      {
+        "description": "prints as x is \"a\"",
+        "rules": ["sentence.phrase.aliases", "sentence.phrase.is", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "expressions": {"s": {"c": "x is \"a\""}}
+      }
+    ]
+  },
+  {
+    "description": "is equal to a field prints as equals",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is equal to y"}}}},
+    "cases": [
+      {
+        "description": "prints as x equals y",
+        "rules": ["sentence.phrase.aliases", "sentence.phrase.is", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": 1}]}
+        ],
+        "expressions": {"s": {"c": "x equals y"}}
+      }
+    ]
+  },
+  {
+    "description": "equals with a value prints as is",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals \"a\""}}}},
+    "cases": [
+      {
+        "description": "prints as x is \"a\"",
+        "rules": ["sentence.phrase.is", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "expressions": {"s": {"c": "x is \"a\""}}
+      }
+    ]
+  },
+  {
+    "description": "two spaces between words print as one",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x  is   \"a\""}}}},
+    "cases": [
+      {
+        "description": "prints as x is \"a\"",
+        "rules": ["sentence.grammar", "sentence.phrase.is", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "expressions": {"s": {"c": "x is \"a\""}}
+      }
+    ]
+  },
+  {
+    "description": "single quotes without a backslash print as double quotes",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 'prod'"}}}},
+    "cases": [
+      {
+        "description": "prints as x is \"prod\"",
+        "rules": ["sentence.value.scalar", "sentence.phrase.is", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": "prod"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "prod"}]}
+        ],
+        "expressions": {"s": {"c": "x is \"prod\""}}
+      }
+    ]
+  },
+  {
+    "description": "a quote inside single quotes prints with a JSON escape",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 'a\"b'"}}}},
+    "cases": [
+      {
+        "description": "prints as x is \"a\\\"b\"",
+        "rules": ["sentence.value.scalar", "sentence.phrase.is", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": "a\"b"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a\"b"}]}
+        ],
+        "expressions": {"s": {"c": "x is \"a\\\"b\""}}
+      }
+    ]
+  },
+  {
+    "description": "is in values prints as is one of",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in \"a\", \"b\""}}}},
+    "cases": [
+      {
+        "description": "prints as x is one of \"a\", \"b\"",
+        "rules": ["sentence.phrase.one_of", "sentence.phrase.aliases", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "expressions": {"s": {"c": "x is one of \"a\", \"b\""}}
+      }
+    ]
+  },
+  {
+    "description": "values with no space after the comma print with one",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of \"a\",\"b\""}}}},
+    "cases": [
+      {
+        "description": "prints as x is one of \"a\", \"b\"",
+        "rules": ["sentence.phrase.one_of", "sentence.value.list", "sentence.grammar", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "expressions": {"s": {"c": "x is one of \"a\", \"b\""}}
+      }
+    ]
+  },
+  {
+    "description": "is one of a path prints as is in",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of $params.k"}}}},
+    "params": {"k": ["a"]},
+    "cases": [
+      {
+        "description": "prints as x is in $params.k",
+        "rules": ["sentence.phrase.one_of", "sentence.phrase.aliases", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
+        ],
+        "expressions": {"s": {"c": "x is in $params.k"}},
+        "refs": {"s": {"c": [{"name": "$$params.k", "value": ["a"]}]}}
+      }
+    ]
+  },
+  {
+    "description": "is before a field prints as equals",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is y"}}}},
+    "cases": [
+      {
+        "description": "prints as x equals y",
+        "rules": ["sentence.value.path", "sentence.phrase.is", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": 1}]}
+        ],
+        "expressions": {"s": {"c": "x equals y"}}
+      }
+    ]
+  },
+  {
+    "description": "does not equal a value prints as is not",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not equal \"a\""}}}},
+    "cases": [
+      {
+        "description": "prints as x is not \"a\"",
+        "rules": ["sentence.phrase.is", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": "b"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "b"}]}
+        ],
+        "expressions": {"s": {"c": "x is not \"a\""}}
+      }
+    ]
+  },
+  {
+    "description": "is not a field prints as does not equal",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not y"}}}},
+    "cases": [
+      {
+        "description": "prints as x does not equal y",
+        "rules": ["sentence.value.path", "sentence.phrase.is", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": 2}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": 2}]}
+        ],
+        "expressions": {"s": {"c": "x does not equal y"}}
+      }
+    ]
+  },
+  {
+    "description": "a pattern with a backslash prints in single quotes",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches '^\\d+$'"}}}},
+    "cases": [
+      {
+        "description": "prints as x matches '^\\d+$'",
+        "rules": ["sentence.phrase.matches", "sentence.value.scalar", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": "12"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "12"}]}
+        ],
+        "expressions": {"s": {"c": "x matches '^\\d+$'"}}
+      }
+    ]
+  },
+  {
+    "description": "a pattern with a backslash written in double quotes prints in single quotes",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"^\\\\d+$\""}}}},
+    "cases": [
+      {
+        "description": "prints as x matches '^\\d+$'",
+        "rules": ["sentence.phrase.matches", "sentence.value.scalar", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": "12"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "12"}]}
+        ],
+        "expressions": {"s": {"c": "x matches '^\\d+$'"}}
+      }
+    ]
+  },
+  {
+    "description": "a pattern with two backslashes in a row prints in double quotes",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"a\\\\\\\\b\""}}}},
+    "cases": [
+      {
+        "description": "prints as x matches \"a\\\\\\\\b\"",
+        "rules": ["sentence.phrase.matches", "sentence.value.scalar", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": "a\\b"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a\\b"}]}
+        ],
+        "expressions": {"s": {"c": "x matches \"a\\\\\\\\b\""}}
+      }
+    ]
+  },
+  {
+    "description": "a pattern with a single quote prints in double quotes",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches 'it\\'s'"}}}},
+    "cases": [
+      {
+        "description": "prints as x matches \"it's\"",
+        "rules": ["sentence.phrase.matches", "sentence.value.scalar", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": "it's"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "it's"}]}
+        ],
+        "expressions": {"s": {"c": "x matches \"it's\""}}
+      }
+    ]
+  },
+  {
+    "description": "a number with a trailing zero prints in its plain form",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 1.50"}}}},
+    "cases": [
+      {
+        "description": "prints as x is 1.5",
+        "rules": ["sentence.value.scalar", "sentence.phrase.is", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": 1.5}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1.5}]}
+        ],
+        "expressions": {"s": {"c": "x is 1.5"}}
+      }
+    ]
+  },
+  {
+    "description": "a number with an exponent prints in its plain form",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 1e2"}}}},
+    "cases": [
+      {
+        "description": "prints as x is 100",
+        "rules": ["sentence.value.scalar", "sentence.phrase.is", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": 100}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 100}]}
+        ],
+        "expressions": {"s": {"c": "x is 100"}}
+      }
+    ]
+  },
+  {
+    "description": "a field on the right with a dot in front prints without it when it isn't needed",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least .y"}}}},
+    "cases": [
+      {
+        "description": "prints as x is at least y",
+        "rules": ["sentence.path.argument", "sentence.phrase.order", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": 2, "y": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2}, {"name": "y", "value": 1}]}
+        ],
+        "expressions": {"s": {"c": "x is at least y"}}
+      }
+    ]
+  },
+  {
+    "description": "a path with a dot in a key prints with quotes",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "meta.\"b.c\" exists"}}}},
+    "cases": [
+      {
+        "description": "prints as meta.\"b.c\" exists",
+        "rules": ["sentence.path.string", "sentence.phrase.exists", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "meta": {"b.c": 1}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "meta.\"b.c\"", "value": 1}]}
+        ],
+        "expressions": {"s": {"c": "meta.\"b.c\" exists"}}
+      }
+    ]
+  },
+  {
+    "description": "a time sentence prints as written",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "opened is on or after closed"}}}},
+    "cases": [
+      {
+        "description": "prints as opened is on or after closed",
+        "rules": ["sentence.phrase.time", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "opened": "2024-01-01T00:00:01Z", "closed": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": "opened", "value": "2024-01-01T00:00:01Z"}, {"name": "closed", "value": "2024-01-01T00:00:00Z"}]
+          }
+        ],
+        "expressions": {"s": {"c": "opened is on or after closed"}}
+      }
+    ]
+  },
+  {
+    "description": "equals with within prints as written",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals y within 0.5"}}}},
+    "cases": [
+      {
+        "description": "prints as x equals y within 0.5",
+        "rules": ["sentence.phrase.within", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}, {"name": "y", "value": 1}]}
+        ],
+        "expressions": {"s": {"c": "x equals y within 0.5"}}
+      }
+    ]
+  },
+  {
+    "description": "is within a value prints as written",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 5 within 1"}}}},
+    "cases": [
+      {
+        "description": "prints as x is 5 within 1",
+        "rules": ["sentence.phrase.within", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": 5}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 5}]}
+        ],
+        "expressions": {"s": {"c": "x is 5 within 1"}}
+      }
+    ]
+  },
+  {
+    "description": "a sentence with an unclosed quote",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is \"a"}}}},
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": ["sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["unclosed quote at column 6"]}]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a sentence with an unclosed quote after a longer path",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "environment is \"prod"}}}},
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": ["sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["unclosed quote at column 16"]}]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a sentence with nothing after the path",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x"}}}},
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": ["sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["nothing after the path at column 2: expected a phrase, like \"is\" or \"exists\""]}]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a number out of range",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least 1e400"}}}},
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": ["sentence.value.scalar", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["number out of range: 1e400"]}]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a bare grammar word as the first key",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "empty is 1"}}}},
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": ["sentence.words", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["empty is a word of the grammar: write .empty"]}]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a name that starts with a dollar sign",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$foo.x exists"}}}},
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": ["sentence.path.start", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["unknown name $foo"]}]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "bounds in the wrong order",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is between 5 and 1"}}}},
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": ["sentence.phrase.between", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["min above max"]}]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is not null",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not null"}}}},
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": ["sentence.phrase.is", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["\"is not null\" is written \"exists\""]}]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a regular expression that isn't valid",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"(\""}}}},
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": ["sentence.phrase.matches", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["invalid pattern \"(\""]}]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a regular expression that isn't valid in a list of several",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not match \"^a\", \"(\""}}}},
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": ["sentence.phrase.matches", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["invalid pattern \"(\""]}]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a phrase with a missing number after within",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 1 within"}}}},
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": ["sentence.phrase.within", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["\"within\" needs a number after it"]}]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a regular expression that uses a lookahead",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"a(?=b)\""}}}},
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": ["sentence.phrase.matches", "patterns.syntax", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["invalid pattern \"a(?=b)\""]}]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
+  }
+]

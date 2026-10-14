@@ -1,6 +1,6 @@
 import glob, json, re, sys
 
-docs = {f: open(f).read() for f in ["spec/semantics.md", "spec/syntax.md"]}
+docs = {f: open(f).read() for f in ["spec/semantics.md", "spec/syntax.md", "spec/sentences.md"]}
 rules = {}
 for f, text in docs.items():
     for name in re.findall(r"\*\*\[([a-z_.]+)\]\*\*", text):

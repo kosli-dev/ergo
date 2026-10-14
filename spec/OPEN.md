@@ -34,6 +34,44 @@ A subject with `of` (see [REFERENCE.md](../REFERENCE.md#a-subject-built-on-anoth
 
 ## Rules without cases
 
-Every rule needs a case, apart from the ones listed here. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.
+Every rule needs a case, apart from the ones listed here. The `sentence` rules here are for forms `ergo.rego` doesn't run yet. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.
 
 - `compare.derived`
+- `sentence.forms`
+- `sentence.flat`
+- `sentence.assert.list`
+- `sentence.assert.and`
+- `sentence.path.keys`
+- `sentence.subject.from`
+- `sentence.subject.condition`
+- `sentence.subject.applies`
+- `sentence.subject.chain`
+- `sentence.subject.quoted`
+- `sentence.subject.narrow`
+- `sentence.subject.depth`
+- `sentence.subject.own`
+- `sentence.subject.short`
+- `sentence.every.walk`
+- `sentence.every.empty`
+- `sentence.every.if_any`
+- `sentence.some.walk`
+- `sentence.where.item`
+- `sentence.where.undecided`
+- `sentence.where.every`
+- `sentence.argument.item`
+- `sentence.argument.subject`
+- `sentence.derived.count`
+- `sentence.derived.sum`
+- `sentence.derived.plus`
+- `sentence.derived.compare`
+- `sentence.for.line`
+- `sentence.for.depth`
+- `sentence.for.scope`
+- `sentence.for.name`
+- `sentence.for.fail`
+- `sentence.for.comma`
+- `sentence.for.assert`
+- `sentence.phrase.empty`
+- `sentence.phrase.starts`
+- `sentence.derived.fail`
+- `sentence.print.order`

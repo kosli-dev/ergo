@@ -92,7 +92,7 @@
           "minimum": 0
         },
         "checks": {
-          "$ref": "#/$defs/named_checks",
+          "$ref": "#/$defs/requirement_checks",
           "minProperties": 1
         }
       },
@@ -107,6 +107,51 @@
       "additionalProperties": {
         "$ref": "#/$defs/check"
       }
+    },
+    "requirement_checks": {
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/check"
+          },
+          {
+            "$ref": "#/$defs/sentence_check"
+          }
+        ]
+      }
+    },
+    "sentence_check": {
+      "description": "A check written as a sentence, alone or under assert. spec/sentences.md and spec/sentences.abnf say how a sentence is written.",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "assert": {
+              "type": "string"
+            },
+            "description": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "meta": {
+              "type": [
+                "object",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "assert"
+          ],
+          "additionalProperties": false
+        }
+      ]
     },
     "key": {
       "description": "A key of an object, or an index of a list. An index has to be written as digits alone, so 1.0 can't be one, although JSON Schema reads it as an integer.",

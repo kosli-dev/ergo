@@ -62,7 +62,7 @@ Draft 0.1. This file covers the syntax policies use today, where a check is a JS
 
 A row's `inputs`, a ref's entry in `$refs` and an item in `failed_items` name the paths they read.
 
-**[name.keys]** Keys are joined with `.`. A key is written as it is when it starts with an ASCII letter, `_` or `$` and the rest is ASCII letters, digits, `_`, `$` or `-`, and in double quotes otherwise. An index is written as digits: `x.1`.
+**[name.keys]** Keys are joined with `.`. A key is written as it is when it starts with an ASCII letter, `_` or `$` and the rest is ASCII letters, digits, `_`, `$` or `-`, and in double quotes otherwise. A first key that starts with `$` is in double quotes too, like `"$schema".x`, so it can't be taken for a name. An index is written as digits: `x.1`.
 
 **[name.selector]** A selector is written `[k=="a"]`, its fields sorted and joined with ` and `.
 
