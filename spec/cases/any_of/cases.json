@@ -249,7 +249,7 @@
             "passed": false,
             "cause": "value",
             "inputs": [{"name": "cs[]", "value": [{"s": true}, {}, {"s": false}]}],
-            "failed_items": [{"cause": "value", "path": "item 3 of cs", "value": {"s": false}}]
+            "failed_items": [{"cause": "value", "path": "item 3 of cs", "item": "item 3 of cs", "value": {"s": false}}]
           }
         ],
         "expressions": {"s": {"c": "every cs: one of: a(s == true) | b(s is missing)"}}

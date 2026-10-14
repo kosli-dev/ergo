@@ -719,7 +719,7 @@ _failed_items_field(check, subj, flaw, item) := {"failed_items": _failed_items(s
 
 _failed_items_field(check, _, _, _) := {} if not _quantified(check)
 
-_failed_items(subj, check, flaw, item) := [{"path": e[0], "cause": flaw, "value": e[1]} |
+_failed_items(subj, check, flaw, item) := [{"path": e[0], "item": e[0], "cause": flaw, "value": e[1]} |
 	some e in _item_entries(subj, check, item)
 ] if flaw != ""
 
@@ -730,12 +730,12 @@ _failed_items(subj, check, "", item) := [] if {
 	some f in _entry_failure(subj, check, e)
 ]
 
-_entry_failure(subj, check, [p, v]) := [{"path": p, "cause": c, "value": v} |
+_entry_failure(subj, check, [p, v]) := [{"path": p, "item": p, "cause": c, "value": v} |
 	c := _failed_item_cause(subj, check, v)
 	c != "satisfied"
 ]
 
-_entry_failure(_, _, [p, v, c]) := [{"path": p, "cause": c, "value": v}]
+_entry_failure(_, _, [p, v, c]) := [{"path": p, "item": p, "cause": c, "value": v}]
 
 _failed_item_cause(subj, check, v) := "satisfied" if {
 	_item_passed(check, v)

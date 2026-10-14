@@ -86,8 +86,8 @@
           "description": "Only on rows of all and any checks.",
           "items": {
             "type": "object",
-            "properties": {"path": {"type": "string"}, "cause": {"$ref": "#/$defs/cause"}, "value": true},
-            "required": ["path", "cause", "value"],
+            "properties": {"path": {"type": "string"}, "item": {"type": "string", "description": "The path of the list item the entry belongs to. For all and any, the same as path."}, "cause": {"$ref": "#/$defs/cause"}, "value": true},
+            "required": ["path", "item", "cause", "value"],
             "additionalProperties": false
           }
         },
