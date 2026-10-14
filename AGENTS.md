@@ -22,6 +22,7 @@ Run these before saying a change is done:
 
 ```sh
 opa check --strict . --ignore .github
+opa check --strict --schema .github/closed-input-schema.json ergo.rego
 opa fmt --list .
 opa test . --ignore .github --timeout 120s
 opa eval --strict-builtin-errors --ignore .github -d . --format raw 'count(data) > 0'
@@ -34,6 +35,8 @@ python3 -m venv /tmp/ergo-venv && /tmp/ergo-venv/bin/pip install --quiet jsonsch
 Run them from the repo root. The last line puts `jsonschema` in a virtual environment outside the repo, because some Pythons, like Homebrew's, refuse `pip install` outside one.
 
 `opa fmt --list .` should print nothing. If it prints file names, run `opa fmt -w .`.
+
+The second `opa check` compiles `ergo.rego` the way a host does when it checks `input` against a closed JSON Schema, and should print nothing. If it fails with `undefined ref: input[...]`, ergo reads something from `input` that the `METADATA` annotation above `package ergo` doesn't declare.
 
 The `opa eval` command runs every test again with `--strict-builtin-errors`, which turns a built-in given the wrong type into an error, and should print `true`. If it prints an error, check the value's type before the built-in on that line, so that ergo gives the same report with or without the flag.
 
@@ -67,12 +70,12 @@ Every change needs tests: new behaviour, bug fixes and changes to existing behav
 
 There are no comments in the code or the tests, and it should stay that way.
 
-The one exception is the license header at the top of `ergo.rego`. Users copy that file on its own, so the header keeps the license with it.
+There are two exceptions, both above `package ergo` in `ergo.rego`. The first is the license header. Users copy that file on its own, so the header keeps the license with it. The second is the `METADATA` annotation that declares `input["ergo/names"]` as an object. While ergo checks, `input` holds ergo's names, and a host that type-checks `input` against a closed JSON Schema, like Kosli does when a policy is published, would otherwise refuse every read of them. OPA only reads a schema from an annotation, and annotations are comments.
 
 CI fails on any other comment in a `.rego` file. It asks `opa parse` for each file's comments, so a `#` inside a string doesn't count. To list them yourself:
 
 ```sh
-git ls-files '*.rego' | while read -r f; do opa parse "$f" --format json --json-include comments,locations | jq -r --arg f "$f" '.comments[]? | .Location.row as $r | select(($f == "ergo.rego" and $r <= 2) | not) | "\($f):\($r)"'; done
+git ls-files '*.rego' | while read -r f; do opa parse "$f" --format json --json-include comments,locations | jq -r --arg f "$f" '.package.location.row as $p | .comments[]? | .Location.row as $r | select(($f == "ergo.rego" and $r < $p) | not) | "\($f):\($r)"'; done
 ```
 
 When something in the code looks like it could be simplified but mustn't be, a test says so instead of a comment. Give the test a name that explains the reason, like `test_out_of_scope_subject_is_recorded_as_evidence`. If you're about to write a comment, write a test.
