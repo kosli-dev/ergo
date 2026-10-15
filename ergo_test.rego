@@ -9434,7 +9434,7 @@ test_as_sentences_writes_input_before_a_from_that_starts_like_another_subject if
 test_as_sentences_writes_naming_and_whole_input_and_narrowing_as_from_lines if {
 	policy := {"subjects": {
 		"all": {"from": []},
-		"run": {"from": ["build", "runs", {"each_as": "r", "keys": {"ref": ["$$params", "kinds"]}}]},
+		"run": {"from": ["build", "runs", {"each_as": "subject", "keys": {"ref": ["$$params", "kinds"]}}]},
 		"one": {"from": ["build", "runs", {"ref": ["$$params", "kind"]}]},
 		"named": {"from": ["build", "runs", {"each_as": "r"}]},
 		"$x": {"from": ["$x"]},
@@ -9477,4 +9477,34 @@ test_as_sentences_writes_compares_with_a_value_and_within if {
 		"c": {"op": "compare", "left": ["x"], "cmp": "eq", "right": ["y"], "within": 0.5},
 	}
 	ergo.as_sentences({"requirements": {"r": {"checks": checks}}}).requirements.r.checks == {"a": "x equals 1 within 0.5", "b": "x is at least 2", "c": "x equals y within 0.5"}
+}
+
+test_as_sentences_keeps_a_naming_step_a_from_line_cant_write_the_same if {
+	every step in [
+		{"each_as": "pr", "keys": {"ref": ["$$params", "names"]}},
+		{"each_as": "subject", "keys": {"ref": ["$$params", "names"]}, "zz": 1},
+		{"keys": {"ref": ["$$params", "names"]}},
+	] {
+		subjects := {"pr": {"from": ["prs", step]}}
+		ergo.as_sentences({"subjects": subjects}).subjects == subjects
+	}
+}
+
+test_as_sentences_narrows_only_with_an_of_that_names_another_subject if {
+	subjects := {
+		"$x": {"from": ["deployments"]},
+		"a": {"of": "$x", "applies_to": {"f": {"op": "present", "path": ["id"]}}},
+		"b": {"of": "deployments", "applies_to": {"f": {"op": "present", "path": ["id"]}}},
+		"c": {"of": ""},
+	}
+	converted := ergo.as_sentences({"subjects": subjects}).subjects
+	[converted.a, converted.b, converted.c] == [subjects.a, subjects.b, subjects.c]
+}
+
+test_as_sentences_leaves_the_checks_of_a_subject_read_from_another if {
+	policy := {
+		"subjects": {"d": {"from": "deployments"}, "c": {"from": "d.commits"}},
+		"requirements": {"r": {"subject": "c", "checks": {"k": {"op": "present", "path": ["d", "v"]}}}},
+	}
+	ergo.as_sentences(policy).requirements == policy.requirements
 }

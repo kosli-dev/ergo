@@ -899,9 +899,10 @@ subjects:
     id: id
 ```
 
-- A check or a subject is only rewritten when ergo reads the sentence back into exactly what was written, so the policy gives the same report verdicts. Anything else stays as it was, and still works.
+- A check or a subject is only rewritten when ergo reads the sentence back into what was written, so the policy gives the same report verdicts. Anything else stays as it was, and still works.
 - `all` and `any` stay, because `every` and `some` walk every list along their path where `all` and `any` read one, so a policy could pass where it failed. Custom operators, `any_of`, substitutes, `count`, `sum` and `add`, and checks with their own `expression` stay too.
-- A subject's `applies_to` filters become its `whose` conditions only when they all can and none has a `description` or `meta`, which a condition has nowhere to keep.
+- A subject's `applies_to` filters become its `whose` conditions only when they all can and none has a `description` or `meta`, which a condition has nowhere to keep. Their names are lost, since a condition has none.
+- The checks of a subject read from another subject, like `from: artifact.pull_requests`, stay as they are, since a sentence there reads `artifact` as that subject.
 - The comments of a YAML file are lost, since OPA reads it as data.
 
 ## Operators

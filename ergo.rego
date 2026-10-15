@@ -6592,19 +6592,24 @@ as_sentences(policy) := object.union(object.remove(policy, ["subjects", "require
 
 as_sentences(policy) := policy if not is_object(policy)
 
-_c_sections(policy) := {f: _c_section(f, policy[f]) | some f in ["subjects", "requirements"]; f in object.keys(policy)}
+_c_sections(policy) := {f: _c_section(f, policy[f], _c_chains(policy)) | some f in ["subjects", "requirements"]; f in object.keys(policy)}
 
-_c_section("subjects", section) := _c_subjects(section) if is_object(section)
+_c_chains(policy) := _s_subject_sentences(policy.subjects, _s_from_reads(policy.subjects)).chains if is_object(object.get(policy, "subjects", null))
 
-_c_section("requirements", section) := _c_requirements(section) if is_object(section)
+_c_chains(policy) := {} if not is_object(object.get(policy, "subjects", null))
 
-_c_section(_, section) := section if not is_object(section)
+_c_section("subjects", section, _) := _c_subjects(section) if is_object(section)
 
-_c_requirements(reqs) := {name: _c_requirement(req) | some name, req in reqs}
+_c_section("requirements", section, chains) := _c_requirements(section, chains) if is_object(section)
 
-_c_requirement(req) := object.union(object.remove(req, ["checks"]), {"checks": {name: _c_check(check) | some name, check in req.checks}}) if {
+_c_section(_, section, _) := section if not is_object(section)
+
+_c_requirements(reqs, chains) := {name: _c_requirement(req, chains) | some name, req in reqs}
+
+_c_requirement(req, chains) := object.union(object.remove(req, ["checks"]), {"checks": {name: _c_check(check) | some name, check in req.checks}}) if {
 	is_object(req)
 	is_object(object.get(req, "checks", null))
+	not object.get(req, "subject", null) in object.keys(chains)
 } else := req
 
 _c_check(check) := _c_written(check, text) if {
@@ -6718,11 +6723,18 @@ _c_from_line(name, def, subjects) := concat("", [source, _c_whose(conds)]) if {
 	conds := _c_conditions(def)
 }
 
-_c_from_line(name, def, _) := concat("", [_path_name([def.of]), _c_whose(conds)]) if {
+_c_from_line(name, def, subjects) := concat("", [parent, _c_whose(conds)]) if {
 	is_string(object.get(def, "of", null))
 	not "from" in object.keys(def)
 	not "id" in object.keys(def)
 	def.of != name
+	def.of in object.keys(subjects)
+	not startswith(def.of, "$")
+	parent := _path_name([def.of])
+	fl := _from_line(parent)
+	object.keys(fl) == {"path"}
+	_s_narrows(name, fl, subjects)
+	fl.path.steps == [def.of]
 	conds := _c_conditions(def)
 }
 
@@ -6756,8 +6768,10 @@ _c_source(name, from, subjects) := text if {
 _c_source(name, from, subjects) := text if {
 	count(from) > 1
 	step := from[count(from) - 1]
-	_c_naming(step)
-	_is_ref(object.get(step, "keys", null))
+	is_object(step)
+	object.keys(step) == {"each_as", "keys"}
+	step.each_as == "subject"
+	_is_ref(step.keys)
 	text := concat("", [_c_from_path(name, array.slice(from, 0, count(from) - 1), subjects), " named by each of ", _ref_name(step.keys.ref)])
 	_c_from_reads_back(text, from)
 }
