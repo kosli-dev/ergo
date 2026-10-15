@@ -712,7 +712,7 @@ _derived_once(check) if {
 
 _answered_once(check) if {
 	is_object(check)
-	"$once" in object.keys(check)
+	object.get(check, "$once", null) != null
 }
 
 default _once_shaped(_) := false
@@ -3882,10 +3882,12 @@ _with_ref_answer(check) := _ref_answered_compare(check) if {
 	is_array(check.checks)
 } else := check
 
-_ref_answered_compare(c) := object.union(c, {"$ref_cause": _ref_cause(c), "$once": _once_shaped(c)}) if {
+_ref_answered_compare(c) := object.union(c, {"$ref_cause": _ref_cause(c), "$once": true}) if {
+	is_object(c)
+	_once_shaped(c)
+} else := object.union(c, {"$once": false}) if {
 	is_object(c)
 	c.op == "compare"
-	_derived_sides(c) != []
 } else := c
 
 default _scope_readable(_, _, _) := false
