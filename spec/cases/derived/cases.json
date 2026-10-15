@@ -7710,5 +7710,77 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a count whose whose reads a param that's missing",
+    "policy": {
+      "subjects": {
+        "thing": {
+          "from": [
+            "things"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "count of xs whose k is one of $params.missing is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as absent and shows null for the count",
+        "rules": [
+          "tally.whose",
+          "tally.inputs",
+          "tally.fail",
+          "sentence.derived.count"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "k": "a"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "count of xs whose k is in $params.missing",
+                "value": null
+              },
+              {
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": "a"
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
