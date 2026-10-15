@@ -5375,11 +5375,9 @@ _s_whose_filters(_, []) := {}
 
 _s_whose_filters(prefix, conds) := {"applies_to": {concat("", [prefix, _s_filter_name(i, count(conds))]): c | some i, c in conds}} if conds != []
 
-_s_filter_prefix(name, chain) := concat("", [_s_pad(count(graph.reachable(chain, [name])) - 1, 3), " ", _text(name), " "])
+_s_filter_prefix(name, chain) := concat("", [_s_pad(count(graph.reachable(chain, [name])) - 1), " ", _text(name), " "])
 
-_s_pad(i, width) := concat("", [substring("          ", 0, width - count(format_int(i, 10))), format_int(i, 10)]) if count(format_int(i, 10)) <= width
-
-_s_pad(i, width) := format_int(i, 10) if count(format_int(i, 10)) > width
+_s_pad(i) := concat("", [substring("         ", 0, 9 - count(format_int(i, 10))), format_int(i, 10)])
 
 _s_chain_parent(n, lines, subjects) := [lines[n].path.steps[0]] if {
 	"path" in object.keys(object.get(lines, n, {}))
