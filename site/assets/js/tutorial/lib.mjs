@@ -713,6 +713,15 @@ export const freshDraft = (drafts, step) => ({
 export const progressDots = (pos) =>
   steps.map((_, i) => (pos >= positions.length ? "done" : positions[pos].step === i ? "current" : positions[pos].step > i ? "done" : "todo"));
 
+export const stepTitles = ["First check", "A failure", "Nothing recorded", "The wrong kind", "Numbers", "Two parts with and", "Every", "Some", "Names", "The requirement", "A day of batches", "The policy"];
+
+export const dotTargets = (pos) =>
+  progressDots(pos).map((state, i) => ({
+    state,
+    tip: `Step ${i + 1} · ${stepTitles[i]}`,
+    jump: state === "done" ? positions.findIndex((p) => p.step === i) : null,
+  }));
+
 export const resultLine = (result) => ({
   cause: result.cause,
   rest: result.failed?.length ? result.failed.map((a) => a.assertion).join(" · ") : evidence(result).map((e) => `${e.name} = ${e.text}`).join(" · "),

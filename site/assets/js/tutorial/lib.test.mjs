@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import opa from "../../tutorial/vendor/opa-wasm.mjs";
 import * as lib from "./lib.mjs";
-import { defaultCell, cellHighlight, makeRunner, defaultNames, checkLines, slug, nameProblem, nameCoach, tutorialPolicy, lineResults, verdict, verdictWord, tapOutcome, requirementCoach, gridFromReport, cellLine, subjectsStatus, subjectsCoach, yamlLines, policyYaml, bakeryBatches, createEnterGate, serializeProgress, restoreProgress, layoutLines, splitSentences, fieldHighlights, keyAction, goalKindAt, isPretty, firstPositionOf, progressDots, resultLine, carryFrom, dimResult, freshDraft, judgePrediction, jsonSegments, fieldHighlight, segmentClasses, isAt, showMeVisible, buildPolicy, clampPosition, intro, positions, evidence, grade, makeChecker, parseInput, parseTime, steps, straighten } from "./lib.mjs";
+import { defaultCell, cellHighlight, makeRunner, defaultNames, checkLines, slug, nameProblem, nameCoach, tutorialPolicy, lineResults, verdict, verdictWord, tapOutcome, requirementCoach, gridFromReport, cellLine, subjectsStatus, subjectsCoach, yamlLines, policyYaml, bakeryBatches, createEnterGate, serializeProgress, restoreProgress, layoutLines, splitSentences, fieldHighlights, keyAction, goalKindAt, isPretty, firstPositionOf, progressDots, stepTitles, dotTargets, resultLine, carryFrom, dimResult, freshDraft, judgePrediction, jsonSegments, fieldHighlight, segmentClasses, isAt, showMeVisible, buildPolicy, clampPosition, intro, positions, evidence, grade, makeChecker, parseInput, parseTime, steps, straighten } from "./lib.mjs";
 
 const wasm = readFileSync(new URL("../../tutorial/ergo.wasm", import.meta.url));
 const ergo = await opa.loadPolicy(wasm, undefined, { "time.parse_rfc3339_ns": parseTime });
@@ -360,6 +360,15 @@ test("progress dots: done before the step, current on it, todo after, all done a
   assert.deepEqual(progressDots(3), ["done", "done", "current", ...Array(9).fill("todo")]);
   assert.deepEqual(progressDots(12), [...Array(11).fill("done"), "current"]);
   assert.deepEqual(progressDots(positions.length), Array(12).fill("done"));
+});
+
+test("only the dots of finished steps jump, and every dot names its step", () => {
+  assert.equal(stepTitles.length, steps.length);
+  const dots = dotTargets(3);
+  assert.deepEqual(dots.map((d) => d.jump), [1, 2, null, ...Array(9).fill(null)]);
+  assert.equal(dots[2].tip, "Step 3 · Nothing recorded");
+  assert.deepEqual(dotTargets(0).map((d) => d.jump), Array(12).fill(null));
+  assert.deepEqual(dotTargets(positions.length).map((d) => d.jump), steps.map((_, i) => i + 1));
 });
 
 test("the result line puts the cause and the evidence together", () => {

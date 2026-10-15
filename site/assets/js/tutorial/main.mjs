@@ -1,5 +1,5 @@
 import opa from "../../tutorial/vendor/opa-wasm.mjs";
-import { defaultCell, cellHighlight, makeRunner, bakeryBatches, defaultNames, checkLines, nameProblem, nameCoach, tutorialPolicy, lineResults, verdict, verdictWord, requirementCoach, gridFromReport, cellLine, subjectsStatus, subjectsCoach, yamlLines, layoutMetrics, createEnterGate, serializeProgress, restoreProgress, layoutLines, keyAction, goalKindAt, parseInput, clampPosition, progressDots, resultLine, freshDraft, dimResult, jsonSegments, fieldHighlights, segmentClasses, isAt, evidence, grade, intro, makeChecker, parseTime, positions, showMeVisible, steps, straighten } from "./lib.mjs";
+import { defaultCell, cellHighlight, makeRunner, bakeryBatches, defaultNames, checkLines, nameProblem, nameCoach, tutorialPolicy, lineResults, verdict, verdictWord, requirementCoach, gridFromReport, cellLine, subjectsStatus, subjectsCoach, yamlLines, layoutMetrics, createEnterGate, serializeProgress, restoreProgress, layoutLines, keyAction, goalKindAt, parseInput, clampPosition, dotTargets, resultLine, freshDraft, dimResult, jsonSegments, fieldHighlights, segmentClasses, isAt, evidence, grade, intro, makeChecker, parseTime, positions, showMeVisible, steps, straighten } from "./lib.mjs";
 
 const root = document.getElementById("tutorial");
 const $ = (name) => root.querySelector(`[data-${name}]`);
@@ -595,8 +595,20 @@ const go = (n, fresh = false, focus = true) => {
   el.dots.style.visibility = onIntro ? "hidden" : "";
   el.count.textContent = "";
   el.restartStep.hidden = onIntro || onEnd;
-  const states = progressDots(pos);
-  el.dots.replaceChildren(...states.map((s) => make("li", `tut__dot is-${s}`)));
+  el.dots.replaceChildren(...dotTargets(pos).map(({ state, tip, jump }) => {
+    const li = make("li", `tut__dot is-${state}`);
+    li.dataset.tip = tip;
+    if (jump === null) {
+      li.setAttribute("aria-label", state === "current" ? `${tip}, current` : tip);
+    } else {
+      const b = make("button", "");
+      b.type = "button";
+      b.setAttribute("aria-label", `Go back to ${tip}`);
+      b.addEventListener("click", () => go(jump));
+      li.append(b);
+    }
+    return li;
+  }));
   el.dots.setAttribute("aria-label", onIntro ? "" : onEnd ? "all steps done" : `step ${here().step + 1} of ${steps.length}`);
   el.menuWrap.hidden = onIntro;
   closeMenu();

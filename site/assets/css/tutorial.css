@@ -10,9 +10,19 @@ html, body.tut-body { height: 100%; overflow: hidden; }
 .tut__bar .wm { height: 26px; }
 
 .tut__dots { list-style: none; margin: 0; padding: 0; display: flex; gap: clamp(4px, 1.4vw, 8px); flex: 1; justify-content: center; }
-.tut__dot { width: clamp(7px, 2vw, 9px); height: clamp(7px, 2vw, 9px); border-radius: 50%; background: var(--line-2); transition: background-color .2s ease-out; }
+.tut__dot { width: clamp(7px, 2vw, 9px); height: clamp(7px, 2vw, 9px); border-radius: 50%; background: var(--line-2); transition: background-color .2s ease-out, box-shadow .15s ease-out; }
 .tut__dot.is-done { background: var(--paper); }
 .tut__dot.is-current { background: var(--lime); }
+.tut__dot { position: relative; }
+.tut__dot button { position: absolute; inset: -7px; border: 0; padding: 0; background: transparent; border-radius: 50%; cursor: pointer; }
+.tut__dot button:focus-visible { outline: 2px solid var(--lime); outline-offset: -3px; }
+.tut__dot.is-done:hover, .tut__dot.is-done:focus-within { box-shadow: 0 0 0 3px var(--line-2); }
+.tut__dot[data-tip]::after {
+  content: attr(data-tip); position: absolute; bottom: calc(100% + 12px); left: 50%; transform: translate(-50%, 4px);
+  white-space: nowrap; padding: 5px 10px; border-radius: 8px; background: var(--ink-3); border: 1px solid var(--line-2);
+  color: var(--paper); font: 500 13px/1.2 var(--sans); pointer-events: none; opacity: 0; transition: opacity .15s ease-out, transform .15s ease-out; z-index: 5;
+}
+.tut__dot:hover::after, .tut__dot:focus-within::after { opacity: 1; transform: translate(-50%, 0); }
 
 .tut__menu { position: relative; }
 .tut__more {
@@ -201,5 +211,5 @@ button.tut__row.is-picked { border-color: var(--lime); }
 
 @media (prefers-reduced-motion: reduce) {
   .tut__state.is-new, .tut__input .is-flash { animation: none; }
-  .tut__next, .tut__result, .tut__pick, .tut__dot, .tut__input span, .tut__keyhint { transition: none; }
+  .tut__next, .tut__result, .tut__pick, .tut__dot, .tut__dot::after, .tut__input span, .tut__keyhint { transition: none; }
 }
