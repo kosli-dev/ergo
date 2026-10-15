@@ -6587,3 +6587,198 @@ _for_named(p) if {
 	some step in p
 	_name_step(step)
 }
+
+as_sentences(policy) := object.union(object.remove(policy, ["subjects", "requirements"]), _c_sections(policy)) if is_object(policy)
+
+as_sentences(policy) := policy if not is_object(policy)
+
+_c_sections(policy) := {f: _c_section(f, policy[f]) | some f in ["subjects", "requirements"]; f in object.keys(policy)}
+
+_c_section("subjects", section) := _c_subjects(section) if is_object(section)
+
+_c_section("requirements", section) := _c_requirements(section) if is_object(section)
+
+_c_section(_, section) := section if not is_object(section)
+
+_c_requirements(reqs) := {name: _c_requirement(req) | some name, req in reqs}
+
+_c_requirement(req) := object.union(object.remove(req, ["checks"]), {"checks": {name: _c_check(check) | some name, check in req.checks}}) if {
+	is_object(req)
+	is_object(object.get(req, "checks", null))
+} else := req
+
+_c_check(check) := _c_written(check, text) if {
+	text := _c_sentence(_c_bare(check))
+} else := check
+
+_c_bare(check) := object.remove(check, ["description", "meta"]) if is_object(check)
+
+_c_written(check, text) := text if object.keys(check) & {"description", "meta"} == set()
+
+_c_written(check, text) := object.union(object.filter(check, {"description", "meta"}), {"assert": text}) if object.keys(check) & {"description", "meta"} != set()
+
+_c_sentence(model) := [t | some t in _c_candidates(model); _c_reads_back(t, model)][0]
+
+_c_reads_back(text, model) if {
+	parsed := _sentence(text)
+	count(parsed.assertions) == 1
+	count(_s_unsupported(parsed)) == 0
+	_s_model(parsed.assertions[0]) == model
+}
+
+_c_path(p) := _path_name(p) if is_array(p)
+
+_c_values(vs) := concat(", ", [_json_text(v) | some v in vs]) if is_array(vs)
+
+_c_values(vs) := _ref_name(vs.ref) if _is_ref(vs)
+
+_c_candidates(m) := [concat("", [_c_path(m.path), " exists"])] if m.op == "present"
+
+_c_candidates(m) := [concat("", [_c_path(m.path), " does not exist"])] if m.op == "missing"
+
+_c_candidates(m) := [concat("", [_c_path(m.path), " is ", _json_text(m.value)])] if m.op == "equals"
+
+_c_candidates(m) := [concat("", [_c_path(m.path), " is a non-empty string"])] if m.op == "non_empty_string"
+
+_c_candidates(m) := [concat("", [_c_path(m.path), " is one of ", _c_values(m.values)]), concat("", [_c_path(m.path), " is in ", _c_values(m.values)])] if m.op == "in"
+
+_c_candidates(m) := [concat("", [_c_path(m.path), " is between ", _json_text(m.min), " and ", _json_text(m.max)])] if m.op == "range"
+
+_c_candidates(m) := [concat("", [_c_path(m.path), " matches ", _c_values(m.patterns)])] if m.op == "matches_any"
+
+_c_candidates(m) := [concat("", [_c_path(m.path), " does not match ", _c_values(m.patterns)])] if m.op == "not_matches_any"
+
+_c_candidates(m) := [concat("", [_c_path(m.path), " contains ", _c_one(m.value)])] if {
+	m.op == "includes"
+	"value" in object.keys(m)
+	not "values" in object.keys(m)
+}
+
+_c_candidates(m) := [concat("", [_c_path(m.path), " contains all of ", _c_values(m.values)])] if {
+	m.op == "includes"
+	"values" in object.keys(m)
+	not "value" in object.keys(m)
+}
+
+_c_candidates(m) := [concat("", [_c_path(m.path), " does not contain ", _c_one(m.value)])] if {
+	m.op == "excludes"
+	"value" in object.keys(m)
+	not "values" in object.keys(m)
+}
+
+_c_candidates(m) := [concat("", [_c_path(m.path), " contains none of ", _c_values(m.values)])] if {
+	m.op == "excludes"
+	"values" in object.keys(m)
+	not "value" in object.keys(m)
+}
+
+_c_candidates(m) := [concat("", [_c_path(m.left), " ", _c_compare_words[m.cmp], " ", _c_side(m.right), _c_within(m)])] if {
+	m.op == "compare"
+	m.cmp in object.keys(_c_compare_words)
+}
+
+_c_candidates(m) := [concat("", [_c_path(m.left), " ", _c_time_words[m.cmp], " ", _c_path(m.right)])] if {
+	m.op == "compare_time"
+	m.cmp in object.keys(_c_time_words)
+}
+
+_c_one(v) := _ref_name(v.ref) if _is_ref(v)
+
+_c_one(v) := _json_text(v) if not _is_ref(v)
+
+_c_side(s) := _c_path(s) if is_array(s)
+
+_c_side(s) := _json_text(s.literal) if _basic_form(s) == "literal"
+
+_c_within(m) := concat("", [" within ", _json_text(m.within)]) if "within" in object.keys(m)
+
+_c_within(m) := "" if not "within" in object.keys(m)
+
+_c_compare_words := {"eq": "equals", "ne": "does not equal", "gt": "is more than", "gte": "is at least", "lt": "is less than", "lte": "is at most"}
+
+_c_time_words := {"gt": "is after", "lt": "is before", "gte": "is on or after", "lte": "is on or before"}
+
+_c_subjects(subjects) := {name: _c_subject(name, def, subjects) | some name, def in subjects}
+
+_c_subject(name, def, subjects) := object.union(object.remove(def, ["from", "applies_to", "of"]), object.union({"from": from}, _c_id(def))) if {
+	is_object(def)
+	from := _c_from_line(name, def, subjects)
+} else := def
+
+_c_id(def) := {"id": text} if {
+	is_array(object.get(def, "id", null))
+	text := _path_name(def.id)
+	object.get(_s_id_read(text), "path", null) == def.id
+} else := {}
+
+_c_from_line(name, def, subjects) := concat("", [source, _c_whose(conds)]) if {
+	not "of" in object.keys(def)
+	is_array(def.from)
+	source := _c_source(name, def.from, subjects)
+	conds := _c_conditions(def)
+}
+
+_c_from_line(name, def, _) := concat("", [_path_name([def.of]), _c_whose(conds)]) if {
+	is_string(object.get(def, "of", null))
+	not "from" in object.keys(def)
+	not "id" in object.keys(def)
+	def.of != name
+	conds := _c_conditions(def)
+}
+
+_c_whose([]) := ""
+
+_c_whose(conds) := concat("", [" whose ", concat(" and ", conds)]) if conds != []
+
+_c_conditions(def) := [] if not "applies_to" in object.keys(def)
+
+_c_conditions(def) := conds if {
+	is_object(def.applies_to)
+	conds := [text |
+		some n in sort(object.keys(def.applies_to))
+		f := def.applies_to[n]
+		is_object(f)
+		object.keys(f) & {"description", "meta"} == set()
+		text := _c_sentence(f)
+	]
+	count(conds) == count(def.applies_to)
+}
+
+_c_source(_, [], _) := "$input"
+
+_c_source(name, from, subjects) := text if {
+	count(from) > 0
+	not _c_naming(from[count(from) - 1])
+	text := _c_from_path(name, from, subjects)
+	_c_from_reads_back(text, from)
+}
+
+_c_source(name, from, subjects) := text if {
+	count(from) > 1
+	step := from[count(from) - 1]
+	_c_naming(step)
+	_is_ref(object.get(step, "keys", null))
+	text := concat("", [_c_from_path(name, array.slice(from, 0, count(from) - 1), subjects), " named by each of ", _ref_name(step.keys.ref)])
+	_c_from_reads_back(text, from)
+}
+
+_c_naming(step) if {
+	is_object(step)
+	not _is_ref(step)
+}
+
+_c_from_path(name, steps, subjects) := concat("", ["$input.", _steps_name(_from_steps(steps))]) if {
+	is_string(steps[0])
+	steps[0] != name
+	steps[0] in object.keys(subjects)
+} else := _steps_name(_from_steps(steps))
+
+_c_from_reads_back(text, from) if {
+	fl := _from_line(text)
+	object.keys(fl) - {"named_by_each_of"} == {"path"}
+	array.concat(_s_from_steps(_s_model_path(fl.path)), _c_each_back(fl, from)) == from
+}
+
+_c_each_back(fl, from) := [object.union(from[count(from) - 1], {"keys": {"ref": _s_model_path(fl.named_by_each_of)}})] if "named_by_each_of" in object.keys(fl)
+
+_c_each_back(fl, _) := [] if not "named_by_each_of" in object.keys(fl)

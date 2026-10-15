@@ -9380,3 +9380,101 @@ test_every_and_count_through_a_for_name_arent_listed_as_inputs_since_they_change
 		[[r.cause, r.inputs] | some r in ergo.report(doc, _sentence_policy({"c": check}), {}).results; r.check == "c"] == [["satisfied", [{"name": "ps[]", "value": ["a"]}]]]
 	}
 }
+
+_old_policy := {
+	"subjects": {"deployment": {
+		"from": ["deployments"],
+		"id": ["id"],
+		"applies_to": {"is_prod": {"op": "equals", "path": ["environment"], "value": "prod"}},
+	}},
+	"requirements": {"approved": {"subject": "deployment", "checks": {
+		"approved": {"op": "non_empty_string", "path": ["approved_by"], "description": "Someone approved it"},
+		"region": {"op": "in", "path": ["region"], "values": ["eu", "us"]},
+		"later": {"op": "compare_time", "left": ["deployed_at"], "right": ["approved_at"], "cmp": "gt"},
+		"signed": {"op": "all", "path": ["commits"], "check": {"op": "equals", "path": ["signed"], "value": true}},
+	}}},
+}
+
+test_as_sentences_writes_null_as_is_null_because_it_reads_back_the_same if {
+	ergo.as_sentences({"requirements": {"r": {"checks": {"c": {"op": "equals", "path": ["x"], "value": null}}}}}).requirements.r.checks.c == "x is null"
+}
+
+test_as_sentences_rewrites_each_check_and_subject_it_can_as_a_sentence if {
+	ergo.as_sentences(_old_policy) == {
+		"subjects": {"deployment": {"from": `deployments whose environment is "prod"`, "id": "id"}},
+		"requirements": {"approved": {"subject": "deployment", "checks": {
+			"approved": {"description": "Someone approved it", "assert": "approved_by is a non-empty string"},
+			"region": `region is one of "eu", "us"`,
+			"later": "deployed_at is after approved_at",
+			"signed": _old_policy.requirements.approved.checks.signed,
+		}}},
+	}
+}
+
+test_as_sentences_leaves_what_doesnt_read_back_the_same_as_written if {
+	every check in [
+		{"op": "all", "path": ["xs"], "check": {"op": "present", "path": ["k"]}},
+		{"op": "empty", "path": ["x"]},
+		{"op": "present", "path": ["x"], "substitute": {"op": "present", "path": ["y"]}},
+		{"op": "even", "path": ["x"]},
+		{"op": "compare", "left": {"count": ["xs"]}, "cmp": "eq", "right": {"literal": 1}},
+		{"op": "present", "path": ["x"], "expression": "x is there"},
+		"x exists",
+		5,
+	] {
+		ergo.as_sentences({"requirements": {"r": {"checks": {"c": check}}}}).requirements.r.checks.c == check
+	}
+}
+
+test_as_sentences_writes_input_before_a_from_that_starts_like_another_subject if {
+	policy := {"subjects": {"artifact": {"from": ["artifact"]}, "pr": {"from": ["artifact", "prs"], "id": ["url"]}}}
+	ergo.as_sentences(policy).subjects == {"artifact": {"from": "artifact"}, "pr": {"from": "$input.artifact.prs", "id": "url"}}
+}
+
+test_as_sentences_writes_naming_and_whole_input_and_narrowing_as_from_lines if {
+	policy := {"subjects": {
+		"all": {"from": []},
+		"run": {"from": ["build", "runs", {"each_as": "r", "keys": {"ref": ["$$params", "kinds"]}}]},
+		"one": {"from": ["build", "runs", {"ref": ["$$params", "kind"]}]},
+		"named": {"from": ["build", "runs", {"each_as": "r"}]},
+		"$x": {"from": ["$x"]},
+		"narrow": {"of": "run", "applies_to": {"b": {"op": "present", "path": ["b"]}, "a": {"op": "present", "path": ["a"]}}},
+		"filtered": {"from": ["xs"], "applies_to": {"f": {"op": "present", "path": ["a"], "description": "kept"}}},
+	}}
+	ergo.as_sentences(policy).subjects == {
+		"all": {"from": "$input"},
+		"run": {"from": "build.runs named by each of $params.kinds"},
+		"one": {"from": "build.runs named by $params.kind"},
+		"named": policy.subjects.named,
+		"$x": {"from": `"$x"`},
+		"narrow": {"from": "run whose .a exists and b exists"},
+		"filtered": policy.subjects.filtered,
+	}
+}
+
+test_as_sentences_keeps_sections_that_arent_objects_and_other_fields if {
+	ergo.as_sentences({"requirements": ["x"], "subjects": 5, "other": 1}) == {"requirements": ["x"], "subjects": 5, "other": 1}
+	ergo.as_sentences("x") == "x"
+	ergo.as_sentences({"requirements": {"r": 1, "s": {"checks": []}}}) == {"requirements": {"r": 1, "s": {"checks": []}}}
+}
+
+test_a_policy_as_sentences_gives_the_same_verdicts_on_every_spec_case if {
+	every topic in ["compare", "compare_time", "contains", "empty", "equals", "in", "missing", "non_empty_string", "patterns", "present", "range", "requirements", "substitutes"] {
+		every group in data.spec.cases[topic] {
+			every c in group.cases {
+				_verdicts(ergo.report(c.input, group.policy, object.get(group, "params", {}))) == _verdicts(ergo.report(c.input, ergo.as_sentences(group.policy), object.get(group, "params", {})))
+			}
+		}
+	}
+}
+
+_verdicts(rep) := {"rows": {[r.requirement, r.subject, r.check, r.passed, r.cause] | some r in rep.results}, "status": {[n, req.status] | some n, req in rep.requirements}}
+
+test_as_sentences_writes_compares_with_a_value_and_within if {
+	checks := {
+		"a": {"op": "compare", "left": ["x"], "cmp": "eq", "right": {"literal": 1}, "within": 0.5},
+		"b": {"op": "compare", "left": ["x"], "cmp": "gte", "right": {"literal": 2}},
+		"c": {"op": "compare", "left": ["x"], "cmp": "eq", "right": ["y"], "within": 0.5},
+	}
+	ergo.as_sentences({"requirements": {"r": {"checks": checks}}}).requirements.r.checks == {"a": "x equals 1 within 0.5", "b": "x is at least 2", "c": "x equals y within 0.5"}
+}
