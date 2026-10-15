@@ -4,14 +4,66 @@ import data.ergo
 
 known_differences := set()
 
-failures contains concat(" / ", [topic, group.description, c.description]) if {
-	some topic, groups in data.spec.cases
-	some group in groups
+failures := union({_topic_failures(topic) | some topic, _ in data.spec.cases})
+
+_topic_failures(topic) := {concat(" / ", [topic, group.description, c.description]) |
+	some group in data.spec.cases[topic]
 	some c in group.cases
 	not _passes(group, c)
 }
 
-test_every_spec_case_passes_except_the_known_differences if failures == known_differences
+_known_in(topic) := known_differences & _case_names(topic)
+
+_case_names(topic) := {concat(" / ", [topic, group.description, c.description]) |
+	some group in data.spec.cases[topic]
+	some c in group.cases
+}
+
+test_every_known_difference_names_a_case if known_differences - union({_case_names(topic) | some topic, _ in data.spec.cases}) == set()
+
+_tested_topics := {"any_of", "compare", "compare_time", "contains", "custom", "derived", "empty", "equals", "for", "in", "lists", "missing", "non_empty_string", "patterns", "present", "range", "requirements", "sentences", "substitutes", "walks"}
+
+test_every_folder_of_cases_has_a_test_of_its_own if {t | some t, _ in data.spec.cases} == _tested_topics
+
+test_the_any_of_cases_pass if _topic_failures("any_of") == _known_in("any_of")
+
+test_the_compare_cases_pass if _topic_failures("compare") == _known_in("compare")
+
+test_the_compare_time_cases_pass if _topic_failures("compare_time") == _known_in("compare_time")
+
+test_the_contains_cases_pass if _topic_failures("contains") == _known_in("contains")
+
+test_the_custom_cases_pass if _topic_failures("custom") == _known_in("custom")
+
+test_the_derived_cases_pass if _topic_failures("derived") == _known_in("derived")
+
+test_the_empty_cases_pass if _topic_failures("empty") == _known_in("empty")
+
+test_the_equals_cases_pass if _topic_failures("equals") == _known_in("equals")
+
+test_the_for_cases_pass if _topic_failures("for") == _known_in("for")
+
+test_the_in_cases_pass if _topic_failures("in") == _known_in("in")
+
+test_the_lists_cases_pass if _topic_failures("lists") == _known_in("lists")
+
+test_the_missing_cases_pass if _topic_failures("missing") == _known_in("missing")
+
+test_the_non_empty_string_cases_pass if _topic_failures("non_empty_string") == _known_in("non_empty_string")
+
+test_the_patterns_cases_pass if _topic_failures("patterns") == _known_in("patterns")
+
+test_the_present_cases_pass if _topic_failures("present") == _known_in("present")
+
+test_the_range_cases_pass if _topic_failures("range") == _known_in("range")
+
+test_the_requirements_cases_pass if _topic_failures("requirements") == _known_in("requirements")
+
+test_the_sentences_cases_pass if _topic_failures("sentences") == _known_in("sentences")
+
+test_the_substitutes_cases_pass if _topic_failures("substitutes") == _known_in("substitutes")
+
+test_the_walks_cases_pass if _topic_failures("walks") == _known_in("walks")
 
 test_a_case_with_the_wrong_rows_is_listed_by_name if {
 	failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
@@ -142,4 +194,17 @@ _compared("$applies", _)
 _compared(check, c) if {
 	some r in c.results
 	r.check == check
+}
+
+test_a_known_difference_that_passes_fails_its_folder if {
+	cases := {"topic": [{
+		"description": "group",
+		"policy": {"subjects": {"subject": {}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+		"cases": [{"description": "case", "input": {"x": 1}, "results": [{
+			"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c",
+			"passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}],
+		}]}],
+	}]}
+	_topic_failures("topic") == set() with data.spec.cases as cases
+	_known_in("topic") == {"topic / group / case"} with data.spec.cases as cases with known_differences as {"topic / group / case", "other / g / c"}
 }
