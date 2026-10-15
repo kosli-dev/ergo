@@ -703,7 +703,21 @@ _once_cause(flaw, _) := flaw if flaw != ""
 
 default _derived_once(_) := false
 
+_derived_once(check) if check["$once"] == true
+
 _derived_once(check) if {
+	not _answered_once(check)
+	_once_shaped(check)
+}
+
+_answered_once(check) if {
+	is_object(check)
+	"$once" in object.keys(check)
+}
+
+default _once_shaped(_) := false
+
+_once_shaped(check) if {
 	check.op == "compare"
 	_derived_sides(check) != []
 	not "substitute" in object.keys(check)
@@ -711,24 +725,32 @@ _derived_once(check) if {
 	every f in ["left", "right"] {
 		_side_form(object.get(check, f, null))
 	}
-	not _unreadable_ref(check)
 }
+
+_ref_cause(check) := check["$ref_cause"] if {
+	is_object(check)
+	"$ref_cause" in object.keys(check)
+} else := _worst_of({_used_ref_state(check, r) | some r in _check_refs(check)}) if {
+	_unreadable_ref(check)
+} else := ""
 
 _derived_eval(check, subj, item) := {"passed": passed, "cause": cause, "inputs": array.concat(l.inputs, r.inputs)} if {
 	l := _side_eval(subj, check.left, item)
 	r := _side_eval(subj, check.right, item)
 	passed := _eval_compared(check, l.v, r.v)
 	states := (l.states | r.states) | {"unusable" | [lf] := l.found; [rf] := r.found; not _usable_sides(check, lf, rf)}
-	cause := _eval_cause(passed, states)
+	cause := _eval_cause(passed, _ref_cause(check), states)
 }
 
 _eval_compared(check, [lv], [rv]) if _compared(check, lv, rv)
 
 default _eval_compared(_, _, _) := false
 
-_eval_cause(true, _) := "satisfied"
+_eval_cause(true, _, _) := "satisfied"
 
-_eval_cause(false, states) := _worst_or_value(states)
+_eval_cause(false, "", states) := _worst_or_value(states)
+
+_eval_cause(false, ref_cause, _) := ref_cause if ref_cause != ""
 
 _basic_eval(subj, side, item) := {"v": v, "found": [x | x := _simple_found(subj, side)], "states": {_read_state(subj, side)}, "inputs": _basic_inputs(subj, side, item)} if {
 	_basic_form(side) == "path"
@@ -805,20 +827,22 @@ _all_of_run(check, flaw) if {
 }
 
 _check_outcome(check, subj, flaw, item) := {
-	"inputs": [{"name": pair[0], "value": pair[1]} | some pair in sort({[i.name, i.value] | some c in check.checks; some i in _assertion_inputs(subj, c, item)})],
+	"inputs": [{"name": pair[0], "value": pair[1]} | some pair in sort({[i.name, i.value] | some o in outs; some i in o.inputs})],
 	"passed": count(failed) == 0,
 	"cause": _all_of_cause(failed),
 	"failed_assertions": failed,
 } if {
 	_all_of_run(check, flaw)
-	failed := _failed_assertions(check, subj, flaw)
+	outs := [_assertion_out(c, subj, flaw, item) | some c in check.checks]
+	failed := [{"assertion": check.assertions[i], "cause": o.cause} | some i, o in outs; o.cause != "satisfied"]
 }
 
-_failed_assertions(check, subj, flaw) := [{"assertion": check.assertions[i], "cause": cause} |
-	some i, c in check.checks
-	cause := _assertion_cause(c, subj, flaw)
-	cause != "satisfied"
-]
+_assertion_out(c, subj, "", item) := {"cause": e.cause, "inputs": e.inputs} if {
+	_derived_once(c)
+	e := _derived_eval(c, subj, item)
+} else := {"cause": _assertion_cause(c, subj, ""), "inputs": _assertion_inputs(subj, c, item)}
+
+_assertion_out(c, subj, flaw, item) := {"cause": _assertion_cause(c, subj, flaw), "inputs": _assertion_inputs(subj, c, item)} if flaw != ""
 
 _assertion_cause(c, subj, "") := _row_cause(c, subj, "") if not _walks(c)
 
@@ -2872,16 +2896,8 @@ _worst_read(_, check) := _worst_of({_used_ref_state(check, r) | some r in _check
 default _unreadable_ref(_) := false
 
 _unreadable_ref(check) if {
-	not _ref_answered(check)
 	some r in _check_refs(check)
 	_used_ref_state(check, r) != "value"
-}
-
-_unreadable_ref(check) if check["$unreadable_ref"] == true
-
-_ref_answered(check) if {
-	is_object(check)
-	"$unreadable_ref" in object.keys(check)
 }
 
 _worst_of(states) := _cause_precedence[i] if {
@@ -2893,9 +2909,10 @@ _worst_of(states) := _cause_precedence[i] if {
 
 _row_cause(_, _, flaw) := flaw if flaw != ""
 
-_row_cause(check, subj, "") := _readable_cause(check, subj) if not _derived_once(check)
-
-_row_cause(check, subj, "") := _derived_eval(check, subj, null).cause if _derived_once(check)
+_row_cause(check, subj, "") := c if {
+	_derived_once(check)
+	c := _derived_eval(check, subj, null).cause
+} else := _readable_cause(check, subj)
 
 _readable_cause(check, subj) := "satisfied" if op_passed(check, subj)
 
@@ -3856,9 +3873,20 @@ _evaluation(doc, req, name) := {
 	groups := _subject_row_groups(matching, req, name, check_flaws, item, prepared)
 }
 
-_with_ref_answer(check) := object.union(check, {"$unreadable_ref": _unreadable_ref(check)}) if is_object(check)
+_with_ref_answer(check) := _ref_answered_compare(check) if {
+	is_object(check)
+	check.op == "compare"
+} else := object.union(check, {"checks": [_ref_answered_compare(c) | some c in check.checks]}) if {
+	is_object(check)
+	check.op in {"all_of", "for"}
+	is_array(check.checks)
+} else := check
 
-_with_ref_answer(check) := check if not is_object(check)
+_ref_answered_compare(c) := object.union(c, {"$ref_cause": _ref_cause(c), "$once": _once_shaped(c)}) if {
+	is_object(c)
+	c.op == "compare"
+	_derived_sides(c) != []
+} else := c
 
 default _scope_readable(_, _, _) := false
 
@@ -4159,6 +4187,12 @@ _basic_value(subj, side) := sum(nums) if {
 	}
 }
 
+_basic_value(subj, side) := r.value if {
+	_basic_form(side) in {"count_of", "sum_of"}
+	r := _tally(subj, side)
+	r.states == set()
+}
+
 _item_causes(subj, side, path) := [_where_cause(side, item) | some item in value_at(subj, path)] if is_array(value_at(subj, path))
 
 _all_decided(causes) if {
@@ -4286,22 +4320,27 @@ _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "v
 } else := r if {
 	f := _basic_form(side)
 	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
-	judged := [_tally_judge(side, e) | some e in w.items]
+	flaws := [_cond_flaw(c) | some c in side.whose]
+	judged := [_tally_judge(side, e, flaws) | some e in w.items]
 	kept := [e.v | some i, e in w.items; judged[i].kept]
-	states := (({x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}) | {c | some j in judged; some c in j.states}) | _tally_number_states(f, kept)
+	states := ((({x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}) | {c | some j in judged; some c in j.states}) | _tally_number_states(f, kept)) | {fl | some fl in flaws; fl != ""}
 	r := object.union({"states": states, "list": _walk_name(side[f], w.walked), "values": [_walk_shown(e.v) | some e in w.items]}, _tally_value(f, kept, states))
 }
 
-_tally_judge(side, e) := {"kept": kept, "states": ({c | some c in causes; not c in {"satisfied", "value", "missing"}} | _tally_mark(kept, e))} if {
-	causes := [_tally_cond_cause(c, e.iv) | some c in side.whose]
+_tally_judge(side, e, flaws) := {"kept": kept, "states": ({c | some c in causes; not c in {"satisfied", "value", "missing"}} | _tally_mark(kept, e))} if {
+	causes := [_tally_cond_cause(c, e.iv, flaws[i]) | some i, c in side.whose]
 	kept := count([c | some c in causes; c in {"value", "missing"}]) == 0
 }
 
-_tally_cond_cause(c, item) := "unusable" if {
+_tally_cond_cause(c, item, "") := _leaf_cause(c, item)
+
+_tally_cond_cause(_, _, flaw) := flaw if flaw != ""
+
+_cond_flaw(c) := "unusable" if {
 	_node_param_broken(c)
 } else := _worst_of({_used_ref_state(c, r) | some r in _check_refs(c)}) if {
 	_unreadable_ref(c)
-} else := _leaf_cause(c, item)
+} else := ""
 
 _tally_mark(true, e) := {"absent"} if e.v == _absent
 

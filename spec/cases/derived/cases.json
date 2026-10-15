@@ -7782,5 +7782,100 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a count of zero whose whose reads a param that's missing",
+    "policy": {
+      "subjects": {
+        "thing": {
+          "from": [
+            "things"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "count of xs whose k is one of $params.missing is 0"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as absent even with no items, where a count of zero would pass",
+        "rules": [
+          "tally.whose",
+          "tally.inputs",
+          "tally.fail"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": []
+            },
+            {
+              "id": "b",
+              "xs": [
+                {
+                  "k": "a"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "count of xs whose k is in $params.missing",
+                "value": null
+              },
+              {
+                "name": "xs[]",
+                "value": []
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "count of xs whose k is in $params.missing",
+                "value": null
+              },
+              {
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": "a"
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "b",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
