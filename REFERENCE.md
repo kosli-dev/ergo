@@ -800,7 +800,8 @@ reads "for every pull request, some approver approved it and isn't its author". 
 - `inputs` holds each list the `for` line walked, with its items, and every field of the subject the sentences read. A field read through a name, like `pr.author`, isn't listed on its own.
 - In `assert`, a bare first key is the subject's field, and a name reaches its item. Inside an item's own `whose`, a bare key is that item's field. A name hides a field of the subject with the same name.
 - Each list fails as a one-line `every` or `some` does: empty, missing, `null` or not a list, and `, if any,` lets an empty one pass.
-- Two items at most. `named by` a name, like `shas named by persona`, isn't supported yet.
+- Two items at most.
+- `named by` a name from the `for` line reads the key its item holds. With `for: every personas_dispatched as persona`, `persona_blob_shas named by persona exists` reads `persona_blob_shas.security`, then `persona_blob_shas.style`, and so on. An item that's `null` fails as `null`, and any other item that isn't a string, a number included, as `unusable`, since it can't be a key. The row's inputs show `persona_blob_shas` itself.
 
 `count of`, `sum of` and `plus` work out a number to compare, as the [derived values](#derived-values) of `compare` do. With the input of [derived values](#derived-values):
 
@@ -834,7 +835,7 @@ A sentence that can't be read is [written wrong](#basic-operators), and the `$we
 
 for `prod: environment is "prod`. `x is not null` is written wrong too, because it could only fail: write `x exists`. So is a value that isn't a number before `within`, like `x is "a" within 1`. An object with both `assert` and `op` is read as a check with an `op`, so a [custom operator](#custom-operators) can still take `assert`.
 
-ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `last of`, `named by` a name from a `for` line, `is between` after a `count of`, a `sum of` or a `plus`, a `count of` in the `whose` of another, a `plus` in the phrase of an `every` or `some`, a value after `is before` and the other time phrases, a field of the subject after `is in`, `contains` and the other phrases that take a list, and a list path with `named by` in it. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `last_signed: last of commits.signed is true` gives:
+ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `last of`, `is between` after a `count of`, a `sum of` or a `plus`, a `count of` in the `whose` of another, a `plus` in the phrase of an `every` or `some`, a value after `is before` and the other time phrases, a field of the subject after `is in`, `contains` and the other phrases that take a list, and a list after a phrase read from a path with `named by` in it, like `matches $params.a named by $params.b`. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `last_signed: last of commits.signed is true` gives:
 
 ```json
 {"name": "checks.last_signed", "value": ["last of isn't supported yet"]}

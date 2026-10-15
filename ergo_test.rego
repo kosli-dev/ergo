@@ -8774,14 +8774,11 @@ test_a_for_line_written_wrong_says_why if {
 	_sentence_problems({"assert": "x.a exists", "for": "every xs as x, every ys as x"}) == ["for: x is given twice"]
 	_sentence_problems({"assert": "x.a is 1", "for": "every xs as params"}) == ["for: params can't be a name"]
 	_sentence_problems({"assert": "x.a is 1", "for": "some xs, if any, as x"}) == ["for: if any can't go with some"]
-	_sentence_problems({"assert": "z named by x is 1", "for": "every xs as x"}) == [`"named by" a name from the for line isn't supported yet`]
-	_sentence_problems({"assert": ["x is 1", "z named by x is 1"], "for": "every xs as x"}) == [`line 2: "named by" a name from the for line isn't supported yet`]
 	_sentence_problems({"assert": "x is $foo", "for": "every xs as x"}) == ["unknown name $foo"]
 }
 
 test_forms_ergo_does_not_run_yet_are_written_wrong_on_a_for_line_too if {
 	every pair in [
-		["every xs named by x as x", `"named by" a name from the for line isn't supported yet`],
 		["every xs named by k as x", "unknown name k"],
 		["every xs whose v named by k is 1 as x", "unknown name k"],
 		["every xs whose count of ys is between 1 and 2 as x", `"is between" after a count of, a sum of or a plus isn't supported yet`],
@@ -9309,4 +9306,77 @@ test_the_parent_is_named_only_in_sentences_and_only_in_its_own_requirement if {
 	other := ergo.report({"things": [{"k": 1}], "trail": {"artifacts": {}}}, {"subjects": object.union(_chain_subjects, {"thing": {"from": ["things", {"each_as": "artifact"}]}}), "requirements": {"t": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["$artifact", "k"]}}}}}, {"name": "web"})
 	other.requirements.t.checks.c.expression == "$artifact.k is present"
 	[r.inputs | some r in other.results; r.check == "c"] == [[{"name": "$artifact.k", "value": 1}]]
+}
+
+_persona_doc := {"things": [
+	{"id": 1, "dispatched": ["security", "style"], "shas": {"security": "3f2a000000000000000000000000000000000000", "style": "9c1b000000000000000000000000000000000000"}},
+	{"id": 2, "dispatched": ["security", "perf", 5], "shas": {"security": "x"}},
+]}
+
+test_named_by_a_name_from_the_for_line_reads_the_key_each_item_names if {
+	check := {"for": "every dispatched as persona", "assert": `shas named by persona matches "^[0-9a-f]{40}$"`}
+	rows := [[r.subject.id, r.cause, [[f.item, f.cause, f.failed_assertions] | some f in r.failed_items], r.inputs] | some r in ergo.report(_persona_doc, _sentence_policy({"c": check}), {}).results; r.check == "c"]
+	rows == [
+		[1, "satisfied", [], [{"name": "dispatched[]", "value": ["security", "style"]}, {"name": "shas", "value": _persona_doc.things[0].shas}]],
+		[
+			2, "unusable", [
+				["item 1 of dispatched", "value", [{"assertion": `shas named by persona matches "^[0-9a-f]{40}$"`, "cause": "value"}]],
+				["item 2 of dispatched", "absent", [{"assertion": `shas named by persona matches "^[0-9a-f]{40}$"`, "cause": "absent"}]],
+				["item 3 of dispatched", "unusable", [{"assertion": `shas named by persona matches "^[0-9a-f]{40}$"`, "cause": "unusable"}]],
+			],
+			[{"name": "dispatched[]", "value": ["security", "perf", 5]}, {"name": "shas", "value": {"security": "x"}}],
+		],
+	]
+}
+
+test_named_by_a_bare_word_that_isnt_a_for_name_is_an_unknown_name if {
+	_sentence_problems("shas named by persona exists") == ["unknown name persona"]
+	_sentence_problems({"for": "every dispatched as other", "assert": "shas named by persona exists"}) == ["unknown name persona"]
+}
+
+test_a_named_by_step_is_only_for_sentences if {
+	_sentence_problems({"op": "present", "path": ["shas", {"named_by": "x"}]}) == ["step that can't be a key in path"]
+	ergo.report({"things": []}, _sentence_policy({"c": {"op": "present", "path": ["shas", {"named_by": "x"}]}}), {}).requirements.s.checks.c.expression == "shas named by x is present"
+}
+
+test_named_by_a_for_name_in_the_second_items_path_reads_the_first_items_key if {
+	check := {"for": "every ys as y, every xs named by y as x", "assert": "x is 1"}
+	rows := [[r.subject.id, r.cause] | some r in ergo.report({"things": [{"id": 1, "xs": {"a": [1], "b": [2]}, "ys": ["a"]}, {"id": 2, "xs": {"a": [1], "b": [2]}, "ys": ["a", "b"]}]}, _sentence_policy({"c": check}), {}).results; r.check == "c"]
+	rows == [[1, "satisfied"], [2, "value"]]
+}
+
+test_named_by_a_for_name_before_it_is_given_is_an_unknown_name if {
+	_sentence_problems({"for": "every xs named by x as x", "assert": "x is 1"}) == ["unknown name x"]
+	_sentence_problems({"for": "every lists named by q as p, every qs as q", "assert": "p is 1"}) == ["unknown name q"]
+	_sentence_problems({"for": "every objs whose v named by o is 1 as o", "assert": "o exists"}) == ["unknown name o"]
+}
+
+test_named_by_a_for_name_that_holds_no_text_fails_with_its_cause if {
+	check := {"for": "every dispatched as p", "assert": "shas named by p exists"}
+	rows := [[r.subject.id, r.cause] |
+		some r in ergo.report(
+			{"things": [
+				{"id": 1, "dispatched": [null], "shas": {"a": "x"}},
+				{"id": 2, "dispatched": [{"k": 1}], "shas": {"a": "x"}},
+				{"id": 3, "dispatched": [0], "shas": ["only"]},
+			]},
+			_sentence_policy({"c": check}), {},
+		).results
+		r.check == "c"
+	]
+	rows == [[1, "null"], [2, "unusable"], [3, "unusable"]]
+}
+
+test_a_from_line_named_by_a_bare_word_is_an_unknown_name if {
+	_from_problems(_from_report({"m": {}}, {"x": {"from": "m named by k"}}, {"c": "id exists"}, {})) == [{"name": "subjects.x.from", "value": ["unknown name k"]}]
+}
+
+test_every_and_count_through_a_for_name_arent_listed_as_inputs_since_they_change_with_each_item if {
+	doc := {"things": [{"id": 1, "ps": ["a"], "xs": [{"k": {"a": 1}}], "ys": [{"m": {"a": 1}}]}]}
+	every check in [
+		{"for": "every ps as p", "assert": "every xs.k named by p is 1"},
+		{"for": "every ps as p", "assert": "count of ys whose m named by p is 1 is 1"},
+	] {
+		[[r.cause, r.inputs] | some r in ergo.report(doc, _sentence_policy({"c": check}), {}).results; r.check == "c"] == [["satisfied", [{"name": "ps[]", "value": ["a"]}]]]
+	}
 }
