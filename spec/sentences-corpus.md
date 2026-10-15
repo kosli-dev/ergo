@@ -211,11 +211,11 @@ Same as SDLC-CTRL-0004 dependencies, except:
 
 ### demo require-artifact-provenance (plain Rego)
 
-|                               | today                                                                  | sentence                            | notes                                                                                                               |
-| ----------------------------- | ---------------------------------------------------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `from` of compliance decision | `input`                                                                | —                                   | No `from`: the whole input is the subject.                                                                          |
-| `fingerprint`                 | `input.artifact_fingerprint != null; input.artifact_fingerprint != ""` | `artifact_fingerprint is not empty` | narrows. Rego passes any value but `null` and `""`, a number included. `is not empty` fails a number as `unusable`. |
-| `compliant`                   | `input.is_compliant == true`                                           | `is_compliant is true`              |                                                                                                                     |
+|                               | today                                                                  | sentence                            | notes                                                                                                                       |
+| ----------------------------- | ---------------------------------------------------------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `from` of compliance decision | `input`                                                                | `$input`                            | `$input` alone reads the whole input. With no `from`, the subject would read the input field `compliance decision` instead. |
+| `fingerprint`                 | `input.artifact_fingerprint != null; input.artifact_fingerprint != ""` | `artifact_fingerprint is not empty` | narrows. Rego passes any value but `null` and `""`, a number included. `is not empty` fails a number as `unusable`.         |
+| `compliant`                   | `input.is_compliant == true`                                           | `is_compliant is true`              |                                                                                                                             |
 
 ### flow-templates npm-bump
 
@@ -696,7 +696,7 @@ Same as DEV-0504 roll-back ready, new features, except:
 
 ## Tally
 
-Every phrase, counted from the parses, twins included: 229 checks and 74 filters, 14 of the checks with a `for` line, plus 90 `from` lines. That's 335 lines in all.
+Every phrase, counted from the parses, twins included: 229 checks and 74 filters, 14 of the checks with a `for` line, plus 91 `from` lines. That's 336 lines in all.
 
 | phrase                  | sdlc-policies | server | pr-reviewer | ergo | DEV controls | total |
 | ----------------------- | ------------: | -----: | ----------: | ---: | -----------: | ----: |

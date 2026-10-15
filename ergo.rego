@@ -240,8 +240,8 @@ _wrong_type_problems := {
 
 _subject_wrong_type_problems := {
 	"applies_to": "not an object",
-	"from": "not a list",
-	"id": "not a list",
+	"from": "not a list or a string",
+	"id": "not a list or a string",
 	"description": "not a string",
 	"of": "empty or not a string",
 }
@@ -5308,44 +5308,39 @@ _s_subject(_, def, _) := def if {
 	not is_object(def)
 }
 
-_s_from_fields(name, def, _) := {"from": [name]} if {
+_s_from_fields(name, def, reads) := {"from": [name]} if {
 	not "from" in object.keys(def)
 	not "of" in object.keys(def)
-}
+} else := reads[name].fields if {
+	_s_from_used(def, reads[name])
+} else := {}
 
-_s_from_fields(name, def, reads) := reads[name].fields if {
+_s_from_used(def, read) if {
 	is_string(def.from)
-	reads[name].problems == []
+	read.problems == []
 	not "applies_to" in object.keys(def)
-}
-
-_s_from_fields(_, def, _) := {} if {
-	"from" in object.keys(def)
-	not is_string(def.from)
-}
-
-_s_from_fields(name, def, reads) := {} if {
-	is_string(def.from)
-	reads[name].problems != []
-}
-
-_s_from_fields(_, def, _) := {} if {
-	is_string(def.from)
-	"applies_to" in object.keys(def)
-}
-
-_s_from_fields(_, def, _) := {} if {
-	not "from" in object.keys(def)
-	"of" in object.keys(def)
+	not "of" in object.keys(def)
 }
 
 _s_from_read(name, text, subjects) := {"problems": problems, "fields": fields} if {
 	fl := _from_line(text)
 	"path" in object.keys(fl)
 	conds := [_s_check([_s_cond_text(c)], {}, set()) | some c in object.get(fl, "where", [])]
-	problems := sort(_s_chain_unsupported(name, fl, subjects) | {concat("", ["whose: ", p]) | some c in conds; some p in object.get(c, "$sentence", [])})
-	fields := object.union({"from": array.concat(_s_model_path(fl.path), _s_each_step(fl))}, _s_whose_filters(conds))
-} else := {"problems": [concat("", ["", p]) | some p in object.get(_from_line(text), "problems", ["doesn't parse"])], "fields": {}}
+	problems := sort(((_s_chain_unsupported(name, fl, subjects) | _s_from_start_problems(fl)) | {concat("", ["whose: ", p]) | some c in conds; some p in object.get(c, "$sentence", [])}))
+	fields := object.union({"from": array.concat(_s_from_steps(_s_model_path(fl.path)), _s_each_step(fl))}, _s_whose_filters(conds))
+} else := {"problems": object.get(_from_line(text), "problems", ["doesn't parse"]), "fields": {}}
+
+_s_from_steps(path) := [_s_plain_from_step(st) | some st in array.slice(path, 1, count(path))] if {
+	count(path) > 0
+	path[0] == "$$input"
+} else := [_s_plain_from_step(st) | some st in path]
+
+_s_plain_from_step(st) := st.literal if {
+	is_object(st)
+	object.keys(st) == {"literal"}
+} else := st
+
+_s_from_start_problems(fl) := {"a from reads the input, so it can't start at $params" | object.get(fl.path, "start", "") == "params"}
 
 _s_each_step(fl) := [{"each_as": "subject", "keys": {"ref": _s_model_path(fl.named_by_each_of)}}] if "named_by_each_of" in object.keys(fl)
 
@@ -5353,9 +5348,13 @@ _s_each_step(fl) := [] if not "named_by_each_of" in object.keys(fl)
 
 _s_whose_filters([]) := {}
 
-_s_whose_filters(conds) := {"applies_to": {_s_filter_name(i): c | some i, c in conds}} if conds != []
+_s_whose_filters(conds) := {"applies_to": {_s_filter_name(i, count(conds)): c | some i, c in conds}} if conds != []
 
-_s_filter_name(i) := concat("", [substring("00", 0, 3 - count(format_int(i, 10))), format_int(i, 10)]) if i < 100
+_s_filter_name(i, n) := concat("", ["whose ", strings.replace_n({" ": "0"}, sprintf_pad)]) if {
+	width := count(format_int(n - 1, 10))
+	digits := format_int(i, 10)
+	sprintf_pad := concat("", [substring("                    ", 0, width - count(digits)), digits])
+}
 
 _s_chain_unsupported(name, fl, subjects) := {"a from that starts at another subject isn't supported yet" |
 	not "start" in object.keys(fl.path)
@@ -5369,7 +5368,7 @@ _s_id_field(read) := {"id": read.id.path} if "path" in object.keys(object.get(re
 
 else := {}
 
-_s_subject_sentences(subjects, reads) := {"filters": {[name, n] | some name, r in reads; some n, _ in object.get(object.get(r, "fields", {}), "applies_to", {})}, "problems": {name: probs | some name, def in subjects; probs := _s_subject_problems(name, def, reads); probs != {}}} if is_object(subjects)
+_s_subject_sentences(subjects, reads) := {"filters": {[name, n] | some name, r in reads; _s_from_used(subjects[name], r); some n, _ in object.get(r.fields, "applies_to", {})}, "problems": {name: probs | some name, def in subjects; probs := _s_subject_problems(name, def, reads); probs != {}}} if is_object(subjects)
 
 _s_subject_sentences(subjects, _) := {"filters": set(), "problems": {}} if not is_object(subjects)
 

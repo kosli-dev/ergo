@@ -98,7 +98,7 @@ subjects:
 
 **[sentence.subject.condition]** A condition in that `whose` is like any `whose` condition: a path and a phrase, or a `count of` or `sum of` and a comparison. pr-reviewer has six, like `whose count of compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is at least 1`.
 
-**[sentence.subject.applies]** The `$applies` row stays. Its `expression` is the conditions as written, joined with ` and `, like `environment is "prod" and change_type is "emergency"`, and its `inputs` hold each path they read. A subject a condition can't decide about, like a deployment with no `change_type`, fails the requirement as `absent` rather than dropping out of it. The filter's name and its description go.
+**[sentence.subject.applies]** The `$applies` row stays. Its `expression` is the conditions in the order written, each in the report's spelling, joined with ` and `, like `environment is "prod" and change_type is "emergency"`, and its `inputs` hold each path they read. A subject a condition can't decide about, like a deployment with no `change_type`, fails the requirement as `absent` rather than dropping out of it. The filter's name and its description go.
 
 **[sentence.subject.chain]** A subject can start from another subject, by that subject's name: `from: artifact.attestations_statuses named by $params.pr_attestation_name.pull_requests`, where `artifact` is a subject of the same policy. Its rows carry the parent's id under `in`, like `{"type": "pull request", "id": "…/pull/8", "in": {"artifact": "sha256:…"}}`, `min_subjects` counts per parent, and a check reads the parent by its name, like `artifact.name`. In the corpus, four `from` lines descend this way, all from an `artifact` subject: sdlc-policies 0007 and 0008, the server's copy of 0008, and server 0010.
 
@@ -371,7 +371,7 @@ Read as `is` or `equals`, and printed as one of them. With it in the grammar, ev
 
 A throwaway tokenizer in JavaScript, outside the repo, turned each phrase above into a regular expression and tried every way to cut each line into a quantifier, a path, `whose` conditions, assertions joined with `and`, and a phrase. It counted every reading.
 
-The corpus has 335 lines: 231 assertions, 14 `for` lines and 90 `from` lines. sdlc-policies 0004's `artifact` and its server copy have no `from` any more. With the rules in this file, which are the rules #174 now states, every line parses exactly one way. Without them, 194 lines parse more than one way:
+The corpus has 336 lines: 231 assertions, 14 `for` lines and 91 `from` lines. sdlc-policies 0004's `artifact` and its server copy have no `from` any more. With the rules in this file, which are the rules #174 now states, every line parses exactly one way. Without them, 194 lines parse more than one way:
 
 | cause                                                                  | lines | rule that removes it                            |
 | ---------------------------------------------------------------------- | ----: | ----------------------------------------------- |
