@@ -6,6 +6,8 @@ operators contains "both_present"
 
 operators contains "multiple_of"
 
+operators contains "sees_only_its_fields"
+
 op_passed(check, subj) if {
 	check.op == "even"
 	n := value_at(subj, check.path)
@@ -30,3 +32,8 @@ op_passed(check, subj) if {
 }
 
 op_passed(check, _) if check.op == "undeclared"
+
+op_passed(check, _) if {
+	check.op == "sees_only_its_fields"
+	object.keys(check) == {"op", "path"}
+}

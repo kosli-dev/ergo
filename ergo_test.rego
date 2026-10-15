@@ -3425,7 +3425,7 @@ test_every_built_in_op_takes_its_own_fields_and_the_ones_every_check_can_have if
 	}
 	rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {name: object.union(c, common) | some name, c in checks}}})
 	problem_inputs(rep) == []
-	object.keys(checks) == {op | some op in ergo.operators; not op in {"even", "both_present", "multiple_of"}}
+	object.keys(checks) == {op | some op in ergo.operators; not op in {"even", "both_present", "multiple_of", "sees_only_its_fields"}}
 }
 
 test_a_check_meta_is_carried_into_the_report if {
@@ -8987,4 +8987,58 @@ test_a_count_whose_whose_reads_a_for_name_isnt_shown_in_the_inputs if {
 
 test_a_count_whose_whose_reads_a_param_it_cant_use_shows_null if {
 	_tally_rows("count of xs whose s is one of $params.v is 1", [{"id": 1, "xs": [{"s": "a"}]}], {"v": 5}) == [[1, "unusable", [{"name": "count of xs whose s is in $params.v", "value": null}, {"name": "xs[]", "value": [{"s": "a"}]}]]]
+}
+
+test_a_derived_check_with_a_substitute_is_read_the_slow_way_and_gives_the_same_report if {
+	check := {
+		"op": "compare",
+		"left": {"add": [["n"], {"count": ["xs"]}, {"literal": 1}]},
+		"cmp": "eq",
+		"right": {"literal": 4},
+		"substitute": {"op": "present", "path": ["waived"]},
+	}
+	rows := [[r.subject.id, r.cause, r.inputs] | some r in ergo.report({"things": [{"id": 1, "n": 1, "xs": [1, 2]}, {"id": 2, "n": "1", "xs": [], "waived": true}, {"id": 3, "n": 1, "xs": []}]}, _sentence_policy({"c": check}), {}).results; r.check == "c"]
+	rows == [
+		[1, "satisfied", [{"name": "n + count(xs) + 1", "value": 4}, {"name": "n", "value": 1}, {"name": "count(xs)", "value": 2}, {"name": "xs", "value": [1, 2]}, {"name": "waived", "value": null}]],
+		[2, "substituted", [{"name": "n + count(xs) + 1", "value": null}, {"name": "n", "value": "1"}, {"name": "count(xs)", "value": 0}, {"name": "xs", "value": []}, {"name": "waived", "value": true}]],
+		[3, "value", [{"name": "n + count(xs) + 1", "value": 2}, {"name": "n", "value": 1}, {"name": "count(xs)", "value": 0}, {"name": "xs", "value": []}, {"name": "waived", "value": null}]],
+	]
+}
+
+test_a_count_whose_ref_cant_be_read_is_read_the_slow_way_and_fails_with_the_refs_cause if {
+	_tally_rows(`count of xs whose s is one of $params.missing is 1`, [{"id": 1, "xs": [{"s": "a"}]}], {}) == [[1, "absent", [{"name": "count of xs whose s is in $params.missing", "value": null}, {"name": "xs[]", "value": [{"s": "a"}]}]]]
+}
+
+test_a_custom_operator_sees_only_the_fields_written_on_its_check if {
+	[r.cause | some r in ergo.report({"things": [{"id": 1}]}, _sentence_policy({"c": {"op": "sees_only_its_fields", "path": ["x"]}}), {}).results; r.check == "c"] == ["satisfied"]
+}
+
+test_a_count_whose_whose_reads_a_missing_param_fails_even_when_it_would_count_zero if {
+	things := [{"id": 1, "xs": []}, {"id": 2, "xs": [{"k": "a"}]}]
+	_tally_rows("count of xs whose k is one of $params.missing is 0", things, {}) == [
+		[1, "absent", [{"name": "count of xs whose k is in $params.missing", "value": null}, {"name": "xs[]", "value": []}]],
+		[2, "absent", [{"name": "count of xs whose k is in $params.missing", "value": null}, {"name": "xs[]", "value": [{"k": "a"}]}]],
+	]
+	[row[1] | some row in _tally_rows("count of xs whose k is one of $params.v is 0", things, {"v": null})] == ["null", "null"]
+}
+
+test_an_and_list_of_counts_shows_each_count_once if {
+	rows := _tally_rows({"assert": ["count of findings is 3", "claude_found plus 1 is 3"]}, [_review], {})
+	rows == [["pr-7", "satisfied", [
+		{"name": "claude_found", "value": 2},
+		{"name": "claude_found plus 1", "value": 3},
+		{"name": "count of findings", "value": 3},
+		{"name": "findings[]", "value": _review.findings},
+	]]]
+}
+
+test_a_hand_written_count_of_inside_an_add_is_written_wrong_and_still_shows_its_count if {
+	check := {"op": "compare", "left": {"add": [{"count_of": ["xs"], "whose": [], "text": "t"}]}, "cmp": "eq", "right": {"literal": 2}, "substitute": {"op": "present", "path": ["z"]}}
+	[[r.cause, r.inputs] | some r in ergo.report({"things": [{"id": 1, "xs": [1, 2]}]}, _sentence_policy({"c": check}), {}).results; r.check == "c"] == [["ill_formed", [{"name": "t", "value": 2}, {"name": "xs[]", "value": [1, 2]}, {"name": "z", "value": null}]]]
+}
+
+test_the_answers_ergo_works_out_once_per_check_cant_be_written_on_a_check if {
+	every f in ["$once", "$ref_cause"] {
+		_sentence_problems(object.union({"op": "compare", "left": {"count": ["xs"]}, "cmp": "eq", "right": {"literal": 1}}, {f: true})) == [concat("", ["unknown field ", f])]
+	}
 }
