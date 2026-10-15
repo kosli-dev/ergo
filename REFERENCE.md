@@ -5,39 +5,18 @@ This page describes everything ergo accepts and everything it returns. If you ha
 - [Policies](#policies)
 - [Subjects](#subjects)
 - [Requirements](#requirements)
-- [Paths](#paths)
-- [Reading from the input](#reading-from-the-input)
-- [Naming subjects](#naming-subjects)
-- [Checks written as sentences](#checks-written-as-sentences)
-- [Operators](#operators)
-- [Substitutes](#substitutes)
+- [Checks](#checks)
 - [Custom operators](#custom-operators)
 - [The report](#the-report)
 - [Causes](#causes)
 - [Violations](#violations)
+- [Compiling to Wasm](#compiling-to-wasm)
 - [Failing closed](#failing-closed)
+- [The old syntax](#the-old-syntax)
 
 ## Policies
 
-A policy is an object with two sections. `subjects` says what the policy checks and where to find it in the input, and `requirements` says what must be true of it. Each section maps names to definitions. You pass the policy to `ergo.report` along with the input and the [params](#params):
-
-```rego
-subjects := {
-	"deployment": { ... },
-	"commit": { ... },
-}
-
-requirements := {
-	"approved_deploy": {"subject": "deployment", ... },
-	"signed_commits": {"subject": "commit", ... },
-}
-
-report := ergo.report(input, {"subjects": subjects, "requirements": requirements}, {})
-```
-
-`ergo.report` reads only its three arguments, so the same arguments always give the same report.
-
-A policy is plain data, so it can also live in a YAML or JSON file that OPA loads. A file in the policy directory with top-level `subjects` and `requirements` keys is read as `data.subjects` and `data.requirements`:
+A policy is an object with two sections. `subjects` says what the policy checks and where to find it in the input, and `requirements` says what must be true of it. Each section maps names to definitions. A policy is plain data, so it usually lives in a YAML file that OPA loads. A file in the policy directory with top-level `subjects` and `requirements` keys is read as `data.subjects` and `data.requirements`:
 
 ```yaml
 subjects:
@@ -47,6 +26,8 @@ requirements:
   approved_deploy: { subject: deployment, ... }
   signed_commits: { subject: commit, ... }
 ```
+
+You pass the policy to `ergo.report` along with the input and the [params](#params):
 
 ```rego
 default subjects := {}
@@ -64,6 +45,8 @@ params := data.params
 report := ergo.report(input, {"subjects": subjects, "requirements": requirements}, params)
 ```
 
+`ergo.report` reads only its three arguments, so the same arguments always give the same report. The policy can also be written in Rego, like `subjects := {"deployment": {"from": "deployments", "id": "id"}}`.
+
 Give each argument a default like this when it comes from `data`. Rego doesn't call a function with an argument that isn't defined, so a file without `requirements:`, or a run without params, would make the whole report undefined, with no rows to say why. The defaults still fail closed: with no subjects every requirement fails, because the subject it names isn't there, with no requirements the policy isn't compliant, and with no params every `$$params` read fails as `absent`. The same goes for the input: if it can be missing, give it a default too.
 
 Because each name is an object key, two requirements can't share a name, and every row in the report points back to exactly one requirement.
@@ -76,22 +59,20 @@ From your own policies, call only `ergo.report` and `ergo.violations`. Rules who
 
 A subject is the kind of thing a requirement checks, like a deployment or a pull request, and says where to find them in the input:
 
-```rego
-"deployment": {
-	"description": "A deployment to production",
-	"from": ["deployments"],
-	"id": ["id"],
-	"applies_to": {"is_prod": { ... }},
-}
+```yaml
+deployment:
+  description: A deployment to production
+  from: deployments whose environment is "prod"
+  id: id
 ```
 
-| Field         | Meaning                                                                                             | Default                                |
-| ------------- | --------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| `description` | What the subject is, in words anyone can read. ergo doesn't copy it into the report.                | `""`                                   |
-| `from`        | The [path](#paths) to the subjects in the input. It can end with a [naming step](#naming-subjects). | the input field named like the subject |
-| `id`          | The path, inside one subject, to the value that identifies it.                                      | the whole subject                      |
-| `applies_to`  | Named checks that pick which of them are in scope. A subject must pass all of them.                 | no filter                              |
-| `of`          | The name of another subject this one [builds on](#a-subject-built-on-another).                      | none                                   |
+| Field         | Meaning                                                                                                     | Default                                |
+| ------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| `description` | What the subject is, in words anyone can read. ergo doesn't copy it into the report.                        | `""`                                   |
+| `from`        | Where the subjects are in the input, and which of them are in scope, written as a [from line](#from-lines). | the input field named like the subject |
+| `id`          | The path, inside one subject, to the value that identifies it.                                              | the whole subject                      |
+
+`applies_to` and `of`, and a `from` or `id` written as a list, are the [old syntax](#subjects-in-the-old-syntax).
 
 The subject's name is what the report calls each one, in every row, like `"subject": {"type": "deployment", "id": "d-2"}`, and in the descriptions of the [checks ergo adds](#checks-ergo-adds), like `The in-scope deployment count is at least 1`. So name it the way a reader would, like `deployment` or `pull request`.
 
@@ -99,17 +80,17 @@ A requirement names its subject with `subject`. Several requirements can name th
 
 A few details:
 
-- If `from` leads to a list, each item is a subject. If it leads to a single object, that object is the only subject. If it leads nowhere, to `null`, or to anything else, like a string or a number, there are no subjects and `$min_subjects` fails with cause `absent`, `null` or `unusable`, even with `min_subjects: 0`, because that's what a typo in `from` looks like. A path through something that can't hold the next key, like `"build": "b1"` for `["build", "items"]`, gives `unusable`, and a missing or `null` parent gives `absent`, as they do in a [check](#paths). An empty list is different: it was read fine, so it fails `$min_subjects` as `value`, or passes with `min_subjects: 0`.
+- If `from` leads to a list, each item is a subject. If it leads to a single object, that object is the only subject. If it leads nowhere, to `null`, or to anything else, like a string or a number, there are no subjects and `$min_subjects` fails with cause `absent`, `null` or `unusable`, even with `min_subjects: 0`, because that's what a typo in `from` looks like. A path through something that can't hold the next key, like `"build": "b1"` for `build.items`, gives `unusable`, and a missing or `null` parent gives `absent`, as they do in a [check](#paths). An empty list is different: it was read fine, so it fails `$min_subjects` as `value`, or passes with `min_subjects: 0`.
 - The input has to be an object. A `null` input fails `$min_subjects` as `null` when `from` is empty or left out, and as `absent` when it has a step. Any other input that isn't an object, a list included, fails it as `unusable`.
 - If `id` doesn't lead anywhere, the subject's id is `null`. Its rows are still there.
-- No two subjects can share an id, or their rows could be identical and the report couldn't say which one failed. If two do, `$unique_ids` fails and so does the requirement. Every subject counts, even one that `applies_to` leaves out, and `null` is an id like any other, so two subjects without one clash.
+- No two subjects can share an id, or their rows could be identical and the report couldn't say which one failed. If two do, `$unique_ids` fails and so does the requirement. Every subject counts, even one that its conditions leave out, and `null` is an id like any other, so two subjects without one clash.
 - An item of the list that isn't an object, like a string or a `null`, is still a subject. Its id is the item itself, and its checks fail with cause `not_an_object`.
-- Without `from`, a subject reads the input field named like it, so `artifact` reads `artifact`. A subject with nothing under it, `artifact:` alone in YAML, does the same. To check the whole input as one subject, write `from: []`. Without `id`, each row repeats the whole subject as its id, so two identical subjects clash.
-- A subject that's written wrong fails `$well_formed` on every requirement that names it, so none of them is met. That's a subject that isn't an object, or that has a field that isn't in the table above, like `subject_type`, or whose `applies_to` isn't an object, whose `from` or `id` isn't a list or a string, or whose `description` isn't a string, or a badly written [naming step](#naming-subjects), an `id` whose selector has a ref or `literal` deeper inside a `where` value than ergo reads, or a filter that's [written wrong](#basic-operators). The `$well_formed` row names each field with its subject, like `{"name": "subjects.deployment.from", "value": ["not a list or a string"]}`. ergo then reads `applies_to` as a filter it can't read, so every subject fails `$applies` with cause `ill_formed`, shown as `<invalid applies_to>`, and gets no other rows. It reads a `from` as giving no subjects (shown as `<invalid from>`), so `$min_subjects` fails as `value`, even with `min_subjects: 0`, and an `id` as giving the id `null`.
+- Without `from`, a subject reads the input field named like it, so `artifact` reads `artifact`. A subject with nothing under it, `artifact:` alone in YAML, does the same. To check the whole input as one subject, write `from: $input`. Without `id`, each row repeats the whole subject as its id, so two identical subjects clash.
+- A subject that's written wrong fails `$well_formed` on every requirement that names it, so none of them is met. That's a subject that isn't an object, or that has a field that isn't in the table above or in the [old syntax](#subjects-in-the-old-syntax), like `subject_type`, or whose `applies_to` isn't an object, whose `from` or `id` isn't a list or a string, or whose `description` isn't a string, or a badly written [naming step](#naming-subjects), an `id` whose selector has a ref or `literal` deeper inside a `where` value than ergo reads, or a filter that's [written wrong](#basic-operators). The `$well_formed` row names each field with its subject, like `{"name": "subjects.deployment.from", "value": ["not a list or a string"]}`. ergo then reads `applies_to` as a filter it can't read, so every subject fails `$applies` with cause `ill_formed`, shown as `<invalid applies_to>`, and gets no other rows. It reads a `from` as giving no subjects (shown as `<invalid from>`), so `$min_subjects` fails as `value`, even with `min_subjects: 0`, and an `id` as giving the id `null`.
 
-### Subjects written as sentences
+### From lines
 
-`from` and `id` can be written as sentences. A `from` line is a path, and `whose` with conditions joined by `and` keeps the subjects they hold for, in place of `applies_to`. `id` is a path written the same way:
+A `from` line is a path, and `whose` with conditions joined by `and` keeps the subjects they hold for. Paths and conditions are written as in [checks](#checks). `id` is a path written the same way:
 
 ```yaml
 subjects:
@@ -156,7 +137,7 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
 - `named by $params.name` picks one key, as a [ref step](#ref-steps) does: `from: trail.artifacts named by $params.artifact_name`.
 - `named by each of $params.kinds` makes each key in the list a subject, as a [naming step](#naming-subjects) with `keys` does: `from: build.test_runs named by each of $params.kinds`.
 - A subject's own name at the start of its `from` is the input field, so `lockfile` can have `from: lockfile whose status is "COMPLETE"`.
-- A `from` line that's another subject's name, with or without a `whose`, narrows that subject, as [`of`](#a-subject-built-on-another) does: `critical defect` with `from: defect whose severity is "critical"` keeps the defects that pass `defect`'s conditions and its own. A name with a space goes in quotes, so the whole line goes in single quotes in YAML: `from: '"critical defect" whose team is "b"'`. Like a subject with `of`, it takes its `id` from the subject it narrows, so an `id` of its own is written wrong.
+- A `from` line that's another subject's name, with or without a `whose`, narrows that subject, as in [a subject built on another](#a-subject-built-on-another): `critical defect` with `from: defect whose severity is "critical"` keeps the defects that pass `defect`'s conditions and its own. A name with a space goes in quotes, so the whole line goes in single quotes in YAML: `from: '"critical defect" whose team is "b"'`. It takes its `id` from the subject it narrows, so an `id` of its own is written wrong.
 - A `from` line that starts at another subject's name and goes on reads the rest of its path from that subject. With `{"params": {"artifact_name": "web"}}` and this input:
 
   ```json
@@ -194,49 +175,61 @@ When requirements check different parts of the same list, give each part its own
 
 ```yaml
 subjects:
-  SBOM package:
-    from: [components]
-    id: [name]
-  locked SBOM package:
-    of: SBOM package
-    applies_to:
-      locked: { op: present, path: [lock_release] }
-  non-exempt SBOM package:
-    of: SBOM package
-    applies_to:
-      not_exempt: { op: equals, path: [exempt], value: false }
+  component:
+    from: components
+    id: name
+  locked component:
+    from: component whose lock_release exists
+  non-exempt component:
+    from: component whose exempt is false
 requirements:
   versions:
-    subject: locked SBOM package
+    subject: locked component
     checks:
-      matches_lock: { op: compare, left: [sbom_release], right: [lock_release], cmp: eq }
+      matches_lock: sbom_release equals lock_release
   licences:
-    subject: non-exempt SBOM package
+    subject: non-exempt component
     checks:
-      licence_known: { op: any, path: [licences], check: { op: non_empty_string, path: [] } }
+      licence_known: some licences is a non-empty string
 ```
 
-A subject with `of` reads `from` and `id` from the subject it names, and keeps only the items that pass that subject's filters and its own. Everything else about it is its own: its rows and descriptions use its name, like `locked SBOM package`. It reports what the same subject written out in full would, except that `$well_formed` names a problem, or a `from` with a [naming step](#naming-subjects), after the subject it's written in.
+With this input:
 
-- A subject can build on one that builds on another, and so on. The chain ends at the one subject without `of`, which gives `from` and `id`, and a subject keeps the items that pass the filters of every subject along its chain.
-- A subject with `of` can't have its own `from` or `id`. They fail as `not allowed with of`.
-- A chain that comes back to a subject already in it, like a subject whose `of` names itself, never reaches `from`. It fails as `leads to a loop`.
-- A filter name can only be used once along a chain, because one filter would hide the other. Using it again fails as `also a filter of a subject it builds on`.
-- An `of` that isn't a name in `subjects` fails as `not in subjects`, and one that names something other than an object fails the way a requirement's `subject` does.
-- Any of these fails `$well_formed` on every requirement that names a subject whose chain has it, and the requirement finds no subjects. A problem is named after the subject it's in, like `subjects."SBOM package".from`.
-- A requirement can name the subject others build on too, like `SBOM package` to check every component.
+```json
+{"components": [
+  {"name": "a", "sbom_release": "1.2", "lock_release": "1.2", "exempt": false, "licences": ["MIT"]},
+  {"name": "b", "sbom_release": "2.0", "lock_release": "2.1", "exempt": true, "licences": []},
+  {"name": "c", "sbom_release": "3.0", "exempt": false, "licences": [""]}
+]}
+```
+
+`versions` checks `a` and `b`, and `licences` checks `a` and `c`. Both fail:
+
+| requirement | subject | check           | passed  | cause       |
+| ----------- | ------- | --------------- | ------- | ----------- |
+| `versions`  | `a`     | `matches_lock`  | `true`  | `satisfied` |
+| `versions`  | `b`     | `matches_lock`  | `false` | `value`     |
+| `licences`  | `a`     | `licence_known` | `true`  | `satisfied` |
+| `licences`  | `c`     | `licence_known` | `false` | `value`     |
+
+A from line that's another subject's name reads that subject's `from` and `id`, and keeps only the items that pass that subject's conditions and its own. Everything else about it is its own: its rows and descriptions use its name, like `locked component`.
+
+- A subject can build on one that builds on another, and so on. A name with a space goes in quotes, so the whole line goes in single quotes in YAML: `from: '"locked component" whose exempt is false'`.
+- A chain that comes back to a subject already in it never reaches a list. It fails as `leads to a loop`.
+- A problem fails `$well_formed` on every requirement that names a subject whose chain has it, and the requirement finds no subjects.
+- A requirement can name the subject others build on too, like `component` to check every component.
 
 ## Requirements
 
-```rego
-{
-	"description": "Every production deployment is approved",
-	"meta": {"control": "SDLC-CTRL-0007", "frameworks": ["SOC 2"]},
-	"subject": "deployment",
-	"require": "every",
-	"min_subjects": 1,
-	"checks": {"approved": { ... }},
-}
+```yaml
+prod_deploy:
+  description: Every production deployment is approved
+  meta: {control: SDLC-CTRL-0007, frameworks: [SOC 2]}
+  subject: deployment
+  require: every
+  min_subjects: 1
+  checks:
+    approved: approved_by is a non-empty string
 ```
 
 | Field          | Meaning                                                                                                                               | Default   |
@@ -245,7 +238,7 @@ A subject with `of` reads `from` and `id` from the subject it names, and keeps o
 | `meta`         | Anything else you want to keep with the requirement, like a control id or an owner. It's copied into the report. ergo never reads it. | `{}`      |
 | `subject`      | The name of the [subject](#subjects) it checks.                                                                                       | required  |
 | `require`      | `"every"`: every subject must pass every check. `"some"`: at least one subject must pass every check.                                 | `"every"` |
-| `min_subjects` | How many subjects must be left after the subject's `applies_to` for the requirement to be met.                                        | `1`       |
+| `min_subjects` | How many subjects must be left after the subject's conditions for the requirement to be met.                                          | `1`       |
 | `checks`       | Named checks that each subject must pass.                                                                                             | required  |
 
 A few details:
@@ -260,23 +253,21 @@ A few details:
 
 ### A requirement that only applies sometimes
 
-Some controls only apply to some inputs, like "new features must be tested", which doesn't apply to a bug fix. Make the thing that decides it the subject, and filter it with `applies_to`. This one reads a [param and a ref](#reading-from-the-input):
+Some controls only apply to some inputs, like "new features must be tested", which doesn't apply to a bug fix. Make the thing that decides it the subject, and keep it only when the control applies, with `whose`. This one reads a [param](#params):
 
 ```yaml
 params:
   untested_change_types: [bug_fix, refactor]
 subjects:
   deployment:
-    from: []
-    applies_to:
-      needs_tests: { op: excludes, path: [$$params, untested_change_types], value: { ref: [$$input, deployment, change_type] } }
+    from: $input whose deployment.change_type is not in $params.untested_change_types
 requirements:
   features_tested:
     subject: deployment
     min_subjects: 0
     checks:
-      tested: { op: any, path: [test_runs], check: { op: present, path: [status] } }
-      passed: { op: all, path: [test_runs], check: { op: equals, path: [status], value: passed } }
+      tested: some test_runs.status exists
+      passed: every test_runs.status is "passed"
 ```
 
 With `{"deployment": {"change_type": "bug_fix"}, "test_runs": []}`, the deployment is out of scope, and the report says so:
@@ -290,11 +281,11 @@ With `{"deployment": {"change_type": "bug_fix"}, "test_runs": []}`, the deployme
     ...
 ```
 
-The `$applies` entry in `checks` records the value the ref read, under `$refs`: `{"name": "$input.deployment.change_type", "value": "bug_fix"}`. A new feature with no test runs fails `tested` and `passed`, and so does a change type that isn't listed, like `hotfix`, so a new or misspelt type has to be tested until someone adds it to the list. A deployment with no `change_type` fails the requirement, because ergo can't tell whether it applies.
+The `$applies` row reads `{"name": "deployment.change_type", "value": "bug_fix"}`, and the `$applies` entry in `checks` records the list it was compared with, under `$refs`: `{"name": "$params.untested_change_types", "value": ["bug_fix", "refactor"]}`. A new feature with no test runs fails `tested` and `passed`, and so does a change type that isn't listed, like `hotfix`, so a new or misspelt type has to be tested until someone adds it to the list. A deployment with no `change_type` fails the requirement, because ergo can't tell whether it applies.
 
-The filter lists the types that don't need tests, rather than the ones that do. Listing `new_development` with `in` would also work, but then any other type, misspelt ones included, would quietly skip the tests.
+The condition lists the types that don't need tests, rather than the ones that do. `deployment.change_type is "new_development"` would also work, but then any other type, misspelt ones included, would quietly skip the tests.
 
-Don't filter the test runs instead, with `from: [test_runs]` and `min_subjects: 0`. That lets a new feature with no test runs pass, because there's nothing to check.
+Don't make the test runs the subject instead, with `from: test_runs` and `min_subjects: 0`. That lets a new feature with no test runs pass, because there's nothing to check.
 
 ### Picking the subject
 
@@ -312,17 +303,15 @@ With the commit as the subject, the check looks through its pull requests:
 ```yaml
 subjects:
   commit:
-    from: [commits]
-    id: [sha]
+    from: commits
+    id: sha
 requirements:
   reviewed:
     subject: commit
     checks:
       reviewed:
         description: Some pull request for the commit was approved
-        op: any
-        path: [pull_requests]
-        check: { op: non_empty_string, path: [approved_by] }
+        assert: some pull_requests.approved_by is a non-empty string
 ```
 
 | subject | check      | passed  | cause       |
@@ -337,8 +326,8 @@ With the pull request as the subject, the same sentence turns into "some pull re
 ```yaml
 subjects:
   pull request:
-    from: [commits, 0, pull_requests]
-    id: [number]
+    from: commits[0].pull_requests
+    id: number
 requirements:
   reviewed:
     subject: pull request
@@ -346,8 +335,7 @@ requirements:
     checks:
       approved:
         description: The pull request was approved
-        op: non_empty_string
-        path: [approved_by]
+        assert: approved_by is a non-empty string
 ```
 
 | subject | check      | passed  | cause       |
@@ -361,241 +349,14 @@ So before writing a check, decide:
 
 - **What would the policy's owner list?** The report has one row per subject, so the subject is what it lists. A rule about commits should list commits, even when the evidence is organised by pull request.
 - **What id would they cite?** `id` is how a row is found again, and how two reports are compared.
-- **How many lists sit between the subject and the values compared?** Each one costs a level of `all` or `any`, and ergo allows [one level of nesting](#nesting). A check that needs more usually means the subject is one list too high, or the evidence was recorded at the wrong grain. Moving the subject down flattens the check, but then the report lists the smaller thing, as above.
-- **Does `require` still say what the sentence says?** "Every commit has some approved pull request" is `every` over commits with `any` inside a check. With the pull request as the subject it becomes `some` over pull requests, which is only the same rule when there is one commit.
+- **How many lists sit between the subject and the values compared?** `every` and `some` walk them all, but a check that compares fields at two levels needs a `for` line, which takes two lists at most. A check that needs more usually means the subject is one list too high, or the evidence was recorded at the wrong grain. Moving the subject down flattens the check, but then the report lists the smaller thing, as above.
+- **Does `require` still say what the sentence says?** "Every commit has some approved pull request" is `every` over commits with `some` inside a check. With the pull request as the subject it becomes `some` over pull requests, which is only the same rule when there is one commit.
 
 A policy can hold several requirements with different subjects over the same input, like a lockfile and each of its entries. Each requirement picks its own grain.
 
-## Paths
+## Checks
 
-A path is a list of keys that ergo follows one step at a time. `["release", "approver", "email"]` reads `release.approver.email`.
-
-A key is a string, or a list index written as digits alone, like `0` or `12`. A string only picks a key of an object and a number only picks an item of a list, so `["a", "0"]` reads nothing when `a` is a list, and `["o", 0]` reads nothing when `o` is `{"0": "zero"}`. JavaScript reads both, so an implementation there has to check the type. A path that runs into something that can't hold its next key, like these, or a string, number or boolean where an object or list should be, fails its check with cause `unusable`, so `["pr", "state"]` on `"pr": "none"` isn't reported as a missing field. A parent that isn't there, or is `null`, is different: the field is just missing. A step that can't be a key, like `true`, `null`, a list, `-1`, `1.5`, or even `1.0`, which OPA doesn't read as `1` but JavaScript does, can never read anything. So a check with one is written wrong: it fails `$well_formed`, its rows fail with cause `ill_formed`, even as a `present` filter, and the step is shown as `<invalid step>`. The same goes for the paths in a check's `inputs`. One in `from` or `id` fails `$well_formed`.
-
-In expressions, `inputs`, `$refs` and `failed_items`, a path is named the way a [sentence](#checks-written-as-sentences) writes it. A name made of keys, positions and `named by` one key can be pasted into a sentence. Names from `each_as` or `as`, like `$pr.author`, selectors, `[]` lists and refs of more than one key can't, because sentences don't have those yet. A key is written as it is when it starts with an ASCII letter (`a` to `z` or `A` to `Z`) or `_`, and the rest is ASCII letters, digits, `_` and `-`. Any other key is quoted, so a key with a dot, a space, a `$` or an accented letter, one that starts with a digit or `-`, and the empty key are all written in quotes. So `["metadata", "labels", "app.kubernetes.io/name"]` is named `metadata.labels."app.kubernetes.io/name"`, and doesn't look like a path four keys deep, and `["x", "$b"]` is named `x."$b"`. A first key that's a word the sentences use, like `empty` or `a`, gets a dot in front: `.empty`. A path into the params or the input starts with `$params` or `$input`, like `$params.allowed`. A list index at the end of a path is written `item <n> of`, counting from 1, and one with more after it in brackets, counting from 0: `["xs", 1]` is `item 2 of xs`, `["xs", 1, "k"]` is `xs[1].k`, and the string key `["xs", "0"]` is `xs."0"`. A first step written as `{"literal": "$schema"}` is named `"$schema"`, so it doesn't look like a [name](#naming-subjects). `from` takes no names and no `$$input`, so there a first key that starts with `$` is always quoted: `["$$input"]` is named `"$$input"`, and can't be mistaken for the whole input.
-
-`from` is a path into the input. Every other path (`id`, a check's `path`, `left` and `right`) is a path into one subject, unless it starts with [`$$input`](#reading-from-the-input) or a [name](#naming-subjects).
-
-An empty path, `[]`, reads the item itself. Use it inside `all` or `any` when the list holds plain values like strings, not objects:
-
-```rego
-"release_branches": {
-	"op": "all",
-	"path": ["branches"],
-	"check": {"op": "matches_any", "path": [], "patterns": ["^main$", "^release/"]},
-}
-```
-
-ergo names the item after its list, so this renders as `every branches: branches[] matches one of ["^main$", "^release/"]`, and the row's input is `branches[]`. An empty `each` works the same way, for a list of lists.
-
-An empty path also reads a subject that isn't an object, like each string of `"from": ["branches"]`. There, the item is named after `from` (`branches[]`), or `$input` when `from` is `[]`, because then the subject is the input and `["$$input"]` reads the same thing. That keeps it apart from a key called `input`, which is named `input`. `$min_subjects` names it the same way, as `count(matching($input))`, when `from` reads the whole input. Any other path on such a subject fails with cause `not_an_object`.
-
-One step in a path can be a **selector** instead of a key. It picks the single item in a list (or an object's values) whose fields match:
-
-```rego
-"path": ["attestations", {"where": {"type": "pull_request"}}, "state"]
-```
-
-This reads the `state` of the attestation whose `type` is `pull_request`, and it works the same whether `attestations` is a list or an object keyed by name.
-
-A selector must match exactly one item. If it matches none, or more than one, the check fails, and the row's cause says which (`unmatched` or `ambiguous`). An empty `where` matches nothing. A path can contain only one selector.
-
-## Reading from the input
-
-A path normally starts inside the subject. Two first steps start somewhere else:
-
-- `$$input` starts at the top of the document given to `ergo.report`.
-- `$$params` starts at the params given to `ergo.report`.
-
-```rego
-"path": ["$$input", "settings", "mode"]
-"path": ["$$params", "level"]
-```
-
-Every subject reads the same value. These only mean this as the first step of a path, and any other first step starting with `$$` is reserved: it's written wrong, so it fails `$well_formed` and the check fails with cause `ill_formed`. To read a key that really is called `$$input` or `$$params`, write it as `{"literal": "$$input"}`.
-
-A check's fixed values can be read this way too. Write `{"ref": path}` in place of the value, where the path starts with `$$params` or `$$input`. This works for `value`, `values`, `patterns`, `min`, `max`, each item in a `values` or `patterns` list, and the values in a selector's `where`, and as a step of a path (see [Ref steps](#ref-steps)). It's how a policy takes params:
-
-```rego
-ergo.report({"packages": packages}, {"subjects": {"package": {"from": ["packages"], "id": ["name"]}}, "requirements": {"licences": {
-	"subject": "package",
-	"checks": {"approved": {
-		"op": "any",
-		"path": ["licences"],
-		"check": {"op": "in", "path": [], "values": {"ref": ["$$params", "allowed_licences"]}},
-	}},
-}}}, {"allowed_licences": ["MIT", "Apache-2.0"]})
-```
-
-With those params, a package licensed `GPL-3.0` gives this violation:
-
-```json
-{
-  "requirement": "licences",
-  "subject": { "type": "package", "id": "gpl-lib" },
-  "check": "approved",
-  "description": "",
-  "expression": "some licences: licences[] in $params.allowed_licences",
-  "inputs": [
-    { "name": "licences[]", "value": ["GPL-3.0"] },
-    { "name": "$params.allowed_licences", "value": ["MIT", "Apache-2.0"] }
-  ],
-  "cause": "value",
-  "failed_items": [{ "path": "item 1 of licences", "item": "item 1 of licences", "value": "GPL-3.0", "cause": "value" }]
-}
-```
-
-A ref or a `literal` anywhere deeper inside a value, like `"value": [{"ref": [...]}]` or `"where": {"k": [{"literal": "a"}]}`, is written wrong, because ergo wouldn't read it and would compare the object instead. To compare data that holds an object that only looks like a ref or a literal, wrap the whole value in a `literal`: `{"literal": [{"ref": [...]}]}`.
-
-The expression says where the value comes from. What it was goes in the check's definition in the report, under `$refs`, once for the whole report and sorted by name, beside the literals the check compares against. The rows' `inputs` only hold what the check reads, like `licences[]` here, and `violations` adds the `$refs` back to each violation's `inputs`, as above. That keeps a record of what was compared, even when the params change between runs, without copying it into every row. A path that starts with `$$input` or `$$params` is something the check reads, so its value stays in the row.
-
-### Params
-
-Params are the third argument to `ergo.report`. ergo doesn't look for them anywhere else, so the policy that calls it picks where they come from. Reading them from `data.params`, as in [Policies](#policies), means `opa eval -d params.json` passes them in when the file holds `{"params": ...}`, and a test can write `with data.params as {...}`.
-
-Params aren't part of the document, so `$$input.params` doesn't reach them, and `$$params` doesn't read the document. With params of `{}`, or params that aren't an object, every `$$params` read fails as `absent`. When the params aren't an object, that includes `present`, which otherwise fails a missing field as `value`, and `missing`, which otherwise passes. So a `present` or `missing` check on a param fails, and a filter like that fails the requirement instead of deciding the scope. ergo has no defaults, so a policy run without its params fails instead of checking something nobody configured.
-
-Some things worth knowing:
-
-- A ref that leads nowhere, or to `null`, fails the check, with cause `absent` or `null`. That cause wins over anything the subject's own fields would give, because the check can't mean anything without the value. ergo has no defaults, so put the value in the params.
-- A ref must be a list that starts with `$$params` or `$$input`, and it can't contain a selector or another ref. Anything else is written wrong: it fails `$well_formed`, the check fails with cause `ill_formed`, and the expression and `inputs` show `<invalid ref>`.
-- An object with a `ref` or `literal` key and any other key is a mistake, not a value, so it fails the check the same way. Otherwise a typo like `{"ref": [...], "note": "..."}` would be compared as an object, and `excludes` would pass.
-- A value that is an object with a single `ref` or `literal` key would be read as one. Wrap it in `{"literal": ...}` to take it as written. Nothing inside a `literal` is read, so `{"literal": {"literal": 1}}` is the object `{"literal": 1}`.
-- `from` already starts at the top of the input, so it doesn't take `$$input` or `$$params`. `"from": ["$$input", "packages"]` looks for a key called `$$input`, finds no subjects, and fails `$min_subjects`. A [ref step](#ref-steps) works in `from`, though.
-
-### Ref steps
-
-A ref can also be one step of a path. It's replaced by the value it reads, which becomes the key for that step. This is how a key can come from the params:
-
-```rego
-"from": ["trail", "artifacts", {"ref": ["$$params", "artifact_name"]}],
-"checks": {"attested": {
-	"op": "equals",
-	"path": ["attestations", {"ref": ["$$params", "attestation_name"]}, "status"],
-	"value": "COMPLETE",
-}},
-```
-
-With `artifact_name` set to `app` and `attestation_name` to `pull-request`, this reads `trail.artifacts.app.attestations.pull-request.status`. The expression shows where the key came from: `attestations named by $params.attestation_name.status == "COMPLETE"`, and the value used is recorded under `$refs`, like any ref.
-
-A ref step works anywhere in any path: first, in the middle or last, after a name or `$$input`, before a selector, and in `from`, `id`, `each`, `left` and `right`.
-
-- The value must be a [key](#paths): a string, or a list index written as digits alone. A ref that leads nowhere, to `null`, or to anything else, like a list, means the path can't be followed, so the check fails with cause `absent`, `null` or, for anything that isn't a key, `unusable`.
-- In `from`, a ref step that can't be read fails `$min_subjects`, even with `min_subjects: 0`, because ergo can't tell where the subjects would be. The `$min_subjects` row takes the ref's cause, and its definition records the ref under `$refs`, so the violation shows which param was missing.
-- A `present` filter whose path has a ref step that can't be read doesn't rule subjects out. It fails the requirement, because the field it looked for is unknown, not missing.
-- A ref step written with another key, like `{"ref": [...], "where": {...}}`, is a mistake, not a selector. It fails the check and shows as `[<invalid ref>]`. In `from`, it fails `$well_formed`.
-- A ref's own path is read as written, so a ref inside a ref isn't followed.
-- Some tools treat `$$` as an escape for `$`, like docker-compose and Make. A policy that passes through one of them reaches ergo as `$input`, which is read as a [name](#naming-subjects). No subject is called `input`, so the check fails with cause `absent`.
-
-## Naming subjects
-
-`from` can end with a step that names each subject: `{"each_as": "name"}`. A path that starts with `$name` then reads that subject.
-
-If `from` leads to an object, the step makes every entry a subject, identified by its key and sorted by key. Without it, the whole object is one subject. If `from` leads to a list, every item is a subject, as without the step.
-
-`keys` says which entries must be there. Say a build records each kind of test run it did:
-
-```json
-{
-  "build": {
-    "test_runs": {
-      "unit-test": { "result": "passed", "report_url": "https://ci.example.com/r/101" },
-      "integration-test": { "result": "failed", "report_url": "https://ci.example.com/r/102" },
-      "smoke-test": { "result": "passed", "report_url": "https://ci.example.com/r/103" }
-    }
-  }
-}
-```
-
-and you need a passing unit test, integration test and system test run:
-
-```rego
-"subjects": {"test run": {
-	"from": ["build", "test_runs", {"each_as": "run", "keys": ["unit-test", "integration-test", "system-test"]}],
-}},
-"requirements": {"tests_passed": {
-	"subject": "test run",
-	"checks": {"passed": {"description": "The tests passed", "op": "equals", "path": ["result"], "value": "passed"}},
-}}
-```
-
-Each key is a subject. A key the object doesn't have is still a subject, so its checks fail as `absent` (or `value`, for a `present` check), and the smoke test run isn't checked at all:
-
-```json
-[
-  {
-    "requirement": "tests_passed",
-    "subject": { "type": "test run", "id": "integration-test" },
-    "check": "passed",
-    "description": "The tests passed",
-    "expression": "result == \"passed\"",
-    "inputs": [{ "name": "result", "value": "failed" }],
-    "cause": "value"
-  },
-  {
-    "requirement": "tests_passed",
-    "subject": { "type": "test run", "id": "system-test" },
-    "check": "passed",
-    "description": "The tests passed",
-    "expression": "result == \"passed\"",
-    "inputs": [{ "name": "result", "value": null }],
-    "cause": "absent"
-  }
-]
-```
-
-The name matters inside `all` and `any`, where paths start at each item of the list. `$name` reaches back to the subject, so an item can be compared with it. `as` names the items of a list the same way (see [Nesting](#nesting)):
-
-```rego
-"subjects": {"pull request": {
-	"from": ["pull_requests", {"each_as": "pr"}],
-	"id": ["number"],
-}},
-"requirements": {"peer_reviewed": {
-	"subject": "pull request",
-	"checks": {"peer": {
-		"description": "Someone other than the author approved it",
-		"op": "any",
-		"path": ["approvers"],
-		"check": {"op": "compare", "left": ["username"], "right": ["$pr", "author"], "cmp": "ne"},
-	}},
-}}
-```
-
-A pull request that only its author approved gives this violation. The row shows the value read through `$pr` beside the list:
-
-```json
-{
-  "requirement": "peer_reviewed",
-  "subject": { "type": "pull request", "id": 42 },
-  "check": "peer",
-  "description": "Someone other than the author approved it",
-  "expression": "some approvers: username ne $pr.author",
-  "inputs": [
-    { "name": "approvers[]", "value": [{ "username": "ann" }] },
-    { "name": "$pr.author", "value": "ann" }
-  ],
-  "cause": "value",
-  "failed_items": [{ "path": "item 1 of approvers", "item": "item 1 of approvers", "value": { "username": "ann" }, "cause": "value" }]
-}
-```
-
-If `author` were missing, the cause would be `absent`.
-
-Some things worth knowing:
-
-- The step must be the last one in `from`, and there can only be one. The name must be a string that doesn't start with `$` and isn't `params` or `input`, which would look like the params and the input in the report. `keys` must be a list, a `literal` holding a list, or a [`ref`](#reading-from-the-input), and a key in the list can't be a ref with another key beside it. A step with any other field, or one that breaks these rules, fails `$well_formed` and gives no subjects, so the requirement is never met, even with `min_subjects: 0`.
-- Any other object in `from`, like a selector or a `literal`, fails `$well_formed` the same way. `from` has never read them, so a requirement with `min_subjects: 0` used to find nothing and pass.
-- Keys are sorted and duplicates dropped, so the order you list them in doesn't change the report. If `from` doesn't lead to an object, every key is still a subject, and its checks fail as `absent` (or `value`, for a `present` check). An empty `keys` list gives no subjects, so `$min_subjects` fails.
-- `keys` can come from the params: `"keys": {"ref": ["$$params", "required_suites"]}`. The list it reads works exactly like one written in the policy. A single key can be a ref too: `[{"ref": ["$$params", "suite"]}, "unit-test"]`, as can a `literal` like `{"literal": "$x"}`. If a ref can't be read, or reads the wrong type (anything but a list for the whole of `keys`, or a string or number for one key), there are no subjects and `$min_subjects` fails as `absent`, `null` or, for the wrong type, `unusable`, even with `min_subjects: 0`. A key is never just left out. The definition of `$min_subjects` records the ref under `$refs`.
-- A subject from an object is identified by its key, even if the subject has an `id`. For a list, the `id` can start with the name, like `["$pr", "number"]`.
-- An empty path is named after the subject's name (`$run`), not after `from`.
-- A path that starts with a name nobody gave, like `["$runs", "result"]`, is written wrong: it fails `$well_formed`, and the check fails with cause `ill_formed`. That holds even when no subject is found, so a requirement can't pass by never running the check. To read a key that really starts with `$`, write it as `{"literal": "$schema"}`.
-- A `ref` can't start with a name yet, only with `$$input`. `{"ref": ["$pr", "author"]}` fails the check and shows `<invalid ref>`.
-
-## Checks written as sentences
-
-A check can be one line of English instead of an object with `op` and `path`. This is new and [spec/sentences.md](spec/sentences.md) is still a draft, so it may change. Write the sentence on its own, or under `assert` when the check has a `description` or `meta`:
+A check is a sentence: one line of English. [spec/sentences.md](spec/sentences.md) has the full grammar. Write the sentence on its own, or under `assert` when the check has a `description` or `meta`:
 
 ```yaml
 subjects:
@@ -814,12 +575,12 @@ all_findings: count of findings equals claude_found plus 1
 
 all four pass. Each row shows the number ergo worked out, named after the words that asked for it as the report prints them, then the list it walked:
 
-| check             | inputs                                                                                                                  |
-| ----------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `some_persona`    | `count of personas_ran = 1`, `personas_ran[] = ["security"]`                                                            |
-| `claude_findings` | `count of findings whose source is "claude" = 2`, `findings[] = [...]`, `claude_found = 2`                              |
-| `costs_add_up`    | `sum of stages.usd whose kind is "model" = 0.75`, `stages[].usd = [0.5, 0.25, 0]`, `total_usd = 0.76`                   |
-| `all_findings`    | `count of findings = 3`, `findings[] = [...]`, `claude_found plus 1 = 3`, `claude_found = 2`                            |
+| check             | inputs                                                                                                |
+| ----------------- | ----------------------------------------------------------------------------------------------------- |
+| `some_persona`    | `count of personas_ran = 1`, `personas_ran[] = ["security"]`                                          |
+| `claude_findings` | `count of findings whose source is "claude" = 2`, `findings[] = [...]`, `claude_found = 2`            |
+| `costs_add_up`    | `sum of stages.usd whose kind is "model" = 0.75`, `stages[].usd = [0.5, 0.25, 0]`, `total_usd = 0.76` |
+| `all_findings`    | `count of findings = 3`, `findings[] = [...]`, `claude_found plus 1 = 3`, `claude_found = 2`          |
 
 - `count of` walks every list along its path, as `every` does, so `count of pull_requests.commits` counts the commits of every pull request. An empty list adds nothing, so `count of approvers` is 0 when there are none.
 - A list that's missing, `null` or not a list fails the check as `absent`, `null` or `unusable`, and so does a number to add that's missing, `null` or isn't a number.
@@ -841,440 +602,11 @@ ergo doesn't run every sentence the spec describes yet. These are written wrong 
 {"name": "checks.last_signed", "value": ["last of isn't supported yet"]}
 ```
 
-Until then, write those checks with an `op`. `from`, `id` and `applies_to` are still written as before.
-
-### Moving a policy to sentences
-
-`ergo.as_sentences(policy)` rewrites a policy written with `op` as sentences, wherever a sentence says exactly the same. With this `policy.yaml`:
-
-```yaml
-subjects:
-  deployment:
-    from: [deployments]
-    id: [id]
-    applies_to:
-      is_prod: {op: equals, path: [environment], value: prod}
-requirements:
-  approved:
-    subject: deployment
-    checks:
-      approved:
-        description: Someone approved the deployment
-        op: non_empty_string
-        path: [approved_by]
-      region: {op: in, path: [region], values: [eu-west-1, us-east-1]}
-      signed: {op: all, path: [commits], check: {op: equals, path: [signed], value: true}}
-```
-
-this command:
-
-```sh
-opa eval -d ergo.rego -d policy.yaml --format raw \
-  'yaml.marshal(data.ergo.as_sentences({"subjects": data.subjects, "requirements": data.requirements}))'
-```
-
-prints:
-
-```yaml
-requirements:
-  approved:
-    checks:
-      approved:
-        assert: approved_by is a non-empty string
-        description: Someone approved the deployment
-      region: region is one of "eu-west-1", "us-east-1"
-      signed:
-        check:
-          op: equals
-          path:
-            - signed
-          value: true
-        op: all
-        path:
-          - commits
-    subject: deployment
-subjects:
-  deployment:
-    from: deployments whose environment is "prod"
-    id: id
-```
-
-- A check or a subject is only rewritten when ergo reads the sentence back into what was written, so the policy gives the same report verdicts. Anything else stays as it was, and still works.
-- `all` and `any` stay, because `every` and `some` walk every list along their path where `all` and `any` read one, so a policy could pass where it failed. Custom operators, `any_of`, substitutes, `count`, `sum` and `add`, and checks with their own `expression` stay too.
-- A subject's `applies_to` filters become its `whose` conditions only when they all can and none has a `description` or `meta`, which a condition has nowhere to keep. Their names are lost, since a condition has none.
-- The checks of a subject read from another subject, like `from: artifact.pull_requests`, stay as they are, since a sentence there reads `artifact` as that subject.
-- The comments of a YAML file are lost, since OPA reads it as data.
-
-## Operators
-
-Every check has an `op` and the parameters that operator needs. A field the operator doesn't use is a mistake, so a typo like `valeu` is caught instead of ignored.
-
-### Basic operators
-
-These read one or two fields of a subject.
-
-| `op`               | Parameters                  | Passes when                                                                                                                                       |
-| ------------------ | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `equals`           | `path`, `value`             | the field equals `value`. The type must match too, so `"1"` doesn't equal `1`.                                                                    |
-| `in`               | `path`, `values`            | the field is one of `values`. The type must match too, as for `equals`.                                                                           |
-| `present`          | `path`                      | the field exists and isn't `null`. An empty string or `false` still counts as present.                                                            |
-| `missing`          | `path`                      | the field isn't there, or is `null`.                                                                                                              |
-| `non_empty_string` | `path`                      | the field is a string, and not `""`.                                                                                                              |
-| `empty`            | `path`                      | the field is an empty list.                                                                                                                       |
-| `matches_any`      | `path`, `patterns`          | the field is a string that matches at least one of the regular expressions.                                                                       |
-| `not_matches_any`  | `path`, `patterns`          | the field is a string that matches none of them.                                                                                                  |
-| `range`            | `path`, `min`, `max`        | the field is a number between `min` and `max`, both included.                                                                                     |
-| `includes`         | `path`, `value` or `values` | the field is a list that contains `value`. With `values` in place of `value`, it contains every one of them.                                      |
-| `excludes`         | `path`, `value` or `values` | the field is a list that doesn't contain `value`. With `values` in place of `value`, it contains none of them.                                    |
-| `compare`          | `left`, `right`, `cmp`      | both sides can be read, have the same type, and `left cmp right` is true. A side is a field, a fixed value or a [derived value](#derived-values). |
-| `compare_time`     | `left`, `right`, `cmp`      | both fields are timestamps in the same format (both RFC 3339 strings, or both numbers) and `left cmp right` is true.                              |
-
-`cmp` is one of `eq`, `ne`, `gt`, `gte`, `lt` or `lte`.
-
-Some things worth knowing:
-
-- A check that's written wrong fails `$well_formed`, and its rows fail with cause `ill_formed`, whatever the subject holds. So in `applies_to` it fails the requirement instead of ruling every subject out. Written wrong means:
-  - an `op` ergo doesn't know, a missing `op`, or a missing parameter
-  - a `cmp` that isn't in the list above
-  - a `compare` side that isn't a path, a `literal` or a [derived value](#derived-values) written as below, or a `compare_time` side that isn't a path. The `$well_formed` row says `invalid left` or `invalid right`
-  - a `within` that isn't a number of 0 or more, or that's on a `cmp` other than `eq`
-  - `values` that isn't a list, an empty `values` for `includes` or `excludes`, both `value` and `values`, a `min` or `max` that isn't a number, a `min` above `max`, or `patterns` that isn't a list of valid regular expressions
-  - a `path`, an `each` or, on other operators than `compare` and `compare_time`, a `left` or `right` that isn't a list, even a string like `"state"` that names one key, or `as` or `each` on an operator other than `all` or `any`. The `$well_formed` row says `path not a list` (or `each not a list`), and the check's row has no `inputs`
-  - a step that can't be a [key](#paths), a number out of range, a badly written [ref](#reading-from-the-input), a ref or `literal` deeper inside a value than ergo reads, or a path that starts with a [name](#naming-subjects) nothing gave
-  - an `all` or `any` [nested](#nesting) too deep, or a name given twice or badly written
-  - a check that isn't an object, or one where it can't go, like a custom operator inside `all`
-  - a field its op doesn't use, like `valeu` or `descripton`. Besides its own parameters, any check can have `description`, `meta`, `expression`, `substitute` and `inputs`. A [custom operator](#custom-operators) can have any fields.
-  - a set, or an object key that isn't a string, anywhere in the check or in a selector in `from` or `id`. Rego can write both, but JSON can't hold either. The `$well_formed` row shows `holds a set` or `holds a key that isn't a string`.
-  - a `description` that isn't a string, or a `meta` that isn't an object or holds something JSON can't, as on a [requirement](#requirements). A `null` one counts as not written. This holds for a custom operator too, and for a check inside another one. The expression doesn't show it, but the `$well_formed` row does, as `invalid description`, `invalid meta`, `meta holds a set` or `meta holds a key that isn't a string`. A number in `meta` that's out of range shows as `number out of range`.
-
-  The expression says what's wrong: `<unknown op nope>`, `<missing op>`, `<invalid check>` for a check that isn't an object, `<even can't go here>` for a check where it can't go, `<missing value>` in place of a missing parameter, as in `state == <missing value>`, or `<invalid path>` in place of a `path`, `left` or `right` that isn't a list, as in `<invalid path> is present`. A `compare` or `compare_time` side that isn't valid shows as `<invalid left>` or `<invalid right>` in its place, as in `<invalid left> lt b`. A check that's written wrong reads nothing, so its `inputs` are empty. The [`$well_formed` row](#checks-ergo-adds) lists each check that's written wrong, and what's wrong with it.
-
-  A [`ref`](#reading-from-the-input) that reads the wrong kind of value from the params, like `values` read from a param that holds `3`, or an empty list read as the `values` of `includes` or `excludes`, isn't a mistake in the policy, so it doesn't fail `$well_formed`. The check fails with cause `unusable`.
-- A field with the wrong kind of value for the operator fails with cause `unusable`, not `value`: a field that isn't a number for `range`, isn't a string for `matches_any` or `not_matches_any`, or isn't a list for `includes`, `excludes`, `all` or `any`, two fields of different types for `compare`, or anything but two timestamps in the same format for `compare_time`. So a filter fails the requirement instead of quietly ruling the subject out. `equals` and `in` are different: `"5"` isn't `5`, which is a sound answer, so that fails with `value`. So does `non_empty_string` on a number, since checking the type is its job.
-- `present` on a missing or `null` field fails with cause `value`, not `absent`: whether the field is there is the question it asks, so "it isn't" is a sound answer. A field whose parent isn't there, or is `null`, is missing too, so `build.fingerprint` is missing when there's no `build`, and so is a field under a [selector](#paths) when the list it selects from isn't there or is `null`. A parent that can't hold the field still fails with cause `unusable`, as for every [path](#paths). In an `any_of` option, a `present` check that finds its field missing settles the option as `value`, even when the option's other checks can't read that field.
-- `missing` is the opposite of `present`: it passes where `present` fails with cause `value`, fails with `value` where `present` passes, and otherwise fails with the same cause as `present`. So a field that's there fails it whatever it holds, `false` and `""` included, and a selector that matches nothing in a list that's there fails it as `unmatched`. To let a missing field pass a check, or keep a subject with no such field in scope, put `missing` in its own [`any_of`](#any_of) option.
-- `empty` only passes on an empty list. A missing list fails with cause `absent`, a `null` one with `null`, and anything else with `unusable`, an empty string or object included. It's for saying that no items is fine where [`all` or `any`](#all-and-any) would fail.
-- `equals` with `"value": null` only passes when the field is there and set to `null`. A missing field doesn't count.
-- `range` needs `min` and `max` to be numbers. A string like `"3"` fails the check, because Rego puts every number before every string, so `5 <= "3"` would be true.
-- `in` fails when the field is missing or `null`, even if `values` contains `null`. To check that a field is `null`, use `equals` with `"value": null`. `in` also fails when `values` is empty, missing, or not a list. The expression then shows `id in <missing values>` or `id in <invalid values>` rather than a list.
-- `includes` and `excludes` take `value` or `values`. Giving both, or neither, is written wrong, and the expression shows `not contains(xs, <both value and values>)` or `contains(xs, <missing value or values>)`. `values` works as one check per value: `"op": "excludes", "values": ["nuts", "garlic"]` passes when neither is in the list, and `includes` with the same `values` passes when both are. The expression shows `contains_none(allergens, ["garlic", "nuts"])` or `contains_all(allergens, ["garlic", "nuts"])`. An empty `values` would pass every list, so it's written wrong.
-- Each item in `values`, for `in` too, and in `patterns` can be a [`ref`](#reading-from-the-input) or a `literal`, as `value` can, so `"values": [{"ref": ["$$params", "nut"]}, "garlic"]` reads the param, and a param that's missing or `null` fails the check instead of being skipped. A ref in `patterns` that reads something other than a valid regular expression fails the check with cause `unusable`. A list read through a `ref`, or wrapped in a `literal`, is data, so an item in it that looks like a ref is compared as it is. A `value` that's a list is still one value, so `"value": ["a", "b"]` looks for the list `["a", "b"]` inside the field. Write separate checks instead when you want a row and a description for each value.
-- To check that a list holds at least one of several values, use [`any`](#all-and-any) with `in`: `{"op": "any", "path": ["allergens"], "check": {"op": "in", "path": [], "values": ["nuts", "garlic"]}}`. Its expression is `some allergens: allergens[] in ["garlic", "nuts"]`. Keep this in mind in `applies_to`, where `includes` with `values` only keeps subjects that have every one of them.
-- `compare` and `compare_time` compare two fields of the same subject. A `compare` side can also be a fixed value, written `{"literal": 1}`, or a [derived value](#derived-values), like the length of a list.
-- `compare` with `lt`, `lte`, `gt` or `gte` needs both fields to be numbers or both to be strings. Ordering objects, lists or booleans fails with cause `unusable`, because Rego's order for them means nothing in a policy: `{"name": "ann"}` comes before `{"owner": "bob"}` only because `name` sorts before `owner`. You'd usually hit this by leaving the field off the end of a path. `eq` and `ne` work on any type. A substitute that orders objects, lists or booleans gives its check the same cause, and so does an item inside `all` or `any`.
-- `compare_time` never converts between formats, so a number against a string fails as `unusable`. With numbers, ergo can't tell seconds from milliseconds, so make sure both sides use the same unit.
-- An RFC 3339 string needs an uppercase `T` and `Z`, a date that exists, and a year from 1678 to 2261, which keeps its nanoseconds since 1970 inside a 64-bit integer. Anything else fails `compare_time` as `unusable`, so `2024-02-30T00:00:00Z` isn't read as 1 March, and `2024-01-01t00:00:00z` isn't read at all.
-- Patterns in `matches_any` and `not_matches_any` aren't anchored: `svc_` matches `my_svc_account`. Use `^` and `$` when you need a full match. A pattern that isn't a string, or isn't a valid regular expression, fails either operator, even when another pattern matches. With an empty `patterns` list, `matches_any` fails and `not_matches_any` passes. When `patterns` isn't a list, both fail and the expression shows `author matches one of <invalid patterns>` or `author matches none of <invalid patterns>`. When it's missing, the expression shows `<missing patterns>` instead.
-
-These two are useful in `applies_to`, for example to leave bot accounts out of a review rule. If the author field is missing, ergo can't tell whether the subject is in scope, so the requirement fails. See [Checks ergo adds](#checks-ergo-adds).
-
-### Derived values
-
-A side of `compare` can be worked out from the subject instead of read from one field. That's how a check says "at least one persona ran", "the findings from Claude match the number it reported" or "the stage costs add up to the total":
-
-| Side                              | Value                                                                                                           |
-| --------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `{"literal": 1}`                  | the value as written                                                                                            |
-| `{"count": path}`                 | the number of items in the list at `path`                                                                       |
-| `{"count": path, "where": check}` | the number of those items that pass `check`                                                                     |
-| `{"sum": path, "each": path}`     | the numbers at `each` in every item of the list at `path`, added up. With `where`, only the items that pass it. |
-| `{"add": [side, ...]}`            | the sides added up. Each one is a path, a number written as a `literal`, a `count` or a `sum`.                  |
-
-`compare` also takes `within` with `cmp: eq`, so two numbers pass when they're at most that far apart. Money and durations rarely add up to the exact cent.
-
-With this input:
-
-```json
-{
-  "reviews": [
-    {
-      "id": "pr-7",
-      "personas_ran": ["security"],
-      "findings": [{ "source": "claude" }, { "source": "gpt" }, { "source": "claude" }],
-      "claude_found": 2,
-      "stages": [{ "kind": "model", "usd": 0.5 }, { "kind": "model", "usd": 0.25 }, { "kind": "tool", "usd": 0 }],
-      "total_usd": 0.76
-    }
-  ]
-}
-```
-
-and these checks on a `review` subject read from `reviews`:
-
-```yaml
-some_persona:
-  op: compare
-  left: { count: [personas_ran] }
-  right: { literal: 1 }
-  cmp: gte
-claude_findings:
-  op: compare
-  left: { count: [findings], where: { op: equals, path: [source], value: claude } }
-  right: [claude_found]
-  cmp: eq
-costs_add_up:
-  op: compare
-  left: { sum: [stages], each: [usd], where: { op: equals, path: [kind], value: model } }
-  right: [total_usd]
-  cmp: eq
-  within: 0.01
-```
-
-all three pass. Each row shows the value ergo worked out, named after the side, beside the list it came from:
-
-| check             | expression                                                          | inputs                                                                                                |
-| ----------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `some_persona`    | `count(personas_ran) gte 1`                                         | `count(personas_ran) = 1`, `personas_ran = ["security"]`                                              |
-| `claude_findings` | `count(findings where source == "claude") eq claude_found`          | `count(findings where source == "claude") = 2`, `findings = [...]`, `claude_found = 2`                |
-| `costs_add_up`    | `sum(stages[].usd where kind == "model") eq total_usd, within 0.01` | `sum(stages[].usd where kind == "model") = 0.75`, `stages[].usd = [0.5, 0.25, 0]`, `total_usd = 0.76` |
-
-Some things worth knowing:
-
-- A list that isn't there fails the check as `absent`, a `null` one as `null`, and anything that isn't a list as `unusable`. A number to add that isn't a number, like `"0.5"`, fails it as `unusable` too, and so does a `within` comparison where either side isn't a number.
-- An item that `where` can't decide about doesn't just go uncounted. If the second finding above had no `source`, ergo couldn't tell whether it came from Claude, so the check would fail as `absent`, with `count(findings where source == "claude") = null`. A `present` condition is the exception, as everywhere: a missing field is its answer.
-- `where` is one [basic operator](#basic-operators), without a substitute. Its paths start at each item, like the inner check of `all`. It can't be `all`, `any` or `any_of`, and a check inside it that's written wrong makes the whole check written wrong.
-- Derived values only go in a check of their own, a filter or a substitute, not inside `all`, `any` or `any_of`. A `literal` side can go anywhere a `compare` can.
-- Paths in a derived value read like any other: they can start with `$$input`, `$$params` or a [name](#naming-subjects).
-
-### `all` and `any`
-
-These apply a check to each item of a list inside the subject.
-
-| `op`  | Parameters                                          | Passes when                                                |
-| ----- | --------------------------------------------------- | ---------------------------------------------------------- |
-| `all` | `path`, `check`, `each` (optional), `as` (optional) | the list isn't empty and every item passes `check`.        |
-| `any` | `path`, `check`, `each` (optional), `as` (optional) | the list isn't empty and at least one item passes `check`. |
-
-```rego
-"signed": {
-	"op": "all",
-	"path": ["commits"],
-	"check": {"op": "equals", "path": ["signed"], "value": true},
-}
-```
-
-An empty list fails, with cause `value`. No commits isn't proof that every commit is signed. When no commits is fine, say so with `empty` in an `any_of`:
-
-```rego
-"signed": {
-	"op": "any_of",
-	"options": {
-		"none": [{"op": "empty", "path": ["commits"]}],
-		"signed": [{"op": "all", "path": ["commits"], "check": {"op": "equals", "path": ["signed"], "value": true}}],
-	},
-}
-```
-
-That renders as `one of: none(commits is empty) | signed(every commits: signed == true)`. A missing `commits` still fails, as `absent`.
-
-Anything that isn't a list fails too, an object included, with cause `unusable`. The row's `inputs` then show `[]` for the list, because an object's values have no order of their own.
-
-`each` goes one level deeper. The check then applies to every item of every inner list:
-
-```rego
-{
-	"op": "all",
-	"path": ["pull_requests"],
-	"each": ["commits"],
-	"check": {"op": "equals", "path": ["signed"], "value": true},
-}
-```
-
-This reads as "every commit of every pull request is signed" (ergo renders it as `every pull_requests[].commits: signed == true`). Every inner list must exist and have at least one item. If one pull request has no `commits`, the check fails, rather than being decided by the other pull requests alone.
-
-The inner `check` can be a basic operator, an `any_of`, or another `all` or `any`.
-
-#### Nesting
-
-An `all` or `any` inside another one checks a list for each item of the outer list. `as` names the outer item, so the inner check can still reach it once its paths start somewhere else. Say a pull request needs an approval given after its last commit:
-
-```json
-{
-  "number": 42,
-  "author": "ann",
-  "commits": [
-    { "sha": "c1", "timestamp": "2026-10-01T10:00:00Z" },
-    { "sha": "c2", "timestamp": "2026-10-01T12:00:00Z" }
-  ],
-  "approvers": [{ "username": "bob", "timestamp": "2026-10-01T11:00:00Z" }]
-}
-```
-
-That's "some approver, such that every commit is earlier than their approval":
-
-```rego
-"subjects": {"pull request": {
-	"from": ["pull_requests", {"each_as": "pr"}],
-	"id": ["number"],
-}},
-"requirements": {"approved_after_last_commit": {
-	"subject": "pull request",
-	"checks": {"after_commits": {
-		"description": "Someone approved it after its last commit",
-		"op": "any",
-		"path": ["approvers"],
-		"as": "approver",
-		"check": {
-			"op": "all",
-			"path": ["$pr", "commits"],
-			"check": {"op": "compare_time", "left": ["$approver", "timestamp"], "right": ["timestamp"], "cmp": "gt"},
-		},
-	}},
-}}
-```
-
-The inner paths start at each commit, so `["timestamp"]` is the commit's. `$approver` is the approver being tried, and `$pr` is the pull request. Bob approved before `c2`, so this fails:
-
-```json
-{
-  "requirement": "approved_after_last_commit",
-  "subject": { "type": "pull request", "id": 42 },
-  "check": "after_commits",
-  "description": "Someone approved it after its last commit",
-  "expression": "some approvers as $approver: every $pr.commits: $approver.timestamp gt timestamp",
-  "inputs": [
-    { "name": "approvers[]", "value": [{ "username": "bob", "timestamp": "2026-10-01T11:00:00Z" }] },
-    { "name": "$pr.commits", "value": [
-      { "sha": "c1", "timestamp": "2026-10-01T10:00:00Z" },
-      { "sha": "c2", "timestamp": "2026-10-01T12:00:00Z" }
-    ] }
-  ],
-  "cause": "value",
-  "failed_items": [{ "path": "item 1 of approvers", "item": "item 1 of approvers", "value": { "username": "bob", "timestamp": "2026-10-01T11:00:00Z" }, "cause": "value" }]
-}
-```
-
-The row shows the lists the check read, and `failed_items` names the approver who didn't count, but not which commit came after the approval. A commit with no timestamp fails the check too, with cause `absent`, because nothing proves the approval came after it.
-
-To require several things of the same approver, put them in one [`any_of`](#any_of) option, list checks included. This one needs an approver who approved, isn't the author, and approved after every commit:
-
-```rego
-"op": "any",
-"path": ["approvers"],
-"as": "approver",
-"check": {"op": "any_of", "options": {"peer": [
-	{"op": "equals", "path": ["state"], "value": "APPROVED"},
-	{"op": "compare", "left": ["username"], "right": ["$pr", "author"], "cmp": "ne"},
-	{"op": "all", "path": ["$pr", "commits"], "check": {"op": "compare_time", "left": ["$approver", "timestamp"], "right": ["timestamp"], "cmp": "gt"}},
-]}},
-```
-
-It renders as `some approvers as $approver: one of: peer(state == "APPROVED" and username ne $pr.author and every $pr.commits: $approver.timestamp gt timestamp)`.
-
-Some things worth knowing:
-
-- `as` takes the same names as a [naming step](#naming-subjects): a string that doesn't start with `$` and isn't `params` or `input`. Without `each`, `$approver` reads the same as a path inside the item, so `as` only matters for a check nested inside. With `each`, it names the inner item.
-- A name can only be given once along a chain of checks. `as` with a name that `from` or an outer check already gave is written wrong: it fails `$well_formed`, the check fails with cause `ill_formed`, and it shows as `<name given twice>`. A badly written name fails the same way and shows as `<invalid name>`. The cause isn't `value`, so a filter written like this fails the requirement rather than ruling every subject out. Two separate checks can use the same name.
-- A name given by `as` belongs to one item, so the row doesn't show it in its `inputs`. It still decides that item's cause, so an approver with no `timestamp` makes the check fail as `absent`. Paths that start with it are shown as paths inside the item, like `approvers[].timestamp`. That only holds inside the list check that gives the name. Anywhere else, like a neighbouring `any_of` option, nothing gives it, so reading it there is written wrong and fails as `ill_formed`.
-- Inner lists follow the same rules as outer ones. If an approver is tried against an empty or missing list of commits, that try fails.
-- One level of nesting is as deep as it goes, because Rego doesn't allow recursion. An `any_of` doesn't count as a level, but an `all` or `any` in one of its options does. A third `all` or `any` is written wrong: it fails `$well_formed`, the check fails with cause `ill_formed`, and its expression shows `<nested too deep>`.
-
-#### Which items failed
-
-A row of an `all` or `any` check also has `failed_items`: the items that made the check fail, in list order, each with its path, item, cause and value. With this input:
-
-```json
-{ "releases": [ { "id": "r-1", "pull_requests": [
-  { "number": 7, "commits": [ { "sha": "a1", "signed": true }, { "sha": "a2", "signed": false } ] },
-  { "number": 8 },
-  { "number": 9, "commits": [ { "sha": "c1" } ] }
-] } ] }
-```
-
-and the check from above, `every pull_requests[].commits: signed == true`, the row says:
-
-```json
-"cause": "absent",
-"failed_items": [
-  { "path": "item 2 of pull_requests[0].commits", "item": "item 2 of pull_requests[0].commits", "cause": "value", "value": { "sha": "a2", "signed": false } },
-  { "path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "absent", "value": null },
-  { "path": "item 1 of pull_requests[2].commits", "item": "item 1 of pull_requests[2].commits", "cause": "absent", "value": { "sha": "c1" } }
-]
-```
-
-`inputs` still shows the whole list, so the row records what was checked as well as what failed.
-
-- `path` is written like a path in an expression, with the item's position added: `item 2 of pull_requests[0].commits` is the second commit of the first pull request. The last position is written `item <n> of`, counting from 1, and one further in is in brackets, counting from 0, as in [sentences](#checks-written-as-sentences). A path that starts with a name keeps it, as in `item 2 of $pr.commits`.
-- `item` is the path of the list item the entry belongs to. Here every entry is a list item, so it's the same as `path`. It's there so a tool can find the item to show for any check, including [sentences](#checks-written-as-sentences), where an entry can point at a field inside the item.
-- With `each`, an inner list that's missing, `null`, not a list or empty fails the check, so it's listed in place of its items, like `pull_requests[1].commits` above.
-- An item whose field a `present` check finds missing or `null` is listed with cause `value`, the same as the row, because `present` read the field fine and found nothing there.
-- When the check passes, it's `[]`. A passing `any` can have items that failed, but none of them is why the row came out the way it did.
-- It's `[]` when the list itself can't be read, because there are no items to blame. The row's `cause` says what's wrong with the list.
-- When the check is [written wrong](#basic-operators), every item, and every inner list that's missing, `null`, not a list or empty, is listed with cause `ill_formed`, because none of them could be checked. When a [`ref`](#reading-from-the-input) in it can't be read, every item that fails is listed with the ref's cause, as the row is.
-- For a nested check, only the outer items are listed. An approver who approved before the last commit is listed with cause `value`, but not the commit.
-- With a [substitute](#substitutes), it lists the items that failed the check itself, even when the substitute passed and the row with it.
-- Only rows of `all` and `any` checks have it. Rows of `any_of` checks, `$applies` rows and rows of custom operators don't, even when an `all` or `any` sits inside them.
-
-### `any_of`
-
-`any_of` passes when at least one of its options passes. Each option is a list of checks that must all pass:
-
-```rego
-"permitted": {
-	"op": "any_of",
-	"options": {
-		"standard": [
-			{"op": "equals", "path": ["type"], "value": "Story"},
-			{"op": "equals", "path": ["state"], "value": "Done"},
-		],
-		"safe": [{"op": "equals", "path": ["type"], "value": "Chore"}],
-	},
-}
-```
-
-This is the only way to say that two fields must agree with each other. Two separate checks, "type is Story or Chore" and "state is Done", would also accept a Chore that isn't Done. With `any_of` it must be a Done Story, or a Chore.
-
-- Name your options. The names show up in the rendered expression: `one of: safe(type == "Chore") | standard(type == "Story" and state == "Done")`. A list of options works too, and they're shown by position.
-- Options can hold basic checks and `all` or `any`, but not another `any_of`, because Rego doesn't allow recursion. An `all` or `any` in an option counts as being where the `any_of` is, so it can nest as deep as it could there (see [Nesting](#nesting)).
-- An empty `options` is written wrong, and so is an empty option, an option written as an object instead of a list, or an `any_of` inside an option. Each fails `$well_formed`, and the check fails with cause `ill_formed`. The expression shows `one of: <empty options>`, `standard(<empty option>)` or `standard(<invalid option>)`, and `$well_formed` says `empty options`, `empty option standard` or `option standard not a list`.
-- To let a missing field pass, give `missing` an option of its own. "No label is `do-not-merge`" then passes on a pull request with no `labels`, and renders as `one of: clean(not contains(labels, "do-not-merge")) | no_labels(labels is missing)`:
-
-  ```rego
-  "mergeable": {
-  	"op": "any_of",
-  	"options": {
-  		"no_labels": [{"op": "missing", "path": ["labels"]}],
-  		"clean": [{"op": "excludes", "path": ["labels"], "value": "do-not-merge"}],
-  	},
-  }
-  ```
-
-  Inside `all`, this skips an item by letting it pass. Inside `any`, skip an item by making it fail instead, with `present` in the same option as the check: `present` on a missing field fails with cause `value`, so the item counts as a plain no.
-- The row shows every field any option read, sorted by name. A field read by more than one option shows once. For an `all` or `any` in an option, that's its list and any names it reads.
-
-## Substitutes
-
-A check can name a `substitute`: another check that satisfies it when the first one fails.
-
-```rego
-"reviewed": {
-	"description": "Reviewed in a pull request",
-	"op": "present",
-	"path": ["pull_request"],
-	"substitute": {
-		"description": "The first commit of a repository, attested by a verified committer",
-		"op": "equals",
-		"path": ["verified_initial_commit"],
-		"value": true,
-	},
-}
-```
-
-This is for alternative evidence. The requirement still applies, and something else proves it was met. A repository's first commit can't have a pull request, so an attestation from a verified committer takes its place.
-
-That's different from `applies_to`. A subject left out by `applies_to` isn't covered by the requirement at all. A subject that passes on its substitute is covered, and meets the requirement another way. Its row passes with the cause `substituted` and shows the values both checks read.
-
-- Substitutes work on checks in `checks` and in `applies_to`. They're ignored on the inner check of `all` and `any`, and on the checks inside an `any_of` option.
-- A substitute's own substitute is ignored.
-- The rendered expression shows both: `reviewed == true, or substitute: verified == true`.
-- When both fail, the row takes the worse of the two causes, except that the substitute's `absent`, `null` and `value` don't count, because substitutes are usually missing. So a substitute whose selector matches nothing or several items, whose path runs into the wrong kind of value, or that compares values of the wrong kind gives the row its cause, and in `applies_to` it stops the filter ruling the subject out.
-- The row shows the check's inputs, then the substitute's, leaving out a path already shown.
-
-A substitute with a wrong path looks just like a substitute whose evidence is missing: it's never used, and the main check keeps failing. Test each substitute with an input that should pass on it.
+Until then, write those checks with an [`op`](#operators).
 
 ## Custom operators
 
-When the built-in operators can't express a check, you can write your own. Don't name one after a built-in operator, or after `empty_string_or_list`, `not_empty_string_or_list`, `not_in` or `has_type`, which ergo keeps for [sentences](#checks-written-as-sentences). Add an `op_passed` rule to the `ergo` package from a file of your own:
+When the built-in operators can't express a check, you can write your own. Don't name one after a built-in operator, or after `empty_string_or_list`, `not_empty_string_or_list`, `not_in` or `has_type`, which ergo keeps for [sentences](#checks). Add an `op_passed` rule to the `ergo` package from a file of your own:
 
 ```rego
 package ergo
@@ -1394,7 +726,7 @@ Three rules:
 | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | `met`            | the requirement passed, and at least one subject was left to check                                                                            |
 | `not_met`        | anything else: a check failed, too few subjects were left, a filter couldn't be read, or the requirement is [written wrong](#basic-operators) |
-| `not_applicable` | the requirement would have passed, but no subject was left after `applies_to`, which only happens with `min_subjects: 0`                      |
+| `not_applicable` | the requirement would have passed, but no subject was left after the subject's conditions, which only happens with `min_subjects: 0`                    |
 
 To tell whether a requirement passed, compare `status` with `"met"` (or `"not_applicable"`, if that counts as passing for you). Don't test for `"not_met"`, so a value you didn't expect counts as a failure.
 
@@ -1426,7 +758,7 @@ The three `ill_formed` rows are the misspelt check on `d-1`, `d-2` and `d-4`. Th
 
 `description` and `meta` are the requirement's, or `""` and `{}` when it has none. They're always there, so you can read `meta.control` without first checking that `meta` exists.
 
-`subjects.total` counts every subject found at `from`, and `subjects.matching` counts the ones left after `applies_to`. `checks` holds each check as you wrote it, plus the `expression` ergo rendered from it. Each check has a `description` and a `meta` too, `""` and `{}` when you didn't write them. A filter in `applies_to` can have them as well, and they're checked the same way, but the report doesn't copy them: its filters all share the one `$applies` entry, with ergo's own description. A `description` or `meta` of the wrong type makes the requirement or the check [written wrong](#basic-operators), and the report shows `""` or `{}` in its place, so a tool always finds a string and an object there. If you write your own `expression`, yours is used, as long as it's a string. Any other value is ignored, and ergo renders the expression as if it weren't there. A check that uses a [`ref`](#reading-from-the-input) also gets `$refs`: the name and value of each one, as read for this report. The `$` marks it as ergo's, so it can't be mixed up with a field of your own. It also holds the [checks ergo adds](#checks-ergo-adds), each with a `description`, an `expression` and an empty `meta`.
+`subjects.total` counts every subject found at `from`, and `subjects.matching` counts the ones left after the subject's conditions. `checks` holds each check as you wrote it, plus the `expression` ergo rendered from it. Each check has a `description` and a `meta` too, `""` and `{}` when you didn't write them. A filter in `applies_to`, in the [old syntax](#subjects-in-the-old-syntax), can have them as well, and they're checked the same way, but the report doesn't copy them: its filters all share the one `$applies` entry, with ergo's own description. A `description` or `meta` of the wrong type makes the requirement or the check [written wrong](#basic-operators), and the report shows `""` or `{}` in its place, so a tool always finds a string and an object there. If you write your own `expression`, yours is used, as long as it's a string. Any other value is ignored, and ergo renders the expression as if it weren't there. A check that uses a [`ref`](#reading-from-the-input) also gets `$refs`: the name and value of each one, as read for this report. The `$` marks it as ergo's, so it can't be mixed up with a field of your own. It also holds the [checks ergo adds](#checks-ergo-adds), each with a `description`, an `expression` and an empty `meta`.
 
 In an expression, a value written in the policy is shown as JSON, written the same way whatever the policy looked like, so anyone can produce the same text:
 
@@ -1462,9 +794,9 @@ ergo adds four checks of its own. They start with `$`, so they can't clash with 
 | Check           | One row per | Passes when                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | --------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `$well_formed`  | requirement | the requirement names a subject in `subjects`, the requirement and its subject have only the fields ergo knows and they have the right types, it has at least one check, a valid `require`, a well written naming step if `from` has one, a `from` or `id` written as a sentence that can be read, no step in `from` or `id` that can't be a key, no number a 64-bit float can't hold in `from`, `id` or `min_subjects`, no set or key that isn't a string in `from` or `id` and no key that isn't a string in `checks` or `applies_to`, a name that's a string, and no check that's [written wrong](#basic-operators). This depends only on how the requirement and its subject are written, never on the input or the params. |
-| `$min_subjects` | requirement | `from` leads to a list or an object, unless it ends with a `keys` step, and at least `min_subjects` subjects are left after `applies_to`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| `$unique_ids`   | requirement | no two subjects share an id, counting the ones `applies_to` leaves out.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| `$applies`      | subject     | the subject passes the `applies_to` filter. These rows only exist when the subject has a filter.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `$min_subjects` | requirement | `from` leads to a list or an object, unless it ends with a `keys` step, and at least `min_subjects` subjects are left after the subject's conditions.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `$unique_ids`   | requirement | no two subjects share an id, counting the ones its conditions leave out.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `$applies`      | subject     | the subject passes its conditions, the `whose` of its from line or its `applies_to`. These rows only exist when the subject has conditions.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 
 The `$well_formed` expression is `count(problems) == 0`. The problems are the inputs below, one for each check or field that's written wrong, so a requirement that's written correctly has none.
 
@@ -1514,24 +846,23 @@ The fields of the requirement and its subject get an input of the same form when
 
 A policy written in Rego can use a key that isn't a string, like `true` or `1.5`. ergo names it `<invalid key true>` or `<invalid key 1.5>`, so two such keys never share a name. A requirement whose own name isn't a string, like `1`, or every requirement of a policy written as a list, fails `$well_formed`, which then starts with `{"name": "requirement name", "value": ["not a string"]}`. The requirement is `not_met`, so the policy isn't compliant.
 
-Their descriptions are plain sentences, like your own checks': `The requirement is written correctly`, `The in-scope deployment count is at least 1`, `Every deployment id is unique` and `The deployment is in scope`. The details are in `expression`, `inputs` and `cause`. `$min_subjects` names its input after what it counts, like `in-scope deployment count`: only the subjects left after `applies_to`. With `min_subjects: 0` the count can't fail, so `$min_subjects` only checks that `from` can be read, and says so: `The deployment list can be read`, with the expression `deployments can be read`. A `from` that ends with a `keys` step keeps the count, because `from` isn't read there. `$unique_ids` lists the ids that more than one subject has, once each, under `repeated deployment ids`, sorted by how they're written as JSON, so `"b"` comes before `10`, and `10` before `3`. They use the subject's name as it's written, so they read right whatever the word's plural would be.
+Their descriptions are plain sentences, like your own checks': `The requirement is written correctly`, `The in-scope deployment count is at least 1`, `Every deployment id is unique` and `The deployment is in scope`. The details are in `expression`, `inputs` and `cause`. `$min_subjects` names its input after what it counts, like `in-scope deployment count`: only the subjects left after the subject's conditions. With `min_subjects: 0` the count can't fail, so `$min_subjects` only checks that `from` can be read, and says so: `The deployment list can be read`, with the expression `deployments can be read`. A `from` that ends with a `keys` step keeps the count, because `from` isn't read there. `$unique_ids` lists the ids that more than one subject has, once each, under `repeated deployment ids`, sorted by how they're written as JSON, so `"b"` comes before `10`, and `10` before `3`. They use the subject's name as it's written, so they read right whatever the word's plural would be.
 
 A subject that fails `$applies` gets no other rows, since it was never checked. But its `$applies` row stays, so you can see what was left out and why.
 
-A subject is only out of scope when ergo read a filter's fields and the values didn't match, so the row's cause is `value`. When a filter fails because a field it reads is missing, `null` or can't be found by a selector, ergo can't tell whether the subject is in scope. Its `$applies` row then fails with that cause, the requirement isn't met, and the row shows up in the violations. This holds with `min_subjects: 0` too, so a missing field can't quietly make a requirement pass.
+A subject is only out of scope when ergo read a condition's fields and the values didn't match, so the row's cause is `value`. When a condition fails because a field it reads is missing, `null` or can't be found, ergo can't tell whether the subject is in scope. Its `$applies` row then fails with that cause, the requirement isn't met, and the row shows up in the violations. This holds with `min_subjects: 0` too, so a missing field can't quietly make a requirement pass.
 
-`present` is the exception, because a missing or `null` field is exactly what it checks for. A `present` filter that finds one rules the subject out, so `{"op": "present", "path": ["lock_release"]}` leaves out a package with no `lock_release`. A selector in its path that matches nothing or more than one item in a list that's there still fails the requirement, as does a parent that can't hold the field, like `"build": "abc"` for `["build", "fingerprint"]`, a subject that isn't an object, or a path that starts with a name nothing gave, like `["$p", "author"]` when `from` gave `$pr`.
+`exists` is the exception, because a missing or `null` field is exactly what it checks for. `whose lock_release exists` leaves out a package with no `lock_release`. A parent that can't hold the field, like `"build": "abc"` for `build.fingerprint`, or a subject that isn't an object, still fails the requirement.
 
-With several filters, the subject is only out of scope when every filter that failed did so with `value`. If one rules it out and another can't be read, the requirement fails, so missing data always shows. A `present` filter that finds its field missing is the exception: it says on purpose that a missing field means out of scope, so it rules the subject out whatever the other filters read. That lets a filter on the same field sit next to it:
+With several conditions, the subject is only out of scope when every condition that failed did so with `value`. If one rules it out and another can't be read, the requirement fails, so missing data always shows. An `exists` that finds its field missing is the exception: it says on purpose that a missing field means out of scope, so it rules the subject out whatever the other conditions read. That lets a condition on the same field sit next to it. With this input:
 
 ```json
-"applies_to": {
-  "recorded": {"op": "present", "path": ["status"]},
-  "attested": {"op": "equals", "path": ["status"], "value": "COMPLETE"}
-}
+{"lockfiles": [{"name": "a", "status": "COMPLETE"}, {"name": "b"}, {"name": "c", "status": "PENDING"}]}
 ```
 
-A lockfile with no `status` is out of scope, although `attested` can't read it. To keep a subject with a missing field in scope instead, use `missing` in an `any_of` option, as in `one of: named(environment == "prod") | unset(environment is missing)`. A filter that's written wrong still fails the requirement. A substitute that isn't there doesn't count as unreadable, because substitutes are usually missing.
+`from: lockfiles whose status exists and status is "COMPLETE"` keeps `a`, and leaves out `b` and `c`, both with cause `value`, although `status is "COMPLETE"` can't read `b`'s status.
+
+The same holds for `applies_to` filters in the old syntax, with `present` in place of `exists`. A filter or a condition that's written wrong still fails the requirement. A substitute that isn't there doesn't count as unreadable, because substitutes are usually missing.
 
 Together, these make sure that whenever a requirement isn't met, at least one row explains why.
 
@@ -1625,17 +956,712 @@ ergo fails a check whenever it can't be sure, instead of letting it pass. Rego d
 
 - A missing, `null` or wrong-typed field fails every operator, except `missing`, which passes on a missing or `null` field.
 - `compare` needs both sides to exist and have the same type. In plain Rego, `null < 5` is true, so a missing field would otherwise pass a `lt` check. Ordering objects, lists or booleans fails too.
-- `all`, `any` and `each` need non-empty lists, inner lists of nested checks included. A policy that's fine with no items says so with `empty`.
+- `every`, `some` and `for` lines need non-empty lists, inner lists included. A policy that's fine with no items says so with `, if any,`.
 - A name given twice, or badly written, fails the check, so an inner name can't quietly hide an outer one.
-- A check that's written wrong, like an unknown `op` or `cmp`, fails `$well_formed`, and its rows fail with cause `ill_formed`, so a mistake in `applies_to` can't rule every subject out.
-- A value of the wrong kind, like a string where `range` needs a number, or a param of the wrong type, fails with cause `unusable`, so a filter can't rule a subject out on it.
-- With several filters, one that can't be read fails the requirement, even when another rules the subject out. The only filter that can rule a subject out regardless is a `present` filter that found its field missing.
+- A check that's written wrong, like an unknown `op` or `cmp`, fails `$well_formed`, and its rows fail with cause `ill_formed`, so a mistake in a subject's conditions can't rule every subject out.
+- A value of the wrong kind, like a string where `range` needs a number, or a param of the wrong type, fails with cause `unusable`, so a condition can't rule a subject out on it.
+- With several conditions, one that can't be read fails the requirement, even when another rules the subject out. The only condition that can rule a subject out regardless is an `exists` that found its field missing.
 - `min_subjects` is 1 unless you say otherwise, so finding nothing fails. A `from` that leads nowhere, to `null` or to something that isn't a list or an object fails even with `min_subjects: 0`.
 - A key listed in `keys` that the input doesn't have is still a subject, so it fails instead of being skipped.
-- A subject whose `applies_to` filter can't be read fails the requirement instead of being left out.
+- A subject whose conditions can't be read fails the requirement instead of being left out.
 - A `ref` that can't be read fails the check, even for operators like `excludes` or `not_matches_any` that would pass on an empty value.
 - A policy with no requirements, and a requirement with no checks, are never met.
 - ergo only reads what JSON can hold. Rego can build sets and object keys that aren't strings, but JSON and YAML can't, so ergo turns both down and gives the same report however it's run. A set or such a key anywhere in the input or the params fails every check on a subject, every `$applies` row and every `$min_subjects` row with cause `unusable`, so even a requirement with no subjects isn't met. `$min_subjects` says why in its inputs, like `{"name": "$$input", "value": ["holds a set"]}`, or `$$params` for the params. In a policy, a requirement or check holding either one is [written wrong](#checks-ergo-adds), and so is a requirement whose name isn't a string. So when you build the input in Rego, make lists, `[x | ...]`, not sets, `{x | ...}`.
 - A requirement that isn't an object, a field of the wrong type, or a field ergo doesn't know, fails `$well_formed` and keeps its place in the report, so a typo in the policy can't make a requirement vanish.
 - A malformed timestamp fails `compare_time` rather than stopping the whole evaluation with an error.
 - Running OPA with `--strict-builtin-errors` gives the same report as running without it, because ergo checks a value's type before it passes it to a built-in like `object.get` or `count`. A [custom operator](#custom-operators) is your own Rego, so it needs the same care if you use the flag.
+
+## The old syntax
+
+Before sentences, a check was an object with an `op` and the parameters that operator takes, and a path was a list of keys, like `{op: non_empty_string, path: [approved_by]}`. That still works, and the rest of this page describes it. But it's going away, on a date we'll announce well in advance. Move your policies to sentences before then.
+
+Most sentences run as one of these operators, as the table in [Checks](#checks) shows, so the [operators](#operators) below also say exactly what those sentences check, and the report's rows for such a sentence are that operator's rows.
+
+### Moving a policy to sentences
+
+`ergo.as_sentences(policy)` rewrites a policy written with `op` as sentences, wherever a sentence says exactly the same. With this `policy.yaml`:
+
+```yaml
+subjects:
+  deployment:
+    from: [deployments]
+    id: [id]
+    applies_to:
+      is_prod: {op: equals, path: [environment], value: prod}
+requirements:
+  approved:
+    subject: deployment
+    checks:
+      approved:
+        description: Someone approved the deployment
+        op: non_empty_string
+        path: [approved_by]
+      region: {op: in, path: [region], values: [eu-west-1, us-east-1]}
+      signed: {op: all, path: [commits], check: {op: equals, path: [signed], value: true}}
+```
+
+this command:
+
+```sh
+opa eval -d ergo.rego -d policy.yaml --format raw \
+  'yaml.marshal(data.ergo.as_sentences({"subjects": data.subjects, "requirements": data.requirements}))'
+```
+
+prints:
+
+```yaml
+requirements:
+  approved:
+    checks:
+      approved:
+        assert: approved_by is a non-empty string
+        description: Someone approved the deployment
+      region: region is one of "eu-west-1", "us-east-1"
+      signed:
+        check:
+          op: equals
+          path:
+            - signed
+          value: true
+        op: all
+        path:
+          - commits
+    subject: deployment
+subjects:
+  deployment:
+    from: deployments whose environment is "prod"
+    id: id
+```
+
+- A check or a subject is only rewritten when ergo reads the sentence back into what was written, so the policy gives the same report verdicts. Anything else stays as it was, and still works.
+- `all` and `any` stay, because `every` and `some` walk every list along their path where `all` and `any` read one, so a policy could pass where it failed. Custom operators, `any_of`, substitutes, `count`, `sum` and `add`, and checks with their own `expression` stay too.
+- A subject's `applies_to` filters become its `whose` conditions only when they all can and none has a `description` or `meta`, which a condition has nowhere to keep. Their names are lost, since a condition has none.
+- The checks of a subject read from another subject, like `from: artifact.pull_requests`, stay as they are, since a sentence there reads `artifact` as that subject.
+- The comments of a YAML file are lost, since OPA reads it as data.
+
+### Subjects in the old syntax
+
+A subject can also use these fields:
+
+| Field        | Meaning                                                                                                      |
+| ------------ | ------------------------------------------------------------------------------------------------------------ |
+| `from`       | A [path](#paths) written as a list, like `[deployments]`. It can end with a [naming step](#naming-subjects). |
+| `id`         | A path written as a list, like `[id]`.                                                                       |
+| `applies_to` | Named checks that pick which subjects are in scope. A subject must pass all of them.                         |
+| `of`         | The name of another subject this one builds on.                                                              |
+
+A subject with `applies_to` is written like this:
+
+```yaml
+deployment:
+  from: [deployments]
+  id: [id]
+  applies_to:
+    is_prod: { op: equals, path: [environment], value: prod }
+```
+
+and gives the same report as `from: deployments whose environment is "prod"`, except that the `$applies` entry's `expression` is `environment == "prod"`. A filter that's [written wrong](#basic-operators) fails `$well_formed` on every requirement that names the subject, and every subject fails `$applies` with cause `ill_formed`, shown as `<invalid applies_to>`. `from: []` reads the whole input.
+
+A subject with `of` reads `from` and `id` from the subject it names, and keeps only the items that pass that subject's filters and its own. Everything else about it is its own: its rows and descriptions use its name. It reports what the same subject written out in full would, except that `$well_formed` names a problem, or a `from` with a [naming step](#naming-subjects), after the subject it's written in.
+
+- A subject can build on one that builds on another, and so on. The chain ends at the one subject without `of`, which gives `from` and `id`, and a subject keeps the items that pass the filters of every subject along its chain.
+- A subject with `of` can't have its own `from` or `id`. They fail as `not allowed with of`.
+- A chain that comes back to a subject already in it, like a subject whose `of` names itself, never reaches `from`. It fails as `leads to a loop`.
+- A filter name can only be used once along a chain, because one filter would hide the other. Using it again fails as `also a filter of a subject it builds on`.
+- An `of` that isn't a name in `subjects` fails as `not in subjects`, and one that names something other than an object fails the way a requirement's `subject` does.
+- Any of these fails `$well_formed` on every requirement that names a subject whose chain has it, and the requirement finds no subjects. A problem is named after the subject it's in, like `subjects.component.from`.
+- A requirement can name the subject others build on too, like `component` to check every component.
+
+### Paths
+
+A path is a list of keys that ergo follows one step at a time. `["release", "approver", "email"]` reads `release.approver.email`.
+
+A key is a string, or a list index written as digits alone, like `0` or `12`. A string only picks a key of an object and a number only picks an item of a list, so `["a", "0"]` reads nothing when `a` is a list, and `["o", 0]` reads nothing when `o` is `{"0": "zero"}`. JavaScript reads both, so an implementation there has to check the type. A path that runs into something that can't hold its next key, like these, or a string, number or boolean where an object or list should be, fails its check with cause `unusable`, so `["pr", "state"]` on `"pr": "none"` isn't reported as a missing field. A parent that isn't there, or is `null`, is different: the field is just missing. A step that can't be a key, like `true`, `null`, a list, `-1`, `1.5`, or even `1.0`, which OPA doesn't read as `1` but JavaScript does, can never read anything. So a check with one is written wrong: it fails `$well_formed`, its rows fail with cause `ill_formed`, even as a `present` filter, and the step is shown as `<invalid step>`. The same goes for the paths in a check's `inputs`. One in `from` or `id` fails `$well_formed`.
+
+In expressions, `inputs`, `$refs` and `failed_items`, a path is named the way a [sentence](#checks) writes it. A name made of keys, positions and `named by` one key can be pasted into a sentence. Names from `each_as` or `as`, like `$pr.author`, selectors, `[]` lists and refs of more than one key can't, because sentences don't have those yet. A key is written as it is when it starts with an ASCII letter (`a` to `z` or `A` to `Z`) or `_`, and the rest is ASCII letters, digits, `_` and `-`. Any other key is quoted, so a key with a dot, a space, a `$` or an accented letter, one that starts with a digit or `-`, and the empty key are all written in quotes. So `["metadata", "labels", "app.kubernetes.io/name"]` is named `metadata.labels."app.kubernetes.io/name"`, and doesn't look like a path four keys deep, and `["x", "$b"]` is named `x."$b"`. A first key that's a word the sentences use, like `empty` or `a`, gets a dot in front: `.empty`. A path into the params or the input starts with `$params` or `$input`, like `$params.allowed`. A list index at the end of a path is written `item <n> of`, counting from 1, and one with more after it in brackets, counting from 0: `["xs", 1]` is `item 2 of xs`, `["xs", 1, "k"]` is `xs[1].k`, and the string key `["xs", "0"]` is `xs."0"`. A first step written as `{"literal": "$schema"}` is named `"$schema"`, so it doesn't look like a [name](#naming-subjects). `from` takes no names and no `$$input`, so there a first key that starts with `$` is always quoted: `["$$input"]` is named `"$$input"`, and can't be mistaken for the whole input.
+
+`from` is a path into the input. Every other path (`id`, a check's `path`, `left` and `right`) is a path into one subject, unless it starts with [`$$input`](#reading-from-the-input) or a [name](#naming-subjects).
+
+An empty path, `[]`, reads the item itself. Use it inside `all` or `any` when the list holds plain values like strings, not objects:
+
+```rego
+"release_branches": {
+	"op": "all",
+	"path": ["branches"],
+	"check": {"op": "matches_any", "path": [], "patterns": ["^main$", "^release/"]},
+}
+```
+
+ergo names the item after its list, so this renders as `every branches: branches[] matches one of ["^main$", "^release/"]`, and the row's input is `branches[]`. An empty `each` works the same way, for a list of lists.
+
+An empty path also reads a subject that isn't an object, like each string of `"from": ["branches"]`. There, the item is named after `from` (`branches[]`), or `$input` when `from` is `[]`, because then the subject is the input and `["$$input"]` reads the same thing. That keeps it apart from a key called `input`, which is named `input`. `$min_subjects` names it the same way, as `count(matching($input))`, when `from` reads the whole input. Any other path on such a subject fails with cause `not_an_object`.
+
+One step in a path can be a **selector** instead of a key. It picks the single item in a list (or an object's values) whose fields match:
+
+```rego
+"path": ["attestations", {"where": {"type": "pull_request"}}, "state"]
+```
+
+This reads the `state` of the attestation whose `type` is `pull_request`, and it works the same whether `attestations` is a list or an object keyed by name.
+
+A selector must match exactly one item. If it matches none, or more than one, the check fails, and the row's cause says which (`unmatched` or `ambiguous`). An empty `where` matches nothing. A path can contain only one selector.
+
+### Reading from the input
+
+A path normally starts inside the subject. Two first steps start somewhere else:
+
+- `$$input` starts at the top of the document given to `ergo.report`.
+- `$$params` starts at the params given to `ergo.report`.
+
+```rego
+"path": ["$$input", "settings", "mode"]
+"path": ["$$params", "level"]
+```
+
+Every subject reads the same value. These only mean this as the first step of a path, and any other first step starting with `$$` is reserved: it's written wrong, so it fails `$well_formed` and the check fails with cause `ill_formed`. To read a key that really is called `$$input` or `$$params`, write it as `{"literal": "$$input"}`.
+
+A check's fixed values can be read this way too. Write `{"ref": path}` in place of the value, where the path starts with `$$params` or `$$input`. This works for `value`, `values`, `patterns`, `min`, `max`, each item in a `values` or `patterns` list, and the values in a selector's `where`, and as a step of a path (see [Ref steps](#ref-steps)). It's how a policy takes params:
+
+```rego
+ergo.report({"packages": packages}, {"subjects": {"package": {"from": ["packages"], "id": ["name"]}}, "requirements": {"licences": {
+	"subject": "package",
+	"checks": {"approved": {
+		"op": "any",
+		"path": ["licences"],
+		"check": {"op": "in", "path": [], "values": {"ref": ["$$params", "allowed_licences"]}},
+	}},
+}}}, {"allowed_licences": ["MIT", "Apache-2.0"]})
+```
+
+With those params, a package licensed `GPL-3.0` gives this violation:
+
+```json
+{
+  "requirement": "licences",
+  "subject": { "type": "package", "id": "gpl-lib" },
+  "check": "approved",
+  "description": "",
+  "expression": "some licences: licences[] in $params.allowed_licences",
+  "inputs": [
+    { "name": "licences[]", "value": ["GPL-3.0"] },
+    { "name": "$params.allowed_licences", "value": ["MIT", "Apache-2.0"] }
+  ],
+  "cause": "value",
+  "failed_items": [{ "path": "item 1 of licences", "item": "item 1 of licences", "value": "GPL-3.0", "cause": "value" }]
+}
+```
+
+A ref or a `literal` anywhere deeper inside a value, like `"value": [{"ref": [...]}]` or `"where": {"k": [{"literal": "a"}]}`, is written wrong, because ergo wouldn't read it and would compare the object instead. To compare data that holds an object that only looks like a ref or a literal, wrap the whole value in a `literal`: `{"literal": [{"ref": [...]}]}`.
+
+The expression says where the value comes from. What it was goes in the check's definition in the report, under `$refs`, once for the whole report and sorted by name, beside the literals the check compares against. The rows' `inputs` only hold what the check reads, like `licences[]` here, and `violations` adds the `$refs` back to each violation's `inputs`, as above. That keeps a record of what was compared, even when the params change between runs, without copying it into every row. A path that starts with `$$input` or `$$params` is something the check reads, so its value stays in the row.
+
+#### Params
+
+Params are the third argument to `ergo.report`. ergo doesn't look for them anywhere else, so the policy that calls it picks where they come from. Reading them from `data.params`, as in [Policies](#policies), means `opa eval -d params.json` passes them in when the file holds `{"params": ...}`, and a test can write `with data.params as {...}`.
+
+Params aren't part of the document, so `$$input.params` doesn't reach them, and `$$params` doesn't read the document. With params of `{}`, or params that aren't an object, every `$$params` read fails as `absent`. When the params aren't an object, that includes `present`, which otherwise fails a missing field as `value`, and `missing`, which otherwise passes. So a `present` or `missing` check on a param fails, and a filter like that fails the requirement instead of deciding the scope. ergo has no defaults, so a policy run without its params fails instead of checking something nobody configured.
+
+Some things worth knowing:
+
+- A ref that leads nowhere, or to `null`, fails the check, with cause `absent` or `null`. That cause wins over anything the subject's own fields would give, because the check can't mean anything without the value. ergo has no defaults, so put the value in the params.
+- A ref must be a list that starts with `$$params` or `$$input`, and it can't contain a selector or another ref. Anything else is written wrong: it fails `$well_formed`, the check fails with cause `ill_formed`, and the expression and `inputs` show `<invalid ref>`.
+- An object with a `ref` or `literal` key and any other key is a mistake, not a value, so it fails the check the same way. Otherwise a typo like `{"ref": [...], "note": "..."}` would be compared as an object, and `excludes` would pass.
+- A value that is an object with a single `ref` or `literal` key would be read as one. Wrap it in `{"literal": ...}` to take it as written. Nothing inside a `literal` is read, so `{"literal": {"literal": 1}}` is the object `{"literal": 1}`.
+- `from` already starts at the top of the input, so it doesn't take `$$input` or `$$params`. `"from": ["$$input", "packages"]` looks for a key called `$$input`, finds no subjects, and fails `$min_subjects`. A [ref step](#ref-steps) works in `from`, though.
+
+#### Ref steps
+
+A ref can also be one step of a path. It's replaced by the value it reads, which becomes the key for that step. This is how a key can come from the params:
+
+```rego
+"from": ["trail", "artifacts", {"ref": ["$$params", "artifact_name"]}],
+"checks": {"attested": {
+	"op": "equals",
+	"path": ["attestations", {"ref": ["$$params", "attestation_name"]}, "status"],
+	"value": "COMPLETE",
+}},
+```
+
+With `artifact_name` set to `app` and `attestation_name` to `pull-request`, this reads `trail.artifacts.app.attestations.pull-request.status`. The expression shows where the key came from: `attestations named by $params.attestation_name.status == "COMPLETE"`, and the value used is recorded under `$refs`, like any ref.
+
+A ref step works anywhere in any path: first, in the middle or last, after a name or `$$input`, before a selector, and in `from`, `id`, `each`, `left` and `right`.
+
+- The value must be a [key](#paths): a string, or a list index written as digits alone. A ref that leads nowhere, to `null`, or to anything else, like a list, means the path can't be followed, so the check fails with cause `absent`, `null` or, for anything that isn't a key, `unusable`.
+- In `from`, a ref step that can't be read fails `$min_subjects`, even with `min_subjects: 0`, because ergo can't tell where the subjects would be. The `$min_subjects` row takes the ref's cause, and its definition records the ref under `$refs`, so the violation shows which param was missing.
+- A `present` filter whose path has a ref step that can't be read doesn't rule subjects out. It fails the requirement, because the field it looked for is unknown, not missing.
+- A ref step written with another key, like `{"ref": [...], "where": {...}}`, is a mistake, not a selector. It fails the check and shows as `[<invalid ref>]`. In `from`, it fails `$well_formed`.
+- A ref's own path is read as written, so a ref inside a ref isn't followed.
+- Some tools treat `$$` as an escape for `$`, like docker-compose and Make. A policy that passes through one of them reaches ergo as `$input`, which is read as a [name](#naming-subjects). No subject is called `input`, so the check fails with cause `absent`.
+
+### Naming subjects
+
+`from` can end with a step that names each subject: `{"each_as": "name"}`. A path that starts with `$name` then reads that subject.
+
+If `from` leads to an object, the step makes every entry a subject, identified by its key and sorted by key. Without it, the whole object is one subject. If `from` leads to a list, every item is a subject, as without the step.
+
+`keys` says which entries must be there. Say a build records each kind of test run it did:
+
+```json
+{
+  "build": {
+    "test_runs": {
+      "unit-test": { "result": "passed", "report_url": "https://ci.example.com/r/101" },
+      "integration-test": { "result": "failed", "report_url": "https://ci.example.com/r/102" },
+      "smoke-test": { "result": "passed", "report_url": "https://ci.example.com/r/103" }
+    }
+  }
+}
+```
+
+and you need a passing unit test, integration test and system test run:
+
+```rego
+"subjects": {"test run": {
+	"from": ["build", "test_runs", {"each_as": "run", "keys": ["unit-test", "integration-test", "system-test"]}],
+}},
+"requirements": {"tests_passed": {
+	"subject": "test run",
+	"checks": {"passed": {"description": "The tests passed", "op": "equals", "path": ["result"], "value": "passed"}},
+}}
+```
+
+Each key is a subject. A key the object doesn't have is still a subject, so its checks fail as `absent` (or `value`, for a `present` check), and the smoke test run isn't checked at all:
+
+```json
+[
+  {
+    "requirement": "tests_passed",
+    "subject": { "type": "test run", "id": "integration-test" },
+    "check": "passed",
+    "description": "The tests passed",
+    "expression": "result == \"passed\"",
+    "inputs": [{ "name": "result", "value": "failed" }],
+    "cause": "value"
+  },
+  {
+    "requirement": "tests_passed",
+    "subject": { "type": "test run", "id": "system-test" },
+    "check": "passed",
+    "description": "The tests passed",
+    "expression": "result == \"passed\"",
+    "inputs": [{ "name": "result", "value": null }],
+    "cause": "absent"
+  }
+]
+```
+
+The name matters inside `all` and `any`, where paths start at each item of the list. `$name` reaches back to the subject, so an item can be compared with it. `as` names the items of a list the same way (see [Nesting](#nesting)):
+
+```rego
+"subjects": {"pull request": {
+	"from": ["pull_requests", {"each_as": "pr"}],
+	"id": ["number"],
+}},
+"requirements": {"peer_reviewed": {
+	"subject": "pull request",
+	"checks": {"peer": {
+		"description": "Someone other than the author approved it",
+		"op": "any",
+		"path": ["approvers"],
+		"check": {"op": "compare", "left": ["username"], "right": ["$pr", "author"], "cmp": "ne"},
+	}},
+}}
+```
+
+A pull request that only its author approved gives this violation. The row shows the value read through `$pr` beside the list:
+
+```json
+{
+  "requirement": "peer_reviewed",
+  "subject": { "type": "pull request", "id": 42 },
+  "check": "peer",
+  "description": "Someone other than the author approved it",
+  "expression": "some approvers: username ne $pr.author",
+  "inputs": [
+    { "name": "approvers[]", "value": [{ "username": "ann" }] },
+    { "name": "$pr.author", "value": "ann" }
+  ],
+  "cause": "value",
+  "failed_items": [{ "path": "item 1 of approvers", "item": "item 1 of approvers", "value": { "username": "ann" }, "cause": "value" }]
+}
+```
+
+If `author` were missing, the cause would be `absent`.
+
+Some things worth knowing:
+
+- The step must be the last one in `from`, and there can only be one. The name must be a string that doesn't start with `$` and isn't `params` or `input`, which would look like the params and the input in the report. `keys` must be a list, a `literal` holding a list, or a [`ref`](#reading-from-the-input), and a key in the list can't be a ref with another key beside it. A step with any other field, or one that breaks these rules, fails `$well_formed` and gives no subjects, so the requirement is never met, even with `min_subjects: 0`.
+- Any other object in `from`, like a selector or a `literal`, fails `$well_formed` the same way. `from` has never read them, so a requirement with `min_subjects: 0` used to find nothing and pass.
+- Keys are sorted and duplicates dropped, so the order you list them in doesn't change the report. If `from` doesn't lead to an object, every key is still a subject, and its checks fail as `absent` (or `value`, for a `present` check). An empty `keys` list gives no subjects, so `$min_subjects` fails.
+- `keys` can come from the params: `"keys": {"ref": ["$$params", "required_suites"]}`. The list it reads works exactly like one written in the policy. A single key can be a ref too: `[{"ref": ["$$params", "suite"]}, "unit-test"]`, as can a `literal` like `{"literal": "$x"}`. If a ref can't be read, or reads the wrong type (anything but a list for the whole of `keys`, or a string or number for one key), there are no subjects and `$min_subjects` fails as `absent`, `null` or, for the wrong type, `unusable`, even with `min_subjects: 0`. A key is never just left out. The definition of `$min_subjects` records the ref under `$refs`.
+- A subject from an object is identified by its key, even if the subject has an `id`. For a list, the `id` can start with the name, like `["$pr", "number"]`.
+- An empty path is named after the subject's name (`$run`), not after `from`.
+- A path that starts with a name nobody gave, like `["$runs", "result"]`, is written wrong: it fails `$well_formed`, and the check fails with cause `ill_formed`. That holds even when no subject is found, so a requirement can't pass by never running the check. To read a key that really starts with `$`, write it as `{"literal": "$schema"}`.
+- A `ref` can't start with a name yet, only with `$$input`. `{"ref": ["$pr", "author"]}` fails the check and shows `<invalid ref>`.
+
+### Operators
+
+Every check has an `op` and the parameters that operator needs. A field the operator doesn't use is a mistake, so a typo like `valeu` is caught instead of ignored.
+
+#### Basic operators
+
+These read one or two fields of a subject.
+
+| `op`               | Parameters                  | Passes when                                                                                                                                       |
+| ------------------ | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `equals`           | `path`, `value`             | the field equals `value`. The type must match too, so `"1"` doesn't equal `1`.                                                                    |
+| `in`               | `path`, `values`            | the field is one of `values`. The type must match too, as for `equals`.                                                                           |
+| `present`          | `path`                      | the field exists and isn't `null`. An empty string or `false` still counts as present.                                                            |
+| `missing`          | `path`                      | the field isn't there, or is `null`.                                                                                                              |
+| `non_empty_string` | `path`                      | the field is a string, and not `""`.                                                                                                              |
+| `empty`            | `path`                      | the field is an empty list.                                                                                                                       |
+| `matches_any`      | `path`, `patterns`          | the field is a string that matches at least one of the regular expressions.                                                                       |
+| `not_matches_any`  | `path`, `patterns`          | the field is a string that matches none of them.                                                                                                  |
+| `range`            | `path`, `min`, `max`        | the field is a number between `min` and `max`, both included.                                                                                     |
+| `includes`         | `path`, `value` or `values` | the field is a list that contains `value`. With `values` in place of `value`, it contains every one of them.                                      |
+| `excludes`         | `path`, `value` or `values` | the field is a list that doesn't contain `value`. With `values` in place of `value`, it contains none of them.                                    |
+| `compare`          | `left`, `right`, `cmp`      | both sides can be read, have the same type, and `left cmp right` is true. A side is a field, a fixed value or a [derived value](#derived-values). |
+| `compare_time`     | `left`, `right`, `cmp`      | both fields are timestamps in the same format (both RFC 3339 strings, or both numbers) and `left cmp right` is true.                              |
+
+`cmp` is one of `eq`, `ne`, `gt`, `gte`, `lt` or `lte`.
+
+Some things worth knowing:
+
+- A check that's written wrong fails `$well_formed`, and its rows fail with cause `ill_formed`, whatever the subject holds. So in `applies_to` it fails the requirement instead of ruling every subject out. Written wrong means:
+  - an `op` ergo doesn't know, a missing `op`, or a missing parameter
+  - a `cmp` that isn't in the list above
+  - a `compare` side that isn't a path, a `literal` or a [derived value](#derived-values) written as below, or a `compare_time` side that isn't a path. The `$well_formed` row says `invalid left` or `invalid right`
+  - a `within` that isn't a number of 0 or more, or that's on a `cmp` other than `eq`
+  - `values` that isn't a list, an empty `values` for `includes` or `excludes`, both `value` and `values`, a `min` or `max` that isn't a number, a `min` above `max`, or `patterns` that isn't a list of valid regular expressions
+  - a `path`, an `each` or, on other operators than `compare` and `compare_time`, a `left` or `right` that isn't a list, even a string like `"state"` that names one key, or `as` or `each` on an operator other than `all` or `any`. The `$well_formed` row says `path not a list` (or `each not a list`), and the check's row has no `inputs`
+  - a step that can't be a [key](#paths), a number out of range, a badly written [ref](#reading-from-the-input), a ref or `literal` deeper inside a value than ergo reads, or a path that starts with a [name](#naming-subjects) nothing gave
+  - an `all` or `any` [nested](#nesting) too deep, or a name given twice or badly written
+  - a check that isn't an object, or one where it can't go, like a custom operator inside `all`
+  - a field its op doesn't use, like `valeu` or `descripton`. Besides its own parameters, any check can have `description`, `meta`, `expression`, `substitute` and `inputs`. A [custom operator](#custom-operators) can have any fields.
+  - a set, or an object key that isn't a string, anywhere in the check or in a selector in `from` or `id`. Rego can write both, but JSON can't hold either. The `$well_formed` row shows `holds a set` or `holds a key that isn't a string`.
+  - a `description` that isn't a string, or a `meta` that isn't an object or holds something JSON can't, as on a [requirement](#requirements). A `null` one counts as not written. This holds for a custom operator too, and for a check inside another one. The expression doesn't show it, but the `$well_formed` row does, as `invalid description`, `invalid meta`, `meta holds a set` or `meta holds a key that isn't a string`. A number in `meta` that's out of range shows as `number out of range`.
+
+  The expression says what's wrong: `<unknown op nope>`, `<missing op>`, `<invalid check>` for a check that isn't an object, `<even can't go here>` for a check where it can't go, `<missing value>` in place of a missing parameter, as in `state == <missing value>`, or `<invalid path>` in place of a `path`, `left` or `right` that isn't a list, as in `<invalid path> is present`. A `compare` or `compare_time` side that isn't valid shows as `<invalid left>` or `<invalid right>` in its place, as in `<invalid left> lt b`. A check that's written wrong reads nothing, so its `inputs` are empty. The [`$well_formed` row](#checks-ergo-adds) lists each check that's written wrong, and what's wrong with it.
+
+  A [`ref`](#reading-from-the-input) that reads the wrong kind of value from the params, like `values` read from a param that holds `3`, or an empty list read as the `values` of `includes` or `excludes`, isn't a mistake in the policy, so it doesn't fail `$well_formed`. The check fails with cause `unusable`.
+- A field with the wrong kind of value for the operator fails with cause `unusable`, not `value`: a field that isn't a number for `range`, isn't a string for `matches_any` or `not_matches_any`, or isn't a list for `includes`, `excludes`, `all` or `any`, two fields of different types for `compare`, or anything but two timestamps in the same format for `compare_time`. So a filter fails the requirement instead of quietly ruling the subject out. `equals` and `in` are different: `"5"` isn't `5`, which is a sound answer, so that fails with `value`. So does `non_empty_string` on a number, since checking the type is its job.
+- `present` on a missing or `null` field fails with cause `value`, not `absent`: whether the field is there is the question it asks, so "it isn't" is a sound answer. A field whose parent isn't there, or is `null`, is missing too, so `build.fingerprint` is missing when there's no `build`, and so is a field under a [selector](#paths) when the list it selects from isn't there or is `null`. A parent that can't hold the field still fails with cause `unusable`, as for every [path](#paths). In an `any_of` option, a `present` check that finds its field missing settles the option as `value`, even when the option's other checks can't read that field.
+- `missing` is the opposite of `present`: it passes where `present` fails with cause `value`, fails with `value` where `present` passes, and otherwise fails with the same cause as `present`. So a field that's there fails it whatever it holds, `false` and `""` included, and a selector that matches nothing in a list that's there fails it as `unmatched`. To let a missing field pass a check, or keep a subject with no such field in scope, put `missing` in its own [`any_of`](#any_of) option.
+- `empty` only passes on an empty list. A missing list fails with cause `absent`, a `null` one with `null`, and anything else with `unusable`, an empty string or object included. It's for saying that no items is fine where [`all` or `any`](#all-and-any) would fail.
+- `equals` with `"value": null` only passes when the field is there and set to `null`. A missing field doesn't count.
+- `range` needs `min` and `max` to be numbers. A string like `"3"` fails the check, because Rego puts every number before every string, so `5 <= "3"` would be true.
+- `in` fails when the field is missing or `null`, even if `values` contains `null`. To check that a field is `null`, use `equals` with `"value": null`. `in` also fails when `values` is empty, missing, or not a list. The expression then shows `id in <missing values>` or `id in <invalid values>` rather than a list.
+- `includes` and `excludes` take `value` or `values`. Giving both, or neither, is written wrong, and the expression shows `not contains(xs, <both value and values>)` or `contains(xs, <missing value or values>)`. `values` works as one check per value: `"op": "excludes", "values": ["nuts", "garlic"]` passes when neither is in the list, and `includes` with the same `values` passes when both are. The expression shows `contains_none(allergens, ["garlic", "nuts"])` or `contains_all(allergens, ["garlic", "nuts"])`. An empty `values` would pass every list, so it's written wrong.
+- Each item in `values`, for `in` too, and in `patterns` can be a [`ref`](#reading-from-the-input) or a `literal`, as `value` can, so `"values": [{"ref": ["$$params", "nut"]}, "garlic"]` reads the param, and a param that's missing or `null` fails the check instead of being skipped. A ref in `patterns` that reads something other than a valid regular expression fails the check with cause `unusable`. A list read through a `ref`, or wrapped in a `literal`, is data, so an item in it that looks like a ref is compared as it is. A `value` that's a list is still one value, so `"value": ["a", "b"]` looks for the list `["a", "b"]` inside the field. Write separate checks instead when you want a row and a description for each value.
+- To check that a list holds at least one of several values, use [`any`](#all-and-any) with `in`: `{"op": "any", "path": ["allergens"], "check": {"op": "in", "path": [], "values": ["nuts", "garlic"]}}`. Its expression is `some allergens: allergens[] in ["garlic", "nuts"]`. Keep this in mind in `applies_to`, where `includes` with `values` only keeps subjects that have every one of them.
+- `compare` and `compare_time` compare two fields of the same subject. A `compare` side can also be a fixed value, written `{"literal": 1}`, or a [derived value](#derived-values), like the length of a list.
+- `compare` with `lt`, `lte`, `gt` or `gte` needs both fields to be numbers or both to be strings. Ordering objects, lists or booleans fails with cause `unusable`, because Rego's order for them means nothing in a policy: `{"name": "ann"}` comes before `{"owner": "bob"}` only because `name` sorts before `owner`. You'd usually hit this by leaving the field off the end of a path. `eq` and `ne` work on any type. A substitute that orders objects, lists or booleans gives its check the same cause, and so does an item inside `all` or `any`.
+- `compare_time` never converts between formats, so a number against a string fails as `unusable`. With numbers, ergo can't tell seconds from milliseconds, so make sure both sides use the same unit.
+- An RFC 3339 string needs an uppercase `T` and `Z`, a date that exists, and a year from 1678 to 2261, which keeps its nanoseconds since 1970 inside a 64-bit integer. Anything else fails `compare_time` as `unusable`, so `2024-02-30T00:00:00Z` isn't read as 1 March, and `2024-01-01t00:00:00z` isn't read at all.
+- Patterns in `matches_any` and `not_matches_any` aren't anchored: `svc_` matches `my_svc_account`. Use `^` and `$` when you need a full match. A pattern that isn't a string, or isn't a valid regular expression, fails either operator, even when another pattern matches. With an empty `patterns` list, `matches_any` fails and `not_matches_any` passes. When `patterns` isn't a list, both fail and the expression shows `author matches one of <invalid patterns>` or `author matches none of <invalid patterns>`. When it's missing, the expression shows `<missing patterns>` instead.
+
+These two are useful in `applies_to`, for example to leave bot accounts out of a review rule. If the author field is missing, ergo can't tell whether the subject is in scope, so the requirement fails. See [Checks ergo adds](#checks-ergo-adds).
+
+#### Derived values
+
+A side of `compare` can be worked out from the subject instead of read from one field. That's how a check says "at least one persona ran", "the findings from Claude match the number it reported" or "the stage costs add up to the total":
+
+| Side                              | Value                                                                                                           |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `{"literal": 1}`                  | the value as written                                                                                            |
+| `{"count": path}`                 | the number of items in the list at `path`                                                                       |
+| `{"count": path, "where": check}` | the number of those items that pass `check`                                                                     |
+| `{"sum": path, "each": path}`     | the numbers at `each` in every item of the list at `path`, added up. With `where`, only the items that pass it. |
+| `{"add": [side, ...]}`            | the sides added up. Each one is a path, a number written as a `literal`, a `count` or a `sum`.                  |
+
+`compare` also takes `within` with `cmp: eq`, so two numbers pass when they're at most that far apart. Money and durations rarely add up to the exact cent.
+
+With this input:
+
+```json
+{
+  "reviews": [
+    {
+      "id": "pr-7",
+      "personas_ran": ["security"],
+      "findings": [{ "source": "claude" }, { "source": "gpt" }, { "source": "claude" }],
+      "claude_found": 2,
+      "stages": [{ "kind": "model", "usd": 0.5 }, { "kind": "model", "usd": 0.25 }, { "kind": "tool", "usd": 0 }],
+      "total_usd": 0.76
+    }
+  ]
+}
+```
+
+and these checks on a `review` subject read from `reviews`:
+
+```yaml
+some_persona:
+  op: compare
+  left: { count: [personas_ran] }
+  right: { literal: 1 }
+  cmp: gte
+claude_findings:
+  op: compare
+  left: { count: [findings], where: { op: equals, path: [source], value: claude } }
+  right: [claude_found]
+  cmp: eq
+costs_add_up:
+  op: compare
+  left: { sum: [stages], each: [usd], where: { op: equals, path: [kind], value: model } }
+  right: [total_usd]
+  cmp: eq
+  within: 0.01
+```
+
+all three pass. Each row shows the value ergo worked out, named after the side, beside the list it came from:
+
+| check             | expression                                                          | inputs                                                                                                |
+| ----------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `some_persona`    | `count(personas_ran) gte 1`                                         | `count(personas_ran) = 1`, `personas_ran = ["security"]`                                              |
+| `claude_findings` | `count(findings where source == "claude") eq claude_found`          | `count(findings where source == "claude") = 2`, `findings = [...]`, `claude_found = 2`                |
+| `costs_add_up`    | `sum(stages[].usd where kind == "model") eq total_usd, within 0.01` | `sum(stages[].usd where kind == "model") = 0.75`, `stages[].usd = [0.5, 0.25, 0]`, `total_usd = 0.76` |
+
+Some things worth knowing:
+
+- A list that isn't there fails the check as `absent`, a `null` one as `null`, and anything that isn't a list as `unusable`. A number to add that isn't a number, like `"0.5"`, fails it as `unusable` too, and so does a `within` comparison where either side isn't a number.
+- An item that `where` can't decide about doesn't just go uncounted. If the second finding above had no `source`, ergo couldn't tell whether it came from Claude, so the check would fail as `absent`, with `count(findings where source == "claude") = null`. A `present` condition is the exception, as everywhere: a missing field is its answer.
+- `where` is one [basic operator](#basic-operators), without a substitute. Its paths start at each item, like the inner check of `all`. It can't be `all`, `any` or `any_of`, and a check inside it that's written wrong makes the whole check written wrong.
+- Derived values only go in a check of their own, a filter or a substitute, not inside `all`, `any` or `any_of`. A `literal` side can go anywhere a `compare` can.
+- Paths in a derived value read like any other: they can start with `$$input`, `$$params` or a [name](#naming-subjects).
+
+#### `all` and `any`
+
+These apply a check to each item of a list inside the subject.
+
+| `op`  | Parameters                                          | Passes when                                                |
+| ----- | --------------------------------------------------- | ---------------------------------------------------------- |
+| `all` | `path`, `check`, `each` (optional), `as` (optional) | the list isn't empty and every item passes `check`.        |
+| `any` | `path`, `check`, `each` (optional), `as` (optional) | the list isn't empty and at least one item passes `check`. |
+
+```rego
+"signed": {
+	"op": "all",
+	"path": ["commits"],
+	"check": {"op": "equals", "path": ["signed"], "value": true},
+}
+```
+
+An empty list fails, with cause `value`. No commits isn't proof that every commit is signed. When no commits is fine, say so with `empty` in an `any_of`:
+
+```rego
+"signed": {
+	"op": "any_of",
+	"options": {
+		"none": [{"op": "empty", "path": ["commits"]}],
+		"signed": [{"op": "all", "path": ["commits"], "check": {"op": "equals", "path": ["signed"], "value": true}}],
+	},
+}
+```
+
+That renders as `one of: none(commits is empty) | signed(every commits: signed == true)`. A missing `commits` still fails, as `absent`.
+
+Anything that isn't a list fails too, an object included, with cause `unusable`. The row's `inputs` then show `[]` for the list, because an object's values have no order of their own.
+
+`each` goes one level deeper. The check then applies to every item of every inner list:
+
+```rego
+{
+	"op": "all",
+	"path": ["pull_requests"],
+	"each": ["commits"],
+	"check": {"op": "equals", "path": ["signed"], "value": true},
+}
+```
+
+This reads as "every commit of every pull request is signed" (ergo renders it as `every pull_requests[].commits: signed == true`). Every inner list must exist and have at least one item. If one pull request has no `commits`, the check fails, rather than being decided by the other pull requests alone.
+
+The inner `check` can be a basic operator, an `any_of`, or another `all` or `any`.
+
+##### Nesting
+
+An `all` or `any` inside another one checks a list for each item of the outer list. `as` names the outer item, so the inner check can still reach it once its paths start somewhere else. Say a pull request needs an approval given after its last commit:
+
+```json
+{
+  "number": 42,
+  "author": "ann",
+  "commits": [
+    { "sha": "c1", "timestamp": "2026-10-01T10:00:00Z" },
+    { "sha": "c2", "timestamp": "2026-10-01T12:00:00Z" }
+  ],
+  "approvers": [{ "username": "bob", "timestamp": "2026-10-01T11:00:00Z" }]
+}
+```
+
+That's "some approver, such that every commit is earlier than their approval":
+
+```rego
+"subjects": {"pull request": {
+	"from": ["pull_requests", {"each_as": "pr"}],
+	"id": ["number"],
+}},
+"requirements": {"approved_after_last_commit": {
+	"subject": "pull request",
+	"checks": {"after_commits": {
+		"description": "Someone approved it after its last commit",
+		"op": "any",
+		"path": ["approvers"],
+		"as": "approver",
+		"check": {
+			"op": "all",
+			"path": ["$pr", "commits"],
+			"check": {"op": "compare_time", "left": ["$approver", "timestamp"], "right": ["timestamp"], "cmp": "gt"},
+		},
+	}},
+}}
+```
+
+The inner paths start at each commit, so `["timestamp"]` is the commit's. `$approver` is the approver being tried, and `$pr` is the pull request. Bob approved before `c2`, so this fails:
+
+```json
+{
+  "requirement": "approved_after_last_commit",
+  "subject": { "type": "pull request", "id": 42 },
+  "check": "after_commits",
+  "description": "Someone approved it after its last commit",
+  "expression": "some approvers as $approver: every $pr.commits: $approver.timestamp gt timestamp",
+  "inputs": [
+    { "name": "approvers[]", "value": [{ "username": "bob", "timestamp": "2026-10-01T11:00:00Z" }] },
+    { "name": "$pr.commits", "value": [
+      { "sha": "c1", "timestamp": "2026-10-01T10:00:00Z" },
+      { "sha": "c2", "timestamp": "2026-10-01T12:00:00Z" }
+    ] }
+  ],
+  "cause": "value",
+  "failed_items": [{ "path": "item 1 of approvers", "item": "item 1 of approvers", "value": { "username": "bob", "timestamp": "2026-10-01T11:00:00Z" }, "cause": "value" }]
+}
+```
+
+The row shows the lists the check read, and `failed_items` names the approver who didn't count, but not which commit came after the approval. A commit with no timestamp fails the check too, with cause `absent`, because nothing proves the approval came after it.
+
+To require several things of the same approver, put them in one [`any_of`](#any_of) option, list checks included. This one needs an approver who approved, isn't the author, and approved after every commit:
+
+```rego
+"op": "any",
+"path": ["approvers"],
+"as": "approver",
+"check": {"op": "any_of", "options": {"peer": [
+	{"op": "equals", "path": ["state"], "value": "APPROVED"},
+	{"op": "compare", "left": ["username"], "right": ["$pr", "author"], "cmp": "ne"},
+	{"op": "all", "path": ["$pr", "commits"], "check": {"op": "compare_time", "left": ["$approver", "timestamp"], "right": ["timestamp"], "cmp": "gt"}},
+]}},
+```
+
+It renders as `some approvers as $approver: one of: peer(state == "APPROVED" and username ne $pr.author and every $pr.commits: $approver.timestamp gt timestamp)`.
+
+Some things worth knowing:
+
+- `as` takes the same names as a [naming step](#naming-subjects): a string that doesn't start with `$` and isn't `params` or `input`. Without `each`, `$approver` reads the same as a path inside the item, so `as` only matters for a check nested inside. With `each`, it names the inner item.
+- A name can only be given once along a chain of checks. `as` with a name that `from` or an outer check already gave is written wrong: it fails `$well_formed`, the check fails with cause `ill_formed`, and it shows as `<name given twice>`. A badly written name fails the same way and shows as `<invalid name>`. The cause isn't `value`, so a filter written like this fails the requirement rather than ruling every subject out. Two separate checks can use the same name.
+- A name given by `as` belongs to one item, so the row doesn't show it in its `inputs`. It still decides that item's cause, so an approver with no `timestamp` makes the check fail as `absent`. Paths that start with it are shown as paths inside the item, like `approvers[].timestamp`. That only holds inside the list check that gives the name. Anywhere else, like a neighbouring `any_of` option, nothing gives it, so reading it there is written wrong and fails as `ill_formed`.
+- Inner lists follow the same rules as outer ones. If an approver is tried against an empty or missing list of commits, that try fails.
+- One level of nesting is as deep as it goes, because Rego doesn't allow recursion. An `any_of` doesn't count as a level, but an `all` or `any` in one of its options does. A third `all` or `any` is written wrong: it fails `$well_formed`, the check fails with cause `ill_formed`, and its expression shows `<nested too deep>`.
+
+##### Which items failed
+
+A row of an `all` or `any` check also has `failed_items`: the items that made the check fail, in list order, each with its path, item, cause and value. With this input:
+
+```json
+{ "releases": [ { "id": "r-1", "pull_requests": [
+  { "number": 7, "commits": [ { "sha": "a1", "signed": true }, { "sha": "a2", "signed": false } ] },
+  { "number": 8 },
+  { "number": 9, "commits": [ { "sha": "c1" } ] }
+] } ] }
+```
+
+and the check from above, `every pull_requests[].commits: signed == true`, the row says:
+
+```json
+"cause": "absent",
+"failed_items": [
+  { "path": "item 2 of pull_requests[0].commits", "item": "item 2 of pull_requests[0].commits", "cause": "value", "value": { "sha": "a2", "signed": false } },
+  { "path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "absent", "value": null },
+  { "path": "item 1 of pull_requests[2].commits", "item": "item 1 of pull_requests[2].commits", "cause": "absent", "value": { "sha": "c1" } }
+]
+```
+
+`inputs` still shows the whole list, so the row records what was checked as well as what failed.
+
+- `path` is written like a path in an expression, with the item's position added: `item 2 of pull_requests[0].commits` is the second commit of the first pull request. The last position is written `item <n> of`, counting from 1, and one further in is in brackets, counting from 0, as in [sentences](#checks). A path that starts with a name keeps it, as in `item 2 of $pr.commits`.
+- `item` is the path of the list item the entry belongs to. Here every entry is a list item, so it's the same as `path`. It's there so a tool can find the item to show for any check, including [sentences](#checks), where an entry can point at a field inside the item.
+- With `each`, an inner list that's missing, `null`, not a list or empty fails the check, so it's listed in place of its items, like `pull_requests[1].commits` above.
+- An item whose field a `present` check finds missing or `null` is listed with cause `value`, the same as the row, because `present` read the field fine and found nothing there.
+- When the check passes, it's `[]`. A passing `any` can have items that failed, but none of them is why the row came out the way it did.
+- It's `[]` when the list itself can't be read, because there are no items to blame. The row's `cause` says what's wrong with the list.
+- When the check is [written wrong](#basic-operators), every item, and every inner list that's missing, `null`, not a list or empty, is listed with cause `ill_formed`, because none of them could be checked. When a [`ref`](#reading-from-the-input) in it can't be read, every item that fails is listed with the ref's cause, as the row is.
+- For a nested check, only the outer items are listed. An approver who approved before the last commit is listed with cause `value`, but not the commit.
+- With a [substitute](#substitutes), it lists the items that failed the check itself, even when the substitute passed and the row with it.
+- Only rows of `all` and `any` checks have it. Rows of `any_of` checks, `$applies` rows and rows of custom operators don't, even when an `all` or `any` sits inside them.
+
+#### `any_of`
+
+`any_of` passes when at least one of its options passes. Each option is a list of checks that must all pass:
+
+```rego
+"permitted": {
+	"op": "any_of",
+	"options": {
+		"standard": [
+			{"op": "equals", "path": ["type"], "value": "Story"},
+			{"op": "equals", "path": ["state"], "value": "Done"},
+		],
+		"safe": [{"op": "equals", "path": ["type"], "value": "Chore"}],
+	},
+}
+```
+
+This is the only way to say that two fields must agree with each other. Two separate checks, "type is Story or Chore" and "state is Done", would also accept a Chore that isn't Done. With `any_of` it must be a Done Story, or a Chore.
+
+- Name your options. The names show up in the rendered expression: `one of: safe(type == "Chore") | standard(type == "Story" and state == "Done")`. A list of options works too, and they're shown by position.
+- Options can hold basic checks and `all` or `any`, but not another `any_of`, because Rego doesn't allow recursion. An `all` or `any` in an option counts as being where the `any_of` is, so it can nest as deep as it could there (see [Nesting](#nesting)).
+- An empty `options` is written wrong, and so is an empty option, an option written as an object instead of a list, or an `any_of` inside an option. Each fails `$well_formed`, and the check fails with cause `ill_formed`. The expression shows `one of: <empty options>`, `standard(<empty option>)` or `standard(<invalid option>)`, and `$well_formed` says `empty options`, `empty option standard` or `option standard not a list`.
+- To let a missing field pass, give `missing` an option of its own. "No label is `do-not-merge`" then passes on a pull request with no `labels`, and renders as `one of: clean(not contains(labels, "do-not-merge")) | no_labels(labels is missing)`:
+
+  ```rego
+  "mergeable": {
+  	"op": "any_of",
+  	"options": {
+  		"no_labels": [{"op": "missing", "path": ["labels"]}],
+  		"clean": [{"op": "excludes", "path": ["labels"], "value": "do-not-merge"}],
+  	},
+  }
+  ```
+
+  Inside `all`, this skips an item by letting it pass. Inside `any`, skip an item by making it fail instead, with `present` in the same option as the check: `present` on a missing field fails with cause `value`, so the item counts as a plain no.
+- The row shows every field any option read, sorted by name. A field read by more than one option shows once. For an `all` or `any` in an option, that's its list and any names it reads.
+
+### Substitutes
+
+A check can name a `substitute`: another check that satisfies it when the first one fails.
+
+```rego
+"reviewed": {
+	"description": "Reviewed in a pull request",
+	"op": "present",
+	"path": ["pull_request"],
+	"substitute": {
+		"description": "The first commit of a repository, attested by a verified committer",
+		"op": "equals",
+		"path": ["verified_initial_commit"],
+		"value": true,
+	},
+}
+```
+
+This is for alternative evidence. The requirement still applies, and something else proves it was met. A repository's first commit can't have a pull request, so an attestation from a verified committer takes its place.
+
+That's different from `applies_to`. A subject left out by `applies_to` isn't covered by the requirement at all. A subject that passes on its substitute is covered, and meets the requirement another way. Its row passes with the cause `substituted` and shows the values both checks read.
+
+- Substitutes work on checks in `checks` and in `applies_to`. They're ignored on the inner check of `all` and `any`, and on the checks inside an `any_of` option.
+- A substitute's own substitute is ignored.
+- The rendered expression shows both: `reviewed == true, or substitute: verified == true`.
+- When both fail, the row takes the worse of the two causes, except that the substitute's `absent`, `null` and `value` don't count, because substitutes are usually missing. So a substitute whose selector matches nothing or several items, whose path runs into the wrong kind of value, or that compares values of the wrong kind gives the row its cause, and in `applies_to` it stops the filter ruling the subject out.
+- The row shows the check's inputs, then the substitute's, leaving out a path already shown.
+
+A substitute with a wrong path looks just like a substitute whose evidence is missing: it's never used, and the main check keeps failing. Test each substitute with an input that should pass on it.

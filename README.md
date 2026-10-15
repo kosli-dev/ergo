@@ -19,69 +19,15 @@ policy/
 
 ### 2. Write a policy
 
-Here is a policy that says "_every production deployment must have an approver_".
-
-`policy/deploy.rego`:
-
-```rego
-package deploy
-
-import data.ergo
-
-subjects := {"deployment": {
-	"from": ["deployments"],
-	"id": ["id"],
-	"applies_to": {"is_prod": {"op": "equals", "path": ["environment"], "value": "prod"}},
-}}
-
-requirements := {"prod_deploy": {
-	"description": "Every production deployment is approved",
-	"subject": "deployment",
-	"checks": {"approved": {
-		"description": "Someone approved the deployment",
-		"op": "non_empty_string",
-		"path": ["approved_by"],
-	}},
-}}
-
-report := ergo.report(input, {"subjects": subjects, "requirements": requirements}, {})
-
-violations := ergo.violations(report)
-```
-
-`ergo.report` takes the input, the policy and the params. The policy holds the subjects and the requirements, and this one has no params, so they're `{}`.
-
-A policy describes what to check, not how to check it. First it says what it's about, the things we call _subjects_. Each kind of subject gets a name, here `deployment`, that the report uses for each one, and says where to find them:
-
-- `from` is the path to the subjects in the input. `["deployments"]` means `input.deployments`, and `["release", "deployments"]` would mean `input.release.deployments`.
-- `id` is the field that uniquely identifies each subject.
-
-Then we can optionally keep only the subjects that are relevant to this policy:
-
-- `applies_to`: in this case, we define one filter that selects only the deployments whose `environment` is `prod`.
-
-And finally the requirement says what must be true of them. Its `description` says what it requires, in words anyone can read, and `subject` names the subject it checks:
-
-- `checks` are the rules each subject must pass. Here, `approved_by` must be a non-empty string.
-
-Several requirements can check the same subject. Each one gets its own rows in the report.
-
-#### Or write the policy in YAML
-
-Subjects and requirements are plain data, so you can keep them in a YAML file instead. OPA reads every YAML and JSON file in the directory you pass with `-d`, so this file becomes `data.subjects` and `data.requirements`.
+Here is a policy that says "_every production deployment must have an approver_". It goes in a YAML file next to `ergo.rego`.
 
 `policy/policy.yaml`:
 
 ```yaml
 subjects:
   deployment:
-    from: [deployments]
-    id: [id]
-    applies_to:
-      is_prod:
-        op: equals
-        path: [environment]
-        value: prod
+    from: deployments whose environment is "prod"
+    id: id
 requirements:
   prod_deploy:
     description: Every production deployment is approved
@@ -89,11 +35,21 @@ requirements:
     checks:
       approved:
         description: Someone approved the deployment
-        op: non_empty_string
-        path: [approved_by]
+        assert: approved_by is a non-empty string
 ```
 
-The Rego file then only has to hand them to ergo:
+A policy describes what to check, not how to check it. First it says what it's about, the things we call _subjects_. Each kind of subject gets a name, here `deployment`, that the report uses for each one, and says where to find them:
+
+- `from` says where the subjects are in the input. `deployments` means `input.deployments`, and `release.deployments` would mean `input.release.deployments`. `whose` keeps only the ones this policy is about, here the deployments whose `environment` is `prod`.
+- `id` is the field that uniquely identifies each subject.
+
+Then the requirement says what must be true of them. Its `description` says what it requires, in words anyone can read, and `subject` names the subject it checks:
+
+- `checks` are the rules each subject must pass, each one written as a sentence. Here, `approved_by` must be a non-empty string. A check with nothing to add can be the sentence alone: `approved: approved_by is a non-empty string`.
+
+Several requirements can check the same subject. Each one gets its own rows in the report.
+
+Then a Rego file hands the policy to ergo. OPA reads every YAML and JSON file in the directory you pass with `-d`, so the YAML file becomes `data.subjects` and `data.requirements`.
 
 `policy/deploy.rego`:
 
@@ -115,9 +71,13 @@ report := ergo.report(input, {"subjects": subjects, "requirements": requirements
 violations := ergo.violations(report)
 ```
 
+`ergo.report` takes the input, the policy and the params. The policy holds the subjects and the requirements, and this one has no params, so they're `{}`.
+
 The defaults keep the report defined when the file leaves out `subjects:` or `requirements:`, or spells one wrong. That report still fails: with no requirements it isn't compliant, and with no subjects the requirement names one that isn't there.
 
-The report and the violations below come out the same either way.
+#### The old way of writing checks
+
+Before sentences, a check was an object with an `op` and a `path`, like `{op: non_empty_string, path: [approved_by]}`, and a subject used `applies_to` filters written the same way. That still works, but it's going away. We'll say when, well in advance. `ergo.as_sentences` rewrites a policy written that way as sentences, as "Moving a policy to sentences" in the [reference](REFERENCE.md) shows.
 
 ### 3. Get the report
 
@@ -150,7 +110,7 @@ The report records every check ergo ran, including the ones that passed. It come
 ```
 
 - `compliant` is the overall answer. When you need a plain yes or no to allow or block something, this is the one to use: `allow := report.compliant`.
-- `requirements` has an entry for each requirement. It repeats the requirement's `description`, and its `status` is `met`, `not_met`, or `not_applicable` when no subject was left to check. When it's `not_met`, `causes` says why, worst first, with how many rows each: here `[{"cause": "absent", "rows": 1}]`. It also says how many subjects were found and kept, and lists every check with a readable `expression`, such as `approved_by is a non-empty string`.
+- `requirements` has an entry for each requirement. It repeats the requirement's `description`, and its `status` is `met`, `not_met`, or `not_applicable` when no subject was left to check. When it's `not_met`, `causes` says why, worst first, with how many rows each: here `[{"cause": "absent", "rows": 1}]`. It also says how many subjects were found and kept, and lists every check with a readable `expression`, which is the sentence as you wrote it.
 - `results` has one row per subject and check, with the value ergo read, whether the check passed, and a `cause`.
 
 Here's what those rows look like for our example:
@@ -171,7 +131,7 @@ You didn't write the checks starting with `$`. ergo adds them for you:
 - `$well_formed` makes sure the requirement itself makes sense, for example that it has at least one check.
 - `$min_subjects` makes sure at least one subject was found. If `from` points to nothing, this check fails, so the policy can't pass without checking anything.
 - `$unique_ids` makes sure no two deployments share an id. Otherwise their rows could look the same, and you couldn't tell which one failed.
-- `$applies` records whether each subject passed the `applies_to` filter. `d-3` didn't, and the report says so rather than leaving it out. A deployment with no `environment` at all would fail `$applies` with the cause `absent`, and the requirement would fail with it, because ergo can't tell whether it's a production deployment.
+- `$applies` records whether each subject passed the `whose` conditions. `d-3` didn't, and the report says so rather than leaving it out. A deployment with no `environment` at all would fail `$applies` with the cause `absent`, and the requirement would fail with it, because ergo can't tell whether it's a production deployment.
 
 When a check fails, `cause` tells you why. `d-2` failed with `absent` because it has no `approved_by` field at all: no approval was ever recorded. Had `approved_by` been `""`, the cause would be `value` instead, since an approval was recorded but it's empty. Both fail, but they're different problems and you'd fix them differently.
 
@@ -188,13 +148,13 @@ opa eval -d policy -i deployments.json --format=pretty 'data.deploy.violations'
 ```json
 [
   {
-    "requirement": "prod_deploy",
-    "subject": { "type": "deployment", "id": "d-2" },
+    "cause": "absent",
     "check": "approved",
     "description": "Someone approved the deployment",
     "expression": "approved_by is a non-empty string",
     "inputs": [{ "name": "approved_by", "value": null }],
-    "cause": "absent"
+    "requirement": "prod_deploy",
+    "subject": { "id": "d-2", "type": "deployment" }
   }
 ]
 ```
