@@ -843,6 +843,68 @@ ergo doesn't run every sentence the spec describes yet. These are written wrong 
 
 Until then, write those checks with an `op`. `from`, `id` and `applies_to` are still written as before.
 
+### Moving a policy to sentences
+
+`ergo.as_sentences(policy)` rewrites a policy written with `op` as sentences, wherever a sentence says exactly the same. With this `policy.yaml`:
+
+```yaml
+subjects:
+  deployment:
+    from: [deployments]
+    id: [id]
+    applies_to:
+      is_prod: {op: equals, path: [environment], value: prod}
+requirements:
+  approved:
+    subject: deployment
+    checks:
+      approved:
+        description: Someone approved the deployment
+        op: non_empty_string
+        path: [approved_by]
+      region: {op: in, path: [region], values: [eu-west-1, us-east-1]}
+      signed: {op: all, path: [commits], check: {op: equals, path: [signed], value: true}}
+```
+
+this command:
+
+```sh
+opa eval -d ergo.rego -d policy.yaml --format raw \
+  'yaml.marshal(data.ergo.as_sentences({"subjects": data.subjects, "requirements": data.requirements}))'
+```
+
+prints:
+
+```yaml
+requirements:
+  approved:
+    checks:
+      approved:
+        assert: approved_by is a non-empty string
+        description: Someone approved the deployment
+      region: region is one of "eu-west-1", "us-east-1"
+      signed:
+        check:
+          op: equals
+          path:
+            - signed
+          value: true
+        op: all
+        path:
+          - commits
+    subject: deployment
+subjects:
+  deployment:
+    from: deployments whose environment is "prod"
+    id: id
+```
+
+- A check or a subject is only rewritten when ergo reads the sentence back into what was written, so the policy gives the same report verdicts. Anything else stays as it was, and still works.
+- `all` and `any` stay, because `every` and `some` walk every list along their path where `all` and `any` read one, so a policy could pass where it failed. Custom operators, `any_of`, substitutes, `count`, `sum` and `add`, and checks with their own `expression` stay too.
+- A subject's `applies_to` filters become its `whose` conditions only when they all can and none has a `description` or `meta`, which a condition has nowhere to keep. Their names are lost, since a condition has none.
+- The checks of a subject read from another subject, like `from: artifact.pull_requests`, stay as they are, since a sentence there reads `artifact` as that subject.
+- The comments of a YAML file are lost, since OPA reads it as data.
+
 ## Operators
 
 Every check has an `op` and the parameters that operator needs. A field the operator doesn't use is a mistake, so a typo like `valeu` is caught instead of ignored.
