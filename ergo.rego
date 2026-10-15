@@ -5592,7 +5592,8 @@ _for_names := object.get(input, "ergo/names", {})
 _for_row(check, subj) := object.union(_for_outer(check, subj, _for_names), {"cause": "unusable", "failed": []}) if {
 	_walk_flawed(check)
 } else := {"cause": "not_an_object", "inputs": [], "failed": []} if {
-	not _named(check.items[0].path)
+	some item in check.items
+	not _named(item.path)
 	not is_object(subj)
 } else := _for_outer(check, subj, _for_names)
 
@@ -5602,7 +5603,8 @@ _for_outer(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(chec
 } else := {"cause": cause, "inputs": inputs, "failed": failed} if {
 	item := check.items[0]
 	w := _for_walk(item, subj, names)
-	judged := [_for_judge_outer(check, subj, names, item, e) | some e in w.items]
+	pre := _for_pre(check, subj, names)
+	judged := [_for_judge_outer(check, subj, names, item, e, pre) | some e in w.items]
 	fails := array.concat(array.concat([object.union(f, {"lines": []}) | some f in w.fails], [object.union(f, {"lines": []}) | some f in _walk_stop(w)]), [j.failure | some j in judged; j.failure != null])
 	cause := _for_verdict(item, w, judged, fails)
 	failed := _for_failed(cause, fails)
@@ -5614,27 +5616,48 @@ _for_walk(item, subj, names) := w if {
 	w := _walk(_walk_start(item, subj), keys, item.if_any == true) with input as {"ergo/names": names}
 } else := {"items": [], "fails": [], "walked": set(), "trail": [], "unread": _read_state(subj, item.path)}
 
-_for_judge_outer(check, subj, names, item, e) := {"passed": res.passed, "kept": wh.kept, "failure": _for_failure(e, wh.undecided, wh.kept, res), "lines": res.lines} if {
+_for_pre(check, subj, names) := _for_walk(check.items[1], subj, names) if {
+	count(check.items) == 2
+	not _for_from_first(check)
+} else := null
+
+_for_from_first(check) if check.items[1].path[0] == concat("", ["$", check.items[0].as])
+
+_for_judge_outer(check, subj, names, item, e, pre) := {"passed": res.passed, "kept": wh.kept, "failure": _for_failure(e, wh.undecided, wh.kept, res), "lines": res.lines} if {
 	wh := _for_whose(item, e, names)
-	res := _for_outer_next(check, subj, object.union(names, {item.as: _walk_shown(e.v)}), wh.undecided, wh.kept)
+	res := _for_outer_next(check, subj, object.union(names, {item.as: e.v}), wh.undecided, wh.kept, pre)
 }
 
 _for_judge_inner(check, subj, names, item, e) := {"passed": res.passed, "kept": wh.kept, "failure": _for_failure(e, wh.undecided, wh.kept, res), "lines": res.lines} if {
 	wh := _for_whose(item, e, names)
-	res := _for_inner_next(check, subj, object.union(names, {item.as: _walk_shown(e.v)}), wh.undecided, wh.kept)
+	res := _for_inner_next(check, subj, object.union(names, {item.as: e.v}), wh.undecided, wh.kept)
 }
 
-_for_whose(item, e, names) := {"undecided": [c | some c in causes; not c in {"satisfied", "value"}], "kept": count([c | some c in causes; c == "value"]) == 0} if {
+_for_whose(item, e, names) := {"undecided": _for_undecided(undecided, kept, e.v), "kept": kept} if {
 	causes := [_row_cause(c, e.iv, "") | some c in item.whose] with input as {"ergo/names": names}
+	undecided := [c | some c in causes; not c in {"satisfied", "value"}]
+	kept := count([c | some c in causes; c == "value"]) == 0
 }
 
-_for_outer_next(_, _, _, undecided, _) := {"passed": false, "cause": undecided[0], "lines": []} if undecided != []
+_for_undecided(undecided, true, v) := array.concat(undecided, _for_mark_cause(v))
 
-_for_outer_next(_, _, _, [], false) := {"passed": false, "cause": "value", "lines": []}
+_for_undecided(undecided, false, _) := undecided
 
-_for_outer_next(check, subj, bound, [], true) := _for_inner(check, subj, bound) if count(check.items) == 2
+_for_mark_cause(v) := ["absent"] if v == _absent
 
-_for_outer_next(check, subj, bound, [], true) := _for_lines(check, subj, bound) if count(check.items) == 1
+_for_mark_cause(v) := ["unusable"] if v == _unusable_mark
+
+_for_mark_cause(v) := [] if not _walk_marked(v)
+
+_for_outer_next(_, _, _, undecided, _, _) := {"passed": false, "cause": undecided[0], "lines": []} if undecided != []
+
+_for_outer_next(_, _, _, [], false, _) := {"passed": false, "cause": "value", "lines": []}
+
+_for_outer_next(check, subj, bound, [], true, null) := _for_inner(check, subj, bound, _for_walk(check.items[1], subj, bound)) if count(check.items) == 2
+
+_for_outer_next(check, subj, bound, [], true, pre) := _for_inner(check, subj, bound, pre) if pre != null
+
+_for_outer_next(check, subj, bound, [], true, _) := _for_lines(check, subj, bound) if count(check.items) == 1
 
 _for_inner_next(_, _, _, undecided, _) := {"passed": false, "cause": undecided[0], "lines": []} if undecided != []
 
@@ -5650,12 +5673,14 @@ _for_failure(e, [], true, res) := {"path": e.i, "item": e.i, "cause": res.cause,
 
 _for_failure(_, [], true, res) := null if res.passed
 
-_for_inner(check, subj, names) := {"passed": false, "cause": w.unread, "lines": []} if {
-	w := _for_walk(check.items[1], subj, names)
+_for_inner(check, subj, names, w) := {"passed": false, "cause": "not_an_object", "lines": []} if {
+	_for_from_first(check)
+	count(check.items[1].path) > 1
+	not is_object(names[check.items[0].as])
+} else := {"passed": false, "cause": w.unread, "lines": []} if {
 	"unread" in object.keys(w)
 } else := {"passed": cause == "satisfied", "cause": cause, "lines": lines} if {
 	item := check.items[1]
-	w := _for_walk(item, subj, names)
 	judged := [_for_judge_inner(check, subj, names, item, e) | some e in w.items]
 	fails := array.concat(array.concat([object.union(f, {"lines": []}) | some f in w.fails], [object.union(f, {"lines": []}) | some f in _walk_stop(w)]), [j.failure | some j in judged; j.failure != null])
 	cause := _for_verdict(item, w, judged, fails)
@@ -5693,35 +5718,37 @@ _for_failed(cause, fails) := [{"path": _path_name(f.path), "item": _path_name(f.
 
 _for_inputs(check, subj, names, item, w) := [{"name": pair[0], "value": pair[1]} | some pair in sort(_for_input_pairs(check, subj, names, item, w))]
 
-_for_input_pairs(check, subj, names, item, w) := ({[_walk_name(item.path, w.walked), [_walk_shown(e.v) | some e in w.items]]} | _for_inner_pairs(check, subj, names, item, w)) | {[_path_name(p), value_at(subj, p)] |
+_for_input_pairs(check, subj, names, item, w) := (({[_walk_name(item.path, w.walked), [_walk_shown(e.v) | some e in w.items]]} | _for_inner_pairs(check, subj, names, item, w)) | {[_path_name(p), value_at(subj, p)] |
 	some c in check.checks
-	some p in _for_reads(c)
+	not _walks(c)
+	some p in _leaf_paths(c)
 	not _for_named(p)
+}) | {[i.name, i.value] |
+	some c in check.checks
+	_walks(c)
+	not _for_named(c.path)
+	some i in _walk_read_row(c, subj).inputs
 }
 
 _for_inner_pairs(check, _, _, _, _) := set() if count(check.items) == 1
 
 _for_inner_pairs(check, subj, names, item, w) := {[_for_list_name(check.items[1].path, walked), values]} if {
 	count(check.items) == 2
-	check.items[1].path[0] == concat("", ["$", item.as])
-	inner := [_for_walk(check.items[1], subj, object.union(names, {item.as: _walk_shown(e.v)})) | some e in w.items]
+	_for_from_first(check)
+	inner := [_for_walk(check.items[1], subj, object.union(names, {item.as: e.v})) | some e in w.items]
 	walked := {i | some iw in inner; some i in iw.walked}
 	values := [_walk_shown(e2.v) | some iw in inner; some e2 in iw.items]
 }
 
 _for_inner_pairs(check, subj, names, _, _) := {[_for_list_name(check.items[1].path, iw.walked), [_walk_shown(e.v) | some e in iw.items]]} if {
 	count(check.items) == 2
-	check.items[1].path[0] != concat("", ["$", check.items[0].as])
+	not _for_from_first(check)
 	iw := _for_walk(check.items[1], subj, names)
 }
 
 _for_list_name(path, walked) := substring(_walk_name(path, walked), 1, -1) if _for_named(path)
 
 _for_list_name(path, walked) := _walk_name(path, walked) if not _for_named(path)
-
-_for_reads(c) := [c.path] if _walks(c)
-
-_for_reads(c) := _leaf_paths(c) if not _walks(c)
 
 _for_named(p) if {
 	_named(p)

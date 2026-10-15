@@ -8812,3 +8812,29 @@ test_a_for_line_whose_param_cant_be_used_fails_as_unusable_and_keeps_its_inputs 
 	rows == [[1, "unusable", [], [{"name": "xs[]", "value": [1]}]], ["s", "unusable", [], [{"name": "xs", "value": []}]]]
 	[row[1] | some row in _for_rows({"for": "every xs whose x is one of $params.l as x", "assert": "x is 1"}, [{"id": 1, "xs": [1]}], {"l": "text"})] == ["unusable"]
 }
+
+test_a_name_whose_path_ends_missing_or_unreadable_fails_its_item_before_its_lines if {
+	rows := _for_rows({"for": "every prs.title as t", "assert": "t does not exist"}, [{"id": 1, "prs": [{}]}, {"id": 2, "prs": [{"title": null}]}, {"id": 3, "prs": [{"meta": "s"}]}], {})
+	[[row[0], row[1], row[2]] | some row in rows] == [
+		[1, "absent", [{"path": "item 1 of prs", "item": "item 1 of prs", "cause": "absent", "value": null, "failed_assertions": []}]],
+		[2, "satisfied", []],
+		[3, "absent", [{"path": "item 1 of prs", "item": "item 1 of prs", "cause": "absent", "value": null, "failed_assertions": []}]],
+	]
+	[row[1] | some row in _for_rows({"for": "every prs.meta.title as t", "assert": "t is null"}, [{"id": 1, "prs": [{"meta": "s"}]}], {})] == ["unusable"]
+	[row[1] | some row in _for_rows({"for": `every prs.title whose n is 1 as t`, "assert": `t is "x"`}, [{"id": 1, "prs": [{"n": 2}, {"n": 1, "title": "x"}]}], {})] == ["satisfied"]
+}
+
+test_an_every_under_a_for_line_shows_its_list_as_a_one_line_every_does if {
+	rows := _for_rows({"for": "every prs as pr", "assert": "every cs.s is true"}, [{"id": 1, "prs": [{"n": 1}], "cs": [{"s": true}, {"s": false}]}], {})
+	rows[0][3] == [{"name": "cs[].s", "value": [true, false]}, {"name": "prs[]", "value": [{"n": 1}]}]
+}
+
+test_a_for_line_on_a_subject_that_isnt_an_object_fails_when_either_path_starts_at_the_subject if {
+	[[row[1], row[3]] | some row in _for_rows({"for": "every $params.l as l, some xs as x", "assert": "x is l"}, ["s"], {"l": [1]})] == [["not_an_object", []]]
+}
+
+test_a_second_item_that_reads_into_a_first_item_that_isnt_an_object_fails_it_as_not_an_object if {
+	rows := _for_rows({"for": "every prs as pr, some pr.approvers as ap", "assert": "ap is 1"}, [{"id": 1, "prs": [1, null, {"approvers": [1]}]}], {})
+	[[f.item, f.cause] | some f in rows[0][2]] == [["item 1 of prs", "not_an_object"], ["item 2 of prs", "not_an_object"]]
+	[row[1] | some row in _for_rows({"for": "every m as row, every row as cell", "assert": "cell is 1"}, [{"id": 1, "m": [[1], [1, 1]]}], {})] == ["satisfied"]
+}
