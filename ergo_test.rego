@@ -9274,3 +9274,39 @@ test_every_and_some_in_a_check_of_a_chain_can_walk_the_parent if {
 	rep := _chain_report(_chain_doc, _chain_subjects, {"c": "some artifact.pull_requests.approved is true"}, {"name": "web"})
 	[r.cause | some r in rep.results; r.check == "c"] == ["satisfied", "satisfied"]
 }
+
+_review_doc := {"trail": {"artifacts": {"web": {
+	"fingerprint": "sha-1",
+	"owner": "ann",
+	"pull_requests": [{"url": "pr/7", "approved": true, "reviews": [{"by": "ann", "ok": true}]}],
+}}}}
+
+test_the_parents_name_is_the_parent_everywhere_in_a_sentence if {
+	every check in [
+		{"for": "every artifact.pull_requests as p", "assert": "p.url exists"},
+		{"for": "every reviews whose by is artifact.owner as r", "assert": "r.ok is true"},
+		"every reviews whose by is artifact.owner exists",
+		"every reviews.by is artifact.owner",
+		"count of reviews whose by is artifact.owner is 1",
+	] {
+		[r.cause | some r in _chain_report(_review_doc, _chain_subjects, {"c": check}, {"name": "web"}).results; r.check == "c"] == ["satisfied"]
+	}
+}
+
+test_a_subject_cant_build_on_a_subject_read_from_another_yet if {
+	doc := {"artifacts": [{"fingerprint": "a1", "prs": [{"url": "p1", "ok": true}]}], "prs": [{"url": "elsewhere", "ok": true}]}
+	base := {"artifact": {"from": "artifacts", "id": "fingerprint"}, "pr": {"from": "artifact.prs", "id": "url"}}
+	every pair in [[{"from": "pr whose ok is true"}, "from"], [{"of": "pr"}, "of"]] {
+		rep := ergo.report(doc, {"subjects": object.union(base, {"okpr": pair[0]}), "requirements": {"r": {"subject": "okpr", "checks": {"c": "url exists"}}}}, {})
+		_from_problems(rep) == [{"name": concat("", ["subjects.okpr.", pair[1]]), "value": ["can't build on a subject read from another subject yet"]}]
+		[r.check | some r in rep.results] == ["$well_formed", "$min_subjects", "$unique_ids"]
+	}
+}
+
+test_the_parent_is_named_only_in_sentences_and_only_in_its_own_requirement if {
+	rep := _chain_report(_chain_doc, _chain_subjects, {"c": {"op": "present", "path": ["$artifact", "name"]}}, {"name": "web"})
+	[i.value | some r in rep.results; r.check == "$well_formed"; some i in r.inputs; i.name == "checks.c"] == [["unknown name $artifact"]]
+	other := ergo.report({"things": [{"k": 1}], "trail": {"artifacts": {}}}, {"subjects": object.union(_chain_subjects, {"thing": {"from": ["things", {"each_as": "artifact"}]}}), "requirements": {"t": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["$artifact", "k"]}}}}}, {"name": "web"})
+	other.requirements.t.checks.c.expression == "$artifact.k is present"
+	[r.inputs | some r in other.results; r.check == "c"] == [[{"name": "$artifact.k", "value": 1}]]
+}

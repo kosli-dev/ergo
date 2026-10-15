@@ -185,7 +185,7 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
    "inputs": [{"name": "approved_by", "value": ""}]}
   ```
 
-  A check reads the artifact by its name, like `artifact.name`. This works when the artifact is one subject. When it's none, the pull requests are none too. When it's several, `$min_subjects` fails as `unusable`, since that isn't supported yet ([#210](https://github.com/kosli-dev/ergo/issues/210)). A chain of more than two subjects is written wrong.
+  A check reads the artifact by its name, like `artifact.name`. This works when the artifact is one subject. When it's none, the pull requests are none too. When it's several, `$min_subjects` fails as `unusable`, since that isn't supported yet ([#210](https://github.com/kosli-dev/ergo/issues/210)). A chain of more than two subjects is written wrong, and so is a subject that builds on one with `of` or a from line that narrows it. Only checks written as sentences can read the artifact.
 - A `from` line can't go with `applies_to`. A `from` or `id` that can't be read is written wrong, and the `$well_formed` row says why, like `{"name": "subjects.x.from", "value": ["doesn't parse"]}`.
 
 ### A subject built on another

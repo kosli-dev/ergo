@@ -64,10 +64,19 @@ _resolved_def(members) := {"def": def, "from_owner": r, "filter_owners": owners}
 	root := _raw_subject(r)
 	owners := {n: _filter_owner_in(members, n) | some m in members; some n, _ in _object_or_empty(_filters_of(m))}
 	def := object.union(
-		{f: root[f] | some f in ["from", "id"]; f in object.keys(root)},
+		{f: _root_field(f, root[f], r, members) | some f in ["from", "id"]; f in object.keys(root)},
 		{"applies_to": _merged_filters(members, owners)},
 	)
 } else := {}
+
+_root_field("from", _, r, members) := "<built on a subject read from another subject>" if {
+	count(members) > 1
+	r in object.keys(object.get(data.ergo_subject_sentences, "chains", {}))
+} else := v if {
+	v := _raw_subject(r).from
+}
+
+_root_field("id", v, _, _) := v
 
 _merged_filters(members, _) := [f | some m in sort(members); f := _filters_of(m); not is_object(f)][0] if {
 	some m in members
@@ -262,6 +271,12 @@ _member_problems(members) := union({
 	{[array.concat(["subjects", m], [p[0]]), p[1]] |
 		some m in members
 		some p in _def_problems(_raw_subject(m))
+	},
+	{[["subjects", m, _of_field(m)], "can't build on a subject read from another subject yet"] |
+		some m in members
+		of := object.get(_raw_subject(m), "of", null)
+		is_string(of)
+		of in object.keys(object.get(data.ergo_subject_sentences, "chains", {}))
 	},
 	{[["subjects", m, "of"], "not in subjects"] |
 		some m in members
@@ -1310,7 +1325,7 @@ _plain_step_name(0, step) := _s_key_text(substring(step, 1, -1)) if _parent_name
 _parent_name(step) if {
 	is_string(step)
 	startswith(step, "$")
-	some p in object.get(data.ergo_subject_sentences, "chains", {})
+	some p, _ in _parent_names
 	step == concat("", ["$", p])
 }
 
@@ -3728,7 +3743,7 @@ _checks_at(_, "checks", n) := ["checks", n]
 _from_names(req) := {n |
 	_from_well_formed(req)
 	n := _each_step(req).each_as
-} | {data.ergo_subject_sentences.chains[req.subject] | _chained(req)}
+} | {data.ergo_subject_sentences.chains[req.subject] | _chained(req); data.ergo_sentence_here == true}
 
 _well_formed_inputs(req) := array.concat(
 	array.concat(
@@ -3908,14 +3923,13 @@ _evaluation(doc, req, name) := {
 	"rows_complete": _rows_complete(groups, matching, req),
 } if {
 	raw := _raw_entries(doc, req)
-	names := _from_names(req)
 	filter_flaws := {n: flaw |
 		some n, check in _applies_to_of(req)
-		flaw := _flaw(check, names) with data.ergo_sentence_here as _s_written_here(req, "applies_to", n)
+		flaw := _flaw(check, _from_names(req)) with data.ergo_sentence_here as _s_written_here(req, "applies_to", n)
 	}
 	check_flaws := {n: flaw |
 		some n, check in _checks_of(req)
-		flaw := _flaw(check, names) with data.ergo_sentence_here as _s_written_here(req, "checks", n)
+		flaw := _flaw(check, _from_names(req)) with data.ergo_sentence_here as _s_written_here(req, "checks", n)
 	}
 	item := _subject_item_name(req)
 	refs := {i: _entry_ref(entry, req) | some i, entry in raw}
@@ -4115,7 +4129,7 @@ _evaluated(doc, req, name) := _chain_evaluation(req, name, _parent_pick(doc, req
 
 _chain_evaluation(req, name, pick) := e if {
 	"subject" in object.keys(pick)
-	e := _evaluation(pick.subject, req, name) with data.ergo_in as {pick.parent: pick.id} with data.ergo_parent as {pick.parent: pick.parent_subject}
+	e := _evaluation(pick.subject, req, name) with data.ergo_in as {pick.parent: pick.id} with data.ergo_parent as {pick.parent: pick.subject}
 }
 
 _chain_evaluation(req, name, pick) := object.union(base, {
@@ -4150,10 +4164,9 @@ _parent_pick_of(doc, preq) := {"cause": c} if {
 	_from_unreadable(preq)
 } else := r if {
 	raw := _raw_entries(doc, preq)
-	names := _from_names(preq)
 	flaws := {n: flaw |
 		some n, check in _applies_to_of(preq)
-		flaw := _flaw(check, names) with data.ergo_sentence_here as _s_written_here(preq, "applies_to", n)
+		flaw := _flaw(check, _from_names(preq)) with data.ergo_sentence_here as _s_written_here(preq, "applies_to", n)
 	}
 	refs := {i: _entry_ref_of(entry, preq) | some i, entry in raw}
 	matches := {i: _subject_matches(entry.subject, preq, flaws) | some i, entry in raw}
@@ -4165,7 +4178,7 @@ _parent_pick_from(raw, refs, applies, preq) := {"cause": _worst_of({row.cause | 
 	not _scope_readable(raw, applies, preq)
 } else := _single_parent(raw, refs, applies, preq)
 
-_single_parent(raw, refs, applies, preq) := {"subject": raw[i].subject, "parent_subject": raw[i].subject, "id": refs[i].id, "parent": preq.subject} if {
+_single_parent(raw, refs, applies, preq) := {"subject": raw[i].subject, "id": refs[i].id, "parent": preq.subject} if {
 	kept := _kept_parents(raw, applies, preq)
 	count(kept) == 1
 	i := kept[0]
@@ -5588,11 +5601,20 @@ _s_parent_named(written, model, names) := _s_named_model(model, names) if {
 	not "$sentence" in object.keys(model)
 }
 
-_s_named_model(m, names) := object.union(m, {"checks": [_s_named_model_leaf(c, names) | some c in m.checks]}) if m.op in {"all_of", "for"}
+_s_named_model(m, names) := object.union(m, {"checks": [_s_named_model_leaf(c, names) | some c in m.checks]}) if m.op == "all_of"
+
+_s_named_model(m, names) := object.union(m, {
+	"checks": [_s_named_model_leaf(c, names) | some c in m.checks],
+	"items": [object.union(item, {"path": _s_named_path(item.path, names), "whose": [_s_named(c, names) | some c in item.whose]}) | some item in m.items],
+}) if m.op == "for"
 
 _s_named_model(m, names) := _s_named_model_leaf(m, names) if not m.op in {"all_of", "for"}
 
-_s_named_model_leaf(m, names) := object.union(m, {"path": _s_named_path(m.path, names)}) if m.op in {"every", "some"}
+_s_named_model_leaf(m, names) := object.union(m, {
+	"path": _s_named_path(m.path, names),
+	"whose": [_s_named(c, names) | some c in m.whose],
+	"check": object.union(_s_named(m.check, names), object.filter(m.check, {"path", "left"})),
+}) if m.op in {"every", "some"}
 
 _s_named_model_leaf(m, names) := _s_named(m, names) if not m.op in {"every", "some"}
 
