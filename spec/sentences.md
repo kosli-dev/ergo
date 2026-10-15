@@ -4,7 +4,7 @@ Draft 0.1, a proposal from [#174](https://github.com/kosli-dev/ergo/issues/174).
 
 [`sentences-corpus.md`](sentences-corpus.md) has every check from sdlc-policies, the server's demo and npm-bump policies, pr-reviewer, ergo's examples and Tore's DEV controls written both ways. Every sentence in it parses exactly one way with the phrases below. The phrases, the tally and the misfits come from it.
 
-`ergo.rego` runs a check written as one or more sentences that start with a path, for every phrase, joined with `and` or listed under `assert`. It runs a `for` line before them too, but doesn't check the limit of three list walks in [sentence.for.depth](#the-for-line) yet. It doesn't run `count of`, `sum of`, `plus`, `last of` or `from` lines yet. Nor does it run a field of the subject after `contains`, `does not contain` or a phrase that takes a list, a list path with `named by` in it, or a value after a time phrase. A check that uses one of them is written wrong, with `isn't supported yet` in its message. `named by` a name from the `for` line is written wrong, with `isn't supported yet` too, and `named by` any other bare word with `unknown name <word>`. A sentence can't be an `any_of` option or a substitute yet, and is written wrong there with `invalid check`.
+`ergo.rego` runs a check written as one or more sentences that start with a path, for every phrase, joined with `and` or listed under `assert`. It runs a `for` line before them too, but doesn't check the limit of three list walks in [sentence.for.depth](#the-for-line) yet. It runs `count of`, `sum of` and `plus` too, but not in the phrase of an `every` or `some`, before `is between`, or inside the `whose` of another `count of` or `sum of`. It doesn't run `last of` or `from` lines yet. Nor does it run a field of the subject after `contains`, `does not contain` or a phrase that takes a list, a list path with `named by` in it, or a value after a time phrase. A check that uses one of them is written wrong, with `isn't supported yet` in its message. `named by` a name from the `for` line is written wrong, with `isn't supported yet` too, and `named by` any other bare word with `unknown name <word>`. A sentence can't be an `any_of` option or a substitute yet, and is written wrong there with `invalid check`.
 
 ## The shape of a sentence
 
@@ -342,7 +342,7 @@ Both sides are timestamps in the same format, both RFC 3339 strings or both numb
 
 Read as `is` or `equals`, and printed as one of them. With it in the grammar, every sentence in the corpus still has exactly one reading.
 
-**[sentence.derived.fail]** `count of` and `sum of` over a list that's missing, `null` or not a list fail as `absent`, `null` or `unusable`. A number to add that isn't a number fails as `unusable`. `every` and `some` fail the same way on the list they walk.
+**[sentence.derived.fail]** `count of` and `sum of` over a list that's missing, `null` or not a list fail as `absent`, `null` or `unusable`. A number to add that's missing fails as `absent`, `null` as `null`, and anything else that isn't a number as `unusable`. `every` and `some` fail the same way on the list they walk.
 
 ## Written wrong
 

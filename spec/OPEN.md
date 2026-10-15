@@ -72,9 +72,4 @@ Every rule needs a case, apart from the ones listed here. The `sentence` rules h
 - `sentence.subject.own`
 - `sentence.subject.short`
 - `sentence.argument.subject`
-- `sentence.derived.count`
-- `sentence.derived.sum`
-- `sentence.derived.plus`
-- `sentence.derived.compare`
 - `sentence.for.depth`
-- `sentence.derived.fail`

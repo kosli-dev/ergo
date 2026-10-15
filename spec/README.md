@@ -60,7 +60,7 @@ and this is the case:
 
 ## Running the cases
 
-`spec_test.rego` runs every case against `ergo.rego`. Its `known_differences` lists the cases an implementation is known to fail, which is where it still differs from the spec. The test fails when another case fails, and also when a listed case passes, so the list stays true.
+`spec_test.rego` runs every case against `ergo.rego`, with one test for each folder of cases, so no test runs long enough to hit the timeout. A new folder needs its test added there too, and a test fails until it is. Its `known_differences` lists the cases an implementation is known to fail, which is where it still differs from the spec. A folder's test fails when another case in it fails, and also when a listed case passes, so the list stays true.
 
 The cases in `cases/custom` use three custom operators that a runner has to supply, each failing when a field it reads isn't found:
 
