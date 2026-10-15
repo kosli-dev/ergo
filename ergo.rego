@@ -259,7 +259,7 @@ _member_problems(members) := union({
 		some m in members
 		some p in _def_problems(_raw_subject(m))
 	},
-	{[["subjects", m, _of_field(m)], "not in subjects"] |
+	{[["subjects", m, "of"], "not in subjects"] |
 		some m in members
 		of := object.get(_raw_subject(m), "of", null)
 		_has_type("of", of)
@@ -5284,7 +5284,7 @@ _s_single_quoted(v) if {
 _s_from_reads(subjects) := {name: object.union(_s_from_part(name, lines, subjects, narrow), _s_id_part(def)) | some name, def in subjects; is_object(def)} if {
 	is_object(subjects)
 	lines := {name: _from_line(def.from) | some name, def in subjects; is_object(def); is_string(def.from)}
-	narrow := {name: _s_narrow_parent(name, lines, subjects) | some name, _ in subjects}
+	narrow := {name: _s_chain_parent(name, lines, subjects) | some name, _ in subjects}
 }
 
 _s_from_part(name, lines, subjects, narrow) := _s_from_read(name, lines[name], subjects, narrow) if name in object.keys(lines)
@@ -5375,11 +5375,18 @@ _s_whose_filters(_, []) := {}
 
 _s_whose_filters(prefix, conds) := {"applies_to": {concat("", [prefix, _s_filter_name(i, count(conds))]): c | some i, c in conds}} if conds != []
 
-_s_filter_prefix(name, narrow) := concat("", [format_int(count(graph.reachable(narrow, [name])) - 1, 10), " ", name, " "])
+_s_filter_prefix(name, chain) := concat("", [_s_pad(count(graph.reachable(chain, [name])) - 1, 3), " ", _text(name), " "])
 
-_s_narrow_parent(n, lines, subjects) := [lines[n].path.steps[0]] if {
+_s_pad(i, width) := concat("", [substring("          ", 0, width - count(format_int(i, 10))), format_int(i, 10)]) if count(format_int(i, 10)) <= width
+
+_s_pad(i, width) := format_int(i, 10) if count(format_int(i, 10)) > width
+
+_s_chain_parent(n, lines, subjects) := [lines[n].path.steps[0]] if {
 	"path" in object.keys(object.get(lines, n, {}))
 	_s_narrows(n, lines[n], subjects)
+} else := [subjects[n].of] if {
+	is_object(subjects[n])
+	is_string(object.get(subjects[n], "of", null))
 } else := []
 
 _s_filter_name(i, n) := concat("", ["whose ", strings.replace_n({" ": "0"}, sprintf_pad)]) if {

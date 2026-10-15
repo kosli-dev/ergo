@@ -9185,3 +9185,25 @@ test_subjects_that_narrow_each_other_lead_to_a_loop if {
 	rep := _narrow_report({"x": {"from": "y whose id exists"}, "y": {"from": "x whose id exists"}}, "x")
 	_from_problems(rep) == [{"name": "subjects.x.from", "value": ["leads to a loop"]}]
 }
+
+test_a_narrowing_chain_through_of_prints_its_from_line_conditions_outer_first_and_its_applies_to_after if {
+	subjects := {
+		"defect": {"from": `defects whose status is "open"`, "id": "id"},
+		"mid": {"of": "defect", "applies_to": {"0 mid": {"op": "equals", "path": ["severity"], "value": "critical"}}},
+		"child": {"from": `mid whose team is "b"`},
+	}
+	rep := _narrow_report(subjects, "child")
+	_kept(rep) == [4]
+	rep.requirements.r.checks["$applies"].expression == `status is "open" and team is "b" and severity == "critical"`
+}
+
+test_a_narrowing_chain_deeper_than_ten_prints_in_order if {
+	subjects := object.union({"s0": {"from": "defects whose id exists", "id": "id"}}, {concat("", ["s", format_int(n, 10)]): {"from": concat("", ["s", format_int(n - 1, 10), " whose id is not ", format_int(100 + n, 10)])} | some n in numbers.range(1, 11)})
+	rep := _narrow_report(subjects, "s11")
+	rep.requirements.r.checks["$applies"].expression == concat(" and ", array.concat(["id exists"], [concat("", ["id is not ", format_int(100 + n, 10)]) | some n in numbers.range(1, 11)]))
+}
+
+test_a_subject_name_that_isnt_a_string_gives_the_same_report_with_strict_builtins if {
+	rep := ergo.report({"defects": [{"id": 1}]}, {"subjects": {1: {"from": "defects whose id exists"}}, "requirements": {"r": {"subject": "c", "checks": {"c": "id exists"}}}}, {})
+	rep.requirements.r.status == "not_met"
+}
