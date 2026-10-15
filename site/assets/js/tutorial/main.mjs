@@ -1,5 +1,5 @@
 import opa from "../../tutorial/vendor/opa-wasm.mjs";
-import { makeRunner, bakeryBatches, defaultNames, checkLines, nameProblem, nameCoach, tutorialPolicy, lineResults, verdict, verdictWord, requirementCoach, gridFromReport, cellLine, subjectsStatus, subjectsCoach, yamlLines, layoutMetrics, createEnterGate, serializeProgress, restoreProgress, layoutLines, keyAction, goalKindAt, parseInput, clampPosition, progressDots, resultLine, freshDraft, dimResult, jsonSegments, fieldHighlights, segmentClasses, isAt, evidence, grade, intro, makeChecker, parseTime, positions, showMeVisible, steps, straighten } from "./lib.mjs";
+import { defaultCell, cellHighlight, makeRunner, bakeryBatches, defaultNames, checkLines, nameProblem, nameCoach, tutorialPolicy, lineResults, verdict, verdictWord, requirementCoach, gridFromReport, cellLine, subjectsStatus, subjectsCoach, yamlLines, layoutMetrics, createEnterGate, serializeProgress, restoreProgress, layoutLines, keyAction, goalKindAt, parseInput, clampPosition, progressDots, resultLine, freshDraft, dimResult, jsonSegments, fieldHighlights, segmentClasses, isAt, evidence, grade, intro, makeChecker, parseTime, positions, showMeVisible, steps, straighten } from "./lib.mjs";
 
 const root = document.getElementById("tutorial");
 const $ = (name) => root.querySelector(`[data-${name}]`);
@@ -189,7 +189,7 @@ const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 const customKinds = new Set(["names", "requirement", "subjects", "policy"]);
 const isCustom = () => customKinds.has(goalNow().kind);
 const runner = { run: null };
-const stageState = { selected: null, view: "policy", hover: "" };
+const stageState = { selected: null, view: "policy", hover: "", grid: null, cell: null, full: false };
 const refs = {};
 
 const fieldsOf = (step) => drafts[step]?.fields ?? {};
@@ -237,16 +237,39 @@ const lineRow = (tag, parts) => {
 };
 
 const fitTall = () => {
-  if (!steps[here()?.step]?.collapse || el.step.hidden) return;
+  if (!steps[here()?.step]?.collapse || el.step.hidden) return true;
   const cs = getComputedStyle(el.step);
   const shown = [...el.step.children].filter((c) => !c.hidden);
   const others = shown.filter((c) => c !== el.fixed && c !== el.result).reduce((n, c) => n + c.getBoundingClientRect().height, 0);
-  const free = el.step.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - (parseFloat(cs.rowGap) || 0) * (shown.length - 1) - others - 178;
+  const free = el.step.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - (parseFloat(cs.rowGap) || 0) * (shown.length - 1) - others - Math.max(178, el.result.firstElementChild?.offsetHeight ?? 0);
   for (let f = 14; f >= 11; f -= 0.5) {
     el.fixed.style.fontSize = `${f}px`;
-    if (el.fixed.offsetHeight <= free) return;
+    if (el.fixed.offsetHeight <= free) return true;
   }
   el.fixed.style.fontSize = "11px";
+  return false;
+};
+
+const updateCell = () => {
+  const f = draft().fields;
+  const [id, name] = (stageState.selected ?? "").split("|");
+  const sentence = checkLines(nameFor()).find((l) => l.name === name)?.sentence;
+  stageState.cell = stageState.grid && sentence ? cellHighlight(parseInput(el.input.value).value, (f.from ?? "").trim(), (f.id ?? "").trim(), id, sentence) : null;
+};
+
+const layoutBatches = () => {
+  const s = steps[here()?.step];
+  if (!s?.collapse || el.step.hidden) return;
+  updateCell();
+  stageState.full = false;
+  if (stageState.grid) {
+    stageState.full = true;
+    showView(s, draft());
+    if (fitTall()) return;
+    stageState.full = false;
+  }
+  showView(s, draft());
+  fitTall();
 };
 
 const hoverLine = (sentence) => {
@@ -386,10 +409,12 @@ const evaluateStage = () => {
     const id = (f.id ?? "").trim();
     const name = nameFor();
     const heading = headingFor();
+    stageState.grid = null;
     const report = from === "" ? null : runner.run(bakeryBatches, tutorialPolicy({ name, heading, from, id: id || "id" }));
     const state = subjectsStatus({ from, id }, report);
     say = subjectsCoach({ from, id }, state);
     el.result.replaceChildren(say.met ? gridNode(report, heading, name) : make("div"));
+    if (!stageState.grid) stageState.selected = null;
     applyHighlight();
   } else if (kind === "policy") {
     say = { kind: "phrase", text: stageState.note || "This is YAML. You can write the same policy in JSON." };
@@ -400,7 +425,7 @@ const evaluateStage = () => {
   setNext();
   el.showme.hidden = true;
   applyHighlight();
-  fitTall();
+  layoutBatches();
   if (gate.evaluated(met)) el.next.click();
 };
 
@@ -408,6 +433,8 @@ const gridNode = (report, heading, name) => {
   const names = checkLines(name).map((l) => l.name);
   const key = Object.keys(report.requirements)[0];
   const grid = gridFromReport(report, key, names);
+  stageState.grid = grid;
+  if (!stageState.selected || !grid.cells[stageState.selected]) stageState.selected = defaultCell(grid);
   const wrap = make("div", "tut__gridwrap");
   const status = grid.status === "met";
   const head = make("p", `tut__gridhead ${status ? "t" : "f"}`);
@@ -429,6 +456,7 @@ const gridNode = (report, heading, name) => {
         detail.textContent = cellLine(grid, id, n);
         for (const o of table.querySelectorAll(".tut__cell")) o.classList.remove("is-picked");
         b.classList.add("is-picked");
+        layoutBatches();
       });
       table.append(b);
     }
@@ -470,10 +498,24 @@ const subjectHighlights = (value) => {
 const applyHighlight = () => {
   if (!viewSegs.length) return;
   const value = parseInput(el.input.value).value;
+  if (goalNow().kind === "subjects" && stageState.grid) {
+    const cell = stageState.cell;
+    for (const { node, seg } of viewSegs) {
+      node.className = cell?.hl && seg.slot === cell.slot ? segmentClasses(seg, cell.hl).join(" ") : "";
+    }
+    return;
+  }
   const hl = !value ? [] : isCustom() ? customHighlights(value) : fieldHighlights(el.sentence.value, value);
   for (const { node, seg } of viewSegs) {
     node.className = segmentClasses(seg, hl).join(" ");
   }
+};
+
+const viewOptions = (s) => {
+  if (s.collapse !== true) return { flat: s.flat === true };
+  if (!stageState.grid) return { collapse: true };
+  if (stageState.full) return { shortIds: (draft().fields.id ?? "").trim() };
+  return { collapse: true, expand: stageState.cell?.slot };
 };
 
 const showView = (s, d) => {
@@ -486,7 +528,7 @@ const showView = (s, d) => {
   }
   const mark = s.view?.mark;
   const flash = !reduced() && !d.viewed;
-  const segs = jsonSegments(parsed.value, { collapse: s.collapse === true, flat: s.flat === true });
+  const segs = jsonSegments(parsed.value, viewOptions(s));
   const laid = layoutLines(segs);
   const metrics = layoutMetrics(laid);
   const tall = metrics.lines > 1 || s.flat === true;
@@ -588,6 +630,8 @@ const go = (n, fresh = false, focus = true) => {
     el.stage.hidden = !custom;
     el.result.hidden = false;
     stageState.selected = null;
+    stageState.grid = null;
+    stageState.cell = null;
     stageState.note = "";
     stageState.view = "policy";
     if (custom) {
@@ -689,7 +733,7 @@ el.next.addEventListener("click", () => {
   }
 });
 window.addEventListener("resize", () => {
-  fitTall(); if (!el.step.hidden) { if (!el.input.hidden) fit(el.input); fit(el.sentence); } });
+  layoutBatches(); if (!el.step.hidden) { if (!el.input.hidden) fit(el.input); fit(el.sentence); } });
 
 $("intro-line1").textContent = intro.lines[0];
 $("intro-example").textContent = intro.example;

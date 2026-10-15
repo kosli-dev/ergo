@@ -462,27 +462,39 @@ const holdsObject = (v) => isObj(v) || (Array.isArray(v) && v.some(isObj));
 
 export const isPretty = (value) => isObj(value) && Object.values(value).some(holdsObject);
 
+const lastThree = (id) => `\u2026${String(id).slice(-3)}`;
+
 export const jsonSegments = (value, opts = {}) => {
   const out = [];
-  const text = (s, within) => out.push({ text: s, within });
-  const scalar = (v, path, within, index) => out.push({ text: JSON.stringify(v), within, leafOf: path ? pid(path) : null, index, raw: v });
+  let slot = null;
+  const tag = () => (slot === null ? {} : { slot });
+  const text = (s, within) => out.push({ text: s, within, ...tag() });
+  const scalar = (v, path, within, index) => {
+    const short = opts.shortIds && typeof v === "string" && path?.at(-1) === opts.shortIds && path.at(-2) === "*";
+    out.push({ text: JSON.stringify(short ? lastThree(v) : v), within, leafOf: path ? pid(path) : null, index, raw: v, ...tag() });
+  };
   const compact = (v, path, within) => {
     if (Array.isArray(v)) {
       text("[", within);
       v.forEach((item, i) => {
         if (i > 0) text(", ", within);
         if (isScalar(item)) scalar(item, path, within, i);
-        else compact(item, path ? [...path, "*"] : null, within);
+        else {
+          const outer = slot;
+          if (path && !path.includes("*")) slot = i;
+          compact(item, path ? [...path, "*"] : null, within);
+          slot = outer;
+        }
       });
       text("]", within);
     } else if (isObj(v)) {
       text("{", within);
-      const collapsed = opts.collapse && path?.includes("*");
+      const collapsed = opts.collapse && path?.includes("*") && slot !== opts.expand;
       Object.entries(v).forEach(([k, val], i) => {
         if (collapsed && i > 0) return;
         if (i > 0) text(", ", within);
         const child = path ? [...path, k] : null;
-        out.push({ text: JSON.stringify(k), within, key: child ? pid(child) : null });
+        out.push({ text: JSON.stringify(k), within, key: child ? pid(child) : null, ...tag() });
         text(": ", within);
         compact(val, child, child ? [...within, pid(child)] : within);
       });
@@ -514,7 +526,12 @@ export const jsonSegments = (value, opts = {}) => {
         if (i > 0) text(",\n", within);
         text(pad, within);
         if (isScalar(item)) scalar(item, path, within, i);
-        else compact(item, path ? [...path, "*"] : null, within);
+        else {
+          const outer = slot;
+          if (path && !path.includes("*")) slot = i;
+          compact(item, path ? [...path, "*"] : null, within);
+          slot = outer;
+        }
       });
       text(`\n${end}]`, within);
     }
@@ -934,7 +951,21 @@ export const gridFromReport = (report, key, checks) => {
 
 export const cellLine = (grid, id, check) => {
   const c = grid.cells[`${id}|${check}`];
-  return c ? `${shortId(id)} · ${check} · ${c.passed ? "satisfied" : c.cause} · ${c.value}` : "";
+  return c ? `${c.passed ? "satisfied" : c.cause} · ${c.value}` : "";
+};
+
+export const defaultCell = (grid) => {
+  const all = grid.ids.flatMap((id) => grid.checks.map((n) => `${id}|${n}`));
+  return all.find((k) => grid.cells[k]?.passed === false) ?? all[0] ?? null;
+};
+
+export const cellHighlight = (value, from, idField, id, sentence) => {
+  const list = isObj(value) ? value[from] : null;
+  const slot = Array.isArray(list) ? list.findIndex((b) => isObj(b) && b[idField] === id) : -1;
+  if (slot < 0) return null;
+  const { exact } = fieldHighlight(sentence, list[slot]);
+  const hl = exact ? { exact: [from, "*", ...exact], partial: [], item: null, valueLine: true, lists: [] } : null;
+  return { slot, hl };
 };
 
 export const subjectsStatus = ({ from, id }, report) => {

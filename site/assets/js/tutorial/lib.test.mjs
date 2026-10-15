@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import opa from "../../tutorial/vendor/opa-wasm.mjs";
 import * as lib from "./lib.mjs";
-import { makeRunner, defaultNames, checkLines, slug, nameProblem, nameCoach, tutorialPolicy, lineResults, verdict, verdictWord, tapOutcome, requirementCoach, gridFromReport, cellLine, subjectsStatus, subjectsCoach, yamlLines, policyYaml, bakeryBatches, createEnterGate, serializeProgress, restoreProgress, layoutLines, splitSentences, fieldHighlights, keyAction, goalKindAt, isPretty, firstPositionOf, progressDots, resultLine, carryFrom, dimResult, freshDraft, judgePrediction, jsonSegments, fieldHighlight, segmentClasses, isAt, showMeVisible, buildPolicy, clampPosition, intro, positions, evidence, grade, makeChecker, parseInput, parseTime, steps, straighten } from "./lib.mjs";
+import { defaultCell, cellHighlight, makeRunner, defaultNames, checkLines, slug, nameProblem, nameCoach, tutorialPolicy, lineResults, verdict, verdictWord, tapOutcome, requirementCoach, gridFromReport, cellLine, subjectsStatus, subjectsCoach, yamlLines, policyYaml, bakeryBatches, createEnterGate, serializeProgress, restoreProgress, layoutLines, splitSentences, fieldHighlights, keyAction, goalKindAt, isPretty, firstPositionOf, progressDots, resultLine, carryFrom, dimResult, freshDraft, judgePrediction, jsonSegments, fieldHighlight, segmentClasses, isAt, showMeVisible, buildPolicy, clampPosition, intro, positions, evidence, grade, makeChecker, parseInput, parseTime, steps, straighten } from "./lib.mjs";
 
 const wasm = readFileSync(new URL("../../tutorial/ergo.wasm", import.meta.url));
 const ergo = await opa.loadPolicy(wasm, undefined, { "time.parse_rfc3339_ns": parseTime });
@@ -1123,11 +1123,84 @@ test("step 11: four batches, only the first passes, and the causes are value, un
 
 test("step 11 cell lines say the cause and the value that was read", () => {
   const grid = gridFromReport(bakery("batches", "id"), "safe_to_sell", names11());
-  assert.equal(cellLine(grid, "cake-batch-2026-03-18-002", "nut_free"), '…002 · nut_free · value · allergens = ["nuts","milk"]');
-  assert.equal(cellLine(grid, "cake-batch-2026-03-18-003", "nut_free"), '…003 · nut_free · unusable · allergens = "nuts"');
-  assert.equal(cellLine(grid, "cake-batch-2026-03-18-004", "nut_free"), "…004 · nut_free · absent · allergens = not in the input");
-  assert.equal(cellLine(grid, "cake-batch-2026-03-18-001", "temp_ok"), "…001 · temp_ok · satisfied · bake.temp_c = 180");
+  assert.equal(cellLine(grid, "cake-batch-2026-03-18-002", "nut_free"), 'value · allergens = ["nuts","milk"]');
+  assert.equal(cellLine(grid, "cake-batch-2026-03-18-003", "nut_free"), 'unusable · allergens = "nuts"');
+  assert.equal(cellLine(grid, "cake-batch-2026-03-18-004", "nut_free"), "absent · allergens = not in the input");
+  assert.equal(cellLine(grid, "cake-batch-2026-03-18-001", "temp_ok"), "satisfied · bake.temp_c = 180");
   assert.equal(grid.shortId("cake-batch-2026-03-18-004"), "…004");
+});
+
+test("step 11 opens on the first failing cell, which is the nut check of batch 002", () => {
+  const grid = gridFromReport(bakery("batches", "id"), "safe_to_sell", names11());
+  assert.equal(defaultCell(grid), "cake-batch-2026-03-18-002|nut_free");
+});
+
+test("the default cell is the first cell when nothing fails, and null with no batches", () => {
+  const grid = { ids: ["a", "b"], checks: ["x", "y"], cells: { "a|x": { passed: true }, "a|y": { passed: true }, "b|x": { passed: true }, "b|y": { passed: true } } };
+  assert.equal(defaultCell(grid), "a|x");
+  assert.equal(defaultCell({ ids: [], checks: ["x"], cells: {} }), null);
+});
+
+test("the default cell skips a failing cell later in the row and finds an earlier row first", () => {
+  const grid = { ids: ["a", "b"], checks: ["x", "y"], cells: { "a|x": { passed: true }, "a|y": { passed: false }, "b|x": { passed: false }, "b|y": { passed: true } } };
+  assert.equal(defaultCell(grid), "a|y");
+});
+
+const sentenceOf = (check) => checkLines("nut_free").find((l) => l.name === check).sentence;
+const hlFor = (n, check) => cellHighlight(bakeryBatches, "batches", "id", `cake-batch-2026-03-18-00${n}`, sentenceOf(check));
+
+test("each check highlights the field it reads in its own batch", () => {
+  assert.deepEqual(hlFor(2, "nut_free").hl.exact, ["batches", "*", "allergens"]);
+  assert.deepEqual(hlFor(2, "temp_ok").hl.exact, ["batches", "*", "bake", "temp_c"]);
+  assert.deepEqual(hlFor(1, "time_ok").hl.exact, ["batches", "*", "bake", "minutes"]);
+  assert.equal(hlFor(3, "nut_free").slot, 2);
+  assert.deepEqual(hlFor(3, "nut_free").hl.exact, ["batches", "*", "allergens"]);
+});
+
+test("a batch with no allergens key highlights nothing but still names its row", () => {
+  assert.deepEqual(hlFor(4, "nut_free"), { slot: 3, hl: null });
+});
+
+test("no highlight when the list key is wrong or the batch is not there", () => {
+  assert.equal(cellHighlight(bakeryBatches, "nope", "id", "x", "allergens"), null);
+  assert.equal(cellHighlight(bakeryBatches, "batches", "id", "missing", "allergens"), null);
+  assert.equal(cellHighlight(null, "batches", "id", "x", "allergens"), null);
+  assert.equal(cellHighlight({ batches: "nuts" }, "batches", "id", "x", "allergens"), null);
+});
+
+test("segments of a batch carry its place in the list, and only those", () => {
+  const segs = jsonSegments(bakeryBatches);
+  const slots = [...new Set(segs.filter((x) => x.slot !== undefined).map((x) => x.slot))];
+  assert.deepEqual(slots, [0, 1, 2, 3]);
+  assert.equal(segs.filter((x) => x.slot === undefined).map((x) => x.text).join("").includes("cake-batch"), false);
+  const hl = hlFor(2, "nut_free");
+  const marked = segs.filter((x) => segmentClasses(x, hl.hl).includes("is-field")).map((x) => x.slot);
+  assert.deepEqual(marked, [0, 1, 2]);
+});
+
+test("short ids change only the shown text of the id, not its value", () => {
+  const segs = jsonSegments(bakeryBatches, { shortIds: "id" });
+  const ids = segs.filter((x) => x.leafOf === JSON.stringify(["batches", "*", "id"]));
+  assert.deepEqual(ids.map((x) => x.text), ['"…001"', '"…002"', '"…003"', '"…004"']);
+  assert.deepEqual(ids.map((x) => x.raw), bakeryBatches.batches.map((b) => b.id));
+  assert.equal(segs.map((x) => x.text).join("").includes("cake-batch"), false);
+  assert.equal(jsonSegments(bakeryBatches).map((x) => x.text).join("").includes("cake-batch-2026-03-18-001"), true);
+});
+
+test("full mode shows every batch whole on one line each", () => {
+  const text = jsonSegments(bakeryBatches, { shortIds: "id" }).map((x) => x.text).join("");
+  const lines = text.split("\n").filter((l) => l.includes("…"));
+  assert.equal(lines.length, 4);
+  assert.equal(lines[1].trim(), '{"id": "…002", "allergens": ["nuts", "milk"], "bake": {"minutes": 32, "temp_c": 180}},');
+  assert.equal(lines[3].trim(), '{"id": "…004", "bake": {"minutes": 32, "temp_c": 180}}');
+});
+
+test("collapsing can leave one batch open in full", () => {
+  const text = jsonSegments(bakeryBatches, { collapse: true, expand: 2 }).map((x) => x.text).join("");
+  const lines = text.split("\n").filter((l) => l.includes("cake-batch"));
+  assert.equal(lines.length, 4);
+  assert.deepEqual(lines.map((l) => l.includes("…")), [true, true, false, true]);
+  assert.equal(lines[2].trim(), '{"id": "cake-batch-2026-03-18-003", "allergens": "nuts", "bake": {"minutes": 32, "temp_c": 180}},');
 });
 
 test("step 11 is met only by the real list key and a real name field", () => {
