@@ -62,8 +62,6 @@ Every rule needs a case, apart from the ones listed here. The `sentence` rules h
 - `sentence.forms`
 - `sentence.flat`
 - `sentence.subject.chain`
-- `sentence.subject.quoted`
-- `sentence.subject.narrow`
 - `sentence.subject.depth`
 - `sentence.argument.subject`
 - `sentence.for.depth`

@@ -9139,3 +9139,71 @@ test_a_from_line_next_to_of_adds_no_filters_of_its_own if {
 	policy := {"subjects": {"d": {"from": "ds"}, "e": {"of": "d", "from": `ds whose t is "e"`}}, "requirements": {"r": {"subject": "e", "checks": {"c": "id exists"}}}}
 	_from_problems(ergo.report({"ds": [{"id": 1}]}, policy, {})) == [{"name": "subjects.e.from", "value": ["not allowed with of"]}]
 }
+
+_defects := {"defects": [
+	{"id": 1, "severity": "critical", "status": "open", "team": "a"},
+	{"id": 2, "severity": "low", "status": "open", "team": "a"},
+	{"id": 3, "severity": "critical", "status": "closed", "team": "b"},
+	{"id": 4, "severity": "critical", "status": "open", "team": "b"},
+]}
+
+_narrow_report(subjects, name) := ergo.report(_defects, {"subjects": subjects, "requirements": {"r": {"subject": name, "checks": {"c": "id exists"}}}}, {})
+
+_kept(rep) := [r.subject.id | some r in rep.results; r.check == "c"]
+
+test_a_from_line_that_names_another_subject_narrows_it if {
+	subjects := {"defect": {"from": "defects", "id": "id"}, "critical defect": {"from": `defect whose severity is "critical" and status is one of "open", "in_progress"`}}
+	rep := _narrow_report(subjects, "critical defect")
+	_kept(rep) == [1, 4]
+	rep.requirements.r.checks["$applies"].expression == `severity is "critical" and status is one of "open", "in_progress"`
+	_from_problems(rep) == []
+	_kept(_narrow_report({"defect": {"from": "defects", "id": "id"}, "all": {"from": "defect"}}, "all")) == [1, 2, 3, 4]
+}
+
+test_a_chain_of_narrowing_subjects_prints_the_outer_conditions_first if {
+	subjects := {
+		"defect": {"from": "defects whose status exists", "id": "id"},
+		"critical defect": {"from": `defect whose severity is "critical"`},
+		"team b defect": {"from": `"critical defect" whose team is "b"`},
+	}
+	rep := _narrow_report(subjects, "team b defect")
+	_kept(rep) == [3, 4]
+	rep.requirements.r.checks["$applies"].expression == `status exists and severity is "critical" and team is "b"`
+}
+
+test_a_from_line_can_narrow_a_subject_written_with_op if {
+	subjects := {"defect": {"from": ["defects"], "id": ["id"], "applies_to": {"open": {"op": "equals", "path": ["status"], "value": "open"}}}, "critical defect": {"from": `defect whose severity is "critical"`}}
+	_kept(_narrow_report(subjects, "critical defect")) == [1, 4]
+}
+
+test_a_narrowing_subject_takes_its_id_from_the_one_it_narrows if {
+	subjects := {"defect": {"from": "defects", "id": "id"}, "critical defect": {"from": `defect whose severity is "critical"`, "id": "team"}}
+	_from_problems(_narrow_report(subjects, "critical defect")) == [{"name": `subjects."critical defect".id`, "value": ["not allowed with of"]}]
+}
+
+test_subjects_that_narrow_each_other_lead_to_a_loop if {
+	rep := _narrow_report({"x": {"from": "y whose id exists"}, "y": {"from": "x whose id exists"}}, "x")
+	_from_problems(rep) == [{"name": "subjects.x.from", "value": ["leads to a loop"]}]
+}
+
+test_a_narrowing_chain_through_of_prints_its_from_line_conditions_outer_first_and_its_applies_to_after if {
+	subjects := {
+		"defect": {"from": `defects whose status is "open"`, "id": "id"},
+		"mid": {"of": "defect", "applies_to": {"0 mid": {"op": "equals", "path": ["severity"], "value": "critical"}}},
+		"child": {"from": `mid whose team is "b"`},
+	}
+	rep := _narrow_report(subjects, "child")
+	_kept(rep) == [4]
+	rep.requirements.r.checks["$applies"].expression == `status is "open" and team is "b" and severity == "critical"`
+}
+
+test_a_narrowing_chain_deeper_than_ten_prints_in_order if {
+	subjects := object.union({"s0": {"from": "defects whose id exists", "id": "id"}}, {concat("", ["s", format_int(n, 10)]): {"from": concat("", ["s", format_int(n - 1, 10), " whose id is not ", format_int(100 + n, 10)])} | some n in numbers.range(1, 11)})
+	rep := _narrow_report(subjects, "s11")
+	rep.requirements.r.checks["$applies"].expression == concat(" and ", array.concat(["id exists"], [concat("", ["id is not ", format_int(100 + n, 10)]) | some n in numbers.range(1, 11)]))
+}
+
+test_a_subject_name_that_isnt_a_string_gives_the_same_report_with_strict_builtins if {
+	rep := ergo.report({"defects": [{"id": 1}]}, {"subjects": {1: {"from": "defects whose id exists"}}, "requirements": {"r": {"subject": "c", "checks": {"c": "id exists"}}}}, {})
+	rep.requirements.r.status == "not_met"
+}
