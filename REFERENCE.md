@@ -668,9 +668,58 @@ The check's `expression` is `approved_by is not empty and reviewed_at is before 
 - Each entry in `failed_items` gives the field that failed as `path`, and the item it belongs to as `item`, so a tool can show the item by reading the input there. A list that's missing, `null`, not a list or empty is listed in its items' place.
 - An empty list fails `every` as `value`, because no commits isn't proof that every commit is signed. Write `, if any,` after the path to let empty lists pass: `every review.incidents, if any, is not empty`. A missing list still fails.
 - `whose` keeps the items that pass its conditions, read on each item: `some pull_requests.approvers whose state is "APPROVED" exists` passes above, with `bob`'s approval. An item a condition can't decide, because the field it reads is missing, fails the check rather than being left out.
-- In a one-line `every` or `some`, a field on the right of the phrase is the item's too, so `some approvers.timestamp whose state is "APPROVED" is after last_commit` reads both from each approver. A field of the subject can't be reached from there yet, since that needs a `for` line.
+- In a one-line `every` or `some`, a field on the right of the phrase is the item's too, so `some approvers.timestamp whose state is "APPROVED" is after last_commit` reads both from each approver. To compare with a field of the subject, use a `for` line, below.
 - `every` and `some` paths can be ten steps long.
-- `contains` and the other list phrases can't follow `every` or `some`, because the last list is walked too, so `every pull_requests.labels does not contain "hotfix"` would ask each label. It's written wrong, and the message says to put the walk on a `for` line, which ergo doesn't run yet.
+- `contains` and the other list phrases can't follow `every` or `some`, because the last list is walked too, so `every pull_requests.labels does not contain "hotfix"` would ask each label. It's written wrong, and the message says to put the walk on a `for` line.
+
+A `for` line names the items of one or two lists, so the sentences under `assert` can read an item and the subject together. Each item is `every` or `some`, a path, an optional `whose`, and `as` a name. The second item can walk a list inside the first, by its name. With the input above:
+
+```yaml
+peer_approved:
+  description: Someone other than the author approved every pull request
+  for: every pull_requests as pr, some pr.approvers as approver
+  assert:
+    - approver.state is "APPROVED"
+    - approver.username does not equal pr.author
+```
+
+reads "for every pull request, some approver approved it and isn't its author". Both sentences have to hold for the same approver. The check's `expression` is `for every pull_requests as pr, some pr.approvers as approver: approver.state is "APPROVED" and approver.username does not equal pr.author`, and it gives:
+
+```json
+{
+  "cause": "value",
+  "check": "peer_approved",
+  "failed_items": [
+    {
+      "cause": "value",
+      "failed_assertions": [
+        {"assertion": "approver.state is \"APPROVED\"", "cause": "value"},
+        {"assertion": "approver.username does not equal pr.author", "cause": "value"}
+      ],
+      "item": "item 2 of pull_requests",
+      "path": "item 2 of pull_requests",
+      "value": null
+    }
+  ],
+  "inputs": [
+    {"name": "pr.approvers[]", "value": [{"state": "APPROVED", "username": "bob"}, {"state": "COMMENTED", "username": "bob"}]},
+    {"name": "pull_requests[]", "value": [
+      {"approvers": [{"state": "APPROVED", "username": "bob"}], "author": "ann", "commits": [{"sha": "a1", "signed": true}, {"sha": "a2", "signed": false}], "number": 7},
+      {"approvers": [{"state": "COMMENTED", "username": "bob"}], "author": "bob", "number": 8}
+    ]}
+  ],
+  "passed": false,
+  "requirement": "release",
+  "subject": {"id": "r-1", "type": "release"}
+}
+```
+
+- `failed_items` lists the items of the first list that failed. Each one has `failed_assertions`: the sentences that failed for it, each with the first cause it failed with. Pull request 8 failed because its one approver commented, and is its author.
+- `failed_assertions` is `[]` when no sentence was checked, like when `whose` leaves no approver, or a field a `whose` reads is missing.
+- `inputs` holds each list the `for` line walked, with its items, and every field of the subject the sentences read. A field read through a name, like `pr.author`, isn't listed on its own.
+- In `assert`, a bare first key is the subject's field, and a name reaches its item. Inside an item's own `whose`, a bare key is that item's field. A name hides a field of the subject with the same name.
+- Each list fails as a one-line `every` or `some` does: empty, missing, `null` or not a list, and `, if any,` lets an empty one pass.
+- Two items at most. `named by` a name, like `shas named by persona`, isn't supported yet.
 
 A sentence that can't be read is [written wrong](#basic-operators), and the `$well_formed` row says why, with the column when it can:
 
@@ -680,7 +729,7 @@ A sentence that can't be read is [written wrong](#basic-operators), and the `$we
 
 for `prod: environment is "prod`. `x is not null` is written wrong too, because it could only fail: write `x exists`. So is a value that isn't a number before `within`, like `x is "a" within 1`. An object with both `assert` and `op` is read as a check with an `op`, so a [custom operator](#custom-operators) can still take `assert`.
 
-ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `count of`, `sum of`, `plus`, `last of`, a `for` line, a value after `is before` and the other time phrases, a field of the subject after `is in`, `contains` and the other phrases that take a list, and a list path with `named by` in it. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `tickets: count of tickets is at least 1` gives:
+ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `count of`, `sum of`, `plus`, `last of`, `named by` a name from a `for` line, a value after `is before` and the other time phrases, a field of the subject after `is in`, `contains` and the other phrases that take a list, and a list path with `named by` in it. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `tickets: count of tickets is at least 1` gives:
 
 ```json
 {"name": "checks.tickets", "value": ["count of, sum of and plus aren't supported yet"]}

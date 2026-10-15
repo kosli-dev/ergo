@@ -56,7 +56,7 @@ Three ways to settle it:
 
 ## Rules without cases
 
-Every rule needs a case, apart from the ones listed here. The `sentence` rules here are for forms `ergo.rego` doesn't run yet. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.
+Every rule needs a case, apart from the ones listed here. The `sentence` rules here are for forms `ergo.rego` doesn't run or check yet. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.
 
 - `compare.derived`
 - `sentence.forms`
@@ -76,11 +76,5 @@ Every rule needs a case, apart from the ones listed here. The `sentence` rules h
 - `sentence.derived.sum`
 - `sentence.derived.plus`
 - `sentence.derived.compare`
-- `sentence.for.line`
 - `sentence.for.depth`
-- `sentence.for.scope`
-- `sentence.for.name`
-- `sentence.for.fail`
-- `sentence.for.comma`
-- `sentence.for.assert`
 - `sentence.derived.fail`

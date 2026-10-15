@@ -1,0 +1,5472 @@
+[
+  {
+    "description": "every over one list on a for line",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every commits as c",
+              "assert": "c.signed is true"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes when every item passes, and failed_items is empty",
+        "rules": [
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.for.line",
+          "sentence.for.name",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": [
+                {
+                  "signed": true
+                },
+                {
+                  "signed": true
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "signed": true
+                  },
+                  {
+                    "signed": true
+                  }
+                ]
+              }
+            ],
+            "failed_items": []
+          }
+        ]
+      },
+      {
+        "description": "fails as value when an item fails, and lists the item with the sentence that failed",
+        "rules": [
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.for.line",
+          "sentence.for.assert",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": [
+                {
+                  "signed": true
+                },
+                {
+                  "signed": false
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "signed": true
+                  },
+                  {
+                    "signed": false
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 2 of commits",
+                "item": "item 2 of commits",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "c.signed is true",
+                    "cause": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "lists every item that fails, in list order",
+        "rules": [
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": [
+                {
+                  "signed": false
+                },
+                {
+                  "signed": true
+                },
+                {
+                  "signed": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "signed": false
+                  },
+                  {
+                    "signed": true
+                  },
+                  {
+                    "signed": 1
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 1 of commits",
+                "item": "item 1 of commits",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "c.signed is true",
+                    "cause": "value"
+                  }
+                ]
+              },
+              {
+                "path": "item 3 of commits",
+                "item": "item 3 of commits",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "c.signed is true",
+                    "cause": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "an item whose field is missing fails as absent",
+        "rules": [
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": [
+                {
+                  "signed": true
+                },
+                {}
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "signed": true
+                  },
+                  {}
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 2 of commits",
+                "item": "item 2 of commits",
+                "cause": "absent",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "c.signed is true",
+                    "cause": "absent"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as value on an empty list, and lists the list",
+        "rules": [
+          "sentence.for.fail",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "commits",
+                "item": "commits",
+                "cause": "value",
+                "value": [],
+                "failed_assertions": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when the list is missing",
+        "rules": [
+          "sentence.for.fail",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "commits",
+                "item": "commits",
+                "cause": "absent",
+                "value": null,
+                "failed_assertions": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as null when the list is null",
+        "rules": [
+          "sentence.for.fail",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": null
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "null",
+            "inputs": [
+              {
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "commits",
+                "item": "commits",
+                "cause": "null",
+                "value": null,
+                "failed_assertions": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when the list is not a list",
+        "rules": [
+          "sentence.for.fail",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": "abc"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "commits",
+                "item": "commits",
+                "cause": "unusable",
+                "value": "abc",
+                "failed_assertions": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every with if any on a for line",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every commits, if any, as c",
+              "assert": "c.signed is true"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes over an empty list",
+        "rules": [
+          "sentence.for.fail",
+          "sentence.for.line",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "failed_items": []
+          }
+        ]
+      },
+      {
+        "description": "still fails as absent when the list is missing",
+        "rules": [
+          "sentence.for.fail",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "commits",
+                "item": "commits",
+                "cause": "absent",
+                "value": null,
+                "failed_assertions": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "still fails as null when the list is null",
+        "rules": [
+          "sentence.for.fail",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": null
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "null",
+            "inputs": [
+              {
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "commits",
+                "item": "commits",
+                "cause": "null",
+                "value": null,
+                "failed_assertions": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "still fails as unusable when the list is not a list",
+        "rules": [
+          "sentence.for.fail",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": {
+                "a": 1
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "commits",
+                "item": "commits",
+                "cause": "unusable",
+                "value": {
+                  "a": 1
+                },
+                "failed_assertions": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "still fails an item that fails",
+        "rules": [
+          "sentence.for.fail",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": [
+                {
+                  "signed": false
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "signed": false
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 1 of commits",
+                "item": "item 1 of commits",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "c.signed is true",
+                    "cause": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "some over one list on a for line",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "some commits as c",
+              "assert": "c.signed is true"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes when one item passes, and failed_items is empty",
+        "rules": [
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.for.line",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": [
+                {
+                  "signed": true
+                },
+                {
+                  "signed": false
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "signed": true
+                  },
+                  {
+                    "signed": false
+                  }
+                ]
+              }
+            ],
+            "failed_items": []
+          }
+        ]
+      },
+      {
+        "description": "fails as value when no item passes, and lists every item",
+        "rules": [
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": [
+                {
+                  "signed": false
+                },
+                {
+                  "signed": false
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "signed": false
+                  },
+                  {
+                    "signed": false
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 1 of commits",
+                "item": "item 1 of commits",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "c.signed is true",
+                    "cause": "value"
+                  }
+                ]
+              },
+              {
+                "path": "item 2 of commits",
+                "item": "item 2 of commits",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "c.signed is true",
+                    "cause": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as value on an empty list, because some needs an item",
+        "rules": [
+          "sentence.for.fail",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "commits",
+                "item": "commits",
+                "cause": "value",
+                "value": [],
+                "failed_assertions": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when the list is missing",
+        "rules": [
+          "sentence.for.fail",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "commits",
+                "item": "commits",
+                "cause": "absent",
+                "value": null,
+                "failed_assertions": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails with the first cause among the items, absent before value",
+        "rules": [
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.for.fail"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": [
+                {
+                  "signed": false
+                },
+                {}
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "signed": false
+                  },
+                  {}
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 1 of commits",
+                "item": "item 1 of commits",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "c.signed is true",
+                    "cause": "value"
+                  }
+                ]
+              },
+              {
+                "path": "item 2 of commits",
+                "item": "item 2 of commits",
+                "cause": "absent",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "c.signed is true",
+                    "cause": "absent"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "passes when an item passes even though another is missing its field",
+        "rules": [
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": [
+                {},
+                {
+                  "signed": true
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {},
+                  {
+                    "signed": true
+                  }
+                ]
+              }
+            ],
+            "failed_items": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "whose on a for item",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "e": {
+              "for": "every commits whose kind is \"code\" as c",
+              "assert": "c.signed is true"
+            },
+            "s": {
+              "for": "some commits whose kind is \"code\" as c",
+              "assert": "c.signed is true"
+            },
+            "i": {
+              "for": "every commits whose kind is \"code\", if any, as c",
+              "assert": "c.signed is true"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "an item that whose leaves out is not checked, and is not listed",
+        "rules": [
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.whose.item",
+          "sentence.for.line",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": [
+                {
+                  "kind": "doc",
+                  "signed": false
+                },
+                {
+                  "kind": "code",
+                  "signed": true
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "e",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": "doc",
+                    "signed": false
+                  },
+                  {
+                    "kind": "code",
+                    "signed": true
+                  }
+                ]
+              }
+            ],
+            "failed_items": []
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "i",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": "doc",
+                    "signed": false
+                  },
+                  {
+                    "kind": "code",
+                    "signed": true
+                  }
+                ]
+              }
+            ],
+            "failed_items": []
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "s",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": "doc",
+                    "signed": false
+                  },
+                  {
+                    "kind": "code",
+                    "signed": true
+                  }
+                ]
+              }
+            ],
+            "failed_items": []
+          }
+        ]
+      },
+      {
+        "description": "an item that whose keeps and that fails is listed with its position in the whole list",
+        "rules": [
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": [
+                {
+                  "kind": "doc",
+                  "signed": true
+                },
+                {
+                  "kind": "code",
+                  "signed": false
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "e",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": "doc",
+                    "signed": true
+                  },
+                  {
+                    "kind": "code",
+                    "signed": false
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 2 of commits",
+                "item": "item 2 of commits",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "c.signed is true",
+                    "cause": "value"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "i",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": "doc",
+                    "signed": true
+                  },
+                  {
+                    "kind": "code",
+                    "signed": false
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 2 of commits",
+                "item": "item 2 of commits",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "c.signed is true",
+                    "cause": "value"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "s",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": "doc",
+                    "signed": true
+                  },
+                  {
+                    "kind": "code",
+                    "signed": false
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 2 of commits",
+                "item": "item 2 of commits",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "c.signed is true",
+                    "cause": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "when whose leaves no item in, every and some fail as value and if any passes",
+        "rules": [
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.whose.every",
+          "sentence.for.fail"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": [
+                {
+                  "kind": "doc",
+                  "signed": true
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "e",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": "doc",
+                    "signed": true
+                  }
+                ]
+              }
+            ],
+            "failed_items": []
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "i",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": "doc",
+                    "signed": true
+                  }
+                ]
+              }
+            ],
+            "failed_items": []
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "s",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": "doc",
+                    "signed": true
+                  }
+                ]
+              }
+            ],
+            "failed_items": []
+          }
+        ]
+      },
+      {
+        "description": "an item whose kind is missing is undecided: every fails as absent, listing it, with no sentence checked",
+        "rules": [
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.whose.undecided",
+          "sentence.for.fail"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": [
+                {
+                  "signed": true
+                },
+                {
+                  "kind": "code",
+                  "signed": true
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "e",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "signed": true
+                  },
+                  {
+                    "kind": "code",
+                    "signed": true
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 1 of commits",
+                "item": "item 1 of commits",
+                "cause": "absent",
+                "value": null,
+                "failed_assertions": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "i",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "signed": true
+                  },
+                  {
+                    "kind": "code",
+                    "signed": true
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 1 of commits",
+                "item": "item 1 of commits",
+                "cause": "absent",
+                "value": null,
+                "failed_assertions": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "s",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "signed": true
+                  },
+                  {
+                    "kind": "code",
+                    "signed": true
+                  }
+                ]
+              }
+            ],
+            "failed_items": []
+          }
+        ]
+      },
+      {
+        "description": "under some, an undecided item and a failed item give the first cause, absent",
+        "rules": [
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.whose.undecided"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": [
+                {
+                  "signed": true
+                },
+                {
+                  "kind": "code",
+                  "signed": false
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "e",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "signed": true
+                  },
+                  {
+                    "kind": "code",
+                    "signed": false
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 1 of commits",
+                "item": "item 1 of commits",
+                "cause": "absent",
+                "value": null,
+                "failed_assertions": []
+              },
+              {
+                "path": "item 2 of commits",
+                "item": "item 2 of commits",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "c.signed is true",
+                    "cause": "value"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "i",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "signed": true
+                  },
+                  {
+                    "kind": "code",
+                    "signed": false
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 1 of commits",
+                "item": "item 1 of commits",
+                "cause": "absent",
+                "value": null,
+                "failed_assertions": []
+              },
+              {
+                "path": "item 2 of commits",
+                "item": "item 2 of commits",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "c.signed is true",
+                    "cause": "value"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "s",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "signed": true
+                  },
+                  {
+                    "kind": "code",
+                    "signed": false
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 1 of commits",
+                "item": "item 1 of commits",
+                "cause": "absent",
+                "value": null,
+                "failed_assertions": []
+              },
+              {
+                "path": "item 2 of commits",
+                "item": "item 2 of commits",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "c.signed is true",
+                    "cause": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "an item whose kind is null is undecided, and fails as null",
+        "rules": [
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.whose.undecided"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": [
+                {
+                  "kind": null,
+                  "signed": true
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "e",
+            "passed": false,
+            "cause": "null",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": null,
+                    "signed": true
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 1 of commits",
+                "item": "item 1 of commits",
+                "cause": "null",
+                "value": null,
+                "failed_assertions": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "i",
+            "passed": false,
+            "cause": "null",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": null,
+                    "signed": true
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 1 of commits",
+                "item": "item 1 of commits",
+                "cause": "null",
+                "value": null,
+                "failed_assertions": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "s",
+            "passed": false,
+            "cause": "null",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": null,
+                    "signed": true
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 1 of commits",
+                "item": "item 1 of commits",
+                "cause": "null",
+                "value": null,
+                "failed_assertions": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "an item whose kind has the wrong type is undecided, but a string that differs is just left out",
+        "rules": [
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.whose.undecided",
+          "sentence.whose.item"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": [
+                {
+                  "kind": [
+                    "code"
+                  ],
+                  "signed": true
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "e",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": [
+                      "code"
+                    ],
+                    "signed": true
+                  }
+                ]
+              }
+            ],
+            "failed_items": []
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "i",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": [
+                      "code"
+                    ],
+                    "signed": true
+                  }
+                ]
+              }
+            ],
+            "failed_items": []
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "s",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": [
+                      "code"
+                    ],
+                    "signed": true
+                  }
+                ]
+              }
+            ],
+            "failed_items": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a name that hides a field of the subject",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every commits as author",
+              "assert": "author.signed is true"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the item's field, not the subject's field of the same name",
+        "rules": [
+          "sentence.for.name",
+          "for.try",
+          "for.inputs",
+          "for.pass",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "author": "ann",
+              "commits": [
+                {
+                  "signed": true
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "signed": true
+                  }
+                ]
+              }
+            ],
+            "failed_items": []
+          }
+        ]
+      },
+      {
+        "description": "a subject whose field has that name is not read when the item lacks the field",
+        "rules": [
+          "sentence.for.name",
+          "for.try",
+          "for.failed_items",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "author": {
+                "signed": true
+              },
+              "commits": [
+                {
+                  "x": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "x": 1
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 1 of commits",
+                "item": "item 1 of commits",
+                "cause": "absent",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "author.signed is true",
+                    "cause": "absent"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a bare key in assert is a field of the subject",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every commits as c",
+              "assert": "c.author does not equal owner"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads owner on the subject and shows it in inputs, sorted with the list",
+        "rules": [
+          "sentence.for.scope",
+          "for.inputs",
+          "for.try",
+          "for.pass",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "owner": "ann",
+              "commits": [
+                {
+                  "author": "bob"
+                },
+                {
+                  "author": "cat"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "bob"
+                  },
+                  {
+                    "author": "cat"
+                  }
+                ]
+              },
+              {
+                "name": "owner",
+                "value": "ann"
+              }
+            ],
+            "failed_items": []
+          }
+        ]
+      },
+      {
+        "description": "fails when an item has the owner as author",
+        "rules": [
+          "sentence.for.scope",
+          "for.failed_items",
+          "for.inputs",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "owner": "ann",
+              "commits": [
+                {
+                  "author": "bob"
+                },
+                {
+                  "author": "ann"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "bob"
+                  },
+                  {
+                    "author": "ann"
+                  }
+                ]
+              },
+              {
+                "name": "owner",
+                "value": "ann"
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 2 of commits",
+                "item": "item 2 of commits",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "c.author does not equal owner",
+                    "cause": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when the subject has no owner",
+        "rules": [
+          "sentence.for.scope",
+          "for.try",
+          "for.inputs",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": [
+                {
+                  "author": "bob"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "bob"
+                  }
+                ]
+              },
+              {
+                "name": "owner",
+                "value": null
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 1 of commits",
+                "item": "item 1 of commits",
+                "cause": "absent",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "c.author does not equal owner",
+                    "cause": "absent"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a bare key in an item's whose is a field of the item",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "some approvals whose role is \"qa\" as approval",
+              "assert": "approval.approved_at is before started_at"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads role on the approval and started_at on the subject, even when the subject has a role",
+        "rules": [
+          "sentence.for.scope",
+          "for.try",
+          "for.inputs",
+          "for.pass",
+          "sentence.phrase.time"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "role": "dev",
+              "started_at": "2026-10-05T00:00:00Z",
+              "approvals": [
+                {
+                  "role": "dev",
+                  "approved_at": "2026-10-09T00:00:00Z"
+                },
+                {
+                  "role": "qa",
+                  "approved_at": "2026-10-01T00:00:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "approvals[]",
+                "value": [
+                  {
+                    "role": "dev",
+                    "approved_at": "2026-10-09T00:00:00Z"
+                  },
+                  {
+                    "role": "qa",
+                    "approved_at": "2026-10-01T00:00:00Z"
+                  }
+                ]
+              },
+              {
+                "name": "started_at",
+                "value": "2026-10-05T00:00:00Z"
+              }
+            ],
+            "failed_items": []
+          }
+        ]
+      },
+      {
+        "description": "fails when the qa approval came after started_at, and the dev one is not looked at",
+        "rules": [
+          "sentence.for.scope",
+          "for.failed_items",
+          "sentence.phrase.time"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "role": "qa",
+              "started_at": "2026-09-05T00:00:00Z",
+              "approvals": [
+                {
+                  "role": "dev",
+                  "approved_at": "2026-10-09T00:00:00Z"
+                },
+                {
+                  "role": "qa",
+                  "approved_at": "2026-10-01T00:00:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "approvals[]",
+                "value": [
+                  {
+                    "role": "dev",
+                    "approved_at": "2026-10-09T00:00:00Z"
+                  },
+                  {
+                    "role": "qa",
+                    "approved_at": "2026-10-01T00:00:00Z"
+                  }
+                ]
+              },
+              {
+                "name": "started_at",
+                "value": "2026-09-05T00:00:00Z"
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 2 of approvals",
+                "item": "item 2 of approvals",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "approval.approved_at is before started_at",
+                    "cause": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "two items, the second walking a list inside the first",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every pull_requests as pr, some pr.approvers whose state is \"APPROVED\" as approver",
+              "assert": "approver.username does not equal pr.author"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes when every pull request has an approver who isn't its author",
+        "rules": [
+          "sentence.for.line",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.for.name",
+          "sentence.for.scope",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "pull_requests": [
+                {
+                  "author": "ann",
+                  "approvers": [
+                    {
+                      "username": "bob",
+                      "state": "APPROVED"
+                    }
+                  ]
+                },
+                {
+                  "author": "cat",
+                  "approvers": [
+                    {
+                      "username": "cat",
+                      "state": "APPROVED"
+                    },
+                    {
+                      "username": "dan",
+                      "state": "APPROVED"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "pr.approvers[]",
+                "value": [
+                  {
+                    "username": "bob",
+                    "state": "APPROVED"
+                  },
+                  {
+                    "username": "cat",
+                    "state": "APPROVED"
+                  },
+                  {
+                    "username": "dan",
+                    "state": "APPROVED"
+                  }
+                ]
+              },
+              {
+                "name": "pull_requests[]",
+                "value": [
+                  {
+                    "author": "ann",
+                    "approvers": [
+                      {
+                        "username": "bob",
+                        "state": "APPROVED"
+                      }
+                    ]
+                  },
+                  {
+                    "author": "cat",
+                    "approvers": [
+                      {
+                        "username": "cat",
+                        "state": "APPROVED"
+                      },
+                      {
+                        "username": "dan",
+                        "state": "APPROVED"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "failed_items": []
+          }
+        ]
+      },
+      {
+        "description": "fails a pull request whose only approver is its author, and lists that pull request",
+        "rules": [
+          "sentence.for.line",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "pull_requests": [
+                {
+                  "author": "ann",
+                  "approvers": [
+                    {
+                      "username": "bob",
+                      "state": "APPROVED"
+                    }
+                  ]
+                },
+                {
+                  "author": "eve",
+                  "approvers": [
+                    {
+                      "username": "eve",
+                      "state": "APPROVED"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "pr.approvers[]",
+                "value": [
+                  {
+                    "username": "bob",
+                    "state": "APPROVED"
+                  },
+                  {
+                    "username": "eve",
+                    "state": "APPROVED"
+                  }
+                ]
+              },
+              {
+                "name": "pull_requests[]",
+                "value": [
+                  {
+                    "author": "ann",
+                    "approvers": [
+                      {
+                        "username": "bob",
+                        "state": "APPROVED"
+                      }
+                    ]
+                  },
+                  {
+                    "author": "eve",
+                    "approvers": [
+                      {
+                        "username": "eve",
+                        "state": "APPROVED"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 2 of pull_requests",
+                "item": "item 2 of pull_requests",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.username does not equal pr.author",
+                    "cause": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "an approver whose leaves out doesn't count, so the pull request fails as value and is listed with no sentence",
+        "rules": [
+          "sentence.for.line",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.for.fail",
+          "sentence.whose.every"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "pull_requests": [
+                {
+                  "author": "ann",
+                  "approvers": [
+                    {
+                      "username": "bob",
+                      "state": "APPROVED"
+                    }
+                  ]
+                },
+                {
+                  "author": "fay",
+                  "approvers": [
+                    {
+                      "username": "gus",
+                      "state": "PENDING"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "pr.approvers[]",
+                "value": [
+                  {
+                    "username": "bob",
+                    "state": "APPROVED"
+                  },
+                  {
+                    "username": "gus",
+                    "state": "PENDING"
+                  }
+                ]
+              },
+              {
+                "name": "pull_requests[]",
+                "value": [
+                  {
+                    "author": "ann",
+                    "approvers": [
+                      {
+                        "username": "bob",
+                        "state": "APPROVED"
+                      }
+                    ]
+                  },
+                  {
+                    "author": "fay",
+                    "approvers": [
+                      {
+                        "username": "gus",
+                        "state": "PENDING"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 2 of pull_requests",
+                "item": "item 2 of pull_requests",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "a pull request with no approvers list fails as absent, listed with no sentence",
+        "rules": [
+          "sentence.for.line",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.for.fail"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "pull_requests": [
+                {
+                  "author": "ann",
+                  "approvers": [
+                    {
+                      "username": "bob",
+                      "state": "APPROVED"
+                    }
+                  ]
+                },
+                {
+                  "author": "hal"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "pr.approvers[]",
+                "value": [
+                  {
+                    "username": "bob",
+                    "state": "APPROVED"
+                  }
+                ]
+              },
+              {
+                "name": "pull_requests[]",
+                "value": [
+                  {
+                    "author": "ann",
+                    "approvers": [
+                      {
+                        "username": "bob",
+                        "state": "APPROVED"
+                      }
+                    ]
+                  },
+                  {
+                    "author": "hal"
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 2 of pull_requests",
+                "item": "item 2 of pull_requests",
+                "cause": "absent",
+                "value": null,
+                "failed_assertions": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "a pull request with an empty approvers list fails as value",
+        "rules": [
+          "sentence.for.line",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.for.fail"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "pull_requests": [
+                {
+                  "author": "ian",
+                  "approvers": []
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "pr.approvers[]",
+                "value": []
+              },
+              {
+                "name": "pull_requests[]",
+                "value": [
+                  {
+                    "author": "ian",
+                    "approvers": []
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 1 of pull_requests",
+                "item": "item 1 of pull_requests",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "an approver whose username is missing fails that approver as absent",
+        "rules": [
+          "sentence.for.line",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "pull_requests": [
+                {
+                  "author": "jo",
+                  "approvers": [
+                    {
+                      "state": "APPROVED"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "pr.approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED"
+                  }
+                ]
+              },
+              {
+                "name": "pull_requests[]",
+                "value": [
+                  {
+                    "author": "jo",
+                    "approvers": [
+                      {
+                        "state": "APPROVED"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 1 of pull_requests",
+                "item": "item 1 of pull_requests",
+                "cause": "absent",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.username does not equal pr.author",
+                    "cause": "absent"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "an approver whose state is missing is undecided: the pull request fails as absent with no sentence checked",
+        "rules": [
+          "sentence.for.line",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.whose.undecided"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "pull_requests": [
+                {
+                  "author": "kim",
+                  "approvers": [
+                    {
+                      "username": "lee"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "pr.approvers[]",
+                "value": [
+                  {
+                    "username": "lee"
+                  }
+                ]
+              },
+              {
+                "name": "pull_requests[]",
+                "value": [
+                  {
+                    "author": "kim",
+                    "approvers": [
+                      {
+                        "username": "lee"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 1 of pull_requests",
+                "item": "item 1 of pull_requests",
+                "cause": "absent",
+                "value": null,
+                "failed_assertions": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as value when the pull requests list is empty",
+        "rules": [
+          "sentence.for.fail",
+          "sentence.for.line",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "pull_requests": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "pr.approvers",
+                "value": []
+              },
+              {
+                "name": "pull_requests[]",
+                "value": []
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "pull_requests",
+                "item": "pull_requests",
+                "cause": "value",
+                "value": [],
+                "failed_assertions": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an outer some and an inner every",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "some pull_requests as pr, every pr.commits, if any, as commit",
+              "assert": "commit.signed is true"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes when one pull request has all its commits signed, an empty list counting with if any",
+        "rules": [
+          "sentence.for.line",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.for.fail"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "pull_requests": [
+                {
+                  "commits": [
+                    {
+                      "signed": false
+                    }
+                  ]
+                },
+                {
+                  "commits": []
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "pr.commits[]",
+                "value": [
+                  {
+                    "signed": false
+                  }
+                ]
+              },
+              {
+                "name": "pull_requests[]",
+                "value": [
+                  {
+                    "commits": [
+                      {
+                        "signed": false
+                      }
+                    ]
+                  },
+                  {
+                    "commits": []
+                  }
+                ]
+              }
+            ],
+            "failed_items": []
+          }
+        ]
+      },
+      {
+        "description": "fails when none does, and lists each pull request with the sentence that failed",
+        "rules": [
+          "sentence.for.line",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "pull_requests": [
+                {
+                  "commits": [
+                    {
+                      "signed": false
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "pr.commits[]",
+                "value": [
+                  {
+                    "signed": false
+                  }
+                ]
+              },
+              {
+                "name": "pull_requests[]",
+                "value": [
+                  {
+                    "commits": [
+                      {
+                        "signed": false
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 1 of pull_requests",
+                "item": "item 1 of pull_requests",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "commit.signed is true",
+                    "cause": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "two items over sibling lists, with two assertions",
+    "policy": {
+      "subjects": {
+        "pr": {
+          "from": [
+            "prs"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pr",
+          "checks": {
+            "c": {
+              "for": "some approvers whose state is \"APPROVED\" as approver, every commits as commit",
+              "assert": [
+                "approver.username does not equal author",
+                "approver.timestamp is after commit.timestamp"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes when one approver isn't the author and approved after every commit",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.assert",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "sentence.for.scope",
+          "for.failed_items",
+          "sentence.phrase.is",
+          "sentence.phrase.time"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p1",
+              "author": "ann",
+              "approvers": [
+                {
+                  "username": "ann",
+                  "state": "APPROVED",
+                  "timestamp": "2026-10-05T00:00:00Z"
+                },
+                {
+                  "username": "bob",
+                  "state": "APPROVED",
+                  "timestamp": "2026-10-03T00:00:00Z"
+                }
+              ],
+              "commits": [
+                {
+                  "timestamp": "2026-10-01T00:00:00Z"
+                },
+                {
+                  "timestamp": "2026-10-02T00:00:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pr",
+              "id": "p1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ann",
+                    "state": "APPROVED",
+                    "timestamp": "2026-10-05T00:00:00Z"
+                  },
+                  {
+                    "username": "bob",
+                    "state": "APPROVED",
+                    "timestamp": "2026-10-03T00:00:00Z"
+                  }
+                ]
+              },
+              {
+                "name": "author",
+                "value": "ann"
+              },
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "timestamp": "2026-10-01T00:00:00Z"
+                  },
+                  {
+                    "timestamp": "2026-10-02T00:00:00Z"
+                  }
+                ]
+              }
+            ],
+            "failed_items": []
+          }
+        ]
+      },
+      {
+        "description": "fails when each approver breaks one sentence, and says which, in the order written",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.assert",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "sentence.for.scope",
+          "for.failed_items",
+          "sentence.phrase.is",
+          "sentence.phrase.time"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p1",
+              "author": "ann",
+              "approvers": [
+                {
+                  "username": "zed",
+                  "state": "PENDING",
+                  "timestamp": "2026-10-09T00:00:00Z"
+                },
+                {
+                  "username": "ann",
+                  "state": "APPROVED",
+                  "timestamp": "2026-10-05T00:00:00Z"
+                },
+                {
+                  "username": "bob",
+                  "state": "APPROVED",
+                  "timestamp": "2026-10-01T12:00:00Z"
+                }
+              ],
+              "commits": [
+                {
+                  "timestamp": "2026-10-01T00:00:00Z"
+                },
+                {
+                  "timestamp": "2026-10-02T00:00:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pr",
+              "id": "p1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "zed",
+                    "state": "PENDING",
+                    "timestamp": "2026-10-09T00:00:00Z"
+                  },
+                  {
+                    "username": "ann",
+                    "state": "APPROVED",
+                    "timestamp": "2026-10-05T00:00:00Z"
+                  },
+                  {
+                    "username": "bob",
+                    "state": "APPROVED",
+                    "timestamp": "2026-10-01T12:00:00Z"
+                  }
+                ]
+              },
+              {
+                "name": "author",
+                "value": "ann"
+              },
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "timestamp": "2026-10-01T00:00:00Z"
+                  },
+                  {
+                    "timestamp": "2026-10-02T00:00:00Z"
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 2 of approvers",
+                "item": "item 2 of approvers",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.username does not equal author",
+                    "cause": "value"
+                  }
+                ]
+              },
+              {
+                "path": "item 3 of approvers",
+                "item": "item 3 of approvers",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.timestamp is after commit.timestamp",
+                    "cause": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "an approver who breaks both sentences lists both, in the order written",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.assert",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "sentence.for.scope",
+          "for.failed_items",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p1",
+              "author": "ann",
+              "approvers": [
+                {
+                  "username": "ann",
+                  "state": "APPROVED",
+                  "timestamp": "2026-10-01T12:00:00Z"
+                }
+              ],
+              "commits": [
+                {
+                  "timestamp": "2026-10-01T00:00:00Z"
+                },
+                {
+                  "timestamp": "2026-10-02T00:00:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pr",
+              "id": "p1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ann",
+                    "state": "APPROVED",
+                    "timestamp": "2026-10-01T12:00:00Z"
+                  }
+                ]
+              },
+              {
+                "name": "author",
+                "value": "ann"
+              },
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "timestamp": "2026-10-01T00:00:00Z"
+                  },
+                  {
+                    "timestamp": "2026-10-02T00:00:00Z"
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 1 of approvers",
+                "item": "item 1 of approvers",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.username does not equal author",
+                    "cause": "value"
+                  },
+                  {
+                    "assertion": "approver.timestamp is after commit.timestamp",
+                    "cause": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as value when no approver is left, and the commits are not read as a failure",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.assert",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "sentence.for.scope",
+          "for.failed_items",
+          "sentence.for.fail"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p1",
+              "author": "ann",
+              "approvers": [
+                {
+                  "username": "bob",
+                  "state": "PENDING",
+                  "timestamp": "2026-10-05T00:00:00Z"
+                }
+              ],
+              "commits": [
+                {
+                  "timestamp": "2026-10-01T00:00:00Z"
+                },
+                {
+                  "timestamp": "2026-10-02T00:00:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pr",
+              "id": "p1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "bob",
+                    "state": "PENDING",
+                    "timestamp": "2026-10-05T00:00:00Z"
+                  }
+                ]
+              },
+              {
+                "name": "author",
+                "value": "ann"
+              },
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "timestamp": "2026-10-01T00:00:00Z"
+                  },
+                  {
+                    "timestamp": "2026-10-02T00:00:00Z"
+                  }
+                ]
+              }
+            ],
+            "failed_items": []
+          }
+        ]
+      },
+      {
+        "description": "an approval before a commit's timestamp that is not a timestamp fails as unusable",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.assert",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "sentence.for.scope",
+          "for.failed_items",
+          "sentence.phrase.time"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p1",
+              "author": "ann",
+              "approvers": [
+                {
+                  "username": "bob",
+                  "state": "APPROVED",
+                  "timestamp": "2026-10-05T00:00:00Z"
+                }
+              ],
+              "commits": [
+                {
+                  "timestamp": "yesterday"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pr",
+              "id": "p1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "bob",
+                    "state": "APPROVED",
+                    "timestamp": "2026-10-05T00:00:00Z"
+                  }
+                ]
+              },
+              {
+                "name": "author",
+                "value": "ann"
+              },
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "timestamp": "yesterday"
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 1 of approvers",
+                "item": "item 1 of approvers",
+                "cause": "unusable",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.timestamp is after commit.timestamp",
+                    "cause": "unusable"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "with every commits and no commits the approver fails as value, and with if any it passes",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.assert",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "sentence.for.scope",
+          "sentence.for.fail"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p1",
+              "author": "ann",
+              "approvers": [
+                {
+                  "username": "bob",
+                  "state": "APPROVED",
+                  "timestamp": "2026-10-05T00:00:00Z"
+                }
+              ],
+              "commits": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pr",
+              "id": "p1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "bob",
+                    "state": "APPROVED",
+                    "timestamp": "2026-10-05T00:00:00Z"
+                  }
+                ]
+              },
+              {
+                "name": "author",
+                "value": "ann"
+              },
+              {
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 1 of approvers",
+                "item": "item 1 of approvers",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "a missing commits list fails the approver as absent, with no sentence listed",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.assert",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "sentence.for.scope",
+          "for.failed_items",
+          "sentence.for.fail"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p1",
+              "author": "ann",
+              "approvers": [
+                {
+                  "username": "bob",
+                  "state": "APPROVED",
+                  "timestamp": "2026-10-05T00:00:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pr",
+              "id": "p1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "bob",
+                    "state": "APPROVED",
+                    "timestamp": "2026-10-05T00:00:00Z"
+                  }
+                ]
+              },
+              {
+                "name": "author",
+                "value": "ann"
+              },
+              {
+                "name": "commits",
+                "value": []
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 1 of approvers",
+                "item": "item 1 of approvers",
+                "cause": "absent",
+                "value": null,
+                "failed_assertions": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a whose value that is a comma list, before a second item",
+    "policy": {
+      "subjects": {
+        "pr": {
+          "from": [
+            "prs"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pr",
+          "checks": {
+            "c": {
+              "for": "some approvals whose role is one of \"qa\", \"dev\" as approval, every commits as commit",
+              "assert": "approval.at is after commit.at"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the comma list as values of the whose and the next item as the second item",
+        "rules": [
+          "sentence.for.comma",
+          "sentence.for.line",
+          "sentence.phrase.one_of",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "sentence.phrase.time"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p1",
+              "approvals": [
+                {
+                  "role": "ops",
+                  "at": "2026-10-09T00:00:00Z"
+                },
+                {
+                  "role": "dev",
+                  "at": "2026-10-03T00:00:00Z"
+                }
+              ],
+              "commits": [
+                {
+                  "at": "2026-10-01T00:00:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pr",
+              "id": "p1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "approvals[]",
+                "value": [
+                  {
+                    "role": "ops",
+                    "at": "2026-10-09T00:00:00Z"
+                  },
+                  {
+                    "role": "dev",
+                    "at": "2026-10-03T00:00:00Z"
+                  }
+                ]
+              },
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "at": "2026-10-01T00:00:00Z"
+                  }
+                ]
+              }
+            ],
+            "failed_items": []
+          }
+        ]
+      },
+      {
+        "description": "fails when the only approval with a listed role came before the commit",
+        "rules": [
+          "sentence.for.comma",
+          "sentence.phrase.one_of",
+          "for.failed_items",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "sentence.phrase.time"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p1",
+              "approvals": [
+                {
+                  "role": "ops",
+                  "at": "2026-10-09T00:00:00Z"
+                },
+                {
+                  "role": "qa",
+                  "at": "2026-09-30T00:00:00Z"
+                }
+              ],
+              "commits": [
+                {
+                  "at": "2026-10-01T00:00:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pr",
+              "id": "p1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "approvals[]",
+                "value": [
+                  {
+                    "role": "ops",
+                    "at": "2026-10-09T00:00:00Z"
+                  },
+                  {
+                    "role": "qa",
+                    "at": "2026-09-30T00:00:00Z"
+                  }
+                ]
+              },
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "at": "2026-10-01T00:00:00Z"
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 2 of approvals",
+                "item": "item 2 of approvals",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "approval.at is after commit.at",
+                    "cause": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a whose that reads a $params list",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every commits whose kind is in $params.kinds as c",
+              "assert": "c.signed is true"
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "kinds": [
+        "code",
+        "test"
+      ]
+    },
+    "cases": [
+      {
+        "description": "keeps the items whose kind is listed in the params, and passes",
+        "rules": [
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.for.line",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": [
+                {
+                  "kind": "code",
+                  "signed": true
+                },
+                {
+                  "kind": "doc",
+                  "signed": false
+                },
+                {
+                  "kind": "test",
+                  "signed": true
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": "code",
+                    "signed": true
+                  },
+                  {
+                    "kind": "doc",
+                    "signed": false
+                  },
+                  {
+                    "kind": "test",
+                    "signed": true
+                  }
+                ]
+              }
+            ],
+            "failed_items": []
+          }
+        ]
+      },
+      {
+        "description": "fails an item the params list keeps",
+        "rules": [
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": [
+                {
+                  "kind": "code",
+                  "signed": true
+                },
+                {
+                  "kind": "test",
+                  "signed": false
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": "code",
+                    "signed": true
+                  },
+                  {
+                    "kind": "test",
+                    "signed": false
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 2 of commits",
+                "item": "item 2 of commits",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "c.signed is true",
+                    "cause": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a whose that reads a $params list that isn't a list",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every commits whose kind is in $params.kinds as c",
+              "assert": "c.signed is true"
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "kinds": "code"
+    },
+    "cases": [
+      {
+        "description": "fails as unusable, whatever the items hold, with no failed items",
+        "rules": [
+          "for.flaws",
+          "for.pass"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": [
+                {
+                  "kind": "code",
+                  "signed": false
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": "code",
+                    "signed": false
+                  }
+                ]
+              }
+            ],
+            "failed_items": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an assertion that reads a $params list",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every commits as c",
+              "assert": "c.author is in $params.staff"
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "staff": [
+        "ann",
+        "bob"
+      ]
+    },
+    "cases": [
+      {
+        "description": "fails an item whose field isn't in the list",
+        "rules": [
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": [
+                {
+                  "author": "ann"
+                },
+                {
+                  "author": "zed"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ann"
+                  },
+                  {
+                    "author": "zed"
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 2 of commits",
+                "item": "item 2 of commits",
+                "cause": "value",
+                "value": null,
+                "failed_assertions": [
+                  {
+                    "assertion": "c.author is in $params.staff",
+                    "cause": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a path that is named by a param",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every shas named by $params.k as sha",
+              "assert": "sha.ok is true"
+            }
+          }
+        }
+      }
+    },
+    "params": {},
+    "cases": [
+      {
+        "description": "fails as absent when the param is missing, and the path's input holds []",
+        "rules": [
+          "for.flaws",
+          "for.pass"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "shas": {
+                "a": [
+                  "x"
+                ]
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "shas named by $params.k",
+                "value": []
+              }
+            ],
+            "failed_items": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a second item whose path is named by a param",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every groups as g, every g.shas named by $params.k as sha",
+              "assert": "sha.ok is true"
+            }
+          }
+        }
+      }
+    },
+    "params": {},
+    "cases": [
+      {
+        "description": "fails the first list's item with the ref's cause",
+        "rules": [
+          "for.flaws",
+          "for.failed_items",
+          "for.pass"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "groups": [
+                {
+                  "shas": {
+                    "a": [
+                      {
+                        "ok": true
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "g.shas named by $params.k",
+                "value": []
+              },
+              {
+                "name": "groups[]",
+                "value": [
+                  {
+                    "shas": {
+                      "a": [
+                        {
+                          "ok": true
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "item 1 of groups",
+                "item": "item 1 of groups",
+                "cause": "absent",
+                "value": null,
+                "failed_assertions": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line on a subject that isn't an object",
+    "policy": {
+      "subjects": {
+        "thing": {
+          "from": [
+            "things"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every xs as x",
+              "assert": "x is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as not_an_object when the first path starts at the subject",
+        "rules": [
+          "for.flaws",
+          "path.not_an_object"
+        ],
+        "input": {
+          "things": [
+            "text"
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "thing",
+              "id": "text"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [],
+            "failed_items": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line with three items",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every xs as x, every x.ys as y, every y.zs as z",
+              "assert": "z is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed lists the problem",
+        "rules": [
+          "sentence.for.line",
+          "written_wrong",
+          "written_wrong.row",
+          "sentence.written_wrong.slot"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "xs": [
+                1
+              ],
+              "ys": [
+                1
+              ],
+              "zs": [
+                1
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "for: a for line holds two items at most"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "ill_formed",
+            "inputs": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line that gives a name twice",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every xs as x, every x.ys as x",
+              "assert": "x is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed lists the problem",
+        "rules": [
+          "sentence.for.name",
+          "written_wrong",
+          "written_wrong.row",
+          "sentence.written_wrong.slot"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "xs": [
+                1
+              ],
+              "ys": [
+                1
+              ],
+              "zs": [
+                1
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "for: x is given twice"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "ill_formed",
+            "inputs": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line that names an item params",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every xs as params",
+              "assert": "params is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed lists the problem",
+        "rules": [
+          "sentence.for.name",
+          "written_wrong",
+          "written_wrong.row",
+          "sentence.written_wrong.slot"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "xs": [
+                1
+              ],
+              "ys": [
+                1
+              ],
+              "zs": [
+                1
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "for: params can't be a name"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "ill_formed",
+            "inputs": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line that names an item with a word of the grammar",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every xs as empty",
+              "assert": "x is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed lists the problem",
+        "rules": [
+          "sentence.for.name",
+          "written_wrong",
+          "written_wrong.row",
+          "sentence.written_wrong.slot"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "xs": [
+                1
+              ],
+              "ys": [
+                1
+              ],
+              "zs": [
+                1
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "for: empty can't be a name"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "ill_formed",
+            "inputs": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line that names an item input",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every xs as input",
+              "assert": "input is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed lists the problem",
+        "rules": [
+          "sentence.for.name",
+          "written_wrong",
+          "written_wrong.row",
+          "sentence.written_wrong.slot"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "xs": [
+                1
+              ],
+              "ys": [
+                1
+              ],
+              "zs": [
+                1
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "for: input can't be a name"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "ill_formed",
+            "inputs": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a name whose path goes on past its list",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every pull_requests.title as t",
+              "assert": "t is not \"WIP\""
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes when every title is there and passes",
+        "rules": [
+          "for.walk",
+          "for.pass",
+          "for.inputs",
+          "sentence.for.line",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "pull_requests": [
+                {
+                  "title": "Fix"
+                },
+                {
+                  "title": "Add"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "name": "pull_requests[].title",
+                "value": [
+                  "Fix",
+                  "Add"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a missing title fails its pull request as absent, without checking the sentence",
+        "rules": [
+          "for.walk",
+          "for.failed_items",
+          "sentence.for.fail"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "pull_requests": [
+                {
+                  "title": "Fix"
+                },
+                {}
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "item 2 of pull_requests",
+                "path": "item 2 of pull_requests",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "name": "pull_requests[].title",
+                "value": [
+                  "Fix",
+                  null
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a title under a value that isn't an object fails as unusable",
+        "rules": [
+          "for.walk",
+          "for.failed_items"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "pull_requests": [
+                "text"
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of pull_requests",
+                "path": "item 1 of pull_requests",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "name": "pull_requests[].title",
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a second item that reads into a first item that isn't an object",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every pull_requests as pr, some pr.approvers as approver",
+              "assert": "approver.username does not equal pr.author"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "a pull request that is a number or null fails as not_an_object",
+        "rules": [
+          "for.flaws",
+          "for.failed_items"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "pull_requests": [
+                1,
+                null,
+                {
+                  "author": "ann",
+                  "approvers": [
+                    {
+                      "username": "bob"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "not_an_object",
+                "failed_assertions": [],
+                "item": "item 1 of pull_requests",
+                "path": "item 1 of pull_requests",
+                "value": null
+              },
+              {
+                "cause": "not_an_object",
+                "failed_assertions": [],
+                "item": "item 2 of pull_requests",
+                "path": "item 2 of pull_requests",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "name": "pr.approvers[]",
+                "value": [
+                  {
+                    "username": "bob"
+                  }
+                ]
+              },
+              {
+                "name": "pull_requests[]",
+                "value": [
+                  1,
+                  null,
+                  {
+                    "approvers": [
+                      {
+                        "username": "bob"
+                      }
+                    ],
+                    "author": "ann"
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

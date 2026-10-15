@@ -83,30 +83,30 @@
         "cause": {"$ref": "#/$defs/cause"},
         "failed_items": {
           "type": "array",
-          "description": "Only on rows of all and any checks.",
+          "description": "Only on rows of all, any, every, some and for checks.",
           "items": {
             "type": "object",
-            "properties": {"path": {"type": "string"}, "item": {"type": "string", "description": "The path of the list item the entry belongs to. For all and any, the same as path."}, "cause": {"$ref": "#/$defs/cause"}, "value": true},
+            "properties": {"path": {"type": "string"}, "item": {"type": "string", "description": "The path of the list item the entry belongs to. For all and any, the same as path."}, "cause": {"$ref": "#/$defs/cause"}, "value": true, "failed_assertions": {"$ref": "#/$defs/failed_assertions", "description": "Only on entries of for checks: the sentences that failed for that item, in the order written."}},
             "required": ["path", "item", "cause", "value"],
             "additionalProperties": false
           }
         },
-        "failed_assertions": {
-          "type": "array",
-          "description": "Only on rows of checks written as several sentences: the ones that failed, in the order written.",
-          "items": {
-            "type": "object",
-            "properties": {"assertion": {"type": "string"}, "cause": {"$ref": "#/$defs/cause"}},
-            "required": ["assertion", "cause"],
-            "additionalProperties": false
-          }
-        }
+        "failed_assertions": {"$ref": "#/$defs/failed_assertions", "description": "Only on rows of checks written as several sentences without a for line: the ones that failed, in the order written."}
       },
       "required": ["requirement", "subject", "check", "inputs", "passed", "cause"],
       "additionalProperties": false,
       "if": {"properties": {"passed": {"const": true}}},
       "then": {"properties": {"cause": {"enum": ["satisfied", "substituted"]}}},
       "else": {"properties": {"cause": {"not": {"enum": ["satisfied", "substituted"]}}}}
+    },
+    "failed_assertions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {"assertion": {"type": "string"}, "cause": {"$ref": "#/$defs/cause"}},
+        "required": ["assertion", "cause"],
+        "additionalProperties": false
+      }
     }
   }
 }
