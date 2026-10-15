@@ -64,10 +64,19 @@ _resolved_def(members) := {"def": def, "from_owner": r, "filter_owners": owners}
 	root := _raw_subject(r)
 	owners := {n: _filter_owner_in(members, n) | some m in members; some n, _ in _object_or_empty(_filters_of(m))}
 	def := object.union(
-		{f: root[f] | some f in ["from", "id"]; f in object.keys(root)},
+		{f: _root_field(f, root[f], r, members) | some f in ["from", "id"]; f in object.keys(root)},
 		{"applies_to": _merged_filters(members, owners)},
 	)
 } else := {}
+
+_root_field("from", _, r, members) := "<built on a subject read from another subject>" if {
+	count(members) > 1
+	r in object.keys(object.get(data.ergo_subject_sentences, "chains", {}))
+} else := v if {
+	v := _raw_subject(r).from
+}
+
+_root_field("id", v, _, _) := v
 
 _merged_filters(members, _) := [f | some m in sort(members); f := _filters_of(m); not is_object(f)][0] if {
 	some m in members
@@ -248,7 +257,11 @@ _subject_wrong_type_problems := {
 
 _req_problems(req) := union({_req_meta_problems(req), _type_problems(req), _range_problems(req), _unknown_problems(req), _checks_problems(req), _require_problems(req), _req_json_problems(req), _subject_problems(req)})
 
-_subject_problems(req) := _subject_ref_problems(req) | _resolution_problems(req)
+_subject_problems(req) := (_subject_ref_problems(req) | _resolution_problems(req)) | _parent_problems(req)
+
+_parent_problems(req) := _resolution_problems({"subject": data.ergo_subject_sentences.chains[req.subject]}) if _chained(req)
+
+_parent_problems(req) := set() if not _chained(req)
 
 _resolution_problems(req) := r.problems if {
 	r := _resolution_of(req)
@@ -258,6 +271,12 @@ _member_problems(members) := union({
 	{[array.concat(["subjects", m], [p[0]]), p[1]] |
 		some m in members
 		some p in _def_problems(_raw_subject(m))
+	},
+	{[["subjects", m, _of_field(m)], "can't build on a subject read from another subject yet"] |
+		some m in members
+		of := object.get(_raw_subject(m), "of", null)
+		is_string(of)
+		of in object.keys(object.get(data.ergo_subject_sentences, "chains", {}))
 	},
 	{[["subjects", m, "of"], "not in subjects"] |
 		some m in members
@@ -658,28 +677,43 @@ _keyed(doc, req) := coll if {
 
 _keyed(doc, req) := {} if not is_object(_target(doc, req))
 
-_scope_of(req, subj) := {"ergo/names": {_each_step(req).each_as: subj}} if _from_well_formed(req)
+_scope_of(req, subj) := {"ergo/names": object.union(names, _parent_names)} if names := _each_names(req, subj)
 
-_passes(req, check, flaw, subj) := _check_passed(check, subj, flaw) if not _has_step(req)
+_each_names(req, subj) := {_each_step(req).each_as: subj} if {
+	_has_step(req)
+	_from_well_formed(req)
+}
+
+_each_names(req, _) := {} if not _has_step(req)
+
+default _parent_names := {}
+
+_parent_names := data.ergo_parent if is_object(data.ergo_parent)
+
+_scoped(req) if _has_step(req)
+
+_scoped(_) if _parent_names != {}
+
+_passes(req, check, flaw, subj) := _check_passed(check, subj, flaw) if not _scoped(req)
 
 else := v if {
-	_has_step(req)
+	_scoped(req)
 	s := _scope_of(req, subj)
 	v := _check_passed(check, subj, flaw) with input as s
 }
 
-_inputs_in(req, check, subj, item) := _row_inputs(subj, check, item) if not _has_step(req)
+_inputs_in(req, check, subj, item) := _row_inputs(subj, check, item) if not _scoped(req)
 
 else := i if {
-	_has_step(req)
+	_scoped(req)
 	s := _scope_of(req, subj)
 	i := _row_inputs(subj, check, item) with input as s
 }
 
-_outcome(req, check, flaw, subj, item) := _check_outcome(check, subj, flaw, item) if not _has_step(req)
+_outcome(req, check, flaw, subj, item) := _check_outcome(check, subj, flaw, item) if not _scoped(req)
 
 else := o if {
-	_has_step(req)
+	_scoped(req)
 	s := _scope_of(req, subj)
 	o := _check_outcome(check, subj, flaw, item) with input as s
 }
@@ -966,16 +1000,24 @@ _subject_matches(subj, req, flaws) if {
 	}
 }
 
-_entry_ref(entry, req) := {"type": _subject_type_of(req), "id": entry.key} if "key" in object.keys(entry)
+_req_subject_ref(req) := object.union({"type": _subject_type_of(req), "id": null}, _row_in)
 
-_entry_ref(entry, req) := _subject_ref(entry.subject, req) if {
+default _row_in := {}
+
+_row_in := {"in": data.ergo_in} if data.ergo_in != {}
+
+_entry_ref(entry, req) := object.union(_entry_ref_of(entry, req), _row_in)
+
+_entry_ref_of(entry, req) := {"type": _subject_type_of(req), "id": entry.key} if "key" in object.keys(entry)
+
+_entry_ref_of(entry, req) := _subject_ref(entry.subject, req) if {
 	not "key" in object.keys(entry)
-	not _has_step(req)
+	not _scoped(req)
 }
 
-_entry_ref(entry, req) := r if {
+_entry_ref_of(entry, req) := r if {
 	not "key" in object.keys(entry)
-	_has_step(req)
+	_scoped(req)
 	s := _scope_of(req, entry.subject)
 	r := _subject_ref(entry.subject, req) with input as s
 }
@@ -1275,6 +1317,16 @@ _plain_step_name(0, step) := step if {
 	is_string(step)
 	startswith(step, "$")
 	not step in {"$$input", "$$params", "$input", "$params"}
+	not _parent_name(step)
+}
+
+_plain_step_name(0, step) := _s_key_text(substring(step, 1, -1)) if _parent_name(step)
+
+_parent_name(step) if {
+	is_string(step)
+	startswith(step, "$")
+	some p, _ in _parent_names
+	step == concat("", ["$", p])
 }
 
 _plain_step_name(0, step) := concat("", ["<unknown name ", step, ">"]) if step in {"$input", "$params"}
@@ -3039,10 +3091,10 @@ _scope_cause(causes) := "ill_formed" if {
 	causes == {"value"}
 } else := _worst_of(causes)
 
-_failed_filter_causes(subj, req, flaws) := _filter_causes(subj, req, flaws) if not _has_step(req)
+_failed_filter_causes(subj, req, flaws) := _filter_causes(subj, req, flaws) if not _scoped(req)
 
 else := causes if {
-	_has_step(req)
+	_scoped(req)
 	s := _scope_of(req, subj)
 	causes := _filter_causes(subj, req, flaws) with input as s
 }
@@ -3691,7 +3743,7 @@ _checks_at(_, "checks", n) := ["checks", n]
 _from_names(req) := {n |
 	_from_well_formed(req)
 	n := _each_step(req).each_as
-}
+} | {data.ergo_subject_sentences.chains[req.subject] | _chained(req); data.ergo_sentence_here == true}
 
 _well_formed_inputs(req) := array.concat(
 	array.concat(
@@ -3763,7 +3815,7 @@ _well_formed_row(req, req_name) := row if {
 	passed := _well_formed_named(req, req_name)
 	row := {
 		"requirement": req_name,
-		"subject": {"type": _subject_type_of(req), "id": null},
+		"subject": _req_subject_ref(req),
 		"check": "$well_formed",
 		"inputs": array.concat(_name_problem_inputs(req_name), _well_formed_inputs(req)),
 		"passed": passed,
@@ -3773,7 +3825,7 @@ _well_formed_row(req, req_name) := row if {
 
 _min_subjects_row(doc, req, req_name, matching) := {
 	"requirement": req_name,
-	"subject": {"type": _subject_type_of(req), "id": null},
+	"subject": _req_subject_ref(req),
 	"check": "$min_subjects",
 	"inputs": array.concat([{"name": _subject_count_name(req), "value": matching}], data.ergo_unreadable),
 	"passed": _enough_subjects(doc, req, matching),
@@ -3803,7 +3855,7 @@ _min_subjects_cause(_, req, _) := _from_cause(req) if {
 
 _unique_ids_row(refs, req, req_name) := {
 	"requirement": req_name,
-	"subject": {"type": _subject_type_of(req), "id": null},
+	"subject": _req_subject_ref(req),
 	"check": "$unique_ids",
 	"inputs": [{"name": _repeated_ids_name(req), "value": repeated}],
 	"passed": count(repeated) == 0,
@@ -3871,14 +3923,13 @@ _evaluation(doc, req, name) := {
 	"rows_complete": _rows_complete(groups, matching, req),
 } if {
 	raw := _raw_entries(doc, req)
-	names := _from_names(req)
 	filter_flaws := {n: flaw |
 		some n, check in _applies_to_of(req)
-		flaw := _flaw(check, names) with data.ergo_sentence_here as _s_written_here(req, "applies_to", n)
+		flaw := _flaw(check, _from_names(req)) with data.ergo_sentence_here as _s_written_here(req, "applies_to", n)
 	}
 	check_flaws := {n: flaw |
 		some n, check in _checks_of(req)
-		flaw := _flaw(check, names) with data.ergo_sentence_here as _s_written_here(req, "checks", n)
+		flaw := _flaw(check, _from_names(req)) with data.ergo_sentence_here as _s_written_here(req, "checks", n)
 	}
 	item := _subject_item_name(req)
 	refs := {i: _entry_ref(entry, req) | some i, entry in raw}
@@ -4016,12 +4067,12 @@ _names(x) := sort(x) if is_set(x)
 
 report(doc, policy, params) := r if {
 	raw := _section(policy, "requirements")
-	reqs := _s_requirements(raw)
-	sentences := _s_sentences(raw, reqs)
 	written_subjects := _section(policy, "subjects")
 	reads := _s_from_reads(written_subjects)
 	subjects := _s_subjects(written_subjects, reads)
 	subject_sentences := _s_subject_sentences(written_subjects, reads)
+	reqs := _s_requirements(raw, subject_sentences.chains)
+	sentences := _s_sentences(raw, reqs)
 	unreadable := _unreadable_inputs(doc, params)
 	resolved := _resolved_subjects with data.ergo_subjects as subjects with data.ergo_subject_sentences as subject_sentences
 	written := _report_of(doc, reqs) with data.ergo_document as doc with data.ergo_params as params with data.ergo_subjects as subjects with data.ergo_resolved as resolved with data.ergo_unreadable as unreadable with data.ergo_sentences as sentences with data.ergo_subject_sentences as subject_sentences with input as {"ergo/names": {}}
@@ -4066,8 +4117,96 @@ _report_of(doc, policy) := {
 	},
 	"results": _results(policy, evaluations),
 } if {
-	evaluations := {name: _evaluation(doc, policy[name], name) | some name in _names(policy)}
+	evaluations := {name: _evaluated(doc, policy[name], name) | some name in _names(policy)}
 }
+
+_evaluated(doc, req, name) := e if {
+	not _chained(req)
+	e := _evaluation(doc, req, name) with data.ergo_in as {}
+}
+
+_evaluated(doc, req, name) := _chain_evaluation(req, name, _parent_pick(doc, req)) if _chained(req)
+
+_chain_evaluation(req, name, pick) := e if {
+	"subject" in object.keys(pick)
+	e := _evaluation(pick.subject, req, name) with data.ergo_in as {pick.parent: pick.id} with data.ergo_parent as {pick.parent: pick.subject}
+}
+
+_chain_evaluation(req, name, pick) := object.union(base, {
+	"min_subjects": _parent_min_subjects_row(req, name, pick.cause),
+	"applies": [],
+	"subject_rows": [],
+	"total": 0,
+	"matching": 0,
+	"scope_readable": true,
+	"rows_complete": true,
+}) if {
+	"cause" in object.keys(pick)
+	base := _evaluation({}, req, name) with data.ergo_in as {}
+}
+
+_chained(req) if {
+	is_object(req)
+	is_string(object.get(req, "subject", null))
+	req.subject in object.keys(object.get(data.ergo_subject_sentences, "chains", {}))
+}
+
+_parent_pick(doc, req) := pick if {
+	parent := data.ergo_subject_sentences.chains[req.subject]
+	preq := {"subject": parent, "checks": {}}
+	pick := _parent_pick_of(doc, preq)
+}
+
+_parent_pick_of(doc, preq) := {"cause": c} if {
+	c := _target_cause(doc, preq)
+} else := {"cause": _from_cause(preq)} if {
+	_from_well_formed(preq)
+	_from_unreadable(preq)
+} else := r if {
+	raw := _raw_entries(doc, preq)
+	flaws := {n: flaw |
+		some n, check in _applies_to_of(preq)
+		flaw := _flaw(check, _from_names(preq)) with data.ergo_sentence_here as _s_written_here(preq, "applies_to", n)
+	}
+	refs := {i: _entry_ref_of(entry, preq) | some i, entry in raw}
+	matches := {i: _subject_matches(entry.subject, preq, flaws) | some i, entry in raw}
+	applies := _applies_rows(raw, refs, matches, preq, "", flaws, _subject_item_name(preq))
+	r := _parent_pick_from(raw, refs, applies, preq)
+}
+
+_parent_pick_from(raw, refs, applies, preq) := {"cause": _worst_of({row.cause | some row in applies} - {"satisfied", "value"})} if {
+	not _scope_readable(raw, applies, preq)
+} else := _single_parent(raw, refs, applies, preq)
+
+_single_parent(raw, refs, applies, preq) := {"subject": raw[i].subject, "id": refs[i].id, "parent": preq.subject} if {
+	kept := _kept_parents(raw, applies, preq)
+	count(kept) == 1
+	i := kept[0]
+} else := {"cause": "none"} if {
+	count(_kept_parents(raw, applies, preq)) == 0
+} else := {"cause": "unusable"}
+
+_kept_parents(raw, _, preq) := [i | some i, _ in raw] if _size(_applies_to_of(preq)) == 0
+
+_kept_parents(_, applies, preq) := [i | some i, row in applies; row.passed] if _size(_applies_to_of(preq)) > 0
+
+_parent_min_subjects_row(req, name, "none") := {
+	"requirement": name,
+	"subject": _req_subject_ref(req),
+	"check": "$min_subjects",
+	"inputs": array.concat([{"name": _subject_count_name(req), "value": 0}], data.ergo_unreadable),
+	"passed": _min_subjects_of(req) == 0,
+	"cause": _verdict_cause(_min_subjects_of(req) == 0),
+}
+
+_parent_min_subjects_row(req, name, cause) := {
+	"requirement": name,
+	"subject": _req_subject_ref(req),
+	"check": "$min_subjects",
+	"inputs": array.concat([{"name": _subject_count_name(req), "value": 0}], data.ergo_unreadable),
+	"passed": false,
+	"cause": cause,
+} if cause != "none"
 
 violations(report) := [object.union(
 	{
@@ -5281,13 +5420,14 @@ _s_single_quoted(v) if {
 	regex.match(`^[^\x00-\x1f]*$`, v)
 }
 
-_s_from_reads(subjects) := {name: object.union(_s_from_part(name, lines, subjects, narrow), _s_id_part(def)) | some name, def in subjects; is_object(def)} if {
+_s_from_reads(subjects) := {name: object.union(_s_from_part(name, lines, subjects, {"narrow": narrow, "descend": descend}), _s_id_part(def)) | some name, def in subjects; is_object(def)} if {
 	is_object(subjects)
 	lines := {name: _from_line(def.from) | some name, def in subjects; is_object(def); is_string(def.from)}
 	narrow := {name: _s_chain_parent(name, lines, subjects) | some name, _ in subjects}
+	descend := {name: lines[name].path.steps[0] | some name, _ in lines; "path" in object.keys(lines[name]); _s_descends(name, lines[name], subjects)}
 }
 
-_s_from_part(name, lines, subjects, narrow) := _s_from_read(name, lines[name], subjects, narrow) if name in object.keys(lines)
+_s_from_part(name, lines, subjects, chains) := _s_from_read(name, lines[name], subjects, chains) if name in object.keys(lines)
 
 _s_from_part(name, lines, _, _) := {} if not name in object.keys(lines)
 
@@ -5335,16 +5475,31 @@ _s_from_used(def, read) if {
 	not "of" in object.keys(def)
 }
 
-_s_from_read(name, fl, subjects, narrow) := {"problems": problems, "fields": fields} if {
+_s_from_read(name, fl, subjects, chains) := {"problems": problems, "fields": fields, "parent": parent} if {
 	"path" in object.keys(fl)
 	conds := [_s_check([_s_cond_text(c)], {}, set()) | some c in object.get(fl, "where", [])]
-	problems := sort(((_s_chain_unsupported(name, fl, subjects) | _s_from_start_problems(fl)) | {concat("", ["whose: ", p]) | some c in conds; some p in object.get(c, "$sentence", [])}))
-	fields := object.union(_s_source(name, fl, subjects), _s_whose_filters(_s_filter_prefix(name, narrow), conds))
+	problems := sort(((_s_chain_unsupported(name, fl, subjects, chains.descend) | _s_from_start_problems(fl)) | {concat("", ["whose: ", p]) | some c in conds; some p in object.get(c, "$sentence", [])}))
+	fields := object.union(_s_source(name, fl, subjects), _s_whose_filters(_s_filter_prefix(name, chains.narrow), conds))
+	parent := _s_descend_parent(name, fl, subjects)
 } else := {"problems": object.get(fl, "problems", ["doesn't parse"]), "fields": {}}
 
 _s_source(name, fl, subjects) := {"of": fl.path.steps[0]} if {
 	_s_narrows(name, fl, subjects)
+} else := {"from": array.concat(_s_from_steps(array.slice(_s_model_path(fl.path), 1, count(fl.path.steps))), _s_each_step(fl))} if {
+	_s_descends(name, fl, subjects)
 } else := {"from": array.concat(_s_from_steps(_s_model_path(fl.path)), _s_each_step(fl))}
+
+_s_descend_parent(name, fl, subjects) := fl.path.steps[0] if _s_descends(name, fl, subjects)
+
+else := null
+
+_s_descends(name, fl, subjects) if {
+	not "start" in object.keys(fl.path)
+	count(fl.path.steps) > 1
+	is_string(fl.path.steps[0])
+	fl.path.steps[0] != name
+	fl.path.steps[0] in object.keys(subjects)
+}
 
 _s_narrows(name, fl, subjects) if {
 	not "start" in object.keys(fl.path)
@@ -5393,22 +5548,18 @@ _s_filter_name(i, n) := concat("", ["whose ", strings.replace_n({" ": "0"}, spri
 	sprintf_pad := concat("", [substring("                    ", 0, width - count(digits)), digits])
 }
 
-_s_chain_unsupported(name, fl, subjects) := {"a from that starts at another subject isn't supported yet" |
-	not _s_narrows(name, fl, subjects)
-	not "start" in object.keys(fl.path)
-	first := fl.path.steps[0]
-	is_string(first)
-	first != name
-	first in object.keys(subjects)
+_s_chain_unsupported(name, fl, subjects, descend) := {"a chain of more than two subjects isn't supported yet" |
+	_s_descends(name, fl, subjects)
+	fl.path.steps[0] in object.keys(descend)
 }
 
 _s_id_field(read) := {"id": read.id.path} if "path" in object.keys(object.get(read, "id", {}))
 
 else := {}
 
-_s_subject_sentences(subjects, reads) := {"narrowed": {name | some name, r in reads; _s_from_used(subjects[name], r); "of" in object.keys(r.fields)}, "filters": {[name, n] | some name, r in reads; _s_from_used(subjects[name], r); some n, _ in object.get(r.fields, "applies_to", {})}, "problems": {name: probs | some name, def in subjects; probs := _s_subject_problems(name, def, reads); probs != {}}} if is_object(subjects)
+_s_subject_sentences(subjects, reads) := {"chains": {name: p | some name, r in reads; _s_from_used(subjects[name], r); p := object.get(r, "parent", null); p != null}, "narrowed": {name | some name, r in reads; _s_from_used(subjects[name], r); "of" in object.keys(r.fields)}, "filters": {[name, n] | some name, r in reads; _s_from_used(subjects[name], r); some n, _ in object.get(r.fields, "applies_to", {})}, "problems": {name: probs | some name, def in subjects; probs := _s_subject_problems(name, def, reads); probs != {}}} if is_object(subjects)
 
-_s_subject_sentences(subjects, _) := {"narrowed": set(), "filters": set(), "problems": {}} if not is_object(subjects)
+_s_subject_sentences(subjects, _) := {"chains": {}, "narrowed": set(), "filters": set(), "problems": {}} if not is_object(subjects)
 
 _s_subject_problems(name, def, reads) := {f: ps | some f in ["from", "id"]; ps := _s_field_problems(name, def, f, reads); ps != []} if is_object(def)
 
@@ -5420,14 +5571,52 @@ _s_field_problems(name, def, "id", reads) := object.get(reads[name].id, "problem
 
 _s_field_problems(_, def, f, _) := [] if not is_string(object.get(def, f, null))
 
-_s_requirements(reqs) := {name: _s_requirement(req) | some name, req in reqs} if is_object(reqs)
+_s_requirements(reqs, chains) := {name: _s_requirement(req, chains) | some name, req in reqs} if is_object(reqs)
 
-_s_requirements(reqs) := reqs if not is_object(reqs)
+_s_requirements(reqs, _) := reqs if not is_object(reqs)
 
-_s_requirement(req) := object.union(object.remove(req, ["checks"]), {"checks": {name: _s_written_check(check) | some name, check in req.checks}}) if {
+_s_requirement(req, chains) := object.union(object.remove(req, ["checks"]), {"checks": {name: _s_parent_named(check, _s_written_check(check), _s_parents_of(req, chains)) | some name, check in req.checks}}) if {
 	is_object(req)
 	is_object(object.get(req, "checks", null))
 } else := req
+
+_s_parents_of(req, chains) := {chains[req.subject]} if {
+	is_string(object.get(req, "subject", null))
+	req.subject in object.keys(chains)
+} else := set()
+
+_s_parent_named(_, model, names) := model if names == set()
+
+_s_parent_named(written, model, _) := model if not _s_written_as_sentence(written)
+
+_s_parent_named(written, model, names) := model if {
+	names != set()
+	_s_written_as_sentence(written)
+	"$sentence" in object.keys(model)
+}
+
+_s_parent_named(written, model, names) := _s_named_model(model, names) if {
+	names != set()
+	_s_written_as_sentence(written)
+	not "$sentence" in object.keys(model)
+}
+
+_s_named_model(m, names) := object.union(m, {"checks": [_s_named_model_leaf(c, names) | some c in m.checks]}) if m.op == "all_of"
+
+_s_named_model(m, names) := object.union(m, {
+	"checks": [_s_named_model_leaf(c, names) | some c in m.checks],
+	"items": [object.union(item, {"path": _s_named_path(item.path, names), "whose": [_s_named(c, names) | some c in item.whose]}) | some item in m.items],
+}) if m.op == "for"
+
+_s_named_model(m, names) := _s_named_model_leaf(m, names) if not m.op in {"all_of", "for"}
+
+_s_named_model_leaf(m, names) := object.union(m, {
+	"path": _s_named_path(m.path, names),
+	"whose": [_s_named(c, names) | some c in m.whose],
+	"check": object.union(_s_named(m.check, names), object.filter(m.check, {"path", "left"})),
+}) if m.op in {"every", "some"}
+
+_s_named_model_leaf(m, names) := _s_named(m, names) if not m.op in {"every", "some"}
 
 _s_written_check(check) := _s_check([check], {}, set()) if is_string(check)
 

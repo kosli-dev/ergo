@@ -8212,10 +8212,10 @@ test_is_not_null_is_written_wrong_because_it_could_only_fail if {
 }
 
 test_requirements_and_checks_that_are_not_objects_are_left_to_the_other_rules if {
-	ergo._s_requirements(null) == null
-	ergo._s_requirements({"r": 1}) == {"r": 1}
-	ergo._s_requirements({"r": {"checks": []}}) == {"r": {"checks": []}}
-	ergo._s_requirements({"r": {"checks": {"c": {"op": "present", "path": ["x"]}, "d": 1}}}) == {"r": {"checks": {"c": {"op": "present", "path": ["x"]}, "d": 1}}}
+	ergo._s_requirements(null, {}) == null
+	ergo._s_requirements({"r": 1}, {}) == {"r": 1}
+	ergo._s_requirements({"r": {"checks": []}}, {}) == {"r": {"checks": []}}
+	ergo._s_requirements({"r": {"checks": {"c": {"op": "present", "path": ["x"]}, "d": 1}}}, {}) == {"r": {"checks": {"c": {"op": "present", "path": ["x"]}, "d": 1}}}
 }
 
 test_a_number_just_past_the_largest_float_is_written_wrong_before_opa_reads_it if {
@@ -9106,12 +9106,62 @@ test_a_from_or_id_written_wrong_says_why_in_well_formed if {
 	}
 }
 
-test_a_from_that_starts_at_another_subject_isnt_supported_yet if {
-	rep := ergo.report({"artifact": {"ys": []}}, {"subjects": {"artifact": null, "y": {"from": "artifact.ys"}}, "requirements": {"r": {"subject": "y", "checks": {"c": "id exists"}}}}, {})
-	_from_problems(rep) == [{"name": "subjects.y.from", "value": ["a from that starts at another subject isn't supported yet"]}]
+test_a_subjects_own_name_in_its_own_from_is_the_input_field if {
 	own := ergo.report({"lockfile": {"status": "COMPLETE"}}, {"subjects": {"lockfile": {"from": `lockfile whose status is "COMPLETE"`}}, "requirements": {"r": {"subject": "lockfile", "checks": {"c": "status exists"}}}}, {})
 	_from_problems(own) == []
 	[r.cause | some r in own.results; r.check == "c"] == ["satisfied"]
+}
+
+_chain_doc := {"trail": {"artifacts": {
+	"web": {"fingerprint": "sha-1", "name": "web", "pull_requests": [{"url": "pr/7", "approved": true}, {"url": "pr/8", "approved": false}]},
+	"api": {"fingerprint": "sha-2", "name": "api", "pull_requests": []},
+}}}
+
+_chain_subjects := {
+	"artifact": {"from": "trail.artifacts named by $params.name", "id": "fingerprint"},
+	"pull request": {"from": "artifact.pull_requests", "id": "url"},
+}
+
+_chain_report(doc, subjects, checks, params) := ergo.report(doc, {"subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": checks}}}, params)
+
+test_a_chain_reads_its_path_from_the_parents_one_subject_and_every_row_says_which if {
+	rep := _chain_report(_chain_doc, _chain_subjects, {"c": "approved is true"}, {"name": "web"})
+	[[r.subject, r.check, r.cause] | some r in rep.results] == [
+		[{"type": "pull request", "id": null, "in": {"artifact": "sha-1"}}, "$well_formed", "satisfied"],
+		[{"type": "pull request", "id": null, "in": {"artifact": "sha-1"}}, "$min_subjects", "satisfied"],
+		[{"type": "pull request", "id": null, "in": {"artifact": "sha-1"}}, "$unique_ids", "satisfied"],
+		[{"type": "pull request", "id": "pr/7", "in": {"artifact": "sha-1"}}, "c", "satisfied"],
+		[{"type": "pull request", "id": "pr/8", "in": {"artifact": "sha-1"}}, "c", "value"],
+	]
+}
+
+test_a_check_of_a_chain_reads_the_parent_by_its_name if {
+	rep := _chain_report(_chain_doc, _chain_subjects, {"c": `artifact.name is "web" and url exists`}, {"name": "web"})
+	[[r.subject.id, r.cause, r.inputs] | some r in rep.results; r.check == "c"] == [
+		["pr/7", "satisfied", [{"name": "artifact.name", "value": "web"}, {"name": "url", "value": "pr/7"}]],
+		["pr/8", "satisfied", [{"name": "artifact.name", "value": "web"}, {"name": "url", "value": "pr/8"}]],
+	]
+}
+
+_chain_min_cause(rep) := [[r.cause, object.keys(r.subject)] | some r in rep.results; r.check == "$min_subjects"]
+
+test_a_chain_with_no_parent_or_several_or_an_unreadable_one_finds_no_subjects if {
+	_chain_min_cause(_chain_report(_chain_doc, _chain_subjects, {"c": "url exists"}, {"name": "api"})) == [["value", {"type", "id", "in"}]]
+	_chain_min_cause(_chain_report(_chain_doc, _chain_subjects, {"c": "url exists"}, {"name": "nope"})) == [["absent", {"type", "id"}]]
+	many := {"artifact": {"from": "trail.artifacts", "id": "fingerprint"}, "pull request": {"from": "artifact.pull_requests", "id": "url"}}
+	_chain_min_cause(_chain_report({"trail": {"artifacts": [{"fingerprint": "a"}, {"fingerprint": "b"}]}}, many, {"c": "url exists"}, {})) == [["unusable", {"type", "id"}]]
+	kept := {"artifact": {"from": `trail.artifacts whose env is "prod"`, "id": "fingerprint"}, "pull request": {"from": "artifact.pull_requests", "id": "url"}}
+	_chain_min_cause(_chain_report({"trail": {"artifacts": [{"fingerprint": "a", "env": "dev"}]}}, kept, {"c": "url exists"}, {})) == [["value", {"type", "id"}]]
+	_chain_min_cause(_chain_report({"trail": {"artifacts": [{"fingerprint": "a"}]}}, kept, {"c": "url exists"}, {})) == [["absent", {"type", "id"}]]
+	zero := _chain_report({"trail": {"artifacts": [{"fingerprint": "a", "env": "dev"}]}}, kept, {"c": "url exists"}, {})
+	zero.requirements.r.status == "not_met"
+}
+
+test_a_chain_whose_parent_is_written_wrong_is_written_wrong_too if {
+	broken := {"artifact": {"from": "trail.artifacts whose", "id": "fingerprint"}, "pull request": {"from": "artifact.pull_requests", "id": "url"}}
+	_from_problems(_chain_report(_chain_doc, broken, {"c": "url exists"}, {})) == [{"name": "subjects.artifact.from", "value": ["doesn't parse"]}]
+	three := object.union(_chain_subjects, {"x": {"from": "artifact.pull_requests"}, "pull request": {"from": "x.reviews"}})
+	_from_problems(_chain_report(_chain_doc, three, {"c": "url exists"}, {"name": "web"})) == [{"name": `subjects."pull request".from`, "value": ["a chain of more than two subjects isn't supported yet"]}]
 }
 
 test_a_from_line_that_starts_at_input_reads_the_input_and_one_at_params_is_written_wrong if {
@@ -9206,4 +9256,57 @@ test_a_narrowing_chain_deeper_than_ten_prints_in_order if {
 test_a_subject_name_that_isnt_a_string_gives_the_same_report_with_strict_builtins if {
 	rep := ergo.report({"defects": [{"id": 1}]}, {"subjects": {1: {"from": "defects whose id exists"}}, "requirements": {"r": {"subject": "c", "checks": {"c": "id exists"}}}}, {})
 	rep.requirements.r.status == "not_met"
+}
+
+test_a_chain_whose_parent_reads_a_param_it_cant_use_fails_with_that_cause if {
+	_chain_min_cause(_chain_report(_chain_doc, _chain_subjects, {"c": "url exists"}, {"name": 5})) == [["unusable", {"type", "id"}]]
+	gone := {"artifact": {"from": "trail.nope", "id": "fingerprint"}, "pull request": {"from": "artifact.pull_requests", "id": "url"}}
+	_chain_min_cause(_chain_report(_chain_doc, gone, {"c": "url exists"}, {})) == [["absent", {"type", "id"}]]
+	_chain_min_cause(_chain_report(_chain_doc, _chain_subjects, {"c": "url exists"}, {})) == [["absent", {"type", "id"}]]
+}
+
+test_a_chain_keeps_the_problems_of_a_check_written_wrong if {
+	rep := _chain_report(_chain_doc, _chain_subjects, {"c": `url is "x`}, {"name": "web"})
+	[i.value | some r in rep.results; r.check == "$well_formed"; some i in r.inputs; i.name == "checks.c"] == [["unclosed quote at column 8"]]
+}
+
+test_every_and_some_in_a_check_of_a_chain_can_walk_the_parent if {
+	rep := _chain_report(_chain_doc, _chain_subjects, {"c": "some artifact.pull_requests.approved is true"}, {"name": "web"})
+	[r.cause | some r in rep.results; r.check == "c"] == ["satisfied", "satisfied"]
+}
+
+_review_doc := {"trail": {"artifacts": {"web": {
+	"fingerprint": "sha-1",
+	"owner": "ann",
+	"pull_requests": [{"url": "pr/7", "approved": true, "reviews": [{"by": "ann", "ok": true}]}],
+}}}}
+
+test_the_parents_name_is_the_parent_everywhere_in_a_sentence if {
+	every check in [
+		{"for": "every artifact.pull_requests as p", "assert": "p.url exists"},
+		{"for": "every reviews whose by is artifact.owner as r", "assert": "r.ok is true"},
+		"every reviews whose by is artifact.owner exists",
+		"every reviews.by is artifact.owner",
+		"count of reviews whose by is artifact.owner is 1",
+	] {
+		[r.cause | some r in _chain_report(_review_doc, _chain_subjects, {"c": check}, {"name": "web"}).results; r.check == "c"] == ["satisfied"]
+	}
+}
+
+test_a_subject_cant_build_on_a_subject_read_from_another_yet if {
+	doc := {"artifacts": [{"fingerprint": "a1", "prs": [{"url": "p1", "ok": true}]}], "prs": [{"url": "elsewhere", "ok": true}]}
+	base := {"artifact": {"from": "artifacts", "id": "fingerprint"}, "pr": {"from": "artifact.prs", "id": "url"}}
+	every pair in [[{"from": "pr whose ok is true"}, "from"], [{"of": "pr"}, "of"]] {
+		rep := ergo.report(doc, {"subjects": object.union(base, {"okpr": pair[0]}), "requirements": {"r": {"subject": "okpr", "checks": {"c": "url exists"}}}}, {})
+		_from_problems(rep) == [{"name": concat("", ["subjects.okpr.", pair[1]]), "value": ["can't build on a subject read from another subject yet"]}]
+		[r.check | some r in rep.results] == ["$well_formed", "$min_subjects", "$unique_ids"]
+	}
+}
+
+test_the_parent_is_named_only_in_sentences_and_only_in_its_own_requirement if {
+	rep := _chain_report(_chain_doc, _chain_subjects, {"c": {"op": "present", "path": ["$artifact", "name"]}}, {"name": "web"})
+	[i.value | some r in rep.results; r.check == "$well_formed"; some i in r.inputs; i.name == "checks.c"] == [["unknown name $artifact"]]
+	other := ergo.report({"things": [{"k": 1}], "trail": {"artifacts": {}}}, {"subjects": object.union(_chain_subjects, {"thing": {"from": ["things", {"each_as": "artifact"}]}}), "requirements": {"t": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["$artifact", "k"]}}}}}, {"name": "web"})
+	other.requirements.t.checks.c.expression == "$artifact.k is present"
+	[r.inputs | some r in other.results; r.check == "c"] == [[{"name": "$artifact.k", "value": 1}]]
 }

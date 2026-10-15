@@ -157,7 +157,36 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
 - `named by each of $params.kinds` makes each key in the list a subject, as a [naming step](#naming-subjects) with `keys` does: `from: build.test_runs named by each of $params.kinds`.
 - A subject's own name at the start of its `from` is the input field, so `lockfile` can have `from: lockfile whose status is "COMPLETE"`.
 - A `from` line that's another subject's name, with or without a `whose`, narrows that subject, as [`of`](#a-subject-built-on-another) does: `critical defect` with `from: defect whose severity is "critical"` keeps the defects that pass `defect`'s conditions and its own. A name with a space goes in quotes, so the whole line goes in single quotes in YAML: `from: '"critical defect" whose team is "b"'`. Like a subject with `of`, it takes its `id` from the subject it narrows, so an `id` of its own is written wrong.
-- A `from` line can't go with `applies_to`, and one that goes on into another subject, like `artifact.pull_requests`, isn't supported yet. A `from` or `id` that can't be read is written wrong, and the `$well_formed` row says why, like `{"name": "subjects.x.from", "value": ["doesn't parse"]}`.
+- A `from` line that starts at another subject's name and goes on reads the rest of its path from that subject. With `{"params": {"artifact_name": "web"}}` and this input:
+
+  ```json
+  {"trail": {"artifacts": {"web": {"fingerprint": "sha-1", "pull_requests": [
+    {"url": "pr/7", "approved_by": "bob"},
+    {"url": "pr/8", "approved_by": ""}
+  ]}}}}
+  ```
+
+  these subjects read the pull requests of the `web` artifact:
+
+  ```yaml
+  subjects:
+    artifact:
+      from: trail.artifacts named by $params.artifact_name
+      id: fingerprint
+    pull request:
+      from: artifact.pull_requests
+      id: url
+  ```
+
+  and every row of a requirement on `pull request` says which artifact it belongs to, under `in`:
+
+  ```json
+  {"check": "approved", "subject": {"type": "pull request", "id": "pr/8", "in": {"artifact": "sha-1"}}, "passed": false, "cause": "value",
+   "inputs": [{"name": "approved_by", "value": ""}]}
+  ```
+
+  A check reads the artifact by its name, like `artifact.name`. This works when the artifact is one subject. When it's none, the pull requests are none too. When it's several, `$min_subjects` fails as `unusable`, since that isn't supported yet ([#210](https://github.com/kosli-dev/ergo/issues/210)). A chain of more than two subjects is written wrong, and so is a subject that builds on one with `of` or a from line that narrows it. Only checks written as sentences can read the artifact.
+- A `from` line can't go with `applies_to`. A `from` or `id` that can't be read is written wrong, and the `$well_formed` row says why, like `{"name": "subjects.x.from", "value": ["doesn't parse"]}`.
 
 ### A subject built on another
 
