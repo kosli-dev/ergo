@@ -8082,7 +8082,7 @@ test_a_sentence_written_wrong_says_what_is_wrong if {
 	_read(`x is "$schema"`) == {"assertions": [{"path": {"steps": ["x"]}, "phrase": {"op": "is", "value": "$schema"}}]}
 	ergo._for_line(`every x as every`) == {"problems": ["every can't be a name"]}
 	ergo._for_line(`every x as params`) == {"problems": ["params can't be a name"]}
-	ergo._for_line(`every x as a, every y as b, every z as c`) == {"problems": ["doesn't parse"]}
+	ergo._for_line(`every x as a, every y as b, every z as c`) == {"problems": ["a for line holds two items at most"]}
 	ergo._for_line(`some x, if any, as y`) == {"problems": ["if any can't go with some"]}
 	ergo._from_line(`count whose x is 1`) == {"problems": ["count is a word of the grammar: write .count"]}
 	ergo._from_line(`x is 1`) == {"problems": ["doesn't parse"]}
@@ -8196,7 +8196,6 @@ test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
 	_sentence_problems({"assert": ["x exists", 1]}) == ["invalid assert"]
 	_sentence_problems({"assert": ["x exists", "y is \"a"]}) == ["line 2: unclosed quote at column 6"]
 	_sentence_problems({"assert": ["x exists", "count of ys is 1"]}) == ["line 2: count of, sum of and plus aren't supported yet"]
-	_sentence_problems({"assert": "x exists", "for": "every xs as x"}) == [`"for" isn't supported yet`]
 }
 
 test_a_check_written_as_a_string_is_read_as_a_sentence if {
@@ -8585,6 +8584,7 @@ test_every_and_some_are_unknown_ops_in_todays_syntax if {
 	every op in ["every", "some"] {
 		_sentence_problems({"op": op, "path": ["xs"], "check": {"op": "present", "path": []}, "whose": [], "if_any": false}) == [concat("", ["unknown op ", op])]
 	}
+	_sentence_problems({"op": "for", "items": [{"q": "every", "path": ["xs"], "whose": [], "if_any": false, "as": "x"}], "checks": [{"op": "present", "path": ["$x"]}], "assertions": ["x exists"]}) == ["unknown op for"]
 }
 
 test_a_walk_that_reads_no_list_stops_at_the_end_when_every_value_along_the_path_is_an_object if {
@@ -8639,4 +8639,176 @@ test_a_walk_whose_named_by_cant_be_read_shows_an_empty_list_in_its_inputs if {
 test_a_list_phrase_after_every_or_some_is_written_wrong_because_the_last_list_is_walked_too if {
 	_sentence_problems(`every pull_requests.labels does not contain "hotfix"`) == [`"does not contain" after every or some would check each item of the last list, not the list: put the walk on a for line`]
 	_sentence_problems(`some xs contains all of 1, 2`) == [`"contains all of" after every or some would check each item of the last list, not the list: put the walk on a for line`]
+}
+
+_for_rows(check, things, params) := [[r.subject.id, r.cause, r.failed_items, r.inputs] | some r in ergo.report({"things": things}, _sentence_policy({"c": check}), params).results; r.check == "c"]
+
+_peer_approval := {
+	"for": `some approvers whose state is "APPROVED" as approver, every commits as commit`,
+	"assert": ["approver.username does not equal author", "approver.timestamp is after commit.timestamp"],
+}
+
+_peer_things := [
+	{"id": "peer", "author": "ann", "commits": [{"timestamp": "2026-10-01T09:00:00Z"}], "approvers": [{"username": "bob", "state": "APPROVED", "timestamp": "2026-10-01T12:00:00Z"}]},
+	{"id": "fails", "author": "ann", "commits": [{"timestamp": "2026-10-01T09:00:00Z"}, {"timestamp": "2026-10-01T11:00:00Z"}], "approvers": [
+		{"username": "bob", "state": "APPROVED", "timestamp": "2026-10-01T10:00:00Z"},
+		{"username": "ann", "state": "APPROVED", "timestamp": "2026-10-01T12:00:00Z"},
+		{"username": "cat", "state": "COMMENTED", "timestamp": "2026-10-01T12:00:00Z"},
+	]},
+	{"id": "nostate", "author": "ann", "commits": [], "approvers": [{"username": "carl", "timestamp": "2026-10-01T12:00:00Z"}]},
+]
+
+test_a_for_line_lists_each_first_item_that_failed_with_the_lines_it_failed if {
+	rows := _for_rows(_peer_approval, _peer_things, {})
+	[[row[0], row[1]] | some row in rows] == [["peer", "satisfied"], ["fails", "value"], ["nostate", "absent"]]
+	rows[1][2] == [
+		{"path": "item 1 of approvers", "item": "item 1 of approvers", "cause": "value", "value": null, "failed_assertions": [{"assertion": "approver.timestamp is after commit.timestamp", "cause": "value"}]},
+		{"path": "item 2 of approvers", "item": "item 2 of approvers", "cause": "value", "value": null, "failed_assertions": [{"assertion": "approver.username does not equal author", "cause": "value"}]},
+	]
+	rows[2][2] == [{"path": "item 1 of approvers", "item": "item 1 of approvers", "cause": "absent", "value": null, "failed_assertions": []}]
+	rows[0][2] == []
+}
+
+test_a_for_line_shows_each_list_it_walked_once_and_the_subject_fields_it_read if {
+	rows := _for_rows(_peer_approval, _peer_things, {})
+	rows[1][3] == [
+		{"name": "approvers[]", "value": _peer_things[1].approvers},
+		{"name": "author", "value": "ann"},
+		{"name": "commits[]", "value": _peer_things[1].commits},
+	]
+}
+
+test_a_for_line_prints_as_its_for_line_and_its_assertions if {
+	r := ergo.report({"things": []}, _sentence_policy({"c": _peer_approval}), {})
+	r.requirements.s.checks.c.expression == `for some approvers whose state is "APPROVED" as approver, every commits as commit: approver.username does not equal author and approver.timestamp is after commit.timestamp`
+}
+
+test_a_second_item_can_walk_a_list_inside_the_first if {
+	check := {"for": `every pull_requests as pr, some pr.approvers whose state is "APPROVED" as approver`, "assert": "approver.username does not equal pr.author"}
+	things := [
+		{"id": 1, "pull_requests": [{"author": "ann", "approvers": [{"username": "bob", "state": "APPROVED"}]}]},
+		{"id": 2, "pull_requests": [{"author": "ann", "approvers": [{"username": "bob", "state": "APPROVED"}]}, {"author": "cat", "approvers": [{"username": "cat", "state": "APPROVED"}, {"username": "dan", "state": "COMMENTED"}]}]},
+	]
+	rows := _for_rows(check, things, {})
+	[[row[0], row[1]] | some row in rows] == [[1, "satisfied"], [2, "value"]]
+	rows[1][2] == [{"path": "item 2 of pull_requests", "item": "item 2 of pull_requests", "cause": "value", "value": null, "failed_assertions": [{"assertion": "approver.username does not equal pr.author", "cause": "value"}]}]
+	rows[1][3] == [
+		{"name": "pr.approvers[]", "value": array.concat(things[1].pull_requests[0].approvers, things[1].pull_requests[1].approvers)},
+		{"name": "pull_requests[]", "value": things[1].pull_requests},
+	]
+}
+
+test_an_item_that_no_approver_passes_fails_without_lines_when_whose_left_every_one_out if {
+	check := {"for": `every pull_requests as pr, some pr.approvers whose state is "APPROVED" as approver`, "assert": "approver.username does not equal pr.author"}
+	rows := _for_rows(check, [{"id": 1, "pull_requests": [{"author": "ann", "approvers": [{"username": "bob", "state": "COMMENTED"}]}]}], {})
+	rows[0][1] == "value"
+	rows[0][2] == [{"path": "item 1 of pull_requests", "item": "item 1 of pull_requests", "cause": "value", "value": null, "failed_assertions": []}]
+}
+
+test_a_for_list_fails_closed_as_a_walk_does if {
+	check := {"for": "every xs as x", "assert": "x is 1"}
+	rows := _for_rows(check, [{"id": 1, "xs": []}, {"id": 2}, {"id": 3, "xs": null}, {"id": 4, "xs": {"a": 1}}], {})
+	[[row[0], row[1], row[2]] | some row in rows] == [
+		[1, "value", [{"path": "xs", "item": "xs", "cause": "value", "value": [], "failed_assertions": []}]],
+		[2, "absent", [{"path": "xs", "item": "xs", "cause": "absent", "value": null, "failed_assertions": []}]],
+		[3, "null", [{"path": "xs", "item": "xs", "cause": "null", "value": null, "failed_assertions": []}]],
+		[4, "unusable", [{"path": "xs", "item": "xs", "cause": "unusable", "value": {"a": 1}, "failed_assertions": []}]],
+	]
+	[row[1] | some row in _for_rows({"for": "every xs, if any, as x", "assert": "x is 1"}, [{"id": 1, "xs": []}, {"id": 2}], {})] == ["satisfied", "absent"]
+}
+
+test_an_item_a_whose_cant_decide_fails_with_its_cause_before_any_line_is_read if {
+	check := {"for": "every xs whose s is at least 1 as x", "assert": `x.k is "a"`}
+	rows := _for_rows(check, [{"id": 1, "xs": [{"k": "a", "s": 1}, {"k": "a"}]}, {"id": 2, "xs": [{"k": "a", "s": "1"}]}], {})
+	[[row[0], row[1], row[2]] | some row in rows] == [
+		[1, "absent", [{"path": "item 2 of xs", "item": "item 2 of xs", "cause": "absent", "value": null, "failed_assertions": []}]],
+		[2, "unusable", [{"path": "item 1 of xs", "item": "item 1 of xs", "cause": "unusable", "value": null, "failed_assertions": []}]],
+	]
+}
+
+test_a_whose_on_an_item_reads_its_own_field_even_when_it_has_the_items_name if {
+	check := {"for": "every xs whose x is 1 as x", "assert": "x.v is 2"}
+	[row[1] | some row in _for_rows(check, [{"id": 1, "xs": [{"x": 1, "v": 2}, {"x": 2, "v": 3}]}], {})] == ["satisfied"]
+}
+
+test_a_whose_on_the_second_item_can_read_the_first_items_name if {
+	check := {"for": "every prs as pr, some pr.rev whose u does not equal pr.author as r", "assert": `r.u is "b"`}
+	[row[1] | some row in _for_rows(check, [{"id": 1, "prs": [{"author": "a", "rev": [{"u": "a"}, {"u": "b"}]}]}, {"id": 2, "prs": [{"author": "b", "rev": [{"u": "a"}, {"u": "b"}]}]}], {})] == ["satisfied", "value"]
+}
+
+test_a_name_hides_the_subject_field_with_the_same_name if {
+	check := {"for": "every xs as x", "assert": `x is "a"`}
+	[row[1] | some row in _for_rows(check, [{"id": 1, "x": "b", "xs": ["a"]}], {})] == ["satisfied"]
+}
+
+test_a_for_line_can_walk_a_param if {
+	check := {"for": "some $params.allowed as ok", "assert": "k equals ok"}
+	rows := _for_rows(check, [{"id": 1, "k": "a"}, {"id": 2, "k": "z"}], {"allowed": ["a", "b"]})
+	[row[1] | some row in rows] == ["satisfied", "value"]
+	rows[1][3] == [{"name": "$params.allowed[]", "value": ["a", "b"]}, {"name": "k", "value": "z"}]
+	[row[1] | some row in _for_rows(check, [{"id": 1, "k": "a"}], {})] == ["absent"]
+}
+
+test_an_every_in_the_assertion_walks_inside_the_named_item if {
+	check := {"for": "some xs as x", "assert": "every x.ys is at most 2"}
+	[row[1] | some row in _for_rows(check, [{"id": 1, "xs": [{"ys": [1, 3]}, {"ys": [1, 2]}]}, {"id": 2, "xs": [{"ys": [3]}]}], {})] == ["satisfied", "value"]
+}
+
+test_each_item_lists_every_line_it_failed_with_the_first_cause_of_each if {
+	check := {"for": "every xs as x", "assert": ["x.a is 2", "x.b is 2", "x.c is 1"]}
+	rows := _for_rows(check, [{"id": 1, "xs": [{"a": 1, "b": 2}, {"a": 2, "b": 2, "c": 1}]}], {})
+	rows[0][2] == [{"path": "item 1 of xs", "item": "item 1 of xs", "cause": "absent", "value": null, "failed_assertions": [{"assertion": "x.a is 2", "cause": "value"}, {"assertion": "x.c is 1", "cause": "absent"}]}]
+}
+
+test_a_for_line_on_a_subject_that_isnt_an_object_fails_like_any_path_does if {
+	[[row[1], row[2], row[3]] | some row in _for_rows({"for": "every xs as x", "assert": "x is 1"}, ["s"], {})] == [["not_an_object", [], []]]
+}
+
+test_a_for_line_written_wrong_says_why if {
+	_sentence_problems({"assert": "x exists", "for": 1}) == ["invalid for"]
+	_sentence_problems({"assert": "x.a exists", "for": "every xs as x, every ys as y, every zs as z"}) == ["for: a for line holds two items at most"]
+	_sentence_problems({"assert": "x.a exists", "for": "every xs as"}) == [`for: an item ends with "as" and a name, like "every pull_requests as pr"`]
+	_sentence_problems({"assert": "x.a exists", "for": "xs as x"}) == [`for: an item starts with "every" or "some"`]
+	_sentence_problems({"assert": "x.a exists", "for": "every xs as x, every ys as x"}) == ["for: x is given twice"]
+	_sentence_problems({"assert": "x.a is 1", "for": "every xs as params"}) == ["for: params can't be a name"]
+	_sentence_problems({"assert": "x.a is 1", "for": "some xs, if any, as x"}) == ["for: if any can't go with some"]
+	_sentence_problems({"assert": "z named by x is 1", "for": "every xs as x"}) == [`"named by" a name from the for line isn't supported yet`]
+	_sentence_problems({"assert": ["x is 1", "z named by x is 1"], "for": "every xs as x"}) == [`line 2: "named by" a name from the for line isn't supported yet`]
+	_sentence_problems({"assert": "x is $foo", "for": "every xs as x"}) == ["unknown name $foo"]
+}
+
+test_forms_ergo_does_not_run_yet_are_written_wrong_on_a_for_line_too if {
+	every pair in [
+		["every xs named by x as x", `"named by" a name from the for line isn't supported yet`],
+		["every xs named by k as x", "unknown name k"],
+		["every xs whose v named by k is 1 as x", "unknown name k"],
+		["every xs whose count of ys is 1 as x", "count of, sum of and plus aren't supported yet"],
+		["every xs whose n is m plus 1 as x", "count of, sum of and plus aren't supported yet"],
+		["every b.c.d.e.f.g.h.i.j.k.l.m as x", "every and some over more than ten steps aren't supported yet"],
+	] {
+		_sentence_problems({"assert": "x is 1", "for": pair[0]}) == [pair[1]]
+	}
+}
+
+test_a_for_list_whose_named_by_cant_be_read_fails_with_its_cause_as_a_walk_does if {
+	check := {"for": "every m named by $params.k as x", "assert": "x is 1"}
+	_for_rows(check, [{"id": 1, "m": {"a": [1]}}], {}) == [[1, "absent", [], [{"name": "m named by $params.k", "value": []}]]]
+	_for_rows(check, [{"id": 1, "m": {"a": [1]}}], {"k": "a"}) == [[1, "satisfied", [], [{"name": "m named by $params.k[]", "value": [1]}]]]
+	inner := {"for": "every xs as x, every m named by $params.k as y", "assert": "y is 1"}
+	_for_rows(inner, [{"id": 1, "xs": [1], "m": {"a": [1]}}], {}) == [[
+		1, "absent",
+		[{"path": "item 1 of xs", "item": "item 1 of xs", "cause": "absent", "value": null, "failed_assertions": []}],
+		[{"name": "m named by $params.k", "value": []}, {"name": "xs[]", "value": [1]}],
+	]]
+}
+
+test_a_second_item_a_whose_cant_decide_fails_the_first_item_with_its_cause if {
+	check := {"for": "every xs as x, every ys whose s is 1 as y", "assert": "x is 1"}
+	_for_rows(check, [{"id": 1, "xs": [1], "ys": [{"s": 1}, {"t": 1}]}], {})[0][2] == [{"path": "item 1 of xs", "item": "item 1 of xs", "cause": "absent", "value": null, "failed_assertions": []}]
+}
+
+test_a_for_line_whose_param_cant_be_used_fails_as_unusable_and_keeps_its_inputs if {
+	rows := _for_rows({"for": "every xs as x", "assert": "x is one of $params.l"}, [{"id": 1, "xs": [1]}, "s"], {"l": "text"})
+	rows == [[1, "unusable", [], [{"name": "xs[]", "value": [1]}]], ["s", "unusable", [], [{"name": "xs", "value": []}]]]
+	[row[1] | some row in _for_rows({"for": "every xs whose x is one of $params.l as x", "assert": "x is 1"}, [{"id": 1, "xs": [1]}], {"l": "text"})] == ["unusable"]
 }

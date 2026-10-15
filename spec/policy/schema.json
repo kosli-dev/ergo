@@ -144,6 +144,10 @@
                 }
               ]
             },
+            "for": {
+              "type": "string",
+              "description": "A for line: one or two items, each every or some, a path, an optional whose and as a name."
+            },
             "description": {
               "type": [
                 "string",

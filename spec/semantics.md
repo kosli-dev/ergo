@@ -285,6 +285,22 @@ Every row has a cause. When a check reads several values, the row takes the firs
 
 **[walk.failed_items]** The row's `failed_items` lists what failed, in path order, when the check fails, and is `[]` when it passes: each value that failed the basic check, with `path` the field, `item` the item and `value` what the path ended at, or `null`; each undecided item, with `path` the field of the first `whose` check that couldn't decide; and each list that failed while walking, with `path` and `item` both the list. An item that `whose` left out isn't listed.
 
+## `for`
+
+`for` takes `items`, one or two, each with `every` or `some`, a path, `whose`, `if_any` and a name, and `checks` and `assertions`, as `all_of` does. It's what a check with a `for` line reads into, see [sentence.for.line](sentences.md#the-for-line), and today's syntax can't use it (see [sentence_ops.syntax](syntax.md#policies)).
+
+**[for.walk]** Each item's path is walked as an `every` or `some` path is, see [walk.lists](#every-and-some), and its items are the items of the innermost list walked. An item's `whose` checks read from that item, and an item is undecided or left out as [walk.items](#every-and-some) says. The second item's path and its `whose` checks can start at the first item's name, and then it's walked again for each item of the first list.
+
+**[for.try]** The checks read the subject, with each name standing for its item. With one item, an item passes when all the checks pass. With two, an item of the first list passes when the second item passes for it, as [walk.every](#every-and-some) or [walk.some](#every-and-some) says, where an item of the second list passes when all the checks pass. A failed item's cause is the first, in the order of [causes](#causes), among the checks that failed, or what failed in the second item's walk.
+
+**[for.pass]** The check passes or fails as the first item does, by [walk.every](#every-and-some) or [walk.some](#every-and-some), with its items judged as [for.try](#for) says.
+
+**[for.inputs]** The row shows each item's list once, named after its path with `[]` after each list walked, holding the items, and every path the checks read from the subject, once each, even when no check was run, all sorted by name. A second item that starts at the first item's name is named with that name, like `pr.approvers[]`, and holds the items of every list it walked, in order. Paths that start at a name aren't shown.
+
+**[for.failed_items]** When the check fails, `failed_items` lists the first item's failures, in path order, as [walk.failed_items](#every-and-some) does, and it's `[]` when the check passes. A failed item has `path` and `item` both the item, like `item 2 of approvers`, and `value` `null`. Each entry also has `failed_assertions`: the sentences that failed for that item, in the order written, each with the first cause it failed with. It's `[]` when no sentence was checked for it, because a `whose` couldn't decide, a list failed while walking, or `whose` left nothing in, and on the entry of a list that failed while walking.
+
+**[for.flaws]** When a ref the check reads can't be used, or the input or params hold something JSON can't, it fails as `unusable` and `failed_items` is `[]`, as [walk.flaws](#every-and-some) says. On a subject that isn't an object, with a first path that starts at the subject, it fails as `not_an_object`. When a ref step in the first item's path can't be read, it fails with the ref's cause, `failed_items` is `[]`, and that path's input holds `[]`. In the second item's path, the first list's item fails with the ref's cause instead.
+
 ## Substitutes
 
 A check in `checks` or `applies_to` can have a substitute: another check that satisfies it when the first one fails. It's for other evidence that the same requirement was met, like an attestation from a verified committer standing in for the pull request a repository's first commit can't have.
