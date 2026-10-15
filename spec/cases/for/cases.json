@@ -5468,5 +5468,148 @@
         ]
       }
     ]
+  },
+  {
+    "description": "named by a name from the for line",
+    "policy": {
+      "subjects": {
+        "thing": {
+          "from": [
+            "things"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every dispatched as persona",
+              "assert": "shas named by persona matches \"^[0-9a-f]{40}$\""
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the key each item names: a key that's there and passes, one that fails, one that's missing, and an item that isn't a string",
+        "rules": [
+          "for.named_by",
+          "sentence.path.dynamic",
+          "for.failed_items",
+          "sentence.phrase.matches"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": 1,
+              "dispatched": [
+                "security",
+                "style"
+              ],
+              "shas": {
+                "security": "3f2a000000000000000000000000000000000000",
+                "style": "9c1b000000000000000000000000000000000000"
+              }
+            },
+            {
+              "id": 2,
+              "dispatched": [
+                "security",
+                "perf",
+                5
+              ],
+              "shas": {
+                "security": "x"
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "name": "dispatched[]",
+                "value": [
+                  "security",
+                  "style"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": 1,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "shas named by persona matches \"^[0-9a-f]{40}$\"",
+                    "cause": "value"
+                  }
+                ],
+                "item": "item 1 of dispatched",
+                "path": "item 1 of dispatched",
+                "value": null
+              },
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "shas named by persona matches \"^[0-9a-f]{40}$\"",
+                    "cause": "absent"
+                  }
+                ],
+                "item": "item 2 of dispatched",
+                "path": "item 2 of dispatched",
+                "value": null
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "shas named by persona matches \"^[0-9a-f]{40}$\"",
+                    "cause": "unusable"
+                  }
+                ],
+                "item": "item 3 of dispatched",
+                "path": "item 3 of dispatched",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "name": "dispatched[]",
+                "value": [
+                  "security",
+                  "perf",
+                  5
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": 2,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

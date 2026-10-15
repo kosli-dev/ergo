@@ -309,6 +309,8 @@ A side of `compare` can also be `count_of` or `sum_of`, each with a path, `whose
 
 **[for.try]** The checks read the subject, with each name standing for its item. With one item, an item passes when all the checks pass. With two, an item of the first list passes when the second item passes for it, as [walk.every](#every-and-some) or [walk.some](#every-and-some) says, where an item of the second list passes when all the checks pass. A failed item's cause is the first, in the order of [causes](#causes), among the checks that failed, or what failed in the second item's walk.
 
+**[for.named_by]** A path with a `named_by` step reads the key that the step's name holds for the item being tried, as a ref step reads a key from the params. When the name holds something that isn't a string, the path can't be read, and its check fails as `unusable`. Only sentences can write such a step, as `<path> named by <name>`; in today's syntax it's a step that can't be a key.
+
 **[for.pass]** The check passes or fails as the first item does, by [walk.every](#every-and-some) or [walk.some](#every-and-some), with its items judged as [for.try](#for) says.
 
 **[for.inputs]** The row shows each item's list once, named after its path with `[]` after each list walked, holding the values its name stands for, and the inputs the checks would show on their own, leaving out paths that start at a name, once each, even when no check was run, all sorted by name. A second item that starts at the first item's name is named with that name, like `pr.approvers[]`, and holds the items of every list it walked, in order. Paths that start at a name aren't shown.

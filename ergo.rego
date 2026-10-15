@@ -1143,6 +1143,19 @@ _step_key(seg) := seg if {
 	not _is_literal(seg)
 	not _is_ref(seg)
 	not _malformed(seg)
+	not _name_step(seg)
+}
+
+_step_key(seg) := v if {
+	_name_step(seg)
+	v := input["ergo/names"][seg.named_by]
+	_is_key(v)
+}
+
+_name_step(seg) if {
+	is_object(seg)
+	object.keys(seg) == {"named_by"}
+	is_string(seg.named_by)
 }
 
 _is_key(v) if is_string(v)
@@ -1171,6 +1184,11 @@ _bad_step(seg) if {
 _bad_step(seg) if {
 	_is_literal(seg)
 	not _is_key(seg.literal)
+}
+
+_bad_step(seg) if {
+	_name_step(seg)
+	not data.ergo_sentence_here == true
 }
 
 _unliteral(seg) := seg.literal if _is_literal(seg)
@@ -1285,6 +1303,11 @@ _step_name(i, p) := concat("", [" named by ", _ref_name(p.ref)]) if {
 	_named_by(p)
 }
 
+_step_name(i, p) := concat("", [" named by ", _s_key_text(p.named_by)]) if {
+	i > 0
+	_name_step(p)
+}
+
 _step_name(i, p) := concat("", ["[", _ref_name(p.ref), "]"]) if {
 	_is_ref(p)
 	not _named_by_after(i, p)
@@ -1298,6 +1321,12 @@ _named_by_after(i, p) if {
 _step_name(i, p) := concat("", [_step_dot(i), _segment_name(p)]) if {
 	not _nameable_step(p)
 	not _is_ref(p)
+	not _name_step_after(i, p)
+}
+
+_name_step_after(i, p) if {
+	i > 0
+	_name_step(p)
 }
 
 _nameable_step(p) if is_string(p)
@@ -5981,6 +6010,13 @@ _s_model_step(s) := s.index if {
 _s_model_step(s) := {"ref": [concat("", ["$$", s.named_by.start]), s.named_by.steps[0]]} if {
 	is_object(s)
 	"named_by" in object.keys(s)
+	"start" in object.keys(s.named_by)
+}
+
+_s_model_step(s) := {"named_by": s.named_by.steps[0]} if {
+	is_object(s)
+	"named_by" in object.keys(s)
+	not "start" in object.keys(s.named_by)
 }
 
 _s_model_position(p) := [p.position - 1] if is_number(object.get(p, "position", null))
@@ -6257,20 +6293,22 @@ _s_for_problems(lines, ftext) := _s_lines_problems(lines) if not is_string(ftext
 
 _s_for_line_unsupported(lines, ftext) := _s_lines_problems(lines) if not "items" in object.keys(_for_line(ftext))
 
-_s_for_line_unsupported(lines, ftext) := _s_for_unsupported(fl, [], {item.as | some item in fl.items}) | {_s_named_unsupported(p, {item.as | some item in fl.items}) | some p in _s_lines_problems(lines)} if {
+_s_for_line_unsupported(lines, ftext) := _s_for_unsupported(fl, [], {item.as | some item in fl.items}) | {p | some p in _s_lines_problems(lines); _s_kept_problem(p, {item.as | some item in fl.items})} if {
 	fl := _for_line(ftext)
 	"items" in object.keys(fl)
 }
 
-_s_for_unsupported(fl, assertions, names) := {_s_named_unsupported(u, names) | some item in fl.items; some u in _s_item_unsupported(item)} | {_s_named_unsupported(u, names) | some a in assertions; some u in _s_assertion_unsupported(a)}
+_s_for_unsupported(fl, assertions, names) := {u | some item in fl.items; some u in _s_item_unsupported(item); _s_kept_problem(u, names)} | {u | some a in assertions; some u in _s_assertion_unsupported(a); _s_kept_problem(u, names)}
 
 _s_item_unsupported(item) := (_s_paths_unsupported(item) | {u | some c in object.get(item, "where", []); some u in _s_cond_unsupported(c)}) | _s_walk_too_long(item)
 
-_s_named_unsupported(u, names) := concat("", [parts[0], `"named by" a name from the for line isn't supported yet`]) if {
+_s_kept_problem(u, names) if not _s_names_a_for_name(u, names)
+
+_s_names_a_for_name(u, names) if {
 	parts := split(u, "unknown name ")
 	count(parts) == 2
 	parts[1] in names
-} else := u
+}
 
 _s_for_item_model(item, names) := {
 	"q": q,
@@ -6502,4 +6540,10 @@ _for_list_name(path, walked) := _walk_name(path, walked) if not _for_named(path)
 _for_named(p) if {
 	_named(p)
 	not _builtin(p)
+}
+
+_for_named(p) if {
+	is_array(p)
+	some step in p
+	_name_step(step)
 }
