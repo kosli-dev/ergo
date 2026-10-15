@@ -7,7 +7,15 @@
     "subjects": {
       "type": "object",
       "additionalProperties": {
-        "$ref": "#/$defs/subject"
+        "anyOf": [
+          {
+            "$ref": "#/$defs/subject"
+          },
+          {
+            "type": "null",
+            "description": "A subject with nothing under it reads the input field of its own name."
+          }
+        ]
       }
     },
     "requirements": {
@@ -32,24 +40,40 @@
           ]
         },
         "from": {
-          "type": "array",
-          "description": "A naming step can only be the last step.",
-          "items": {
-            "anyOf": [
-              {
-                "$ref": "#/$defs/key"
-              },
-              {
-                "$ref": "#/$defs/ref"
-              },
-              {
-                "$ref": "#/$defs/naming_step"
+          "anyOf": [
+            {
+              "type": "array",
+              "description": "A naming step can only be the last step.",
+              "items": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/key"
+                  },
+                  {
+                    "$ref": "#/$defs/ref"
+                  },
+                  {
+                    "$ref": "#/$defs/naming_step"
+                  }
+                ]
               }
-            ]
-          }
+            },
+            {
+              "type": "string",
+              "description": "A from line: a path, optionally named by each of a list, optionally whose and conditions. spec/sentences.md says how it's written."
+            }
+          ]
         },
         "id": {
-          "$ref": "#/$defs/path"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/path"
+            },
+            {
+              "type": "string",
+              "description": "A path written as in a sentence, like build.number."
+            }
+          ]
         },
         "applies_to": {
           "$ref": "#/$defs/named_checks"

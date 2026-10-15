@@ -130,7 +130,7 @@
   },
   {
     "description": "the whole input as the subject",
-    "policy": {"subjects": {"subject": {}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+    "policy": {"subjects": {"subject": {"from": []}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
     "cases": [
       {
         "description": "checks the input itself, with itself as its id",
