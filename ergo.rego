@@ -4175,7 +4175,11 @@ _side_inputs(subj, side, item) := _basic_inputs(subj, side, item) if _basic_form
 
 _side_inputs(subj, side, item) := array.concat([_derived_input(subj, side, _side_text(item, side))], [i | some operand in side.add; some i in _basic_inputs(subj, operand, item)]) if _side_form(side) == "add"
 
-_tally(subj, side) := {"states": {_read_state(subj, path)}, "list": _path_name(path), "values": []} if {
+_tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "values": []} if {
+	path := side[_basic_form(side)]
+	not _named(path)
+	not is_object(subj)
+} else := {"states": {_read_state(subj, path)}, "list": _path_name(path), "values": []} if {
 	path := side[_basic_form(side)]
 	not _walk_keys({"path": path}, subj)
 } else := r if {
@@ -4187,18 +4191,22 @@ _tally(subj, side) := {"states": {_read_state(subj, path)}, "list": _path_name(p
 	r := object.union({"states": states, "list": _walk_name(side[f], w.walked), "values": [_walk_shown(e.v) | some e in w.items]}, _tally_value(f, kept, states))
 }
 
-_tally_judge(side, e) := {"kept": kept, "states": ({c | some c in causes; not c in {"satisfied", "value", "missing"}} | _tally_mark(kept, e.v))} if {
-	causes := [_leaf_cause(c, e.iv) | some c in side.whose]
+_tally_judge(side, e) := {"kept": kept, "states": ({c | some c in causes; not c in {"satisfied", "value", "missing"}} | _tally_mark(kept, e))} if {
+	causes := [_tally_cond_cause(c, e.iv) | some c in side.whose]
 	kept := count([c | some c in causes; c in {"value", "missing"}]) == 0
 }
 
-_tally_mark(true, v) := {"absent"} if v == _absent
+_tally_cond_cause(c, _) := "unusable" if _node_param_broken(c)
 
-_tally_mark(true, v) := {"unusable"} if v == _unusable_mark
+_tally_cond_cause(c, item) := _leaf_cause(c, item) if not _node_param_broken(c)
 
-_tally_mark(_, v) := set() if not _walk_marked(v)
+_tally_mark(true, e) := {"absent"} if e.v == _absent
 
-_tally_mark(false, v) := set() if _walk_marked(v)
+_tally_mark(true, e) := {_read_state(e.iv, e.r)} if e.v == _unusable_mark
+
+_tally_mark(_, e) := set() if not _walk_marked(e.v)
+
+_tally_mark(false, e) := set() if _walk_marked(e.v)
 
 _tally_value(_, _, states) := {} if states != set()
 
@@ -4218,6 +4226,9 @@ _decimal_sum(nums) := sum([round(n * scale) | some n in nums]) / scale if {
 	places := max(array.concat([0], [_decimal_places(n) | some n in nums]))
 	places <= 15
 	scale := product([10 | some i in numbers.range(1, 15); i <= places])
+	every n in nums {
+		abs(n) * scale < 1e15
+	}
 } else := sum(nums)
 
 _decimal_places(n) := max([0, count(_fraction_digits(parts[0])) - _written_exponent(parts)]) if parts := split(lower(json.marshal(n)), "e")
@@ -5949,9 +5960,7 @@ _for_input_pairs(check, subj, names, item, w) := ((({[_walk_name(item.path, w.wa
 }) | {[i.name, i.value] |
 	some c in check.checks
 	some side in _derived_sides(c)
-	every p in _side_paths(side) {
-		not _for_named(p)
-	}
+	not _tally_named(side)
 	some i in _side_inputs(subj, side, null)
 }) | {[i.name, i.value] |
 	some c in check.checks
@@ -5975,6 +5984,22 @@ _for_inner_pairs(check, subj, names, _, _) := {[_for_list_name(check.items[1].pa
 	not _for_from_first(check)
 	iw := _for_walk(check.items[1], subj, names)
 }
+
+_tally_named(side) if {
+	some p in _side_paths(side)
+	_for_named(p)
+}
+
+_tally_named(side) if {
+	some t in _tally_parts(side)
+	some c in t.whose
+	some p in _condition_paths(c)
+	_for_named(p)
+}
+
+_tally_parts(side) := [side] if _basic_form(side) in {"count_of", "sum_of"}
+
+_tally_parts(side) := [o | some o in side.add; _basic_form(o) in {"count_of", "sum_of"}] if _side_form(side) == "add"
 
 _for_list_name(path, walked) := substring(_walk_name(path, walked), 1, -1) if _for_named(path)
 

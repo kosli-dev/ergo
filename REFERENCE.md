@@ -730,7 +730,7 @@ costs_add_up: sum of stages.usd whose kind is "model" equals total_usd within 0.
 all_findings: count of findings equals claude_found plus 1
 ```
 
-all four pass. Each row shows the number ergo worked out, named after the words that asked for it, then the list it walked:
+all four pass. Each row shows the number ergo worked out, named after the words that asked for it as the report prints them, then the list it walked:
 
 | check             | inputs                                                                                                                  |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------------- |

@@ -342,7 +342,7 @@ Both sides are timestamps in the same format, both RFC 3339 strings or both numb
 
 Read as `is` or `equals`, and printed as one of them. With it in the grammar, every sentence in the corpus still has exactly one reading.
 
-**[sentence.derived.fail]** `count of` and `sum of` over a list that's missing, `null` or not a list fail as `absent`, `null` or `unusable`. A number to add that isn't a number fails as `unusable`. `every` and `some` fail the same way on the list they walk.
+**[sentence.derived.fail]** `count of` and `sum of` over a list that's missing, `null` or not a list fail as `absent`, `null` or `unusable`. A number to add that's missing fails as `absent`, `null` as `null`, and anything else that isn't a number as `unusable`. `every` and `some` fail the same way on the list they walk.
 
 ## Written wrong
 

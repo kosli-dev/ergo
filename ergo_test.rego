@@ -8932,7 +8932,7 @@ test_a_count_whose_named_by_cant_be_read_fails_with_its_cause if {
 }
 
 test_a_count_fails_on_a_value_it_cant_read_unless_whose_left_its_item_out if {
-	[row[1] | some row in _tally_rows("count of xs.t is 1", [{"id": 1, "xs": ["s"]}], {})] == ["unusable"]
+	[row[1] | some row in _tally_rows("count of xs.t is 1", [{"id": 1, "xs": ["s"]}], {})] == ["not_an_object"]
 	[row[1] | some row in _tally_rows("count of xs.t whose k is 1 is 1", [{"id": 1, "xs": [{"k": 1, "t": 0}, {"k": 2}]}], {})] == ["satisfied"]
 }
 
@@ -8965,4 +8965,26 @@ test_sum_of_and_plus_add_numbers_as_decimals if {
 
 test_a_sum_with_several_values_it_cant_add_fails_with_the_worst_cause if {
 	[row[1] | some row in _tally_rows("sum of items.usd is 30", [{"id": 1, "items": [{"usd": null}, {}, {"usd": "x"}]}, {"id": 2, "items": [{"usd": null}, {}]}], {})] == ["unusable", "absent"]
+}
+
+test_large_numbers_are_added_as_the_runtime_adds_them_so_the_sum_stays_right if {
+	[row[1] | some row in _tally_rows("sum of xs is at least big", [{"id": 1, "xs": [0.1, 1e30], "big": 1e30}], {})] == ["satisfied"]
+	[row[1] | some row in _tally_rows("big plus 0.1 is at least big", [{"id": 1, "big": 1e30}], {})] == ["satisfied"]
+}
+
+test_a_count_on_a_subject_or_item_that_isnt_an_object_fails_as_not_an_object if {
+	[[row[0], row[1]] | some row in _tally_rows("count of xs is 1", [5, null, [1, 2]], {})] == [[5, "not_an_object"], [null, "not_an_object"], [[1, 2], "not_an_object"]]
+	[row[1] | some row in _tally_rows("count of xs.n is 1", [{"id": 1, "xs": [5]}], {})] == ["not_an_object"]
+	[row[2][0].value | some row in _tally_rows("count of xs.n is 2", [{"id": 1, "xs": [{"n": 1}, {"n": null}]}], {})] == [2]
+}
+
+test_a_count_whose_whose_reads_a_for_name_isnt_shown_in_the_inputs if {
+	rows := _tally_rows({"for": "every prs as pr", "assert": "count of xs whose n is pr.need is at least 1"}, [{"id": 1, "prs": [{"need": 1}, {"need": 2}], "xs": [{"n": 1}, {"n": 2}]}], {})
+	rows == [[1, "satisfied", [{"name": "prs[]", "value": [{"need": 1}, {"need": 2}]}]]]
+	added := _tally_rows({"for": "every prs as pr", "assert": "1 plus count of xs whose n is pr.need is at least 2"}, [{"id": 1, "prs": [{"need": 1}], "xs": [{"n": 1}]}], {})
+	added == [[1, "satisfied", [{"name": "prs[]", "value": [{"need": 1}]}]]]
+}
+
+test_a_count_whose_whose_reads_a_param_it_cant_use_shows_null if {
+	_tally_rows("count of xs whose s is one of $params.v is 1", [{"id": 1, "xs": [{"s": "a"}]}], {"v": 5}) == [[1, "unusable", [{"name": "count of xs whose s is in $params.v", "value": null}, {"name": "xs[]", "value": [{"s": "a"}]}]]]
 }

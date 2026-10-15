@@ -213,13 +213,13 @@ Every row has a cause. When a check reads several values, the row takes the firs
 
 A side of `compare` can also be `count_of` or `sum_of`, each with a path, `whose`, a list of basic checks, and `text`, the words that wrote it. `add` can take `text` too, and `count_of` and `sum_of` among the sides it adds up. They're what `count of`, `sum of` and `plus` read into, see [sentence.derived.count](sentences.md#derived-values), and today's syntax can't use them (see [sentence_ops.syntax](syntax.md#policies)).
 
-**[tally.walk]** The path is walked as [walk.lists](#every-and-some) says, except that an empty list adds nothing instead of failing. A list that's missing, `null` or not a list fails the side as `absent`, `null` or `unusable`, and so does a path where no step walks a list, as [walk.lists](#every-and-some) says.
+**[tally.walk]** The path is walked as [walk.lists](#every-and-some) says, except that an empty list adds nothing instead of failing. A list that's missing, `null` or not a list fails the side as `absent`, `null` or `unusable`, and so does a path where no step walks a list, as [walk.lists](#every-and-some) says. On a subject that isn't an object, with a path that starts at the subject, it fails as `not_an_object`, and so does an item that isn't an object when the path goes on into it, as [walk.flaws](#every-and-some) says for `every`. A ref the side reads that can't be used, in its path or its `whose` checks, fails it as `unusable`.
 
 **[tally.whose]** The `whose` checks read from each item of the innermost list walked, as [walk.items](#every-and-some) says. An item is left out when one of them fails with `value`, or when a `present` check finds the field missing. An item one of them can't decide fails the side with its cause.
 
-**[tally.count]** `count_of` is the number of values the path ends at in the items left in. A value that's missing or can't be read fails the side as `absent` or `unusable`.
+**[tally.count]** `count_of` is the number of values the path ends at in the items left in, `null` included. A value that's missing fails the side as `absent`.
 
-**[tally.sum]** `sum_of` adds up the values the path ends at in the items left in, and is 0 over none. A value that's missing fails the side as `absent`, `null` as `null`, and anything else that isn't a number as `unusable`. Numbers are added as decimals, so `0.1` and `0.2` add up to `0.3`, and so are the sides of an `add` with `text`. A number with more than 15 decimal places is added as the runtime adds it.
+**[tally.sum]** `sum_of` adds up the values the path ends at in the items left in, and is 0 over none. A value that's missing fails the side as `absent`, `null` as `null`, and anything else that isn't a number as `unusable`. Numbers are added as decimals, so `0.1` and `0.2` add up to `0.3`, and so are the sides of an `add` with `text`. A number with more than 15 decimal places, or too large to scale to a whole number below 10^15, is added as the runtime adds it.
 
 **[tally.fail]** A side that fails gives the check its cause, as a path that ends anything but `found` does in [compare.fail](#compare), and the worst one when both sides fail. An `add` fails as its worst operand does.
 
