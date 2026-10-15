@@ -259,7 +259,7 @@ _member_problems(members) := union({
 		some m in members
 		some p in _def_problems(_raw_subject(m))
 	},
-	{[["subjects", m, "of"], "not in subjects"] |
+	{[["subjects", m, _of_field(m)], "not in subjects"] |
 		some m in members
 		of := object.get(_raw_subject(m), "of", null)
 		_has_type("of", of)
@@ -283,7 +283,11 @@ _member_problems(members) := union({
 	},
 })
 
-_loop_problems(name, members) := {[["subjects", name, "of"], "leads to a loop"] |
+_of_field(m) := "from" if m in object.get(data.ergo_subject_sentences, "narrowed", set())
+
+else := "of"
+
+_loop_problems(name, members) := {[["subjects", name, _of_field(name)], "leads to a loop"] |
 	count(members) > 0
 	every m in members {
 		_links(m)
@@ -5277,11 +5281,15 @@ _s_single_quoted(v) if {
 	regex.match(`^[^\x00-\x1f]*$`, v)
 }
 
-_s_from_reads(subjects) := {name: object.union(_s_from_part(name, def, subjects), _s_id_part(def)) | some name, def in subjects; is_object(def)} if is_object(subjects)
+_s_from_reads(subjects) := {name: object.union(_s_from_part(name, lines, subjects, narrow), _s_id_part(def)) | some name, def in subjects; is_object(def)} if {
+	is_object(subjects)
+	lines := {name: _from_line(def.from) | some name, def in subjects; is_object(def); is_string(def.from)}
+	narrow := {name: _s_narrow_parent(name, lines, subjects) | some name, _ in subjects}
+}
 
-_s_from_part(name, def, subjects) := _s_from_read(name, def.from, subjects) if is_string(object.get(def, "from", null))
+_s_from_part(name, lines, subjects, narrow) := _s_from_read(name, lines[name], subjects, narrow) if name in object.keys(lines)
 
-_s_from_part(_, def, _) := {} if not is_string(object.get(def, "from", null))
+_s_from_part(name, lines, _, _) := {} if not name in object.keys(lines)
 
 _s_id_part(def) := {"id": _s_id_read(def.id)} if is_string(object.get(def, "id", null))
 
@@ -5301,7 +5309,12 @@ _s_subjects(subjects, _) := subjects if not is_object(subjects)
 
 _s_subject(name, null, _) := {"from": [name]}
 
-_s_subject(name, def, reads) := object.union(def, object.union(_s_from_fields(name, def, reads), _s_id_field(reads[name]))) if is_object(def)
+_s_subject(name, def, reads) := object.union(_s_without_narrowed_from(def, reads[name]), object.union(_s_from_fields(name, def, reads), _s_id_field(reads[name]))) if is_object(def)
+
+_s_without_narrowed_from(def, read) := object.remove(def, ["from"]) if {
+	"of" in object.keys(object.get(read, "fields", {}))
+	_s_from_used(def, read)
+} else := def
 
 _s_subject(_, def, _) := def if {
 	def != null
@@ -5322,13 +5335,25 @@ _s_from_used(def, read) if {
 	not "of" in object.keys(def)
 }
 
-_s_from_read(name, text, subjects) := {"problems": problems, "fields": fields} if {
-	fl := _from_line(text)
+_s_from_read(name, fl, subjects, narrow) := {"problems": problems, "fields": fields} if {
 	"path" in object.keys(fl)
 	conds := [_s_check([_s_cond_text(c)], {}, set()) | some c in object.get(fl, "where", [])]
 	problems := sort(((_s_chain_unsupported(name, fl, subjects) | _s_from_start_problems(fl)) | {concat("", ["whose: ", p]) | some c in conds; some p in object.get(c, "$sentence", [])}))
-	fields := object.union({"from": array.concat(_s_from_steps(_s_model_path(fl.path)), _s_each_step(fl))}, _s_whose_filters(conds))
-} else := {"problems": object.get(_from_line(text), "problems", ["doesn't parse"]), "fields": {}}
+	fields := object.union(_s_source(name, fl, subjects), _s_whose_filters(_s_filter_prefix(name, narrow), conds))
+} else := {"problems": object.get(fl, "problems", ["doesn't parse"]), "fields": {}}
+
+_s_source(name, fl, subjects) := {"of": fl.path.steps[0]} if {
+	_s_narrows(name, fl, subjects)
+} else := {"from": array.concat(_s_from_steps(_s_model_path(fl.path)), _s_each_step(fl))}
+
+_s_narrows(name, fl, subjects) if {
+	not "start" in object.keys(fl.path)
+	fl.path.steps == [fl.path.steps[0]]
+	is_string(fl.path.steps[0])
+	fl.path.steps[0] != name
+	fl.path.steps[0] in object.keys(subjects)
+	not "named_by_each_of" in object.keys(fl)
+}
 
 _s_from_steps(path) := [_s_plain_from_step(st) | some st in array.slice(path, 1, count(path))] if {
 	count(path) > 0
@@ -5346,9 +5371,16 @@ _s_each_step(fl) := [{"each_as": "subject", "keys": {"ref": _s_model_path(fl.nam
 
 _s_each_step(fl) := [] if not "named_by_each_of" in object.keys(fl)
 
-_s_whose_filters([]) := {}
+_s_whose_filters(_, []) := {}
 
-_s_whose_filters(conds) := {"applies_to": {_s_filter_name(i, count(conds)): c | some i, c in conds}} if conds != []
+_s_whose_filters(prefix, conds) := {"applies_to": {concat("", [prefix, _s_filter_name(i, count(conds))]): c | some i, c in conds}} if conds != []
+
+_s_filter_prefix(name, narrow) := concat("", [format_int(count(graph.reachable(narrow, [name])) - 1, 10), " ", name, " "])
+
+_s_narrow_parent(n, lines, subjects) := [lines[n].path.steps[0]] if {
+	"path" in object.keys(object.get(lines, n, {}))
+	_s_narrows(n, lines[n], subjects)
+} else := []
 
 _s_filter_name(i, n) := concat("", ["whose ", strings.replace_n({" ": "0"}, sprintf_pad)]) if {
 	width := count(format_int(n - 1, 10))
@@ -5357,6 +5389,7 @@ _s_filter_name(i, n) := concat("", ["whose ", strings.replace_n({" ": "0"}, spri
 }
 
 _s_chain_unsupported(name, fl, subjects) := {"a from that starts at another subject isn't supported yet" |
+	not _s_narrows(name, fl, subjects)
 	not "start" in object.keys(fl.path)
 	first := fl.path.steps[0]
 	is_string(first)
@@ -5368,9 +5401,9 @@ _s_id_field(read) := {"id": read.id.path} if "path" in object.keys(object.get(re
 
 else := {}
 
-_s_subject_sentences(subjects, reads) := {"filters": {[name, n] | some name, r in reads; _s_from_used(subjects[name], r); some n, _ in object.get(r.fields, "applies_to", {})}, "problems": {name: probs | some name, def in subjects; probs := _s_subject_problems(name, def, reads); probs != {}}} if is_object(subjects)
+_s_subject_sentences(subjects, reads) := {"narrowed": {name | some name, r in reads; _s_from_used(subjects[name], r); "of" in object.keys(r.fields)}, "filters": {[name, n] | some name, r in reads; _s_from_used(subjects[name], r); some n, _ in object.get(r.fields, "applies_to", {})}, "problems": {name: probs | some name, def in subjects; probs := _s_subject_problems(name, def, reads); probs != {}}} if is_object(subjects)
 
-_s_subject_sentences(subjects, _) := {"filters": set(), "problems": {}} if not is_object(subjects)
+_s_subject_sentences(subjects, _) := {"narrowed": set(), "filters": set(), "problems": {}} if not is_object(subjects)
 
 _s_subject_problems(name, def, reads) := {f: ps | some f in ["from", "id"]; ps := _s_field_problems(name, def, f, reads); ps != []} if is_object(def)
 

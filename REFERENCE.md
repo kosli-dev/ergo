@@ -156,7 +156,8 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
 - `named by $params.name` picks one key, as a [ref step](#ref-steps) does: `from: trail.artifacts named by $params.artifact_name`.
 - `named by each of $params.kinds` makes each key in the list a subject, as a [naming step](#naming-subjects) with `keys` does: `from: build.test_runs named by each of $params.kinds`.
 - A subject's own name at the start of its `from` is the input field, so `lockfile` can have `from: lockfile whose status is "COMPLETE"`.
-- A `from` line can't go with `applies_to`, and one that starts at another subject's name isn't supported yet. A `from` or `id` that can't be read is written wrong, and the `$well_formed` row says why, like `{"name": "subjects.x.from", "value": ["doesn't parse"]}`.
+- A `from` line that's another subject's name and a `whose` narrows that subject, as [`of`](#a-subject-built-on-another) does: `critical defect` with `from: defect whose severity is "critical"` keeps the defects that pass `defect`'s conditions and its own. A name with a space goes in quotes, so the whole line goes in single quotes in YAML: `from: '"critical defect" whose team is "b"'`.
+- A `from` line can't go with `applies_to`, and one that goes on into another subject, like `artifact.pull_requests`, isn't supported yet. A `from` or `id` that can't be read is written wrong, and the `$well_formed` row says why, like `{"name": "subjects.x.from", "value": ["doesn't parse"]}`.
 
 ### A subject built on another
 
