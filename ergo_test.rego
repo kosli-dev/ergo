@@ -8988,3 +8988,23 @@ test_a_count_whose_whose_reads_a_for_name_isnt_shown_in_the_inputs if {
 test_a_count_whose_whose_reads_a_param_it_cant_use_shows_null if {
 	_tally_rows("count of xs whose s is one of $params.v is 1", [{"id": 1, "xs": [{"s": "a"}]}], {"v": 5}) == [[1, "unusable", [{"name": "count of xs whose s is in $params.v", "value": null}, {"name": "xs[]", "value": [{"s": "a"}]}]]]
 }
+
+test_a_derived_check_with_a_substitute_is_read_the_slow_way_and_gives_the_same_report if {
+	check := {
+		"op": "compare",
+		"left": {"add": [["n"], {"count": ["xs"]}, {"literal": 1}]},
+		"cmp": "eq",
+		"right": {"literal": 4},
+		"substitute": {"op": "present", "path": ["waived"]},
+	}
+	rows := [[r.subject.id, r.cause, r.inputs] | some r in ergo.report({"things": [{"id": 1, "n": 1, "xs": [1, 2]}, {"id": 2, "n": "1", "xs": [], "waived": true}, {"id": 3, "n": 1, "xs": []}]}, _sentence_policy({"c": check}), {}).results; r.check == "c"]
+	rows == [
+		[1, "satisfied", [{"name": "n + count(xs) + 1", "value": 4}, {"name": "n", "value": 1}, {"name": "count(xs)", "value": 2}, {"name": "xs", "value": [1, 2]}, {"name": "waived", "value": null}]],
+		[2, "substituted", [{"name": "n + count(xs) + 1", "value": null}, {"name": "n", "value": "1"}, {"name": "count(xs)", "value": 0}, {"name": "xs", "value": []}, {"name": "waived", "value": true}]],
+		[3, "value", [{"name": "n + count(xs) + 1", "value": 2}, {"name": "n", "value": 1}, {"name": "count(xs)", "value": 0}, {"name": "xs", "value": []}, {"name": "waived", "value": null}]],
+	]
+}
+
+test_a_count_whose_ref_cant_be_read_is_read_the_slow_way_and_fails_with_the_refs_cause if {
+	_tally_rows(`count of xs whose s is one of $params.missing is 1`, [{"id": 1, "xs": [{"s": "a"}]}], {}) == [[1, "absent", [{"name": "count of xs whose s is in $params.missing", "value": null}, {"name": "xs[]", "value": [{"s": "a"}]}]]]
+}

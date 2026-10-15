@@ -681,7 +681,96 @@ _check_outcome(check, subj, flaw, item) := object.union(
 ) if {
 	not _all_of_run(check, flaw)
 	not _walk_run(check, flaw)
+	not _derived_once(check)
 }
+
+_check_outcome(check, subj, flaw, item) := {
+	"inputs": e.inputs,
+	"passed": _once_passed(flaw, e),
+	"cause": _once_cause(flaw, e),
+} if {
+	_derived_once(check)
+	e := _derived_eval(check, subj, item)
+}
+
+_once_passed("", e) := e.passed
+
+_once_passed(flaw, _) := false if flaw != ""
+
+_once_cause("", e) := e.cause
+
+_once_cause(flaw, _) := flaw if flaw != ""
+
+default _derived_once(_) := false
+
+_derived_once(check) if {
+	check.op == "compare"
+	_derived_sides(check) != []
+	not "substitute" in object.keys(check)
+	not "inputs" in object.keys(check)
+	every f in ["left", "right"] {
+		_side_form(object.get(check, f, null))
+	}
+	not _unreadable_ref(check)
+}
+
+_derived_eval(check, subj, item) := {"passed": passed, "cause": cause, "inputs": array.concat(l.inputs, r.inputs)} if {
+	l := _side_eval(subj, check.left, item)
+	r := _side_eval(subj, check.right, item)
+	passed := _eval_compared(check, l.v, r.v)
+	states := (l.states | r.states) | {"unusable" | [lf] := l.found; [rf] := r.found; not _usable_sides(check, lf, rf)}
+	cause := _eval_cause(passed, states)
+}
+
+_eval_compared(check, [lv], [rv]) if _compared(check, lv, rv)
+
+default _eval_compared(_, _, _) := false
+
+_eval_cause(true, _) := "satisfied"
+
+_eval_cause(false, states) := _worst_or_value(states)
+
+_basic_eval(subj, side, item) := {"v": v, "found": [x | x := _simple_found(subj, side)], "states": {_read_state(subj, side)}, "inputs": _basic_inputs(subj, side, item)} if {
+	_basic_form(side) == "path"
+	v := [x | x := value_at(subj, side)]
+}
+
+_basic_eval(subj, side, _) := {"v": [_written(side)], "found": [x | x := _simple_found(subj, side)], "states": set(), "inputs": []} if _basic_form(side) == "literal"
+
+_basic_eval(subj, side, item) := {"v": v, "found": v, "states": _basic_states(subj, side), "inputs": _basic_inputs(subj, side, item)} if {
+	_basic_form(side) in {"count", "sum"}
+	v := [x | x := _basic_value(subj, side)]
+}
+
+_basic_eval(subj, side, _) := {"v": v, "found": v, "states": t.states, "inputs": [{"name": side.text, "value": object.get(t, "value", null)}, {"name": t.list, "value": t.values}]} if {
+	_basic_form(side) in {"count_of", "sum_of"}
+	t := _tally(subj, side)
+	v := [x | x := t.value]
+}
+
+_side_eval(subj, side, item) := _basic_eval(subj, side, item) if _basic_form(side)
+
+_side_eval(subj, side, item) := {"v": v, "found": v, "states": union({o.states | some o in ops}), "inputs": array.concat([{"name": _side_text(item, side), "value": _first_or_null(v)}], [i | some o in ops; some i in o.inputs])} if {
+	_side_form(side) == "add"
+	ops := [_operand_eval(subj, operand, item) | some operand in side.add]
+	v := _added(side, ops)
+}
+
+_operand_eval(subj, operand, item) := object.union(_basic_eval(subj, operand, item), {"states": _number_states(subj, operand)}) if _basic_form(operand) == "path"
+
+_operand_eval(subj, operand, item) := _basic_eval(subj, operand, item) if _basic_form(operand) != "path"
+
+_added(side, ops) := [_add_numbers(side, nums)] if {
+	nums := [n | some o in ops; [n] := o.v]
+	count(nums) == count(ops)
+	every n in nums {
+		is_number(n)
+	}
+} else := []
+
+_first_or_null([x]) := x
+
+_first_or_null([]) := null
 
 _check_outcome(check, subj, flaw, _) := {
 	"inputs": r.inputs,
@@ -2783,8 +2872,16 @@ _worst_read(_, check) := _worst_of({_used_ref_state(check, r) | some r in _check
 default _unreadable_ref(_) := false
 
 _unreadable_ref(check) if {
+	not _ref_answered(check)
 	some r in _check_refs(check)
 	_used_ref_state(check, r) != "value"
+}
+
+_unreadable_ref(check) if check["$unreadable_ref"] == true
+
+_ref_answered(check) if {
+	is_object(check)
+	"$unreadable_ref" in object.keys(check)
 }
 
 _worst_of(states) := _cause_precedence[i] if {
@@ -2796,7 +2893,9 @@ _worst_of(states) := _cause_precedence[i] if {
 
 _row_cause(_, _, flaw) := flaw if flaw != ""
 
-_row_cause(check, subj, "") := _readable_cause(check, subj)
+_row_cause(check, subj, "") := _readable_cause(check, subj) if not _derived_once(check)
+
+_row_cause(check, subj, "") := _derived_eval(check, subj, null).cause if _derived_once(check)
 
 _readable_cause(check, subj) := "satisfied" if op_passed(check, subj)
 
@@ -3283,6 +3382,11 @@ _check_inputs(subj, check, item) := array.concat(_side_inputs(subj, object.get(c
 	every f in ["left", "right"] {
 		_side_form(object.get(check, f, null))
 	}
+	not _derived_once(check)
+}
+
+_check_inputs(subj, check, item) := _derived_eval(check, subj, item).inputs if {
+	_derived_once(check)
 }
 
 _check_inputs(subj, check, _) := array.concat(_quantified_inputs(subj, check), _name_inputs(subj, check)) if {
@@ -3610,15 +3714,15 @@ _requirement_checks_written_or_added(req) := object.union(
 	object.union(_applies_def(req), _well_formed_def),
 )
 
-_subject_row_groups(matching, req, req_name, flaws, item) := [[row |
-	some check_name in _names(_checks_of(req))
+_subject_row_groups(matching, req, req_name, flaws, item, prepared) := [[row |
+	some check_name in _names(prepared)
 	row := object.union(
 		{
 			"requirement": req_name,
 			"subject": ref,
 			"check": check_name,
 		},
-		_outcome(req, _checks_of(req)[check_name], flaws[check_name], entry.subject, item),
+		_outcome(req, prepared[check_name], flaws[check_name], entry.subject, item),
 	)
 ] |
 	some entry in matching
@@ -3748,8 +3852,13 @@ _evaluation(doc, req, name) := {
 	matches := {i: _subject_matches(entry.subject, req, filter_flaws) | some i, entry in raw}
 	applies := _applies_rows(raw, refs, matches, req, name, filter_flaws, item)
 	matching := [raw[i] | some i, _ in raw; matches[i]]
-	groups := _subject_row_groups(matching, req, name, check_flaws, item)
+	prepared := {n: _with_ref_answer(check) | some n, check in _checks_of(req)}
+	groups := _subject_row_groups(matching, req, name, check_flaws, item, prepared)
 }
+
+_with_ref_answer(check) := object.union(check, {"$unreadable_ref": _unreadable_ref(check)}) if is_object(check)
+
+_with_ref_answer(check) := check if not is_object(check)
 
 default _scope_readable(_, _, _) := false
 
@@ -4050,12 +4159,6 @@ _basic_value(subj, side) := sum(nums) if {
 	}
 }
 
-_basic_value(subj, side) := r.value if {
-	_basic_form(side) in {"count_of", "sum_of"}
-	r := _tally(subj, side)
-	r.states == set()
-}
-
 _item_causes(subj, side, path) := [_where_cause(side, item) | some item in value_at(subj, path)] if is_array(value_at(subj, path))
 
 _all_decided(causes) if {
@@ -4093,8 +4196,6 @@ _basic_states(subj, side) := _counted_states(subj, side, side.sum) | {s |
 	causes[i] == "satisfied"
 	some s in _number_states(item, side.each)
 } if _basic_form(side) == "sum"
-
-_basic_states(subj, side) := _tally(subj, side).states if _basic_form(side) in {"count_of", "sum_of"}
 
 _side_states(subj, side) := _basic_states(subj, side) if _basic_form(side)
 
@@ -4196,9 +4297,11 @@ _tally_judge(side, e) := {"kept": kept, "states": ({c | some c in causes; not c 
 	kept := count([c | some c in causes; c in {"value", "missing"}]) == 0
 }
 
-_tally_cond_cause(c, _) := "unusable" if _node_param_broken(c)
-
-_tally_cond_cause(c, item) := _leaf_cause(c, item) if not _node_param_broken(c)
+_tally_cond_cause(c, item) := "unusable" if {
+	_node_param_broken(c)
+} else := _worst_of({_used_ref_state(c, r) | some r in _check_refs(c)}) if {
+	_unreadable_ref(c)
+} else := _leaf_cause(c, item)
 
 _tally_mark(true, e) := {"absent"} if e.v == _absent
 
