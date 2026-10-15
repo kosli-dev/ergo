@@ -678,7 +678,25 @@ _check_outcome(check, subj, flaw, item) := object.union(
 		"cause": _row_cause(check, subj, flaw),
 	},
 	_failed_items_field(check, subj, flaw, item),
-) if not _all_of_run(check, flaw)
+) if {
+	not _all_of_run(check, flaw)
+	not _walk_run(check, flaw)
+}
+
+_check_outcome(check, subj, _, _) := {
+	"inputs": r.inputs,
+	"passed": r.cause == "satisfied",
+	"cause": r.cause,
+	"failed_items": r.failed,
+} if {
+	_walks(check)
+	r := _walk_row(check, subj)
+}
+
+_walk_run(check, flaw) if {
+	_walks(check)
+	flaw != "ill_formed"
+}
 
 _all_of_run(check, flaw) if {
 	check.op == "all_of"
@@ -686,7 +704,7 @@ _all_of_run(check, flaw) if {
 }
 
 _check_outcome(check, subj, flaw, item) := {
-	"inputs": [{"name": pair[0], "value": pair[1]} | some pair in sort({[i.name, i.value] | some c in check.checks; some i in _row_inputs(subj, c, item)})],
+	"inputs": [{"name": pair[0], "value": pair[1]} | some pair in sort({[i.name, i.value] | some c in check.checks; some i in _assertion_inputs(subj, c, item)})],
 	"passed": count(failed) == 0,
 	"cause": _all_of_cause(failed),
 	"failed_assertions": failed,
@@ -701,15 +719,22 @@ _failed_assertions(check, subj, flaw) := [{"assertion": check.assertions[i], "ca
 	cause != "satisfied"
 ]
 
-_assertion_cause(c, subj, "") := _row_cause(c, subj, "")
+_assertion_cause(c, subj, "") := _row_cause(c, subj, "") if not _walks(c)
+
+_assertion_cause(c, subj, _) := _walk_row(c, subj).cause if _walks(c)
 
 _assertion_cause(c, subj, "unusable") := "unusable" if {
+	not _walks(c)
 	_unusable_assertion(c)
-} else := _row_cause(c, subj, "")
+} else := _row_cause(c, subj, "") if not _walks(c)
 
 _unusable_assertion(_) if _unreadable_input
 
 _unusable_assertion(c) if _node_param_broken(c)
+
+_assertion_inputs(subj, c, item) := _row_inputs(subj, c, item) if not _walks(c)
+
+_assertion_inputs(subj, c, _) := _walk_row(c, subj).inputs if _walks(c)
 
 _all_of_cause([]) := "satisfied"
 
@@ -1791,6 +1816,8 @@ _required_fields := {
 	"not_in": {"path", "values"},
 	"has_type": {"path", "type"},
 	"all_of": {"checks", "assertions"},
+	"every": {"path", "check", "whose", "if_any"},
+	"some": {"path", "check", "whose", "if_any"},
 	"not_empty_string_or_list": {"path"},
 	"matches_any": {"path", "patterns"},
 	"not_matches_any": {"path", "patterns"},
@@ -1858,6 +1885,14 @@ _assertion_children(node, names) := [[c, ["checks", i], "assertion", names] | so
 	is_array(node.checks)
 }
 
+_assertion_children(node, names) := array.concat([[node.check, ["check"], "assertion", names]], [[c, ["whose", i], "assertion", names] | some i, c in node.whose]) if {
+	_walks(node)
+	is_object(node.check)
+	is_array(node.whose)
+}
+
+_walks(check) if check.op in {"every", "some"}
+
 default _inner_child(_, _) := []
 
 _inner_child(node, names) := [[node.check, ["check"], "check", _given_with(node, names)]] if _quantified(node)
@@ -1892,7 +1927,7 @@ _op_problems(node, _) := {concat("", ["unknown op ", _text(node.op)])} if {
 	not _sentence_op(node)
 }
 
-_sentence_ops := {"empty_string_or_list", "not_empty_string_or_list", "not_in", "has_type", "all_of"}
+_sentence_ops := {"empty_string_or_list", "not_empty_string_or_list", "not_in", "has_type", "all_of", "every", "some"}
 
 _sentence_op(node) if {
 	node.op in _sentence_ops
@@ -4220,6 +4255,7 @@ _s_patterns := {
 	"phrases": phrases,
 	"kinds": {kind[0]: concat("", [`^(?:`, kind[1], `)$`]) | some kind in kinds},
 	"plain": concat("", [`^(`, path, `) +(\S.*)$`]),
+	"quantified": concat("", [`^(every|some) +(`, path, `) +(\S.*)$`]),
 	"path": concat("", [`^`, path, `$`]),
 	"path_parts": concat("", [`^(?:(item +([1-9][0-9]*)|first|last) +of +)?(`, start, `)((?:`, step, `)*)$`]),
 	"steps": concat("", [`\.(`, key, `|`, dq, `)| +named +by +(`, ref, `)|\[(`, ref, `)\]|\[(`, dq, `)\]|\[(0|[1-9][0-9]*)\]`]),
@@ -4312,6 +4348,11 @@ _sentence(raw) := {"assertions": [assertion]} if {
 	pat := _s_patterns
 	m := regex.find_all_string_submatch_n(pat.plain, trim_space(raw), 1)[0]
 	assertion := {"path": _s_path_of(m[1], pat), "phrase": _s_phrase_of(m[2], pat)}
+	count(_s_sentence_problems({"assertions": [assertion]})) == 0
+} else := {"assertions": [assertion]} if {
+	pat := _s_patterns
+	m := regex.find_all_string_submatch_n(pat.quantified, trim_space(raw), 1)[0]
+	assertion := {m[1]: _s_path_of(m[2], pat), "phrase": _s_phrase_of(m[3], pat)}
 	count(_s_sentence_problems({"assertions": [assertion]})) == 0
 } else := {"assertions": assertions} if {
 	pat := _s_patterns
@@ -4558,7 +4599,7 @@ _s_sq_char(`\\`) := `\`
 
 _s_sq_char(c) := c if not c in {`\'`, `\\`}
 
-_s_sentence_problems(parsed) := ((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
+_s_sentence_problems(parsed) := (((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"bare_word" in object.keys(node)
@@ -4627,6 +4668,11 @@ _s_sentence_problems(parsed) := ((((((((((((({concat("", [node.bare_word, " is a
 	node.op in {"starts with", "ends with"}
 	"value" in object.keys(node)
 	not is_string(node.value)
+}) | {concat("", [`"`, node.phrase.op, `" after every or some would check each item of the last list, not the list: put the walk on a for line`]) |
+	some node in _s_nodes(parsed)
+	is_object(node)
+	object.keys(node) & {"every", "some"} != set()
+	node.phrase.op in {"contains", "does not contain", "contains all of", "contains none of"}
 }) | {`"within" only compares numbers` |
 	some node in _s_nodes(parsed)
 	is_object(node)
@@ -5012,11 +5058,30 @@ _s_unsupported(parsed) := set() if not "assertions" in object.keys(parsed)
 
 _s_unsupported(parsed) := {u | some a in parsed.assertions; some u in _s_assertion_unsupported(a)} if "assertions" in object.keys(parsed)
 
-_s_assertion_unsupported(a) := {"every and some aren't supported yet"} if object.keys(a) & {"every", "some"} != set()
+_s_assertion_unsupported(a) := ((_s_paths_unsupported(a) | _s_argument_unsupported(a.phrase)) | {u | some c in object.get(a, "where", []); some u in _s_cond_unsupported(c)}) | _s_walk_too_long(a) if object.keys(a) & {"every", "some"} != set()
+
+_s_cond_unsupported(c) := {"count of, sum of and plus aren't supported yet"} if "terms" in object.keys(c)
+
+_s_cond_unsupported(c) := _s_argument_unsupported(c.phrase) if not "terms" in object.keys(c)
+
+_s_walk_too_long(a) := {"every and some over more than ten steps aren't supported yet" | count(_walk_steps(_s_model_path(a[_s_quantifier_of(a)]))) > 10}
 
 _s_assertion_unsupported(a) := {"count of, sum of and plus aren't supported yet"} if "terms" in object.keys(a)
 
 _s_assertion_unsupported(a) := _s_paths_unsupported(a) | _s_argument_unsupported(a.phrase) if object.keys(a) & {"every", "some", "terms"} == set()
+
+_s_model(a) := _s_leaf_model(a) if _s_quantifier_of(a) == ""
+
+_s_model(a) := {
+	"op": q,
+	"path": _s_model_path(a[q]),
+	"check": _s_leaf_model(object.union(object.remove(a, ["every", "some", "where", "if_any"]), {"path": {"steps": ["x"]}})),
+	"whose": [_s_leaf_model(c) | some c in object.get(a, "where", [])],
+	"if_any": object.get(a, "if_any", false),
+} if {
+	q := _s_quantifier_of(a)
+	q != ""
+}
 
 _s_paths_unsupported(a) := {"last of isn't supported yet" |
 	some node in _s_nodes(a)
@@ -5087,44 +5152,44 @@ _s_time_cmps := {"is before": "lt", "is after": "gt", "is on or after": "gte", "
 
 _s_order_cmps := {"is at least": "gte", "is at most": "lte", "is more than": "gt", "is less than": "lt"}
 
-_s_model(a) := {"op": "equals", "path": _s_model_path(a.path), "value": a.phrase.value} if {
+_s_leaf_model(a) := {"op": "equals", "path": _s_model_path(a.path), "value": a.phrase.value} if {
 	a.phrase.op == "is"
 	"value" in object.keys(a.phrase)
 	not "within" in object.keys(a.phrase)
 }
 
-_s_model(a) := object.union({"op": "compare", "left": _s_model_path(a.path), "cmp": "eq", "right": _s_side(a.phrase)}, object.filter(a.phrase, {"within"})) if {
+_s_leaf_model(a) := object.union({"op": "compare", "left": _s_model_path(a.path), "cmp": "eq", "right": _s_side(a.phrase)}, object.filter(a.phrase, {"within"})) if {
 	a.phrase.op == "is"
 	_s_side_given(a.phrase)
 }
 
-_s_model(a) := {"op": "compare", "left": _s_model_path(a.path), "cmp": "ne", "right": _s_side(a.phrase)} if a.phrase.op == "is not"
+_s_leaf_model(a) := {"op": "compare", "left": _s_model_path(a.path), "cmp": "ne", "right": _s_side(a.phrase)} if a.phrase.op == "is not"
 
-_s_model(a) := {"op": _s_compare_ops[a.phrase.op][0], "left": _s_model_path(a.path), "cmp": _s_compare_ops[a.phrase.op][1], "right": _s_side(a.phrase)} if a.phrase.op in object.keys(_s_compare_ops)
+_s_leaf_model(a) := {"op": _s_compare_ops[a.phrase.op][0], "left": _s_model_path(a.path), "cmp": _s_compare_ops[a.phrase.op][1], "right": _s_side(a.phrase)} if a.phrase.op in object.keys(_s_compare_ops)
 
-_s_model(a) := {"op": "in", "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if a.phrase.op == "is one of"
+_s_leaf_model(a) := {"op": "in", "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if a.phrase.op == "is one of"
 
-_s_model(a) := {"op": "has_type", "path": _s_model_path(a.path), "type": a.phrase.type} if a.phrase.op == "is a"
+_s_leaf_model(a) := {"op": "has_type", "path": _s_model_path(a.path), "type": a.phrase.type} if a.phrase.op == "is a"
 
-_s_model(a) := {"op": "not_in", "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if a.phrase.op == "is not one of"
+_s_leaf_model(a) := {"op": "not_in", "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if a.phrase.op == "is not one of"
 
-_s_model(a) := {"op": "present", "path": _s_model_path(a.path)} if a.phrase.op == "exists"
+_s_leaf_model(a) := {"op": "present", "path": _s_model_path(a.path)} if a.phrase.op == "exists"
 
-_s_model(a) := {"op": "missing", "path": _s_model_path(a.path)} if a.phrase.op == "does not exist"
+_s_leaf_model(a) := {"op": "missing", "path": _s_model_path(a.path)} if a.phrase.op == "does not exist"
 
-_s_model(a) := {"op": "non_empty_string", "path": _s_model_path(a.path)} if a.phrase.op == "is a non-empty string"
+_s_leaf_model(a) := {"op": "non_empty_string", "path": _s_model_path(a.path)} if a.phrase.op == "is a non-empty string"
 
-_s_model(a) := {"op": "empty_string_or_list", "path": _s_model_path(a.path)} if a.phrase.op == "is empty"
+_s_leaf_model(a) := {"op": "empty_string_or_list", "path": _s_model_path(a.path)} if a.phrase.op == "is empty"
 
-_s_model(a) := {"op": "not_empty_string_or_list", "path": _s_model_path(a.path)} if a.phrase.op == "is not empty"
+_s_leaf_model(a) := {"op": "not_empty_string_or_list", "path": _s_model_path(a.path)} if a.phrase.op == "is not empty"
 
-_s_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "value": _s_one(a.phrase)} if a.phrase.op in {"contains", "does not contain"}
+_s_leaf_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "value": _s_one(a.phrase)} if a.phrase.op in {"contains", "does not contain"}
 
-_s_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if a.phrase.op in {"contains all of", "contains none of"}
+_s_leaf_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if a.phrase.op in {"contains all of", "contains none of"}
 
-_s_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "patterns": _s_list(a.phrase)} if a.phrase.op in {"matches", "does not match"}
+_s_leaf_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "patterns": _s_list(a.phrase)} if a.phrase.op in {"matches", "does not match"}
 
-_s_model(a) := {"op": "range", "path": _s_model_path(a.path), "min": a.phrase.min, "max": a.phrase.max} if a.phrase.op == "is between"
+_s_leaf_model(a) := {"op": "range", "path": _s_model_path(a.path), "min": a.phrase.min, "max": a.phrase.max} if a.phrase.op == "is between"
 
 _s_compare_ops := object.union(
 	object.union({op: ["compare", cmp] | some op, cmp in _s_order_cmps}, {op: ["compare_time", cmp] | some op, cmp in _s_time_cmps}),
@@ -5187,3 +5252,239 @@ _s_model_position(p) := [p.position - 1] if is_number(object.get(p, "position", 
 _s_model_position(p) := [0] if object.get(p, "position", null) == "first"
 
 _s_model_position(p) := [] if not "position" in object.keys(p)
+
+_unusable_mark := {"ergo/unusable": set()}
+
+_walk_row(check, subj) := object.union(_walk_read_row(check, subj), {"cause": "unusable", "failed": []}) if {
+	_walk_flawed(check)
+} else := {"cause": "not_an_object", "inputs": [], "failed": []} if {
+	not _named(check.path)
+	not is_object(subj)
+} else := _walk_read_row(check, subj)
+
+_walk_flawed(check) if _param_broken(check, set())
+
+_walk_flawed(_) if _unreadable_input
+
+_walk_read_row(check, subj) := {"cause": state, "inputs": [{"name": _path_name(check.path), "value": []}], "failed": []} if {
+	state := _read_state(subj, check.path)
+	not _walk_keys(check, subj)
+}
+
+_walk_read_row(check, subj) := {"cause": cause, "inputs": inputs, "failed": failed} if {
+	keys := _walk_keys(check, subj)
+	w := _walk(_walk_start(check, subj), keys, check.if_any == true)
+	judged := [_walk_judge(check, e) | some e in w.items]
+	fails := array.concat(array.concat(w.fails, [j.failure | some j in judged; j.failure != null]), _walk_stop(w))
+	cause := _walk_cause(check, w, judged, fails)
+	failed := _walk_failed(cause, fails)
+	inputs := _walk_inputs(check, w)
+}
+
+_walk_keys(check, subj) := ks if {
+	_ := _start_of(subj, check.path)
+	ks := _keys_of(check.path)
+}
+
+_walk_start(check, subj) := {"c": _walk_root(check.path), "v": _start_of(subj, check.path), "i": null, "iv": null, "r": []}
+
+_walk_root(path) := [path[0]] if _named(path)
+
+_walk_root(path) := [] if not _named(path)
+
+_walk(start, keys, if_any) := {"items": items, "fails": fails, "walked": walked, "trail": trail} if {
+	r0 := _walk_level([start], keys, 0, if_any)
+	r1 := _walk_level(r0.entries, keys, 1, if_any)
+	r2 := _walk_level(r1.entries, keys, 2, if_any)
+	r3 := _walk_level(r2.entries, keys, 3, if_any)
+	r4 := _walk_level(r3.entries, keys, 4, if_any)
+	r5 := _walk_level(r4.entries, keys, 5, if_any)
+	r6 := _walk_level(r5.entries, keys, 6, if_any)
+	r7 := _walk_level(r6.entries, keys, 7, if_any)
+	r8 := _walk_level(r7.entries, keys, 8, if_any)
+	r9 := _walk_level(r8.entries, keys, 9, if_any)
+	r10 := _walk_level(r9.entries, keys, 10, if_any)
+	levels := [r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10]
+	fails := [f | some r in levels; some f in r.fails]
+	walked := {i | some i, r in levels; r.walked}
+	items := [e | some e in r10.entries; e.i != null]
+	trail := array.concat([start], [r.entries[0] | some i, r in levels; i < count(keys); count(r.entries) == 1])
+}
+
+_walk_level(entries, keys, i, _) := {"entries": entries, "fails": [], "walked": false} if i > count(keys)
+
+_walk_level(entries, keys, i, if_any) := {"entries": [_walk_step(e, keys, i) | some e in expanded], "fails": fails, "walked": walked} if {
+	i <= count(keys)
+	walked := _walks_here(entries, keys, i)
+	expanded := [x | some e in entries; some x in _walk_expand(e, walked)]
+	fails := [f | some e in entries; some f in _walk_expand_fail(e, walked, if_any)]
+}
+
+_walks_here(entries, keys, i) if {
+	some e in entries
+	is_array(e.v)
+	i == count(keys)
+} else if {
+	some e in entries
+	is_array(e.v)
+	not is_number(keys[i])
+} else := false
+
+_walk_expand(e, false) := [e]
+
+_walk_expand(e, true) := [{"c": array.concat(e.c, [j]), "v": x, "i": array.concat(e.c, [j]), "iv": x, "r": []} | some j, x in e.v] if is_array(e.v)
+
+_walk_expand(e, true) := [] if not is_array(e.v)
+
+_walk_expand_fail(_, false, _) := []
+
+_walk_expand_fail(e, true, if_any) := [] if {
+	is_array(e.v)
+	_walk_empty_ok(e.v, if_any)
+}
+
+_walk_expand_fail(e, true, if_any) := [{"path": e.c, "item": e.c, "cause": "value", "value": []}] if {
+	e.v == []
+	not _walk_empty_ok(e.v, if_any)
+}
+
+_walk_expand_fail(e, true, _) := [{"path": e.c, "item": e.c, "cause": _walk_state(e.v), "value": _walk_shown(e.v)}] if not is_array(e.v)
+
+_walk_empty_ok(v, _) if count(v) > 0
+
+_walk_empty_ok(_, true)
+
+_walk_step(e, keys, i) := e if i >= count(keys)
+
+_walk_step(e, keys, i) := {"c": array.concat(e.c, [keys[i]]), "v": _walk_read(e.v, keys[i]), "i": e.i, "iv": e.iv, "r": array.concat(e.r, [keys[i]])} if i < count(keys)
+
+_walk_read(v, k) := object.get(v, k, _absent) if {
+	is_object(v)
+	is_string(k)
+	v != _absent
+	v != _unusable_mark
+} else := v[k] if {
+	is_array(v)
+	is_number(k)
+	k < count(v)
+} else := _absent if {
+	is_array(v)
+	is_number(k)
+} else := _absent if {
+	_walk_gone(v)
+} else := _unusable_mark
+
+_walk_gone(v) if v == _absent
+
+_walk_gone(null)
+
+_walk_state(v) := "absent" if v == _absent
+
+_walk_state(null) := "null"
+
+_walk_state(v) := "unusable" if not _walk_gone(v)
+
+_walk_shown(v) := null if _walk_marked(v)
+
+_walk_shown(v) := v if not _walk_marked(v)
+
+_walk_marked(v) if v == _absent
+
+_walk_marked(v) if v == _unusable_mark
+
+_walk_judge(check, e) := {"kept": kept, "passed": passed, "failure": failure} if {
+	undecided := [[c, cause] | some c in check.whose; cause := _row_cause(c, e.iv, ""); not cause in {"satisfied", "value"}]
+	kept := count([c | some c in check.whose; _row_cause(c, e.iv, "") == "value"]) == 0
+	leaf := _walk_target(check.check, e.r)
+	passed := _walk_passed(undecided, kept, leaf, e.iv)
+	failure := _walk_failure(e, undecided, kept, leaf, passed)
+}
+
+default _walk_passed(_, _, _, _) := false
+
+_walk_passed([], true, leaf, v) if op_passed(leaf, v)
+
+_walk_failure(e, [], true, leaf, false) := {"path": e.c, "item": e.i, "cause": _row_cause(leaf, e.iv, ""), "value": _walk_shown(e.v)}
+
+_walk_failure(e, undecided, _, _, _) := {"path": array.concat(e.i, _walk_first_path(undecided[0][0])), "item": e.i, "cause": undecided[0][1], "value": _walk_first_value(undecided[0][0], e.iv)} if undecided != []
+
+_walk_failure(_, [], false, _, _) := null
+
+_walk_failure(_, [], true, _, true) := null
+
+_walk_first_path(c) := _leaf_paths(c)[0]
+
+_walk_first_value(c, v) := value_at(v, _leaf_paths(c)[0])
+
+_walk_target(leaf, r) := object.union(leaf, {"left": r}) if _two_sided(leaf)
+
+_walk_target(leaf, r) := object.union(leaf, {"path": r}) if not _two_sided(leaf)
+
+_walk_cause(_, w, _, _) := _walk_stop(w)[0].cause if w.walked == set()
+
+_walk_cause(check, w, judged, fails) := _walk_verdict(check.op, check.if_any == true, judged, fails) if w.walked != set()
+
+_walk_stop(w) := [] if w.walked != set()
+
+_walk_stop(w) := [{"path": e.c, "item": e.c, "cause": _walk_stop_state(e.v), "value": _walk_shown(e.v)} | e := _walk_stopped_at(w.trail)] if w.walked == set()
+
+_walk_stopped_at(trail) := [e | some i, e in trail; i > 0; not _walk_container(e.v)][0] if {
+	some i, e in trail
+	i > 0
+	not _walk_container(e.v)
+} else := trail[count(trail) - 1]
+
+_walk_container(v) if {
+	is_object(v)
+	not _walk_marked(v)
+}
+
+_walk_container(v) if is_array(v)
+
+_walk_stop_state(v) := _walk_state(v) if _walk_gone(v)
+
+_walk_stop_state(v) := "unusable" if not _walk_gone(v)
+
+_walk_verdict("every", if_any, judged, []) := "satisfied" if {
+	_walk_some_kept(judged, if_any)
+} else := "value"
+
+_walk_verdict("every", _, _, fails) := _walk_worst(fails) if fails != []
+
+_walk_verdict("some", _, judged, fails) := "satisfied" if {
+	some j in judged
+	j.passed
+} else := _walk_worst(fails) if {
+	fails != []
+} else := "value"
+
+_walk_some_kept(_, true)
+
+_walk_some_kept(judged, false) if {
+	some j in judged
+	j.kept
+}
+
+_walk_worst(fails) := [c | some c in array.concat(_cause_precedence, ["value"]); c in {f.cause | some f in fails}][0]
+
+_walk_failed("satisfied", _) := []
+
+_walk_failed(cause, fails) := [{"path": _path_name(f.path), "item": _path_name(f.item), "cause": f.cause, "value": f.value} |
+	some p in sort({f.path | some f in fails})
+	some f in fails
+	f.path == p
+] if cause != "satisfied"
+
+_walk_inputs(check, w) := [{"name": _walk_name(check.path, w.walked), "value": [_walk_shown(e.v) | some e in w.items]}]
+
+_walk_name(path, walked) := concat("", array.concat(array.concat(_walk_root_name(path), [concat("", [_walk_mark(i, walked), _step_name(i + count(_walk_root(path)), step)]) | some i, step in _walk_steps(path)]), [_walk_mark(count(_walk_steps(path)), walked)]))
+
+_walk_root_name(path) := [_plain_step_name(0, path[0])] if _named(path)
+
+_walk_root_name(path) := [] if not _named(path)
+
+_walk_steps(path) := array.slice(path, count(_walk_root(path)), count(path))
+
+_walk_mark(i, walked) := "[]" if i in walked
+
+_walk_mark(i, walked) := "" if not i in walked

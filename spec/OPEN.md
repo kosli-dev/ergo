@@ -44,6 +44,16 @@ A report could also give each input its exact location, counted from the root of
 
 A tool could then point at the value itself, like a report viewer that highlights the spot in the input when you hover a row. The open questions are whether it's worth the size it adds to every report, what a value read from the params or worked out from several values (a `count of`, a `sum of`) gets, and whether `failed_items` and `$refs` get one too.
 
+## Which steps a walk walks
+
+`every` and `some` walk "into every list along the path" ([walk.lists](semantics.md#every-and-some)), and ergo decides that from the data: a step is walked when at least one value there is a list, and then every value there must be one. So `every prs.commits.signed is true` on `{"prs": [{"commits": {"signed": true}}]}` passes, because `commits` is an object and nothing is walked at that step, but the same pull request fails as `unusable` when another one has a list of commits. It fails closed whenever the data shows a list, and only passes data shaped wrong when every item is shaped wrong the same way and the wrong shape still holds a field that passes.
+
+Three ways to settle it:
+
+- Keep it as it is, and say so in the spec.
+- Have the author mark the lists, like `every prs[].commits[].signed`. That changes the grammar of [#174](https://github.com/kosli-dev/ergo/issues/174), and costs some of its plain reading.
+- Give ergo the shape of the input, as a schema, so a step is walked because the schema says it holds a list. [#191](https://github.com/kosli-dev/ergo/pull/191) already declares a schema for part of `input`.
+
 ## Rules without cases
 
 Every rule needs a case, apart from the ones listed here. The `sentence` rules here are for forms `ergo.rego` doesn't run yet. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.
@@ -61,14 +71,6 @@ Every rule needs a case, apart from the ones listed here. The `sentence` rules h
 - `sentence.subject.depth`
 - `sentence.subject.own`
 - `sentence.subject.short`
-- `sentence.every.walk`
-- `sentence.every.empty`
-- `sentence.every.if_any`
-- `sentence.some.walk`
-- `sentence.whose.item`
-- `sentence.whose.undecided`
-- `sentence.whose.every`
-- `sentence.argument.item`
 - `sentence.argument.subject`
 - `sentence.derived.count`
 - `sentence.derived.sum`

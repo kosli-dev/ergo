@@ -8181,7 +8181,6 @@ test_an_assert_object_takes_only_description_and_meta if {
 
 test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
 	every pair in [
-		[`every xs is 1`, "every and some aren't supported yet"],
 		[`count of xs is 1`, "count of, sum of and plus aren't supported yet"],
 		[`x is y plus 1`, "count of, sum of and plus aren't supported yet"],
 		[`t is before "2024-01-01T00:00:00Z"`, `"is before" with a value isn't supported yet: compare with a field`],
@@ -8196,7 +8195,7 @@ test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
 	_sentence_problems({"assert": []}) == ["empty assert"]
 	_sentence_problems({"assert": ["x exists", 1]}) == ["invalid assert"]
 	_sentence_problems({"assert": ["x exists", "y is \"a"]}) == ["line 2: unclosed quote at column 6"]
-	_sentence_problems({"assert": ["x exists", "every ys is 1"]}) == ["line 2: every and some aren't supported yet"]
+	_sentence_problems({"assert": ["x exists", "count of ys is 1"]}) == ["line 2: count of, sum of and plus aren't supported yet"]
 	_sentence_problems({"assert": "x exists", "for": "every xs as x"}) == [`"for" isn't supported yet`]
 }
 
@@ -8532,4 +8531,112 @@ test_an_all_of_written_by_hand_fails_as_ill_formed_like_any_unknown_op_whatever_
 test_every_assertion_is_unusable_when_the_input_holds_something_json_cant if {
 	r := ergo.report({"things": [{"id": "a", "x": 1, "s": {1}}]}, _sentence_policy({"c": "x is 1 and x exists"}), {})
 	[[row.cause, row.failed_assertions] | some row in r.results; row.check == "c"] == [["unusable", [{"assertion": "x is 1", "cause": "unusable"}, {"assertion": "x exists", "cause": "unusable"}]]]
+}
+
+_walk_rows(checks, doc, params) := [[r.subject.id, r.check, r.cause, object.get(r, "failed_items", object.get(r, "failed_assertions", []))] | some r in ergo.report(doc, _sentence_policy(checks), params).results; not startswith(r.check, "$")]
+
+test_every_and_some_read_into_a_walk_with_its_conditions if {
+	c := ergo._s_written_check(`every approvers.username whose state is "APPROVED", if any, is in $params.staff`)
+	c.op == "every"
+	c.path == ["approvers", "username"]
+	c.whose == [{"op": "equals", "path": ["state"], "value": "APPROVED"}]
+	c.check.op == "in"
+	c.if_any == true
+}
+
+test_a_walk_that_reads_no_list_fails_with_what_its_path_ends_at if {
+	doc := {"things": [{"id": "a", "x": {"y": 1}}, {"id": "b"}, {"id": "c", "x": {"y": null}}]}
+	_walk_rows({"e": "every x.y is 1"}, doc, {}) == [
+		["a", "e", "unusable", [{"path": "x.y", "item": "x.y", "cause": "unusable", "value": 1}]],
+		["b", "e", "absent", [{"path": "x", "item": "x", "cause": "absent", "value": null}]],
+		["c", "e", "null", [{"path": "x.y", "item": "x.y", "cause": "null", "value": null}]],
+	]
+}
+
+test_a_walk_starts_where_its_path_starts_and_steps_past_a_position_without_walking_it if {
+	doc := {"things": [{"id": "a", "m": [[1, 2], [3]]}]}
+	rows := _walk_rows({"i": "every $input.things[0].m[0] is at least 1", "p": "every first of m is 1"}, doc, {})
+	rows == [["a", "i", "satisfied", []], ["a", "p", "value", [{"path": "item 2 of m[0]", "item": "item 2 of m[0]", "cause": "value", "value": 2}]]]
+}
+
+test_a_walk_whose_key_comes_from_a_param_that_cant_be_read_fails_with_its_cause if {
+	doc := {"things": [{"id": "a", "o": {"k": [1]}}]}
+	_walk_rows({"w": "every o named by $params.key is 1"}, doc, {}) == [["a", "w", "absent", []]]
+	_walk_rows({"w": "every o named by $params.key is 1"}, doc, {"key": "k"}) == [["a", "w", "satisfied", []]]
+}
+
+test_every_and_some_joined_with_and_give_one_row_with_the_failed_sentences if {
+	doc := {"things": [{"id": "a", "n": 1, "xs": [{"v": 1}, {"v": 2}]}]}
+	r := ergo.report(doc, _sentence_policy({"c": "n is 1 and every xs.v is 1 and some xs.v is 2"}), {})
+	[[row.cause, row.failed_assertions, row.inputs] | some row in r.results; row.check == "c"] == [[
+		"value",
+		[{"assertion": "every xs.v is 1", "cause": "value"}],
+		[{"name": "n", "value": 1}, {"name": "xs[].v", "value": [1, 2]}],
+	]]
+}
+
+test_forms_a_walk_cant_take_yet_are_written_wrong if {
+	_sentence_problems(`every xs whose count of ys is 1 is not empty`) == ["count of, sum of and plus aren't supported yet"]
+	_sentence_problems(`every xs whose y is in z is 1`) == [`"is in" with a field of the subject isn't supported yet`]
+	_sentence_problems(`every k1.k2.k3.k4.k5.k6.k7.k8.k9.k10.k11.k12 is 1`) == ["every and some over more than ten steps aren't supported yet"]
+}
+
+test_every_and_some_are_unknown_ops_in_todays_syntax if {
+	every op in ["every", "some"] {
+		_sentence_problems({"op": op, "path": ["xs"], "check": {"op": "present", "path": []}, "whose": [], "if_any": false}) == [concat("", ["unknown op ", op])]
+	}
+}
+
+test_a_walk_that_reads_no_list_stops_at_the_end_when_every_value_along_the_path_is_an_object if {
+	doc := {"things": [{"id": "a", "x": {"y": {"z": 1}}}, {"id": "b", "xs": [1, 2]}]}
+	_walk_rows({"e": "every x.y is 1"}, doc, {})[0] == ["a", "e", "unusable", [{"path": "x.y", "item": "x.y", "cause": "unusable", "value": {"z": 1}}]]
+	_walk_rows({"e": "every xs[5].y is 1"}, doc, {})[1] == ["b", "e", "absent", [{"path": "item 6 of xs", "item": "item 6 of xs", "cause": "absent", "value": null}]]
+	_walk_rows({"e": "every x.y.z.w is 1"}, doc, {})[1] == ["b", "e", "absent", [{"path": "x", "item": "x", "cause": "absent", "value": null}]]
+}
+
+test_an_item_a_whose_condition_cant_decide_is_undecided_even_when_another_condition_leaves_it_out if {
+	doc := {"things": [{"id": "a", "xs": [{"kind": "b"}]}]}
+	_walk_rows({"e": `every xs whose kind is "a" and state is "open" is not empty`}, doc, {}) == [["a", "e", "absent", [{"path": "xs[0].state", "item": "item 1 of xs", "cause": "absent", "value": null}]]]
+}
+
+test_a_walk_whose_param_cant_be_used_fails_as_unusable_even_with_if_any if {
+	doc := {"things": [{"id": "a", "xs": [{"v": 2, "kind": "a"}]}]}
+	checks := {
+		"a": "every xs.v whose kind is not one of $params.l, if any, is 1",
+		"b": "every xs is not one of $params.l",
+		"c": "every xs.v is 2 and every xs.kind is in $params.l",
+	}
+	r := ergo.report(doc, _sentence_policy(checks), {"l": "text"})
+	[[row.check, row.cause, object.get(row, "failed_items", object.get(row, "failed_assertions", null))] | some row in r.results; row.check in {"a", "b", "c"}] == [
+		["a", "unusable", []],
+		["b", "unusable", []],
+		["c", "unusable", [{"assertion": "every xs.kind is in $params.l", "cause": "unusable"}]],
+	]
+	not r.compliant
+}
+
+test_a_walk_fails_as_unusable_when_the_input_holds_something_json_cant if {
+	r := ergo.report({"things": [{"id": "a", "xs": [1], "bad": {1}}]}, _sentence_policy({"c": "every xs is 1"}), {})
+	[row.cause | some row in r.results; row.check == "c"] == ["unusable"]
+}
+
+test_a_walk_on_a_subject_that_isnt_an_object_fails_like_any_path_does if {
+	r := ergo.report({"things": ["text", null]}, {"subjects": {"t": {"from": ["things"]}}, "requirements": {"s": {"subject": "t", "checks": {"c": "every xs is 1"}}}}, {})
+	[row.cause | some row in r.results; row.check == "c"] == ["not_an_object", "not_an_object"]
+}
+
+test_a_walk_of_exactly_ten_steps_walks_its_last_list_and_eleven_is_written_wrong if {
+	doc := {"things": [{"id": "a", "p0": [{"p1": {"p2": {"p3": {"p4": {"p5": {"p6": {"p7": {"p8": {"p9": [""]}}}}}}}}}]}]}
+	_walk_rows({"c": "every p0.p1.p2.p3.p4.p5.p6.p7.p8.p9 is not empty"}, doc, {})[0][2] == "value"
+	_sentence_problems("every p0.p1.p2.p3.p4.p5.p6.p7.p8.p9.p10 is not empty") == ["every and some over more than ten steps aren't supported yet"]
+}
+
+test_a_walk_whose_named_by_cant_be_read_shows_an_empty_list_in_its_inputs if {
+	r := ergo.report({"things": [{"id": "a", "xs": {"k": [1]}}]}, _sentence_policy({"c": "every xs named by $params.k is 1"}), {})
+	[[row.cause, row.inputs, row.failed_items] | some row in r.results; row.check == "c"] == [["absent", [{"name": "xs named by $params.k", "value": []}], []]]
+}
+
+test_a_list_phrase_after_every_or_some_is_written_wrong_because_the_last_list_is_walked_too if {
+	_sentence_problems(`every pull_requests.labels does not contain "hotfix"`) == [`"does not contain" after every or some would check each item of the last list, not the list: put the walk on a for line`]
+	_sentence_problems(`some xs contains all of 1, 2`) == [`"contains all of" after every or some would check each item of the last list, not the list: put the walk on a for line`]
 }
