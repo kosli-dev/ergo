@@ -12,6 +12,20 @@ hugo server -s site
 
 Then open http://localhost:1313.
 
+## The tutorial
+
+`/tutorial/` teaches check sentences one step at a time, with ergo running in the reader's browser as Wasm. It needs the Wasm built from this checkout's `ergo.rego`, and the build fails without it. You need [OPA](https://www.openpolicyagent.org/), `curl`, `openssl` and Node 24:
+
+```sh
+site/build-tutorial.sh
+node --test site/assets/js/tutorial/lib.test.mjs
+hugo server -s site
+```
+
+Then open http://localhost:1313/tutorial/. The script writes `site/assets/tutorial/`, which git ignores. Run it again after you change `ergo.rego`. The tests run the built Wasm, so they need the script to have run first.
+
+The logic that builds the policy and grades each step is in `assets/js/tutorial/lib.mjs`, with no page code in it. The steps' text, hints and goals are in the same file.
+
 ## Files
 
 | What | Where |
@@ -22,6 +36,8 @@ Then open http://localhost:1313.
 | How the docs are read from the repo | `content/docs/_content.gotmpl` and `[module]` in `hugo.toml` |
 | Styles and colour tokens | `assets/css/ergo.css` |
 | Logo | `static/brand/ergo-wordmark-white.svg` (master), inlined in `layouts/_partials/wordmark.html` and `mark.html`; `static/favicon.svg` |
+| Tutorial page and layout | `content/tutorial.md`, `layouts/tutorial.html` |
+| Tutorial script and styles | `assets/js/tutorial/`, `assets/css/tutorial.css` |
 | Site settings (repo links, status bar) | `hugo.toml` |
 
 ## Edit the landing page copy
