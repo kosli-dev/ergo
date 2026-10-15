@@ -1,0 +1,1254 @@
+[
+  {
+    "description": "count of a list",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings is 2"}}}},
+    "cases": [
+      {
+        "description": "passes when the list has that many items, and shows the number and the items",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"findings": [{"id": 1}, {"id": 2}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of findings", "value": 2}, {"name": "findings[]", "value": [{"id": 1}, {"id": 2}]}]}
+        ],
+        "expressions": {"s": {"c": "count of findings is 2"}}
+      },
+      {
+        "description": "fails as value when the count is different",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"findings": [{"id": 1}, {"id": 2}, {"id": 3}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "count of findings", "value": 3}, {"name": "findings[]", "value": [{"id": 1}, {"id": 2}, {"id": 3}]}]}
+        ]
+      },
+      {
+        "description": "counts an empty list as 0, so it fails as value here",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"findings": [], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "count of findings", "value": 0}, {"name": "findings[]", "value": []}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the list is missing, with the count shown as null",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "tally.fail", "sentence.derived.fail", "sentence.phrase.is", "path.absent"],
+        "input": {"releases": [{"id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "count of findings", "value": null}, {"name": "findings", "value": []}]}
+        ]
+      },
+      {
+        "description": "fails as null when the list is null",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "tally.fail", "sentence.derived.fail", "sentence.phrase.is", "path.null"],
+        "input": {"releases": [{"findings": null, "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "count of findings", "value": null}, {"name": "findings", "value": []}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the list is a string",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "tally.fail", "sentence.derived.fail", "sentence.phrase.is", "path.unusable"],
+        "input": {"releases": [{"findings": "abc", "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "count of findings", "value": null}, {"name": "findings", "value": []}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the list is an object",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "tally.fail", "sentence.derived.fail", "sentence.phrase.is", "path.unusable"],
+        "input": {"releases": [{"findings": {"id": 1}, "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "count of findings", "value": null}, {"name": "findings", "value": []}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of an empty list is 0",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings is 0"}}}},
+    "cases": [
+      {
+        "description": "passes on an empty list",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"findings": [], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of findings", "value": 0}, {"name": "findings[]", "value": []}]}
+        ]
+      },
+      {
+        "description": "still fails as absent when the list is missing, not counted as 0",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "tally.fail", "sentence.derived.fail", "sentence.phrase.is", "path.absent"],
+        "input": {"releases": [{"id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "count of findings", "value": null}, {"name": "findings", "value": []}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of a list with whose",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings whose severity is \"high\" is 1"}}}},
+    "cases": [
+      {
+        "description": "counts only the items that pass, and shows every item",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "tally.whose", "sentence.phrase.is"],
+        "input": {"releases": [{"findings": [{"severity": "high"}, {"severity": "low"}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of findings whose severity is \"high\"", "value": 1}, {"name": "findings[]", "value": [{"severity": "high"}, {"severity": "low"}]}]}
+        ],
+        "expressions": {"s": {"c": "count of findings whose severity is \"high\" is 1"}}
+      },
+      {
+        "description": "counts 0 when whose leaves every item out",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "tally.whose", "sentence.phrase.is"],
+        "input": {"releases": [{"findings": [{"severity": "low"}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "count of findings whose severity is \"high\"", "value": 0}, {"name": "findings[]", "value": [{"severity": "low"}]}]}
+        ]
+      },
+      {
+        "description": "leaves out an item whose field is another value, even of another type",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "tally.whose", "sentence.phrase.is"],
+        "input": {"releases": [{"findings": [{"severity": "high"}, {"severity": 5}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of findings whose severity is \"high\"", "value": 1}, {"name": "findings[]", "value": [{"severity": "high"}, {"severity": 5}]}]}
+        ]
+      },
+      {
+        "description": "fails as absent when an item cannot be decided because the field is missing",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "tally.whose", "tally.fail", "sentence.derived.fail", "sentence.phrase.is", "path.absent"],
+        "input": {"releases": [{"findings": [{"severity": "high"}, {}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "count of findings whose severity is \"high\"", "value": null}, {"name": "findings[]", "value": [{"severity": "high"}, {}]}]}
+        ]
+      },
+      {
+        "description": "fails as null when an item cannot be decided because the field is null",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "tally.whose", "tally.fail", "sentence.derived.fail", "sentence.phrase.is", "path.null"],
+        "input": {"releases": [{"findings": [{"severity": "high"}, {"severity": null}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "count of findings whose severity is \"high\"", "value": null}, {"name": "findings[]", "value": [{"severity": "high"}, {"severity": null}]}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the list is missing",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "tally.whose", "tally.fail", "sentence.derived.fail", "sentence.phrase.is"],
+        "input": {"releases": [{"id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "count of findings whose severity is \"high\"", "value": null}, {"name": "findings", "value": []}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of a list whose a field exists",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings whose severity exists is 1"}}}},
+    "cases": [
+      {
+        "description": "leaves out items where the field is missing or null, and does not fail on them",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "tally.whose", "sentence.phrase.is", "sentence.phrase.exists"],
+        "input": {"releases": [{"findings": [{}, {"severity": null}, {"severity": "high"}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of findings whose severity exists", "value": 1}, {"name": "findings[]", "value": [{}, {"severity": null}, {"severity": "high"}]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of two lists",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of pull_requests.commits is 3"}}}},
+    "cases": [
+      {
+        "description": "adds up the commits of every pull request",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"pull_requests": [{"commits": [{"sha": "a"}, {"sha": "b"}]}, {"commits": [{"sha": "c"}]}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of pull_requests.commits", "value": 3}, {"name": "pull_requests[].commits[]", "value": [{"sha": "a"}, {"sha": "b"}, {"sha": "c"}]}]}
+        ]
+      },
+      {
+        "description": "an empty inner list adds nothing and does not fail",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"pull_requests": [{"commits": [{"sha": "a"}, {"sha": "b"}, {"sha": "c"}]}, {"commits": []}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of pull_requests.commits", "value": 3}, {"name": "pull_requests[].commits[]", "value": [{"sha": "a"}, {"sha": "b"}, {"sha": "c"}]}]}
+        ]
+      },
+      {
+        "description": "counts 0 when every inner list is empty",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"pull_requests": [{"commits": []}, {"commits": []}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "count of pull_requests.commits", "value": 0}, {"name": "pull_requests[].commits[]", "value": []}]}
+        ]
+      },
+      {
+        "description": "counts 0 when the outer list is empty, and the inner list is never walked",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"pull_requests": [], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "count of pull_requests.commits", "value": 0}, {"name": "pull_requests[].commits", "value": []}]}
+        ]
+      },
+      {
+        "description": "fails as absent when one inner list is missing",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "tally.fail", "sentence.derived.fail", "sentence.phrase.is", "path.absent"],
+        "input": {"releases": [{"pull_requests": [{"commits": [{"sha": "a"}]}, {}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "count of pull_requests.commits", "value": null}, {"name": "pull_requests[].commits[]", "value": [{"sha": "a"}]}]}
+        ]
+      },
+      {
+        "description": "fails as null when one inner list is null",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "tally.fail", "sentence.derived.fail", "sentence.phrase.is", "path.null"],
+        "input": {"releases": [{"pull_requests": [{"commits": [{"sha": "a"}]}, {"commits": null}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "count of pull_requests.commits", "value": null}, {"name": "pull_requests[].commits[]", "value": [{"sha": "a"}]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when one inner list is a string",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "tally.fail", "sentence.derived.fail", "sentence.phrase.is", "path.unusable"],
+        "input": {"releases": [{"pull_requests": [{"commits": [{"sha": "a"}]}, {"commits": "x"}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "count of pull_requests.commits", "value": null}, {"name": "pull_requests[].commits[]", "value": [{"sha": "a"}]}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the outer list is missing",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "tally.fail", "sentence.derived.fail", "sentence.phrase.is", "path.absent"],
+        "input": {"releases": [{"id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "count of pull_requests.commits", "value": null}, {"name": "pull_requests.commits", "value": []}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "sum of a field",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "sum of items.usd is 30"}}}},
+    "cases": [
+      {
+        "description": "adds the field up across the items",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"items": [{"usd": 10}, {"usd": 20}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "sum of items.usd", "value": 30}, {"name": "items[].usd", "value": [10, 20]}]}
+        ],
+        "expressions": {"s": {"c": "sum of items.usd is 30"}}
+      },
+      {
+        "description": "fails as value when the sum is different",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"items": [{"usd": 10}, {"usd": 25}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "sum of items.usd", "value": 35}, {"name": "items[].usd", "value": [10, 25]}]}
+        ]
+      },
+      {
+        "description": "a sum over no items is 0, so it fails as value here",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"items": [], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "sum of items.usd", "value": 0}, {"name": "items[].usd", "value": []}]}
+        ]
+      },
+      {
+        "description": "fails as absent when an item has no such field, with null for it in the list",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "tally.fail", "sentence.derived.fail", "sentence.phrase.is", "path.absent"],
+        "input": {"releases": [{"items": [{"usd": 10}, {}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "sum of items.usd", "value": null}, {"name": "items[].usd", "value": [10, null]}]}
+        ]
+      },
+      {
+        "description": "fails as null when a value is null",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "tally.fail", "sentence.derived.fail", "sentence.phrase.is", "path.null"],
+        "input": {"releases": [{"items": [{"usd": 10}, {"usd": null}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "sum of items.usd", "value": null}, {"name": "items[].usd", "value": [10, null]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when a value is text, even a number written as text",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "tally.fail", "sentence.derived.fail", "sentence.phrase.is", "path.unusable"],
+        "input": {"releases": [{"items": [{"usd": 10}, {"usd": "20"}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "sum of items.usd", "value": null}, {"name": "items[].usd", "value": [10, "20"]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when a value is a boolean",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "tally.fail", "sentence.derived.fail", "sentence.phrase.is", "path.unusable"],
+        "input": {"releases": [{"items": [{"usd": 10}, {"usd": true}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "sum of items.usd", "value": null}, {"name": "items[].usd", "value": [10, true]}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the list is missing",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "tally.fail", "sentence.derived.fail", "sentence.phrase.is", "path.absent"],
+        "input": {"releases": [{"id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "sum of items.usd", "value": null}, {"name": "items.usd", "value": []}]}
+        ]
+      },
+      {
+        "description": "fails as null when the list is null",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "tally.fail", "sentence.derived.fail", "sentence.phrase.is", "path.null"],
+        "input": {"releases": [{"items": null, "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "sum of items.usd", "value": null}, {"name": "items.usd", "value": []}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the list is not a list",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "tally.fail", "sentence.derived.fail", "sentence.phrase.is", "path.unusable"],
+        "input": {"releases": [{"items": "x", "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "sum of items.usd", "value": null}, {"name": "items.usd", "value": []}]}
+        ]
+      },
+      {
+        "description": "the worst cause wins when several values fail: unusable before absent before null",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "tally.fail", "sentence.derived.fail", "sentence.phrase.is", "path.unusable"],
+        "input": {"releases": [{"items": [{"usd": null}, {}, {"usd": "x"}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "sum of items.usd", "value": null}, {"name": "items[].usd", "value": [null, null, "x"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "sum over no items is 0",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "sum of items.usd is 0"}}}},
+    "cases": [
+      {
+        "description": "passes on an empty list",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"items": [], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "sum of items.usd", "value": 0}, {"name": "items[].usd", "value": []}]}
+        ]
+      },
+      {
+        "description": "passes on items that add up to 0",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"items": [{"usd": 1}, {"usd": -1}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "sum of items.usd", "value": 0}, {"name": "items[].usd", "value": [1, -1]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "sum of decimals",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "sum of items.usd is 0.3"}}}},
+    "cases": [
+      {
+        "description": "adds 0.1 and 0.2 up to 0.3",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "sentence.phrase.is", "sentence.derived.sum"],
+        "input": {"releases": [{"items": [{"usd": 0.1}, {"usd": 0.2}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "sum of items.usd", "value": 0.3}, {"name": "items[].usd", "value": [0.1, 0.2]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "sum of a field with whose",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "sum of items.usd whose kind is \"a\" is 10"}}}},
+    "cases": [
+      {
+        "description": "adds only the items that pass",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "tally.whose", "sentence.phrase.is"],
+        "input": {"releases": [{"items": [{"kind": "a", "usd": 10}, {"kind": "b", "usd": 20}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "sum of items.usd whose kind is \"a\"", "value": 10}, {"name": "items[].usd", "value": [10, 20]}]}
+        ],
+        "expressions": {"s": {"c": "sum of items.usd whose kind is \"a\" is 10"}}
+      },
+      {
+        "description": "does not read the field of an item that whose leaves out",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "tally.whose", "sentence.phrase.is"],
+        "input": {"releases": [{"items": [{"kind": "a", "usd": 10}, {"kind": "b"}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "sum of items.usd whose kind is \"a\"", "value": 10}, {"name": "items[].usd", "value": [10, null]}]}
+        ]
+      },
+      {
+        "description": "fails as absent when an item cannot be decided because kind is missing",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "tally.whose", "tally.fail", "sentence.derived.fail", "sentence.phrase.is", "path.absent"],
+        "input": {"releases": [{"items": [{"kind": "a", "usd": 10}, {"usd": 5}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "sum of items.usd whose kind is \"a\"", "value": null}, {"name": "items[].usd", "value": [10, 5]}]}
+        ]
+      },
+      {
+        "description": "fails as absent when a kept item has no such field",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "tally.whose", "tally.fail", "sentence.derived.fail", "sentence.phrase.is", "path.absent"],
+        "input": {"releases": [{"items": [{"kind": "a", "usd": 10}, {"kind": "a"}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "sum of items.usd whose kind is \"a\"", "value": null}, {"name": "items[].usd", "value": [10, null]}]}
+        ]
+      },
+      {
+        "description": "fails as value when whose leaves nothing and the sum 0 is not 10",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "tally.whose", "sentence.phrase.is"],
+        "input": {"releases": [{"items": [{"kind": "b", "usd": 20}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "sum of items.usd whose kind is \"a\"", "value": 0}, {"name": "items[].usd", "value": [20]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "sum with whose over no items is 0",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "sum of items.usd whose kind is \"a\" is 0"}}}},
+    "cases": [
+      {
+        "description": "passes when whose leaves nothing in",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "tally.whose", "sentence.phrase.is"],
+        "input": {"releases": [{"items": [{"kind": "b", "usd": 20}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "sum of items.usd whose kind is \"a\"", "value": 0}, {"name": "items[].usd", "value": [20]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "sum within a distance",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "sum of items.usd is 1 within 0.5"}}}},
+    "cases": [
+      {
+        "description": "passes when the sum is within the distance",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "sentence.phrase.within"],
+        "input": {"releases": [{"items": [{"usd": 0.7}, {"usd": 0.7}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "sum of items.usd", "value": 1.4}, {"name": "items[].usd", "value": [0.7, 0.7]}]}
+        ],
+        "expressions": {"s": {"c": "sum of items.usd is 1 within 0.5"}}
+      },
+      {
+        "description": "fails as value when the sum is further away",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "sentence.phrase.within"],
+        "input": {"releases": [{"items": [{"usd": 0.7}, {"usd": 0.9}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "sum of items.usd", "value": 1.6}, {"name": "items[].usd", "value": [0.7, 0.9]}]}
+        ]
+      },
+      {
+        "description": "fails as value when the sum is further away, with whole numbers",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "sentence.phrase.within"],
+        "input": {"releases": [{"items": [{"usd": 1}, {"usd": 1}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "sum of items.usd", "value": 2}, {"name": "items[].usd", "value": [1, 1]}]}
+        ]
+      },
+      {
+        "description": "passes when the sum is exactly that far away",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "sentence.phrase.within"],
+        "input": {"releases": [{"items": [{"usd": 0.5}, {"usd": 1}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "sum of items.usd", "value": 1.5}, {"name": "items[].usd", "value": [0.5, 1]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when a value is text",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "tally.fail", "sentence.derived.fail", "sentence.phrase.within"],
+        "input": {"releases": [{"items": [{"usd": "x"}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "sum of items.usd", "value": null}, {"name": "items[].usd", "value": ["x"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "sum within a distance of a field",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "sum of items.usd equals total within 0.01"}}}},
+    "cases": [
+      {
+        "description": "passes when the sum is close enough to the field",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "sentence.phrase.within", "sentence.derived.compare"],
+        "input": {"releases": [{"items": [{"usd": 0.1}, {"usd": 0.2}], "total": 0.305, "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "sum of items.usd", "value": 0.3}, {"name": "items[].usd", "value": [0.1, 0.2]}, {"name": "total", "value": 0.305}]}
+        ]
+      },
+      {
+        "description": "fails as value when it is not",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "sentence.phrase.within"],
+        "input": {"releases": [{"items": [{"usd": 0.1}, {"usd": 0.2}], "total": 0.5, "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "sum of items.usd", "value": 0.3}, {"name": "items[].usd", "value": [0.1, 0.2]}, {"name": "total", "value": 0.5}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "tally.fail", "sentence.derived.fail", "sentence.phrase.within"],
+        "input": {"releases": [{"items": [{"usd": 0.1}, {"usd": 0.2}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "sum of items.usd", "value": 0.3}, {"name": "items[].usd", "value": [0.1, 0.2]}, {"name": "total", "value": null}]}
+        ]
+      },
+      {
+        "description": "the worse cause wins when both sides fail: absent before null",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "tally.fail", "sentence.derived.fail", "sentence.phrase.within"],
+        "input": {"releases": [{"items": [{"usd": null}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "sum of items.usd", "value": null}, {"name": "items[].usd", "value": [null]}, {"name": "total", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a path plus a number on the left",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "base plus 2 is 5"}}}},
+    "cases": [
+      {
+        "description": "adds a path and a number",
+        "rules": ["sentence.derived.plus", "tally.fail", "tally.inputs", "tally.walk", "sentence.phrase.is"],
+        "input": {"releases": [{"base": 3, "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "base plus 2", "value": 5}, {"name": "base", "value": 3}]}
+        ]
+      },
+      {
+        "description": "fails as value when the sum is different",
+        "rules": ["sentence.derived.plus", "tally.fail", "tally.inputs", "tally.walk", "sentence.phrase.is"],
+        "input": {"releases": [{"base": 4, "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "base plus 2", "value": 6}, {"name": "base", "value": 4}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the path holds text",
+        "rules": ["sentence.derived.plus", "tally.fail", "tally.inputs", "tally.walk", "sentence.phrase.is"],
+        "input": {"releases": [{"base": "3", "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "base plus 2", "value": null}, {"name": "base", "value": "3"}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the path is missing",
+        "rules": ["sentence.derived.plus", "tally.fail", "tally.inputs", "tally.walk", "sentence.phrase.is"],
+        "input": {"releases": [{"id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "base plus 2", "value": null}, {"name": "base", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when the path is null",
+        "rules": ["sentence.derived.plus", "tally.fail", "tally.inputs", "tally.walk", "sentence.phrase.is"],
+        "input": {"releases": [{"base": null, "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "base plus 2", "value": null}, {"name": "base", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a number plus a path on the left",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "2 plus base is 5"}}}},
+    "cases": [
+      {
+        "description": "adds a number and a path",
+        "rules": ["sentence.derived.plus", "tally.fail", "tally.inputs", "tally.walk", "sentence.phrase.is"],
+        "input": {"releases": [{"base": 3, "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "2 plus base", "value": 5}, {"name": "base", "value": 3}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "two paths on the left",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "base plus extra is 5"}}}},
+    "cases": [
+      {
+        "description": "adds two fields",
+        "rules": ["sentence.derived.plus", "tally.fail", "tally.inputs", "tally.walk", "sentence.phrase.is"],
+        "input": {"releases": [{"base": 2, "extra": 3, "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "base plus extra", "value": 5}, {"name": "base", "value": 2}, {"name": "extra", "value": 3}]}
+        ]
+      },
+      {
+        "description": "fails as unusable before absent before null when several operands fail",
+        "rules": ["sentence.derived.plus", "tally.fail", "tally.inputs", "tally.walk", "sentence.phrase.is"],
+        "input": {"releases": [{"base": null, "extra": "x", "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "base plus extra", "value": null}, {"name": "base", "value": null}, {"name": "extra", "value": "x"}]}
+        ]
+      },
+      {
+        "description": "fails as absent before null",
+        "rules": ["sentence.derived.plus", "tally.fail", "tally.inputs", "tally.walk", "sentence.phrase.is"],
+        "input": {"releases": [{"base": null, "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "base plus extra", "value": null}, {"name": "base", "value": null}, {"name": "extra", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "decimals added from paths",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "base plus extra is 0.3"}}}},
+    "cases": [
+      {
+        "description": "adds 0.1 and 0.2 up to 0.3",
+        "rules": ["sentence.derived.plus", "tally.fail", "tally.inputs", "tally.walk", "sentence.phrase.is"],
+        "input": {"releases": [{"base": 0.1, "extra": 0.2, "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "base plus extra", "value": 0.3}, {"name": "base", "value": 0.1}, {"name": "extra", "value": 0.2}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a path plus a count on the left",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "base plus count of findings is 5"}}}},
+    "cases": [
+      {
+        "description": "adds a path and a count",
+        "rules": ["sentence.derived.plus", "tally.fail", "tally.inputs", "tally.walk", "sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"base": 3, "findings": [{"id": 0}, {"id": 1}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "base plus count of findings", "value": 5}, {"name": "base", "value": 3}, {"name": "count of findings", "value": 2}, {"name": "findings[]", "value": [{"id": 0}, {"id": 1}]}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the list is missing",
+        "rules": ["sentence.derived.plus", "tally.fail", "tally.inputs", "tally.walk", "sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"base": 3, "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "base plus count of findings", "value": null}, {"name": "base", "value": 3}, {"name": "count of findings", "value": null}, {"name": "findings", "value": []}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the path is text and the list is null",
+        "rules": ["sentence.derived.plus", "tally.fail", "tally.inputs", "tally.walk", "sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"base": "x", "findings": null, "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "base plus count of findings", "value": null}, {"name": "base", "value": "x"}, {"name": "count of findings", "value": null}, {"name": "findings", "value": []}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count plus a path on the left",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings plus base is 5"}}}},
+    "cases": [
+      {
+        "description": "adds a count and a path",
+        "rules": ["sentence.derived.plus", "tally.fail", "tally.inputs", "tally.walk", "sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"base": 3, "findings": [{"id": 0}, {"id": 1}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of findings plus base", "value": 5}, {"name": "count of findings", "value": 2}, {"name": "findings[]", "value": [{"id": 0}, {"id": 1}]}, {"name": "base", "value": 3}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count plus a number on the left",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings plus 1 is 3"}}}},
+    "cases": [
+      {
+        "description": "adds a count and a number",
+        "rules": ["sentence.derived.plus", "tally.fail", "tally.inputs", "tally.walk", "sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"findings": [{"id": 0}, {"id": 1}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of findings plus 1", "value": 3}, {"name": "count of findings", "value": 2}, {"name": "findings[]", "value": [{"id": 0}, {"id": 1}]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a path plus a sum on the left",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "fee plus sum of items.usd is 0.3"}}}},
+    "cases": [
+      {
+        "description": "adds a path and a sum, as decimals",
+        "rules": ["sentence.derived.plus", "tally.fail", "tally.inputs", "tally.walk", "sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"fee": 0.2, "items": [{"usd": 0.1}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "fee plus sum of items.usd", "value": 0.3}, {"name": "fee", "value": 0.2}, {"name": "sum of items.usd", "value": 0.1}, {"name": "items[].usd", "value": [0.1]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a number plus a count with whose",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "1 plus count of findings whose severity is \"high\" is 3"}}}},
+    "cases": [
+      {
+        "description": "adds to a count that has whose when the count is last",
+        "rules": ["sentence.derived.plus", "tally.fail", "tally.inputs", "tally.walk", "sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "tally.whose", "sentence.phrase.is"],
+        "input": {"releases": [{"findings": [{"severity": "high"}, {"severity": "high"}, {"severity": "low"}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "1 plus count of findings whose severity is \"high\"", "value": 3}, {"name": "count of findings whose severity is \"high\"", "value": 2}, {"name": "findings[]", "value": [{"severity": "high"}, {"severity": "high"}, {"severity": "low"}]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a path on the left and a path plus a number on the right",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "total is base plus 2"}}}},
+    "cases": [
+      {
+        "description": "compares a field with a sum on the right",
+        "rules": ["sentence.derived.plus", "tally.fail", "tally.inputs", "tally.walk", "sentence.phrase.is", "sentence.value.path"],
+        "input": {"releases": [{"total": 5, "base": 3, "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "total", "value": 5}, {"name": "base plus 2", "value": 5}, {"name": "base", "value": 3}]}
+        ]
+      },
+      {
+        "description": "fails as value when they differ",
+        "rules": ["sentence.derived.plus", "tally.fail", "tally.inputs", "tally.walk", "sentence.phrase.is"],
+        "input": {"releases": [{"total": 6, "base": 3, "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "total", "value": 6}, {"name": "base plus 2", "value": 5}, {"name": "base", "value": 3}]}
+        ]
+      },
+      {
+        "description": "fails as absent when an operand on the right is missing",
+        "rules": ["sentence.derived.plus", "tally.fail", "tally.inputs", "tally.walk", "sentence.phrase.is"],
+        "input": {"releases": [{"total": 5, "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "total", "value": 5}, {"name": "base plus 2", "value": null}, {"name": "base", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a path and a count plus a path on the right",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "total is count of findings plus base"}}}},
+    "cases": [
+      {
+        "description": "compares a field with a count plus a path",
+        "rules": ["sentence.derived.plus", "tally.fail", "tally.inputs", "tally.walk", "sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"total": 5, "base": 3, "findings": [{"id": 0}, {"id": 1}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "total", "value": 5}, {"name": "count of findings plus base", "value": 5}, {"name": "count of findings", "value": 2}, {"name": "findings[]", "value": [{"id": 0}, {"id": 1}]}, {"name": "base", "value": 3}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a path on the left and a path plus a count on the right",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "total is base plus count of findings"}}}},
+    "cases": [
+      {
+        "description": "compares a field with a path plus a count",
+        "rules": ["sentence.derived.plus", "tally.fail", "tally.inputs", "tally.walk", "sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"total": 5, "base": 3, "findings": [{"id": 0}, {"id": 1}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "total", "value": 5}, {"name": "base plus count of findings", "value": 5}, {"name": "base", "value": 3}, {"name": "count of findings", "value": 2}, {"name": "findings[]", "value": [{"id": 0}, {"id": 1}]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count on the left and a count plus a number on the right",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings is count of items plus 1"}}}},
+    "cases": [
+      {
+        "description": "compares a count with a count plus a number",
+        "rules": ["sentence.derived.plus", "tally.fail", "tally.inputs", "tally.walk", "sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"findings": [{"id": 0}, {"id": 1}, {"id": 2}], "items": [{"id": 0}, {"id": 1}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of findings", "value": 3}, {"name": "findings[]", "value": [{"id": 0}, {"id": 1}, {"id": 2}]}, {"name": "count of items plus 1", "value": 3}, {"name": "count of items", "value": 2}, {"name": "items[]", "value": [{"id": 0}, {"id": 1}]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count on the left and a field on the right",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings equals limit"}}}},
+    "cases": [
+      {
+        "description": "compares a count with a field",
+        "rules": ["sentence.derived.compare", "tally.inputs", "sentence.phrase.is", "sentence.derived.count", "tally.walk", "tally.count", "tally.inputs"],
+        "input": {"releases": [{"findings": [{"id": 0}, {"id": 1}], "limit": 2, "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of findings", "value": 2}, {"name": "findings[]", "value": [{"id": 0}, {"id": 1}]}, {"name": "limit", "value": 2}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.derived.compare", "tally.fail", "sentence.phrase.is", "sentence.derived.count", "tally.walk", "tally.count", "tally.inputs"],
+        "input": {"releases": [{"findings": [{"id": 0}, {"id": 1}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "count of findings", "value": 2}, {"name": "findings[]", "value": [{"id": 0}, {"id": 1}]}, {"name": "limit", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as the worse cause when both sides fail",
+        "rules": ["sentence.derived.compare", "tally.fail", "sentence.phrase.is", "sentence.derived.count", "tally.walk", "tally.count", "tally.inputs"],
+        "input": {"releases": [{"limit": null, "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "count of findings", "value": null}, {"name": "findings", "value": []}, {"name": "limit", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count does not equal a field",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings does not equal limit"}}}},
+    "cases": [
+      {
+        "description": "passes when the numbers differ",
+        "rules": ["sentence.derived.compare", "sentence.phrase.is", "sentence.derived.count", "tally.walk", "tally.count", "tally.inputs"],
+        "input": {"releases": [{"findings": [{"id": 0}, {"id": 1}], "limit": 3, "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of findings", "value": 2}, {"name": "findings[]", "value": [{"id": 0}, {"id": 1}]}, {"name": "limit", "value": 3}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the field is text, even with does not equal",
+        "rules": ["sentence.derived.compare", "sentence.phrase.is", "tally.fail", "sentence.derived.count", "tally.walk", "tally.count", "tally.inputs"],
+        "input": {"releases": [{"findings": [{"id": 0}, {"id": 1}], "limit": "3", "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "count of findings", "value": 2}, {"name": "findings[]", "value": [{"id": 0}, {"id": 1}]}, {"name": "limit", "value": "3"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of findings is not 2",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings is not 2"}}}},
+    "cases": [
+      {
+        "description": "fails as value with 2 findings",
+        "rules": ["sentence.derived.compare", "tally.count", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"findings": [{"id": 0}, {"id": 1}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "count of findings", "value": 2}, {"name": "findings[]", "value": [{"id": 0}, {"id": 1}]}]}
+        ]
+      },
+      {
+        "description": "passes with 3 findings",
+        "rules": ["sentence.derived.compare", "tally.count", "tally.inputs", "sentence.phrase.is"],
+        "input": {"releases": [{"findings": [{"id": 0}, {"id": 1}, {"id": 2}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of findings", "value": 3}, {"name": "findings[]", "value": [{"id": 0}, {"id": 1}, {"id": 2}]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of findings is at least 2",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings is at least 2"}}}},
+    "cases": [
+      {
+        "description": "fails as value with 1 findings",
+        "rules": ["sentence.derived.compare", "tally.count", "tally.inputs", "sentence.phrase.order"],
+        "input": {"releases": [{"findings": [{"id": 0}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "count of findings", "value": 1}, {"name": "findings[]", "value": [{"id": 0}]}]}
+        ]
+      },
+      {
+        "description": "passes with 2 findings",
+        "rules": ["sentence.derived.compare", "tally.count", "tally.inputs", "sentence.phrase.order"],
+        "input": {"releases": [{"findings": [{"id": 0}, {"id": 1}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of findings", "value": 2}, {"name": "findings[]", "value": [{"id": 0}, {"id": 1}]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of findings is at most 2",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings is at most 2"}}}},
+    "cases": [
+      {
+        "description": "passes with 2 findings",
+        "rules": ["sentence.derived.compare", "tally.count", "tally.inputs", "sentence.phrase.order"],
+        "input": {"releases": [{"findings": [{"id": 0}, {"id": 1}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of findings", "value": 2}, {"name": "findings[]", "value": [{"id": 0}, {"id": 1}]}]}
+        ]
+      },
+      {
+        "description": "fails as value with 3 findings",
+        "rules": ["sentence.derived.compare", "tally.count", "tally.inputs", "sentence.phrase.order"],
+        "input": {"releases": [{"findings": [{"id": 0}, {"id": 1}, {"id": 2}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "count of findings", "value": 3}, {"name": "findings[]", "value": [{"id": 0}, {"id": 1}, {"id": 2}]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of findings is more than 2",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings is more than 2"}}}},
+    "cases": [
+      {
+        "description": "fails as value with 2 findings",
+        "rules": ["sentence.derived.compare", "tally.count", "tally.inputs", "sentence.phrase.order"],
+        "input": {"releases": [{"findings": [{"id": 0}, {"id": 1}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "count of findings", "value": 2}, {"name": "findings[]", "value": [{"id": 0}, {"id": 1}]}]}
+        ]
+      },
+      {
+        "description": "passes with 3 findings",
+        "rules": ["sentence.derived.compare", "tally.count", "tally.inputs", "sentence.phrase.order"],
+        "input": {"releases": [{"findings": [{"id": 0}, {"id": 1}, {"id": 2}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of findings", "value": 3}, {"name": "findings[]", "value": [{"id": 0}, {"id": 1}, {"id": 2}]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of findings is less than 2",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings is less than 2"}}}},
+    "cases": [
+      {
+        "description": "passes with 1 findings",
+        "rules": ["sentence.derived.compare", "tally.count", "tally.inputs", "sentence.phrase.order"],
+        "input": {"releases": [{"findings": [{"id": 0}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of findings", "value": 1}, {"name": "findings[]", "value": [{"id": 0}]}]}
+        ]
+      },
+      {
+        "description": "fails as value with 2 findings",
+        "rules": ["sentence.derived.compare", "tally.count", "tally.inputs", "sentence.phrase.order"],
+        "input": {"releases": [{"findings": [{"id": 0}, {"id": 1}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "count of findings", "value": 2}, {"name": "findings[]", "value": [{"id": 0}, {"id": 1}]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a sum is at least a number",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "sum of items.usd is at least 10"}}}},
+    "cases": [
+      {
+        "description": "passes when the sum is that number",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "sentence.derived.compare", "sentence.phrase.order"],
+        "input": {"releases": [{"items": [{"usd": 4}, {"usd": 6}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "sum of items.usd", "value": 10}, {"name": "items[].usd", "value": [4, 6]}]}
+        ]
+      },
+      {
+        "description": "fails as value when it is lower",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "sentence.derived.compare", "sentence.phrase.order"],
+        "input": {"releases": [{"items": [{"usd": 4}, {"usd": 5}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "sum of items.usd", "value": 9}, {"name": "items[].usd", "value": [4, 5]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when a value is text",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "sentence.derived.compare", "sentence.phrase.order", "tally.fail"],
+        "input": {"releases": [{"items": [{"usd": "x"}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "sum of items.usd", "value": null}, {"name": "items[].usd", "value": ["x"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count in the whose of an every",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.title whose count of reviews is at least 2 is not empty"}}}},
+    "cases": [
+      {
+        "description": "checks the items whose count passes, and leaves the others out",
+        "rules": ["sentence.whose.item", "sentence.derived.count", "tally.walk", "tally.count", "sentence.whose.every", "sentence.every.walk", "walk.every", "sentence.phrase.empty"],
+        "input": {"releases": [{"pull_requests": [{"title": "x", "reviews": [{"by": "a"}, {"by": "b"}]}, {"title": "", "reviews": [{"by": "a"}]}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "pull_requests[].title", "value": ["x", ""]}], "failed_items": []}
+        ]
+      },
+      {
+        "description": "fails as value when a kept item fails",
+        "rules": ["sentence.whose.item", "sentence.derived.count", "tally.count", "walk.every", "sentence.phrase.empty"],
+        "input": {"releases": [{"pull_requests": [{"title": "", "reviews": [{"by": "a"}, {"by": "b"}]}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "pull_requests[].title", "value": [""]}], "failed_items": [{"path": "pull_requests[0].title", "item": "item 1 of pull_requests", "cause": "value", "value": ""}]}
+        ]
+      },
+      {
+        "description": "fails as value when whose leaves no item",
+        "rules": ["sentence.whose.item", "sentence.derived.count", "tally.count", "sentence.whose.every", "walk.every"],
+        "input": {"releases": [{"pull_requests": [{"title": "x", "reviews": [{"by": "a"}]}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "pull_requests[].title", "value": ["x"]}], "failed_items": []}
+        ]
+      },
+      {
+        "description": "an item whose count is 0 because its list is empty is left out",
+        "rules": ["sentence.whose.item", "sentence.derived.count", "tally.walk", "tally.count", "sentence.whose.every", "walk.every"],
+        "input": {"releases": [{"pull_requests": [{"title": "x", "reviews": [{"by": "a"}, {"by": "b"}]}, {"title": "", "reviews": []}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "pull_requests[].title", "value": ["x", ""]}], "failed_items": []}
+        ]
+      },
+      {
+        "description": "fails as absent when an item's list is missing, so the item cannot be decided",
+        "rules": ["sentence.whose.item", "sentence.derived.count", "tally.fail", "sentence.derived.fail", "sentence.whose.undecided", "walk.items", "walk.every", "path.absent"],
+        "input": {"releases": [{"pull_requests": [{"title": "x", "reviews": [{"by": "a"}, {"by": "b"}]}, {"title": "y"}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests[].title", "value": ["x", "y"]}], "failed_items": [{"path": "pull_requests[1].reviews", "item": "item 2 of pull_requests", "cause": "absent", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null when an item's list is null",
+        "rules": ["sentence.whose.item", "sentence.derived.count", "tally.fail", "sentence.derived.fail", "sentence.whose.undecided", "walk.items", "walk.every", "path.null"],
+        "input": {"releases": [{"pull_requests": [{"title": "x", "reviews": null}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "pull_requests[].title", "value": ["x"]}], "failed_items": [{"path": "pull_requests[0].reviews", "item": "item 1 of pull_requests", "cause": "null", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when an item's list is text",
+        "rules": ["sentence.whose.item", "sentence.derived.count", "tally.fail", "sentence.derived.fail", "sentence.whose.undecided", "walk.items", "walk.every", "path.unusable"],
+        "input": {"releases": [{"pull_requests": [{"title": "x", "reviews": "none"}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "pull_requests[].title", "value": ["x"]}], "failed_items": [{"path": "pull_requests[0].reviews", "item": "item 1 of pull_requests", "cause": "unusable", "value": "none"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count under a for line reading the line's name",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": {"for": "every pull_requests as pr", "assert": "count of pr.reviews is at least 2"}}}}},
+    "cases": [
+      {
+        "description": "passes when every pull request has enough reviews",
+        "rules": ["sentence.for.line", "sentence.for.name", "sentence.for.scope", "for.walk", "for.try", "for.pass", "for.inputs", "for.failed_items", "sentence.derived.count", "tally.walk", "tally.count", "sentence.phrase.order"],
+        "input": {"releases": [{"pull_requests": [{"reviews": [{"id": 0}, {"id": 1}]}, {"reviews": [{"id": 0}, {"id": 1}, {"id": 2}]}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "pull_requests[]", "value": [{"reviews": [{"id": 0}, {"id": 1}]}, {"reviews": [{"id": 0}, {"id": 1}, {"id": 2}]}]}], "failed_items": []}
+        ]
+      },
+      {
+        "description": "fails as value when one pull request has too few, and lists it with the sentence that failed",
+        "rules": ["sentence.for.line", "sentence.for.name", "sentence.for.scope", "for.walk", "for.try", "for.pass", "for.inputs", "for.failed_items", "sentence.derived.count", "tally.walk", "tally.count", "sentence.phrase.order", "for.failed_items"],
+        "input": {"releases": [{"pull_requests": [{"reviews": [{"id": 0}, {"id": 1}]}, {"reviews": [{"id": 0}]}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "pull_requests[]", "value": [{"reviews": [{"id": 0}, {"id": 1}]}, {"reviews": [{"id": 0}]}]}], "failed_items": [{"path": "item 2 of pull_requests", "item": "item 2 of pull_requests", "cause": "value", "value": null, "failed_assertions": [{"assertion": "count of pr.reviews is at least 2", "cause": "value"}]}]}
+        ]
+      },
+      {
+        "description": "counts an empty list as 0, which fails the pull request as value",
+        "rules": ["sentence.for.line", "sentence.for.name", "sentence.for.scope", "for.walk", "for.try", "for.pass", "for.inputs", "for.failed_items", "sentence.derived.count", "tally.walk", "tally.count", "sentence.phrase.order"],
+        "input": {"releases": [{"pull_requests": [{"reviews": []}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "pull_requests[]", "value": [{"reviews": []}]}], "failed_items": [{"path": "item 1 of pull_requests", "item": "item 1 of pull_requests", "cause": "value", "value": null, "failed_assertions": [{"assertion": "count of pr.reviews is at least 2", "cause": "value"}]}]}
+        ]
+      },
+      {
+        "description": "fails as absent when a pull request has no reviews field",
+        "rules": ["sentence.for.line", "sentence.for.name", "sentence.for.scope", "for.walk", "for.try", "for.pass", "for.inputs", "for.failed_items", "sentence.derived.count", "tally.walk", "tally.count", "sentence.phrase.order", "tally.fail", "sentence.derived.fail", "path.absent"],
+        "input": {"releases": [{"pull_requests": [{"reviews": [{"id": 0}, {"id": 1}]}, {}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests[]", "value": [{"reviews": [{"id": 0}, {"id": 1}]}, {}]}], "failed_items": [{"path": "item 2 of pull_requests", "item": "item 2 of pull_requests", "cause": "absent", "value": null, "failed_assertions": [{"assertion": "count of pr.reviews is at least 2", "cause": "absent"}]}]}
+        ]
+      },
+      {
+        "description": "fails as null when the reviews are null",
+        "rules": ["sentence.for.line", "sentence.for.name", "sentence.for.scope", "for.walk", "for.try", "for.pass", "for.inputs", "for.failed_items", "sentence.derived.count", "tally.walk", "tally.count", "sentence.phrase.order", "tally.fail", "sentence.derived.fail", "path.null"],
+        "input": {"releases": [{"pull_requests": [{"reviews": null}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "pull_requests[]", "value": [{"reviews": null}]}], "failed_items": [{"path": "item 1 of pull_requests", "item": "item 1 of pull_requests", "cause": "null", "value": null, "failed_assertions": [{"assertion": "count of pr.reviews is at least 2", "cause": "null"}]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the reviews are not a list",
+        "rules": ["sentence.for.line", "sentence.for.name", "sentence.for.scope", "for.walk", "for.try", "for.pass", "for.inputs", "for.failed_items", "sentence.derived.count", "tally.walk", "tally.count", "sentence.phrase.order", "tally.fail", "sentence.derived.fail", "path.unusable"],
+        "input": {"releases": [{"pull_requests": [{"reviews": "two"}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "pull_requests[]", "value": [{"reviews": "two"}]}], "failed_items": [{"path": "item 1 of pull_requests", "item": "item 1 of pull_requests", "cause": "unusable", "value": null, "failed_assertions": [{"assertion": "count of pr.reviews is at least 2", "cause": "unusable"}]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of a params list",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of $params.approvers is at least 2"}}}},
+    "params": {"approvers": ["ann", "bob"]},
+    "cases": [
+      {
+        "description": "counts the items of a params list",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "sentence.derived.compare", "sentence.phrase.order", "sentence.path.start"],
+        "input": {"releases": [{"id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of $params.approvers", "value": 2}, {"name": "$params.approvers[]", "value": ["ann", "bob"]}]}
+        ],
+        "expressions": {"s": {"c": "count of $params.approvers is at least 2"}}
+      }
+    ]
+  },
+  {
+    "description": "count of a params list with too few items",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of $params.approvers is at least 2"}}}},
+    "params": {"approvers": ["ann"]},
+    "cases": [
+      {
+        "description": "fails as value",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "sentence.derived.compare", "sentence.phrase.order", "sentence.path.start"],
+        "input": {"releases": [{"id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "count of $params.approvers", "value": 1}, {"name": "$params.approvers[]", "value": ["ann"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of an empty params list",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of $params.approvers is at least 2"}}}},
+    "params": {"approvers": []},
+    "cases": [
+      {
+        "description": "counts 0 and fails as value",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "sentence.derived.compare", "sentence.phrase.order", "sentence.path.start"],
+        "input": {"releases": [{"id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "count of $params.approvers", "value": 0}, {"name": "$params.approvers[]", "value": []}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of a params list that is missing",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of $params.approvers is at least 2"}}}},
+    "params": {},
+    "cases": [
+      {
+        "description": "fails as absent",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "sentence.derived.compare", "sentence.phrase.order", "sentence.path.start", "tally.fail", "sentence.derived.fail"],
+        "input": {"releases": [{"id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "count of $params.approvers", "value": null}, {"name": "$params.approvers", "value": []}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of a params list that is null",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of $params.approvers is at least 2"}}}},
+    "params": {"approvers": null},
+    "cases": [
+      {
+        "description": "fails as null",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "sentence.derived.compare", "sentence.phrase.order", "sentence.path.start", "tally.fail", "sentence.derived.fail"],
+        "input": {"releases": [{"id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "count of $params.approvers", "value": null}, {"name": "$params.approvers", "value": []}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of a params value that is not a list",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of $params.approvers is at least 2"}}}},
+    "params": {"approvers": "ann"},
+    "cases": [
+      {
+        "description": "fails as unusable",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "sentence.derived.compare", "sentence.phrase.order", "sentence.path.start", "tally.fail", "sentence.derived.fail"],
+        "input": {"releases": [{"id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "count of $params.approvers", "value": null}, {"name": "$params.approvers", "value": []}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "sum of a params list",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "sum of $params.budgets.usd is 0.3"}}}},
+    "params": {"budgets": [{"usd": 0.1}, {"usd": 0.2}]},
+    "cases": [
+      {
+        "description": "adds a field of a params list up as decimals",
+        "rules": ["sentence.derived.sum", "tally.walk", "tally.sum", "tally.inputs", "sentence.path.start", "sentence.phrase.is"],
+        "input": {"releases": [{"id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "sum of $params.budgets.usd", "value": 0.3}, {"name": "$params.budgets[].usd", "value": [0.1, 0.2]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of a list in the subject against a params number",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings is at most $params.limit"}}}},
+    "params": {"limit": 3},
+    "cases": [
+      {
+        "description": "compares a count with a params field",
+        "rules": ["sentence.derived.count", "tally.walk", "tally.count", "tally.inputs", "sentence.derived.compare", "sentence.phrase.order", "sentence.path.start", "sentence.phrase.is"],
+        "input": {"releases": [{"findings": [{"id": 0}, {"id": 1}], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of findings", "value": 2}, {"name": "findings[]", "value": [{"id": 0}, {"id": 1}]}, {"name": "$params.limit", "value": 3}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count with is empty",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of approvers is empty"}}}},
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": ["sentence.derived.compare", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"releases": [{"approvers": [], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["is empty can't follow a count of, a sum of or a plus"]}]},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count with is between",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of x is between 1 and 3"}}}},
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": ["sentence.derived.compare", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"releases": [{"approvers": [], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["\"is between\" after a count of, a sum of or a plus isn't supported yet"]}]},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a sum with is empty",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "sum of items.usd is empty"}}}},
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": ["sentence.derived.compare", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"releases": [{"approvers": [], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["is empty can't follow a count of, a sum of or a plus"]}]},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count with whose on the right",
+    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of x is count of y whose a is 1"}}}},
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": ["sentence.derived.compare", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"releases": [{"approvers": [], "id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["doesn't parse"]}]},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
+  }
+]

@@ -219,7 +219,7 @@ A side of `compare` can also be `count_of` or `sum_of`, each with a path, `whose
 
 **[tally.count]** `count_of` is the number of values the path ends at in the items left in. A value that's missing or can't be read fails the side as `absent` or `unusable`.
 
-**[tally.sum]** `sum_of` adds up the values the path ends at in the items left in, and is 0 over none. A value that's missing fails the side as `absent`, `null` as `null`, and anything else that isn't a number as `unusable`. Numbers are added as decimals, so `0.1` and `0.2` add up to `0.3`.
+**[tally.sum]** `sum_of` adds up the values the path ends at in the items left in, and is 0 over none. A value that's missing fails the side as `absent`, `null` as `null`, and anything else that isn't a number as `unusable`. Numbers are added as decimals, so `0.1` and `0.2` add up to `0.3`, and so are the sides of an `add` with `text`. A number with more than 15 decimal places is added as the runtime adds it.
 
 **[tally.fail]** A side that fails gives the check its cause, as a path that ends anything but `found` does in [compare.fail](#compare), and the worst one when both sides fail. An `add` fails as its worst operand does.
 

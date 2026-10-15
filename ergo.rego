@@ -4066,7 +4066,7 @@ _all_decided(causes) if {
 
 _side_value(subj, side) := _basic_value(subj, side) if _basic_form(side)
 
-_side_value(subj, side) := sum(nums) if {
+_side_value(subj, side) := _add_numbers(side, nums) if {
 	_side_form(side) == "add"
 	nums := [n | some operand in side.add; n := _basic_value(subj, operand)]
 	count(nums) == count(side.add)
@@ -4074,6 +4074,10 @@ _side_value(subj, side) := sum(nums) if {
 		is_number(n)
 	}
 }
+
+_add_numbers(side, nums) := _decimal_sum(nums) if "text" in object.keys(side)
+
+_add_numbers(side, nums) := sum(nums) if not "text" in object.keys(side)
 
 _where_cause(side, _) := "satisfied" if not "where" in object.keys(side)
 
@@ -4178,8 +4182,8 @@ _tally(subj, side) := {"states": {_read_state(subj, path)}, "list": _path_name(p
 	f := _basic_form(side)
 	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
 	judged := [_tally_judge(side, e) | some e in w.items]
-	states := ({x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}) | {c | some j in judged; some c in j.states}
 	kept := [e.v | some i, e in w.items; judged[i].kept]
+	states := (({x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}) | {c | some j in judged; some c in j.states}) | _tally_number_states(f, kept)
 	r := object.union({"states": states, "list": _walk_name(side[f], w.walked), "values": [_walk_shown(e.v) | some e in w.items]}, _tally_value(f, kept, states))
 }
 
@@ -4200,20 +4204,31 @@ _tally_value(_, _, states) := {} if states != set()
 
 _tally_value("count_of", kept, set()) := {"value": count(kept)}
 
-_tally_value("sum_of", kept, set()) := {"value": sum(kept)} if {
-	every n in kept {
-		is_number(n)
-	}
-}
+_tally_value("sum_of", kept, set()) := {"value": _decimal_sum(kept)}
 
-_tally_value("sum_of", kept, set()) := {"states": {_sum_state(n) | some n in kept; not is_number(n)}} if {
-	some n in kept
-	not is_number(n)
-}
+_tally_number_states("count_of", _) := set()
+
+_tally_number_states("sum_of", kept) := {_sum_state(n) | some n in kept; not _walk_marked(n); not is_number(n)}
 
 _sum_state(null) := "null"
 
 _sum_state(n) := "unusable" if n != null
+
+_decimal_sum(nums) := sum([round(n * scale) | some n in nums]) / scale if {
+	places := max(array.concat([0], [_decimal_places(n) | some n in nums]))
+	places <= 15
+	scale := product([10 | some i in numbers.range(1, 15); i <= places])
+} else := sum(nums)
+
+_decimal_places(n) := max([0, count(_fraction_digits(parts[0])) - _written_exponent(parts)]) if parts := split(lower(json.marshal(n)), "e")
+
+_fraction_digits(mantissa) := split(mantissa, ".")[1] if contains(mantissa, ".")
+
+_fraction_digits(mantissa) := "" if not contains(mantissa, ".")
+
+_written_exponent([_]) := 0
+
+_written_exponent([_, e]) := to_number(e)
 
 _derived_input(subj, side, name) := {"name": name, "value": v} if {
 	v := _side_value(subj, side)

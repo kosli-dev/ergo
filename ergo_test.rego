@@ -8952,3 +8952,17 @@ test_plus_under_a_for_line_reads_the_names if {
 test_an_add_of_a_count_is_an_invalid_side_in_todays_syntax if {
 	_sentence_problems({"op": "compare", "left": {"add": [{"count_of": ["xs"], "whose": [], "text": "t"}]}, "cmp": "eq", "right": {"literal": 1}}) == ["invalid left"]
 }
+
+test_sum_of_and_plus_add_numbers_as_decimals if {
+	_tally_rows("sum of xs.n is 1.6", [{"id": 1, "xs": [{"n": 0.7}, {"n": 0.9}]}], {})[0][2][0] == {"name": "sum of xs.n", "value": 1.6}
+	[row[1] | some row in _tally_rows("x is p plus q plus 0.1", [{"id": 1, "p": 0.7, "q": 0.9, "x": 1.7}], {})] == ["satisfied"]
+	ergo._decimal_sum([1e-7, 2e-7]) == 3e-7
+	ergo._decimal_sum([1.5e3, 0.25]) == 1500.25
+	ergo._decimal_sum([-0.7, 0.9]) == 0.2
+	ergo._decimal_sum([]) == 0
+	ergo._decimal_sum([1e-20, 1]) == sum([1e-20, 1])
+}
+
+test_a_sum_with_several_values_it_cant_add_fails_with_the_worst_cause if {
+	[row[1] | some row in _tally_rows("sum of items.usd is 30", [{"id": 1, "items": [{"usd": null}, {}, {"usd": "x"}]}, {"id": 2, "items": [{"usd": null}, {}]}], {})] == ["unusable", "absent"]
+}
