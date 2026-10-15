@@ -61,7 +61,6 @@ Every rule needs a case, apart from the ones listed here. The `sentence` rules h
 - `compare.derived`
 - `sentence.forms`
 - `sentence.flat`
-- `sentence.path.keys`
 - `sentence.subject.chain`
 - `sentence.subject.quoted`
 - `sentence.subject.narrow`

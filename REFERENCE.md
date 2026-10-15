@@ -85,13 +85,13 @@ A subject is the kind of thing a requirement checks, like a deployment or a pull
 }
 ```
 
-| Field         | Meaning                                                                                             | Default           |
-| ------------- | --------------------------------------------------------------------------------------------------- | ----------------- |
-| `description` | What the subject is, in words anyone can read. ergo doesn't copy it into the report.                | `""`              |
-| `from`        | The [path](#paths) to the subjects in the input. It can end with a [naming step](#naming-subjects). | the whole input   |
-| `id`          | The path, inside one subject, to the value that identifies it.                                      | the whole subject |
-| `applies_to`  | Named checks that pick which of them are in scope. A subject must pass all of them.                 | no filter         |
-| `of`          | The name of another subject this one [builds on](#a-subject-built-on-another).                      | none              |
+| Field         | Meaning                                                                                             | Default                                |
+| ------------- | --------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| `description` | What the subject is, in words anyone can read. ergo doesn't copy it into the report.                | `""`                                   |
+| `from`        | The [path](#paths) to the subjects in the input. It can end with a [naming step](#naming-subjects). | the input field named like the subject |
+| `id`          | The path, inside one subject, to the value that identifies it.                                      | the whole subject                      |
+| `applies_to`  | Named checks that pick which of them are in scope. A subject must pass all of them.                 | no filter                              |
+| `of`          | The name of another subject this one [builds on](#a-subject-built-on-another).                      | none                                   |
 
 The subject's name is what the report calls each one, in every row, like `"subject": {"type": "deployment", "id": "d-2"}`, and in the descriptions of the [checks ergo adds](#checks-ergo-adds), like `The in-scope deployment count is at least 1`. So name it the way a reader would, like `deployment` or `pull request`.
 
@@ -104,8 +104,59 @@ A few details:
 - If `id` doesn't lead anywhere, the subject's id is `null`. Its rows are still there.
 - No two subjects can share an id, or their rows could be identical and the report couldn't say which one failed. If two do, `$unique_ids` fails and so does the requirement. Every subject counts, even one that `applies_to` leaves out, and `null` is an id like any other, so two subjects without one clash.
 - An item of the list that isn't an object, like a string or a `null`, is still a subject. Its id is the item itself, and its checks fail with cause `not_an_object`.
-- Leaving out `from` or `id` is allowed, but rarely what you want. Without `from`, the whole input is checked as one subject. Without `id`, each row repeats the whole subject as its id, so two identical subjects clash.
-- A subject that's written wrong fails `$well_formed` on every requirement that names it, so none of them is met. That's a subject that isn't an object, or that has a field that isn't in the table above, like `subject_type`, or whose `applies_to` isn't an object, whose `from` or `id` isn't a list, or whose `description` isn't a string, or a badly written [naming step](#naming-subjects), an `id` whose selector has a ref or `literal` deeper inside a `where` value than ergo reads, or a filter that's [written wrong](#basic-operators). The `$well_formed` row names each field with its subject, like `{"name": "subjects.deployment.from", "value": ["not a list"]}`. ergo then reads `applies_to` as a filter it can't read, so every subject fails `$applies` with cause `ill_formed`, shown as `<invalid applies_to>`, and gets no other rows. It reads a `from` as giving no subjects (shown as `<invalid from>`), so `$min_subjects` fails as `value`, even with `min_subjects: 0`, and an `id` as giving the id `null`.
+- Without `from`, a subject reads the input field named like it, so `artifact` reads `artifact`. A subject with nothing under it, `artifact:` alone in YAML, does the same. To check the whole input as one subject, write `from: []`. Without `id`, each row repeats the whole subject as its id, so two identical subjects clash.
+- A subject that's written wrong fails `$well_formed` on every requirement that names it, so none of them is met. That's a subject that isn't an object, or that has a field that isn't in the table above, like `subject_type`, or whose `applies_to` isn't an object, whose `from` or `id` isn't a list or a string, or whose `description` isn't a string, or a badly written [naming step](#naming-subjects), an `id` whose selector has a ref or `literal` deeper inside a `where` value than ergo reads, or a filter that's [written wrong](#basic-operators). The `$well_formed` row names each field with its subject, like `{"name": "subjects.deployment.from", "value": ["not a list"]}`. ergo then reads `applies_to` as a filter it can't read, so every subject fails `$applies` with cause `ill_formed`, shown as `<invalid applies_to>`, and gets no other rows. It reads a `from` as giving no subjects (shown as `<invalid from>`), so `$min_subjects` fails as `value`, even with `min_subjects: 0`, and an `id` as giving the id `null`.
+
+### Subjects written as sentences
+
+`from` and `id` can be written as sentences. A `from` line is a path, and `whose` with conditions joined by `and` keeps the subjects they hold for, in place of `applies_to`. `id` is a path written the same way:
+
+```yaml
+subjects:
+  emergency change:
+    from: deployments whose environment is "prod" and change_type is "emergency"
+    id: id
+  artifact:
+    id: fingerprint
+requirements:
+  approved:
+    subject: emergency change
+    checks:
+      approved: approved_by is a non-empty string
+  signed:
+    subject: artifact
+    checks:
+      signed: signed is true
+```
+
+With this input:
+
+```json
+{"deployments": [
+  {"id": "d-1", "environment": "prod", "change_type": "emergency", "approved_by": "bob"},
+  {"id": "d-2", "environment": "prod", "change_type": "standard"},
+  {"id": "d-3", "environment": "prod"}
+],
+ "artifact": {"fingerprint": "sha256:abc", "signed": true}}
+```
+
+the `$applies` rows keep `d-1` and leave `d-2` out:
+
+```json
+{"check": "$applies", "subject": {"id": "d-1", "type": "emergency change"}, "passed": true, "cause": "satisfied",
+ "inputs": [{"name": "change_type", "value": "emergency"}, {"name": "environment", "value": "prod"}]}
+{"check": "$applies", "subject": {"id": "d-2", "type": "emergency change"}, "passed": false, "cause": "value",
+ "inputs": [{"name": "change_type", "value": "standard"}, {"name": "environment", "value": "prod"}]}
+{"check": "$applies", "subject": {"id": "d-3", "type": "emergency change"}, "passed": false, "cause": "absent",
+ "inputs": [{"name": "change_type", "value": null}, {"name": "environment", "value": "prod"}]}
+```
+
+and the `$applies` entry's `expression` is the conditions as written, `environment is "prod" and change_type is "emergency"`. `d-3` has no `change_type`, so ergo can't tell whether it's an emergency change, and `approved` isn't met. `artifact` has no `from`, so it reads the input field `artifact`, and `signed` is met.
+
+- `named by $params.name` picks one key, as a [ref step](#ref-steps) does: `from: trail.artifacts named by $params.artifact_name`.
+- `named by each of $params.kinds` makes each key in the list a subject, as a [naming step](#naming-subjects) with `keys` does: `from: build.test_runs named by each of $params.kinds`.
+- A subject's own name at the start of its `from` is the input field, so `lockfile` can have `from: lockfile whose status is "COMPLETE"`.
+- A `from` line can't go with `applies_to`, and one that starts at another subject's name isn't supported yet. A `from` or `id` that can't be read is written wrong, and the `$well_formed` row says why, like `{"name": "subjects.x.from", "value": ["doesn't parse"]}`.
 
 ### A subject built on another
 
@@ -307,7 +358,7 @@ An empty path, `[]`, reads the item itself. Use it inside `all` or `any` when th
 
 ergo names the item after its list, so this renders as `every branches: branches[] matches one of ["^main$", "^release/"]`, and the row's input is `branches[]`. An empty `each` works the same way, for a list of lists.
 
-An empty path also reads a subject that isn't an object, like each string of `"from": ["branches"]`. There, the item is named after `from` (`branches[]`), or `$input` when there's no `from`, because then the subject is the input and `["$$input"]` reads the same thing. That keeps it apart from a key called `input`, which is named `input`. `$min_subjects` names it the same way, as `count(matching($input))`, when `from` reads the whole input. Any other path on such a subject fails with cause `not_an_object`.
+An empty path also reads a subject that isn't an object, like each string of `"from": ["branches"]`. There, the item is named after `from` (`branches[]`), or `$input` when `from` is `[]`, because then the subject is the input and `["$$input"]` reads the same thing. That keeps it apart from a key called `input`, which is named `input`. `$min_subjects` names it the same way, as `count(matching($input))`, when `from` reads the whole input. Any other path on such a subject fails with cause `not_an_object`.
 
 One step in a path can be a **selector** instead of a key. It picks the single item in a list (or an object's values) whose fields match:
 

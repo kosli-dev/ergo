@@ -1,0 +1,2871 @@
+[
+  {
+    "description": "a subject whose from is a path in a string",
+    "policy": {
+      "subjects": {
+        "deployment": {
+          "from": "data.deployments",
+          "id": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "deployment",
+          "checks": {
+            "c": {
+              "op": "present",
+              "path": [
+                "x"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads each item of the list at the path, in list order, with a string id",
+        "rules": [
+          "subjects.sentence",
+          "sentence.subject.from",
+          "subjects.from",
+          "subjects.id"
+        ],
+        "input": {
+          "data": {
+            "deployments": [
+              {
+                "id": "d2",
+                "x": 1
+              },
+              {
+                "id": "d1",
+                "x": 1
+              }
+            ]
+          }
+        },
+        "requirements": {
+          "s": {
+            "status": "met",
+            "subjects": {
+              "matching": 2,
+              "total": 2
+            }
+          }
+        },
+        "compliant": true,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "in-scope deployment count",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated deployment ids",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": "d2"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": "d1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails $min_subjects as absent when the path isn't in the input",
+        "rules": [
+          "subjects.sentence",
+          "sentence.subject.from",
+          "subjects.from"
+        ],
+        "input": {
+          "data": {}
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "in-scope deployment count",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated deployment ids",
+                "value": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject whose id is a dotted string",
+    "policy": {
+      "subjects": {
+        "deployment": {
+          "from": "deployments",
+          "id": "meta.id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "deployment",
+          "checks": {
+            "c": {
+              "op": "present",
+              "path": [
+                "x"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the id inside each subject along the path",
+        "rules": [
+          "subjects.sentence",
+          "subjects.id"
+        ],
+        "input": {
+          "deployments": [
+            {
+              "meta": {
+                "id": "a"
+              },
+              "x": 1
+            },
+            {
+              "meta": {
+                "id": 7
+              },
+              "x": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "in-scope deployment count",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated deployment ids",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": "a"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": 7
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "gives a null id when the path doesn't end found, and the subject still gets its rows",
+        "rules": [
+          "subjects.sentence",
+          "subjects.id"
+        ],
+        "input": {
+          "deployments": [
+            {
+              "meta": {},
+              "x": 1
+            },
+            {
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "in-scope deployment count",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "repeated deployment ids",
+                "value": [
+                  null
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject whose id is a plain key in a string",
+    "policy": {
+      "subjects": {
+        "deployment": {
+          "from": "deployments",
+          "id": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "deployment",
+          "checks": {
+            "c": {
+              "op": "present",
+              "path": [
+                "x"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the id from the field of that name",
+        "rules": [
+          "subjects.sentence",
+          "subjects.id"
+        ],
+        "input": {
+          "deployments": [
+            {
+              "id": "d1",
+              "x": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "in-scope deployment count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated deployment ids",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": "d1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with whose and two conditions",
+    "policy": {
+      "subjects": {
+        "deployment": {
+          "from": "deployments whose environment is \"prod\" and change_type is \"emergency\"",
+          "id": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "deployment",
+          "checks": {
+            "c": {
+              "op": "present",
+              "path": [
+                "x"
+              ]
+            }
+          },
+          "min_subjects": 0
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "joins the conditions as written in the $applies row, and keeps only the subjects that pass both",
+        "rules": [
+          "subjects.sentence",
+          "sentence.subject.from",
+          "sentence.subject.applies",
+          "scope.filters",
+          "scope.out",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "deployments": [
+            {
+              "id": "d1",
+              "environment": "prod",
+              "change_type": "emergency",
+              "x": 1
+            },
+            {
+              "id": "d2",
+              "environment": "staging",
+              "change_type": "emergency",
+              "x": 1
+            },
+            {
+              "id": "d3",
+              "environment": "prod",
+              "change_type": "normal",
+              "x": 1
+            }
+          ]
+        },
+        "expressions": {
+          "s": {
+            "$applies": "environment is \"prod\" and change_type is \"emergency\""
+          }
+        },
+        "requirements": {
+          "s": {
+            "status": "met",
+            "subjects": {
+              "matching": 1,
+              "total": 3
+            }
+          }
+        },
+        "compliant": true,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "in-scope deployment count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated deployment ids",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": "d1"
+            },
+            "check": "$applies",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "change_type",
+                "value": "emergency"
+              },
+              {
+                "name": "environment",
+                "value": "prod"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": "d2"
+            },
+            "check": "$applies",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "change_type",
+                "value": "emergency"
+              },
+              {
+                "name": "environment",
+                "value": "staging"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": "d3"
+            },
+            "check": "$applies",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "change_type",
+                "value": "normal"
+              },
+              {
+                "name": "environment",
+                "value": "prod"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": "d1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails the requirement as absent for a subject a condition can't decide, even with min_subjects 0",
+        "rules": [
+          "sentence.subject.applies",
+          "scope.unreadable",
+          "subjects.sentence"
+        ],
+        "input": {
+          "deployments": [
+            {
+              "id": "d1",
+              "environment": "prod",
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met",
+            "subjects": {
+              "matching": 0,
+              "total": 1
+            }
+          }
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "in-scope deployment count",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated deployment ids",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": "d1"
+            },
+            "check": "$applies",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "change_type",
+                "value": null
+              },
+              {
+                "name": "environment",
+                "value": "prod"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when the first condition can't be decided, even though the second rules the subject out",
+        "rules": [
+          "sentence.subject.applies",
+          "scope.unreadable"
+        ],
+        "input": {
+          "deployments": [
+            {
+              "id": "d1",
+              "change_type": "normal",
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "in-scope deployment count",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated deployment ids",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": "d1"
+            },
+            "check": "$applies",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "change_type",
+                "value": "normal"
+              },
+              {
+                "name": "environment",
+                "value": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with its conditions in the other order",
+    "policy": {
+      "subjects": {
+        "deployment": {
+          "from": "deployments whose change_type is \"emergency\" and environment is \"prod\"",
+          "id": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "deployment",
+          "checks": {
+            "c": {
+              "op": "present",
+              "path": [
+                "x"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "keeps the written order in the expression, and lists the inputs sorted by name",
+        "rules": [
+          "sentence.subject.applies",
+          "subjects.sentence",
+          "sentence.subject.from"
+        ],
+        "input": {
+          "deployments": [
+            {
+              "id": "d1",
+              "environment": "prod",
+              "change_type": "emergency",
+              "x": 1
+            }
+          ]
+        },
+        "expressions": {
+          "s": {
+            "$applies": "change_type is \"emergency\" and environment is \"prod\""
+          }
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "in-scope deployment count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated deployment ids",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": "d1"
+            },
+            "check": "$applies",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "change_type",
+                "value": "emergency"
+              },
+              {
+                "name": "environment",
+                "value": "prod"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": "d1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a condition with count of",
+    "policy": {
+      "subjects": {
+        "pr": {
+          "from": "pulls whose count of reviews is at least 1",
+          "id": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pr",
+          "checks": {
+            "c": {
+              "op": "present",
+              "path": [
+                "x"
+              ]
+            }
+          },
+          "min_subjects": 0
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "counts the items of the list and keeps subjects with enough",
+        "rules": [
+          "sentence.subject.condition",
+          "sentence.subject.applies",
+          "subjects.sentence",
+          "sentence.phrase.order",
+          "scope.out"
+        ],
+        "input": {
+          "pulls": [
+            {
+              "id": "p1",
+              "reviews": [
+                {},
+                {}
+              ],
+              "x": 1
+            },
+            {
+              "id": "p2",
+              "reviews": [],
+              "x": 1
+            }
+          ]
+        },
+        "expressions": {
+          "s": {
+            "$applies": "count of reviews is at least 1"
+          }
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pr",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pr",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "in-scope pr count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pr",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated pr ids",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pr",
+              "id": "p1"
+            },
+            "check": "$applies",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count of reviews",
+                "value": 2
+              },
+              {
+                "name": "reviews[]",
+                "value": [
+                  {},
+                  {}
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pr",
+              "id": "p2"
+            },
+            "check": "$applies",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count of reviews",
+                "value": 0
+              },
+              {
+                "name": "reviews[]",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pr",
+              "id": "p1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails the requirement as absent for a subject whose list is missing",
+        "rules": [
+          "sentence.subject.condition",
+          "scope.unreadable"
+        ],
+        "input": {
+          "pulls": [
+            {
+              "id": "p1",
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pr",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pr",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "in-scope pr count",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pr",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated pr ids",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pr",
+              "id": "p1"
+            },
+            "check": "$applies",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "count of reviews",
+                "value": null
+              },
+              {
+                "name": "reviews",
+                "value": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by a param",
+    "policy": {
+      "subjects": {
+        "artifact": {
+          "from": "artifacts named by $params.name",
+          "id": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "artifact",
+          "checks": {
+            "c": {
+              "op": "present",
+              "path": [
+                "x"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "name": "web"
+    },
+    "cases": [
+      {
+        "description": "reads the key the param holds",
+        "rules": [
+          "subjects.sentence",
+          "sentence.subject.from",
+          "sentence.path.dynamic"
+        ],
+        "input": {
+          "artifacts": {
+            "web": {
+              "id": "w",
+              "x": 1
+            },
+            "api": {
+              "id": "a",
+              "x": 1
+            }
+          }
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "in-scope artifact count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated artifact ids",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": "w"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails $min_subjects as absent when the object has no such key",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from",
+          "sentence.path.dynamic"
+        ],
+        "input": {
+          "artifacts": {
+            "api": {
+              "id": "a",
+              "x": 1
+            }
+          }
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "in-scope artifact count",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated artifact ids",
+                "value": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by each of a param list",
+    "policy": {
+      "subjects": {
+        "scan": {
+          "from": "scans named by each of $params.required",
+          "id": "name"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "scan",
+          "checks": {
+            "c": {
+              "op": "present",
+              "path": [
+                "x"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "required": [
+        "sast",
+        "sca",
+        "secrets"
+      ]
+    },
+    "cases": [
+      {
+        "description": "makes each listed key a subject, identified by its key, and a key the object doesn't have is still a subject",
+        "rules": [
+          "subjects.sentence",
+          "sentence.subject.from",
+          "sentence.path.keys"
+        ],
+        "input": {
+          "scans": {
+            "sast": {
+              "name": "other",
+              "x": 1
+            },
+            "sca": {
+              "name": "sca"
+            }
+          }
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met",
+            "subjects": {
+              "matching": 3,
+              "total": 3
+            }
+          }
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "scan",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "in-scope scan count",
+                "value": 3
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "scan",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated scan ids",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "scan",
+              "id": "sast"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "scan",
+              "id": "sca"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "x",
+                "value": null
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "scan",
+              "id": "secrets"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "x",
+                "value": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject's own name in its own from",
+    "policy": {
+      "subjects": {
+        "lockfile": {
+          "from": "lockfile whose status is \"COMPLETE\"",
+          "id": "name"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "lockfile",
+          "checks": {
+            "c": {
+              "op": "present",
+              "path": [
+                "x"
+              ]
+            }
+          },
+          "min_subjects": 0
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is the input field, never the subject",
+        "rules": [
+          "sentence.subject.own",
+          "subjects.sentence",
+          "sentence.subject.from",
+          "sentence.phrase.is",
+          "scope.out"
+        ],
+        "input": {
+          "lockfile": [
+            {
+              "name": "a",
+              "status": "COMPLETE",
+              "x": 1
+            },
+            {
+              "name": "b",
+              "status": "PENDING",
+              "x": 1
+            }
+          ]
+        },
+        "expressions": {
+          "s": {
+            "$applies": "status is \"COMPLETE\""
+          }
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "lockfile",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "lockfile",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "in-scope lockfile count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "lockfile",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated lockfile ids",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "lockfile",
+              "id": "a"
+            },
+            "check": "$applies",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "status",
+                "value": "COMPLETE"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "lockfile",
+              "id": "b"
+            },
+            "check": "$applies",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "status",
+                "value": "PENDING"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "lockfile",
+              "id": "a"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject with no from",
+    "policy": {
+      "subjects": {
+        "artifact": {
+          "id": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "artifact",
+          "checks": {
+            "c": {
+              "op": "present",
+              "path": [
+                "x"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the input field of its own name, and can still have an id",
+        "rules": [
+          "subjects.no_from",
+          "sentence.subject.short",
+          "subjects.id"
+        ],
+        "input": {
+          "artifact": [
+            {
+              "id": "a1",
+              "x": 1
+            }
+          ],
+          "other": [
+            {
+              "id": "o",
+              "x": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "in-scope artifact count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated artifact ids",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": "a1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "takes an object as the only subject",
+        "rules": [
+          "subjects.no_from",
+          "sentence.subject.short"
+        ],
+        "input": {
+          "artifact": {
+            "id": "a1",
+            "x": 1
+          }
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "in-scope artifact count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated artifact ids",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": "a1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject with nothing under it",
+    "policy": {
+      "subjects": {
+        "artifact": null
+      },
+      "requirements": {
+        "s": {
+          "subject": "artifact",
+          "checks": {
+            "c": {
+              "op": "present",
+              "path": [
+                "x"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the input field of its own name",
+        "rules": [
+          "subjects.no_from",
+          "sentence.subject.short"
+        ],
+        "input": {
+          "artifact": [
+            {
+              "x": 1
+            },
+            {
+              "x": 2
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "met",
+            "subjects": {
+              "matching": 2,
+              "total": 2
+            }
+          }
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "in-scope artifact count",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated artifact ids",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": {
+                "x": 1
+              }
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": {
+                "x": 2
+              }
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails $min_subjects as absent when the input has no such field",
+        "rules": [
+          "subjects.no_from",
+          "subjects.from"
+        ],
+        "input": {
+          "other": [
+            {
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "in-scope artifact count",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated artifact ids",
+                "value": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject with from as an empty list",
+    "policy": {
+      "subjects": {
+        "artifact": {
+          "from": [],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "artifact",
+          "checks": {
+            "c": {
+              "op": "present",
+              "path": [
+                "x"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the whole input, not a field named like the subject",
+        "rules": [
+          "subjects.no_from",
+          "subjects.from"
+        ],
+        "input": {
+          "id": "whole",
+          "x": 1,
+          "artifact": [
+            {
+              "id": "inner",
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "subjects": {
+              "matching": 1,
+              "total": 1
+            }
+          }
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "in-scope artifact count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated artifact ids",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "artifact",
+              "id": "whole"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that doesn't parse",
+    "policy": {
+      "subjects": {
+        "deployment": {
+          "from": "deployments whose environment is \"prod",
+          "id": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "deployment",
+          "checks": {
+            "c": {
+              "op": "present",
+              "path": [
+                "x"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong and $well_formed lists it under the subject's from",
+        "rules": [
+          "subjects.sentence",
+          "well_formed",
+          "written_wrong.row"
+        ],
+        "input": {
+          "deployments": [
+            {
+              "id": "d1",
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "subjects.deployment.from",
+                "value": [
+                  "unclosed quote at column 34"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "in-scope deployment count",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated deployment ids",
+                "value": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an id that isn't a path",
+    "policy": {
+      "subjects": {
+        "deployment": {
+          "from": "deployments",
+          "id": "environment is"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "deployment",
+          "checks": {
+            "c": {
+              "op": "present",
+              "path": [
+                "x"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong and $well_formed lists it under the subject's id",
+        "rules": [
+          "subjects.sentence",
+          "well_formed",
+          "written_wrong.row"
+        ],
+        "input": {
+          "deployments": [
+            {
+              "id": "d1",
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "subjects.deployment.id",
+                "value": [
+                  "an id is a path, like \"id\" or \"build.number\""
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "in-scope deployment count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated deployment ids",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line next to applies_to",
+    "policy": {
+      "subjects": {
+        "deployment": {
+          "from": "deployments",
+          "id": "id",
+          "applies_to": {
+            "f": {
+              "op": "present",
+              "path": [
+                "x"
+              ]
+            }
+          }
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "deployment",
+          "checks": {
+            "c": {
+              "op": "present",
+              "path": [
+                "x"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong and $well_formed lists it under the subject's from",
+        "rules": [
+          "subjects.sentence",
+          "well_formed",
+          "written_wrong.row"
+        ],
+        "input": {
+          "deployments": [
+            {
+              "id": "d1",
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "subjects.deployment.from",
+                "value": [
+                  "applies_to can't go with a from written as a sentence: put the conditions after \"whose\""
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "in-scope deployment count",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated deployment ids",
+                "value": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that starts at another subject's name",
+    "policy": {
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "id": "id"
+        },
+        "pull_request": {
+          "from": "artifact.pulls",
+          "id": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pull_request",
+          "checks": {
+            "c": {
+              "op": "present",
+              "path": [
+                "x"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "isn't supported yet, so it's written wrong and $well_formed lists it",
+        "rules": [
+          "subjects.sentence",
+          "well_formed",
+          "written_wrong.row"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a",
+              "pulls": [
+                {
+                  "id": "p",
+                  "x": 1
+                }
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pull_request",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "subjects.pull_request.from",
+                "value": [
+                  "a from that starts at another subject isn't supported yet"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pull_request",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "in-scope pull_request count",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pull_request",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated pull_request ids",
+                "value": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
