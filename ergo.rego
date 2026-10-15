@@ -3987,11 +3987,21 @@ _basic_form(side) := "sum" if {
 	_where_shaped(side)
 }
 
+_basic_form(side) := f if {
+	is_object(side)
+	some f in ["count_of", "sum_of"]
+	object.keys(side) == {f, "whose", "text"}
+	is_array(side[f])
+	is_array(side.whose)
+	is_string(side.text)
+}
+
 _side_form(side) := _basic_form(side)
 
 _side_form(side) := "add" if {
 	is_object(side)
-	object.keys(side) == {"add"}
+	object.keys(side) - {"text"} == {"add"}
+	is_string(object.get(side, "text", ""))
 	is_array(side.add)
 	count(side.add) > 0
 	every operand in side.add {
@@ -4003,7 +4013,7 @@ _where_shaped(side) if not "where" in object.keys(side)
 
 _where_shaped(side) if is_object(side.where)
 
-_operand(x) if _basic_form(x) in {"path", "count", "sum"}
+_operand(x) if _basic_form(x) in {"path", "count", "sum", "count_of", "sum_of"}
 
 _operand(x) if {
 	_basic_form(x) == "literal"
@@ -4012,7 +4022,7 @@ _operand(x) if {
 
 default _derived(_) := false
 
-_derived(side) if _side_form(side) in {"count", "sum", "add"}
+_derived(side) if _side_form(side) in {"count", "sum", "add", "count_of", "sum_of"}
 
 default _derived_sides(_) := []
 
@@ -4038,6 +4048,12 @@ _basic_value(subj, side) := sum(nums) if {
 	every n in nums {
 		is_number(n)
 	}
+}
+
+_basic_value(subj, side) := r.value if {
+	_basic_form(side) in {"count_of", "sum_of"}
+	r := _tally(subj, side)
+	r.states == set()
 }
 
 _item_causes(subj, side, path) := [_where_cause(side, item) | some item in value_at(subj, path)] if is_array(value_at(subj, path))
@@ -4073,6 +4089,8 @@ _basic_states(subj, side) := _counted_states(subj, side, side.sum) | {s |
 	causes[i] == "satisfied"
 	some s in _number_states(item, side.each)
 } if _basic_form(side) == "sum"
+
+_basic_states(subj, side) := _tally(subj, side).states if _basic_form(side) in {"count_of", "sum_of"}
 
 _side_states(subj, side) := _basic_states(subj, side) if _basic_form(side)
 
@@ -4144,9 +4162,58 @@ _basic_inputs(subj, side, item) := [_derived_input(subj, side, _basic_text(item,
 
 _basic_inputs(subj, side, item) := [_derived_input(subj, side, _basic_text(item, side)), {"name": _projection_name(side.sum, side.each), "value": [value_at(x, side.each) | some x in _list_at(subj, side.sum)]}] if _basic_form(side) == "sum"
 
+_basic_inputs(subj, side, _) := [{"name": side.text, "value": object.get(r, "value", null)}, {"name": r.list, "value": r.values}] if {
+	_basic_form(side) in {"count_of", "sum_of"}
+	r := _tally(subj, side)
+}
+
 _side_inputs(subj, side, item) := _basic_inputs(subj, side, item) if _basic_form(side)
 
 _side_inputs(subj, side, item) := array.concat([_derived_input(subj, side, _side_text(item, side))], [i | some operand in side.add; some i in _basic_inputs(subj, operand, item)]) if _side_form(side) == "add"
+
+_tally(subj, side) := {"states": {_read_state(subj, path)}, "list": _path_name(path), "values": []} if {
+	path := side[_basic_form(side)]
+	not _walk_keys({"path": path}, subj)
+} else := r if {
+	f := _basic_form(side)
+	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
+	judged := [_tally_judge(side, e) | some e in w.items]
+	states := ({x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}) | {c | some j in judged; some c in j.states}
+	kept := [e.v | some i, e in w.items; judged[i].kept]
+	r := object.union({"states": states, "list": _walk_name(side[f], w.walked), "values": [_walk_shown(e.v) | some e in w.items]}, _tally_value(f, kept, states))
+}
+
+_tally_judge(side, e) := {"kept": kept, "states": ({c | some c in causes; not c in {"satisfied", "value", "missing"}} | _tally_mark(kept, e.v))} if {
+	causes := [_leaf_cause(c, e.iv) | some c in side.whose]
+	kept := count([c | some c in causes; c in {"value", "missing"}]) == 0
+}
+
+_tally_mark(true, v) := {"absent"} if v == _absent
+
+_tally_mark(true, v) := {"unusable"} if v == _unusable_mark
+
+_tally_mark(_, v) := set() if not _walk_marked(v)
+
+_tally_mark(false, v) := set() if _walk_marked(v)
+
+_tally_value(_, _, states) := {} if states != set()
+
+_tally_value("count_of", kept, set()) := {"value": count(kept)}
+
+_tally_value("sum_of", kept, set()) := {"value": sum(kept)} if {
+	every n in kept {
+		is_number(n)
+	}
+}
+
+_tally_value("sum_of", kept, set()) := {"states": {_sum_state(n) | some n in kept; not is_number(n)}} if {
+	some n in kept
+	not is_number(n)
+}
+
+_sum_state(null) := "null"
+
+_sum_state(n) := "unusable" if n != null
 
 _derived_input(subj, side, name) := {"name": name, "value": v} if {
 	v := _side_value(subj, side)
@@ -4160,9 +4227,19 @@ _basic_text(item, side) := concat("", ["count(", _item_path_name(item, side.coun
 
 _basic_text(_, side) := concat("", ["sum(", _projection_name(side.sum, side.each), _where_text(side, side.sum), ")"]) if _basic_form(side) == "sum"
 
+_basic_text(_, side) := side.text if _basic_form(side) in {"count_of", "sum_of"}
+
 _side_text(item, side) := _basic_text(item, side) if _basic_form(side)
 
-_side_text(item, side) := concat(" + ", [_basic_text(item, operand) | some operand in side.add]) if _side_form(side) == "add"
+_side_text(item, side) := concat(" + ", [_basic_text(item, operand) | some operand in side.add]) if {
+	_side_form(side) == "add"
+	not "text" in object.keys(side)
+}
+
+_side_text(_, side) := side.text if {
+	_side_form(side) == "add"
+	"text" in object.keys(side)
+}
 
 _where_text(side, _) := "" if not "where" in object.keys(side)
 
@@ -4215,26 +4292,65 @@ _basic_paths(side) := [side.sum, side.each] if _basic_form(side) == "sum"
 
 _basic_paths(side) := [] if _basic_form(side) == "literal"
 
+_basic_paths(side) := [side[f]] if {
+	f := _basic_form(side)
+	f in {"count_of", "sum_of"}
+}
+
+_sentence_side(side) if _basic_form(side) in {"count_of", "sum_of"}
+
+_sentence_side(side) if {
+	is_object(side)
+	"text" in object.keys(side)
+}
+
+_sentence_side(side) if {
+	_side_form(side) == "add"
+	some operand in side.add
+	_basic_form(operand) in {"count_of", "sum_of"}
+}
+
 _side_paths(side) := _basic_paths(side) if _basic_form(side)
 
 _side_paths(side) := [p | some operand in side.add; some p in _basic_paths(operand)] if _side_form(side) == "add"
 
 _side_paths(side) := [] if not _side_form(side)
 
-_where_children(node, names) := [[node[f].where, [f, "where"], "where", names] |
-	node.op == "compare"
-	some f in ["left", "right"]
-	f in object.keys(node)
-	_basic_form(node[f]) in {"count", "sum"}
-	"where" in object.keys(node[f])
-]
+_where_children(node, names) := array.concat(
+	[[node[f].where, [f, "where"], "where", names] |
+		node.op == "compare"
+		some f in ["left", "right"]
+		f in object.keys(node)
+		_basic_form(node[f]) in {"count", "sum"}
+		"where" in object.keys(node[f])
+	],
+	[[c, array.concat(at, ["whose", i]), "where", names] |
+		node.op == "compare"
+		some f in ["left", "right"]
+		f in object.keys(node)
+		some [at, side] in _tallies(node[f], [f])
+		some i, c in side.whose
+	],
+)
 
-_side_problem(node) := {concat("", ["invalid ", f]) |
+_tallies(side, at) := [[at, side]] if _basic_form(side) in {"count_of", "sum_of"}
+
+_tallies(side, at) := [[array.concat(at, ["add", i]), operand] | some i, operand in side.add; _basic_form(operand) in {"count_of", "sum_of"}] if _side_form(side) == "add"
+
+_tallies(side, _) := [] if not _side_form(side) in {"count_of", "sum_of", "add"}
+
+_side_problem(node) := ({concat("", ["invalid ", f]) |
 	node.op == "compare"
 	some f in ["left", "right"]
 	f in object.keys(node)
 	not _side_form(node[f])
 } | {concat("", ["invalid ", f]) |
+	node.op == "compare"
+	some f in ["left", "right"]
+	f in object.keys(node)
+	_sentence_side(node[f])
+	not _s_read(node)
+}) | {concat("", ["invalid ", f]) |
 	node.op == "compare_time"
 	some f in ["left", "right"]
 	f in object.keys(node)
@@ -4258,11 +4374,18 @@ _non_negative(n) if {
 
 _derived_placement_problem(node, kinds) := {concat("", [_side_form(side), " can't go here"]) |
 	kinds != []
+	not _assertion_kinds(kinds)
 	some side in _derived_sides(node)
 } | {"substitute can't go here" |
 	kinds != []
 	kinds[count(kinds) - 1] == "where"
 	"substitute" in object.keys(node)
+}
+
+_assertion_kinds(kinds) if {
+	every k in kinds {
+		k == "assertion"
+	}
 }
 
 _s_patterns := {
@@ -5095,15 +5218,33 @@ _s_unsupported(parsed) := set() if not "assertions" in object.keys(parsed)
 
 _s_unsupported(parsed) := {u | some a in parsed.assertions; some u in _s_assertion_unsupported(a)} if "assertions" in object.keys(parsed)
 
-_s_assertion_unsupported(a) := ((_s_paths_unsupported(a) | _s_argument_unsupported(a.phrase)) | {u | some c in object.get(a, "where", []); some u in _s_cond_unsupported(c)}) | _s_walk_too_long(a) if object.keys(a) & {"every", "some"} != set()
+_s_assertion_unsupported(a) := (((_s_paths_unsupported(a) | _s_argument_unsupported(a.phrase)) | {u | some c in object.get(a, "where", []); some u in _s_cond_unsupported(c)}) | _s_walk_too_long(a)) | {"count of, sum of and plus after every or some aren't supported yet" |
+	terms := object.get(a.phrase, "terms", [])
+	terms != []
+	not _s_one_path(terms)
+} if object.keys(a) & {"every", "some"} != set()
 
-_s_cond_unsupported(c) := {"count of, sum of and plus aren't supported yet"} if "terms" in object.keys(c)
+_s_cond_unsupported(c) := _s_derived_unsupported(c) if "terms" in object.keys(c)
 
 _s_cond_unsupported(c) := _s_argument_unsupported(c.phrase) if not "terms" in object.keys(c)
 
 _s_walk_too_long(a) := {"every and some over more than ten steps aren't supported yet" | count(_walk_steps(_s_model_path(a[_s_quantifier_of(a)]))) > 10}
 
-_s_assertion_unsupported(a) := {"count of, sum of and plus aren't supported yet"} if "terms" in object.keys(a)
+_s_assertion_unsupported(a) := _s_derived_unsupported(a) if "terms" in object.keys(a)
+
+_s_derived_unsupported(a) := ((_s_paths_unsupported(a) | {`"is between" after a count of, a sum of or a plus isn't supported yet` | a.phrase.op == "is between"}) | {u | some c in object.get(a, "where", []); some u in _s_tally_cond_unsupported(c)}) | {"every and some over more than ten steps aren't supported yet" |
+	some t in array.concat(a.terms, object.get(a.phrase, "terms", []))
+	_s_derived_term(t)
+	count(_walk_steps(_s_model_path(object.get(t, "count", object.get(t, "sum", null))))) > 10
+}
+
+_s_tally_cond_unsupported(c) := ({"a count of, a sum of or a plus in the whose of a count of or a sum of isn't supported yet" |
+	"terms" in object.keys(c)
+} | {"a count of, a sum of or a plus in the whose of a count of or a sum of isn't supported yet" |
+	terms := object.get(c.phrase, "terms", [])
+	terms != []
+	not _s_one_path(terms)
+}) | _s_argument_unsupported(c.phrase)
 
 _s_assertion_unsupported(a) := _s_paths_unsupported(a) | _s_argument_unsupported(a.phrase) if object.keys(a) & {"every", "some", "terms"} == set()
 
@@ -5131,10 +5272,11 @@ _s_paths_unsupported(a) := {"last of isn't supported yet" |
 	not "start" in object.keys(ref)
 }
 
-_s_argument_unsupported(ph) := {"count of, sum of and plus aren't supported yet"} if {
+_s_argument_unsupported(ph) := {concat("", [`"`, _s_phrase_words(ph), `" can't take a count of, a sum of or a plus`])} if {
 	terms := object.get(ph, "terms", [])
 	terms != []
 	not _s_one_path(terms)
+	not ph.op in object.keys(_s_derived_cmps)
 }
 
 _s_argument_unsupported(ph) := {concat("", [`"`, ph.op, `" with a value isn't supported yet: compare with a field`])} if {
@@ -5189,44 +5331,50 @@ _s_time_cmps := {"is before": "lt", "is after": "gt", "is on or after": "gte", "
 
 _s_order_cmps := {"is at least": "gte", "is at most": "lte", "is more than": "gt", "is less than": "lt"}
 
-_s_leaf_model(a) := {"op": "equals", "path": _s_model_path(a.path), "value": a.phrase.value} if {
+_s_leaf_model(a) := object.union({"op": "compare", "left": _s_left_side(a.terms, object.get(a, "where", [])), "cmp": _s_derived_cmps[a.phrase.op], "right": _s_side(a.phrase)}, object.filter(a.phrase, {"within"})) if "terms" in object.keys(a)
+
+_s_leaf_model(a) := _s_plain_model(a) if not "terms" in object.keys(a)
+
+_s_derived_cmps := {"is": "eq", "is not": "ne", "is at least": "gte", "is at most": "lte", "is more than": "gt", "is less than": "lt"}
+
+_s_plain_model(a) := {"op": "equals", "path": _s_model_path(a.path), "value": a.phrase.value} if {
 	a.phrase.op == "is"
 	"value" in object.keys(a.phrase)
 	not "within" in object.keys(a.phrase)
 }
 
-_s_leaf_model(a) := object.union({"op": "compare", "left": _s_model_path(a.path), "cmp": "eq", "right": _s_side(a.phrase)}, object.filter(a.phrase, {"within"})) if {
+_s_plain_model(a) := object.union({"op": "compare", "left": _s_model_path(a.path), "cmp": "eq", "right": _s_side(a.phrase)}, object.filter(a.phrase, {"within"})) if {
 	a.phrase.op == "is"
 	_s_side_given(a.phrase)
 }
 
-_s_leaf_model(a) := {"op": "compare", "left": _s_model_path(a.path), "cmp": "ne", "right": _s_side(a.phrase)} if a.phrase.op == "is not"
+_s_plain_model(a) := {"op": "compare", "left": _s_model_path(a.path), "cmp": "ne", "right": _s_side(a.phrase)} if a.phrase.op == "is not"
 
-_s_leaf_model(a) := {"op": _s_compare_ops[a.phrase.op][0], "left": _s_model_path(a.path), "cmp": _s_compare_ops[a.phrase.op][1], "right": _s_side(a.phrase)} if a.phrase.op in object.keys(_s_compare_ops)
+_s_plain_model(a) := {"op": _s_compare_ops[a.phrase.op][0], "left": _s_model_path(a.path), "cmp": _s_compare_ops[a.phrase.op][1], "right": _s_side(a.phrase)} if a.phrase.op in object.keys(_s_compare_ops)
 
-_s_leaf_model(a) := {"op": "in", "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if a.phrase.op == "is one of"
+_s_plain_model(a) := {"op": "in", "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if a.phrase.op == "is one of"
 
-_s_leaf_model(a) := {"op": "has_type", "path": _s_model_path(a.path), "type": a.phrase.type} if a.phrase.op == "is a"
+_s_plain_model(a) := {"op": "has_type", "path": _s_model_path(a.path), "type": a.phrase.type} if a.phrase.op == "is a"
 
-_s_leaf_model(a) := {"op": "not_in", "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if a.phrase.op == "is not one of"
+_s_plain_model(a) := {"op": "not_in", "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if a.phrase.op == "is not one of"
 
-_s_leaf_model(a) := {"op": "present", "path": _s_model_path(a.path)} if a.phrase.op == "exists"
+_s_plain_model(a) := {"op": "present", "path": _s_model_path(a.path)} if a.phrase.op == "exists"
 
-_s_leaf_model(a) := {"op": "missing", "path": _s_model_path(a.path)} if a.phrase.op == "does not exist"
+_s_plain_model(a) := {"op": "missing", "path": _s_model_path(a.path)} if a.phrase.op == "does not exist"
 
-_s_leaf_model(a) := {"op": "non_empty_string", "path": _s_model_path(a.path)} if a.phrase.op == "is a non-empty string"
+_s_plain_model(a) := {"op": "non_empty_string", "path": _s_model_path(a.path)} if a.phrase.op == "is a non-empty string"
 
-_s_leaf_model(a) := {"op": "empty_string_or_list", "path": _s_model_path(a.path)} if a.phrase.op == "is empty"
+_s_plain_model(a) := {"op": "empty_string_or_list", "path": _s_model_path(a.path)} if a.phrase.op == "is empty"
 
-_s_leaf_model(a) := {"op": "not_empty_string_or_list", "path": _s_model_path(a.path)} if a.phrase.op == "is not empty"
+_s_plain_model(a) := {"op": "not_empty_string_or_list", "path": _s_model_path(a.path)} if a.phrase.op == "is not empty"
 
-_s_leaf_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "value": _s_one(a.phrase)} if a.phrase.op in {"contains", "does not contain"}
+_s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "value": _s_one(a.phrase)} if a.phrase.op in {"contains", "does not contain"}
 
-_s_leaf_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if a.phrase.op in {"contains all of", "contains none of"}
+_s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if a.phrase.op in {"contains all of", "contains none of"}
 
-_s_leaf_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "patterns": _s_list(a.phrase)} if a.phrase.op in {"matches", "does not match"}
+_s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "patterns": _s_list(a.phrase)} if a.phrase.op in {"matches", "does not match"}
 
-_s_leaf_model(a) := {"op": "range", "path": _s_model_path(a.path), "min": a.phrase.min, "max": a.phrase.max} if a.phrase.op == "is between"
+_s_plain_model(a) := {"op": "range", "path": _s_model_path(a.path), "min": a.phrase.min, "max": a.phrase.max} if a.phrase.op == "is between"
 
 _s_compare_ops := object.union(
 	object.union({op: ["compare", cmp] | some op, cmp in _s_order_cmps}, {op: ["compare_time", cmp] | some op, cmp in _s_time_cmps}),
@@ -5248,7 +5396,38 @@ _s_side_given(ph) if "within" in object.keys(ph)
 
 _s_side(ph) := {"literal": ph.value} if "value" in object.keys(ph)
 
-_s_side(ph) := _s_model_path(ph.terms[0]) if "terms" in object.keys(ph)
+_s_side(ph) := _s_bare_side(ph.terms) if "terms" in object.keys(ph)
+
+_s_bare_side([t]) := _s_term_side(t)
+
+_s_bare_side(terms) := {"add": [_s_term_side(t) | some t in terms], "text": _s_terms_text(terms)} if count(terms) > 1
+
+_s_left_side(terms, []) := _s_bare_side(terms)
+
+_s_left_side(terms, where) := _s_whose_side(terms[0], where) if {
+	where != []
+	count(terms) == 1
+}
+
+_s_left_side(terms, where) := {"add": array.concat([_s_term_side(t) | some t in array.slice(terms, 0, count(terms) - 1)], [_s_whose_side(terms[count(terms) - 1], where)]), "text": concat("", [_s_terms_text(terms), _s_where_text({"where": where})])} if {
+	where != []
+	count(terms) > 1
+}
+
+_s_whose_side(t, where) := object.union(_s_term_side(t), {"whose": [_s_plain_model(c) | some c in where], "text": concat("", [_s_term_text(t), _s_where_text({"where": where})])})
+
+_s_term_side(t) := {"literal": t} if is_number(t)
+
+_s_term_side(t) := _s_model_path(t) if {
+	is_object(t)
+	"steps" in object.keys(t)
+}
+
+_s_term_side(t) := {concat("", [k, "_of"]): _s_model_path(t[k]), "whose": [], "text": _s_term_text(t)} if {
+	is_object(t)
+	some k in ["count", "sum"]
+	k in object.keys(t)
+}
 
 _s_one(ph) := ph.value if "value" in object.keys(ph)
 
@@ -5449,9 +5628,11 @@ _walk_failure(_, [], false, _, _) := null
 
 _walk_failure(_, [], true, _, true) := null
 
-_walk_first_path(c) := _leaf_paths(c)[0]
+_walk_first_path(c) := _condition_paths(c)[0]
 
-_walk_first_value(c, v) := value_at(v, _leaf_paths(c)[0])
+_walk_first_value(c, v) := value_at(v, _condition_paths(c)[0])
+
+_condition_paths(c) := array.concat(_leaf_paths(c), [p | some side in _derived_sides(c); some p in _side_paths(side)])
 
 _walk_target(leaf, r) := object.union(leaf, {"left": r}) if _two_sided(leaf)
 
@@ -5579,7 +5760,34 @@ _s_for_item_model(item, names) := {
 	"as": item.as,
 } if q := _s_quantifier_of(item)
 
-_s_named(m, names) := object.union(m, {f: _s_named_path(m[f], names) | some f in ["path", "left", "right"]; is_array(object.get(m, f, null))})
+_s_named(m, names) := object.union(m, {f: _s_named_side(m[f], names) | some f in ["path", "left", "right"]; f in object.keys(m)})
+
+_s_named_side(side, names) := _s_named_path(side, names) if is_array(side)
+
+_s_named_side(side, names) := object.union(side, {"add": [_s_named_tally(o, names) | some o in side.add]}) if {
+	is_object(side)
+	"add" in object.keys(side)
+}
+
+_s_named_side(side, names) := _s_named_tally(side, names) if {
+	is_object(side)
+	not "add" in object.keys(side)
+}
+
+_s_named_tally(side, names) := _s_named_path(side, names) if is_array(side)
+
+_s_named_tally(side, names) := object.union(side, {f: _s_named_path(side[f], names), "whose": [_s_named_cond(c, names) | some c in side.whose]}) if {
+	is_object(side)
+	some f in ["count_of", "sum_of"]
+	f in object.keys(side)
+}
+
+_s_named_tally(side, _) := side if {
+	is_object(side)
+	object.keys(side) & {"count_of", "sum_of"} == set()
+}
+
+_s_named_cond(c, names) := object.union(c, {f: _s_named_path(c[f], names) | some f in ["path", "left", "right"]; is_array(object.get(c, f, null))})
 
 _s_named_path(p, names) := array.concat([concat("", ["$", p[0]])], array.slice(p, 1, count(p))) if {
 	count(p) > 0
@@ -5718,11 +5926,18 @@ _for_failed(cause, fails) := [{"path": _path_name(f.path), "item": _path_name(f.
 
 _for_inputs(check, subj, names, item, w) := [{"name": pair[0], "value": pair[1]} | some pair in sort(_for_input_pairs(check, subj, names, item, w))]
 
-_for_input_pairs(check, subj, names, item, w) := (({[_walk_name(item.path, w.walked), [_walk_shown(e.v) | some e in w.items]]} | _for_inner_pairs(check, subj, names, item, w)) | {[_path_name(p), value_at(subj, p)] |
+_for_input_pairs(check, subj, names, item, w) := ((({[_walk_name(item.path, w.walked), [_walk_shown(e.v) | some e in w.items]]} | _for_inner_pairs(check, subj, names, item, w)) | {[_path_name(p), value_at(subj, p)] |
 	some c in check.checks
 	not _walks(c)
 	some p in _leaf_paths(c)
 	not _for_named(p)
+}) | {[i.name, i.value] |
+	some c in check.checks
+	some side in _derived_sides(c)
+	every p in _side_paths(side) {
+		not _for_named(p)
+	}
+	some i in _side_inputs(subj, side, null)
 }) | {[i.name, i.value] |
 	some c in check.checks
 	_walks(c)

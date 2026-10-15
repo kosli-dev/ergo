@@ -209,6 +209,22 @@ Every row has a cause. When a check reads several values, the row takes the firs
 
 **[compare.text]** Two more comparisons, `starts_with` and `ends_with`, are what the sentences `starts with` and `ends with` read into, see [sentence.phrase.starts](sentences.md#phrases), and today's syntax can't use them (see [sentence_ops.syntax](syntax.md#policies)). They pass when both values are strings and the left one starts, or ends, with the right one, code point by code point. Anything but two strings, two numbers included, fails with `unusable`, and the rest is as [compare.fail](#compare) says.
 
+## Counts and sums in sentences
+
+A side of `compare` can also be `count_of` or `sum_of`, each with a path, `whose`, a list of basic checks, and `text`, the words that wrote it. `add` can take `text` too, and `count_of` and `sum_of` among the sides it adds up. They're what `count of`, `sum of` and `plus` read into, see [sentence.derived.count](sentences.md#derived-values), and today's syntax can't use them (see [sentence_ops.syntax](syntax.md#policies)).
+
+**[tally.walk]** The path is walked as [walk.lists](#every-and-some) says, except that an empty list adds nothing instead of failing. A list that's missing, `null` or not a list fails the side as `absent`, `null` or `unusable`, and so does a path where no step walks a list, as [walk.lists](#every-and-some) says.
+
+**[tally.whose]** The `whose` checks read from each item of the innermost list walked, as [walk.items](#every-and-some) says. An item is left out when one of them fails with `value`, or when a `present` check finds the field missing. An item one of them can't decide fails the side with its cause.
+
+**[tally.count]** `count_of` is the number of values the path ends at in the items left in. A value that's missing or can't be read fails the side as `absent` or `unusable`.
+
+**[tally.sum]** `sum_of` adds up the values the path ends at in the items left in, and is 0 over none. A value that's missing fails the side as `absent`, `null` as `null`, and anything else that isn't a number as `unusable`. Numbers are added as decimals, so `0.1` and `0.2` add up to `0.3`.
+
+**[tally.fail]** A side that fails gives the check its cause, as a path that ends anything but `found` does in [compare.fail](#compare), and the worst one when both sides fail. An `add` fails as its worst operand does.
+
+**[tally.inputs]** For each side that's worked out, the row shows an entry named after its `text`, holding the number, or `null` when the side failed. For a `count_of` or a `sum_of`, the list it walked comes next, named and filled as [walk.inputs](#every-and-some) says. For an `add`, each side it adds up comes next, as if it stood alone. The left side's entries come before the right side's.
+
 ## `compare_time`
 
 `compare_time` takes the same parameters as `compare`, and compares two times.

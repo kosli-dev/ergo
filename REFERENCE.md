@@ -721,6 +721,30 @@ reads "for every pull request, some approver approved it and isn't its author". 
 - Each list fails as a one-line `every` or `some` does: empty, missing, `null` or not a list, and `, if any,` lets an empty one pass.
 - Two items at most. `named by` a name, like `shas named by persona`, isn't supported yet.
 
+`count of`, `sum of` and `plus` work out a number to compare, as the [derived values](#derived-values) of `compare` do. With the input of [derived values](#derived-values):
+
+```yaml
+some_persona: count of personas_ran is at least 1
+claude_findings: count of findings whose source is "claude" equals claude_found
+costs_add_up: sum of stages.usd whose kind is "model" equals total_usd within 0.01
+all_findings: count of findings equals claude_found plus 1
+```
+
+all four pass. Each row shows the number ergo worked out, named after the words that asked for it, then the list it walked:
+
+| check             | inputs                                                                                                                  |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `some_persona`    | `count of personas_ran = 1`, `personas_ran[] = ["security"]`                                                            |
+| `claude_findings` | `count of findings whose source is "claude" = 2`, `findings[] = [...]`, `claude_found = 2`                              |
+| `costs_add_up`    | `sum of stages.usd whose kind is "model" = 0.75`, `stages[].usd = [0.5, 0.25, 0]`, `total_usd = 0.76`                   |
+| `all_findings`    | `count of findings = 3`, `findings[] = [...]`, `claude_found plus 1 = 3`, `claude_found = 2`                            |
+
+- `count of` walks every list along its path, as `every` does, so `count of pull_requests.commits` counts the commits of every pull request. An empty list adds nothing, so `count of approvers` is 0 when there are none.
+- A list that's missing, `null` or not a list fails the check as `absent`, `null` or `unusable`, and so does a number to add that's missing, `null` or isn't a number.
+- An item that `whose` can't decide about fails the check, as with `every`.
+- `whose` goes after the last `count of` or `sum of`, and only on the left: `claude_found plus count of findings whose source is "gpt" is at least 3`.
+- A count goes with `is`, `equals`, `is not`, `does not equal`, `is at least`, `is at most`, `is more than`, `is less than` and `within`.
+
 A sentence that can't be read is [written wrong](#basic-operators), and the `$well_formed` row says why, with the column when it can:
 
 ```json
@@ -729,10 +753,10 @@ A sentence that can't be read is [written wrong](#basic-operators), and the `$we
 
 for `prod: environment is "prod`. `x is not null` is written wrong too, because it could only fail: write `x exists`. So is a value that isn't a number before `within`, like `x is "a" within 1`. An object with both `assert` and `op` is read as a check with an `op`, so a [custom operator](#custom-operators) can still take `assert`.
 
-ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `count of`, `sum of`, `plus`, `last of`, `named by` a name from a `for` line, a value after `is before` and the other time phrases, a field of the subject after `is in`, `contains` and the other phrases that take a list, and a list path with `named by` in it. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `tickets: count of tickets is at least 1` gives:
+ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `last of`, `named by` a name from a `for` line, `is between` after a `count of`, a `sum of` or a `plus`, a `count of` in the `whose` of another, a `plus` in the phrase of an `every` or `some`, a value after `is before` and the other time phrases, a field of the subject after `is in`, `contains` and the other phrases that take a list, and a list path with `named by` in it. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `last_signed: last of commits.signed is true` gives:
 
 ```json
-{"name": "checks.tickets", "value": ["count of, sum of and plus aren't supported yet"]}
+{"name": "checks.last_signed", "value": ["last of isn't supported yet"]}
 ```
 
 Until then, write those checks with an `op`. `from`, `id` and `applies_to` are still written as before.

@@ -8181,8 +8181,10 @@ test_an_assert_object_takes_only_description_and_meta if {
 
 test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
 	every pair in [
-		[`count of xs is 1`, "count of, sum of and plus aren't supported yet"],
-		[`x is y plus 1`, "count of, sum of and plus aren't supported yet"],
+		[`count of xs is between 1 and 3`, `"is between" after a count of, a sum of or a plus isn't supported yet`],
+		[`every xs is y plus 1`, "count of, sum of and plus after every or some aren't supported yet"],
+		[`t is before y plus 1`, `"is before" can't take a count of, a sum of or a plus`],
+		[`count of xs whose count of ys is 1 is 2`, "a count of, a sum of or a plus in the whose of a count of or a sum of isn't supported yet"],
 		[`t is before "2024-01-01T00:00:00Z"`, `"is before" with a value isn't supported yet: compare with a field`],
 		[`x is in allowed`, `"is in" with a field of the subject isn't supported yet`],
 		[`l contains y`, `"contains" with a field of the subject isn't supported yet`],
@@ -8195,7 +8197,7 @@ test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
 	_sentence_problems({"assert": []}) == ["empty assert"]
 	_sentence_problems({"assert": ["x exists", 1]}) == ["invalid assert"]
 	_sentence_problems({"assert": ["x exists", "y is \"a"]}) == ["line 2: unclosed quote at column 6"]
-	_sentence_problems({"assert": ["x exists", "count of ys is 1"]}) == ["line 2: count of, sum of and plus aren't supported yet"]
+	_sentence_problems({"assert": ["x exists", "count of ys is between 1 and 2"]}) == [concat("", ["line 2: ", `"is between" after a count of, a sum of or a plus isn't supported yet`])]
 }
 
 test_a_check_written_as_a_string_is_read_as_a_sentence if {
@@ -8575,7 +8577,7 @@ test_every_and_some_joined_with_and_give_one_row_with_the_failed_sentences if {
 }
 
 test_forms_a_walk_cant_take_yet_are_written_wrong if {
-	_sentence_problems(`every xs whose count of ys is 1 is not empty`) == ["count of, sum of and plus aren't supported yet"]
+	_sentence_problems(`every xs whose count of ys is between 1 and 2 is not empty`) == [`"is between" after a count of, a sum of or a plus isn't supported yet`]
 	_sentence_problems(`every xs whose y is in z is 1`) == [`"is in" with a field of the subject isn't supported yet`]
 	_sentence_problems(`every k1.k2.k3.k4.k5.k6.k7.k8.k9.k10.k11.k12 is 1`) == ["every and some over more than ten steps aren't supported yet"]
 }
@@ -8782,8 +8784,7 @@ test_forms_ergo_does_not_run_yet_are_written_wrong_on_a_for_line_too if {
 		["every xs named by x as x", `"named by" a name from the for line isn't supported yet`],
 		["every xs named by k as x", "unknown name k"],
 		["every xs whose v named by k is 1 as x", "unknown name k"],
-		["every xs whose count of ys is 1 as x", "count of, sum of and plus aren't supported yet"],
-		["every xs whose n is m plus 1 as x", "count of, sum of and plus aren't supported yet"],
+		["every xs whose count of ys is between 1 and 2 as x", `"is between" after a count of, a sum of or a plus isn't supported yet`],
 		["every b.c.d.e.f.g.h.i.j.k.l.m as x", "every and some over more than ten steps aren't supported yet"],
 	] {
 		_sentence_problems({"assert": "x is 1", "for": pair[0]}) == [pair[1]]
@@ -8837,4 +8838,117 @@ test_a_second_item_that_reads_into_a_first_item_that_isnt_an_object_fails_it_as_
 	rows := _for_rows({"for": "every prs as pr, some pr.approvers as ap", "assert": "ap is 1"}, [{"id": 1, "prs": [1, null, {"approvers": [1]}]}], {})
 	[[f.item, f.cause] | some f in rows[0][2]] == [["item 1 of prs", "not_an_object"], ["item 2 of prs", "not_an_object"]]
 	[row[1] | some row in _for_rows({"for": "every m as row, every row as cell", "assert": "cell is 1"}, [{"id": 1, "m": [[1], [1, 1]]}], {})] == ["satisfied"]
+}
+
+_tally_rows(check, things, params) := [[r.subject.id, r.cause, r.inputs] | some r in ergo.report({"things": things}, _sentence_policy({"c": check}), params).results; r.check == "c"]
+
+_review := {
+	"id": "pr-7",
+	"personas_ran": ["security"],
+	"findings": [{"source": "claude"}, {"source": "gpt"}, {"source": "claude"}],
+	"claude_found": 2,
+	"stages": [{"kind": "model", "usd": 0.5}, {"kind": "model", "usd": 0.25}, {"kind": "tool", "usd": 0}],
+	"total_usd": 0.76,
+}
+
+test_count_of_counts_the_items_left_in_and_shows_them_beside_the_count if {
+	_tally_rows(`count of findings whose source is "claude" equals claude_found`, [_review], {}) == [["pr-7", "satisfied", [
+		{"name": `count of findings whose source is "claude"`, "value": 2},
+		{"name": "findings[]", "value": _review.findings},
+		{"name": "claude_found", "value": 2},
+	]]]
+}
+
+test_sum_of_adds_up_the_field_across_the_items_left_in if {
+	_tally_rows(`sum of stages.usd whose kind is "model" equals total_usd within 0.01`, [_review], {}) == [["pr-7", "satisfied", [
+		{"name": `sum of stages.usd whose kind is "model"`, "value": 0.75},
+		{"name": "stages[].usd", "value": [0.5, 0.25, 0]},
+		{"name": "total_usd", "value": 0.76},
+	]]]
+	[row[1] | some row in _tally_rows("sum of xs.n is 0.3", [{"id": 1, "xs": [{"n": 0.1}, {"n": 0.2}]}], {})] == ["satisfied"]
+}
+
+test_plus_adds_paths_numbers_counts_and_sums if {
+	_tally_rows("claude_found is count of personas_ran plus 1", [_review], {}) == [["pr-7", "satisfied", [
+		{"name": "claude_found", "value": 2},
+		{"name": "count of personas_ran plus 1", "value": 2},
+		{"name": "count of personas_ran", "value": 1},
+		{"name": "personas_ran[]", "value": ["security"]},
+	]]]
+	[row[1] | some row in _tally_rows("claude_found plus count of findings is 5", [_review], {})] == ["satisfied"]
+	[row[1] | some row in _tally_rows("count of personas_ran plus claude_found is 3", [object.union(_review, {"claude_found": "2"})], {})] == ["unusable"]
+}
+
+test_count_of_walks_every_list_along_its_path_and_an_empty_list_adds_nothing if {
+	things := [{"id": "empty", "prs": []}, {"id": "nested", "prs": [{"cs": [1, 2]}, {"cs": []}, {"cs": [3]}]}]
+	[[row[0], row[1], row[2][0].value] | some row in _tally_rows("count of prs.cs is 3", things, {})] == [["empty", "value", 0], ["nested", "satisfied", 3]]
+	[[row[0], row[1], row[2][0].value] | some row in _tally_rows("sum of prs.cs is 6", things, {})] == [["empty", "value", 0], ["nested", "satisfied", 6]]
+}
+
+test_count_of_and_sum_of_fail_closed_on_a_list_they_cant_read if {
+	things := [{"id": "miss", "prs": [{"cs": [1]}, {}]}, {"id": "null", "prs": null}, {"id": "str", "prs": "x"}, {"id": "gone"}]
+	[[row[0], row[1], row[2][0].value] | some row in _tally_rows("count of prs.cs is 1", things, {})] == [["miss", "absent", null], ["null", "null", null], ["str", "unusable", null], ["gone", "absent", null]]
+	[[row[0], row[1]] | some row in _tally_rows("count of n is 1", [{"id": 1, "n": 5}, {"id": 2, "n": {"a": 1}}], {})] == [[1, "unusable"], [2, "unusable"]]
+}
+
+test_sum_of_fails_on_a_value_that_isnt_a_number if {
+	things := [{"id": "nul", "xs": [{"n": null}]}, {"id": "txt", "xs": [{"n": "1"}]}, {"id": "gone", "xs": [{}]}]
+	[[row[0], row[1]] | some row in _tally_rows("sum of xs.n is 1", things, {})] == [["nul", "null"], ["txt", "unusable"], ["gone", "absent"]]
+}
+
+test_an_item_a_whose_cant_decide_fails_the_count_rather_than_going_uncounted if {
+	[[row[1], row[2][0].value] | some row in _tally_rows(`count of xs whose k is "a" is 1`, [{"id": 1, "xs": [{"k": "a"}, {"j": 1}]}], {})] == [["absent", null]]
+	[row[1] | some row in _tally_rows(`count of xs whose k exists is 1`, [{"id": 1, "xs": [{"k": "a"}, {"j": 1}]}], {})] == ["satisfied"]
+}
+
+test_count_of_reads_params_and_named_by if {
+	[row[1] | some row in _tally_rows("count of $params.l is 2", [{"id": 1}], {"l": [1, 2]})] == ["satisfied"]
+	[row[1] | some row in _tally_rows("count of $params.l is 2", [{"id": 1}], {})] == ["absent"]
+	[row[1] | some row in _tally_rows("count of m named by $params.k is 2", [{"id": 1, "m": {"a": [1, 2]}}], {"k": "a"})] == ["satisfied"]
+}
+
+test_a_count_can_go_in_a_whose_of_every_and_an_item_it_cant_decide_fails_the_walk if {
+	things := [{"id": 1, "findings": [{"a": 1}]}, {"id": 2, "findings": [{"a": 1, "ys": [1]}]}]
+	[[row[0], row[1]] | some row in _tally_rows("every findings whose count of ys is 1 exists", things, {})] == [[1, "absent"], [2, "satisfied"]]
+}
+
+test_counts_work_in_and_lists_and_under_a_for_line_with_its_names if {
+	[row[1] | some row in _tally_rows({"assert": ["count of findings is 3", "sum of stages.usd is 0.75"]}, [_review], {})] == ["satisfied"]
+	things := [{"id": 1, "ps": ["a"], "prs": [{"r": [1, 2]}, {"r": [1]}]}, {"id": 2, "ps": ["a"], "prs": [{"r": [1, 2]}]}]
+	rows := _tally_rows({"for": "every prs as pr", "assert": ["count of ps is 1", "count of pr.r is at least 2"]}, things, {})
+	[[row[0], row[1]] | some row in rows] == [[1, "value"], [2, "satisfied"]]
+	rows[1][2] == [{"name": "count of ps", "value": 1}, {"name": "prs[]", "value": [{"r": [1, 2]}]}, {"name": "ps[]", "value": ["a"]}]
+	[row[1] | some row in _tally_rows({"for": "every prs as pr", "assert": "count of pr.r whose u does not equal pr.a is 2"}, [{"id": 1, "prs": [{"a": "x", "r": [{"u": "x"}, {"u": "y"}, {"u": "z"}]}]}], {})] == ["satisfied"]
+}
+
+test_counts_and_sums_are_invalid_sides_in_todays_syntax if {
+	_sentence_problems({"op": "compare", "left": {"count_of": ["xs"], "whose": [], "text": "t"}, "cmp": "eq", "right": {"literal": 1}}) == ["invalid left"]
+	_sentence_problems({"op": "compare", "left": ["n"], "cmp": "eq", "right": {"sum_of": ["xs"], "whose": [], "text": "t"}}) == ["invalid right"]
+	_sentence_problems({"op": "compare", "left": {"add": [["n"], {"literal": 1}], "text": "t"}, "cmp": "eq", "right": {"literal": 1}}) == ["invalid left"]
+}
+
+test_a_count_whose_named_by_cant_be_read_fails_with_its_cause if {
+	_tally_rows("count of m named by $params.k is 2", [{"id": 1, "m": {"a": [1, 2]}}], {}) == [[1, "absent", [{"name": "count of m named by $params.k", "value": null}, {"name": "m named by $params.k", "value": []}]]]
+}
+
+test_a_count_fails_on_a_value_it_cant_read_unless_whose_left_its_item_out if {
+	[row[1] | some row in _tally_rows("count of xs.t is 1", [{"id": 1, "xs": ["s"]}], {})] == ["unusable"]
+	[row[1] | some row in _tally_rows("count of xs.t whose k is 1 is 1", [{"id": 1, "xs": [{"k": 1, "t": 0}, {"k": 2}]}], {})] == ["satisfied"]
+}
+
+test_plus_with_a_whose_on_its_last_count if {
+	_tally_rows(`claude_found plus count of findings whose source is "gpt" is at least 3`, [_review], {}) == [["pr-7", "satisfied", [
+		{"name": `claude_found plus count of findings whose source is "gpt"`, "value": 3},
+		{"name": "claude_found", "value": 2},
+		{"name": `count of findings whose source is "gpt"`, "value": 1},
+		{"name": "findings[]", "value": _review.findings},
+	]]]
+}
+
+test_plus_under_a_for_line_reads_the_names if {
+	[row[1] | some row in _tally_rows({"for": "every prs as pr", "assert": "pr.a plus count of pr.r is 3"}, [{"id": 1, "prs": [{"a": 1, "r": [1, 2]}]}, {"id": 2, "prs": [{"a": 2, "r": [1, 2]}]}], {})] == ["satisfied", "value"]
+}
+
+test_an_add_of_a_count_is_an_invalid_side_in_todays_syntax if {
+	_sentence_problems({"op": "compare", "left": {"add": [{"count_of": ["xs"], "whose": [], "text": "t"}]}, "cmp": "eq", "right": {"literal": 1}}) == ["invalid left"]
 }
