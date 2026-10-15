@@ -371,6 +371,21 @@ test("only the dots of finished steps jump, and every dot names its step", () =>
   assert.deepEqual(dotTargets(positions.length).map((d) => d.jump), steps.map((_, i) => i + 1));
 });
 
+test("after going back, the dots of steps already reached still jump forward", () => {
+  const dots = dotTargets(2, 9);
+  assert.deepEqual(dots.map((d) => d.state), ["done", "current", ...Array(7).fill("done"), ...Array(3).fill("todo")]);
+  assert.deepEqual(dots.map((d) => d.jump), [1, null, 3, 4, 5, 6, 7, 8, 9, null, null, null]);
+});
+
+test("the furthest step reached is saved and comes back, but never behind the current one", () => {
+  const drafts = { 1: { sentence: 'allergens does not contain "nuts"', input: "{}" } };
+  assert.equal(serializeProgress(2, drafts, 9).furthest, 9);
+  assert.equal(restoreProgress(serializeProgress(2, drafts, 9)).furthest, 9);
+  assert.equal(restoreProgress({ pos: 2, furthest: 1, drafts: serializeProgress(2, drafts).drafts }).furthest, 2);
+  assert.equal(restoreProgress({ pos: 2, furthest: "9", drafts: serializeProgress(2, drafts).drafts }).furthest, 2);
+  assert.equal(restoreProgress({ pos: 2, furthest: 999, drafts: serializeProgress(2, drafts).drafts }).furthest, 2);
+});
+
 test("the result line puts the cause and the evidence together", () => {
   assert.deepEqual(resultLine(check(nutFree, { allergens: ["milk", "eggs", "nuts"] })), { cause: "value", rest: 'allergens = ["milk","eggs","nuts"]' });
   assert.deepEqual(resultLine(check(nutFree, {})), { cause: "absent", rest: "allergens = not in the input" });
@@ -1005,8 +1020,8 @@ test("an old save with step 7 goal B in the same step maps to step 8, and does n
 });
 
 test("restoring ignores what it can't read, and starts at the intro when an earlier answer is missing", () => {
-  assert.deepEqual(restoreProgress(null), { drafts: {}, pos: 0 });
-  assert.deepEqual(restoreProgress({ pos: 3, s2: nutFree }), { drafts: {}, pos: 0 });
+  assert.deepEqual(restoreProgress(null), { drafts: {}, pos: 0, furthest: 0 });
+  assert.deepEqual(restoreProgress({ pos: 3, s2: nutFree }), { drafts: {}, pos: 0, furthest: 0 });
   const bad = restoreProgress({ pos: 3, drafts: { 1: { sentence: nutFree, input: "{}" }, 2: { sentence: 5, input: "{}" }, 99: { sentence: "a", input: "{}" }, 3: { sentence: "a", input: 5 }, 4: { sentence: "a", input: "{}", choice: "maybe" } } });
   assert.deepEqual(Object.keys(bad.drafts).sort(), ["1", "4"]);
   assert.equal(bad.drafts[4].choice, undefined);

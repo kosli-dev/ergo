@@ -559,7 +559,8 @@ const showView = (s, d) => {
   d.viewed = true;
 };
 
-const persist = () => store.write(serializeProgress(Math.min(pos, END - 1), drafts));
+let furthest = 0;
+const persist = () => store.write(serializeProgress(Math.min(pos, END - 1), drafts, furthest));
 
 const focusStep = () => {
   const kind = goalKindAt(pos);
@@ -582,6 +583,7 @@ const go = (n, fresh = false, focus = true) => {
   gate.reset();
   if (!fresh) saveDraft();
   pos = n;
+  furthest = Math.max(furthest, n);
   touched = false;
   lastKey = "";
   met = false;
@@ -595,7 +597,7 @@ const go = (n, fresh = false, focus = true) => {
   el.dots.style.visibility = onIntro ? "hidden" : "";
   el.count.textContent = "";
   el.restartStep.hidden = onIntro || onEnd;
-  el.dots.replaceChildren(...dotTargets(pos).map(({ state, tip, jump }) => {
+  el.dots.replaceChildren(...dotTargets(pos, furthest).map(({ state, tip, jump }) => {
     const li = make("li", `tut__dot is-${state}`);
     li.dataset.tip = tip;
     if (jump === null) {
@@ -721,6 +723,7 @@ el.restartStep.addEventListener("click", () => {
 el.startOver.addEventListener("click", () => {
   closeMenu();
   for (const k of Object.keys(drafts)) delete drafts[k];
+  furthest = 0;
   go(0, true);
   try { localStorage.removeItem("ergo-tutorial"); } catch {}
 });
@@ -739,6 +742,7 @@ el.next.addEventListener("click", () => {
   if (el.next.disabled) return;
   if (pos === END) {
     for (const k of Object.keys(drafts)) delete drafts[k];
+    furthest = 0;
     go(0);
   } else {
     go(pos + 1);
@@ -754,6 +758,7 @@ $("intro-line2").textContent = intro.lines[1];
 const restored = restoreProgress(store.read());
 Object.assign(drafts, restored.drafts);
 const startPos = restored.pos;
+furthest = restored.furthest;
 go(startPos, false, startPos === 0);
 try {
   const res = await fetch(root.dataset.wasm);

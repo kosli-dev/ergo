@@ -715,12 +715,12 @@ export const progressDots = (pos) =>
 
 export const stepTitles = ["First check", "A failure", "Nothing recorded", "The wrong kind", "Numbers", "Two parts with and", "Every", "Some", "Names", "The requirement", "A day of batches", "The policy"];
 
-export const dotTargets = (pos) =>
-  progressDots(pos).map((state, i) => ({
-    state,
-    tip: `Step ${i + 1} · ${stepTitles[i]}`,
-    jump: state === "done" ? positions.findIndex((p) => p.step === i) : null,
-  }));
+export const dotTargets = (pos, furthest = pos) =>
+  steps.map((_, i) => {
+    const at = positions.findIndex((p) => p.step === i);
+    const state = pos < positions.length && positions[pos].step === i ? "current" : at <= Math.max(pos, furthest) ? "done" : "todo";
+    return { state, tip: `Step ${i + 1} · ${stepTitles[i]}`, jump: state === "done" ? at : null };
+  });
 
 export const resultLine = (result) => ({
   cause: result.cause,
@@ -800,8 +800,9 @@ export const createEnterGate = () => {
 
 const goodChoice = (c) => c === "passed" || c === "failed";
 
-export const serializeProgress = (pos, drafts) => ({
+export const serializeProgress = (pos, drafts, furthest = pos) => ({
   pos,
+  furthest,
   drafts: Object.fromEntries(
     Object.entries(drafts).map(([step, d]) => [step, { sentence: d.sentence, input: d.input, ...(d.fields ? { fields: d.fields } : {}), ...(d.choice ? { choice: d.choice } : {}), ...(d.editing ? { editing: true } : {}) }]),
   ),
@@ -837,7 +838,9 @@ export const restoreProgress = (saved) => {
     }
   }
   const saves = { s2: drafts[1]?.sentence ?? "", s5: drafts[4]?.sentence ?? "" };
-  return { drafts, pos: clampPosition(saved?.pos, saves) };
+  const pos = clampPosition(saved?.pos, saves);
+  const furthest = Number.isInteger(saved?.furthest) && saved.furthest > pos && saved.furthest <= positions.length ? saved.furthest : pos;
+  return { drafts, pos, furthest };
 };
 
 export const layoutLines = (segments) => {
