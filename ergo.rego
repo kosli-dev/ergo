@@ -142,7 +142,11 @@ _has_type("checks", v) if is_object(v)
 
 _has_type("from", v) if is_array(v)
 
+_has_type("from", v) if is_string(v)
+
 _has_type("id", v) if is_array(v)
+
+_has_type("id", v) if is_string(v)
 
 _has_type("min_subjects", v) if {
 	is_number(v)
@@ -236,8 +240,8 @@ _wrong_type_problems := {
 
 _subject_wrong_type_problems := {
 	"applies_to": "not an object",
-	"from": "not a list",
-	"id": "not a list",
+	"from": "not a list or a string",
+	"id": "not a list or a string",
 	"description": "not a string",
 	"of": "empty or not a string",
 }
@@ -264,6 +268,11 @@ _member_problems(members) := union({
 	{[["subjects", m], "not an object"] |
 		some m in members
 		not _raw_subject(m)
+	},
+	{[["subjects", m, f], p] |
+		some m in members
+		some f, ps in object.get(data.ergo_subject_sentences.problems, m, {})
+		some p in ps
 	},
 	{[["subjects", m, "applies_to", n], "also a filter of a subject it builds on"] |
 		some m in members
@@ -3859,7 +3868,10 @@ _evaluation(doc, req, name) := {
 } if {
 	raw := _raw_entries(doc, req)
 	names := _from_names(req)
-	filter_flaws := {n: _flaw(check, names) | some n, check in _applies_to_of(req)}
+	filter_flaws := {n: flaw |
+		some n, check in _applies_to_of(req)
+		flaw := _flaw(check, names) with data.ergo_sentence_here as _s_written_here(req, "applies_to", n)
+	}
 	check_flaws := {n: flaw |
 		some n, check in _checks_of(req)
 		flaw := _flaw(check, names) with data.ergo_sentence_here as _s_written_here(req, "checks", n)
@@ -4002,10 +4014,13 @@ report(doc, policy, params) := r if {
 	raw := _section(policy, "requirements")
 	reqs := _s_requirements(raw)
 	sentences := _s_sentences(raw, reqs)
-	subjects := _section(policy, "subjects")
+	written_subjects := _section(policy, "subjects")
+	reads := _s_from_reads(written_subjects)
+	subjects := _s_subjects(written_subjects, reads)
+	subject_sentences := _s_subject_sentences(written_subjects, reads)
 	unreadable := _unreadable_inputs(doc, params)
-	resolved := _resolved_subjects with data.ergo_subjects as subjects
-	written := _report_of(doc, reqs) with data.ergo_document as doc with data.ergo_params as params with data.ergo_subjects as subjects with data.ergo_resolved as resolved with data.ergo_unreadable as unreadable with data.ergo_sentences as sentences with input as {"ergo/names": {}}
+	resolved := _resolved_subjects with data.ergo_subjects as subjects with data.ergo_subject_sentences as subject_sentences
+	written := _report_of(doc, reqs) with data.ergo_document as doc with data.ergo_params as params with data.ergo_subjects as subjects with data.ergo_resolved as resolved with data.ergo_unreadable as unreadable with data.ergo_sentences as sentences with data.ergo_subject_sentences as subject_sentences with input as {"ergo/names": {}}
 	used := _used_subjects(reqs, subjects, resolved)
 	r := _reported(written, unreadable, [raw, used])
 }
@@ -5262,6 +5277,111 @@ _s_single_quoted(v) if {
 	regex.match(`^[^\x00-\x1f]*$`, v)
 }
 
+_s_from_reads(subjects) := {name: object.union(_s_from_part(name, def, subjects), _s_id_part(def)) | some name, def in subjects; is_object(def)} if is_object(subjects)
+
+_s_from_part(name, def, subjects) := _s_from_read(name, def.from, subjects) if is_string(object.get(def, "from", null))
+
+_s_from_part(_, def, _) := {} if not is_string(object.get(def, "from", null))
+
+_s_id_part(def) := {"id": _s_id_read(def.id)} if is_string(object.get(def, "id", null))
+
+_s_id_part(def) := {} if not is_string(object.get(def, "id", null))
+
+_s_id_read(text) := {"path": _s_model_path(fl.path)} if {
+	fl := _from_line(text)
+	object.keys(fl) == {"path"}
+	count(_s_paths_unsupported({"path": fl.path})) == 0
+} else := {"problems": [`an id is a path, like "id" or "build.number"`]}
+
+_s_from_reads(subjects) := {} if not is_object(subjects)
+
+_s_subjects(subjects, reads) := {name: _s_subject(name, def, reads) | some name, def in subjects} if is_object(subjects)
+
+_s_subjects(subjects, _) := subjects if not is_object(subjects)
+
+_s_subject(name, null, _) := {"from": [name]}
+
+_s_subject(name, def, reads) := object.union(def, object.union(_s_from_fields(name, def, reads), _s_id_field(reads[name]))) if is_object(def)
+
+_s_subject(_, def, _) := def if {
+	def != null
+	not is_object(def)
+}
+
+_s_from_fields(name, def, reads) := {"from": [name]} if {
+	not "from" in object.keys(def)
+	not "of" in object.keys(def)
+} else := reads[name].fields if {
+	_s_from_used(def, reads[name])
+} else := {}
+
+_s_from_used(def, read) if {
+	is_string(def.from)
+	read.problems == []
+	not "applies_to" in object.keys(def)
+	not "of" in object.keys(def)
+}
+
+_s_from_read(name, text, subjects) := {"problems": problems, "fields": fields} if {
+	fl := _from_line(text)
+	"path" in object.keys(fl)
+	conds := [_s_check([_s_cond_text(c)], {}, set()) | some c in object.get(fl, "where", [])]
+	problems := sort(((_s_chain_unsupported(name, fl, subjects) | _s_from_start_problems(fl)) | {concat("", ["whose: ", p]) | some c in conds; some p in object.get(c, "$sentence", [])}))
+	fields := object.union({"from": array.concat(_s_from_steps(_s_model_path(fl.path)), _s_each_step(fl))}, _s_whose_filters(conds))
+} else := {"problems": object.get(_from_line(text), "problems", ["doesn't parse"]), "fields": {}}
+
+_s_from_steps(path) := [_s_plain_from_step(st) | some st in array.slice(path, 1, count(path))] if {
+	count(path) > 0
+	path[0] == "$$input"
+} else := [_s_plain_from_step(st) | some st in path]
+
+_s_plain_from_step(st) := st.literal if {
+	is_object(st)
+	object.keys(st) == {"literal"}
+} else := st
+
+_s_from_start_problems(fl) := {"a from reads the input, so it can't start at $params" | object.get(fl.path, "start", "") == "params"}
+
+_s_each_step(fl) := [{"each_as": "subject", "keys": {"ref": _s_model_path(fl.named_by_each_of)}}] if "named_by_each_of" in object.keys(fl)
+
+_s_each_step(fl) := [] if not "named_by_each_of" in object.keys(fl)
+
+_s_whose_filters([]) := {}
+
+_s_whose_filters(conds) := {"applies_to": {_s_filter_name(i, count(conds)): c | some i, c in conds}} if conds != []
+
+_s_filter_name(i, n) := concat("", ["whose ", strings.replace_n({" ": "0"}, sprintf_pad)]) if {
+	width := count(format_int(n - 1, 10))
+	digits := format_int(i, 10)
+	sprintf_pad := concat("", [substring("                    ", 0, width - count(digits)), digits])
+}
+
+_s_chain_unsupported(name, fl, subjects) := {"a from that starts at another subject isn't supported yet" |
+	not "start" in object.keys(fl.path)
+	first := fl.path.steps[0]
+	is_string(first)
+	first != name
+	first in object.keys(subjects)
+}
+
+_s_id_field(read) := {"id": read.id.path} if "path" in object.keys(object.get(read, "id", {}))
+
+else := {}
+
+_s_subject_sentences(subjects, reads) := {"filters": {[name, n] | some name, r in reads; _s_from_used(subjects[name], r); some n, _ in object.get(r.fields, "applies_to", {})}, "problems": {name: probs | some name, def in subjects; probs := _s_subject_problems(name, def, reads); probs != {}}} if is_object(subjects)
+
+_s_subject_sentences(subjects, _) := {"filters": set(), "problems": {}} if not is_object(subjects)
+
+_s_subject_problems(name, def, reads) := {f: ps | some f in ["from", "id"]; ps := _s_field_problems(name, def, f, reads); ps != []} if is_object(def)
+
+_s_subject_problems(_, def, _) := {} if not is_object(def)
+
+_s_field_problems(name, def, "from", reads) := array.concat(reads[name].problems, [`applies_to can't go with a from written as a sentence: put the conditions after "whose"` | "applies_to" in object.keys(def)]) if is_string(object.get(def, "from", null))
+
+_s_field_problems(name, def, "id", reads) := object.get(reads[name].id, "problems", []) if is_string(object.get(def, "id", null))
+
+_s_field_problems(_, def, f, _) := [] if not is_string(object.get(def, f, null))
+
 _s_requirements(reqs) := {name: _s_requirement(req) | some name, req in reqs} if is_object(reqs)
 
 _s_requirements(reqs) := reqs if not is_object(reqs)
@@ -5382,7 +5502,10 @@ _s_written_here(req, "checks", n) if {
 	[req, n] in data.ergo_sentences
 } else := false
 
-_s_written_here(_, "applies_to", _) := false
+_s_written_here(req, "applies_to", n) if {
+	some m in data.ergo_resolved[req.subject].members
+	[m, n] in data.ergo_subject_sentences.filters
+} else := false
 
 _s_unsupported(parsed) := set() if not "assertions" in object.keys(parsed)
 

@@ -18,7 +18,7 @@ lifted_req(reqs, name, req) := object.union(object.remove(req, array.concat(subj
 
 lifted_req(_, _, req) := req if not is_object(req)
 
-subject_def(req) := {f: req[f] | some f in subject_fields; f in object.keys(req)}
+subject_def(req) := object.union({"from": []}, {f: req[f] | some f in subject_fields; f in object.keys(req)})
 
 subject_type(req) := object.get(req, "subject_type", "subject")
 
@@ -2477,7 +2477,7 @@ test_a_violation_for_a_from_that_reads_nothing_says_what_failed if {
 }
 
 test_min_subjects_fails_like_well_formed_when_from_is_written_wrong_even_at_zero if {
-	every f in ["items", [{"each_as": "it"}, "items"], ["items", {"each_as": "it", "bad": 1}], ["items", {"ref": ["$$params", "nope"]}, {"bad": 1}]] {
+	every f in [5, [{"each_as": "it"}, "items"], ["items", {"each_as": "it", "bad": 1}], ["items", {"ref": ["$$params", "nope"]}, {"bad": 1}]] {
 		every n in [0, 1] {
 			req := {"s": object.union(min_subjects_req(n).s, {"from": f})}
 			rep := report({"items": [{"id": "a"}]}, req)
@@ -2579,7 +2579,7 @@ test_unique_ids_passes_with_no_subjects_because_min_subjects_already_fails_the_r
 
 test_unique_ids_definition_is_in_the_check_table if {
 	rows := [[d.description, d.expression] |
-		some from in [["repos"], [], "repos"]
+		some from in [["repos"], [], 5]
 		d := report({}, {"s": object.union(owner_req.s, {"from": from})}).requirements.s.checks["$unique_ids"]
 	]
 	rows == [
@@ -2957,7 +2957,7 @@ test_a_requirement_without_checks_says_they_are_missing if {
 }
 
 test_problems_with_several_fields_are_listed_by_field if {
-	req := {"from": "items", "require": "most", "zz": 1, "checks": {}, "min_subjects": -1}
+	req := {"from": 5, "require": "most", "zz": 1, "checks": {}, "min_subjects": -1}
 	row := rows_for(report({"items": [{"id": 1}]}, {"s": req}), "s", "$well_formed")[0]
 	row.inputs == [
 		{"name": "count(checks)", "value": 0},
@@ -2965,7 +2965,7 @@ test_problems_with_several_fields_are_listed_by_field if {
 		{"name": "min_subjects", "value": ["not a whole number of 0 or more"]},
 		{"name": "require", "value": ["neither every nor some"]},
 		{"name": "zz", "value": ["unknown field"]},
-		{"name": "subjects.subject.from", "value": ["not a list"]},
+		{"name": "subjects.subject.from", "value": ["not a list or a string"]},
 	]
 }
 
@@ -2978,10 +2978,10 @@ wrong_types := [
 	["checks", 5],
 	["checks", [{"op": "present", "path": ["id"]}]],
 	["checks", null],
-	["from", "items"],
+	["from", 5],
 	["from", {"a": 1}],
 	["from", null],
-	["id", "id"],
+	["id", 5],
 	["id", null],
 	["min_subjects", "0"],
 	["min_subjects", null],
@@ -3011,8 +3011,8 @@ test_a_min_subjects_whose_value_is_a_whole_number_is_well_formed_however_it_is_w
 wrong_type_problems := {
 	"applies_to": "not an object",
 	"checks": "not an object",
-	"from": "not a list",
-	"id": "not a list",
+	"from": "not a list or a string",
+	"id": "not a list or a string",
 	"min_subjects": "not a whole number of 0 or more",
 	"subject_type": "empty or not a string",
 	"description": "not a string",
@@ -3076,13 +3076,13 @@ test_checks_that_are_not_an_object_give_no_rows_named_by_list_index if {
 }
 
 test_a_from_that_is_not_a_list_gives_no_subjects if {
-	rep := report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"from": "items", "min_subjects": 1})})
+	rep := report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"from": 5, "min_subjects": 1})})
 	rep.requirements.s.subjects == {"total": 0, "matching": 0}
 	rep.requirements.s.checks["$min_subjects"].expression == "count(matching(<invalid from>)) >= 1"
 }
 
 test_an_id_that_is_not_a_list_gives_a_null_id if {
-	rep := report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"id": "id"})})
+	rep := report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"id": 5})})
 	[r.subject.id | some r in rows_for(rep, "s", "c")] == [null]
 }
 
@@ -7274,7 +7274,7 @@ test_subjects_that_are_not_an_object_fail_every_requirement_that_names_one if {
 }
 
 test_a_subject_that_is_not_an_object_fails_every_requirement_that_names_it if {
-	every def in [null, "deployments", [], 1] {
+	every def in ["deployments", [], 1] {
 		rep := ergo.report(deployments_doc, subject_policy({"deployment": def}, {"a": approved_req("deployment"), "t": tested_req("deployment")}), {})
 		[rep.requirements.a.status, rep.requirements.t.status] == ["not_met", "not_met"]
 		well_formed_problems(rep, "a") == [{"name": "subjects.deployment", "value": ["not an object"]}]
@@ -7283,14 +7283,14 @@ test_a_subject_that_is_not_an_object_fails_every_requirement_that_names_it if {
 }
 
 test_a_badly_written_subject_fails_every_requirement_that_names_it if {
-	broken := object.union(prod_deployment, {"from": "deployments", "id": [true], "applies_to": {"is_prod": {"op": "equls", "path": ["environment"]}}, "zz": 1, "description": 5})
+	broken := object.union(prod_deployment, {"from": 5, "id": [true], "applies_to": {"is_prod": {"op": "equls", "path": ["environment"]}}, "zz": 1, "description": 5})
 	rep := ergo.report(deployments_doc, subject_policy({"deployment": broken}, {"a": approved_req("deployment"), "t": tested_req("deployment")}), {})
 	rep.compliant == false
 	every name in ["a", "t"] {
 		rep.requirements[name].status == "not_met"
 		well_formed_problems(rep, name) == [
 			{"name": "subjects.deployment.description", "value": ["not a string"]},
-			{"name": "subjects.deployment.from", "value": ["not a list"]},
+			{"name": "subjects.deployment.from", "value": ["not a list or a string"]},
 			{"name": "subjects.deployment.id", "value": ["step that can't be a key"]},
 			{"name": "subjects.deployment.zz", "value": ["unknown field"]},
 			{"name": "subjects.deployment.applies_to.is_prod", "value": ["unknown op equls"]},
@@ -7384,7 +7384,7 @@ test_a_subject_built_on_one_that_is_not_there_fails_and_checks_nothing if {
 }
 
 test_a_subject_built_on_one_that_is_not_an_object_fails if {
-	every base in [null, "components", []] {
+	every base in ["components", []] {
 		built_problems(object.union(sbom_subjects, {"SBOM package": base})) == [{"name": "subjects.\"SBOM package\"", "value": ["not an object"]}]
 	}
 }
@@ -7462,9 +7462,9 @@ test_an_of_that_is_not_a_name_fails if {
 }
 
 test_problems_with_the_subject_built_on_are_named_after_it if {
-	base := {"from": "components", "applies_to": {"bad": {"op": "nope", "path": ["x"]}}}
+	base := {"from": 5, "applies_to": {"bad": {"op": "nope", "path": ["x"]}}}
 	built_problems(object.union(sbom_subjects, {"SBOM package": base})) == [
-		{"name": "subjects.\"SBOM package\".from", "value": ["not a list"]},
+		{"name": "subjects.\"SBOM package\".from", "value": ["not a list or a string"]},
 		{"name": "subjects.\"SBOM package\".applies_to.bad", "value": ["unknown op nope"]},
 	]
 	stepped := object.union(sbom_subjects, {"SBOM package": {"from": ["components", {"each_as": "$p"}]}})
@@ -7848,7 +7848,7 @@ test_every_corpus_line_parses_and_prints_back_unchanged if {
 	every text in data.spec.sentence_corpus {
 		_prints_back(text)
 	}
-	count(data.spec.sentence_corpus) == 306
+	count(data.spec.sentence_corpus) == 307
 }
 
 _prints_back(text) if _printed(text) == text
@@ -9041,4 +9041,101 @@ test_the_answers_ergo_works_out_once_per_check_cant_be_written_on_a_check if {
 	every f in ["$once", "$ref_cause"] {
 		_sentence_problems(object.union({"op": "compare", "left": {"count": ["xs"]}, "cmp": "eq", "right": {"literal": 1}}, {f: true})) == [concat("", ["unknown field ", f])]
 	}
+}
+
+_from_report(doc, subjects, checks, params) := ergo.report(doc, {"subjects": subjects, "requirements": {"r": {"subject": object.keys(subjects)[_], "checks": checks}}}, params) if count(subjects) == 1
+
+_from_rows(rep) := [[r.subject.id, r.check, r.cause, r.inputs] | some r in rep.results; not r.check in {"$min_subjects", "$unique_ids", "$well_formed"}]
+
+_from_problems(rep) := [i | some r in rep.results; r.check == "$well_formed"; some i in r.inputs; startswith(i.name, "subjects.")]
+
+_deployments := {"deployments": [
+	{"id": 1, "environment": "prod", "change_type": "emergency"},
+	{"id": 2, "environment": "dev"},
+	{"id": 3, "environment": "prod", "change_type": "standard"},
+]}
+
+test_a_from_written_as_a_sentence_reads_its_path_and_keeps_the_subjects_whose_conditions_hold if {
+	rep := _from_report(_deployments, {"emergency change": {"from": `deployments whose environment is "prod" and change_type is "emergency"`, "id": "id"}}, {"c": "id exists"}, {})
+	_from_rows(rep) == [
+		[1, "$applies", "satisfied", [{"name": "change_type", "value": "emergency"}, {"name": "environment", "value": "prod"}]],
+		[2, "$applies", "absent", [{"name": "change_type", "value": null}, {"name": "environment", "value": "dev"}]],
+		[3, "$applies", "value", [{"name": "change_type", "value": "standard"}, {"name": "environment", "value": "prod"}]],
+		[1, "c", "satisfied", [{"name": "id", "value": 1}]],
+	]
+	rep.requirements.r.checks["$applies"].expression == `environment is "prod" and change_type is "emergency"`
+}
+
+test_the_conditions_of_a_from_keep_the_order_they_were_written_in_past_ten if {
+	conds := concat(" and ", [concat("", ["k", format_int(i, 10), " exists"]) | some i in numbers.range(1, 11)])
+	rep := _from_report({"xs": [{"id": 1}]}, {"x": {"from": concat("", ["xs whose ", conds])}}, {"c": "id exists"}, {})
+	rep.requirements.r.checks["$applies"].expression == conds
+}
+
+test_a_subject_with_no_from_reads_the_input_field_named_like_it if {
+	doc := {"artifact": {"fingerprint": "sha256:abc", "signed": true}}
+	every def in [null, {}, {"id": "fingerprint"}, {"id": ["fingerprint"]}] {
+		[[r[1], r[2]] | some r in _from_rows(_from_report(doc, {"artifact": def}, {"c": "signed is true"}, {}))] == [["c", "satisfied"]]
+	}
+	[[r[0], r[2]] | some r in _from_rows(_from_report(doc, {"artifact": {"from": [], "id": "artifact.fingerprint"}}, {"c": "artifact.signed is true"}, {}))] == [["sha256:abc", "satisfied"]]
+}
+
+test_a_from_named_by_a_param_or_by_each_of_a_param_list if {
+	doc := {"build": {"runs": {"unit": {"result": "passed"}, "integration": {"result": "failed"}, "smoke": {"result": "passed"}}}}
+	each := _from_report(doc, {"run": {"from": "build.runs named by each of $params.kinds"}}, {"c": `result is "passed"`}, {"kinds": ["unit", "integration", "system"]})
+	[[r[0], r[2]] | some r in _from_rows(each)] == [["integration", "value"], ["system", "absent"], ["unit", "satisfied"]]
+	one := _from_report(doc, {"run": {"from": "build.runs named by $params.kind"}}, {"c": `result is "passed"`}, {"kind": "unit"})
+	[r[2] | some r in _from_rows(one)] == ["satisfied"]
+}
+
+test_conditions_of_a_from_can_use_phrases_only_sentences_have if {
+	doc := {"xs": [{"id": 1, "tags": [], "cs": [1]}, {"id": 2, "tags": ["a"], "cs": [1]}]}
+	rep := _from_report(doc, {"x": {"from": "xs whose tags is empty and count of cs is at least 1", "id": "id"}}, {"c": "id exists"}, {})
+	[[r[0], r[1], r[2]] | some r in _from_rows(rep)] == [[1, "$applies", "satisfied"], [2, "$applies", "value"], [1, "c", "satisfied"]]
+}
+
+test_a_from_or_id_written_wrong_says_why_in_well_formed if {
+	every pair in [
+		[{"from": "xs whose"}, {"name": "subjects.x.from", "value": ["doesn't parse"]}],
+		[{"from": "xs whose last of ys is 1"}, {"name": "subjects.x.from", "value": ["whose: last of isn't supported yet"]}],
+		[{"from": "xs whose a is 1"}, {"name": "subjects.x.from", "value": ["a is a word of the grammar: write .a"]}],
+		[{"from": "xs", "id": "id is 1"}, {"name": "subjects.x.id", "value": [`an id is a path, like "id" or "build.number"`]}],
+		[{"from": "xs whose id exists", "applies_to": {"a": {"op": "present", "path": ["id"]}}}, {"name": "subjects.x.from", "value": [`applies_to can't go with a from written as a sentence: put the conditions after "whose"`]}],
+	] {
+		_from_problems(_from_report({"xs": [{"id": 1}]}, {"x": pair[0]}, {"c": "id exists"}, {})) == [pair[1]]
+	}
+}
+
+test_a_from_that_starts_at_another_subject_isnt_supported_yet if {
+	rep := ergo.report({"artifact": {"ys": []}}, {"subjects": {"artifact": null, "y": {"from": "artifact.ys"}}, "requirements": {"r": {"subject": "y", "checks": {"c": "id exists"}}}}, {})
+	_from_problems(rep) == [{"name": "subjects.y.from", "value": ["a from that starts at another subject isn't supported yet"]}]
+	own := ergo.report({"lockfile": {"status": "COMPLETE"}}, {"subjects": {"lockfile": {"from": `lockfile whose status is "COMPLETE"`}}, "requirements": {"r": {"subject": "lockfile", "checks": {"c": "status exists"}}}}, {})
+	_from_problems(own) == []
+	[r.cause | some r in own.results; r.check == "c"] == ["satisfied"]
+}
+
+test_a_from_line_that_starts_at_input_reads_the_input_and_one_at_params_is_written_wrong if {
+	doc := {"ds": [{"id": 5}]}
+	[[r[0], r[2]] | some r in _from_rows(_from_report(doc, {"d": {"from": "$input.ds whose id is 5", "id": "id"}}, {"c": "id exists"}, {}))] == [[5, "satisfied"], [5, "satisfied"]]
+	[[r[0], r[2]] | some r in _from_rows(_from_report(doc, {"d": {"from": "$input", "id": "ds"}}, {"c": "ds exists"}, {}))] == [[[{"id": 5}], "satisfied"]]
+	_from_problems(_from_report(doc, {"d": {"from": "$params.ds"}}, {"c": "id exists"}, {"ds": [{"id": 1}]})) == [{"name": "subjects.d.from", "value": ["a from reads the input, so it can't start at $params"]}]
+	both := ergo.report({"artifact": {"x": [{"id": 1}]}}, {"subjects": {"artifact": null, "d": {"from": "$input.artifact.x", "id": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "id exists"}}}}, {})
+	[r.cause | some r in both.results; r.check == "c"] == ["satisfied"]
+}
+
+test_a_from_line_keeps_every_condition_past_a_hundred if {
+	conds := concat(" and ", array.concat([`id is 1` | some _ in numbers.range(1, 100)], [`env is "prod"`]))
+	rep := _from_report({"ds": [{"id": 1, "env": "dev"}]}, {"d": {"from": concat("", ["ds whose ", conds]), "id": "id"}}, {"c": "id exists"}, {})
+	rep.requirements.r.status == "not_met"
+	[r.cause | some r in rep.results; r.check == "$applies"] == ["value"]
+	endswith(rep.requirements.r.checks["$applies"].expression, `and env is "prod"`)
+}
+
+test_a_from_line_can_start_with_a_quoted_key_that_starts_with_a_dollar if {
+	[r[2] | some r in _from_rows(_from_report({"$schema": [{"id": 2}]}, {"d": {"from": `"$schema" whose id is 2`, "id": "id"}}, {"c": "id exists"}, {}))] == ["satisfied", "satisfied"]
+}
+
+test_a_from_line_next_to_of_adds_no_filters_of_its_own if {
+	policy := {"subjects": {"d": {"from": "ds"}, "e": {"of": "d", "from": `ds whose t is "e"`}}, "requirements": {"r": {"subject": "e", "checks": {"c": "id exists"}}}}
+	_from_problems(ergo.report({"ds": [{"id": 1}]}, policy, {})) == [{"name": "subjects.e.from", "value": ["not allowed with of"]}]
 }

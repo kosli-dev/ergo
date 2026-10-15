@@ -84,6 +84,7 @@
 "attestations_statuses named by $params.scan_attestation_name.status is \"COMPLETE\"",
 "attestations_statuses named by $params.scan_attestation_name.is_compliant is true",
 "attestations_statuses named by $params.scan_attestation_name.has_audit_package is true",
+"$input",
 "artifact_fingerprint is not empty",
 "is_compliant is true",
 "trail.compliance_status.artifacts_statuses.artifact.attestations_statuses.npm-bump-prs.attestation_data",

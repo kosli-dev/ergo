@@ -21,7 +21,7 @@ _case_names(topic) := {concat(" / ", [topic, group.description, c.description]) 
 
 test_every_known_difference_names_a_case if known_differences - union({_case_names(topic) | some topic, _ in data.spec.cases}) == set()
 
-_tested_topics := {"any_of", "compare", "compare_time", "contains", "custom", "derived", "empty", "equals", "for", "in", "lists", "missing", "non_empty_string", "patterns", "present", "range", "requirements", "sentences", "substitutes", "walks"}
+_tested_topics := {"any_of", "compare", "compare_time", "contains", "custom", "derived", "empty", "equals", "for", "in", "lists", "missing", "non_empty_string", "patterns", "present", "range", "requirements", "sentences", "subjects", "substitutes", "walks"}
 
 test_every_folder_of_cases_has_a_test_of_its_own if {t | some t, _ in data.spec.cases} == _tested_topics
 
@@ -61,6 +61,8 @@ test_the_requirements_cases_pass if _topic_failures("requirements") == _known_in
 
 test_the_sentences_cases_pass if _topic_failures("sentences") == _known_in("sentences")
 
+test_the_subjects_cases_pass if _topic_failures("subjects") == _known_in("subjects")
+
 test_the_substitutes_cases_pass if _topic_failures("substitutes") == _known_in("substitutes")
 
 test_the_walks_cases_pass if _topic_failures("walks") == _known_in("walks")
@@ -68,7 +70,7 @@ test_the_walks_cases_pass if _topic_failures("walks") == _known_in("walks")
 test_a_case_with_the_wrong_rows_is_listed_by_name if {
 	failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
 		"description": "group",
-		"policy": {"subjects": {"subject": {}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+		"policy": {"subjects": {"subject": {"from": []}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
 		"cases": [{"description": "case", "input": {"x": 1}, "results": []}],
 	}]}
 }
@@ -76,7 +78,7 @@ test_a_case_with_the_wrong_rows_is_listed_by_name if {
 test_a_case_with_the_wrong_status_is_listed_by_name if {
 	failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
 		"description": "group",
-		"policy": {"subjects": {"subject": {}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+		"policy": {"subjects": {"subject": {"from": []}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
 		"cases": [{"description": "case", "input": {"x": 1}, "status": {"s": "not_met"}, "results": [{
 			"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c",
 			"passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}],
@@ -87,7 +89,7 @@ test_a_case_with_the_wrong_status_is_listed_by_name if {
 test_a_case_with_the_wrong_expression_is_listed_by_name if {
 	failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
 		"description": "group",
-		"policy": {"subjects": {"subject": {}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+		"policy": {"subjects": {"subject": {"from": []}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
 		"cases": [{"description": "case", "input": {"x": 1}, "expressions": {"s": {"c": "y is present"}}, "results": [{
 			"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c",
 			"passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}],
@@ -98,7 +100,7 @@ test_a_case_with_the_wrong_expression_is_listed_by_name if {
 test_a_case_with_the_wrong_refs_is_listed_by_name if {
 	failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
 		"description": "group",
-		"policy": {"subjects": {"subject": {}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+		"policy": {"subjects": {"subject": {"from": []}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
 		"cases": [{"description": "case", "input": {"x": 1}, "refs": {"s": {"c": [{"name": "$$params.x", "value": 1}]}}, "results": [{
 			"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c",
 			"passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}],
@@ -110,7 +112,7 @@ test_a_case_with_the_wrong_requirement_entry_is_listed_by_name if {
 	every want in [{"subjects": {"matching": 2, "total": 1}}, {"checks": {"$min_subjects": {"description": "nope"}}}] {
 		failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
 			"description": "group",
-			"policy": {"subjects": {"subject": {}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+			"policy": {"subjects": {"subject": {"from": []}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
 			"cases": [{"description": "case", "input": {"x": 1}, "requirements": {"s": want}, "results": [{
 				"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c",
 				"passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}],
@@ -122,7 +124,7 @@ test_a_case_with_the_wrong_requirement_entry_is_listed_by_name if {
 test_a_case_with_the_wrong_violations_is_listed_by_name if {
 	failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
 		"description": "group",
-		"policy": {"subjects": {"subject": {}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+		"policy": {"subjects": {"subject": {"from": []}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
 		"cases": [{"description": "case", "input": {"x": 1}, "violations": [{}], "results": [{
 			"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c",
 			"passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}],
@@ -133,7 +135,7 @@ test_a_case_with_the_wrong_violations_is_listed_by_name if {
 test_a_case_with_the_wrong_compliant_is_listed_by_name if {
 	failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
 		"description": "group",
-		"policy": {"subjects": {"subject": {}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+		"policy": {"subjects": {"subject": {"from": []}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
 		"cases": [{"description": "case", "input": {"x": 1}, "compliant": false, "results": [{
 			"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c",
 			"passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}],
@@ -199,7 +201,7 @@ _compared(check, c) if {
 test_a_known_difference_that_passes_fails_its_folder if {
 	cases := {"topic": [{
 		"description": "group",
-		"policy": {"subjects": {"subject": {}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+		"policy": {"subjects": {"subject": {"from": []}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
 		"cases": [{"description": "case", "input": {"x": 1}, "results": [{
 			"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c",
 			"passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}],
