@@ -1149,7 +1149,7 @@ _step_key(seg) := seg if {
 _step_key(seg) := v if {
 	_name_step(seg)
 	v := input["ergo/names"][seg.named_by]
-	_is_key(v)
+	is_string(v)
 }
 
 _name_step(seg) if {
@@ -2772,6 +2772,20 @@ _any_read_state(subj, path) := "not_an_object" if {
 }
 
 _reads_itself(path) if _keys_of(path) == []
+
+_any_read_state(_, path) := _name_step_state(path) if _name_step_state(path)
+
+_name_step_state(path) := "null" if {
+	_has_name_step(path)
+	some step in path
+	_name_step(step)
+	input["ergo/names"][step.named_by] == null
+} else := "unusable" if {
+	_has_name_step(path)
+	some step in path
+	_name_step(step)
+	not is_string(input["ergo/names"][step.named_by])
+}
 
 _any_read_state(subj, path) := "ambiguous" if count(_selector_candidates(subj, path)) > 1
 
@@ -5507,7 +5521,7 @@ _s_from_used(def, read) if {
 _s_from_read(name, fl, subjects, chains) := {"problems": problems, "fields": fields, "parent": parent} if {
 	"path" in object.keys(fl)
 	conds := [_s_check([_s_cond_text(c)], {}, set()) | some c in object.get(fl, "where", [])]
-	problems := sort(((_s_chain_unsupported(name, fl, subjects, chains.descend) | _s_from_start_problems(fl)) | {concat("", ["whose: ", p]) | some c in conds; some p in object.get(c, "$sentence", [])}))
+	problems := sort((((_s_chain_unsupported(name, fl, subjects, chains.descend) | _s_from_start_problems(fl)) | _s_paths_unsupported({"path": fl.path})) | {concat("", ["whose: ", p]) | some c in conds; some p in object.get(c, "$sentence", [])}))
 	fields := object.union(_s_source(name, fl, subjects), _s_whose_filters(_s_filter_prefix(name, chains.narrow), conds))
 	parent := _s_descend_parent(name, fl, subjects)
 } else := {"problems": object.get(fl, "problems", ["doesn't parse"]), "fields": {}}
@@ -6298,7 +6312,7 @@ _s_for_line_unsupported(lines, ftext) := _s_for_unsupported(fl, [], {item.as | s
 	"items" in object.keys(fl)
 }
 
-_s_for_unsupported(fl, assertions, names) := {u | some item in fl.items; some u in _s_item_unsupported(item); _s_kept_problem(u, names)} | {u | some a in assertions; some u in _s_assertion_unsupported(a); _s_kept_problem(u, names)}
+_s_for_unsupported(fl, assertions, names) := {u | some i, item in fl.items; some u in _s_item_unsupported(item); _s_kept_problem(u, {earlier.as | some earlier in array.slice(fl.items, 0, i)})} | {u | some a in assertions; some u in _s_assertion_unsupported(a); _s_kept_problem(u, names)}
 
 _s_item_unsupported(item) := (_s_paths_unsupported(item) | {u | some c in object.get(item, "where", []); some u in _s_cond_unsupported(c)}) | _s_walk_too_long(item)
 
@@ -6389,6 +6403,12 @@ _for_pre(check, subj, names) := _for_walk(check.items[1], subj, names) if {
 
 _for_from_first(check) if check.items[1].path[0] == concat("", ["$", check.items[0].as])
 
+_for_from_first(check) if {
+	some step in check.items[1].path
+	_name_step(step)
+	step.named_by == check.items[0].as
+}
+
 _for_judge_outer(check, subj, names, item, e, pre) := {"passed": res.passed, "kept": wh.kept, "failure": _for_failure(e, wh.undecided, wh.kept, res), "lines": res.lines} if {
 	wh := _for_whose(item, e, names)
 	res := _for_outer_next(check, subj, object.union(names, {item.as: e.v}), wh.undecided, wh.kept, pre)
@@ -6440,7 +6460,7 @@ _for_failure(e, [], true, res) := {"path": e.i, "item": e.i, "cause": res.cause,
 _for_failure(_, [], true, res) := null if res.passed
 
 _for_inner(check, subj, names, w) := {"passed": false, "cause": "not_an_object", "lines": []} if {
-	_for_from_first(check)
+	check.items[1].path[0] == concat("", ["$", check.items[0].as])
 	count(check.items[1].path) > 1
 	not is_object(names[check.items[0].as])
 } else := {"passed": false, "cause": w.unread, "lines": []} if {
@@ -6484,11 +6504,11 @@ _for_failed(cause, fails) := [{"path": _path_name(f.path), "item": _path_name(f.
 
 _for_inputs(check, subj, names, item, w) := [{"name": pair[0], "value": pair[1]} | some pair in sort(_for_input_pairs(check, subj, names, item, w))]
 
-_for_input_pairs(check, subj, names, item, w) := ((({[_walk_name(item.path, w.walked), [_walk_shown(e.v) | some e in w.items]]} | _for_inner_pairs(check, subj, names, item, w)) | {[_path_name(p), value_at(subj, p)] |
+_for_input_pairs(check, subj, names, item, w) := ((({[_walk_name(item.path, w.walked), [_walk_shown(e.v) | some e in w.items]]} | _for_inner_pairs(check, subj, names, item, w)) | {[_path_name(shown), value_at(subj, shown)] |
 	some c in check.checks
 	not _walks(c)
 	some p in _leaf_paths(c)
-	not _for_named(p)
+	shown := _before_names(p)
 }) | {[i.name, i.value] |
 	some c in check.checks
 	some side in _derived_sides(c)
@@ -6533,9 +6553,29 @@ _tally_parts(side) := [side] if _basic_form(side) in {"count_of", "sum_of"}
 
 _tally_parts(side) := [o | some o in side.add; _basic_form(o) in {"count_of", "sum_of"}] if _side_form(side) == "add"
 
-_for_list_name(path, walked) := substring(_walk_name(path, walked), 1, -1) if _for_named(path)
+_for_list_name(path, walked) := substring(_walk_name(path, walked), 1, -1) if _starts_at_name(path)
 
-_for_list_name(path, walked) := _walk_name(path, walked) if not _for_named(path)
+_for_list_name(path, walked) := _walk_name(path, walked) if not _starts_at_name(path)
+
+_starts_at_name(p) if {
+	_named(p)
+	not _builtin(p)
+}
+
+_before_names(p) := p if {
+	not _starts_at_name(p)
+	not _has_name_step(p)
+} else := array.slice(p, 0, i) if {
+	not _starts_at_name(p)
+	i := min([j | some j, step in p; _name_step(step)])
+	i > 0
+}
+
+_has_name_step(p) if {
+	is_array(p)
+	some step in p
+	_name_step(step)
+}
 
 _for_named(p) if {
 	_named(p)

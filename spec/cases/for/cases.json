@@ -5541,6 +5541,13 @@
                   "security",
                   "style"
                 ]
+              },
+              {
+                "name": "shas",
+                "value": {
+                  "security": "3f2a000000000000000000000000000000000000",
+                  "style": "9c1b000000000000000000000000000000000000"
+                }
               }
             ],
             "passed": true,
@@ -5599,6 +5606,12 @@
                   "perf",
                   5
                 ]
+              },
+              {
+                "name": "shas",
+                "value": {
+                  "security": "x"
+                }
               }
             ],
             "passed": false,
