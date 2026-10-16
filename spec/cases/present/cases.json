@@ -460,7 +460,7 @@
     "params": null,
     "cases": [
       {
-        "description": "fails as absent, because params that aren't an object weren't given either",
+        "description": "fails as absent, because null params mean none were given",
         "rules": ["present.no_params", "path.start", "path.inputs", "path.steps"],
         "input": {"things": [{"id": "t1"}]},
         "results": [

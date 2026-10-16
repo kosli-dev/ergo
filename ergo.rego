@@ -4274,10 +4274,16 @@ _reported(written, unreadable, sections) := _plain_numbers(written) if {
 	count(_json_problems(sections)) == 0
 } else := written
 
-_unreadable_inputs(doc, params) := [{"name": name, "value": sort(_json_problems(v))} |
-	some [name, v] in [["$input", doc], ["$params", params]]
-	count(_json_problems(v)) > 0
+_unreadable_inputs(doc, params) := [{"name": name, "value": sort(problems)} |
+	some [name, problems] in [["$input", _json_problems(doc)], ["$params", (_json_problems(params) | _params_shape_problems(params))]]
+	count(problems) > 0
 ]
+
+_params_shape_problems(params) := set() if is_object(params)
+
+else := set() if params == null
+
+else := {"not an object"}
 
 _report_of(doc, policy) := {
 	"compliant": _policy_compliant(policy, evaluations),

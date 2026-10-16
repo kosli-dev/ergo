@@ -6072,36 +6072,41 @@ test_params_that_are_missing_fail_closed if {
 	check := {"op": "excludes", "path": ["licences"], "value": {"ref": ["$$params", "banned"]}}
 	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "absent", [{"name": "licences", "value": ["MIT"]}]]]
 	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "absent", [{"name": "licences", "value": ["MIT"]}]]] with data.params as {}
-	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "absent", [{"name": "licences", "value": ["MIT"]}]]] with data.params as "not an object"
+	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "absent", [{"name": "licences", "value": ["MIT"]}]]] with data.params as null
+	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "unusable", [{"name": "licences", "value": ["MIT"]}]]] with data.params as "not an object"
 	params_rows({"items": [{"id": 1, "licences": ["MIT"]}]}, check) == [[false, "null", [{"name": "licences", "value": ["MIT"]}]]] with data.params as {"banned": null}
 }
 
-test_a_present_check_on_a_param_fails_as_absent_when_the_params_are_not_an_object if {
+test_a_present_check_on_a_param_fails_as_absent_with_no_params_and_as_unusable_with_params_that_are_not_an_object if {
 	check := {"op": "present", "path": ["$$params", "x"]}
-	every params in ["not an object", 1, null, [1]] {
-		params_rows({"items": [{"id": 1}]}, check) == [[false, "absent", [{"name": "$params.x", "value": null}]]] with data.params as params
+	params_rows({"items": [{"id": 1}]}, check) == [[false, "absent", [{"name": "$params.x", "value": null}]]] with data.params as null
+	every params in ["not an object", 1, [1]] {
+		params_rows({"items": [{"id": 1}]}, check) == [[false, "unusable", [{"name": "$params.x", "value": null}]]] with data.params as params
 	}
 	params_rows({"items": [{"id": 1}]}, check) == [[false, "value", [{"name": "$params.x", "value": null}]]] with data.params as {}
 }
 
-test_a_missing_check_on_a_param_fails_as_absent_when_the_params_are_not_an_object if {
+test_a_missing_check_on_a_param_fails_as_absent_with_no_params_and_as_unusable_with_params_that_are_not_an_object if {
 	check := {"op": "missing", "path": ["$$params", "x"]}
-	every params in ["not an object", 1, null, [1]] {
-		params_rows({"items": [{"id": 1}]}, check) == [[false, "absent", [{"name": "$params.x", "value": null}]]] with data.params as params
+	params_rows({"items": [{"id": 1}]}, check) == [[false, "absent", [{"name": "$params.x", "value": null}]]] with data.params as null
+	every params in ["not an object", 1, [1]] {
+		params_rows({"items": [{"id": 1}]}, check) == [[false, "unusable", [{"name": "$params.x", "value": null}]]] with data.params as params
 	}
 	params_rows({"items": [{"id": 1}]}, check) == [[true, "satisfied", [{"name": "$params.x", "value": null}]]] with data.params as {}
 }
 
-test_a_present_filter_on_a_param_fails_the_requirement_when_the_params_are_not_an_object if {
+test_a_present_filter_on_a_param_fails_the_requirement_with_no_params_or_params_that_are_not_an_object if {
 	req := {"s": {
 		"from": ["items"],
 		"id": ["id"],
 		"applies_to": {"f": {"op": "present", "path": ["$$params", "x"]}},
 		"checks": {"c": {"op": "present", "path": ["id"]}},
 	}}
-	rep := report({"items": [{"id": 1}]}, req) with data.params as "not an object"
-	rep.requirements.s.status == "not_met"
-	rows_for(rep, "s", "$applies")[0].cause == "absent"
+	every params, cause in {"null": "absent", `"not an object"`: "unusable"} {
+		rep := report({"items": [{"id": 1}]}, req) with data.params as json.unmarshal(params)
+		rep.requirements.s.status == "not_met"
+		rows_for(rep, "s", "$applies")[0].cause == cause
+	}
 }
 
 test_the_applies_row_lists_each_field_its_filters_read_once_in_name_order if {
@@ -7179,6 +7184,29 @@ test_min_subjects_says_what_the_input_and_params_hold_that_json_cannot if {
 		{"name": "$input", "value": ["holds a key that isn't a string", "holds a set"]},
 		{"name": "$params", "value": ["holds a set"]},
 	]
+}
+
+test_params_that_are_not_an_object_fail_every_requirement_even_one_that_reads_no_params_since_they_can_only_be_a_mistake if {
+	every params in ["x", 1, true, [], ["a"]] {
+		rep := ergo.report({"items": [{"id": "a", "x": 1}]}, lifted(json_only_req), params)
+		row_verdicts(rep) == [["$well_formed", true, "satisfied"], ["$min_subjects", false, "unusable"], ["$unique_ids", true, "satisfied"], ["c", false, "unusable"]]
+		rows_for(rep, "s", "$min_subjects")[0].inputs == [{"name": "in-scope thing count", "value": 1}, {"name": "$params", "value": ["not an object"]}]
+		rep.compliant == false
+	}
+}
+
+test_null_params_are_no_params_and_fail_nothing_a_policy_does_not_read if {
+	every params in [null, {}] {
+		rep := ergo.report({"items": [{"id": "a", "x": 1}]}, lifted(json_only_req), params)
+		row_verdicts(rep) == [["$well_formed", true, "satisfied"], ["$min_subjects", true, "satisfied"], ["$unique_ids", true, "satisfied"], ["c", true, "satisfied"]]
+	}
+}
+
+test_a_whole_params_read_with_null_params_fails_as_null_and_with_an_object_reads_it if {
+	check := {"op": "present", "path": ["$$params"]}
+	params_rows({"items": [{"id": 1}]}, check) == [[false, "null", [{"name": "$params", "value": null}]]] with data.params as null
+	params_rows({"items": [{"id": 1}]}, check) == [[true, "satisfied", [{"name": "$params", "value": {}}]]] with data.params as {}
+	params_rows({"items": [{"id": 1}]}, check) == [[false, "unusable", [{"name": "$params", "value": "x"}]]] with data.params as "x"
 }
 
 test_min_subjects_lists_only_the_count_when_the_input_and_params_are_json if {
