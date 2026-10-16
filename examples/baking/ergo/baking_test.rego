@@ -75,7 +75,7 @@ test_workings_table_shows_the_good_batch_clause_by_clause if {
 			"clause": "Must not contain nut allergens",
 			"check": "nut_free",
 			"inputs": [{"name": "allergens", "value": ["milk", "eggs"]}],
-			"expression": `not contains(allergens, "nuts")`,
+			"expression": `allergens does not contain "nuts"`,
 			"passed": true,
 		},
 		{
@@ -83,7 +83,7 @@ test_workings_table_shows_the_good_batch_clause_by_clause if {
 			"clause": "Bake temperature 175–200°C inclusive",
 			"check": "temp_ok",
 			"inputs": [{"name": "bake.temp_c", "value": 180}],
-			"expression": "bake.temp_c >= 175 and bake.temp_c <= 200",
+			"expression": "bake.temp_c is between 175 and 200",
 			"passed": true,
 		},
 		{
@@ -91,7 +91,7 @@ test_workings_table_shows_the_good_batch_clause_by_clause if {
 			"clause": "Bake time 25–40 minutes inclusive",
 			"check": "time_ok",
 			"inputs": [{"name": "bake.minutes", "value": 32}],
-			"expression": "bake.minutes >= 25 and bake.minutes <= 40",
+			"expression": "bake.minutes is between 25 and 40",
 			"passed": true,
 		},
 	]
@@ -107,7 +107,7 @@ test_workings_table_shows_a_missing_allergen_record_as_null if {
 test_workings_table_leaves_out_the_checks_ergo_adds if {
 	subjects := {"batch": object.union(
 		data.examples.baking.ergo.baking.subjects.batch,
-		{"applies_to": {"is_cake": {"op": "present", "path": ["bake"]}}},
+		{"from": "batches whose bake exists"},
 	)}
 	w := baking.workings_table
 		with input as {"batches": data.examples.baking.batches}

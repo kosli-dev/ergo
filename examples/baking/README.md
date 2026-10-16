@@ -62,11 +62,11 @@ opa eval -d ergo.rego -d examples/baking/ergo -i examples/baking/batches.json -f
 
 Each row has the clause's wording, the check, what it read, the expression and the result. Here is batch 004 as a table:
 
-| clause                               | check      | inputs              | expression                                  | passed  |
-| ------------------------------------ | ---------- | ------------------- | ------------------------------------------- | ------- |
-| Must not contain nut allergens       | `nut_free` | `allergens = null`  | `not contains(allergens, "nuts")`           | `false` |
-| Bake temperature 175–200°C inclusive | `temp_ok`  | `bake.temp_c = 180` | `bake.temp_c >= 175 and bake.temp_c <= 200` | `true`  |
-| Bake time 25–40 minutes inclusive    | `time_ok`  | `bake.minutes = 32` | `bake.minutes >= 25 and bake.minutes <= 40` | `true`  |
+| clause                               | check      | inputs              | expression                           | passed  |
+| ------------------------------------ | ---------- | ------------------- | ------------------------------------ | ------- |
+| Must not contain nut allergens       | `nut_free` | `allergens = null`  | `allergens does not contain "nuts"`  | `false` |
+| Bake temperature 175–200°C inclusive | `temp_ok`  | `bake.temp_c = 180` | `bake.temp_c is between 175 and 200` | `true`  |
+| Bake time 25–40 minutes inclusive    | `time_ok`  | `bake.minutes = 32` | `bake.minutes is between 25 and 40`  | `true`  |
 
 `workings.rego` only reads the report, not anything about baking, so it works for any ergo policy. The plain Rego version has nothing to build it from: its output is `true` or `false` for each rule.
 
