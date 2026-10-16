@@ -9480,6 +9480,8 @@ test_named_by_a_field_reads_the_key_the_subjects_field_holds if {
 		["c", true, "satisfied", [{"name": "age", "value": 3}, {"name": "$params.limits named by severity", "value": 5}, {"name": "severity", "value": "high"}]],
 		["c", false, "value", [{"name": "age", "value": 40}, {"name": "$params.limits named by severity", "value": 30}, {"name": "severity", "value": "low"}]],
 	]
+	_sentence_rows({"c": "age is at most $params.limits[severity]"}, doc, {"limits": {"high": 5, "low": 30}}) == _sentence_rows({"c": "age is at most $params.limits named by severity"}, doc, {"limits": {"high": 5, "low": 30}})
+	ergo.report(doc, _sentence_policy({"c": "age is at most $params.limits[severity]"}), {}).requirements.s.checks.c.expression == "age is at most $params.limits named by severity"
 	rep := ergo.report(doc, _sentence_policy({"c": "age is at most $params.limits named by severity"}), {})
 	rep.requirements.s.checks.c.expression == "age is at most $params.limits named by severity"
 	not "$refs" in object.keys(rep.requirements.s.checks.c)
