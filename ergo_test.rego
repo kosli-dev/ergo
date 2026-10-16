@@ -8268,8 +8268,6 @@ test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
 		[`t is before y plus 1`, `"is before" can't take a count of, a sum of or a plus`],
 		[`count of xs whose count of ys is 1 is 2`, "a count of, a sum of or a plus in the whose of a count of or a sum of isn't supported yet"],
 		[`t is before "2024-01-01T00:00:00Z"`, `"is before" with a value isn't supported yet: compare with a field`],
-		[`x is in allowed`, `"is in" with a field of the subject isn't supported yet`],
-		[`l contains y`, `"contains" with a field of the subject isn't supported yet`],
 		[`x matches $params.a named by $params.b`, `"matches" with named by in its path isn't supported yet`],
 		[`last of xs is 1`, "last of isn't supported yet"],
 		[`x named by persona is 1`, "unknown name persona"],
@@ -8660,7 +8658,6 @@ test_every_and_some_joined_with_and_give_one_row_with_the_failed_sentences if {
 
 test_forms_a_walk_cant_take_yet_are_written_wrong if {
 	_sentence_problems(`every xs whose count of ys is between 1 and 2 is not empty`) == [`"is between" after a count of, a sum of or a plus isn't supported yet`]
-	_sentence_problems(`every xs whose y is in z is 1`) == [`"is in" with a field of the subject isn't supported yet`]
 	_sentence_problems(`every k1.k2.k3.k4.k5.k6.k7.k8.k9.k10.k11.k12 is 1`) == ["every and some over more than ten steps aren't supported yet"]
 }
 
@@ -9590,3 +9587,228 @@ test_as_sentences_leaves_the_checks_of_a_subject_read_from_another if {
 	}
 	ergo.as_sentences(policy).requirements == policy.requirements
 }
+
+_list_phrases := {
+	"is one of": "is in",
+	"is not one of": "is not in",
+	"contains": "contains",
+	"does not contain": "does not contain",
+	"contains all of": "contains all of",
+	"contains none of": "contains none of",
+	"matches": "matches",
+	"does not match": "does not match",
+}
+
+_list_lefts := [
+	{"id": "l00"},
+	{"id": "l01", "x": null},
+	{"id": "l02", "x": "a"},
+	{"id": "l03", "x": "b"},
+	{"id": "l04", "x": 3},
+	{"id": "l05", "x": true},
+	{"id": "l06", "x": []},
+	{"id": "l07", "x": ["a"]},
+	{"id": "l08", "x": ["a", "b"]},
+	{"id": "l09", "x": ["b"]},
+	{"id": "l10", "x": {"k": "a"}},
+	{"id": "l11", "x": ""},
+	{"id": "l12", "x": [1]},
+	{"id": "l13", "x": [null]},
+	{"id": "l14", "x": ["a", 1]},
+	{"id": "l15", "x": [["a"]]},
+]
+
+_list_rights := [
+	{},
+	{"v": null},
+	{"v": []},
+	{"v": ["a"]},
+	{"v": ["a", "b"]},
+	{"v": "a"},
+	{"v": "text"},
+	{"v": 3},
+	{"v": true},
+	{"v": {"k": "a"}},
+	{"v": [1, "a"]},
+	{"v": ["a", null]},
+	{"v": [["a"]]},
+	{"v": ["^a", "("]},
+	{"v": ["^a"]},
+	{"v": ["^a", 1]},
+	{"v": [null]},
+	{"v": ["a", "a"]},
+	{"v": [1]},
+	{"v": [{"k": "a"}]},
+	{"v": "("},
+	{"v": ["["]},
+	{"v": [true]},
+	{"v": [false]},
+]
+
+_list_verdicts(check, things, params) := [[r.subject.id, r.passed, r.cause] | some r in ergo.report({"things": things}, _sentence_policy({"c": check}), params).results; r.check == "c"]
+
+_list_with_field(things, right) := [object.union(t, {"y": right.v}) | some t in things] if "v" in object.keys(right)
+
+_list_with_field(things, right) := things if not "v" in object.keys(right)
+
+_list_params(right) := {"k": right.v} if "v" in object.keys(right)
+
+_list_params(right) := {} if not "v" in object.keys(right)
+
+_list_same_as_params(words, suffix, right) if {
+	_list_verdicts(concat("", ["x ", words, " y", suffix]), _list_with_field(_list_lefts, right), {}) == _list_verdicts(concat("", ["x ", words, " $params.k", suffix]), _list_lefts, _list_params(right))
+}
+
+test_a_field_after_a_list_phrase_gives_the_verdict_and_cause_of_the_same_list_read_from_params if {
+	every _, words in _list_phrases {
+		every right in _list_rights {
+			_list_same_as_params(words, "", right)
+		}
+	}
+}
+
+test_a_path_that_cant_be_read_after_a_list_phrase_gives_the_cause_of_the_same_path_in_params if {
+	every _, words in _list_phrases {
+		every right in [{}, {"v": null}, {"v": "s"}, {"v": 3}, {"v": []}, {"v": {}}, {"v": {"z": null}}, {"v": {"z": ["a"]}}, {"v": {"z": "a"}}, {"v": {"z": ["^a"]}}] {
+			_list_same_as_params(words, ".z", right)
+		}
+	}
+}
+
+test_each_list_phrase_with_a_field_fails_closed_on_a_missing_null_or_wrong_typed_side if {
+	every pair in [
+		["x is in y", "a", ["a"], 3, ["absent", "null", "value", "absent", "null", "unusable"]],
+		["x is not in y", "a", ["a"], 3, ["absent", "null", "satisfied", "absent", "null", "unusable"]],
+		["x contains y", ["a"], "a", 3, ["absent", "null", "unusable", "absent", "null", "value"]],
+		["x does not contain y", ["a"], "a", 3, ["absent", "null", "unusable", "absent", "null", "satisfied"]],
+		["x contains all of y", ["a"], ["a"], 3, ["absent", "null", "unusable", "absent", "null", "unusable"]],
+		["x contains none of y", ["a"], ["a"], 3, ["absent", "null", "unusable", "absent", "null", "unusable"]],
+		["x matches y", "a", ["^a"], 3, ["absent", "null", "unusable", "absent", "null", "unusable"]],
+		["x does not match y", "a", ["^a"], 3, ["absent", "null", "unusable", "absent", "null", "unusable"]],
+	] {
+		things := [
+			{"id": 1, "y": pair[2]},
+			{"id": 2, "x": null, "y": pair[2]},
+			{"id": 3, "x": pair[3], "y": pair[2]},
+			{"id": 4, "x": pair[1]},
+			{"id": 5, "x": pair[1], "y": null},
+			{"id": 6, "x": pair[1], "y": pair[3]},
+		]
+		[r[2] | some r in _list_verdicts(pair[0], things, {})] == pair[4]
+	}
+}
+
+test_a_field_after_a_list_phrase_passes_and_fails_by_what_the_list_holds if {
+	things := [
+		{"id": 1, "x": "a", "l": ["a", "b"], "p": ["^a"], "w": "a"},
+		{"id": 2, "x": "c", "l": ["a", "b"], "p": ["^a"], "w": "c"},
+		{"id": 3, "x": ["a", "b"], "l": ["a"], "p": ["^a"], "w": "z"},
+		{"id": 4, "x": ["a", "b"], "l": ["c"], "p": [], "w": "b"},
+	]
+	every pair in [
+		["x is in l", [true, false, false, false]],
+		["x is not in l", [false, true, true, true]],
+		["x contains w", [false, false, false, true]],
+		["x does not contain w", [false, false, true, false]],
+		["x contains all of l", [false, false, true, false]],
+		["x contains none of l", [false, false, false, true]],
+		["x matches p", [true, false, false, false]],
+		["x does not match p", [false, true, false, false]],
+	] {
+		[r[1] | some r in _list_verdicts(pair[0], things, {})] == pair[1]
+	}
+}
+
+test_a_field_after_a_list_phrase_lists_both_fields_in_the_row_inputs_and_keeps_the_sentence_as_written if {
+	doc := {"things": [{"id": "t1", "files": ["a", "b"], "gaps": ["a"]}]}
+	r := ergo.report(doc, _sentence_policy({"c": "files contains all of gaps"}), {})
+	[row.inputs | some row in r.results; row.check == "c"] == [[{"name": "files", "value": ["a", "b"]}, {"name": "gaps", "value": ["a"]}]]
+	r.requirements.s.checks.c == {"description": "", "meta": {}, "expression": "files contains all of gaps"}
+	r2 := ergo.report(doc, _sentence_policy({"c": "files contains all of $params.k"}), {"k": ["a"]})
+	[row.inputs | some row in r2.results; row.check == "c"] == [[{"name": "files", "value": ["a", "b"]}]]
+}
+
+test_a_field_of_the_input_before_a_list_phrase_reads_a_field_of_the_subject_after_it if {
+	doc := {"artifact": {"developers": ["ann", "bob"]}, "things": [{"id": "t1", "tested_by": "cy"}, {"id": "t2", "tested_by": "ann"}]}
+	r := ergo.report(doc, _sentence_policy({"c": "$input.artifact.developers does not contain tested_by"}), {})
+	[[row.subject.id, row.cause, row.inputs] | some row in r.results; row.check == "c"] == [
+		["t1", "satisfied", [{"name": "$input.artifact.developers", "value": ["ann", "bob"]}, {"name": "tested_by", "value": "cy"}]],
+		["t2", "value", [{"name": "$input.artifact.developers", "value": ["ann", "bob"]}, {"name": "tested_by", "value": "ann"}]],
+	]
+}
+
+test_a_list_phrase_with_a_field_runs_after_a_for_line_a_whose_and_a_one_line_every_or_some if {
+	doc := {"things": [
+		{"id": 1, "excluded": ["q"], "allowed": ["s1"], "approvers": [{"username": "x"}, {"username": "y"}], "commits": [{"sha": "s1", "author": "x", "ok": ["s1"]}, {"sha": "s2", "author": "z", "ok": ["s1"]}]},
+		{"id": 2, "excluded": ["x"], "allowed": ["s9"], "approvers": [{"username": "x"}, {"username": "y"}], "commits": [{"sha": "s1", "author": "x", "ok": ["s9"]}]},
+	]}
+	checks := {
+		"f": {"for": "every approvers as ap", "assert": "ap.username is not one of excluded"},
+		"w": "every commits.sha whose author is \"x\" is in ok",
+		"s": "some commits.sha whose author is \"x\" is in ok",
+		"c": {"for": "every commits as cm", "assert": "cm.sha is in allowed"},
+	}
+	[[r.check, r.subject.id, r.passed, r.cause] | some r in ergo.report(doc, _sentence_policy(checks), {}).results; r.check in {"f", "w", "s", "c"}] == [
+		["c", 1, false, "value"], ["f", 1, true, "satisfied"], ["s", 1, true, "satisfied"], ["w", 1, true, "satisfied"],
+		["c", 2, false, "value"], ["f", 2, false, "value"], ["s", 2, false, "value"], ["w", 2, false, "value"],
+	]
+}
+
+test_a_list_phrase_with_a_field_runs_in_a_from_lines_whose if {
+	doc := {"deployments": [
+		{"id": 1, "environment": "prod", "allowed_envs": ["prod"]},
+		{"id": 2, "environment": "dev", "allowed_envs": ["prod"]},
+		{"id": 3, "environment": "prod", "allowed_envs": ["dev"]},
+	]}
+	rep := _from_report(doc, {"d": {"from": "deployments whose environment is in allowed_envs", "id": "id"}}, {"c": "id exists"}, {})
+	[r[0] | some r in _from_rows(rep); r[1] == "c"] == [1]
+}
+
+test_a_list_comparison_is_an_invalid_cmp_in_todays_syntax_even_when_it_copies_a_sentence if {
+	every cmp in ["in", "not_in", "includes", "excludes", "includes_all", "excludes_all", "matches_any", "not_matches_any"] {
+		_sentence_problems({"op": "compare", "left": ["x"], "cmp": cmp, "right": ["y"]}) == ["invalid cmp"]
+		_sentence_problems({"op": "compare", "left": ["x"], "cmp": cmp, "right": ["y"], "expression": "x is in y"}) == ["invalid cmp"]
+		r := ergo.report({"things": [{"id": "t1", "x": "a", "y": ["a"], "xs": [{"x": "a", "y": ["a"]}]}]}, _sentence_policy({"c": {"op": "all", "path": ["xs"], "check": {"op": "compare", "left": [], "cmp": cmp, "right": ["y"]}}}), {})
+		[row.cause | some row in r.results; row.check == "c"] == ["ill_formed"]
+	}
+}
+
+test_a_list_comparison_only_ever_passes_on_values_of_the_type_it_reads_even_through_leaf_passed if {
+	every cmp in ["in", "not_in", "includes", "excludes", "includes_all", "excludes_all", "matches_any", "not_matches_any"] {
+		not ergo.leaf_passed({"op": "compare_time", "left": ["n"], "cmp": cmp, "right": ["m"]}, {"n": 15, "m": 1})
+	}
+	not ergo.leaf_passed({"op": "compare", "left": ["x"], "cmp": "matches_any", "right": ["y"]}, {"x": "a", "y": ["("]})
+	not ergo.leaf_passed({"op": "compare", "left": ["x"], "cmp": "not_matches_any", "right": ["y"]}, {"x": "a", "y": ["(", "^b"]})
+	not ergo.leaf_passed({"op": "compare", "left": ["x"], "cmp": "includes_all", "right": ["y"]}, {"x": ["a"], "y": []})
+}
+
+test_a_written_list_and_a_params_list_after_a_list_phrase_still_read_into_their_own_ops if {
+	doc := {"things": [{"id": "t1", "x": "a", "l": ["a"], "y": ["a"]}]}
+	params := {"k": ["a"]}
+	every pair in [
+		[`x is in "a", "b"`, {"op": "in", "path": ["x"], "values": ["a", "b"]}],
+		[`x is in $params.k`, {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "k"]}}],
+		[`l contains "a"`, {"op": "includes", "path": ["l"], "value": "a"}],
+		[`l contains $params.k`, {"op": "includes", "path": ["l"], "value": {"ref": ["$$params", "k"]}}],
+		[`x is in y`, {"op": "compare", "left": ["x"], "cmp": "in", "right": ["y"]}],
+		[`l contains all of y`, {"op": "compare", "left": ["l"], "cmp": "includes_all", "right": ["y"]}],
+	] {
+		ergo._s_written_check(pair[0]).op == pair[1].op
+	}
+	_sentence_rows({"c": `x is in y`}, doc, params) == [["c", true, "satisfied", [{"name": "x", "value": "a"}, {"name": "y", "value": ["a"]}]]]
+}
+
+test_a_whose_of_a_count_with_a_field_after_a_list_phrase_decides_each_item_as_the_same_whose_with_params_does if {
+	every _, words in _list_phrases {
+		every right in [{}, {"v": null}, {"v": 3}, {"v": []}, {"v": ["a"]}, {"v": ["^a"]}, {"v": ["^a", "("]}] {
+			items := [{"s": "a", "l": ["a"]}, {"s": "b", "l": ["a"]}, {"s": null, "l": "a"}]
+			by_field := _tally_rows(concat("", ["count of xs whose s ", words, " k is at least 1"]), [{"id": 1, "xs": [object.union(i, object.filter(_list_item_right(right), ["k"])) | some i in items]}], {})
+			by_params := _tally_rows(concat("", ["count of xs whose s ", words, " $params.k is at least 1"]), [{"id": 1, "xs": items}], _list_params(right))
+			[r[1] | some r in by_field] == [r[1] | some r in by_params]
+		}
+	}
+}
+
+_list_item_right(right) := {"k": right.v} if "v" in object.keys(right)
+
+_list_item_right(right) := {} if not "v" in object.keys(right)

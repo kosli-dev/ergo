@@ -499,11 +499,54 @@ A sentence is a path, then a phrase, then what the phrase takes:
 | `labels contains all of "a", "b"`, `labels contains none of ...`                     | `includes`, `excludes` with `values`                                     |
 | `branch matches '^release/'`, `branch does not match ...`                            | `matches_any`, `not_matches_any`                                         |
 | `branch starts with "release/"`, `file ends with suffix`                             | `compare` with `starts_with`, `ends_with`                                |
+| `tested_by is in reviewers`, `files contains all of gap_files`                       | `compare` with `in`, `includes_all`, `matches_any`, ...                  |
 | `score is at least 3`, `is at most`, `is more than`, `is less than`                  | `compare` with `gte`, `lte`, `gt`, `lt`                                  |
 | `score is between 1 and 5`                                                           | `range`                                                                  |
 | `reviewed_at is before deployed_at`, `is after`, `is on or after`, `is on or before` | `compare_time` with `lt`, `gt`, `gte`, `lte`                             |
 
 `is empty` passes on `""` or `[]` and `is not empty` on a string or a list with something in it. Anything else that's there, like a number or an object, fails both as `unusable`. Their operators only exist for sentences. `starts with` and `ends with` compare two strings: anything else, two numbers included, fails as `unusable`, and a written value after them that isn't text, like `x starts with 1`, is written wrong.
+
+After `is in`, `is not in`, `contains`, `does not contain`, `contains all of`, `contains none of`, `matches` and `does not match`, the thing on the right can be a field too, read like the field after `is at least`: from the subject, from the name of a `for` line or from the item of a one-line `every` or `some` and a `whose`. With this policy and this input:
+
+```yaml
+subjects:
+  deployment:
+    from: deployments
+    id: id
+requirements:
+  prod_deploy:
+    subject: deployment
+    checks:
+      reviewed_by_peer: tested_by is in reviewers
+      tickets_covered: tickets contains all of required_tickets
+```
+
+```json
+{
+  "deployments": [
+    {"id": "d1", "tested_by": "ann", "reviewers": ["ann", "bob"], "tickets": ["OPS-1", "OPS-2"], "required_tickets": ["OPS-1"]},
+    {"id": "d2", "tested_by": "cy", "reviewers": ["ann", "bob"], "tickets": ["OPS-1"]}
+  ]
+}
+```
+
+`d1` passes both and `d2` fails both. Its `reviewed_by_peer` row fails as `value`, because `cy` isn't in the list, and its `tickets_covered` row fails as `absent`, because `required_tickets` is missing:
+
+```json
+{
+  "cause": "absent",
+  "check": "tickets_covered",
+  "inputs": [
+    {"name": "tickets", "value": ["OPS-1"]},
+    {"name": "required_tickets", "value": null}
+  ],
+  "passed": false,
+  "requirement": "prod_deploy",
+  "subject": {"id": "d2", "type": "deployment"}
+}
+```
+
+They run as `compare` with `in`, `not_in`, `includes`, `excludes`, `includes_all`, `excludes_all`, `matches_any` and `not_matches_any`, and only sentences can use those. The row has the same `passed` and `cause` as the sentence with `$params.required_tickets` holding that field's value, and the field is in the row's `inputs` after the left side instead of in `$refs`. A field on the right that's missing or `null` fails the row as `absent` or `null`, whatever the left side is. One that can't be used fails it as `unusable`: not a list after `is in`, `is not in`, `contains all of`, `contains none of`, `matches` and `does not match`, an empty list after `contains all of` and `contains none of`, and patterns that aren't all valid regular expressions. Only when the right side can be used does the left side's own cause count.
 
 The thing on the right is a value when it's in quotes, a number, `true`, `false` or `null`, and a field otherwise. A list of values is separated by `, `. A string can be in single quotes, which keep backslashes as written, so `'^\s*FROM'` needs no doubled backslash.
 
@@ -660,7 +703,7 @@ A sentence that can't be read is [written wrong](#basic-operators), and the `$we
 
 for `prod: environment is "prod`. `x is not null` is written wrong too, because it could only fail: write `x exists`. So is a value that isn't a number before `within`, like `x is "a" within 1`. An object with both `assert` and `op` is read as a check with an `op`, so a [custom operator](#custom-operators) can still take `assert`.
 
-ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `last of`, `is between` after a `count of`, a `sum of` or a `plus`, a `count of` in the `whose` of another, a `plus` in the phrase of an `every` or `some`, a value after `is before` and the other time phrases, a field of the subject after `is in`, `contains` and the other phrases that take a list, and a list after a phrase read from a path with `named by` in it, like `matches $params.a named by $params.b`. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `last_signed: last of commits.signed is true` gives:
+ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `last of`, `is between` after a `count of`, a `sum of` or a `plus`, a `count of` in the `whose` of another, a `plus` in the phrase of an `every` or `some`, a value after `is before` and the other time phrases, and a list after a phrase read from a path with `named by` in it, like `matches $params.a named by $params.b`. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `last_signed: last of commits.signed is true` gives:
 
 ```json
 {"name": "checks.last_signed", "value": ["last of isn't supported yet"]}
