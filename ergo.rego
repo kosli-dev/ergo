@@ -3754,6 +3754,7 @@ _well_formed(req) if {
 	_wrapped_in_where(_id_of(req)) == set()
 	_req_json_problems(req) == set()
 	_check_problem_inputs(req) == []
+	_policy_problems == []
 }
 
 _check_problem_inputs(req) := [{"name": name, "value": sort({p[1] | some p in problems; p[0] == name})} | some name in sort({p[0] | some p in problems})] if {
@@ -3783,7 +3784,7 @@ _well_formed_inputs(req) := array.concat(
 		[{"name": "count(checks)", "value": count(_checks_of(req))}],
 		array.concat(_echo(req, "require", _require_of(req)), _from_echo(req)),
 	),
-	array.concat(array.concat(_not_an_object_inputs(req), _field_problem_inputs(req)), _check_problem_inputs(req)),
+	array.concat(array.concat(array.concat(_not_an_object_inputs(req), _field_problem_inputs(req)), _check_problem_inputs(req)), _policy_problems),
 )
 
 _echo(req, f, v) := [{"name": _field_name(f), "value": v}] if not _has_problems(req, f)
@@ -4108,7 +4109,7 @@ report(doc, policy, params) := r if {
 	sentences := _s_sentences(raw, reqs)
 	unreadable := _unreadable_inputs(doc, params)
 	resolved := _resolved_subjects with data.ergo_subjects as subjects with data.ergo_subject_sentences as subject_sentences
-	written := _report_of(doc, reqs) with data.ergo_document as doc with data.ergo_params as params with data.ergo_subjects as subjects with data.ergo_resolved as resolved with data.ergo_unreadable as unreadable with data.ergo_sentences as sentences with data.ergo_subject_sentences as subject_sentences with input as {"ergo/names": {}}
+	written := object.union(_report_of(doc, reqs), {"description": _reported_description(policy), "meta": _reported_meta(policy)}) with data.ergo_policy_problems as _policy_problem_inputs(policy) with data.ergo_document as doc with data.ergo_params as params with data.ergo_subjects as subjects with data.ergo_resolved as resolved with data.ergo_unreadable as unreadable with data.ergo_sentences as sentences with data.ergo_subject_sentences as subject_sentences with input as {"ergo/names": {}}
 	used := _used_subjects(reqs, subjects, resolved)
 	r := _reported(written, unreadable, [raw, used])
 }
@@ -4122,6 +4123,23 @@ _used_subjects(reqs, subjects, resolved) := {name: subjects[name] |
 _section(policy, name) := object.get(policy, name, {}) if is_object(policy)
 
 _section(policy, _) := null if not is_object(policy)
+
+_policy_problem_inputs(policy) := [{"name": concat("", ["$policy.", f]), "value": sort(_policy_field_problems(f, policy[f]))} |
+	is_object(policy)
+	some f in ["description", "meta"]
+	f in object.keys(policy)
+	count(_policy_field_problems(f, policy[f])) > 0
+]
+
+_policy_field_problems(f, v) := {_wrong_type_problems[f]} if not _has_type(f, v)
+
+else := _meta_problems(v) if is_object(v)
+
+else := set()
+
+default _policy_problems := []
+
+_policy_problems := data.ergo_policy_problems
 
 _reported(written, unreadable, sections) := _plain_numbers(written) if {
 	count(unreadable) == 0

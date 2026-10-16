@@ -99,11 +99,13 @@ Let's ask for the report:
 opa eval -d policy -i deployments.json --format=pretty 'data.deploy.report'
 ```
 
-The report records every check ergo ran, including the ones that passed. It comes in three parts:
+The report records every check ergo ran, including the ones that passed. It comes in three parts, after the policy's own `description` and `meta`, which this one doesn't have:
 
 ```json
 {
   "compliant": false,
+  "description": "",
+  "meta": {},
   "requirements": { ... },
   "results": [ ... ]
 }

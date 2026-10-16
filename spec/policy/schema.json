@@ -23,6 +23,18 @@
       "additionalProperties": {
         "$ref": "#/$defs/requirement"
       }
+    },
+    "description": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "meta": {
+      "type": [
+        "object",
+        "null"
+      ]
     }
   },
   "required": [

@@ -2875,6 +2875,59 @@ test_a_requirement_that_is_not_an_object_reports_an_empty_description_and_meta i
 	rep.requirements.s.meta == {}
 }
 
+two_reqs_policy(extra) := object.union(lifted({"s": typed_req, "t": typed_req}), extra)
+
+test_a_policy_description_and_meta_are_copied_to_the_top_of_the_report if {
+	meta := {"control": "DEV-0401", "title": "Security testing and code review"}
+	rep := ergo.report({"items": [{"id": 1}]}, two_reqs_policy({"description": "Vulnerabilities are fixed in time", "meta": meta}), {})
+	[rep.description, rep.meta, rep.compliant] == ["Vulnerabilities are fixed in time", meta, true]
+	[r.passed | some r in rep.results; r.check == "$well_formed"] == [true, true]
+}
+
+test_a_policy_without_a_description_or_meta_reports_empty_ones_so_tools_can_read_them_without_checking if {
+	every extra in [{}, {"description": null, "meta": null}] {
+		rep := ergo.report({"items": [{"id": 1}]}, two_reqs_policy(extra), {})
+		[rep.description, rep.meta, rep.compliant] == ["", {}, true]
+	}
+	every policy in [5, [], null] {
+		rep := ergo.report({"items": [{"id": 1}]}, policy, {})
+		[rep.description, rep.meta] == ["", {}]
+	}
+}
+
+test_a_policy_description_or_meta_written_wrong_fails_every_requirement_since_it_belongs_to_none_of_them if {
+	rows := [[r.description, r.meta, r.compliant, [[w.requirement, w.passed, problem_inputs_of(w)] | some w in r.results; w.check == "$well_formed"]] |
+		some extra in [{"description": 5, "meta": "x"}, {"meta": {"a": {1: "x"}}}, {"meta": {"n": 1e400}}]
+		r := ergo.report({"items": [{"id": 1}]}, two_reqs_policy(extra), {})
+	]
+	rows == [
+		["", {}, false, [
+			["s", false, [{"name": "$policy.description", "value": ["not a string"]}, {"name": "$policy.meta", "value": ["not an object"]}]],
+			["t", false, [{"name": "$policy.description", "value": ["not a string"]}, {"name": "$policy.meta", "value": ["not an object"]}]],
+		]],
+		["", {}, false, [
+			["s", false, [{"name": "$policy.meta", "value": ["holds a key that isn't a string"]}]],
+			["t", false, [{"name": "$policy.meta", "value": ["holds a key that isn't a string"]}]],
+		]],
+		["", {}, false, [
+			["s", false, [{"name": "$policy.meta", "value": ["number out of range"]}]],
+			["t", false, [{"name": "$policy.meta", "value": ["number out of range"]}]],
+		]],
+	]
+}
+
+test_a_policy_description_and_meta_are_kept_when_it_is_rewritten_as_sentences if {
+	policy := two_reqs_policy({"description": "d", "meta": {"control": "DEV-0401"}})
+	converted := ergo.as_sentences(policy)
+	[converted.description, converted.meta] == ["d", {"control": "DEV-0401"}]
+}
+
+problem_inputs_of(row) := [i |
+	some i in row.inputs
+	not i.name in {"count(checks)", "require"}
+	not is_from(i.name)
+]
+
 badly_written_requirements := {
 	"require_most": [{"require": "most"}, [{"name": "require", "value": ["neither every nor some"]}]],
 	"require_number": [{"require": 5}, [{"name": "require", "value": ["neither every nor some"]}]],
@@ -3943,7 +3996,7 @@ test_requirement_entry_carries_exactly_the_documented_keys if {
 }
 
 test_report_carries_exactly_the_documented_keys if {
-	object.keys(solo({}, is_merged)) == {"compliant", "requirements", "results"}
+	object.keys(solo({}, is_merged)) == {"compliant", "description", "meta", "requirements", "results"}
 }
 
 test_report_is_deterministic if {
@@ -6063,7 +6116,7 @@ test_the_report_never_reads_data_params if {
 	[r.cause | some r in rows_for(unset, "s", "c")] == ["absent"]
 }
 
-empty_report := {"compliant": false, "requirements": {}, "results": []}
+empty_report := {"compliant": false, "description": "", "meta": {}, "requirements": {}, "results": []}
 
 test_a_policy_without_requirements_is_not_compliant if {
 	ergo.report({"items": [{"id": 1}]}, {}, {}) == empty_report

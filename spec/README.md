@@ -27,6 +27,7 @@ A topic's `cases.json` holds a list of groups. A group has a `description`, a `p
 - `refs` (optional): the `$refs` some checks must have, `[]` for none
 - `requirements` (optional): fields some requirement entries must have, like `{"s": {"subjects": {"matching": 1, "total": 2}}}`. Only the fields listed are compared, and under `checks`, only the listed fields of the listed checks.
 - `violations` (optional): the violations the report must give, all of them, in order
+- `report` (optional): fields the report must have at its top, like `{"description": "", "meta": {}}`
 
 Here is one case, from `cases/present`. Its group's policy has a `thing` subject read from `things`, and a requirement `s` that checks `{"op": "present", "path": ["x"]}`:
 

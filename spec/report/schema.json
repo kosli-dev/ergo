@@ -4,10 +4,12 @@
   "type": "object",
   "properties": {
     "compliant": {"type": "boolean", "description": "true when there's at least one requirement and none is not_met"},
+    "description": {"type": "string"},
+    "meta": {"type": "object"},
     "requirements": {"type": "object", "additionalProperties": {"$ref": "#/$defs/requirement"}},
     "results": {"type": "array", "items": {"$ref": "#/$defs/row"}}
   },
-  "required": ["compliant", "requirements", "results"],
+  "required": ["compliant", "description", "meta", "requirements", "results"],
   "additionalProperties": false,
   "$defs": {
     "cause": {"enum": ["satisfied", "substituted", "ill_formed", "not_an_object", "ambiguous", "unmatched", "unusable", "absent", "null", "value"]},

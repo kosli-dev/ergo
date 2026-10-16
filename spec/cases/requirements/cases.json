@@ -716,5 +716,240 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a policy with a description and meta",
+    "policy": {
+      "description": "Every item has an x",
+      "meta": {
+        "control": "DEV-0401"
+      },
+      "subjects": {
+        "subject": {
+          "from": [
+            "t"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "subject",
+          "checks": {
+            "c": {
+              "op": "present",
+              "path": [
+                "x"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "copies both to the top of the report",
+        "rules": [
+          "report.policy",
+          "policy.shape"
+        ],
+        "input": {
+          "t": [
+            {
+              "id": 1,
+              "x": 1
+            }
+          ]
+        },
+        "report": {
+          "description": "Every item has an x",
+          "meta": {
+            "control": "DEV-0401"
+          }
+        },
+        "compliant": true,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "subject",
+              "id": 1
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a policy whose description and meta are written wrong",
+    "policy": {
+      "description": 5,
+      "meta": "DEV-0401",
+      "subjects": {
+        "subject": {
+          "from": [
+            "t"
+          ],
+          "id": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "subject",
+          "checks": {
+            "c": {
+              "op": "present",
+              "path": [
+                "x"
+              ]
+            }
+          }
+        },
+        "t": {
+          "subject": "subject",
+          "checks": {
+            "c": {
+              "op": "present",
+              "path": [
+                "x"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails the $well_formed row of every requirement and reports neither",
+        "rules": [
+          "report.policy",
+          "written_wrong.row"
+        ],
+        "input": {
+          "t": [
+            {
+              "id": 1,
+              "x": 1
+            }
+          ]
+        },
+        "report": {
+          "description": "",
+          "meta": {}
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "subject",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "$policy.description",
+                "value": [
+                  "not a string"
+                ]
+              },
+              {
+                "name": "$policy.meta",
+                "value": [
+                  "not an object"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "t",
+            "subject": {
+              "type": "subject",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "$policy.description",
+                "value": [
+                  "not a string"
+                ]
+              },
+              {
+                "name": "$policy.meta",
+                "value": [
+                  "not an object"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "subject",
+              "id": 1
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "t",
+            "subject": {
+              "type": "subject",
+              "id": 1
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]
