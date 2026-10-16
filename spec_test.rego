@@ -143,6 +143,17 @@ test_a_case_with_the_wrong_compliant_is_listed_by_name if {
 	}]}
 }
 
+test_a_case_with_the_wrong_report_field_is_listed_by_name if {
+	failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
+		"description": "group",
+		"policy": {"subjects": {"subject": {"from": []}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+		"cases": [{"description": "case", "input": {"x": 1}, "report": {"description": "nope"}, "results": [{
+			"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c",
+			"passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}],
+		}]}],
+	}]}
+}
+
 _passes(group, c) if {
 	report := _report(group, c)
 	[r | some r in report.results; _compared(r.check, c)] == c.results
@@ -161,6 +172,9 @@ _passes(group, c) if {
 		}
 	}
 	_violations_match(c, report)
+	every field, value in object.get(c, "report", {}) {
+		report[field] == value
+	}
 	every name, checks in object.get(c, "refs", {}) {
 		every check, refs in checks {
 			object.get(report.requirements[name].checks[check], "$refs", []) == refs

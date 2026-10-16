@@ -16,7 +16,7 @@ This page describes everything ergo accepts and everything it returns. If you ha
 
 ## Policies
 
-A policy is an object with two sections. `subjects` says what the policy checks and where to find it in the input, and `requirements` says what must be true of it. Each section maps names to definitions. A policy is plain data, so it usually lives in a YAML file that OPA loads. A file in the policy directory with top-level `subjects` and `requirements` keys is read as `data.subjects` and `data.requirements`:
+A policy is an object with two sections, and it can [describe itself](#describing-a-policy) too. `subjects` says what the policy checks and where to find it in the input, and `requirements` says what must be true of it. Each section maps names to definitions. A policy is plain data, so it usually lives in a YAML file that OPA loads. A file in the policy directory with top-level `subjects` and `requirements` keys is read as `data.subjects` and `data.requirements`:
 
 ```yaml
 subjects:
@@ -54,6 +54,64 @@ Because each name is an object key, two requirements can't share a name, and eve
 A policy with no requirements is never compliant: it doesn't check anything, so it can't vouch for anything either. The same goes for a policy that isn't an object, or whose `requirements` isn't one. ergo leaves out any other section of the policy, so it changes nothing in the report.
 
 From your own policies, call only `ergo.report` and `ergo.violations`. Rules whose names start with `_`, like `ergo._row_cause`, are ergo's own and can change or disappear in any release. If you lint with [Regal](https://www.openpolicyagent.org/projects/regal), its `leaked-internal-reference` rule flags a call to one.
+
+### Describing a policy
+
+A policy can have a `description` and a `meta` of its own, next to its sections. They work like a [requirement's](#requirements): `description` says what the policy asks for, `meta` keeps anything else, like the id of the control the policy checks, and ergo copies both to the top of the report and never reads them. This is where a control with several requirements keeps its text:
+
+```yaml
+description: Production changes are reviewed and approved
+meta: {control: DEV-0401, title: Security testing and code review}
+subjects:
+  deployment:
+    from: deployments whose environment is "prod"
+    id: id
+requirements:
+  approved:
+    subject: deployment
+    checks:
+      approved: approved_by is a non-empty string
+  reviewed:
+    subject: deployment
+    checks:
+      reviewed: reviewer is a non-empty string
+```
+
+OPA reads them as `data.description` and `data.meta`, so pass them in with the sections:
+
+```rego
+default description := null
+
+description := data.description
+
+default meta := null
+
+meta := data.meta
+
+report := ergo.report(input, {"description": description, "meta": meta, "subjects": subjects, "requirements": requirements}, params)
+```
+
+With this input:
+
+```json
+{"deployments": [{"id": "d-1", "environment": "prod", "approved_by": "alice", "reviewer": "bob"}]}
+```
+
+the report starts with:
+
+```json
+{
+  "compliant": true,
+  "description": "Production changes are reviewed and approved",
+  "meta": {
+    "control": "DEV-0401",
+    "title": "Security testing and code review"
+  },
+  ...
+}
+```
+
+`null` counts as not written, so the defaults above give `""` and `{}`. A `description` that isn't a string, or a `meta` that isn't an object or holds something JSON can't, belongs to every requirement, so every requirement's `$well_formed` row fails and lists it last, like `{"name": "policy meta", "value": ["not an object"]}`. The report then shows `""` or `{}` in its place.
 
 ### Params
 
@@ -677,12 +735,16 @@ Three rules:
 ```json
 {
   "compliant": false,
+  "description": "",
+  "meta": {},
   "requirements": { ... },
   "results": [ ... ]
 }
 ```
 
 `compliant` is `true` when there's at least one requirement and none of them is `not_met`.
+
+`description` and `meta` are the [policy's](#describing-a-policy), or `""` and `{}` when it has none.
 
 `requirements` has an entry for each requirement:
 

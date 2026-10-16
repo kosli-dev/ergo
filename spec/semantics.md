@@ -355,7 +355,7 @@ A custom operator is for a check the built-in operators can't express. The polic
 
 ## Requirements
 
-A policy has two sections. `subjects` defines each kind of subject once, and `requirements` says what must be true of them. A subject definition has a way to find its subjects (`from`), a path to each subject's id (`id`) and filters (`applies_to`). A requirement names one subject definition with `subject`, and has `require`, `min_subjects` and checks. It can also have a `description` and `meta`, which ergo copies into the report and never reads.
+A policy has two sections. `subjects` defines each kind of subject once, and `requirements` says what must be true of them. A subject definition has a way to find its subjects (`from`), a path to each subject's id (`id`) and filters (`applies_to`). A requirement names one subject definition with `subject`, and has `require`, `min_subjects` and checks. It can also have a `description` and `meta`, which ergo copies into the report and never reads, and so can the policy.
 
 **[requirement.subject]** A requirement checks the subjects of the definition it names, with its own rows. Several requirements can name the same definition. A requirement that names none, or one that isn't in `subjects`, has no subjects, and its `$well_formed` and `$min_subjects` rows fail. The name of the definition is the `type` in each row's `subject`.
 
@@ -398,6 +398,8 @@ A policy has two sections. `subjects` defines each kind of subject once, and `re
 **[compliant]** The report is `compliant` when it has at least one requirement and none is `not_met`. A policy with no requirements is never compliant, because it doesn't check anything.
 
 **[report.requirements]** The report has an entry for each requirement, with its `description` and `meta`, or `""` and `{}` when it has none, its `require`, its `status`, `subjects` with `total`, the number found by `from`, and `matching`, the number in scope, `checks`, each check as written with its `description`, `meta` and `expression`, plus the checks ergo adds, and `causes`. All the filters share one `$applies` entry.
+
+**[report.policy]** The report has the policy's `description` and `meta` at its top, next to `compliant`, or `""` and `{}` when the policy has none. `null` counts as none. A `description` that isn't a string, or a `meta` that isn't an object or holds something JSON can't, makes the `$well_formed` row of every requirement fail, because the policy belongs to all of them, and the report shows `""` or `{}` in its place.
 
 **[report.causes]** `causes` lists the causes of the rows that would be [violations](#violations) of the requirement, each with `rows`, the number of rows that have it. It counts rows, not subjects, and lists the causes in the order of [causes](#causes), worst first. A requirement that's `met` or `not_applicable` has an empty list.
 
