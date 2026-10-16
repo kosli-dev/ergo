@@ -325,7 +325,8 @@ const buildStage = (kind) => {
       lab.append(make("span", "", label), textField(key, placeholder, "tut__smallfield"));
       return lab;
     };
-    el.stage.append(mk("Where are the batches?", "from", "a key"), mk("What names each one?", "id", "a field"));
+    const { questions } = goalNow();
+    el.stage.append(mk(questions.from, "from", "a key"), mk(questions.id, "id", "a field"));
   } else if (kind === "policy") {
     const sw = make("div", "tut__switch");
     sw.setAttribute("role", "group");

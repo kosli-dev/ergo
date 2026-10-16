@@ -106,7 +106,7 @@ export const steps = [
     editable: false,
     goal: {
       kind: "sentence",
-      ask: "This batch's allergens are listed. Write a check that passes when they contain milk.",
+      ask: "This is a milk loaf, so its allergen list must warn about milk. Write a check that passes when the allergens contain milk.",
       field: "allergens",
       phrase: "contains",
       word: "milk",
@@ -265,7 +265,7 @@ export const steps = [
     carryRoot: 4,
     goal: {
       kind: "sentence",
-      ask: "It must also bake for 25 to 40 minutes. Add that to the same check, joined with `and`.",
+      ask: "This batch baked for 45 minutes, and it must bake for 25 to 40. Your check still passes it. Add the minutes, joined with `and`.",
       sample: bakeInput(180, 32),
       field: "bake.temp_c",
       phrase: "is between",
@@ -372,7 +372,7 @@ export const steps = [
       field: "some tasters.verdict",
       phrase: "is",
       word: "approved",
-      start: "Same idea, but one is enough. Start with `some`, then `tasters.verdict`.",
+      start: "Same idea, but one is enough: `some` means at least one. Start with `some`, then `tasters.verdict`.",
       fieldFirst: "Start with `some`: one taster is enough. Then `tasters.verdict`.",
       phraseSay: 'Now what it should be: `is "approved"`',
       next: 'Now the value, in double quotes: `"approved"`',
@@ -410,7 +410,7 @@ export const steps = [
           say: () => "That fails when everyone approves. It should pass.",
         },
       ],
-      done: "One approval is enough. ergo looked at each taster and found Ana's.",
+      done: "`some` means at least one, so one approval is enough. ergo looked at each taster and found Ana's.",
     },
   },
   {
@@ -419,7 +419,7 @@ export const steps = [
     flat: true,
     goal: {
       kind: "names",
-      ask: "You've written three checks. Give the first one a name, like the other two have.",
+      ask: "In the report, each check is a row, and its name tells people which row failed. The other two have names. Name the first one.",
       done: "Every check has a name now. The report uses it on each row.",
     },
   },
@@ -439,7 +439,8 @@ export const steps = [
     collapse: true,
     goal: {
       kind: "subjects",
-      ask: "A whole day of batches. Where are they, and what names each one?",
+      ask: "A whole day of batches in one input. Tell ergo where the list is and what tells the batches apart.",
+      questions: { from: "Which key holds the list of batches?", id: "Which field tells the batches apart?" },
       done: "Four batches, one report. Tap a × to see why it failed.",
     },
   },
