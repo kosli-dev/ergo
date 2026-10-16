@@ -694,7 +694,7 @@ test("step 7 goal B is met by the answer and not by wrong sentences", () => {
 });
 
 test("step 7 goal B coaching, state by state", () => {
-  assert.deepEqual(sayN(7, 0, ""), { kind: "empty", text: "Same idea, but one is enough. Start with `some`, then `tasters.verdict`." });
+  assert.deepEqual(sayN(7, 0, ""), { kind: "empty", text: "Same idea, but one is enough: `some` means at least one. Start with `some`, then `tasters.verdict`." });
   assert.equal(sayN(7, 0, "some").text, "Now the path through the list: `tasters.verdict`.");
   assert.equal(sayN(7, 0, "some tasters").text, "The list is `tasters`. The verdict is inside each taster: `tasters.verdict`.");
   assert.equal(sayN(7, 0, "some tasters.verdict").text, 'Now what it should be: `is "approved"`');
@@ -1366,4 +1366,30 @@ test("steps 9 and 10 show their batch on one flat line, with the same keys the c
     }
   }
   assert.equal(isPretty(JSON.parse(steps[8].input)), true);
+});
+
+test("step 1 says why the check should pass when milk is there", () => {
+  assert.equal(steps[0].goal.ask, "This is a milk loaf, so its allergen list must warn about milk. Write a check that passes when the allergens contain milk.");
+});
+
+test("step 6 says the carried temperature check still passes and the minutes are missing", () => {
+  const carried = steps[4].goal.answer.sentence;
+  const r = grade(steps[5].goal, check, carried, steps[5].input);
+  assert.equal(r.shown.passed, true);
+  assert.equal(r.met, false);
+  assert.equal(JSON.parse(steps[5].input).bake.minutes, 45);
+  assert.equal(steps[5].goal.ask, "This batch baked for 45 minutes, and it must bake for 25 to 40. Your check still passes it. Add the minutes, joined with `and`.");
+});
+
+test("step 8 says some means at least one", () => {
+  assert.match(steps[7].goal.start, /`some` means at least one/);
+  assert.match(steps[7].goal.done, /^`some` means at least one/);
+});
+
+test("step 9 says what a check's name is for before asking for one", () => {
+  assert.equal(steps[8].goal.ask, "In the report, each check is a row, and its name tells people which row failed. The other two have names. Name the first one.");
+});
+
+test("step 11 asks which key holds the batches and which field tells them apart", () => {
+  assert.deepEqual(steps[10].goal.questions, { from: "Which key holds the list of batches?", id: "Which field tells the batches apart?" });
 });
