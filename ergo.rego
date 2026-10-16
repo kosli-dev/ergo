@@ -6545,7 +6545,7 @@ _s_check_for(lines, ftext, wording, problems) := object.union(wording, {
 		"assertions" in object.keys(p)
 	}
 	assertions := [a | some p in parsed; some a in p.assertions]
-	count(_s_for_unsupported(fl, assertions, names)) == 0
+	count(_s_for_unsupported(fl, assertions)) == 0
 	texts := [_s_assertion_text(a) | some a in assertions]
 } else := object.union(wording, {"expression": _s_for_written_text(lines, ftext), "$sentence": sort(_s_or_unrunnable(problems | _s_for_problems(lines, ftext)))})
 
@@ -6559,12 +6559,12 @@ _s_for_problems(lines, ftext) := _s_lines_problems(lines) if not is_string(ftext
 
 _s_for_line_unsupported(lines, ftext) := _s_lines_problems(lines) if not "items" in object.keys(_for_line(ftext))
 
-_s_for_line_unsupported(lines, ftext) := _s_for_unsupported(fl, [], {item.as | some item in fl.items}) | {p | some p in _s_lines_problems(lines); _s_kept_problem(p, {item.as | some item in fl.items})} if {
+_s_for_line_unsupported(lines, ftext) := _s_for_unsupported(fl, []) | _s_lines_problems(lines) if {
 	fl := _for_line(ftext)
 	"items" in object.keys(fl)
 }
 
-_s_for_unsupported(fl, assertions, names) := ({u | some i, item in fl.items; some u in _s_item_unsupported(item); _s_kept_problem(u, {earlier.as | some earlier in array.slice(fl.items, 0, i)})} | {u | some a in assertions; some u in _s_assertion_unsupported(a); _s_kept_problem(u, names)}) | {u | some i, item in fl.items; some u in _s_names_not_given(item, {later.as | some later in array.slice(fl.items, i, count(fl.items))})}
+_s_for_unsupported(fl, assertions) := ({u | some item in fl.items; some u in _s_item_unsupported(item)} | {u | some a in assertions; some u in _s_assertion_unsupported(a)}) | {u | some i, item in fl.items; some u in _s_names_not_given(item, {later.as | some later in array.slice(fl.items, i, count(fl.items))})}
 
 _s_names_not_given(x, later) := {concat("", ["unknown name ", ref.steps[0]]) |
 	some node in _s_nodes(x)
@@ -6575,14 +6575,6 @@ _s_names_not_given(x, later) := {concat("", ["unknown name ", ref.steps[0]]) |
 }
 
 _s_item_unsupported(item) := (_s_paths_unsupported(item) | {u | some c in object.get(item, "where", []); some u in _s_cond_unsupported(c)}) | _s_walk_too_long(item)
-
-_s_kept_problem(u, names) if not _s_names_a_for_name(u, names)
-
-_s_names_a_for_name(u, names) if {
-	parts := split(u, "unknown name ")
-	count(parts) == 2
-	parts[1] in names
-}
 
 _s_for_item_model(item, names) := {
 	"q": q,
@@ -6621,9 +6613,7 @@ _s_named_tally(side, _) := side if {
 
 _s_named_cond(c, names) := object.union(c, {f: _s_named_path(c[f], names) | some f in ["path", "left", "right"]; is_array(object.get(c, f, null))})
 
-_s_named_path(p, names) := [_s_named_step(i, step, names) | some i, step in p] if is_array(p)
-
-else := p
+_s_named_path(p, names) := [_s_named_step(i, step, names) | some i, step in p]
 
 _s_named_step(i, step, names) := concat("", ["$", step]) if {
 	i == 0

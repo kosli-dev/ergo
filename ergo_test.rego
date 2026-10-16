@@ -9541,6 +9541,13 @@ test_named_by_a_field_on_a_for_line_reads_the_subject_and_a_for_name_hides_a_fie
 	_for_rows({"for": "every xs whose v named by k is 1 as x", "assert": "x exists"}, [{"id": 1, "xs": [{"k": "a", "v": {"a": 1}}]}], {})[0][1] == "satisfied"
 }
 
+test_a_field_after_named_by_is_part_of_its_path_so_another_sides_cause_can_come_first_as_with_a_for_name_and_unlike_a_param if {
+	doc := {"things": [{"id": 1, "s": null, "m": {}}]}
+	_sentence_rows({"c": "xs equals m named by s"}, doc, {})[0][2] == "absent"
+	_for_rows({"for": "every ks as s", "assert": "xs equals m named by s"}, [{"id": 1, "ks": [null], "m": {}}], {})[0][1] == "absent"
+	_sentence_rows({"c": "xs equals m named by $params.s"}, {"things": [{"id": 1, "m": {}}]}, {"s": null})[0][2] == "null"
+}
+
 test_a_named_by_field_step_is_only_for_sentences if {
 	_sentence_problems({"op": "present", "path": ["shas", {"named_by_field": "x"}]}) == ["step that can't be a key in path"]
 }
