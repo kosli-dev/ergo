@@ -4365,5 +4365,230 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a field after a phrase that takes a list",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"in": "x is in y", "not_in": "x is not in y", "has": "l contains w", "lacks": "l does not contain w", "all": "l contains all of y", "none": "l contains none of y", "match": "x matches p", "no_match": "x does not match p"}}}},
+    "cases": [
+      {
+        "description": "passes or fails as the same phrase with the list written, and lists both fields in inputs",
+        "rules": ["sentence.phrase.field", "compare.list", "compare.inputs", "sentence.phrase.one_of", "sentence.phrase.contains", "sentence.phrase.contains_all", "sentence.phrase.matches"],
+        "input": {"things": [{"id": "t1", "x": "a", "y": ["a", "b"], "l": ["a", "b"], "w": "a", "p": ["^a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "all", "passed": true, "cause": "satisfied", "inputs": [{"name": "l", "value": ["a", "b"]}, {"name": "y", "value": ["a", "b"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "has", "passed": true, "cause": "satisfied", "inputs": [{"name": "l", "value": ["a", "b"]}, {"name": "w", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "in", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}, {"name": "y", "value": ["a", "b"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "lacks", "passed": false, "cause": "value", "inputs": [{"name": "l", "value": ["a", "b"]}, {"name": "w", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "match", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}, {"name": "p", "value": ["^a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "no_match", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a"}, {"name": "p", "value": ["^a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "none", "passed": false, "cause": "value", "inputs": [{"name": "l", "value": ["a", "b"]}, {"name": "y", "value": ["a", "b"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "not_in", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a"}, {"name": "y", "value": ["a", "b"]}]}
+        ],
+        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "all": "l contains all of y", "has": "l contains w", "in": "x is in y", "lacks": "l does not contain w", "match": "x matches p", "no_match": "x does not match p", "none": "l contains none of y", "not_in": "x is not in y"}},
+        "refs": {"s": {"$min_subjects": [], "$unique_ids": [], "$well_formed": [], "all": [], "has": [], "in": [], "lacks": [], "match": [], "no_match": [], "none": [], "not_in": []}}
+      },
+      {
+        "description": "fails as value when the field holds no match",
+        "rules": ["sentence.phrase.field", "compare.list", "sentence.phrase.one_of", "sentence.phrase.contains", "sentence.phrase.contains_all", "sentence.phrase.matches"],
+        "input": {"things": [{"id": "t1", "x": "c", "y": ["a", "b"], "l": ["a", "b"], "w": "c", "p": ["^a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "all", "passed": true, "cause": "satisfied", "inputs": [{"name": "l", "value": ["a", "b"]}, {"name": "y", "value": ["a", "b"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "has", "passed": false, "cause": "value", "inputs": [{"name": "l", "value": ["a", "b"]}, {"name": "w", "value": "c"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "in", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "c"}, {"name": "y", "value": ["a", "b"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "lacks", "passed": true, "cause": "satisfied", "inputs": [{"name": "l", "value": ["a", "b"]}, {"name": "w", "value": "c"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "match", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "c"}, {"name": "p", "value": ["^a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "no_match", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "c"}, {"name": "p", "value": ["^a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "none", "passed": false, "cause": "value", "inputs": [{"name": "l", "value": ["a", "b"]}, {"name": "y", "value": ["a", "b"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "not_in", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "c"}, {"name": "y", "value": ["a", "b"]}]}
+        ],
+        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "all": "l contains all of y", "has": "l contains w", "in": "x is in y", "lacks": "l does not contain w", "match": "x matches p", "no_match": "x does not match p", "none": "l contains none of y", "not_in": "x is not in y"}}
+      },
+      {
+        "description": "fails as absent on the right when the field is missing, whatever the left side is",
+        "rules": ["sentence.phrase.field", "compare.list", "sentence.phrase.one_of", "sentence.phrase.contains", "sentence.phrase.contains_all", "sentence.phrase.matches"],
+        "input": {"things": [{"id": "t1", "x": "a", "l": ["a"]}, {"id": "t2", "x": 3, "l": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "all", "passed": false, "cause": "absent", "inputs": [{"name": "l", "value": ["a"]}, {"name": "y", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "has", "passed": false, "cause": "absent", "inputs": [{"name": "l", "value": ["a"]}, {"name": "w", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "in", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": "a"}, {"name": "y", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "lacks", "passed": false, "cause": "absent", "inputs": [{"name": "l", "value": ["a"]}, {"name": "w", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "match", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": "a"}, {"name": "p", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "no_match", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": "a"}, {"name": "p", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "none", "passed": false, "cause": "absent", "inputs": [{"name": "l", "value": ["a"]}, {"name": "y", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "not_in", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": "a"}, {"name": "y", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "all", "passed": false, "cause": "absent", "inputs": [{"name": "l", "value": "a"}, {"name": "y", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "has", "passed": false, "cause": "absent", "inputs": [{"name": "l", "value": "a"}, {"name": "w", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "in", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": 3}, {"name": "y", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "lacks", "passed": false, "cause": "absent", "inputs": [{"name": "l", "value": "a"}, {"name": "w", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "match", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": 3}, {"name": "p", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "no_match", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": 3}, {"name": "p", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "none", "passed": false, "cause": "absent", "inputs": [{"name": "l", "value": "a"}, {"name": "y", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "not_in", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": 3}, {"name": "y", "value": null}]}
+        ],
+        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "all": "l contains all of y", "has": "l contains w", "in": "x is in y", "lacks": "l does not contain w", "match": "x matches p", "no_match": "x does not match p", "none": "l contains none of y", "not_in": "x is not in y"}}
+      },
+      {
+        "description": "fails as null on the right when the field is null, whatever the left side is",
+        "rules": ["sentence.phrase.field", "compare.list", "sentence.phrase.one_of", "sentence.phrase.contains", "sentence.phrase.contains_all", "sentence.phrase.matches"],
+        "input": {"things": [{"id": "t1", "x": "a", "y": null, "l": ["a"], "w": null, "p": null}, {"id": "t2", "y": null, "l": "a", "w": null, "p": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "all", "passed": false, "cause": "null", "inputs": [{"name": "l", "value": ["a"]}, {"name": "y", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "has", "passed": false, "cause": "null", "inputs": [{"name": "l", "value": ["a"]}, {"name": "w", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "in", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": "a"}, {"name": "y", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "lacks", "passed": false, "cause": "null", "inputs": [{"name": "l", "value": ["a"]}, {"name": "w", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "match", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": "a"}, {"name": "p", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "no_match", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": "a"}, {"name": "p", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "none", "passed": false, "cause": "null", "inputs": [{"name": "l", "value": ["a"]}, {"name": "y", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "not_in", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": "a"}, {"name": "y", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "all", "passed": false, "cause": "null", "inputs": [{"name": "l", "value": "a"}, {"name": "y", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "has", "passed": false, "cause": "null", "inputs": [{"name": "l", "value": "a"}, {"name": "w", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "in", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}, {"name": "y", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "lacks", "passed": false, "cause": "null", "inputs": [{"name": "l", "value": "a"}, {"name": "w", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "match", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}, {"name": "p", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "no_match", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}, {"name": "p", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "none", "passed": false, "cause": "null", "inputs": [{"name": "l", "value": "a"}, {"name": "y", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "not_in", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}, {"name": "y", "value": null}]}
+        ],
+        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "all": "l contains all of y", "has": "l contains w", "in": "x is in y", "lacks": "l does not contain w", "match": "x matches p", "no_match": "x does not match p", "none": "l contains none of y", "not_in": "x is not in y"}}
+      },
+      {
+        "description": "fails as unusable on the right when it isn't a list, whatever the left side is, but any value is a value to look for after contains",
+        "rules": ["sentence.phrase.field", "compare.list", "sentence.phrase.one_of", "sentence.phrase.contains", "sentence.phrase.contains_all", "sentence.phrase.matches"],
+        "input": {"things": [{"id": "t1", "x": "a", "y": 3, "l": ["a"], "w": 3, "p": 3}, {"id": "t2", "y": "a", "l": "a", "w": ["a"], "p": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "all", "passed": false, "cause": "unusable", "inputs": [{"name": "l", "value": ["a"]}, {"name": "y", "value": 3}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "has", "passed": false, "cause": "value", "inputs": [{"name": "l", "value": ["a"]}, {"name": "w", "value": 3}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "in", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a"}, {"name": "y", "value": 3}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "lacks", "passed": true, "cause": "satisfied", "inputs": [{"name": "l", "value": ["a"]}, {"name": "w", "value": 3}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "match", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a"}, {"name": "p", "value": 3}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "no_match", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a"}, {"name": "p", "value": 3}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "none", "passed": false, "cause": "unusable", "inputs": [{"name": "l", "value": ["a"]}, {"name": "y", "value": 3}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "not_in", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a"}, {"name": "y", "value": 3}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "all", "passed": false, "cause": "unusable", "inputs": [{"name": "l", "value": "a"}, {"name": "y", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "has", "passed": false, "cause": "unusable", "inputs": [{"name": "l", "value": "a"}, {"name": "w", "value": ["a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "in", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": null}, {"name": "y", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "lacks", "passed": false, "cause": "unusable", "inputs": [{"name": "l", "value": "a"}, {"name": "w", "value": ["a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "match", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": null}, {"name": "p", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "no_match", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": null}, {"name": "p", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "none", "passed": false, "cause": "unusable", "inputs": [{"name": "l", "value": "a"}, {"name": "y", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "not_in", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": null}, {"name": "y", "value": "a"}]}
+        ],
+        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "all": "l contains all of y", "has": "l contains w", "in": "x is in y", "lacks": "l does not contain w", "match": "x matches p", "no_match": "x does not match p", "none": "l contains none of y", "not_in": "x is not in y"}}
+      },
+      {
+        "description": "fails as unusable on the right when it's an empty list after contains all of or none of, or holds a pattern that isn't valid",
+        "rules": ["sentence.phrase.field", "compare.list", "sentence.phrase.one_of", "sentence.phrase.contains_all", "sentence.phrase.matches"],
+        "input": {"things": [{"id": "t1", "x": "a", "y": [], "l": ["a"], "p": ["^a", "("]}, {"id": "t2", "x": "a", "y": [], "l": ["a"], "p": ["^a", 1]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "all", "passed": false, "cause": "unusable", "inputs": [{"name": "l", "value": ["a"]}, {"name": "y", "value": []}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "has", "passed": false, "cause": "absent", "inputs": [{"name": "l", "value": ["a"]}, {"name": "w", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "in", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a"}, {"name": "y", "value": []}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "lacks", "passed": false, "cause": "absent", "inputs": [{"name": "l", "value": ["a"]}, {"name": "w", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "match", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a"}, {"name": "p", "value": ["^a", "("]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "no_match", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a"}, {"name": "p", "value": ["^a", "("]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "none", "passed": false, "cause": "unusable", "inputs": [{"name": "l", "value": ["a"]}, {"name": "y", "value": []}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "not_in", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}, {"name": "y", "value": []}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "all", "passed": false, "cause": "unusable", "inputs": [{"name": "l", "value": ["a"]}, {"name": "y", "value": []}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "has", "passed": false, "cause": "absent", "inputs": [{"name": "l", "value": ["a"]}, {"name": "w", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "in", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a"}, {"name": "y", "value": []}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "lacks", "passed": false, "cause": "absent", "inputs": [{"name": "l", "value": ["a"]}, {"name": "w", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "match", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a"}, {"name": "p", "value": ["^a", 1]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "no_match", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a"}, {"name": "p", "value": ["^a", 1]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "none", "passed": false, "cause": "unusable", "inputs": [{"name": "l", "value": ["a"]}, {"name": "y", "value": []}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "not_in", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}, {"name": "y", "value": []}]}
+        ],
+        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "all": "l contains all of y", "has": "l contains w", "in": "x is in y", "lacks": "l does not contain w", "match": "x matches p", "no_match": "x does not match p", "none": "l contains none of y", "not_in": "x is not in y"}}
+      },
+      {
+        "description": "looks at the left side only when the right side can be used",
+        "rules": ["sentence.phrase.field", "compare.list", "sentence.phrase.one_of", "sentence.phrase.contains", "sentence.phrase.contains_all", "sentence.phrase.matches"],
+        "input": {"things": [{"id": "t1", "y": ["a"], "l": null, "w": "a", "p": ["^a"]}, {"id": "t2", "x": 3, "y": ["a"], "l": "a", "w": "a", "p": ["^a"]}, {"id": "t3", "y": ["a"], "l": ["a"], "w": "a", "p": ["^a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "all", "passed": false, "cause": "null", "inputs": [{"name": "l", "value": null}, {"name": "y", "value": ["a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "has", "passed": false, "cause": "null", "inputs": [{"name": "l", "value": null}, {"name": "w", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "in", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}, {"name": "y", "value": ["a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "lacks", "passed": false, "cause": "null", "inputs": [{"name": "l", "value": null}, {"name": "w", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "match", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}, {"name": "p", "value": ["^a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "no_match", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}, {"name": "p", "value": ["^a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "none", "passed": false, "cause": "null", "inputs": [{"name": "l", "value": null}, {"name": "y", "value": ["a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "not_in", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}, {"name": "y", "value": ["a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "all", "passed": false, "cause": "unusable", "inputs": [{"name": "l", "value": "a"}, {"name": "y", "value": ["a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "has", "passed": false, "cause": "unusable", "inputs": [{"name": "l", "value": "a"}, {"name": "w", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "in", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 3}, {"name": "y", "value": ["a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "lacks", "passed": false, "cause": "unusable", "inputs": [{"name": "l", "value": "a"}, {"name": "w", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "match", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 3}, {"name": "p", "value": ["^a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "no_match", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 3}, {"name": "p", "value": ["^a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "none", "passed": false, "cause": "unusable", "inputs": [{"name": "l", "value": "a"}, {"name": "y", "value": ["a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "not_in", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 3}, {"name": "y", "value": ["a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t3"}, "check": "all", "passed": true, "cause": "satisfied", "inputs": [{"name": "l", "value": ["a"]}, {"name": "y", "value": ["a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t3"}, "check": "has", "passed": true, "cause": "satisfied", "inputs": [{"name": "l", "value": ["a"]}, {"name": "w", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t3"}, "check": "in", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}, {"name": "y", "value": ["a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t3"}, "check": "lacks", "passed": false, "cause": "value", "inputs": [{"name": "l", "value": ["a"]}, {"name": "w", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t3"}, "check": "match", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}, {"name": "p", "value": ["^a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t3"}, "check": "no_match", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}, {"name": "p", "value": ["^a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t3"}, "check": "none", "passed": false, "cause": "value", "inputs": [{"name": "l", "value": ["a"]}, {"name": "y", "value": ["a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t3"}, "check": "not_in", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}, {"name": "y", "value": ["a"]}]}
+        ],
+        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "all": "l contains all of y", "has": "l contains w", "in": "x is in y", "lacks": "l does not contain w", "match": "x matches p", "no_match": "x does not match p", "none": "l contains none of y", "not_in": "x is not in y"}}
+      }
+    ]
+  },
+  {
+    "description": "a field after a phrase that takes a list, read through a path that can't hold it",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"in": "x is in y.z", "has": "l contains y.z"}}}},
+    "cases": [
+      {
+        "description": "fails as unusable on the right when the path reads into something that can't hold the field",
+        "rules": ["sentence.phrase.field", "compare.list", "sentence.phrase.one_of", "sentence.phrase.contains", "path.unusable"],
+        "input": {"things": [{"id": "t1", "x": "a", "y": "s", "l": ["a"]}, {"id": "t2", "x": "a", "y": {"z": ["a"]}, "l": ["a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "has", "passed": false, "cause": "unusable", "inputs": [{"name": "l", "value": ["a"]}, {"name": "y.z", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "in", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a"}, {"name": "y.z", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "has", "passed": false, "cause": "value", "inputs": [{"name": "l", "value": ["a"]}, {"name": "y.z", "value": ["a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "in", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}, {"name": "y.z", "value": ["a"]}]}
+        ],
+        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "has": "l contains y.z", "in": "x is in y.z"}}
+      }
+    ]
+  },
+  {
+    "description": "an empty list after is in and is not in",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"in": "x is in y", "not_in": "x is not in y"}}}},
+    "cases": [
+      {
+        "description": "treats an empty list as one that holds nothing after is in and is not in",
+        "rules": ["sentence.phrase.field", "compare.list", "sentence.phrase.one_of"],
+        "input": {"things": [{"id": "t1", "x": "a", "y": []}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "in", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a"}, {"name": "y", "value": []}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "not_in", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}, {"name": "y", "value": []}]}
+        ],
+        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "in": "x is in y", "not_in": "x is not in y"}}
+      }
+    ]
+  },
+  {
+    "description": "a field after a phrase that takes a list, in a for line, a one-line every or some, and the input",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"for": {"for": "every approvers as ap", "assert": "ap.username is not one of excluded"}, "every": "every commits.sha whose author is \"x\" is in ok", "some": "some commits.sha whose author is \"x\" is in ok", "files": "files contains all of gap_files", "dev": "$input.dev does not contain tested_by"}}}},
+    "cases": [
+      {
+        "description": "reads the field from the subject, from the item or from the input, and lists what it read",
+        "rules": ["sentence.phrase.field", "compare.list", "sentence.argument.item", "sentence.phrase.contains_all", "sentence.phrase.contains"],
+        "input": {"dev": ["ann"], "things": [{"id": "t1", "excluded": ["q"], "approvers": [{"username": "x"}, {"username": "y"}], "commits": [{"sha": "s1", "author": "x", "ok": ["s1"]}, {"sha": "s2", "author": "z", "ok": []}], "files": ["a", "b"], "gap_files": ["a"], "tested_by": "cy"}, {"id": "t2", "excluded": ["x"], "approvers": [{"username": "x"}, {"username": "y"}], "commits": [{"sha": "s1", "author": "x", "ok": ["s9"]}], "files": ["a"], "gap_files": ["a", "b"], "tested_by": "ann"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "dev", "passed": true, "cause": "satisfied", "inputs": [{"name": "$input.dev", "value": ["ann"]}, {"name": "tested_by", "value": "cy"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "every", "passed": true, "cause": "satisfied", "inputs": [{"name": "commits[].sha", "value": ["s1", "s2"]}], "failed_items": []},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "files", "passed": true, "cause": "satisfied", "inputs": [{"name": "files", "value": ["a", "b"]}, {"name": "gap_files", "value": ["a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "for", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[]", "value": [{"username": "x"}, {"username": "y"}]}, {"name": "excluded", "value": ["q"]}], "failed_items": []},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "some", "passed": true, "cause": "satisfied", "inputs": [{"name": "commits[].sha", "value": ["s1", "s2"]}], "failed_items": []},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "dev", "passed": false, "cause": "value", "inputs": [{"name": "$input.dev", "value": ["ann"]}, {"name": "tested_by", "value": "ann"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "every", "passed": false, "cause": "value", "inputs": [{"name": "commits[].sha", "value": ["s1"]}], "failed_items": [{"cause": "value", "item": "item 1 of commits", "path": "commits[0].sha", "value": "s1"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "files", "passed": false, "cause": "value", "inputs": [{"name": "files", "value": ["a"]}, {"name": "gap_files", "value": ["a", "b"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "for", "passed": false, "cause": "value", "inputs": [{"name": "approvers[]", "value": [{"username": "x"}, {"username": "y"}]}, {"name": "excluded", "value": ["x"]}], "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "ap.username is not in excluded", "cause": "value"}], "item": "item 1 of approvers", "path": "item 1 of approvers", "value": null}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "some", "passed": false, "cause": "value", "inputs": [{"name": "commits[].sha", "value": ["s1"]}], "failed_items": [{"cause": "value", "item": "item 1 of commits", "path": "commits[0].sha", "value": "s1"}]}
+        ],
+        "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "dev": "$input.dev does not contain tested_by", "every": "every commits.sha whose author is \"x\" is in ok", "files": "files contains all of gap_files", "for": "for every approvers as ap: ap.username is not in excluded", "some": "some commits.sha whose author is \"x\" is in ok"}}
+      }
+    ]
   }
 ]

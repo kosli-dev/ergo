@@ -1815,8 +1815,15 @@ _leaf_op_passed("compare", check, subj) if {
 
 _compared(check, l, r) if {
 	not "within" in object.keys(check)
+	not check.cmp in _list_cmps
 	_comparable(l, r)
 	_orderable(check.cmp, l)
+	_cmp(check.cmp, l, r)
+}
+
+_compared(check, l, r) if {
+	not "within" in object.keys(check)
+	check.cmp in _list_cmps
 	_cmp(check.cmp, l, r)
 }
 
@@ -1904,9 +1911,24 @@ _unusable(leaf, x) if {
 _unusable(leaf, x) if {
 	leaf.op == "compare"
 	not "within" in object.keys(leaf)
+	not leaf.cmp in _list_cmps
 	l := _simple_found(x, leaf.left)
 	r := _simple_found(x, leaf.right)
 	not _usable_pair(leaf.cmp, l, r)
+}
+
+_unusable(leaf, x) if {
+	_list_cmp(leaf)
+	leaf.cmp in {"matches_any", "not_matches_any"}
+	v := _found(x, leaf.left)
+	not is_string(v)
+}
+
+_unusable(leaf, x) if {
+	_list_cmp(leaf)
+	leaf.cmp in {"includes", "excludes", "includes_all", "excludes_all"}
+	v := _found(x, leaf.left)
+	not is_array(v)
 }
 
 _unusable(leaf, x) if {
@@ -2005,6 +2027,101 @@ _cmp("ends_with", l, r) if {
 	is_string(l)
 	is_string(r)
 	endswith(l, r)
+}
+
+_cmp("in", l, r) if {
+	l != null
+	is_array(r)
+	l in r
+}
+
+_cmp("not_in", l, r) if {
+	l != null
+	is_array(r)
+	not l in r
+}
+
+_cmp("includes", l, r) if {
+	is_array(l)
+	r != null
+	r in l
+}
+
+_cmp("excludes", l, r) if {
+	is_array(l)
+	r != null
+	not r in l
+}
+
+_cmp("includes_all", l, r) if {
+	is_array(l)
+	_wanted(r)
+	every want in r {
+		want in l
+	}
+}
+
+_cmp("excludes_all", l, r) if {
+	is_array(l)
+	_wanted(r)
+	every want in r {
+		not want in l
+	}
+}
+
+_cmp("matches_any", l, r) if {
+	is_string(l)
+	_valid_patterns(r)
+	some pattern in r
+	regex.match(pattern, l)
+}
+
+_cmp("not_matches_any", l, r) if {
+	is_string(l)
+	_valid_patterns(r)
+	every pattern in r {
+		not regex.match(pattern, l)
+	}
+}
+
+_list_cmps := {"in", "not_in", "includes", "excludes", "includes_all", "excludes_all", "matches_any", "not_matches_any"}
+
+_list_cmp(leaf) if {
+	leaf.op == "compare"
+	leaf.cmp in _list_cmps
+	is_array(leaf.right)
+}
+
+default _list_flaw(_, _) := set()
+
+_list_flaw(leaf, x) := {_read_state(x, leaf.right)} if {
+	_list_cmp(leaf)
+	_read_state(x, leaf.right) != "value"
+}
+
+_list_flaw(leaf, x) := {"unusable"} if {
+	_list_cmp(leaf)
+	_read_state(x, leaf.right) == "value"
+	not _list_right_usable(leaf.cmp, value_at(x, leaf.right))
+}
+
+_list_flawed(leaf, x) if count(_list_flaw(leaf, x)) > 0
+
+_list_right_usable(cmp, r) if {
+	cmp in {"in", "not_in"}
+	is_array(r)
+}
+
+_list_right_usable(cmp, _) if cmp in {"includes", "excludes"}
+
+_list_right_usable(cmp, r) if {
+	cmp in {"includes_all", "excludes_all"}
+	_wanted(r)
+}
+
+_list_right_usable(cmp, r) if {
+	cmp in {"matches_any", "not_matches_any"}
+	_valid_patterns(r)
 }
 
 _leaf_ops := {"range", "excludes", "includes", "in", "equals", "present", "missing", "non_empty_string", "empty", "matches_any", "not_matches_any", "compare", "compare_time"}
@@ -2323,7 +2440,7 @@ _text_cmps := {"starts_with", "ends_with"}
 
 _sentence_cmp(node) if {
 	node.op == "compare"
-	node.cmp in _text_cmps
+	node.cmp in (_text_cmps | _list_cmps)
 	_s_read(node)
 }
 
@@ -2848,6 +2965,14 @@ _check_states(check, subj) := (_answered(check, subj, {_read_state(subj, p) | so
 	not _cause_from_inputs(check)
 	not _quantified(check)
 	not _combinator(check)
+	not _list_flawed(check, subj)
+}
+
+_check_states(check, subj) := _list_flaw(check, subj) if {
+	not _cause_from_inputs(check)
+	not _quantified(check)
+	not _combinator(check)
+	_list_flawed(check, subj)
 }
 
 _check_states(check, subj) := {_list_cause(check, subj)} if {
@@ -2875,6 +3000,8 @@ _leaf_cause(leaf, x) := "satisfied" if {
 } else := "missing" if {
 	_asks_presence(leaf, x)
 	_read_state(x, leaf.path) in {"absent", "null"}
+} else := _worst_or_value(_list_flaw(leaf, x)) if {
+	_list_flawed(leaf, x)
 } else := _worst_or_value({_read_state(x, p) | some p in _leaf_paths(leaf)} | _unusable_states(leaf, x))
 
 _answered(check, x, states) := {_presence_state(s) | some s in states} if _asks_presence(check, x)
@@ -5855,12 +5982,6 @@ _s_argument_unsupported(ph) := {concat("", [`"`, ph.op, `" with a value isn't su
 	"value" in object.keys(ph)
 }
 
-_s_argument_unsupported(ph) := {concat("", [`"`, _s_phrase_words(ph), `" with a field of the subject isn't supported yet`])} if {
-	ph.op in _s_list_ops
-	p := _s_list_path(ph)
-	not "start" in object.keys(p)
-}
-
 _s_argument_unsupported(ph) := {concat("", [`"`, _s_phrase_words(ph), `" with named by in its path isn't supported yet`])} if {
 	ph.op in _s_list_ops
 	p := _s_list_path(ph)
@@ -5923,11 +6044,17 @@ _s_plain_model(a) := {"op": "compare", "left": _s_model_path(a.path), "cmp": "ne
 
 _s_plain_model(a) := {"op": _s_compare_ops[a.phrase.op][0], "left": _s_model_path(a.path), "cmp": _s_compare_ops[a.phrase.op][1], "right": _s_side(a.phrase)} if a.phrase.op in object.keys(_s_compare_ops)
 
-_s_plain_model(a) := {"op": "in", "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if a.phrase.op == "is one of"
+_s_plain_model(a) := {"op": "in", "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if {
+	a.phrase.op == "is one of"
+	not _s_field_arg(a.phrase)
+}
 
 _s_plain_model(a) := {"op": "has_type", "path": _s_model_path(a.path), "type": a.phrase.type} if a.phrase.op == "is a"
 
-_s_plain_model(a) := {"op": "not_in", "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if a.phrase.op == "is not one of"
+_s_plain_model(a) := {"op": "not_in", "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if {
+	a.phrase.op == "is not one of"
+	not _s_field_arg(a.phrase)
+}
 
 _s_plain_model(a) := {"op": "present", "path": _s_model_path(a.path)} if a.phrase.op == "exists"
 
@@ -5939,11 +6066,39 @@ _s_plain_model(a) := {"op": "empty_string_or_list", "path": _s_model_path(a.path
 
 _s_plain_model(a) := {"op": "not_empty_string_or_list", "path": _s_model_path(a.path)} if a.phrase.op == "is not empty"
 
-_s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "value": _s_one(a.phrase)} if a.phrase.op in {"contains", "does not contain"}
+_s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "value": _s_one(a.phrase)} if {
+	a.phrase.op in {"contains", "does not contain"}
+	not _s_field_arg(a.phrase)
+}
 
-_s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if a.phrase.op in {"contains all of", "contains none of"}
+_s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if {
+	a.phrase.op in {"contains all of", "contains none of"}
+	not _s_field_arg(a.phrase)
+}
 
-_s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "patterns": _s_list(a.phrase)} if a.phrase.op in {"matches", "does not match"}
+_s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "patterns": _s_list(a.phrase)} if {
+	a.phrase.op in {"matches", "does not match"}
+	not _s_field_arg(a.phrase)
+}
+
+_s_plain_model(a) := {"op": "compare", "left": _s_model_path(a.path), "cmp": _s_list_cmps[a.phrase.op], "right": _s_model_path(_s_list_path(a.phrase))} if _s_field_arg(a.phrase)
+
+_s_field_arg(ph) if {
+	ph.op in _s_list_ops
+	p := _s_list_path(ph)
+	not "start" in object.keys(p)
+}
+
+_s_list_cmps := {
+	"is one of": "in",
+	"is not one of": "not_in",
+	"contains": "includes",
+	"does not contain": "excludes",
+	"contains all of": "includes_all",
+	"contains none of": "excludes_all",
+	"matches": "matches_any",
+	"does not match": "not_matches_any",
+}
 
 _s_plain_model(a) := {"op": "range", "path": _s_model_path(a.path), "min": a.phrase.min, "max": a.phrase.max} if a.phrase.op == "is between"
 
