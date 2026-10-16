@@ -6231,6 +6231,20 @@ test_a_ref_step_in_from_works_with_a_naming_step if {
 	rows_for(rep, "s", "$well_formed")[0].passed == true
 }
 
+test_a_ref_step_in_from_that_cannot_be_read_fails_the_requirement_with_a_naming_step if {
+	every last in [{"each_as": "att"}, {"each_as": "att", "keys": ["junit"]}] {
+		req := {"s": {
+			"from": ["trail", "artifacts", {"ref": ["$$params", "artifact"]}, "attestations", last],
+			"checks": {"c": {"op": "equals", "path": ["$att", "status"], "value": "COMPLETE"}},
+		}}
+		every params, cause in {"{}": "absent", `{"artifact": null}`: "null", `{"artifact": ["app"]}`: "unusable"} {
+			rep := report(trail_doc, req) with data.params as json.unmarshal(params)
+			rep.requirements.s.status == "not_met"
+			[[r.passed, r.cause] | some r in rows_for(rep, "s", "$min_subjects")] == [[false, cause]]
+		}
+	}
+}
+
 test_a_badly_written_ref_step_in_from_is_not_well_formed if {
 	rep := report(trail_doc, {"s": {
 		"from": ["trail", "artifacts", {"ref": ["$$params", "artifact"], "note": "x"}],
