@@ -122,7 +122,7 @@ One change is still needed outside these files when this is built: `syntax.md` (
 
 One: server demo 0008 builds one requirement per suite in Rego. sdlc-policies 0008 already says the same thing with `named by each of`.
 
-pr-reviewer's `keys_match` is a sentence, `persona_blob_shas named by persona`, but ergo can't run it until a ref can start with a name, so the policy keeps its custom operator until then. Its other six custom operators become sentences that run today.
+pr-reviewer's seven custom operators all become sentences that ergo runs: `keys_match`, `persona_blob_shas named by persona`, since #213, `contains_all`, `x contains all of y`, since #224, and the other five since #173.
 
 ## Changes in what passes
 
