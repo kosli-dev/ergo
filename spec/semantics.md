@@ -54,6 +54,8 @@ Reading a path ends in one of these outcomes. Each one except `found` is also a 
 
 **[path.ref_step]** A ref step reads its ref first and uses the value as the key for that step. If the ref ends anything but `found`, the path ends there with the ref's outcome, and a value that can't be a key ends `unusable`.
 
+**[path.field_step]** A field step reads one field of the value bare keys read from at that point, the subject or, inside a `whose` or the phrase of a one-line `every` or `some`, the item, and uses it as the key for that step. A field that's missing ends the path `absent`, a `null` one `null`, and one that isn't a string, a number included, `unusable`. On a subject or item that isn't an object, the path ends `not_an_object`. The step is part of its path, as a `named_by` step is, so in a check that reads two paths, the other path's cause can come first, where a ref that can't be read would decide the cause. The row's `inputs` show the field too, unless it's read on an item. Only sentences can write such a step, as `<path> named by <field>`; in today's syntax it's a step that can't be a key.
+
 ## Causes
 
 Every row has a cause. When a check reads several values, the row takes the first cause in this order:
