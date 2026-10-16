@@ -10002,6 +10002,27 @@ test_elapsed_counts_seconds_for_two_numbers_and_gives_fractions_and_zero if {
 	_elapsed_first("seconds elapsed from p to q is 0.5", [{"id": 1, "p": "2026-01-01T00:00:00Z", "q": "2026-01-01T00:00:00.5Z"}], {}) == [true, "satisfied"]
 }
 
+test_elapsed_is_rounded_down_to_six_decimal_places_so_every_runtime_prints_the_same_number if {
+	[r[3][0].value | some r in _elapsed_rows(
+		"days elapsed from p to q is less than 5", [
+			{"id": 1, "p": 0, "q": 1},
+			{"id": 2, "p": 0, "q": 431999},
+			{"id": 3, "p": "2025-05-30T00:00:00.000000001Z", "q": "2025-06-04T23:59:59.999999999Z"},
+		],
+		{},
+	)] == [0.000011, 4.999988, 5.999999]
+}
+
+test_elapsed_reads_a_number_to_the_nearest_microsecond if {
+	_elapsed_first("seconds elapsed from p to q is 0.876543", [{"id": 1, "p": 1748736000.1234567, "q": 1748736001}], {}) == [true, "satisfied"]
+}
+
+test_elapsed_fails_a_number_outside_the_years_rfc_3339_times_cover_so_milliseconds_arent_read_as_seconds if {
+	_elapsed_cause("days elapsed from p to q is 1", {"id": 1, "p": 1748736000000, "q": 1748822400000}, {}) == "unusable"
+	_elapsed_cause("days elapsed from p to q is 1", {"id": 1, "p": -9000000001, "q": 0}, {}) == "unusable"
+	_elapsed_first("seconds elapsed from p to q is 18000000000", [{"id": 1, "p": -9000000000, "q": 9000000000}], {}) == [true, "satisfied"]
+}
+
 test_elapsed_fails_as_value_when_the_end_is_before_the_start if {
 	_elapsed_rows("days elapsed from p to q is at most 5", [{"id": 1, "p": "2026-01-02T00:00:00Z", "q": "2026-01-01T00:00:00Z"}, {"id": 2, "p": 5, "q": 4}], {}) == [
 		[1, false, "value", [{"name": "days elapsed from p to q", "value": null}, {"name": "p", "value": "2026-01-02T00:00:00Z"}, {"name": "q", "value": "2026-01-01T00:00:00Z"}]],

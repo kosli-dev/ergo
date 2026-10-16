@@ -4636,16 +4636,35 @@ _basic_value(subj, side) := r.value if {
 	r.states == set()
 }
 
-_elapsed_units(unit, x, y) := (_time_ns(y) - _time_ns(x)) / (_elapsed_seconds[unit] * 1000000000) if {
+_elapsed_units(unit, x, y) := _elapsed_ns(unit, _time_ns(y) - _time_ns(x)) if {
 	_rfc3339_shaped(x)
 	_rfc3339_shaped(y)
-	_time_ns(y) >= _time_ns(x)
 }
 
-_elapsed_units(unit, x, y) := (y - x) / _elapsed_seconds[unit] if {
-	is_number(x)
-	is_number(y)
-	y >= x
+_elapsed_units(unit, x, y) := _elapsed_ns(unit, (round(y * 1000000) - round(x * 1000000)) * 1000) if {
+	_elapsed_seconds_time(x)
+	_elapsed_seconds_time(y)
+}
+
+_elapsed_ns(unit, n) := ((n - (n % step)) / step) / 1000000 if {
+	n >= 0
+	step := _elapsed_seconds[unit] * 1000
+}
+
+_elapsed_seconds_time(v) if {
+	is_number(v)
+	v >= -9000000000
+	v <= 9000000000
+}
+
+_elapsed_times(x, y) if {
+	_rfc3339_shaped(x)
+	_rfc3339_shaped(y)
+}
+
+_elapsed_times(x, y) if {
+	_elapsed_seconds_time(x)
+	_elapsed_seconds_time(y)
 }
 
 _time_ns(v) := time.parse_rfc3339_ns(v) if _rfc3339_shaped(v)
@@ -4660,7 +4679,7 @@ _elapsed_path_states(subj, path) := set() if _read_state(subj, path) == "value"
 _elapsed_states(subj, side) := (_elapsed_path_states(subj, side.elapsed_from) | _elapsed_path_states(subj, side.elapsed_to)) | {"unusable" |
 	_elapsed_path_states(subj, side.elapsed_from) == set()
 	_elapsed_path_states(subj, side.elapsed_to) == set()
-	not _timestamps(value_at(subj, side.elapsed_from), value_at(subj, side.elapsed_to))
+	not _elapsed_times(value_at(subj, side.elapsed_from), value_at(subj, side.elapsed_to))
 }
 
 _item_causes(subj, side, path) := [_where_cause(side, item) | some item in value_at(subj, path)] if is_array(value_at(subj, path))

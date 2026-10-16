@@ -757,8 +757,8 @@ fixed_in_time: days elapsed from first_seen_ts to now_ts is less than $params.ma
 ]
 ```
 
-- A unit is a fixed length: a second, 60 seconds, 3600, 86400 and 604800. The result isn't rounded, so 36 hours is `1.5` days. There's no `months` or `years`, because they have no fixed length.
-- Both fields must be RFC 3339 times, like `2026-10-01T00:00:00Z` (a capital `T` and `Z`, a real date, a year from 1678 to 2261), or both numbers, which are read as seconds. A missing field fails the check as `absent`, a `null` one as `null`, and anything else, including one time and one number, as `unusable`.
+- A unit is a fixed length: a second, 60 seconds, 3600, 86400 and 604800. The result is rounded down to 6 decimal places, so 36 hours is `1.5` days and one second is `0.000011` days. That way every runtime gives the same number. There's no `months` or `years`, because they have no fixed length.
+- Both fields must be RFC 3339 times, like `2026-10-01T00:00:00Z` (a capital `T` and `Z`, a real date, a year from 1678 to 2261), or both numbers, which are read as seconds, to the nearest microsecond. A number must be between -9000000000 and 9000000000, about the years 1684 to 2255, so a time in milliseconds fails as `unusable` instead of being read as seconds. A missing field fails the check as `absent`, a `null` one as `null`, and anything else, including one time and one number, as `unusable`.
 - When the second time is before the first, the check fails as `value`, and the number in its first input is `null`.
 - It only goes alone at the start of a sentence, with the phrases a count goes with. `plus`, a `whose`, `every`, `some`, the right side of a phrase and a `from` line are written wrong with `isn't supported yet`. It works in each line under `assert`, and under a `for` line, where a path can start at a name, like `days elapsed from pr.opened_ts to pr.merged_ts is at most 2`.
 - `seconds`, `minutes`, `hours`, `days`, `weeks` and `to` are words of the grammar, so a field with one of those names is written `.days`.
