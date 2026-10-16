@@ -9969,3 +9969,178 @@ test_a_whose_of_a_count_with_a_field_after_a_list_phrase_decides_each_item_as_th
 _list_item_right(right) := {"k": right.v} if "v" in object.keys(right)
 
 _list_item_right(right) := {} if not "v" in object.keys(right)
+
+_snyk := {"id": "v1", "first_seen_ts": "2026-10-01T00:00:00Z", "now_ts": "2026-10-04T12:00:00Z", "severity": "high"}
+
+_elapsed_rows(check, things, params) := [[r.subject.id, r.passed, r.cause, r.inputs] | some r in ergo.report({"things": things}, _sentence_policy({"c": check}), params).results; r.check == "c"]
+
+_elapsed_first(check, things, params) := [_elapsed_rows(check, things, params)[0][1], _elapsed_rows(check, things, params)[0][2]]
+
+_elapsed_cause(check, thing, params) := _elapsed_rows(check, [thing], params)[0][2]
+
+test_days_elapsed_is_the_difference_of_two_times_in_days_and_shows_its_inputs if {
+	_elapsed_rows("days elapsed from first_seen_ts to now_ts is less than $params.max_days named by severity", [_snyk], {"max_days": {"high": 4}}) == [["v1", true, "satisfied", [
+		{"name": "days elapsed from first_seen_ts to now_ts", "value": 3.5},
+		{"name": "first_seen_ts", "value": "2026-10-01T00:00:00Z"},
+		{"name": "now_ts", "value": "2026-10-04T12:00:00Z"},
+		{"name": "$params.max_days named by severity", "value": 4},
+		{"name": "severity", "value": "high"},
+	]]]
+	_elapsed_first("days elapsed from first_seen_ts to now_ts is less than $params.max_days named by severity", [_snyk], {"max_days": {"high": 3}}) == [false, "value"]
+}
+
+test_every_unit_divides_the_seconds_between_two_times_by_its_length if {
+	every pair in [["seconds", "302400"], ["minutes", "5040"], ["hours", "84"], ["days", "3.5"], ["weeks", "0.5"]] {
+		_elapsed_first(concat("", [pair[0], " elapsed from first_seen_ts to now_ts is ", pair[1]]), [_snyk], {}) == [true, "satisfied"]
+	}
+}
+
+test_elapsed_counts_seconds_for_two_numbers_and_gives_fractions_and_zero if {
+	_elapsed_first("days elapsed from p to q is 1.5", [{"id": 1, "p": 100, "q": 129700}], {}) == [true, "satisfied"]
+	_elapsed_first("hours elapsed from p to q is 0", [{"id": 1, "p": 100, "q": 100}], {}) == [true, "satisfied"]
+	_elapsed_first("days elapsed from p to q is 0", [{"id": 1, "p": "2026-01-01T00:00:00Z", "q": "2026-01-01T01:00:00+01:00"}], {}) == [true, "satisfied"]
+	_elapsed_first("seconds elapsed from p to q is 0.5", [{"id": 1, "p": "2026-01-01T00:00:00Z", "q": "2026-01-01T00:00:00.5Z"}], {}) == [true, "satisfied"]
+}
+
+test_elapsed_is_rounded_down_to_six_decimal_places_so_every_runtime_prints_the_same_number if {
+	[r[3][0].value | some r in _elapsed_rows(
+		"days elapsed from p to q is less than 5", [
+			{"id": 1, "p": 0, "q": 1},
+			{"id": 2, "p": 0, "q": 431999},
+			{"id": 3, "p": "2025-05-30T00:00:00.000000001Z", "q": "2025-06-04T23:59:59.999999999Z"},
+		],
+		{},
+	)] == [0.000011, 4.999988, 5.999999]
+}
+
+test_elapsed_reads_a_number_to_the_nearest_microsecond if {
+	_elapsed_first("seconds elapsed from p to q is 0.876543", [{"id": 1, "p": 1748736000.1234567, "q": 1748736001}], {}) == [true, "satisfied"]
+}
+
+test_elapsed_fails_a_number_outside_the_years_rfc_3339_times_cover_so_milliseconds_arent_read_as_seconds if {
+	_elapsed_cause("days elapsed from p to q is 1", {"id": 1, "p": 1748736000000, "q": 1748822400000}, {}) == "unusable"
+	_elapsed_cause("days elapsed from p to q is 1", {"id": 1, "p": -9000000001, "q": 0}, {}) == "unusable"
+	_elapsed_first("seconds elapsed from p to q is 18000000000", [{"id": 1, "p": -9000000000, "q": 9000000000}], {}) == [true, "satisfied"]
+}
+
+test_elapsed_fails_as_value_when_the_end_is_before_the_start if {
+	_elapsed_rows("days elapsed from p to q is at most 5", [{"id": 1, "p": "2026-01-02T00:00:00Z", "q": "2026-01-01T00:00:00Z"}, {"id": 2, "p": 5, "q": 4}], {}) == [
+		[1, false, "value", [{"name": "days elapsed from p to q", "value": null}, {"name": "p", "value": "2026-01-02T00:00:00Z"}, {"name": "q", "value": "2026-01-01T00:00:00Z"}]],
+		[2, false, "value", [{"name": "days elapsed from p to q", "value": null}, {"name": "p", "value": 5}, {"name": "q", "value": 4}]],
+	]
+}
+
+test_elapsed_fails_closed_on_a_side_it_cant_read if {
+	t := "2026-01-01T00:00:00Z"
+	every case in [
+		[{"id": 1, "q": t}, "absent"],
+		[{"id": 1, "p": t}, "absent"],
+		[{"id": 1, "p": null, "q": t}, "null"],
+		[{"id": 1, "p": t, "q": null}, "null"],
+		[{"id": 1, "p": null, "q": null}, "null"],
+		[{"id": 1, "p": null}, "absent"],
+		[{"id": 1, "p": true, "q": t}, "unusable"],
+		[{"id": 1, "p": t, "q": [1]}, "unusable"],
+		[{"id": 1, "p": {"x": 1}, "q": t}, "unusable"],
+		[{"id": 1, "p": "yesterday", "q": t}, "unusable"],
+		[{"id": 1, "p": true}, "absent"],
+		[{"id": 1, "p": true, "q": null}, "null"],
+		[{"id": 1, "p": t, "q": 5}, "unusable"],
+		[{"id": 1, "p": 5, "q": t}, "unusable"],
+		[{"id": 1, "p": "2026-01-01t00:00:00Z", "q": t}, "unusable"],
+		[{"id": 1, "p": t, "q": "2026-01-01T00:00:00z"}, "unusable"],
+		[{"id": 1, "p": "2026-02-30T00:00:00Z", "q": t}, "unusable"],
+		[{"id": 1, "p": "1677-12-31T00:00:00Z", "q": t}, "unusable"],
+		[{"id": 1, "p": t, "q": "2262-01-01T00:00:00Z"}, "unusable"],
+	] {
+		_elapsed_cause("days elapsed from p to q is at least 0", case[0], {}) == case[1]
+	}
+}
+
+test_elapsed_reads_paths_like_any_other_path if {
+	t := {"id": 1, "x": {"p": "2026-01-01T00:00:00Z"}, "ends": {"k": 1100}, "k": "k"}
+	_elapsed_cause("days elapsed from x.a to $input.now is 1", t, {}) == "absent"
+	_elapsed_first("seconds elapsed from $params.start to ends named by k is 1000", [t], {"start": 100}) == [true, "satisfied"]
+	_elapsed_cause("seconds elapsed from $params.start to $params.end is 1", {"id": 1}, {"start": 100}) == "absent"
+	_elapsed_first("seconds elapsed from $params.start to $params.end is 1", [{"id": 1}], {"start": 100, "end": 101}) == [true, "satisfied"]
+}
+
+test_elapsed_takes_the_phrases_a_count_takes if {
+	every pair in [
+		["days elapsed from p to q equals 1", true],
+		["days elapsed from p to q is not 2", true],
+		["days elapsed from p to q does not equal 2", true],
+		["days elapsed from p to q is at least 1", true],
+		["days elapsed from p to q is at most 1", true],
+		["days elapsed from p to q is more than 0.5", true],
+		["days elapsed from p to q is less than 2", true],
+		["days elapsed from p to q is 1.01 within 0.1", true],
+		["days elapsed from p to q is more than 1", false],
+		["days elapsed from p to q is c", true],
+		["days elapsed from p to q is more than c plus 1", false],
+	] {
+		_elapsed_rows(pair[0], [{"id": 1, "p": 0, "q": 86400, "c": 1}], {})[0][1] == pair[1]
+	}
+}
+
+test_elapsed_prints_its_sentence_in_the_reports_spelling if {
+	r := ergo.report({"things": []}, _sentence_policy({"c": "hours   elapsed  from  .days to  x named by  $params.k is less than 5"}), {})
+	r.requirements.s.checks.c.expression == "hours elapsed from .days to x named by $params.k is less than 5"
+	r2 := ergo.report({"things": []}, _sentence_policy({"c": {"assert": ["days elapsed from p to q is 1", "weeks elapsed from \"a b\" to q is at most 1"]}}), {})
+	r2.requirements.s.checks.c.expression == `days elapsed from p to q is 1 and weeks elapsed from "a b" to q is at most 1`
+}
+
+test_elapsed_words_start_a_sentence_so_a_field_with_that_name_needs_a_dot if {
+	every w in ["seconds", "minutes", "hours", "days", "weeks", "to"] {
+		_sentence_problems(concat("", [w, " is 1"])) == [concat("", [w, " is a word of the grammar: write .", w])]
+		_elapsed_rows(concat("", [".", w, " is 1"]), [{"id": 1, w: 1}], {})[0][1] == true
+	}
+	_elapsed_first("days elapsed from .to to .days is 1", [{"id": 1, "to": 0, "days": 86400}], {}) == [true, "satisfied"]
+}
+
+test_months_and_years_are_not_elapsed_phrases if {
+	_sentence_problems("months elapsed from p to q is 1") == ["doesn't parse"]
+	_sentence_problems("years elapsed from p to q is 1") == ["doesn't parse"]
+}
+
+test_elapsed_works_in_each_line_of_a_list_and_under_a_for_line if {
+	_elapsed_first({"assert": ["days elapsed from p to q is 1", "hours elapsed from p to q is 24"]}, [{"id": 1, "p": 0, "q": 86400}], {}) == [true, "satisfied"]
+	fors := _elapsed_rows({"for": "every ps as it", "assert": "days elapsed from it.p to it.q is less than $params.max"}, [{"id": 1, "ps": [{"p": 0, "q": 86400}, {"p": 0, "q": 86400}]}, {"id": 2, "ps": [{"p": 0, "q": 864000}]}], {"max": 2})
+	[[r[0], r[1]] | some r in fors] == [[1, true], [2, false]]
+	_elapsed_cause({"for": "every ps as it", "assert": "days elapsed from it.p to it.q is 1"}, {"id": 1, "ps": [{"p": 0}]}, {}) == "absent"
+	_elapsed_cause({"for": "every ps as it", "assert": "days elapsed from it.p to it.q is 1"}, {"id": 1, "ps": [{"p": 1, "q": 0}]}, {}) == "value"
+}
+
+test_elapsed_is_written_wrong_anywhere_but_alone_before_a_phrase if {
+	msg := "an elapsed time isn't supported yet except alone before a phrase"
+	every check in [
+		"days elapsed from p to q plus 1 is 2",
+		"1 plus days elapsed from p to q is 2",
+		"count of xs plus days elapsed from p to q is 2",
+		"n is days elapsed from p to q",
+		"days elapsed from p to q is less than days elapsed from c to d",
+		"n is at least 1 plus days elapsed from p to q",
+		"every xs whose days elapsed from p to q is 1 is not empty",
+		"count of xs whose days elapsed from p to q is 1 is 2",
+		"every xs is days elapsed from p to q",
+		"x is more than days elapsed from p to q",
+	] {
+		msg in _sentence_problems(check)
+	}
+	msg in _sentence_problems({"for": "every xs whose days elapsed from p to q is 1 as x", "assert": "x.n is 1"})
+	_from_problems(_from_report({"xs": [{"id": 1}]}, {"x": {"from": "xs whose days elapsed from p to q is 1"}}, {"c": "id exists"}, {})) == [{"name": "subjects.x.from", "value": [msg]}]
+}
+
+test_elapsed_cant_take_is_between_or_a_phrase_that_takes_no_number if {
+	_sentence_problems("days elapsed from p to q is between 1 and 2") == [`"is between" after a count of, a sum of or a plus isn't supported yet`]
+	_sentence_problems("days elapsed from p to q is empty") == ["is empty can't follow a count of, a sum of or a plus"]
+	_sentence_problems("days elapsed from p to q is before c") == ["is before can't follow a count of, a sum of or a plus"]
+}
+
+test_elapsed_is_an_invalid_side_in_todays_syntax if {
+	side := {"unit": "days", "elapsed_from": ["a"], "elapsed_to": ["b"], "text": "t"}
+	_sentence_problems({"op": "compare", "left": side, "cmp": "eq", "right": {"literal": 1}}) == ["invalid left"]
+	_sentence_problems({"op": "compare", "left": ["n"], "cmp": "eq", "right": side}) == ["invalid right"]
+	_sentence_problems({"op": "compare", "left": {"add": [side, {"literal": 1}], "text": "t"}, "cmp": "eq", "right": {"literal": 1}}) == ["invalid left"]
+	_sentence_problems({"op": "compare", "left": object.union(side, {"unit": "months"}), "cmp": "eq", "right": {"literal": 1}}) == ["invalid left"]
+}

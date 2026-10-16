@@ -807,6 +807,11 @@ _basic_eval(subj, side, _) := {"v": v, "found": v, "states": t.states, "inputs":
 	v := [x | x := t.value]
 }
 
+_basic_eval(subj, side, item) := {"v": v, "found": v, "states": _elapsed_states(subj, side), "inputs": _basic_inputs(subj, side, item)} if {
+	_basic_form(side) == "elapsed"
+	v := [x | x := _basic_value(subj, side)]
+}
+
 _side_eval(subj, side, item) := _basic_eval(subj, side, item) if _basic_form(side)
 
 _side_eval(subj, side, item) := {"v": v, "found": v, "states": union({o.states | some o in ops}), "inputs": array.concat([{"name": _side_text(item, side), "value": _first_or_null(v)}], [i | some o in ops; some i in o.inputs])} if {
@@ -4558,6 +4563,17 @@ _basic_form(side) := f if {
 	is_string(side.text)
 }
 
+_basic_form(side) := "elapsed" if {
+	is_object(side)
+	object.keys(side) == {"unit", "elapsed_from", "elapsed_to", "text"}
+	side.unit in object.keys(_elapsed_seconds)
+	is_array(side.elapsed_from)
+	is_array(side.elapsed_to)
+	is_string(side.text)
+}
+
+_elapsed_seconds := {"seconds": 1, "minutes": 60, "hours": 3600, "days": 86400, "weeks": 604800}
+
 _side_form(side) := _basic_form(side)
 
 _side_form(side) := "add" if {
@@ -4584,7 +4600,7 @@ _operand(x) if {
 
 default _derived(_) := false
 
-_derived(side) if _side_form(side) in {"count", "sum", "add", "count_of", "sum_of"}
+_derived(side) if _side_form(side) in {"count", "sum", "add", "count_of", "sum_of", "elapsed"}
 
 default _derived_sides(_) := []
 
@@ -4612,10 +4628,58 @@ _basic_value(subj, side) := sum(nums) if {
 	}
 }
 
+_basic_value(subj, side) := _elapsed_units(side.unit, value_at(subj, side.elapsed_from), value_at(subj, side.elapsed_to)) if _basic_form(side) == "elapsed"
+
 _basic_value(subj, side) := r.value if {
 	_basic_form(side) in {"count_of", "sum_of"}
 	r := _tally(subj, side)
 	r.states == set()
+}
+
+_elapsed_units(unit, x, y) := _elapsed_ns(unit, _time_ns(y) - _time_ns(x)) if {
+	_rfc3339_shaped(x)
+	_rfc3339_shaped(y)
+}
+
+_elapsed_units(unit, x, y) := _elapsed_ns(unit, (round(y * 1000000) - round(x * 1000000)) * 1000) if {
+	_elapsed_seconds_time(x)
+	_elapsed_seconds_time(y)
+}
+
+_elapsed_ns(unit, n) := ((n - (n % step)) / step) / 1000000 if {
+	n >= 0
+	step := _elapsed_seconds[unit] * 1000
+}
+
+_elapsed_seconds_time(v) if {
+	is_number(v)
+	v >= -9000000000
+	v <= 9000000000
+}
+
+_elapsed_times(x, y) if {
+	_rfc3339_shaped(x)
+	_rfc3339_shaped(y)
+}
+
+_elapsed_times(x, y) if {
+	_elapsed_seconds_time(x)
+	_elapsed_seconds_time(y)
+}
+
+_time_ns(v) := time.parse_rfc3339_ns(v) if _rfc3339_shaped(v)
+
+_elapsed_path_states(subj, path) := {s} if {
+	s := _read_state(subj, path)
+	s != "value"
+}
+
+_elapsed_path_states(subj, path) := set() if _read_state(subj, path) == "value"
+
+_elapsed_states(subj, side) := (_elapsed_path_states(subj, side.elapsed_from) | _elapsed_path_states(subj, side.elapsed_to)) | {"unusable" |
+	_elapsed_path_states(subj, side.elapsed_from) == set()
+	_elapsed_path_states(subj, side.elapsed_to) == set()
+	not _elapsed_times(value_at(subj, side.elapsed_from), value_at(subj, side.elapsed_to))
 }
 
 _item_causes(subj, side, path) := [_where_cause(side, item) | some item in value_at(subj, path)] if is_array(value_at(subj, path))
@@ -4731,6 +4795,12 @@ _basic_inputs(subj, side, _) := [{"name": side.text, "value": object.get(r, "val
 	r := _tally(subj, side)
 }
 
+_basic_inputs(subj, side, item) := [
+	{"name": side.text, "value": _first_or_null([x | x := _basic_value(subj, side)])},
+	{"name": _item_path_name(item, side.elapsed_from), "value": value_at(subj, side.elapsed_from)},
+	{"name": _item_path_name(item, side.elapsed_to), "value": value_at(subj, side.elapsed_to)},
+] if _basic_form(side) == "elapsed"
+
 _side_inputs(subj, side, item) := _basic_inputs(subj, side, item) if _basic_form(side)
 
 _side_inputs(subj, side, item) := array.concat([_derived_input(subj, side, _side_text(item, side))], [i | some operand in side.add; some i in _basic_inputs(subj, operand, item)]) if _side_form(side) == "add"
@@ -4820,7 +4890,7 @@ _basic_text(item, side) := concat("", ["count(", _item_path_name(item, side.coun
 
 _basic_text(_, side) := concat("", ["sum(", _projection_name(side.sum, side.each), _where_text(side, side.sum), ")"]) if _basic_form(side) == "sum"
 
-_basic_text(_, side) := side.text if _basic_form(side) in {"count_of", "sum_of"}
+_basic_text(_, side) := side.text if _basic_form(side) in {"count_of", "sum_of", "elapsed"}
 
 _side_text(item, side) := _basic_text(item, side) if _basic_form(side)
 
@@ -4885,12 +4955,14 @@ _basic_paths(side) := [side.sum, side.each] if _basic_form(side) == "sum"
 
 _basic_paths(side) := [] if _basic_form(side) == "literal"
 
+_basic_paths(side) := [side.elapsed_from, side.elapsed_to] if _basic_form(side) == "elapsed"
+
 _basic_paths(side) := [side[f]] if {
 	f := _basic_form(side)
 	f in {"count_of", "sum_of"}
 }
 
-_sentence_side(side) if _basic_form(side) in {"count_of", "sum_of"}
+_sentence_side(side) if _basic_form(side) in {"count_of", "sum_of", "elapsed"}
 
 _sentence_side(side) if {
 	is_object(side)
@@ -4999,6 +5071,7 @@ _s_patterns := {
 	"terms": concat("", [`(`, term, `)(?: +plus +|$)`]),
 	"number": concat("", [`^`, num, `$`]),
 	"derived": concat("", [`^(count|sum) +of +(`, path, `)$`]),
+	"elapsed": concat("", [`^(seconds|minutes|hours|days|weeks) +elapsed +from +(`, path, `) +to +(`, path, `)$`]),
 	"value": concat("", [`^`, value, `$`]),
 	"values": concat("", [`^`, values, `$`]),
 	"each_value": value,
@@ -5021,7 +5094,8 @@ _s_patterns := {
 	plain := concat("", [`(?:`, start, `)(?:`, step, `)*`])
 	path := concat("", [`(?:`, pos, `)?`, plain])
 	rpath := concat("", [`(?:`, pos, `)?(?:`, rstart, `)(?:`, step, `)*`])
-	derived := concat("", [`(?:count|sum) +of +`, path])
+	elapsed := concat("", [`(?:seconds|minutes|hours|days|weeks) +elapsed +from +`, path, ` +to +`, path])
+	derived := concat("", [`(?:(?:count|sum) +of +`, path, `|`, elapsed, `)`])
 	term := concat("", [`(?:`, derived, `|`, rpath, `|`, num, `)`])
 	terms := concat("", [term, `(?: +plus +`, term, `)*`])
 	left := concat("", [`(?:`, path, `|`, terms, `)`])
@@ -5074,7 +5148,7 @@ _s_patterns := {
 	for_item := concat("", [`(?:every|some) +`, path, `(?: +whose +`, conds, `)?(?:, +if +any,)? +as +`, key])
 }
 
-_s_words := {"a", "after", "an", "and", "as", "at", "before", "between", "count", "each", "empty", "equal", "every", "false", "first", "in", "item", "last", "less", "more", "named", "not", "null", "of", "on", "one", "or", "plus", "some", "sum", "true", "whose", "within"}
+_s_words := {"a", "after", "an", "and", "as", "at", "before", "between", "count", "days", "each", "empty", "equal", "every", "false", "first", "hours", "in", "item", "last", "less", "minutes", "more", "named", "not", "null", "of", "on", "one", "or", "plus", "seconds", "some", "sum", "to", "true", "weeks", "whose", "within"}
 
 _s_pieces(pattern, text) := [m[1] | some m in matches] if {
 	matches := regex.find_all_string_submatch_n(pattern, text, -1)
@@ -5190,6 +5264,8 @@ _s_term_of(text, pat) := _s_number(text) if {
 	regex.match(pat.number, text)
 } else := {m[1]: _s_path_of(m[2], pat)} if {
 	m := regex.find_all_string_submatch_n(pat.derived, text, 1)[0]
+} else := {"unit": m[1], "elapsed_from": _s_path_of(m[2], pat), "elapsed_to": _s_path_of(m[3], pat)} if {
+	m := regex.find_all_string_submatch_n(pat.elapsed, text, 1)[0]
 } else := _s_path_of(text, pat)
 
 _s_path_of(text, pat) := _s_lifted(object.union(_s_position_of(m[1], m[2]), _s_start_of(m[3], _s_steps_of(m[4], pat)))) if {
@@ -5542,6 +5618,11 @@ _s_term_text(t) := concat("", ["sum of ", _s_path_text(t.sum, "left")]) if {
 	"sum" in object.keys(t)
 }
 
+_s_term_text(t) := concat("", [t.unit, " elapsed from ", _s_path_text(t.elapsed_from, "left"), " to ", _s_path_text(t.elapsed_to, "left")]) if {
+	is_object(t)
+	"elapsed_from" in object.keys(t)
+}
+
 _s_term_text(t) := _s_path_text(t, "right") if {
 	is_object(t)
 	"steps" in object.keys(t)
@@ -5743,7 +5824,7 @@ _s_from_used(def, read) if {
 _s_from_read(name, fl, subjects, chains) := {"problems": problems, "fields": fields, "parent": parent} if {
 	"path" in object.keys(fl)
 	conds := [_s_check([_s_cond_text(c)], {}, set()) | some c in object.get(fl, "where", [])]
-	problems := sort((((_s_chain_unsupported(name, fl, subjects, chains.descend) | _s_from_start_problems(fl)) | _s_from_paths_unsupported({"path": fl.path})) | {concat("", ["whose: ", p]) | some c in conds; some p in object.get(c, "$sentence", [])}))
+	problems := sort(((((_s_chain_unsupported(name, fl, subjects, chains.descend) | _s_from_start_problems(fl)) | _s_from_paths_unsupported({"path": fl.path})) | _s_elapsed_unsupported({"where": object.get(fl, "where", [])})) | {concat("", ["whose: ", p]) | some c in conds; some p in object.get(c, "$sentence", [])}))
 	fields := object.union(_s_source(name, fl, subjects), _s_whose_filters(_s_filter_prefix(name, chains.narrow), conds))
 	parent := _s_descend_parent(name, fl, subjects)
 } else := {"problems": object.get(fl, "problems", ["doesn't parse"]), "fields": {}}
@@ -6050,6 +6131,13 @@ _s_paths_unsupported(a) := {"last of isn't supported yet" |
 	some node in _s_nodes(a)
 	is_object(node)
 	object.get(node, "position", null) == "last"
+} | _s_elapsed_unsupported(a)
+
+_s_elapsed_unsupported(a) := {"an elapsed time isn't supported yet except alone before a phrase" |
+	some node in _s_nodes(a)
+	is_object(node)
+	"elapsed_from" in object.keys(node)
+	object.get(a, "terms", []) != [node]
 }
 
 _s_from_paths_unsupported(a) := _s_paths_unsupported(a) | {concat("", ["unknown name ", ref.steps[0]]) |
@@ -6232,6 +6320,11 @@ _s_left_side(terms, where) := {"add": array.concat([_s_term_side(t) | some t in 
 _s_whose_side(t, where) := object.union(_s_term_side(t), {"whose": [_s_plain_model(c) | some c in where], "text": concat("", [_s_term_text(t), _s_where_text({"where": where})])})
 
 _s_term_side(t) := {"literal": t} if is_number(t)
+
+_s_term_side(t) := {"unit": t.unit, "elapsed_from": _s_model_path(t.elapsed_from), "elapsed_to": _s_model_path(t.elapsed_to), "text": _s_term_text(t)} if {
+	is_object(t)
+	"elapsed_from" in object.keys(t)
+}
 
 _s_term_side(t) := _s_model_path(t) if {
 	is_object(t)
@@ -6606,9 +6699,14 @@ _s_named_tally(side, names) := object.union(side, {f: _s_named_path(side[f], nam
 	f in object.keys(side)
 }
 
+_s_named_tally(side, names) := object.union(side, {f: _s_named_path(side[f], names) | some f in ["elapsed_from", "elapsed_to"]}) if {
+	is_object(side)
+	"elapsed_from" in object.keys(side)
+}
+
 _s_named_tally(side, _) := side if {
 	is_object(side)
-	object.keys(side) & {"count_of", "sum_of"} == set()
+	object.keys(side) & {"count_of", "sum_of", "elapsed_from"} == set()
 }
 
 _s_named_cond(c, names) := object.union(c, {f: _s_named_path(c[f], names) | some f in ["path", "left", "right"]; is_array(object.get(c, f, null))})

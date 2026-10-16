@@ -7877,5 +7877,3528 @@
         ]
       }
     ]
+  },
+  {
+    "description": "seconds elapsed between two times",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "seconds elapsed from first_seen_ts to now_ts is 302400"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes when the times are exactly that many seconds apart",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "time.format",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "first_seen_ts": "2026-10-01T00:00:00Z",
+              "now_ts": "2026-10-04T12:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "seconds elapsed from first_seen_ts to now_ts",
+                "value": 302400
+              },
+              {
+                "name": "first_seen_ts",
+                "value": "2026-10-01T00:00:00Z"
+              },
+              {
+                "name": "now_ts",
+                "value": "2026-10-04T12:00:00Z"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "seconds elapsed from first_seen_ts to now_ts is 302400"
+          }
+        }
+      },
+      {
+        "description": "fails as value when they are further apart",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "time.format",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "first_seen_ts": "2026-10-01T00:00:00Z",
+              "now_ts": "2026-10-08T00:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "seconds elapsed from first_seen_ts to now_ts",
+                "value": 604800
+              },
+              {
+                "name": "first_seen_ts",
+                "value": "2026-10-01T00:00:00Z"
+              },
+              {
+                "name": "now_ts",
+                "value": "2026-10-08T00:00:00Z"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "seconds elapsed from first_seen_ts to now_ts is 302400"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "minutes elapsed between two times",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "minutes elapsed from first_seen_ts to now_ts is 5040"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes when the times are exactly that many minutes apart",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "time.format",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "first_seen_ts": "2026-10-01T00:00:00Z",
+              "now_ts": "2026-10-04T12:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "minutes elapsed from first_seen_ts to now_ts",
+                "value": 5040
+              },
+              {
+                "name": "first_seen_ts",
+                "value": "2026-10-01T00:00:00Z"
+              },
+              {
+                "name": "now_ts",
+                "value": "2026-10-04T12:00:00Z"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "minutes elapsed from first_seen_ts to now_ts is 5040"
+          }
+        }
+      },
+      {
+        "description": "fails as value when they are further apart",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "time.format",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "first_seen_ts": "2026-10-01T00:00:00Z",
+              "now_ts": "2026-10-08T00:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "minutes elapsed from first_seen_ts to now_ts",
+                "value": 10080
+              },
+              {
+                "name": "first_seen_ts",
+                "value": "2026-10-01T00:00:00Z"
+              },
+              {
+                "name": "now_ts",
+                "value": "2026-10-08T00:00:00Z"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "minutes elapsed from first_seen_ts to now_ts is 5040"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "hours elapsed between two times",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "hours elapsed from first_seen_ts to now_ts is 84"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes when the times are exactly that many hours apart",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "time.format",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "first_seen_ts": "2026-10-01T00:00:00Z",
+              "now_ts": "2026-10-04T12:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "hours elapsed from first_seen_ts to now_ts",
+                "value": 84
+              },
+              {
+                "name": "first_seen_ts",
+                "value": "2026-10-01T00:00:00Z"
+              },
+              {
+                "name": "now_ts",
+                "value": "2026-10-04T12:00:00Z"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "hours elapsed from first_seen_ts to now_ts is 84"
+          }
+        }
+      },
+      {
+        "description": "fails as value when they are further apart",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "time.format",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "first_seen_ts": "2026-10-01T00:00:00Z",
+              "now_ts": "2026-10-08T00:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "hours elapsed from first_seen_ts to now_ts",
+                "value": 168
+              },
+              {
+                "name": "first_seen_ts",
+                "value": "2026-10-01T00:00:00Z"
+              },
+              {
+                "name": "now_ts",
+                "value": "2026-10-08T00:00:00Z"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "hours elapsed from first_seen_ts to now_ts is 84"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "days elapsed between two times",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "days elapsed from first_seen_ts to now_ts is 3.5"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes when the times are exactly that many days apart",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "time.format",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "first_seen_ts": "2026-10-01T00:00:00Z",
+              "now_ts": "2026-10-04T12:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "days elapsed from first_seen_ts to now_ts",
+                "value": 3.5
+              },
+              {
+                "name": "first_seen_ts",
+                "value": "2026-10-01T00:00:00Z"
+              },
+              {
+                "name": "now_ts",
+                "value": "2026-10-04T12:00:00Z"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from first_seen_ts to now_ts is 3.5"
+          }
+        }
+      },
+      {
+        "description": "fails as value when they are further apart",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "time.format",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "first_seen_ts": "2026-10-01T00:00:00Z",
+              "now_ts": "2026-10-08T00:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "days elapsed from first_seen_ts to now_ts",
+                "value": 7
+              },
+              {
+                "name": "first_seen_ts",
+                "value": "2026-10-01T00:00:00Z"
+              },
+              {
+                "name": "now_ts",
+                "value": "2026-10-08T00:00:00Z"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from first_seen_ts to now_ts is 3.5"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "weeks elapsed between two times",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "weeks elapsed from first_seen_ts to now_ts is 0.5"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes when the times are exactly that many weeks apart",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "time.format",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "first_seen_ts": "2026-10-01T00:00:00Z",
+              "now_ts": "2026-10-04T12:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "weeks elapsed from first_seen_ts to now_ts",
+                "value": 0.5
+              },
+              {
+                "name": "first_seen_ts",
+                "value": "2026-10-01T00:00:00Z"
+              },
+              {
+                "name": "now_ts",
+                "value": "2026-10-04T12:00:00Z"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "weeks elapsed from first_seen_ts to now_ts is 0.5"
+          }
+        }
+      },
+      {
+        "description": "fails as value when they are further apart",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "time.format",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "first_seen_ts": "2026-10-01T00:00:00Z",
+              "now_ts": "2026-10-08T00:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "weeks elapsed from first_seen_ts to now_ts",
+                "value": 1
+              },
+              {
+                "name": "first_seen_ts",
+                "value": "2026-10-01T00:00:00Z"
+              },
+              {
+                "name": "now_ts",
+                "value": "2026-10-08T00:00:00Z"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "weeks elapsed from first_seen_ts to now_ts is 0.5"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "days elapsed against a limit by severity",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "days elapsed from first_seen_ts to now_ts is less than $params.max_days named by severity"
+          }
+        }
+      }
+    },
+    "params": {
+      "max_days": {
+        "high": 4
+      }
+    },
+    "cases": [
+      {
+        "description": "passes when fewer days than the limit for its severity have passed",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "time.format",
+          "sentence.derived.compare",
+          "sentence.phrase.order",
+          "sentence.path.start"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "first_seen_ts": "2026-10-01T00:00:00Z",
+              "now_ts": "2026-10-04T12:00:00Z",
+              "severity": "high"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "days elapsed from first_seen_ts to now_ts",
+                "value": 3.5
+              },
+              {
+                "name": "first_seen_ts",
+                "value": "2026-10-01T00:00:00Z"
+              },
+              {
+                "name": "now_ts",
+                "value": "2026-10-04T12:00:00Z"
+              },
+              {
+                "name": "$params.max_days named by severity",
+                "value": 4
+              },
+              {
+                "name": "severity",
+                "value": "high"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from first_seen_ts to now_ts is less than $params.max_days named by severity"
+          }
+        }
+      },
+      {
+        "description": "fails as value when as many days as the limit have passed",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.compare",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "first_seen_ts": "2026-10-01T00:00:00Z",
+              "now_ts": "2026-10-05T00:00:00Z",
+              "severity": "high"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "days elapsed from first_seen_ts to now_ts",
+                "value": 4
+              },
+              {
+                "name": "first_seen_ts",
+                "value": "2026-10-01T00:00:00Z"
+              },
+              {
+                "name": "now_ts",
+                "value": "2026-10-05T00:00:00Z"
+              },
+              {
+                "name": "$params.max_days named by severity",
+                "value": 4
+              },
+              {
+                "name": "severity",
+                "value": "high"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from first_seen_ts to now_ts is less than $params.max_days named by severity"
+          }
+        }
+      },
+      {
+        "description": "fails as absent when the limit has no entry for its severity",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.compare",
+          "sentence.phrase.order",
+          "path.absent"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "first_seen_ts": "2026-10-01T00:00:00Z",
+              "now_ts": "2026-10-04T12:00:00Z",
+              "severity": "low"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "days elapsed from first_seen_ts to now_ts",
+                "value": 3.5
+              },
+              {
+                "name": "first_seen_ts",
+                "value": "2026-10-01T00:00:00Z"
+              },
+              {
+                "name": "now_ts",
+                "value": "2026-10-04T12:00:00Z"
+              },
+              {
+                "name": "$params.max_days named by severity",
+                "value": null
+              },
+              {
+                "name": "severity",
+                "value": "low"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from first_seen_ts to now_ts is less than $params.max_days named by severity"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "days elapsed between two numbers",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "days elapsed from started to ended is 1.5"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads two numbers as seconds and does not round",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "time.pass",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 100,
+              "ended": 129700
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": 1.5
+              },
+              {
+                "name": "started",
+                "value": 100
+              },
+              {
+                "name": "ended",
+                "value": 129700
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is 1.5"
+          }
+        }
+      },
+      {
+        "description": "fails as value when the seconds are fewer",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 5,
+              "ended": 86405
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": 1
+              },
+              {
+                "name": "started",
+                "value": 5
+              },
+              {
+                "name": "ended",
+                "value": 86405
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is 1.5"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "days elapsed between equal times",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "days elapsed from started to ended is 0"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "gives 0 for the same instant written two ways",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "time.pass",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": "2026-01-01T00:00:00Z",
+              "ended": "2026-01-01T01:00:00+01:00"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": 0
+              },
+              {
+                "name": "started",
+                "value": "2026-01-01T00:00:00Z"
+              },
+              {
+                "name": "ended",
+                "value": "2026-01-01T01:00:00+01:00"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is 0"
+          }
+        }
+      },
+      {
+        "description": "gives 0 for two equal numbers",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 5,
+              "ended": 5
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": 0
+              },
+              {
+                "name": "started",
+                "value": 5
+              },
+              {
+                "name": "ended",
+                "value": 5
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is 0"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "days elapsed with the end before the start",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "days elapsed from started to ended is at most 5"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as value for two times, and shows no number",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.compare",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": "2026-01-02T00:00:00Z",
+              "ended": "2026-01-01T00:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": "2026-01-02T00:00:00Z"
+              },
+              {
+                "name": "ended",
+                "value": "2026-01-01T00:00:00Z"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is at most 5"
+          }
+        }
+      },
+      {
+        "description": "fails as value for two numbers",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.compare",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 5,
+              "ended": 4
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": 5
+              },
+              {
+                "name": "ended",
+                "value": 4
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is at most 5"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "days elapsed that cannot be read",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "days elapsed from started to ended is at least 0"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as absent when the start is missing",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.compare",
+          "sentence.phrase.order",
+          "path.absent"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "ended": "2026-10-01T00:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": null
+              },
+              {
+                "name": "ended",
+                "value": "2026-10-01T00:00:00Z"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is at least 0"
+          }
+        }
+      },
+      {
+        "description": "fails as absent when the end is missing",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.compare",
+          "sentence.phrase.order",
+          "path.absent"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": "2026-10-01T00:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": "2026-10-01T00:00:00Z"
+              },
+              {
+                "name": "ended",
+                "value": null
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is at least 0"
+          }
+        }
+      },
+      {
+        "description": "fails as null when the start is null",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.compare",
+          "sentence.phrase.order",
+          "path.null"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": null,
+              "ended": "2026-10-01T00:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "null",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": null
+              },
+              {
+                "name": "ended",
+                "value": "2026-10-01T00:00:00Z"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is at least 0"
+          }
+        }
+      },
+      {
+        "description": "fails as null when the end is null",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.compare",
+          "sentence.phrase.order",
+          "path.null"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": "2026-10-01T00:00:00Z",
+              "ended": null
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "null",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": "2026-10-01T00:00:00Z"
+              },
+              {
+                "name": "ended",
+                "value": null
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is at least 0"
+          }
+        }
+      },
+      {
+        "description": "fails as absent when one side is missing and the other null",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.compare",
+          "sentence.phrase.order",
+          "path.absent",
+          "path.null"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": null
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": null
+              },
+              {
+                "name": "ended",
+                "value": null
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is at least 0"
+          }
+        }
+      },
+      {
+        "description": "fails as unusable when a side is true",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.compare",
+          "sentence.phrase.order",
+          "time.fail"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": true,
+              "ended": "2026-10-01T00:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": true
+              },
+              {
+                "name": "ended",
+                "value": "2026-10-01T00:00:00Z"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is at least 0"
+          }
+        }
+      },
+      {
+        "description": "fails as unusable when a side is a list",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.compare",
+          "sentence.phrase.order",
+          "time.fail"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": "2026-10-01T00:00:00Z",
+              "ended": [
+                1
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": "2026-10-01T00:00:00Z"
+              },
+              {
+                "name": "ended",
+                "value": [
+                  1
+                ]
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is at least 0"
+          }
+        }
+      },
+      {
+        "description": "fails as unusable when a side is an object",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.compare",
+          "sentence.phrase.order",
+          "time.fail"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": {
+                "a": 1
+              },
+              "ended": "2026-10-01T00:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": {
+                  "a": 1
+                }
+              },
+              {
+                "name": "ended",
+                "value": "2026-10-01T00:00:00Z"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is at least 0"
+          }
+        }
+      },
+      {
+        "description": "fails as unusable when a side is text that is not a time",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.compare",
+          "sentence.phrase.order",
+          "time.format",
+          "time.fail"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": "yesterday",
+              "ended": "2026-10-01T00:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": "yesterday"
+              },
+              {
+                "name": "ended",
+                "value": "2026-10-01T00:00:00Z"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is at least 0"
+          }
+        }
+      },
+      {
+        "description": "fails as unusable when a time has a lowercase t",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.compare",
+          "sentence.phrase.order",
+          "time.format",
+          "time.fail"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": "2026-01-01t00:00:00Z",
+              "ended": "2026-10-01T00:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": "2026-01-01t00:00:00Z"
+              },
+              {
+                "name": "ended",
+                "value": "2026-10-01T00:00:00Z"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is at least 0"
+          }
+        }
+      },
+      {
+        "description": "fails as unusable when a time has a lowercase z",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.compare",
+          "sentence.phrase.order",
+          "time.format",
+          "time.fail"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": "2026-10-01T00:00:00Z",
+              "ended": "2026-01-01T00:00:00z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": "2026-10-01T00:00:00Z"
+              },
+              {
+                "name": "ended",
+                "value": "2026-01-01T00:00:00z"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is at least 0"
+          }
+        }
+      },
+      {
+        "description": "fails as unusable when the date does not exist",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.compare",
+          "sentence.phrase.order",
+          "time.format",
+          "time.fail"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": "2026-02-30T00:00:00Z",
+              "ended": "2026-10-01T00:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": "2026-02-30T00:00:00Z"
+              },
+              {
+                "name": "ended",
+                "value": "2026-10-01T00:00:00Z"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is at least 0"
+          }
+        }
+      },
+      {
+        "description": "fails as unusable when the year is before 1678",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.compare",
+          "sentence.phrase.order",
+          "time.format",
+          "time.fail"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": "1677-12-31T00:00:00Z",
+              "ended": "2026-10-01T00:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": "1677-12-31T00:00:00Z"
+              },
+              {
+                "name": "ended",
+                "value": "2026-10-01T00:00:00Z"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is at least 0"
+          }
+        }
+      },
+      {
+        "description": "fails as unusable when the year is after 2261",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.compare",
+          "sentence.phrase.order",
+          "time.format",
+          "time.fail"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": "2026-10-01T00:00:00Z",
+              "ended": "2262-01-01T00:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": "2026-10-01T00:00:00Z"
+              },
+              {
+                "name": "ended",
+                "value": "2262-01-01T00:00:00Z"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is at least 0"
+          }
+        }
+      },
+      {
+        "description": "fails as unusable when one side is a time and the other a number",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.compare",
+          "sentence.phrase.order",
+          "time.fail"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": "2026-10-01T00:00:00Z",
+              "ended": 5
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": "2026-10-01T00:00:00Z"
+              },
+              {
+                "name": "ended",
+                "value": 5
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is at least 0"
+          }
+        }
+      },
+      {
+        "description": "fails as unusable when one side is a number and the other a time",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.compare",
+          "sentence.phrase.order",
+          "time.fail"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 5,
+              "ended": "2026-10-01T00:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": 5
+              },
+              {
+                "name": "ended",
+                "value": "2026-10-01T00:00:00Z"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is at least 0"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "days elapsed under a for line reading the line's name",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": {
+              "for": "every pull_requests as pr",
+              "assert": "days elapsed from pr.opened to pr.closed is at most 2"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes when every pull request was closed within 2 days",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.for.line",
+          "sentence.for.name",
+          "sentence.for.scope",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.derived.compare",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "pull_requests": [
+                {
+                  "opened": 0,
+                  "closed": 86400
+                },
+                {
+                  "opened": 0,
+                  "closed": 172800
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "pull_requests[]",
+                "value": [
+                  {
+                    "closed": 86400,
+                    "opened": 0
+                  },
+                  {
+                    "closed": 172800,
+                    "opened": 0
+                  }
+                ]
+              }
+            ],
+            "failed_items": []
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "for every pull_requests as pr: days elapsed from pr.opened to pr.closed is at most 2"
+          }
+        }
+      },
+      {
+        "description": "fails as value when one pull request took longer, and lists it",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.for.line",
+          "sentence.for.name",
+          "sentence.for.scope",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.derived.compare",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "pull_requests": [
+                {
+                  "opened": 0,
+                  "closed": 86400
+                },
+                {
+                  "opened": 0,
+                  "closed": 259200
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "pull_requests[]",
+                "value": [
+                  {
+                    "closed": 86400,
+                    "opened": 0
+                  },
+                  {
+                    "closed": 259200,
+                    "opened": 0
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "days elapsed from pr.opened to pr.closed is at most 2",
+                    "cause": "value"
+                  }
+                ],
+                "item": "item 2 of pull_requests",
+                "path": "item 2 of pull_requests",
+                "value": null
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "for every pull_requests as pr: days elapsed from pr.opened to pr.closed is at most 2"
+          }
+        }
+      },
+      {
+        "description": "fails as absent when a pull request has no closing time",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.for.line",
+          "sentence.for.name",
+          "sentence.for.scope",
+          "for.walk",
+          "for.try",
+          "for.pass",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.derived.compare",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "pull_requests": [
+                {
+                  "opened": 0
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "pull_requests[]",
+                "value": [
+                  {
+                    "opened": 0
+                  }
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "days elapsed from pr.opened to pr.closed is at most 2",
+                    "cause": "absent"
+                  }
+                ],
+                "item": "item 1 of pull_requests",
+                "path": "item 1 of pull_requests",
+                "value": null
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "for every pull_requests as pr: days elapsed from pr.opened to pr.closed is at most 2"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "days elapsed in a list of assertions",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": {
+              "assert": [
+                "days elapsed from started to ended is at most 2",
+                "hours elapsed from started to ended is at least 24"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes when every line passes",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.assert.list",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 0,
+              "ended": 86400
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": 1
+              },
+              {
+                "name": "ended",
+                "value": 86400
+              },
+              {
+                "name": "hours elapsed from started to ended",
+                "value": 24
+              },
+              {
+                "name": "started",
+                "value": 0
+              }
+            ],
+            "failed_assertions": []
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is at most 2 and hours elapsed from started to ended is at least 24"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a field called days",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "days is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, because days is a word of the grammar",
+        "rules": [
+          "sentence.words",
+          "sentence.written_wrong.slot",
+          "written_wrong",
+          "written_wrong.row"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "days": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "vuln"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "days is a word of the grammar: write .days"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "ill_formed",
+            "inputs": []
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days is 1"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a field called days with a dot",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": ".days is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the field",
+        "rules": [
+          "sentence.words",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "days": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": ".days",
+                "value": 1
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": ".days is 1"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a field called to",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "days elapsed from .to to .days is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads both fields, because to and days are words of the grammar and need a dot",
+        "rules": [
+          "sentence.words",
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "to": 0,
+              "days": 86400
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "days elapsed from .to to .days",
+                "value": 1
+              },
+              {
+                "name": ".to",
+                "value": 0
+              },
+              {
+                "name": ".days",
+                "value": 86400
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from .to to .days is 1"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "days elapsed added to another term",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "days elapsed from started to ended plus 1 is 2"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": [
+          "sentence.derived.elapsed",
+          "sentence.written_wrong.slot",
+          "written_wrong",
+          "written_wrong.row"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 0,
+              "ended": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "vuln"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "an elapsed time isn't supported yet except alone before a phrase"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "ill_formed",
+            "inputs": []
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended plus 1 is 2"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "days elapsed added to another term, first",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "1 plus days elapsed from started to ended is 2"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": [
+          "sentence.derived.elapsed",
+          "sentence.written_wrong.slot",
+          "written_wrong",
+          "written_wrong.row"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 0,
+              "ended": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "vuln"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "an elapsed time isn't supported yet except alone before a phrase"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "ill_formed",
+            "inputs": []
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "1 plus days elapsed from started to ended is 2"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "days elapsed on the right side of a phrase",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "n is days elapsed from started to ended"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": [
+          "sentence.derived.elapsed",
+          "sentence.written_wrong.slot",
+          "written_wrong",
+          "written_wrong.row"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 0,
+              "ended": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "vuln"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "an elapsed time isn't supported yet except alone before a phrase"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "ill_formed",
+            "inputs": []
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "n is days elapsed from started to ended"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "days elapsed in a sum on the right side",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "n is more than 1 plus days elapsed from started to ended"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": [
+          "sentence.derived.elapsed",
+          "sentence.written_wrong.slot",
+          "written_wrong",
+          "written_wrong.row"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 0,
+              "ended": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "vuln"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "an elapsed time isn't supported yet except alone before a phrase"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "ill_formed",
+            "inputs": []
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "n is more than 1 plus days elapsed from started to ended"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "days elapsed in the whose of an every",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "every xs whose days elapsed from started to ended is 1 is not empty"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": [
+          "sentence.derived.elapsed",
+          "sentence.derived.compare",
+          "sentence.written_wrong.slot",
+          "written_wrong",
+          "written_wrong.row"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 0,
+              "ended": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "vuln"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "an elapsed time isn't supported yet except alone before a phrase"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "ill_formed",
+            "inputs": []
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "every xs whose days elapsed from started to ended is 1 is not empty"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "days elapsed in the whose of a count",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "count of xs whose days elapsed from started to ended is 1 is 2"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": [
+          "sentence.derived.elapsed",
+          "sentence.written_wrong.slot",
+          "written_wrong",
+          "written_wrong.row"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 0,
+              "ended": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "vuln"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "a count of, a sum of or a plus in the whose of a count of or a sum of isn't supported yet",
+                  "an elapsed time isn't supported yet except alone before a phrase"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "ill_formed",
+            "inputs": []
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "count of xs whose days elapsed from started to ended is 1 is 2"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "days elapsed after every",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "every xs is days elapsed from started to ended"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": [
+          "sentence.derived.elapsed",
+          "sentence.written_wrong.slot",
+          "written_wrong",
+          "written_wrong.row"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 0,
+              "ended": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "vuln"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "an elapsed time isn't supported yet except alone before a phrase",
+                  "count of, sum of and plus after every or some aren't supported yet"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "ill_formed",
+            "inputs": []
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "every xs is days elapsed from started to ended"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "days elapsed with is between",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "days elapsed from started to ended is between 1 and 2"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": [
+          "sentence.derived.elapsed",
+          "sentence.derived.compare",
+          "sentence.written_wrong.slot",
+          "written_wrong",
+          "written_wrong.row"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 0,
+              "ended": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "vuln"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "\"is between\" after a count of, a sum of or a plus isn't supported yet"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "ill_formed",
+            "inputs": []
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is between 1 and 2"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "days elapsed with a phrase that takes no number",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "days elapsed from started to ended is empty"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": [
+          "sentence.derived.elapsed",
+          "sentence.derived.compare",
+          "sentence.written_wrong.slot",
+          "written_wrong",
+          "written_wrong.row"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 0,
+              "ended": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "vuln"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "is empty can't follow a count of, a sum of or a plus"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "ill_formed",
+            "inputs": []
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is empty"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "days elapsed with a unit that has no fixed length",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "months elapsed from started to ended is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": [
+          "sentence.derived.elapsed",
+          "sentence.written_wrong.slot",
+          "written_wrong",
+          "written_wrong.row"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 0,
+              "ended": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "vuln"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "doesn't parse"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "ill_formed",
+            "inputs": []
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "months elapsed from started to ended is 1"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "days elapsed in a from line",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": "vulns whose days elapsed from started to ended is 1"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong in the from line, and $well_formed says why",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.written_wrong.slot"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 0,
+              "ended": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "vuln"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "subjects.vuln.from",
+                "value": [
+                  "an elapsed time isn't supported yet except alone before a phrase"
+                ]
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "id exists"
+          }
+        }
+      }
+    ]
   }
 ]

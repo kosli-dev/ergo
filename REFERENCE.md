@@ -732,6 +732,37 @@ all four pass. Each row shows the number ergo worked out, named after the words 
 - `whose` goes after the last `count of` or `sum of`, and only on the left: `claude_found plus count of findings whose source is "gpt" is at least 3`.
 - A count goes with `is`, `equals`, `is not`, `does not equal`, `is at least`, `is at most`, `is more than`, `is less than` and `within`.
 
+`seconds`, `minutes`, `hours`, `days` and `weeks` followed by `elapsed from` and two paths, like `days elapsed from first_seen_ts to now_ts`, work out the time between two fields. Take a requirement on `vulnerabilities`, with the policy's params `{"max_days": {"high": 7, "low": 30}}` and this input:
+
+```json
+{"vulnerabilities": [
+  {"id": "CVE-1", "severity": "high", "first_seen_ts": "2026-10-01T00:00:00Z", "now_ts": "2026-10-04T12:00:00Z"},
+  {"id": "CVE-2", "severity": "low", "first_seen_ts": "2026-08-01T00:00:00Z", "now_ts": "2026-10-04T12:00:00Z"}
+]}
+```
+
+```yaml
+fixed_in_time: days elapsed from first_seen_ts to now_ts is less than $params.max_days named by severity
+```
+
+`CVE-1` passes, with 3.5 days against a limit of 7. `CVE-2` fails as `value`, with 64.5 days against 30, and its row's `inputs` are:
+
+```json
+[
+  {"name": "days elapsed from first_seen_ts to now_ts", "value": 64.5},
+  {"name": "first_seen_ts", "value": "2026-08-01T00:00:00Z"},
+  {"name": "now_ts", "value": "2026-10-04T12:00:00Z"},
+  {"name": "$params.max_days named by severity", "value": 30},
+  {"name": "severity", "value": "low"}
+]
+```
+
+- A unit is a fixed length: a second, 60 seconds, 3600, 86400 and 604800. The result is rounded down to 6 decimal places, so 36 hours is `1.5` days and one second is `0.000011` days. That way every runtime gives the same number. There's no `months` or `years`, because they have no fixed length.
+- Both fields must be RFC 3339 times, like `2026-10-01T00:00:00Z` (a capital `T` and `Z`, a real date, a year from 1678 to 2261), or both numbers, which are read as seconds, to the nearest microsecond. A number must be between -9000000000 and 9000000000, about the years 1684 to 2255, so a time in milliseconds fails as `unusable` instead of being read as seconds. A missing field fails the check as `absent`, a `null` one as `null`, and anything else, including one time and one number, as `unusable`.
+- When the second time is before the first, the check fails as `value`, and the number in its first input is `null`.
+- It only goes alone at the start of a sentence, with the phrases a count goes with. `plus`, a `whose`, `every`, `some`, the right side of a phrase and a `from` line are written wrong with `isn't supported yet`. It works in each line under `assert`, and under a `for` line, where a path can start at a name, like `days elapsed from pr.opened_ts to pr.merged_ts is at most 2`.
+- `seconds`, `minutes`, `hours`, `days`, `weeks` and `to` are words of the grammar, so a field with one of those names is written `.days`.
+
 A sentence that can't be read is [written wrong](#basic-operators), and the `$well_formed` row says why, with the column when it can:
 
 ```json
@@ -740,7 +771,7 @@ A sentence that can't be read is [written wrong](#basic-operators), and the `$we
 
 for `prod: environment is "prod`. `x is not null` is written wrong too, because it could only fail: write `x exists`. So is a value that isn't a number before `within`, like `x is "a" within 1`. An object with both `assert` and `op` is read as a check with an `op`, so a [custom operator](#custom-operators) can still take `assert`.
 
-ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `last of`, `is between` after a `count of`, a `sum of` or a `plus`, a `count of` in the `whose` of another, a `plus` in the phrase of an `every` or `some`, a value after `is before` and the other time phrases, and a list after a phrase read from a path with `named by` in it, like `matches $params.a named by $params.b`. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `last_signed: last of commits.signed is true` gives:
+ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `last of`, `is between` after a `count of`, a `sum of`, a `plus` or an elapsed time, a `count of` in the `whose` of another, a `plus` in the phrase of an `every` or `some`, an elapsed time anywhere but alone at the start of a sentence, a value after `is before` and the other time phrases, and a list after a phrase read from a path with `named by` in it, like `matches $params.a named by $params.b`. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `last_signed: last of commits.signed is true` gives:
 
 ```json
 {"name": "checks.last_signed", "value": ["last of isn't supported yet"]}
