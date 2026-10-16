@@ -8,6 +8,7 @@ The sources, as of 9 October 2026:
 - [kosli-dev/server](https://github.com/kosli-dev/server) `demo/use_cases/policies/` and `flow-templates/policies/npm-bump/`. Seven of the demo policies are plain Rego, not ergo. Their conditions are written as the checks an ergo policy would have.
 - [kosli-dev/pr-reviewer](https://github.com/kosli-dev/pr-reviewer) `kosli/policies/review-controls/`, custom operators included
 - ergo's `examples/baking` and the README example
+- [cyber-dojo/snyk-scanning](https://github.com/cyber-dojo/snyk-scanning) `snyk-vuln-compliance.rego` at `bbc1abc`, as of 16 October 2026. It's plain Rego, and the only source here that's public.
 - Tore's DEV controls, all 36 of them, from [kosli-playground/dev-process-controls](https://github.com/kosli-playground/dev-process-controls). They're invented to exercise ergo, so a check only they need weighs less.
 
 Paths are written as the sentence writes them. `$params.x` is today's `{ref: [$$params, x]}`, `$input` is `$$input`, and `named by $params.x` reads a key named by a param, a ref step today. Brackets are the other spelling, `artifacts_statuses[$params.artifact_name]`, and the corpus uses the word form, as the report prints it. The subject's `id` is one key in every policy here, so it's left out.
@@ -332,6 +333,34 @@ Same as SDLC-CTRL-0004 dependencies, except:
 | `from` of deployment | `[deployments], applies_to: {is_prod}`           | `deployments whose environment is "prod"` | `$applies` prints `environment is "prod"`               |
 | filter `is_prod`     | `{op: equals, path: [environment], value: prod}` | `environment is "prod"`                   | In the `whose` of deployment's `from`, so its name goes |
 | `approved`           | `{op: non_empty_string, path: [approved_by]}`    | `approved_by is not empty`                | widens                                                  |
+
+## cyber-dojo
+
+### snyk-vuln-compliance (plain Rego)
+
+Every vuln Snyk found in one artifact. One with no `.snyk` ignore must be fixed within the limit for its severity, counted from when it was first seen, and one with an ignore passes until the ignore's date, or always when it has none. The sentences are the ones in [jbpros/snyk-scanning](https://github.com/jbpros/snyk-scanning/tree/ergo-port/ergo), which runs them.
+
+|                                     | today                                                                                        | sentence                                                                          | notes                                                                                                                                                                                                                   |
+| ----------------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `from` of vuln                      | `input.vulns`                                                                                | `vulns`                                                                           |                                                                                                                                                                                                                         |
+| `from` of unignored critical vuln   | `vuln.ignore_expires_exists == false`                                                        | `vuln whose ignore_expires_exists is false and severity is "critical"`            | chain, depth 2. One subject per severity, because a sentence can't read the limit with `$params.max_days_by_severity named by severity`. `$applies` prints `ignore_expires_exists is false and severity is "critical"`  |
+| `from` of unignored high vuln       | `vuln.ignore_expires_exists == false`                                                        | `vuln whose ignore_expires_exists is false and severity is "high"`                | chain, depth 2. As for critical                                                                                                                                                                                         |
+| `from` of unignored medium vuln     | `vuln.ignore_expires_exists == false`                                                        | `vuln whose ignore_expires_exists is false and severity is "medium"`              | chain, depth 2. As for critical                                                                                                                                                                                         |
+| `from` of unignored low vuln        | `vuln.ignore_expires_exists == false`                                                        | `vuln whose ignore_expires_exists is false and severity is "low"`                 | chain, depth 2. As for critical                                                                                                                                                                                         |
+| `from` of ignored vuln              | `vuln.ignore_expires_exists == true`                                                         | `vuln whose ignore_expires_exists is true`                                        | chain, depth 2                                                                                                                                                                                                          |
+| `from` of vuln ignored until a date | `vuln.ignore_expires_exists == true; vuln.ignore_forever == false`                           | `"ignored vuln" whose ignore_forever is false`                                    | chain, depth 3: it narrows `ignored vuln`, which narrows `vuln`. A vuln with no `ignore_forever` fails `$applies` as `absent` even when `ignore_expires_exists` is false, where Rego never reads the field              |
+| `severity`                          | `max_days_by_severity[vuln.severity]`                                                        | `severity is one of "critical", "high", "medium", "low"`                          | narrows. Rego only reads the severity of a vuln with no ignore, so an ignored vuln with another severity passes there and fails here                                                                                    |
+| `ignore_known`                      | `vuln.ignore_expires_exists == false`, or `== true`                                          | `ignore_expires_exists is a boolean`                                              | Rego denies a vuln that matches neither, with no violation naming it. Without this check, a value like `"false"` would leave the vuln out of every subject and pass                                                     |
+| `forever_known`                     | `vuln.ignore_forever == false`, or `== true`                                                 | `ignore_forever is a boolean`                                                     | As `ignore_known`, on `ignored vuln`                                                                                                                                                                                    |
+| `seen_before_now`                   | `days >= 0` in `age_days`                                                                    | `first_seen_ts is at most now_ts`                                                 | Rego leaves the age undefined and denies with no violation naming the vuln. One per severity, like `within_limit`                                                                                                       |
+| `within_limit`                      | `(vuln.now_ts - vuln.first_seen_ts) / seconds_per_day < max_days_by_severity[vuln.severity]` | `first_seen_ts plus $params.max_seconds_by_severity.critical is more than now_ts` | A sentence can't subtract or divide, so the limits move from days to seconds and the age check becomes a sum. With the original's days, it needs arithmetic (#140) and `$params.max_days_by_severity named by severity` |
+| `seen_before_now`                   | `days >= 0` in `age_days`                                                                    | `first_seen_ts is at most now_ts`                                                 |                                                                                                                                                                                                                         |
+| `within_limit`                      | `(vuln.now_ts - vuln.first_seen_ts) / seconds_per_day < max_days_by_severity[vuln.severity]` | `first_seen_ts plus $params.max_seconds_by_severity.high is more than now_ts`     | As for critical                                                                                                                                                                                                         |
+| `seen_before_now`                   | `days >= 0` in `age_days`                                                                    | `first_seen_ts is at most now_ts`                                                 |                                                                                                                                                                                                                         |
+| `within_limit`                      | `(vuln.now_ts - vuln.first_seen_ts) / seconds_per_day < max_days_by_severity[vuln.severity]` | `first_seen_ts plus $params.max_seconds_by_severity.medium is more than now_ts`   | As for critical                                                                                                                                                                                                         |
+| `seen_before_now`                   | `days >= 0` in `age_days`                                                                    | `first_seen_ts is at most now_ts`                                                 |                                                                                                                                                                                                                         |
+| `within_limit`                      | `(vuln.now_ts - vuln.first_seen_ts) / seconds_per_day < max_days_by_severity[vuln.severity]` | `first_seen_ts plus $params.max_seconds_by_severity.low is more than now_ts`      | As for critical                                                                                                                                                                                                         |
+| `not_expired`                       | `vuln.ignore_expires_ts >= vuln.now_ts`                                                      | `ignore_expires_ts is at least now_ts`                                            |                                                                                                                                                                                                                         |
 
 ## DEV controls
 
@@ -696,51 +725,53 @@ Same as DEV-0504 roll-back ready, new features, except:
 
 ## Tally
 
-Every phrase, counted from the parses, twins included: 229 checks and 74 filters, 14 of the checks with a `for` line, plus 91 `from` lines. That's 336 lines in all.
+Every phrase, counted from the parses, twins included: 241 checks and 74 filters, 14 of the checks with a `for` line, plus 98 `from` lines. That's 355 lines in all.
 
-| phrase                  | sdlc-policies | server | pr-reviewer | ergo | DEV controls | total |
-| ----------------------- | ------------: | -----: | ----------: | ---: | -----------: | ----: |
-| `is`                    | 14            | 34     | 23          | 1    | 79           | 151   |
-| `is not empty`          | 9             | 11     | 2           | 1    | 31           | 54    |
-| `$params`               | 11            | 31     |             |      | 9            | 51    |
-| `whose` (in `from`)     | 3             | 3      | 14          | 1    | 28           | 49    |
-| `named by $params.x`    | 8             | 29     |             |      |              | 37    |
-| `and` (in `whose`)      | 1             | 1      | 9           |      | 21           | 32    |
-| `is before`             |               |        |             |      | 21           | 21    |
-| `some`                  | 3             | 4      | 3           |      | 10           | 20    |
-| `is one of`             |               |        | 9           |      | 9            | 18    |
-| `$input`                |               |        |             |      | 17           | 17    |
-| `as`                    | 2             | 1      | 1           |      | 12           | 16    |
-| `every`                 | 2             | 1      | 1           |      | 12           | 16    |
-| `whose`                 | 1             | 1      | 3           |      | 10           | 15    |
-| `equals`                | 2             | 2      | 7           |      | 3            | 14    |
-| `for` line              | 1             | 1      | 1           |      | 11           | 14    |
-| `does not equal`        | 1             | 2      | 1           |      | 5            | 9     |
-| `is at least`           |               |        | 9           |      |              | 9     |
-| `count of`              |               |        | 6           |      |              | 6     |
-| `count of` (in `whose`) |               |        | 6           |      |              | 6     |
-| `is after`              | 1             | 1      |             |      | 4            | 6     |
-| `is empty`              |               | 1      | 4           |      | 1            | 6     |
-| `is in`                 | 1             |        |             |      | 5            | 6     |
-| `is on or after`        |               |        |             |      | 6            | 6     |
-| `named by each of`      | 1             | 1      |             |      | 4            | 6     |
-| `matches`               |               |        | 3           |      | 2            | 5     |
-| `exists`                | 2             | 1      |             |      | 1            | 4     |
-| `is between`            | 1             | 1      |             | 2    |              | 4     |
-| `, if any,`             |               |        |             |      | 3            | 3     |
-| `contains`              |               |        | 3           |      |              | 3     |
-| `does not match`        | 1             | 1      | 1           |      |              | 3     |
-| `contains all of`       |               |        | 1           |      | 1            | 2     |
-| `does not contain`      |               |        |             | 1    | 1            | 2     |
-| `equals ... within`     |               |        | 2           |      |              | 2     |
-| `plus`                  |               |        | 2           |      |              | 2     |
-| `sum of`                |               |        | 2           |      |              | 2     |
-| list under `assert`     | 1             |        |             |      | 1            | 2     |
-| `is a`                  |               |        | 1           |      |              | 1     |
-| `is not`                |               |        | 1           |      |              | 1     |
-| `named by <name>`       |               |        | 1           |      |              | 1     |
+| phrase                  | sdlc-policies | server | pr-reviewer | ergo | cyber-dojo | DEV controls | total |
+| ----------------------- | ------------: | -----: | ----------: | ---: | ---------: | -----------: | ----: |
+| `is`                    | 14            | 34     | 23          | 1    | 10         | 79           | 161   |
+| `$params`               | 11            | 31     |             |      | 4          | 9            | 55    |
+| `whose` (in `from`)     | 3             | 3      | 14          | 1    | 6          | 28           | 55    |
+| `is not empty`          | 9             | 11     | 2           | 1    |            | 31           | 54    |
+| `named by $params.x`    | 8             | 29     |             |      |            |              | 37    |
+| `and` (in `whose`)      | 1             | 1      | 9           |      | 4          | 21           | 36    |
+| `is before`             |               |        |             |      |            | 21           | 21    |
+| `some`                  | 3             | 4      | 3           |      |            | 10           | 20    |
+| `is one of`             |               |        | 9           |      | 1          | 9            | 19    |
+| `$input`                |               |        |             |      |            | 17           | 17    |
+| `as`                    | 2             | 1      | 1           |      |            | 12           | 16    |
+| `every`                 | 2             | 1      | 1           |      |            | 12           | 16    |
+| `whose`                 | 1             | 1      | 3           |      |            | 10           | 15    |
+| `equals`                | 2             | 2      | 7           |      |            | 3            | 14    |
+| `for` line              | 1             | 1      | 1           |      |            | 11           | 14    |
+| `is at least`           |               |        | 9           |      | 1          |              | 10    |
+| `does not equal`        | 1             | 2      | 1           |      |            | 5            | 9     |
+| `count of`              |               |        | 6           |      |            |              | 6     |
+| `count of` (in `whose`) |               |        | 6           |      |            |              | 6     |
+| `is after`              | 1             | 1      |             |      |            | 4            | 6     |
+| `is empty`              |               | 1      | 4           |      |            | 1            | 6     |
+| `is in`                 | 1             |        |             |      |            | 5            | 6     |
+| `is on or after`        |               |        |             |      |            | 6            | 6     |
+| `named by each of`      | 1             | 1      |             |      |            | 4            | 6     |
+| `plus`                  |               |        | 2           |      | 4          |              | 6     |
+| `matches`               |               |        | 3           |      |            | 2            | 5     |
+| `exists`                | 2             | 1      |             |      |            | 1            | 4     |
+| `is between`            | 1             | 1      |             | 2    |            |              | 4     |
+| `is at most`            |               |        |             |      | 4          |              | 4     |
+| `is more than`          |               |        |             |      | 4          |              | 4     |
+| `, if any,`             |               |        |             |      |            | 3            | 3     |
+| `contains`              |               |        | 3           |      |            |              | 3     |
+| `does not match`        | 1             | 1      | 1           |      |            |              | 3     |
+| `is a`                  |               |        | 1           |      | 2          |              | 3     |
+| `contains all of`       |               |        | 1           |      |            | 1            | 2     |
+| `does not contain`      |               |        |             | 1    |            | 1            | 2     |
+| `equals ... within`     |               |        | 2           |      |            |              | 2     |
+| `sum of`                |               |        | 2           |      |            |              | 2     |
+| list under `assert`     | 1             |        |             |      |            | 1            | 2     |
+| `is not`                |               |        | 1           |      |            |              | 1     |
+| `named by <name>`       |               |        | 1           |      |            |              | 1     |
 
-Not used anywhere: `is not one of`, `does not exist`, `contains none of`, `starts with`, `ends with`, `is at most`, `is more than`, `is less than`, `is on or before`, `is ... within`, `ignoring case`, `first of`, `item 3 of` and `items[2]`.
+Not used anywhere: `is not one of`, `does not exist`, `contains none of`, `starts with`, `ends with`, `is less than`, `is on or before`, `is ... within`, `ignoring case`, `first of`, `item 3 of` and `items[2]`.
 
 ## pr-reviewer's custom operators
 
@@ -758,9 +789,10 @@ All seven run today: the five numeric ones since #173, as it found, `keys_match`
 
 ## Misfits
 
-Checks the grammar can't say as they are today, or can say only by changing what passes. This is the grammar's edge. With #174's `for` line, lists under `assert` and `named by`, only one is left.
+Checks the grammar can't say as they are today, or can say only by changing what passes. This is the grammar's edge. With #174's `for` line, lists under `assert` and `named by`, only two are left.
 
 - **demo SDLC-CTRL-0008 quality assurance `test suite`** (server, misfit). Rego writes one requirement per suite name. The sentence form can't loop over names to make requirements. Smallest addition: none, because sdlc-policies 0008 already says the same with `named by each of`, one requirement whose subjects are the suites. This one should move to that shape.
+- **snyk-vuln-compliance `within_limit`** (cyber-dojo, misfit). The limit is a number of days picked by the vuln's severity, and the age is worked out from two Unix timestamps. A sentence can't read `$params.max_days_by_severity named by severity`, and can't turn days into seconds, so the corpus has a subject and a requirement per severity, with the limits in seconds. Smallest addition: a reference after `named by` read from the subject (#63), and days added to a time (#140). #140 alone isn't enough, because it asks whether times written as numbers are allowed, and this input has no RFC 3339 time: its `first_seen` reads like `2025-05-30 00:00:00+00:00`.
 
 Fits on one line, but changes what passes:
 
@@ -769,9 +801,10 @@ Fits on one line, but changes what passes:
 - **Timestamps compared as text** (sdlc-policies 0007 and server 0007 `peer_approval`). Today's `compare` with `gt` orders them as text. `is after` reads them as times and fails one that isn't RFC 3339. That's a fix, but it is a change.
 - **Custom operators that skipped items** (pr-reviewer `first_pass_findings_recorded`, `second_pass_findings_recorded`, `verifier_cost_matches_its_stage`). A finding with no `source`, or a stage row with no `stage`, was skipped and could pass. The sentence fails it as `absent`, as #173 meant.
 - **Rego's `!=` and `!= ""`** (server 0010 `approved_by_non_author`, require-artifact-provenance `fingerprint`). Rego passes values of another type, the sentence fails them as `unusable`.
+- **Fields Rego only reads in one case** (snyk-vuln-compliance `severity` and `vuln ignored until a date`). Rego reads the severity only of a vuln with no ignore, and `ignore_forever` only of an ignored one. The sentences read both on every vuln, so an ignored vuln with an unknown severity, or an unignored one with no `ignore_forever`, fails where Rego passes. Snyk's schema rules both out.
 - **Rego defaults** (34 paths in the server demos and sdlc-policies 0004). A Rego variable like `artifact_name` with a default of `"artifact"` becomes `$params.artifact_name`, which fails without the param. sdlc-policies already made that choice.
 
-Fits, but only after Rego reshapes the input (26 entries): sdlc-policies 0004 builds every subject from attested text, the server demos copy fields between objects, and DEV-0401, 0402, 0705 and 0802 compute deadlines with date arithmetic (#140). Sentences don't change that. A deadline as a sentence would need date arithmetic and a param key read from the subject, `$params.sla_days at severity`.
+Fits, but only after Rego reshapes the input (26 entries): sdlc-policies 0004 builds every subject from attested text, the server demos copy fields between objects, and DEV-0401, 0402, 0705 and 0802 compute deadlines with date arithmetic (#140). Sentences don't change that. A deadline as a sentence would need date arithmetic and a param key read from the subject, `$params.sla_days at severity`. snyk-vuln-compliance needs the same, and is a misfit above.
 
 ## `is`, never `must`
 
@@ -781,7 +814,7 @@ The question is closed: [#174](https://github.com/kosli-dev/ergo/issues/174#the-
 
 What the corpus says about each decision the brief left open.
 
-**Looking up by key.** #174 settled it as `named by`, with brackets as the other spelling. It appears 37 times, all in sdlc-policies and the server demos, and 24 of those have more path after the key, like `artifacts_statuses named by $params.artifact_name.attestations_statuses`. Every reference after `named by` in the corpus is `$params` plus one key, or a name from a `for` line, so the issue's rule takes nothing away. Whether the report prints the word form or brackets waits for the readability test.
+**Looking up by key.** #174 settled it as `named by`, with brackets as the other spelling. It appears 37 times, all in sdlc-policies and the server demos, and 24 of those have more path after the key, like `artifacts_statuses named by $params.artifact_name.attestations_statuses`. Every reference after `named by` in the corpus is `$params` plus one key, or a name from a `for` line, so the issue's rule takes nothing away. Two policies would read a key from the subject if they could: DEV-0401's `$params.sla_days named by severity` and snyk-vuln-compliance's `$params.max_days_by_severity named by severity`. Both are written another way here. Whether the report prints the word form or brackets waits for the readability test.
 
 **`from` with `whose`, and `$applies`.** #174 folds `applies_to` into `from`. The 74 filters became 74 `whose` conditions on 49 `from` lines. 15 of those lines are new: in pr-reviewer and sdlc-policies 0004, several requirements shared one subject with different filters, and each filter set is now a subject of its own. Six pr-reviewer filters are `count of x is at least 1`, since a `whose` condition can start with `count of` or `sum of`. The `$applies` row prints the conditions as written, joined with `and`. Each `from` row above says what it prints.
 
@@ -789,7 +822,7 @@ What the corpus says about each decision the brief left open.
 
 **One-line `every` and `some`, or always `for`.** #174 asks whether the one-line form earns its second scoping rule. 20 assertions use a one-line `every` or `some` (11 `every`, 9 `some`) and 14 checks have a `for` line, so most walks don't need one. 18 of the 20 read nothing after the path but a value or `$params`, like `every commits.verified is true` or `some licences is in $params.allowed_licenses`, so for them the second rule never comes up. It only matters for a bare field read on the item, which happens in 2: DEV-0801's `whose state is "APPROVED"`, and server 0007, where the `whose` and the argument read fields Rego copied onto each approver. A one-line form without `whose` and without bare fields in its argument would keep the 18 on one line and move those 2 to `for`. But `count of ... whose` and `sum of ... whose` (3 checks, all pr-reviewer) read the item in their `whose` whatever happens, because a `for` line can't produce a number, so the item-scoped `whose` stays in the grammar either way.
 
-**Chains.** #174 lets a subject start from another subject by name. 6 `from` lines chain, twins included. 4 descend from `artifact` instead of repeating its lookup: sdlc-policies 0007's pull requests and 0008's test suites, the server's copy of 0008, and server 0010's approval attestation. 2 narrow, DEV-0409's `critical defect` and its twin. No chain is more than two subjects deep. The deepest check is sdlc-policies 0007 `peer_approval`: two chained subjects, then two `for` items, so four levels and three list walks, the same three walks it has today. A subject's own name in its own `from` is the input field, so sdlc-policies 0004's `lockfile` reads `input.lockfile`, and its `artifact` drops `from` altogether. The tokenizer applied that rule and the other one, that any other subject's name starts a chain, to every `from` line, and it finds exactly the 6 chains above. 19 subject names have a space, like `production deployment`. One of those can start a chain quoted, but no chain in the corpus needs it.
+**Chains.** #174 lets a subject start from another subject by name. 12 `from` lines chain, twins included. 4 descend from `artifact` instead of repeating its lookup: sdlc-policies 0007's pull requests and 0008's test suites, the server's copy of 0008, and server 0010's approval attestation. 8 narrow: DEV-0409's `critical defect` and its twin, and six in snyk-vuln-compliance, which narrow `vuln` by severity and by its ignore. One of those is three subjects deep, `vuln ignored until a date`, which narrows `ignored vuln`, which narrows `vuln`. No chain that descends is more than two subjects deep. The deepest check is sdlc-policies 0007 `peer_approval`: two chained subjects, then two `for` items, so four levels and three list walks, the same three walks it has today. A subject's own name in its own `from` is the input field, so sdlc-policies 0004's `lockfile` reads `input.lockfile`, and its `artifact` drops `from` altogether. The tokenizer applied that rule and the other one, that any other subject's name starts a chain, to every `from` line, and it found the 6 chains in the corpus then. ergo reads snyk-vuln-compliance's six as chains too, and runs them. 25 subject names have a space, like `production deployment`. Only `vuln ignored until a date` starts from one of them, quoted: `"ignored vuln" whose ignore_forever is false`.
 
 **Time phrases.** Settled in #174 as `is before`, `is after`, `is on or after` and `is on or before`. The corpus has 33 time comparisons: 21 `is before`, 6 `is after` and 6 `is on or after`, which were `is not before` before. 4 of the `is on or after` compare a deadline Rego worked out with `$input.evaluated_at` (#140). Two checks compare timestamps as text today, and the time phrases fail a timestamp that isn't RFC 3339.
 
