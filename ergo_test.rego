@@ -7972,7 +7972,7 @@ test_every_corpus_line_parses_and_prints_back_unchanged if {
 	every text in data.spec.sentence_corpus {
 		_prints_back(text)
 	}
-	count(data.spec.sentence_corpus) == 307
+	count(data.spec.sentence_corpus) == 326
 }
 
 _prints_back(text) if _printed(text) == text
