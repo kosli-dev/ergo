@@ -38,7 +38,7 @@ Reading a path ends in one of these outcomes. Each one except `found` is also a 
 | `unmatched`     | A selector found no item in a list that's there.                                                                         |
 | `ambiguous`     | A selector found more than one item.                                                                                     |
 
-**[path.start]** A path starts at the subject, the input, the params or a name. With no params, or params that aren't an object, a path into the params ends `absent`.
+**[path.start]** A path starts at the subject, the input, the params or a name. With no params, a path into the params ends `absent`. Params that are there but aren't an object fail the whole report, as [REFERENCE.md](../REFERENCE.md#params) says.
 
 **[path.empty]** A path with no steps reads its starting value itself, so on a subject it never ends `not_an_object`. A `null` subject ends `null`.
 
@@ -93,7 +93,7 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 
 **[present.missing]** It fails with cause `value` when its path ends `absent` or `null`. Whether the field is there is the question it asks, so "it isn't" is a sound answer, and the cause says so.
 
-**[present.no_params]** On a path into the params, it fails with cause `absent` instead when there are no params, or they aren't an object. Then the params weren't given at all, so ergo can't tell whether the field would be there, and a policy run without its params fails instead of ruling every subject out. When the params are an object without the field, it fails with `value` as usual.
+**[present.no_params]** On a path into the params, it fails with cause `absent` instead when there are no params. Then the params weren't given at all, so ergo can't tell whether the field would be there, and a policy run without its params fails instead of ruling every subject out. When the params are an object without the field, it fails with `value` as usual.
 
 **[present.other]** It fails with the outcome as its cause when its path ends any other way: `not_an_object`, `unusable`, `unmatched` or `ambiguous`. A ref step whose ref can't be read keeps the ref's cause too, even `absent` or `null`, because then the field it looks for is unknown, not missing.
 
