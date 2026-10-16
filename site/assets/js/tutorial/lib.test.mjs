@@ -16,7 +16,7 @@ const nutFree = 'allergens does not contain "nuts"';
 
 test("the policy has one subject that is the whole input, one requirement and one check", () => {
   assert.deepEqual(buildPolicy("x is 1"), {
-    subjects: { batch: { from: [] } },
+    subjects: { batch: { from: "$input" } },
     requirements: { tutorial: { subject: "batch", checks: { sentence: "x is 1" } } },
   });
 });
@@ -1262,8 +1262,8 @@ test("the YAML is built from the reader's own parts", () => {
   assert.equal(policyYaml(policy), [
     "subjects:",
     "  batch:",
-    "    from: [batches]",
-    "    identified_by: [id]",
+    "    from: batches",
+    "    identified_by: id",
     "requirements:",
     "  safe_to_sell:",
     "    description: Safe to sell",
