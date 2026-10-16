@@ -4590,5 +4590,35 @@
         "expressions": {"s": {"$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "dev": "$input.dev does not contain tested_by", "every": "every commits.sha whose author is \"x\" is in ok", "files": "files contains all of gap_files", "for": "for every approvers as ap: ap.username is not in excluded", "some": "some commits.sha whose author is \"x\" is in ok"}}
       }
     ]
+  },
+  {
+    "description": "named by a field",
+    "policy": {"requirements": {"s": {"checks": {"item": "every items.n is at least $params.min named by kind", "limit": "age is less than $params.max_days named by severity", "named": {"assert": "$params.need named by k exists", "for": "every kinds as k"}, "own": "m named by k is 1"}, "subject": "thing"}}, "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}},
+    "params": {"max_days": {"critical": 1, "high": 5}, "min": {"a": 2, "b": 2}, "need": {"b": 1}},
+    "cases": [
+      {
+        "description": "the subject's field picks the key, inside a whose or a one-line every the item's does, and a for name hides a field with the same name",
+        "rules": ["path.field_step", "sentence.path.dynamic", "sentence.path.start", "for.named_by"],
+        "input": {"things": [{"age": 3, "id": 1, "items": [{"kind": "a", "n": 3}], "k": "a", "kinds": ["b"], "m": {"a": 1}, "severity": "high"}, {"age": 2, "id": 2, "items": [{"kind": "b", "n": 1}], "k": "b", "kinds": ["b", "a"], "m": {"a": 1, "b": 2}, "severity": "critical"}, {"age": 0, "id": 3, "items": [{"kind": 5, "n": 3}], "k": null, "kinds": ["b"], "m": {"a": 1}, "severity": "unknown"}, {"age": 0, "id": 4, "items": [{"n": 3}], "k": 7, "kinds": ["b"], "m": {"a": 1}}]},
+        "results": [
+          {"cause": "satisfied", "check": "item", "failed_items": [], "inputs": [{"name": "items[].n", "value": [3]}], "passed": true, "requirement": "s", "subject": {"id": 1, "type": "thing"}},
+          {"cause": "satisfied", "check": "limit", "inputs": [{"name": "age", "value": 3}, {"name": "$params.max_days named by severity", "value": 5}, {"name": "severity", "value": "high"}], "passed": true, "requirement": "s", "subject": {"id": 1, "type": "thing"}},
+          {"cause": "satisfied", "check": "named", "failed_items": [], "inputs": [{"name": "$params.need", "value": {"b": 1}}, {"name": "kinds[]", "value": ["b"]}], "passed": true, "requirement": "s", "subject": {"id": 1, "type": "thing"}},
+          {"cause": "satisfied", "check": "own", "inputs": [{"name": "m named by k", "value": 1}, {"name": "k", "value": "a"}], "passed": true, "requirement": "s", "subject": {"id": 1, "type": "thing"}},
+          {"cause": "value", "check": "item", "failed_items": [{"cause": "value", "item": "item 1 of items", "path": "items[0].n", "value": 1}], "inputs": [{"name": "items[].n", "value": [1]}], "passed": false, "requirement": "s", "subject": {"id": 2, "type": "thing"}},
+          {"cause": "value", "check": "limit", "inputs": [{"name": "age", "value": 2}, {"name": "$params.max_days named by severity", "value": 1}, {"name": "severity", "value": "critical"}], "passed": false, "requirement": "s", "subject": {"id": 2, "type": "thing"}},
+          {"cause": "value", "check": "named", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "$params.need named by k exists", "cause": "value"}], "item": "item 2 of kinds", "path": "item 2 of kinds", "value": null}], "inputs": [{"name": "$params.need", "value": {"b": 1}}, {"name": "kinds[]", "value": ["b", "a"]}], "passed": false, "requirement": "s", "subject": {"id": 2, "type": "thing"}},
+          {"cause": "value", "check": "own", "inputs": [{"name": "m named by k", "value": 2}, {"name": "k", "value": "b"}], "passed": false, "requirement": "s", "subject": {"id": 2, "type": "thing"}},
+          {"cause": "unusable", "check": "item", "failed_items": [{"cause": "unusable", "item": "item 1 of items", "path": "items[0].n", "value": 3}], "inputs": [{"name": "items[].n", "value": [3]}], "passed": false, "requirement": "s", "subject": {"id": 3, "type": "thing"}},
+          {"cause": "absent", "check": "limit", "inputs": [{"name": "age", "value": 0}, {"name": "$params.max_days named by severity", "value": null}, {"name": "severity", "value": "unknown"}], "passed": false, "requirement": "s", "subject": {"id": 3, "type": "thing"}},
+          {"cause": "satisfied", "check": "named", "failed_items": [], "inputs": [{"name": "$params.need", "value": {"b": 1}}, {"name": "kinds[]", "value": ["b"]}], "passed": true, "requirement": "s", "subject": {"id": 3, "type": "thing"}},
+          {"cause": "null", "check": "own", "inputs": [{"name": "m named by k", "value": null}, {"name": "k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": 3, "type": "thing"}},
+          {"cause": "absent", "check": "item", "failed_items": [{"cause": "absent", "item": "item 1 of items", "path": "items[0].n", "value": 3}], "inputs": [{"name": "items[].n", "value": [3]}], "passed": false, "requirement": "s", "subject": {"id": 4, "type": "thing"}},
+          {"cause": "absent", "check": "limit", "inputs": [{"name": "age", "value": 0}, {"name": "$params.max_days named by severity", "value": null}, {"name": "severity", "value": null}], "passed": false, "requirement": "s", "subject": {"id": 4, "type": "thing"}},
+          {"cause": "satisfied", "check": "named", "failed_items": [], "inputs": [{"name": "$params.need", "value": {"b": 1}}, {"name": "kinds[]", "value": ["b"]}], "passed": true, "requirement": "s", "subject": {"id": 4, "type": "thing"}},
+          {"cause": "unusable", "check": "own", "inputs": [{"name": "m named by k", "value": null}, {"name": "k", "value": 7}], "passed": false, "requirement": "s", "subject": {"id": 4, "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

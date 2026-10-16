@@ -722,7 +722,7 @@ _check_outcome(check, subj, flaw, item) := object.union(
 }
 
 _check_outcome(check, subj, flaw, item) := {
-	"inputs": e.inputs,
+	"inputs": _with_key_fields(subj, check, item, e.inputs),
 	"passed": _once_passed(flaw, e),
 	"cause": _once_cause(flaw, e),
 } if {
@@ -831,8 +831,8 @@ _first_or_null([x]) := x
 
 _first_or_null([]) := null
 
-_check_outcome(check, subj, flaw, _) := {
-	"inputs": r.inputs,
+_check_outcome(check, subj, flaw, item) := {
+	"inputs": _with_key_fields(subj, check, item, r.inputs),
 	"passed": r.cause == "satisfied",
 	"cause": r.cause,
 	"failed_items": r.failed,
@@ -874,12 +874,12 @@ _check_outcome(check, subj, flaw, item) := {
 	failed := [{"assertion": check.assertions[i], "cause": o.cause} | some i, o in outs; o.cause != "satisfied"]
 }
 
-_assertion_out(c, subj, "", item) := {"cause": e.cause, "inputs": e.inputs} if {
+_assertion_out(c, subj, "", item) := {"cause": e.cause, "inputs": _with_key_fields(subj, c, item, e.inputs)} if {
 	_derived_once(c)
 	e := _derived_eval(c, subj, item)
-} else := {"cause": _assertion_cause(c, subj, ""), "inputs": _assertion_inputs(subj, c, item)}
+} else := {"cause": _assertion_cause(c, subj, ""), "inputs": _with_key_fields(subj, c, item, _assertion_inputs(subj, c, item))}
 
-_assertion_out(c, subj, flaw, item) := {"cause": _assertion_cause(c, subj, flaw), "inputs": _assertion_inputs(subj, c, item)} if flaw != ""
+_assertion_out(c, subj, flaw, item) := {"cause": _assertion_cause(c, subj, flaw), "inputs": _with_key_fields(subj, c, item, _assertion_inputs(subj, c, item))} if flaw != ""
 
 _assertion_cause(c, subj, "") := _row_cause(c, subj, "") if not _walks(c)
 
@@ -1056,7 +1056,7 @@ _field(subj, path) := v if {
 _resolved(subj, path) := object.get(subj, path, _absent) if {
 	is_object(subj)
 	_plain_path(path)
-} else := _read_from(_start_of(subj, path), _keys_of(path))
+} else := _read_from(_start_of(subj, path), _keys_in(subj, path))
 
 _plain_path(path) if {
 	is_array(path)
@@ -1134,6 +1134,7 @@ _step_key(seg) := seg if {
 	not _is_ref(seg)
 	not _malformed(seg)
 	not _name_step(seg)
+	not _field_step(seg)
 }
 
 _step_key(seg) := v if {
@@ -1147,6 +1148,40 @@ _name_step(seg) if {
 	object.keys(seg) == {"named_by"}
 	is_string(seg.named_by)
 }
+
+_field_step(seg) if {
+	is_object(seg)
+	object.keys(seg) == {"named_by_field"}
+	is_string(seg.named_by_field)
+}
+
+_has_field_step(path) if {
+	is_array(path)
+	some seg in path
+	_field_step(seg)
+}
+
+_keys_in(_, path) := _keys_of(path) if not _has_field_step(path)
+
+_keys_in(subj, path) := ks if {
+	_has_field_step(path)
+	steps := _path_steps(path)
+	ks := [k | some seg in steps; k := _field_step_key(subj, seg)]
+	count(ks) == count(steps)
+}
+
+_path_steps(path) := array.slice(path, 1, count(path)) if _named(path)
+
+_path_steps(path) := path if not _named(path)
+
+_field_step_key(subj, seg) := v if {
+	_field_step(seg)
+	is_object(subj)
+	v := subj[seg.named_by_field]
+	is_string(v)
+}
+
+_field_step_key(_, seg) := _step_key(seg) if not _field_step(seg)
 
 _is_key(v) if is_string(v)
 
@@ -1178,6 +1213,11 @@ _bad_step(seg) if {
 
 _bad_step(seg) if {
 	_name_step(seg)
+	not data.ergo_sentence_here == true
+}
+
+_bad_step(seg) if {
+	_field_step(seg)
 	not data.ergo_sentence_here == true
 }
 
@@ -1298,6 +1338,11 @@ _step_name(i, p) := concat("", [" named by ", _s_key_text(p.named_by)]) if {
 	_name_step(p)
 }
 
+_step_name(i, p) := concat("", [" named by ", _s_key_text(p.named_by_field)]) if {
+	i > 0
+	_field_step(p)
+}
+
 _step_name(i, p) := concat("", ["[", _ref_name(p.ref), "]"]) if {
 	_is_ref(p)
 	not _named_by_after(i, p)
@@ -1317,6 +1362,11 @@ _step_name(i, p) := concat("", [_step_dot(i), _segment_name(p)]) if {
 _name_step_after(i, p) if {
 	i > 0
 	_name_step(p)
+}
+
+_name_step_after(i, p) if {
+	i > 0
+	_field_step(p)
 }
 
 _nameable_step(p) if is_string(p)
@@ -1741,7 +1791,7 @@ _string_or_list(v) if is_string(v)
 _string_or_list(v) if is_array(v)
 
 _missing_at(x, path) if {
-	_keys_of(path)
+	_keys_in(x, path)
 	_ := _start_of(x, path)
 	_read_state(x, path) in {"absent", "null"}
 }
@@ -2882,6 +2932,25 @@ _reads_itself(path) if _keys_of(path) == []
 
 _any_read_state(_, path) := _name_step_state(path) if _name_step_state(path)
 
+_any_read_state(subj, path) := s if {
+	not _name_step_state(path)
+	s := _field_step_state(subj, path)
+}
+
+_field_step_state(subj, path) := "not_an_object" if {
+	_has_field_step(path)
+	not is_object(subj)
+} else := "null" if {
+	some seg in path
+	_field_step(seg)
+	subj[seg.named_by_field] == null
+} else := "unusable" if {
+	some seg in path
+	_field_step(seg)
+	v := subj[seg.named_by_field]
+	not is_string(v)
+}
+
 _name_step_state(path) := "null" if {
 	_has_name_step(path)
 	some step in path
@@ -2903,7 +2972,7 @@ _any_read_state(subj, path) := "null" if _resolved(subj, path) == null
 _any_read_state(subj, path) := "unusable" if {
 	start := _start_of(subj, path)
 	is_object(start)
-	_blocked(start, _keys_of(path))
+	_blocked(start, _keys_in(subj, path))
 }
 
 _any_read_state(subj, path) := "value" if {
@@ -2913,7 +2982,7 @@ _any_read_state(subj, path) := "value" if {
 }
 
 _selector_candidates(subj, path) := candidates if {
-	keys := _keys_of(path)
+	keys := _keys_in(subj, path)
 	base := _base_collection(_start_of(subj, path), keys)
 	candidates := [v |
 		some v in base
@@ -3012,7 +3081,7 @@ default _asks_presence(_, _) := false
 
 _asks_presence(check, x) if {
 	check.op == "present"
-	_keys_of(check.path)
+	_keys_in(x, check.path)
 	_ := _start_of(x, check.path)
 	not _params_not_given(check.path)
 }
@@ -3272,7 +3341,7 @@ default _answers_presence(_, _, _) := false
 
 _answers_presence(check, subj, "") if {
 	check.op == "present"
-	_keys_of(check.path)
+	_keys_in(subj, check.path)
 	_ := _start_of(subj, check.path)
 	not _unreadable_ref(check)
 	not _params_not_given(check.path)
@@ -3744,12 +3813,24 @@ _leaf_paths(leaf) := [leaf.path] if {
 	leaf.path
 }
 
-_row_inputs(subj, check, item) := _check_inputs(subj, check, item) if not check.substitute
+_row_inputs(subj, check, item) := _with_key_fields(subj, check, item, _check_inputs(subj, check, item)) if not check.substitute
 
-_row_inputs(subj, check, item) := _once(array.concat(
+_row_inputs(subj, check, item) := _with_key_fields(subj, check, item, _once(array.concat(
 	_check_inputs(subj, check, item),
 	_check_inputs(subj, check.substitute, item),
-)) if check.substitute
+))) if check.substitute
+
+_with_key_fields(subj, check, item, inputs) := _once(array.concat(inputs, [{"name": _item_path_name(item, [f]), "value": value_at(subj, [f])} | some f in _key_fields(check)])) if count(_key_fields(check)) > 0
+
+else := inputs
+
+_key_fields(check) := sort({seg.named_by_field |
+	is_object(check)
+	some p in array.concat([object.get(check, "path", [])], array.concat(_side_paths(object.get(check, "left", null)), _side_paths(object.get(check, "right", null))))
+	is_array(p)
+	some seg in p
+	_field_step(seg)
+})
 
 _once(xs) := [x | some i, x in xs; not x in array.slice(xs, 0, i)]
 
@@ -5622,7 +5703,7 @@ _s_id_part(def) := {} if not is_string(object.get(def, "identified_by", null))
 _s_id_read(text) := {"path": _s_model_path(fl.path)} if {
 	fl := _from_line(text)
 	object.keys(fl) == {"path"}
-	count(_s_paths_unsupported({"path": fl.path})) == 0
+	count(_s_from_paths_unsupported({"path": fl.path})) == 0
 } else := {"problems": [`identified_by is a path, like "id" or "build.number"`]}
 
 _s_from_reads(subjects) := {} if not is_object(subjects)
@@ -5662,7 +5743,7 @@ _s_from_used(def, read) if {
 _s_from_read(name, fl, subjects, chains) := {"problems": problems, "fields": fields, "parent": parent} if {
 	"path" in object.keys(fl)
 	conds := [_s_check([_s_cond_text(c)], {}, set()) | some c in object.get(fl, "where", [])]
-	problems := sort((((_s_chain_unsupported(name, fl, subjects, chains.descend) | _s_from_start_problems(fl)) | _s_paths_unsupported({"path": fl.path})) | {concat("", ["whose: ", p]) | some c in conds; some p in object.get(c, "$sentence", [])}))
+	problems := sort((((_s_chain_unsupported(name, fl, subjects, chains.descend) | _s_from_start_problems(fl)) | _s_from_paths_unsupported({"path": fl.path})) | {concat("", ["whose: ", p]) | some c in conds; some p in object.get(c, "$sentence", [])}))
 	fields := object.union(_s_source(name, fl, subjects), _s_whose_filters(_s_filter_prefix(name, chains.narrow), conds))
 	parent := _s_descend_parent(name, fl, subjects)
 } else := {"problems": object.get(fl, "problems", ["doesn't parse"]), "fields": {}}
@@ -5969,7 +6050,9 @@ _s_paths_unsupported(a) := {"last of isn't supported yet" |
 	some node in _s_nodes(a)
 	is_object(node)
 	object.get(node, "position", null) == "last"
-} | {concat("", ["unknown name ", ref.steps[0]]) |
+}
+
+_s_from_paths_unsupported(a) := _s_paths_unsupported(a) | {concat("", ["unknown name ", ref.steps[0]]) |
 	some node in _s_nodes(a)
 	is_object(node)
 	ref := object.get(node, "named_by", {"start": ""})
@@ -6196,7 +6279,7 @@ _s_model_step(s) := {"ref": [concat("", ["$$", s.named_by.start]), s.named_by.st
 	"start" in object.keys(s.named_by)
 }
 
-_s_model_step(s) := {"named_by": s.named_by.steps[0]} if {
+_s_model_step(s) := {"named_by_field": s.named_by.steps[0]} if {
 	is_object(s)
 	"named_by" in object.keys(s)
 	not "start" in object.keys(s.named_by)
@@ -6238,7 +6321,7 @@ _walk_read_row(check, subj) := {"cause": cause, "inputs": inputs, "failed": fail
 
 _walk_keys(check, subj) := ks if {
 	_ := _start_of(subj, check.path)
-	ks := _keys_of(check.path)
+	ks := _keys_in(subj, check.path)
 }
 
 _walk_start(check, subj) := {"c": _walk_root(check.path), "v": _start_of(subj, check.path), "i": null, "iv": null, "r": []}
@@ -6481,7 +6564,15 @@ _s_for_line_unsupported(lines, ftext) := _s_for_unsupported(fl, [], {item.as | s
 	"items" in object.keys(fl)
 }
 
-_s_for_unsupported(fl, assertions, names) := {u | some i, item in fl.items; some u in _s_item_unsupported(item); _s_kept_problem(u, {earlier.as | some earlier in array.slice(fl.items, 0, i)})} | {u | some a in assertions; some u in _s_assertion_unsupported(a); _s_kept_problem(u, names)}
+_s_for_unsupported(fl, assertions, names) := ({u | some i, item in fl.items; some u in _s_item_unsupported(item); _s_kept_problem(u, {earlier.as | some earlier in array.slice(fl.items, 0, i)})} | {u | some a in assertions; some u in _s_assertion_unsupported(a); _s_kept_problem(u, names)}) | {u | some i, item in fl.items; some u in _s_names_not_given(item, {later.as | some later in array.slice(fl.items, i, count(fl.items))})}
+
+_s_names_not_given(x, later) := {concat("", ["unknown name ", ref.steps[0]]) |
+	some node in _s_nodes(x)
+	is_object(node)
+	ref := object.get(node, "named_by", {"start": ""})
+	not "start" in object.keys(ref)
+	ref.steps[0] in later
+}
 
 _s_item_unsupported(item) := (_s_paths_unsupported(item) | {u | some c in object.get(item, "where", []); some u in _s_cond_unsupported(c)}) | _s_walk_too_long(item)
 
@@ -6530,11 +6621,18 @@ _s_named_tally(side, _) := side if {
 
 _s_named_cond(c, names) := object.union(c, {f: _s_named_path(c[f], names) | some f in ["path", "left", "right"]; is_array(object.get(c, f, null))})
 
-_s_named_path(p, names) := array.concat([concat("", ["$", p[0]])], array.slice(p, 1, count(p))) if {
-	count(p) > 0
-	is_string(p[0])
-	p[0] in names
-} else := p
+_s_named_path(p, names) := [_s_named_step(i, step, names) | some i, step in p] if is_array(p)
+
+else := p
+
+_s_named_step(i, step, names) := concat("", ["$", step]) if {
+	i == 0
+	is_string(step)
+	step in names
+} else := {"named_by": step.named_by_field} if {
+	_field_step(step)
+	step.named_by_field in names
+} else := step
 
 _for_names := object.get(input, "ergo/names", {})
 
@@ -6673,7 +6771,7 @@ _for_failed(cause, fails) := [{"path": _path_name(f.path), "item": _path_name(f.
 
 _for_inputs(check, subj, names, item, w) := [{"name": pair[0], "value": pair[1]} | some pair in sort(_for_input_pairs(check, subj, names, item, w))]
 
-_for_input_pairs(check, subj, names, item, w) := ((({[_walk_name(item.path, w.walked), [_walk_shown(e.v) | some e in w.items]]} | _for_inner_pairs(check, subj, names, item, w)) | {[_path_name(shown), value_at(subj, shown)] |
+_for_input_pairs(check, subj, names, item, w) := (((({[_walk_name(item.path, w.walked), [_walk_shown(e.v) | some e in w.items]]} | _for_inner_pairs(check, subj, names, item, w)) | {[_path_name(shown), value_at(subj, shown)] |
 	some c in check.checks
 	not _walks(c)
 	some p in _leaf_paths(c)
@@ -6688,7 +6786,15 @@ _for_input_pairs(check, subj, names, item, w) := ((({[_walk_name(item.path, w.wa
 	_walks(c)
 	not _for_named(c.path)
 	some i in _walk_read_row(c, subj).inputs
+}) | {[_path_name([f]), value_at(subj, [f])] |
+	some f in _for_key_fields(check)
 }
+
+_for_key_fields(check) := {seg.named_by_field |
+	some item in check.items
+	some seg in item.path
+	_field_step(seg)
+} | {f | some c in check.checks; some f in _key_fields(c)}
 
 _for_inner_pairs(check, _, _, _, _) := set() if count(check.items) == 1
 

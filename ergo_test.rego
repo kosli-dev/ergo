@@ -8329,7 +8329,6 @@ test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
 		[`t is before "2024-01-01T00:00:00Z"`, `"is before" with a value isn't supported yet: compare with a field`],
 		[`x matches $params.a named by $params.b`, `"matches" with named by in its path isn't supported yet`],
 		[`last of xs is 1`, "last of isn't supported yet"],
-		[`x named by persona is 1`, "unknown name persona"],
 	] {
 		_sentence_problems(pair[0]) == [pair[1]]
 	}
@@ -8917,8 +8916,6 @@ test_a_for_line_written_wrong_says_why if {
 
 test_forms_ergo_does_not_run_yet_are_written_wrong_on_a_for_line_too if {
 	every pair in [
-		["every xs named by k as x", "unknown name k"],
-		["every xs whose v named by k is 1 as x", "unknown name k"],
 		["every xs whose count of ys is between 1 and 2 as x", `"is between" after a count of, a sum of or a plus isn't supported yet`],
 		["every b.c.d.e.f.g.h.i.j.k.l.m as x", "every and some over more than ten steps aren't supported yet"],
 	] {
@@ -9467,9 +9464,83 @@ test_named_by_a_name_from_the_for_line_reads_the_key_each_item_names if {
 	]
 }
 
-test_named_by_a_bare_word_that_isnt_a_for_name_is_an_unknown_name if {
-	_sentence_problems("shas named by persona exists") == ["unknown name persona"]
-	_sentence_problems({"for": "every dispatched as other", "assert": "shas named by persona exists"}) == ["unknown name persona"]
+test_named_by_a_bare_word_in_a_from_line_or_an_id_is_an_unknown_name_since_there_is_no_subject_to_read_it_from if {
+	from := ergo.report({"things": [{"id": 1, "k": "a"}]}, {"subjects": {"thing": {"from": "things named by k", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists"}}}}, {})
+	[i.value | some r in from.results; r.check == "$well_formed"; some i in r.inputs; i.name == "subjects.thing.from"] == [["unknown name k"]]
+	id := ergo.report({"things": [{"id": {"a": 1}, "k": "a"}]}, {"subjects": {"thing": {"from": "things", "identified_by": "id named by k"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "k exists"}}}}, {})
+	[i.value | some r in id.results; r.check == "$well_formed"; some i in r.inputs; i.name == "subjects.thing.identified_by"] == [[`identified_by is a path, like "id" or "build.number"`]]
+}
+
+test_named_by_a_field_reads_the_key_the_subjects_field_holds if {
+	doc := {"things": [
+		{"id": "v1", "severity": "high", "age": 3},
+		{"id": "v2", "severity": "low", "age": 40},
+	]}
+	_sentence_rows({"c": "age is at most $params.limits named by severity"}, doc, {"limits": {"high": 5, "low": 30}}) == [
+		["c", true, "satisfied", [{"name": "age", "value": 3}, {"name": "$params.limits named by severity", "value": 5}, {"name": "severity", "value": "high"}]],
+		["c", false, "value", [{"name": "age", "value": 40}, {"name": "$params.limits named by severity", "value": 30}, {"name": "severity", "value": "low"}]],
+	]
+	rep := ergo.report(doc, _sentence_policy({"c": "age is at most $params.limits named by severity"}), {})
+	rep.requirements.s.checks.c.expression == "age is at most $params.limits named by severity"
+	not "$refs" in object.keys(rep.requirements.s.checks.c)
+}
+
+test_named_by_a_field_reads_a_key_of_the_subject_too if {
+	doc := {"things": [{"id": 1, "k": "a", "m": {"a": 1, "b": 2}}, {"id": 2, "k": "b", "m": {"a": 1, "b": 2}}]}
+	_sentence_rows({"c": "m named by k is 1"}, doc, {}) == [
+		["c", true, "satisfied", [{"name": "m named by k", "value": 1}, {"name": "k", "value": "a"}]],
+		["c", false, "value", [{"name": "m named by k", "value": 2}, {"name": "k", "value": "b"}]],
+	]
+}
+
+test_named_by_a_field_that_holds_no_key_fails_with_its_cause if {
+	doc := {"things": [
+		{"id": 1, "age": 1},
+		{"id": 2, "age": 1, "severity": null},
+		{"id": 3, "age": 1, "severity": 3},
+		{"id": 4, "age": 1, "severity": ["high"]},
+		{"id": 5, "age": 1, "severity": "medium"},
+		{"id": 6, "age": 1, "severity": "high"},
+	]}
+	rows := [[r.subject.id, r.cause] | some r in ergo.report(doc, _sentence_policy({"c": "age is at most $params.limits named by severity"}), {"limits": {"high": 5}}).results; r.check == "c"]
+	rows == [[1, "absent"], [2, "null"], [3, "unusable"], [4, "unusable"], [5, "absent"], [6, "satisfied"]]
+}
+
+test_named_by_a_field_on_a_subject_that_isnt_an_object_fails_as_not_an_object if {
+	rows := [[r.subject.id, r.cause] | some r in ergo.report({"things": ["x"]}, {"subjects": {"thing": {"from": "things"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$params.limits named by severity is 1"}}}}, {"limits": {"x": 1}}).results; r.check == "c"]
+	rows == [["x", "not_an_object"]]
+}
+
+test_named_by_a_field_works_with_exists_every_count_and_plus if {
+	doc := {"things": [{"id": 1, "k": "a", "xs": {"a": [1], "b": [2, 3]}}]}
+	_sentence_rows({"c": "xs named by k exists"}, doc, {}) == [["c", true, "satisfied", [{"name": "xs named by k", "value": [1]}, {"name": "k", "value": "a"}]]]
+	_sentence_rows({"c": "every xs named by k is 1"}, doc, {}) == [["c", true, "satisfied", [{"name": "xs named by k[]", "value": [1]}, {"name": "k", "value": "a"}]]]
+	_sentence_rows({"c": "count of xs named by k is 1"}, doc, {}) == [["c", true, "satisfied", [{"name": "count of xs named by k", "value": 1}, {"name": "xs named by k[]", "value": [1]}, {"name": "k", "value": "a"}]]]
+	_sentence_rows({"c": "count of xs.b plus $params.extra named by k is 3"}, doc, {"extra": {"a": 1}}) == [["c", true, "satisfied", [{"name": "count of xs.b plus $params.extra named by k", "value": 3}, {"name": "count of xs.b", "value": 2}, {"name": "xs.b[]", "value": [2, 3]}, {"name": "$params.extra named by k", "value": 1}, {"name": "k", "value": "a"}]]]
+	_sentence_rows({"c": {"assert": ["xs named by k exists", "every xs named by k is 1"]}}, doc, {}) == [["c", true, "satisfied", [{"name": "k", "value": "a"}, {"name": "xs named by k", "value": [1]}, {"name": "xs named by k[]", "value": [1]}]]]
+}
+
+test_named_by_a_field_in_a_whose_or_the_phrase_of_a_one_line_every_reads_the_items_field if {
+	doc := {"things": [{"id": 1, "items": [{"kind": "a", "n": 3}, {"kind": "b", "n": 1}]}]}
+	params := {"min": {"a": 2, "b": 2}}
+	_walk_rows({"c": "every items.n is at least $params.min named by kind"}, doc, params) == [[1, "c", "value", [{"cause": "value", "item": "item 2 of items", "path": "items[1].n", "value": 1}]]]
+	_sentence_rows({"c": "count of items whose n is at least $params.min named by kind is 1"}, doc, params)[0][2] == "satisfied"
+}
+
+test_named_by_a_field_on_a_for_line_reads_the_subject_and_a_for_name_hides_a_field_with_the_same_name if {
+	things := [{"id": 1, "k": "a", "xs": {"a": [1], "b": [2]}, "items": [{"kind": "a", "n": 3}, {"kind": "b", "n": 1}]}]
+	_for_rows({"for": "every xs named by k as x", "assert": "x is 1"}, things, {}) == [[1, "satisfied", [], [{"name": "k", "value": "a"}, {"name": "xs named by k[]", "value": [1]}]]]
+	_for_rows({"for": "every items as i", "assert": "i.n is at least $params.min named by k"}, things, {"min": {"a": 2, "b": 2}})[0][3] == [
+		{"name": "$params.min named by k", "value": 2},
+		{"name": "items[]", "value": [{"kind": "a", "n": 3}, {"kind": "b", "n": 1}]},
+		{"name": "k", "value": "a"},
+	]
+	_for_rows({"for": "every items as k", "assert": "$params.min named by k exists"}, [{"id": 1, "k": "b", "items": ["a"]}], {"min": {"a": 1}})[0][1] == "satisfied"
+	_for_rows({"for": "every xs whose v named by k is 1 as x", "assert": "x exists"}, [{"id": 1, "xs": [{"k": "a", "v": {"a": 1}}]}], {})[0][1] == "satisfied"
+}
+
+test_a_named_by_field_step_is_only_for_sentences if {
+	_sentence_problems({"op": "present", "path": ["shas", {"named_by_field": "x"}]}) == ["step that can't be a key in path"]
 }
 
 test_a_named_by_step_is_only_for_sentences if {

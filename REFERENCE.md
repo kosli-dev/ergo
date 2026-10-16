@@ -550,7 +550,44 @@ They run as `compare` with `in`, `not_in`, `includes`, `excludes`, `includes_all
 
 The thing on the right is a value when it's in quotes, a number, `true`, `false` or `null`, and a field otherwise. A list of values is separated by `, `. A string can be in single quotes, which keep backslashes as written, so `'^\s*FROM'` needs no doubled backslash.
 
-A path is keys joined by `.`, like `build.commit.sha`. A key with anything but letters, digits, `_` and `-` goes in double quotes, like `labels."app.kubernetes.io/name"`. `$params.regions` reads the params and `$input.repo` the input. `artifacts named by $params.name` reads the key the param holds, as a [ref step](#ref-steps) does, and so does `artifacts[$params.name]`. `item 2 of commits`, `first of commits` and `commits[1]` read one item of a list. A path can't start with a word the sentences use, like `empty`, `count` or `true`. Put a dot in front, `.empty is 1`, to read a field with that name.
+A path is keys joined by `.`, like `build.commit.sha`. A key with anything but letters, digits, `_` and `-` goes in double quotes, like `labels."app.kubernetes.io/name"`. `$params.regions` reads the params and `$input.repo` the input. `artifacts named by $params.name` reads the key the param holds, as a [ref step](#ref-steps) does, and so does `artifacts[$params.name]`. `named by` a bare field reads the key the subject holds, as below. `item 2 of commits`, `first of commits` and `commits[1]` read one item of a list. A path can't start with a word the sentences use, like `empty`, `count` or `true`. Put a dot in front, `.empty is 1`, to read a field with that name.
+
+`named by` a bare field picks the key from the subject, so a limit can depend on a field like the severity. With the params `{"max_days": {"critical": 1, "high": 5}}`, this policy:
+
+```yaml
+subjects:
+  vuln:
+    from: vulns
+    identified_by: id
+requirements:
+  fixed_in_time:
+    subject: vuln
+    checks:
+      within_limit: age_days is less than $params.max_days named by severity
+```
+
+and this input:
+
+```json
+{"vulns": [
+  {"id": "v-1", "severity": "high", "age_days": 3},
+  {"id": "v-2", "severity": "critical", "age_days": 2},
+  {"id": "v-3", "severity": "unknown", "age_days": 0}
+]}
+```
+
+`v-1` passes, `v-2` fails as `value`, and `v-3` fails as `absent`, because the params have no limit for `unknown`. Each row shows the field that picked the key after the check's own inputs:
+
+```json
+{"check": "within_limit", "subject": {"id": "v-2", "type": "vuln"}, "passed": false, "cause": "value",
+ "inputs": [
+   {"name": "age_days", "value": 2},
+   {"name": "$params.max_days named by severity", "value": 1},
+   {"name": "severity", "value": "critical"}
+ ]}
+```
+
+A field that's missing fails the check as `absent`, a `null` one as `null`, and one that isn't a string, a number included, as `unusable`. A name from a [`for` line](#checks) hides a field with the same name. Inside a `whose`, and in the phrase of a one-line `every` or `some`, the field is the item's, as a bare key is there. A `from` line and `identified_by` can't use it, because they don't have a subject yet.
 
 In YAML, ` #` starts a comment, so `title does not match 'WIP' #, 'DRAFT'` loses everything after `'WIP'`. YAML also won't take a plain value that starts with a quote, or that has `: ` in it. Put the whole sentence in single quotes then, doubling any single quote inside: `'"$schema" exists'`.
 
