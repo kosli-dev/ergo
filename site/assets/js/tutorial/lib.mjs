@@ -679,6 +679,9 @@ export const coach = (goal, ctx) => {
     if (goal.word && !text.includes('"')) return { kind: "unreadable", text: `The text goes in double quotes, like \`"${goal.word}"\`.` };
     return { kind: "unreadable", text: goal.unreadable ?? "ergo can't read that yet. A check is the field, then the phrase, then the text in double quotes." };
   }
+  if (goal.word && goal.phrase && !text.includes('"') && new RegExp(`\\b${goal.phrase}\\s+[A-Za-z_][\\w-]*$`).test(text)) {
+    return { kind: "unreadable", text: `The text goes in double quotes, like \`"${goal.word}"\`.` };
+  }
   return { kind: "wrong", text: failed.say(ctx) };
 };
 
