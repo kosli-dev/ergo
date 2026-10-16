@@ -637,26 +637,16 @@ _raw_entries(doc, req) := [{"subject": subj} | some subj in _listed_subjects(doc
 
 _raw_entries(_, req) := [] if not _from_well_formed(req)
 
-_raw_entries(doc, req) := [{"subject": subj} | some subj in coll] if {
+_raw_entries(doc, req) := [entry | some entry in _each_entries(_target(doc, req))] if {
 	_from_well_formed(req)
 	not "keys" in object.keys(_each_step(req))
-	coll := _target(doc, req)
-	is_array(coll)
 }
 
-_raw_entries(doc, req) := [{"key": k, "subject": coll[k]} | some k in sort(object.keys(coll))] if {
-	_from_well_formed(req)
-	not "keys" in object.keys(_each_step(req))
-	coll := _target(doc, req)
-	is_object(coll)
-}
+_each_entries(coll) := [{"subject": subj} | some subj in coll] if is_array(coll)
 
-_raw_entries(doc, req) := [] if {
-	_from_well_formed(req)
-	not "keys" in object.keys(_each_step(req))
-	not is_array(_target(doc, req))
-	not is_object(_target(doc, req))
-}
+_each_entries(coll) := [{"key": k, "subject": coll[k]} | some k in sort(object.keys(coll))] if is_object(coll)
+
+_each_entries(coll) := [] if not _is_collection(coll)
 
 _raw_entries(doc, req) := [{"key": k, "subject": object.get(_keyed(doc, req), [k], _absent)} | some k in sort({k | some k in _listed_keys(_each_step(req))})] if {
 	_from_well_formed(req)
