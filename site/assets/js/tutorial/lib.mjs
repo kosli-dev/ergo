@@ -7,7 +7,7 @@ export const parseTime = (v) => {
 export const straighten = (text) => text.replace(/[“”]/g, '"').replace(/[‘’]/g, "'");
 
 export const buildPolicy = (sentence) => ({
-  subjects: { batch: { from: [] } },
+  subjects: { batch: { from: "$input" } },
   requirements: { tutorial: { subject: "batch", checks: { sentence } } },
 });
 
@@ -910,7 +910,7 @@ export const nameCoach = (name) => {
 };
 
 export const tutorialPolicy = ({ name = defaultNames.name, heading = defaultNames.heading, from = null, id = null } = {}) => ({
-  subjects: { batch: from === null ? { from: [] } : { from: [from], identified_by: [id] } },
+  subjects: { batch: from === null ? { from: "$input" } : { from, identified_by: id } },
   requirements: {
     [slug(heading)]: {
       description: heading,
@@ -1018,8 +1018,8 @@ export const yamlLines = (policy) => {
   const subj = policy.subjects.batch;
   add("subjects:", null, "A policy has two parts: what you look at, and what must be true of it.");
   add("  batch:", 11, "The thing each check is run on. You found its list in step 11.");
-  add(`    from: [${subj.from?.[0] ?? ""}]`, 11, "You said where the batches are in step 11.");
-  add(`    identified_by: [${subj.identified_by?.[0] ?? ""}]`, 11, "You said what names each batch in step 11.");
+  add(`    from: ${subj.from ?? ""}`, 11, "You said where the batches are in step 11.");
+  add(`    identified_by: ${subj.identified_by ?? ""}`, 11, "You said what names each batch in step 11.");
   add("requirements:", null, "The rules. Each one has a heading, a subject and some checks.");
   add(`  ${key}:`, 10, "Made from your heading in step 10.");
   add(`    description: ${yamlText(req.description)}`, 10, "Your heading from step 10.");
