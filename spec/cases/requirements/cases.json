@@ -871,13 +871,13 @@
                 "value": "every"
               },
               {
-                "name": "$policy.description",
+                "name": "policy description",
                 "value": [
                   "not a string"
                 ]
               },
               {
-                "name": "$policy.meta",
+                "name": "policy meta",
                 "value": [
                   "not an object"
                 ]
@@ -903,13 +903,13 @@
                 "value": "every"
               },
               {
-                "name": "$policy.description",
+                "name": "policy description",
                 "value": [
                   "not a string"
                 ]
               },
               {
-                "name": "$policy.meta",
+                "name": "policy meta",
                 "value": [
                   "not an object"
                 ]

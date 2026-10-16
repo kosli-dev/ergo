@@ -111,7 +111,7 @@ the report starts with:
 }
 ```
 
-`null` counts as not written, so the defaults above give `""` and `{}`. A `description` that isn't a string, or a `meta` that isn't an object or holds something JSON can't, belongs to every requirement, so every requirement's `$well_formed` row fails and lists it last, like `{"name": "$policy.meta", "value": ["not an object"]}`. The report then shows `""` or `{}` in its place.
+`null` counts as not written, so the defaults above give `""` and `{}`. A `description` that isn't a string, or a `meta` that isn't an object or holds something JSON can't, belongs to every requirement, so every requirement's `$well_formed` row fails and lists it last, like `{"name": "policy meta", "value": ["not an object"]}`. The report then shows `""` or `{}` in its place.
 
 ### Params
 

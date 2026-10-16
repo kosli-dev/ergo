@@ -2895,23 +2895,23 @@ test_a_policy_without_a_description_or_meta_reports_empty_ones_so_tools_can_read
 	}
 }
 
-test_a_policy_description_or_meta_written_wrong_fails_every_requirement_since_it_belongs_to_none_of_them if {
+test_a_policy_description_or_meta_written_wrong_fails_every_requirement_and_is_named_in_words_since_a_dollar_name_is_one_a_check_can_read if {
 	rows := [[r.description, r.meta, r.compliant, [[w.requirement, w.passed, problem_inputs_of(w)] | some w in r.results; w.check == "$well_formed"]] |
 		some extra in [{"description": 5, "meta": "x"}, {"meta": {"a": {1: "x"}}}, {"meta": {"n": 1e400}}]
 		r := ergo.report({"items": [{"id": 1}]}, two_reqs_policy(extra), {})
 	]
 	rows == [
 		["", {}, false, [
-			["s", false, [{"name": "$policy.description", "value": ["not a string"]}, {"name": "$policy.meta", "value": ["not an object"]}]],
-			["t", false, [{"name": "$policy.description", "value": ["not a string"]}, {"name": "$policy.meta", "value": ["not an object"]}]],
+			["s", false, [{"name": "policy description", "value": ["not a string"]}, {"name": "policy meta", "value": ["not an object"]}]],
+			["t", false, [{"name": "policy description", "value": ["not a string"]}, {"name": "policy meta", "value": ["not an object"]}]],
 		]],
 		["", {}, false, [
-			["s", false, [{"name": "$policy.meta", "value": ["holds a key that isn't a string"]}]],
-			["t", false, [{"name": "$policy.meta", "value": ["holds a key that isn't a string"]}]],
+			["s", false, [{"name": "policy meta", "value": ["holds a key that isn't a string"]}]],
+			["t", false, [{"name": "policy meta", "value": ["holds a key that isn't a string"]}]],
 		]],
 		["", {}, false, [
-			["s", false, [{"name": "$policy.meta", "value": ["number out of range"]}]],
-			["t", false, [{"name": "$policy.meta", "value": ["number out of range"]}]],
+			["s", false, [{"name": "policy meta", "value": ["number out of range"]}]],
+			["t", false, [{"name": "policy meta", "value": ["number out of range"]}]],
 		]],
 	]
 }

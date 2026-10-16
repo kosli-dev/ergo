@@ -4124,7 +4124,7 @@ _section(policy, name) := object.get(policy, name, {}) if is_object(policy)
 
 _section(policy, _) := null if not is_object(policy)
 
-_policy_problem_inputs(policy) := [{"name": concat("", ["$policy.", f]), "value": sort(_policy_field_problems(f, policy[f]))} |
+_policy_problem_inputs(policy) := [{"name": concat(" ", ["policy", f]), "value": sort(_policy_field_problems(f, policy[f]))} |
 	is_object(policy)
 	some f in ["description", "meta"]
 	f in object.keys(policy)
