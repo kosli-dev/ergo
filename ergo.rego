@@ -1472,7 +1472,7 @@ _written_step(index, p, i) := p[i] if not is_object(index[array.slice(p, 0, i)])
 
 _key_text(k) := k if is_string(k)
 
-_key_text(k) := json.marshal(k) if not is_string(k)
+_key_text(k) := "<invalid key>" if not is_string(k)
 
 _node_json(paths, index, i) := concat("", [
 	_node_separator(paths, i),

@@ -1870,8 +1870,8 @@ test_a_large_number_value_is_written_in_full if {
 	rendered({}, {"op": "equals", "path": ["n"], "value": 123456789012345678901234567890}) == "n == 123456789012345678901234567890"
 }
 
-test_keys_of_different_types_are_sorted_by_how_they_are_written if {
-	rendered({}, {"op": "equals", "path": ["x"], "value": {"o": {false: 1, 1: 2, "a": {null: 3, 10: 4, 9: 5}}}}) == `x == {"o": {"1": 2, "a": {"10": 4, "9": 5, "null": 3}, "false": 1}}`
+test_keys_are_sorted_by_how_they_are_written if {
+	rendered({}, {"op": "equals", "path": ["x"], "value": {"o": {"b": 1, "B": 2, "a": {"9": 3, "10": 4, "<": 5}}}}) == `x == {"o": {"B": 2, "a": {"10": 4, "9": 3, "<": 5}, "b": 1}}`
 }
 
 test_a_set_value_is_written_as_a_sorted_list if {
@@ -1879,8 +1879,6 @@ test_a_set_value_is_written_as_a_sorted_list if {
 }
 
 test_an_empty_list_value_is_written_as_json if rendered({}, {"op": "equals", "path": ["x"], "value": [[], {}]}) == "x == [[], {}]"
-
-test_a_key_that_is_not_a_string_is_written_as_a_json_string if rendered({}, {"op": "equals", "path": ["x"], "value": {1: "a"}}) == `x == {"1": "a"}`
 
 test_a_list_or_object_value_is_written_as_json_with_sorted_keys if {
 	rendered({}, {"op": "equals", "path": ["x"], "value": ["a", 1.50, {"b": [true, null], "a": "x,y:z"}]}) == `x == ["a", 1.5, {"a": "x,y:z", "b": [true, null]}]`
@@ -7073,6 +7071,23 @@ test_a_check_holding_a_set_or_a_key_that_is_not_a_string_is_written_wrong if {
 		{"name": "checks.s", "value": ["holds a set"]},
 	]
 	[r.cause | some r in rep.results; r.check in {"k", "s"}] == ["ill_formed", "ill_formed"]
+}
+
+test_a_key_that_is_not_a_string_is_written_as_invalid_key_in_the_expression if {
+	every value in [{{"b": 1, "a": 2}: "x"}, {["b", "a"]: "x"}, {10: "x"}, {true: "x"}, {null: "x"}] {
+		rep := report({"items": [{"id": "a", "x": 1}]}, {"s": {"subject_type": "thing", "from": ["items"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["x"], "value": value}}}})
+		rep.requirements.s.checks.c.expression == `x == {"<invalid key>": "x"}`
+	}
+}
+
+test_a_key_that_is_not_a_string_never_merges_with_a_string_key_written_the_same if {
+	rep := report({"items": [{"id": "a", "x": 1}]}, {"s": {"subject_type": "thing", "from": ["items"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["x"], "value": {10: "a", "10": "b"}}}}})
+	rep.requirements.s.checks.c.expression == `x == {"10": "b", "<invalid key>": "a"}`
+}
+
+test_keys_that_are_not_strings_are_each_written_in_the_expression if {
+	rep := report({"items": [{"id": "a", "x": 1}]}, {"s": {"subject_type": "thing", "from": ["items"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["x"], "value": {2: "b", {"k": 1}: "c", 1: "a"}}}}})
+	rep.requirements.s.checks.c.expression == `x == {"<invalid key>": "a", "<invalid key>": "b", "<invalid key>": "c"}`
 }
 
 test_a_set_in_a_selector_of_from_or_id_is_written_wrong if {
