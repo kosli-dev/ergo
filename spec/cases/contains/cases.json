@@ -1,7 +1,7 @@
 [
   {
     "description": "includes a value",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "includes", "path": ["x"], "value": "a"}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "includes", "path": ["x"], "value": "a"}}}}},
     "cases": [
       {
         "description": "passes when the list contains it",
@@ -64,7 +64,7 @@
   },
   {
     "description": "includes a number",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "includes", "path": ["x"], "value": 1}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "includes", "path": ["x"], "value": 1}}}}},
     "cases": [
       {
         "description": "passes on 1.0, because numbers compare by value",
@@ -86,7 +86,7 @@
   },
   {
     "description": "includes a list given as value",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "includes", "path": ["x"], "value": ["a", "b"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "includes", "path": ["x"], "value": ["a", "b"]}}}}},
     "cases": [
       {
         "description": "looks for the list as one item",
@@ -109,7 +109,7 @@
   },
   {
     "description": "includes values",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "includes", "path": ["x"], "values": ["b", "a"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "includes", "path": ["x"], "values": ["b", "a"]}}}}},
     "cases": [
       {
         "description": "passes when the list contains every one",
@@ -132,7 +132,7 @@
   },
   {
     "description": "excludes a value",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "excludes", "path": ["x"], "value": "a"}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "excludes", "path": ["x"], "value": "a"}}}}},
     "cases": [
       {
         "description": "passes when the list doesn't contain it",
@@ -179,7 +179,7 @@
   },
   {
     "description": "excludes values",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "excludes", "path": ["x"], "values": ["nuts", "garlic"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "excludes", "path": ["x"], "values": ["nuts", "garlic"]}}}}},
     "cases": [
       {
         "description": "passes when the list contains none of them",
@@ -202,7 +202,7 @@
   },
   {
     "description": "excludes a value read through a ref",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "excludes", "path": ["x"], "value": {"ref": ["$$params", "banned"]}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "excludes", "path": ["x"], "value": {"ref": ["$$params", "banned"]}}}}}},
     "params": {},
     "cases": [
       {
@@ -218,7 +218,7 @@
   },
   {
     "description": "excludes values read through a ref to an empty list",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "excludes", "path": ["x"], "values": {"ref": ["$$params", "banned"]}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "excludes", "path": ["x"], "values": {"ref": ["$$params", "banned"]}}}}}},
     "params": {"banned": []},
     "cases": [
       {
@@ -234,7 +234,7 @@
   },
   {
     "description": "excludes values read through a ref that isn't a list",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "excludes", "path": ["x"], "values": {"ref": ["$$params", "banned"]}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "excludes", "path": ["x"], "values": {"ref": ["$$params", "banned"]}}}}}},
     "params": {"banned": "a"},
     "cases": [
       {
@@ -253,7 +253,7 @@
       "subjects": {
         "thing": {
           "from": ["things"],
-          "id": ["id"]
+          "identified_by": ["id"]
         }
       },
       "requirements": {

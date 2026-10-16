@@ -1,7 +1,7 @@
 [
   {
     "description": "equals a string",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["x"], "value": "a"}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["x"], "value": "a"}}}}},
     "cases": [
       {
         "description": "passes on the same string",
@@ -40,7 +40,7 @@
   },
   {
     "description": "equals a number",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["x"], "value": 1}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["x"], "value": 1}}}}},
     "cases": [
       {
         "description": "passes on 1.0, because numbers compare by value",
@@ -63,7 +63,7 @@
   },
   {
     "description": "equals a number written with an exponent",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["x"], "value": 150.0}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["x"], "value": 150.0}}}}},
     "cases": [
       {
         "description": "shows the number in plain decimal",
@@ -78,7 +78,7 @@
   },
   {
     "description": "equals null",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["x"], "value": null}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["x"], "value": null}}}}},
     "cases": [
       {
         "description": "passes on a field that is there and null",
@@ -101,7 +101,7 @@
   },
   {
     "description": "equals an object",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["x"], "value": {"a": "x", "b": [1, 2]}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["x"], "value": {"a": "x", "b": [1, 2]}}}}}},
     "cases": [
       {
         "description": "passes on an equal object whose keys are in another order",
@@ -124,7 +124,7 @@
   },
   {
     "description": "equals a literal that looks like a ref",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["x"], "value": {"literal": {"ref": ["a"]}}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["x"], "value": {"literal": {"ref": ["a"]}}}}}}},
     "cases": [
       {
         "description": "compares the object as written",
@@ -139,7 +139,7 @@
   },
   {
     "description": "equals a ref",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["x"], "value": {"ref": ["$$params", "want"]}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["x"], "value": {"ref": ["$$params", "want"]}}}}}},
     "params": {"want": "a"},
     "cases": [
       {
@@ -156,7 +156,7 @@
   },
   {
     "description": "equals a ref to a param that is missing",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["x"], "value": {"ref": ["$$params", "want"]}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["x"], "value": {"ref": ["$$params", "want"]}}}}}},
     "params": {},
     "cases": [
       {
@@ -172,7 +172,7 @@
   },
   {
     "description": "equals a ref to a param that is null",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["x"], "value": {"ref": ["$$params", "want"]}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["x"], "value": {"ref": ["$$params", "want"]}}}}}},
     "params": {"want": null},
     "cases": [
       {
@@ -191,7 +191,7 @@
       "subjects": {
         "thing": {
           "from": ["things"],
-          "id": ["id"]
+          "identified_by": ["id"]
         }
       },
       "requirements": {

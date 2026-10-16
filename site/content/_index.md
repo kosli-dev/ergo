@@ -43,7 +43,7 @@ declaration:
   notes_intro: Write the policy as a YAML file or as a Rego object. ==ergo== reads both the same way and gives the same report.
   notes:
     - title: Define the subjects
-      body: "Each subject gets a name, and `from` and `id` say where to find them."
+      body: "Each subject gets a name, and `from` and `identified_by` say where to find them."
     - title: Filter the scope
       body: "`applies_to` keeps only the subjects the policy is about. The rest are recorded, not dropped."
     - title: Test the values

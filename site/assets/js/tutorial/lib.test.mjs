@@ -1263,7 +1263,7 @@ test("the YAML is built from the reader's own parts", () => {
     "subjects:",
     "  batch:",
     "    from: [batches]",
-    "    id: [id]",
+    "    identified_by: [id]",
     "requirements:",
     "  safe_to_sell:",
     "    description: Safe to sell",

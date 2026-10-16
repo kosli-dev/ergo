@@ -2,7 +2,7 @@ baking:
   subjects:
     batch:
       from: [batches]
-      id: [id]
+      identified_by: [id]
   requirements:
     cake_batch:
       subject: batch

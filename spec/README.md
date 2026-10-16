@@ -33,7 +33,7 @@ Here is one case, from `cases/present`. Its group's policy has a `thing` subject
 
 ```json
 {
-  "subjects": {"thing": {"from": ["things"], "id": ["id"]}},
+  "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}},
   "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x"]}}}}
 }
 ```

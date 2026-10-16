@@ -65,22 +65,22 @@ Its subjects, with the ids from the policy. `artifact` has no `from`, so it read
 ```yaml
 subjects:
   artifact:
-    id: artifact_fingerprint
+    identified_by: artifact_fingerprint
   lockfile:
     from: lockfile whose status exists and status is "COMPLETE"
-    id: name
+    identified_by: name
   lockfile entry:
     from: lock_entries
-    id: entry
+    identified_by: entry
   SBOM package:
     from: components whose lock_release exists
-    id: name
+    identified_by: name
   non-exempt SBOM package:
     from: components whose exempt is false
-    id: name
+    identified_by: name
   base image:
     from: base_images
-    id: ref
+    identified_by: ref
 ```
 
 |                                   | today                                                                                                 | sentence                                                                                  | notes                                                                                                                                                                                                                                                      |

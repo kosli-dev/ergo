@@ -1,7 +1,7 @@
 [
   {
     "description": "subjects from a list",
-    "policy": {"subjects": {"subject": {"from": ["t"], "id": ["id"]}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+    "policy": {"subjects": {"subject": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
     "cases": [
       {
         "description": "each item is a subject, in list order",
@@ -93,7 +93,7 @@
   },
   {
     "description": "subjects from a list with min_subjects 0",
-    "policy": {"subjects": {"subject": {"from": ["t"], "id": ["id"]}}, "requirements": {"s": {"subject": "subject", "min_subjects": 0, "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+    "policy": {"subjects": {"subject": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "subject", "min_subjects": 0, "checks": {"c": {"op": "present", "path": ["x"]}}}}},
     "cases": [
       {
         "description": "is not applicable on an empty list",
@@ -162,7 +162,7 @@
   },
   {
     "description": "min_subjects 2",
-    "policy": {"subjects": {"subject": {"from": ["t"], "id": ["id"]}}, "requirements": {"s": {"subject": "subject", "min_subjects": 2, "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+    "policy": {"subjects": {"subject": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "subject", "min_subjects": 2, "checks": {"c": {"op": "present", "path": ["x"]}}}}},
     "cases": [
       {
         "description": "fails as value with one subject, though it passes",
@@ -178,7 +178,7 @@
   },
   {
     "description": "ids",
-    "policy": {"subjects": {"subject": {"from": ["t"], "id": ["id"]}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+    "policy": {"subjects": {"subject": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
     "cases": [
       {
         "description": "lists each repeated id once, sorted by its JSON text",
@@ -217,7 +217,7 @@
   },
   {
     "description": "ids of subjects out of scope",
-    "policy": {"subjects": {"subject": {"from": ["t"], "id": ["id"], "applies_to": {"f": {"op": "equals", "path": ["e"], "value": "p"}}}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+    "policy": {"subjects": {"subject": {"from": ["t"], "identified_by": ["id"], "applies_to": {"f": {"op": "equals", "path": ["e"], "value": "p"}}}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
     "cases": [
       {
         "description": "still count",
@@ -235,7 +235,7 @@
   },
   {
     "description": "require some",
-    "policy": {"subjects": {"subject": {"from": ["t"], "id": ["id"]}}, "requirements": {"s": {"subject": "subject", "require": "some", "checks": {"a": {"op": "present", "path": ["a"]}, "b": {"op": "present", "path": ["b"]}}}}},
+    "policy": {"subjects": {"subject": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "subject", "require": "some", "checks": {"a": {"op": "present", "path": ["a"]}, "b": {"op": "present", "path": ["b"]}}}}},
     "cases": [
       {
         "description": "is met when one subject passes every check, and the others aren't violations",
@@ -272,7 +272,7 @@
   },
   {
     "description": "a filter",
-    "policy": {"subjects": {"subject": {"from": ["t"], "id": ["id"], "applies_to": {"prod": {"op": "equals", "path": ["e"], "value": "p"}}}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+    "policy": {"subjects": {"subject": {"from": ["t"], "identified_by": ["id"], "applies_to": {"prod": {"op": "equals", "path": ["e"], "value": "p"}}}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
     "cases": [
       {
         "description": "leaves out a subject that fails it on value, and fails one it can't read",
@@ -311,7 +311,7 @@
   },
   {
     "description": "a filter with min_subjects 0",
-    "policy": {"subjects": {"subject": {"from": ["t"], "id": ["id"], "applies_to": {"prod": {"op": "equals", "path": ["e"], "value": "p"}}}}, "requirements": {"s": {"subject": "subject", "min_subjects": 0, "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+    "policy": {"subjects": {"subject": {"from": ["t"], "identified_by": ["id"], "applies_to": {"prod": {"op": "equals", "path": ["e"], "value": "p"}}}}, "requirements": {"s": {"subject": "subject", "min_subjects": 0, "checks": {"c": {"op": "present", "path": ["x"]}}}}},
     "cases": [
       {
         "description": "is not applicable when every subject is out of scope",
@@ -342,7 +342,7 @@
       "subjects": {
         "subject": {
           "from": ["t"],
-          "id": ["id"],
+          "identified_by": ["id"],
           "applies_to": {"a": {"op": "equals", "path": ["e"], "value": "p"}, "b": {"op": "equals", "path": ["k"], "value": 1}}
         }
       },
@@ -368,7 +368,7 @@
   },
   {
     "description": "a filter written wrong beside one that rules the subject out",
-    "policy": {"subjects": {"subject": {"from": ["t"], "id": ["id"], "applies_to": {"a": {"op": "nope"}, "b": {"op": "equals", "path": ["e"], "value": "p"}}}}, "requirements": {"s": {"subject": "subject", "min_subjects": 0, "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+    "policy": {"subjects": {"subject": {"from": ["t"], "identified_by": ["id"], "applies_to": {"a": {"op": "nope"}, "b": {"op": "equals", "path": ["e"], "value": "p"}}}}, "requirements": {"s": {"subject": "subject", "min_subjects": 0, "checks": {"c": {"op": "present", "path": ["x"]}}}}},
     "cases": [
       {
         "description": "fails the subject's $applies row as ill_formed",
@@ -483,7 +483,7 @@
       "subjects": {
         "deployment": {
           "from": ["t"],
-          "id": ["id"],
+          "identified_by": ["id"],
           "applies_to": {"p": {"op": "present", "path": ["e"]}}
         }
       },
@@ -554,7 +554,7 @@
   },
   {
     "description": "a requirement with min_subjects 0, described",
-    "policy": {"subjects": {"subject": {"from": ["t"], "id": ["id"]}}, "requirements": {"s": {"subject": "subject", "min_subjects": 0, "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+    "policy": {"subjects": {"subject": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "subject", "min_subjects": 0, "checks": {"c": {"op": "present", "path": ["x"]}}}}},
     "cases": [
       {
         "description": "describes min_subjects as reading the list",
@@ -582,7 +582,7 @@
   },
   {
     "description": "a requirement with no description or meta",
-    "policy": {"subjects": {"subject": {"from": ["t"], "id": ["id"]}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+    "policy": {"subjects": {"subject": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
     "cases": [
       {
         "description": "gets an empty description and meta",
@@ -606,7 +606,7 @@
     "description": "two requirements",
     "policy": {
       "subjects": {
-        "subject": {"from": ["t"], "id": ["id"], "applies_to": {"f": {"op": "present", "path": ["id"]}}}
+        "subject": {"from": ["t"], "identified_by": ["id"], "applies_to": {"f": {"op": "present", "path": ["id"]}}}
       },
       "requirements": {
         "a": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}},
@@ -647,7 +647,7 @@
   },
   {
     "description": "violations with refs and failed items",
-    "policy": {"subjects": {"subject": {"from": ["t"], "id": ["id"]}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "all", "path": ["cs"], "check": {"op": "in", "path": ["v"], "values": {"ref": ["$$params", "ok"]}}}}}}},
+    "policy": {"subjects": {"subject": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "all", "path": ["cs"], "check": {"op": "in", "path": ["v"], "values": {"ref": ["$$params", "ok"]}}}}}}},
     "params": {"ok": ["a", "b"]},
     "cases": [
       {
@@ -697,9 +697,25 @@
     ]
   },
   {
+    "description": "a subject that says id instead of identified_by",
+    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+    "cases": [
+      {
+        "description": "is never met, says id is an unknown field, and identifies each subject as the whole subject",
+        "rules": ["policy.old_fields", "well_formed", "subjects.id"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "requirements": {"s": {"status": "not_met"}},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "subjects.thing.id", "value": ["unknown field"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": {"id": "t1", "x": 1}}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+        ]
+      }
+    ]
+  },
+  {
     "description": "causes of a requirement",
     "policy": {
-      "subjects": {"thing": {"from": ["things"], "id": ["id"]}},
+      "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}},
       "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x"]}, "d": {"op": "nope"}}}}
     },
     "cases": [
@@ -729,7 +745,7 @@
           "from": [
             "t"
           ],
-          "id": [
+          "identified_by": [
             "id"
           ]
         }
@@ -801,7 +817,7 @@
           "from": [
             "t"
           ],
-          "id": [
+          "identified_by": [
             "id"
           ]
         }

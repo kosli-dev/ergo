@@ -64,7 +64,7 @@ _resolved_def(members) := {"def": def, "from_owner": r, "filter_owners": owners}
 	root := _raw_subject(r)
 	owners := {n: _filter_owner_in(members, n) | some m in members; some n, _ in _object_or_empty(_filters_of(m))}
 	def := object.union(
-		{f: _root_field(f, root[f], r, members) | some f in ["from", "id"]; f in object.keys(root)},
+		{f: _root_field(f, root[f], r, members) | some f in ["from", "identified_by"]; f in object.keys(root)},
 		{"applies_to": _merged_filters(members, owners)},
 	)
 } else := {}
@@ -76,7 +76,7 @@ _root_field("from", _, r, members) := "<built on a subject read from another sub
 	v := _raw_subject(r).from
 }
 
-_root_field("id", v, _, _) := v
+_root_field("identified_by", v, _, _) := v
 
 _merged_filters(members, _) := [f | some m in sort(members); f := _filters_of(m); not is_object(f)][0] if {
 	some m in members
@@ -126,7 +126,7 @@ _from_of(req) := _subject_field(req, "from", []) if _resolves(req)
 
 _from_of(req) := null if not _resolves(req)
 
-_id_of(req) := _subject_field(req, "id", []) if _resolves(req)
+_id_of(req) := _subject_field(req, "identified_by", []) if _resolves(req)
 
 _id_of(req) := [] if not _resolves(req)
 
@@ -153,9 +153,9 @@ _has_type("from", v) if is_array(v)
 
 _has_type("from", v) if is_string(v)
 
-_has_type("id", v) if is_array(v)
+_has_type("identified_by", v) if is_array(v)
 
-_has_type("id", v) if is_string(v)
+_has_type("identified_by", v) if is_string(v)
 
 _has_type("min_subjects", v) if {
 	is_number(v)
@@ -250,7 +250,7 @@ _wrong_type_problems := {
 _subject_wrong_type_problems := {
 	"applies_to": "not an object",
 	"from": "not a list or a string",
-	"id": "not a list or a string",
+	"identified_by": "not a list or a string",
 	"description": "not a string",
 	"of": "empty or not a string",
 }
@@ -314,7 +314,7 @@ _loop_problems(name, members) := {[["subjects", name, _of_field(name)], "leads t
 }
 
 _read_problems(resolved) := {[array.concat(["subjects", resolved.from_owner], [p[0]]), p[1]] |
-	some p in (_naming_step_problems(object.get(resolved.def, "from", [])) | _where_problems(object.get(resolved.def, "id", [])))
+	some p in (_naming_step_problems(object.get(resolved.def, "from", [])) | _where_problems(object.get(resolved.def, "identified_by", [])))
 }
 
 _subject_ref_problems(req) := (({["subject", "missing"] |
@@ -337,9 +337,9 @@ _subject_ref_problems(req) := (({["subject", "missing"] |
 _def_problems(def) := union({
 	{[f, _subject_wrong_type_problems[f]] | some f in _wrong_typed(def, _subject_wrong_type_problems)},
 	{[f, "unknown field"] | some f in _unknown_subject_fields(def)},
-	{[f, "not allowed with of"] | "of" in object.keys(def); some f in ["from", "id"]; f in object.keys(def)},
+	{[f, "not allowed with of"] | "of" in object.keys(def); some f in ["from", "identified_by"]; f in object.keys(def)},
 	_path_problems(def, "from"),
-	_path_problems(def, "id"),
+	_path_problems(def, "identified_by"),
 	_def_json_problems(def),
 })
 
@@ -351,7 +351,7 @@ _req_json_problems(req) := {["checks", "holds a key that isn't a string"] |
 }
 
 _def_json_problems(def) := {[f, p] |
-	some f in ["from", "id"]
+	some f in ["from", "identified_by"]
 	v := object.get(def, f, null)
 	is_array(v)
 	some p in _json_problems(v)
@@ -402,7 +402,7 @@ _object_step_problems(step, true) := ({concat("", ["unknown field ", _text(k), "
 	not k in {"each_as", "keys"}
 } | {"invalid name" | not _valid_name(step.each_as)}) | {"invalid keys" | not _keys_well_formed(step)} if "each_as" in object.keys(step)
 
-_where_problems(id) := {["id", concat("", [kind, " inside where"])] | some kind in _wrapped_in_where(id)}
+_where_problems(id) := {["identified_by", concat("", [kind, " inside where"])] | some kind in _wrapped_in_where(id)}
 
 _field_problem_inputs(req) := [{"name": _field_name(f), "value": sort({p[1] | some p in problems; p[0] == f})} | some f in sort({p[0] | some p in problems})] if {
 	problems := _req_problems(req)
@@ -5609,15 +5609,15 @@ _s_from_part(name, lines, subjects, chains) := _s_from_read(name, lines[name], s
 
 _s_from_part(name, lines, _, _) := {} if not name in object.keys(lines)
 
-_s_id_part(def) := {"id": _s_id_read(def.id)} if is_string(object.get(def, "id", null))
+_s_id_part(def) := {"identified_by": _s_id_read(def.identified_by)} if is_string(object.get(def, "identified_by", null))
 
-_s_id_part(def) := {} if not is_string(object.get(def, "id", null))
+_s_id_part(def) := {} if not is_string(object.get(def, "identified_by", null))
 
 _s_id_read(text) := {"path": _s_model_path(fl.path)} if {
 	fl := _from_line(text)
 	object.keys(fl) == {"path"}
 	count(_s_paths_unsupported({"path": fl.path})) == 0
-} else := {"problems": [`an id is a path, like "id" or "build.number"`]}
+} else := {"problems": [`identified_by is a path, like "id" or "build.number"`]}
 
 _s_from_reads(subjects) := {} if not is_object(subjects)
 
@@ -5731,7 +5731,7 @@ _s_chain_unsupported(name, fl, subjects, descend) := {"a chain of more than two 
 	fl.path.steps[0] in object.keys(descend)
 }
 
-_s_id_field(read) := {"id": read.id.path} if "path" in object.keys(object.get(read, "id", {}))
+_s_id_field(read) := {"identified_by": read.identified_by.path} if "path" in object.keys(object.get(read, "identified_by", {}))
 
 else := {}
 
@@ -5739,13 +5739,13 @@ _s_subject_sentences(subjects, reads) := {"chains": {name: p | some name, r in r
 
 _s_subject_sentences(subjects, _) := {"chains": {}, "narrowed": set(), "filters": set(), "problems": {}} if not is_object(subjects)
 
-_s_subject_problems(name, def, reads) := {f: ps | some f in ["from", "id"]; ps := _s_field_problems(name, def, f, reads); ps != []} if is_object(def)
+_s_subject_problems(name, def, reads) := {f: ps | some f in ["from", "identified_by"]; ps := _s_field_problems(name, def, f, reads); ps != []} if is_object(def)
 
 _s_subject_problems(_, def, _) := {} if not is_object(def)
 
 _s_field_problems(name, def, "from", reads) := array.concat(reads[name].problems, [`applies_to can't go with a from written as a sentence: put the conditions after "whose"` | "applies_to" in object.keys(def)]) if is_string(object.get(def, "from", null))
 
-_s_field_problems(name, def, "id", reads) := object.get(reads[name].id, "problems", []) if is_string(object.get(def, "id", null))
+_s_field_problems(name, def, "identified_by", reads) := object.get(reads[name].identified_by, "problems", []) if is_string(object.get(def, "identified_by", null))
 
 _s_field_problems(_, def, f, _) := [] if not is_string(object.get(def, f, null))
 
@@ -6873,10 +6873,10 @@ _c_subject(name, def, subjects) := object.union(object.remove(def, ["from", "app
 	from := _c_from_line(name, def, subjects)
 } else := def
 
-_c_id(def) := {"id": text} if {
-	is_array(object.get(def, "id", null))
-	text := _path_name(def.id)
-	object.get(_s_id_read(text), "path", null) == def.id
+_c_id(def) := {"identified_by": text} if {
+	is_array(object.get(def, "identified_by", null))
+	text := _path_name(def.identified_by)
+	object.get(_s_id_read(text), "path", null) == def.identified_by
 } else := {}
 
 _c_from_line(name, def, subjects) := concat("", [source, _c_whose(conds)]) if {
@@ -6889,7 +6889,7 @@ _c_from_line(name, def, subjects) := concat("", [source, _c_whose(conds)]) if {
 _c_from_line(name, def, subjects) := concat("", [parent, _c_whose(conds)]) if {
 	is_string(object.get(def, "of", null))
 	not "from" in object.keys(def)
-	not "id" in object.keys(def)
+	not "identified_by" in object.keys(def)
 	def.of != name
 	def.of in object.keys(subjects)
 	not startswith(def.of, "$")

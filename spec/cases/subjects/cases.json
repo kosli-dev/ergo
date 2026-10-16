@@ -5,7 +5,7 @@
       "subjects": {
         "deployment": {
           "from": "data.deployments",
-          "id": "id"
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -220,7 +220,7 @@
       "subjects": {
         "deployment": {
           "from": "deployments",
-          "id": "meta.id"
+          "identified_by": "meta.id"
         }
       },
       "requirements": {
@@ -466,7 +466,7 @@
       "subjects": {
         "deployment": {
           "from": "deployments",
-          "id": "id"
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -577,7 +577,7 @@
       "subjects": {
         "deployment": {
           "from": "deployments whose environment is \"prod\" and change_type is \"emergency\"",
-          "id": "id"
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -978,7 +978,7 @@
       "subjects": {
         "deployment": {
           "from": "deployments whose change_type is \"emergency\" and environment is \"prod\"",
-          "id": "id"
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -1117,7 +1117,7 @@
       "subjects": {
         "pr": {
           "from": "pulls whose count of reviews is at least 1",
-          "id": "id"
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -1383,7 +1383,7 @@
       "subjects": {
         "artifact": {
           "from": "artifacts named by $params.name",
-          "id": "id"
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -1577,7 +1577,7 @@
       "subjects": {
         "scan": {
           "from": "scans named by each of $params.required",
-          "id": "name"
+          "identified_by": "name"
         }
       },
       "requirements": {
@@ -1720,7 +1720,7 @@
       "subjects": {
         "lockfile": {
           "from": "lockfile whose status is \"COMPLETE\"",
-          "id": "name"
+          "identified_by": "name"
         }
       },
       "requirements": {
@@ -1877,7 +1877,7 @@
     "policy": {
       "subjects": {
         "artifact": {
-          "id": "id"
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -2290,7 +2290,7 @@
       "subjects": {
         "artifact": {
           "from": [],
-          "id": [
+          "identified_by": [
             "id"
           ]
         }
@@ -2413,7 +2413,7 @@
       "subjects": {
         "deployment": {
           "from": "deployments whose environment is \"prod",
-          "id": "id"
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -2520,7 +2520,7 @@
       "subjects": {
         "deployment": {
           "from": "deployments",
-          "id": "environment is"
+          "identified_by": "environment is"
         }
       },
       "requirements": {
@@ -2578,9 +2578,9 @@
                 "value": "every"
               },
               {
-                "name": "subjects.deployment.id",
+                "name": "subjects.deployment.identified_by",
                 "value": [
-                  "an id is a path, like \"id\" or \"build.number\""
+                  "identified_by is a path, like \"id\" or \"build.number\""
                 ]
               }
             ]
@@ -2643,7 +2643,7 @@
       "subjects": {
         "deployment": {
           "from": "deployments",
-          "id": "id",
+          "identified_by": "id",
           "applies_to": {
             "f": {
               "op": "present",
@@ -2758,11 +2758,11 @@
       "subjects": {
         "artifact": {
           "from": "artifacts",
-          "id": "id"
+          "identified_by": "id"
         },
         "pull_request": {
           "from": "artifact.pulls",
-          "id": "id"
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -3093,7 +3093,7 @@
       "subjects": {
         "defect": {
           "from": "defects whose status exists",
-          "id": "id"
+          "identified_by": "id"
         },
         "critical defect": {
           "from": "defect whose severity is \"critical\""
@@ -3308,7 +3308,7 @@
       "subjects": {
         "defect": {
           "from": "defects",
-          "id": "id"
+          "identified_by": "id"
         },
         "critical defect": {
           "from": "defect whose severity is \"critical\""

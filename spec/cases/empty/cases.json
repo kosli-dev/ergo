@@ -1,7 +1,7 @@
 [
   {
     "description": "empty",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "empty", "path": ["x"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "empty", "path": ["x"]}}}}},
     "cases": [
       {
         "description": "passes on an empty list",

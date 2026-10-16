@@ -1,7 +1,7 @@
 [
   {
     "description": "compare_time with lt",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "compare_time", "cmp": "lt", "left": ["a"], "right": ["b"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "compare_time", "cmp": "lt", "left": ["a"], "right": ["b"]}}}}},
     "cases": [
       {
         "description": "passes on two times in order",
@@ -301,7 +301,7 @@
   },
   {
     "description": "compare_time with eq",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "compare_time", "cmp": "eq", "left": ["a"], "right": ["b"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "compare_time", "cmp": "eq", "left": ["a"], "right": ["b"]}}}}},
     "cases": [
       {
         "description": "passes on the same instant in two offsets",
@@ -352,7 +352,7 @@
   },
   {
     "description": "compare_time with ne",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "compare_time", "cmp": "ne", "left": ["a"], "right": ["b"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "compare_time", "cmp": "ne", "left": ["a"], "right": ["b"]}}}}},
     "cases": [
       {
         "description": "fails as value on the same instant in two offsets",

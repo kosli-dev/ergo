@@ -49,7 +49,7 @@ deny <span class="kw">contains</span> msg <span class="kw">if</span> {
 <pre class="code ft__code"><code><span class="k">subjects</span>:
   <span class="k">deployment</span>:
     <span class="k">from</span>: [<span class="s">deployments</span>]
-    <span class="k">id</span>: [<span class="s">id</span>]
+    <span class="k">identified_by</span>: [<span class="s">id</span>]
     <span class="k">applies_to</span>:
       <span class="k">is_prod</span>:
         <span class="k">op</span>: <span class="s">equals</span>
@@ -136,7 +136,7 @@ peer_approved(pr) <span class="kw">if</span> {
 <pre class="code ft__code"><code><span class="k">subjects</span>:
   <span class="k">pull request</span>:
     <span class="k">from</span>: [<span class="s">pull_requests</span>, {<span class="k">each_as</span>: <span class="s">pr</span>}]
-    <span class="k">id</span>: [<span class="s">number</span>]
+    <span class="k">identified_by</span>: [<span class="s">number</span>]
 <span class="k">requirements</span>:
   <span class="k">peer_reviewed</span>:
     <span class="k">subject</span>: <span class="s">pull request</span>

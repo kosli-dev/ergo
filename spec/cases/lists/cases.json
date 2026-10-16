@@ -1,7 +1,7 @@
 [
   {
     "description": "all",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["cs"], "check": {"op": "equals", "path": ["s"], "value": true}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["cs"], "check": {"op": "equals", "path": ["s"], "value": true}}}}}},
     "cases": [
       {
         "description": "passes when every item passes",
@@ -88,7 +88,7 @@
   },
   {
     "description": "any",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "any", "path": ["cs"], "check": {"op": "non_empty_string", "path": ["u"]}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "any", "path": ["cs"], "check": {"op": "non_empty_string", "path": ["u"]}}}}}},
     "cases": [
       {
         "description": "passes when one item passes, with no failed items",
@@ -135,7 +135,7 @@
   },
   {
     "description": "all with present inside",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["cs"], "check": {"op": "present", "path": ["x"]}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["cs"], "check": {"op": "present", "path": ["x"]}}}}}},
     "cases": [
       {
         "description": "lists an item missing the field with cause value",
@@ -157,7 +157,7 @@
   },
   {
     "description": "all with an empty path inside",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["bs"], "check": {"op": "matches_any", "path": [], "patterns": ["^main$"]}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["bs"], "check": {"op": "matches_any", "path": [], "patterns": ["^main$"]}}}}}},
     "cases": [
       {
         "description": "reads each item itself and names it after the list",
@@ -184,7 +184,7 @@
       "subjects": {
         "thing": {
           "from": ["things"],
-          "id": ["id"]
+          "identified_by": ["id"]
         }
       },
       "requirements": {
@@ -216,7 +216,7 @@
   },
   {
     "description": "all with a ref that can't be read",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["cs"], "check": {"op": "equals", "path": ["x"], "value": {"ref": ["$$params", "want"]}}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["cs"], "check": {"op": "equals", "path": ["x"], "value": {"ref": ["$$params", "want"]}}}}}}},
     "params": {},
     "cases": [
       {
@@ -239,7 +239,7 @@
   },
   {
     "description": "all with each",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["prs"], "check": {"op": "equals", "path": ["s"], "value": true}, "each": ["cs"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["prs"], "check": {"op": "equals", "path": ["s"], "value": true}, "each": ["cs"]}}}}},
     "cases": [
       {
         "description": "passes when every item of every inner list passes",
@@ -283,7 +283,7 @@
   },
   {
     "description": "any with each",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "any", "path": ["prs"], "check": {"op": "equals", "path": ["s"], "value": true}, "each": ["cs"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "any", "path": ["prs"], "check": {"op": "equals", "path": ["s"], "value": true}, "each": ["cs"]}}}}},
     "cases": [
       {
         "description": "passes when an item of any inner list passes",
@@ -321,7 +321,7 @@
   },
   {
     "description": "all with an empty each",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["xss"], "check": {"op": "equals", "path": [], "value": 1}, "each": []}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["xss"], "check": {"op": "equals", "path": [], "value": 1}, "each": []}}}}},
     "cases": [
       {
         "description": "checks the items of a list of lists",
@@ -348,7 +348,7 @@
       "subjects": {
         "pull request": {
           "from": ["prs", {"each_as": "pr"}],
-          "id": ["n"]
+          "identified_by": ["n"]
         }
       },
       "requirements": {
@@ -400,7 +400,7 @@
       "subjects": {
         "pull request": {
           "from": ["prs", {"each_as": "pr"}],
-          "id": ["n"]
+          "identified_by": ["n"]
         }
       },
       "requirements": {
@@ -436,7 +436,7 @@
       "subjects": {
         "thing": {
           "from": ["things"],
-          "id": ["id"]
+          "identified_by": ["id"]
         }
       },
       "requirements": {
@@ -472,7 +472,7 @@
       "subjects": {
         "thing": {
           "from": ["things"],
-          "id": ["id"]
+          "identified_by": ["id"]
         }
       },
       "requirements": {
@@ -589,7 +589,7 @@
   {
     "description": "as with params or input as the name",
     "policy": {
-      "subjects": {"thing": {"from": ["things"], "id": ["id"]}},
+      "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}},
       "requirements": {
         "s": {
           "subject": "thing",

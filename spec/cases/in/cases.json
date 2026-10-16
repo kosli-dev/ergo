@@ -1,7 +1,7 @@
 [
   {
     "description": "in a list",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": ["b", 1, "a"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": ["b", 1, "a"]}}}}},
     "cases": [
       {
         "description": "passes when the field is one of the values",
@@ -40,7 +40,7 @@
   },
   {
     "description": "in a list holding null",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": ["a", null]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": ["a", null]}}}}},
     "cases": [
       {
         "description": "fails as absent on a missing field",
@@ -62,7 +62,7 @@
   },
   {
     "description": "in an empty list",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": []}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": []}}}}},
     "cases": [
       {
         "description": "fails as value",
@@ -81,7 +81,7 @@
       "subjects": {
         "thing": {
           "from": ["things"],
-          "id": ["id"]
+          "identified_by": ["id"]
         }
       },
       "requirements": {
@@ -106,7 +106,7 @@
   },
   {
     "description": "in values with a ref among them",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": [{"ref": ["$$params", "want"]}, "z"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": [{"ref": ["$$params", "want"]}, "z"]}}}}},
     "params": {},
     "cases": [
       {
@@ -121,7 +121,7 @@
   },
   {
     "description": "in values read through a ref",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}}}}},
     "params": {"allowed": ["a", "b"]},
     "cases": [
       {
@@ -137,7 +137,7 @@
   },
   {
     "description": "in values read through a ref that isn't a list",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}}}}},
     "params": {"allowed": "a"},
     "cases": [
       {
@@ -152,7 +152,7 @@
   },
   {
     "description": "in values read through a ref that holds an object like a ref",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}}}}},
     "params": {"allowed": [{"ref": ["q"]}]},
     "cases": [
       {
@@ -167,7 +167,7 @@
   },
   {
     "description": "in values held in a literal",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": {"literal": [{"ref": ["q"]}]}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": {"literal": [{"ref": ["q"]}]}}}}}},
     "cases": [
       {
         "description": "compares the object as it is",
@@ -186,7 +186,7 @@
       "subjects": {
         "thing": {
           "from": ["things"],
-          "id": ["id"]
+          "identified_by": ["id"]
         }
       },
       "requirements": {
