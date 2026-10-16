@@ -27,7 +27,7 @@ Here is a policy that says "_every production deployment must have an approver_"
 subjects:
   deployment:
     from: deployments whose environment is "prod"
-    id: id
+    identified_by: id
 requirements:
   prod_deploy:
     description: Every production deployment is approved
@@ -41,7 +41,7 @@ requirements:
 A policy describes what to check, not how to check it. First it says what it's about, the things we call _subjects_. Each kind of subject gets a name, here `deployment`, that the report uses for each one, and says where to find them:
 
 - `from` says where the subjects are in the input. `deployments` means `input.deployments`, and `release.deployments` would mean `input.release.deployments`. `whose` keeps only the ones this policy is about, here the deployments whose `environment` is `prod`.
-- `id` is the field that uniquely identifies each subject.
+- `identified_by` names the field that tells the subjects apart, here `id`. No two subjects can share one.
 
 Then the requirement says what must be true of them. Its `description` says what it requires, in words anyone can read, and `subject` names the subject it checks:
 

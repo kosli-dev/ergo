@@ -65,7 +65,7 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
 
   const document = { deployments: Array.from({ length: 100 }, (_, i) => ({ id: `d-${i}`, environment: i % 3 ? "prod" : "staging", ...(i % 2 ? { approved_by: "a" } : {}), tests: [{ ok: i % 5 > 0 }, { ok: true }] })) };
   const budgetPolicy = {
-    subjects: { deployment: { from: ["deployments"], id: ["id"], applies_to: { is_prod: { op: "equals", path: ["environment"], value: "prod" } } } },
+    subjects: { deployment: { from: ["deployments"], identified_by: ["id"], applies_to: { is_prod: { op: "equals", path: ["environment"], value: "prod" } } } },
     requirements: {
       approved: { subject: "deployment", checks: { approved: { op: "non_empty_string", path: ["approved_by"] } } },
       tested: { subject: "deployment", require: "some", checks: { tested: { op: "all", path: ["tests"], check: { op: "equals", path: ["ok"], value: true } } } },

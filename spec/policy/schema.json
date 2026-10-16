@@ -76,7 +76,7 @@
             }
           ]
         },
-        "id": {
+        "identified_by": {
           "anyOf": [
             {
               "$ref": "#/$defs/path"
@@ -92,7 +92,7 @@
         },
         "of": {
           "type": "string",
-          "description": "The name of another subject this one builds on. A subject with of has no from or id of its own."
+          "description": "The name of another subject this one builds on. A subject with of has no from or identified_by of its own."
         }
       },
       "additionalProperties": false

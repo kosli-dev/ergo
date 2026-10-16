@@ -93,7 +93,7 @@ peer_approval:
 subjects:
   emergency change:
     from: deployments whose environment is "prod" and change_type is "emergency"
-    id: id
+    identified_by: id
 ```
 
 **[sentence.subject.condition]** A condition in that `whose` is like any `whose` condition: a path and a phrase, or a `count of` or `sum of` and a comparison. pr-reviewer has six, like `whose count of compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is at least 1`.
@@ -110,15 +110,15 @@ subjects:
 
 **[sentence.subject.own]** A subject's own name in its own `from` is the input field, never the subject, so sdlc-policies 0004's `lockfile` subject can have `from: lockfile whose status is "COMPLETE"`. Any other subject's name starts a chain. `$input.artifact` reaches the input field `artifact` even when a subject named `artifact` exists. The tokenizer applied these two rules to every `from` line in the corpus and found exactly the six chains it has.
 
-**[sentence.subject.short]** A subject with no `from` reads the input field of its own name. It can still have an `id`:
+**[sentence.subject.short]** A subject with no `from` reads the input field of its own name. It can still have `identified_by`:
 
 ```yaml
 subjects:
   artifact:
-    id: artifact_fingerprint
+    identified_by: artifact_fingerprint
   lockfile:
     from: lockfile whose status exists and status is "COMPLETE"
-    id: name
+    identified_by: name
 ```
 
 The map is the only way to write `subjects`, and a simple subject is a name with nothing under it.

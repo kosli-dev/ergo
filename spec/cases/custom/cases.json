@@ -1,7 +1,7 @@
 [
   {
     "description": "a custom operator",
-    "policy": {"subjects": {"thing": {"from": ["t"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "even", "path": ["n"], "expression": "n is even", "inputs": [["n"]]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "even", "path": ["n"], "expression": "n is even", "inputs": [["n"]]}}}}},
     "cases": [
       {
         "description": "passes when the operator says so",
@@ -44,7 +44,7 @@
       "subjects": {
         "thing": {
           "from": ["t"],
-          "id": ["id"]
+          "identified_by": ["id"]
         }
       },
       "requirements": {
@@ -81,7 +81,7 @@
       "subjects": {
         "thing": {
           "from": ["t"],
-          "id": ["id"]
+          "identified_by": ["id"]
         }
       },
       "requirements": {
@@ -106,7 +106,7 @@
   },
   {
     "description": "a custom operator reading two fields",
-    "policy": {"subjects": {"thing": {"from": ["t"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "both_present", "expression": "a and b are present", "inputs": [["a"], ["b"]], "paths": [["a"], ["b"]]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "both_present", "expression": "a and b are present", "inputs": [["a"], ["b"]], "paths": [["a"], ["b"]]}}}}},
     "cases": [
       {
         "description": "shows each field it reads",
@@ -128,7 +128,7 @@
   },
   {
     "description": "an operator nobody supplied",
-    "policy": {"subjects": {"thing": {"from": ["t"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "nope", "path": ["n"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "nope", "path": ["n"]}}}}},
     "cases": [
       {
         "description": "is written wrong, so a typo can't pass",
@@ -155,7 +155,7 @@
       "subjects": {
         "thing": {
           "from": ["t"],
-          "id": ["id"],
+          "identified_by": ["id"],
           "applies_to": {"f": {"op": "even", "path": ["n"], "expression": "n is even", "inputs": [["n"]]}}
         }
       },
@@ -194,7 +194,7 @@
       "subjects": {
         "thing": {
           "from": ["t"],
-          "id": ["id"]
+          "identified_by": ["id"]
         }
       },
       "requirements": {
@@ -218,7 +218,7 @@
   },
   {
     "description": "an op that isn't a string",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": ["range"], "path": ["x"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": ["range"], "path": ["x"]}}}}},
     "cases": [
       {
         "description": "is an unknown op and nothing else, though a list names an operator's entry in the table of operators",

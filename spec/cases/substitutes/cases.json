@@ -1,7 +1,7 @@
 [
   {
     "description": "a check with a substitute",
-    "policy": {"subjects": {"thing": {"from": ["t"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["pull_request"], "substitute": {"op": "equals", "path": ["verified"], "value": true}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["pull_request"], "substitute": {"op": "equals", "path": ["verified"], "value": true}}}}}},
     "cases": [
       {
         "description": "passes as satisfied when the check passes",
@@ -68,7 +68,7 @@
   },
   {
     "description": "a substitute whose field is null",
-    "policy": {"subjects": {"thing": {"from": ["t"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["s"], "value": "M", "substitute": {"op": "equals", "path": ["w"], "value": true}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["s"], "value": "M", "substitute": {"op": "equals", "path": ["w"], "value": true}}}}}},
     "cases": [
       {
         "description": "doesn't change the cause",
@@ -90,7 +90,7 @@
   },
   {
     "description": "a substitute whose path runs into a string",
-    "policy": {"subjects": {"thing": {"from": ["t"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["s"], "value": "M", "substitute": {"op": "equals", "path": ["w", "x"], "value": true}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["s"], "value": "M", "substitute": {"op": "equals", "path": ["w", "x"], "value": true}}}}}},
     "cases": [
       {
         "description": "gives the row its unusable cause",
@@ -108,7 +108,7 @@
       "subjects": {
         "thing": {
           "from": ["t"],
-          "id": ["id"]
+          "identified_by": ["id"]
         }
       },
       "requirements": {
@@ -157,7 +157,7 @@
       "subjects": {
         "thing": {
           "from": ["t"],
-          "id": ["id"]
+          "identified_by": ["id"]
         }
       },
       "requirements": {
@@ -187,7 +187,7 @@
   },
   {
     "description": "a substitute with a ref that can't be read",
-    "policy": {"subjects": {"thing": {"from": ["t"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["a"], "substitute": {"op": "equals", "path": ["b"], "value": {"ref": ["$$params", "w"]}}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["a"], "substitute": {"op": "equals", "path": ["b"], "value": {"ref": ["$$params", "w"]}}}}}}},
     "params": {},
     "cases": [
       {
@@ -203,7 +203,7 @@
   },
   {
     "description": "a substitute reading the same path as its check",
-    "policy": {"subjects": {"thing": {"from": ["t"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["s"], "value": "M", "substitute": {"op": "equals", "path": ["s"], "value": "N"}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["s"], "value": "M", "substitute": {"op": "equals", "path": ["s"], "value": "N"}}}}}},
     "cases": [
       {
         "description": "shows the path once",
@@ -217,7 +217,7 @@
   },
   {
     "description": "a substitute written wrong",
-    "policy": {"subjects": {"thing": {"from": ["t"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["n"], "substitute": {"op": "nope", "path": ["n"]}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["n"], "substitute": {"op": "nope", "path": ["n"]}}}}}},
     "cases": [
       {
         "description": "fails the check as ill_formed even though the check passes",
@@ -236,7 +236,7 @@
       "subjects": {
         "thing": {
           "from": ["t"],
-          "id": ["id"]
+          "identified_by": ["id"]
         }
       },
       "requirements": {
@@ -264,7 +264,7 @@
       "subjects": {
         "thing": {
           "from": ["t"],
-          "id": ["id"]
+          "identified_by": ["id"]
         }
       },
       "requirements": {
@@ -300,7 +300,7 @@
       "subjects": {
         "thing": {
           "from": ["t"],
-          "id": ["id"]
+          "identified_by": ["id"]
         }
       },
       "requirements": {
@@ -327,7 +327,7 @@
       "subjects": {
         "thing": {
           "from": ["t"],
-          "id": ["id"]
+          "identified_by": ["id"]
         }
       },
       "requirements": {
@@ -361,7 +361,7 @@
     "description": "an any_of as a substitute",
     "policy": {
       "subjects": {
-        "thing": {"from": ["t"], "id": ["id"]}
+        "thing": {"from": ["t"], "identified_by": ["id"]}
       },
       "requirements": {
         "s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["a"], "substitute": {"op": "any_of", "options": {"x": [{"op": "present", "path": ["b"]}]}}}}}
@@ -384,7 +384,7 @@
       "subjects": {
         "thing": {
           "from": ["t"],
-          "id": ["id"],
+          "identified_by": ["id"],
           "applies_to": {"f": {"op": "equals", "path": ["s"], "value": "M", "substitute": {"op": "equals", "path": ["w"], "value": true}}}
         }
       },
@@ -431,7 +431,7 @@
       "subjects": {
         "thing": {
           "from": ["t"],
-          "id": ["id"],
+          "identified_by": ["id"],
           "applies_to": {"f": {"op": "present", "path": ["e"], "substitute": {"op": "compare", "cmp": "lt", "left": ["a"], "right": ["b"]}}}
         }
       },

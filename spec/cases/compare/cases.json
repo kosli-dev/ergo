@@ -1,7 +1,7 @@
 [
   {
     "description": "compare with eq",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "compare", "cmp": "eq", "left": ["a"], "right": ["b"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "compare", "cmp": "eq", "left": ["a"], "right": ["b"]}}}}},
     "cases": [
       {
         "description": "passes on 1 and 1.0",
@@ -55,7 +55,7 @@
   },
   {
     "description": "compare with ne",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "compare", "cmp": "ne", "left": ["a"], "right": ["b"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "compare", "cmp": "ne", "left": ["a"], "right": ["b"]}}}}},
     "cases": [
       {
         "description": "passes on two different strings",
@@ -85,7 +85,7 @@
   },
   {
     "description": "compare with lt",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "compare", "cmp": "lt", "left": ["a"], "right": ["b"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "compare", "cmp": "lt", "left": ["a"], "right": ["b"]}}}}},
     "cases": [
       {
         "description": "passes on two numbers in order",
@@ -155,7 +155,7 @@
   },
   {
     "description": "compare with gte",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "compare", "cmp": "gte", "left": ["a"], "right": ["b"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "compare", "cmp": "gte", "left": ["a"], "right": ["b"]}}}}},
     "cases": [
       {
         "description": "passes on 2 and 2.0",
@@ -169,7 +169,7 @@
   },
   {
     "description": "compare against the input",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "compare", "cmp": "lt", "left": ["a"], "right": ["$$input", "limit"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "compare", "cmp": "lt", "left": ["a"], "right": ["$$input", "limit"]}}}}},
     "cases": [
       {
         "description": "names the path into the input",
@@ -195,7 +195,7 @@
       "subjects": {
         "thing": {
           "from": ["things"],
-          "id": ["id"]
+          "identified_by": ["id"]
         }
       },
       "requirements": {

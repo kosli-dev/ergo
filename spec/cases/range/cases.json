@@ -1,7 +1,7 @@
 [
   {
     "description": "range between two numbers",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "range", "path": ["x"], "max": 3, "min": 1}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "range", "path": ["x"], "max": 3, "min": 1}}}}},
     "cases": [
       {
         "description": "passes inside the range",
@@ -64,7 +64,7 @@
   },
   {
     "description": "range with bounds written in other forms",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "range", "path": ["x"], "max": 20.0, "min": 1.5}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "range", "path": ["x"], "max": 20.0, "min": 1.5}}}}},
     "cases": [
       {
         "description": "shows them in plain decimal",
@@ -79,7 +79,7 @@
   },
   {
     "description": "range with bounds read through refs",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "range", "path": ["x"], "max": {"ref": ["$$params", "hi"]}, "min": {"ref": ["$$params", "lo"]}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "range", "path": ["x"], "max": {"ref": ["$$params", "hi"]}, "min": {"ref": ["$$params", "lo"]}}}}}},
     "params": {"hi": 3, "lo": 1},
     "cases": [
       {
@@ -96,7 +96,7 @@
   },
   {
     "description": "range with a bound read through a ref that isn't a number",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "range", "path": ["x"], "max": 3, "min": {"ref": ["$$params", "lo"]}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "range", "path": ["x"], "max": 3, "min": {"ref": ["$$params", "lo"]}}}}}},
     "params": {"lo": "1"},
     "cases": [
       {
@@ -111,7 +111,7 @@
   },
   {
     "description": "range with bounds read through refs that put min above max",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "range", "path": ["x"], "max": 3, "min": {"ref": ["$$params", "lo"]}}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "range", "path": ["x"], "max": 3, "min": {"ref": ["$$params", "lo"]}}}}}},
     "params": {"lo": 5},
     "cases": [
       {
@@ -130,7 +130,7 @@
       "subjects": {
         "thing": {
           "from": ["things"],
-          "id": ["id"]
+          "identified_by": ["id"]
         }
       },
       "requirements": {

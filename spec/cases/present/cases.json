@@ -1,7 +1,7 @@
 [
   {
     "description": "present on a field of the subject",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
     "cases": [
       {
         "description": "passes on a string",
@@ -88,7 +88,7 @@
   },
   {
     "description": "present on a nested field",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x", "y"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x", "y"]}}}}},
     "cases": [
       {
         "description": "fails as value when the parent is missing",
@@ -126,7 +126,7 @@
   },
   {
     "description": "present on a list item",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x", 1]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x", 1]}}}}},
     "cases": [
       {
         "description": "passes when the item is there",
@@ -186,7 +186,7 @@
   },
   {
     "description": "present through a selector",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["xs", {"where": {"k": "a"}}, "v"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["xs", {"where": {"k": "a"}}, "v"]}}}}},
     "cases": [
       {
         "description": "passes when the one matching item has the field",
@@ -232,7 +232,7 @@
   },
   {
     "description": "present through a selector with two fields, onto a key that needs quotes",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["xs", {"where": {"k": "a", "b": 2}}, "a.b"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["xs", {"where": {"k": "a", "b": 2}}, "a.b"]}}}}},
     "cases": [
       {
         "description": "names the selector's fields in order and quotes the key",
@@ -250,7 +250,7 @@
       "subjects": {
         "thing": {
           "from": ["things"],
-          "id": ["id"]
+          "identified_by": ["id"]
         }
       },
       "requirements": {
@@ -284,7 +284,7 @@
   },
   {
     "description": "present with a ref step that can't be read",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x", {"ref": ["$$params", "key"]}]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x", {"ref": ["$$params", "key"]}]}}}}},
     "params": {"key": ["a"]},
     "cases": [
       {
@@ -299,7 +299,7 @@
   },
   {
     "description": "present with a ref step whose param is missing",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x", {"ref": ["$$params", "key"]}]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x", {"ref": ["$$params", "key"]}]}}}}},
     "params": {},
     "cases": [
       {
@@ -318,7 +318,7 @@
       "subjects": {
         "thing": {
           "from": ["things"],
-          "id": ["id"]
+          "identified_by": ["id"]
         }
       },
       "requirements": {
@@ -363,7 +363,7 @@
       "subjects": {
         "thing": {
           "from": ["things"],
-          "id": ["id"],
+          "identified_by": ["id"],
           "applies_to": {"complete": {"op": "equals", "path": ["status"], "value": "COMPLETE"}, "recorded": {"op": "present", "path": ["status"]}}
         }
       },
@@ -415,7 +415,7 @@
       "subjects": {
         "thing": {
           "from": ["things"],
-          "id": ["id"],
+          "identified_by": ["id"],
           "applies_to": {"recorded": {"op": "present", "path": ["build", "fingerprint"]}}
         }
       },
@@ -456,7 +456,7 @@
   },
   {
     "description": "present on a param when the params are null",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["$$params", "flag"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["$$params", "flag"]}}}}},
     "params": null,
     "cases": [
       {
@@ -471,7 +471,7 @@
   },
   {
     "description": "present on a param the params don't have",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["$$params", "flag"]}}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["$$params", "flag"]}}}}},
     "params": {},
     "cases": [
       {

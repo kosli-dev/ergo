@@ -5,7 +5,7 @@ import rego.v1
 
 report(doc, reqs) := ergo.report(doc, lifted(reqs), given_params)
 
-subject_fields := ["from", "id", "applies_to"]
+subject_fields := ["from", "identified_by", "applies_to"]
 
 lifted(reqs) := {
 	"subjects": {subject_name(reqs, name): subject_def(req) | some name, req in reqs; is_object(req)},
@@ -35,7 +35,7 @@ solo(subj, check) := report(
 	{"s": {
 		"subject_type": "thing",
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"checks": {"c": check},
 	}},
 )
@@ -66,7 +66,7 @@ rows_for(report, req_name, check_name) := [r |
 id_req(from) := {"s": {
 	"subject_type": "thing",
 	"from": from,
-	"id": ["id"],
+	"identified_by": ["id"],
 	"checks": {"c": {"op": "present", "path": ["id"]}},
 }}
 
@@ -86,7 +86,7 @@ test_missing_from_yields_no_subjects if {
 
 mixed_subjects := {"items": [{"id": "x", "n": "a"}, "b", null, 3]}
 
-mixed_req := {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["n"]}}}}
+mixed_req := {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "present", "path": ["n"]}}}}
 
 test_a_subject_that_is_not_an_object_keeps_its_rows if {
 	rows := rows_for(report(mixed_subjects, mixed_req), "s", "c")
@@ -105,7 +105,7 @@ test_a_subject_that_is_not_an_object_shows_up_as_a_violation if {
 test_a_subject_that_is_not_an_object_keeps_its_applies_row if {
 	req := {"s": {
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"applies_to": {"kind": {"op": "equals", "path": ["kind"], "value": "lib"}},
 		"checks": {"c": {"op": "present", "path": ["n"]}},
 	}}
@@ -127,7 +127,7 @@ test_a_subject_that_is_not_an_object_fails_a_quantified_check_as_not_an_object i
 test_an_id_path_can_use_a_selector if {
 	req := {"s": {
 		"from": ["items"],
-		"id": ["tags", {"where": {"k": "name"}}, "v"],
+		"identified_by": ["tags", {"where": {"k": "name"}}, "v"],
 		"checks": {"c": {"op": "present", "path": ["tags"]}},
 	}}
 	[r.subject.id | some r in rows_for(report({"items": [{"tags": [{"k": "name", "v": "web"}]}]}, req), "s", "c")] == ["web"]
@@ -160,7 +160,7 @@ test_subject_id_is_read_from_the_declared_path if {
 scoped_req(applies_to) := {"s": {
 	"subject_type": "thing",
 	"from": ["items"],
-	"id": ["id"],
+	"identified_by": ["id"],
 	"applies_to": applies_to,
 	"checks": {"c": {"op": "present", "path": ["id"]}},
 }}
@@ -339,7 +339,7 @@ test_values_that_is_not_a_list_is_ill_formed_for_includes_and_excludes if {
 }
 
 test_includes_and_excludes_take_value_or_values_but_not_both if {
-	rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {
+	rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {
 		"both": {"op": "excludes", "path": ["xs"], "value": 2, "values": [3]},
 		"neither": {"op": "includes", "path": ["xs"]},
 	}}})
@@ -351,7 +351,7 @@ test_includes_and_excludes_take_value_or_values_but_not_both if {
 }
 
 test_well_formed_says_when_the_values_of_includes_or_excludes_are_empty_or_not_a_list if {
-	rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {
+	rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {
 		"empty": {"op": "excludes", "path": ["xs"], "values": []},
 		"text": {"op": "includes", "path": ["xs"], "values": "nuts"},
 	}}})
@@ -1425,7 +1425,7 @@ test_any_of_can_scope_a_requirement if {
 		{"s": {
 			"subject_type": "thing",
 			"from": ["items"],
-			"id": ["id"],
+			"identified_by": ["id"],
 			"applies_to": {"in_a_flavour": flavoured},
 			"checks": {"c": {"op": "present", "path": ["id"]}},
 		}},
@@ -1561,7 +1561,7 @@ test_a_substituted_check_satisfies_its_requirement if {
 		{"s": {
 			"subject_type": "thing",
 			"from": ["items"],
-			"id": ["id"],
+			"identified_by": ["id"],
 			"checks": {"c": reviewed_or_verified},
 		}},
 	)
@@ -1589,7 +1589,7 @@ test_a_substitute_works_in_an_applies_to_filter if {
 	rep := report({"items": [{"id": "a", "internal": true}]}, {"s": {
 		"subject_type": "thing",
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"applies_to": {"in_scope": {
 			"op": "equals",
 			"path": ["production"],
@@ -1621,7 +1621,7 @@ test_a_substitute_that_reads_the_wrong_kind_of_value_stops_a_filter_ruling_a_sub
 	rep := report({"items": [{"id": "a", "production": false, "score": "high"}]}, {"s": {
 		"subject_type": "thing",
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"applies_to": {"in_scope": {
 			"op": "equals",
 			"path": ["production"],
@@ -1906,7 +1906,7 @@ test_a_byte_order_mark_in_a_subject_name_and_from_is_written_as_is if {
 	min_subjects := report({"i\ufeff": [{"id": 1}]}, {"s": {
 		"subject_type": "t\ufeff",
 		"from": ["i\ufeff"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"checks": {"c": {"op": "present", "path": ["id"]}},
 	}}).requirements.s.checks["$min_subjects"]
 	min_subjects.description == "The in-scope t\ufeff count is at least 1"
@@ -1938,7 +1938,7 @@ test_a_present_filter_with_a_step_that_cannot_be_a_key_cannot_rule_subjects_out 
 		some seg in bad_steps
 		rep := report({"xs": [{"id": 1, "a": [1, 2]}]}, {"s": {
 			"from": ["xs"],
-			"id": ["id"],
+			"identified_by": ["id"],
 			"min_subjects": 0,
 			"applies_to": {"f": {"op": "present", "path": ["a", seg]}},
 			"checks": {"c": {"op": "present", "path": ["id"]}},
@@ -1994,7 +1994,7 @@ test_a_ref_step_that_reads_something_that_cannot_be_a_key_fails_as_unusable if {
 
 test_a_from_or_id_with_a_step_that_cannot_be_a_key_is_not_well_formed if {
 	rows := [r.passed |
-		some m in [{"from": ["xs", true]}, {"from": ["xs", 1.0, {"each_as": "x"}]}, {"id": ["id", null]}]
+		some m in [{"from": ["xs", true]}, {"from": ["xs", 1.0, {"each_as": "x"}]}, {"identified_by": ["id", null]}]
 		rep := report({"xs": [{"id": 1}]}, {"s": object.union({"from": ["xs"], "checks": {"c": {"op": "present", "path": ["id"]}}}, m)})
 		some r in rows_for(rep, "s", "$well_formed")
 	]
@@ -2044,7 +2044,7 @@ test_a_number_at_the_edge_of_a_float_still_works if {
 
 test_a_requirement_with_a_number_out_of_range_is_not_well_formed if {
 	rows := [[r.check, r.passed] |
-		some m in [{"min_subjects": 1e-400}, {"id": ["xs", 1e400]}, {"from": ["xs", 1e400]}]
+		some m in [{"min_subjects": 1e-400}, {"identified_by": ["xs", 1e400]}, {"from": ["xs", 1e400]}]
 		rep := report({"xs": [{"id": 1}]}, {"s": object.union({"from": ["xs"], "checks": {"c": {"op": "present", "path": ["id"]}}}, m)})
 		some r in rows_for(rep, "s", "$well_formed")
 	]
@@ -2115,7 +2115,7 @@ test_a_declared_custom_op_without_an_expression_renders_as_empty if rendered({},
 two_check_req := {"s": {
 	"subject_type": "thing",
 	"from": ["items"],
-	"id": ["id"],
+	"identified_by": ["id"],
 	"checks": {
 		"a": {"op": "present", "path": ["id"]},
 		"b": {"op": "equals", "path": ["state"], "value": "MERGED"},
@@ -2152,8 +2152,8 @@ test_unknown_op_produces_a_failing_row_not_a_gap if {
 test_rows_from_different_requirements_are_labelled_separately if {
 	doc := {"a": [{"id": "1"}], "b": [{"id": "2"}]}
 	policy := {
-		"first": {"subject_type": "t", "from": ["a"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}},
-		"second": {"subject_type": "t", "from": ["b"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}},
+		"first": {"subject_type": "t", "from": ["a"], "identified_by": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}},
+		"second": {"subject_type": "t", "from": ["b"], "identified_by": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}},
 	}
 	rep := report(doc, policy)
 	count(rows_for(rep, "first", "c")) == 1
@@ -2275,7 +2275,7 @@ test_synthesised_rows_carry_a_cause if {
 	rep := report({"items": []}, {"s": {
 		"subject_type": "thing",
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"checks": {"c": {"op": "present", "path": ["x"]}},
 	}})
 	rows_for(rep, "s", "$well_formed")[0].cause == "satisfied"
@@ -2286,7 +2286,7 @@ test_an_applies_row_carries_the_state_of_the_filter_paths if {
 	rep := report({"items": [{"id": "a", "env": "prod"}, {"id": "b"}]}, {"s": {
 		"subject_type": "thing",
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"applies_to": {"prod_only": {"op": "equals", "path": ["env"], "value": "prod"}},
 		"checks": {"c": {"op": "present", "path": ["x"]}},
 	}})
@@ -2298,7 +2298,7 @@ test_violations_carry_the_cause if {
 	rep := report({"items": [{"id": "a"}]}, {"s": {
 		"subject_type": "thing",
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"checks": {"c": {"op": "equals", "path": ["state"], "value": "MERGED"}},
 	}})
 	[v.cause | some v in ergo.violations(rep)] == ["absent"]
@@ -2307,7 +2307,7 @@ test_violations_carry_the_cause if {
 min_subjects_req(n) := {"s": {
 	"subject_type": "thing",
 	"from": ["items"],
-	"id": ["id"],
+	"identified_by": ["id"],
 	"min_subjects": n,
 	"checks": {"c": {"op": "present", "path": ["id"]}},
 }}
@@ -2506,7 +2506,7 @@ test_a_from_that_reads_nothing_lists_its_min_subjects_row_as_a_violation if {
 owner_req := {"s": {
 	"subject_type": "repo",
 	"from": ["repos"],
-	"id": ["name"],
+	"identified_by": ["name"],
 	"checks": {"owned": {"op": "non_empty_string", "path": ["owner"]}},
 }}
 
@@ -2552,7 +2552,7 @@ test_unique_ids_reads_a_subject_that_is_not_an_object_as_its_own_id if {
 }
 
 test_unique_ids_counts_two_identical_subjects_as_a_clash_without_an_id_path if {
-	policy := {"s": object.remove(owner_req.s, ["id"])}
+	policy := {"s": object.remove(owner_req.s, ["identified_by"])}
 	unique_ids_row({"repos": [{"owner": "bob"}, {"owner": "bob"}, {"owner": "carol"}]}, policy) == [[{"name": "repeated repo ids", "value": [{"owner": "bob"}]}], false, "value"]
 }
 
@@ -2574,7 +2574,7 @@ test_unique_ids_lists_each_repeated_id_once_in_the_order_it_is_written_whatever_
 }
 
 test_unique_ids_reads_ids_through_a_name if {
-	policy := {"s": object.union(owner_req.s, {"from": ["repos", {"each_as": "repo"}], "id": ["$repo", "name"]})}
+	policy := {"s": object.union(owner_req.s, {"from": ["repos", {"each_as": "repo"}], "identified_by": ["$repo", "name"]})}
 	unique_ids_row({"repos": [{"name": "a"}, {"name": "a"}]}, policy) == [[{"name": "repeated repo ids", "value": ["a"]}], false, "value"]
 }
 
@@ -2604,7 +2604,7 @@ test_unique_ids_definition_is_in_the_check_table if {
 test_unique_ids_records_the_refs_in_from_and_id if {
 	policy := {"s": object.union(owner_req.s, {
 		"from": [{"ref": ["$$params", "list"]}],
-		"id": [{"ref": ["$$params", "key"]}],
+		"identified_by": [{"ref": ["$$params", "key"]}],
 	})}
 	rep := ergo.report({"repos": [{"name": "a"}, {"name": "a"}]}, lifted(policy), {"list": "repos", "key": "name"})
 	rep.requirements.s.checks["$unique_ids"]["$refs"] == [{"name": "$params.key", "value": "name"}, {"name": "$params.list", "value": "repos"}]
@@ -2624,7 +2624,7 @@ test_well_formed_fails_when_no_checks_are_declared if {
 	rep := report({"items": [{"id": "a"}]}, {"s": {
 		"subject_type": "thing",
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 	}})
 	rows_for(rep, "s", "$well_formed")[0].passed == false
 	rep.requirements.s.status == "not_met"
@@ -2676,7 +2676,7 @@ test_a_requirement_that_is_not_an_object_stays_in_the_report_and_is_not_well_for
 test_a_requirement_field_ergo_does_not_know_fails_well_formed if {
 	rep := report({"releases": [{"id": "r-1", "signed": false}]}, {"s": {
 		"from": ["releases"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"subjects": "release",
 		"checks": {"signed": {"op": "equals", "path": ["signed"], "value": true}},
 	}})
@@ -2689,12 +2689,12 @@ test_a_requirement_field_ergo_does_not_know_fails_well_formed if {
 test_from_id_applies_to_and_subject_type_belong_to_the_subject_not_the_requirement if {
 	rep := ergo.report(
 		{"releases": [{"id": "r-1", "signed": true}]}, {
-			"subjects": {"release": {"from": ["releases"], "id": ["id"]}},
+			"subjects": {"release": {"from": ["releases"], "identified_by": ["id"]}},
 			"requirements": {"s": {
 				"subject": "release",
 				"subject_type": "release",
 				"from": ["releases"],
-				"id": ["id"],
+				"identified_by": ["id"],
 				"applies_to": {},
 				"checks": {"signed": {"op": "equals", "path": ["signed"], "value": true}},
 			}},
@@ -2707,9 +2707,26 @@ test_from_id_applies_to_and_subject_type_belong_to_the_subject_not_the_requireme
 		{"name": "require", "value": "every"},
 		{"name": "applies_to", "value": ["unknown field"]},
 		{"name": "from", "value": ["unknown field"]},
-		{"name": "id", "value": ["unknown field"]},
+		{"name": "identified_by", "value": ["unknown field"]},
 		{"name": "subject_type", "value": ["unknown field"]},
 	]]
+}
+
+test_a_subject_with_id_instead_of_identified_by_is_written_wrong if {
+	rep := ergo.report(
+		{"releases": [{"id": "r-1", "signed": true}]},
+		{
+			"subjects": {"release": {"from": ["releases"], "id": ["id"]}},
+			"requirements": {"s": {"subject": "release", "checks": {"signed": {"op": "equals", "path": ["signed"], "value": true}}}},
+		},
+		{},
+	)
+	rep.requirements.s.status == "not_met"
+	[[r.passed, r.inputs] | some r in rows_for(rep, "s", "$well_formed")] == [[false, [
+		{"name": "count(checks)", "value": 1},
+		{"name": "require", "value": "every"},
+		{"name": "subjects.release.id", "value": ["unknown field"]},
+	]]]
 }
 
 test_a_requirement_with_an_unknown_field_still_has_its_subject_rows if {
@@ -2774,7 +2791,7 @@ test_numbers_in_meta_are_written_the_same_way_however_the_policy_wrote_them if {
 	json.marshal(report({"items": [{"id": 1}]}, written).requirements.s.meta) == `{"n":[1.5,100,0,1,0.0025]}`
 }
 
-numbers_req(value, bound, inner) := {"s": {"from": ["items"], "id": ["id"], "checks": {
+numbers_req(value, bound, inner) := {"s": {"from": ["items"], "identified_by": ["id"], "checks": {
 	"eq": {"op": "equals", "path": ["n"], "value": value},
 	"rg": {"op": "range", "path": ["n"], "min": -0.0, "max": bound},
 	"ref": {"op": "equals", "path": ["n"], "value": {"ref": ["$$params", "p"]}},
@@ -2844,7 +2861,7 @@ test_a_requirement_meta_that_json_cannot_hold_fails_well_formed_and_is_reported_
 }
 
 test_a_check_meta_that_json_cannot_hold_is_written_wrong_and_is_reported_empty if {
-	rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {
+	rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {
 		"k": {"op": "present", "path": ["n"], "meta": {"a": {1: "x"}}},
 		"s": {"op": "present", "path": ["n"], "meta": {"tags": {"a"}}},
 		"r": {"op": "present", "path": ["n"], "meta": {"n": 1e400}},
@@ -2952,15 +2969,15 @@ badly_written_requirements := {
 	"naming_step_keys": [{"from": ["items", {"each_as": "x", "keys": 5}]}, [{"name": "require", "value": "every"}, {"name": "subjects.subject.from", "value": ["invalid keys"]}]],
 	"from_step_not_key": [{"from": ["items", true]}, [{"name": "require", "value": "every"}, {"name": "subjects.subject.from", "value": ["step that can't be a key"]}]],
 	"from_out_of_range": [{"from": ["items", 1e400]}, [{"name": "require", "value": "every"}, {"name": "subjects.subject.from", "value": ["number out of range", "step that can't be a key"]}]],
-	"id_step_not_key": [{"id": [1.5]}, [{"name": "require", "value": "every"}, {"name": "subjects.subject.id", "value": ["step that can't be a key"]}]],
-	"id_ref_in_where": [{"id": [{"where": {"k": {"v": {"ref": ["$$params", "x"]}}}}]}, [{"name": "require", "value": "every"}, {"name": "subjects.subject.id", "value": ["ref inside where"]}]],
+	"id_step_not_key": [{"identified_by": [1.5]}, [{"name": "require", "value": "every"}, {"name": "subjects.subject.identified_by", "value": ["step that can't be a key"]}]],
+	"id_ref_in_where": [{"identified_by": [{"where": {"k": {"v": {"ref": ["$$params", "x"]}}}}]}, [{"name": "require", "value": "every"}, {"name": "subjects.subject.identified_by", "value": ["ref inside where"]}]],
 	"min_out_of_range": [{"min_subjects": 1e400}, [{"name": "require", "value": "every"}, {"name": "min_subjects", "value": ["number out of range"]}]],
 }
 
 test_every_way_a_requirement_is_written_wrong_says_what_is_wrong if {
 	got := {name: [row.passed, array.slice(row.inputs, 1, count(row.inputs))] |
 		some name, [fields, _] in badly_written_requirements
-		base := {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}}
+		base := {"from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}}
 		req := object.union(object.remove(base, object.keys(fields)), fields)
 		row := rows_for(report({"items": [{"id": 1}]}, {"s": req}), "s", "$well_formed")[0]
 	}
@@ -3034,7 +3051,7 @@ test_problems_with_several_fields_are_listed_by_field if {
 	]
 }
 
-typed_req := {"from": ["items"], "id": ["id"], "min_subjects": 0, "checks": {"c": {"op": "present", "path": ["id"]}}}
+typed_req := {"from": ["items"], "identified_by": ["id"], "min_subjects": 0, "checks": {"c": {"op": "present", "path": ["id"]}}}
 
 wrong_types := [
 	["applies_to", true],
@@ -3046,8 +3063,8 @@ wrong_types := [
 	["from", 5],
 	["from", {"a": 1}],
 	["from", null],
-	["id", 5],
-	["id", null],
+	["identified_by", 5],
+	["identified_by", null],
 	["min_subjects", "0"],
 	["min_subjects", null],
 	["min_subjects", -1],
@@ -3077,7 +3094,7 @@ wrong_type_problems := {
 	"applies_to": "not an object",
 	"checks": "not an object",
 	"from": "not a list or a string",
-	"id": "not a list or a string",
+	"identified_by": "not a list or a string",
 	"min_subjects": "not a whole number of 0 or more",
 	"subject_type": "empty or not a string",
 	"description": "not a string",
@@ -3147,7 +3164,7 @@ test_a_from_that_is_not_a_list_gives_no_subjects if {
 }
 
 test_an_id_that_is_not_a_list_gives_a_null_id if {
-	rep := report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"id": 5})})
+	rep := report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"identified_by": 5})})
 	[r.subject.id | some r in rows_for(rep, "s", "c")] == [null]
 }
 
@@ -3197,7 +3214,7 @@ is_from(name) if regex.match(`^subjects\.[^.]+\.from$`, name)
 test_a_badly_written_check_fails_well_formed_and_says_where_and_what if {
 	rep := report({"items": [{"id": 1}]}, {"s": {
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"applies_to": {"is_prod": {"op": "equals", "path": ["env"]}},
 		"checks": {"merged": {"op": "equls", "path": ["state"], "value": "MERGED"}, "fine": {"op": "present", "path": ["id"]}},
 	}})
@@ -3210,7 +3227,7 @@ test_a_badly_written_check_fails_well_formed_and_says_where_and_what if {
 }
 
 test_a_problem_inside_a_check_is_named_by_where_it_sits if {
-	rep := report({"items": [{"id": 1}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {
+	rep := report({"items": [{"id": 1}]}, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {
 		"signed": {"op": "all", "path": ["xs"], "check": {"op": "equals", "path": ["v"]}},
 		"reviewed": {"op": "present", "path": ["id"], "substitute": {"op": "nope"}},
 		"permitted": {"op": "any_of", "options": {"standard": [{"op": "present", "path": ["id"]}, {"op": "in", "path": ["x"], "values": 3}]}},
@@ -3285,12 +3302,12 @@ test_a_check_whose_path_is_not_a_list_reads_nothing if {
 }
 
 test_a_custom_input_that_is_not_a_list_is_a_step_that_cannot_be_a_key if {
-	rep := report({"items": [{"id": 1, "n": 2}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "even", "path": ["n"], "expression": "n is even", "inputs": [true]}}}})
+	rep := report({"items": [{"id": 1, "n": 2}]}, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "even", "path": ["n"], "expression": "n is even", "inputs": [true]}}}})
 	problem_inputs(rep) == [{"name": "checks.c", "value": ["step that can't be a key in inputs"]}]
 }
 
 test_well_formed_says_which_path_is_not_a_list if {
-	rep := report({"items": [{"id": 1}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {
+	rep := report({"items": [{"id": 1}]}, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {
 		"c": {"op": "even", "left": "a", "right": ["b"]},
 		"d": {"op": "even", "left": ["a"], "right": 1},
 		"e": {"op": "all", "path": ["xs"], "each": "a", "check": {"op": "equals", "path": [], "value": 1}},
@@ -3305,12 +3322,12 @@ test_well_formed_says_which_path_is_not_a_list if {
 }
 
 test_well_formed_says_which_option_is_not_a_list if {
-	rep := report({"items": [{"id": 1}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "any_of", "options": {"standard": {"a": {"op": "present", "path": ["a"]}}, "other": []}}}}})
+	rep := report({"items": [{"id": 1}]}, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "any_of", "options": {"standard": {"a": {"op": "present", "path": ["a"]}}, "other": []}}}}})
 	problem_inputs(rep) == [{"name": "checks.c", "value": ["empty option other", "option standard not a list"]}]
 }
 
 test_a_check_with_several_problems_lists_them_in_order if {
-	rep := report({"items": [{"id": 1}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "range", "path": ["n", 1e400], "min": 9, "max": 1}}}})
+	rep := report({"items": [{"id": 1}]}, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "range", "path": ["n", 1e400], "min": 9, "max": 1}}}})
 	problem_inputs(rep) == [{"name": "checks.c", "value": ["min above max", "number out of range", "step that can't be a key in path"]}]
 }
 
@@ -3320,7 +3337,7 @@ _within(name, base) if startswith(name, concat("", [base, "."]))
 
 test_every_badly_written_check_fails_well_formed if {
 	checks := {sprintf("c%d", [i]): c | some i, c in badly_written}
-	rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": checks}})
+	rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": checks}})
 	rows_for(rep, "s", "$well_formed")[0].passed == false
 	every i, _ in badly_written {
 		some p in problem_inputs(rep)
@@ -3330,21 +3347,21 @@ test_every_badly_written_check_fails_well_formed if {
 
 test_a_ref_that_reads_the_wrong_kind_of_value_leaves_well_formed_alone_because_params_are_input if {
 	every check in read_the_wrong_kind {
-		rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
+		rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": check}}})
 		rows_for(rep, "s", "$well_formed")[0].passed == true
 	}
 }
 
 test_a_name_given_by_from_is_known_and_any_other_is_not if {
-	good := report({"prs": [{"n": 1}]}, {"s": {"from": ["prs", {"each_as": "pr"}], "id": ["n"], "checks": {"c": {"op": "present", "path": ["$pr", "n"]}}}})
-	bad := report({"prs": [{"n": 1}]}, {"s": {"from": ["prs", {"each_as": "pr"}], "id": ["n"], "checks": {"c": {"op": "present", "path": ["$p", "n"]}}}})
+	good := report({"prs": [{"n": 1}]}, {"s": {"from": ["prs", {"each_as": "pr"}], "identified_by": ["n"], "checks": {"c": {"op": "present", "path": ["$pr", "n"]}}}})
+	bad := report({"prs": [{"n": 1}]}, {"s": {"from": ["prs", {"each_as": "pr"}], "identified_by": ["n"], "checks": {"c": {"op": "present", "path": ["$p", "n"]}}}})
 	rows_for(good, "s", "$well_formed")[0].passed == true
 	problem_inputs(bad) == [{"name": "checks.c", "value": ["unknown name $p"]}]
 	[r.cause | some r in rows_for(bad, "s", "c")] == ["ill_formed"]
 }
 
 test_a_name_given_by_as_is_known_only_inside_its_check if {
-	rep := report({"prs": [{"n": 1}]}, {"s": {"from": ["prs"], "id": ["n"], "checks": {"c": {"op": "any_of", "options": {
+	rep := report({"prs": [{"n": 1}]}, {"s": {"from": ["prs"], "identified_by": ["n"], "checks": {"c": {"op": "any_of", "options": {
 		"a": [{"op": "any", "path": ["approvers"], "as": "approver", "check": {"op": "present", "path": ["$approver", "id"]}}],
 		"b": [{"op": "present", "path": ["$approver", "id"]}],
 	}}}}})
@@ -3358,7 +3375,7 @@ test_a_badly_written_filter_fails_well_formed_too if {
 
 test_a_badly_written_filter_wins_over_one_that_rules_the_subject_out_because_scope_cannot_be_trusted if {
 	rep := report(typo_doc, {"s": {
-		"from": ["items"], "id": ["id"], "min_subjects": 0, "applies_to": {
+		"from": ["items"], "identified_by": ["id"], "min_subjects": 0, "applies_to": {
 			"out": {"op": "equals", "path": ["n"], "value": 2},
 			"broken": {"op": "nope", "path": ["n"]},
 		},
@@ -3443,7 +3460,7 @@ test_a_check_reading_a_name_nothing_gives_fails_the_requirement_even_when_no_sub
 }
 
 test_a_field_its_op_does_not_use_fails_well_formed if {
-	rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {
+	rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {
 		"typo": {"op": "equals", "path": ["n"], "valeu": 1},
 		"note": {"op": "equals", "path": ["n"], "value": 1, "descripton": "n is one"},
 	}}})
@@ -3455,7 +3472,7 @@ test_a_field_its_op_does_not_use_fails_well_formed if {
 }
 
 test_an_unknown_field_inside_a_check_is_found_where_it_sits if {
-	rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {
+	rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {
 		"inner": {"op": "all", "path": ["xs"], "check": {"op": "present", "path": [], "owner": "me"}},
 		"sub": {"op": "present", "path": ["n"], "substitute": {"op": "present", "path": ["s"], "x": 1}},
 		"opt": {"op": "any_of", "options": {"o": [{"op": "present", "path": ["n"], "y": 2}]}, "z": 3},
@@ -3488,25 +3505,25 @@ test_every_built_in_op_takes_its_own_fields_and_the_ones_every_check_can_have if
 		"any": {"op": "any", "path": ["xs"], "each": [], "as": "x", "check": {"op": "present", "path": []}},
 		"any_of": {"op": "any_of", "options": {"o": [{"op": "present", "path": ["n"]}]}},
 	}
-	rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {name: object.union(c, common) | some name, c in checks}}})
+	rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {name: object.union(c, common) | some name, c in checks}}})
 	problem_inputs(rep) == []
 	object.keys(checks) == {op | some op in ergo.operators; not op in {"even", "both_present", "multiple_of", "sees_only_its_fields"}}
 }
 
 test_a_check_meta_is_carried_into_the_report if {
-	rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["n"], "meta": {"severity": "high", "refs": ["RB-1"]}}}}})
+	rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "present", "path": ["n"], "meta": {"severity": "high", "refs": ["RB-1"]}}}}})
 	problem_inputs(rep) == []
 	rep.requirements.s.checks.c.meta == {"severity": "high", "refs": ["RB-1"]}
 }
 
 test_a_check_without_a_description_or_meta_reports_empty_ones_so_tools_can_read_them_without_checking if {
-	rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["n"]}}}})
+	rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "present", "path": ["n"]}}}})
 	rep.requirements.s.checks.c.description == ""
 	rep.requirements.s.checks.c.meta == {}
 }
 
 test_a_check_description_or_meta_of_the_wrong_type_is_written_wrong_and_never_reaches_the_report if {
-	rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {
+	rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {
 		"d": {"op": "present", "path": ["n"], "description": 5},
 		"m": {"op": "present", "path": ["n"], "meta": "high"},
 		"n": {"op": "present", "path": ["n"], "meta": []},
@@ -3524,13 +3541,13 @@ test_a_check_description_or_meta_of_the_wrong_type_is_written_wrong_and_never_re
 }
 
 test_a_filter_description_and_meta_are_checked_but_the_shared_applies_entry_keeps_ergos_own if {
-	rep := report({"items": [{"id": 1, "env": "prod"}]}, {"s": {"from": ["items"], "id": ["id"], "applies_to": {"f": {"op": "equals", "path": ["env"], "value": "prod", "description": "Production only", "meta": {"why": "scope"}}}, "checks": {"c": {"op": "present", "path": ["id"]}}}})
+	rep := report({"items": [{"id": 1, "env": "prod"}]}, {"s": {"from": ["items"], "identified_by": ["id"], "applies_to": {"f": {"op": "equals", "path": ["env"], "value": "prod", "description": "Production only", "meta": {"why": "scope"}}}, "checks": {"c": {"op": "present", "path": ["id"]}}}})
 	rows_for(rep, "s", "$well_formed")[0].passed == true
 	rep.requirements.s.checks["$applies"] == {"description": "The subject is in scope", "expression": `env == "prod"`, "meta": {}}
 }
 
 test_meta_can_sit_wherever_a_description_can if {
-	rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "applies_to": {"f": {"op": "present", "path": ["n"], "meta": {"m": "x"}}}, "checks": {
+	rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "applies_to": {"f": {"op": "present", "path": ["n"], "meta": {"m": "x"}}}, "checks": {
 		"inner": {"op": "all", "path": ["xs"], "check": {"op": "present", "path": [], "meta": {"m": "x"}}},
 		"sub": {"op": "present", "path": ["n"], "substitute": {"op": "present", "path": ["s"], "meta": {"m": "x"}}},
 		"opt": {"op": "any_of", "options": {"o": [{"op": "present", "path": ["n"], "meta": {"m": "x"}}]}},
@@ -3539,7 +3556,7 @@ test_meta_can_sit_wherever_a_description_can if {
 }
 
 test_a_bad_meta_or_description_inside_a_check_is_found_where_it_sits if {
-	rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "applies_to": {"f": {"op": "present", "path": ["n"], "description": 1}}, "checks": {
+	rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "applies_to": {"f": {"op": "present", "path": ["n"], "description": 1}}, "checks": {
 		"inner": {"op": "all", "path": ["xs"], "check": {"op": "present", "path": [], "meta": 5}},
 		"sub": {"op": "present", "path": ["n"], "substitute": {"op": "present", "path": ["s"], "description": true}},
 		"opt": {"op": "any_of", "options": {"o": [{"op": "present", "path": ["n"], "meta": ["x"]}]}},
@@ -3553,12 +3570,12 @@ test_a_bad_meta_or_description_inside_a_check_is_found_where_it_sits if {
 }
 
 test_a_custom_op_keeps_its_own_fields_but_not_a_description_or_meta_of_the_wrong_type if {
-	rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "multiple_of", "path": ["n"], "by": 1, "description": 5, "meta": "x"}}}})
+	rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "multiple_of", "path": ["n"], "by": 1, "description": 5, "meta": "x"}}}})
 	problem_inputs(rep) == [{"name": "checks.c", "value": ["invalid description", "invalid meta"]}]
 }
 
 test_every_check_in_the_report_has_a_description_and_meta_even_the_ones_ergo_adds if {
-	rep := report({"items": [{"id": 1, "env": "prod"}]}, {"s": {"from": ["items"], "id": ["id"], "applies_to": {"f": {"op": "equals", "path": ["env"], "value": "prod"}}, "checks": {"c": {"op": "equals", "path": ["id"], "value": {"ref": ["$$params", "p"]}}}}})
+	rep := report({"items": [{"id": 1, "env": "prod"}]}, {"s": {"from": ["items"], "identified_by": ["id"], "applies_to": {"f": {"op": "equals", "path": ["env"], "value": "prod"}}, "checks": {"c": {"op": "equals", "path": ["id"], "value": {"ref": ["$$params", "p"]}}}}})
 	{name: [is_string(def.description), def.meta] | some name, def in rep.requirements.s.checks} == {
 		"$applies": [true, {}],
 		"$min_subjects": [true, {}],
@@ -3569,7 +3586,7 @@ test_every_check_in_the_report_has_a_description_and_meta_even_the_ones_ergo_add
 }
 
 test_a_custom_op_keeps_any_fields_it_likes if {
-	rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "multiple_of", "path": ["n"], "by": 1, "owner": "me", "expression": "n is whole", "inputs": [["n"]]}}}})
+	rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "multiple_of", "path": ["n"], "by": 1, "owner": "me", "expression": "n is whole", "inputs": [["n"]]}}}})
 	problem_inputs(rep) == []
 	[r.cause | some r in rows_for(rep, "s", "c")] == ["satisfied"]
 }
@@ -3581,10 +3598,10 @@ test_a_list_check_without_from_is_described if {
 
 kinds_doc := {"items": [{"id": 1, "s": "x", "n": 5, "o": {"a": 1}, "e": [], "l": [1], "t": "2026-01-01T00:00:00Z", "bad_t": "2026-02-30T00:00:00Z"}]}
 
-kind_cause(check) := [r.cause | some r in rows_for(report(kinds_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}}), "s", "c")][0]
+kind_cause(check) := [r.cause | some r in rows_for(report(kinds_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": check}}}), "s", "c")][0]
 
 kind_filter(check) := [rep.requirements.s.status, [r.cause | some r in rows_for(rep, "s", "$applies")]] if {
-	rep := report(kinds_doc, {"s": {"from": ["items"], "id": ["id"], "min_subjects": 0, "applies_to": {"f": check}, "checks": {"c": {"op": "present", "path": ["id"]}}}})
+	rep := report(kinds_doc, {"s": {"from": ["items"], "identified_by": ["id"], "min_subjects": 0, "applies_to": {"f": check}, "checks": {"c": {"op": "present", "path": ["id"]}}}})
 }
 
 test_a_value_the_op_cannot_use_fails_as_unusable_and_a_filter_cannot_rule_the_subject_out_with_it if {
@@ -3635,7 +3652,7 @@ not_a_bot := {"op": "any", "path": ["approvers"], "check": {"op": "not_matches_a
 
 every_human := {"op": "all", "path": ["approvers"], "check": {"op": "not_matches_any", "path": ["username"], "patterns": ["\\[bot\\]$"]}}
 
-item_cause(check, approvers) := [r.cause | some r in rows_for(report(approvers_doc(approvers), {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}}), "s", "c")][0]
+item_cause(check, approvers) := [r.cause | some r in rows_for(report(approvers_doc(approvers), {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": check}}}), "s", "c")][0]
 
 test_a_list_check_takes_the_worst_cause_of_its_failing_items if {
 	item_cause(not_a_bot, [{"username": "renovate[bot]"}, {}]) == "absent"
@@ -3647,7 +3664,7 @@ test_a_list_check_takes_the_worst_cause_of_its_failing_items if {
 }
 
 test_a_filter_cannot_rule_out_a_subject_whose_items_could_not_be_read if {
-	rep := report(approvers_doc([{"username": "renovate[bot]"}, {}]), {"s": {"from": ["items"], "id": ["id"], "min_subjects": 0, "applies_to": {"f": not_a_bot}, "checks": {"c": {"op": "present", "path": ["id"]}}}})
+	rep := report(approvers_doc([{"username": "renovate[bot]"}, {}]), {"s": {"from": ["items"], "identified_by": ["id"], "min_subjects": 0, "applies_to": {"f": not_a_bot}, "checks": {"c": {"op": "present", "path": ["id"]}}}})
 	rep.requirements.s.status == "not_met"
 	[r.cause | some r in rows_for(rep, "s", "$applies")] == ["absent"]
 }
@@ -3656,7 +3673,7 @@ test_each_takes_the_cause_of_its_inner_lists if {
 	check := {"op": "all", "path": ["prs"], "each": ["commits"], "check": {"op": "present", "path": ["sha"]}}
 	causes := [[r.passed, r.cause] |
 		some prs in [[{"commits": [{"sha": "a"}]}, {}], [{"commits": "a"}], [{"commits": []}], [{"commits": [{"sha": "a"}]}]]
-		some r in rows_for(report({"items": [{"id": 1, "prs": prs}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}}), "s", "c")
+		some r in rows_for(report({"items": [{"id": 1, "prs": prs}]}, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": check}}}), "s", "c")
 	]
 	causes == [[false, "absent"], [false, "unusable"], [false, "value"], [true, "satisfied"]]
 }
@@ -3665,7 +3682,7 @@ test_a_nested_list_check_takes_the_worst_cause_of_its_inner_items if {
 	check := {"op": "all", "path": ["prs"], "check": {"op": "all", "path": ["commits"], "check": {"op": "range", "path": ["n"], "min": 0, "max": 9}}}
 	causes := [r.cause |
 		some commits in [[{"n": 1}, {"n": 99}], [{"n": 1}, {}], [{"n": 1}, {"n": "x"}]]
-		some r in rows_for(report({"items": [{"id": 1, "prs": [{"commits": commits}]}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}}), "s", "c")
+		some r in rows_for(report({"items": [{"id": 1, "prs": [{"commits": commits}]}]}, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": check}}}), "s", "c")
 	]
 	causes == ["value", "absent", "unusable"]
 }
@@ -3674,7 +3691,7 @@ test_an_any_of_inside_a_list_check_takes_the_worst_cause_of_its_options if {
 	check := {"op": "any", "path": ["xs"], "check": {"op": "any_of", "options": {"a": [{"op": "equals", "path": ["k"], "value": 1}], "b": [{"op": "range", "path": ["n"], "min": 0, "max": 9}]}}}
 	causes := [r.cause |
 		some xs in [[{"k": 2, "n": 99}], [{"k": 2}], [{"k": 2, "n": "x"}]]
-		some r in rows_for(report({"items": [{"id": 1, "xs": xs}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}}), "s", "c")
+		some r in rows_for(report({"items": [{"id": 1, "xs": xs}]}, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": check}}}), "s", "c")
 	]
 	causes == ["value", "absent", "unusable"]
 }
@@ -3684,11 +3701,11 @@ test_a_list_check_that_passes_in_an_option_adds_nothing_to_the_cause_even_when_a
 		{"op": "any", "path": ["xs"], "check": {"op": "equals", "path": ["k"], "value": 1}},
 		{"op": "equals", "path": ["n"], "value": 1},
 	]}}
-	rep := report({"items": [{"id": 1, "n": 2, "xs": [{"k": 1}, {}]}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
+	rep := report({"items": [{"id": 1, "n": 2, "xs": [{"k": 1}, {}]}]}, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": check}}})
 	[r.cause | some r in rows_for(rep, "s", "c")] == ["value"]
 }
 
-lockfile_req(filters) := {"s": {"from": ["items"], "id": ["id"], "min_subjects": 0, "applies_to": filters, "checks": {"c": {"op": "equals", "path": ["hashed"], "value": true}}}}
+lockfile_req(filters) := {"s": {"from": ["items"], "identified_by": ["id"], "min_subjects": 0, "applies_to": filters, "checks": {"c": {"op": "equals", "path": ["hashed"], "value": true}}}}
 
 lockfile_scope(item, filters) := [rep.requirements.s.status, [r.cause | some r in rows_for(rep, "s", "$applies")]] if {
 	rep := report({"items": [item]}, lockfile_req(filters))
@@ -3718,14 +3735,14 @@ test_present_on_a_missing_field_is_a_clean_no_wherever_it_is if {
 		{"op": "present", "path": ["username"]},
 		{"op": "not_matches_any", "path": ["username"], "patterns": ["\\[bot\\]$"]},
 	]}}}
-	as_check := report(doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["owner"]}, "h": human}}})
+	as_check := report(doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "present", "path": ["owner"]}, "h": human}}})
 	[[r.check, r.cause] | some r in as_check.results; r.check in {"c", "h"}] == [["c", "value"], ["h", "value"]]
-	as_filter := report(doc, {"s": {"from": ["items"], "id": ["id"], "min_subjects": 0, "applies_to": {"h": human}, "checks": {"c": {"op": "present", "path": ["id"]}}}})
+	as_filter := report(doc, {"s": {"from": ["items"], "identified_by": ["id"], "min_subjects": 0, "applies_to": {"h": human}, "checks": {"c": {"op": "present", "path": ["id"]}}}})
 	[as_filter.requirements.s.status, [r.cause | some r in rows_for(as_filter, "s", "$applies")]] == ["not_applicable", ["value"]]
 }
 
 test_present_that_cannot_reach_its_field_is_not_a_clean_no if {
-	causes := [[r.cause | some r in rows_for(report({"items": [item]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}}), "s", "c")][0] |
+	causes := [[r.cause | some r in rows_for(report({"items": [item]}, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": check}}}), "s", "c")][0] |
 		some [item, check] in [
 			[{"id": 1, "xs": []}, {"op": "present", "path": ["xs", {"where": {"k": 1}}, "v"]}],
 		]
@@ -3735,7 +3752,7 @@ test_present_that_cannot_reach_its_field_is_not_a_clean_no if {
 }
 
 test_a_path_starting_with_a_reserved_double_dollar_name_is_ill_formed if {
-	rep := report({"items": [{"id": 1}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["$$foo", "x"], "value": 1}}}})
+	rep := report({"items": [{"id": 1}]}, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "equals", "path": ["$$foo", "x"], "value": 1}}}})
 	problem_inputs(rep) == [{"name": "checks.c", "value": ["unknown name $$foo"]}]
 	[r.cause | some r in rows_for(rep, "s", "c")] == ["ill_formed"]
 }
@@ -3752,11 +3769,11 @@ test_an_empty_subject_name_fails_well_formed_because_rows_and_descriptions_would
 }
 
 named_subject_policy(name) := {
-	"subjects": {name: {"from": ["items"], "id": ["id"]}},
+	"subjects": {name: {"from": ["items"], "identified_by": ["id"]}},
 	"requirements": {"s": {"subject": name, "checks": {"c": {"op": "present", "path": ["id"]}}}},
 }
 
-plain_defs(req) := report({"items": [{"id": 1}]}, {"s": object.union({"from": ["items"], "id": ["id"], "applies_to": {"f": {"op": "present", "path": ["id"]}}, "checks": {"c": {"op": "present", "path": ["id"]}}}, req)}).requirements.s.checks
+plain_defs(req) := report({"items": [{"id": 1}]}, {"s": object.union({"from": ["items"], "identified_by": ["id"], "applies_to": {"f": {"op": "present", "path": ["id"]}}, "checks": {"c": {"op": "present", "path": ["id"]}}}, req)}).requirements.s.checks
 
 test_the_checks_ergo_adds_are_described_in_plain_words if {
 	defs := plain_defs({"subject_type": "deployment"})
@@ -3788,7 +3805,7 @@ test_well_formed_definition_is_in_the_check_table if {
 require_req(q) := {"s": {
 	"subject_type": "thing",
 	"from": ["items"],
-	"id": ["id"],
+	"identified_by": ["id"],
 	"require": q,
 	"checks": {
 		"signed": {"op": "equals", "path": ["signed"], "value": true},
@@ -3867,7 +3884,7 @@ test_require_defaults_to_every if {
 	defaulted := report(split_across_subjects, {"s": {
 		"subject_type": "thing",
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"checks": require_req("every").s.checks,
 	}})
 	defaulted.requirements.s.require == "every"
@@ -3881,8 +3898,8 @@ test_unknown_require_value_is_not_met if {
 test_compliant_when_every_requirement_is_met if {
 	doc := {"a": [{"id": "1"}], "b": [{"id": "2"}]}
 	policy := {
-		"first": {"subject_type": "t", "from": ["a"], "id": ["id"], "min_subjects": 1, "checks": {"c": {"op": "present", "path": ["id"]}}},
-		"second": {"subject_type": "t", "from": ["b"], "id": ["id"], "min_subjects": 1, "checks": {"c": {"op": "present", "path": ["id"]}}},
+		"first": {"subject_type": "t", "from": ["a"], "identified_by": ["id"], "min_subjects": 1, "checks": {"c": {"op": "present", "path": ["id"]}}},
+		"second": {"subject_type": "t", "from": ["b"], "identified_by": ["id"], "min_subjects": 1, "checks": {"c": {"op": "present", "path": ["id"]}}},
 	}
 	report(doc, policy).compliant == true
 }
@@ -3890,8 +3907,8 @@ test_compliant_when_every_requirement_is_met if {
 test_not_compliant_when_any_requirement_is_not_met if {
 	doc := {"a": [{"id": "1"}], "b": [{"no_id": true}]}
 	policy := {
-		"first": {"subject_type": "t", "from": ["a"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}},
-		"second": {"subject_type": "t", "from": ["b"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}},
+		"first": {"subject_type": "t", "from": ["a"], "identified_by": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}},
+		"second": {"subject_type": "t", "from": ["b"], "identified_by": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}},
 	}
 	report(doc, policy).compliant == false
 }
@@ -3899,7 +3916,7 @@ test_not_compliant_when_any_requirement_is_not_met if {
 prod_only := {"s": {
 	"subject_type": "deployment",
 	"from": ["deployments"],
-	"id": ["id"],
+	"identified_by": ["id"],
 	"min_subjects": 0,
 	"applies_to": {"prod": {"op": "equals", "path": ["env"], "value": "prod"}},
 	"checks": {"approved": {"op": "present", "path": ["approved_by"]}},
@@ -3996,8 +4013,8 @@ test_violations_drop_the_failing_rows_of_a_requirement_that_is_met_or_not_applic
 test_report_has_one_entry_per_declared_requirement if {
 	doc := {"a": [{"id": "1"}], "b": [{"id": "2"}]}
 	policy := {
-		"first": {"subject_type": "t", "from": ["a"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}},
-		"second": {"subject_type": "t", "from": ["b"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}},
+		"first": {"subject_type": "t", "from": ["a"], "identified_by": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}},
+		"second": {"subject_type": "t", "from": ["b"], "identified_by": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}},
 	}
 	object.keys(report(doc, policy).requirements) == {"first", "second"}
 }
@@ -4019,8 +4036,8 @@ test_report_is_deterministic if {
 
 test_row_order_is_independent_of_policy_key_order if {
 	doc := {"a": [{"id": "1"}], "b": [{"id": "2"}]}
-	first := {"subject_type": "t", "from": ["a"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}}
-	second := {"subject_type": "t", "from": ["b"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}}
+	first := {"subject_type": "t", "from": ["a"], "identified_by": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}}
+	second := {"subject_type": "t", "from": ["b"], "identified_by": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}}
 
 	json.marshal(report(doc, {"first": first, "second": second})) == json.marshal(report(doc, {"second": second, "first": first}))
 }
@@ -4029,7 +4046,7 @@ test_row_order_groups_by_check_kind_then_requirement if {
 	req := {
 		"subject_type": "t",
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"applies_to": {"live": {"op": "equals", "path": ["live"], "value": true}},
 		"checks": {
 			"zeta": {"op": "present", "path": ["id"]},
@@ -4060,19 +4077,19 @@ test_row_order_groups_by_check_kind_then_requirement if {
 }
 
 test_requirements_come_out_in_name_order_whatever_the_runtime if {
-	req := {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}}
+	req := {"from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "present", "path": ["id"]}}}
 	rep := report({"items": [{"id": 1}]}, {"t": req, "s": req, "delta": req, "alpha": req, "gamma": req, "beta": req})
 	[r.requirement | some r in rep.results; r.check == "c"] == ["alpha", "beta", "delta", "gamma", "s", "t"]
 }
 
 test_checks_come_out_in_name_order_whatever_the_runtime if {
 	check := {"op": "present", "path": ["id"]}
-	rep := report({"items": [{"id": 1}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check, "b": check, "a": check, "delta": check, "gamma": check}}})
+	rep := report({"items": [{"id": 1}]}, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": check, "b": check, "a": check, "delta": check, "gamma": check}}})
 	[r.check | some r in rep.results; not startswith(r.check, "$")] == ["a", "b", "c", "delta", "gamma"]
 }
 
 test_a_policy_written_as_a_set_still_gets_its_rows if {
-	policy := {"subjects": {"item": {"from": ["items"], "id": ["id"]}}, "requirements": {{"subject": "item", "checks": {"c": {"op": "present", "path": ["id"]}}}}}
+	policy := {"subjects": {"item": {"from": ["items"], "identified_by": ["id"]}}, "requirements": {{"subject": "item", "checks": {"c": {"op": "present", "path": ["id"]}}}}}
 	[r.check | some r in ergo.report({"items": [{"id": 1}]}, policy, {}).results] == ["$well_formed", "$min_subjects", "$unique_ids", "c"]
 }
 
@@ -4135,7 +4152,7 @@ test_every_row_resolves_to_one_check_definition if {
 violating_req := {"s": {
 	"subject_type": "thing",
 	"from": ["items"],
-	"id": ["id"],
+	"identified_by": ["id"],
 	"checks": {
 		"signed": {"description": "Signed", "op": "equals", "path": ["signed"], "value": true},
 		"reviewed": {"description": "Reviewed", "op": "equals", "path": ["reviewed"], "value": true},
@@ -4173,7 +4190,7 @@ test_violations_default_a_missing_description_to_an_empty_string if {
 	rep := report({"items": [{"id": "a"}]}, {"s": {
 		"subject_type": "thing",
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"checks": {"undescribed": {"op": "equals", "path": ["x"], "value": 1}},
 	}})
 	v := ergo.violations(rep)
@@ -4204,7 +4221,7 @@ test_violations_exclude_subjects_that_are_out_of_scope if {
 	rep := report(doc, {"s": {
 		"subject_type": "thing",
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"applies_to": merged_only,
 		"checks": {"signed": {"op": "equals", "path": ["signed"], "value": true}},
 	}})
@@ -4251,8 +4268,8 @@ test_definition_field_reads_only_the_requirements_so_violations_stay_linear_in_s
 test_violations_span_multiple_requirements if {
 	doc := {"a": [{"id": "1"}], "b": [{"id": "2"}]}
 	policy := {
-		"first": {"subject_type": "t", "from": ["a"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["v"], "value": 1}}},
-		"second": {"subject_type": "t", "from": ["b"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["v"], "value": 1}}},
+		"first": {"subject_type": "t", "from": ["a"], "identified_by": ["id"], "checks": {"c": {"op": "equals", "path": ["v"], "value": 1}}},
+		"second": {"subject_type": "t", "from": ["b"], "identified_by": ["id"], "checks": {"c": {"op": "equals", "path": ["v"], "value": 1}}},
 	}
 	{v.requirement | some v in ergo.violations(report(doc, policy))} == {"first", "second"}
 }
@@ -4270,15 +4287,15 @@ test_violations_follow_results_order if {
 test_violations_keep_two_failures_that_look_alike if {
 	rep := report(
 		{"items": [{"signed": false}, {"signed": false}]},
-		{"s": {"from": ["items"], "id": ["no_such_field"], "checks": {"signed": {"op": "equals", "path": ["signed"], "value": true}}}},
+		{"s": {"from": ["items"], "identified_by": ["no_such_field"], "checks": {"signed": {"op": "equals", "path": ["signed"], "value": true}}}},
 	)
 	[[v.check, v.subject.id] | some v in ergo.violations(rep)] == [["$unique_ids", null], ["signed", null], ["signed", null]]
 }
 
 test_violations_take_the_definition_from_the_rows_own_requirement if {
 	rep := report({"a": [{"id": 1}], "b": [{"id": 2}]}, {
-		"first": {"from": ["a"], "id": ["id"], "checks": {"c": {"description": "First", "op": "present", "path": ["x"]}}},
-		"second": {"from": ["b"], "id": ["id"], "checks": {"c": {"description": "Second", "op": "present", "path": ["x"]}}},
+		"first": {"from": ["a"], "identified_by": ["id"], "checks": {"c": {"description": "First", "op": "present", "path": ["x"]}}},
+		"second": {"from": ["b"], "identified_by": ["id"], "checks": {"c": {"description": "Second", "op": "present", "path": ["x"]}}},
 	})
 	{[v.requirement, v.description] | some v in ergo.violations(rep)} == {["first", "First"], ["second", "Second"]}
 }
@@ -4287,7 +4304,7 @@ test_a_requirement_without_checks_yields_a_violation if {
 	rep := report({"items": [{"id": "a"}]}, {"s": {
 		"subject_type": "thing",
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 	}})
 	rep.compliant == false
 	[v.check | some v in ergo.violations(rep)] == ["$well_formed"]
@@ -4316,7 +4333,7 @@ scan_docs := [
 scan_policy(rq, mn, cs, fl) := {"s": {
 	"subject_type": "thing",
 	"from": ["items"],
-	"id": ["id"],
+	"identified_by": ["id"],
 	"require": rq,
 	"min_subjects": mn,
 	"applies_to": fl,
@@ -4412,8 +4429,8 @@ test_out_of_scope_subject_is_recorded_as_evidence if {
 test_requirement_names_are_unique_by_construction if {
 	doc := {"a": [{"id": "A", "v": 1}], "b": [{"id": "B", "v": 9}]}
 	policy := {
-		"thing": {"subject_type": "thing", "from": ["a"], "id": ["id"], "checks": {"chk": {"op": "equals", "path": ["v"], "value": 1}}},
-		"other_thing": {"subject_type": "thing", "from": ["b"], "id": ["id"], "checks": {"chk": {"op": "equals", "path": ["v"], "value": 2}}},
+		"thing": {"subject_type": "thing", "from": ["a"], "identified_by": ["id"], "checks": {"chk": {"op": "equals", "path": ["v"], "value": 1}}},
+		"other_thing": {"subject_type": "thing", "from": ["b"], "identified_by": ["id"], "checks": {"chk": {"op": "equals", "path": ["v"], "value": 2}}},
 	}
 	rep := report(doc, policy)
 	every row in rep.results {
@@ -4430,7 +4447,7 @@ test_a_user_check_named_min_subjects_is_not_clobbered if {
 	colliding := {"s": {
 		"subject_type": "thing",
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"min_subjects": 1,
 		"checks": {"min_subjects": {"description": "user check", "op": "equals", "path": ["id"], "value": "zzz"}},
 	}}
@@ -4456,7 +4473,7 @@ test_a_requirement_without_checks_explains_itself if {
 	rep := report({"items": [{"id": "a"}]}, {"s": {
 		"subject_type": "thing",
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 	}})
 	rep.requirements.s.status == "not_met"
 	count(rep.results) > 0
@@ -4515,7 +4532,7 @@ test_a_custom_op_can_call_the_built_in_operators if {
 test_a_custom_op_can_scope_a_requirement if {
 	rep := report({"items": [{"id": "a", "n": 2}, {"id": "b", "n": 3}]}, {"s": {
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"applies_to": {"is_even": even},
 		"checks": {"c": {"op": "present", "path": ["n"]}},
 	}})
@@ -4545,7 +4562,7 @@ degraded_only := {"degraded": {"op": "equals", "path": ["degraded"], "value": tr
 degraded_req(req_kind) := {"s": {
 	"subject_type": "round",
 	"from": ["rounds"],
-	"id": ["id"],
+	"identified_by": ["id"],
 	"require": req_kind,
 	"min_subjects": 0,
 	"applies_to": degraded_only,
@@ -4644,7 +4661,7 @@ test_a_missing_substitute_does_not_make_an_out_of_scope_subject_unreadable if {
 
 locked_req(filter_path) := {"s": {
 	"from": ["packages"],
-	"id": ["id"],
+	"identified_by": ["id"],
 	"min_subjects": 0,
 	"applies_to": {"locked": {"op": "present", "path": filter_path}},
 	"checks": {"c": {"op": "equals", "path": ["signed"], "value": true}},
@@ -4712,7 +4729,7 @@ test_a_failing_custom_op_filter_that_declares_no_reads_rules_a_subject_out if {
 in_doc(top, subj, check) := report(object.union(top, {"items": [subj]}), {"s": {
 	"subject_type": "thing",
 	"from": ["items"],
-	"id": ["id"],
+	"identified_by": ["id"],
 	"checks": {"c": check},
 }})
 
@@ -4923,7 +4940,7 @@ test_a_ref_deeper_inside_a_value_is_written_wrong_so_it_cannot_be_compared_as_da
 }
 
 test_well_formed_says_where_a_ref_sits_inside_a_value if {
-	rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {
+	rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {
 		"in_value": {"op": "excludes", "path": ["xs"], "value": [nuts_ref]},
 		"in_values": {"op": "in", "path": ["n"], "values": [[nuts_ref]]},
 		"in_patterns": {"op": "matches_any", "path": ["s"], "patterns": [{"p": nuts_ref}]},
@@ -4945,7 +4962,7 @@ test_a_literal_deeper_inside_a_value_is_written_wrong_so_it_cannot_be_compared_a
 		r := row_in({}, {"id": 1, "xs": [["nuts"]]}, check)
 		[r.passed, r.cause] == [false, "ill_formed"]
 	}
-	rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "excludes", "path": ["xs"], "value": [{"literal": "nuts"}]}}}})
+	rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "excludes", "path": ["xs"], "value": [{"literal": "nuts"}]}}}})
 	problem_inputs(rep) == [{"name": "checks.c", "value": ["literal inside value"]}]
 }
 
@@ -4966,7 +4983,7 @@ test_a_literal_step_inside_a_ref_is_part_of_the_ref_and_not_a_literal_inside_a_v
 test_a_ref_or_literal_deeper_inside_a_where_value_is_written_wrong if {
 	top := {"params": {"k": "a"}}
 	subj := {"id": 1, "items": [{"k": ["a"], "tags": ["bad"]}]}
-	rep := report(object.union(top, {"items": [subj]}), {"s": {"from": ["items"], "id": ["id"], "checks": {
+	rep := report(object.union(top, {"items": [subj]}), {"s": {"from": ["items"], "identified_by": ["id"], "checks": {
 		"ref": {"op": "excludes", "path": ["items", {"where": {"k": [{"ref": ["$$input", "params", "k"]}]}}, "tags"], "value": "bad"},
 		"literal": {"op": "present", "path": ["items", {"where": {"k": {"a": {"literal": 1}}}}, "tags"]},
 		"right": {"op": "compare", "left": ["id"], "right": ["items", {"where": {"k": [{"literal": "a"}]}}, "n"], "cmp": "eq"},
@@ -4982,7 +4999,7 @@ test_a_ref_or_literal_deeper_inside_a_where_value_is_written_wrong if {
 id_where_well_formed(where) := rows_for(
 	report(
 		{"params": {"k": "a"}, "items": [{"ids": [{"k": "a", "v": 1}], "x": 1}]},
-		{"s": {"from": ["items"], "id": ["ids", {"where": {"k": where}}, "v"], "checks": {"c": {"op": "present", "path": ["x"]}}}},
+		{"s": {"from": ["items"], "identified_by": ["ids", {"where": {"k": where}}, "v"], "checks": {"c": {"op": "present", "path": ["x"]}}}},
 	),
 	"s", "$well_formed",
 )[0].passed
@@ -5154,7 +5171,7 @@ test_ref_inputs_are_sorted_by_name if {
 test_a_ref_in_an_applies_to_filter_is_read_and_shown if {
 	req := {"s": {
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"min_subjects": 0,
 		"applies_to": {"kind": {"op": "equals", "path": ["kind"], "value": {"ref": ["$$input", "params", "kind"]}}},
 		"checks": {"c": {"op": "present", "path": ["id"]}},
@@ -5275,12 +5292,12 @@ test_an_each_step_makes_every_entry_of_an_object_a_subject_named_by_its_key if {
 }
 
 test_an_each_step_identifies_entries_of_an_object_by_key_even_with_an_id if {
-	rep := report(suite_doc, {"s": object.union(suite_req({"each_as": "suite"}).s, {"id": ["result"]})})
+	rep := report(suite_doc, {"s": object.union(suite_req({"each_as": "suite"}).s, {"identified_by": ["result"]})})
 	[r.subject.id | some r in rows_for(rep, "s", "c")] == ["integration-test", "smoke-test", "unit-test"]
 }
 
 test_an_each_step_over_a_list_makes_every_item_a_subject if {
-	rep := report({"items": [{"id": "b"}, {"id": "a"}]}, {"s": {"from": ["items", {"each_as": "item"}], "id": ["id"], "checks": {"c": {"op": "present", "path": ["$item", "id"]}}}})
+	rep := report({"items": [{"id": "b"}, {"id": "a"}]}, {"s": {"from": ["items", {"each_as": "item"}], "identified_by": ["id"], "checks": {"c": {"op": "present", "path": ["$item", "id"]}}}})
 	[[r.subject.id, r.passed] | some r in rows_for(rep, "s", "c")] == [["b", true], ["a", true]]
 }
 
@@ -5381,7 +5398,7 @@ pr_doc := {"pull_requests": [
 peer_req := {"s": {
 	"subject_type": "pull request",
 	"from": ["pull_requests", {"each_as": "pr"}],
-	"id": ["number"],
+	"identified_by": ["number"],
 	"checks": {"c": {"op": "any", "path": ["approvers"], "check": {"op": "compare", "left": ["username"], "right": ["$pr", "author"], "cmp": "ne"}}},
 }}
 
@@ -5406,7 +5423,7 @@ test_a_name_read_inside_a_list_check_is_shown_in_the_row if {
 test_a_name_read_inside_an_any_of_in_a_list_check_is_shown_in_the_row if {
 	rep := report(pr_doc, {"s": {
 		"from": ["pull_requests", {"each_as": "pr"}],
-		"id": ["number"],
+		"identified_by": ["number"],
 		"checks": {"c": {"op": "all", "path": ["approvers"], "check": {"op": "any_of", "options": {"x": [{"op": "compare", "left": ["username"], "right": ["$pr", "author"], "cmp": "eq"}]}}}},
 	}})
 	some r in rows_for(rep, "s", "c")
@@ -5418,7 +5435,7 @@ test_a_name_read_inside_an_any_of_in_a_list_check_is_shown_in_the_row if {
 test_an_input_read_inside_a_list_check_is_shown_in_the_row if {
 	rep := report({"items": [{"id": 1, "xs": [{"v": 2}]}], "params": {"max": 3}}, {"s": {
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"checks": {"c": {"op": "all", "path": ["xs"], "check": {"op": "compare", "left": ["v"], "right": ["$$input", "params", "max"], "cmp": "lt"}}},
 	}})
 	[r.inputs | some r in rows_for(rep, "s", "c")] == [[{"name": "xs[]", "value": [{"v": 2}]}, {"name": "$input.params.max", "value": 3}]]
@@ -5427,7 +5444,7 @@ test_an_input_read_inside_a_list_check_is_shown_in_the_row if {
 test_each_subject_reads_its_own_name if {
 	rep := report({"a": [{"x": 1, "y": 1}, {"x": 2, "y": 3}]}, {"s": {
 		"from": ["a", {"each_as": "it"}],
-		"id": ["x"],
+		"identified_by": ["x"],
 		"checks": {"c": {"op": "compare", "left": ["$it", "x"], "right": ["y"], "cmp": "eq"}},
 	}})
 	[[r.subject.id, r.passed] | some r in rows_for(rep, "s", "c")] == [[1, true], [2, false]]
@@ -5436,7 +5453,7 @@ test_each_subject_reads_its_own_name if {
 test_a_name_that_is_not_bound_is_ill_formed if {
 	rep := report(pr_doc, {"s": {
 		"from": ["pull_requests", {"each_as": "pr"}],
-		"id": ["number"],
+		"identified_by": ["number"],
 		"checks": {"c": {"op": "present", "path": ["$p", "author"]}},
 	}})
 	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "ill_formed"], [false, "ill_formed"], [false, "ill_formed"]]
@@ -5460,7 +5477,7 @@ test_a_key_that_starts_with_a_dollar_is_read_with_literal if {
 test_a_ref_to_a_name_fails_closed if {
 	rep := report(pr_doc, {"s": {
 		"from": ["pull_requests", {"each_as": "pr"}],
-		"id": ["number"],
+		"identified_by": ["number"],
 		"checks": {"c": {"op": "equals", "path": ["author"], "value": {"ref": ["$pr", "author"]}}},
 	}})
 	[r.passed | some r in rows_for(rep, "s", "c")] == [false, false, false]
@@ -5508,7 +5525,7 @@ test_require_some_passes_when_one_key_passes if {
 test_a_custom_operator_can_read_a_name if {
 	rep := report({"xs": [{"n": 2}, {"n": 3}]}, {"s": {
 		"from": ["xs", {"each_as": "x"}],
-		"id": ["n"],
+		"identified_by": ["n"],
 		"checks": {"c": {"op": "even", "path": ["$x", "n"]}},
 	}})
 	[[r.subject.id, r.passed] | some r in rows_for(rep, "s", "c")] == [[2, true], [3, false]]
@@ -5576,7 +5593,7 @@ test_a_well_formed_row_without_a_step_is_unchanged if {
 test_an_input_missing_inside_a_list_check_fails_as_absent if {
 	rep := report({"items": [{"id": 1, "xs": [{"v": 2}]}]}, {"s": {
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"checks": {"c": {"op": "all", "path": ["xs"], "check": {"op": "compare", "left": ["v"], "right": ["$$input", "params", "max"], "cmp": "lt"}}},
 	}})
 	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "absent"]]
@@ -5585,7 +5602,7 @@ test_an_input_missing_inside_a_list_check_fails_as_absent if {
 test_a_name_missing_in_the_path_of_a_list_check_fails_as_absent if {
 	rep := report({"prs": [{"n": 1, "xs": [1, 2]}]}, {"s": {
 		"from": ["prs", {"each_as": "pr"}],
-		"id": ["n"],
+		"identified_by": ["n"],
 		"checks": {"c": {"op": "all", "path": ["xs"], "check": {"op": "non_empty_string", "path": ["$pr", "author"]}}},
 	}})
 	[[r.passed, r.cause, r.inputs] | some r in rows_for(rep, "s", "c")] == [[false, "absent", [{"name": "xs[]", "value": [1, 2]}, {"name": "$pr.author", "value": null}]]]
@@ -5594,7 +5611,7 @@ test_a_name_missing_in_the_path_of_a_list_check_fails_as_absent if {
 test_an_input_missing_in_the_path_of_a_list_check_fails_as_absent if {
 	rep := report({"items": [{"id": 1, "xs": [1]}]}, {"s": {
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"checks": {"c": {"op": "all", "path": ["xs"], "check": {"op": "non_empty_string", "path": ["$$input", "nope"]}}},
 	}})
 	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "absent"]]
@@ -5603,7 +5620,7 @@ test_an_input_missing_in_the_path_of_a_list_check_fails_as_absent if {
 test_an_id_can_start_with_a_name if {
 	rep := report(pr_doc, {"s": {
 		"from": ["pull_requests", {"each_as": "pr"}],
-		"id": ["$pr", "number"],
+		"identified_by": ["$pr", "number"],
 		"checks": {"c": {"op": "present", "path": ["number"]}},
 	}})
 	[r.subject.id | some r in rows_for(rep, "s", "c")] == [1, 2, 3]
@@ -5654,7 +5671,7 @@ after_last_commit := {"op": "any", "path": ["approvers"], "as": "approver", "che
 review_req(check) := {"s": {
 	"subject_type": "pull request",
 	"from": ["pull_requests", {"each_as": "pr"}],
-	"id": ["number"],
+	"identified_by": ["number"],
 	"checks": {"c": check},
 }}
 
@@ -5699,20 +5716,20 @@ test_a_name_given_by_as_reads_the_same_as_a_path_inside_the_item if {
 }
 
 test_an_empty_path_under_as_is_named_after_the_name if {
-	rep := report({"items": [{"id": 1, "tags": ["a"]}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "all", "path": ["tags"], "as": "tag", "check": {"op": "non_empty_string", "path": []}}}}})
+	rep := report({"items": [{"id": 1, "tags": ["a"]}]}, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "all", "path": ["tags"], "as": "tag", "check": {"op": "non_empty_string", "path": []}}}}})
 	rep.requirements.s.checks.c.expression == "every tags as $tag: $tag is a non-empty string"
 	rows_for(rep, "s", "c")[0].passed == true
 }
 
 test_as_works_without_a_naming_step if {
-	rep := report({"items": [{"id": 1, "xs": [{"v": 1, "w": [1]}]}]}, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "all", "path": ["xs"], "as": "x", "check": {"op": "all", "path": ["w"], "check": {"op": "compare", "left": [], "right": ["$x", "v"], "cmp": "eq"}}}}}})
+	rep := report({"items": [{"id": 1, "xs": [{"v": 1, "w": [1]}]}]}, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "all", "path": ["xs"], "as": "x", "check": {"op": "all", "path": ["w"], "check": {"op": "compare", "left": [], "right": ["$x", "v"], "cmp": "eq"}}}}}})
 	rows_for(rep, "s", "c")[0].passed == true
 }
 
 test_an_inner_list_check_can_read_a_list_inside_the_outer_item if {
 	rep := report({"items": [{"id": 1, "xs": [{"ys": [2, 3]}, {"ys": [4]}]}, {"id": 2, "xs": [{"ys": [1]}]}]}, {"s": {
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"checks": {"c": {"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["ys"], "check": {"op": "range", "path": [], "min": 2, "max": 9}}}},
 	}})
 	[[r.subject.id, r.passed] | some r in rows_for(rep, "s", "c")] == [[1, true], [2, false]]
@@ -5723,7 +5740,7 @@ test_an_inner_list_check_can_read_a_list_inside_the_outer_item if {
 test_an_inner_list_check_fails_on_an_empty_or_missing_inner_list if {
 	rep := report({"items": [{"id": 1, "xs": [{"ys": [2]}, {"ys": []}]}, {"id": 2, "xs": [{"ys": [2]}, {}]}]}, {"s": {
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"checks": {"c": {"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["ys"], "check": {"op": "present", "path": []}}}},
 	}})
 	[r.passed | some r in rows_for(rep, "s", "c")] == [false, false]
@@ -5780,7 +5797,7 @@ test_a_name_given_twice_fails_the_check if {
 test_the_same_name_can_be_given_in_two_separate_checks if {
 	rep := report(review_doc, {"s": {
 		"from": ["pull_requests", {"each_as": "pr"}],
-		"id": ["number"],
+		"identified_by": ["number"],
 		"checks": {
 			"a": {"op": "any", "path": ["approvers"], "as": "x", "check": {"op": "present", "path": ["$x", "username"]}},
 			"b": {"op": "all", "path": ["commits"], "as": "x", "check": {"op": "present", "path": ["$x", "sha"]}},
@@ -5793,7 +5810,7 @@ test_the_same_name_can_be_given_in_two_separate_checks if {
 test_a_filter_can_use_as if {
 	rep := report(review_doc, {"s": {
 		"from": ["pull_requests", {"each_as": "pr"}],
-		"id": ["number"],
+		"identified_by": ["number"],
 		"applies_to": {"f": {"op": "any", "path": ["approvers"], "as": "a", "check": {"op": "equals", "path": ["$a", "username"], "value": "cat"}}},
 		"checks": {"c": {"op": "present", "path": ["author"]}},
 	}})
@@ -5818,7 +5835,7 @@ test_a_name_given_twice_fails_every_kind_of_list_check if {
 test_a_filter_with_a_name_given_twice_cannot_rule_subjects_out if {
 	rep := report(review_doc, {"s": {
 		"from": ["pull_requests", {"each_as": "pr"}],
-		"id": ["number"],
+		"identified_by": ["number"],
 		"min_subjects": 0,
 		"applies_to": {"f": {"op": "any", "path": ["approvers"], "as": "pr", "check": {"op": "present", "path": ["username"]}}},
 		"checks": {"c": {"op": "equals", "path": ["number"], "value": 0}},
@@ -5830,7 +5847,7 @@ test_a_filter_with_a_name_given_twice_cannot_rule_subjects_out if {
 test_a_filter_with_a_badly_written_as_cannot_rule_subjects_out if {
 	rep := report(review_doc, {"s": {
 		"from": ["pull_requests", {"each_as": "pr"}],
-		"id": ["number"],
+		"identified_by": ["number"],
 		"min_subjects": 0,
 		"applies_to": {"f": {"op": "all", "path": ["approvers"], "as": "a", "check": {"op": "any", "path": ["$pr", "commits"], "as": "$c", "check": {"op": "present", "path": ["sha"]}}}},
 		"checks": {"c": {"op": "equals", "path": ["number"], "value": 0}},
@@ -5842,7 +5859,7 @@ test_a_filter_with_a_badly_written_as_cannot_rule_subjects_out if {
 test_a_filter_nested_too_deep_cannot_rule_subjects_out if {
 	rep := report({"items": [{"id": 1, "xs": [{"ys": [{"zs": [1]}]}]}]}, {"s": {
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"min_subjects": 0,
 		"applies_to": {"f": {"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["ys"], "check": {"op": "all", "path": ["zs"], "check": {"op": "present", "path": []}}}}},
 		"checks": {"c": {"op": "equals", "path": ["id"], "value": 0}},
@@ -5958,7 +5975,7 @@ test_a_name_given_twice_in_a_list_check_inside_an_any_of_is_ill_formed if {
 test_a_broken_list_check_in_an_any_of_filter_cannot_rule_subjects_out if {
 	rep := report(peer_doc, {"s": {
 		"from": ["pull_requests", {"each_as": "pr"}],
-		"id": ["number"],
+		"identified_by": ["number"],
 		"min_subjects": 0,
 		"applies_to": {"f": {"op": "any_of", "options": {"o": [{"op": "all", "path": ["commits"], "as": "pr", "check": {"op": "present", "path": ["timestamp"]}}]}}},
 		"checks": {"c": {"op": "equals", "path": ["number"], "value": 0}},
@@ -6006,7 +6023,7 @@ test_a_name_read_outside_the_list_check_that_gives_it_is_ill_formed if {
 test_a_filter_reading_a_name_outside_the_list_check_that_gives_it_cannot_rule_subjects_out if {
 	rep := report({"items": [{"id": 1, "xs": [{"ys": []}]}]}, {"s": {
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"min_subjects": 0,
 		"applies_to": {"f": {"op": "all", "path": ["xs"], "check": {"op": "any_of", "options": {
 			"a": [{"op": "all", "path": ["ys"], "as": "x", "check": {"op": "present", "path": []}}],
@@ -6032,7 +6049,7 @@ test_a_name_nothing_gives_in_an_each_path_is_ill_formed if {
 test_a_name_in_an_each_path_reads_the_subject if {
 	rep := report({"items": [{"id": 1, "xs": [1, 2], "ys": [3]}]}, {"s": {
 		"from": ["items", {"each_as": "it"}],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"checks": {"c": {"op": "all", "path": ["xs"], "each": ["$it", "ys"], "check": {"op": "equals", "path": [], "value": 3}}},
 	}})
 	[r.passed | some r in rows_for(rep, "s", "c")] == [true]
@@ -6041,7 +6058,7 @@ test_a_name_in_an_each_path_reads_the_subject if {
 test_a_filter_with_a_misspelt_name_in_an_each_path_cannot_rule_subjects_out if {
 	rep := report({"items": [{"id": 1, "xs": [{"ys": [1]}]}]}, {"s": {
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"min_subjects": 0,
 		"applies_to": {"f": {"op": "all", "path": ["xs"], "each": ["$q", "ys"], "check": {"op": "present", "path": []}}},
 		"checks": {"c": {"op": "equals", "path": ["id"], "value": 0}},
@@ -6049,7 +6066,7 @@ test_a_filter_with_a_misspelt_name_in_an_each_path_cannot_rule_subjects_out if {
 	rep.requirements.s.status == "not_met"
 }
 
-params_req(check) := {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}}
+params_req(check) := {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": check}}}
 
 params_rows(doc, check) := [[r.passed, r.cause, r.inputs] | some r in rows_for(report(doc, params_req(check)), "s", "c")]
 
@@ -6098,7 +6115,7 @@ test_a_missing_check_on_a_param_fails_as_absent_with_no_params_and_as_unusable_w
 test_a_present_filter_on_a_param_fails_the_requirement_with_no_params_or_params_that_are_not_an_object if {
 	req := {"s": {
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"applies_to": {"f": {"op": "present", "path": ["$$params", "x"]}},
 		"checks": {"c": {"op": "present", "path": ["id"]}},
 	}}
@@ -6112,7 +6129,7 @@ test_a_present_filter_on_a_param_fails_the_requirement_with_no_params_or_params_
 test_the_applies_row_lists_each_field_its_filters_read_once_in_name_order if {
 	req := {"s": {
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"applies_to": {
 			"a": {"op": "present", "path": ["status"]},
 			"b": {"op": "equals", "path": ["status"], "value": "open"},
@@ -6168,7 +6185,7 @@ test_params_are_not_read_from_the_input if {
 
 test_params_can_be_read_inside_named_and_nested_list_checks if {
 	check := {"op": "all", "path": ["xs"], "as": "x", "check": {"op": "any", "path": ["$x", "ys"], "check": {"op": "compare", "left": [], "right": ["$$params", "max"], "cmp": "lt"}}}
-	rep := report({"items": [{"id": 1, "xs": [{"ys": [1, 9]}, {"ys": [2]}]}]}, {"s": {"from": ["items", {"each_as": "it"}], "id": ["id"], "checks": {"c": check}}}) with data.params as {"max": 3}
+	rep := report({"items": [{"id": 1, "xs": [{"ys": [1, 9]}, {"ys": [2]}]}]}, {"s": {"from": ["items", {"each_as": "it"}], "identified_by": ["id"], "checks": {"c": check}}}) with data.params as {"max": 3}
 	[[r.passed, r.inputs] | some r in rows_for(rep, "s", "c")] == [[true, [{"name": "xs[].ys", "value": [[1, 9], [2]]}, {"name": "$params.max", "value": 3}]]]
 }
 
@@ -6185,7 +6202,7 @@ trail_doc := {"trail": {"artifacts": {"app": {
 
 trail_req(check) := {"s": {
 	"from": ["trail", "artifacts", {"ref": ["$$params", "artifact"]}],
-	"id": ["fingerprint"],
+	"identified_by": ["fingerprint"],
 	"checks": {"c": check},
 }}
 
@@ -6238,7 +6255,7 @@ test_a_ref_inside_a_ref_path_is_not_followed if {
 test_a_ref_step_works_in_left_right_each_and_id if {
 	rep := report({"items": [{"key": "k1", "a": 1, "b": 2, "xs": [{"ys": [1]}]}]}, {"s": {
 		"from": ["items"],
-		"id": [{"ref": ["$$params", "id"]}],
+		"identified_by": [{"ref": ["$$params", "id"]}],
 		"checks": {
 			"two_sided": {"op": "compare", "left": [{"ref": ["$$params", "l"]}], "right": [{"ref": ["$$params", "r"]}], "cmp": "lt"},
 			"each": {"op": "all", "path": ["xs"], "each": [{"ref": ["$$params", "inner"]}], "check": {"op": "equals", "path": [], "value": 1}},
@@ -6250,13 +6267,13 @@ test_a_ref_step_works_in_left_right_each_and_id if {
 test_a_ref_step_can_follow_a_name_and_come_before_a_selector if {
 	rep := report({"prs": [{"n": 1, "atts": {"list": [{"type": "a", "ok": true}]}}]}, {"s": {
 		"from": ["prs", {"each_as": "pr"}],
-		"id": ["n"],
+		"identified_by": ["n"],
 		"checks": {"c": {"op": "equals", "path": ["$pr", {"ref": ["$$params", "k"]}, {"where": {"type": "a"}}, "ok"], "value": true}},
 	}}) with data.params as {"k": "atts"}
 	[r.passed | some r in rows_for(rep, "s", "c")] == [false]
 	rep2 := report({"prs": [{"n": 1, "atts": [{"type": "a", "ok": true}]}]}, {"s": {
 		"from": ["prs", {"each_as": "pr"}],
-		"id": ["n"],
+		"identified_by": ["n"],
 		"checks": {"c": {"op": "equals", "path": ["$pr", {"ref": ["$$params", "k"]}, {"where": {"type": "a"}}, "ok"], "value": true}},
 	}}) with data.params as {"k": "atts"}
 	[r.passed | some r in rows_for(rep2, "s", "c")] == [true]
@@ -6362,7 +6379,7 @@ test_a_literal_in_a_ref_path_is_read_as_written if {
 test_a_present_filter_with_a_path_written_as_an_object_cannot_rule_subjects_out if {
 	rep := report({"items": [{"id": 1}]}, {"s": {
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"min_subjects": 0,
 		"applies_to": {"f": {"op": "present", "path": {"a": 1}}},
 		"checks": {"c": {"op": "equals", "path": ["id"], "value": 0}},
@@ -6373,7 +6390,7 @@ test_a_present_filter_with_a_path_written_as_an_object_cannot_rule_subjects_out 
 test_a_ref_step_after_a_name_that_cannot_be_read_is_not_skipped if {
 	rep := report({"prs": [{"n": 1, "x": "here"}]}, {"s": {
 		"from": ["prs", {"each_as": "pr"}],
-		"id": ["n"],
+		"identified_by": ["n"],
 		"checks": {"c": {"op": "present", "path": ["$pr", {"ref": ["$$params", "k"]}, "x"]}},
 	}})
 	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "absent"]]
@@ -6406,7 +6423,7 @@ test_a_ref_step_of_the_wrong_type_shows_its_value_in_refs if {
 test_a_filter_with_a_ref_step_of_the_wrong_type_inside_a_list_check_cannot_rule_subjects_out if {
 	rep := report({"items": [{"id": 1, "xs": [{"v": 1}]}]}, {"s": {
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"min_subjects": 0,
 		"applies_to": {"f": {"op": "all", "path": ["xs"], "check": {"op": "present", "path": [{"ref": ["$$params", "k"]}]}}},
 		"checks": {"c": {"op": "equals", "path": ["id"], "value": 0}},
@@ -6540,7 +6557,7 @@ typo_doc := {"params": {"word": "x", "none": null, "nine": 9}, "items": [{"id": 
 
 typo_req(filter) := {"s": {
 	"from": ["items"],
-	"id": ["id"],
+	"identified_by": ["id"],
 	"min_subjects": 0,
 	"applies_to": {"f": filter},
 	"checks": {"c": {"op": "equals", "path": ["n"], "value": 999}},
@@ -6626,7 +6643,7 @@ test_a_filter_whose_ref_reads_the_wrong_kind_of_value_cannot_rule_subjects_out i
 
 test_a_check_whose_ref_reads_the_wrong_kind_of_value_fails_and_is_not_ill_formed if {
 	every check in read_the_wrong_kind {
-		rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
+		rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": check}}})
 		[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "unusable"]]
 	}
 }
@@ -6641,32 +6658,32 @@ test_a_badly_written_filter_cannot_rule_subjects_out if {
 
 test_a_badly_written_check_is_ill_formed if {
 	every check in badly_written {
-		rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
+		rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": check}}})
 		[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "ill_formed"]]
 	}
 }
 
 test_an_operator_that_is_not_declared_fails_even_when_a_rule_passes_it if {
 	ergo.op_passed({"op": "undeclared", "path": ["n"]}, {"n": 1})
-	rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": {"op": "undeclared", "path": ["n"]}}}})
+	rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "undeclared", "path": ["n"]}}}})
 	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "ill_formed"]]
 }
 
 test_a_badly_written_option_fails_an_any_of_even_when_another_option_passes if {
 	check := {"op": "any_of", "options": {"good": [{"op": "present", "path": ["n"]}], "bad": [{"op": "compare", "left": ["n"], "right": ["n"], "cmp": "bad"}]}}
-	rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
+	rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": check}}})
 	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "ill_formed"]]
 }
 
 test_a_badly_written_substitute_fails_the_check_even_when_the_check_passes if {
 	check := {"op": "present", "path": ["n"], "substitute": {"op": "nope", "path": ["n"]}}
-	rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
+	rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": check}}})
 	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "ill_formed"]]
 }
 
 test_a_bound_that_reads_null_keeps_the_cause_of_its_ref if {
 	check := {"op": "range", "path": ["n"], "min": {"ref": ["$$input", "params", "none"]}, "max": 5}
-	rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
+	rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": check}}})
 	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "null"]]
 }
 
@@ -6689,7 +6706,7 @@ test_a_present_filter_on_a_name_nothing_gives_cannot_rule_subjects_out if {
 	every path in [["$p", "n"], ["$$nope", "n"]] {
 		rep := report({"items": [{"id": 1, "n": 1}]}, {"s": {
 			"from": ["items", {"each_as": "item"}],
-			"id": ["id"],
+			"identified_by": ["id"],
 			"min_subjects": 0,
 			"applies_to": {"f": {"op": "present", "path": path}},
 			"checks": {"c": {"op": "equals", "path": ["n"], "value": 999}},
@@ -6702,7 +6719,7 @@ test_a_present_filter_on_a_name_nothing_gives_cannot_rule_subjects_out if {
 test_a_present_filter_on_a_given_name_still_rules_subjects_out if {
 	rep := report({"items": [{"id": 1}]}, {"s": {
 		"from": ["items", {"each_as": "item"}],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"min_subjects": 0,
 		"applies_to": {"f": {"op": "present", "path": ["$item", "n"]}},
 		"checks": {"c": {"op": "equals", "path": ["n"], "value": 999}},
@@ -6716,7 +6733,7 @@ test_a_check_fails_when_its_substitute_passes_but_one_side_is_badly_written if {
 		{"op": "equals", "path": ["n"], "value": 999, "substitute": {"op": "undeclared", "path": ["n"]}},
 		{"op": "nope", "path": ["n"], "substitute": {"op": "present", "path": ["n"]}},
 	] {
-		rep := report(typo_doc, {"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
+		rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": check}}})
 		[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "ill_formed"]]
 	}
 }
@@ -6811,7 +6828,7 @@ test_a_filter_ordering_objects_cannot_rule_subjects_out if {
 	] {
 		rep := report({"items": [ordering_doc]}, {"s": {
 			"from": ["items"],
-			"id": ["id"],
+			"identified_by": ["id"],
 			"min_subjects": 0,
 			"applies_to": {"f": filter},
 			"checks": {"c": {"op": "equals", "path": ["n"], "value": 999}},
@@ -6824,7 +6841,7 @@ test_a_filter_ordering_objects_cannot_rule_subjects_out if {
 test_a_present_filter_with_a_substitute_ordering_numbers_still_rules_subjects_out if {
 	rep := report({"items": [ordering_doc]}, {"s": {
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"min_subjects": 0,
 		"applies_to": {"f": {"op": "present", "path": ["missing"], "substitute": {"op": "compare", "left": ["n"], "right": ["m"], "cmp": "gt"}}},
 		"checks": {"c": {"op": "equals", "path": ["n"], "value": 999}},
@@ -6889,7 +6906,7 @@ failed_of(subj, check) := row.failed_items if {
 no_self_deploy := {"segregation": {
 	"subject_type": "deployment",
 	"from": ["deployments", {"each_as": "deploy"}],
-	"id": ["id"],
+	"identified_by": ["id"],
 	"checks": {"not_self_deployed": {
 		"op": "all",
 		"path": ["pull_requests"],
@@ -7006,7 +7023,7 @@ test_failed_items_write_paths_the_way_inputs_do if {
 test_failed_items_of_a_named_path_start_with_the_name if {
 	rep := report({"prs": [{"number": 1, "commits": [{"sha": "a"}, {}]}]}, {"s": {
 		"from": ["prs", {"each_as": "pr"}],
-		"id": ["number"],
+		"identified_by": ["number"],
 		"checks": {"c": {"op": "all", "path": ["$pr", "commits"], "check": {"op": "present", "path": ["sha"]}}},
 	}})
 	rows_for(rep, "s", "c")[0].failed_items == [{"path": "item 2 of $pr.commits", "item": "item 2 of $pr.commits", "cause": "value", "value": {}}]
@@ -7025,7 +7042,7 @@ test_failed_items_of_a_substituted_check_are_those_of_the_main_check if {
 test_only_rows_of_all_and_any_checks_have_failed_items if {
 	rep := report({"items": [{"id": 1, "xs": [1], "env": "prod"}]}, {"s": {
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"applies_to": {"f": {"op": "all", "path": ["xs"], "check": {"op": "equals", "path": [], "value": 1}}},
 		"checks": {
 			"leaf": {"op": "equals", "path": ["env"], "value": "prod"},
@@ -7039,7 +7056,7 @@ test_only_rows_of_all_and_any_checks_have_failed_items if {
 test_violations_carry_failed_items_and_other_checks_have_none if {
 	rep := report({"items": [{"id": 1, "xs": [1, 2], "env": "dev"}]}, {"s": {
 		"from": ["items"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"checks": {
 			"leaf": {"op": "equals", "path": ["env"], "value": "prod"},
 			"every": {"op": "all", "path": ["xs"], "check": {"op": "equals", "path": [], "value": 1}},
@@ -7060,7 +7077,7 @@ test_failed_items_of_a_nested_check_name_the_outer_item_only if {
 		}]},
 		{"s": {
 			"from": ["prs", {"each_as": "pr"}],
-			"id": ["number"],
+			"identified_by": ["number"],
 			"checks": {"c": {
 				"op": "any",
 				"path": ["approvers"],
@@ -7090,7 +7107,7 @@ test_failed_items_of_an_empty_each_add_only_the_position if {
 	]
 }
 
-json_only_req := {"s": {"subject_type": "thing", "from": ["items"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["x"], "value": 1}}}}
+json_only_req := {"s": {"subject_type": "thing", "from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "equals", "path": ["x"], "value": 1}}}}
 
 row_verdicts(rep) := [[r.check, r.passed, r.cause] | some r in rep.results]
 
@@ -7101,13 +7118,13 @@ test_a_set_anywhere_in_the_input_fails_every_check_as_unusable_so_a_port_can_che
 }
 
 test_a_key_that_is_not_a_string_in_the_input_fails_the_check_even_when_a_number_step_reaches_it if {
-	req := {"s": {"subject_type": "thing", "from": ["items"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["x", 1], "value": "a"}}}}
+	req := {"s": {"subject_type": "thing", "from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "equals", "path": ["x", 1], "value": "a"}}}}
 	rows_for(report({"items": [{"id": "a", "x": {1: "a"}}]}, req), "s", "c")[0].cause == "unusable"
 }
 
 test_a_set_in_the_input_fails_checks_that_pass_on_nothing if {
 	every check in [{"op": "missing", "path": ["y"]}, {"op": "excludes", "path": ["y"], "value": "x"}, {"op": "empty", "path": ["y"]}] {
-		req := {"s": {"subject_type": "thing", "from": ["items"], "id": ["id"], "checks": {"c": check}}}
+		req := {"s": {"subject_type": "thing", "from": ["items"], "identified_by": ["id"], "checks": {"c": check}}}
 		r := rows_for(report({"items": [{"id": "a"}], "tags": {"prod"}}, req), "s", "c")[0]
 		[r.passed, r.cause] == [false, "unusable"]
 	}
@@ -7124,17 +7141,17 @@ test_a_set_in_the_input_fails_a_requirement_that_has_no_subjects if {
 }
 
 test_a_set_in_the_params_fails_every_check_as_unusable if {
-	req := {"s": {"subject_type": "thing", "from": ["items"], "id": ["id"], "checks": {"c": {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}}}}
+	req := {"s": {"subject_type": "thing", "from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}}}}
 	rows_for(ergo.report({"items": [{"id": "a", "x": "MIT"}]}, lifted(req), {"allowed": {"MIT"}}), "s", "c")[0].cause == "unusable"
 }
 
 test_a_list_in_the_params_is_read_as_usual if {
-	req := {"s": {"subject_type": "thing", "from": ["items"], "id": ["id"], "checks": {"c": {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}}}}
+	req := {"s": {"subject_type": "thing", "from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}}}}
 	rows_for(ergo.report({"items": [{"id": "a", "x": "MIT"}]}, lifted(req), {"allowed": ["MIT"]}), "s", "c")[0].passed == true
 }
 
 test_a_check_holding_a_set_or_a_key_that_is_not_a_string_is_written_wrong if {
-	rep := report({"items": [{"id": "a", "x": 1}]}, {"s": {"subject_type": "thing", "from": ["items"], "id": ["id"], "checks": {
+	rep := report({"items": [{"id": "a", "x": 1}]}, {"s": {"subject_type": "thing", "from": ["items"], "identified_by": ["id"], "checks": {
 		"k": {"op": "equals", "path": ["x"], "value": {1: "a"}},
 		"s": {"op": "in", "path": ["x"], "values": {1, 2}},
 	}}})
@@ -7147,23 +7164,23 @@ test_a_check_holding_a_set_or_a_key_that_is_not_a_string_is_written_wrong if {
 
 test_a_key_that_is_not_a_string_is_written_as_invalid_key_in_the_expression if {
 	every value in [{{"b": 1, "a": 2}: "x"}, {["b", "a"]: "x"}, {10: "x"}, {true: "x"}, {null: "x"}] {
-		rep := report({"items": [{"id": "a", "x": 1}]}, {"s": {"subject_type": "thing", "from": ["items"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["x"], "value": value}}}})
+		rep := report({"items": [{"id": "a", "x": 1}]}, {"s": {"subject_type": "thing", "from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "equals", "path": ["x"], "value": value}}}})
 		rep.requirements.s.checks.c.expression == `x == {"<invalid key>": "x"}`
 	}
 }
 
 test_a_key_that_is_not_a_string_never_merges_with_a_string_key_written_the_same if {
-	rep := report({"items": [{"id": "a", "x": 1}]}, {"s": {"subject_type": "thing", "from": ["items"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["x"], "value": {10: "a", "10": "b"}}}}})
+	rep := report({"items": [{"id": "a", "x": 1}]}, {"s": {"subject_type": "thing", "from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "equals", "path": ["x"], "value": {10: "a", "10": "b"}}}}})
 	rep.requirements.s.checks.c.expression == `x == {"10": "b", "<invalid key>": "a"}`
 }
 
 test_keys_that_are_not_strings_are_each_written_in_the_expression if {
-	rep := report({"items": [{"id": "a", "x": 1}]}, {"s": {"subject_type": "thing", "from": ["items"], "id": ["id"], "checks": {"c": {"op": "equals", "path": ["x"], "value": {2: "b", {"k": 1}: "c", 1: "a"}}}}})
+	rep := report({"items": [{"id": "a", "x": 1}]}, {"s": {"subject_type": "thing", "from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "equals", "path": ["x"], "value": {2: "b", {"k": 1}: "c", 1: "a"}}}}})
 	rep.requirements.s.checks.c.expression == `x == {"<invalid key>": "a", "<invalid key>": "b", "<invalid key>": "c"}`
 }
 
 test_a_set_in_a_selector_of_from_or_id_is_written_wrong if {
-	every f in ["from", "id"] {
+	every f in ["from", "identified_by"] {
 		req := {"s": object.union(json_only_req.s, {f: [{"where": {"x": {1}}}]})}
 		some i in rows_for(report({"items": [{"id": "a", "x": 1}]}, req), "s", "$well_formed")[0].inputs
 		i.name == concat(".", ["subjects", "thing", f])
@@ -7248,7 +7265,7 @@ test_patterns_written_as_a_set_are_only_reported_as_a_set if {
 
 test_an_any_of_with_a_stray_path_is_written_wrong_instead_of_stopping_the_report if {
 	check := {"op": "any_of", "path": ["y"], "options": {"o": [{"op": "equals", "path": ["x"], "value": 1}]}}
-	rep := report({"items": [{"id": "a", "x": 1}]}, {"s": {"subject_type": "thing", "from": ["items"], "id": ["id"], "checks": {"c": check}}})
+	rep := report({"items": [{"id": "a", "x": 1}]}, {"s": {"subject_type": "thing", "from": ["items"], "identified_by": ["id"], "checks": {"c": check}}})
 	r := rows_for(rep, "s", "c")[0]
 	[r.passed, r.cause, r.inputs] == [false, "ill_formed", [{"name": "x", "value": 1}]]
 	rep.compliant == false
@@ -7278,7 +7295,7 @@ lookalike_rows(doc, req) := [[r.check, r.subject.id, r.passed, r.cause, r.inputs
 	not startswith(r.check, "$")
 ]
 
-lookalike_req(from, checks) := {"s": {"from": from, "id": ["id"], "checks": checks}}
+lookalike_req(from, checks) := {"s": {"from": from, "identified_by": ["id"], "checks": checks}}
 
 test_a_field_holding_an_object_like_ergos_absent_marker_is_there if {
 	lookalike_rows({"items": [{"id": 1, "o": absent_lookalike}]}, lookalike_req(["items"], {
@@ -7332,7 +7349,7 @@ deployments_doc := {"deployments": [
 	{"id": "d-3", "environment": "staging"},
 ]}
 
-prod_deployment := {"from": ["deployments"], "id": ["id"], "applies_to": {"is_prod": {"op": "equals", "path": ["environment"], "value": "prod"}}}
+prod_deployment := {"from": ["deployments"], "identified_by": ["id"], "applies_to": {"is_prod": {"op": "equals", "path": ["environment"], "value": "prod"}}}
 
 subject_policy(subjects, reqs) := {"subjects": subjects, "requirements": reqs}
 
@@ -7407,7 +7424,7 @@ test_a_subject_that_is_not_an_object_fails_every_requirement_that_names_it if {
 }
 
 test_a_badly_written_subject_fails_every_requirement_that_names_it if {
-	broken := object.union(prod_deployment, {"from": 5, "id": [true], "applies_to": {"is_prod": {"op": "equls", "path": ["environment"]}}, "zz": 1, "description": 5})
+	broken := object.union(prod_deployment, {"from": 5, "identified_by": [true], "applies_to": {"is_prod": {"op": "equls", "path": ["environment"]}}, "zz": 1, "description": 5})
 	rep := ergo.report(deployments_doc, subject_policy({"deployment": broken}, {"a": approved_req("deployment"), "t": tested_req("deployment")}), {})
 	rep.compliant == false
 	every name in ["a", "t"] {
@@ -7415,7 +7432,7 @@ test_a_badly_written_subject_fails_every_requirement_that_names_it if {
 		well_formed_problems(rep, name) == [
 			{"name": "subjects.deployment.description", "value": ["not a string"]},
 			{"name": "subjects.deployment.from", "value": ["not a list or a string"]},
-			{"name": "subjects.deployment.id", "value": ["step that can't be a key"]},
+			{"name": "subjects.deployment.identified_by", "value": ["step that can't be a key"]},
 			{"name": "subjects.deployment.zz", "value": ["unknown field"]},
 			{"name": "subjects.deployment.applies_to.is_prod", "value": ["unknown op equls"]},
 		]
@@ -7437,7 +7454,7 @@ test_a_subject_can_have_a_description if {
 }
 
 test_a_subject_can_read_params if {
-	from_params := {"from": [{"ref": ["$$params", "list"]}], "id": ["id"], "applies_to": {"env": {"op": "equals", "path": ["environment"], "value": {"ref": ["$$params", "env"]}}}}
+	from_params := {"from": [{"ref": ["$$params", "list"]}], "identified_by": ["id"], "applies_to": {"env": {"op": "equals", "path": ["environment"], "value": {"ref": ["$$params", "env"]}}}}
 	rep := ergo.report(deployments_doc, subject_policy({"deployment": from_params}, {"a": approved_req("deployment")}), {"list": "deployments", "env": "staging"})
 	[[r.subject.id, r.check, r.passed] | some r in rep.results; r.check == "$applies"] == [["d-1", "$applies", false], ["d-2", "$applies", false], ["d-3", "$applies", true]]
 	rep.requirements.a.checks["$applies"]["$refs"] == [{"name": "$params.env", "value": "staging"}]
@@ -7450,7 +7467,7 @@ sbom_doc := {"components": [
 ]}
 
 sbom_subjects := {
-	"SBOM package": {"from": ["components"], "id": ["name"]},
+	"SBOM package": {"from": ["components"], "identified_by": ["name"]},
 	"locked SBOM package": {"of": "SBOM package", "applies_to": {"locked": {"op": "present", "path": ["lock_release"]}}},
 	"non-exempt SBOM package": {"of": "SBOM package", "applies_to": {"not_exempt": {"op": "equals", "path": ["exempt"], "value": false}}},
 }
@@ -7479,10 +7496,10 @@ test_a_subject_built_on_another_reads_its_from_and_id_and_adds_its_own_filters i
 
 test_a_subject_built_on_another_reports_what_the_same_subject_written_out_reports if {
 	built := {
-		"base": {"from": ["components"], "id": ["name"], "applies_to": {"has_sbom": {"op": "present", "path": ["sbom_release"]}}},
+		"base": {"from": ["components"], "identified_by": ["name"], "applies_to": {"has_sbom": {"op": "present", "path": ["sbom_release"]}}},
 		"locked": {"of": "base", "description": "A package the lockfile pins", "applies_to": {"locked": {"op": "present", "path": ["lock_release"]}}},
 	}
-	written_out := {"locked": {"from": ["components"], "id": ["name"], "applies_to": {
+	written_out := {"locked": {"from": ["components"], "identified_by": ["name"], "applies_to": {
 		"has_sbom": {"op": "present", "path": ["sbom_release"]},
 		"locked": {"op": "present", "path": ["lock_release"]},
 	}}}
@@ -7514,7 +7531,7 @@ test_a_subject_built_on_one_that_is_not_an_object_fails if {
 }
 
 deep_subjects := {
-	"component": {"from": ["components"], "id": ["name"]},
+	"component": {"from": ["components"], "identified_by": ["name"]},
 	"SBOM package": {"of": "component", "applies_to": {"has_sbom": {"op": "present", "path": ["sbom_release"]}}},
 	"pinned SBOM package": {"of": "SBOM package", "applies_to": {"pinned": {"op": "present", "path": ["lock_release"]}}},
 	"locked SBOM package": {"of": "pinned SBOM package", "applies_to": {"not_exempt": {"op": "equals", "path": ["exempt"], "value": false}}},
@@ -7522,7 +7539,7 @@ deep_subjects := {
 
 test_a_subject_can_build_on_a_chain_of_subjects if {
 	rep := ergo.report(sbom_doc, subject_policy(deep_subjects, {"v": sbom_reqs.versions}), {})
-	written_out := {"locked SBOM package": {"from": ["components"], "id": ["name"], "applies_to": {
+	written_out := {"locked SBOM package": {"from": ["components"], "identified_by": ["name"], "applies_to": {
 		"has_sbom": {"op": "present", "path": ["sbom_release"]},
 		"pinned": {"op": "present", "path": ["lock_release"]},
 		"not_exempt": {"op": "equals", "path": ["exempt"], "value": false},
@@ -7566,10 +7583,10 @@ test_a_problem_in_a_filter_deep_in_the_chain_is_named_after_its_subject if {
 }
 
 test_a_subject_built_on_another_takes_its_from_and_id_from_it if {
-	own := object.union(sbom_subjects, {"locked SBOM package": object.union(sbom_subjects["locked SBOM package"], {"from": ["other"], "id": ["x"]})})
+	own := object.union(sbom_subjects, {"locked SBOM package": object.union(sbom_subjects["locked SBOM package"], {"from": ["other"], "identified_by": ["x"]})})
 	built_problems(own) == [
 		{"name": "subjects.\"locked SBOM package\".from", "value": ["not allowed with of"]},
-		{"name": "subjects.\"locked SBOM package\".id", "value": ["not allowed with of"]},
+		{"name": "subjects.\"locked SBOM package\".identified_by", "value": ["not allowed with of"]},
 	]
 }
 
@@ -7596,7 +7613,7 @@ test_problems_with_the_subject_built_on_are_named_after_it if {
 }
 
 test_a_well_formed_row_names_the_from_after_the_subject_it_comes_from if {
-	stepped := object.union(sbom_subjects, {"SBOM package": {"from": ["components", {"each_as": "p"}], "id": ["name"]}})
+	stepped := object.union(sbom_subjects, {"SBOM package": {"from": ["components", {"each_as": "p"}], "identified_by": ["name"]}})
 	row := rows_for(ergo.report(sbom_doc, subject_policy(stepped, {"v": sbom_reqs.versions}), {}), "v", "$well_formed")[0]
 	row.passed == true
 	row.inputs[2] == {"name": "subjects.\"SBOM package\".from", "value": ["components", {"each_as": "p"}]}
@@ -7606,7 +7623,7 @@ test_filters_that_are_not_an_object_on_either_subject_rule_no_one_out if {
 	every pair in [[[], {"locked": {"op": "present", "path": ["lock_release"]}}], [{}, null]] {
 		[base_filters, own_filters] := pair
 		subjects := {
-			"SBOM package": {"from": ["components"], "id": ["name"], "applies_to": base_filters},
+			"SBOM package": {"from": ["components"], "identified_by": ["name"], "applies_to": base_filters},
 			"locked SBOM package": {"of": "SBOM package", "applies_to": own_filters},
 		}
 		rep := ergo.report(sbom_doc, subject_policy(subjects, {"v": sbom_reqs.versions}), {})
@@ -7617,13 +7634,13 @@ test_filters_that_are_not_an_object_on_either_subject_rule_no_one_out if {
 }
 
 test_a_subject_no_requirement_names_does_not_change_how_numbers_are_written if {
-	policy := subject_policy({"i": {"from": ["items"], "id": ["id"]}}, {"r": {"subject": "i", "checks": {"c": {"op": "equals", "path": ["n"], "value": 1.50}}}})
+	policy := subject_policy({"i": {"from": ["items"], "identified_by": ["id"]}}, {"r": {"subject": "i", "checks": {"c": {"op": "equals", "path": ["n"], "value": 1.50}}}})
 	with_unused := object.union(policy, {"subjects": {"unused": {"from": [{"where": {"k": {1}}}]}}})
 	json.marshal(ergo.report({"items": [{"id": 1, "n": 1.5}]}, with_unused, {})) == json.marshal(ergo.report({"items": [{"id": 1, "n": 1.5}]}, policy, {}))
 }
 
 test_subject_keys_that_are_not_strings_get_a_name_each if {
-	subjects := {"i": {"from": ["items"], "id": ["id"], true: 1, false: 2, 2: 3}}
+	subjects := {"i": {"from": ["items"], "identified_by": ["id"], true: 1, false: 2, 2: 3}}
 	rep := ergo.report({"items": [{"id": 1}]}, subject_policy(subjects, {"r": {"subject": "i", "checks": {"c": {"op": "present", "path": ["id"]}}}}), {})
 	well_formed_problems(rep, "r") == [
 		{"name": "subjects.i.<invalid key false>", "value": ["unknown field"]},
@@ -7675,7 +7692,7 @@ causes_doc := {"deployments": [
 	{"id": "d-5"},
 ]}
 
-causes_policy(check) := {"subjects": {"deployment": {"from": ["deployments"], "id": ["id"], "applies_to": {"is_prod": {"op": "equals", "path": ["environment"], "value": "prod"}}}}, "requirements": {"r": {"subject": "deployment", "checks": {"approved": check}}}}
+causes_policy(check) := {"subjects": {"deployment": {"from": ["deployments"], "identified_by": ["id"], "applies_to": {"is_prod": {"op": "equals", "path": ["environment"], "value": "prod"}}}}, "requirements": {"r": {"subject": "deployment", "checks": {"approved": check}}}}
 
 causes_of(deployments, check) := ergo.report({"deployments": deployments}, causes_policy(check), {}).requirements.r.causes
 
@@ -7721,14 +7738,14 @@ test_causes_count_the_rows_violations_returns if {
 }
 
 derived_row(subj, check) := [r.passed, r.cause, r.inputs] if {
-	r := rows_for(ergo.report({"items": [object.union({"id": 1}, subj)]}, lifted({"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}}), {}), "s", "c")[0]
+	r := rows_for(ergo.report({"items": [object.union({"id": 1}, subj)]}, lifted({"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": check}}}), {}), "s", "c")[0]
 }
 
 derived_verdict(subj, check) := array.slice(derived_row(subj, check), 0, 2)
 
-derived_expression(check) := ergo.report({"items": []}, lifted({"s": {"from": ["items"], "id": ["id"], "min_subjects": 0, "checks": {"c": check}}}), {}).requirements.s.checks.c.expression
+derived_expression(check) := ergo.report({"items": []}, lifted({"s": {"from": ["items"], "identified_by": ["id"], "min_subjects": 0, "checks": {"c": check}}}), {}).requirements.s.checks.c.expression
 
-derived_problems(check) := [i | some i in rows_for(ergo.report({"items": [{"id": 1}]}, lifted({"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}}), {}), "s", "$well_formed")[0].inputs; startswith(i.name, "checks.")]
+derived_problems(check) := [i | some i in rows_for(ergo.report({"items": [{"id": 1}]}, lifted({"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": check}}}), {}), "s", "$well_formed")[0].inputs; startswith(i.name, "checks.")]
 
 at_least_one := {"op": "compare", "left": {"count": ["personas"]}, "right": {"literal": 1}, "cmp": "gte"}
 
@@ -7879,7 +7896,7 @@ test_a_derived_check_with_a_bad_other_side_is_ill_formed_and_says_which if {
 
 test_a_derived_value_reads_the_input_and_the_params_like_any_path if {
 	check := {"op": "compare", "left": {"count": ["$$params", "suites"]}, "right": {"count": ["$$input", "runs"]}, "cmp": "eq"}
-	policy := lifted({"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
+	policy := lifted({"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": check}}})
 	r := rows_for(ergo.report({"runs": ["unit", "e2e"], "items": [{"id": 1}]}, policy, {"suites": ["unit", "e2e"]}), "s", "c")[0]
 	[r.passed, r.cause] == [true, "satisfied"]
 	ergo.report({"runs": ["unit", "e2e"], "items": [{"id": 1}]}, policy, {}).requirements.s.causes == [{"cause": "absent", "rows": 1}]
@@ -7892,7 +7909,7 @@ test_a_derived_check_can_have_a_substitute if {
 }
 
 test_a_derived_check_works_as_a_filter if {
-	subjects := {"pr": {"from": ["prs"], "id": ["n"], "applies_to": {"big": {"op": "compare", "left": {"count": ["files"]}, "right": {"literal": 10}, "cmp": "gt"}}}}
+	subjects := {"pr": {"from": ["prs"], "identified_by": ["n"], "applies_to": {"big": {"op": "compare", "left": {"count": ["files"]}, "right": {"literal": 10}, "cmp": "gt"}}}}
 	reqs := {"r": {"subject": "pr", "checks": {"reviewed": {"op": "present", "path": ["reviewer"]}}}}
 	rep := ergo.report({"prs": [{"n": 1, "files": array.concat(numbers.range(1, 11), []), "reviewer": "ann"}, {"n": 2, "files": [1]}, {"n": 3}]}, subject_policy(subjects, reqs), {})
 	[[r.subject.id, r.passed, r.cause] | some r in rep.results; r.check == "$applies"] == [[1, true, "satisfied"], [2, false, "value"], [3, false, "absent"]]
@@ -7917,7 +7934,7 @@ test_a_present_condition_leaves_out_items_whose_field_is_missing if {
 
 test_a_derived_value_reads_a_name_given_by_from if {
 	check := {"op": "compare", "left": {"count": ["$it", "xs"]}, "right": {"literal": 2}, "cmp": "eq"}
-	policy := {"subjects": {"i": {"from": ["items", {"each_as": "it"}], "id": ["id"]}}, "requirements": {"r": {"subject": "i", "checks": {"c": check}}}}
+	policy := {"subjects": {"i": {"from": ["items", {"each_as": "it"}], "identified_by": ["id"]}}, "requirements": {"r": {"subject": "i", "checks": {"c": check}}}}
 	rep := ergo.report({"items": [{"id": 1, "xs": [1, 2]}]}, policy, {})
 	[[r.check, r.passed, r.cause] | some r in rep.results; r.check == "c"] == [["c", true, "satisfied"]]
 	rep.requirements.r.checks.c.expression == "count($it.xs) eq 2"
@@ -7925,7 +7942,7 @@ test_a_derived_value_reads_a_name_given_by_from if {
 	[[r.check, r.cause] | some r in ergo.report({"items": [{"id": 1, "xs": [1, 2]}]}, object.union(policy, {"requirements": {"r": {"subject": "i", "checks": {"c": unknown}}}}), {}).results; r.check == "c"] == [["c", "ill_formed"]]
 }
 
-one_check_policy(check) := lifted({"s": {"from": ["items"], "id": ["id"], "checks": {"c": check}}})
+one_check_policy(check) := lifted({"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": check}}})
 
 test_a_ref_step_in_a_derived_value_reads_its_param_like_in_any_path if {
 	counted := {"op": "compare", "left": {"count": ["groups", {"ref": ["$$params", "g"]}]}, "right": {"literal": 2}, "cmp": "eq"}
@@ -8214,7 +8231,7 @@ test_a_sentence_written_wrong_says_what_is_wrong if {
 }
 
 _sentence_policy(checks) := {
-	"subjects": {"thing": {"from": ["things"], "id": ["id"]}},
+	"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}},
 	"requirements": {"s": {"subject": "thing", "checks": checks}},
 }
 
@@ -8425,7 +8442,7 @@ test_a_failed_item_of_a_list_check_with_no_path_counts_from_one_like_every_other
 
 test_a_list_after_each_is_named_further_along_the_path_so_a_grammar_word_gets_no_dot if {
 	doc := {"items": [{"id": "i", "o": [{"a": [1, 2]}, {"a": [3]}]}]}
-	policy := {"subjects": {"t": {"from": ["items"], "id": ["id"]}}, "requirements": {"s": {"subject": "t", "checks": {"c": {"op": "all", "path": ["o"], "each": ["a"], "check": {"op": "equals", "path": [], "value": 9}}}}}}
+	policy := {"subjects": {"t": {"from": ["items"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "t", "checks": {"c": {"op": "all", "path": ["o"], "each": ["a"], "check": {"op": "equals", "path": [], "value": 9}}}}}}
 	r := ergo.report(doc, policy, {})
 	r.requirements.s.checks.c.expression == "every o[].a: o[].a[] == 9"
 	[row.inputs[0].name | some row in r.results; row.check == "c"] == ["o[].a"]
@@ -8437,14 +8454,14 @@ test_a_list_whose_path_ends_in_an_index_keeps_the_index_in_brackets_before_its_i
 		"c": {"op": "all", "path": ["ys", 0], "check": {"op": "equals", "path": [], "value": 9}},
 		"d": {"op": "all", "path": ["ys"], "each": [0], "check": {"op": "equals", "path": [], "value": 9}},
 	}
-	r := ergo.report(doc, {"subjects": {"t": {"from": ["items"], "id": ["id"]}}, "requirements": {"s": {"subject": "t", "checks": checks}}}, {})
+	r := ergo.report(doc, {"subjects": {"t": {"from": ["items"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "t", "checks": checks}}}, {})
 	r.requirements.s.checks.c.expression == "every item 1 of ys: ys[0][] == 9"
 	r.requirements.s.checks.d.expression == "every ys[][0]: ys[][0][] == 9"
 }
 
 test_params_and_input_cant_be_names_so_a_name_is_never_read_as_the_params_or_the_input if {
 	every name in ["params", "input"] {
-		policy := {"subjects": {"t": {"from": ["items", {"each_as": name}], "id": ["id"]}}, "requirements": {"s": {"subject": "t", "checks": {"c": {"op": "present", "path": ["id"]}}}}}
+		policy := {"subjects": {"t": {"from": ["items", {"each_as": name}], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "t", "checks": {"c": {"op": "present", "path": ["id"]}}}}}
 		r := ergo.report({"items": [{"id": "a"}]}, policy, {})
 		not r.compliant
 		[row.cause | some row in r.results; row.check == "$well_formed"] == ["value"]
@@ -8458,7 +8475,7 @@ test_an_each_that_isnt_a_list_shows_as_invalid_in_the_expression if {
 }
 
 test_a_name_nothing_gave_never_prints_like_the_params_or_the_input if {
-	policy := {"subjects": {"t": {"from": ["items"], "id": ["id"]}}, "requirements": {"s": {"subject": "t", "checks": {
+	policy := {"subjects": {"t": {"from": ["items"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "t", "checks": {
 		"a": {"op": "equals", "path": ["$params", "x"], "value": 1},
 		"b": {"op": "equals", "path": ["$$params", "x"], "value": 1},
 		"c": {"op": "present", "path": ["$input", "x"]},
@@ -8468,7 +8485,7 @@ test_a_name_nothing_gave_never_prints_like_the_params_or_the_input if {
 }
 
 test_an_each_that_isnt_a_list_still_lists_every_item_as_ill_formed if {
-	policy := {"subjects": {"t": {"from": ["items"], "id": ["id"]}}, "requirements": {"s": {"subject": "t", "checks": {"c": {"op": "all", "path": ["ys"], "each": "x", "check": {"op": "equals", "path": [], "value": 9}}}}}}
+	policy := {"subjects": {"t": {"from": ["items"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "t", "checks": {"c": {"op": "all", "path": ["ys"], "each": "x", "check": {"op": "equals", "path": [], "value": 9}}}}}}
 	[r.failed_items | some r in ergo.report({"items": [{"id": "i", "ys": [[1], [2]]}]}, policy, {}).results; r.check == "c"] == [[
 		{"cause": "ill_formed", "path": "item 1 of ys", "item": "item 1 of ys", "value": [1]},
 		{"cause": "ill_formed", "path": "item 2 of ys", "item": "item 2 of ys", "value": [2]},
@@ -8513,7 +8530,7 @@ test_a_check_that_copies_a_sentences_translation_still_cant_use_its_operator if 
 		[row.cause | some row in r.results; row.check == "b"] == ["ill_formed"]
 	}
 	filtered := {
-		"subjects": {"thing": {"from": ["things"], "id": ["id"], "applies_to": {"f": copy}}},
+		"subjects": {"thing": {"from": ["things"], "identified_by": ["id"], "applies_to": {"f": copy}}},
 		"requirements": {"s": {"subject": "thing", "checks": {"a": "x is empty"}}},
 	}
 	[row.cause | some row in ergo.report({"things": [{"id": "t1", "x": ""}]}, filtered, {}).results; row.check == "$applies"] == ["ill_formed"]
@@ -8607,7 +8624,7 @@ test_an_op_that_is_a_list_is_only_an_unknown_op_because_a_list_would_be_read_as_
 
 test_assertions_joined_with_and_or_listed_under_assert_give_one_row_that_names_the_ones_that_failed if {
 	doc := {"prs": [{"id": "late", "username": "bob", "author": "ann", "ts": 1, "last_commit": 2}, {"id": "gone", "username": "ann", "author": "ann", "last_commit": 2}]}
-	policy := {"subjects": {"pr": {"from": ["prs"], "id": ["id"]}}, "requirements": {"s": {"subject": "pr", "checks": {
+	policy := {"subjects": {"pr": {"from": ["prs"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "pr", "checks": {
 		"line": "username does not equal author and ts is after last_commit",
 		"list": {"assert": ["username does not equal author", "ts is after last_commit"]},
 	}}}}
@@ -9174,7 +9191,7 @@ _deployments := {"deployments": [
 ]}
 
 test_a_from_written_as_a_sentence_reads_its_path_and_keeps_the_subjects_whose_conditions_hold if {
-	rep := _from_report(_deployments, {"emergency change": {"from": `deployments whose environment is "prod" and change_type is "emergency"`, "id": "id"}}, {"c": "id exists"}, {})
+	rep := _from_report(_deployments, {"emergency change": {"from": `deployments whose environment is "prod" and change_type is "emergency"`, "identified_by": "id"}}, {"c": "id exists"}, {})
 	_from_rows(rep) == [
 		[1, "$applies", "satisfied", [{"name": "change_type", "value": "emergency"}, {"name": "environment", "value": "prod"}]],
 		[2, "$applies", "absent", [{"name": "change_type", "value": null}, {"name": "environment", "value": "dev"}]],
@@ -9192,10 +9209,10 @@ test_the_conditions_of_a_from_keep_the_order_they_were_written_in_past_ten if {
 
 test_a_subject_with_no_from_reads_the_input_field_named_like_it if {
 	doc := {"artifact": {"fingerprint": "sha256:abc", "signed": true}}
-	every def in [null, {}, {"id": "fingerprint"}, {"id": ["fingerprint"]}] {
+	every def in [null, {}, {"identified_by": "fingerprint"}, {"identified_by": ["fingerprint"]}] {
 		[[r[1], r[2]] | some r in _from_rows(_from_report(doc, {"artifact": def}, {"c": "signed is true"}, {}))] == [["c", "satisfied"]]
 	}
-	[[r[0], r[2]] | some r in _from_rows(_from_report(doc, {"artifact": {"from": [], "id": "artifact.fingerprint"}}, {"c": "artifact.signed is true"}, {}))] == [["sha256:abc", "satisfied"]]
+	[[r[0], r[2]] | some r in _from_rows(_from_report(doc, {"artifact": {"from": [], "identified_by": "artifact.fingerprint"}}, {"c": "artifact.signed is true"}, {}))] == [["sha256:abc", "satisfied"]]
 }
 
 test_a_from_named_by_a_param_or_by_each_of_a_param_list if {
@@ -9208,7 +9225,7 @@ test_a_from_named_by_a_param_or_by_each_of_a_param_list if {
 
 test_conditions_of_a_from_can_use_phrases_only_sentences_have if {
 	doc := {"xs": [{"id": 1, "tags": [], "cs": [1]}, {"id": 2, "tags": ["a"], "cs": [1]}]}
-	rep := _from_report(doc, {"x": {"from": "xs whose tags is empty and count of cs is at least 1", "id": "id"}}, {"c": "id exists"}, {})
+	rep := _from_report(doc, {"x": {"from": "xs whose tags is empty and count of cs is at least 1", "identified_by": "id"}}, {"c": "id exists"}, {})
 	[[r[0], r[1], r[2]] | some r in _from_rows(rep)] == [[1, "$applies", "satisfied"], [2, "$applies", "value"], [1, "c", "satisfied"]]
 }
 
@@ -9217,7 +9234,7 @@ test_a_from_or_id_written_wrong_says_why_in_well_formed if {
 		[{"from": "xs whose"}, {"name": "subjects.x.from", "value": ["doesn't parse"]}],
 		[{"from": "xs whose last of ys is 1"}, {"name": "subjects.x.from", "value": ["whose: last of isn't supported yet"]}],
 		[{"from": "xs whose a is 1"}, {"name": "subjects.x.from", "value": ["a is a word of the grammar: write .a"]}],
-		[{"from": "xs", "id": "id is 1"}, {"name": "subjects.x.id", "value": [`an id is a path, like "id" or "build.number"`]}],
+		[{"from": "xs", "identified_by": "id is 1"}, {"name": "subjects.x.identified_by", "value": [`identified_by is a path, like "id" or "build.number"`]}],
 		[{"from": "xs whose id exists", "applies_to": {"a": {"op": "present", "path": ["id"]}}}, {"name": "subjects.x.from", "value": [`applies_to can't go with a from written as a sentence: put the conditions after "whose"`]}],
 	] {
 		_from_problems(_from_report({"xs": [{"id": 1}]}, {"x": pair[0]}, {"c": "id exists"}, {})) == [pair[1]]
@@ -9236,8 +9253,8 @@ _chain_doc := {"trail": {"artifacts": {
 }}}
 
 _chain_subjects := {
-	"artifact": {"from": "trail.artifacts named by $params.name", "id": "fingerprint"},
-	"pull request": {"from": "artifact.pull_requests", "id": "url"},
+	"artifact": {"from": "trail.artifacts named by $params.name", "identified_by": "fingerprint"},
+	"pull request": {"from": "artifact.pull_requests", "identified_by": "url"},
 }
 
 _chain_report(doc, subjects, checks, params) := ergo.report(doc, {"subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": checks}}}, params)
@@ -9266,9 +9283,9 @@ _chain_min_cause(rep) := [[r.cause, object.keys(r.subject)] | some r in rep.resu
 test_a_chain_with_no_parent_or_several_or_an_unreadable_one_finds_no_subjects if {
 	_chain_min_cause(_chain_report(_chain_doc, _chain_subjects, {"c": "url exists"}, {"name": "api"})) == [["value", {"type", "id", "in"}]]
 	_chain_min_cause(_chain_report(_chain_doc, _chain_subjects, {"c": "url exists"}, {"name": "nope"})) == [["absent", {"type", "id"}]]
-	many := {"artifact": {"from": "trail.artifacts", "id": "fingerprint"}, "pull request": {"from": "artifact.pull_requests", "id": "url"}}
+	many := {"artifact": {"from": "trail.artifacts", "identified_by": "fingerprint"}, "pull request": {"from": "artifact.pull_requests", "identified_by": "url"}}
 	_chain_min_cause(_chain_report({"trail": {"artifacts": [{"fingerprint": "a"}, {"fingerprint": "b"}]}}, many, {"c": "url exists"}, {})) == [["unusable", {"type", "id"}]]
-	kept := {"artifact": {"from": `trail.artifacts whose env is "prod"`, "id": "fingerprint"}, "pull request": {"from": "artifact.pull_requests", "id": "url"}}
+	kept := {"artifact": {"from": `trail.artifacts whose env is "prod"`, "identified_by": "fingerprint"}, "pull request": {"from": "artifact.pull_requests", "identified_by": "url"}}
 	_chain_min_cause(_chain_report({"trail": {"artifacts": [{"fingerprint": "a", "env": "dev"}]}}, kept, {"c": "url exists"}, {})) == [["value", {"type", "id"}]]
 	_chain_min_cause(_chain_report({"trail": {"artifacts": [{"fingerprint": "a"}]}}, kept, {"c": "url exists"}, {})) == [["absent", {"type", "id"}]]
 	zero := _chain_report({"trail": {"artifacts": [{"fingerprint": "a", "env": "dev"}]}}, kept, {"c": "url exists"}, {})
@@ -9276,7 +9293,7 @@ test_a_chain_with_no_parent_or_several_or_an_unreadable_one_finds_no_subjects if
 }
 
 test_a_chain_whose_parent_is_written_wrong_is_written_wrong_too if {
-	broken := {"artifact": {"from": "trail.artifacts whose", "id": "fingerprint"}, "pull request": {"from": "artifact.pull_requests", "id": "url"}}
+	broken := {"artifact": {"from": "trail.artifacts whose", "identified_by": "fingerprint"}, "pull request": {"from": "artifact.pull_requests", "identified_by": "url"}}
 	_from_problems(_chain_report(_chain_doc, broken, {"c": "url exists"}, {})) == [{"name": "subjects.artifact.from", "value": ["doesn't parse"]}]
 	three := object.union(_chain_subjects, {"x": {"from": "artifact.pull_requests"}, "pull request": {"from": "x.reviews"}})
 	_from_problems(_chain_report(_chain_doc, three, {"c": "url exists"}, {"name": "web"})) == [{"name": `subjects."pull request".from`, "value": ["a chain of more than two subjects isn't supported yet"]}]
@@ -9284,10 +9301,10 @@ test_a_chain_whose_parent_is_written_wrong_is_written_wrong_too if {
 
 test_a_from_line_that_starts_at_input_reads_the_input_and_one_at_params_is_written_wrong if {
 	doc := {"ds": [{"id": 5}]}
-	[[r[0], r[2]] | some r in _from_rows(_from_report(doc, {"d": {"from": "$input.ds whose id is 5", "id": "id"}}, {"c": "id exists"}, {}))] == [[5, "satisfied"], [5, "satisfied"]]
-	[[r[0], r[2]] | some r in _from_rows(_from_report(doc, {"d": {"from": "$input", "id": "ds"}}, {"c": "ds exists"}, {}))] == [[[{"id": 5}], "satisfied"]]
+	[[r[0], r[2]] | some r in _from_rows(_from_report(doc, {"d": {"from": "$input.ds whose id is 5", "identified_by": "id"}}, {"c": "id exists"}, {}))] == [[5, "satisfied"], [5, "satisfied"]]
+	[[r[0], r[2]] | some r in _from_rows(_from_report(doc, {"d": {"from": "$input", "identified_by": "ds"}}, {"c": "ds exists"}, {}))] == [[[{"id": 5}], "satisfied"]]
 	_from_problems(_from_report(doc, {"d": {"from": "$params.ds"}}, {"c": "id exists"}, {"ds": [{"id": 1}]})) == [{"name": "subjects.d.from", "value": ["a from reads the input, so it can't start at $params"]}]
-	both := ergo.report({"artifact": {"x": [{"id": 1}]}}, {"subjects": {"artifact": null, "d": {"from": "$input.artifact.x", "id": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "id exists"}}}}, {})
+	both := ergo.report({"artifact": {"x": [{"id": 1}]}}, {"subjects": {"artifact": null, "d": {"from": "$input.artifact.x", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "id exists"}}}}, {})
 	[r.cause | some r in both.results; r.check == "c"] == ["satisfied"]
 }
 
@@ -9300,7 +9317,7 @@ test_a_from_line_keeps_every_condition_past_a_hundred if {
 }
 
 test_a_from_line_can_start_with_a_quoted_key_that_starts_with_a_dollar if {
-	[r[2] | some r in _from_rows(_from_report({"$schema": [{"id": 2}]}, {"d": {"from": `"$schema" whose id is 2`, "id": "id"}}, {"c": "id exists"}, {}))] == ["satisfied", "satisfied"]
+	[r[2] | some r in _from_rows(_from_report({"$schema": [{"id": 2}]}, {"d": {"from": `"$schema" whose id is 2`, "identified_by": "id"}}, {"c": "id exists"}, {}))] == ["satisfied", "satisfied"]
 }
 
 test_a_from_line_next_to_of_adds_no_filters_of_its_own if {
@@ -9320,17 +9337,17 @@ _narrow_report(subjects, name) := ergo.report(_defects, {"subjects": subjects, "
 _kept(rep) := [r.subject.id | some r in rep.results; r.check == "c"]
 
 test_a_from_line_that_names_another_subject_narrows_it if {
-	subjects := {"defect": {"from": "defects", "id": "id"}, "critical defect": {"from": `defect whose severity is "critical" and status is one of "open", "in_progress"`}}
+	subjects := {"defect": {"from": "defects", "identified_by": "id"}, "critical defect": {"from": `defect whose severity is "critical" and status is one of "open", "in_progress"`}}
 	rep := _narrow_report(subjects, "critical defect")
 	_kept(rep) == [1, 4]
 	rep.requirements.r.checks["$applies"].expression == `severity is "critical" and status is one of "open", "in_progress"`
 	_from_problems(rep) == []
-	_kept(_narrow_report({"defect": {"from": "defects", "id": "id"}, "all": {"from": "defect"}}, "all")) == [1, 2, 3, 4]
+	_kept(_narrow_report({"defect": {"from": "defects", "identified_by": "id"}, "all": {"from": "defect"}}, "all")) == [1, 2, 3, 4]
 }
 
 test_a_chain_of_narrowing_subjects_prints_the_outer_conditions_first if {
 	subjects := {
-		"defect": {"from": "defects whose status exists", "id": "id"},
+		"defect": {"from": "defects whose status exists", "identified_by": "id"},
 		"critical defect": {"from": `defect whose severity is "critical"`},
 		"team b defect": {"from": `"critical defect" whose team is "b"`},
 	}
@@ -9340,13 +9357,13 @@ test_a_chain_of_narrowing_subjects_prints_the_outer_conditions_first if {
 }
 
 test_a_from_line_can_narrow_a_subject_written_with_op if {
-	subjects := {"defect": {"from": ["defects"], "id": ["id"], "applies_to": {"open": {"op": "equals", "path": ["status"], "value": "open"}}}, "critical defect": {"from": `defect whose severity is "critical"`}}
+	subjects := {"defect": {"from": ["defects"], "identified_by": ["id"], "applies_to": {"open": {"op": "equals", "path": ["status"], "value": "open"}}}, "critical defect": {"from": `defect whose severity is "critical"`}}
 	_kept(_narrow_report(subjects, "critical defect")) == [1, 4]
 }
 
 test_a_narrowing_subject_takes_its_id_from_the_one_it_narrows if {
-	subjects := {"defect": {"from": "defects", "id": "id"}, "critical defect": {"from": `defect whose severity is "critical"`, "id": "team"}}
-	_from_problems(_narrow_report(subjects, "critical defect")) == [{"name": `subjects."critical defect".id`, "value": ["not allowed with of"]}]
+	subjects := {"defect": {"from": "defects", "identified_by": "id"}, "critical defect": {"from": `defect whose severity is "critical"`, "identified_by": "team"}}
+	_from_problems(_narrow_report(subjects, "critical defect")) == [{"name": `subjects."critical defect".identified_by`, "value": ["not allowed with of"]}]
 }
 
 test_subjects_that_narrow_each_other_lead_to_a_loop if {
@@ -9356,7 +9373,7 @@ test_subjects_that_narrow_each_other_lead_to_a_loop if {
 
 test_a_narrowing_chain_through_of_prints_its_from_line_conditions_outer_first_and_its_applies_to_after if {
 	subjects := {
-		"defect": {"from": `defects whose status is "open"`, "id": "id"},
+		"defect": {"from": `defects whose status is "open"`, "identified_by": "id"},
 		"mid": {"of": "defect", "applies_to": {"0 mid": {"op": "equals", "path": ["severity"], "value": "critical"}}},
 		"child": {"from": `mid whose team is "b"`},
 	}
@@ -9366,7 +9383,7 @@ test_a_narrowing_chain_through_of_prints_its_from_line_conditions_outer_first_an
 }
 
 test_a_narrowing_chain_deeper_than_ten_prints_in_order if {
-	subjects := object.union({"s0": {"from": "defects whose id exists", "id": "id"}}, {concat("", ["s", format_int(n, 10)]): {"from": concat("", ["s", format_int(n - 1, 10), " whose id is not ", format_int(100 + n, 10)])} | some n in numbers.range(1, 11)})
+	subjects := object.union({"s0": {"from": "defects whose id exists", "identified_by": "id"}}, {concat("", ["s", format_int(n, 10)]): {"from": concat("", ["s", format_int(n - 1, 10), " whose id is not ", format_int(100 + n, 10)])} | some n in numbers.range(1, 11)})
 	rep := _narrow_report(subjects, "s11")
 	rep.requirements.r.checks["$applies"].expression == concat(" and ", array.concat(["id exists"], [concat("", ["id is not ", format_int(100 + n, 10)]) | some n in numbers.range(1, 11)]))
 }
@@ -9378,7 +9395,7 @@ test_a_subject_name_that_isnt_a_string_gives_the_same_report_with_strict_builtin
 
 test_a_chain_whose_parent_reads_a_param_it_cant_use_fails_with_that_cause if {
 	_chain_min_cause(_chain_report(_chain_doc, _chain_subjects, {"c": "url exists"}, {"name": 5})) == [["unusable", {"type", "id"}]]
-	gone := {"artifact": {"from": "trail.nope", "id": "fingerprint"}, "pull request": {"from": "artifact.pull_requests", "id": "url"}}
+	gone := {"artifact": {"from": "trail.nope", "identified_by": "fingerprint"}, "pull request": {"from": "artifact.pull_requests", "identified_by": "url"}}
 	_chain_min_cause(_chain_report(_chain_doc, gone, {"c": "url exists"}, {})) == [["absent", {"type", "id"}]]
 	_chain_min_cause(_chain_report(_chain_doc, _chain_subjects, {"c": "url exists"}, {})) == [["absent", {"type", "id"}]]
 }
@@ -9413,7 +9430,7 @@ test_the_parents_name_is_the_parent_everywhere_in_a_sentence if {
 
 test_a_subject_cant_build_on_a_subject_read_from_another_yet if {
 	doc := {"artifacts": [{"fingerprint": "a1", "prs": [{"url": "p1", "ok": true}]}], "prs": [{"url": "elsewhere", "ok": true}]}
-	base := {"artifact": {"from": "artifacts", "id": "fingerprint"}, "pr": {"from": "artifact.prs", "id": "url"}}
+	base := {"artifact": {"from": "artifacts", "identified_by": "fingerprint"}, "pr": {"from": "artifact.prs", "identified_by": "url"}}
 	every pair in [[{"from": "pr whose ok is true"}, "from"], [{"of": "pr"}, "of"]] {
 		rep := ergo.report(doc, {"subjects": object.union(base, {"okpr": pair[0]}), "requirements": {"r": {"subject": "okpr", "checks": {"c": "url exists"}}}}, {})
 		_from_problems(rep) == [{"name": concat("", ["subjects.okpr.", pair[1]]), "value": ["can't build on a subject read from another subject yet"]}]
@@ -9505,7 +9522,7 @@ test_every_and_count_through_a_for_name_arent_listed_as_inputs_since_they_change
 _old_policy := {
 	"subjects": {"deployment": {
 		"from": ["deployments"],
-		"id": ["id"],
+		"identified_by": ["id"],
 		"applies_to": {"is_prod": {"op": "equals", "path": ["environment"], "value": "prod"}},
 	}},
 	"requirements": {"approved": {"subject": "deployment", "checks": {
@@ -9522,7 +9539,7 @@ test_as_sentences_writes_null_as_is_null_because_it_reads_back_the_same if {
 
 test_as_sentences_rewrites_each_check_and_subject_it_can_as_a_sentence if {
 	ergo.as_sentences(_old_policy) == {
-		"subjects": {"deployment": {"from": `deployments whose environment is "prod"`, "id": "id"}},
+		"subjects": {"deployment": {"from": `deployments whose environment is "prod"`, "identified_by": "id"}},
 		"requirements": {"approved": {"subject": "deployment", "checks": {
 			"approved": {"description": "Someone approved it", "assert": "approved_by is a non-empty string"},
 			"region": `region is one of "eu", "us"`,
@@ -9548,8 +9565,8 @@ test_as_sentences_leaves_what_doesnt_read_back_the_same_as_written if {
 }
 
 test_as_sentences_writes_input_before_a_from_that_starts_like_another_subject if {
-	policy := {"subjects": {"artifact": {"from": ["artifact"]}, "pr": {"from": ["artifact", "prs"], "id": ["url"]}}}
-	ergo.as_sentences(policy).subjects == {"artifact": {"from": "artifact"}, "pr": {"from": "$input.artifact.prs", "id": "url"}}
+	policy := {"subjects": {"artifact": {"from": ["artifact"]}, "pr": {"from": ["artifact", "prs"], "identified_by": ["url"]}}}
+	ergo.as_sentences(policy).subjects == {"artifact": {"from": "artifact"}, "pr": {"from": "$input.artifact.prs", "identified_by": "url"}}
 }
 
 test_as_sentences_writes_naming_and_whole_input_and_narrowing_as_from_lines if {
@@ -9820,7 +9837,7 @@ test_a_list_phrase_with_a_field_runs_in_a_from_lines_whose if {
 		{"id": 2, "environment": "dev", "allowed_envs": ["prod"]},
 		{"id": 3, "environment": "prod", "allowed_envs": ["dev"]},
 	]}
-	rep := _from_report(doc, {"d": {"from": "deployments whose environment is in allowed_envs", "id": "id"}}, {"c": "id exists"}, {})
+	rep := _from_report(doc, {"d": {"from": "deployments whose environment is in allowed_envs", "identified_by": "id"}}, {"c": "id exists"}, {})
 	[r[0] | some r in _from_rows(rep); r[1] == "c"] == [1]
 }
 

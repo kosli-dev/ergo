@@ -1,7 +1,7 @@
 [
   {
     "description": "every over one list of objects",
-    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every commits.signed is true"}}}},
+    "policy": {"subjects": {"release": {"from": ["releases"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every commits.signed is true"}}}},
     "cases": [
       {
         "description": "passes when every item passes, and failed_items is empty",
@@ -104,7 +104,7 @@
   },
   {
     "description": "every over nested lists",
-    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.commits.signed is true"}}}},
+    "policy": {"subjects": {"release": {"from": ["releases"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.commits.signed is true"}}}},
     "cases": [
       {
         "description": "passes when every commit of every pull request is signed",
@@ -182,7 +182,7 @@
   },
   {
     "description": "every where the last list is the one walked, over strings",
-    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every branches matches \"^release/\""}}}},
+    "policy": {"subjects": {"release": {"from": ["releases"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every branches matches \"^release/\""}}}},
     "cases": [
       {
         "description": "passes when every string matches",
@@ -229,7 +229,7 @@
   },
   {
     "description": "every where each label is checked, not each pull request's labels",
-    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.labels is not empty"}}}},
+    "policy": {"subjects": {"release": {"from": ["releases"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.labels is not empty"}}}},
     "cases": [
       {
         "description": "passes when every label is not empty",
@@ -267,7 +267,7 @@
   },
   {
     "description": "every with if any",
-    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.commits.signed, if any, is true"}}}},
+    "policy": {"subjects": {"release": {"from": ["releases"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.commits.signed, if any, is true"}}}},
     "cases": [
       {
         "description": "passes when the list is empty",
@@ -354,7 +354,7 @@
   },
   {
     "description": "some over one list of objects",
-    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some approvers.state is \"APPROVED\""}}}},
+    "policy": {"subjects": {"release": {"from": ["releases"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some approvers.state is \"APPROVED\""}}}},
     "cases": [
       {
         "description": "passes when one item passes, and failed_items is empty even though another item did not",
@@ -433,7 +433,7 @@
   },
   {
     "description": "some over nested lists",
-    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some pull_requests.approvers.state is \"APPROVED\""}}}},
+    "policy": {"subjects": {"release": {"from": ["releases"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some pull_requests.approvers.state is \"APPROVED\""}}}},
     "cases": [
       {
         "description": "passes when an item passes, even if another pull request has no approvers",
@@ -455,7 +455,7 @@
   },
   {
     "description": "whose under some",
-    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some approvers.username whose state is \"APPROVED\" is in $params.staff"}}}},
+    "policy": {"subjects": {"release": {"from": ["releases"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some approvers.username whose state is \"APPROVED\" is in $params.staff"}}}},
     "params": {"staff": ["ann", "bob"]},
     "cases": [
       {
@@ -519,7 +519,7 @@
   },
   {
     "description": "whose under every",
-    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every approvers.username whose state is \"APPROVED\" is in $params.staff"}}}},
+    "policy": {"subjects": {"release": {"from": ["releases"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every approvers.username whose state is \"APPROVED\" is in $params.staff"}}}},
     "params": {"staff": ["ann", "bob"]},
     "cases": [
       {
@@ -582,7 +582,7 @@
   },
   {
     "description": "whose under every with if any",
-    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every approvers.username whose state is \"APPROVED\", if any, is in $params.staff"}}}},
+    "policy": {"subjects": {"release": {"from": ["releases"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every approvers.username whose state is \"APPROVED\", if any, is in $params.staff"}}}},
     "params": {"staff": ["ann", "bob"]},
     "cases": [
       {
@@ -630,7 +630,7 @@
   },
   {
     "description": "whose with exists is the exception to undecided items",
-    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"e": "every approvers.username whose comment exists is in $params.staff", "s2": "some approvers.username whose comment does not exist is in $params.staff"}}}},
+    "policy": {"subjects": {"release": {"from": ["releases"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"e": "every approvers.username whose comment exists is in $params.staff", "s2": "some approvers.username whose comment does not exist is in $params.staff"}}}},
     "params": {"staff": ["ann", "bob"]},
     "cases": [
       {
@@ -655,7 +655,7 @@
   },
   {
     "description": "whose with a condition that cannot compare the item",
-    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every reviews.name whose rank is at least 2 is \"ann\""}}}},
+    "policy": {"subjects": {"release": {"from": ["releases"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every reviews.name whose rank is at least 2 is \"ann\""}}}},
     "cases": [
       {
         "description": "fails as unusable under every when the field is the wrong type for the condition",
@@ -669,7 +669,7 @@
   },
   {
     "description": "a field on the right side is read from the item",
-    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some approvers.timestamp whose state is \"APPROVED\" is after last_commit_timestamp"}}}},
+    "policy": {"subjects": {"release": {"from": ["releases"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some approvers.timestamp whose state is \"APPROVED\" is after last_commit_timestamp"}}}},
     "cases": [
       {
         "description": "passes when the item's timestamp is after the item's own last commit",
@@ -700,7 +700,7 @@
   },
   {
     "description": "params and input on the right side still read the params and the input",
-    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"i": "every approvers.username is in $input.staff", "p": "every approvers.username is in $params.staff"}}}},
+    "policy": {"subjects": {"release": {"from": ["releases"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"i": "every approvers.username is in $input.staff", "p": "every approvers.username is in $params.staff"}}}},
     "params": {"staff": ["ann", "bob"]},
     "cases": [
       {
@@ -716,7 +716,7 @@
   },
   {
     "description": "every and some joined with and to a plain sentence",
-    "policy": {"subjects": {"release": {"from": ["releases"], "id": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every commits.signed is true and state is \"MERGED\"", "d": "state is \"MERGED\" and some approvers.state is \"APPROVED\"", "w": "every items.price whose kind is \"a\" is at least 2 and owner is \"x\""}}}},
+    "policy": {"subjects": {"release": {"from": ["releases"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every commits.signed is true and state is \"MERGED\"", "d": "state is \"MERGED\" and some approvers.state is \"APPROVED\"", "w": "every items.price whose kind is \"a\" is at least 2 and owner is \"x\""}}}},
     "cases": [
       {
         "description": "passes with failed_assertions empty when both parts pass",
@@ -762,7 +762,7 @@
   },
   {
     "description": "a walk that can't be run as written",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every xs.v whose kind is not one of $params.l, if any, is 1", "n": "every xs named by $params.k is 1"}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every xs.v whose kind is not one of $params.l, if any, is 1", "n": "every xs named by $params.k is 1"}}}},
     "params": {"l": "text"},
     "cases": [
       {
@@ -792,7 +792,7 @@
   },
   {
     "description": "contains after every",
-    "policy": {"subjects": {"thing": {"from": ["things"], "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every pull_requests.labels does not contain \"hotfix\""}}}},
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every pull_requests.labels does not contain \"hotfix\""}}}},
     "cases": [
       {
         "description": "is written wrong, because the last list is walked too and a label never holds a value",
