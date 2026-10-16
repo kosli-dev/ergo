@@ -4,7 +4,7 @@ Draft 0.1, a proposal from [#174](https://github.com/kosli-dev/ergo/issues/174).
 
 [`sentences-corpus.md`](sentences-corpus.md) has every check from sdlc-policies, the server's demo and npm-bump policies, pr-reviewer, ergo's examples and Tore's DEV controls written both ways. Every sentence in it parses exactly one way with the phrases below. The phrases, the tally and the misfits come from it.
 
-`ergo.rego` runs a check written as one or more sentences that start with a path, for every phrase, joined with `and` or listed under `assert`. It runs a `for` line before them too, but doesn't check the limit of three list walks in [sentence.for.depth](#the-for-line) yet. It runs `count of`, `sum of` and `plus` too, but not in the phrase of an `every` or `some`, before `is between`, or inside the `whose` of another `count of` or `sum of`. It runs `from` lines and string `id`s too, one that narrows another subject, and one that goes on into another subject with one subject, but not into a subject with several or a chain of more than two. It doesn't run `last of` yet. Nor does it run a list after a phrase read from a path with `named by` in it, like `matches $params.a named by $params.b`, or a value after a time phrase. A check that uses one of them is written wrong, with `isn't supported yet` in its message. In a `from` line or an `id`, `named by` a bare word is written wrong, with `unknown name <word>`, because there's no subject to read it from yet, and so is a `for` name used before its item gives it. A sentence can't be an `any_of` option or a substitute yet, and is written wrong there with `invalid check`.
+`ergo.rego` runs a check written as one or more sentences that start with a path, for every phrase, joined with `and` or listed under `assert`. It runs a `for` line before them too, but doesn't check the limit of three list walks in [sentence.for.depth](#the-for-line) yet. It runs `count of`, `sum of` and `plus` too, but not in the phrase of an `every` or `some`, before `is between`, or inside the `whose` of another `count of` or `sum of`. It runs `<unit> elapsed from` too, only alone at the start of an assertion, and not before `is between`. It runs `from` lines and string `id`s too, one that narrows another subject, and one that goes on into another subject with one subject, but not into a subject with several or a chain of more than two. It doesn't run `last of` yet. Nor does it run a list after a phrase read from a path with `named by` in it, like `matches $params.a named by $params.b`, or a value after a time phrase. A check that uses one of them is written wrong, with `isn't supported yet` in its message. In a `from` line or an `id`, `named by` a bare word is written wrong, with `unknown name <word>`, because there's no subject to read it from yet, and so is a `for` name used before its item gives it. A sentence can't be an `any_of` option or a substitute yet, and is written wrong there with `invalid check`.
 
 ## The shape of a sentence
 
@@ -38,6 +38,7 @@ sum of stages.usd whose kind is "model" equals total_usd within 0.01
 - `every <path>` or `some <path>`, optionally with `whose`, and the assertion is about each item the path ends at
 - `count of <path>` or `sum of <path>`, optionally with `whose`, and the assertion is about the number
 - a path, a `count of` or a `sum of` joined to more terms with `plus`, as in `count of records plus capped is findings_in`
+- `<unit> elapsed from <path> to <path>`, alone, and the assertion is about the number of units between the two times
 
 A check that walks two lists, or compares an item with its subject, puts the walking on a [`for` line](#the-for-line) and keeps the assertion flat.
 
@@ -133,7 +134,7 @@ The map is the only way to write `subjects`, and a simple subject is a name with
 
 ## Words a field can't be called
 
-**[sentence.words]** These words are read as part of a phrase, a quantifier, a position or a value, never as the first key of a path written bare: `a`, `after`, `an`, `and`, `as`, `at`, `before`, `between`, `count`, `each`, `empty`, `equal`, `every`, `false`, `first`, `in`, `item`, `last`, `less`, `more`, `named`, `not`, `null`, `of`, `on`, `one`, `or`, `plus`, `some`, `sum`, `true`, `whose`, `within`. Without this, `x is empty` could also compare `x` with a field called `empty`, `x is true` with a field called `true`, and `count of x is 1` could start from a field called `count`. A field with one of these names is written `.empty`, on either side of the sentence. The rule is the same on both sides so that it's one rule, and so that a parser never has to know which side it's on to read a key. Keys after the first are never words of the grammar, so `review.count` needs no dot.
+**[sentence.words]** These words are read as part of a phrase, a quantifier, a position or a value, never as the first key of a path written bare: `a`, `after`, `an`, `and`, `as`, `at`, `before`, `between`, `count`, `days`, `each`, `empty`, `equal`, `every`, `false`, `first`, `hours`, `in`, `item`, `last`, `less`, `minutes`, `more`, `named`, `not`, `null`, `of`, `on`, `one`, `or`, `plus`, `seconds`, `some`, `sum`, `to`, `true`, `weeks`, `whose`, `within`. Without this, `x is empty` could also compare `x` with a field called `empty`, `x is true` with a field called `true`, and `count of x is 1` could start from a field called `count`. A field with one of these names is written `.empty`, on either side of the sentence. The rule is the same on both sides so that it's one rule, and so that a parser never has to know which side it's on to read a key. Keys after the first are never words of the grammar, so `review.count` needs no dot.
 
 ## `every`, `some` and `whose`
 
@@ -163,7 +164,15 @@ The map is the only way to write `subjects`, and a simple subject is a name with
 
 **[sentence.derived.plus]** `<term> plus <term>` adds numbers. A term is a path, a number, a `count of` or a `sum of`. A `whose` ends the terms, so `count of x whose n is m plus k is t` reads one way: `m plus k` is the condition's right side, and nothing is added to the count. To add to a count that has a `whose`, put the `count of` last: `k plus count of x whose n is m is t`. On the right side of a phrase, a `count of` or `sum of` takes no `whose` at all, because `x is count of y whose a is 1 and b is 2` could be one assertion with two conditions or two assertions. Count on the left and compare on the right.
 
-**[sentence.derived.compare]** A derived value only goes with `is`, `equals`, `is not`, `does not equal`, `is ... within`, `equals ... within`, `is at least`, `is at most`, `is more than`, `is less than` and `is between`. `count of approvers is empty` is written wrong.
+**[sentence.derived.elapsed]** `<unit> elapsed from <path> to <path>` is a number: the time from the first path to the second, in `seconds`, `minutes`, `hours`, `days` or `weeks`, which are 1, 60, 3600, 86400 and 604800 seconds. It isn't rounded, so 36 hours is `1.5` days. Each path is read as any other path in the sentence is, and `to` between them is a word of the grammar, so a field called `to` is written `.to`. Both values must be times as [time.format](semantics.md#compare_time) says, both RFC 3339 strings or both numbers, read as seconds. Anything else, and one string with one number, fails as `unusable`, a missing path as `absent` and a `null` one as `null`, and the worst of the two wins, as for `is before`. If the second time is before the first there is no sensible number, so the check fails as `value`. Two equal times are 0. The phrases that follow are the ones [sentence.derived.compare](#derived-values) lists:
+
+```yaml
+within_limit: days elapsed from first_seen_ts to now_ts is less than $params.max_days named by severity
+```
+
+It only stands alone at the start of an assertion, on its own line of a list under `assert` or after the `for` line. Added to something with `plus`, in a `whose`, after `every` or `some`, on the right of a phrase, or in a `from` line, it's written wrong, with `isn't supported yet`. Months and years have no fixed length, so `months elapsed from` and `years elapsed from` don't read as this phrase.
+
+**[sentence.derived.compare]** A derived value only goes with `is`, `equals`, `is not`, `does not equal`, `is ... within`, `equals ... within`, `is at least`, `is at most`, `is more than`, `is less than` and `is between`. `count of approvers is empty` is written wrong, and so is `days elapsed from a to b is empty`.
 
 ## The `for` line
 

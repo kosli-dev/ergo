@@ -7,12 +7,13 @@
 ; a YAML list holds one assertion per item and means the same.
 check             = assertion *(WS "and" WS assertion)
 
-assertion         = plain / quantified / derived-assertion
+assertion         = plain / quantified / derived-assertion / elapsed-assertion
 plain             = path WS phrase
 quantified        = quantifier WS path [WS whose] [if-any] WS phrase
 quantifier        = "every" / "some"
 if-any            = "," WS "if any,"
 derived-assertion = derived-left WS compare-phrase
+elapsed-assertion = elapsed WS compare-phrase
 
 ; A for: line walks one or two lists and names each item.
 for-line          = for-item ["," WS for-item]
@@ -29,6 +30,8 @@ condition         = path WS phrase / derived WS compare-phrase
 ; Derived values: count of, sum of, and terms added with plus.
 ; Only the last term on the left can carry a whose, and none on the right.
 derived           = ("count" / "sum") WS "of" WS path
+; An elapsed time stands alone: it takes no whose and joins no plus.
+elapsed           = ("seconds" / "minutes" / "hours" / "days" / "weeks") WS "elapsed" WS "from" WS path WS "to" WS path
 term              = right-path / derived / number
 derived-left      = derived [WS whose]
                   / 1*(term WS "plus" WS) (term / derived WS whose)
