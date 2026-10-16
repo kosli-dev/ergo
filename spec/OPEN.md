@@ -20,6 +20,22 @@ Decided on 2026-10-16: the spec will take the Rust model's definition, a plain J
 
 It's put off until a control needs logic that no phrase covers. On 2026-10-16, pr-reviewer was the only known policy with custom operators, and six of its seven run as sentences. The seventh, `contains_all`, is `contains all of` with a field of the subject, which waits on the same support as DEV-0406's `does not contain`. The next candidate is a time at most a number of days before another, with the days looked up by a field of the subject ([#140](https://github.com/kosli-dev/ergo/issues/140), [#63](https://github.com/kosli-dev/ergo/issues/63)), which DEV-0401, 0402, 0705 and 0802 work out in Rego today. Until then, custom operators keep working in the [syntax of syntax.md](syntax.md), so that syntax can't be removed while a policy still needs one. Allowing them inside `all` and `any` is a separate question for Rego, which can't recurse.
 
+### Where sentences fall short
+
+When a policy needs something no sentence can say, the first question is whether it should be a phrase. These gaps are guesses as of 2026-10-16. Only date arithmetic, version order and reshaped evidence show up in the corpus.
+
+| Gap                            | Example                                                                | Where it belongs                                                                |
+| ------------------------------ | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Time arithmetic                | fixed within 30 days of `first_seen`, ran in the last 7 days           | a phrase, because many controls need it                                         |
+| Arithmetic beyond `plus`       | coverage of at least 80% (`covered / total`), a difference, an average | more derived values next to `count of`, `sum of` and `plus`                     |
+| Uniqueness and distinct counts | no two approvers are the same user, at least 2 distinct reviewers      | a derived value, like `count of distinct approvers.username`                    |
+| Orderings of one domain        | version order, an address in a network range, a path matching a glob   | a custom operator, because each has its own rules and isn't shared widely       |
+| Decoding                       | base64 payloads, signed tokens, a hash matching some content           | before ergo, when the evidence is attested, so the report still shows the facts |
+| Recursion                      | dependencies of dependencies, chains of approvals                      | before ergo. Rego can't recurse, so a custom operator can't either              |
+| Rules across subjects          | at most 5% of deployments failed, every service deployed this week     | something on the requirement, since a check sees one subject at a time          |
+
+A gap that many controls share becomes a phrase or a derived value, which stays readable, runs the same everywhere and fails closed in one place. A gap that belongs to one domain becomes a custom operator, with a definition that says what it means. Parsing and decoding stay out of ergo, because an operator that decodes hides the evidence from the report as much as Rego that runs before ergo does.
+
 ## Derived values
 
 Derived values on a side of `compare` (`count`, `sum`, `add`, `literal`, and `within`, from [#173](https://github.com/kosli-dev/ergo/issues/173)) have an entry in `policy/schema.json` and a rule in `syntax.md`, `compare.derived`. They have no rules in `semantics.md` and no cases yet, so what a derived side reads, when it fails and how it's shown in `expression` and `inputs` is only in [REFERENCE.md](../REFERENCE.md#derived-values).
