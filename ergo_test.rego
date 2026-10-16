@@ -2021,6 +2021,20 @@ test_a_number_out_of_range_anywhere_in_a_check_fails_it if {
 	rendered({}, {"op": "in", "path": ["n"], "values": ["a", 1e400]}) == `n in ["a", <number out of range>]`
 }
 
+test_a_number_a_float_cannot_hold_in_the_input_is_compared_exactly if {
+	compare := {"op": "compare", "left": ["a"], "cmp": "eq", "right": ["b"]}
+	[verdict({"id": 1, "a": 1e400, "b": 1e400}, compare), verdict({"id": 1, "a": 1e400, "b": 2e400}, compare)] == [true, false]
+	[verdict({"id": 1, "a": 1e-400, "b": 0}, compare), cause_of({"id": 1, "a": 1e-400, "b": 0}, compare)] == [false, "value"]
+}
+
+test_a_number_a_float_cannot_hold_read_from_the_params_is_compared_exactly if {
+	check := {"op": "equals", "path": ["n"], "value": {"ref": ["$$params", "n"]}}
+	big := row_in({}, {"id": 1, "n": 1e400}, check) with data.params as {"n": 1e400}
+	small := row_in({}, {"id": 1, "n": 0}, check) with data.params as {"n": 1e-400}
+	[[big.passed, big.cause], [small.passed, small.cause]] == [[true, "satisfied"], [false, "value"]]
+	json.marshal(refs_in({}, {"id": 1, "n": 1e400}, check)) == `[{"name":"$params.n","value":1e400}]` with data.params as {"n": 1e400}
+}
+
 test_a_number_at_the_edge_of_a_float_still_works if {
 	verdict({"id": 1, "n": 1.7976931348623157e308}, {"op": "equals", "path": ["n"], "value": 1.7976931348623157e308}) == true
 	verdict({"id": 1, "n": 2.2250738585072014e-308}, {"op": "equals", "path": ["n"], "value": 2.2250738585072014e-308}) == true
