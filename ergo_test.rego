@@ -9659,13 +9659,31 @@ _list_same_as_params(words, suffix, right) if {
 	_list_verdicts(concat("", ["x ", words, " y", suffix]), _list_with_field(_list_lefts, right), {}) == _list_verdicts(concat("", ["x ", words, " $params.k", suffix]), _list_lefts, _list_params(right))
 }
 
-test_a_field_after_a_list_phrase_gives_the_verdict_and_cause_of_the_same_list_read_from_params if {
-	every _, words in _list_phrases {
-		every right in _list_rights {
-			_list_same_as_params(words, "", right)
-		}
+_list_same_as_params_for_every_right(words) if {
+	every right in _list_rights {
+		_list_same_as_params(words, "", right)
 	}
 }
+
+test_the_list_phrases_compared_with_params_are_every_list_phrase if {
+	{w | some _, w in _list_phrases} == {"is in", "is not in", "contains", "does not contain", "contains all of", "contains none of", "matches", "does not match"}
+}
+
+test_a_field_after_is_in_gives_the_verdict_and_cause_of_the_same_list_read_from_params if _list_same_as_params_for_every_right("is in")
+
+test_a_field_after_is_not_in_gives_the_verdict_and_cause_of_the_same_list_read_from_params if _list_same_as_params_for_every_right("is not in")
+
+test_a_field_after_contains_gives_the_verdict_and_cause_of_the_same_list_read_from_params if _list_same_as_params_for_every_right("contains")
+
+test_a_field_after_does_not_contain_gives_the_verdict_and_cause_of_the_same_list_read_from_params if _list_same_as_params_for_every_right("does not contain")
+
+test_a_field_after_contains_all_of_gives_the_verdict_and_cause_of_the_same_list_read_from_params if _list_same_as_params_for_every_right("contains all of")
+
+test_a_field_after_contains_none_of_gives_the_verdict_and_cause_of_the_same_list_read_from_params if _list_same_as_params_for_every_right("contains none of")
+
+test_a_field_after_matches_gives_the_verdict_and_cause_of_the_same_list_read_from_params if _list_same_as_params_for_every_right("matches")
+
+test_a_field_after_does_not_match_gives_the_verdict_and_cause_of_the_same_list_read_from_params if _list_same_as_params_for_every_right("does not match")
 
 test_a_path_that_cant_be_read_after_a_list_phrase_gives_the_cause_of_the_same_path_in_params if {
 	every _, words in _list_phrases {
