@@ -3610,6 +3610,8 @@ test_a_value_the_op_cannot_use_fails_as_unusable_and_a_filter_cannot_rule_the_su
 		{"op": "equals", "path": ["n"], "value": "5"},
 		{"op": "in", "path": ["n"], "values": ["5"]},
 		{"op": "in", "path": ["n"], "values": ["5", null]},
+		{"op": "includes", "path": ["l"], "value": "1"},
+		{"op": "excludes", "path": ["l"], "values": ["1"]},
 		{"op": "matches_any", "path": ["n"], "patterns": ["x"]},
 		{"op": "not_matches_any", "path": ["n"], "patterns": ["x"]},
 		{"op": "includes", "path": ["s"], "value": "x"},
@@ -4866,7 +4868,7 @@ test_ref_shaped_items_under_a_literal_or_read_from_params_are_data_not_refs if {
 	top := {"params": {"nut": "nuts", "list": [shaped]}}
 	every values in [{"literal": [shaped]}, {"ref": ["$$input", "params", "list"]}] {
 		check := {"op": "excludes", "path": ["xs"], "values": values}
-		row_in(top, {"id": 1, "xs": ["nuts"]}, check).passed == true
+		row_in(top, {"id": 1, "xs": [{"nut": "nuts"}]}, check).passed == true
 		[row_in(top, {"id": 1, "xs": [shaped]}, check).passed, row_in(top, {"id": 1, "xs": [shaped]}, check).cause] == [false, "value"]
 	}
 }
@@ -9839,8 +9841,8 @@ test_each_list_phrase_with_a_field_fails_closed_on_a_missing_null_or_wrong_typed
 	every pair in [
 		["x is in y", "a", ["a"], 3, ["absent", "null", "unusable", "absent", "null", "unusable"]],
 		["x is not in y", "a", ["a"], 3, ["absent", "null", "unusable", "absent", "null", "unusable"]],
-		["x contains y", ["a"], "a", 3, ["absent", "null", "unusable", "absent", "null", "value"]],
-		["x does not contain y", ["a"], "a", 3, ["absent", "null", "unusable", "absent", "null", "satisfied"]],
+		["x contains y", ["a"], "a", 3, ["absent", "null", "unusable", "absent", "null", "unusable"]],
+		["x does not contain y", ["a"], "a", 3, ["absent", "null", "unusable", "absent", "null", "unusable"]],
 		["x contains all of y", ["a"], ["a"], 3, ["absent", "null", "unusable", "absent", "null", "unusable"]],
 		["x contains none of y", ["a"], ["a"], 3, ["absent", "null", "unusable", "absent", "null", "unusable"]],
 		["x matches y", "a", ["^a"], 3, ["absent", "null", "unusable", "absent", "null", "unusable"]],

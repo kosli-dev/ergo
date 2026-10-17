@@ -69,17 +69,26 @@
       {
         "description": "passes on 1.0, because numbers compare by value",
         "rules": ["contains.pass", "value.equal"],
-        "input": {"things": [{"id": "t1", "x": ["1", 1.0]}]},
+        "input": {"things": [{"id": "t1", "x": [2, 1.0]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["1", 1]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": [2, 1]}]}
         ]
       },
       {
-        "description": "fails as value on the string \"1\"",
+        "description": "fails as unusable on a list whose items have more than one type, even when it holds the number",
+        "rules": ["contains.fail"],
+        "input": {"things": [{"id": "t1", "x": ["1", 1]}, {"id": "t2", "x": [1, null]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["1", 1]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": [1, null]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on the string \"1\"",
         "rules": ["contains.fail", "value.equal"],
         "input": {"things": [{"id": "t1", "x": ["1"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["1"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["1"]}]}
         ]
       }
     ]
@@ -98,11 +107,11 @@
         "expressions": {"s": {"c": "contains(x, [\"a\", \"b\"])"}}
       },
       {
-        "description": "fails as value when the list only holds its items",
+        "description": "fails as unusable when the list only holds its items, which have another type than the list",
         "rules": ["contains.value", "contains.fail"],
         "input": {"things": [{"id": "t1", "x": ["a", "b"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["a", "b"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["a", "b"]}]}
         ]
       }
     ]
@@ -149,6 +158,14 @@
         "input": {"things": [{"id": "t1", "x": []}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": []}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on a list of another type, which can't hold it",
+        "rules": ["contains.fail"],
+        "input": {"things": [{"id": "t1", "x": [1, 2]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": [1, 2]}]}
         ]
       },
       {
@@ -248,6 +265,22 @@
     ]
   },
   {
+    "description": "excludes values read through a ref that holds values of mixed types",
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "excludes", "path": ["x"], "values": {"ref": ["$$params", "banned"]}}}}}},
+    "params": {"banned": ["a", 1]},
+    "cases": [
+      {
+        "description": "fails as unusable, whatever the list holds",
+        "rules": ["contains.value"],
+        "input": {"things": [{"id": "t1", "x": ["b"]}, {"id": "t2"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["b"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
     "description": "includes and excludes written wrong",
     "policy": {
       "subjects": {
@@ -263,6 +296,7 @@
             "both": {"op": "includes", "path": ["x"], "value": "a", "values": ["a"]},
             "empty_values": {"op": "includes", "path": ["x"], "values": []},
             "excludes_both": {"op": "excludes", "path": ["x"], "value": "a", "values": ["a"]},
+            "mixed_types": {"op": "includes", "path": ["x"], "values": ["a", 1]},
             "neither": {"op": "includes", "path": ["x"]},
             "not_a_list": {"op": "excludes", "path": ["x"], "values": "a"}
           }
@@ -282,11 +316,12 @@
             "passed": false,
             "cause": "value",
             "inputs": [
-              {"name": "count(checks)", "value": 5},
+              {"name": "count(checks)", "value": 6},
               {"name": "require", "value": "every"},
               {"name": "checks.both", "value": ["both value and values"]},
               {"name": "checks.empty_values", "value": ["empty values"]},
               {"name": "checks.excludes_both", "value": ["both value and values"]},
+              {"name": "checks.mixed_types", "value": ["values of mixed types"]},
               {"name": "checks.neither", "value": ["missing value or values"]},
               {"name": "checks.not_a_list", "value": ["invalid values"]}
             ]
@@ -294,6 +329,7 @@
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "both", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": ["a"]}]},
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "empty_values", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": ["a"]}]},
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "excludes_both", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": ["a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "mixed_types", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": ["a"]}]},
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "neither", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": ["a"]}]},
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "not_a_list", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": ["a"]}]}
         ],

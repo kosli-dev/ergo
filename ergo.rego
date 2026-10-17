@@ -1701,6 +1701,7 @@ _leaf_op_passed("excludes", check, subj) if {
 	v := value_at(subj, check.path)
 	is_array(v)
 	want := arg(check.value)
+	_items_fit(v, [want])
 	not want in v
 }
 
@@ -1708,6 +1709,7 @@ _leaf_op_passed("includes", check, subj) if {
 	v := value_at(subj, check.path)
 	is_array(v)
 	want := arg(check.value)
+	_items_fit(v, [want])
 	want in v
 }
 
@@ -1716,6 +1718,7 @@ _leaf_op_passed("excludes", check, subj) if {
 	is_array(v)
 	wants := _wants(check.values)
 	_wanted(wants)
+	_items_fit(v, wants)
 	every want in wants {
 		not want in v
 	}
@@ -1726,6 +1729,7 @@ _leaf_op_passed("includes", check, subj) if {
 	is_array(v)
 	wants := _wants(check.values)
 	_wanted(wants)
+	_items_fit(v, wants)
 	every want in wants {
 		want in v
 	}
@@ -1960,6 +1964,22 @@ _unusable(leaf, x) if {
 }
 
 _unusable(leaf, x) if {
+	leaf.op in {"includes", "excludes"}
+	v := _found(x, leaf.path)
+	is_array(v)
+	not _items_fit(v, _leaf_wants(leaf))
+}
+
+_leaf_wants(leaf) := [arg(leaf.value)] if "value" in object.keys(leaf)
+
+_leaf_wants(leaf) := vals if {
+	vals := _wants(leaf.values)
+	_value_list(vals)
+}
+
+_items_fit(items, wants) if not _mixed_types(array.concat(items, wants))
+
+_unusable(leaf, x) if {
 	leaf.op in {"empty_string_or_list", "not_empty_string_or_list"}
 	v := _found(x, leaf.path)
 	not _string_or_list(v)
@@ -2023,6 +2043,25 @@ _unusable(leaf, x) if {
 	leaf.cmp in {"includes", "excludes", "includes_all", "excludes_all"}
 	v := _found(x, leaf.left)
 	not is_array(v)
+}
+
+_unusable(leaf, x) if {
+	_list_cmp(leaf)
+	leaf.cmp in {"includes", "excludes"}
+	l := _found(x, leaf.left)
+	r := _found(x, leaf.right)
+	is_array(l)
+	not _items_fit(l, [r])
+}
+
+_unusable(leaf, x) if {
+	_list_cmp(leaf)
+	leaf.cmp in {"includes_all", "excludes_all"}
+	l := _found(x, leaf.left)
+	r := _found(x, leaf.right)
+	is_array(l)
+	is_array(r)
+	not _items_fit(l, r)
 }
 
 _unusable(leaf, x) if {
@@ -2140,18 +2179,21 @@ _cmp("not_in", l, r) if {
 _cmp("includes", l, r) if {
 	is_array(l)
 	r != null
+	_items_fit(l, [r])
 	r in l
 }
 
 _cmp("excludes", l, r) if {
 	is_array(l)
 	r != null
+	_items_fit(l, [r])
 	not r in l
 }
 
 _cmp("includes_all", l, r) if {
 	is_array(l)
 	_wanted(r)
+	_items_fit(l, r)
 	every want in r {
 		want in l
 	}
@@ -2160,6 +2202,7 @@ _cmp("includes_all", l, r) if {
 _cmp("excludes_all", l, r) if {
 	is_array(l)
 	_wanted(r)
+	_items_fit(l, r)
 	every want in r {
 		not want in l
 	}
@@ -2214,6 +2257,7 @@ _list_right_usable(cmp, _) if cmp in {"includes", "excludes"}
 _list_right_usable(cmp, r) if {
 	cmp in {"includes_all", "excludes_all"}
 	_wanted(r)
+	not _mixed_types(r)
 }
 
 _list_right_usable(cmp, r) if {
@@ -2455,7 +2499,7 @@ _values_problem(node) := ({"invalid values" |
 	not _is_ref(node.values)
 	not _malformed(node.values)
 } | {"values of mixed types" |
-	node.op in {"in", "not_in"}
+	node.op in {"in", "not_in", "includes", "excludes"}
 	vals := _written(node.values)
 	_value_list(vals)
 	_mixed_types([_written(w) | some w in vals; not _is_ref(w)])
@@ -2711,7 +2755,7 @@ _node_param_broken(node) if {
 }
 
 _node_param_broken(node) if {
-	node.op in {"in", "not_in"}
+	node.op in {"in", "not_in", "includes", "excludes"}
 	vals := _wants(node.values)
 	_value_list(vals)
 	_mixed_types(vals)
