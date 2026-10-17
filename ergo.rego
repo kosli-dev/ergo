@@ -1736,6 +1736,7 @@ _leaf_op_passed("in", check, subj) if {
 	v != null
 	vals := _wants(check.values)
 	_value_list(vals)
+	_fits_list(v, vals)
 	some want in vals
 	want == v
 }
@@ -1753,6 +1754,7 @@ _leaf_op_passed("not_in", check, subj) if {
 	v != null
 	vals := _wants(check.values)
 	_value_list(vals)
+	_fits_list(v, vals)
 	every want in vals {
 		want != v
 	}
@@ -1973,6 +1975,43 @@ _unusable(leaf, x) if {
 }
 
 _unusable(leaf, x) if {
+	leaf.op == "equals"
+	v := _found(x, leaf.path)
+	w := arg(leaf.value)
+	w != null
+	type_name(v) != type_name(w)
+}
+
+_unusable(leaf, x) if {
+	leaf.op in {"in", "not_in"}
+	v := _found(x, leaf.path)
+	vals := _wants(leaf.values)
+	_value_list(vals)
+	not _fits_list(v, vals)
+}
+
+_unusable(leaf, x) if {
+	_list_cmp(leaf)
+	leaf.cmp in {"in", "not_in"}
+	l := _found(x, leaf.left)
+	r := _found(x, leaf.right)
+	is_array(r)
+	not _fits_list(l, r)
+}
+
+_fits_list(v, vals) if {
+	every w in vals {
+		_fits(v, w)
+	}
+}
+
+_fits(_, w) if w == null
+
+_fits(v, w) if type_name(v) == type_name(w)
+
+_mixed_types(vals) if count({type_name(w) | some w in vals; w != null}) > 1
+
+_unusable(leaf, x) if {
 	_list_cmp(leaf)
 	leaf.cmp in {"matches_any", "not_matches_any"}
 	v := _found(x, leaf.left)
@@ -2087,12 +2126,14 @@ _cmp("ends_with", l, r) if {
 _cmp("in", l, r) if {
 	l != null
 	is_array(r)
+	_fits_list(l, r)
 	l in r
 }
 
 _cmp("not_in", l, r) if {
 	l != null
 	is_array(r)
+	_fits_list(l, r)
 	not l in r
 }
 
@@ -2165,6 +2206,7 @@ _list_flawed(leaf, x) if count(_list_flaw(leaf, x)) > 0
 _list_right_usable(cmp, r) if {
 	cmp in {"in", "not_in"}
 	is_array(r)
+	not _mixed_types(r)
 }
 
 _list_right_usable(cmp, _) if cmp in {"includes", "excludes"}
@@ -2405,14 +2447,19 @@ _range_order_problem(node) := {"min above max" |
 	lo > hi
 }
 
-_values_problem(node) := {"invalid values" |
+_values_problem(node) := ({"invalid values" |
 	node.op in {"in", "not_in", "includes", "excludes"}
 	"values" in object.keys(node)
 	not _value_list(_written(node.values))
 	not is_set(_written(node.values))
 	not _is_ref(node.values)
 	not _malformed(node.values)
-} | {"empty values" |
+} | {"values of mixed types" |
+	node.op in {"in", "not_in"}
+	vals := _written(node.values)
+	_value_list(vals)
+	_mixed_types([_written(w) | some w in vals; not _is_ref(w)])
+}) | {"empty values" |
 	node.op in {"includes", "excludes"}
 	_value_list(_written(node.values))
 	count(_written(node.values)) == 0
@@ -2661,6 +2708,13 @@ _node_param_broken(node) if {
 	_is_ref(node.values)
 	v := arg(node.values)
 	not _value_list(v)
+}
+
+_node_param_broken(node) if {
+	node.op in {"in", "not_in"}
+	vals := _wants(node.values)
+	_value_list(vals)
+	_mixed_types(vals)
 }
 
 _node_param_broken(node) if {

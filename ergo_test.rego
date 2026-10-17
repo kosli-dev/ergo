@@ -3607,6 +3607,9 @@ kind_filter(check) := [rep.requirements.s.status, [r.cause | some r in rows_for(
 test_a_value_the_op_cannot_use_fails_as_unusable_and_a_filter_cannot_rule_the_subject_out_with_it if {
 	every check in [
 		{"op": "range", "path": ["s"], "min": 0, "max": 9},
+		{"op": "equals", "path": ["n"], "value": "5"},
+		{"op": "in", "path": ["n"], "values": ["5"]},
+		{"op": "in", "path": ["n"], "values": ["5", null]},
 		{"op": "matches_any", "path": ["n"], "patterns": ["x"]},
 		{"op": "not_matches_any", "path": ["n"], "patterns": ["x"]},
 		{"op": "includes", "path": ["s"], "value": "x"},
@@ -3631,8 +3634,8 @@ test_a_value_the_op_cannot_use_fails_as_unusable_and_a_filter_cannot_rule_the_su
 
 test_a_value_ergo_could_use_that_does_not_pass_stays_value if {
 	every check in [
-		{"op": "equals", "path": ["n"], "value": "5"},
-		{"op": "in", "path": ["n"], "values": ["5"]},
+		{"op": "equals", "path": ["n"], "value": 6},
+		{"op": "in", "path": ["n"], "values": [6, 7]},
 		{"op": "non_empty_string", "path": ["n"]},
 		{"op": "all", "path": ["e"], "check": {"op": "present", "path": []}},
 		{"op": "any", "path": ["e"], "check": {"op": "present", "path": []}},
@@ -4621,10 +4624,10 @@ test_a_filter_that_reads_a_value_that_does_not_match_leaves_the_subject_out_of_s
 	rows_for(rep, "s", "$applies")[0].cause == "value"
 }
 
-test_a_filter_value_of_the_wrong_type_leaves_the_subject_out_of_scope if {
+test_a_filter_value_of_the_wrong_type_fails_the_requirement_instead_of_leaving_the_subject_out if {
 	rep := report({"rounds": [{"id": "r1", "degraded": "yes"}]}, degraded_req("every"))
-	rep.requirements.s.status == "not_applicable"
-	rows_for(rep, "s", "$applies")[0].cause == "value"
+	rep.requirements.s.status == "not_met"
+	rows_for(rep, "s", "$applies")[0].cause == "unusable"
 }
 
 test_a_subject_ruled_out_by_one_filter_still_fails_the_requirement_when_another_filter_cannot_be_read if {
@@ -8551,12 +8554,12 @@ test_a_phrase_lists_its_longer_wording_first_because_finding_a_phrase_never_goes
 	}
 }
 
-test_is_not_one_of_passes_on_any_value_that_is_there_and_not_listed_a_value_of_another_type_included if {
+test_is_not_one_of_passes_on_a_value_of_the_listed_type_that_is_not_listed_and_fails_as_unusable_on_another_type if {
 	doc := {"things": [{"id": "a", "x": "dev"}, {"id": "b", "x": "prod"}, {"id": "c", "x": 5}, {"id": "d", "x": null}, {"id": "e"}]}
 	[[r[0], r[2]] | some r in _sentence_rows({"v": `x is not one of "prod", "staging"`, "p": "x is not in $params.blocked"}, doc, {"blocked": ["prod"]})] == [
 		["p", "satisfied"], ["v", "satisfied"],
 		["p", "value"], ["v", "value"],
-		["p", "satisfied"], ["v", "satisfied"],
+		["p", "unusable"], ["v", "unusable"],
 		["p", "null"], ["v", "null"],
 		["p", "absent"], ["v", "absent"],
 	]
@@ -9834,8 +9837,8 @@ test_a_path_that_cant_be_read_after_a_list_phrase_gives_the_cause_of_the_same_pa
 
 test_each_list_phrase_with_a_field_fails_closed_on_a_missing_null_or_wrong_typed_side if {
 	every pair in [
-		["x is in y", "a", ["a"], 3, ["absent", "null", "value", "absent", "null", "unusable"]],
-		["x is not in y", "a", ["a"], 3, ["absent", "null", "satisfied", "absent", "null", "unusable"]],
+		["x is in y", "a", ["a"], 3, ["absent", "null", "unusable", "absent", "null", "unusable"]],
+		["x is not in y", "a", ["a"], 3, ["absent", "null", "unusable", "absent", "null", "unusable"]],
 		["x contains y", ["a"], "a", 3, ["absent", "null", "unusable", "absent", "null", "value"]],
 		["x does not contain y", ["a"], "a", 3, ["absent", "null", "unusable", "absent", "null", "satisfied"]],
 		["x contains all of y", ["a"], ["a"], 3, ["absent", "null", "unusable", "absent", "null", "unusable"]],
@@ -9864,7 +9867,7 @@ test_a_field_after_a_list_phrase_passes_and_fails_by_what_the_list_holds if {
 	]
 	every pair in [
 		["x is in l", [true, false, false, false]],
-		["x is not in l", [false, true, true, true]],
+		["x is not in l", [false, true, false, false]],
 		["x contains w", [false, false, false, true]],
 		["x does not contain w", [false, false, true, false]],
 		["x contains all of l", [false, false, true, false]],

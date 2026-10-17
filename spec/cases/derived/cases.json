@@ -596,7 +596,62 @@
         ]
       },
       {
-        "description": "leaves out an item whose field is another value, even of another type",
+        "description": "leaves out an item whose field is another value",
+        "rules": [
+          "sentence.derived.count",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs",
+          "tally.whose",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "findings": [
+                {
+                  "severity": "high"
+                },
+                {
+                  "severity": "low"
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count of findings whose severity is \"high\"",
+                "value": 1
+              },
+              {
+                "name": "findings[]",
+                "value": [
+                  {
+                    "severity": "high"
+                  },
+                  {
+                    "severity": "low"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when an item's field has another type than the value",
         "rules": [
           "sentence.derived.count",
           "tally.walk",
@@ -628,12 +683,12 @@
               "id": "r1"
             },
             "check": "c",
-            "passed": true,
-            "cause": "satisfied",
+            "passed": false,
+            "cause": "unusable",
             "inputs": [
               {
                 "name": "count of findings whose severity is \"high\"",
-                "value": 1
+                "value": null
               },
               {
                 "name": "findings[]",

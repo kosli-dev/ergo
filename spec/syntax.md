@@ -48,7 +48,7 @@ Draft 0.1. This file covers the syntax policies use today, where a check is a JS
 
 **[range.written_wrong]** A `min` or `max` that isn't a number or a ref is written `invalid min` or `invalid max`, and a `min` above `max` is written `min above max`.
 
-**[in.written_wrong]** `values` is a list, a literal holding a list, or a ref, and each item of a list can be a ref or a literal. Anything else is written `invalid values`.
+**[in.written_wrong]** `values` is a list, a literal holding a list, or a ref, and each item of a list can be a ref or a literal. Anything else is written `invalid values`. A list whose written values have more than one type, leaving refs and `null` aside, is written `values of mixed types`.
 
 **[patterns.written_wrong]** `patterns` is a list, a literal holding a list, or a ref, and each item of a list can be a ref or a literal. A `patterns` that isn't a list, or an item that isn't a string holding a valid pattern, is written `invalid patterns`, even when another pattern would match.
 

@@ -90,11 +90,11 @@
         ]
       },
       {
-        "description": "fails as value on a number, because a number isn't the text",
+        "description": "fails as unusable on a number, which has another type than the text",
         "rules": ["sentence.phrase.is", "sentence.value.scalar", "value.equal"],
         "input": {"things": [{"id": "t1", "x": 5}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 5}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 5}]}
         ]
       },
       {
@@ -129,11 +129,11 @@
         "expressions": {"s": {"c": "x is 1"}}
       },
       {
-        "description": "fails as value on the string \"1\"",
+        "description": "fails as unusable on the string \"1\"",
         "rules": ["sentence.phrase.is", "sentence.value.scalar", "value.equal"],
         "input": {"things": [{"id": "t1", "x": "1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "1"}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "1"}]}
         ]
       },
       {
@@ -168,11 +168,11 @@
         ]
       },
       {
-        "description": "fails as value on the string \"true\"",
+        "description": "fails as unusable on the string \"true\"",
         "rules": ["sentence.phrase.is", "sentence.value.scalar", "sentence.words"],
         "input": {"things": [{"id": "t1", "x": "true"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "true"}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "true"}]}
         ]
       }
     ]
@@ -628,11 +628,11 @@
         ]
       },
       {
-        "description": "fails as value on a number",
+        "description": "fails as unusable on a number",
         "rules": ["sentence.phrase.one_of", "sentence.value.list", "sentence.value.scalar"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 1}]}
         ]
       },
       {
@@ -698,11 +698,11 @@
         ]
       },
       {
-        "description": "fails as value on the string \"1\"",
+        "description": "fails as unusable on the string \"1\"",
         "rules": ["sentence.phrase.one_of", "sentence.value.list"],
         "input": {"things": [{"id": "t1", "x": "1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "1"}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "1"}]}
         ]
       }
     ]
@@ -732,11 +732,11 @@
         "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"]}]}}
       },
       {
-        "description": "fails as value on a number",
+        "description": "fails as unusable on a number",
         "rules": ["sentence.phrase.one_of", "sentence.value.path", "value.ref", "value.refs"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 1}]}
         ],
         "refs": {"s": {"c": [{"name": "$params.k", "value": ["a", "b"]}]}}
       },
@@ -1011,7 +1011,7 @@
         ]
       },
       {
-        "description": "fails as value on a number",
+        "description": "fails as unusable on a number",
         "rules": ["sentence.phrase.type", "non_empty_string.pass"],
         "input": {"things": [{"id": "t1", "x": 5}]},
         "results": [
@@ -3914,11 +3914,11 @@
         "expressions": {"s": {"c": "x is not one of \"prod\", \"staging\""}}
       },
       {
-        "description": "passes on a value of another type, since 5 isn't one of two strings",
+        "description": "fails as unusable on a value of another type than the strings",
         "rules": ["sentence.phrase.one_of", "not_in.pass"],
         "input": {"things": [{"id": "t1", "x": 5}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 5}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 5}]}
         ]
       },
       {
@@ -4037,19 +4037,19 @@
     "params": {"blocked": ["prod"]},
     "cases": [
       {
-        "description": "passes on a list, which isn't one of the strings",
+        "description": "fails as unusable on a list",
         "rules": ["sentence.phrase.one_of", "not_in.pass"],
         "input": {"things": [{"id": "t1", "x": ["prod"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["prod"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["prod"]}]}
         ]
       },
       {
-        "description": "passes on an object",
+        "description": "fails as unusable on an object",
         "rules": ["sentence.phrase.one_of", "not_in.pass"],
         "input": {"things": [{"id": "t1", "x": {"a": 1}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": {"a": 1}}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": {"a": 1}}]}
         ]
       }
     ]
@@ -4514,12 +4514,12 @@
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "not_in", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}, {"name": "y", "value": ["a"]}]},
           {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "all", "passed": false, "cause": "unusable", "inputs": [{"name": "l", "value": "a"}, {"name": "y", "value": ["a"]}]},
           {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "has", "passed": false, "cause": "unusable", "inputs": [{"name": "l", "value": "a"}, {"name": "w", "value": "a"}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "in", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 3}, {"name": "y", "value": ["a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "in", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 3}, {"name": "y", "value": ["a"]}]},
           {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "lacks", "passed": false, "cause": "unusable", "inputs": [{"name": "l", "value": "a"}, {"name": "w", "value": "a"}]},
           {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "match", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 3}, {"name": "p", "value": ["^a"]}]},
           {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "no_match", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 3}, {"name": "p", "value": ["^a"]}]},
           {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "none", "passed": false, "cause": "unusable", "inputs": [{"name": "l", "value": "a"}, {"name": "y", "value": ["a"]}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "not_in", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 3}, {"name": "y", "value": ["a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "not_in", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 3}, {"name": "y", "value": ["a"]}]},
           {"requirement": "s", "subject": {"type": "thing", "id": "t3"}, "check": "all", "passed": true, "cause": "satisfied", "inputs": [{"name": "l", "value": ["a"]}, {"name": "y", "value": ["a"]}]},
           {"requirement": "s", "subject": {"type": "thing", "id": "t3"}, "check": "has", "passed": true, "cause": "satisfied", "inputs": [{"name": "l", "value": ["a"]}, {"name": "w", "value": "a"}]},
           {"requirement": "s", "subject": {"type": "thing", "id": "t3"}, "check": "in", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}, {"name": "y", "value": ["a"]}]},
@@ -4617,6 +4617,37 @@
           {"cause": "absent", "check": "limit", "inputs": [{"name": "age", "value": 0}, {"name": "$params.max_days named by severity", "value": null}, {"name": "severity", "value": null}], "passed": false, "requirement": "s", "subject": {"id": 4, "type": "thing"}},
           {"cause": "satisfied", "check": "named", "failed_items": [], "inputs": [{"name": "$params.need", "value": {"b": 1}}, {"name": "kinds[]", "value": ["b"]}], "passed": true, "requirement": "s", "subject": {"id": 4, "type": "thing"}},
           {"cause": "unusable", "check": "own", "inputs": [{"name": "m named by k", "value": null}, {"name": "k", "value": 7}], "passed": false, "requirement": "s", "subject": {"id": 4, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is one of values of mixed types",
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"in": "x is one of \"a\", 1", "not_in": "x is not one of \"a\", 1"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, and says why",
+        "rules": ["in.values", "written_wrong", "written_wrong.row", "sentence.phrase.one_of"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 2}, {"name": "require", "value": "every"}, {"name": "checks.in", "value": ["values of mixed types"]}, {"name": "checks.not_in", "value": ["values of mixed types"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "in", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": "a"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "not_in", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": "a"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is one of a field holding values of mixed types",
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"in": "x is one of y", "not_in": "x is not one of y"}}}},
+    "cases": [
+      {
+        "description": "fails as unusable, even when the field is one of them",
+        "rules": ["sentence.phrase.field", "compare.list"],
+        "input": {"things": [{"id": "t1", "x": "a", "y": ["a", 1]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "in", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a"}, {"name": "y", "value": ["a", 1]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "not_in", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a"}, {"name": "y", "value": ["a", 1]}]}
         ]
       }
     ]
