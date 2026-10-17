@@ -26,11 +26,10 @@ NON_SYNTAX = [
 ]
 
 VOCABULARY = ["x", "y", "items", "status", "a_b", "k-1", "_id", "Count", "env", "sha", "pr", "commits", "owner"]
-GRAMMAR_WORDS = [
-    "a", "after", "an", "and", "as", "at", "before", "between", "count", "days", "each", "empty", "equal", "every",
-    "false", "first", "hours", "in", "item", "last", "less", "minutes", "more", "named", "not", "null", "of", "on",
-    "one", "or", "plus", "seconds", "some", "sum", "to", "true", "weeks", "whose", "within",
-]
+GRAMMAR_WORDS = re.findall(
+    r"`([a-z]+)`",
+    re.search(r"^\*\*\[sentence\.words\]\*\* [^:]*: (.*?)\. Without", open("spec/sentences.md").read(), re.M).group(1),
+)
 ASCII_POOL = [chr(c) for c in range(0x20, 0x7F) if chr(c) != "`"]
 OTHER_POOL = [0xE9, 0x65E5, 0x1F600, 0xFEFF, 0x2028, 0xA0]
 
@@ -200,17 +199,33 @@ def case_sentences():
 
     for path in sorted(glob.glob("spec/cases/*/cases.json")):
         for group in json.load(open(path)):
-            walk(group.get("policy", {}))
+            policy = group.get("policy", {})
+            walk(policy)
+            requirements = policy.get("requirements")
+            for requirement in requirements.values() if isinstance(requirements, dict) else []:
+                checks = requirement.get("checks") if isinstance(requirement, dict) else None
+                for check in checks.values() if isinstance(checks, dict) else []:
+                    if isinstance(check, str):
+                        found.append(("check", check))
     return found
+
+
+def bare_word_keys(node):
+    if node.name in ("first-key", "plain-right") and node.children and node.children[0].name == "bare-key":
+        if node.children[0].value in GRAMMAR_WORDS:
+            yield node.children[0].value
+    for child in node.children:
+        yield from bare_word_keys(child)
 
 
 def abnf_accepts(grammar, rules, text):
     for rule in rules:
         try:
-            grammar(rule).parse_all(text)
-            return True
+            tree = grammar(rule).parse_all(text.strip(" "))
         except ParseError:
-            pass
+            continue
+        if not any(bare_word_keys(tree)):
+            return True
     return False
 
 
