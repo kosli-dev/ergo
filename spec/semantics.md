@@ -389,6 +389,20 @@ A policy has two sections. `subjects` defines each kind of subject once, and `re
 
 **[well_formed]** The `$well_formed` row passes when the requirement can be read into the model, names a subject definition that can be read too, and has at least one check. Otherwise it fails with `value`, and the requirement is never met. Its inputs start with `count(checks)` and `require`. A requirement that's written wrong still gets its rows for its subjects.
 
+## Parts
+
+A subject can have parts: named paths inside itself, each with an alias, written as [syntax.md](syntax.md#parts) says. A part is a short name for a long path, so a policy that reads the same attestation in six checks writes where it is once.
+
+**[parts.swap]** A part's alias stands for its path inside the subject. A check that starts a path with the alias gives exactly the rows that the same check gives with the path written out in its place: the same `passed`, the same `cause` and the same values. A part that is missing, `null` or the wrong type fails the check as the full path would, with `absent`, `null`, `unusable`, or `not_an_object` when the subject isn't an object, and a `named by` in the path that can't be read fails it as it would there. Only the names differ. A row's `expression`, its `inputs` and the paths of its `failed_items` keep the alias, see [name.part](syntax.md#naming-a-path).
+
+**[parts.where]** An alias is read wherever a bare first key reads the subject (see [sentence.path.start](sentences.md#paths)): in the subject's checks, in the assertions of a `for` line and in a later item of it whose path starts at the subject, in the conditions of the subject's own `from` line, and in the conditions of a subject that narrows it. It isn't read where a bare first key reads an item instead: in a `whose`, and in the argument of a one-line `every` or `some`, see [sentence.argument.item](sentences.md#every-some-and-whose). There `cov` is a field of the item, as it is for a subject with no part called `cov`.
+
+**[parts.shadow]** An alias shadows a field of the subject with the same name, so `cov.x` reads the part and not the field `cov`. The dot in front of a first key, like `.cov`, only marks a field that is named like a word of the grammar. It doesn't get around an alias, so a field named like a part of the same subject can't be read by a sentence: name the part something else.
+
+**[parts.narrow]** A subject that narrows another keeps its parts, and can add its own. Its checks and its conditions read them like parts of its own, and the report lists them (see [report.subjects](#statuses)).
+
+**[parts.chain]** The alias of a chained subject's parent gives everything the parent has, its fields and its parts, so `artifact.pr_attestation.approvers` reads the part `pr_attestation` of `artifact`, and a `from` line can start from one: `from: artifact.pr_attestation.pull_requests`. A part is only reached through its subject. A bare `pr_attestation` in a check of the chained subject is its own field, and a part of the chained subject isn't one of the parent's.
+
 ## Scope
 
 **[scope.filters]** A subject is in scope when it passes every filter in its definition's `applies_to`. Each subject gets one `$applies` row when the definition has filters, and a subject that's out of scope gets no other rows, but its `$applies` row stays.
@@ -416,7 +430,7 @@ A policy has two sections. `subjects` defines each kind of subject once, and `re
 - `description`, the subject's description, or `""` when it has none or it isn't a string
 - `from`, how the subject is found, written as a `from` line: the line itself, printed the same way whatever spaces it was written with, or for a subject written as a list, its path followed by `whose` and its conditions, which are sorted by name. A naming step at the end of the path is shown as `named by each of <ref>` when its keys come from a ref, as `<each of "a", "b">` when they're listed, and as `<each as name>` when it has none. Anything with no sentence form is shown in angle brackets, never left out: a condition that can't be written as a sentence is shown as `<condition name>`, and `applies_to` that isn't an object as `<invalid applies_to>`. A subject without `from` reads the input field named like it. A `from` that is written wrong is `<invalid from>`.
 - `identified_by`, the path of the subject's id, or `null` when it has none, because the whole subject is its id. A subject that narrows another has the id of the one it narrows. An id that is written wrong is `<invalid identified_by>`.
-- `parts`, always `{}` for now
+- `parts`, every part the subject has, including the ones it keeps from a subject it narrows, by alias. Each is `{"from": ..., "identified_by": ...}`: `from` is the part's path written the way a sentence writes it, so `  dd.b ` is `dd.b` and `x[$params.k]` is `x named by $params.k`, and `identified_by` is the path of the part's id, or `null` when it has none. A part written as one line has no id. A part written wrong is listed as best it can be: `<invalid from>` for a path that can't be read and `<invalid identified_by>` for an id that can't, and a part that is neither a string nor an object has `<invalid from>` and `null`.
 
 A subject that is written wrong still has its entry.
 

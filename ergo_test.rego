@@ -10434,3 +10434,855 @@ test_a_filter_with_a_field_its_sentence_would_lose_is_shown_by_its_name if {
 	}
 	_listed({"d": {"from": ["ds"], "applies_to": filters}}, "d").d.from == "ds whose <condition a> and <condition b> and <condition c> and <condition d> and <condition e> and <condition f> and x exists"
 }
+
+_parts_policy(has, checks) := {
+	"subjects": {"round": {"from": "trail", "identified_by": "name", "has": has}},
+	"requirements": {"r": {"subject": "round", "checks": checks}},
+}
+
+_parts_doc(d) := {"trail": {"name": "t1", "dd": d}}
+
+_parts_report(has, checks, d) := ergo.report(_parts_doc(d), _parts_policy(has, checks), {})
+
+_parts_rows(rep, check) := [r | some r in rep.results; r.check == check]
+
+_parts_row(rep, check) := _parts_rows(rep, check)[0]
+
+_parts_problems(rep) := {i.name: i.value | some r in rep.results; r.check == "$well_formed"; some i in r.inputs}
+
+test_a_part_alias_stands_for_its_path_inside_the_subject if {
+	rep := _parts_report({"cov": "dd.b"}, {"c": "cov.x is 1"}, {"b": {"x": 1}})
+	row := _parts_row(rep, "c")
+	row.passed
+	row.cause == "satisfied"
+	row.inputs == [{"name": "cov.x", "value": 1}]
+	rep.requirements.r.checks.c.expression == "cov.x is 1"
+}
+
+test_a_part_can_be_a_path_to_one_value_and_a_check_can_read_the_alias_alone if {
+	rep := _parts_report({"ratio": "dd.b.ratio"}, {"c": "ratio is at least 2"}, {"b": {"ratio": 3}})
+	row := _parts_row(rep, "c")
+	row.passed
+	row.inputs == [{"name": "ratio", "value": 3}]
+}
+
+test_a_part_in_the_long_form_works_like_one_written_as_a_line if {
+	line := _parts_report({"cov": "dd.b"}, {"c": "cov.x is 1"}, {"b": {"x": 2}})
+	long := _parts_report({"cov": {"from": "dd.b", "identified_by": "id"}}, {"c": "cov.x is 1"}, {"b": {"x": 2}})
+	_parts_row(line, "c") == _parts_row(long, "c")
+	_parts_row(line, "c").cause == "value"
+}
+
+test_a_missing_part_fails_as_absent_like_its_full_path if {
+	rep := _parts_report({"cov": "dd.b"}, {"c": "cov.x is 1", "f": "dd.b.x is 1"}, {})
+	_parts_row(rep, "c").cause == "absent"
+	_parts_row(rep, "f").cause == "absent"
+	rep2 := _parts_report({"cov": "dd.b"}, {"c": "cov exists", "f": "dd.b exists"}, {})
+	_parts_row(rep2, "c").cause == "value"
+	_parts_row(rep2, "f").cause == "value"
+}
+
+test_a_null_part_fails_as_null_when_the_alias_stands_alone_and_absent_when_a_step_follows if {
+	rep := _parts_report({"cov": "dd.b"}, {"c": "cov.x is 1", "a": "cov is null", "f": "dd.b.x is 1"}, {"b": null})
+	_parts_row(rep, "c").cause == "absent"
+	_parts_row(rep, "f").cause == "absent"
+	_parts_row(rep, "a").passed
+}
+
+test_a_wrong_typed_part_fails_as_unusable_like_its_full_path if {
+	rep := _parts_report({"cov": "dd.b"}, {"c": "cov.x is 1", "f": "dd.b.x is 1"}, {"b": "text"})
+	_parts_row(rep, "c").cause == "unusable"
+	_parts_row(rep, "f").cause == "unusable"
+	rep2 := _parts_report({"cov": "dd.b"}, {"c": "cov.x is 1", "f": "dd.b.x is 1"}, "text")
+	_parts_row(rep2, "c").cause == "unusable"
+	_parts_row(rep2, "f").cause == "unusable"
+}
+
+test_a_part_of_a_subject_that_is_not_an_object_fails_as_not_an_object_like_its_full_path if {
+	policy := {
+		"subjects": {"s": {"from": "items", "has": {"cov": "dd.b"}}},
+		"requirements": {"r": {"subject": "s", "checks": {"c": "cov.x is 1", "f": "dd.b.x is 1"}}},
+	}
+	rep := ergo.report({"items": ["text", null, 5]}, policy, {})
+	causes := [r.cause | some r in rep.results; r.check == "c"]
+	causes == ["not_an_object", "not_an_object", "not_an_object"]
+	[r.cause | some r in rep.results; r.check == "f"] == causes
+}
+
+test_a_part_keeps_its_ref_step_so_an_unreadable_param_fails_it_like_its_full_path if {
+	has := {"by": "dd.m named by $params.k"}
+	alias := ergo.report(_parts_doc({"m": {"q": {"x": 1}}}), _parts_policy(has, {"c": "by.x is 1"}), {"k": 1})
+	full := ergo.report(_parts_doc({"m": {"q": {"x": 1}}}), _parts_policy({}, {"c": "dd.m named by $params.k.x is 1"}), {"k": 1})
+	_parts_row(alias, "c").cause == _parts_row(full, "c").cause
+	_parts_row(alias, "c").cause == "unusable"
+	alias.requirements.r.checks.c["$refs"] == full.requirements.r.checks.c["$refs"]
+	good := ergo.report(_parts_doc({"m": {"q": {"x": 1}}}), _parts_policy(has, {"c": "by.x is 1"}), {"k": "q"})
+	_parts_row(good, "c").passed
+}
+
+test_the_names_in_a_row_keep_the_alias_and_the_values_are_the_full_paths if {
+	has := {"lst": "dd.items", "pos": "dd.items[1]", "cov": "dd.b"}
+	checks := {
+		"every": "every lst.x is 1",
+		"count": "count of lst is 2",
+		"pos": "pos.x is 1",
+		"alone": "pos exists",
+		"two": "cov.x is at least cov.n",
+	}
+	d := {"items": [{"x": 1}, {"x": 2}], "b": {"x": 1, "n": 2}}
+	rep := _parts_report(has, checks, d)
+	_parts_row(rep, "every").inputs == [{"name": "lst[].x", "value": [1, 2]}]
+	_parts_row(rep, "every").failed_items == [{"cause": "value", "item": "item 2 of lst", "path": "lst[1].x", "value": 2}]
+	_parts_row(rep, "count").inputs == [{"name": "count of lst", "value": 2}, {"name": "lst[]", "value": [{"x": 1}, {"x": 2}]}]
+	_parts_row(rep, "pos").inputs == [{"name": "pos.x", "value": 2}]
+	_parts_row(rep, "alone").inputs == [{"name": "pos", "value": {"x": 2}}]
+	_parts_row(rep, "two").inputs == [{"name": "cov.x", "value": 1}, {"name": "cov.n", "value": 2}]
+	rep.requirements.r.checks.every.expression == "every lst.x is 1"
+	rep.requirements.r.checks.pos.expression == "pos.x is 1"
+}
+
+test_an_alias_shadows_a_field_of_the_subject_with_the_same_name if {
+	policy := _parts_policy({"cov": "dd.b"}, {"c": "cov.x is 1"})
+	rep := ergo.report({"trail": {"name": "t1", "cov": {"x": 2}, "dd": {"b": {"x": 1}}}}, policy, {})
+	_parts_row(rep, "c").passed
+}
+
+test_the_dot_in_front_of_a_field_does_not_get_around_an_alias if {
+	policy := _parts_policy({"cov": "dd.b"}, {"c": "cov.x is 1", "d": ".cov.x is 1", "e": "dd.b.x is 1 and .cov.x is 1"})
+	rep := ergo.report({"trail": {"name": "t1", "cov": {"x": 2}, "dd": {"b": {"x": 1}}}}, policy, {})
+	_parts_row(rep, "c").passed
+	_parts_row(rep, "d").passed
+	_parts_row(rep, "d").inputs == [{"name": "cov.x", "value": 1}]
+	_parts_row(rep, "e").passed
+}
+
+test_a_field_of_the_subject_with_no_alias_in_the_way_is_read_as_before if {
+	rep := _parts_report({"cov": "dd.b"}, {"c": "name is \"t1\""}, {})
+	_parts_row(rep, "c").passed
+}
+
+test_an_alias_does_not_apply_to_the_whose_or_the_argument_of_a_one_line_every if {
+	has := {"cov": "dd.b"}
+	d := {"b": {"x": 1}, "items": [{"cov": 5, "x": 5}, {"cov": 7, "x": 6}]}
+	rep := _parts_report(has, {"w": "every dd.items.x whose cov is at least 5 is at least 5", "a": "every dd.items.x equals cov"}, d)
+	_parts_row(rep, "w").passed
+	_parts_row(rep, "a").cause == "value"
+	_parts_row(rep, "a").failed_items == [{"cause": "value", "item": "item 2 of dd.items", "path": "dd.items[1].x", "value": 6}]
+}
+
+test_an_alias_works_on_the_subject_in_a_for_line_and_not_on_its_items if {
+	has := {"cov": "dd.b", "lst": "dd.items"}
+	checks := {
+		"c": {"for": "every lst as it", "assert": ["it.x is cov.x", "cov.s exists"]},
+		"d": {"for": "some lst whose y is 2 as it", "assert": "it.x is 1"},
+		"e": {"for": "every lst as it, every it.sub as s", "assert": "s is cov.x"},
+	}
+	d := {"b": {"x": 1, "s": "a"}, "items": [{"x": 1, "y": 2, "sub": [1]}, {"x": 1, "y": 3, "sub": [1, 1]}]}
+	rep := _parts_report(has, checks, d)
+	every c in ["c", "d", "e"] {
+		_parts_row(rep, c).passed
+	}
+	rep.requirements.r.checks.c.expression == "for every lst as it: it.x equals cov.x and cov.s exists"
+	_parts_row(rep, "c").inputs == [{"name": "cov.s", "value": "a"}, {"name": "cov.x", "value": 1}, {"name": "lst[]", "value": [{"sub": [1], "x": 1, "y": 2}, {"sub": [1, 1], "x": 1, "y": 3}]}]
+}
+
+test_a_for_line_alias_that_is_also_a_part_alias_is_written_wrong if {
+	has := {"cov": "dd.b"}
+	rep := _parts_report(has, {"c": {"for": "every dd.items as cov", "assert": "cov.x is 1"}}, {"items": [{"x": 1}]})
+	_parts_problems(rep)["checks.c"] == ["alias given twice"]
+	_parts_row(rep, "c").cause == "ill_formed"
+}
+
+test_a_whose_in_the_from_line_reads_the_subjects_parts if {
+	policy := {
+		"subjects": {"round": {"from": "rounds whose cov.x is 1", "identified_by": "id", "has": {"cov": "dd.b"}}},
+		"requirements": {"r": {"subject": "round", "checks": {"c": "cov.n is 2"}}},
+	}
+	rep := ergo.report({"rounds": [{"id": "a", "dd": {"b": {"x": 1, "n": 2}}}, {"id": "b", "dd": {"b": {"x": 2, "n": 2}}}, {"id": "c", "dd": {}}]}, policy, {})
+	[[r.subject.id, r.cause, r.inputs] | some r in rep.results; r.check == "$applies"] == [
+		["a", "satisfied", [{"name": "cov.x", "value": 1}]],
+		["b", "value", [{"name": "cov.x", "value": 2}]],
+		["c", "absent", [{"name": "cov.x", "value": null}]],
+	]
+	rep.requirements.r.checks["$applies"].expression == "cov.x is 1"
+	[r.subject.id | some r in rep.results; r.check == "c"] == ["a"]
+}
+
+_parts_narrow := {
+	"subjects": {
+		"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "dd.b"}},
+		"good round": {"from": "round whose cov.x is 1", "has": {"extra": "dd.e"}},
+		"old round": {"of": "round", "applies_to": {"f": {"op": "equals", "path": ["$cov", "x"], "value": 1}}, "has": {"extra": "dd.e"}},
+	},
+	"requirements": {
+		"r": {"subject": "good round", "checks": {"c": "cov.n is 2 and extra is 5"}},
+		"o": {"subject": "old round", "checks": {"c": "cov.n is 2 and extra is 5", "d": {"op": "equals", "path": ["$extra"], "value": 5}}},
+	},
+}
+
+_parts_rounds := {"rounds": [{"id": "a", "dd": {"b": {"x": 1, "n": 2}, "e": 5}}, {"id": "b", "dd": {"b": {"x": 2, "n": 2}, "e": 5}}]}
+
+test_a_subject_that_narrows_another_keeps_its_parts_and_can_add_its_own if {
+	rep := ergo.report(_parts_rounds, _parts_narrow, {})
+	rows := [[r.requirement, r.subject.id, r.check, r.passed] | some r in rep.results; r.check in {"c", "d"}]
+	rows == [["o", "a", "c", true], ["o", "a", "d", true], ["r", "a", "c", true]]
+	rep.subjects["good round"].parts == {
+		"cov": {"from": "dd.b", "identified_by": null},
+		"extra": {"from": "dd.e", "identified_by": null},
+	}
+	rep.subjects.round.parts == {"cov": {"from": "dd.b", "identified_by": null}}
+}
+
+test_re_adding_a_kept_alias_is_written_wrong_and_names_the_part if {
+	subjects := object.union(_parts_narrow.subjects, {"good round": {"from": "round whose cov.x is 1", "has": {"cov": "dd.q"}}})
+	rep := ergo.report(_parts_rounds, {"subjects": subjects, "requirements": {"r": {"subject": "good round", "checks": {"c": "cov.n is 2"}}}}, {})
+	_parts_problems(rep)["subjects.\"good round\".has.cov"] == ["alias given twice"]
+	rep2 := ergo.report(_parts_rounds, {"subjects": object.union(subjects, {"good round": {"of": "round", "has": {"cov": "dd.q"}}}), "requirements": {"r": {"subject": "good round", "checks": {"c": "cov.n is 2"}}}}, {})
+	_parts_problems(rep2)["subjects.\"good round\".has.cov"] == ["alias given twice"]
+}
+
+test_two_subjects_that_do_not_narrow_each_other_can_use_the_same_alias if {
+	subjects := {
+		"a": {"from": "xs", "has": {"cov": "p"}},
+		"b": {"from": "ys", "has": {"cov": "q"}},
+	}
+	policy := {"subjects": subjects, "requirements": {"ra": {"subject": "a", "checks": {"c": "cov is 1"}}, "rb": {"subject": "b", "checks": {"c": "cov is 2"}}}}
+	rep := ergo.report({"xs": [{"p": 1, "q": 2}], "ys": [{"p": 1, "q": 2}]}, policy, {})
+	[r.passed | some r in rep.results; r.check == "c"] == [true, true]
+}
+
+_parts_chain := {
+	"subjects": {
+		"artifact": {"from": "trail.artifacts named by $params.art", "identified_by": "fingerprint", "has": {"pra": "attestations.pr"}},
+		"pull request": {"from": "artifact.pra.pull_requests", "identified_by": "url", "has": {"rev": "reviews"}},
+	},
+	"requirements": {"r": {"subject": "pull request", "checks": {
+		"parent": "artifact.pra.name is \"w\"",
+		"own": "rev.count is 2",
+		"field": "pra is 1",
+		"every": "every artifact.pra.pull_requests.url is not empty",
+	}}},
+}
+
+_parts_chain_doc := {"trail": {"artifacts": {"web": {"fingerprint": "sha-1", "pra": 1, "attestations": {"pr": {"name": "w", "pull_requests": [
+	{"url": "pr/7", "reviews": {"count": 2}},
+	{"url": "pr/8", "reviews": {"count": 1}},
+]}}}}}}
+
+test_a_chained_subject_reads_its_parents_parts_and_starts_from_one if {
+	rep := ergo.report(_parts_chain_doc, _parts_chain, {"art": "web"})
+	[[r.subject.id, r.check, r.passed, r.cause] | some r in rep.results; r.check in {"parent", "own", "field", "every"}] == [
+		["pr/7", "every", true, "satisfied"], ["pr/7", "field", false, "absent"], ["pr/7", "own", true, "satisfied"], ["pr/7", "parent", true, "satisfied"],
+		["pr/8", "every", true, "satisfied"], ["pr/8", "field", false, "absent"], ["pr/8", "own", false, "value"], ["pr/8", "parent", true, "satisfied"],
+	]
+	_parts_row(rep, "parent").inputs == [{"name": "artifact.pra.name", "value": "w"}]
+	_parts_row(rep, "every").inputs == [{"name": "artifact.pra.pull_requests[].url", "value": ["pr/7", "pr/8"]}]
+	rep.subjects["pull request"].from == "artifact.pra.pull_requests"
+}
+
+test_a_part_is_only_reached_through_its_subject_so_a_bare_alias_in_a_chained_child_is_a_field if {
+	rep := ergo.report(_parts_chain_doc, _parts_chain, {"art": "web"})
+	_parts_row(rep, "field").inputs == [{"name": "pra", "value": null}]
+	_parts_row(rep, "field").cause == "absent"
+}
+
+test_a_chained_subject_cannot_use_its_parents_name_as_a_part_alias if {
+	subjects := object.union(_parts_chain.subjects, {"pull request": {"from": "artifact.pra.pull_requests", "identified_by": "url", "has": {"artifact": "reviews"}}})
+	rep := ergo.report(_parts_chain_doc, {"subjects": subjects, "requirements": _parts_chain.requirements}, {"art": "web"})
+	_parts_problems(rep)["subjects.\"pull request\".has.artifact"] == ["alias given twice"]
+}
+
+test_a_problem_in_a_parent_subjects_has_fails_the_requirements_of_its_chained_child if {
+	subjects := object.union(_parts_chain.subjects, {"artifact": {"from": "trail.artifacts named by $params.art", "identified_by": "fingerprint", "has": {"pra": 5}}})
+	rep := ergo.report(_parts_chain_doc, {"subjects": subjects, "requirements": _parts_chain.requirements}, {"art": "web"})
+	_parts_problems(rep)["subjects.artifact.has.pra"] == ["not a string or an object"]
+}
+
+test_a_chained_child_cannot_read_a_part_the_parent_does_not_have if {
+	policy := object.union(_parts_chain, {"requirements": {"r": {"subject": "pull request", "checks": {"c": "artifact.nope.name is \"w\""}}}})
+	rep := ergo.report(_parts_chain_doc, policy, {"art": "web"})
+	_parts_row(rep, "c").cause == "absent"
+}
+
+test_an_old_syntax_check_reads_a_part_as_a_dollar_alias_and_the_name_keeps_the_dollar if {
+	checks := {
+		"eq": {"op": "equals", "path": ["$cov", "x"], "value": 1},
+		"pr": {"op": "present", "path": ["$cov"]},
+		"ms": {"op": "missing", "path": ["$cov", "nope"]},
+		"cmp": {"op": "compare", "left": ["$cov", "x"], "right": ["$cov", "n"], "cmp": "lt"},
+	}
+	rep := _parts_report({"cov": "dd.b"}, checks, {"b": {"x": 1, "n": 2}})
+	every c in ["eq", "pr", "ms", "cmp"] {
+		_parts_row(rep, c).passed
+	}
+	_parts_row(rep, "eq").inputs == [{"name": "$cov.x", "value": 1}]
+	rep.requirements.r.checks.eq.expression == "$cov.x == 1"
+}
+
+test_an_old_syntax_check_reads_a_part_inside_all_any_any_of_and_a_substitute if {
+	has := {"cov": "dd.b", "lst": "dd.items"}
+	checks := {
+		"all": {"op": "all", "path": ["$lst"], "check": {"op": "equals", "path": ["x"], "value": 1}},
+		"any": {"op": "any", "path": ["$cov", "items"], "as": "i", "check": {"op": "equals", "path": ["$i"], "value": 2}},
+		"anyof": {"op": "any_of", "options": {"a": [{"op": "equals", "path": ["$cov", "x"], "value": 9}], "b": [{"op": "equals", "path": ["$cov", "x"], "value": 1}]}},
+		"sub": {"op": "equals", "path": ["$cov", "x"], "value": 9, "substitute": {"op": "equals", "path": ["$cov", "n"], "value": 2}},
+		"count": {"op": "compare", "left": {"count": ["$lst"]}, "right": {"literal": 2}, "cmp": "eq"},
+		"sum": {"op": "compare", "left": {"sum": ["$lst"], "each": ["n"]}, "right": ["$cov", "n"], "cmp": "gt"},
+		"add": {"op": "compare", "left": {"add": [["$cov", "x"], {"literal": 1}]}, "right": ["$cov", "n"], "cmp": "eq"},
+	}
+	d := {"b": {"x": 1, "n": 2, "items": [1, 2]}, "items": [{"x": 1, "n": 2}, {"x": 1, "n": 3}]}
+	rep := _parts_report(has, checks, d)
+	every c in ["all", "any", "anyof", "sub", "count", "sum", "add"] {
+		_parts_row(rep, c).passed
+	}
+	_parts_row(rep, "sub").cause == "substituted"
+	_parts_row(rep, "all").inputs == [{"name": "$lst[].x", "value": [1, 1]}]
+}
+
+test_an_old_syntax_custom_operator_reads_a_part_through_its_path_and_inputs if {
+	checks := {"c": {"op": "even", "path": ["$cov", "n"], "inputs": [["$cov", "n"]], "expression": "n is even"}}
+	rep := _parts_report({"cov": "dd.b"}, checks, {"b": {"n": 4}})
+	_parts_row(rep, "c").passed
+	_parts_row(rep, "c").inputs == [{"name": "$cov.n", "value": 4}]
+}
+
+test_an_old_syntax_alias_that_is_not_a_part_is_still_unknown if {
+	rep := _parts_report({"cov": "dd.b"}, {"c": {"op": "equals", "path": ["$other", "x"], "value": 1}}, {"b": {"x": 1}})
+	_parts_problems(rep)["checks.c"] == ["unknown alias $other"]
+}
+
+test_a_dollar_alias_in_a_check_of_a_subject_without_that_part_is_unknown if {
+	policy := {
+		"subjects": {"a": {"from": "xs", "has": {"cov": "p"}}, "b": {"from": "ys"}},
+		"requirements": {"r": {"subject": "b", "checks": {"c": {"op": "present", "path": ["$cov"]}}}},
+	}
+	rep := ergo.report({"xs": [], "ys": [{"p": 1}]}, policy, {})
+	_parts_problems(rep)["checks.c"] == ["unknown alias $cov"]
+}
+
+test_an_old_syntax_alias_given_by_as_or_each_as_cannot_also_be_a_part if {
+	checks := {"c": {"op": "all", "path": ["dd", "items"], "as": "cov", "check": {"op": "present", "path": ["x"]}}}
+	rep := _parts_report({"cov": "dd.b"}, checks, {"items": [{"x": 1}]})
+	_parts_problems(rep)["checks.c"] == ["alias given twice"]
+	policy := {
+		"subjects": {"s": {"from": ["items", {"each_as": "cov", "keys": ["a"]}], "has": {"cov": "p"}}},
+		"requirements": {"r": {"subject": "s", "checks": {"c": {"op": "present", "path": ["p"]}}}},
+	}
+	_parts_problems(ergo.report({"items": {"a": {"p": 1}}}, policy, {}))["subjects.s.has.cov"] == ["alias given twice"]
+}
+
+test_a_path_shaped_like_an_internal_part_marker_does_not_read_the_subject if {
+	forged := "${\"alias\":\"zzz\",\"n\":0,\"of\":null,\"old\":false}"
+	rep := _parts_report({"cov": "dd.b"}, {"c": {"op": "present", "path": [forged, "name"]}}, {"b": {"x": 1}})
+	_parts_row(rep, "c").cause == "ill_formed"
+	_parts_row(rep, "c").passed == false
+}
+
+test_a_subject_with_no_has_is_listed_with_no_parts if {
+	rep := ergo.report({"trail": {"name": "t1"}}, _parts_policy({}, {"c": "name is \"t1\""}), {})
+	rep.subjects.round.parts == {}
+	_parts_row(rep, "c").passed
+}
+
+test_the_report_lists_every_part_with_its_path_as_written_canonically_and_its_id if {
+	has := {
+		"a": "  dd.b  ",
+		"b": {"from": "dd.\"x y\".z", "identified_by": "attestation_id"},
+		"c": {"from": "dd.m named by $params.k"},
+		"d": "dd.items[1].y",
+		"e": "item 3 of dd.items",
+		"f": "dd.m[$params.k]",
+	}
+	rep := _parts_report(has, {"c": "name is \"t1\""}, {})
+	rep.subjects.round.parts == {
+		"a": {"from": "dd.b", "identified_by": null},
+		"b": {"from": "dd.\"x y\".z", "identified_by": "attestation_id"},
+		"c": {"from": "dd.m named by $params.k", "identified_by": null},
+		"d": {"from": "dd.items[1].y", "identified_by": null},
+		"e": {"from": "item 3 of dd.items", "identified_by": null},
+		"f": {"from": "dd.m named by $params.k", "identified_by": null},
+	}
+}
+
+test_the_report_shows_a_part_written_wrong_as_best_it_can if {
+	has := {
+		"bad_from": {"from": "dd.b whose x is 1", "identified_by": "id"},
+		"bad_id": {"from": "dd.b", "identified_by": 5},
+		"no_from": {"identified_by": "id"},
+		"number": 5,
+		"bad alias": "dd.b",
+	}
+	rep := _parts_report(has, {"c": "name is \"t1\""}, {})
+	rep.subjects.round.parts == {
+		"bad alias": {"from": "dd.b", "identified_by": null},
+		"bad_from": {"from": "<invalid from>", "identified_by": "id"},
+		"bad_id": {"from": "dd.b", "identified_by": "<invalid identified_by>"},
+		"no_from": {"from": "<invalid from>", "identified_by": "id"},
+		"number": {"from": "<invalid from>", "identified_by": null},
+	}
+}
+
+test_a_has_that_is_not_an_object_is_written_wrong_and_lists_no_parts if {
+	rep := _parts_report("cov", {"c": "name is \"t1\""}, {})
+	_parts_problems(rep)["subjects.round.has"] == ["not an object"]
+	rep.subjects.round.parts == {}
+}
+
+test_every_way_a_part_can_be_written_wrong_is_named_with_its_alias if {
+	has := {
+		"num": 5,
+		"nofrom": {"identified_by": "id"},
+		"extra": {"from": "x", "other": 1},
+		"fromnum": {"from": 1},
+		"idnum": {"from": "x", "identified_by": 1},
+		"who": "x whose y is 1",
+		"eacha": "x named by each of $params.k",
+		"cnt": "count of x",
+		"prm": "$params.x",
+		"inp": "$input.x",
+		"nobare": "x named by foo",
+		"emp": "",
+		"idbad": {"from": "x", "identified_by": "y whose z is 1"},
+		"$dollar": "x",
+		"with space": "x",
+		"plain": "x",
+		"item": "x",
+	}
+	problems := _parts_problems(_parts_report(has, {"c": "name is \"t1\""}, {}))
+	problems["subjects.round.has.num"] == ["not a string or an object"]
+	problems["subjects.round.has.nofrom"] == ["missing from"]
+	problems["subjects.round.has.extra"] == ["unknown field other"]
+	problems["subjects.round.has.fromnum"] == ["invalid from"]
+	problems["subjects.round.has.idnum"] == ["invalid identified_by"]
+	problems["subjects.round.has.who"] == ["from: a part is a path: whose and named by each of can't go in it"]
+	problems["subjects.round.has.eacha"] == ["from: a part is a path: whose and named by each of can't go in it"]
+	problems["subjects.round.has.cnt"] == ["from: doesn't parse"]
+	problems["subjects.round.has.prm"] == ["from: a part reads inside its subject, so it can't start at $params or $input"]
+	problems["subjects.round.has.inp"] == ["from: a part reads inside its subject, so it can't start at $params or $input"]
+	problems["subjects.round.has.nobare"] == ["from: unknown alias foo"]
+	problems["subjects.round.has.emp"] == ["from: doesn't parse"]
+	problems["subjects.round.has.idbad"] == ["identified_by: a part is a path: whose and named by each of can't go in it"]
+	problems["subjects.round.has.$dollar"] == ["invalid alias"]
+	problems["subjects.round.has.\"with space\""] == ["invalid alias"]
+	problems["subjects.round.has.item"] == ["invalid alias"]
+	not "subjects.round.has.plain" in object.keys(problems)
+}
+
+test_a_part_alias_must_be_a_bare_word_that_is_not_a_word_of_the_grammar_or_params_or_input if {
+	bad := ["empty", "every", "params", "input", "true", "a", "x y", "$x", "", "1x", "x.y", "é"]
+	every alias in bad {
+		problems := _parts_problems(_parts_report({alias: "x"}, {"c": "name is \"t1\""}, {}))
+		some key, value in problems
+		contains(key, "subjects.round.has")
+		value == ["invalid alias"]
+	}
+	good := ["x", "_x", "x-y", "x_1", "Cov", "coverage-verification"]
+	every alias in good {
+		problems := _parts_problems(_parts_report({alias: "x"}, {"c": "name is \"t1\""}, {}))
+		count([k | some k, _ in problems; contains(k, "subjects.round.has")]) == 0
+	}
+}
+
+test_a_named_by_that_names_a_part_alias_is_written_wrong_because_it_would_read_the_subjects_field if {
+	has := {"cov": "dd.k"}
+	checks := {
+		"a": "$params.m named by cov is 1",
+		"b": "every dd.items.z whose $params.m named by cov is 1 is 2",
+		"c": {"for": "every dd.items as it", "assert": "$params.m named by it is 1"},
+	}
+	problems := _parts_problems(_parts_report(has, checks, {"k": "q"}))
+	problems["checks.a"] == ["named by cov reads a part, which isn't supported yet"]
+	problems["checks.b"] == ["named by cov reads a part, which isn't supported yet"]
+	not "checks.c" in object.keys(problems)
+}
+
+test_as_sentences_leaves_an_old_check_that_names_an_alias_as_written_because_a_sentence_would_read_the_part if {
+	policy := {
+		"subjects": {"s": {"from": ["items"], "has": {"cov": "dd.b"}}},
+		"requirements": {"r": {"subject": "s", "checks": {
+			"a": {"op": "equals", "path": ["cov", "x"], "value": 1},
+			"b": {"op": "equals", "path": ["other", "x"], "value": 1},
+			"c": {"op": "equals", "path": ["$cov", "x"], "value": 1},
+		}}},
+	}
+	converted := ergo.as_sentences(policy)
+	converted.requirements.r.checks.a == {"op": "equals", "path": ["cov", "x"], "value": 1}
+	converted.requirements.r.checks.b == "other.x is 1"
+	converted.requirements.r.checks.c == {"op": "equals", "path": ["$cov", "x"], "value": 1}
+	converted.subjects.s.has == {"cov": "dd.b"}
+}
+
+test_a_problem_in_has_names_the_subject_that_holds_it_for_every_requirement_that_builds_on_it if {
+	subjects := {
+		"round": {"from": "rounds", "has": {"cov": 5}},
+		"good": {"from": "round whose x is 1"},
+	}
+	rep := ergo.report({"rounds": [{"x": 1}]}, {"subjects": subjects, "requirements": {"r": {"subject": "good", "checks": {"c": "x is 1"}}}}, {})
+	_parts_problems(rep)["subjects.round.has.cov"] == ["not a string or an object"]
+}
+
+test_a_part_with_no_alias_clash_works_when_another_subject_of_the_policy_is_written_wrong if {
+	subjects := {
+		"round": {"from": "rounds", "has": {"cov": "dd.b"}},
+		"bad": {"from": "rounds", "has": 5},
+	}
+	policy := {"subjects": subjects, "requirements": {"r": {"subject": "round", "checks": {"c": "cov.x is 1"}}}}
+	rep := ergo.report({"rounds": [{"dd": {"b": {"x": 1}}}]}, policy, {})
+	_parts_row(rep, "c").passed
+	not "subjects.bad.has" in object.keys(_parts_problems(rep))
+}
+
+_swap_has := {
+	"cov": "dd.b",
+	"lst": "dd.items",
+	"uno": "dd.b.x",
+	"by": "dd.m named by $params.k",
+	"pos": "dd.items[1]",
+}
+
+_swap_full := {
+	"@cov": "dd.b",
+	"@lst": "dd.items",
+	"@uno": "dd.b.x",
+	"@by": "dd.m named by $params.k",
+	"@pos": "dd.items[1]",
+}
+
+_swap_alias := {
+	"@cov": "cov",
+	"@lst": "lst",
+	"@uno": "uno",
+	"@by": "by",
+	"@pos": "pos",
+}
+
+_swap_lines := [
+	"@cov.x is 1",
+	"@cov.x is not 1",
+	"@cov.x exists",
+	"@cov.x does not exist",
+	"@cov.s is a non-empty string",
+	"@cov.x is one of 1, 2",
+	"@cov.x is not one of 1, 2",
+	"@cov.s matches \"^a\"",
+	"@cov.s does not match \"^b\"",
+	"@cov.s starts with \"a\"",
+	"@cov.x is at least 2",
+	"@cov.x is between 1 and 3",
+	"@cov.x equals @cov.n",
+	"@cov.x does not equal @cov.n",
+	"@cov.t is before @cov.t2",
+	"@cov.items is empty",
+	"@cov.items is not empty",
+	"@cov exists",
+	"@cov.x is a number",
+	"@cov.x is 1 and @cov.n is 2",
+	"@uno is 1",
+	"@uno exists",
+	"@by.x is 1",
+	"@by exists",
+	"@pos.x is 1",
+	"@pos exists",
+]
+
+_swap_walks := [
+	"every @lst.x is 1",
+	"some @lst.x is 1",
+	"every @lst.x whose y is 2 is 1",
+	"every @lst.x is at least 1",
+	"every @lst, if any, is not empty",
+	"some @lst.x whose y is 2 is 1",
+	"every @lst.sub is not empty",
+	"count of @lst is 2",
+	"count of @lst whose y is 2 is 1",
+	"sum of @lst.n is 5",
+	"sum of @lst.n whose y is 2 is 2",
+	"@cov.x plus @cov.n is 3",
+	"count of @lst plus @cov.x is 3",
+	"days elapsed from @cov.t to @cov.t2 is 1",
+	"count of @lst is @cov.x",
+	"sum of @lst.n equals @cov.n within 0.5",
+]
+
+_swap_fors := [
+	{"for": "every @lst as it", "assert": "it.x is 1"},
+	{"for": "every @lst as it", "assert": ["it.x is @cov.x", "@cov.s exists"]},
+	{"for": "some @lst whose y is 2 as it", "assert": ["it.x is 1", "@cov.s exists"]},
+	{"for": "every @lst as it, every it.sub as s", "assert": "s is @cov.x"},
+	{"for": "every @lst as it", "assert": "count of it.sub is @cov.x"},
+	{"for": "every @lst as it", "assert": "it.x is @uno"},
+	{"for": "every @cov.items as it", "assert": "it.x is @uno"},
+]
+
+_swap_old(p) := [
+	{"op": "present", "path": array.concat(p.cov, ["x"])},
+	{"op": "equals", "path": array.concat(p.cov, ["x"]), "value": 1},
+	{"op": "compare", "left": array.concat(p.cov, ["x"]), "right": array.concat(p.cov, ["n"]), "cmp": "lt"},
+	{"op": "compare", "left": {"count": p.lst}, "right": {"literal": 2}, "cmp": "eq"},
+	{"op": "compare", "left": {"sum": p.lst, "each": ["n"]}, "right": array.concat(p.cov, ["n"]), "cmp": "eq"},
+	{"op": "compare", "left": {"add": [array.concat(p.cov, ["x"]), {"literal": 1}]}, "right": {"literal": 2}, "cmp": "eq"},
+	{"op": "all", "path": p.lst, "check": {"op": "equals", "path": ["x"], "value": 1}},
+	{"op": "any", "path": p.lst, "as": "q", "check": {"op": "equals", "path": ["x"], "value": 1}},
+	{"op": "all", "path": array.concat(p.cov, ["items"]), "check": {"op": "present", "path": ["x"]}, "substitute": {"op": "present", "path": p.uno}},
+	{"op": "any_of", "options": {"a": [{"op": "present", "path": array.concat(p.cov, ["x"])}], "b": [{"op": "equals", "path": p.uno, "value": 1}]}},
+	{"op": "even", "path": array.concat(p.cov, ["n"]), "inputs": [array.concat(p.cov, ["n"])], "expression": "n is even"},
+]
+
+_swap_old_alias := {"cov": ["$cov"], "lst": ["$lst"], "uno": ["$uno"]}
+
+_swap_old_full := {"cov": ["dd", "b"], "lst": ["dd", "items"], "uno": ["dd", "b", "x"]}
+
+_swap_checks(replacements, old, lines, walks, fors) := object.union(
+	{sprintf("l%02d", [i]): strings.replace_n(replacements, line) | some i, line in lines},
+	object.union(
+		{sprintf("w%02d", [i]): strings.replace_n(replacements, line) | some i, line in walks},
+		object.union(
+			{sprintf("f%02d", [i]): _swap_for(replacements, item) | some i, item in fors},
+			{sprintf("o%02d", [i]): item | some i, item in old},
+		),
+	),
+)
+
+_swap_for(replacements, item) := {"for": strings.replace_n(replacements, item.for), "assert": _swap_assert(replacements, item.assert)}
+
+_swap_assert(replacements, a) := strings.replace_n(replacements, a) if is_string(a)
+
+_swap_assert(replacements, a) := [strings.replace_n(replacements, line) | some line in a] if is_array(a)
+
+_swap_policy(has, checks) := {
+	"subjects": {"round": _swap_subject(has)},
+	"requirements": {"r": {"subject": "round", "checks": checks}},
+}
+
+_swap_subject(has) := {"from": "trail", "identified_by": "name", "has": has} if count(has) > 0
+
+_swap_subject(has) := {"from": "trail", "identified_by": "name"} if count(has) == 0
+
+_swap_view(rep) := {
+	"rows": [{
+		"check": r.check,
+		"subject": r.subject,
+		"passed": r.passed,
+		"cause": r.cause,
+		"values": {i.value | some i in r.inputs},
+		"failed": {[f.cause, f.value, [a.cause | some a in object.get(f, "failed_assertions", [])]] | some f in object.get(r, "failed_items", [])},
+		"lines": [a.cause | some a in object.get(r, "failed_assertions", [])],
+	} |
+		some r in rep.results
+	],
+	"requirement": {c: {x.value | some x in object.get(d, "$refs", [])} | some c, d in rep.requirements.r.checks},
+	"status": rep.requirements.r.status,
+	"causes": rep.requirements.r.causes,
+}
+
+_swap_item(x, y, n, sub) := {"x": x, "y": y, "n": n, "sub": sub}
+
+_swap_good := {
+	"b": {"x": 1, "s": "abc", "n": 2, "t": "2026-01-01T00:00:00Z", "t2": "2026-01-02T00:00:00Z", "items": [1, 2]},
+	"items": [_swap_item(1, 2, 2, [1]), _swap_item(1, 3, 3, [1, 1])],
+	"m": {"m1": {"x": 1}},
+}
+
+_swap_same(d, params) if {
+	alias := ergo.report(_parts_doc(d), _swap_policy(_swap_has, _swap_checks(_swap_alias, _swap_old(_swap_old_alias), _swap_lines, _swap_walks, _swap_fors)), params)
+	full := ergo.report(_parts_doc(d), _swap_policy({}, _swap_checks(_swap_full, _swap_old(_swap_old_full), _swap_lines, _swap_walks, _swap_fors)), params)
+	_swap_view(alias) == _swap_view(full)
+	count(alias.results) > 60
+}
+
+_swap_same_doc(doc, params) if {
+	alias := ergo.report(doc, _swap_policy(_swap_has, _swap_checks(_swap_alias, _swap_old(_swap_old_alias), _swap_lines, _swap_walks, _swap_fors)), params)
+	full := ergo.report(doc, _swap_policy({}, _swap_checks(_swap_full, _swap_old(_swap_old_full), _swap_lines, _swap_walks, _swap_fors)), params)
+	_swap_view(alias) == _swap_view(full)
+	count(alias.results) > 60
+}
+
+test_a_part_gives_the_rows_of_its_full_path_when_everything_is_there if {
+	_swap_same(_swap_good, {"k": "m1"})
+	_swap_same(_swap_good, {})
+}
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_params_it_names_by_are_wrong if {
+	_swap_same(_swap_good, {"k": 1})
+	_swap_same(_swap_good, {"k": null})
+	_swap_same(object.union(_swap_good, {"m": {}}), {"k": "m1"})
+}
+
+test_a_part_gives_the_rows_of_its_full_path_when_an_object_part_is_missing_null_or_wrong_typed if {
+	_swap_same(object.remove(_swap_good, ["b"]), {"k": "m1"})
+	_swap_same(object.union(_swap_good, {"b": null}), {"k": "m1"})
+	_swap_same(object.union(_swap_good, {"b": "text"}), {"k": "m1"})
+	_swap_same(object.union(_swap_good, {"b": [1]}), {"k": "m1"})
+}
+
+test_a_part_gives_the_rows_of_its_full_path_when_a_field_inside_it_is_null_or_wrong_typed if {
+	_swap_same(object.union(_swap_good, {"b": object.union(_swap_good.b, {"x": null})}), {"k": "m1"})
+	_swap_same(object.union(_swap_good, {"b": {"x": "1", "s": 5, "n": "2", "t": "nope", "t2": 3, "items": "s"}}), {"k": "m1"})
+}
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_is_missing_null_empty_or_a_string if {
+	_swap_same(object.remove(_swap_good, ["items"]), {"k": "m1"})
+	_swap_same(object.union(_swap_good, {"items": null}), {"k": "m1"})
+	_swap_same(object.union(_swap_good, {"items": []}), {"k": "m1"})
+	_swap_same(object.union(_swap_good, {"items": "str"}), {"k": "m1"})
+}
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_holds_odd_items if {
+	_swap_same(object.union(_swap_good, {"items": [_swap_item(1, 2, 2, [1]), 5, null]}), {"k": "m1"})
+	_swap_same(object.union(_swap_good, {"items": [_swap_item(null, 2, "q", []), {"y": 2}]}), {"k": "m1"})
+}
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_part_is_missing_or_wrong_typed if {
+	_swap_same(object.union(_swap_good, {"m": null}), {"k": "m1"})
+	_swap_same(object.union(_swap_good, {"m": "s"}), {"k": "m1"})
+	_swap_same(object.remove(_swap_good, ["m"]), {"k": "m1"})
+}
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_subject_has_nothing_or_is_not_an_object if {
+	_swap_same_doc({"trail": {"name": "t1"}}, {"k": "m1"})
+	_swap_same_doc({"trail": {"name": "t1", "dd": null}}, {"k": "m1"})
+	_swap_same_doc({"trail": {"name": "t1", "dd": "s"}}, {"k": "m1"})
+	_swap_same_doc({"trail": {"name": "t1", "dd": [1]}}, {"k": "m1"})
+}
+
+test_the_swap_comparison_would_notice_a_part_that_reads_the_wrong_path if {
+	alias := ergo.report(_parts_doc(_swap_good), _swap_policy({"cov": "dd.items"}, {"c": "cov.x is 1"}), {})
+	full := ergo.report(_parts_doc(_swap_good), _swap_policy({}, {"c": "dd.b.x is 1"}), {})
+	_swap_view(alias) != _swap_view(full)
+}
+
+test_the_swap_comparison_sees_rows_of_every_kind_of_outcome if {
+	alias := ergo.report(_parts_doc(object.union(_swap_good, {"b": "text"})), _swap_policy(_swap_has, _swap_checks(_swap_alias, _swap_old(_swap_old_alias), _swap_lines, _swap_walks, _swap_fors)), {"k": "m1"})
+	{r.cause | some r in alias.results; startswith(r.check, "l")} >= {"unusable", "satisfied"}
+	{r.cause | some r in alias.results} >= {"unusable", "satisfied", "value", "not_an_object"}
+}
+
+_deep_all(p, check) := {"op": "all", "path": p.lst, "check": check}
+
+_deep_options(form, group) := {"g": group} if form == "object"
+
+_deep_options(form, group) := [group] if form == "list"
+
+_deep_leaf(p) := {"op": "present", "path": array.concat(p.cov, ["x"])}
+
+_deep_at(level, _, options) := {"op": "any_of", "options": options} if level == "a"
+
+_deep_at(level, p, options) := _deep_all(p, {"op": "any_of", "options": options}) if level == "b"
+
+_deep_at(level, p, options) := _deep_all(p, {"op": "all", "path": ["sub"], "check": {"op": "any_of", "options": options}}) if level == "c"
+
+_deep_at(level, p, options) := {"op": "any_of", "options": [[_deep_all(p, {"op": "all", "path": ["sub"], "check": {"op": "any_of", "options": options}})]]} if level == "d"
+
+_deep_row(doc, level, form) := _parts_row(ergo.report(doc, _swap_policy(_swap_has, {"c": _deep_at(level, _swap_old_alias, _deep_options(form, _deep_leaf_group(_swap_old_alias)))}), {}), "c")
+
+_deep_leaf_group(p) := [_deep_leaf(p)]
+
+test_an_old_syntax_part_is_read_from_the_subject_at_every_depth_a_check_can_be_nested_to if {
+	every level in ["a", "b", "c", "d"] {
+		every form in ["object", "list"] {
+			good := _deep_row(_parts_doc(_swap_good), level, form)
+			good.passed
+			good.cause == "satisfied"
+			bad := _deep_row(_parts_doc(object.remove(_swap_good, ["b"])), level, form)
+			bad.passed == false
+			bad.cause == "value"
+		}
+	}
+}
+
+test_a_group_of_options_that_is_not_a_list_or_holds_a_non_object_is_written_wrong_at_every_depth if {
+	every level in ["a", "b", "c", "d"] {
+		every options in [{"g": "nope"}, ["nope"], {"g": [5]}, [[5]]] {
+			check := _deep_at(level, _swap_old_alias, options)
+			rep := ergo.report(_parts_doc(_swap_good), _swap_policy(_swap_has, {"c": check}), {})
+			[r.cause | some r in rep.results; r.check == "c"] == ["ill_formed"]
+		}
+	}
+}
+
+_deep_nest(n, leaf) := {"op": "all", "path": ["xs"], "check": leaf} if n == 1
+
+_deep_nest(n, leaf) := {"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["xs"], "check": leaf}} if n == 2
+
+_deep_nest(n, leaf) := {"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["xs"], "check": leaf}}} if n == 3
+
+_deep_nest(n, leaf) := {"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["xs"], "check": leaf}}}} if n == 4
+
+test_a_nested_check_that_is_not_an_object_is_written_wrong_at_every_depth_and_does_not_hide_the_row if {
+	every n in [1, 2, 3, 4] {
+		rep := ergo.report(_parts_doc(_swap_good), _swap_policy(_swap_has, {"c": _deep_nest(n, 5)}), {})
+		[r.cause | some r in rep.results; r.check == "c"] == ["ill_formed"]
+	}
+}
+
+test_a_check_or_a_substitute_or_a_filter_that_is_not_an_object_is_written_wrong_when_a_subject_has_parts if {
+	rep := ergo.report(_parts_doc(_swap_good), _swap_policy(_swap_has, {"c": 5, "d": {"op": "present", "path": ["$cov", "x"], "substitute": 5}}), {})
+	[r.cause | some r in rep.results; r.check == "c"] == ["ill_formed"]
+	[r.cause | some r in rep.results; r.check == "d"] == ["ill_formed"]
+	policy := {
+		"subjects": {"s": {"from": ["trail"], "has": {"cov": "dd.b"}, "applies_to": {"f": 5, "g": {"op": "present", "path": ["$cov", "x"]}}}},
+		"requirements": {"r": {"subject": "s", "checks": {"c": "name is \"t1\""}}},
+	}
+	filters := ergo.report(_parts_doc(_swap_good), policy, {})
+	[r.cause | some r in filters.results; r.check == "$applies"] == ["ill_formed"]
+	_parts_problems(filters)["subjects.s.applies_to.f"] == ["invalid check"]
+}
+
+test_an_old_syntax_filter_and_substitute_read_a_part_through_its_alias if {
+	policy := {
+		"subjects": {"s": {"from": ["trail"], "has": {"cov": "dd.b"}, "applies_to": {"f": {"op": "present", "path": ["$cov", "x"], "substitute": {"op": "present", "path": ["$cov", "n"]}}}}},
+		"requirements": {"r": {"subject": "s", "checks": {"c": {"op": "equals", "path": ["$cov", "x"], "value": 5, "substitute": {"op": "equals", "path": ["$cov", "n"], "value": 2}}}}},
+	}
+	rep := ergo.report(_parts_doc({"b": {"n": 2}}), policy, {})
+	[[r.check, r.cause] | some r in rep.results; r.check in {"$applies", "c"}] == [["$applies", "satisfied"], ["c", "substituted"]]
+}
+
+test_an_old_syntax_derived_side_reads_a_part_from_the_subject_in_where_and_add if {
+	p := _swap_old_alias
+	checks := {
+		"count": {"op": "compare", "left": {"count": p.lst, "where": {"op": "equals", "path": ["y"], "value": 2}}, "right": {"literal": 1}, "cmp": "eq"},
+		"sum": {"op": "compare", "left": {"sum": p.lst, "each": ["n"], "where": {"op": "present", "path": array.concat(p.cov, ["x"])}}, "right": {"literal": 5}, "cmp": "eq"},
+		"add": {"op": "compare", "left": {"add": [{"count": p.lst}, array.concat(p.cov, ["n"])]}, "right": {"literal": 4}, "cmp": "eq"},
+	}
+	rep := _parts_report(_swap_has, checks, _swap_good)
+	every c in ["count", "sum", "add"] {
+		_parts_row(rep, c).passed
+	}
+	_parts_row(rep, "sum").inputs[0].name == "sum($lst[].n where $cov.x is present)"
+	_parts_row(rep, "add").inputs[0] == {"name": "count($lst) + $cov.n", "value": 4}
+	missing := _parts_report(_swap_has, checks, object.remove(_swap_good, ["b"]))
+	_parts_row(missing, "sum").cause == "value"
+	_parts_row(missing, "add").cause == "absent"
+}
+
+test_an_old_syntax_custom_operator_with_object_and_odd_inputs_still_reads_its_part_and_shows_no_marker if {
+	checks := {"c": {"op": "even", "path": ["$cov", "n"], "inputs": [{"path": ["$cov", "n"], "each": ["$cov", "x"]}, 5, ["$cov", "x"]], "expression": "n is even"}}
+	rep := _parts_report({"cov": "dd.b"}, checks, {"b": {"n": 4, "x": 1}})
+	row := _parts_row(rep, "c")
+	row.passed
+	every i in row.inputs {
+		not contains(i.name, "alias")
+	}
+}
+
+test_an_old_syntax_side_that_is_not_a_path_or_a_known_shape_is_left_as_written if {
+	checks := {
+		"a": {"op": "compare", "left": 5, "right": ["$cov", "x"], "cmp": "lt"},
+		"b": {"op": "compare", "left": {"add": [5, ["$cov", "x"]]}, "right": {"literal": 1}, "cmp": "lt"},
+		"c": {"op": "compare", "left": {"count_of": ["$lst"], "whose": [5], "text": "t"}, "right": {"literal": 1}, "cmp": "lt"},
+	}
+	rep := _parts_report(_swap_has, checks, _swap_good)
+	every c in ["a", "b", "c"] {
+		[r.cause | some r in rep.results; r.check == c] == ["ill_formed"]
+	}
+}
+
+test_a_part_with_a_key_that_is_not_a_string_is_written_wrong_and_is_not_listed if {
+	policy := _parts_policy({1: "dd.b", true: "dd.c", "ok": "dd.d"}, {"c": "ok exists"})
+	rep := ergo.report(_parts_doc({"d": 1}), policy, {})
+	problems := _parts_problems(rep)
+	problems["subjects.round.has.<invalid key 1>"] == ["invalid alias"]
+	problems["subjects.round.has.<invalid key true>"] == ["invalid alias"]
+	rep.subjects.round.parts == {"ok": {"from": "dd.d", "identified_by": null}}
+	_parts_row(rep, "c").passed
+}

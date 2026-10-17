@@ -130,11 +130,12 @@ deployment:
   identified_by: id
 ```
 
-| Field           | Meaning                                                                                                             | Default                                |
-| --------------- | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| `description`   | What the subject is, in words anyone can read. The report copies it into its [`subjects`](#subjects-in-the-report). | `""`                                   |
-| `from`          | Where the subjects are in the input, and which of them are in scope, written as a [from line](#from-lines).         | the input field named like the subject |
-| `identified_by` | The path, inside one subject, to the value that identifies it.                                                      | the whole subject                      |
+| Field           | Meaning                                                                                                                 | Default                                |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| `description`   | What the subject is, in words anyone can read. The report copies it into its [`subjects`](#subjects-in-the-report).     | `""`                                   |
+| `from`          | Where the subjects are in the input, and which of them are in scope, written as a [from line](#from-lines).             | the input field named like the subject |
+| `identified_by` | The path, inside one subject, to the value that identifies it.                                                          | the whole subject                      |
+| `has`           | Names for paths inside the subject, so a check can write a short alias where a long path would go. See [Parts](#parts). | none                                   |
 
 `applies_to` and `of`, and a `from` or `identified_by` written as a list, are the [old syntax](#subjects-in-the-old-syntax).
 
@@ -282,6 +283,111 @@ A from line that's another subject's name reads that subject's `from` and `ident
 - A chain that comes back to a subject already in it never reaches a list. It fails as `leads to a loop`.
 - A problem fails `$well_formed` on every requirement that names a subject whose chain has it, and the requirement finds no subjects.
 - A requirement can name the subject others build on too, like `component` to check every component.
+
+### Parts
+
+Data often keeps what a check needs deep inside the subject. Kosli, for one, puts every attestation at `compliance_status.attestations_statuses.<name>.attestation_data`, so a policy that reads three attestations repeats that path in every check. A subject can give a path a name once, with `has`, and the checks use the name. Each entry of `has` is a **part**, and its key is the part's alias. An alias is a short word that stands for something longer, as `as pr` does on a `for` line.
+
+```yaml
+subjects:
+  round:
+    from: trail
+    identified_by: name
+    has:
+      findings: compliance_status.attestations_statuses.findings.attestation_data
+      coverage:
+        from: compliance_status.attestations_statuses.coverage-verification
+        identified_by: attestation_id
+requirements:
+  review_round:
+    subject: round
+    checks:
+      complete: findings.truncated is false
+      every_hunk_acknowledged: coverage.attestation_data.hunks_acknowledged equals coverage.attestation_data.hunks_total
+```
+
+With this input:
+
+```json
+{
+  "trail": {
+    "name": "round-1",
+    "compliance_status": {
+      "attestations_statuses": {
+        "findings": { "attestation_data": { "truncated": false } },
+        "coverage-verification": {
+          "attestation_id": "cov-9",
+          "attestation_data": { "hunks_acknowledged": 25, "hunks_total": 28 }
+        }
+      }
+    }
+  }
+}
+```
+
+`complete` passes and `every_hunk_acknowledged` fails with cause `value`:
+
+```json
+{"check": "complete", "subject": {"type": "round", "id": "round-1"}, "passed": true, "cause": "satisfied",
+ "inputs": [{"name": "findings.truncated", "value": false}]}
+{"check": "every_hunk_acknowledged", "subject": {"type": "round", "id": "round-1"}, "passed": false, "cause": "value",
+ "inputs": [{"name": "coverage.attestation_data.hunks_acknowledged", "value": 25},
+            {"name": "coverage.attestation_data.hunks_total", "value": 28}]}
+```
+
+A part is a short name for its path and nothing more. `coverage.attestation_data.hunks_total` gives exactly the rows that `compliance_status.attestations_statuses.coverage-verification.attestation_data.hunks_total` gives: the same `passed`, the same `cause` and the same values. A part that is missing fails the check as `absent`, a `null` one as `absent` when a step follows it, and one of the wrong type as `unusable`, because the full path would. Only the names differ. With `coverage-verification` missing from the input, the row is
+
+```json
+{"check": "every_hunk_acknowledged", "subject": {"type": "round", "id": "round-1"}, "passed": false, "cause": "absent",
+ "inputs": [{"name": "coverage.attestation_data.hunks_acknowledged", "value": null},
+            {"name": "coverage.attestation_data.hunks_total", "value": null}]}
+```
+
+and written out in full, its inputs are named `compliance_status.attestations_statuses.coverage-verification.attestation_data.hunks_acknowledged` and `...hunks_total`, with the same `null`. The `expression` of a check and the names in its `inputs` and `failed_items` keep the alias, so a reader sees the words the policy was written in.
+
+- A part is one line, a path, or an object with `from`, a path, and `identified_by`, a path read inside the part. Nothing reads `identified_by` yet, but the report shows it, because it will say how to tell one part from another.
+- A path is written as in a [from line](#from-lines): keys joined by `.`, keys in quotes, positions, and `named by` a key of `$params` or `$input`. It is a path inside the subject, so it can't start at `$params` or `$input`, and it can't have `whose`, `count of` or `named by each of`.
+- A part can be any path, even one that ends at a single value: `ratio: compliance_status.attestations_statuses.coverage.attestation_data.ratio` makes `ratio is at least 0.8` read the same.
+- Keep the data's own names, as `findings` and `coverage` do, because a reader who knows the data finds `coverage.attestation_data.hunks_total` where they'd look for it.
+- An alias is read wherever a bare first key reads the subject: in the subject's checks, in the assertions of a `for` line, and in the conditions of the subject's `from` line and of a subject that narrows it. It isn't read in a `whose` or in the argument of a one-line `every` or `some`, where a bare first key is a field of the item. `named by` a part's alias is written wrong, with `named by coverage reads a part, which isn't supported yet`.
+- An alias shadows a field of the subject with the same name, and `.coverage` doesn't get around it: that dot only marks a field named like a word of the grammar. To read the field, give the part another name.
+- An alias is a bare word that isn't a word of the grammar, `params` or `input`, or it is written wrong with `invalid alias`. Two aliases with the same name are written wrong with `alias given twice`: two parts of a subject, a part and one a subject keeps from a subject it narrows, a part and an alias of a `for` line in a check of the subject, a part and the name of the subject a chained subject reads from, and in the [old syntax](#subjects-in-the-old-syntax) a part and an `as` or `each_as` alias.
+- A subject that narrows another keeps its parts and can add its own. The report lists them all.
+- A [chained subject](#from-lines) reads its parent's parts through the parent's name, and its `from` line can start from one. With `{"params": {"artifact_name": "web"}}` and this input:
+
+  ```json
+  {"trail": {"artifacts": {"web": {"fingerprint": "sha-1", "attestations_statuses": {
+    "pull-request": {"attestation_data": {"approvers": ["bob"], "pull_requests": [{"url": "pr/7"}, {"url": "pr/8"}]}}}}}}}
+  ```
+
+  this policy reads the pull requests of the attestation, and checks each of them against its approvers:
+
+  ```yaml
+  subjects:
+    artifact:
+      from: trail.artifacts named by $params.artifact_name
+      identified_by: fingerprint
+      has:
+        pr_attestation: attestations_statuses.pull-request.attestation_data
+    pull request:
+      from: artifact.pr_attestation.pull_requests
+      identified_by: url
+  requirements:
+    approved:
+      subject: pull request
+      checks:
+        approved: artifact.pr_attestation.approvers is not empty
+  ```
+
+  ```json
+  {"check": "approved", "subject": {"type": "pull request", "id": "pr/7", "in": {"artifact": "sha-1"}}, "passed": true, "cause": "satisfied",
+   "inputs": [{"name": "artifact.pr_attestation.approvers", "value": ["bob"]}]}
+  ```
+
+  A part is only reached through its subject, so a bare `pr_attestation` in a check of `pull request` is one of its own fields.
+- In the old syntax, a check reads a part as `$alias` in the first step of a path, like `{"op": "equals", "path": ["$coverage", "attestation_data", "hunks_total"], "value": 28}`, and the name keeps the dollar: `$coverage.attestation_data.hunks_total`. The same rules apply, and a part's path is written as above whichever syntax the subject uses.
+- A part that is written wrong fails `$well_formed` on every requirement that names the subject, with the problem under the part's alias, like `{"name": "subjects.round.has.coverage", "value": ["missing from"]}`. That is a `has` that isn't an object (`not an object`), a part that isn't a string or an object (`not a string or an object`), an object without `from` (`missing from`), with a field other than `from` and `identified_by` (`unknown field <name>`), or with a `from` or `identified_by` that isn't a string (`invalid from`, `invalid identified_by`), and a path that can't be read (`from: a part is a path: whose and named by each of can't go in it`, `from: a part reads inside its subject, so it can't start at $params or $input`, or the problems a from line gives).
+- The report lists every part under the subject's [`parts`](#subjects-in-the-report), including the ones it keeps from a subject it narrows.
 
 ## Requirements
 
@@ -1030,7 +1136,16 @@ Each entry has:
 - `description` is the subject's, or `""` when it has none. A `description` that isn't a string is [written wrong](#subjects) and shows as `""`.
 - `from` says how the subject is found, as a [from line](#from-lines) is written. A `from` written as a line is printed the same way whatever spaces it had. One written as a list, in the [old syntax](#subjects-in-the-old-syntax), is printed as a sentence too: its path, then ` whose ` and its `applies_to` filters, sorted by name and joined with `and`. A [naming step](#naming-subjects) at the end of the path shows as `named by each of $params.suites` when its keys come from a ref, as `<each of "unit", "lint">` when they're listed, and as `<each as suite>` when it has none, since a `from` line has no way to write those two. A filter that can't be written as a sentence, like one with a custom operator or a substitute, shows as `<condition name>` so it's never left out, and an `applies_to` that isn't an object shows as `<invalid applies_to>`. A subject built on another with `of` starts with that subject's name. A subject without `from` reads the input field named like it. A `from` that is written wrong shows as `<invalid from>`.
 - `identified_by` is the path of the subject's id, or `null` when it has none, and the whole subject is its id. A subject that narrows another has the id of the one it narrows. An id that is written wrong shows as `<invalid identified_by>`.
-- `parts` is always `{}` for now.
+- `parts` lists every [part](#parts) the subject has, including the ones it keeps from a subject it narrows, by alias. Each is `{"from": ..., "identified_by": ...}`, with `from` written the way a sentence writes a path, so `"  dd.b "` is `dd.b` and `x[$params.k]` is `x named by $params.k`, and `identified_by` the path of the part's id or `null` when it has none. For the policy under [Parts](#parts) it is
+
+  ```json
+  {
+    "coverage": {"from": "compliance_status.attestations_statuses.coverage-verification", "identified_by": "attestation_id"},
+    "findings": {"from": "compliance_status.attestations_statuses.findings.attestation_data", "identified_by": null}
+  }
+  ```
+
+  A part that is written wrong is listed as best it can be, with `<invalid from>` for a path that can't be read and `<invalid identified_by>` for an id that can't.
 
 A subject that is written wrong still has its entry, so nothing disappears from the report. With this policy and the same input:
 
@@ -1118,23 +1233,25 @@ The fields of the requirement and its subject get an input of the same form when
 ]
 ```
 
-| Field                                          | What's wrong                                                                                                                     |
-| ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| any field ergo doesn't know                    | `unknown field`                                                                                                                  |
-| `checks`                                       | `not an object`, `holds a key that isn't a string`, `missing`, `empty`                                                           |
-| `require`                                      | `neither every nor some`                                                                                                         |
-| `min_subjects`                                 | `not a whole number of 0 or more`, `number out of range`                                                                         |
-| `subject`                                      | `missing`, `empty or not a string`, `not in subjects`                                                                            |
-| `subjects`                                     | `not an object`                                                                                                                  |
-| `subjects.deployment`                          | `not an object`                                                                                                                  |
-| `subjects.deployment.applies_to`               | `not an object`, `holds a key that isn't a string`                                                                               |
-| `subjects.deployment.from`, `...identified_by` | `not a list`, `step that can't be a key`, `number out of range`, `holds a set`, `holds a key that isn't a string`                |
-| `subjects.deployment.from`                     | `object step before the last`, `object step without each_as`, `invalid alias`, `invalid keys`, `unknown field foo in naming step` |
-| `subjects.deployment.identified_by`            | `ref inside where`, `literal inside where`                                                                                       |
-| `subjects.deployment.description`              | `not a string`                                                                                                                   |
-| `subjects.deployment.of`                       | `empty or not a string`, `not in subjects`, `leads to a loop`                                                                    |
-| `subjects.deployment.from`, `...identified_by` | `not allowed with of`                                                                                                            |
-| `subjects.deployment.applies_to.locked`        | `also a filter of a subject it builds on`                                                                                        |
+| Field                                          | What's wrong                                                                                                                                                                       |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| any field ergo doesn't know                    | `unknown field`                                                                                                                                                                    |
+| `checks`                                       | `not an object`, `holds a key that isn't a string`, `missing`, `empty`                                                                                                             |
+| `require`                                      | `neither every nor some`                                                                                                                                                           |
+| `min_subjects`                                 | `not a whole number of 0 or more`, `number out of range`                                                                                                                           |
+| `subject`                                      | `missing`, `empty or not a string`, `not in subjects`                                                                                                                              |
+| `subjects`                                     | `not an object`                                                                                                                                                                    |
+| `subjects.deployment`                          | `not an object`                                                                                                                                                                    |
+| `subjects.deployment.applies_to`               | `not an object`, `holds a key that isn't a string`                                                                                                                                 |
+| `subjects.deployment.from`, `...identified_by` | `not a list`, `step that can't be a key`, `number out of range`, `holds a set`, `holds a key that isn't a string`                                                                  |
+| `subjects.deployment.from`                     | `object step before the last`, `object step without each_as`, `invalid alias`, `invalid keys`, `unknown field foo in naming step`                                                  |
+| `subjects.deployment.identified_by`            | `ref inside where`, `literal inside where`                                                                                                                                         |
+| `subjects.deployment.description`              | `not a string`                                                                                                                                                                     |
+| `subjects.deployment.of`                       | `empty or not a string`, `not in subjects`, `leads to a loop`                                                                                                                      |
+| `subjects.deployment.from`, `...identified_by` | `not allowed with of`                                                                                                                                                              |
+| `subjects.deployment.applies_to.locked`        | `also a filter of a subject it builds on`                                                                                                                                          |
+| `subjects.deployment.has`                      | `not an object`                                                                                                                                                                    |
+| `subjects.deployment.has.coverage`             | `not a string or an object`, `missing from`, `unknown field foo`, `invalid from`, `invalid identified_by`, `from: ...`, `identified_by: ...`, `invalid alias`, `alias given twice` |
 
 A policy written in Rego can use a key that isn't a string, like `true` or `1.5`. ergo names it `<invalid key true>` or `<invalid key 1.5>`, so two such keys never share a name. A requirement whose own name isn't a string, like `1`, or every requirement of a policy written as a list, fails `$well_formed`, which then starts with `{"name": "requirement name", "value": ["not a string"]}`. The requirement is `not_met`, so the policy isn't compliant.
 
@@ -1250,6 +1367,7 @@ ergo fails a check whenever it can't be sure, instead of letting it pass. Rego d
 - `compare` needs both sides to exist and have the same type. In plain Rego, `null < 5` is true, so a missing field would otherwise pass a `lt` check. Ordering objects, lists or booleans fails too.
 - `every`, `some` and `for` lines need non-empty lists, inner lists included. A policy that's fine with no items says so with `, if any,`.
 - An alias given twice, or badly written, fails the check, so an inner alias can't quietly hide an outer one.
+- A [part](#parts) that is missing, `null` or the wrong type fails a check exactly as the full path it stands for would, and a part that is written wrong, or has an alias another one has, fails `$well_formed` and is never read as an alias.
 - A check that's written wrong, like an unknown `op` or `cmp`, fails `$well_formed`, and its rows fail with cause `ill_formed`, so a mistake in a subject's conditions can't rule every subject out.
 - A value of the wrong kind, like a string where `range` needs a number, or a param of the wrong type, fails with cause `unusable`, so a condition can't rule a subject out on it.
 - With several conditions, one that can't be read fails the requirement, even when another rules the subject out. The only condition that can rule a subject out regardless is an `exists` that found its field missing.
