@@ -291,7 +291,7 @@ The field has that JSON type. Either article is accepted, and the report prints 
 <path> does not contain <value or field>
 ```
 
-The field is a list that holds the value, or doesn't. Missing: `absent`. `null`: `null`. Not a list: `unusable`. `does not contain` passes on an empty list.
+The field is a list that holds the value, or doesn't. Missing: `absent`. `null`: `null`. Not a list: `unusable`. Wrong type: `unusable`, when the list's items and the value have more than one type, leaving `null` aside, so `labels contains 1` on `["1"]` can't rule a subject out. `does not contain` passes on an empty list.
 
 **[sentence.phrase.contains_all]**
 ```
@@ -299,7 +299,7 @@ The field is a list that holds the value, or doesn't. Missing: `absent`. `null`:
 <path> contains none of <list>
 ```
 
-The field is a list that holds every value, or none of them. Missing, `null` and not a list as `contains`. An empty list written in the sentence can't be written, and one read from a path fails as `unusable`, because it would pass every list. `contains "a", "b"` on its own is written wrong, because it could mean all of them or any of them, so a list always takes `all of` or `none of`.
+The field is a list that holds every value, or none of them. Missing, `null`, not a list and wrong type as `contains`. Values of more than one type are written wrong, with `values of mixed types`, and a list read from a path whose values have more than one type fails as `unusable`. An empty list written in the sentence can't be written, and one read from a path fails as `unusable`, because it would pass every list. `contains "a", "b"` on its own is written wrong, because it could mean all of them or any of them, so a list always takes `all of` or `none of`.
 
 **[sentence.phrase.matches]**
 ```
