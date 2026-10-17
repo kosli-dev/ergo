@@ -4688,5 +4688,745 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a time is before a written time",
+    "policy": {
+      "subjects": {
+        "thing": {
+          "from": [
+            "things"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "opened is before \"2024-01-01T00:00:01Z\""
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes when the order holds",
+        "rules": [
+          "sentence.phrase.time",
+          "sentence.value.scalar",
+          "time.pass",
+          "path.inputs"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "opened": "2024-01-01T00:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "opened",
+                "value": "2024-01-01T00:00:00Z"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "opened is before \"2024-01-01T00:00:01Z\""
+          }
+        }
+      },
+      {
+        "description": "fails as value on the same instant written in another offset",
+        "rules": [
+          "sentence.phrase.time",
+          "sentence.value.scalar",
+          "time.pass"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "opened": "2024-01-01T01:00:01+01:00"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "opened",
+                "value": "2024-01-01T01:00:01+01:00"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when the field is text that is not a time",
+        "rules": [
+          "sentence.phrase.time",
+          "sentence.value.scalar",
+          "time.fail"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "opened": "yesterday"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "opened",
+                "value": "yesterday"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when the field is a number, because the written time is a string",
+        "rules": [
+          "sentence.phrase.time",
+          "sentence.value.scalar",
+          "time.fail"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "opened": 5
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "opened",
+                "value": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": [
+          "sentence.phrase.time",
+          "sentence.value.scalar",
+          "time.fail",
+          "path.absent"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "opened",
+                "value": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a time is after a written number",
+    "policy": {
+      "subjects": {
+        "thing": {
+          "from": [
+            "things"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "opened is after 100"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes when the number is higher",
+        "rules": [
+          "sentence.phrase.time",
+          "sentence.value.scalar",
+          "time.pass",
+          "path.inputs"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "opened": 101
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "opened",
+                "value": 101
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "opened is after 100"
+          }
+        }
+      },
+      {
+        "description": "fails as value on the same number",
+        "rules": [
+          "sentence.phrase.time",
+          "sentence.value.scalar",
+          "time.pass"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "opened": 100
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "opened",
+                "value": 100
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when the field is a string, because the written time is a number",
+        "rules": [
+          "sentence.phrase.time",
+          "sentence.value.scalar",
+          "time.fail"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "opened": "2024-01-01T00:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "opened",
+                "value": "2024-01-01T00:00:00Z"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a time is on or before a written time",
+    "policy": {
+      "subjects": {
+        "thing": {
+          "from": [
+            "things"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "opened is on or before \"2024-01-01T00:00:01Z\""
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes on the same instant written in another offset",
+        "rules": [
+          "sentence.phrase.time",
+          "sentence.value.scalar",
+          "time.pass",
+          "path.inputs"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "opened": "2024-01-01T01:00:01+01:00"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "opened",
+                "value": "2024-01-01T01:00:01+01:00"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "opened is on or before \"2024-01-01T00:00:01Z\""
+          }
+        }
+      },
+      {
+        "description": "fails as value when it is later",
+        "rules": [
+          "sentence.phrase.time",
+          "sentence.value.scalar",
+          "time.pass"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "opened": "2024-01-01T00:00:02Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "opened",
+                "value": "2024-01-01T00:00:02Z"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is in a list read with named by",
+    "policy": {
+      "subjects": {
+        "thing": {
+          "from": [
+            "things"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "x is in $params.lists named by $params.k"
+          }
+        }
+      }
+    },
+    "params": {
+      "lists": {
+        "a": [
+          "p",
+          "q"
+        ],
+        "b": [
+          "r"
+        ]
+      },
+      "k": "a"
+    },
+    "cases": [
+      {
+        "description": "passes when the list under the key has the value",
+        "rules": [
+          "sentence.phrase.one_of",
+          "sentence.phrase.aliases",
+          "sentence.path.dynamic",
+          "path.ref_step",
+          "value.ref",
+          "value.refs"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "x": "p"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": "p"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "x is in $params.lists named by $params.k"
+          }
+        }
+      },
+      {
+        "description": "fails as value when it does not",
+        "rules": [
+          "sentence.phrase.one_of",
+          "sentence.phrase.aliases",
+          "sentence.path.dynamic",
+          "path.ref_step",
+          "value.ref",
+          "value.refs"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "x": "r"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "x",
+                "value": "r"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is in a list read with named by a key that has no list",
+    "policy": {
+      "subjects": {
+        "thing": {
+          "from": [
+            "things"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "x is in $params.lists named by $params.k"
+          }
+        }
+      }
+    },
+    "params": {
+      "lists": {
+        "a": [
+          "p",
+          "q"
+        ],
+        "b": [
+          "r"
+        ]
+      },
+      "k": "c"
+    },
+    "cases": [
+      {
+        "description": "fails as absent whatever the field holds",
+        "rules": [
+          "sentence.phrase.one_of",
+          "sentence.phrase.aliases",
+          "sentence.path.dynamic",
+          "path.ref_step",
+          "value.ref",
+          "value.refs",
+          "path.absent"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "x": "p"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "x",
+                "value": "p"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "matches patterns read with named by",
+    "policy": {
+      "subjects": {
+        "thing": {
+          "from": [
+            "things"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "x matches $params.pats named by $params.k"
+          }
+        }
+      }
+    },
+    "params": {
+      "pats": {
+        "a": [
+          "^a",
+          "^b"
+        ],
+        "b": [
+          "^z"
+        ]
+      },
+      "k": "a"
+    },
+    "cases": [
+      {
+        "description": "passes when a pattern under the key matches",
+        "rules": [
+          "sentence.phrase.matches",
+          "sentence.path.dynamic",
+          "path.ref_step",
+          "value.ref",
+          "value.refs",
+          "patterns.list"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "x": "abc"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": "abc"
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "x matches $params.pats named by $params.k"
+          }
+        }
+      },
+      {
+        "description": "fails as value when only a pattern under another key matches",
+        "rules": [
+          "sentence.phrase.matches",
+          "sentence.path.dynamic",
+          "path.ref_step",
+          "value.ref",
+          "value.refs",
+          "patterns.list"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "x": "zzz"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "thing",
+              "id": "t1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "x",
+                "value": "zzz"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]

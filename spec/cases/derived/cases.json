@@ -7391,17 +7391,259 @@
     },
     "cases": [
       {
-        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "description": "passes between the bounds",
         "rules": [
-          "sentence.derived.compare",
-          "sentence.written_wrong.slot",
-          "written_wrong",
-          "written_wrong.row"
+          "sentence.phrase.between",
+          "tally.between",
+          "sentence.derived.count",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs"
         ],
         "input": {
           "releases": [
             {
-              "approvers": [],
+              "id": "r1",
+              "x": [
+                1,
+                2
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count of x",
+                "value": 2
+              },
+              {
+                "name": "x[]",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "count of x is between 1 and 3"
+          }
+        }
+      },
+      {
+        "description": "passes at the lower bound",
+        "rules": [
+          "sentence.phrase.between",
+          "tally.between",
+          "sentence.derived.count",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "x": [
+                1
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count of x",
+                "value": 1
+              },
+              {
+                "name": "x[]",
+                "value": [
+                  1
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "passes at the upper bound",
+        "rules": [
+          "sentence.phrase.between",
+          "tally.between",
+          "sentence.derived.count",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "x": [
+                1,
+                2,
+                3
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count of x",
+                "value": 3
+              },
+              {
+                "name": "x[]",
+                "value": [
+                  1,
+                  2,
+                  3
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as value above the upper bound",
+        "rules": [
+          "sentence.phrase.between",
+          "tally.between",
+          "sentence.derived.count",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "x": [
+                1,
+                2,
+                3,
+                4
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count of x",
+                "value": 4
+              },
+              {
+                "name": "x[]",
+                "value": [
+                  1,
+                  2,
+                  3,
+                  4
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as value on an empty list, which counts 0",
+        "rules": [
+          "sentence.phrase.between",
+          "tally.between",
+          "sentence.derived.count",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "x": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count of x",
+                "value": 0
+              },
+              {
+                "name": "x[]",
+                "value": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when the list is missing",
+        "rules": [
+          "sentence.phrase.between",
+          "tally.between",
+          "sentence.derived.count",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs",
+          "tally.fail",
+          "sentence.derived.fail",
+          "path.absent"
+        ],
+        "input": {
+          "releases": [
+            {
               "id": "r1"
             }
           ]
@@ -7411,28 +7653,45 @@
             "requirement": "s",
             "subject": {
               "type": "release",
-              "id": null
+              "id": "r1"
             },
-            "check": "$well_formed",
+            "check": "c",
             "passed": false,
-            "cause": "value",
+            "cause": "absent",
             "inputs": [
               {
-                "name": "count(checks)",
-                "value": 1
+                "name": "count of x",
+                "value": null
               },
               {
-                "name": "require",
-                "value": "every"
-              },
-              {
-                "name": "checks.c",
-                "value": [
-                  "\"is between\" after a count of, a sum of or a plus isn't supported yet"
-                ]
+                "name": "x",
+                "value": []
               }
             ]
-          },
+          }
+        ]
+      },
+      {
+        "description": "fails as null when the list is null",
+        "rules": [
+          "sentence.phrase.between",
+          "tally.between",
+          "sentence.derived.count",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs",
+          "tally.fail",
+          "sentence.derived.fail"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "x": null
+            }
+          ]
+        },
+        "results": [
           {
             "requirement": "s",
             "subject": {
@@ -7441,8 +7700,437 @@
             },
             "check": "c",
             "passed": false,
-            "cause": "ill_formed",
-            "inputs": []
+            "cause": "null",
+            "inputs": [
+              {
+                "name": "count of x",
+                "value": null
+              },
+              {
+                "name": "x",
+                "value": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when the list is a string",
+        "rules": [
+          "sentence.phrase.between",
+          "tally.between",
+          "sentence.derived.count",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs",
+          "tally.fail",
+          "sentence.derived.fail"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "x": "abc"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "count of x",
+                "value": null
+              },
+              {
+                "name": "x",
+                "value": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a sum with is between",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "sum of items.usd is between 1 and 3"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes between the bounds",
+        "rules": [
+          "sentence.phrase.between",
+          "tally.between",
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.inputs"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "items": [
+                {
+                  "usd": 1
+                },
+                {
+                  "usd": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "sum of items.usd",
+                "value": 2
+              },
+              {
+                "name": "items[].usd",
+                "value": [
+                  1,
+                  1
+                ]
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "sum of items.usd is between 1 and 3"
+          }
+        }
+      },
+      {
+        "description": "passes at the upper bound",
+        "rules": [
+          "sentence.phrase.between",
+          "tally.between",
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.inputs"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "items": [
+                {
+                  "usd": 1
+                },
+                {
+                  "usd": 2
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "sum of items.usd",
+                "value": 3
+              },
+              {
+                "name": "items[].usd",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as value below the lower bound",
+        "rules": [
+          "sentence.phrase.between",
+          "tally.between",
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.inputs"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "items": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "sum of items.usd",
+                "value": 0
+              },
+              {
+                "name": "items[].usd",
+                "value": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when a value is text",
+        "rules": [
+          "sentence.phrase.between",
+          "tally.between",
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.inputs",
+          "tally.fail",
+          "sentence.derived.fail"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "items": [
+                {
+                  "usd": 1
+                },
+                {
+                  "usd": "2"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "sum of items.usd",
+                "value": null
+              },
+              {
+                "name": "items[].usd",
+                "value": [
+                  1,
+                  "2"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a plus with is between",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "base plus 2 is between 4 and 6"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes between the bounds",
+        "rules": [
+          "sentence.phrase.between",
+          "tally.between",
+          "sentence.derived.plus",
+          "tally.walk",
+          "tally.inputs"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "base": 3
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "base plus 2",
+                "value": 5
+              },
+              {
+                "name": "base",
+                "value": 3
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "base plus 2 is between 4 and 6"
+          }
+        }
+      },
+      {
+        "description": "fails as value above the upper bound",
+        "rules": [
+          "sentence.phrase.between",
+          "tally.between",
+          "sentence.derived.plus",
+          "tally.walk",
+          "tally.inputs"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "base": 5
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "base plus 2",
+                "value": 7
+              },
+              {
+                "name": "base",
+                "value": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when the path is missing",
+        "rules": [
+          "sentence.phrase.between",
+          "tally.between",
+          "sentence.derived.plus",
+          "tally.walk",
+          "tally.inputs",
+          "tally.fail",
+          "path.absent"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "base plus 2",
+                "value": null
+              },
+              {
+                "name": "base",
+                "value": null
+              }
+            ]
           }
         ]
       }
@@ -10535,19 +11223,20 @@
     },
     "cases": [
       {
-        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "description": "adds a number to the elapsed days",
         "rules": [
           "sentence.derived.elapsed",
-          "sentence.written_wrong.slot",
-          "written_wrong",
-          "written_wrong.row"
+          "tally.elapsed",
+          "sentence.derived.plus",
+          "tally.inputs",
+          "sentence.phrase.is"
         ],
         "input": {
           "vulns": [
             {
               "id": "v1",
               "started": 0,
-              "ended": 1
+              "ended": 86400
             }
           ]
         },
@@ -10555,39 +11244,30 @@
           {
             "requirement": "s",
             "subject": {
-              "id": null,
-              "type": "vuln"
+              "type": "vuln",
+              "id": "v1"
             },
-            "check": "$well_formed",
-            "passed": false,
-            "cause": "value",
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
             "inputs": [
               {
-                "name": "count(checks)",
+                "name": "days elapsed from started to ended plus 1",
+                "value": 2
+              },
+              {
+                "name": "days elapsed from started to ended",
                 "value": 1
               },
               {
-                "name": "require",
-                "value": "every"
+                "name": "started",
+                "value": 0
               },
               {
-                "name": "checks.c",
-                "value": [
-                  "an elapsed time isn't supported yet except alone before a phrase"
-                ]
+                "name": "ended",
+                "value": 86400
               }
             ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "id": "v1",
-              "type": "vuln"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "ill_formed",
-            "inputs": []
           }
         ],
         "expressions": {
@@ -10595,6 +11275,154 @@
             "c": "days elapsed from started to ended plus 1 is 2"
           }
         }
+      },
+      {
+        "description": "fails as value when the sum is different",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.plus",
+          "tally.inputs",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 0,
+              "ended": 172800
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "vuln",
+              "id": "v1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended plus 1",
+                "value": 3
+              },
+              {
+                "name": "days elapsed from started to ended",
+                "value": 2
+              },
+              {
+                "name": "started",
+                "value": 0
+              },
+              {
+                "name": "ended",
+                "value": 172800
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as value when the end is before the start, and shows no number",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.plus",
+          "tally.inputs",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 86400,
+              "ended": 0
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "vuln",
+              "id": "v1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended plus 1",
+                "value": null
+              },
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": 86400
+              },
+              {
+                "name": "ended",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when the end is missing",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.plus",
+          "tally.inputs",
+          "sentence.phrase.is",
+          "tally.fail",
+          "path.absent"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 0
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "vuln",
+              "id": "v1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended plus 1",
+                "value": null
+              },
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": 0
+              },
+              {
+                "name": "ended",
+                "value": null
+              }
+            ]
+          }
+        ]
       }
     ]
   },
@@ -10622,19 +11450,20 @@
     },
     "cases": [
       {
-        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "description": "adds the elapsed days to a number",
         "rules": [
           "sentence.derived.elapsed",
-          "sentence.written_wrong.slot",
-          "written_wrong",
-          "written_wrong.row"
+          "tally.elapsed",
+          "sentence.derived.plus",
+          "tally.inputs",
+          "sentence.phrase.is"
         ],
         "input": {
           "vulns": [
             {
               "id": "v1",
               "started": 0,
-              "ended": 1
+              "ended": 86400
             }
           ]
         },
@@ -10642,39 +11471,30 @@
           {
             "requirement": "s",
             "subject": {
-              "id": null,
-              "type": "vuln"
+              "type": "vuln",
+              "id": "v1"
             },
-            "check": "$well_formed",
-            "passed": false,
-            "cause": "value",
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
             "inputs": [
               {
-                "name": "count(checks)",
+                "name": "1 plus days elapsed from started to ended",
+                "value": 2
+              },
+              {
+                "name": "days elapsed from started to ended",
                 "value": 1
               },
               {
-                "name": "require",
-                "value": "every"
+                "name": "started",
+                "value": 0
               },
               {
-                "name": "checks.c",
-                "value": [
-                  "an elapsed time isn't supported yet except alone before a phrase"
-                ]
+                "name": "ended",
+                "value": 86400
               }
             ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "id": "v1",
-              "type": "vuln"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "ill_formed",
-            "inputs": []
           }
         ],
         "expressions": {
@@ -10682,6 +11502,56 @@
             "c": "1 plus days elapsed from started to ended is 2"
           }
         }
+      },
+      {
+        "description": "fails as absent when the start is missing",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.plus",
+          "tally.inputs",
+          "sentence.phrase.is",
+          "tally.fail",
+          "path.absent"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "ended": 86400
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "vuln",
+              "id": "v1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "1 plus days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": null
+              },
+              {
+                "name": "ended",
+                "value": 86400
+              }
+            ]
+          }
+        ]
       }
     ]
   },
@@ -10709,19 +11579,21 @@
     },
     "cases": [
       {
-        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "description": "compares a field with the elapsed days",
         "rules": [
           "sentence.derived.elapsed",
-          "sentence.written_wrong.slot",
-          "written_wrong",
-          "written_wrong.row"
+          "tally.elapsed",
+          "tally.inputs",
+          "sentence.phrase.is",
+          "sentence.value.path"
         ],
         "input": {
           "vulns": [
             {
               "id": "v1",
+              "n": 1,
               "started": 0,
-              "ended": 1
+              "ended": 86400
             }
           ]
         },
@@ -10729,39 +11601,30 @@
           {
             "requirement": "s",
             "subject": {
-              "id": null,
-              "type": "vuln"
+              "type": "vuln",
+              "id": "v1"
             },
-            "check": "$well_formed",
-            "passed": false,
-            "cause": "value",
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
             "inputs": [
               {
-                "name": "count(checks)",
+                "name": "n",
                 "value": 1
               },
               {
-                "name": "require",
-                "value": "every"
+                "name": "days elapsed from started to ended",
+                "value": 1
               },
               {
-                "name": "checks.c",
-                "value": [
-                  "an elapsed time isn't supported yet except alone before a phrase"
-                ]
+                "name": "started",
+                "value": 0
+              },
+              {
+                "name": "ended",
+                "value": 86400
               }
             ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "id": "v1",
-              "type": "vuln"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "ill_formed",
-            "inputs": []
           }
         ],
         "expressions": {
@@ -10769,11 +11632,112 @@
             "c": "n is days elapsed from started to ended"
           }
         }
+      },
+      {
+        "description": "fails as value when they differ",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "tally.inputs",
+          "sentence.phrase.is",
+          "sentence.value.path"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "n": 2,
+              "started": 0,
+              "ended": 86400
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "vuln",
+              "id": "v1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "n",
+                "value": 2
+              },
+              {
+                "name": "days elapsed from started to ended",
+                "value": 1
+              },
+              {
+                "name": "started",
+                "value": 0
+              },
+              {
+                "name": "ended",
+                "value": 86400
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when the end is missing",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "tally.inputs",
+          "sentence.phrase.is",
+          "sentence.value.path",
+          "tally.fail",
+          "path.absent"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "n": 1,
+              "started": 0
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "vuln",
+              "id": "v1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "n",
+                "value": 1
+              },
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": 0
+              },
+              {
+                "name": "ended",
+                "value": null
+              }
+            ]
+          }
+        ]
       }
     ]
   },
   {
-    "description": "days elapsed in a sum on the right side",
+    "description": "days elapsed in a plus on the right side",
     "policy": {
       "subjects": {
         "vuln": {
@@ -10796,19 +11760,22 @@
     },
     "cases": [
       {
-        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "description": "compares a field with a number plus the elapsed days",
         "rules": [
           "sentence.derived.elapsed",
-          "sentence.written_wrong.slot",
-          "written_wrong",
-          "written_wrong.row"
+          "tally.elapsed",
+          "sentence.derived.plus",
+          "tally.inputs",
+          "sentence.phrase.order",
+          "sentence.value.path"
         ],
         "input": {
           "vulns": [
             {
               "id": "v1",
+              "n": 3,
               "started": 0,
-              "ended": 1
+              "ended": 86400
             }
           ]
         },
@@ -10816,39 +11783,34 @@
           {
             "requirement": "s",
             "subject": {
-              "id": null,
-              "type": "vuln"
+              "type": "vuln",
+              "id": "v1"
             },
-            "check": "$well_formed",
-            "passed": false,
-            "cause": "value",
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
             "inputs": [
               {
-                "name": "count(checks)",
+                "name": "n",
+                "value": 3
+              },
+              {
+                "name": "1 plus days elapsed from started to ended",
+                "value": 2
+              },
+              {
+                "name": "days elapsed from started to ended",
                 "value": 1
               },
               {
-                "name": "require",
-                "value": "every"
+                "name": "started",
+                "value": 0
               },
               {
-                "name": "checks.c",
-                "value": [
-                  "an elapsed time isn't supported yet except alone before a phrase"
-                ]
+                "name": "ended",
+                "value": 86400
               }
             ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "id": "v1",
-              "type": "vuln"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "ill_formed",
-            "inputs": []
           }
         ],
         "expressions": {
@@ -10856,6 +11818,61 @@
             "c": "n is more than 1 plus days elapsed from started to ended"
           }
         }
+      },
+      {
+        "description": "fails as value when the field is not more",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.derived.plus",
+          "tally.inputs",
+          "sentence.phrase.order",
+          "sentence.value.path"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "n": 2,
+              "started": 0,
+              "ended": 86400
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "vuln",
+              "id": "v1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "n",
+                "value": 2
+              },
+              {
+                "name": "1 plus days elapsed from started to ended",
+                "value": 2
+              },
+              {
+                "name": "days elapsed from started to ended",
+                "value": 1
+              },
+              {
+                "name": "started",
+                "value": 0
+              },
+              {
+                "name": "ended",
+                "value": 86400
+              }
+            ]
+          }
+        ]
       }
     ]
   },
@@ -10876,27 +11893,39 @@
         "s": {
           "subject": "vuln",
           "checks": {
-            "c": "every xs whose days elapsed from started to ended is 1 is not empty"
+            "c": "every xs.title whose days elapsed from started to ended is 1 is not empty"
           }
         }
       }
     },
     "cases": [
       {
-        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "description": "checks the items whose elapsed days pass, and leaves the others out",
         "rules": [
+          "sentence.whose.item",
           "sentence.derived.elapsed",
-          "sentence.derived.compare",
-          "sentence.written_wrong.slot",
-          "written_wrong",
-          "written_wrong.row"
+          "tally.elapsed",
+          "sentence.whose.every",
+          "sentence.every.walk",
+          "walk.every",
+          "sentence.phrase.empty"
         ],
         "input": {
           "vulns": [
             {
               "id": "v1",
-              "started": 0,
-              "ended": 1
+              "xs": [
+                {
+                  "title": "x",
+                  "started": 0,
+                  "ended": 86400
+                },
+                {
+                  "title": "",
+                  "started": 0,
+                  "ended": 172800
+                }
+              ]
             }
           ]
         },
@@ -10904,46 +11933,184 @@
           {
             "requirement": "s",
             "subject": {
-              "id": null,
-              "type": "vuln"
-            },
-            "check": "$well_formed",
-            "passed": false,
-            "cause": "value",
-            "inputs": [
-              {
-                "name": "count(checks)",
-                "value": 1
-              },
-              {
-                "name": "require",
-                "value": "every"
-              },
-              {
-                "name": "checks.c",
-                "value": [
-                  "an elapsed time isn't supported yet except alone before a phrase"
-                ]
-              }
-            ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "id": "v1",
-              "type": "vuln"
+              "type": "vuln",
+              "id": "v1"
             },
             "check": "c",
-            "passed": false,
-            "cause": "ill_formed",
-            "inputs": []
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "xs[].title",
+                "value": [
+                  "x",
+                  ""
+                ]
+              }
+            ],
+            "failed_items": []
           }
         ],
         "expressions": {
           "s": {
-            "c": "every xs whose days elapsed from started to ended is 1 is not empty"
+            "c": "every xs.title whose days elapsed from started to ended is 1 is not empty"
           }
         }
+      },
+      {
+        "description": "leaves out an item whose end is before its start",
+        "rules": [
+          "sentence.whose.item",
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.whose.every",
+          "sentence.every.walk",
+          "walk.every",
+          "sentence.phrase.empty",
+          "tally.elapsed"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "xs": [
+                {
+                  "title": "x",
+                  "started": 0,
+                  "ended": 86400
+                },
+                {
+                  "title": "",
+                  "started": 86400,
+                  "ended": 0
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "vuln",
+              "id": "v1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "xs[].title",
+                "value": [
+                  "x",
+                  ""
+                ]
+              }
+            ],
+            "failed_items": []
+          }
+        ]
+      },
+      {
+        "description": "fails as value when a kept item fails",
+        "rules": [
+          "sentence.whose.item",
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.whose.every",
+          "sentence.every.walk",
+          "walk.every",
+          "sentence.phrase.empty"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "xs": [
+                {
+                  "title": "",
+                  "started": 0,
+                  "ended": 86400
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "vuln",
+              "id": "v1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "xs[].title",
+                "value": [
+                  ""
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "xs[0].title",
+                "item": "item 1 of xs",
+                "cause": "value",
+                "value": ""
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as value when whose leaves no item",
+        "rules": [
+          "sentence.whose.item",
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.whose.every",
+          "sentence.every.walk",
+          "walk.every",
+          "sentence.phrase.empty"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "xs": [
+                {
+                  "title": "x",
+                  "started": 0,
+                  "ended": 172800
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "vuln",
+              "id": "v1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "xs[].title",
+                "value": [
+                  "x"
+                ]
+              }
+            ],
+            "failed_items": []
+          }
+        ]
       }
     ]
   },
@@ -10971,19 +12138,35 @@
     },
     "cases": [
       {
-        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "description": "counts the items whose elapsed days pass, and shows every item",
         "rules": [
+          "sentence.derived.count",
           "sentence.derived.elapsed",
-          "sentence.written_wrong.slot",
-          "written_wrong",
-          "written_wrong.row"
+          "tally.walk",
+          "tally.count",
+          "tally.inputs",
+          "tally.whose",
+          "tally.elapsed",
+          "sentence.phrase.is"
         ],
         "input": {
           "vulns": [
             {
               "id": "v1",
-              "started": 0,
-              "ended": 1
+              "xs": [
+                {
+                  "started": 0,
+                  "ended": 86400
+                },
+                {
+                  "started": 0,
+                  "ended": 86400
+                },
+                {
+                  "started": 0,
+                  "ended": 172800
+                }
+              ]
             }
           ]
         },
@@ -10991,40 +12174,35 @@
           {
             "requirement": "s",
             "subject": {
-              "id": null,
-              "type": "vuln"
+              "type": "vuln",
+              "id": "v1"
             },
-            "check": "$well_formed",
-            "passed": false,
-            "cause": "value",
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
             "inputs": [
               {
-                "name": "count(checks)",
-                "value": 1
+                "name": "count of xs whose days elapsed from started to ended is 1",
+                "value": 2
               },
               {
-                "name": "require",
-                "value": "every"
-              },
-              {
-                "name": "checks.c",
+                "name": "xs[]",
                 "value": [
-                  "a count of, a sum of or a plus in the whose of a count of or a sum of isn't supported yet",
-                  "an elapsed time isn't supported yet except alone before a phrase"
+                  {
+                    "started": 0,
+                    "ended": 86400
+                  },
+                  {
+                    "started": 0,
+                    "ended": 86400
+                  },
+                  {
+                    "started": 0,
+                    "ended": 172800
+                  }
                 ]
               }
             ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "id": "v1",
-              "type": "vuln"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "ill_formed",
-            "inputs": []
           }
         ],
         "expressions": {
@@ -11032,16 +12210,208 @@
             "c": "count of xs whose days elapsed from started to ended is 1 is 2"
           }
         }
+      },
+      {
+        "description": "fails as value when fewer items pass",
+        "rules": [
+          "sentence.derived.count",
+          "sentence.derived.elapsed",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs",
+          "tally.whose",
+          "tally.elapsed",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "xs": [
+                {
+                  "started": 0,
+                  "ended": 86400
+                },
+                {
+                  "started": 0,
+                  "ended": 172800
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "vuln",
+              "id": "v1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count of xs whose days elapsed from started to ended is 1",
+                "value": 1
+              },
+              {
+                "name": "xs[]",
+                "value": [
+                  {
+                    "started": 0,
+                    "ended": 86400
+                  },
+                  {
+                    "started": 0,
+                    "ended": 172800
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "leaves out an item whose end is before its start",
+        "rules": [
+          "sentence.derived.count",
+          "sentence.derived.elapsed",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs",
+          "tally.whose",
+          "tally.elapsed",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "xs": [
+                {
+                  "started": 0,
+                  "ended": 86400
+                },
+                {
+                  "started": 0,
+                  "ended": 86400
+                },
+                {
+                  "started": 86400,
+                  "ended": 0
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "vuln",
+              "id": "v1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count of xs whose days elapsed from started to ended is 1",
+                "value": 2
+              },
+              {
+                "name": "xs[]",
+                "value": [
+                  {
+                    "started": 0,
+                    "ended": 86400
+                  },
+                  {
+                    "started": 0,
+                    "ended": 86400
+                  },
+                  {
+                    "started": 86400,
+                    "ended": 0
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when an item cannot be decided because its end is missing",
+        "rules": [
+          "sentence.derived.count",
+          "sentence.derived.elapsed",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs",
+          "tally.whose",
+          "tally.elapsed",
+          "sentence.phrase.is",
+          "tally.fail",
+          "sentence.whose.undecided",
+          "path.absent"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "xs": [
+                {
+                  "started": 0,
+                  "ended": 86400
+                },
+                {
+                  "started": 0
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "vuln",
+              "id": "v1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "count of xs whose days elapsed from started to ended is 1",
+                "value": null
+              },
+              {
+                "name": "xs[]",
+                "value": [
+                  {
+                    "started": 0,
+                    "ended": 86400
+                  },
+                  {
+                    "started": 0
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
     ]
   },
   {
-    "description": "days elapsed after every",
+    "description": "a count in the whose of a count",
     "policy": {
       "subjects": {
-        "vuln": {
+        "release": {
           "from": [
-            "vulns"
+            "releases"
           ],
           "identified_by": [
             "id"
@@ -11050,28 +12420,41 @@
       },
       "requirements": {
         "s": {
-          "subject": "vuln",
+          "subject": "release",
           "checks": {
-            "c": "every xs is days elapsed from started to ended"
+            "c": "count of prs whose count of reviews is at least 2 is 1"
           }
         }
       }
     },
     "cases": [
       {
-        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "description": "counts the items whose own count passes, and shows every item",
         "rules": [
-          "sentence.derived.elapsed",
-          "sentence.written_wrong.slot",
-          "written_wrong",
-          "written_wrong.row"
+          "sentence.derived.count",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs",
+          "tally.whose",
+          "sentence.phrase.is"
         ],
         "input": {
-          "vulns": [
+          "releases": [
             {
-              "id": "v1",
-              "started": 0,
-              "ended": 1
+              "id": "r1",
+              "prs": [
+                {
+                  "reviews": [
+                    1,
+                    2
+                  ]
+                },
+                {
+                  "reviews": [
+                    1
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -11079,45 +12462,189 @@
           {
             "requirement": "s",
             "subject": {
-              "id": null,
-              "type": "vuln"
+              "type": "release",
+              "id": "r1"
             },
-            "check": "$well_formed",
-            "passed": false,
-            "cause": "value",
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
             "inputs": [
               {
-                "name": "count(checks)",
+                "name": "count of prs whose count of reviews is at least 2",
                 "value": 1
               },
               {
-                "name": "require",
-                "value": "every"
-              },
-              {
-                "name": "checks.c",
+                "name": "prs[]",
                 "value": [
-                  "an elapsed time isn't supported yet except alone before a phrase",
-                  "count of, sum of and plus after every or some aren't supported yet"
+                  {
+                    "reviews": [
+                      1,
+                      2
+                    ]
+                  },
+                  {
+                    "reviews": [
+                      1
+                    ]
+                  }
                 ]
               }
             ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "id": "v1",
-              "type": "vuln"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "ill_formed",
-            "inputs": []
           }
         ],
         "expressions": {
           "s": {
-            "c": "every xs is days elapsed from started to ended"
+            "c": "count of prs whose count of reviews is at least 2 is 1"
+          }
+        }
+      },
+      {
+        "description": "fails as absent when an item's list is missing, so the item cannot be decided",
+        "rules": [
+          "sentence.derived.count",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs",
+          "tally.whose",
+          "sentence.phrase.is",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.whose.undecided",
+          "path.absent"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "prs": [
+                {
+                  "reviews": [
+                    1,
+                    2
+                  ]
+                },
+                {}
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "count of prs whose count of reviews is at least 2",
+                "value": null
+              },
+              {
+                "name": "prs[]",
+                "value": [
+                  {
+                    "reviews": [
+                      1,
+                      2
+                    ]
+                  },
+                  {}
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count in the whose of a sum",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "sum of prs.n whose count of reviews is at least 2 is 5"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "adds only the items whose own count passes",
+        "rules": [
+          "sentence.derived.sum",
+          "sentence.derived.count",
+          "tally.walk",
+          "tally.sum",
+          "tally.inputs",
+          "tally.whose",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "prs": [
+                {
+                  "n": 5,
+                  "reviews": [
+                    1,
+                    2
+                  ]
+                },
+                {
+                  "n": 7,
+                  "reviews": [
+                    1
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "r1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "sum of prs.n whose count of reviews is at least 2",
+                "value": 5
+              },
+              {
+                "name": "prs[].n",
+                "value": [
+                  5,
+                  7
+                ]
+              }
+            ]
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "sum of prs.n whose count of reviews is at least 2 is 5"
           }
         }
       }
@@ -11147,20 +12674,20 @@
     },
     "cases": [
       {
-        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "description": "passes at the lower bound",
         "rules": [
           "sentence.derived.elapsed",
-          "sentence.derived.compare",
-          "sentence.written_wrong.slot",
-          "written_wrong",
-          "written_wrong.row"
+          "tally.elapsed",
+          "sentence.phrase.between",
+          "tally.between",
+          "tally.inputs"
         ],
         "input": {
           "vulns": [
             {
               "id": "v1",
               "started": 0,
-              "ended": 1
+              "ended": 86400
             }
           ]
         },
@@ -11168,39 +12695,26 @@
           {
             "requirement": "s",
             "subject": {
-              "id": null,
-              "type": "vuln"
+              "type": "vuln",
+              "id": "v1"
             },
-            "check": "$well_formed",
-            "passed": false,
-            "cause": "value",
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
             "inputs": [
               {
-                "name": "count(checks)",
+                "name": "days elapsed from started to ended",
                 "value": 1
               },
               {
-                "name": "require",
-                "value": "every"
+                "name": "started",
+                "value": 0
               },
               {
-                "name": "checks.c",
-                "value": [
-                  "\"is between\" after a count of, a sum of or a plus isn't supported yet"
-                ]
+                "name": "ended",
+                "value": 86400
               }
             ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "id": "v1",
-              "type": "vuln"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "ill_formed",
-            "inputs": []
           }
         ],
         "expressions": {
@@ -11208,6 +12722,187 @@
             "c": "days elapsed from started to ended is between 1 and 2"
           }
         }
+      },
+      {
+        "description": "passes at the upper bound",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.phrase.between",
+          "tally.between",
+          "tally.inputs"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 0,
+              "ended": 172800
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "vuln",
+              "id": "v1"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": 2
+              },
+              {
+                "name": "started",
+                "value": 0
+              },
+              {
+                "name": "ended",
+                "value": 172800
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as value above the upper bound",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.phrase.between",
+          "tally.between",
+          "tally.inputs"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 0,
+              "ended": 259200
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "vuln",
+              "id": "v1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": 3
+              },
+              {
+                "name": "started",
+                "value": 0
+              },
+              {
+                "name": "ended",
+                "value": 259200
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as value when the end is before the start, and shows no number",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.phrase.between",
+          "tally.between",
+          "tally.inputs"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 86400,
+              "ended": 0
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "vuln",
+              "id": "v1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": 86400
+              },
+              {
+                "name": "ended",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when the end is missing",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "sentence.phrase.between",
+          "tally.between",
+          "tally.inputs",
+          "tally.fail",
+          "path.absent"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": 0
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "vuln",
+              "id": "v1"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": 0
+              },
+              {
+                "name": "ended",
+                "value": null
+              }
+            ]
+          }
+        ]
       }
     ]
   },
@@ -11381,76 +13076,6 @@
         "expressions": {
           "s": {
             "c": "months elapsed from started to ended is 1"
-          }
-        }
-      }
-    ]
-  },
-  {
-    "description": "days elapsed in a from line",
-    "policy": {
-      "subjects": {
-        "vuln": {
-          "from": "vulns whose days elapsed from started to ended is 1"
-        }
-      },
-      "requirements": {
-        "s": {
-          "subject": "vuln",
-          "checks": {
-            "c": "id exists"
-          }
-        }
-      }
-    },
-    "cases": [
-      {
-        "description": "is written wrong in the from line, and $well_formed says why",
-        "rules": [
-          "sentence.derived.elapsed",
-          "tally.elapsed",
-          "sentence.written_wrong.slot"
-        ],
-        "input": {
-          "vulns": [
-            {
-              "id": "v1",
-              "started": 0,
-              "ended": 1
-            }
-          ]
-        },
-        "results": [
-          {
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "vuln"
-            },
-            "check": "$well_formed",
-            "passed": false,
-            "cause": "value",
-            "inputs": [
-              {
-                "name": "count(checks)",
-                "value": 1
-              },
-              {
-                "name": "require",
-                "value": "every"
-              },
-              {
-                "name": "subjects.vuln.from",
-                "value": [
-                  "an elapsed time isn't supported yet except alone before a phrase"
-                ]
-              }
-            ]
-          }
-        ],
-        "expressions": {
-          "s": {
-            "c": "id exists"
           }
         }
       }

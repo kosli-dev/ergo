@@ -70,6 +70,16 @@ Three ways to settle it:
 - Have the author mark the lists, like `every prs[].commits[].signed`. That changes the grammar of [#174](https://github.com/kosli-dev/ergo/issues/174), and costs some of its plain reading.
 - Give ergo the shape of the input, as a schema, so a step is walked because the schema says it holds a list. [#191](https://github.com/kosli-dev/ergo/pull/191) already declares a schema for part of `input`.
 
+## Sentences the spec doesn't say enough about yet
+
+`ergo.rego` doesn't run these forms, and the spec doesn't pin down their rows, so there are no cases for them. A case for each can go in once the question is settled, and be listed in `known_differences` in `spec_test.rego` while `ergo.rego` fails it.
+
+- `last of`: what a row's `inputs` name is. `first of xs` prints `item 1 of xs`, because the position is known when the sentence is read. The last position isn't, and an empty list has no item to number. It could print `last of xs`, or `item 3 of xs` for a list of three and something else for an empty one. The meaning is clear: the last item, absent on an empty list, `unusable` on something that isn't a list, as `first of` is.
+- `count of`, `sum of` and `plus` in the phrase of an `every` or `some`, like `every xs is count of ys`, and an elapsed time there, like `every xs is days elapsed from started to ended`: [sentence.argument.item](sentences.md#every-some-and-whose) says a path in the argument starts at the item, but not what the row's `inputs` show for a number worked out from each item.
+- An elapsed time in the `whose` of a `count of`, a `sum of` or an `every`, when an item can't be decided: which path `failed_items` names when the check reads two, `started` or `ended`.
+- An elapsed time in a subject's `from` line, like `vulns whose days elapsed from started to ended is 1`: what the `$applies` row shows for it, and which paths its `inputs` list.
+- A `plus` in the `whose` of a `count of` or a `sum of`, like `count of xs whose a plus b is 3 is 1`: whether a `whose` condition can have `plus` on its left.
+
 ## Rules without cases
 
 Every rule needs a case, apart from the ones listed here. The `sentence` rules here are for forms `ergo.rego` doesn't run or check yet. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.
