@@ -99,7 +99,7 @@ Let's ask for the report:
 opa eval -d policy -i deployments.json --format=pretty 'data.deploy.report'
 ```
 
-The report records every check ergo ran, including the ones that passed. It comes in three parts, after the policy's own `description` and `meta`, which this one doesn't have:
+The report records every check ergo ran, including the ones that passed. It comes in four parts, after the policy's own `description` and `meta`, which this one doesn't have:
 
 ```json
 {
@@ -107,13 +107,26 @@ The report records every check ergo ran, including the ones that passed. It come
   "description": "",
   "meta": {},
   "requirements": { ... },
-  "results": [ ... ]
+  "results": [ ... ],
+  "subjects": { ... }
 }
 ```
 
 - `compliant` is the overall answer. When you need a plain yes or no to allow or block something, this is the one to use: `allow := report.compliant`.
 - `requirements` has an entry for each requirement. It repeats the requirement's `description`, and its `status` is `met`, `not_met`, or `not_applicable` when no subject was left to check. When it's `not_met`, `causes` says why, worst first, with how many rows each: here `[{"cause": "absent", "rows": 1}]`. It also says how many subjects were found and kept, and lists every check with a readable `expression`, which is the sentence as you wrote it.
 - `results` has one row per subject and check, with the value ergo read, whether the check passed, and a `cause`.
+- `subjects` says where each subject the requirements use comes from. Here it holds one entry, and the requirement's own entry has `"subject": "deployment"` to point at it:
+
+  ```json
+  "subjects": {
+    "deployment": {
+      "description": "",
+      "from": "deployments whose environment is \"prod\"",
+      "identified_by": "id",
+      "parts": {}
+    }
+  }
+  ```
 
 Here's what those rows look like for our example:
 

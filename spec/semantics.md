@@ -407,9 +407,18 @@ A policy has two sections. `subjects` defines each kind of subject once, and `re
 
 **[compliant]** The report is `compliant` when it has at least one requirement and none is `not_met`. A policy with no requirements is never compliant, because it doesn't check anything.
 
-**[report.requirements]** The report has an entry for each requirement, with its `description` and `meta`, or `""` and `{}` when it has none, its `require`, its `status`, `subjects` with `total`, the number found by `from`, and `matching`, the number in scope, `checks`, each check as written with its `description`, `meta` and `expression`, plus the checks ergo adds, and `causes`. All the filters share one `$applies` entry.
+**[report.requirements]** The report has an entry for each requirement, with its `description` and `meta`, or `""` and `{}` when it has none, its `require`, `subject`, the name of the subject it checks, or `null` when it names none or one that isn't in the policy's subjects, its `status`, `subjects` with `total`, the number found by `from`, and `matching`, the number in scope, `checks`, each check as written with its `description`, `meta` and `expression`, plus the checks ergo adds, and `causes`. All the filters share one `$applies` entry.
 
 **[report.policy]** The report has the policy's `description` and `meta` at its top, next to `compliant`, or `""` and `{}` when the policy has none. `null` counts as none. A `description` that isn't a string, or a `meta` that isn't an object or holds something JSON can't, makes the `$well_formed` row of every requirement fail, because the policy belongs to all of them, and the report shows `""` or `{}` in its place.
+
+**[report.subjects]** The report has `subjects` at its top, with an entry for each subject a requirement uses, by name. That's the subject it names, the subjects that one narrows or reads from, and so on all the way back. A subject no requirement uses isn't listed. An entry has:
+
+- `description`, the subject's description, or `""` when it has none or it isn't a string
+- `from`, how the subject is found, written as a `from` line: the line itself, printed the same way whatever spaces it was written with, or for a subject written as a list, its path followed by `whose` and its conditions, which are sorted by name. A naming step at the end of the path is shown as `named by each of <ref>` when its keys come from a ref, as `<each of "a", "b">` when they're listed, and as `<each as name>` when it has none. Anything with no sentence form is shown in angle brackets, never left out: a condition that can't be written as a sentence is shown as `<condition name>`, and `applies_to` that isn't an object as `<invalid applies_to>`. A subject without `from` reads the input field named like it. A `from` that is written wrong is `<invalid from>`.
+- `identified_by`, the path of the subject's id, or `null` when it has none, because the whole subject is its id. A subject that narrows another has the id of the one it narrows. An id that is written wrong is `<invalid identified_by>`.
+- `parts`, always `{}` for now
+
+A subject that is written wrong still has its entry.
 
 **[report.causes]** `causes` lists the causes of the rows that would be [violations](#violations) of the requirement, each with `rows`, the number of rows that have it. It counts rows, not subjects, and lists the causes in the order of [causes](#causes), worst first. A requirement that's `met` or `not_applicable` has an empty list.
 

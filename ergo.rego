@@ -4423,7 +4423,7 @@ report(doc, policy, params) := r if {
 	sentences := _s_sentences(raw, reqs)
 	unreadable := _unreadable_inputs(doc, params)
 	resolved := _resolved_subjects with data.ergo_subjects as subjects with data.ergo_subject_sentences as subject_sentences
-	written := object.union(_report_of(doc, reqs), {"description": _reported_description(policy), "meta": _reported_meta(policy)}) with data.ergo_policy_problems as _policy_problem_inputs(policy) with data.ergo_document as doc with data.ergo_params as params with data.ergo_subjects as subjects with data.ergo_resolved as resolved with data.ergo_unreadable as unreadable with data.ergo_sentences as sentences with data.ergo_subject_sentences as subject_sentences with input as {"ergo/names": {}}
+	written := object.union(_report_of(doc, reqs), {"description": _reported_description(policy), "meta": _reported_meta(policy), "subjects": _reported_subjects(written_subjects, reqs)}) with data.ergo_policy_problems as _policy_problem_inputs(policy) with data.ergo_document as doc with data.ergo_params as params with data.ergo_subjects as subjects with data.ergo_resolved as resolved with data.ergo_unreadable as unreadable with data.ergo_sentences as sentences with data.ergo_subject_sentences as subject_sentences with input as {"ergo/names": {}}
 	used := _used_subjects(reqs, subjects, resolved)
 	r := _reported(written, unreadable, [raw, used])
 }
@@ -4433,6 +4433,188 @@ _used_subjects(reqs, subjects, resolved) := {name: subjects[name] |
 	_names_a_subject(req)
 	some name in resolved[req.subject].members
 }
+
+_reported_subject_name(req) := req.subject if {
+	_names_a_subject(req)
+	is_object(data.ergo_subjects)
+	req.subject in object.keys(data.ergo_subjects)
+} else := null
+
+_listed_subject_graph := {name: array.concat(_of_edges(def, data.ergo_subjects), [chains[name] | name in object.keys(chains)]) |
+	some name, def in data.ergo_subjects
+	chains := object.get(data.ergo_subject_sentences, "chains", {})
+}
+
+_listed_subject_names(reqs) := graph.reachable(_listed_subject_graph, {req.subject |
+	some req in reqs
+	_reported_subject_name(req) != null
+})
+
+_reported_subjects(written, reqs) := {name: _reported_subject(name, written[name]) | some name in _listed_subject_names(reqs)} if is_object(written)
+
+_reported_subjects(written, _) := {} if not is_object(written)
+
+_reported_subject(name, def) := {
+	"description": _reported_description(def),
+	"from": _subject_from_text(name, def),
+	"identified_by": _subject_id_text(name),
+	"parts": {},
+}
+
+_subject_from_text(name, null) := _path_name([name])
+
+_subject_from_text(_, def) := "<invalid from>" if {
+	def != null
+	not is_object(def)
+}
+
+_subject_from_text(name, def) := "<invalid from>" if {
+	is_object(def)
+	_subject_from_unreadable(name, def)
+}
+
+_subject_from_text(name, def) := _subject_text(name, def) if {
+	is_object(def)
+	not _subject_from_unreadable(name, def)
+}
+
+default _subject_from_invalid(_) := false
+
+_subject_from_invalid(name) if {
+	some p in data.ergo_resolved[name].problems
+	some f in ["from", "of"]
+	p[0] == ["subjects", name, f]
+}
+
+_subject_from_unreadable(name, _) if _subject_from_invalid(name)
+
+_subject_from_unreadable(name, def) if not _subject_readable(name, def)
+
+_subject_readable(name, def) if _subject_text(name, def)
+
+_subject_text(_, def) := _s_from_line_text(_from_line(def.from)) if {
+	is_string(object.get(def, "from", null))
+	object.keys(def) & {"of", "applies_to"} == set()
+}
+
+_subject_text(name, def) := concat("", [_subject_source_text(name, def), _subject_whose_text(def)]) if not is_string(object.get(def, "from", null))
+
+_subject_source_text(name, def) := _path_name([def.of]) if {
+	is_string(object.get(def, "of", null))
+	not "from" in object.keys(def)
+	def.of != name
+	def.of in object.keys(data.ergo_subjects)
+} else := _subject_list_source_text(name, def.from) if {
+	is_array(object.get(def, "from", null))
+	not "of" in object.keys(def)
+} else := _path_name([name]) if {
+	not "from" in object.keys(def)
+	not "of" in object.keys(def)
+}
+
+_subject_list_source_text(_, []) := "$input"
+
+_subject_list_source_text(name, from) := _c_from_path(name, from, data.ergo_subjects) if {
+	count(from) > 0
+	_all_string_steps(from)
+}
+
+_subject_list_source_text(name, from) := text if {
+	count(from) > 0
+	not _all_string_steps(from)
+	text := _c_source(name, from, data.ergo_subjects)
+} else := concat("", [_from_text({"subject": name}), _naming_text(from[count(from) - 1])]) if {
+	count(from) > 0
+	not _all_string_steps(from)
+}
+
+_naming_text(step) := "" if not _c_naming(step)
+
+_naming_text(step) := concat("", [" <each as ", _text(step.each_as), ">"]) if {
+	_c_naming(step)
+	not "keys" in object.keys(step)
+}
+
+_naming_text(step) := concat("", [" named by each of ", _ref_name(step.keys.ref)]) if {
+	_c_naming(step)
+	_is_ref(object.get(step, "keys", null))
+}
+
+_naming_text(step) := concat("", [" <each of ", concat(", ", [_naming_key_text(k) | some k in step.keys]), ">"]) if {
+	_c_naming(step)
+	is_array(object.get(step, "keys", null))
+}
+
+_naming_text(step) := concat("", [" <each of ", concat(", ", [_literal_text(k) | some k in step.keys.literal]), ">"]) if {
+	_c_naming(step)
+	_is_literal(object.get(step, "keys", null))
+	is_array(step.keys.literal)
+}
+
+_naming_key_text(k) := _ref_name(k.ref) if _is_ref(k)
+
+_naming_key_text(k) := _literal_text(k.literal) if _is_literal(k)
+
+_naming_key_text(k) := _literal_text(k) if {
+	not _is_ref(k)
+	not _is_literal(k)
+}
+
+_all_string_steps(from) if {
+	every step in from {
+		is_string(step)
+	}
+}
+
+_subject_whose_text(def) := "" if not "applies_to" in object.keys(def)
+
+_subject_whose_text(def) := " whose <invalid applies_to>" if {
+	"applies_to" in object.keys(def)
+	not is_object(def.applies_to)
+}
+
+_subject_whose_text(def) := "" if {
+	is_object(object.get(def, "applies_to", null))
+	count(def.applies_to) == 0
+}
+
+_subject_whose_text(def) := concat("", [" whose ", concat(" and ", [_subject_condition_text(n, def.applies_to[n]) | some n in sort(object.keys(def.applies_to))])]) if {
+	is_object(object.get(def, "applies_to", null))
+	count(def.applies_to) > 0
+}
+
+_subject_condition_text(n, f) := _c_candidates(_c_bare(f))[0] if {
+	is_object(f)
+	(object.keys(_c_bare(f)) - {"op"}) - object.get(_plain_condition_fields, object.get(f, "op", null), set()) == set()
+} else := concat("", ["<condition ", _text(n), ">"])
+
+_plain_condition_fields := {
+	"present": {"path"},
+	"missing": {"path"},
+	"non_empty_string": {"path"},
+	"equals": {"path", "value"},
+	"in": {"path", "values"},
+	"range": {"path", "min", "max"},
+	"matches_any": {"path", "patterns"},
+	"not_matches_any": {"path", "patterns"},
+	"includes": {"path", "value", "values"},
+	"excludes": {"path", "value", "values"},
+	"compare": {"left", "right", "cmp", "within"},
+	"compare_time": {"left", "right", "cmp"},
+}
+
+_subject_id_text(name) := _id_text(data.ergo_resolved[name].def.identified_by) if {
+	"identified_by" in object.keys(data.ergo_resolved[name].def)
+} else := null
+
+_id_text(p) := null if p == []
+
+_id_text(p) := _path_name(p) if {
+	is_array(p)
+	count(p) > 0
+}
+
+_id_text(p) := "<invalid identified_by>" if not is_array(p)
 
 _section(policy, name) := object.get(policy, name, {}) if is_object(policy)
 
@@ -4478,6 +4660,7 @@ _report_of(doc, policy) := {
 		"description": _reported_description(req),
 		"meta": _reported_meta(req),
 		"require": _require_of(req),
+		"subject": _reported_subject_name(req),
 		"status": status,
 		"causes": _causes(status, evaluations[name]),
 		"subjects": {"total": evaluations[name].total, "matching": evaluations[name].matching},

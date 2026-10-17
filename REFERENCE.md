@@ -130,11 +130,11 @@ deployment:
   identified_by: id
 ```
 
-| Field           | Meaning                                                                                                     | Default                                |
-| --------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| `description`   | What the subject is, in words anyone can read. ergo doesn't copy it into the report.                        | `""`                                   |
-| `from`          | Where the subjects are in the input, and which of them are in scope, written as a [from line](#from-lines). | the input field named like the subject |
-| `identified_by` | The path, inside one subject, to the value that identifies it.                                              | the whole subject                      |
+| Field           | Meaning                                                                                                             | Default                                |
+| --------------- | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| `description`   | What the subject is, in words anyone can read. The report copies it into its [`subjects`](#subjects-in-the-report). | `""`                                   |
+| `from`          | Where the subjects are in the input, and which of them are in scope, written as a [from line](#from-lines).         | the input field named like the subject |
+| `identified_by` | The path, inside one subject, to the value that identifies it.                                                      | the whole subject                      |
 
 `applies_to` and `of`, and a `from` or `identified_by` written as a list, are the [old syntax](#subjects-in-the-old-syntax).
 
@@ -849,13 +849,16 @@ Three rules:
   "description": "",
   "meta": {},
   "requirements": { ... },
-  "results": [ ... ]
+  "results": [ ... ],
+  "subjects": { ... }
 }
 ```
 
 `compliant` is `true` when there's at least one requirement and none of them is `not_met`.
 
 `description` and `meta` are the [policy's](#describing-a-policy), or `""` and `{}` when it has none.
+
+`subjects` says where the subjects come from, as [Subjects in the report](#subjects-in-the-report) shows.
 
 `requirements` has an entry for each requirement:
 
@@ -893,6 +896,7 @@ Three rules:
   "require": "every",
   "status": "not_met",
   "causes": [{ "cause": "absent", "rows": 1 }],
+  "subject": "deployment",
   "subjects": { "matching": 2, "total": 3 }
 }
 ```
@@ -935,7 +939,7 @@ The three `ill_formed` rows are the misspelt check on `d-1`, `d-2` and `d-4`. Th
 
 `description` and `meta` are the requirement's, or `""` and `{}` when it has none. They're always there, so you can read `meta.control` without first checking that `meta` exists.
 
-`subjects.total` counts every subject found at `from`, and `subjects.matching` counts the ones left after the subject's conditions. `checks` holds each check as you wrote it, plus the `expression` ergo rendered from it. Each check has a `description` and a `meta` too, `""` and `{}` when you didn't write them. A filter in `applies_to`, in the [old syntax](#subjects-in-the-old-syntax), can have them as well, and they're checked the same way, but the report doesn't copy them: its filters all share the one `$applies` entry, with ergo's own description. A `description` or `meta` of the wrong type makes the requirement or the check [written wrong](#basic-operators), and the report shows `""` or `{}` in its place, so a tool always finds a string and an object there. If you write your own `expression`, yours is used, as long as it's a string. Any other value is ignored, and ergo renders the expression as if it weren't there. A check that uses a [`ref`](#reading-from-the-input) also gets `$refs`: the name and value of each one, as read for this report. The `$` marks it as ergo's, so it can't be mixed up with a field of your own. It also holds the [checks ergo adds](#checks-ergo-adds), each with a `description`, an `expression` and an empty `meta`.
+`subject` is the name of the subject the requirement checks, which is also a key of the report's `subjects`. It's `null` when the requirement names no subject, or one that isn't in the policy's `subjects`. `subjects.total` counts every subject found at `from`, and `subjects.matching` counts the ones left after the subject's conditions. `checks` holds each check as you wrote it, plus the `expression` ergo rendered from it. Each check has a `description` and a `meta` too, `""` and `{}` when you didn't write them. A filter in `applies_to`, in the [old syntax](#subjects-in-the-old-syntax), can have them as well, and they're checked the same way, but the report doesn't copy them: its filters all share the one `$applies` entry, with ergo's own description. A `description` or `meta` of the wrong type makes the requirement or the check [written wrong](#basic-operators), and the report shows `""` or `{}` in its place, so a tool always finds a string and an object there. If you write your own `expression`, yours is used, as long as it's a string. Any other value is ignored, and ergo renders the expression as if it weren't there. A check that uses a [`ref`](#reading-from-the-input) also gets `$refs`: the name and value of each one, as read for this report. The `$` marks it as ergo's, so it can't be mixed up with a field of your own. It also holds the [checks ergo adds](#checks-ergo-adds), each with a `description`, an `expression` and an empty `meta`.
 
 In an expression, a value written in the policy is shown as JSON, written the same way whatever the policy looked like, so anyone can produce the same text:
 
@@ -963,6 +967,113 @@ Several of these rules depend on how a number was written, not only on its value
 ```
 
 Passing and failing rows have the same fields. A row of an `all` or `any` check also has [`failed_items`](#which-items-failed). To find a row's description and expression, look up `requirements[row.requirement].checks[row.check]`. Look it up through the requirement, because two requirements can use the same check name for different things.
+
+### Subjects in the report
+
+`subjects` has an entry for each subject the requirements use, by name. That's the subject a requirement names, the subject it narrows or reads from, and so on all the way back. A subject no requirement uses isn't listed.
+
+Take this policy:
+
+```yaml
+subjects:
+  deployment:
+    description: Something we ship
+    from: deployments
+    identified_by: id
+  prod deployment:
+    from: deployment whose environment is "prod"
+  release:
+    from: releases
+requirements:
+  approved:
+    subject: prod deployment
+    checks:
+      approved: approved_by is a non-empty string
+```
+
+and this input:
+
+```json
+{
+  "deployments": [
+    { "id": "d-1", "environment": "prod", "approved_by": "alice" },
+    { "id": "d-2", "environment": "staging" }
+  ]
+}
+```
+
+The requirement's entry has `"subject": "prod deployment"`, and `subjects` is:
+
+```json
+{
+  "deployment": {
+    "description": "Something we ship",
+    "from": "deployments",
+    "identified_by": "id",
+    "parts": {}
+  },
+  "prod deployment": {
+    "description": "",
+    "from": "deployment whose environment is \"prod\"",
+    "identified_by": "id",
+    "parts": {}
+  }
+}
+```
+
+`release` isn't there, because no requirement uses it. `deployment` is, because `prod deployment` narrows it.
+
+Each entry has:
+
+- `description` is the subject's, or `""` when it has none. A `description` that isn't a string is [written wrong](#subjects) and shows as `""`.
+- `from` says how the subject is found, as a [from line](#from-lines) is written. A `from` written as a line is printed the same way whatever spaces it had. One written as a list, in the [old syntax](#subjects-in-the-old-syntax), is printed as a sentence too: its path, then ` whose ` and its `applies_to` filters, sorted by name and joined with `and`. A [naming step](#naming-subjects) at the end of the path shows as `named by each of $params.suites` when its keys come from a ref, as `<each of "unit", "lint">` when they're listed, and as `<each as suite>` when it has none, since a `from` line has no way to write those two. A filter that can't be written as a sentence, like one with a custom operator or a substitute, shows as `<condition name>` so it's never left out, and an `applies_to` that isn't an object shows as `<invalid applies_to>`. A subject built on another with `of` starts with that subject's name. A subject without `from` reads the input field named like it. A `from` that is written wrong shows as `<invalid from>`.
+- `identified_by` is the path of the subject's id, or `null` when it has none, and the whole subject is its id. A subject that narrows another has the id of the one it narrows. An id that is written wrong shows as `<invalid identified_by>`.
+- `parts` is always `{}` for now.
+
+A subject that is written wrong still has its entry, so nothing disappears from the report. With this policy and the same input:
+
+```yaml
+subjects:
+  deployment:
+    from: [deployments]
+    identified_by: [id]
+    applies_to:
+      is_prod: {op: equals, path: [environment], value: prod}
+  note: {}
+requirements:
+  approved:
+    subject: deployment
+    checks:
+      approved: approved_by is a non-empty string
+  noted:
+    subject: note
+    checks:
+      text: text is a non-empty string
+  other:
+    checks:
+      x: x exists
+```
+
+`subjects` is:
+
+```json
+{
+  "deployment": {
+    "description": "",
+    "from": "deployments whose environment is \"prod\"",
+    "identified_by": "id",
+    "parts": {}
+  },
+  "note": {
+    "description": "",
+    "from": "note",
+    "identified_by": null,
+    "parts": {}
+  }
+}
+```
+
+and the three requirements' `subject` are `"deployment"`, `"note"` and `null`, because `other` names no subject.
 
 ### Checks ergo adds
 

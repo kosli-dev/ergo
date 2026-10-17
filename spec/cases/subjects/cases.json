@@ -3717,5 +3717,392 @@
         ]
       }
     ]
+  },
+  {
+    "description": "the report lists the subjects the requirements use",
+    "policy": {
+      "subjects": {
+        "deployment": {
+          "from": "  deployments   whose environment is \"prod\" ",
+          "identified_by": "id",
+          "description": "A deployment to production"
+        },
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "deployment",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists a subject with its description, its from line printed the same way whatever the spaces, and its id",
+        "rules": [
+          "report.subjects"
+        ],
+        "input": {},
+        "report": {
+          "subjects": {
+            "deployment": {
+              "description": "A deployment to production",
+              "from": "deployments whose environment is \"prod\"",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "results": []
+      },
+      {
+        "description": "names the subject in the requirement entry, and lists no subject that no requirement uses",
+        "rules": [
+          "report.requirements",
+          "report.subjects"
+        ],
+        "input": {},
+        "report": {
+          "subjects": {
+            "deployment": {
+              "description": "A deployment to production",
+              "from": "deployments whose environment is \"prod\"",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "requirements": {
+          "s": {
+            "subject": "deployment"
+          }
+        },
+        "results": []
+      }
+    ]
+  },
+  {
+    "description": "a subject that narrows another",
+    "policy": {
+      "subjects": {
+        "round": {
+          "from": "rounds",
+          "identified_by": "id",
+          "description": "A round"
+        },
+        "done": {
+          "from": "round whose state is \"done\""
+        },
+        "other": {
+          "from": "others"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "done",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists both subjects, and the narrowing one has the id of the one it narrows",
+        "rules": [
+          "report.subjects"
+        ],
+        "input": {},
+        "report": {
+          "subjects": {
+            "done": {
+              "description": "",
+              "from": "round whose state is \"done\"",
+              "identified_by": "id",
+              "parts": {}
+            },
+            "round": {
+              "description": "A round",
+              "from": "rounds",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "results": []
+      }
+    ]
+  },
+  {
+    "description": "a subject read from another subject",
+    "policy": {
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts",
+          "identified_by": "fingerprint"
+        },
+        "pull request": {
+          "from": "artifact.pull_requests",
+          "identified_by": "url"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pull request",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the parent it is read from too",
+        "rules": [
+          "report.subjects"
+        ],
+        "input": {},
+        "report": {
+          "subjects": {
+            "artifact": {
+              "description": "",
+              "from": "trail.artifacts",
+              "identified_by": "fingerprint",
+              "parts": {}
+            },
+            "pull request": {
+              "description": "",
+              "from": "artifact.pull_requests",
+              "identified_by": "url",
+              "parts": {}
+            }
+          }
+        },
+        "results": []
+      }
+    ]
+  },
+  {
+    "description": "subjects written as lists",
+    "policy": {
+      "subjects": {
+        "base": {
+          "from": [
+            "components"
+          ],
+          "identified_by": [
+            "name"
+          ]
+        },
+        "locked": {
+          "of": "base",
+          "applies_to": {
+            "locked": {
+              "op": "present",
+              "path": [
+                "lock_release"
+              ]
+            },
+            "exempt": {
+              "op": "equals",
+              "path": [
+                "exempt"
+              ],
+              "value": false
+            }
+          }
+        },
+        "odd": {
+          "from": [
+            "things"
+          ],
+          "applies_to": {
+            "b": {
+              "op": "present",
+              "path": [
+                "b"
+              ]
+            },
+            "a": {
+              "op": "even",
+              "path": [
+                "n"
+              ]
+            }
+          }
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "locked",
+          "checks": {
+            "c": "id exists"
+          }
+        },
+        "t": {
+          "subject": "odd",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "prints the path and the conditions sorted by name as a sentence, and shows a condition that is not a sentence by its name",
+        "rules": [
+          "report.subjects"
+        ],
+        "input": {},
+        "report": {
+          "subjects": {
+            "base": {
+              "description": "",
+              "from": "components",
+              "identified_by": "name",
+              "parts": {}
+            },
+            "locked": {
+              "description": "",
+              "from": "base whose exempt is false and lock_release exists",
+              "identified_by": "name",
+              "parts": {}
+            },
+            "odd": {
+              "description": "",
+              "from": "things whose <condition a> and b exists",
+              "identified_by": null,
+              "parts": {}
+            }
+          }
+        },
+        "results": []
+      }
+    ]
+  },
+  {
+    "description": "a subject with no from and no identified_by",
+    "policy": {
+      "subjects": {
+        "deployments": {}
+      },
+      "requirements": {
+        "s": {
+          "subject": "deployments",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the input field named like it, and has no id path",
+        "rules": [
+          "report.subjects"
+        ],
+        "input": {},
+        "report": {
+          "subjects": {
+            "deployments": {
+              "description": "",
+              "from": "deployments",
+              "identified_by": null,
+              "parts": {}
+            }
+          }
+        },
+        "results": []
+      }
+    ]
+  },
+  {
+    "description": "a subject written wrong",
+    "policy": {
+      "subjects": {
+        "broken": {
+          "from": "deployments whose",
+          "description": 3
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "broken",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "still has its entry, with <invalid from> and an empty description",
+        "rules": [
+          "report.subjects"
+        ],
+        "input": {},
+        "report": {
+          "subjects": {
+            "broken": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": null,
+              "parts": {}
+            }
+          }
+        },
+        "results": []
+      }
+    ]
+  },
+  {
+    "description": "a requirement with no subject, or one that isn't there",
+    "policy": {
+      "subjects": {
+        "deployment": {
+          "from": "deployments"
+        }
+      },
+      "requirements": {
+        "s": {
+          "checks": {
+            "c": "id exists"
+          }
+        },
+        "t": {
+          "subject": "nope",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "has subject null, and no subject is listed",
+        "rules": [
+          "report.requirements",
+          "report.subjects"
+        ],
+        "input": {},
+        "report": {
+          "subjects": {}
+        },
+        "requirements": {
+          "s": {
+            "subject": null
+          },
+          "t": {
+            "subject": null
+          }
+        },
+        "results": []
+      }
+    ]
   }
 ]
