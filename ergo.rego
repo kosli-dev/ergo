@@ -383,7 +383,7 @@ _checks_problems(req) := {["checks", "missing"] | is_object(req); not "checks" i
 
 _require_problems(req) := {["require", "neither every nor some"] | is_object(req); not _require_of(req) in {"every", "some"}}
 
-_path_problems(req, f) := {[f, "step that can't be a key"] | is_array(_req_field(req, f, null)); _badly_stepped(req[f])} | {[f, "number out of range"] | is_array(_req_field(req, f, null)); _out_of_range(req[f])}
+_path_problems(req, f) := {[f, "step that can't be a key"] | is_array(_req_field(req, f, null)); _badly_stepped(req[f], false)} | {[f, "number out of range"] | is_array(_req_field(req, f, null)); _out_of_range(req[f])}
 
 _naming_step_problems(from) := {["from", m] |
 	is_array(from)
@@ -1195,35 +1195,35 @@ _is_key(v) if {
 	regex.match(`^[0-9]+$`, json.marshal(v))
 }
 
-_badly_stepped(p) if {
+_badly_stepped(p, here) if {
 	is_array(p)
 	some seg in p
-	_bad_step(seg)
+	_bad_step(seg, here)
 }
 
-_badly_stepped(p) if {
+_badly_stepped(p, here) if {
 	not is_array(p)
-	_bad_step(p)
+	_bad_step(p, here)
 }
 
-_bad_step(seg) if {
+_bad_step(seg, _) if {
 	not is_object(seg)
 	not _is_key(seg)
 }
 
-_bad_step(seg) if {
+_bad_step(seg, _) if {
 	_is_literal(seg)
 	not _is_key(seg.literal)
 }
 
-_bad_step(seg) if {
+_bad_step(seg, here) if {
 	_name_step(seg)
-	not data.ergo_sentence_here == true
+	not here
 }
 
-_bad_step(seg) if {
+_bad_step(seg, here) if {
 	_field_step(seg)
-	not data.ergo_sentence_here == true
+	not here
 }
 
 _unliteral(seg) := seg.literal if _is_literal(seg)
@@ -2296,8 +2296,8 @@ _required_fields := {
 	"any_of": {"options"},
 }
 
-_flaw(check, names) := "ill_formed" if {
-	_ill_formed(check, names)
+_flaw(check, names, here) := "ill_formed" if {
+	_ill_formed(check, names, here)
 } else := "unusable" if {
 	_param_broken(check, names)
 } else := "unusable" if {
@@ -2306,13 +2306,13 @@ _flaw(check, names) := "ill_formed" if {
 
 _unreadable_input if data.ergo_unreadable != []
 
-default _ill_formed(_, _) := false
+default _ill_formed(_, _, _) := false
 
-_ill_formed(check, names) if count(_check_problems(check, names)) > 0
+_ill_formed(check, names, here) if count(_check_problems(check, names, here)) > 0
 
-_check_problems(check, names) := {[node[1], msg] |
+_check_problems(check, names, here) := {[node[1], msg] |
 	some node in _static_nodes(check, names)
-	some msg in _node_problems(node[0], node[2], node[3])
+	some msg in _node_problems(node[0], node[2], node[3], here)
 }
 
 _static_nodes(check, names) := array.concat(_walk_nodes([[check, [], [], names]]), _substitute_nodes(check, names))
@@ -2384,35 +2384,35 @@ _option_children(node, names) := [[leaf, ["options", nm, i], "option", names] |
 	_option_list(node.options)
 }
 
-_node_problems(node, _, _) := {"invalid check"} if not is_object(node)
+_node_problems(node, _, _, _) := {"invalid check"} if not is_object(node)
 
-_node_problems(node, kinds, names) := (((_op_problems(node, kinds) | _field_problems(node)) | _step_problems(node)) | _name_problems(node, names)) | _derived_placement_problem(node, kinds) if {
+_node_problems(node, kinds, names, here) := (((_op_problems(node, kinds, here) | _field_problems(node, here)) | _step_problems(node, here)) | _name_problems(node, names)) | _derived_placement_problem(node, kinds) if {
 	is_object(node)
-	not _s_unread(node)
+	not _s_unread(node, here)
 }
 
-_node_problems(node, _, _) := {p | some p in node["$sentence"]} | _wording_problem(node) if _s_unread(node)
+_node_problems(node, _, _, here) := {p | some p in node["$sentence"]} | _wording_problem(node) if _s_unread(node, here)
 
-default _op_problems(_, _) := set()
+default _op_problems(_, _, _) := set()
 
-_op_problems(node, _) := {"missing op"} if not "op" in object.keys(node)
+_op_problems(node, _, _) := {"missing op"} if not "op" in object.keys(node)
 
-_op_problems(node, _) := {concat("", ["unknown op ", _text(node.op)])} if {
+_op_problems(node, _, here) := {concat("", ["unknown op ", _text(node.op)])} if {
 	"op" in object.keys(node)
 	not node.op in operators
-	not _sentence_op(node)
+	not _sentence_op(node, here)
 }
 
 _sentence_ops := {"empty_string_or_list", "not_empty_string_or_list", "not_in", "has_type", "all_of", "every", "some", "for"}
 
-_sentence_op(node) if {
+_sentence_op(node, here) if {
 	node.op in _sentence_ops
-	_s_read(node)
+	_s_read(node, here)
 }
 
-_op_problems(node, kinds) := {"nested too deep"} if _too_deep(node, kinds)
+_op_problems(node, kinds, _) := {"nested too deep"} if _too_deep(node, kinds)
 
-_op_problems(node, kinds) := {concat("", [_text(node.op), " can't go here"])} if {
+_op_problems(node, kinds, _) := {concat("", [_text(node.op), " can't go here"])} if {
 	node.op in operators
 	not _quantified(node)
 	not node.op in _allowed_ops(kinds)
@@ -2429,7 +2429,7 @@ _nested_ops := {
 	"assertion": [_leaf_ops],
 }
 
-_field_problems(node) := union({_side_problem(node), _within_problem(node), _wording_problem(node), _unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node), _misplaced_fields_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node), _json_problem(node)})
+_field_problems(node, here) := union({_side_problem(node, here), _within_problem(node), _wording_problem(node), _unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node, here), _misplaced_fields_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node), _json_problem(node)})
 
 _json_problem(node) := _json_problems(object.remove(_own_fields(node), ["meta"]))
 
@@ -2575,19 +2575,19 @@ _ref_read_at(f, v, [_]) if {
 	_value_list(v)
 }
 
-_cmp_problem(node) := {"invalid cmp" |
+_cmp_problem(node, here) := {"invalid cmp" |
 	_two_sided(node)
 	"cmp" in object.keys(node)
 	not node.cmp in {"eq", "ne", "gt", "gte", "lt", "lte"}
-	not _sentence_cmp(node)
+	not _sentence_cmp(node, here)
 }
 
 _text_cmps := {"starts_with", "ends_with"}
 
-_sentence_cmp(node) if {
+_sentence_cmp(node, here) if {
 	node.op == "compare"
 	node.cmp in (_text_cmps | _list_cmps)
-	_s_read(node)
+	_s_read(node, here)
 }
 
 _misplaced_fields_problem(node) := {concat("", [f, " can't go here"]) |
@@ -2644,7 +2644,7 @@ _valid_patterns(v) if {
 
 _own_fields(node) := object.remove(node, ["check", "options", "substitute"])
 
-_step_problems(node) := {concat("", [f, " not a list"]) |
+_step_problems(node, here) := {concat("", [f, " not a list"]) |
 	some f in ["path", "left", "right", "each"]
 	f in object.keys(node)
 	not _side_field(node, f)
@@ -2653,7 +2653,7 @@ _step_problems(node) := {concat("", [f, " not a list"]) |
 } | {concat("", ["step that can't be a key in ", f]) |
 	some f in ["path", "left", "right", "each", "inputs"]
 	some p in _own_paths(node, f)
-	_badly_stepped(p)
+	_badly_stepped(p, here)
 }
 
 _checked_as_side(node, f) if {
@@ -3937,9 +3937,9 @@ _key_fields(check) := sort({seg.named_by_field |
 
 _once(xs) := [x | some i, x in xs; not x in array.slice(xs, 0, i)]
 
-_check_def(check, _) := _with_refs({"description": _reported_description(check), "meta": _reported_meta(check), "expression": check.expression}, check) if _s_read(check)
+_check_def(check, _, here) := _with_refs({"description": _reported_description(check), "meta": _reported_meta(check), "expression": check.expression}, check) if _s_read(check, here)
 
-_check_def(check, item) := _with_refs(object.union(object.remove(_described(check, item), {"description", "meta"}), {"description": _reported_description(check), "meta": _reported_meta(check)}), check) if not _s_read(check)
+_check_def(check, item, here) := _with_refs(object.union(object.remove(_described(check, item), {"description", "meta"}), {"description": _reported_description(check), "meta": _reported_meta(check)}), check) if not _s_read(check, here)
 
 _with_refs(def, checked) := object.union(def, {"$refs": _ref_inputs(checked)}) if count(_check_refs(checked)) > 0
 
@@ -4060,8 +4060,8 @@ _well_formed(req) if {
 	_require_of(req) in {"every", "some"}
 	_from_well_formed(req)
 	not _out_of_range([_from_of(req), _id_of(req), _min_subjects_of(req)])
-	not _badly_stepped(_from_of(req))
-	not _badly_stepped(_id_of(req))
+	not _badly_stepped(_from_of(req), false)
+	not _badly_stepped(_id_of(req), false)
 	_wrapped_in_where(_id_of(req)) == set()
 	_req_json_problems(req) == set()
 	_check_problem_inputs(req) == []
@@ -4072,7 +4072,8 @@ _check_problem_inputs(req) := [{"name": name, "value": sort({p[1] | some p in pr
 	problems := {[_field_path_name(array.concat(_checks_at(req, f, n), p[0])), p[1]] |
 		some f in ["applies_to", "checks"]
 		some n, check in _req_checks(req, f)
-		found := _check_problems(check, _from_names(req)) with data.ergo_sentence_here as _s_written_here(req, f, n)
+		here := _s_written_here(req, f, n)
+		found := _check_problems(check, _from_names(req, here), here)
 		some p in found
 	}
 }
@@ -4085,10 +4086,10 @@ _checks_at(req, "applies_to", n) := ["subjects", _filter_owner(req, n), "applies
 
 _checks_at(_, "checks", n) := ["checks", n]
 
-_from_names(req) := {n |
+_from_names(req, here) := {n |
 	_from_well_formed(req)
 	n := _each_step(req).each_as
-} | {data.ergo_subject_sentences.chains[req.subject] | _chained(req); data.ergo_sentence_here == true}
+} | {data.ergo_subject_sentences.chains[req.subject] | _chained(req); here}
 
 _well_formed_inputs(req) := array.concat(
 	array.concat(
@@ -4134,7 +4135,7 @@ _requirement_checks_written_or_added(req) := object.union(
 	object.union(
 		{name: def |
 			some name, check in _checks_of(req)
-			def := _check_def(check, _subject_item_name(req)) with data.ergo_sentence_here as _s_written_here(req, "checks", name)
+			def := _check_def(check, _subject_item_name(req), _s_written_here(req, "checks", name))
 		},
 		object.union(_min_subjects_def(req), _unique_ids_def(req)),
 	),
@@ -4270,11 +4271,13 @@ _evaluation(doc, req, name) := {
 	raw := _raw_entries(doc, req)
 	filter_flaws := {n: flaw |
 		some n, check in _applies_to_of(req)
-		flaw := _flaw(check, _from_names(req)) with data.ergo_sentence_here as _s_written_here(req, "applies_to", n)
+		here := _s_written_here(req, "applies_to", n)
+		flaw := _flaw(check, _from_names(req, here), here)
 	}
 	check_flaws := {n: flaw |
 		some n, check in _checks_of(req)
-		flaw := _flaw(check, _from_names(req)) with data.ergo_sentence_here as _s_written_here(req, "checks", n)
+		here := _s_written_here(req, "checks", n)
+		flaw := _flaw(check, _from_names(req, here), here)
 	}
 	item := _subject_item_name(req)
 	refs := {i: _entry_ref(entry, req) | some i, entry in raw}
@@ -4490,7 +4493,7 @@ _report_of(doc, policy) := {
 
 _evaluated(doc, req, name) := e if {
 	not _chained(req)
-	e := _evaluation(doc, req, name) with data.ergo_in as {}
+	e := _evaluation(doc, req, name)
 }
 
 _evaluated(doc, req, name) := _chain_evaluation(req, name, _parent_pick(doc, req)) if _chained(req)
@@ -4510,7 +4513,7 @@ _chain_evaluation(req, name, pick) := object.union(base, {
 	"rows_complete": true,
 }) if {
 	"cause" in object.keys(pick)
-	base := _evaluation({}, req, name) with data.ergo_in as {}
+	base := _evaluation({}, req, name)
 }
 
 _chained(req) if {
@@ -4534,7 +4537,8 @@ _parent_pick_of(doc, preq) := {"cause": c} if {
 	raw := _raw_entries(doc, preq)
 	flaws := {n: flaw |
 		some n, check in _applies_to_of(preq)
-		flaw := _flaw(check, _from_names(preq)) with data.ergo_sentence_here as _s_written_here(preq, "applies_to", n)
+		here := _s_written_here(preq, "applies_to", n)
+		flaw := _flaw(check, _from_names(preq, here), here)
 	}
 	refs := {i: _entry_ref_of(entry, preq) | some i, entry in raw}
 	matches := {i: _subject_matches(entry.subject, preq, flaws) | some i, entry in raw}
@@ -5102,7 +5106,7 @@ _tallies(side, at) := [[array.concat(at, ["add", i]), operand] | some i, operand
 
 _tallies(side, _) := [] if not _side_form(side) in {"count_of", "sum_of", "add"}
 
-_side_problem(node) := ({concat("", ["invalid ", f]) |
+_side_problem(node, here) := ({concat("", ["invalid ", f]) |
 	node.op == "compare"
 	some f in ["left", "right"]
 	f in object.keys(node)
@@ -5112,7 +5116,7 @@ _side_problem(node) := ({concat("", ["invalid ", f]) |
 	some f in ["left", "right"]
 	f in object.keys(node)
 	_sentence_side(node[f])
-	not _s_read(node)
+	not _s_read(node, here)
 }) | {concat("", ["invalid ", f]) |
 	node.op == "compare_time"
 	some f in ["left", "right"]
@@ -6159,15 +6163,12 @@ _s_unread_problems(text) := {p | some p in object.get(parsed, "problems", [])} |
 	parsed := _sentence(text)
 }
 
-_s_unread(node) if {
-	_s_read(node)
+_s_unread(node, here) if {
+	_s_read(node, here)
 	count(object.get(node, "$sentence", [])) > 0
 }
 
-_s_read(node) if {
-	is_object(node)
-	data.ergo_sentence_here == true
-}
+_s_read(node, true) if is_object(node)
 
 _s_written_here(req, "checks", n) if {
 	[req, n] in data.ergo_sentences
