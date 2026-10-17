@@ -36,7 +36,7 @@ elapsed           = ("seconds" / "minutes" / "hours" / "days" / "weeks") WS "ela
 term              = right-path / derived / elapsed / number
 derived-left      = derived [WS whose]
                   / 1*(term WS "plus" WS) (term / derived WS whose)
-field             = (right-path / derived) *(WS "plus" WS term)
+field             = (right-path / derived / elapsed) *(WS "plus" WS term)
                   / number 1*(WS "plus" WS term)
 operand           = value / field
 
@@ -64,7 +64,7 @@ starts-phrase     = ("starts" WS "with" / "ends" WS "with") WS operand
 time-phrase       = ("is" WS "before" / "is" WS "after" / "is" WS "on" WS "or" WS "after" / "is" WS "on" WS "or" WS "before") WS operand
 
 list              = values / right-path
-values            = value *("," WS value)
+values            = value *("," [WS] value)
 value             = string / number / "true" / "false" / "null"
 
 ; Paths. The first key of a path, when bare, is never a word of the
