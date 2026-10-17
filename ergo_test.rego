@@ -8385,9 +8385,20 @@ test_a_sentence_marker_written_by_hand_is_an_unknown_field_like_any_other if {
 	ergo.report({"things": []}, _sentence_policy({"c": {"op": "present", "path": ["x"], "$sentence": []}}), {}).requirements.s.checks.c == {"description": "", "meta": {}, "op": "present", "path": ["x"], "$sentence": [], "expression": "x is present"}
 }
 
+test_no_data_document_can_make_a_check_read_as_a_sentence if {
+	json_policy := lifted({"s": {"from": ["items", {"each_as": "it"}], "id": ["id"], "checks": {
+		"c": {"op": "all_of", "checks": [{"op": "present", "path": ["id"]}], "assertions": ["id exists"]},
+		"d": {"op": "present", "path": ["id"], "$sentence": []},
+	}}})
+	plain := ergo.report({"items": [{"id": 1}]}, json_policy, {})
+	set_by_data := ergo.report({"items": [{"id": 1}]}, json_policy, {}) with data.ergo_sentence_here as true
+	set_by_data == plain
+	[r.passed | some r in plain.results; r.check == "$well_formed"] == [false]
+}
+
 test_a_check_is_read_as_a_sentence_only_where_the_policy_wrote_one if {
-	not ergo._s_read({"op": "present", "path": ["x"], "expression": "x exists"})
-	ergo._s_read({"op": "present", "path": ["x"], "expression": "x exists"}) with data.ergo_sentence_here as true
+	not ergo._s_read({"op": "present", "path": ["x"], "expression": "x exists"}, false)
+	ergo._s_read({"op": "present", "path": ["x"], "expression": "x exists"}, true)
 	ergo._s_sentences({"r": {"checks": ["x exists"]}, "q": 1}, {"r": {"checks": ["x exists"]}, "q": 1}) == set()
 	ergo._s_sentences(null, null) == set()
 	ergo._s_written_here({}, "applies_to", "f") == false
