@@ -85,11 +85,11 @@
         ]
       },
       {
-        "description": "fails as value when an item's field is the wrong type for is",
+        "description": "fails as unusable when an item's field is the wrong type for is",
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.is"],
         "input": {"releases": [{"id": "r1", "commits": [{"signed": "yes"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "commits[].signed", "value": ["yes"]}], "failed_items": [{"path": "commits[0].signed", "item": "item 1 of commits", "cause": "value", "value": "yes"}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "commits[].signed", "value": ["yes"]}], "failed_items": [{"path": "commits[0].signed", "item": "item 1 of commits", "cause": "unusable", "value": "yes"}]}
         ]
       },
       {

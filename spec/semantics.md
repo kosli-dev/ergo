@@ -117,17 +117,17 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 
 **[equals.pass]** It passes when its path ends `found` or `null` and the value read [equals](#values) the value. So a `null` value passes on a field that's there and `null`.
 
-**[equals.fail]** It fails with the path's outcome as its cause when the path ends anything but `found` or `null`, a missing field included, even when the value is `null`. It fails with `null` when the field is `null` and the value isn't. When the field was read, it fails with `value`, even when the types differ.
+**[equals.fail]** It fails with the path's outcome as its cause when the path ends anything but `found` or `null`, a missing field included, even when the value is `null`. It fails with `null` when the field is `null` and the value isn't. When the field was read, it fails with `unusable` when the field and the value have different types, so `"5"` against `5` can't rule a subject out, and with `value` otherwise. Against a `null` value, a field that was read fails with `value`.
 
 ## `in`
 
 `in` takes a path and a list of values, and asks whether the field is one of them.
 
-**[in.values]** The values are a list whose items are values, or a ref to a list. When the ref reads something other than a list, the check fails as `unusable`. A list read through a ref is data, so an object in it that looks like a ref is compared as an object.
+**[in.values]** The values are a list whose items are values, or a ref to a list. The values all have one type, leaving `null` aside. When the ref reads something other than a list, or the values read through refs have more than one type, the check fails as `unusable`. A list read through a ref is data, so an object in it that looks like a ref is compared as an object.
 
 **[in.pass]** It passes when its path ends `found` and the value read [equals](#values) one of the values.
 
-**[in.fail]** It fails with the path's outcome as its cause when the path ends anything but `found`, so a missing or `null` field fails even when the values hold `null`. When the field was read, it fails with `value`, an empty list of values included.
+**[in.fail]** It fails with the path's outcome as its cause when the path ends anything but `found`, so a missing or `null` field fails even when the values hold `null`. When the field was read, it fails with `unusable` when its type isn't the type of the values, and with `value` otherwise, an empty list of values included.
 
 ## `has_type`
 
@@ -141,9 +141,9 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 
 `not_in` takes a path and a list of values, written like the values of [`in`](#in), and asks whether the field is none of them. It's what the sentences `is not one of` and `is not in` read into, see [sentence.phrase.one_of](sentences.md#phrases), and today's syntax can't use it (see [sentence_ops.syntax](syntax.md#policies)).
 
-**[not_in.pass]** It passes when its path ends `found` and the value read [equals](#values) none of the values. So a value of another type passes, since `5` isn't one of `"prod"` and `"staging"`, and so does any value when the list is empty.
+**[not_in.pass]** It passes when its path ends `found`, the value read has the type of the values, and it [equals](#values) none of them. Any value passes when the list is empty.
 
-**[not_in.fail]** It fails with the path's outcome as its cause when the path ends anything but `found`, so a missing or `null` field fails even when the values hold `null`. When a ref reads something other than a list, it fails as `unusable`, as `in` does. When the field equals one of the values, it fails with `value`.
+**[not_in.fail]** It fails with the path's outcome as its cause when the path ends anything but `found`, so a missing or `null` field fails even when the values hold `null`. When the values can't be used, as [in.values](#in) says, or the field has another type than the values, it fails as `unusable`, as `in` does. When the field equals one of the values, it fails with `value`.
 
 ## `non_empty_string`
 
@@ -213,7 +213,7 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 
 **[compare.text]** Two more comparisons, `starts_with` and `ends_with`, are what the sentences `starts with` and `ends with` read into, see [sentence.phrase.starts](sentences.md#phrases), and today's syntax can't use them (see [sentence_ops.syntax](syntax.md#policies)). They pass when both values are strings and the left one starts, or ends, with the right one, code point by code point. Anything but two strings, two numbers included, fails with `unusable`, and the rest is as [compare.fail](#compare) says.
 
-**[compare.list]** Eight more comparisons, `in`, `not_in`, `includes`, `excludes`, `includes_all`, `excludes_all`, `matches_any` and `not_matches_any`, are what the sentences `is one of`, `is not one of`, `contains`, `does not contain`, `contains all of`, `contains none of`, `matches` and `does not match` read into when what follows is a field, see [sentence.phrase.field](sentences.md#phrases), and today's syntax can't use them (see [sentence_ops.syntax](syntax.md#policies)). Each means what [`in`](#in), [`not_in`](#not_in), [`includes` and `excludes`](#includes-and-excludes) and [`matches_any` and `not_matches_any`](#matches_any-and-not_matches_any) say, with the right side's value as their value, values or patterns, and the check as a whole passes and fails as they say, so `compare.pass` and `compare.fail` don't apply to them. The right side decides first. When it ends anything but `found`, the row fails with that outcome, whatever the left side is. When it was read but can't be used, it fails with `unusable`, again whatever the left side is: a value that isn't a list after `in`, `not_in`, `includes_all`, `excludes_all`, `matches_any` or `not_matches_any`, an empty list after `includes_all` or `excludes_all`, and patterns that aren't all valid regular expressions. Anything that was read is usable after `includes` and `excludes`. Only then are the left side's outcome and type looked at, as the rules named above say. The row has the two entries of [compare.inputs](#compare).
+**[compare.list]** Eight more comparisons, `in`, `not_in`, `includes`, `excludes`, `includes_all`, `excludes_all`, `matches_any` and `not_matches_any`, are what the sentences `is one of`, `is not one of`, `contains`, `does not contain`, `contains all of`, `contains none of`, `matches` and `does not match` read into when what follows is a field, see [sentence.phrase.field](sentences.md#phrases), and today's syntax can't use them (see [sentence_ops.syntax](syntax.md#policies)). Each means what [`in`](#in), [`not_in`](#not_in), [`includes` and `excludes`](#includes-and-excludes) and [`matches_any` and `not_matches_any`](#matches_any-and-not_matches_any) say, with the right side's value as their value, values or patterns, and the check as a whole passes and fails as they say, so `compare.pass` and `compare.fail` don't apply to them. The right side decides first. When it ends anything but `found`, the row fails with that outcome, whatever the left side is. When it was read but can't be used, it fails with `unusable`, again whatever the left side is: a value that isn't a list after `in`, `not_in`, `includes_all`, `excludes_all`, `matches_any` or `not_matches_any`, a list whose values have more than one type after `in` or `not_in`, an empty list after `includes_all` or `excludes_all`, and patterns that aren't all valid regular expressions. Anything that was read is usable after `includes` and `excludes`. Only then are the left side's outcome and type looked at, as the rules named above say. The row has the two entries of [compare.inputs](#compare).
 
 ## Counts and sums in sentences
 

@@ -876,6 +876,109 @@
         ]
       },
       {
+        "description": "fails the requirement as unusable for a subject whose field has another type than the value, even with min_subjects 0",
+        "rules": [
+          "sentence.subject.applies",
+          "scope.unreadable",
+          "subjects.sentence",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "deployments": [
+            {
+              "id": "d1",
+              "environment": "prod",
+              "change_type": true,
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met",
+            "subjects": {
+              "matching": 0,
+              "total": 1
+            }
+          }
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "in-scope deployment count",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": null
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "repeated deployment ids",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "deployment",
+              "id": "d1"
+            },
+            "check": "$applies",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "change_type",
+                "value": true
+              },
+              {
+                "name": "environment",
+                "value": "prod"
+              }
+            ]
+          }
+        ]
+      },
+      {
         "description": "fails as absent when the first condition can't be decided, even though the second rules the subject out",
         "rules": [
           "sentence.subject.applies",

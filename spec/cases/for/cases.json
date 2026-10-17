@@ -183,7 +183,7 @@
             },
             "check": "c",
             "passed": false,
-            "cause": "value",
+            "cause": "unusable",
             "inputs": [
               {
                 "name": "commits[]",
@@ -216,12 +216,12 @@
               {
                 "path": "item 3 of commits",
                 "item": "item 3 of commits",
-                "cause": "value",
+                "cause": "unusable",
                 "value": null,
                 "failed_assertions": [
                   {
                     "assertion": "c.signed is true",
-                    "cause": "value"
+                    "cause": "unusable"
                   }
                 ]
               }
@@ -1929,7 +1929,7 @@
             },
             "check": "e",
             "passed": false,
-            "cause": "value",
+            "cause": "unusable",
             "inputs": [
               {
                 "name": "commits[]",
@@ -1943,7 +1943,15 @@
                 ]
               }
             ],
-            "failed_items": []
+            "failed_items": [
+              {
+                "path": "item 1 of commits",
+                "item": "item 1 of commits",
+                "cause": "unusable",
+                "value": null,
+                "failed_assertions": []
+              }
+            ]
           },
           {
             "requirement": "s",
@@ -1952,8 +1960,8 @@
               "id": "r1"
             },
             "check": "i",
-            "passed": true,
-            "cause": "satisfied",
+            "passed": false,
+            "cause": "unusable",
             "inputs": [
               {
                 "name": "commits[]",
@@ -1967,7 +1975,15 @@
                 ]
               }
             ],
-            "failed_items": []
+            "failed_items": [
+              {
+                "path": "item 1 of commits",
+                "item": "item 1 of commits",
+                "cause": "unusable",
+                "value": null,
+                "failed_assertions": []
+              }
+            ]
           },
           {
             "requirement": "s",
@@ -1977,7 +1993,7 @@
             },
             "check": "s",
             "passed": false,
-            "cause": "value",
+            "cause": "unusable",
             "inputs": [
               {
                 "name": "commits[]",
@@ -1991,7 +2007,15 @@
                 ]
               }
             ],
-            "failed_items": []
+            "failed_items": [
+              {
+                "path": "item 1 of commits",
+                "item": "item 1 of commits",
+                "cause": "unusable",
+                "value": null,
+                "failed_assertions": []
+              }
+            ]
           }
         ]
       }

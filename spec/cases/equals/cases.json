@@ -52,11 +52,11 @@
         "expressions": {"s": {"c": "x == 1"}}
       },
       {
-        "description": "fails as value on the string \"1\", because the type must match",
+        "description": "fails as unusable on the string \"1\", because the type must match",
         "rules": ["equals.fail", "value.equal"],
         "input": {"things": [{"id": "t1", "x": "1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "1"}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "1"}]}
         ]
       }
     ]
