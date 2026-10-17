@@ -4026,11 +4026,11 @@ test_report_has_one_entry_per_declared_requirement if {
 
 test_requirement_entry_carries_exactly_the_documented_keys if {
 	rep := solo({"state": "MERGED"}, is_merged)
-	object.keys(rep.requirements.s) == {"description", "meta", "require", "status", "causes", "subjects", "checks"}
+	object.keys(rep.requirements.s) == {"description", "meta", "require", "subject", "status", "causes", "subjects", "checks"}
 }
 
 test_report_carries_exactly_the_documented_keys if {
-	object.keys(solo({}, is_merged)) == {"compliant", "description", "meta", "requirements", "results"}
+	object.keys(solo({}, is_merged)) == {"compliant", "description", "meta", "requirements", "results", "subjects"}
 }
 
 test_report_is_deterministic if {
@@ -6155,7 +6155,7 @@ test_the_report_never_reads_data_params if {
 	[r.cause | some r in rows_for(unset, "s", "c")] == ["absent"]
 }
 
-empty_report := {"compliant": false, "description": "", "meta": {}, "requirements": {}, "results": []}
+empty_report := {"compliant": false, "description": "", "meta": {}, "requirements": {}, "results": [], "subjects": {}}
 
 test_a_policy_without_requirements_is_not_compliant if {
 	ergo.report({"items": [{"id": 1}]}, {}, {}) == empty_report
@@ -7455,8 +7455,10 @@ test_a_subject_can_have_a_description if {
 	described := object.union(prod_deployment, {"description": "A deployment to production"})
 	rep := ergo.report(deployments_doc, subject_policy({"deployment": described}, {"a": approved_req("deployment")}), {})
 	rows_for(rep, "a", "$well_formed")[0].passed == true
-	rep == ergo.report(deployments_doc, subject_policy({"deployment": prod_deployment}, {"a": approved_req("deployment")}), {})
+	without_subjects(rep) == without_subjects(ergo.report(deployments_doc, subject_policy({"deployment": prod_deployment}, {"a": approved_req("deployment")}), {}))
 }
+
+without_subjects(rep) := object.remove(rep, ["subjects"])
 
 test_a_subject_can_read_params if {
 	from_params := {"from": [{"ref": ["$$params", "list"]}], "identified_by": ["id"], "applies_to": {"env": {"op": "equals", "path": ["environment"], "value": {"ref": ["$$params", "env"]}}}}
@@ -7510,7 +7512,7 @@ test_a_subject_built_on_another_reports_what_the_same_subject_written_out_report
 	}}}
 	versions := object.union(sbom_reqs.versions, {"subject": "locked"})
 	rep := ergo.report(sbom_doc, subject_policy(built, {"versions": versions}), {})
-	rep == ergo.report(sbom_doc, subject_policy(written_out, {"versions": versions}), {})
+	without_subjects(rep) == without_subjects(ergo.report(sbom_doc, subject_policy(written_out, {"versions": versions}), {}))
 	rep.requirements.versions.checks["$applies"].expression == "sbom_release is present and lock_release is present"
 }
 
@@ -7549,7 +7551,7 @@ test_a_subject_can_build_on_a_chain_of_subjects if {
 		"pinned": {"op": "present", "path": ["lock_release"]},
 		"not_exempt": {"op": "equals", "path": ["exempt"], "value": false},
 	}}}
-	rep == ergo.report(sbom_doc, subject_policy(written_out, {"v": sbom_reqs.versions}), {})
+	without_subjects(rep) == without_subjects(ergo.report(sbom_doc, subject_policy(written_out, {"v": sbom_reqs.versions}), {}))
 	[[r.subject.id, r.passed] | some r in rep.results; r.check == "$applies"] == [["a", true], ["b", false], ["c", false]]
 	rows_for(rep, "v", "$well_formed")[0].passed == true
 }
@@ -10159,4 +10161,244 @@ test_elapsed_is_an_invalid_side_in_todays_syntax if {
 	_sentence_problems({"op": "compare", "left": ["n"], "cmp": "eq", "right": side}) == ["invalid right"]
 	_sentence_problems({"op": "compare", "left": {"add": [side, {"literal": 1}], "text": "t"}, "cmp": "eq", "right": {"literal": 1}}) == ["invalid left"]
 	_sentence_problems({"op": "compare", "left": object.union(side, {"unit": "months"}), "cmp": "eq", "right": {"literal": 1}}) == ["invalid left"]
+}
+
+_listed_reqs(name) := {"r": {"subject": name, "checks": {"c": "id exists"}}}
+
+_listed(subjects, name) := ergo.report({}, {"subjects": subjects, "requirements": _listed_reqs(name)}, {}).subjects
+
+test_the_report_lists_a_subject_with_its_description_from_and_id if {
+	subjects := {"deployment": {"from": `deployments whose environment is "prod"`, "identified_by": "id", "description": "A deployment to production"}}
+	_listed(subjects, "deployment") == {"deployment": {"description": "A deployment to production", "from": `deployments whose environment is "prod"`, "identified_by": "id", "parts": {}}}
+}
+
+test_a_listed_subject_carries_exactly_the_documented_keys if {
+	rep := ergo.report({}, {"subjects": {"d": {"from": "ds"}}, "requirements": _listed_reqs("d")}, {})
+	object.keys(rep.subjects.d) == {"description", "from", "identified_by", "parts"}
+}
+
+test_a_from_line_is_printed_the_canonical_way if {
+	subjects := {"d": {"from": `  deployments   whose environment is   "prod"  and approved_by exists `}}
+	_listed(subjects, "d").d.from == `deployments whose environment is "prod" and approved_by exists`
+}
+
+test_a_from_line_that_names_each_key_is_printed_with_it if {
+	subjects := {"d": {"from": "trail.artifacts named by each of $params.names"}}
+	_listed(subjects, "d").d.from == "trail.artifacts named by each of $params.names"
+}
+
+test_a_subject_that_narrows_another_is_listed_with_the_one_it_narrows if {
+	subjects := {
+		"round": {"from": "rounds", "identified_by": "id", "description": "A round"},
+		"done": {"from": `round whose state is "done"`},
+		"other": {"from": "others"},
+	}
+	_listed(subjects, "done") == {
+		"done": {"description": "", "from": `round whose state is "done"`, "identified_by": "id", "parts": {}},
+		"round": {"description": "A round", "from": "rounds", "identified_by": "id", "parts": {}},
+	}
+}
+
+test_a_chain_of_narrowing_subjects_lists_every_subject_it_builds_on if {
+	subjects := {
+		"defect": {"from": "defects", "identified_by": "id"},
+		"critical": {"from": `defect whose severity is "critical"`},
+		"open critical": {"from": `critical whose state is "open"`},
+	}
+	object.keys(_listed(subjects, "open critical")) == {"defect", "critical", "open critical"}
+	_listed(subjects, "open critical")["open critical"].identified_by == "id"
+}
+
+test_a_subject_read_from_another_is_listed_with_its_parent if {
+	rep := _chain_report(_chain_doc, _chain_subjects, {"c": "approved is true"}, {"name": "web"})
+	rep.subjects == {
+		"artifact": {"description": "", "from": "trail.artifacts named by $params.name", "identified_by": "fingerprint", "parts": {}},
+		"pull request": {"description": "", "from": "artifact.pull_requests", "identified_by": "url", "parts": {}},
+	}
+}
+
+test_a_parent_that_is_not_named_by_a_requirement_is_still_listed if {
+	rep := _chain_report(_chain_doc, _chain_subjects, {"c": "approved is true"}, {})
+	object.keys(rep.subjects) == {"artifact", "pull request"}
+}
+
+test_a_subject_in_the_old_syntax_prints_its_path_and_its_filters_as_sentences if {
+	subjects := {"d": {"from": ["trail", "deployments"], "identified_by": ["id"], "applies_to": {
+		"prod": {"op": "equals", "path": ["environment"], "value": "prod"},
+		"approved": {"op": "non_empty_string", "path": ["approved_by"], "description": "Someone approved it"},
+	}}}
+	_listed(subjects, "d").d == {"description": "", "from": `trail.deployments whose approved_by is a non-empty string and environment is "prod"`, "identified_by": "id", "parts": {}}
+}
+
+test_an_old_subject_without_filters_prints_just_its_path if {
+	_listed({"d": {"from": ["deployments"], "applies_to": {}}}, "d").d.from == "deployments"
+	_listed({"d": {"from": [], "identified_by": ["id"]}}, "d").d.from == "$input"
+}
+
+test_an_old_subject_that_names_each_key_prints_it if {
+	subjects := {"d": {"from": ["trail", "artifacts", {"each_as": "subject", "keys": {"ref": ["$$params", "names"]}}]}}
+	_listed(subjects, "d").d.from == "trail.artifacts named by each of $params.names"
+}
+
+test_an_old_subject_built_on_another_prints_the_other_and_its_own_filters if {
+	subjects := {
+		"base": {"from": ["components"], "identified_by": ["name"]},
+		"locked": {"of": "base", "applies_to": {"locked": {"op": "present", "path": ["lock_release"]}}},
+	}
+	_listed(subjects, "locked") == {
+		"base": {"description": "", "from": "components", "identified_by": "name", "parts": {}},
+		"locked": {"description": "", "from": "base whose lock_release exists", "identified_by": "name", "parts": {}},
+	}
+}
+
+test_a_filter_that_cannot_be_a_sentence_is_shown_by_its_name_and_never_dropped if {
+	subjects := {"d": {"from": ["ds"], "applies_to": {"a": {"op": "present", "path": ["x"]}, "b": {"op": "even", "path": ["n"]}, "c": {"op": "all", "path": ["xs"], "check": {"op": "present", "path": ["y"]}}}}}
+	_listed(subjects, "d").d.from == "ds whose x exists and <condition b> and <condition c>"
+}
+
+test_an_applies_to_that_is_not_an_object_is_shown_as_invalid if {
+	every bad in ["x", 1, [], null] {
+		_listed({"d": {"from": ["ds"], "applies_to": bad}}, "d").d.from == "ds whose <invalid applies_to>"
+	}
+}
+
+test_a_subject_without_from_reads_the_input_field_named_like_it if {
+	_listed({"deployments": {}}, "deployments").deployments.from == "deployments"
+	_listed({"deployments": null}, "deployments").deployments.from == "deployments"
+	_listed({"my deployments": {"identified_by": "id"}}, "my deployments")["my deployments"].from == `"my deployments"`
+}
+
+test_a_subject_without_identified_by_has_none if {
+	every subjects in [{"d": {"from": "ds"}}, {"d": {"from": ["ds"]}}, {"d": {"from": ["ds"], "identified_by": []}}, {"d": null}] {
+		_listed(subjects, "d").d.identified_by == null
+	}
+}
+
+test_an_id_written_in_the_old_syntax_is_printed_as_a_sentence_path if {
+	_listed({"d": {"from": ["ds"], "identified_by": ["build", "number"]}}, "d").d.identified_by == "build.number"
+	_listed({"d": {"from": "ds", "identified_by": "build.number"}}, "d").d.identified_by == "build.number"
+}
+
+test_a_from_written_wrong_still_gets_an_entry_marked_invalid if {
+	every from in ["???", "ds whose", "", 1, true, null, [true], [["a"]], [1.5]] {
+		subjects := {"d": {"from": from, "identified_by": "id"}}
+		_listed(subjects, "d").d.from == "<invalid from>"
+	}
+}
+
+test_a_from_line_with_applies_to_or_of_is_marked_invalid if {
+	_listed({"d": {"from": "ds", "applies_to": {"a": {"op": "present", "path": ["x"]}}}}, "d").d.from == "<invalid from>"
+	_listed({"b": {"from": "bs"}, "d": {"from": "ds", "of": "b"}}, "d").d.from == "<invalid from>"
+}
+
+test_a_subject_built_on_one_that_is_missing_or_loops_is_marked_invalid if {
+	_listed({"d": {"of": "nope"}}, "d").d.from == "<invalid from>"
+	_listed({"d": {"of": "d"}}, "d").d.from == "<invalid from>"
+	every name in ["a", "b"] {
+		_listed({"a": {"of": "b"}, "b": {"of": "a"}}, name)[name].from == "<invalid from>"
+	}
+}
+
+test_an_id_written_wrong_is_marked_invalid if {
+	every id in ["???", 1, true] {
+		_listed({"d": {"from": ["ds"], "identified_by": id}}, "d").d.identified_by == "<invalid identified_by>"
+	}
+}
+
+test_an_id_with_a_step_that_cannot_be_a_key_shows_the_step_as_invalid if {
+	_listed({"d": {"from": ["ds"], "identified_by": [[1]]}}, "d").d.identified_by == "<invalid step>"
+}
+
+test_a_subject_that_is_not_an_object_still_gets_an_entry if {
+	every def in ["ds", 1, true, ["ds"]] {
+		_listed({"d": def}, "d").d == {"description": "", "from": "<invalid from>", "identified_by": null, "parts": {}}
+	}
+}
+
+test_a_subject_description_that_is_null_or_the_wrong_type_is_empty if {
+	every description in [null, 1, true, [], {}] {
+		_listed({"d": {"from": "ds", "description": description}}, "d").d.description == ""
+	}
+	_listed({"d": {"from": "ds"}}, "d").d.description == ""
+}
+
+test_a_subject_no_requirement_uses_is_not_listed if {
+	subjects := {"used": {"from": "us"}, "unused": {"from": "others"}, "broken": {"from": "???"}}
+	object.keys(_listed(subjects, "used")) == {"used"}
+}
+
+test_a_subject_nothing_builds_on_or_reads_from_is_not_listed_even_when_it_looks_related if {
+	subjects := {"round": {"from": "rounds"}, "done": {"from": "round whose state is \"done\""}}
+	object.keys(_listed(subjects, "round")) == {"round"}
+}
+
+test_no_subject_is_listed_when_no_requirement_names_one if {
+	ergo.report({}, {"subjects": {"d": {"from": "ds"}}, "requirements": {"r": {"checks": {"c": "id exists"}}}}, {}).subjects == {}
+	ergo.report({}, {"subjects": {"d": {"from": "ds"}}}, {}).subjects == {}
+	ergo.report({}, {"subjects": {"d": {"from": "ds"}}, "requirements": {"r": {"subject": "nope", "checks": {"c": "id exists"}}}}, {}).subjects == {}
+}
+
+test_a_subjects_section_that_is_not_an_object_lists_nothing if {
+	every subjects in [null, true, 1, "d", []] {
+		ergo.report({}, {"subjects": subjects, "requirements": _listed_reqs("d")}, {}).subjects == {}
+	}
+}
+
+test_a_requirement_reports_the_name_of_its_subject if {
+	rep := ergo.report({}, {"subjects": {"d": {"from": "ds"}, "e": {"from": "es"}}, "requirements": {"a": {"subject": "d", "checks": {"c": "id exists"}}, "b": {"subject": "e", "checks": {"c": "id exists"}}}}, {})
+	{name: entry.subject | some name, entry in rep.requirements} == {"a": "d", "b": "e"}
+}
+
+test_a_requirement_reports_no_subject_when_it_names_none_or_one_that_is_not_there if {
+	every req in [{"checks": {"c": "id exists"}}, {"subject": "nope", "checks": {"c": "id exists"}}, {"subject": 1, "checks": {"c": "id exists"}}, {"subject": null, "checks": {"c": "id exists"}}, {"subject": ["d"], "checks": {"c": "id exists"}}] {
+		ergo.report({}, {"subjects": {"d": {"from": "ds"}}, "requirements": {"r": req}}, {}).requirements.r.subject == null
+	}
+	ergo.report({}, {"subjects": [], "requirements": _listed_reqs("d")}, {}).requirements.r.subject == null
+}
+
+test_a_requirement_that_names_a_subject_written_wrong_still_reports_its_name if {
+	ergo.report({}, {"subjects": {"d": 1}, "requirements": _listed_reqs("d")}, {}).requirements.r.subject == "d"
+}
+
+test_the_subjects_section_is_independent_of_the_order_the_policy_is_written_in if {
+	first := {"round": {"from": "rounds", "identified_by": "id"}, "done": {"from": `round whose state is "done"`}, "old": {"from": ["ds"], "applies_to": {"b": {"op": "present", "path": ["b"]}, "a": {"op": "present", "path": ["a"]}}}}
+	reqs := {"x": {"subject": "done", "checks": {"c": "id exists"}}, "y": {"subject": "old", "checks": {"c": "id exists"}}}
+	one := ergo.report({}, {"subjects": first, "requirements": reqs}, {})
+	two := ergo.report({}, {"requirements": {"y": reqs.y, "x": reqs.x}, "subjects": {"old": {"applies_to": {"a": {"op": "present", "path": ["a"]}, "b": {"op": "present", "path": ["b"]}}, "from": ["ds"]}, "done": first.done, "round": first.round}}, {})
+	json.marshal(one) == json.marshal(two)
+	one.subjects.old.from == "ds whose .a exists and b exists"
+}
+
+test_a_from_that_cannot_be_printed_is_invalid_even_when_nothing_flagged_it if {
+	every def in [{"from": "ds", "applies_to": {}}, {"from": "ds", "of": "b"}, {"from": 1}, {"of": 1}] {
+		ergo._subject_from_text("d", def) == "<invalid from>" with data.ergo_resolved as {"d": {"problems": set()}} with data.ergo_subjects as {"d": def, "b": {}}
+	}
+}
+
+test_old_filters_are_printed_as_the_sentence_each_operator_reads_as if {
+	filters := {
+		"a": {"op": "present", "path": ["x"]},
+		"b": {"op": "missing", "path": ["x"]},
+		"c": {"op": "in", "path": ["x"], "values": ["p", "q"]},
+		"d": {"op": "range", "path": ["x"], "min": 1, "max": 5},
+		"e": {"op": "includes", "path": ["x"], "value": "p"},
+		"f": {"op": "excludes", "path": ["x"], "values": ["p", "q"]},
+		"g": {"op": "compare", "left": ["x"], "right": ["y"], "cmp": "gte"},
+		"h": {"op": "compare_time", "left": ["x"], "right": ["y"], "cmp": "lt"},
+		"i": {"op": "matches_any", "path": ["x"], "patterns": ["^a"]},
+	}
+	_listed({"d": {"from": ["ds"], "applies_to": filters}}, "d").d.from == `ds whose x exists and x does not exist and x is one of "p", "q" and x is between 1 and 5 and x contains "p" and x contains none of "p", "q" and x is at least y and x is before y and x matches "^a"`
+}
+
+test_a_filter_with_a_field_its_sentence_would_lose_is_shown_by_its_name if {
+	filters := {
+		"a": {"op": "present", "path": ["x"], "substitute": {"op": "present", "path": ["y"]}},
+		"b": {"op": "present", "path": ["x"], "zz": 1},
+		"c": {"op": "present", "path": "x"},
+		"d": {"op": "equals", "path": ["x"]},
+		"e": {"op": ["present"], "path": ["x"]},
+		"f": 1,
+		"g": {"op": "present", "path": ["x"], "description": "kept out", "meta": {"k": 1}},
+	}
+	_listed({"d": {"from": ["ds"], "applies_to": filters}}, "d").d.from == "ds whose <condition a> and <condition b> and <condition c> and <condition d> and <condition e> and <condition f> and x exists"
 }

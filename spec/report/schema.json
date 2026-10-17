@@ -7,12 +7,28 @@
     "description": {"type": "string"},
     "meta": {"type": "object"},
     "requirements": {"type": "object", "additionalProperties": {"$ref": "#/$defs/requirement"}},
-    "results": {"type": "array", "items": {"$ref": "#/$defs/row"}}
+    "results": {"type": "array", "items": {"$ref": "#/$defs/row"}},
+    "subjects": {
+      "type": "object",
+      "description": "The subjects the requirements use, directly or through the subjects they narrow or read from, by name.",
+      "additionalProperties": {"$ref": "#/$defs/subject"}
+    }
   },
-  "required": ["compliant", "description", "meta", "requirements", "results"],
+  "required": ["compliant", "description", "meta", "requirements", "results", "subjects"],
   "additionalProperties": false,
   "$defs": {
     "cause": {"enum": ["satisfied", "substituted", "ill_formed", "not_an_object", "ambiguous", "unmatched", "unusable", "absent", "null", "value"]},
+    "subject": {
+      "type": "object",
+      "properties": {
+        "description": {"type": "string", "description": "The subject's description, or \"\" when it has none."},
+        "from": {"type": "string", "description": "How the subject is found, as a from line is written, or <invalid from> when it is written wrong."},
+        "identified_by": {"type": ["string", "null"], "description": "The path of the subject's id, or null when it has none and the whole subject is its id."},
+        "parts": {"type": "object", "description": "Always empty for now."}
+      },
+      "required": ["description", "from", "identified_by", "parts"],
+      "additionalProperties": false
+    },
     "requirement": {
       "type": "object",
       "properties": {
@@ -47,6 +63,7 @@
         "meta": {"type": "object"},
         "require": {"description": "The require the requirement was written with, or every by default."},
         "status": {"enum": ["met", "not_met", "not_applicable"]},
+        "subject": {"type": ["string", "null"], "description": "The name of the subject the requirement checks, or null when it names none or one that isn't in the policy's subjects."},
         "subjects": {
           "type": "object",
           "properties": {
@@ -57,7 +74,7 @@
           "additionalProperties": false
         }
       },
-      "required": ["causes", "checks", "description", "meta", "require", "status", "subjects"],
+      "required": ["causes", "checks", "description", "meta", "require", "status", "subject", "subjects"],
       "additionalProperties": false
     },
     "input": {
