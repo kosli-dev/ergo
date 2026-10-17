@@ -34,7 +34,7 @@
           "for.inputs",
           "for.failed_items",
           "sentence.for.line",
-          "sentence.for.name",
+          "sentence.for.alias",
           "sentence.phrase.is"
         ],
         "input": {
@@ -2050,7 +2050,7 @@
       {
         "description": "reads the item's field, not the subject's field of the same name",
         "rules": [
-          "sentence.for.name",
+          "sentence.for.alias",
           "for.try",
           "for.inputs",
           "for.pass",
@@ -2096,7 +2096,7 @@
       {
         "description": "a subject whose field has that name is not read when the item lacks the field",
         "rules": [
-          "sentence.for.name",
+          "sentence.for.alias",
           "for.try",
           "for.failed_items",
           "sentence.phrase.is"
@@ -2564,7 +2564,7 @@
           "for.pass",
           "for.inputs",
           "for.failed_items",
-          "sentence.for.name",
+          "sentence.for.alias",
           "sentence.for.scope",
           "sentence.phrase.is"
         ],
@@ -4875,7 +4875,7 @@
       {
         "description": "fails every row as ill_formed with no inputs, and $well_formed lists the problem",
         "rules": [
-          "sentence.for.name",
+          "sentence.for.alias",
           "written_wrong",
           "written_wrong.row",
           "sentence.written_wrong.slot"
@@ -4967,7 +4967,7 @@
       {
         "description": "fails every row as ill_formed with no inputs, and $well_formed lists the problem",
         "rules": [
-          "sentence.for.name",
+          "sentence.for.alias",
           "written_wrong",
           "written_wrong.row",
           "sentence.written_wrong.slot"
@@ -5010,7 +5010,7 @@
               {
                 "name": "checks.c",
                 "value": [
-                  "for: params can't be a name"
+                  "for: params can't be an alias"
                 ]
               }
             ]
@@ -5059,7 +5059,7 @@
       {
         "description": "fails every row as ill_formed with no inputs, and $well_formed lists the problem",
         "rules": [
-          "sentence.for.name",
+          "sentence.for.alias",
           "written_wrong",
           "written_wrong.row",
           "sentence.written_wrong.slot"
@@ -5102,7 +5102,7 @@
               {
                 "name": "checks.c",
                 "value": [
-                  "for: empty can't be a name"
+                  "for: empty can't be an alias"
                 ]
               }
             ]
@@ -5151,7 +5151,7 @@
       {
         "description": "fails every row as ill_formed with no inputs, and $well_formed lists the problem",
         "rules": [
-          "sentence.for.name",
+          "sentence.for.alias",
           "written_wrong",
           "written_wrong.row",
           "sentence.written_wrong.slot"
@@ -5194,7 +5194,7 @@
               {
                 "name": "checks.c",
                 "value": [
-                  "for: input can't be a name"
+                  "for: input can't be an alias"
                 ]
               }
             ]

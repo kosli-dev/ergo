@@ -16,10 +16,10 @@ if-any            = "," WS "if" WS "any,"
 derived-assertion = derived-left WS compare-phrase
 elapsed-assertion = elapsed WS compare-phrase
 
-; A for: line walks one or two lists and names each item.
+; A for: line walks one or two lists and gives each item an alias.
 for-line          = for-item ["," WS for-item]
-for-item          = quantifier WS path [WS whose] [if-any] WS "as" WS name
-name              = bare-key
+for-item          = quantifier WS path [WS whose] [if-any] WS "as" WS alias
+alias             = bare-key
 
 ; A subject's from: line.
 from-line         = path [WS "named" WS "by" WS "each" WS "of" WS right-path] [WS whose]
@@ -85,7 +85,7 @@ first-key         = bare-key / "." key / quoted-key
 step              = "." key / WS "named" WS "by" WS reference
                   / "[" reference "]" / "[" quoted-key "]" / "[" int "]"
 key               = bare-key / quoted-key
-reference         = ("$params" / "$input") "." key / name
+reference         = ("$params" / "$input") "." key / alias
 bare-key          = (ALPHA / "_") *(ALPHA / DIGIT / "_" / "-")
 quoted-key        = dq-string
 

@@ -339,7 +339,7 @@
               {"name": "checks.any_of_inside.options.a.0", "value": ["any_of can't go here"]},
               {"name": "checks.empty_option", "value": ["empty option a"]},
               {"name": "checks.empty_options", "value": ["empty options"]},
-              {"name": "checks.name_from_sibling.options.b.0", "value": ["unknown name $x"]},
+              {"name": "checks.name_from_sibling.options.b.0", "value": ["unknown alias $x"]},
               {"name": "checks.no_options", "value": ["missing options"]},
               {"name": "checks.option_object", "value": ["option a not a list"]}
             ]

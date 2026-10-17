@@ -658,7 +658,9 @@ The check's `expression` is `approved_by is not empty and reviewed_at is before 
 - `every` and `some` paths can be ten steps long.
 - `contains` and the other list phrases can't follow `every` or `some`, because the last list is walked too, so `every pull_requests.labels does not contain "hotfix"` would ask each label. It's written wrong, and the message says to put the walk on a `for` line.
 
-A `for` line names the items of one or two lists, so the sentences under `assert` can read an item and the subject together. Each item is `every` or `some`, a path, an optional `whose`, and `as` a name. The second item can walk a list inside the first, by its name. With the input above:
+A `for` line names the items of one or two lists, so the sentences under `assert` can read an item and the subject together. Each item is `every` or `some`, a path, an optional `whose`, and `as` an alias. The second item can walk a list inside the first, by its alias.
+
+An alias is a short word that stands for something longer: `as pr` makes `pr` an alias for each pull request in turn. With the input above:
 
 ```yaml
 peer_approved:
@@ -706,7 +708,7 @@ reads "for every pull request, some approver approved it and isn't its author". 
 - In `assert`, a bare first key is the subject's field, and a name reaches its item. Inside an item's own `whose`, a bare key is that item's field. A name hides a field of the subject with the same name.
 - Each list fails as a one-line `every` or `some` does: empty, missing, `null` or not a list, and `, if any,` lets an empty one pass.
 - Two items at most.
-- `named by` a name from the `for` line reads the key its item holds. With `for: every personas_dispatched as persona`, `persona_blob_shas named by persona exists` reads `persona_blob_shas.security`, then `persona_blob_shas.style`, and so on. An item that's `null` fails as `null`, and any other item that isn't a string, a number included, as `unusable`, since it can't be a key. The row's inputs show `persona_blob_shas` itself.
+- `named by` an alias from the `for` line reads the key its item holds. With `for: every personas_dispatched as persona`, `persona_blob_shas named by persona exists` reads `persona_blob_shas.security`, then `persona_blob_shas.style`, and so on. An item that's `null` fails as `null`, and any other item that isn't a string, a number included, as `unusable`, since it can't be a key. The row's inputs show `persona_blob_shas` itself.
 
 `count of`, `sum of` and `plus` work out a number to compare, as the [derived values](#derived-values) of `compare` do. With the input of [derived values](#derived-values):
 
@@ -1127,7 +1129,7 @@ The fields of the requirement and its subject get an input of the same form when
 | `subjects.deployment`                          | `not an object`                                                                                                                  |
 | `subjects.deployment.applies_to`               | `not an object`, `holds a key that isn't a string`                                                                               |
 | `subjects.deployment.from`, `...identified_by` | `not a list`, `step that can't be a key`, `number out of range`, `holds a set`, `holds a key that isn't a string`                |
-| `subjects.deployment.from`                     | `object step before the last`, `object step without each_as`, `invalid name`, `invalid keys`, `unknown field foo in naming step` |
+| `subjects.deployment.from`                     | `object step before the last`, `object step without each_as`, `invalid alias`, `invalid keys`, `unknown field foo in naming step` |
 | `subjects.deployment.identified_by`            | `ref inside where`, `literal inside where`                                                                                       |
 | `subjects.deployment.description`              | `not a string`                                                                                                                   |
 | `subjects.deployment.of`                       | `empty or not a string`, `not in subjects`, `leads to a loop`                                                                    |
@@ -1247,7 +1249,7 @@ ergo fails a check whenever it can't be sure, instead of letting it pass. Rego d
 - A missing, `null` or wrong-typed field fails every operator, except `missing`, which passes on a missing or `null` field.
 - `compare` needs both sides to exist and have the same type. In plain Rego, `null < 5` is true, so a missing field would otherwise pass a `lt` check. Ordering objects, lists or booleans fails too.
 - `every`, `some` and `for` lines need non-empty lists, inner lists included. A policy that's fine with no items says so with `, if any,`.
-- A name given twice, or badly written, fails the check, so an inner name can't quietly hide an outer one.
+- An alias given twice, or badly written, fails the check, so an inner alias can't quietly hide an outer one.
 - A check that's written wrong, like an unknown `op` or `cmp`, fails `$well_formed`, and its rows fail with cause `ill_formed`, so a mistake in a subject's conditions can't rule every subject out.
 - A value of the wrong kind, like a string where `range` needs a number, or a param of the wrong type, fails with cause `unusable`, so a condition can't rule a subject out on it.
 - With several conditions, one that can't be read fails the requirement, even when another rules the subject out. The only condition that can rule a subject out regardless is an `exists` that found its field missing.
@@ -1368,9 +1370,9 @@ A path is a list of keys that ergo follows one step at a time. `["release", "app
 
 A key is a string, or a list index written as digits alone, like `0` or `12`. A string only picks a key of an object and a number only picks an item of a list, so `["a", "0"]` reads nothing when `a` is a list, and `["o", 0]` reads nothing when `o` is `{"0": "zero"}`. JavaScript reads both, so an implementation there has to check the type. A path that runs into something that can't hold its next key, like these, or a string, number or boolean where an object or list should be, fails its check with cause `unusable`, so `["pr", "state"]` on `"pr": "none"` isn't reported as a missing field. A parent that isn't there, or is `null`, is different: the field is just missing. A step that can't be a key, like `true`, `null`, a list, `-1`, `1.5`, or even `1.0`, which OPA doesn't read as `1` but JavaScript does, can never read anything. So a check with one is written wrong: it fails `$well_formed`, its rows fail with cause `ill_formed`, even as a `present` filter, and the step is shown as `<invalid step>`. The same goes for the paths in a check's `inputs`. One in `from` or `id` fails `$well_formed`.
 
-In expressions, `inputs`, `$refs` and `failed_items`, a path is named the way a [sentence](#checks) writes it. A name made of keys, positions and `named by` one key can be pasted into a sentence. Names from `each_as` or `as`, like `$pr.author`, selectors, `[]` lists and refs of more than one key can't, because sentences don't have those yet. A key is written as it is when it starts with an ASCII letter (`a` to `z` or `A` to `Z`) or `_`, and the rest is ASCII letters, digits, `_` and `-`. Any other key is quoted, so a key with a dot, a space, a `$` or an accented letter, one that starts with a digit or `-`, and the empty key are all written in quotes. So `["metadata", "labels", "app.kubernetes.io/name"]` is named `metadata.labels."app.kubernetes.io/name"`, and doesn't look like a path four keys deep, and `["x", "$b"]` is named `x."$b"`. A first key that's a word the sentences use, like `empty` or `a`, gets a dot in front: `.empty`. A path into the params or the input starts with `$params` or `$input`, like `$params.allowed`. A list index at the end of a path is written `item <n> of`, counting from 1, and one with more after it in brackets, counting from 0: `["xs", 1]` is `item 2 of xs`, `["xs", 1, "k"]` is `xs[1].k`, and the string key `["xs", "0"]` is `xs."0"`. A first step written as `{"literal": "$schema"}` is named `"$schema"`, so it doesn't look like a [name](#naming-subjects). `from` takes no names and no `$$input`, so there a first key that starts with `$` is always quoted: `["$$input"]` is named `"$$input"`, and can't be mistaken for the whole input.
+In expressions, `inputs`, `$refs` and `failed_items`, a path is named the way a [sentence](#checks) writes it. A name made of keys, positions and `named by` one key can be pasted into a sentence. Aliases from `each_as` or `as`, like `$pr.author`, selectors, `[]` lists and refs of more than one key can't, because sentences don't have those yet. A key is written as it is when it starts with an ASCII letter (`a` to `z` or `A` to `Z`) or `_`, and the rest is ASCII letters, digits, `_` and `-`. Any other key is quoted, so a key with a dot, a space, a `$` or an accented letter, one that starts with a digit or `-`, and the empty key are all written in quotes. So `["metadata", "labels", "app.kubernetes.io/name"]` is named `metadata.labels."app.kubernetes.io/name"`, and doesn't look like a path four keys deep, and `["x", "$b"]` is named `x."$b"`. A first key that's a word the sentences use, like `empty` or `a`, gets a dot in front: `.empty`. A path into the params or the input starts with `$params` or `$input`, like `$params.allowed`. A list index at the end of a path is written `item <n> of`, counting from 1, and one with more after it in brackets, counting from 0: `["xs", 1]` is `item 2 of xs`, `["xs", 1, "k"]` is `xs[1].k`, and the string key `["xs", "0"]` is `xs."0"`. A first step written as `{"literal": "$schema"}` is named `"$schema"`, so it doesn't look like an [alias](#naming-subjects). `from` takes no names and no `$$input`, so there a first key that starts with `$` is always quoted: `["$$input"]` is named `"$$input"`, and can't be mistaken for the whole input.
 
-`from` is a path into the input. Every other path (`identified_by`, a check's `path`, `left` and `right`) is a path into one subject, unless it starts with [`$$input`](#reading-from-the-input) or a [name](#naming-subjects).
+`from` is a path into the input. Every other path (`identified_by`, a check's `path`, `left` and `right`) is a path into one subject, unless it starts with [`$$input`](#reading-from-the-input) or an [alias](#naming-subjects).
 
 An empty path, `[]`, reads the item itself. Use it inside `all` or `any` when the list holds plain values like strings, not objects:
 
@@ -1483,7 +1485,7 @@ A ref step works anywhere in any path: first, in the middle or last, after a nam
 
 ### Naming subjects
 
-`from` can end with a step that names each subject: `{"each_as": "name"}`. A path that starts with `$name` then reads that subject.
+`from` can end with a step that names each subject: `{"each_as": "name"}`, where `name` is an alias for the subject. A path that starts with `$name` then reads that subject.
 
 If `from` leads to an object, the step makes every entry a subject, identified by its key and sorted by key. Without it, the whole object is one subject. If `from` leads to a list, every item is a subject, as without the step.
 
@@ -1538,7 +1540,7 @@ Each key is a subject. A key the object doesn't have is still a subject, so its 
 ]
 ```
 
-The name matters inside `all` and `any`, where paths start at each item of the list. `$name` reaches back to the subject, so an item can be compared with it. `as` names the items of a list the same way (see [Nesting](#nesting)):
+The alias matters inside `all` and `any`, where paths start at each item of the list. `$name` reaches back to the subject, so an item can be compared with it. `as` gives the items of a list an alias the same way (see [Nesting](#nesting)):
 
 ```rego
 "subjects": {"pull request": {
@@ -1623,7 +1625,7 @@ Some things worth knowing:
   - `values` that isn't a list, an empty `values` for `includes` or `excludes`, both `value` and `values`, a `min` or `max` that isn't a number, a `min` above `max`, or `patterns` that isn't a list of valid regular expressions
   - a `path`, an `each` or, on other operators than `compare` and `compare_time`, a `left` or `right` that isn't a list, even a string like `"state"` that names one key, or `as` or `each` on an operator other than `all` or `any`. The `$well_formed` row says `path not a list` (or `each not a list`), and the check's row has no `inputs`
   - a step that can't be a [key](#paths), a number out of range, a badly written [ref](#reading-from-the-input), a ref or `literal` deeper inside a value than ergo reads, or a path that starts with a [name](#naming-subjects) nothing gave
-  - an `all` or `any` [nested](#nesting) too deep, or a name given twice or badly written
+  - an `all` or `any` [nested](#nesting) too deep, or an alias given twice or badly written
   - a check that isn't an object, or one where it can't go, like a custom operator inside `all`
   - a field its op doesn't use, like `valeu` or `descripton`. Besides its own parameters, any check can have `description`, `meta`, `expression`, `substitute` and `inputs`. A [custom operator](#custom-operators) can have any fields.
   - a set, or an object key that isn't a string, anywhere in the check or in a selector in `from` or `identified_by`. Rego can write both, but JSON can't hold either. The `$well_formed` row shows `holds a set` or `holds a key that isn't a string`. The expression writes such a key as `"<invalid key>"`, so `"value": {10: "a", "10": "b"}` on `x` shows as `x == {"10": "b", "<invalid key>": "a"}`, the same in every runtime.
@@ -1716,7 +1718,7 @@ Some things worth knowing:
 - An item that `where` can't decide about doesn't just go uncounted. If the second finding above had no `source`, ergo couldn't tell whether it came from Claude, so the check would fail as `absent`, with `count(findings where source == "claude") = null`. A `present` condition is the exception, as everywhere: a missing field is its answer.
 - `where` is one [basic operator](#basic-operators), without a substitute. Its paths start at each item, like the inner check of `all`. It can't be `all`, `any` or `any_of`, and a check inside it that's written wrong makes the whole check written wrong.
 - Derived values only go in a check of their own, a filter or a substitute, not inside `all`, `any` or `any_of`. A `literal` side can go anywhere a `compare` can.
-- Paths in a derived value read like any other: they can start with `$$input`, `$$params` or a [name](#naming-subjects).
+- Paths in a derived value read like any other: they can start with `$$input`, `$$params` or an [alias](#naming-subjects).
 
 #### `all` and `any`
 
@@ -1768,7 +1770,7 @@ The inner `check` can be a basic operator, an `any_of`, or another `all` or `any
 
 ##### Nesting
 
-An `all` or `any` inside another one checks a list for each item of the outer list. `as` names the outer item, so the inner check can still reach it once its paths start somewhere else. Say a pull request needs an approval given after its last commit:
+An `all` or `any` inside another one checks a list for each item of the outer list. `as` gives the outer item an alias, so the inner check can still reach it once its paths start somewhere else. Say a pull request needs an approval given after its last commit:
 
 ```json
 {
@@ -1845,9 +1847,9 @@ It renders as `some approvers as $approver: one of: peer(state == "APPROVED" and
 
 Some things worth knowing:
 
-- `as` takes the same names as a [naming step](#naming-subjects): a string that doesn't start with `$` and isn't `params` or `input`. Without `each`, `$approver` reads the same as a path inside the item, so `as` only matters for a check nested inside. With `each`, it names the inner item.
-- A name can only be given once along a chain of checks. `as` with a name that `from` or an outer check already gave is written wrong: it fails `$well_formed`, the check fails with cause `ill_formed`, and it shows as `<name given twice>`. A badly written name fails the same way and shows as `<invalid name>`. The cause isn't `value`, so a filter written like this fails the requirement rather than ruling every subject out. Two separate checks can use the same name.
-- A name given by `as` belongs to one item, so the row doesn't show it in its `inputs`. It still decides that item's cause, so an approver with no `timestamp` makes the check fail as `absent`. Paths that start with it are shown as paths inside the item, like `approvers[].timestamp`. That only holds inside the list check that gives the name. Anywhere else, like a neighbouring `any_of` option, nothing gives it, so reading it there is written wrong and fails as `ill_formed`.
+- `as` takes the same aliases as a [naming step](#naming-subjects): a string that doesn't start with `$` and isn't `params` or `input`. Without `each`, `$approver` reads the same as a path inside the item, so `as` only matters for a check nested inside. With `each`, it names the inner item.
+- An alias can only be given once along a chain of checks. `as` with an alias that `from` or an outer check already gave is written wrong: it fails `$well_formed`, the check fails with cause `ill_formed`, and it shows as `<alias given twice>`. A badly written alias fails the same way and shows as `<invalid alias>`. The cause isn't `value`, so a filter written like this fails the requirement rather than ruling every subject out. Two separate checks can use the same alias.
+- An alias given by `as` belongs to one item, so the row doesn't show it in its `inputs`. It still decides that item's cause, so an approver with no `timestamp` makes the check fail as `absent`. Paths that start with it are shown as paths inside the item, like `approvers[].timestamp`. That only holds inside the list check that gives the alias. Anywhere else, like a neighbouring `any_of` option, nothing gives it, so reading it there is written wrong and fails as `ill_formed`.
 - Inner lists follow the same rules as outer ones. If an approver is tried against an empty or missing list of commits, that try fails.
 - One level of nesting is as deep as it goes, because Rego doesn't allow recursion. An `any_of` doesn't count as a level, but an `all` or `any` in one of its options does. A third `all` or `any` is written wrong: it fails `$well_formed`, the check fails with cause `ill_formed`, and its expression shows `<nested too deep>`.
 

@@ -10,10 +10,11 @@ NON_SYNTAX = [
     re.compile(p)
     for p in [
         r" is a word of the grammar: write \.",
-        r" can't be a name$",
+        r" can't be an alias$",
         r" is given twice$",
         r"^if any can't go with some$",
         r"^unknown name ",
+        r"^unknown alias ",
         r"^min above max$",
         r"^number out of range: ",
         r"^invalid pattern ",
