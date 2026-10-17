@@ -207,7 +207,7 @@ def case_sentences():
 def abnf_accepts(grammar, rules, text):
     for rule in rules:
         try:
-            grammar(rule).parse_all(text)
+            grammar(rule).parse_all(text.strip(" "))
             return True
         except ParseError:
             pass

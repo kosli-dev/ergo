@@ -83,22 +83,4 @@ Every rule needs a case, apart from the ones listed here. The `sentence` rules h
 
 ## Sentences the ABNF and ergo.rego read differently
 
-`check_grammar.py` reads sentences with `ergo.rego` and with a parser built from `sentences.abnf`, and fails on any sentence that one reads and the other rejects as a matter of syntax. The ones below are known, each with the sentence that shows it, and the script also fails when one of them stops disagreeing. None is decided yet.
-
-Whitespace around a sentence. `ergo.rego` trims it, as YAML would leave a trailing newline, and the ABNF has no room for it:
-
-- check `" x is 1"`
-- check `"x is 1 "`
-
-Spaces inside a keyword that has more than one word. [sentences.md](sentences.md) says a run of spaces between two words reads as one, `ergo.rego` does that, and the ABNF spells `is not empty`, `if any,` and `named by` with one space each:
-
-- check `"x is  not empty"`
-- check `"every x, if  any, is 1"`
-- check `"x named  by y is 1"`
-
-An elapsed time in a `whose` or after a `plus`. `ergo.rego` reads it and then reports that it isn't supported yet, as [sentence.derived.elapsed](sentences.md#derived-values) says, and the ABNF lets an elapsed time stand alone and nowhere else:
-
-- check `"x is 1 plus days elapsed from p to q"`
-- check `"every xs whose days elapsed from p to q is 1 is not empty"`
-- for-line `"every xs whose days elapsed from p to q is 1 as x"`
-- from-line `"vulns whose days elapsed from started to ended is 1"`
+`check_grammar.py` reads sentences with `ergo.rego` and with a parser built from `sentences.abnf`, and fails on any sentence that one reads and the other rejects as a matter of syntax. A disagreement goes here, as a line like ``- check `"x is 1"` ``, with the sentence written as JSON, until it's decided. The script also fails when a listed one stops disagreeing. None is listed now.

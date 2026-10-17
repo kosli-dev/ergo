@@ -2,6 +2,7 @@
 ; sentences.md says what each form means and what it can't say here.
 ; Every quoted string is case-sensitive, as if written with RFC 7405's %s.
 ; WS between two words is one space when the report prints a sentence.
+; Spaces at either end of a line are dropped before it's read.
 
 ; A check is one assertion, or several joined with "and". Under assert:,
 ; a YAML list holds one assertion per item and means the same.
@@ -11,7 +12,7 @@ assertion         = plain / quantified / derived-assertion / elapsed-assertion
 plain             = path WS phrase
 quantified        = quantifier WS path [WS whose] [if-any] WS phrase
 quantifier        = "every" / "some"
-if-any            = "," WS "if any,"
+if-any            = "," WS "if" WS "any,"
 derived-assertion = derived-left WS compare-phrase
 elapsed-assertion = elapsed WS compare-phrase
 
@@ -21,18 +22,18 @@ for-item          = quantifier WS path [WS whose] [if-any] WS "as" WS name
 name              = bare-key
 
 ; A subject's from: line.
-from-line         = path [WS "named by each of" WS right-path] [WS whose]
+from-line         = path [WS "named" WS "by" WS "each" WS "of" WS right-path] [WS whose]
 
 ; whose keeps the items that pass every condition.
 whose             = "whose" WS condition *(WS "and" WS condition)
-condition         = path WS phrase / derived WS compare-phrase
+condition         = path WS phrase / (derived / elapsed) WS compare-phrase
 
 ; Derived values: count of, sum of, and terms added with plus.
 ; Only the last term on the left can carry a whose, and none on the right.
 derived           = ("count" / "sum") WS "of" WS path
-; An elapsed time stands alone: it takes no whose and joins no plus.
+; ergo.rego doesn't run an elapsed time in a whose or after a plus yet.
 elapsed           = ("seconds" / "minutes" / "hours" / "days" / "weeks") WS "elapsed" WS "from" WS path WS "to" WS path
-term              = right-path / derived / number
+term              = right-path / derived / elapsed / number
 derived-left      = derived [WS whose]
                   / 1*(term WS "plus" WS) (term / derived WS whose)
 field             = (right-path / derived) *(WS "plus" WS term)
@@ -45,22 +46,22 @@ phrase            = one-of-phrase / exists-phrase / empty-phrase / type-phrase
                   / starts-phrase / time-phrase / compare-phrase
 compare-phrase    = within-phrase / order-phrase / between-phrase / is-phrase
 
-is-phrase         = ("is not" / "does not equal") WS operand
-                  / ("is equal to" / "equals" / "is") WS operand
-within-phrase     = ("is equal to" / "equals" / "is") WS operand WS "within" WS number
-order-phrase      = ("is at least" / "is at most" / "is more than" / "is less than") WS operand
-between-phrase    = "is between" WS number WS "and" WS number
-one-of-phrase     = ("is one of" / "is in") WS list
-                  / ("is not one of" / "is not in") WS list
-exists-phrase     = "exists" / "does not exist"
-empty-phrase      = "is empty" / "is not empty"
-type-phrase       = "is a non-empty string" / "is" WS ("a" / "an") WS type
+is-phrase         = ("is" WS "not" / "does" WS "not" WS "equal") WS operand
+                  / ("is" WS "equal" WS "to" / "equals" / "is") WS operand
+within-phrase     = ("is" WS "equal" WS "to" / "equals" / "is") WS operand WS "within" WS number
+order-phrase      = ("is" WS "at" WS "least" / "is" WS "at" WS "most" / "is" WS "more" WS "than" / "is" WS "less" WS "than") WS operand
+between-phrase    = "is" WS "between" WS number WS "and" WS number
+one-of-phrase     = ("is" WS "one" WS "of" / "is" WS "in") WS list
+                  / ("is" WS "not" WS "one" WS "of" / "is" WS "not" WS "in") WS list
+exists-phrase     = "exists" / "does" WS "not" WS "exist"
+empty-phrase      = "is" WS "empty" / "is" WS "not" WS "empty"
+type-phrase       = "is" WS "a" WS "non-empty" WS "string" / "is" WS ("a" / "an") WS type
 type              = "list" / "string" / "number" / "boolean" / "object"
-contains-phrase   = ("contains" / "does not contain") WS operand
-contains-all-phrase = ("contains all of" / "contains none of") WS list
-matches-phrase    = ("matches" / "does not match") WS list
-starts-phrase     = ("starts with" / "ends with") WS operand
-time-phrase       = ("is before" / "is after" / "is on or after" / "is on or before") WS operand
+contains-phrase   = ("contains" / "does" WS "not" WS "contain") WS operand
+contains-all-phrase = ("contains" WS "all" WS "of" / "contains" WS "none" WS "of") WS list
+matches-phrase    = ("matches" / "does" WS "not" WS "match") WS list
+starts-phrase     = ("starts" WS "with" / "ends" WS "with") WS operand
+time-phrase       = ("is" WS "before" / "is" WS "after" / "is" WS "on" WS "or" WS "after" / "is" WS "on" WS "or" WS "before") WS operand
 
 list              = values / right-path
 values            = value *("," WS value)
@@ -81,7 +82,7 @@ position          = "item" WS positive / "first" / "last"
 positive          = %x31-39 *DIGIT
 start             = "$params" / "$input" / first-key
 first-key         = bare-key / "." key / quoted-key
-step              = "." key / WS "named by" WS reference
+step              = "." key / WS "named" WS "by" WS reference
                   / "[" reference "]" / "[" quoted-key "]" / "[" int "]"
 key               = bare-key / quoted-key
 reference         = ("$params" / "$input") "." key / name
