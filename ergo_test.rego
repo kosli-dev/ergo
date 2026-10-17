@@ -10240,6 +10240,19 @@ test_an_old_subject_that_names_each_key_prints_it if {
 	_listed(subjects, "d").d.from == "trail.artifacts named by each of $params.names"
 }
 
+test_every_old_naming_step_is_printed_and_one_with_no_sentence_form_shows_in_angle_brackets if {
+	steps := [
+		[{"each_as": "it"}, "items <each as it>"],
+		[{"each_as": "it", "keys": ["b", "a"]}, `items <each of "b", "a">`],
+		[{"each_as": "it", "keys": {"literal": ["x"]}}, `items <each of "x">`],
+		[{"each_as": "it", "keys": [{"ref": ["$$params", "k"]}, "z"]}, `items <each of $params.k, "z">`],
+		[{"each_as": "it", "keys": {"ref": ["$$params", "ks"]}}, "items named by each of $params.ks"],
+	]
+	every pair in steps {
+		_listed({"d": {"from": ["items", pair[0]]}}, "d").d.from == pair[1]
+	}
+}
+
 test_an_old_subject_built_on_another_prints_the_other_and_its_own_filters if {
 	subjects := {
 		"base": {"from": ["components"], "identified_by": ["name"]},

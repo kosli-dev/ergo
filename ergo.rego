@@ -4523,9 +4523,41 @@ _subject_list_source_text(name, from) := text if {
 	count(from) > 0
 	not _all_string_steps(from)
 	text := _c_source(name, from, data.ergo_subjects)
-} else := _from_text({"subject": name}) if {
+} else := concat("", [_from_text({"subject": name}), _naming_text(from[count(from) - 1])]) if {
 	count(from) > 0
 	not _all_string_steps(from)
+}
+
+_naming_text(step) := "" if not _c_naming(step)
+
+_naming_text(step) := concat("", [" <each as ", _text(step.each_as), ">"]) if {
+	_c_naming(step)
+	not "keys" in object.keys(step)
+}
+
+_naming_text(step) := concat("", [" named by each of ", _ref_name(step.keys.ref)]) if {
+	_c_naming(step)
+	_is_ref(object.get(step, "keys", null))
+}
+
+_naming_text(step) := concat("", [" <each of ", concat(", ", [_naming_key_text(k) | some k in step.keys]), ">"]) if {
+	_c_naming(step)
+	is_array(object.get(step, "keys", null))
+}
+
+_naming_text(step) := concat("", [" <each of ", concat(", ", [_literal_text(k) | some k in step.keys.literal]), ">"]) if {
+	_c_naming(step)
+	_is_literal(object.get(step, "keys", null))
+	is_array(step.keys.literal)
+}
+
+_naming_key_text(k) := _ref_name(k.ref) if _is_ref(k)
+
+_naming_key_text(k) := _literal_text(k.literal) if _is_literal(k)
+
+_naming_key_text(k) := _literal_text(k) if {
+	not _is_ref(k)
+	not _is_literal(k)
 }
 
 _all_string_steps(from) if {
