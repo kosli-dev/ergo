@@ -24,7 +24,19 @@
         "description": {"type": "string", "description": "The subject's description, or \"\" when it has none."},
         "from": {"type": "string", "description": "How the subject is found, as a from line is written, or <invalid from> when it is written wrong."},
         "identified_by": {"type": ["string", "null"], "description": "The path of the subject's id, or null when it has none and the whole subject is its id."},
-        "parts": {"type": "object", "description": "Always empty for now."}
+        "parts": {
+          "type": "object",
+          "description": "Every part the subject has, including the ones it keeps from a subject it narrows, by alias.",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "from": {"type": "string", "description": "The part's path, written as a sentence writes it, or <invalid from> when it is written wrong."},
+              "identified_by": {"type": ["string", "null"], "description": "The path of the part's id, <invalid identified_by> when it is written wrong, or null when it has none."}
+            },
+            "required": ["from", "identified_by"],
+            "additionalProperties": false
+          }
+        }
       },
       "required": ["description", "from", "identified_by", "parts"],
       "additionalProperties": false
