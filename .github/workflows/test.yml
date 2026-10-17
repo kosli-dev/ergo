@@ -88,11 +88,14 @@ jobs:
         run: python3 spec/check_rules.py
       - name: Check the corpus JSON matches the markdown
         run: python3 spec/sentences_corpus.py --check
-      - name: Check the cases' policies and reports match the schemas
+      - name: Install the spec checks' Python packages
         run: |
           python3 -m venv "$RUNNER_TEMP/venv"
-          "$RUNNER_TEMP/venv/bin/pip" install --quiet jsonschema==4.26.0
-          "$RUNNER_TEMP/venv/bin/python" .github/spec-schemas.py
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet jsonschema==4.26.0 abnf==2.9.0
+      - name: Check the cases' policies and reports match the schemas
+        run: '"$RUNNER_TEMP/venv/bin/python" .github/spec-schemas.py'
+      - name: Check ergo.rego and the ABNF read the same sentences
+        run: '"$RUNNER_TEMP/venv/bin/python" spec/check_grammar.py'
 
   tutorial:
     runs-on: ubuntu-latest
