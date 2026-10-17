@@ -509,11 +509,11 @@
               {"name": "checks.as_on_equals", "value": ["as can't go here"]},
               {"name": "checks.check_not_object.check", "value": ["invalid check"]},
               {"name": "checks.each_on_equals", "value": ["each can't go here"]},
-              {"name": "checks.invalid_name", "value": ["invalid name"]},
-              {"name": "checks.name_twice.check", "value": ["name given twice"]},
+              {"name": "checks.invalid_name", "value": ["invalid alias"]},
+              {"name": "checks.name_twice.check", "value": ["alias given twice"]},
               {"name": "checks.no_check", "value": ["missing check"]},
               {"name": "checks.too_deep.check.check", "value": ["nested too deep"]},
-              {"name": "checks.unknown_name.check", "value": ["unknown name $q"]}
+              {"name": "checks.unknown_name.check", "value": ["unknown alias $q"]}
             ]
           },
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "as_on_equals", "passed": false, "cause": "ill_formed", "inputs": [{"name": "cs", "value": [1]}]},
@@ -576,8 +576,8 @@
         "expressions": {
           "s": {
             "check_not_object": "every cs: <invalid check>",
-            "invalid_name": "every cs as <invalid name>: cs[] is present",
-            "name_twice": "every cs as $x: every b as <name given twice>: $x is present",
+            "invalid_name": "every cs as <invalid alias>: cs[] is present",
+            "name_twice": "every cs as $x: every b as <alias given twice>: $x is present",
             "no_check": "every cs: <missing check>",
             "too_deep": "every cs: every b: <nested too deep>",
             "unknown_name": "every cs: $q.v == 1"
@@ -615,14 +615,14 @@
             "inputs": [
               {"name": "count(checks)", "value": 2},
               {"name": "require", "value": "every"},
-              {"name": "checks.input", "value": ["invalid name"]},
-              {"name": "checks.params", "value": ["invalid name"]}
+              {"name": "checks.input", "value": ["invalid alias"]},
+              {"name": "checks.params", "value": ["invalid alias"]}
             ]
           },
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "input", "passed": false, "cause": "ill_formed", "inputs": [{"name": "cs[]", "value": [1]}], "failed_items": [{"path": "item 1 of cs", "item": "item 1 of cs", "cause": "ill_formed", "value": 1}]},
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "params", "passed": false, "cause": "ill_formed", "inputs": [{"name": "cs[]", "value": [1]}], "failed_items": [{"path": "item 1 of cs", "item": "item 1 of cs", "cause": "ill_formed", "value": 1}]}
         ],
-        "expressions": {"s": {"params": "every cs as <invalid name>: cs[] is present"}}
+        "expressions": {"s": {"params": "every cs as <invalid alias>: cs[] is present"}}
       }
     ]
   }

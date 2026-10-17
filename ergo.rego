@@ -400,7 +400,7 @@ _object_step_problems(step, true) := {"object step without each_as"} if not "eac
 _object_step_problems(step, true) := ({concat("", ["unknown field ", _text(k), " in naming step"]) |
 	some k in object.keys(step)
 	not k in {"each_as", "keys"}
-} | {"invalid name" | not _valid_name(step.each_as)}) | {"invalid keys" | not _keys_well_formed(step)} if "each_as" in object.keys(step)
+} | {"invalid alias" | not _valid_name(step.each_as)}) | {"invalid keys" | not _keys_well_formed(step)} if "each_as" in object.keys(step)
 
 _where_problems(id) := {["identified_by", concat("", [kind, " inside where"])] | some kind in _wrapped_in_where(id)}
 
@@ -2686,19 +2686,19 @@ _input_paths(spec) := [object.get(spec, f, []) | some f in ["path", "each"]] if 
 
 _name_problems(node, names) := union({_invalid_name_problem(node), _name_given_twice_problem(node, names), _unknown_name_problem(node, names)})
 
-_invalid_name_problem(node) := {"invalid name" |
+_invalid_name_problem(node) := {"invalid alias" |
 	_quantified(node)
 	"as" in object.keys(node)
 	not _valid_name(node.as)
 }
 
-_name_given_twice_problem(node, names) := {"name given twice" |
+_name_given_twice_problem(node, names) := {"alias given twice" |
 	_quantified(node)
 	_valid_name(node.as)
 	node.as in names
 }
 
-_unknown_name_problem(node, names) := {concat("", ["unknown name ", p[0]]) |
+_unknown_name_problem(node, names) := {concat("", ["unknown alias ", p[0]]) |
 	some f in ["path", "left", "right", "each", "inputs"]
 	some p in _own_paths(node, f)
 	_named(p)
@@ -3622,12 +3622,12 @@ _as_text(check, given) := concat("", [" as $", check.as]) if {
 	not check.as in given
 }
 
-_as_text(check, given) := " as <name given twice>" if {
+_as_text(check, given) := " as <alias given twice>" if {
 	_valid_name(check.as)
 	check.as in given
 }
 
-_as_text(check, _) := " as <invalid name>" if {
+_as_text(check, _) := " as <invalid alias>" if {
 	"as" in object.keys(check)
 	not _valid_name(check.as)
 }
@@ -5528,11 +5528,11 @@ _s_sentence_problems(parsed) := (((((((((((((({concat("", [node.bare_word, " is 
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"bare_word" in object.keys(node)
-} | {concat("", [node.bad_name, " can't be a name"]) |
+} | {concat("", [node.bad_name, " can't be an alias"]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"bad_name" in object.keys(node)
-}) | {concat("", [node.as, " can't be a name"]) |
+}) | {concat("", [node.as, " can't be an alias"]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	_s_bad_name(object.get(node, "as", ""))
@@ -6239,7 +6239,7 @@ _s_elapsed_unsupported(a) := {"an elapsed time isn't supported yet except alone 
 	object.get(a, "terms", []) != [node]
 }
 
-_s_from_paths_unsupported(a) := _s_paths_unsupported(a) | {concat("", ["unknown name ", ref.steps[0]]) |
+_s_from_paths_unsupported(a) := _s_paths_unsupported(a) | {concat("", ["unknown alias ", ref.steps[0]]) |
 	some node in _s_nodes(a)
 	is_object(node)
 	ref := object.get(node, "named_by", {"start": ""})
@@ -6758,7 +6758,7 @@ _s_for_line_unsupported(lines, ftext) := _s_for_unsupported(fl, []) | _s_lines_p
 
 _s_for_unsupported(fl, assertions) := ({u | some item in fl.items; some u in _s_item_unsupported(item)} | {u | some a in assertions; some u in _s_assertion_unsupported(a)}) | {u | some i, item in fl.items; some u in _s_names_not_given(item, {later.as | some later in array.slice(fl.items, i, count(fl.items))})}
 
-_s_names_not_given(x, later) := {concat("", ["unknown name ", ref.steps[0]]) |
+_s_names_not_given(x, later) := {concat("", ["unknown alias ", ref.steps[0]]) |
 	some node in _s_nodes(x)
 	is_object(node)
 	ref := object.get(node, "named_by", {"start": ""})

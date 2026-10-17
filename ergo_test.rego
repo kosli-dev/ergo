@@ -2961,7 +2961,7 @@ badly_written_requirements := {
 	"require_most": [{"require": "most"}, [{"name": "require", "value": ["neither every nor some"]}]],
 	"require_number": [{"require": 5}, [{"name": "require", "value": ["neither every nor some"]}]],
 	"checks_empty": [{"checks": {}}, [{"name": "require", "value": "every"}, {"name": "checks", "value": ["empty"]}]],
-	"name_with_dollar": [{"from": ["items", {"each_as": "$x"}]}, [{"name": "require", "value": "every"}, {"name": "subjects.subject.from", "value": ["invalid name"]}]],
+	"name_with_dollar": [{"from": ["items", {"each_as": "$x"}]}, [{"name": "require", "value": "every"}, {"name": "subjects.subject.from", "value": ["invalid alias"]}]],
 	"step_not_last": [{"from": [{"each_as": "x"}, "items"]}, [{"name": "require", "value": "every"}, {"name": "subjects.subject.from", "value": ["object step before the last"]}]],
 	"selector_in_from": [{"from": ["items", {"where": {"id": 1}}]}, [{"name": "require", "value": "every"}, {"name": "subjects.subject.from", "value": ["object step without each_as"]}]],
 	"keys_without_name": [{"from": ["items", {"keys": ["a"]}]}, [{"name": "require", "value": "every"}, {"name": "subjects.subject.from", "value": ["object step without each_as"]}]],
@@ -3352,11 +3352,30 @@ test_a_ref_that_reads_the_wrong_kind_of_value_leaves_well_formed_alone_because_p
 	}
 }
 
+test_an_alias_given_twice_is_reported_as_an_alias if {
+	rep := report({"prs": [{"n": 1}]}, {"s": {"from": ["prs", {"each_as": "pr"}], "identified_by": ["n"], "checks": {"c": {"op": "all", "path": ["$pr", "xs"], "as": "pr", "check": {"op": "present", "path": ["v"]}}}}})
+	problem_inputs(rep) == [{"name": "checks.c", "value": ["alias given twice"]}]
+}
+
+test_an_alias_that_is_not_a_valid_word_is_reported_as_an_invalid_alias if {
+	rep := report({"prs": [{"n": 1}]}, {"s": {"from": ["prs"], "identified_by": ["n"], "checks": {"c": {"op": "all", "path": ["xs"], "as": "$x", "check": {"op": "present", "path": ["v"]}}}}})
+	problem_inputs(rep) == [{"name": "checks.c", "value": ["invalid alias"]}]
+}
+
+test_a_bare_word_after_named_by_that_no_for_line_gives_is_an_unknown_alias if {
+	_sentence_problems({"for": "every xs named by x as x", "assert": "x is 1"}) == ["unknown alias x"]
+}
+
+test_a_dollar_word_in_a_sentence_is_not_an_alias_so_it_stays_an_unknown_name if {
+	_sentence_problems({"for": "every xs as x", "assert": "x is $foo"}) == ["unknown name $foo"]
+	_sentence_problems({"assert": "$foo.a exists"}) == ["unknown name $foo"]
+}
+
 test_a_name_given_by_from_is_known_and_any_other_is_not if {
 	good := report({"prs": [{"n": 1}]}, {"s": {"from": ["prs", {"each_as": "pr"}], "identified_by": ["n"], "checks": {"c": {"op": "present", "path": ["$pr", "n"]}}}})
 	bad := report({"prs": [{"n": 1}]}, {"s": {"from": ["prs", {"each_as": "pr"}], "identified_by": ["n"], "checks": {"c": {"op": "present", "path": ["$p", "n"]}}}})
 	rows_for(good, "s", "$well_formed")[0].passed == true
-	problem_inputs(bad) == [{"name": "checks.c", "value": ["unknown name $p"]}]
+	problem_inputs(bad) == [{"name": "checks.c", "value": ["unknown alias $p"]}]
 	[r.cause | some r in rows_for(bad, "s", "c")] == ["ill_formed"]
 }
 
@@ -3365,7 +3384,7 @@ test_a_name_given_by_as_is_known_only_inside_its_check if {
 		"a": [{"op": "any", "path": ["approvers"], "as": "approver", "check": {"op": "present", "path": ["$approver", "id"]}}],
 		"b": [{"op": "present", "path": ["$approver", "id"]}],
 	}}}}})
-	problem_inputs(rep) == [{"name": "checks.c.options.b.0", "value": ["unknown name $approver"]}]
+	problem_inputs(rep) == [{"name": "checks.c.options.b.0", "value": ["unknown alias $approver"]}]
 }
 
 test_a_badly_written_filter_fails_well_formed_too if {
@@ -3456,7 +3475,7 @@ test_a_missing_path_or_check_inside_a_nested_list_check_shows_in_the_expression 
 test_a_check_reading_a_name_nothing_gives_fails_the_requirement_even_when_no_subject_is_found if {
 	rep := report({"items": []}, {"s": {"from": ["items"], "min_subjects": 0, "checks": {"c": {"op": "present", "path": ["$p", "id"]}}}})
 	rep.requirements.s.status == "not_met"
-	problem_inputs(rep) == [{"name": "checks.c", "value": ["unknown name $p"]}]
+	problem_inputs(rep) == [{"name": "checks.c", "value": ["unknown alias $p"]}]
 }
 
 test_a_field_its_op_does_not_use_fails_well_formed if {
@@ -3758,7 +3777,7 @@ test_present_that_cannot_reach_its_field_is_not_a_clean_no if {
 
 test_a_path_starting_with_a_reserved_double_dollar_name_is_ill_formed if {
 	rep := report({"items": [{"id": 1}]}, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "equals", "path": ["$$foo", "x"], "value": 1}}}})
-	problem_inputs(rep) == [{"name": "checks.c", "value": ["unknown name $$foo"]}]
+	problem_inputs(rep) == [{"name": "checks.c", "value": ["unknown alias $$foo"]}]
 	[r.cause | some r in rows_for(rep, "s", "c")] == ["ill_formed"]
 }
 
@@ -5783,7 +5802,7 @@ test_a_badly_written_as_fails_the_check if {
 	every name in [1, "", "$a", "$$input", null] {
 		check := {"op": "any", "path": ["approvers"], "as": name, "check": {"op": "present", "path": ["username"]}}
 		[r[1] | some r in review_rows(check)] == [false, false, false, false, false]
-		report(review_doc, review_req(check)).requirements.s.checks.c.expression == "some approvers as <invalid name>: username is present"
+		report(review_doc, review_req(check)).requirements.s.checks.c.expression == "some approvers as <invalid alias>: username is present"
 	}
 }
 
@@ -5888,9 +5907,9 @@ test_a_badly_written_list_check_is_ill_formed if {
 review_expression(check) := report(review_doc, review_req(check)).requirements.s.checks.c.expression
 
 test_a_name_given_twice_shows_in_the_expression if {
-	review_expression({"op": "any", "path": ["approvers"], "as": "pr", "check": {"op": "present", "path": ["username"]}}) == "some approvers as <name given twice>: username is present"
-	review_expression({"op": "any", "path": ["approvers"], "as": "a", "check": {"op": "all", "path": ["$pr", "commits"], "as": "a", "check": {"op": "present", "path": ["sha"]}}}) == "some approvers as $a: every $pr.commits as <name given twice>: sha is present"
-	review_expression({"op": "any", "path": ["approvers"], "as": "a", "check": {"op": "all", "path": ["$pr", "commits"], "as": "pr", "check": {"op": "present", "path": ["sha"]}}}) == "some approvers as $a: every $pr.commits as <name given twice>: sha is present"
+	review_expression({"op": "any", "path": ["approvers"], "as": "pr", "check": {"op": "present", "path": ["username"]}}) == "some approvers as <alias given twice>: username is present"
+	review_expression({"op": "any", "path": ["approvers"], "as": "a", "check": {"op": "all", "path": ["$pr", "commits"], "as": "a", "check": {"op": "present", "path": ["sha"]}}}) == "some approvers as $a: every $pr.commits as <alias given twice>: sha is present"
+	review_expression({"op": "any", "path": ["approvers"], "as": "a", "check": {"op": "all", "path": ["$pr", "commits"], "as": "pr", "check": {"op": "present", "path": ["sha"]}}}) == "some approvers as $a: every $pr.commits as <alias given twice>: sha is present"
 	expression_in({}, {"id": 1}, {"op": "any", "path": ["xs"], "as": "items", "check": {"op": "present", "path": []}}) == "some xs as $items: $items is present"
 }
 
@@ -5971,10 +5990,10 @@ test_a_list_check_two_levels_under_an_any_of_at_the_top_is_too_deep if {
 test_a_name_given_twice_in_a_list_check_inside_an_any_of_is_ill_formed if {
 	inner := {"op": "any", "path": ["approvers"], "as": "approver", "check": {"op": "any_of", "options": {"peer": [{"op": "all", "path": ["$pr", "commits"], "as": "approver", "check": {"op": "present", "path": ["timestamp"]}}]}}}
 	{r[2] | some r in peer_rows(inner)} == {"ill_formed"}
-	report(peer_doc, review_req(inner)).requirements.s.checks.c.expression == "some approvers as $approver: one of: peer(every $pr.commits as <name given twice>: timestamp is present)"
+	report(peer_doc, review_req(inner)).requirements.s.checks.c.expression == "some approvers as $approver: one of: peer(every $pr.commits as <alias given twice>: timestamp is present)"
 	top := {"op": "any_of", "options": {"o": [{"op": "all", "path": ["commits"], "as": "pr", "check": {"op": "present", "path": ["timestamp"]}}]}}
 	{r[2] | some r in peer_rows(top)} == {"ill_formed"}
-	report(peer_doc, review_req(top)).requirements.s.checks.c.expression == "one of: o(every commits as <name given twice>: timestamp is present)"
+	report(peer_doc, review_req(top)).requirements.s.checks.c.expression == "one of: o(every commits as <alias given twice>: timestamp is present)"
 }
 
 test_a_broken_list_check_in_an_any_of_filter_cannot_rule_subjects_out if {
@@ -7614,7 +7633,7 @@ test_problems_with_the_subject_built_on_are_named_after_it if {
 		{"name": "subjects.\"SBOM package\".applies_to.bad", "value": ["unknown op nope"]},
 	]
 	stepped := object.union(sbom_subjects, {"SBOM package": {"from": ["components", {"each_as": "$p"}]}})
-	built_problems(stepped) == [{"name": "subjects.\"SBOM package\".from", "value": ["invalid name"]}]
+	built_problems(stepped) == [{"name": "subjects.\"SBOM package\".from", "value": ["invalid alias"]}]
 }
 
 test_a_well_formed_row_names_the_from_after_the_subject_it_comes_from if {
@@ -8200,8 +8219,8 @@ test_a_sentence_written_wrong_says_what_is_wrong if {
 	_read(`x plus y matches "a"`) == {"problems": ["matches can't follow a count of, a sum of or a plus"]}
 	_read(`5 is 5`) == {"problems": ["a number can't start a sentence"]}
 	_read(`1 plus x is 5`).assertions[0].terms == [1, {"steps": ["x"]}]
-	_read(`x named by every is 1`) == {"problems": ["every can't be a name"]}
-	_read(`x[params] is 1`) == {"problems": ["params can't be a name"]}
+	_read(`x named by every is 1`) == {"problems": ["every can't be an alias"]}
+	_read(`x[params] is 1`) == {"problems": ["params can't be an alias"]}
 	_read(`commits[01] is "x"`) == {"problems": ["doesn't parse"]}
 	_read(`$foo is 1`) == {"problems": ["unknown name $foo"]}
 	_read(`x is $params`).assertions[0].phrase.terms == [{"start": "params", "steps": []}]
@@ -8226,8 +8245,8 @@ test_a_sentence_written_wrong_says_what_is_wrong if {
 	_read(`item 0 of x is 1`) == {"problems": ["doesn't parse"]}
 	_read(`foo$bar is 1`) == {"problems": ["doesn't parse"]}
 	_read(`x is "$schema"`) == {"assertions": [{"path": {"steps": ["x"]}, "phrase": {"op": "is", "value": "$schema"}}]}
-	ergo._for_line(`every x as every`) == {"problems": ["every can't be a name"]}
-	ergo._for_line(`every x as params`) == {"problems": ["params can't be a name"]}
+	ergo._for_line(`every x as every`) == {"problems": ["every can't be an alias"]}
+	ergo._for_line(`every x as params`) == {"problems": ["params can't be an alias"]}
 	ergo._for_line(`every x as a, every y as b, every z as c`) == {"problems": ["a for line holds two items at most"]}
 	ergo._for_line(`some x, if any, as y`) == {"problems": ["if any can't go with some"]}
 	ergo._from_line(`count whose x is 1`) == {"problems": ["count is a word of the grammar: write .count"]}
@@ -8481,7 +8500,7 @@ test_params_and_input_cant_be_names_so_a_name_is_never_read_as_the_params_or_the
 		not r.compliant
 		[row.cause | some row in r.results; row.check == "$well_formed"] == ["value"]
 	}
-	rendered({}, {"op": "all", "path": ["xs"], "as": "input", "check": {"op": "present", "path": ["v"]}}) == "every xs as <invalid name>: v is present"
+	rendered({}, {"op": "all", "path": ["xs"], "as": "input", "check": {"op": "present", "path": ["v"]}}) == "every xs as <invalid alias>: v is present"
 }
 
 test_an_each_that_isnt_a_list_shows_as_invalid_in_the_expression if {
@@ -8925,7 +8944,7 @@ test_a_for_line_written_wrong_says_why if {
 	_sentence_problems({"assert": "x.a exists", "for": "every xs as"}) == [`for: an item ends with "as" and a name, like "every pull_requests as pr"`]
 	_sentence_problems({"assert": "x.a exists", "for": "xs as x"}) == [`for: an item starts with "every" or "some"`]
 	_sentence_problems({"assert": "x.a exists", "for": "every xs as x, every ys as x"}) == ["for: x is given twice"]
-	_sentence_problems({"assert": "x.a is 1", "for": "every xs as params"}) == ["for: params can't be a name"]
+	_sentence_problems({"assert": "x.a is 1", "for": "every xs as params"}) == ["for: params can't be an alias"]
 	_sentence_problems({"assert": "x.a is 1", "for": "some xs, if any, as x"}) == ["for: if any can't go with some"]
 	_sentence_problems({"assert": "x is $foo", "for": "every xs as x"}) == ["unknown name $foo"]
 }
@@ -9453,7 +9472,7 @@ test_a_subject_cant_build_on_a_subject_read_from_another_yet if {
 
 test_the_parent_is_named_only_in_sentences_and_only_in_its_own_requirement if {
 	rep := _chain_report(_chain_doc, _chain_subjects, {"c": {"op": "present", "path": ["$artifact", "name"]}}, {"name": "web"})
-	[i.value | some r in rep.results; r.check == "$well_formed"; some i in r.inputs; i.name == "checks.c"] == [["unknown name $artifact"]]
+	[i.value | some r in rep.results; r.check == "$well_formed"; some i in r.inputs; i.name == "checks.c"] == [["unknown alias $artifact"]]
 	other := ergo.report({"things": [{"k": 1}], "trail": {"artifacts": {}}}, {"subjects": object.union(_chain_subjects, {"thing": {"from": ["things", {"each_as": "artifact"}]}}), "requirements": {"t": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["$artifact", "k"]}}}}}, {"name": "web"})
 	other.requirements.t.checks.c.expression == "$artifact.k is present"
 	[r.inputs | some r in other.results; r.check == "c"] == [[{"name": "$artifact.k", "value": 1}]]
@@ -9482,7 +9501,7 @@ test_named_by_a_name_from_the_for_line_reads_the_key_each_item_names if {
 
 test_named_by_a_bare_word_in_a_from_line_or_an_id_is_an_unknown_name_since_there_is_no_subject_to_read_it_from if {
 	from := ergo.report({"things": [{"id": 1, "k": "a"}]}, {"subjects": {"thing": {"from": "things named by k", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists"}}}}, {})
-	[i.value | some r in from.results; r.check == "$well_formed"; some i in r.inputs; i.name == "subjects.thing.from"] == [["unknown name k"]]
+	[i.value | some r in from.results; r.check == "$well_formed"; some i in r.inputs; i.name == "subjects.thing.from"] == [["unknown alias k"]]
 	id := ergo.report({"things": [{"id": {"a": 1}, "k": "a"}]}, {"subjects": {"thing": {"from": "things", "identified_by": "id named by k"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "k exists"}}}}, {})
 	[i.value | some r in id.results; r.check == "$well_formed"; some i in r.inputs; i.name == "subjects.thing.identified_by"] == [[`identified_by is a path, like "id" or "build.number"`]]
 }
@@ -9580,9 +9599,9 @@ test_named_by_a_for_name_in_the_second_items_path_reads_the_first_items_key if {
 }
 
 test_named_by_a_for_name_before_it_is_given_is_an_unknown_name if {
-	_sentence_problems({"for": "every xs named by x as x", "assert": "x is 1"}) == ["unknown name x"]
-	_sentence_problems({"for": "every lists named by q as p, every qs as q", "assert": "p is 1"}) == ["unknown name q"]
-	_sentence_problems({"for": "every objs whose v named by o is 1 as o", "assert": "o exists"}) == ["unknown name o"]
+	_sentence_problems({"for": "every xs named by x as x", "assert": "x is 1"}) == ["unknown alias x"]
+	_sentence_problems({"for": "every lists named by q as p, every qs as q", "assert": "p is 1"}) == ["unknown alias q"]
+	_sentence_problems({"for": "every objs whose v named by o is 1 as o", "assert": "o exists"}) == ["unknown alias o"]
 }
 
 test_named_by_a_for_name_that_holds_no_text_fails_with_its_cause if {
@@ -9602,7 +9621,7 @@ test_named_by_a_for_name_that_holds_no_text_fails_with_its_cause if {
 }
 
 test_a_from_line_named_by_a_bare_word_is_an_unknown_name if {
-	_from_problems(_from_report({"m": {}}, {"x": {"from": "m named by k"}}, {"c": "id exists"}, {})) == [{"name": "subjects.x.from", "value": ["unknown name k"]}]
+	_from_problems(_from_report({"m": {}}, {"x": {"from": "m named by k"}}, {"c": "id exists"}, {})) == [{"name": "subjects.x.from", "value": ["unknown alias k"]}]
 }
 
 test_every_and_count_through_a_for_name_arent_listed_as_inputs_since_they_change_with_each_item if {

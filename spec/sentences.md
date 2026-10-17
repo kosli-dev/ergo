@@ -69,7 +69,7 @@ peer_approval:
 
 **[sentence.path.string]** A path is keys joined by `.`, like `git_commit_info.sha1`. A key is written bare when it starts with an ASCII letter or `_` and the rest is ASCII letters, digits, `_` and `-`, so Kosli's `secrets-scan`, `pull-request` and `coverage-verification` need no quotes. Any other key is quoted as a JSON string, like `metadata.labels."app.kubernetes.io/name"`, and so is any key with a `$` in it, like `"$schema"` or `"foo$bar"`. The report prints keys by the same rule, so `$` only ever starts `$params` or `$input`, and a path from a row can be pasted into a policy.
 
-**[sentence.path.start]** A bare first key is a field of the subject. Inside `whose`, and in the argument of a one-line `every` or `some`, it's a field of the item instead (see [sentence.argument.item](#every-some-and-whose)). A name given by `as` on a `for` line is a bare word too, and it shadows a field with the same name. `$params` starts at the params and `$input` at the input. Any other `$<word>` is written wrong, with `unknown name $<word>`.
+**[sentence.path.start]** A bare first key is a field of the subject. Inside `whose`, and in the argument of a one-line `every` or `some`, it's a field of the item instead (see [sentence.argument.item](#every-some-and-whose)). An alias given by `as` on a `for` line is a bare word too, and it shadows a field with the same name. `$params` starts at the params and `$input` at the input. Any other `$<word>` is written wrong, with `unknown name $<word>`.
 
 **[sentence.path.index]** `item 3 of items` reads the third item of `items`, counting from 1, and `first of items` and `last of items` read the ends. The path after `of` is the whole rest of the path, so `item 3 of pull_request.commits` picks the third commit, and a field of that item has no word form: write `pull_request.commits[2].sha` with brackets, which count from 0 as [sentence.path.brackets](#paths) says. `item 0 of items` is written wrong. The report prints the word form when the position ends the path, so `commits[2]` prints as `item 3 of commits`, and prints the brackets when a key follows them. No policy in the corpus needs a position.
 
@@ -80,7 +80,7 @@ peer_approval:
 - A field with one of those names is written with a dot in front: `is .empty`, `is .true`. The dot is allowed on any field on the right side, so `equals .total_usd` means `equals total_usd`, and the report prints it only where it's needed.
 - A key that has to be quoted, like `$schema`, is written with the dot too: `is ."$schema"`.
 
-**[sentence.path.dynamic]** `<path> named by <reference>` reads the key that the reference holds, as a ref step does today, and the path can go on after it: `artifacts_statuses named by $params.artifact_name.attestations_statuses`. The reference is `$params` or `$input` plus one key, or one bare key. A bare key is a name from a `for` line, like `persona_blob_shas named by persona`, or else a field, read where a bare first key would be read (see [sentence.path.start](#paths)): `$params.max_days_by_severity named by severity` reads the subject's `severity`, and inside a `whose` the item's. Without that limit, `named by $params.a.b` could end the reference after `a` or after `b`, and the tokenizer found 24 lines in the corpus that read two ways because of it.
+**[sentence.path.dynamic]** `<path> named by <reference>` reads the key that the reference holds, as a ref step does today, and the path can go on after it: `artifacts_statuses named by $params.artifact_name.attestations_statuses`. The reference is `$params` or `$input` plus one key, or one bare key. A bare key is an alias from a `for` line, like `persona_blob_shas named by persona`, or else a field, read where a bare first key would be read (see [sentence.path.start](#paths)): `$params.max_days_by_severity named by severity` reads the subject's `severity`, and inside a `whose` the item's. Without that limit, `named by $params.a.b` could end the reference after `a` or after `b`, and the tokenizer found 24 lines in the corpus that read two ways because of it.
 
 **[sentence.path.brackets]** Brackets are the other spelling: `artifacts_statuses[$params.artifact_name]`, `persona_blob_shas[persona]`, and `items[2]` for a position. In brackets the type decides, as in JSON: a string picks a key and a number picks a position. The report prints the word form.
 
@@ -176,7 +176,7 @@ It's a number like a `count of`, so it goes where one does: at the start of an a
 
 ## The `for` line
 
-**[sentence.for.line]** A check can have a `for` line before its `assert`. It holds one or two items separated by `, `, and each item is `every` or `some`, a path, an optional `whose` with `and`, and `as` a name:
+**[sentence.for.line]** A check can have a `for` line before its `assert`. It holds one or two items separated by `, `, and each item is `every` or `some`, a path, an optional `whose` with `and`, and `as` an alias:
 
 ```yaml
 peer_approved:
@@ -185,13 +185,13 @@ peer_approved:
   assert: approver.username does not equal pr.author
 ```
 
-Items nest left to right, so a later one can use an earlier name, as `pr.approvers` does. A third item is written wrong, because two is the one level of nesting Rego gives today.
+Items nest left to right, so a later one can use an earlier alias, as `pr.approvers` does. A third item is written wrong, because two is the one level of nesting Rego gives today.
 
 **[sentence.for.depth]** A check walks three lists at most, from the input to its assertion, counted as list walks and not as subjects. Walks in `from`, in a parent subject's `from`, on the `for` line, in a one-line `every` or `some`, and in a `count of` or `sum of`, in a `whose` too, all count, and a fourth is written wrong. A `count of` or `sum of` counts because it reads every item of its list, as `every` does, so `for: every pull_requests as pr` with `assert: count of pr.reviews is at least 2` walks two lists. sdlc-policies 0007's peer approval reaches the limit: pull requests in its `from`, then approvers and commits on its `for` line. Its `artifact` parent picks one artifact by name and walks no list.
 
-**[sentence.for.scope]** In `assert` and in a later item, a bare first key is the subject's field and a named item is reached by its name. Inside an item's own `whose`, a bare key is that item's field. So in `for: some approvals whose role is "qa" as approval` with `assert: approval.approved_at is before started_at`, `role` is the approval's and `started_at` the subject's.
+**[sentence.for.scope]** In `assert` and in a later item, a bare first key is the subject's field and an item is reached by its alias. Inside an item's own `whose`, a bare key is that item's field. So in `for: some approvals whose role is "qa" as approval` with `assert: approval.approved_at is before started_at`, `role` is the approval's and `started_at` the subject's.
 
-**[sentence.for.name]** A name is a bare word that isn't `params`, `input` or a word of the grammar, like `every`, `as` or `empty`. For the rest of the check it shadows a field of the subject with the same name. A name given twice is written wrong.
+**[sentence.for.alias]** An alias is a bare word that isn't `params`, `input` or a word of the grammar, like `every`, `as` or `empty`. For the rest of the check it shadows a field of the subject with the same name. An alias given twice is written wrong, and so is a bare word after `named by` that no `for` line gives, with `unknown alias <word>`.
 
 **[sentence.for.fail]** Each item fails closed as a one-line `every` or `some` does: `some` over an empty list fails, `every` over one fails unless the item says `if any`, a missing or non-list path fails as `absent`, `null` or `unusable`, and an item a `whose` can't decide fails the try with its cause.
 
@@ -205,12 +205,12 @@ Items nest left to right, so a later one can use an earlier name, as `pr.approve
 
 Some rules can't be said in ABNF, so they're here:
 
-- A bare first key is never a word of the grammar, see [sentence.words](#words-a-field-cant-be-called). A `for` name isn't one either, nor `params` or `input`.
-- Which bare first key is a subject's field, an item's field, a `for` name or a subject's name depends on where the sentence is, see [sentence.path.start](#paths), [sentence.for.scope](#the-for-line) and [sentence.subject.own](#subjects).
+- A bare first key is never a word of the grammar, see [sentence.words](#words-a-field-cant-be-called). A `for` alias isn't one either, nor `params` or `input`.
+- Which bare first key is a subject's field, an item's field, a `for` alias or a subject's name depends on where the sentence is, see [sentence.path.start](#paths), [sentence.for.scope](#the-for-line) and [sentence.subject.own](#subjects).
 - A `for` line has two items at most, and a check walks three lists at most, see [sentence.for.depth](#the-for-line).
 - `is`, `equals` and `is equal to` read the same, as do `is one of` and `is in`, and the report picks the spelling, see [sentence.print.canonical](#printing-the-sentence).
 - A run of spaces between two words reads as one, and a list of values can be written with or without a space after each comma. The report prints one space and `, `.
-- The bounds of `is between` are in order, a string in `matches` is a valid regular expression, and a `for` name is given once, or the sentence is written wrong.
+- The bounds of `is between` are in order, a string in `matches` is a valid regular expression, and a `for` alias is given once, or the sentence is written wrong.
 
 A grammar word only needs quoting or a dot when it's the first key, so `a`, `an`, `in`, `on` and `of` cost nothing in ordinary paths.
 
@@ -395,7 +395,7 @@ Some lines have two causes. The tokenizer also applied [sentence.subject.own](#s
 
 28 made-up lines test what the corpus doesn't reach:
 
-- `count of x whose n is m plus k is t` read three ways until [sentence.derived.plus](#derived-values) was written. Under the grammar it reads one way, with `m plus k` inside the condition. A `for` item named `every` reads one way until [sentence.for.name](#the-for-line) forbids it.
+- `count of x whose n is m plus k is t` read three ways until [sentence.derived.plus](#derived-values) was written. Under the grammar it reads one way, with `m plus k` inside the condition. A `for` item named `every` reads one way until [sentence.for.alias](#the-for-line) forbids it.
 - `if any` with `some`, two quantifiers in one sentence, `count of ... is empty`, `whose count of reviews is empty` and the bare key `foo$bar` parse no way, as they should.
 - `whose count of reviews is at least 1 and state is "open"` and `some orders.id whose sum of items.price is more than 100 is not empty` read one way.
 - `every items.price whose kind is "a" and qty is 1 is at least 2 and owner is "x"` reads one way, with `owner` on the subject. So do `state is "MERGED" and every commits.verified is true` and `every items.price whose kind is "a" is at least 2 and some items.owner is "x"`, two quantified assertions on one line.

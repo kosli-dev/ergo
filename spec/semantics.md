@@ -17,7 +17,7 @@ Each rule has a name in brackets, like `[present.missing]`. The cases in [`cases
 A syntax reads each check into this model. Everything below is said in terms of it.
 
 - A **check** has an operator, like `equals` or `all`, and the parameters that operator takes.
-- A **path** has a start and a list of steps. It starts at the subject, at the input, at the params, or at a name given by a subject's `from` or by an enclosing list check.
+- A **path** has a start and a list of steps. It starts at the subject, at the input, at the params, or at an alias given by a subject's `from` or by an enclosing list check.
 - A **step** is a key (a string, which reads a key of an object), an index (a whole number of 0 or more, which reads an item of a list), a selector (fields and the values they must equal), or a ref step (a ref whose value is the key).
 - A **value** is a JSON value or a ref.
 - A **ref** is a path that starts at the input or the params and whose steps are all keys or indexes.
@@ -38,7 +38,7 @@ Reading a path ends in one of these outcomes. Each one except `found` is also a 
 | `unmatched`     | A selector found no item in a list that's there.                                                                         |
 | `ambiguous`     | A selector found more than one item.                                                                                     |
 
-**[path.start]** A path starts at the subject, the input, the params or a name. With no params, a path into the params ends `absent`. Params that are there but aren't an object fail the whole report, as [REFERENCE.md](../REFERENCE.md#params) says.
+**[path.start]** A path starts at the subject, the input, the params or an alias. With no params, a path into the params ends `absent`. Params that are there but aren't an object fail the whole report, as [REFERENCE.md](../REFERENCE.md#params) says.
 
 **[path.empty]** A path with no steps reads its starting value itself, so on a subject it never ends `not_an_object`. A `null` subject ends `null`.
 
@@ -247,7 +247,7 @@ A side of `compare` can also be `count_of` or `sum_of`, each with a path, `whose
 
 ## `all` and `any`
 
-`all` takes a path to a list and an inner check, and asks whether every item passes the check. `any` asks whether at least one does. Both can also take `each`, a path inside each item to an inner list, and `as`, a name for each item.
+`all` takes a path to a list and an inner check, and asks whether every item passes the check. `any` asks whether at least one does. Both can also take `each`, a path inside each item to an inner list, and `as`, an alias for each item.
 
 **[list.read]** The path must end `found` on a list. A list that's missing fails the check as `absent`, a `null` one as `null`, and anything else, an object included, as `unusable`. An empty list fails as `value`, because no items isn't proof of anything.
 
@@ -259,7 +259,7 @@ A side of `compare` can also be `count_of` or `sum_of`, each with a path, `whose
 
 **[list.each]** With `each`, the check runs on every item of every inner list. Every inner list must be readable, a list and not empty, for `all` and `any` alike. One that isn't fails the check with the cause it would give as a list, even when an item elsewhere passes.
 
-**[list.as]** `as` names each item, so a check nested inside can still read it once its own paths start somewhere else. A name can only be given once along a chain of checks, so `from` and an enclosing check can't give the same one. A path can only start with a name that `from` or an enclosing list check gives, not one given in a neighbouring `any_of` option. A check that breaks either rule is [written wrong](#the-model-of-a-check). Only `all` and `any` take `as` and `each`.
+**[list.as]** `as` gives each item an alias, so a check nested inside can still read it once its own paths start somewhere else. An alias can only be given once along a chain of checks, so `from` and an enclosing check can't give the same one. A path can only start with an alias that `from` or an enclosing list check gives, not one given in a neighbouring `any_of` option. A check that breaks either rule is [written wrong](#the-model-of-a-check). Only `all` and `any` take `as` and `each`.
 
 **[list.inner]** The inner check is a basic operator, an `any_of`, or another `all` or `any`. One `all` or `any` can sit inside another, but not a third, so ergo can be written in a language without recursion. An `any_of` doesn't count as a level, but an `all` or `any` in one of its options does. Anything else is [written wrong](#the-model-of-a-check).
 
@@ -313,17 +313,17 @@ A side of `compare` can also be `count_of` or `sum_of`, each with a path, `whose
 
 ## `for`
 
-`for` takes `items`, one or two, each with `every` or `some`, a path, `whose`, `if_any` and a name, and `checks` and `assertions`, as `all_of` does. It's what a check with a `for` line reads into, see [sentence.for.line](sentences.md#the-for-line), and today's syntax can't use it (see [sentence_ops.syntax](syntax.md#policies)).
+`for` takes `items`, one or two, each with `every` or `some`, a path, `whose`, `if_any` and an alias, and `checks` and `assertions`, as `all_of` does. It's what a check with a `for` line reads into, see [sentence.for.line](sentences.md#the-for-line), and today's syntax can't use it (see [sentence_ops.syntax](syntax.md#policies)).
 
-**[for.walk]** Each item's path is walked as an `every` or `some` path is, see [walk.lists](#every-and-some), and its name stands for the value the path ends at in each item of the innermost list walked. The `whose` checks read from that item, and an item is undecided or left out as [walk.items](#every-and-some) says. An item `whose` keeps, whose path ends at a value that's missing or that can't be read, fails as `absent` or `unusable` without its checks being run. The second item's path and its `whose` checks can start at the first item's name, and then it's walked again for each item of the first list.
+**[for.walk]** Each item's path is walked as an `every` or `some` path is, see [walk.lists](#every-and-some), and its alias stands for the value the path ends at in each item of the innermost list walked. The `whose` checks read from that item, and an item is undecided or left out as [walk.items](#every-and-some) says. An item `whose` keeps, whose path ends at a value that's missing or that can't be read, fails as `absent` or `unusable` without its checks being run. The second item's path and its `whose` checks can start at the first item's alias, and then it's walked again for each item of the first list.
 
-**[for.try]** The checks read the subject, with each name standing for its item. With one item, an item passes when all the checks pass. With two, an item of the first list passes when the second item passes for it, as [walk.every](#every-and-some) or [walk.some](#every-and-some) says, where an item of the second list passes when all the checks pass. A failed item's cause is the first, in the order of [causes](#causes), among the checks that failed, or what failed in the second item's walk.
+**[for.try]** The checks read the subject, with each alias standing for its item. With one item, an item passes when all the checks pass. With two, an item of the first list passes when the second item passes for it, as [walk.every](#every-and-some) or [walk.some](#every-and-some) says, where an item of the second list passes when all the checks pass. A failed item's cause is the first, in the order of [causes](#causes), among the checks that failed, or what failed in the second item's walk.
 
-**[for.named_by]** A path with a `named_by` step reads the key that the step's name holds for the item being tried, as a ref step reads a key from the params. When the name holds `null`, the check fails as `null`, and when it holds anything else that isn't a string, a number included, as `unusable`. The name has to be given before it's used: in the `assert` lines, or in a later item's path or `whose`. Only sentences can write such a step, as `<path> named by <name>`; in today's syntax it's a step that can't be a key.
+**[for.named_by]** A path with a `named_by` step reads the key that the step's alias holds for the item being tried, as a ref step reads a key from the params. When the alias holds `null`, the check fails as `null`, and when it holds anything else that isn't a string, a number included, as `unusable`. The alias has to be given before it's used: in the `assert` lines, or in a later item's path or `whose`. Only sentences can write such a step, as `<path> named by <alias>`; in today's syntax it's a step that can't be a key.
 
 **[for.pass]** The check passes or fails as the first item does, by [walk.every](#every-and-some) or [walk.some](#every-and-some), with its items judged as [for.try](#for) says.
 
-**[for.inputs]** The row shows each item's list once, named after its path with `[]` after each list walked, holding the values its name stands for, and the inputs the checks would show on their own, leaving out paths that start at a name, once each, even when no check was run, all sorted by name. A second item that starts at the first item's name is named with that name, like `pr.approvers[]`, and holds the items of every list it walked, in order. Paths that start at a name aren't shown. A path that reads through a name further on, like `shas named by persona`, shows the part before the name, `shas`, and an `every`, `some`, `count of` or `sum of` through a name isn't shown.
+**[for.inputs]** The row shows each item's list once, named after its path with `[]` after each list walked, holding the values its alias stands for, and the inputs the checks would show on their own, leaving out paths that start at an alias, once each, even when no check was run, all sorted by name. A second item that starts at the first item's alias is named with that alias, like `pr.approvers[]`, and holds the items of every list it walked, in order. Paths that start at an alias aren't shown. A path that reads through an alias further on, like `shas named by persona`, shows the part before the name, `shas`, and an `every`, `some`, `count of` or `sum of` through an alias isn't shown.
 
 **[for.failed_items]** When the check fails, `failed_items` lists the first item's failures, in path order, as [walk.failed_items](#every-and-some) does, and it's `[]` when the check passes. A failed item has `path` and `item` both the item, like `item 2 of pull_requests`, and `value` `null`. Each entry also has `failed_assertions`: the sentences that failed for that item, in the order written, each with the first cause it failed with. It's `[]` when no sentence was checked for it, because a `whose` couldn't decide, a list failed while walking, or `whose` left nothing in, and on the entry of a list that failed while walking.
 
