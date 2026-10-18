@@ -9833,12 +9833,62 @@ test_as_sentences_keeps_sections_that_arent_objects_and_other_fields if {
 	ergo.as_sentences({"requirements": {"r": 1, "s": {"checks": []}}}) == {"requirements": {"r": 1, "s": {"checks": []}}}
 }
 
-test_a_policy_as_sentences_gives_the_same_verdicts_on_every_spec_case if {
-	every topic in ["compare", "compare_time", "contains", "empty", "equals", "in", "missing", "non_empty_string", "patterns", "present", "range", "requirements", "substitutes"] {
-		every group in data.spec.cases[topic] {
-			every c in group.cases {
-				_verdicts(ergo.report(c.input, group.policy, object.get(group, "params", {}))) == _verdicts(ergo.report(c.input, ergo.as_sentences(group.policy), object.get(group, "params", {})))
-			}
+test_a_policy_as_sentences_gives_the_same_verdicts_on_the_compare_spec_cases if {
+	_as_sentences_gives_the_same_verdicts(data.spec.cases.compare)
+}
+
+test_a_policy_as_sentences_gives_the_same_verdicts_on_the_compare_time_spec_cases if {
+	_as_sentences_gives_the_same_verdicts(data.spec.cases.compare_time)
+}
+
+test_a_policy_as_sentences_gives_the_same_verdicts_on_the_contains_spec_cases if {
+	_as_sentences_gives_the_same_verdicts(data.spec.cases.contains)
+}
+
+test_a_policy_as_sentences_gives_the_same_verdicts_on_the_empty_spec_cases if {
+	_as_sentences_gives_the_same_verdicts(data.spec.cases.empty)
+}
+
+test_a_policy_as_sentences_gives_the_same_verdicts_on_the_equals_spec_cases if {
+	_as_sentences_gives_the_same_verdicts(data.spec.cases.equals)
+}
+
+test_a_policy_as_sentences_gives_the_same_verdicts_on_the_in_spec_cases if {
+	_as_sentences_gives_the_same_verdicts(data.spec.cases.in)
+}
+
+test_a_policy_as_sentences_gives_the_same_verdicts_on_the_missing_spec_cases if {
+	_as_sentences_gives_the_same_verdicts(data.spec.cases.missing)
+}
+
+test_a_policy_as_sentences_gives_the_same_verdicts_on_the_non_empty_string_spec_cases if {
+	_as_sentences_gives_the_same_verdicts(data.spec.cases.non_empty_string)
+}
+
+test_a_policy_as_sentences_gives_the_same_verdicts_on_the_patterns_spec_cases if {
+	_as_sentences_gives_the_same_verdicts(data.spec.cases.patterns)
+}
+
+test_a_policy_as_sentences_gives_the_same_verdicts_on_the_present_spec_cases if {
+	_as_sentences_gives_the_same_verdicts(data.spec.cases.present)
+}
+
+test_a_policy_as_sentences_gives_the_same_verdicts_on_the_range_spec_cases if {
+	_as_sentences_gives_the_same_verdicts(data.spec.cases.range)
+}
+
+test_a_policy_as_sentences_gives_the_same_verdicts_on_the_requirements_spec_cases if {
+	_as_sentences_gives_the_same_verdicts(data.spec.cases.requirements)
+}
+
+test_a_policy_as_sentences_gives_the_same_verdicts_on_the_substitutes_spec_cases if {
+	_as_sentences_gives_the_same_verdicts(data.spec.cases.substitutes)
+}
+
+_as_sentences_gives_the_same_verdicts(groups) if {
+	every group in groups {
+		every c in group.cases {
+			_verdicts(ergo.report(c.input, group.policy, object.get(group, "params", {}))) == _verdicts(ergo.report(c.input, ergo.as_sentences(group.policy), object.get(group, "params", {})))
 		}
 	}
 }
