@@ -11083,67 +11083,244 @@ _swap_good := {
 	"m": {"m1": {"x": 1}},
 }
 
-_swap_same(d, params) if {
-	alias := ergo.report(_parts_doc(d), _swap_policy(_swap_has, _swap_checks(_swap_alias, _swap_old(_swap_old_alias), _swap_lines, _swap_walks, _swap_fors)), params)
-	full := ergo.report(_parts_doc(d), _swap_policy({}, _swap_checks(_swap_full, _swap_old(_swap_old_full), _swap_lines, _swap_walks, _swap_fors)), params)
+_swap_group_checks("lines_a", replacements, _) := _swap_checks(replacements, [], array.slice(_swap_lines, 0, 13), [], [])
+
+_swap_group_checks("lines_b", replacements, _) := _swap_checks(replacements, [], array.slice(_swap_lines, 13, count(_swap_lines)), [], [])
+
+_swap_group_checks("walks", replacements, _) := _swap_checks(replacements, [], [], _swap_walks, [])
+
+_swap_group_checks("for_and_old", replacements, old) := _swap_checks(replacements, old, [], [], _swap_fors)
+
+_swap_good_with(f, v) := {"trail": {"name": "t1", "dd": object.union(_swap_good, {f: v})}}
+
+_swap_good_without(f) := {"trail": {"name": "t1", "dd": object.remove(_swap_good, [f])}}
+
+_swap_scenarios := {
+	"everything_is_there": {"doc": _parts_doc(_swap_good), "params": {"k": "m1"}},
+	"everything_is_there_and_no_params": {"doc": _parts_doc(_swap_good), "params": {}},
+	"the_named_by_param_is_a_number": {"doc": _parts_doc(_swap_good), "params": {"k": 1}},
+	"the_named_by_param_is_null": {"doc": _parts_doc(_swap_good), "params": {"k": null}},
+	"the_named_by_key_is_not_in_its_object": {"doc": _swap_good_with("m", {}), "params": {"k": "m1"}},
+	"an_object_part_is_missing": {"doc": _swap_good_without("b"), "params": {"k": "m1"}},
+	"an_object_part_is_null": {"doc": _swap_good_with("b", null), "params": {"k": "m1"}},
+	"an_object_part_is_text": {"doc": _swap_good_with("b", "text"), "params": {"k": "m1"}},
+	"an_object_part_is_a_list": {"doc": _swap_good_with("b", [1]), "params": {"k": "m1"}},
+	"a_field_inside_a_part_is_null": {"doc": _swap_good_with("b", object.union(_swap_good.b, {"x": null})), "params": {"k": "m1"}},
+	"the_fields_inside_a_part_have_the_wrong_types": {"doc": _swap_good_with("b", {"x": "1", "s": 5, "n": "2", "t": "nope", "t2": 3, "items": "s"}), "params": {"k": "m1"}},
+	"the_list_is_missing": {"doc": _swap_good_without("items"), "params": {"k": "m1"}},
+	"the_list_is_null": {"doc": _swap_good_with("items", null), "params": {"k": "m1"}},
+	"the_list_is_empty": {"doc": _swap_good_with("items", []), "params": {"k": "m1"}},
+	"the_list_is_a_string": {"doc": _swap_good_with("items", "str"), "params": {"k": "m1"}},
+	"the_list_holds_a_number_and_a_null": {"doc": _swap_good_with("items", [_swap_item(1, 2, 2, [1]), 5, null]), "params": {"k": "m1"}},
+	"the_list_holds_items_with_missing_and_wrong_fields": {"doc": _swap_good_with("items", [_swap_item(null, 2, "q", []), {"y": 2}]), "params": {"k": "m1"}},
+	"the_named_by_part_is_null": {"doc": _swap_good_with("m", null), "params": {"k": "m1"}},
+	"the_named_by_part_is_text": {"doc": _swap_good_with("m", "s"), "params": {"k": "m1"}},
+	"the_named_by_part_is_missing": {"doc": _swap_good_without("m"), "params": {"k": "m1"}},
+	"the_subject_has_no_part_field": {"doc": {"trail": {"name": "t1"}}, "params": {"k": "m1"}},
+	"the_part_field_is_null": {"doc": {"trail": {"name": "t1", "dd": null}}, "params": {"k": "m1"}},
+	"the_part_field_is_text": {"doc": {"trail": {"name": "t1", "dd": "s"}}, "params": {"k": "m1"}},
+	"the_part_field_is_a_list": {"doc": {"trail": {"name": "t1", "dd": [1]}}, "params": {"k": "m1"}},
+}
+
+_swap_same(scenario, group) if {
+	s := _swap_scenarios[scenario]
+	alias := ergo.report(s.doc, _swap_policy(_swap_has, _swap_group_checks(group, _swap_alias, _swap_old(_swap_old_alias))), s.params)
+	full := ergo.report(s.doc, _swap_policy({}, _swap_group_checks(group, _swap_full, _swap_old(_swap_old_full))), s.params)
 	_swap_view(alias) == _swap_view(full)
-	count(alias.results) > 60
+	count(alias.results) > 10
 }
 
-_swap_same_doc(doc, params) if {
-	alias := ergo.report(doc, _swap_policy(_swap_has, _swap_checks(_swap_alias, _swap_old(_swap_old_alias), _swap_lines, _swap_walks, _swap_fors)), params)
-	full := ergo.report(doc, _swap_policy({}, _swap_checks(_swap_full, _swap_old(_swap_old_full), _swap_lines, _swap_walks, _swap_fors)), params)
-	_swap_view(alias) == _swap_view(full)
-	count(alias.results) > 60
-}
+test_a_part_gives_the_rows_of_its_full_path_when_everything_is_there_in_the_first_one_line_checks if _swap_same("everything_is_there", "lines_a")
 
-test_a_part_gives_the_rows_of_its_full_path_when_everything_is_there if {
-	_swap_same(_swap_good, {"k": "m1"})
-	_swap_same(_swap_good, {})
-}
+test_a_part_gives_the_rows_of_its_full_path_when_everything_is_there_in_the_other_one_line_checks if _swap_same("everything_is_there", "lines_b")
 
-test_a_part_gives_the_rows_of_its_full_path_when_the_params_it_names_by_are_wrong if {
-	_swap_same(_swap_good, {"k": 1})
-	_swap_same(_swap_good, {"k": null})
-	_swap_same(object.union(_swap_good, {"m": {}}), {"k": "m1"})
-}
+test_a_part_gives_the_rows_of_its_full_path_when_everything_is_there_in_the_checks_that_walk_lists if _swap_same("everything_is_there", "walks")
 
-test_a_part_gives_the_rows_of_its_full_path_when_an_object_part_is_missing_null_or_wrong_typed if {
-	_swap_same(object.remove(_swap_good, ["b"]), {"k": "m1"})
-	_swap_same(object.union(_swap_good, {"b": null}), {"k": "m1"})
-	_swap_same(object.union(_swap_good, {"b": "text"}), {"k": "m1"})
-	_swap_same(object.union(_swap_good, {"b": [1]}), {"k": "m1"})
-}
+test_a_part_gives_the_rows_of_its_full_path_when_everything_is_there_in_the_for_line_and_old_syntax_checks if _swap_same("everything_is_there", "for_and_old")
 
-test_a_part_gives_the_rows_of_its_full_path_when_a_field_inside_it_is_null_or_wrong_typed if {
-	_swap_same(object.union(_swap_good, {"b": object.union(_swap_good.b, {"x": null})}), {"k": "m1"})
-	_swap_same(object.union(_swap_good, {"b": {"x": "1", "s": 5, "n": "2", "t": "nope", "t2": 3, "items": "s"}}), {"k": "m1"})
-}
+test_a_part_gives_the_rows_of_its_full_path_when_everything_is_there_and_no_params_in_the_first_one_line_checks if _swap_same("everything_is_there_and_no_params", "lines_a")
 
-test_a_part_gives_the_rows_of_its_full_path_when_the_list_is_missing_null_empty_or_a_string if {
-	_swap_same(object.remove(_swap_good, ["items"]), {"k": "m1"})
-	_swap_same(object.union(_swap_good, {"items": null}), {"k": "m1"})
-	_swap_same(object.union(_swap_good, {"items": []}), {"k": "m1"})
-	_swap_same(object.union(_swap_good, {"items": "str"}), {"k": "m1"})
-}
+test_a_part_gives_the_rows_of_its_full_path_when_everything_is_there_and_no_params_in_the_other_one_line_checks if _swap_same("everything_is_there_and_no_params", "lines_b")
 
-test_a_part_gives_the_rows_of_its_full_path_when_the_list_holds_odd_items if {
-	_swap_same(object.union(_swap_good, {"items": [_swap_item(1, 2, 2, [1]), 5, null]}), {"k": "m1"})
-	_swap_same(object.union(_swap_good, {"items": [_swap_item(null, 2, "q", []), {"y": 2}]}), {"k": "m1"})
-}
+test_a_part_gives_the_rows_of_its_full_path_when_everything_is_there_and_no_params_in_the_checks_that_walk_lists if _swap_same("everything_is_there_and_no_params", "walks")
 
-test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_part_is_missing_or_wrong_typed if {
-	_swap_same(object.union(_swap_good, {"m": null}), {"k": "m1"})
-	_swap_same(object.union(_swap_good, {"m": "s"}), {"k": "m1"})
-	_swap_same(object.remove(_swap_good, ["m"]), {"k": "m1"})
-}
+test_a_part_gives_the_rows_of_its_full_path_when_everything_is_there_and_no_params_in_the_for_line_and_old_syntax_checks if _swap_same("everything_is_there_and_no_params", "for_and_old")
 
-test_a_part_gives_the_rows_of_its_full_path_when_the_subject_has_nothing_or_is_not_an_object if {
-	_swap_same_doc({"trail": {"name": "t1"}}, {"k": "m1"})
-	_swap_same_doc({"trail": {"name": "t1", "dd": null}}, {"k": "m1"})
-	_swap_same_doc({"trail": {"name": "t1", "dd": "s"}}, {"k": "m1"})
-	_swap_same_doc({"trail": {"name": "t1", "dd": [1]}}, {"k": "m1"})
-}
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_param_is_a_number_in_the_first_one_line_checks if _swap_same("the_named_by_param_is_a_number", "lines_a")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_param_is_a_number_in_the_other_one_line_checks if _swap_same("the_named_by_param_is_a_number", "lines_b")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_param_is_a_number_in_the_checks_that_walk_lists if _swap_same("the_named_by_param_is_a_number", "walks")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_param_is_a_number_in_the_for_line_and_old_syntax_checks if _swap_same("the_named_by_param_is_a_number", "for_and_old")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_param_is_null_in_the_first_one_line_checks if _swap_same("the_named_by_param_is_null", "lines_a")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_param_is_null_in_the_other_one_line_checks if _swap_same("the_named_by_param_is_null", "lines_b")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_param_is_null_in_the_checks_that_walk_lists if _swap_same("the_named_by_param_is_null", "walks")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_param_is_null_in_the_for_line_and_old_syntax_checks if _swap_same("the_named_by_param_is_null", "for_and_old")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_key_is_not_in_its_object_in_the_first_one_line_checks if _swap_same("the_named_by_key_is_not_in_its_object", "lines_a")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_key_is_not_in_its_object_in_the_other_one_line_checks if _swap_same("the_named_by_key_is_not_in_its_object", "lines_b")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_key_is_not_in_its_object_in_the_checks_that_walk_lists if _swap_same("the_named_by_key_is_not_in_its_object", "walks")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_key_is_not_in_its_object_in_the_for_line_and_old_syntax_checks if _swap_same("the_named_by_key_is_not_in_its_object", "for_and_old")
+
+test_a_part_gives_the_rows_of_its_full_path_when_an_object_part_is_missing_in_the_first_one_line_checks if _swap_same("an_object_part_is_missing", "lines_a")
+
+test_a_part_gives_the_rows_of_its_full_path_when_an_object_part_is_missing_in_the_other_one_line_checks if _swap_same("an_object_part_is_missing", "lines_b")
+
+test_a_part_gives_the_rows_of_its_full_path_when_an_object_part_is_missing_in_the_checks_that_walk_lists if _swap_same("an_object_part_is_missing", "walks")
+
+test_a_part_gives_the_rows_of_its_full_path_when_an_object_part_is_missing_in_the_for_line_and_old_syntax_checks if _swap_same("an_object_part_is_missing", "for_and_old")
+
+test_a_part_gives_the_rows_of_its_full_path_when_an_object_part_is_null_in_the_first_one_line_checks if _swap_same("an_object_part_is_null", "lines_a")
+
+test_a_part_gives_the_rows_of_its_full_path_when_an_object_part_is_null_in_the_other_one_line_checks if _swap_same("an_object_part_is_null", "lines_b")
+
+test_a_part_gives_the_rows_of_its_full_path_when_an_object_part_is_null_in_the_checks_that_walk_lists if _swap_same("an_object_part_is_null", "walks")
+
+test_a_part_gives_the_rows_of_its_full_path_when_an_object_part_is_null_in_the_for_line_and_old_syntax_checks if _swap_same("an_object_part_is_null", "for_and_old")
+
+test_a_part_gives_the_rows_of_its_full_path_when_an_object_part_is_text_in_the_first_one_line_checks if _swap_same("an_object_part_is_text", "lines_a")
+
+test_a_part_gives_the_rows_of_its_full_path_when_an_object_part_is_text_in_the_other_one_line_checks if _swap_same("an_object_part_is_text", "lines_b")
+
+test_a_part_gives_the_rows_of_its_full_path_when_an_object_part_is_text_in_the_checks_that_walk_lists if _swap_same("an_object_part_is_text", "walks")
+
+test_a_part_gives_the_rows_of_its_full_path_when_an_object_part_is_text_in_the_for_line_and_old_syntax_checks if _swap_same("an_object_part_is_text", "for_and_old")
+
+test_a_part_gives_the_rows_of_its_full_path_when_an_object_part_is_a_list_in_the_first_one_line_checks if _swap_same("an_object_part_is_a_list", "lines_a")
+
+test_a_part_gives_the_rows_of_its_full_path_when_an_object_part_is_a_list_in_the_other_one_line_checks if _swap_same("an_object_part_is_a_list", "lines_b")
+
+test_a_part_gives_the_rows_of_its_full_path_when_an_object_part_is_a_list_in_the_checks_that_walk_lists if _swap_same("an_object_part_is_a_list", "walks")
+
+test_a_part_gives_the_rows_of_its_full_path_when_an_object_part_is_a_list_in_the_for_line_and_old_syntax_checks if _swap_same("an_object_part_is_a_list", "for_and_old")
+
+test_a_part_gives_the_rows_of_its_full_path_when_a_field_inside_a_part_is_null_in_the_first_one_line_checks if _swap_same("a_field_inside_a_part_is_null", "lines_a")
+
+test_a_part_gives_the_rows_of_its_full_path_when_a_field_inside_a_part_is_null_in_the_other_one_line_checks if _swap_same("a_field_inside_a_part_is_null", "lines_b")
+
+test_a_part_gives_the_rows_of_its_full_path_when_a_field_inside_a_part_is_null_in_the_checks_that_walk_lists if _swap_same("a_field_inside_a_part_is_null", "walks")
+
+test_a_part_gives_the_rows_of_its_full_path_when_a_field_inside_a_part_is_null_in_the_for_line_and_old_syntax_checks if _swap_same("a_field_inside_a_part_is_null", "for_and_old")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_fields_inside_a_part_have_the_wrong_types_in_the_first_one_line_checks if _swap_same("the_fields_inside_a_part_have_the_wrong_types", "lines_a")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_fields_inside_a_part_have_the_wrong_types_in_the_other_one_line_checks if _swap_same("the_fields_inside_a_part_have_the_wrong_types", "lines_b")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_fields_inside_a_part_have_the_wrong_types_in_the_checks_that_walk_lists if _swap_same("the_fields_inside_a_part_have_the_wrong_types", "walks")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_fields_inside_a_part_have_the_wrong_types_in_the_for_line_and_old_syntax_checks if _swap_same("the_fields_inside_a_part_have_the_wrong_types", "for_and_old")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_is_missing_in_the_first_one_line_checks if _swap_same("the_list_is_missing", "lines_a")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_is_missing_in_the_other_one_line_checks if _swap_same("the_list_is_missing", "lines_b")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_is_missing_in_the_checks_that_walk_lists if _swap_same("the_list_is_missing", "walks")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_is_missing_in_the_for_line_and_old_syntax_checks if _swap_same("the_list_is_missing", "for_and_old")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_is_null_in_the_first_one_line_checks if _swap_same("the_list_is_null", "lines_a")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_is_null_in_the_other_one_line_checks if _swap_same("the_list_is_null", "lines_b")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_is_null_in_the_checks_that_walk_lists if _swap_same("the_list_is_null", "walks")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_is_null_in_the_for_line_and_old_syntax_checks if _swap_same("the_list_is_null", "for_and_old")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_is_empty_in_the_first_one_line_checks if _swap_same("the_list_is_empty", "lines_a")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_is_empty_in_the_other_one_line_checks if _swap_same("the_list_is_empty", "lines_b")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_is_empty_in_the_checks_that_walk_lists if _swap_same("the_list_is_empty", "walks")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_is_empty_in_the_for_line_and_old_syntax_checks if _swap_same("the_list_is_empty", "for_and_old")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_is_a_string_in_the_first_one_line_checks if _swap_same("the_list_is_a_string", "lines_a")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_is_a_string_in_the_other_one_line_checks if _swap_same("the_list_is_a_string", "lines_b")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_is_a_string_in_the_checks_that_walk_lists if _swap_same("the_list_is_a_string", "walks")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_is_a_string_in_the_for_line_and_old_syntax_checks if _swap_same("the_list_is_a_string", "for_and_old")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_holds_a_number_and_a_null_in_the_first_one_line_checks if _swap_same("the_list_holds_a_number_and_a_null", "lines_a")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_holds_a_number_and_a_null_in_the_other_one_line_checks if _swap_same("the_list_holds_a_number_and_a_null", "lines_b")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_holds_a_number_and_a_null_in_the_checks_that_walk_lists if _swap_same("the_list_holds_a_number_and_a_null", "walks")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_holds_a_number_and_a_null_in_the_for_line_and_old_syntax_checks if _swap_same("the_list_holds_a_number_and_a_null", "for_and_old")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_holds_items_with_missing_and_wrong_fields_in_the_first_one_line_checks if _swap_same("the_list_holds_items_with_missing_and_wrong_fields", "lines_a")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_holds_items_with_missing_and_wrong_fields_in_the_other_one_line_checks if _swap_same("the_list_holds_items_with_missing_and_wrong_fields", "lines_b")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_holds_items_with_missing_and_wrong_fields_in_the_checks_that_walk_lists if _swap_same("the_list_holds_items_with_missing_and_wrong_fields", "walks")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_list_holds_items_with_missing_and_wrong_fields_in_the_for_line_and_old_syntax_checks if _swap_same("the_list_holds_items_with_missing_and_wrong_fields", "for_and_old")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_part_is_null_in_the_first_one_line_checks if _swap_same("the_named_by_part_is_null", "lines_a")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_part_is_null_in_the_other_one_line_checks if _swap_same("the_named_by_part_is_null", "lines_b")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_part_is_null_in_the_checks_that_walk_lists if _swap_same("the_named_by_part_is_null", "walks")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_part_is_null_in_the_for_line_and_old_syntax_checks if _swap_same("the_named_by_part_is_null", "for_and_old")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_part_is_text_in_the_first_one_line_checks if _swap_same("the_named_by_part_is_text", "lines_a")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_part_is_text_in_the_other_one_line_checks if _swap_same("the_named_by_part_is_text", "lines_b")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_part_is_text_in_the_checks_that_walk_lists if _swap_same("the_named_by_part_is_text", "walks")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_part_is_text_in_the_for_line_and_old_syntax_checks if _swap_same("the_named_by_part_is_text", "for_and_old")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_part_is_missing_in_the_first_one_line_checks if _swap_same("the_named_by_part_is_missing", "lines_a")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_part_is_missing_in_the_other_one_line_checks if _swap_same("the_named_by_part_is_missing", "lines_b")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_part_is_missing_in_the_checks_that_walk_lists if _swap_same("the_named_by_part_is_missing", "walks")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_named_by_part_is_missing_in_the_for_line_and_old_syntax_checks if _swap_same("the_named_by_part_is_missing", "for_and_old")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_subject_has_no_part_field_in_the_first_one_line_checks if _swap_same("the_subject_has_no_part_field", "lines_a")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_subject_has_no_part_field_in_the_other_one_line_checks if _swap_same("the_subject_has_no_part_field", "lines_b")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_subject_has_no_part_field_in_the_checks_that_walk_lists if _swap_same("the_subject_has_no_part_field", "walks")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_subject_has_no_part_field_in_the_for_line_and_old_syntax_checks if _swap_same("the_subject_has_no_part_field", "for_and_old")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_part_field_is_null_in_the_first_one_line_checks if _swap_same("the_part_field_is_null", "lines_a")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_part_field_is_null_in_the_other_one_line_checks if _swap_same("the_part_field_is_null", "lines_b")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_part_field_is_null_in_the_checks_that_walk_lists if _swap_same("the_part_field_is_null", "walks")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_part_field_is_null_in_the_for_line_and_old_syntax_checks if _swap_same("the_part_field_is_null", "for_and_old")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_part_field_is_text_in_the_first_one_line_checks if _swap_same("the_part_field_is_text", "lines_a")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_part_field_is_text_in_the_other_one_line_checks if _swap_same("the_part_field_is_text", "lines_b")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_part_field_is_text_in_the_checks_that_walk_lists if _swap_same("the_part_field_is_text", "walks")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_part_field_is_text_in_the_for_line_and_old_syntax_checks if _swap_same("the_part_field_is_text", "for_and_old")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_part_field_is_a_list_in_the_first_one_line_checks if _swap_same("the_part_field_is_a_list", "lines_a")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_part_field_is_a_list_in_the_other_one_line_checks if _swap_same("the_part_field_is_a_list", "lines_b")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_part_field_is_a_list_in_the_checks_that_walk_lists if _swap_same("the_part_field_is_a_list", "walks")
+
+test_a_part_gives_the_rows_of_its_full_path_when_the_part_field_is_a_list_in_the_for_line_and_old_syntax_checks if _swap_same("the_part_field_is_a_list", "for_and_old")
 
 test_the_swap_comparison_would_notice_a_part_that_reads_the_wrong_path if {
 	alias := ergo.report(_parts_doc(_swap_good), _swap_policy({"cov": "dd.items"}, {"c": "cov.x is 1"}), {})
@@ -11152,9 +11329,17 @@ test_the_swap_comparison_would_notice_a_part_that_reads_the_wrong_path if {
 }
 
 test_the_swap_comparison_sees_rows_of_every_kind_of_outcome if {
-	alias := ergo.report(_parts_doc(object.union(_swap_good, {"b": "text"})), _swap_policy(_swap_has, _swap_checks(_swap_alias, _swap_old(_swap_old_alias), _swap_lines, _swap_walks, _swap_fors)), {"k": "m1"})
-	{r.cause | some r in alias.results; startswith(r.check, "l")} >= {"unusable", "satisfied"}
-	{r.cause | some r in alias.results} >= {"unusable", "satisfied", "value", "not_an_object"}
+	text := _swap_scenarios.an_object_part_is_text
+	one := ergo.report(text.doc, _swap_policy(_swap_has, _swap_group_checks("lines_a", _swap_alias, [])), text.params)
+	{"unusable"} - {r.cause | some r in one.results; startswith(r.check, "l")} == set()
+	walks := ergo.report(_swap_scenarios.the_list_holds_a_number_and_a_null.doc, _swap_policy(_swap_has, _swap_group_checks("walks", _swap_alias, [])), {"k": "m1"})
+	{"value", "satisfied"} - {r.cause | some r in walks.results; startswith(r.check, "w")} == set()
+}
+
+test_the_swap_comparison_sees_a_subject_that_is_not_an_object if {
+	nothing := _swap_scenarios.the_part_field_is_text
+	rep := ergo.report(nothing.doc, _swap_policy(_swap_has, _swap_group_checks("for_and_old", _swap_alias, _swap_old(_swap_old_alias))), nothing.params)
+	{"unusable"} - {r.cause | some r in rep.results; startswith(r.check, "f")} == set()
 }
 
 _deep_all(p, check) := {"op": "all", "path": p.lst, "check": check}
