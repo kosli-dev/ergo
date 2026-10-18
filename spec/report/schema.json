@@ -125,7 +125,7 @@
         "cause": {"$ref": "#/$defs/cause"},
         "failed_items": {
           "type": "array",
-          "description": "Only on rows of all, any, every, some and for checks.",
+          "description": "Only on rows of all, any, every, some and for checks, and on the $min_subjects row of a subject whose from line has every.",
           "items": {
             "type": "object",
             "properties": {"path": {"type": "string"}, "item": {"type": "string", "description": "The path of the list item the entry belongs to. For all and any, the same as path."}, "cause": {"$ref": "#/$defs/cause"}, "value": true, "failed_assertions": {"$ref": "#/$defs/failed_assertions", "description": "Only on entries of for checks: the sentences that failed for that item, in the order written."}},

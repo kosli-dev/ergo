@@ -11800,3 +11800,137 @@ test_an_applies_row_tags_the_inputs_its_conditions_read_through_a_part if {
 	rep := ergo.report({"xs": [{"n": "a", "d": {"i": 9, "v": 1}}]}, policy, {})
 	[r.inputs | some r in rep.results; r.check == "$applies"] == [[{"name": "p.v", "part": {"id": 9, "name": "p"}, "value": 1}]]
 }
+
+_flows_doc := {"artifacts": [
+	{"fingerprint": "sha-1", "pull_requests": [{"url": "pr/7", "approvals": 2}, {"url": "pr/8", "approvals": 0}]},
+	{"fingerprint": "sha-2", "pull_requests": []},
+	{"fingerprint": "sha-3", "pull_requests": [{"url": "pr/9", "approvals": 1}]},
+]}
+
+_every_prs := {"pull request": {"from": "every artifacts.pull_requests", "identified_by": "url"}}
+
+test_a_from_line_with_every_reads_one_flat_list_from_every_list_along_its_path if {
+	rep := _from_report(_flows_doc, _every_prs, {"c": "approvals is at least 1"}, {})
+	[[r.check, r.subject, r.cause] | some r in rep.results] == [
+		["$well_formed", {"type": "pull request", "id": null}, "satisfied"],
+		["$min_subjects", {"type": "pull request", "id": null}, "satisfied"],
+		["$unique_ids", {"type": "pull request", "id": null}, "satisfied"],
+		["c", {"type": "pull request", "id": "pr/7"}, "satisfied"],
+		["c", {"type": "pull request", "id": "pr/8"}, "value"],
+		["c", {"type": "pull request", "id": "pr/9"}, "satisfied"],
+	]
+	[r.inputs | some r in rep.results; r.check == "$min_subjects"] == [[{"name": "in-scope pull request count", "value": 3}]]
+	rep.subjects["pull request"].from == "every artifacts.pull_requests"
+	rep.requirements.r.checks["$min_subjects"].expression == "count(matching(every artifacts.pull_requests)) >= 1"
+	rep.requirements.r.checks["$unique_ids"].expression == "count(repeated(ids(every artifacts.pull_requests))) == 0"
+}
+
+test_a_from_line_with_every_lists_no_failed_items_when_every_branch_is_read if {
+	rep := _from_report(_flows_doc, _every_prs, {"c": "url exists"}, {})
+	[r.failed_items | some r in rep.results; r.check == "$min_subjects"] == [[]]
+	[r | some r in rep.results; r.check != "$min_subjects"; "failed_items" in object.keys(r)] == []
+}
+
+test_a_from_line_with_every_walks_lists_inside_lists_and_the_last_one if {
+	doc := {"flows": [{"trails": [{"tags": ["a", "b"]}, {"tags": ["c"]}]}, {"trails": [{"tags": ["d"]}]}]}
+	rep := _from_report(doc, {"tag": {"from": "every flows.trails.tags"}}, {"c": "x exists"}, {})
+	[r.subject.id | some r in rep.results; r.check == "c"] == ["a", "b", "c", "d"]
+}
+
+test_ids_of_subjects_read_with_every_are_unique_across_all_of_them if {
+	doc := {"artifacts": [{"pull_requests": [{"url": "pr/7"}]}, {"pull_requests": [{"url": "pr/7"}]}]}
+	rep := _from_report(doc, _every_prs, {"c": "url exists"}, {})
+	[[r.cause, r.inputs] | some r in rep.results; r.check == "$unique_ids"] == [["value", [{"name": "repeated pull request ids", "value": ["pr/7"]}]]]
+}
+
+test_a_from_line_with_every_keeps_the_subjects_its_whose_holds_for if {
+	subjects := {"pull request": {"from": "every artifacts.pull_requests whose approvals is at least 1", "identified_by": "url"}}
+	rep := _from_report(_flows_doc, subjects, {"c": "url exists"}, {})
+	[[r.subject.id, r.cause] | some r in rep.results; r.check in {"$applies", "c"}] == [["pr/7", "satisfied"], ["pr/8", "value"], ["pr/9", "satisfied"], ["pr/7", "satisfied"], ["pr/9", "satisfied"]]
+	rep.subjects["pull request"].from == "every artifacts.pull_requests whose approvals is at least 1"
+}
+
+test_an_empty_list_along_a_from_line_with_every_adds_no_subject_and_fails_nothing if {
+	rep := _from_report(_flows_doc, _every_prs, {"c": "url exists"}, {})
+	rep.requirements.r.status == "met"
+	none := _from_report({"artifacts": [{"pull_requests": []}]}, _every_prs, {"c": "url exists"}, {})
+	[[r.cause, r.failed_items] | some r in none.results; r.check == "$min_subjects"] == [["value", []]]
+}
+
+test_a_broken_branch_along_a_from_line_with_every_fails_min_subjects_with_the_worst_cause_and_lists_where if {
+	doc := {"artifacts": [
+		{"pull_requests": [{"url": "pr/7", "approvals": 2}]},
+		{"fingerprint": "sha-4"},
+		{"pull_requests": null},
+		{"pull_requests": "none"},
+	]}
+	rep := _from_report(doc, _every_prs, {"c": "approvals is at least 1"}, {})
+	[[r.passed, r.cause, r.failed_items] | some r in rep.results; r.check == "$min_subjects"] == [[false, "unusable", [
+		{"path": "artifacts[1].pull_requests", "item": "artifacts[1].pull_requests", "cause": "absent", "value": null},
+		{"path": "artifacts[2].pull_requests", "item": "artifacts[2].pull_requests", "cause": "null", "value": null},
+		{"path": "artifacts[3].pull_requests", "item": "artifacts[3].pull_requests", "cause": "unusable", "value": "none"},
+	]]]
+	[[r.subject.id, r.cause] | some r in rep.results; r.check == "c"] == [["pr/7", "satisfied"]]
+	rep.requirements.r.status == "not_met"
+	[[v.check, v.failed_items[0].path] | some v in ergo.violations(rep)] == [["$min_subjects", "artifacts[1].pull_requests"]]
+	missing := _from_report({"artifacts": [{"pull_requests": [{"url": "pr/7"}]}, {}]}, _every_prs, {"c": "url exists"}, {})
+	[r.cause | some r in missing.results; r.check == "$min_subjects"] == ["absent"]
+	zero := ergo.report(doc, {"subjects": _every_prs, "requirements": {"r": {"subject": "pull request", "min_subjects": 0, "checks": {"c": "url exists"}}}}, {})
+	[r.cause | some r in zero.results; r.check == "$min_subjects"] == ["unusable"]
+	zero.requirements.r.status == "not_met"
+}
+
+test_a_from_line_with_every_fails_where_its_path_stops_as_every_does_in_a_check if {
+	rep := _from_report({"artifact": {"pull_requests": [{"url": "pr/7"}]}}, {"a": {"from": "every artifact"}}, {"c": "x exists"}, {})
+	[[r.cause, r.failed_items] | some r in rep.results; r.check == "$min_subjects"] == [["unusable", [{"path": "artifact", "item": "artifact", "cause": "unusable", "value": {"pull_requests": [{"url": "pr/7"}]}}]]]
+	gone := _from_report({}, _every_prs, {"c": "x exists"}, {})
+	[[r.cause, r.failed_items[0].path] | some r in gone.results; r.check == "$min_subjects"] == [["absent", "artifacts"]]
+	ends := _from_report({"flows": [{"a": {"n": 1}}, {"a": "x"}]}, {"a": {"from": "every flows.a"}}, {"c": "n exists"}, {})
+	[[r.cause, [f.path | some f in r.failed_items]] | some r in ends.results; r.check == "$min_subjects"] == [["unusable", ["flows[1].a"]]]
+	[r.cause | some r in ends.results; r.check == "c"] == ["satisfied"]
+}
+
+test_a_from_line_with_every_on_an_input_that_is_not_an_object_fails_as_one_without_every if {
+	[r.cause | some r in _from_report([1], _every_prs, {"c": "x exists"}, {}).results; r.check == "$min_subjects"] == ["unusable"]
+	[r.failed_items | some r in _from_report([1], _every_prs, {"c": "x exists"}, {}).results; r.check == "$min_subjects"] == [[]]
+	[r.cause | some r in _from_report(null, _every_prs, {"c": "x exists"}, {}).results; r.check == "$min_subjects"] == ["absent"]
+}
+
+test_a_from_line_through_a_list_without_every_still_fails if {
+	rep := _from_report(_flows_doc, {"pull request": {"from": "artifacts.pull_requests", "identified_by": "url"}}, {"c": "url exists"}, {})
+	[r.cause | some r in rep.results; r.check == "$min_subjects"] == ["unusable"]
+	[r | some r in rep.results; r.check == "$min_subjects"; "failed_items" in object.keys(r)] == []
+}
+
+test_every_in_a_from_line_cant_start_at_another_subject_or_go_with_named_by_each_of_or_walk_more_than_ten_steps if {
+	subjects := {"artifact": {"from": "artifacts", "identified_by": "fingerprint"}, "pull request": {"from": "every artifact.pull_requests", "identified_by": "url"}}
+	_from_problems(ergo.report(_flows_doc, {"subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": {"c": "url exists"}}}}, {})) == [{"name": `subjects."pull request".from`, "value": ["every can't go with a from line that starts at another subject yet"]}]
+	narrow := {"artifact": {"from": "artifacts", "identified_by": "fingerprint"}, "kept": {"from": "every artifact"}}
+	_from_problems(ergo.report(_flows_doc, {"subjects": narrow, "requirements": {"r": {"subject": "kept", "checks": {"c": "url exists"}}}}, {})) == [{"name": "subjects.kept.from", "value": ["every can't go with a from line that starts at another subject yet"]}]
+	_from_problems(_from_report(_flows_doc, {"s": {"from": "every artifacts named by each of $params.names"}}, {"c": "x exists"}, {"names": ["a"]})) == [{"name": "subjects.s.from", "value": ["every can't go with named by each of: start the from line at a subject to read its names one subject at a time"]}]
+	_from_problems(_from_report(_flows_doc, {"s": {"from": "every x.b.c.d.e.f.g.h.i.j.k"}}, {"c": "x exists"}, {})) == [{"name": "subjects.s.from", "value": ["every over more than ten steps isn't supported yet"]}]
+	_from_problems(_from_report(_flows_doc, {"s": {"from": "every x.b.c.d.e.f.g.h.i.j"}}, {"c": "x exists"}, {})) == []
+}
+
+test_a_field_called_every_in_a_from_line_is_written_with_a_dot if {
+	rep := _from_report({"every": {"x": [{"id": 1}]}}, {"s": {"from": ".every.x", "identified_by": "id"}}, {"c": "id exists"}, {})
+	[[r.subject.id, r.cause] | some r in rep.results; r.check == "c"] == [[1, "satisfied"]]
+	_from_problems(_from_report({"every": [1]}, {"s": {"from": "every"}}, {"c": "x exists"}, {})) == [{"name": "subjects.s.from", "value": ["every is a word of the grammar: write .every"]}]
+	_from_problems(_from_report({}, {"s": {"from": "every count.x"}}, {"c": "x exists"}, {})) == [{"name": "subjects.s.from", "value": ["count is a word of the grammar: write .count"]}]
+	ergo._sentence(`every x whose k is 1`) == {"problems": ["doesn't parse"]}
+}
+
+test_a_parent_read_with_every_gives_its_child_subjects_per_parent if {
+	doc := {"flows": [{"artifacts": [{"fingerprint": "a", "pull_requests": [{"url": "pr/7"}]}]}, {"artifacts": [{"fingerprint": "b", "pull_requests": [{"url": "pr/7"}]}]}]}
+	subjects := {"artifact": {"from": "every flows.artifacts", "identified_by": "fingerprint"}, "pull request": {"from": "artifact.pull_requests", "identified_by": "url"}}
+	rep := ergo.report(doc, {"subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": {"c": "url exists"}}}}, {})
+	[[r.check, r.subject.id, object.get(r.subject, "in", null)] | some r in rep.results; r.check != "$well_formed"] == [
+		["$min_subjects", null, {"artifact": "a"}],
+		["$min_subjects", null, {"artifact": "b"}],
+		["$unique_ids", null, {"artifact": "a"}],
+		["$unique_ids", null, {"artifact": "b"}],
+		["c", "pr/7", {"artifact": "a"}],
+		["c", "pr/7", {"artifact": "b"}],
+	]
+	rep.requirements.r.status == "met"
+}

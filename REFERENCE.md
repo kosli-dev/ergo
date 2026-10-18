@@ -280,6 +280,46 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
   - When no artifact is in scope, there's one `$min_subjects` row with no `in`. It fails with `value`, or passes with `min_subjects: 0`, as for any subject that finds none.
 
   A chain of more than two subjects is written wrong, since that isn't supported yet ([#210](https://github.com/kosli-dev/ergo/issues/210)), and so is a subject that builds on a child subject with `of` or a from line that narrows it.
+- `every` in front of the path walks every list along it, the last one included, as [`every`](#checks) does in a check, and each value it ends at is a subject. With this input:
+
+  ```json
+  {"artifacts": [
+    {"fingerprint": "sha-1", "pull_requests": [{"url": "pr/7", "approvals": 2}, {"url": "pr/8", "approvals": 0}]},
+    {"fingerprint": "sha-2", "pull_requests": []},
+    {"fingerprint": "sha-3"}
+  ]}
+  ```
+
+  and this policy:
+
+  ```yaml
+  subjects:
+    pull request:
+      from: every artifacts.pull_requests
+      identified_by: url
+  requirements:
+    reviewed:
+      subject: pull request
+      checks:
+        approved: approvals is at least 1
+  ```
+
+  the pull requests are one list, `pr/7` and `pr/8`, and the report has these rows after `$well_formed`:
+
+  ```json
+  {"check": "$min_subjects", "subject": {"type": "pull request", "id": null}, "passed": false, "cause": "absent",
+   "inputs": [{"name": "in-scope pull request count", "value": 2}],
+   "failed_items": [{"path": "artifacts[2].pull_requests", "item": "artifacts[2].pull_requests", "cause": "absent", "value": null}]}
+  {"check": "$unique_ids",   "subject": {"type": "pull request", "id": null}, "passed": true,  "cause": "satisfied"}
+  {"check": "approved",      "subject": {"type": "pull request", "id": "pr/7"}, "passed": true,  "cause": "satisfied"}
+  {"check": "approved",      "subject": {"type": "pull request", "id": "pr/8"}, "passed": false, "cause": "value"}
+  ```
+
+  - Unlike a [child subject](#from-lines), these pull requests don't belong to an artifact. Their rows have no `in`, they're counted once, and their ids must be unique across all of them. A check can't read the artifact.
+  - An empty list, like `sha-2`'s, adds nothing and fails nothing.
+  - A list that's missing, like `sha-3`'s, `null` or not a list fails `$min_subjects` with the worst cause found, even with `min_subjects: 0`. The row's `failed_items` says where, and the pull requests that could be read are still checked. So does a value at the end that isn't an object, and a path with no list along it, as `every` does in a check.
+  - Without `every`, a path through a list reads nothing, and `$min_subjects` fails as `unusable`.
+  - `every` can't go with a path that starts at another subject's name or with `named by each of`. Both are written wrong. A child subject reads names one parent at a time.
 - A `from` line can't go with `applies_to`. A `from` or `identified_by` that can't be read is written wrong, and the `$well_formed` row says why, like `{"name": "subjects.x.from", "value": ["doesn't parse"]}`.
 
 ### A subject built on another
@@ -1124,7 +1164,7 @@ Several of these rules depend on how a number was written, not only on its value
 }
 ```
 
-Passing and failing rows have the same fields. A row of an `all` or `any` check also has [`failed_items`](#which-items-failed). To find a row's description and expression, look up `requirements[row.requirement].checks[row.check]`. Look it up through the requirement, because two requirements can use the same check name for different things.
+Passing and failing rows have the same fields. A row of an `all` or `any` check also has [`failed_items`](#which-items-failed), and so does the `$min_subjects` row of a subject whose `from` line has [`every`](#from-lines). To find a row's description and expression, look up `requirements[row.requirement].checks[row.check]`. Look it up through the requirement, because two requirements can use the same check name for different things.
 
 ### Subjects in the report
 
@@ -1380,7 +1420,7 @@ When a check reads several fields, the row shows the first cause in this table's
 ]
 ```
 
-A violation of an `all` or `any` check keeps its row's `failed_items`, and one of a check written as several sentences its `failed_assertions`.
+A violation of an `all` or `any` check, or of the `$min_subjects` row of a subject read with `every`, keeps its row's `failed_items`, and one of a check written as several sentences its `failed_assertions`.
 
 It leaves out:
 
