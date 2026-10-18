@@ -49,7 +49,6 @@ A subject with `of` (see [REFERENCE.md](../REFERENCE.md#a-subject-built-on-anoth
 A subject's parts (`has`, see [syntax.md](syntax.md#parts)) leave a few things open:
 
 - `named by` a bare word that is a part's alias is written wrong. It would have to read the part's value and use it as a key, as it does for a `for` alias, and nothing says yet whether a part that is a path with its own `named by` can be used that way.
-- `identified_by` of a part is read and shown, but nothing uses it. A later change is meant to tag the values a check reads with the id of the part they sit in, so a report can say which one.
 
 ## Time limits
 

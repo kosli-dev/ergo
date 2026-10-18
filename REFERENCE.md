@@ -329,23 +329,25 @@ With this input:
 
 ```json
 {"check": "complete", "subject": {"type": "round", "id": "round-1"}, "passed": true, "cause": "satisfied",
- "inputs": [{"name": "findings.truncated", "value": false}]}
+ "inputs": [{"name": "findings.truncated", "value": false, "part": {"name": "findings", "id": null}}]}
 {"check": "every_hunk_acknowledged", "subject": {"type": "round", "id": "round-1"}, "passed": false, "cause": "value",
- "inputs": [{"name": "coverage.attestation_data.hunks_acknowledged", "value": 25},
-            {"name": "coverage.attestation_data.hunks_total", "value": 28}]}
+ "inputs": [{"name": "coverage.attestation_data.hunks_acknowledged", "value": 25, "part": {"name": "coverage", "id": "cov-9"}},
+            {"name": "coverage.attestation_data.hunks_total", "value": 28, "part": {"name": "coverage", "id": "cov-9"}}]}
 ```
+
+Each input read through a part says which part, and which one of them: `part` has the alias as the check writes it, and the `id`, the value at the part's `identified_by` inside the part. That is how a reader tells one attestation from another when a subject has several of the same kind. A one-line part has no id, so its `id` is `null`, and so is the id of a part that is missing or has nothing at `identified_by`. An input that doesn't go through a part has no `part`.
 
 A part is a short name for its path and nothing more. `coverage.attestation_data.hunks_total` gives exactly the rows that `compliance_status.attestations_statuses.coverage-verification.attestation_data.hunks_total` gives: the same `passed`, the same `cause` and the same values. A part that is missing fails the check as `absent`, a `null` one as `absent` when a step follows it, and one of the wrong type as `unusable`, because the full path would. Only the names differ. With `coverage-verification` missing from the input, the row is
 
 ```json
 {"check": "every_hunk_acknowledged", "subject": {"type": "round", "id": "round-1"}, "passed": false, "cause": "absent",
- "inputs": [{"name": "coverage.attestation_data.hunks_acknowledged", "value": null},
-            {"name": "coverage.attestation_data.hunks_total", "value": null}]}
+ "inputs": [{"name": "coverage.attestation_data.hunks_acknowledged", "value": null, "part": {"name": "coverage", "id": null}},
+            {"name": "coverage.attestation_data.hunks_total", "value": null, "part": {"name": "coverage", "id": null}}]}
 ```
 
 and written out in full, its inputs are named `compliance_status.attestations_statuses.coverage-verification.attestation_data.hunks_acknowledged` and `...hunks_total`, with the same `null`. The `expression` of a check and the names in its `inputs` and `failed_items` keep the alias, so a reader sees the words the policy was written in.
 
-- A part is one line, a path, or an object with `from`, a path, and `identified_by`, a path read inside the part. Nothing reads `identified_by` yet, but the report shows it, because it will say how to tell one part from another.
+- A part is one line, a path, or an object with `from`, a path, and `identified_by`, a path read inside the part. The report shows it under [`parts`](#subjects-in-the-report), and tags each input read through the part with the id it leads to.
 - A path is written as in a [from line](#from-lines): keys joined by `.`, keys in quotes, positions, and `named by` a key of `$params` or `$input`. It is a path inside the subject, so it can't start at `$params` or `$input`, and it can't have `whose`, `count of` or `named by each of`.
 - A part can be any path, even one that ends at a single value: `ratio: compliance_status.attestations_statuses.coverage.attestation_data.ratio` makes `ratio is at least 0.8` read the same.
 - Keep the data's own names, as `findings` and `coverage` do, because a reader who knows the data finds `coverage.attestation_data.hunks_total` where they'd look for it.
@@ -381,7 +383,7 @@ and written out in full, its inputs are named `compliance_status.attestations_st
 
   ```json
   {"check": "approved", "subject": {"type": "pull request", "id": "pr/7", "in": {"artifact": "sha-1"}}, "passed": true, "cause": "satisfied",
-   "inputs": [{"name": "artifact.pr_attestation.approvers", "value": ["bob"]}]}
+   "inputs": [{"name": "artifact.pr_attestation.approvers", "value": ["bob"], "part": {"name": "artifact.pr_attestation", "id": null}}]}
   ```
 
   A part is only reached through its subject, so a bare `pr_attestation` in a check of `pull request` is one of its own fields.
