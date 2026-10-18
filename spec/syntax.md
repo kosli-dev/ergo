@@ -146,7 +146,7 @@ Each check's definition in the report has an `expression` that says what it chec
 
 ## Checks ergo adds
 
-**[added.text]** The checks ergo adds have these descriptions and expressions, where `<type>` is the name of the requirement's subject, and `<from>` is the name of the subject's `from`, or `$input` when it has no steps. A subject read from a part of its parent shows its `from` as written, with the parent's name and the part's alias, like `artifact.pr_attestation.pull_requests`:
+**[added.text]** The checks ergo adds have these descriptions and expressions, where `<type>` is the name of the requirement's subject, and `<from>` is the name of the subject's `from`, or `$input` when it has no steps. For a subject that goes on into another subject, `<from>` is its `from` as written, starting with that subject's name: `artifact.pull_requests`, or, read from a part of it, `artifact.pr_attestation.pull_requests`.
 
 | Check           | Description                                                                                           | Expression                                                  |
 | --------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |

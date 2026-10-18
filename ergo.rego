@@ -4102,6 +4102,7 @@ _matching_count_name(req) := concat("", ["count(matching(", _from_text(req), "))
 _from_text(req) := _from_name(_from_path(req)) if {
 	_from_well_formed(req)
 	_from_path(req) != []
+	not _chained(req)
 	not _chain_part(req)
 }
 
@@ -4109,6 +4110,12 @@ _from_text(req) := _chain_part_name(req) if {
 	_from_well_formed(req)
 	_from_path(req) != []
 	_chain_part(req)
+}
+
+_from_text(req) := _path_name(array.concat([data.ergo_subject_sentences.chains[req.subject]], _from_path(req))) if {
+	_from_well_formed(req)
+	_chained(req)
+	not _chain_part(req)
 }
 
 _from_text(req) := "$input" if {
