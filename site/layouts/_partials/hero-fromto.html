@@ -72,7 +72,7 @@ deny <span class="kw">contains</span> msg <span class="kw">if</span> {
       <p class="ft__caption">{{ partial "copy.html" (index $c.fromto.examples 0).input_caption }}</p>
     </div>
 
-    <div class="ft__view" data-ex="deploy" data-step="4" data-file="opa eval ... data.deploy.report" data-hold="8500">
+    <div class="ft__view" data-ex="deploy" data-step="4" data-file="opa eval ... report" data-hold="8500">
       <p class="ft__label mono"><span class="ft__who ft__who--ergo">Ergo</span> the report</p>
       <div class="report ft__report">
         <div class="report__head"><span>subject</span><span>check</span><span>value read</span><span>passed</span><span>cause</span></div>
@@ -156,7 +156,7 @@ peer_approved(pr) <span class="kw">if</span> {
       <p class="ft__caption">{{ partial "copy.html" (index $c.fromto.examples 1).input_caption }}</p>
     </div>
 
-    <div class="ft__view" data-ex="review" data-step="4" data-file="opa eval ... data.review.report" data-hold="8500">
+    <div class="ft__view" data-ex="review" data-step="4" data-file="opa eval ... report" data-hold="8500">
       <p class="ft__label mono"><span class="ft__who ft__who--ergo">Ergo</span> the report</p>
       <div class="report ft__report">
         <div class="report__head"><span>subject</span><span>check</span><span>value read</span><span>passed</span><span>cause</span></div>
@@ -168,6 +168,57 @@ peer_approved(pr) <span class="kw">if</span> {
         <div class="report__row is-fail"><span>3</span><span>peer</span><span>author = null<br><span class="n">approvers: bob</span></span><span class="f">false</span><span class="f">absent</span></div>
       </div>
       <p class="ft__caption">{{ partial "copy.html" (index $c.fromto.examples 1).ergo_caption }}</p>
+    </div>
+
+
+    {{/* Example 3: expense claims, outside software delivery (checked by running ergo.rego on this policy and input) */}}
+    <div class="ft__view" data-ex="expenses" data-step="2" data-file="policy/policy.yaml" data-hold="6500">
+      <p class="ft__label mono"><span class="ft__who ft__who--ergo">Ergo</span> the policy</p>
+<pre class="code ft__code"><code><span class="k">subjects</span>:
+  <span class="k">expense</span>:
+    <span class="k">from</span>: <span class="s">expenses</span>
+    <span class="k">identified_by</span>: <span class="s">id</span>
+<span class="k">requirements</span>:
+  <span class="k">expense_policy</span>:
+    <span class="k">subject</span>: <span class="s">expense</span>
+    <span class="k">checks</span>:
+      <span class="k">within_limit</span>:
+        <span class="k">description</span>: <span class="s">The meal costs at most €50</span>
+        <span class="k">assert</span>: <span class="s">amount is at most 50</span>
+      <span class="k">receipt</span>:
+        <span class="k">description</span>: <span class="s">A receipt is attached</span>
+        <span class="k">assert</span>: <span class="s">receipt is a non-empty string</span></code></pre>
+    </div>
+
+    <div class="ft__view" data-ex="expenses" data-step="3" data-file="expenses.json" data-hold="6000">
+      <p class="ft__label mono"><span class="ft__who ft__who--ergo">Ergo</span> the evaluation, reading this input</p>
+<pre class="code ft__code"><code>{
+  <span class="k">"expenses"</span>: [
+    {<span class="k">"id"</span>: <span class="s">"e-1"</span>, <span class="k">"amount"</span>: <span class="n">42</span>,
+     <span class="k">"receipt"</span>: <span class="s">"r-881.pdf"</span>},
+    {<span class="k">"id"</span>: <span class="s">"e-2"</span>, <span class="k">"amount"</span>: <span class="n">68</span>,
+     <span class="k">"receipt"</span>: <span class="s">"r-902.pdf"</span>},
+    {<span class="k">"id"</span>: <span class="s">"e-3"</span>, <span class="k">"amount"</span>: <span class="n">35</span>}
+  ]
+}</code></pre>
+      <p class="ft__caption">{{ partial "copy.html" (index $c.fromto.examples 2).input_caption }}</p>
+    </div>
+
+    <div class="ft__view" data-ex="expenses" data-step="4" data-file="opa eval ... report" data-hold="8500">
+      <p class="ft__label mono"><span class="ft__who ft__who--ergo">Ergo</span> the report</p>
+      <div class="report ft__report">
+        <div class="report__head"><span>subject</span><span>check</span><span>value read</span><span>passed</span><span>cause</span></div>
+        <div class="report__row is-sys"><span></span><span class="sys">$well_formed</span><span>count(checks) = 2</span><span class="t">true</span><span>satisfied</span></div>
+        <div class="report__row is-sys"><span></span><span class="sys">$min_subjects</span><span>in-scope expense count = 3</span><span class="t">true</span><span>satisfied</span></div>
+        <div class="report__row is-sys"><span></span><span class="sys">$unique_ids</span><span>repeated expense ids = []</span><span class="t">true</span><span>satisfied</span></div>
+        <div class="report__row"><span>e-1</span><span>receipt</span><span>receipt = "r-881.pdf"</span><span class="t">true</span><span>satisfied</span></div>
+        <div class="report__row"><span>e-1</span><span>within_limit</span><span>amount = 42</span><span class="t">true</span><span>satisfied</span></div>
+        <div class="report__row"><span>e-2</span><span>receipt</span><span>receipt = "r-902.pdf"</span><span class="t">true</span><span>satisfied</span></div>
+        <div class="report__row is-fail"><span>e-2</span><span>within_limit</span><span>amount = 68</span><span class="f">false</span><span class="f">value</span></div>
+        <div class="report__row is-fail"><span>e-3</span><span>receipt</span><span>receipt = null</span><span class="f">false</span><span class="f">absent</span></div>
+        <div class="report__row"><span>e-3</span><span>within_limit</span><span>amount = 35</span><span class="t">true</span><span>satisfied</span></div>
+      </div>
+      <p class="ft__caption">{{ partial "copy.html" (index $c.fromto.examples 2).ergo_caption }}</p>
     </div>
 
   </div>

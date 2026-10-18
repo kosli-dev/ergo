@@ -156,7 +156,7 @@ p code, li code, dd code, td code {
 
 /* Hero from → to: each example steps Rego policy → Rego result → ergo policy → ergo report. */
 .ft__bar { flex-wrap: wrap; row-gap: 10px; }
-.ft__file { flex: 1 1 auto; min-width: 0; }
+.ft__file { flex: 1 1 0; min-width: 0; }
 .ft__tabs { display: flex; gap: 4px; margin-left: auto; padding: 3px; border: 1px solid var(--line); border-radius: 999px; }
 .ft__tab { padding: 5px 11px; border: 0; border-radius: 999px; background: none; color: var(--muted); font: 500 12px/1 var(--mono); cursor: pointer; }
 .ft__tab:hover { color: var(--paper); }
