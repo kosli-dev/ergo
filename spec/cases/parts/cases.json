@@ -1681,6 +1681,12 @@
             }
           }
         },
+        "expressions": {
+          "r": {
+            "$min_subjects": "count(matching(artifact.pra.pull_requests)) >= 1",
+            "$unique_ids": "count(repeated(ids(artifact.pra.pull_requests))) == 0"
+          }
+        },
         "report": {
           "subjects": {
             "artifact": {
@@ -2831,6 +2837,134 @@
             "subject": {
               "id": "a",
               "type": "round"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part whose path goes through a list",
+    "policy": {
+      "subjects": {
+        "s": {
+          "from": [],
+          "has": {
+            "reviews": "pull_requests.reviews"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "s",
+          "checks": {
+            "all_ok": "every reviews.state is \"ok\""
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "names a failed item with the full path, so no position is hidden",
+        "rules": [
+          "name.part",
+          "parts.swap"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "reviews": [
+                {
+                  "state": "ok"
+                }
+              ]
+            },
+            {
+              "reviews": [
+                {
+                  "state": "ok"
+                },
+                {
+                  "state": "ok"
+                }
+              ]
+            },
+            {
+              "reviews": [
+                {
+                  "state": "bad"
+                },
+                {
+                  "state": "ok"
+                }
+              ]
+            }
+          ]
+        },
+        "expressions": {
+          "r": {
+            "all_ok": "every reviews.state is \"ok\""
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "all_ok",
+            "failed_items": [
+              {
+                "cause": "value",
+                "item": "item 1 of pull_requests[2].reviews",
+                "path": "pull_requests[2].reviews[0].state",
+                "value": "bad"
+              }
+            ],
+            "inputs": [
+              {
+                "name": "pull_requests[].reviews[].state",
+                "value": [
+                  "ok",
+                  "ok",
+                  "ok",
+                  "bad",
+                  "ok"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "pull_requests": [
+                  {
+                    "reviews": [
+                      {
+                        "state": "ok"
+                      }
+                    ]
+                  },
+                  {
+                    "reviews": [
+                      {
+                        "state": "ok"
+                      },
+                      {
+                        "state": "ok"
+                      }
+                    ]
+                  },
+                  {
+                    "reviews": [
+                      {
+                        "state": "bad"
+                      },
+                      {
+                        "state": "ok"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": "s"
             }
           }
         ]

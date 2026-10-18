@@ -104,7 +104,7 @@ A row's `inputs`, a ref's entry in `$refs`, an item in `failed_items` and a path
 
 **[name.list]** Inside `all` or `any`, a path is named after the list: `cs[].s`, or `cs[]` for the items themselves. With `each`, the inner lists are `prs[].cs`.
 
-**[name.part]** A path that starts with a part's alias is named with the alias, and the steps the alias stands for aren't named, so the full path `compliance_status.attestations_statuses.coverage-verification.attestation_data.hunks_total` is `coverage.attestation_data.hunks_total` when it was written with the alias. In the old syntax the alias keeps its `$`, like `$coverage.attestation_data.hunks_total`, as `$pr.author` does. A path read through a chained subject's parent, like `artifact.pr_attestation.approvers`, is named the same way, and a list the alias stands for is `coverage[]` when it's walked. A path written in full is named in full, whether or not a part stands for it. Only the names differ: a row's `expression`, `inputs` and the paths of its `failed_items` use the alias, and the values in them are the same.
+**[name.part]** A path that starts with a part's alias is named with the alias, and the steps the alias stands for aren't named, so the full path `compliance_status.attestations_statuses.coverage-verification.attestation_data.hunks_total` is `coverage.attestation_data.hunks_total` when it was written with the alias. In the old syntax the alias keeps its `$`, like `$coverage.attestation_data.hunks_total`, as `$pr.author` does. A path read through a chained subject's parent, like `artifact.pr_attestation.approvers`, is named the same way, and a list the alias stands for is `coverage[]` when it's walked. A path written in full is named in full, whether or not a part stands for it. A position is never hidden: when a walk (`every`, `some`, `count of`, `sum of`, a `for` line) goes through a list inside a part's path, not at its end, every name from that walk uses the full path, like `pull_requests[2].reviews[0].state` for a part `reviews` that stands for `pull_requests.reviews`. Only the names differ: a row's `expression`, `inputs` and the paths of its `failed_items` use the alias, and the values in them are the same.
 
 ## Expressions
 
@@ -146,7 +146,7 @@ Each check's definition in the report has an `expression` that says what it chec
 
 ## Checks ergo adds
 
-**[added.text]** The checks ergo adds have these descriptions and expressions, where `<type>` is the name of the requirement's subject, and `<from>` is the name of the subject's `from`, or `$input` when it has no steps:
+**[added.text]** The checks ergo adds have these descriptions and expressions, where `<type>` is the name of the requirement's subject, and `<from>` is the name of the subject's `from`, or `$input` when it has no steps. A subject read from a part of its parent shows its `from` as written, with the parent's name and the part's alias, like `artifact.pr_attestation.pull_requests`:
 
 | Check           | Description                                                                                           | Expression                                                  |
 | --------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |

@@ -11286,3 +11286,74 @@ test_a_part_with_a_key_that_is_not_a_string_is_written_wrong_and_is_not_listed i
 	rep.subjects.round.parts == {"ok": {"from": "dd.d", "identified_by": null}}
 	_parts_row(rep, "c").passed
 }
+
+_hidden_doc := {"pull_requests": [
+	{"reviews": [{"state": "ok"}]},
+	{"reviews": [{"state": "ok"}, {"state": "ok"}]},
+	{"reviews": [{"state": "bad"}, {"state": "ok"}]},
+]}
+
+test_a_position_in_a_list_inside_a_part_is_never_hidden_so_the_failed_item_names_the_full_path if {
+	checks := {
+		"every": "every reviews.state is \"ok\"",
+		"count": "count of reviews is 4",
+		"for": {"for": "every reviews as r", "assert": "r.state is \"ok\""},
+	}
+	full := {
+		"every": "every pull_requests.reviews.state is \"ok\"",
+		"count": "count of pull_requests.reviews is 4",
+		"for": {"for": "every pull_requests.reviews as r", "assert": "r.state is \"ok\""},
+	}
+	alias := ergo.report(_hidden_doc, _swap_policy2({"reviews": "pull_requests.reviews"}, checks), {})
+	plain := ergo.report(_hidden_doc, _swap_policy2({}, full), {})
+	row := _parts_row(alias, "every")
+	row.failed_items == [{"cause": "value", "item": "item 1 of pull_requests[2].reviews", "path": "pull_requests[2].reviews[0].state", "value": "bad"}]
+	row.inputs == [{"name": "pull_requests[].reviews[].state", "value": ["ok", "ok", "ok", "bad", "ok"]}]
+	_parts_row(alias, "count").inputs[1].name == "pull_requests[].reviews[]"
+	_parts_row(alias, "for").failed_items[0].item == "item 1 of pull_requests[2].reviews"
+	_parts_row(alias, "for").inputs[0].name == "pull_requests[].reviews[]"
+	[[r.check, r.passed, r.cause] | some r in alias.results; r.check in {"every", "count", "for"}] == [[r.check, r.passed, r.cause] | some r in plain.results; r.check in {"every", "count", "for"}]
+	alias.requirements.r.checks.every.expression == "every reviews.state is \"ok\""
+}
+
+_swap_policy2(has, checks) := {
+	"subjects": {"round": _swap_subject2(has)},
+	"requirements": {"r": {"subject": "round", "checks": checks}},
+}
+
+_swap_subject2(has) := {"from": [], "has": has} if count(has) > 0
+
+_swap_subject2(has) := {"from": []} if count(has) == 0
+
+test_a_position_in_a_list_inside_a_parents_part_is_never_hidden_either if {
+	subjects := {
+		"artifact": {"from": "trail.artifacts named by $params.art", "identified_by": "fingerprint", "has": {"rv": "pull_requests.reviews"}},
+		"pull request": {"from": "artifact.items", "identified_by": "state"},
+	}
+	doc := {"trail": {"artifacts": {"web": {"fingerprint": "sha-1", "items": [{"state": "s"}], "pull_requests": [{"reviews": [{"state": "ok"}]}, {"reviews": [{"state": "bad"}]}]}}}}
+	checks := {"c": "every artifact.rv.state is \"ok\"", "n": "count of artifact.rv is 2"}
+	rep := ergo.report(doc, {"subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": checks}}}, {"art": "web"})
+	row := _parts_row(rep, "c")
+	row.failed_items == [{"cause": "value", "item": "item 1 of artifact.pull_requests[1].reviews", "path": "artifact.pull_requests[1].reviews[0].state", "value": "bad"}]
+	row.inputs == [{"name": "artifact.pull_requests[].reviews[].state", "value": ["ok", "bad"]}]
+}
+
+test_a_chained_subject_that_starts_at_its_parents_part_shows_its_from_as_written_in_its_expressions if {
+	rep := ergo.report(_parts_chain_doc, _parts_chain, {"art": "web"})
+	checks := rep.requirements.r.checks
+	checks["$min_subjects"].expression == "count(matching(artifact.pra.pull_requests)) >= 1"
+	checks["$unique_ids"].expression == "count(repeated(ids(artifact.pra.pull_requests))) == 0"
+	deeper := object.union(_parts_chain.subjects, {"pull request": {"from": "artifact.pra.pull_requests", "identified_by": "url"}})
+	policy := {"subjects": deeper, "requirements": {"r": {"subject": "pull request", "checks": {"c": "url exists"}}}}
+	ergo.report(_parts_chain_doc, policy, {"art": "web"}).requirements.r.checks["$min_subjects"].expression == "count(matching(artifact.pra.pull_requests)) >= 1"
+}
+
+test_a_chained_subject_that_starts_deeper_in_its_parents_part_keeps_the_rest_of_the_path_in_its_expressions if {
+	subjects := {
+		"artifact": {"from": "trail.artifacts named by $params.art", "identified_by": "fingerprint", "has": {"pra": "attestations.pr"}},
+		"pull request": {"from": "artifact.pra.pull_requests[0].list", "identified_by": "url"},
+	}
+	doc := {"trail": {"artifacts": {"web": {"fingerprint": "sha-1", "attestations": {"pr": {"pull_requests": [{"list": [{"url": "a"}]}]}}}}}}
+	rep := ergo.report(doc, {"subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": {"c": "url exists"}}}}, {"art": "web"})
+	rep.requirements.r.checks["$min_subjects"].expression == "count(matching(artifact.pra.pull_requests[0].list)) >= 1"
+}

@@ -50,8 +50,6 @@ A subject's parts (`has`, see [syntax.md](syntax.md#parts)) leave a few things o
 
 - `named by` a bare word that is a part's alias is written wrong. It would have to read the part's value and use it as a key, as it does for a `for` alias, and nothing says yet whether a part that is a path with its own `named by` can be used that way.
 - `identified_by` of a part is read and shown, but nothing uses it. A later change is meant to tag the values a check reads with the id of the part they sit in, so a report can say which one.
-- When `every`, `some`, `count of` or `sum of` walks a list in the middle of a part's path, not at its end, the rows are the full path's, but the name of a failed item shows the alias and the steps after the walked list's position, like `x.sub[1].y` for a part `x` that stands for `items.sub`. The position in the hidden list isn't shown. A part that ends at its list, like `items`, names every item.
-- A part's path in the `$min_subjects` and `$unique_ids` expressions of a chained subject whose `from` starts at a part of its parent is shown in full, because those expressions show the subject's `from` as a path and not as a line.
 
 ## Time limits
 
