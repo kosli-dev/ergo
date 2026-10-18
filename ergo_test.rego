@@ -11596,6 +11596,21 @@ test_an_old_syntax_filter_and_substitute_read_a_part_through_its_alias if {
 	[[r.check, r.cause] | some r in rep.results; r.check in {"$applies", "c"}] == [["$applies", "satisfied"], ["c", "substituted"]]
 }
 
+test_an_old_syntax_filter_reads_a_part_through_its_alias_when_the_checks_read_parts_by_name if {
+	policy := {
+		"subjects": {"s": {"from": ["trail"], "has": {"cov": "dd.b"}, "applies_to": {"f": {"op": "present", "path": ["$cov", "x"]}}}},
+		"requirements": {"r": {"subject": "s", "checks": {"c": "cov.n is 2"}}},
+	}
+	rep := ergo.report(_parts_doc({"b": {"n": 2, "x": 1}}), policy, {})
+	[[r.check, r.cause] | some r in rep.results; r.check in {"$applies", "c"}] == [["$applies", "satisfied"], ["c", "satisfied"]]
+}
+
+test_a_requirement_that_reads_parts_only_by_name_runs_without_a_scope_because_a_scope_makes_opa_work_out_every_row_again if {
+	parts := {"parts": {"s": {"cov": {}}}}
+	not ergo._scoped_of({"subject": "s", "checks": {"c": {"op": "present", "path": [ergo._p_marker("cov", 1, null, false), "b", "x"]}}}) with data.ergo_subject_sentences as parts
+	ergo._scoped_of({"subject": "s", "checks": {"c": {"op": "present", "path": [ergo._p_marker("cov", 1, null, true), "b", "x"]}}}) with data.ergo_subject_sentences as parts
+}
+
 test_an_old_syntax_derived_side_reads_a_part_from_the_subject_in_where_and_add if {
 	p := _swap_old_alias
 	checks := {
