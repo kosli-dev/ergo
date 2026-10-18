@@ -23,12 +23,16 @@ hero:
         input_caption: Three pull requests. PR 2 was approved only by its author, and PR 3 has no author recorded.
         rego_caption: Two failures, one message. Which is which?
         ergo_caption: PR 2 was only approved by its author. PR 3 has no author recorded. Different problems, different fixes.
+      - key: expenses
+        label: Expenses
+        input_caption: Three meal expenses. e-2 is over the €50 limit, and e-3 has no receipt.
+        ergo_caption: e-2 costs too much and e-3 has no receipt, so whoever claimed them knows exactly what to fix.
 
 problem:
   title: A decision nobody can inspect
   muted: isn't evidence.
   lede: With Rego you can block a deployment, but you can't show later why. When you write policies with ==ergo== you have records of why decisions were made.
-  body: In regulated settings, someone else has to be able to check that a policy behaved as it should. A yes or no can't be validated. You don't just tell the auditor the decision. You hand over the workings.
+  body: When a decision matters, someone else has to be able to check that the policy behaved as it should. A yes or no can't be validated. You don't just tell an auditor, a customer or a colleague the decision. You hand over the workings.
   without:
     label: "**Rego** provides decisions"
     note: Useful. But why was it false?
@@ -52,7 +56,7 @@ declaration:
 shape:
   title: One report format.
   muted: Every policy.
-  lede: "A deployment policy. A code-review policy. A vulnerability policy. Different checks, same evidence: one row per subject and check. Passing and failing rows have the same fields."
+  lede: "A deployment policy. An expense policy. A loan eligibility policy. Different checks, same evidence: one row per subject and check. Passing and failing rows have the same fields."
   fields:
     - name: requirement
       body: Which requirement produced the row.
