@@ -12083,3 +12083,14 @@ test_a_part_named_like_a_grandparent_is_an_alias_given_twice if {
 	rep := ergo.report(_three_doc, {"subjects": subjects, "requirements": {"r": {"subject": "commit", "checks": {"c": "sha exists"}}}}, {})
 	[i | some r in rep.results; r.check == "$well_formed"; some i in r.inputs; startswith(i.name, "subjects.")] == [{"name": "subjects.commit.has.artifact", "value": ["alias given twice"]}]
 }
+
+test_a_requirement_field_named_like_the_facts_ergo_works_out_once_is_unknown_and_changes_no_row if {
+	subjects := {"artifact": {"from": "artifacts", "identified_by": "fingerprint", "has": {"pr_att": "atts.pr"}}, "pull request": {"from": "artifact.pull_requests", "identified_by": "url"}}
+	doc := {"artifacts": [{"fingerprint": "a", "atts": {"pr": {"id": "x"}}, "pull_requests": [{"url": "pr/7"}]}, {"fingerprint": "b", "pull_requests": [{"url": "pr/8"}]}]}
+	plain := {"subject": "pull request", "checks": {"c": "url exists and artifact.pr_att.id exists"}}
+	odd := object.union(plain, {"ergo/fixed": {"each_step": [{"each_as": "x"}], "has_parts": true, "tagging": false, "scoped": false}})
+	clean := ergo.report(doc, {"subjects": subjects, "requirements": {"r": plain}}, {})
+	marked := ergo.report(doc, {"subjects": subjects, "requirements": {"r": odd}}, {})
+	[r | some r in marked.results; r.check != "$well_formed"] == [r | some r in clean.results; r.check != "$well_formed"]
+	[i | some r in marked.results; r.check == "$well_formed"; some i in r.inputs; i.name == `"ergo/fixed"`] == [{"name": `"ergo/fixed"`, "value": ["unknown field"]}]
+}

@@ -446,7 +446,23 @@ default _has_step(_) := false
 
 _has_step(req) if _each_step(req)
 
-_each_step(req) := step if {
+_each_step(req) := req["ergo/fixed"].each_step[0] if _has_fixed(req)
+
+_each_step(req) := _each_step_of(req) if not _has_fixed(req)
+
+_has_fixed(req) if is_set(req["ergo/fixed"].mark)
+
+_with_fixed(req) := object.union(req, {"ergo/fixed": {
+	"mark": set(),
+	"each_step": [step | step := _each_step_of(req)],
+	"has_parts": _has_parts_of(req),
+	"tagging": _tagging_of(req),
+	"scoped": _scoped_of(req),
+}}) if is_object(req)
+
+else := req
+
+_each_step_of(req) := step if {
 	f := _from_of(req)
 	is_array(f)
 	count(f) > 0
@@ -731,6 +747,18 @@ _subjects_with_parts := {name | some name, parts in object.get(data.ergo_subject
 default _has_parts(_) := false
 
 _has_parts(req) if {
+	_has_fixed(req)
+	req["ergo/fixed"].has_parts == true
+}
+
+_has_parts(req) if {
+	not _has_fixed(req)
+	_has_parts_of(req)
+}
+
+default _has_parts_of(_) := false
+
+_has_parts_of(req) if {
 	is_string(object.get(req, "subject", null))
 	req.subject in _subjects_with_parts
 }
@@ -746,11 +774,23 @@ default _parent_names := {}
 
 _parent_names := data.ergo_parent if is_object(data.ergo_parent)
 
-_scoped(req) if _has_step(req)
+_scoped(req) if {
+	_has_fixed(req)
+	req["ergo/fixed"].scoped == true
+}
 
-_scoped(_) if _parent_names != {}
+_scoped(req) if {
+	not _has_fixed(req)
+	_scoped_of(req)
+}
 
-_scoped(req) if _has_parts(req)
+default _scoped_of(_) := false
+
+_scoped_of(req) if _has_step(req)
+
+_scoped_of(_) if _parent_names != {}
+
+_scoped_of(req) if _has_parts(req)
 
 _passes(req, check, flaw, subj) := _check_passed(check, subj, flaw) if not _scoped(req)
 
@@ -777,9 +817,21 @@ else := o if {
 	o := object.union(raw, {"inputs": _tagged(raw.inputs, check, req, subj)}) with input as s
 }
 
-_tagging(req) if _has_parts(req)
+_tagging(req) if {
+	_has_fixed(req)
+	req["ergo/fixed"].tagging == true
+}
 
 _tagging(req) if {
+	not _has_fixed(req)
+	_tagging_of(req)
+}
+
+default _tagging_of(_) := false
+
+_tagging_of(req) if _has_parts(req)
+
+_tagging_of(req) if {
 	is_string(object.get(req, "subject", null))
 	some a in _s_ancestors(req.subject, data.ergo_subject_sentences.chains)
 	a in _subjects_with_parts
@@ -4520,8 +4572,24 @@ _applies_inputs(subj, req, item) := [inp |
 	inp.name == name
 ]
 
-_evaluation(doc, req, name) := {
-	"well_formed": _well_formed_row(req, name),
+_evaluation(doc, req, name) := object.union({"well_formed": _well_formed_row(req, name)}, _evaluation_with(doc, req, name, _fixed_of(req)))
+
+_fixed_of(req) := {
+	"filter_flaws": {n: flaw |
+		some n, check in _applies_to_of(req)
+		here := _s_written_here(req, "applies_to", n)
+		flaw := _flaw(check, _from_names(req, here), here)
+	},
+	"check_flaws": {n: flaw |
+		some n, check in _checks_of(req)
+		here := _s_written_here(req, "checks", n)
+		flaw := _flaw(check, _from_names(req, here), here)
+	},
+	"item": _subject_item_name(req),
+	"prepared": {n: _with_ref_answer(check) | some n, check in _checks_of(req)},
+}
+
+_evaluation_with(doc, written, name, fixed) := {
 	"min_subjects": [_min_subjects_row(doc, req, name, count(matching))],
 	"unique_ids": [_unique_ids_row(refs, req, name)],
 	"applies": applies,
@@ -4531,24 +4599,13 @@ _evaluation(doc, req, name) := {
 	"scope_readable": _scope_readable(raw, applies, req),
 	"rows_complete": _rows_complete(groups, matching, req),
 } if {
+	req := _with_fixed(written)
 	raw := _raw_entries(doc, req)
-	filter_flaws := {n: flaw |
-		some n, check in _applies_to_of(req)
-		here := _s_written_here(req, "applies_to", n)
-		flaw := _flaw(check, _from_names(req, here), here)
-	}
-	check_flaws := {n: flaw |
-		some n, check in _checks_of(req)
-		here := _s_written_here(req, "checks", n)
-		flaw := _flaw(check, _from_names(req, here), here)
-	}
-	item := _subject_item_name(req)
 	refs := {i: _entry_ref(entry, req) | some i, entry in raw}
-	matches := {i: _subject_matches(entry.subject, req, filter_flaws) | some i, entry in raw}
-	applies := _applies_rows(raw, refs, matches, req, name, filter_flaws, item)
+	matches := {i: _subject_matches(entry.subject, req, fixed.filter_flaws) | some i, entry in raw}
+	applies := _applies_rows(raw, refs, matches, req, name, fixed.filter_flaws, fixed.item)
 	matching := [raw[i] | some i, _ in raw; matches[i]]
-	prepared := {n: _with_ref_answer(check) | some n, check in _checks_of(req)}
-	groups := _subject_row_groups(matching, req, name, check_flaws, item, prepared)
+	groups := _subject_row_groups(matching, req, name, fixed.check_flaws, fixed.item, fixed.prepared)
 }
 
 _with_ref_answer(check) := _ref_answered_compare(check) if {
@@ -4969,7 +5026,7 @@ _evaluated(doc, req, name) := _chain_evaluation(req, name, _parent_pick(doc, req
 	not _grand_chained(req)
 }
 
-_evaluated(doc, req, name) := _grand_evaluation(req, name, _parent_pick_of(doc, {"subject": grand, "checks": {}}), parent, grand) if {
+_evaluated(doc, req, name) := _grand_evaluation(req, name, _parent_pick_of(doc, {"subject": grand, "checks": {}}), parent, grand, _fixed_of(req)) if {
 	_grand_chained(req)
 	parent := data.ergo_subject_sentences.chains[req.subject]
 	grand := data.ergo_subject_sentences.chains[parent]
@@ -4980,31 +5037,31 @@ _grand_chained(req) if {
 	data.ergo_subject_sentences.chains[req.subject] in object.keys(data.ergo_subject_sentences.chains)
 }
 
-_grand_evaluation(req, name, gpick, _, _) := _no_parent_evaluation(req, name, gpick.cause) if "cause" in object.keys(gpick)
+_grand_evaluation(req, name, gpick, _, _, _) := _no_parent_evaluation(req, name, gpick.cause) if "cause" in object.keys(gpick)
 
-_grand_evaluation(req, name, gpick, parent, grand) := _grand_branches(req, name, [e | some g in gpick.parents; some e in _grand_branch(req, name, parent, grand, g)]) if "parents" in object.keys(gpick)
+_grand_evaluation(req, name, gpick, parent, grand, fixed) := _grand_branches(req, name, [e | some g in gpick.parents; some e in _grand_branch(req, name, parent, grand, g, fixed)]) if "parents" in object.keys(gpick)
 
 _grand_branches(req, name, es) := _parents_evaluation(req, name, es) if count(es) > 0
 
 else := _no_parent_evaluation(req, name, "none")
 
-_grand_branch(req, name, _, grand, g) := [_parent_evaluation(req, name, grand, g)] if "cause" in object.keys(g)
+_grand_branch(req, name, _, grand, g, fixed) := [_parent_evaluation(req, name, grand, g, fixed)] if "cause" in object.keys(g)
 
-_grand_branch(req, name, parent, grand, g) := _grand_children(req, name, parent, grand, g, pick) if {
+_grand_branch(req, name, parent, grand, g, fixed) := _grand_children(req, name, parent, grand, g, pick, fixed) if {
 	"subject" in object.keys(g)
 	pick := _parent_pick_of(g.subject, {"subject": parent, "checks": {}}) with data.ergo_in as {grand: g.id} with data.ergo_parent as {grand: g.subject}
 }
 
-_grand_children(req, name, _, grand, g, pick) := [_parent_evaluation(req, name, grand, {"id": g.id, "cause": pick.cause})] if "cause" in object.keys(pick)
+_grand_children(req, name, _, grand, g, pick, fixed) := [_parent_evaluation(req, name, grand, {"id": g.id, "cause": pick.cause}, fixed)] if "cause" in object.keys(pick)
 
-_grand_children(req, name, parent, grand, g, pick) := [_grandchild_evaluation(req, name, parent, grand, g, p) | some p in pick.parents] if "parents" in object.keys(pick)
+_grand_children(req, name, parent, grand, g, pick, fixed) := [_grandchild_evaluation(req, name, parent, grand, g, p, fixed) | some p in pick.parents] if "parents" in object.keys(pick)
 
-_grandchild_evaluation(req, name, parent, grand, g, p) := e if {
+_grandchild_evaluation(req, name, parent, grand, g, p, fixed) := e if {
 	"subject" in object.keys(p)
-	e := _evaluation(p.subject, req, name) with data.ergo_in as {grand: g.id, parent: p.id} with data.ergo_parent as {grand: g.subject, parent: p.subject}
+	e := _evaluation_with(p.subject, req, name, fixed) with data.ergo_in as {grand: g.id, parent: p.id} with data.ergo_parent as {grand: g.subject, parent: p.subject}
 }
 
-_grandchild_evaluation(req, name, parent, grand, g, p) := {
+_grandchild_evaluation(req, name, parent, grand, g, p, _) := {
 	"min_subjects": [row],
 	"unique_ids": [],
 	"applies": [],
@@ -5018,7 +5075,8 @@ _grandchild_evaluation(req, name, parent, grand, g, p) := {
 	row := _parent_min_subjects_row(req, name, p.cause) with data.ergo_in as {grand: g.id, parent: p.id}
 }
 
-_chain_evaluation(req, name, pick) := _parents_evaluation(req, name, [_parent_evaluation(req, name, pick.parent, p) | some p in pick.parents]) if {
+_chain_evaluation(req, name, pick) := _parents_evaluation(req, name, [_parent_evaluation(req, name, pick.parent, p, fixed) | some p in pick.parents]) if {
+	fixed := _fixed_of(req)
 	"parents" in object.keys(pick)
 	count(pick.parents) > 0
 }
@@ -5040,12 +5098,12 @@ _no_parent_evaluation(req, name, cause) := object.union(_evaluation({}, req, nam
 	"rows_complete": true,
 })
 
-_parent_evaluation(req, name, parent, p) := e if {
+_parent_evaluation(req, name, parent, p, fixed) := e if {
 	"subject" in object.keys(p)
-	e := _evaluation(p.subject, req, name) with data.ergo_in as {parent: p.id} with data.ergo_parent as {parent: p.subject}
+	e := _evaluation_with(p.subject, req, name, fixed) with data.ergo_in as {parent: p.id} with data.ergo_parent as {parent: p.subject}
 }
 
-_parent_evaluation(req, name, parent, p) := {
+_parent_evaluation(req, name, parent, p, _) := {
 	"min_subjects": [row],
 	"unique_ids": [],
 	"applies": [],
