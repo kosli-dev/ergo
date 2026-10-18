@@ -76,6 +76,10 @@ Three ways to settle it:
 - Have the author mark the lists, like `every prs[].commits[].signed`. That changes the grammar of [#174](https://github.com/kosli-dev/ergo/issues/174), and costs some of its plain reading.
 - Give ergo the shape of the input, as a schema, so a step is walked because the schema says it holds a list. [#191](https://github.com/kosli-dev/ergo/pull/191) already declares a schema for part of `input`.
 
+## Reading a policy once
+
+`ergo.rego` can read a policy once with `ergo.read` and run what it returns many times ([#255](https://github.com/kosli-dev/ergo/issues/255)). The spec only says the report must be the same as from the policy, and leaves the shape of a read policy to each implementation. Still to decide: whether the shape goes in the spec, so one implementation can run another's, and how an implementation tells a read policy made by another version, or edited by hand, from its own.
+
 ## Sentences the spec doesn't say enough about yet
 
 `ergo.rego` doesn't run these forms, and the spec doesn't pin down their rows, so there are no cases for them. A case for each can go in once the question is settled, and be listed in `known_differences` in `spec_test.rego` while `ergo.rego` fails it.

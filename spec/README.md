@@ -73,6 +73,8 @@ The cases in `cases/custom` use three custom operators that a runner has to supp
 
 `custom_op_test.rego` defines them for `ergo.rego`.
 
+`spec_test.rego` also runs every case from what `ergo.read` returns for the group's policy, saved as JSON and read back, and a folder's test fails when that gives a different report. An implementation that lets a caller read a policy once has to give the same report from it as from the policy, whatever shape it keeps it in.
+
 To list the cases `ergo.rego` fails:
 
 ```sh

@@ -11,6 +11,7 @@ This page describes everything ergo accepts and everything it returns. If you ha
 - [Causes](#causes)
 - [Violations](#violations)
 - [Compiling to Wasm](#compiling-to-wasm)
+- [Reading a policy once](#reading-a-policy-once)
 - [Failing closed](#failing-closed)
 - [The old syntax](#the-old-syntax)
 
@@ -1456,6 +1457,65 @@ const parseTime = (v) => {
 
 const policy = await loadPolicy(wasm, undefined, { "time.parse_rfc3339_ns": parseTime });
 ```
+
+## Reading a policy once
+
+`ergo.report` reads every sentence of the policy each time it runs. When the same policy runs many times, like in a test suite or on every `kosli evaluate`, you can read it once with `ergo.read(policy)`, save what it returns as JSON, and pass that to `ergo.report` instead of the policy. The report is the same.
+
+With this `policy.yaml`:
+
+```yaml
+subjects:
+  deployment:
+    from: deployments
+    identified_by: id
+requirements:
+  approved_deploy:
+    subject: deployment
+    checks:
+      approved: approved_by is not empty
+```
+
+read it once:
+
+```sh
+opa eval -d ergo.rego -d policy.yaml --format raw \
+  'json.marshal({"read_policy": data.ergo.read({"subjects": data.subjects, "requirements": data.requirements})})' > read_policy.json
+```
+
+and run what it saved in `policy.rego`:
+
+```rego
+package policy
+
+import data.ergo
+
+report := ergo.report(input, data.read_policy, {})
+```
+
+On this `input.json`:
+
+```json
+{"deployments": [{"id": "d-1", "approved_by": "alice"}, {"id": "d-2", "approved_by": ""}]}
+```
+
+`opa eval -d ergo.rego -d policy.rego -d read_policy.json -i input.json --format pretty 'data.ergo.violations(data.policy.report)'` gives the same violation as the policy itself would:
+
+```json
+[
+  {
+    "cause": "value",
+    "check": "approved",
+    "description": "",
+    "expression": "approved_by is not empty",
+    "inputs": [{ "name": "approved_by", "value": "" }],
+    "requirement": "approved_deploy",
+    "subject": { "id": "d-2", "type": "deployment" }
+  }
+]
+```
+
+The input and the params are read on each run, so a read policy works with any of them. What `ergo.read` returns holds the policy and what ergo worked out from it, in a shape that's ergo's own and changes between versions. ergo doesn't check yet that a read policy was made by the same `ergo.rego` or that nobody edited it, so read the policy again whenever you change it or move your copy of ergo, and don't edit the file. A read policy with a field missing or of the wrong type fails like a policy ergo can't read. Reading a read policy again gives it back unchanged.
 
 ## Failing closed
 
