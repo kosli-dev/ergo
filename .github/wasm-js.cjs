@@ -84,6 +84,13 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
       },
     },
   };
+  const chainPolicy = {
+    subjects: {
+      deployment: { from: 'deployments whose environment is "prod"', identified_by: "id" },
+      test: { from: "deployment.tests" },
+    },
+    requirements: { approved: { subject: "test", checks: { ok: "ok is true and deployment.approved_by exists" } } },
+  };
   const measure = async (name, policy, rows, matching, budgetMB) => {
     const fresh = await load(ergoDir);
     const report = fresh.evaluate({ document, policy, params: {} }, "entrypoint/report")[0].result;
@@ -91,10 +98,11 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
     const sound = report.results.length === rows && report.requirements.approved.subjects.matching === matching;
     console.log(`A report on 100 deployments ${name} used ${usedMB.toFixed(1)} MB of Wasm memory (budget ${budgetMB} MB)`);
     if (!sound) console.error("The memory budget's report didn't come out as expected, so its measurement can't be trusted");
-    if (usedMB > budgetMB) console.error(`That's over the budget. Wasm doesn't cache function calls and frees nothing until the report is done, so look for something worked out again per row, or a large regular expression compiled for every report.`);
+    if (usedMB > budgetMB) console.error(`That's over the budget. Wasm doesn't cache function calls and frees nothing until the report is done, so look for something worked out again per row, or a large regular expression compiled for every report, or for every parent of a subject read from another subject.`);
     return sound && usedMB <= budgetMB;
   };
   const withOps = await measure("with checks written with op", budgetPolicy, 338, 66, 20);
   const withSentences = await measure("with checks written as sentences", sentencePolicy, 301, 66, 12);
-  process.exit(failed.length > 0 || !withOps || !withSentences ? 1 : 0);
+  const withChain = await measure("with the tests of each prod deployment as subjects", chainPolicy, 265, 132, 40);
+  process.exit(failed.length > 0 || !withOps || !withSentences || !withChain ? 1 : 0);
 });
