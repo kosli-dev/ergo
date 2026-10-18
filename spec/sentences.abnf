@@ -22,7 +22,7 @@ for-item          = quantifier WS path [WS whose] [if-any] WS "as" WS alias
 alias             = bare-key
 
 ; A subject's from: line.
-from-line         = path [WS "named" WS "by" WS "each" WS "of" WS right-path] [WS whose]
+from-line         = ["every" WS] path [WS "named" WS "by" WS "each" WS "of" WS right-path] [WS whose]
 
 ; whose keeps the items that pass every condition.
 whose             = "whose" WS condition *(WS "and" WS condition)

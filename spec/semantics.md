@@ -381,6 +381,12 @@ A policy has two sections. `subjects` defines each kind of subject once, and `re
 
 **[subjects.chain.scope]** A parent its own conditions leave out gives no rows at all: its child subjects aren't subjects of the requirement, so nothing in them is read, not even their ids. A parent whose conditions can't be decided, like `environment is "prod"` on an artifact without `environment`, gets one `$min_subjects` row, with its `in`, that fails with the condition's cause, even with `min_subjects: 0`, and its child subjects aren't read or checked, so it has no `$unique_ids` row.
 
+**[subjects.every]** A `from` line with `every` (see [sentence.subject.every](sentences.md#subjects)) reads its path one step at a time, as [walk.lists](#every-and-some) says, with `if_any` true, and each value at the end is a subject, in the order the walk reaches them. A value at the end that isn't a list item must be an object. The subjects don't belong to the items the walk went through: their rows have no `in`, and a check can't read those items.
+
+**[subjects.every.count]** Subjects read with `every` are counted once, across every list, so there's one `$min_subjects` row and one `$unique_ids` row, and ids must be unique across all of them. An empty list adds no subject and fails nothing, so a path whose lists are all empty finds none, and `$min_subjects` fails with `value`, or passes with `min_subjects: 0`.
+
+**[subjects.every.broken]** A place where the walk breaks, a list that's missing, `null` or not a list, or a value at the end that isn't an object, fails `$min_subjects` with the worst cause found, even with `min_subjects: 0`, and the subjects that could be read are still checked. A path where no step walks a list breaks as [walk.lists](#every-and-some) says. The `$min_subjects` row of a subject read with `every` has `failed_items`, sorted by path: one entry for each place the walk broke, with its `path`, its `item`, the same path, its `cause` and the `value` it read, or `null` when it's missing or can't be read. It's `[]` when nothing broke.
+
 **[subjects.id]** A subject definition's `identified_by` is a path inside each subject. Its value is the subject's id, or `null` when the path doesn't end `found`. With no steps, the id is the whole subject, so an item that isn't an object is its own id. A subject without an id still gets its rows.
 
 **[subjects.not_an_object]** An item that isn't an object is still a subject, and its checks fail as the [paths](#reading-a-path) they read say, usually `not_an_object`.

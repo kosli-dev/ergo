@@ -90,7 +90,7 @@ peer_approval:
 
 ## Subjects
 
-**[sentence.subject.from]** A subject's `from` takes the shape of a `for` item without `every` or `as`: a path, optionally `named by each of` a list, optionally `whose` with conditions joined by `and`. `applies_to` goes. The conditions read the subject, as a `whose` reads its item:
+**[sentence.subject.from]** A subject's `from` takes the shape of a `for` item without `as`, and without `every` unless it reads every list along its path ([sentence.subject.every](#subjects)): a path, optionally `named by each of` a list, optionally `whose` with conditions joined by `and`. `applies_to` goes. The conditions read the subject, as a `whose` reads its item:
 
 ```yaml
 subjects:
@@ -98,6 +98,8 @@ subjects:
     from: deployments whose environment is "prod" and change_type is "emergency"
     identified_by: id
 ```
+
+**[sentence.subject.every]** `every` in front of a `from` line's path walks every list along the path, the last one included, as `every` does in a check ([sentence.every.walk](#every-some-and-whose)), and each value it ends at is a subject: `from: every artifacts.pull_requests` makes every pull request of every artifact a subject. They're one flat list, independent of the artifacts: their rows have no `in`, and they're counted once ([subjects.every](semantics.md#requirements)). Without `every`, a path through a list reads nothing, as before. `every` can't go with a path that starts at another subject's name, which is written wrong with `every can't go with a from line that starts at another subject yet`, or with `named by each of`, which is written wrong too, because the names would be read under every list item with no `in` to tell them apart. A child subject does that one parent at a time. Like a check's walk, it takes ten steps at most, and an eleventh is written wrong.
 
 **[sentence.subject.condition]** A condition in that `whose` is like any `whose` condition: a path and a phrase, or a `count of` or `sum of` and a comparison. pr-reviewer has six, like `whose count of compliance_status.attestations_statuses.claude-review.attestation_data.personas_ran is at least 1`.
 
