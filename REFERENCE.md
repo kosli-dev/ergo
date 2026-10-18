@@ -224,14 +224,62 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
       identified_by: url
   ```
 
-  and every row of a requirement on `pull request` says which artifact it belongs to, under `in`:
+  The pull requests are a **child subject** of `artifact`: they only exist under an artifact that's in scope, and each one belongs to one artifact. Every row of a requirement on `pull request` says which, under `in`, apart from `$well_formed`, which is about the requirement as written:
 
   ```json
   {"check": "approved", "subject": {"type": "pull request", "id": "pr/8", "in": {"artifact": "sha-1"}}, "passed": false, "cause": "value",
    "inputs": [{"name": "approved_by", "value": ""}]}
   ```
 
-  A check reads the artifact by its name, like `artifact.name`. This works when the artifact is one subject. When it's none, the pull requests are none too. When it's several, `$min_subjects` fails as `unusable`, since that isn't supported yet ([#210](https://github.com/kosli-dev/ergo/issues/210)). A chain of more than two subjects is written wrong, and so is a subject that builds on one with `of` or a from line that narrows it. Only checks written as sentences can read the artifact.
+  A check reads the artifact by its name, like `artifact.name`. Only checks written as sentences can read it.
+
+  When the artifact is several subjects, the pull requests of each are read and checked in turn. With this input:
+
+  ```json
+  {"trail": {"artifacts": [
+    {"fingerprint": "sha-1", "environment": "prod", "pull_requests": [{"url": "pr/7", "approvals": 2}, {"url": "pr/8", "approvals": 0}]},
+    {"fingerprint": "sha-2", "environment": "prod", "pull_requests": []},
+    {"fingerprint": "sha-3", "environment": "staging", "pull_requests": [{"url": "pr/9", "approvals": 0}]},
+    {"fingerprint": "sha-4", "pull_requests": [{"url": "pr/10", "approvals": 1}]}
+  ]}}
+  ```
+
+  and these subjects and requirement:
+
+  ```yaml
+  subjects:
+    artifact:
+      from: trail.artifacts whose environment is "prod"
+      identified_by: fingerprint
+    pull request:
+      from: artifact.pull_requests
+      identified_by: url
+  requirements:
+    reviewed:
+      subject: pull request
+      checks:
+        approved: approvals is at least 1
+  ```
+
+  the report has these rows:
+
+  ```json
+  {"check": "$well_formed",  "subject": {"type": "pull request", "id": null}, "passed": true, "cause": "satisfied"}
+  {"check": "$min_subjects", "subject": {"type": "pull request", "id": null, "in": {"artifact": "sha-1"}}, "passed": true, "cause": "satisfied"}
+  {"check": "$min_subjects", "subject": {"type": "pull request", "id": null, "in": {"artifact": "sha-2"}}, "passed": false, "cause": "value"}
+  {"check": "$min_subjects", "subject": {"type": "pull request", "id": null, "in": {"artifact": "sha-4"}}, "passed": false, "cause": "absent"}
+  {"check": "$unique_ids",   "subject": {"type": "pull request", "id": null, "in": {"artifact": "sha-1"}}, "passed": true, "cause": "satisfied"}
+  {"check": "$unique_ids",   "subject": {"type": "pull request", "id": null, "in": {"artifact": "sha-2"}}, "passed": true, "cause": "satisfied"}
+  {"check": "approved",      "subject": {"type": "pull request", "id": "pr/7", "in": {"artifact": "sha-1"}}, "passed": true, "cause": "satisfied"}
+  {"check": "approved",      "subject": {"type": "pull request", "id": "pr/8", "in": {"artifact": "sha-1"}}, "passed": false, "cause": "value"}
+  ```
+
+  - Each artifact gets its own `$min_subjects` and `$unique_ids` rows. `sha-2` has no pull requests, so it fails on its own row, unless the requirement has `min_subjects: 0`. Ids only need to be unique within each artifact, so `pr/7` under two artifacts is fine.
+  - `sha-3` is out of scope, so its pull requests aren't subjects at all and it has no rows. Nothing in them is read, so `pr/9` isn't checked.
+  - `sha-4` has no `environment`, so ergo can't tell whether it's in scope. Its `$min_subjects` row fails with the cause, even with `min_subjects: 0`, and its pull requests aren't checked.
+  - When no artifact is in scope, there's one `$min_subjects` row with no `in`. It fails with `value`, or passes with `min_subjects: 0`, as for any subject that finds none.
+
+  A chain of more than two subjects is written wrong, since that isn't supported yet ([#210](https://github.com/kosli-dev/ergo/issues/210)), and so is a subject that builds on a child subject with `of` or a from line that narrows it.
 - A `from` line can't go with `applies_to`. A `from` or `identified_by` that can't be read is written wrong, and the `$well_formed` row says why, like `{"name": "subjects.x.from", "value": ["doesn't parse"]}`.
 
 ### A subject built on another
@@ -353,9 +401,9 @@ and written out in full, its inputs are named `compliance_status.attestations_st
 - Keep the data's own names, as `findings` and `coverage` do, because a reader who knows the data finds `coverage.attestation_data.hunks_total` where they'd look for it.
 - An alias is read wherever a bare first key reads the subject: in the subject's checks, in the assertions of a `for` line, and in the conditions of the subject's `from` line and of a subject that narrows it. It isn't read in a `whose` or in the argument of a one-line `every` or `some`, where a bare first key is a field of the item. `named by` a part's alias is written wrong, with `named by coverage reads a part, which isn't supported yet`.
 - An alias shadows a field of the subject with the same name, and `.coverage` doesn't get around it: that dot only marks a field named like a word of the grammar. To read the field, give the part another name.
-- An alias is a bare word that isn't a word of the grammar, `params` or `input`, or it is written wrong with `invalid alias`. Two aliases with the same name are written wrong with `alias given twice`: two parts of a subject, a part and one a subject keeps from a subject it narrows, a part and an alias of a `for` line in a check of the subject, a part and the name of the subject a chained subject reads from, and in the [old syntax](#subjects-in-the-old-syntax) a part and an `as` or `each_as` alias.
+- An alias is a bare word that isn't a word of the grammar, `params` or `input`, or it is written wrong with `invalid alias`. Two aliases with the same name are written wrong with `alias given twice`: two parts of a subject, a part and one a subject keeps from a subject it narrows, a part and an alias of a `for` line in a check of the subject, a part and the name of the parent a child subject reads from, and in the [old syntax](#subjects-in-the-old-syntax) a part and an `as` or `each_as` alias.
 - A subject that narrows another keeps its parts and can add its own. The report lists them all.
-- A [chained subject](#from-lines) reads its parent's parts through the parent's name, and its `from` line can start from one. With `{"params": {"artifact_name": "web"}}` and this input:
+- A [child subject](#from-lines) reads its parent's parts through the parent's name, and its `from` line can start from one. With `{"params": {"artifact_name": "web"}}` and this input:
 
   ```json
   {"trail": {"artifacts": {"web": {"fingerprint": "sha-1", "attestations_statuses": {

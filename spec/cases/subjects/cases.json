@@ -2879,7 +2879,7 @@
     },
     "cases": [
       {
-        "description": "reads its path from the parent's one subject, and every row carries the parent's id under in",
+        "description": "reads its path from the parent's one subject, and every row but $well_formed carries the parent's id under in",
         "expressions": {"s": {"$min_subjects": "count(matching(artifact.pulls)) >= 1", "$unique_ids": "count(repeated(ids(artifact.pulls))) == 0"}},
         "rules": [
           "added.text",
@@ -2932,9 +2932,6 @@
             "requirement": "s",
             "subject": {
               "id": null,
-              "in": {
-                "artifact": "a1"
-              },
               "type": "pull_request"
             }
           },
@@ -3032,9 +3029,10 @@
         ]
       },
       {
-        "description": "with more than one parent subject, finds none and fails min_subjects as unusable",
+        "description": "with more than one parent subject, reads the subjects of each and counts them per parent",
         "rules": [
           "subjects.chain",
+          "subjects.chain.count",
           "sentence.subject.chain"
         ],
         "input": {
@@ -3053,6 +3051,151 @@
               "pulls": []
             }
           ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met",
+            "subjects": {
+              "matching": 1,
+              "total": 1
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope pull_request count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope pull_request count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a2"
+              },
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated pull_request ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated pull_request ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a2"
+              },
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_assertions": [
+              {
+                "assertion": "artifact.name exists",
+                "cause": "value"
+              }
+            ],
+            "inputs": [
+              {
+                "name": "artifact.name",
+                "value": null
+              },
+              {
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "with no parent subject, finds none and fails min_subjects as value",
+        "rules": [
+          "subjects.chain"
+        ],
+        "input": {
+          "artifacts": []
         },
         "requirements": {
           "s": {
@@ -3085,7 +3228,7 @@
             }
           },
           {
-            "cause": "unusable",
+            "cause": "value",
             "check": "$min_subjects",
             "inputs": [
               {
@@ -3117,14 +3260,542 @@
             }
           }
         ]
+      }
+    ]
+  },
+  {
+    "description": "a subject that goes on into one of several subjects that its own conditions pick",
+    "policy": {
+      "subjects": {
+        "artifact": {
+          "from": "artifacts whose environment is \"prod\"",
+          "identified_by": "id"
+        },
+        "pull_request": {
+          "from": "artifact.pulls",
+          "identified_by": "id"
+        }
       },
+      "requirements": {
+        "s": {
+          "subject": "pull_request",
+          "checks": {
+            "c": "artifact.id exists and approvals is at least 1"
+          }
+        }
+      }
+    },
+    "cases": [
       {
-        "description": "with no parent subject, finds none and fails min_subjects as value",
+        "description": "checks ids are unique within each parent, so the same id under two parents is fine",
         "rules": [
-          "subjects.chain"
+          "subjects.chain",
+          "subjects.chain.count"
         ],
         "input": {
-          "artifacts": []
+          "artifacts": [
+            {
+              "id": "a1",
+              "environment": "prod",
+              "pulls": [
+                {
+                  "id": "p1",
+                  "approvals": 1
+                },
+                {
+                  "id": "p1",
+                  "approvals": 2
+                }
+              ]
+            },
+            {
+              "id": "a2",
+              "environment": "prod",
+              "pulls": [
+                {
+                  "id": "p1",
+                  "approvals": 1
+                }
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met",
+            "subjects": {
+              "matching": 3,
+              "total": 3
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope pull_request count",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope pull_request count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a2"
+              },
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated pull_request ids",
+                "value": [
+                  "p1"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated pull_request ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a2"
+              },
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_assertions": [],
+            "inputs": [
+              {
+                "name": "approvals",
+                "value": 1
+              },
+              {
+                "name": "artifact.id",
+                "value": "a1"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_assertions": [],
+            "inputs": [
+              {
+                "name": "approvals",
+                "value": 2
+              },
+              {
+                "name": "artifact.id",
+                "value": "a1"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_assertions": [],
+            "inputs": [
+              {
+                "name": "approvals",
+                "value": 1
+              },
+              {
+                "name": "artifact.id",
+                "value": "a2"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a2"
+              },
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "gives no rows for a parent its conditions leave out, even when its subjects repeat an id or fail",
+        "rules": [
+          "subjects.chain.scope"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a1",
+              "environment": "prod",
+              "pulls": [
+                {
+                  "id": "p1",
+                  "approvals": 1
+                }
+              ]
+            },
+            {
+              "id": "a2",
+              "environment": "dev",
+              "pulls": [
+                {
+                  "id": "p2",
+                  "approvals": 0
+                },
+                {
+                  "id": "p2"
+                }
+              ]
+            },
+            {
+              "id": "a3",
+              "environment": "dev",
+              "pulls": []
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "met",
+            "subjects": {
+              "matching": 1,
+              "total": 1
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope pull_request count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated pull_request ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_assertions": [],
+            "inputs": [
+              {
+                "name": "approvals",
+                "value": 1
+              },
+              {
+                "name": "artifact.id",
+                "value": "a1"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as absent on the row of a parent whose conditions can't be decided, and doesn't check its subjects",
+        "rules": [
+          "subjects.chain.scope"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a1",
+              "environment": "prod",
+              "pulls": [
+                {
+                  "id": "p1",
+                  "approvals": 1
+                }
+              ]
+            },
+            {
+              "id": "a2",
+              "pulls": [
+                {
+                  "id": "p2",
+                  "approvals": 0
+                },
+                {
+                  "id": "p2"
+                }
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met",
+            "subjects": {
+              "matching": 1,
+              "total": 1
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope pull_request count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope pull_request count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a2"
+              },
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated pull_request ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_assertions": [],
+            "inputs": [
+              {
+                "name": "approvals",
+                "value": 1
+              },
+              {
+                "name": "artifact.id",
+                "value": "a1"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "with every parent left out, fails min_subjects as value on one row without in",
+        "rules": [
+          "subjects.chain.count",
+          "subjects.chain.scope"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a1",
+              "environment": "dev",
+              "pulls": [
+                {
+                  "id": "p1",
+                  "approvals": 0
+                }
+              ]
+            }
+          ]
         },
         "requirements": {
           "s": {

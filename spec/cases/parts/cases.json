@@ -2230,9 +2230,6 @@
             "requirement": "r",
             "subject": {
               "id": null,
-              "in": {
-                "artifact": "sha-1"
-              },
               "type": "pull request"
             }
           },
