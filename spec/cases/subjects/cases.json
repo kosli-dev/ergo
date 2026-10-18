@@ -2880,7 +2880,9 @@
     "cases": [
       {
         "description": "reads its path from the parent's one subject, and every row carries the parent's id under in",
+        "expressions": {"s": {"$min_subjects": "count(matching(artifact.pulls)) >= 1", "$unique_ids": "count(repeated(ids(artifact.pulls))) == 0"}},
         "rules": [
+          "added.text",
           "subjects.chain",
           "sentence.subject.chain",
           "sentence.path.start",

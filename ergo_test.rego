@@ -9293,6 +9293,16 @@ _chain_subjects := {
 
 _chain_report(doc, subjects, checks, params) := ergo.report(doc, {"subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": checks}}}, params)
 
+test_a_chain_names_its_parent_in_the_expressions_of_the_checks_ergo_adds_as_its_from_line_does if {
+	rep := _chain_report(_chain_doc, _chain_subjects, {"c": "approved is true"}, {"name": "web"})
+	[rep.requirements.r.checks["$min_subjects"].expression, rep.requirements.r.checks["$unique_ids"].expression] == [
+		"count(matching(artifact.pull_requests)) >= 1",
+		"count(repeated(ids(artifact.pull_requests))) == 0",
+	]
+	quoted := {"locked thing": {"from": "trail.artifacts named by $params.name"}, "pull request": {"from": `"locked thing".pull_requests`, "identified_by": "url"}}
+	_chain_report(_chain_doc, quoted, {"c": "approved is true"}, {"name": "web"}).requirements.r.checks["$min_subjects"].expression == `count(matching("locked thing".pull_requests)) >= 1`
+}
+
 test_a_chain_reads_its_path_from_the_parents_one_subject_and_every_row_says_which if {
 	rep := _chain_report(_chain_doc, _chain_subjects, {"c": "approved is true"}, {"name": "web"})
 	[[r.subject, r.check, r.cause] | some r in rep.results] == [
