@@ -4456,8 +4456,8 @@ _applies_inputs(subj, req, item) := [inp |
 
 _evaluation(doc, req, name) := {
 	"well_formed": _well_formed_row(req, name),
-	"min_subjects": _min_subjects_row(doc, req, name, count(matching)),
-	"unique_ids": _unique_ids_row(refs, req, name),
+	"min_subjects": [_min_subjects_row(doc, req, name, count(matching))],
+	"unique_ids": [_unique_ids_row(refs, req, name)],
 	"applies": applies,
 	"subject_rows": groups,
 	"total": count(raw),
@@ -4524,8 +4524,8 @@ default _holds(_, _) := false
 
 _holds(req, e) if {
 	e.well_formed.passed
-	e.unique_ids.passed
-	e.min_subjects.passed
+	_all_passed(e.unique_ids)
+	_all_passed(e.min_subjects)
 	e.scope_readable
 	e.rows_complete
 	_required(_require_of(req), e.subject_rows)
@@ -4576,7 +4576,7 @@ _causes("not_met", e) := [{"cause": cause, "rows": n} |
 ]
 
 _requirement_rows(e) := array.concat(
-	array.concat([e.well_formed, e.min_subjects, e.unique_ids], e.applies),
+	array.concat(array.concat([e.well_formed], array.concat(e.min_subjects, e.unique_ids)), e.applies),
 	[row | some group in e.subject_rows; some row in group],
 )
 
@@ -4594,8 +4594,8 @@ _results(policy, evaluations) := array.concat(
 	array.concat(
 		[evaluations[name].well_formed | some name in _names(policy)],
 		array.concat(
-			[evaluations[name].min_subjects | some name in _names(policy)],
-			[evaluations[name].unique_ids | some name in _names(policy)],
+			[row | some name in _names(policy); some row in evaluations[name].min_subjects],
+			[row | some name in _names(policy); some row in evaluations[name].unique_ids],
 		),
 	),
 	array.concat(
@@ -4900,22 +4900,60 @@ _evaluated(doc, req, name) := e if {
 
 _evaluated(doc, req, name) := _chain_evaluation(req, name, _parent_pick(doc, req)) if _chained(req)
 
-_chain_evaluation(req, name, pick) := e if {
-	"subject" in object.keys(pick)
-	e := _evaluation(pick.subject, req, name) with data.ergo_in as {pick.parent: pick.id} with data.ergo_parent as {pick.parent: pick.subject}
+_chain_evaluation(req, name, pick) := _parents_evaluation(req, name, [_parent_evaluation(req, name, pick.parent, p) | some p in pick.parents]) if {
+	"parents" in object.keys(pick)
+	count(pick.parents) > 0
 }
 
-_chain_evaluation(req, name, pick) := object.union(base, {
-	"min_subjects": _parent_min_subjects_row(req, name, pick.cause),
+_chain_evaluation(req, name, pick) := _no_parent_evaluation(req, name, "none") if {
+	"parents" in object.keys(pick)
+	count(pick.parents) == 0
+}
+
+_chain_evaluation(req, name, pick) := _no_parent_evaluation(req, name, pick.cause) if "cause" in object.keys(pick)
+
+_no_parent_evaluation(req, name, cause) := object.union(_evaluation({}, req, name), {
+	"min_subjects": [_parent_min_subjects_row(req, name, cause)],
 	"applies": [],
 	"subject_rows": [],
 	"total": 0,
 	"matching": 0,
 	"scope_readable": true,
 	"rows_complete": true,
-}) if {
-	"cause" in object.keys(pick)
-	base := _evaluation({}, req, name)
+})
+
+_parent_evaluation(req, name, parent, p) := e if {
+	"subject" in object.keys(p)
+	e := _evaluation(p.subject, req, name) with data.ergo_in as {parent: p.id} with data.ergo_parent as {parent: p.subject}
+}
+
+_parent_evaluation(req, name, parent, p) := {
+	"min_subjects": [row],
+	"unique_ids": [],
+	"applies": [],
+	"subject_rows": [],
+	"total": 0,
+	"matching": 0,
+	"scope_readable": true,
+	"rows_complete": true,
+} if {
+	"cause" in object.keys(p)
+	row := _parent_min_subjects_row(req, name, p.cause) with data.ergo_in as {parent: p.id}
+}
+
+_parents_evaluation(req, name, es) := {
+	"well_formed": _well_formed_row(req, name),
+	"min_subjects": [row | some e in es; some row in e.min_subjects],
+	"unique_ids": [row | some e in es; some row in e.unique_ids],
+	"applies": [row | some e in es; some row in e.applies],
+	"subject_rows": [group | some e in es; some group in e.subject_rows],
+	"total": sum([e.total | some e in es]),
+	"matching": sum([e.matching | some e in es]),
+	"scope_readable": every_readable,
+	"rows_complete": every_complete,
+} if {
+	every_readable := count([e | some e in es; not e.scope_readable]) == 0
+	every_complete := count([e | some e in es; not e.rows_complete]) == 0
 }
 
 _chained(req) if {
@@ -4949,20 +4987,29 @@ _parent_pick_of(doc, preq) := {"cause": c} if {
 }
 
 _parent_pick_from(raw, refs, applies, preq) := {"cause": _worst_of({row.cause | some row in applies} - {"satisfied", "value"})} if {
+	_size(_applies_to_of(preq)) == 0
 	not _scope_readable(raw, applies, preq)
-} else := _single_parent(raw, refs, applies, preq)
+} else := {"parent": preq.subject, "parents": [p |
+	some i, entry in raw
+	some p in _parent_of(entry, refs[i], applies, i, preq)
+]}
 
-_single_parent(raw, refs, applies, preq) := {"subject": raw[i].subject, "id": refs[i].id, "parent": preq.subject} if {
-	kept := _kept_parents(raw, applies, preq)
-	count(kept) == 1
-	i := kept[0]
-} else := {"cause": "none"} if {
-	count(_kept_parents(raw, applies, preq)) == 0
-} else := {"cause": "unusable"}
+_parent_of(entry, ref, _, _, preq) := [{"subject": entry.subject, "id": ref.id}] if _size(_applies_to_of(preq)) == 0
 
-_kept_parents(raw, _, preq) := [i | some i, _ in raw] if _size(_applies_to_of(preq)) == 0
+_parent_of(entry, ref, applies, i, preq) := [{"subject": entry.subject, "id": ref.id}] if {
+	_size(_applies_to_of(preq)) > 0
+	applies[i].passed
+}
 
-_kept_parents(_, applies, preq) := [i | some i, row in applies; row.passed] if _size(_applies_to_of(preq)) > 0
+_parent_of(_, ref, applies, i, preq) := [{"id": ref.id, "cause": applies[i].cause}] if {
+	_size(_applies_to_of(preq)) > 0
+	not applies[i].cause in {"satisfied", "value"}
+}
+
+_parent_of(_, _, applies, i, preq) := [] if {
+	_size(_applies_to_of(preq)) > 0
+	applies[i].cause == "value"
+}
 
 _parent_min_subjects_row(req, name, "none") := {
 	"requirement": name,
