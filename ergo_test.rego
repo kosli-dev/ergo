@@ -11933,4 +11933,6 @@ test_a_parent_read_with_every_gives_its_child_subjects_per_parent if {
 		["c", "pr/7", {"artifact": "b"}],
 	]
 	rep.requirements.r.status == "met"
+	broken := ergo.report({"flows": [{"artifacts": [{"fingerprint": "a", "pull_requests": [{"url": "pr/7"}]}]}, {}]}, {"subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": {"c": "url exists"}}}}, {})
+	[[r.check, r.cause, object.get(r.subject, "in", null)] | some r in broken.results; r.check != "$well_formed"] == [["$min_subjects", "absent", null], ["$unique_ids", "satisfied", null]]
 }
