@@ -6,11 +6,37 @@ Draft 0.1. This file covers the syntax policies use today, where a check is a JS
 
 ## Policies
 
-**[policy.shape]** A policy is an object with two sections. `subjects` maps each subject's name to its definition, with `from`, `identified_by`, `applies_to` and `description`, or to `null` for a subject with none of them (see [subjects.no_from](semantics.md#requirements)). `requirements` maps each requirement's name to its definition, with `subject`, `checks`, `require`, `min_subjects`, `description` and `meta`. `subject` is the name of an entry in `subjects`. The policy can also have a `description` and a `meta` of its own, next to its sections. A subject definition can also build on another with `of`, which the spec doesn't cover yet (see [OPEN.md](OPEN.md)).
+**[policy.shape]** A policy is an object with two sections. `subjects` maps each subject's name to its definition, with `from`, `identified_by`, `applies_to`, `has` and `description`, or to `null` for a subject with none of them (see [subjects.no_from](semantics.md#requirements)). `requirements` maps each requirement's name to its definition, with `subject`, `checks`, `require`, `min_subjects`, `description` and `meta`. `subject` is the name of an entry in `subjects`. The policy can also have a `description` and a `meta` of its own, next to its sections. A subject definition can also build on another with `of`, which the spec doesn't cover yet (see [OPEN.md](OPEN.md)).
 
 **[sentence_ops.syntax]** `empty_string_or_list`, `not_empty_string_or_list`, `not_in`, `has_type`, `all_of`, `every`, `some` and `for`, the comparisons `starts_with`, `ends_with`, `in`, `not_in`, `includes`, `excludes`, `includes_all`, `excludes_all`, `matches_any` and `not_matches_any` of `compare`, and the `compare` sides `count_of`, `sum_of` and an `add` with `text`, are only read from sentences. A check in this syntax with one of them as its `op` is written wrong, with `unknown op <op>`, a `compare` with one of them as its `cmp` with `invalid cmp`, and one with one of them as a side with `invalid left` or `invalid right`, as a misspelt operator is, wherever it is and even when it's a copy of what a sentence in the same policy reads into. Whether a check was written as a sentence decides, not what it looks like.
 
 **[policy.old_fields]** A requirement that has `from`, `identified_by`, `applies_to` or `subject_type`, or any other field it doesn't take, is written wrong, and the `$well_formed` row lists the field with `["unknown field"]`. A subject definition with a field it doesn't take is written wrong the same way. So is one with `id`, the old name for `identified_by`.
+
+## Parts
+
+A subject can have parts, named paths inside itself. What a part means is in [semantics.md](semantics.md#parts), and how a sentence reads one in [sentences.md](sentences.md#paths).
+
+**[parts.syntax]** `has` on a subject definition is an object. Each key is a part's alias, and each value is the part: a path in a string, or an object with `from`, a path in a string, and optionally `identified_by`, a path in a string that is read inside the part. Nothing reads `identified_by` yet, but the report shows it. A part is written the same way whichever syntax the subject's checks use. A subject that narrows another, with `of` or a from line, can have `has` too.
+
+```yaml
+subjects:
+  round:
+    from: trail
+    identified_by: name
+    has:
+      findings: compliance_status.attestations_statuses.findings.attestation_data
+      coverage:
+        from: compliance_status.attestations_statuses.coverage-verification
+        identified_by: attestation_id
+```
+
+**[parts.path]** A part's path is written as a path in a `from` line is (see [sentence.path.string](sentences.md#paths)): keys joined by `.`, keys in double quotes, positions, and `named by` a key of `$params` or `$input`. It is a path inside the subject, so it can't start at `$params` or `$input`, and it has no `whose`, `count of` or `named by each of`. A part is as often a path to one value as to a whole attestation.
+
+**[parts.alias]** An alias is a bare word that starts with an ASCII letter or `_` and goes on with ASCII letters, digits, `_` or `-`. It isn't a word of the grammar (see [sentence.words](sentences.md#words-a-field-cant-be-called)), `params` or `input`, or it's written wrong with `invalid alias`. Two aliases with the same name are written wrong with `alias given twice`: two parts of one subject, a part and one a subject keeps from a subject it narrows, a part and a `for` alias in a check of the subject, a part and the name of the subject a chained subject reads from, and in the old syntax a part and an `as` or `each_as` alias.
+
+**[parts.written_wrong]** A part written wrong makes its subject written wrong, so the `$well_formed` row of every requirement that uses the subject fails. It lists the problems under the part's alias, like `subjects.round.has.coverage`, and under `subjects.round.has` when `has` isn't an object, which is written `not an object`. A part that's neither a string nor an object is written `not a string or an object`, and an object without `from` `missing from`. A field other than `from` and `identified_by` is written `unknown field <name>`, and a `from` or `identified_by` that isn't a string `invalid from` or `invalid identified_by`. A path that can't be read is written `from: <problem>` or `identified_by: <problem>`, with the problems of a path in a `from` line, or `a part is a path: whose and named by each of can't go in it` and `a part reads inside its subject, so it can't start at $params or $input`. A bad alias is written `invalid alias` and a repeated one `alias given twice`. A part written wrong is never read as an alias, and the report still lists it, see [report.subjects](semantics.md#statuses).
+
+**[parts.old_syntax]** A check written with `op` reads a part as `$alias` in the first step of a path, like `["$coverage", "attestation_data", "hunks_total"]`, wherever it can read an alias given by `as`, including in the paths of a derived value and of a custom operator's `inputs`, in a substitute, and in the filters of `applies_to`. Inside an item of `all` or `any`, `$alias` still reads the subject, as any alias from outside the item does. Any other `$name` that nothing gave is `unknown alias $<name>` as before.
 
 ## Paths
 
@@ -78,6 +104,8 @@ A row's `inputs`, a ref's entry in `$refs`, an item in `failed_items` and a path
 
 **[name.list]** Inside `all` or `any`, a path is named after the list: `cs[].s`, or `cs[]` for the items themselves. With `each`, the inner lists are `prs[].cs`.
 
+**[name.part]** A path that starts with a part's alias is named with the alias, and the steps the alias stands for aren't named, so the full path `compliance_status.attestations_statuses.coverage-verification.attestation_data.hunks_total` is `coverage.attestation_data.hunks_total` when it was written with the alias. In the old syntax the alias keeps its `$`, like `$coverage.attestation_data.hunks_total`, as `$pr.author` does. A path read through a chained subject's parent, like `artifact.pr_attestation.approvers`, is named the same way, and a list the alias stands for is `coverage[]` when it's walked. A path written in full is named in full, whether or not a part stands for it. A position is never hidden: when a walk (`every`, `some`, `count of`, `sum of`, a `for` line) goes through a list inside a part's path, not at its end, every name from that walk uses the full path, like `pull_requests[2].reviews[0].state` for a part `reviews` that stands for `pull_requests.reviews`. Only the names differ: a row's `expression`, `inputs` and the paths of its `failed_items` use the alias, and the values in them are the same.
+
 ## Expressions
 
 Each check's definition in the report has an `expression` that says what it checks.
@@ -118,7 +146,7 @@ Each check's definition in the report has an `expression` that says what it chec
 
 ## Checks ergo adds
 
-**[added.text]** The checks ergo adds have these descriptions and expressions, where `<type>` is the name of the requirement's subject, and `<from>` is the name of the subject's `from`, or `$input` when it has no steps:
+**[added.text]** The checks ergo adds have these descriptions and expressions, where `<type>` is the name of the requirement's subject, and `<from>` is the name of the subject's `from`, or `$input` when it has no steps. A subject read from a part of its parent shows its `from` as written, with the parent's name and the part's alias, like `artifact.pr_attestation.pull_requests`:
 
 | Check           | Description                                                                                           | Expression                                                  |
 | --------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |

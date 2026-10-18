@@ -1,0 +1,2974 @@
+[
+  {
+    "description": "a subject with two parts, one written as a line and one with an id",
+    "policy": {
+      "subjects": {
+        "round": {
+          "from": "trail",
+          "identified_by": "name",
+          "has": {
+            "findings": "compliance_status.attestations_statuses.findings.attestation_data",
+            "coverage": {
+              "from": "compliance_status.attestations_statuses.coverage-verification",
+              "identified_by": "attestation_id"
+            }
+          }
+        }
+      },
+      "requirements": {
+        "review_round": {
+          "subject": "round",
+          "checks": {
+            "complete": "findings.truncated is false",
+            "every_hunk_acknowledged": "coverage.attestation_data.hunks_acknowledged equals coverage.attestation_data.hunks_total"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads each alias as the path inside the subject, and the names in the rows and expressions keep the alias",
+        "rules": [
+          "parts.syntax",
+          "parts.path",
+          "parts.swap",
+          "sentence.path.part",
+          "name.part"
+        ],
+        "input": {
+          "trail": {
+            "name": "t1",
+            "compliance_status": {
+              "attestations_statuses": {
+                "findings": {
+                  "attestation_data": {
+                    "truncated": false
+                  }
+                },
+                "coverage-verification": {
+                  "attestation_data": {
+                    "hunks_acknowledged": 3,
+                    "hunks_total": 3
+                  }
+                }
+              }
+            }
+          }
+        },
+        "expressions": {
+          "review_round": {
+            "complete": "findings.truncated is false",
+            "every_hunk_acknowledged": "coverage.attestation_data.hunks_acknowledged equals coverage.attestation_data.hunks_total"
+          }
+        },
+        "report": {
+          "subjects": {
+            "round": {
+              "description": "",
+              "from": "trail",
+              "identified_by": "name",
+              "parts": {
+                "coverage": {
+                  "from": "compliance_status.attestations_statuses.coverage-verification",
+                  "identified_by": "attestation_id"
+                },
+                "findings": {
+                  "from": "compliance_status.attestations_statuses.findings.attestation_data",
+                  "identified_by": null
+                }
+              }
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "complete",
+            "inputs": [
+              {
+                "name": "findings.truncated",
+                "value": false
+              }
+            ],
+            "passed": true,
+            "requirement": "review_round",
+            "subject": {
+              "id": "t1",
+              "type": "round"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "every_hunk_acknowledged",
+            "inputs": [
+              {
+                "name": "coverage.attestation_data.hunks_acknowledged",
+                "value": 3
+              },
+              {
+                "name": "coverage.attestation_data.hunks_total",
+                "value": 3
+              }
+            ],
+            "passed": true,
+            "requirement": "review_round",
+            "subject": {
+              "id": "t1",
+              "type": "round"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as value when a field of a part holds the wrong value",
+        "rules": [
+          "parts.swap"
+        ],
+        "input": {
+          "trail": {
+            "name": "t1",
+            "compliance_status": {
+              "attestations_statuses": {
+                "findings": {
+                  "attestation_data": {
+                    "truncated": true
+                  }
+                },
+                "coverage-verification": {
+                  "attestation_data": {
+                    "hunks_acknowledged": 3,
+                    "hunks_total": 3
+                  }
+                }
+              }
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "complete",
+            "inputs": [
+              {
+                "name": "findings.truncated",
+                "value": true
+              }
+            ],
+            "passed": false,
+            "requirement": "review_round",
+            "subject": {
+              "id": "t1",
+              "type": "round"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "every_hunk_acknowledged",
+            "inputs": [
+              {
+                "name": "coverage.attestation_data.hunks_acknowledged",
+                "value": 3
+              },
+              {
+                "name": "coverage.attestation_data.hunks_total",
+                "value": 3
+              }
+            ],
+            "passed": true,
+            "requirement": "review_round",
+            "subject": {
+              "id": "t1",
+              "type": "round"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when the part is missing, as the full path would",
+        "rules": [
+          "parts.swap",
+          "path.absent"
+        ],
+        "input": {
+          "trail": {
+            "name": "t1",
+            "compliance_status": {
+              "attestations_statuses": {
+                "findings": {
+                  "attestation_data": {
+                    "truncated": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "complete",
+            "inputs": [
+              {
+                "name": "findings.truncated",
+                "value": false
+              }
+            ],
+            "passed": true,
+            "requirement": "review_round",
+            "subject": {
+              "id": "t1",
+              "type": "round"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "every_hunk_acknowledged",
+            "inputs": [
+              {
+                "name": "coverage.attestation_data.hunks_acknowledged",
+                "value": null
+              },
+              {
+                "name": "coverage.attestation_data.hunks_total",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "review_round",
+            "subject": {
+              "id": "t1",
+              "type": "round"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when the part is null, because a step follows it",
+        "rules": [
+          "parts.swap",
+          "path.absent"
+        ],
+        "input": {
+          "trail": {
+            "name": "t1",
+            "compliance_status": {
+              "attestations_statuses": {
+                "findings": {
+                  "attestation_data": null
+                },
+                "coverage-verification": {
+                  "attestation_data": null
+                }
+              }
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "complete",
+            "inputs": [
+              {
+                "name": "findings.truncated",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "review_round",
+            "subject": {
+              "id": "t1",
+              "type": "round"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "every_hunk_acknowledged",
+            "inputs": [
+              {
+                "name": "coverage.attestation_data.hunks_acknowledged",
+                "value": null
+              },
+              {
+                "name": "coverage.attestation_data.hunks_total",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "review_round",
+            "subject": {
+              "id": "t1",
+              "type": "round"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when the part is a string, as the full path would",
+        "rules": [
+          "parts.swap",
+          "path.unusable"
+        ],
+        "input": {
+          "trail": {
+            "name": "t1",
+            "compliance_status": {
+              "attestations_statuses": {
+                "findings": {
+                  "attestation_data": "truncated"
+                },
+                "coverage-verification": {
+                  "attestation_data": "done"
+                }
+              }
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "complete",
+            "inputs": [
+              {
+                "name": "findings.truncated",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "review_round",
+            "subject": {
+              "id": "t1",
+              "type": "round"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "every_hunk_acknowledged",
+            "inputs": [
+              {
+                "name": "coverage.attestation_data.hunks_acknowledged",
+                "value": null
+              },
+              {
+                "name": "coverage.attestation_data.hunks_total",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "review_round",
+            "subject": {
+              "id": "t1",
+              "type": "round"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when something on the way to the part can't hold a key",
+        "rules": [
+          "parts.swap",
+          "path.unusable"
+        ],
+        "input": {
+          "trail": {
+            "name": "t1",
+            "compliance_status": "ok"
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "complete",
+            "inputs": [
+              {
+                "name": "findings.truncated",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "review_round",
+            "subject": {
+              "id": "t1",
+              "type": "round"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "every_hunk_acknowledged",
+            "inputs": [
+              {
+                "name": "coverage.attestation_data.hunks_acknowledged",
+                "value": null
+              },
+              {
+                "name": "coverage.attestation_data.hunks_total",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "review_round",
+            "subject": {
+              "id": "t1",
+              "type": "round"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "the same check written with an alias and with the path it stands for",
+    "policy": {
+      "subjects": {
+        "s": {
+          "from": "items",
+          "identified_by": "id",
+          "has": {
+            "cov": "d.b"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "s",
+          "checks": {
+            "alias": "cov.x is at least cov.n",
+            "full": "d.b.x is at least d.b.n"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "gives the same row apart from the names of the inputs",
+        "rules": [
+          "parts.swap",
+          "name.part"
+        ],
+        "input": {
+          "items": [
+            {
+              "id": "a",
+              "d": {
+                "b": {
+                  "x": 3,
+                  "n": 2
+                }
+              }
+            },
+            {
+              "id": "b",
+              "d": {
+                "b": {
+                  "x": 1,
+                  "n": 2
+                }
+              }
+            }
+          ]
+        },
+        "expressions": {
+          "r": {
+            "alias": "cov.x is at least cov.n",
+            "full": "d.b.x is at least d.b.n"
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "alias",
+            "inputs": [
+              {
+                "name": "cov.x",
+                "value": 3
+              },
+              {
+                "name": "cov.n",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "s"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "full",
+            "inputs": [
+              {
+                "name": "d.b.x",
+                "value": 3
+              },
+              {
+                "name": "d.b.n",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "s"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "alias",
+            "inputs": [
+              {
+                "name": "cov.x",
+                "value": 1
+              },
+              {
+                "name": "cov.n",
+                "value": 2
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "b",
+              "type": "s"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "full",
+            "inputs": [
+              {
+                "name": "d.b.x",
+                "value": 1
+              },
+              {
+                "name": "d.b.n",
+                "value": 2
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "b",
+              "type": "s"
+            }
+          }
+        ]
+      },
+      {
+        "description": "gives the same rows when the part is missing, null or a string",
+        "rules": [
+          "parts.swap"
+        ],
+        "input": {
+          "items": [
+            {
+              "id": "a",
+              "d": {}
+            },
+            {
+              "id": "b",
+              "d": {
+                "b": null
+              }
+            },
+            {
+              "id": "c",
+              "d": {
+                "b": "text"
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "alias",
+            "inputs": [
+              {
+                "name": "cov.x",
+                "value": null
+              },
+              {
+                "name": "cov.n",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "s"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "full",
+            "inputs": [
+              {
+                "name": "d.b.x",
+                "value": null
+              },
+              {
+                "name": "d.b.n",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "s"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "alias",
+            "inputs": [
+              {
+                "name": "cov.x",
+                "value": null
+              },
+              {
+                "name": "cov.n",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "b",
+              "type": "s"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "full",
+            "inputs": [
+              {
+                "name": "d.b.x",
+                "value": null
+              },
+              {
+                "name": "d.b.n",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "b",
+              "type": "s"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "alias",
+            "inputs": [
+              {
+                "name": "cov.x",
+                "value": null
+              },
+              {
+                "name": "cov.n",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c",
+              "type": "s"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "full",
+            "inputs": [
+              {
+                "name": "d.b.x",
+                "value": null
+              },
+              {
+                "name": "d.b.n",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "c",
+              "type": "s"
+            }
+          }
+        ]
+      },
+      {
+        "description": "gives the same rows when the subject is not an object",
+        "rules": [
+          "parts.swap",
+          "path.not_an_object"
+        ],
+        "input": {
+          "items": [
+            "text",
+            null,
+            5
+          ]
+        },
+        "results": [
+          {
+            "cause": "not_an_object",
+            "check": "alias",
+            "inputs": [
+              {
+                "name": "cov.x",
+                "value": null
+              },
+              {
+                "name": "cov.n",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "text",
+              "type": "s"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "full",
+            "inputs": [
+              {
+                "name": "d.b.x",
+                "value": null
+              },
+              {
+                "name": "d.b.n",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "text",
+              "type": "s"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "alias",
+            "inputs": [
+              {
+                "name": "cov.x",
+                "value": null
+              },
+              {
+                "name": "cov.n",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "full",
+            "inputs": [
+              {
+                "name": "d.b.x",
+                "value": null
+              },
+              {
+                "name": "d.b.n",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "alias",
+            "inputs": [
+              {
+                "name": "cov.x",
+                "value": null
+              },
+              {
+                "name": "cov.n",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": 5,
+              "type": "s"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "full",
+            "inputs": [
+              {
+                "name": "d.b.x",
+                "value": null
+              },
+              {
+                "name": "d.b.n",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": 5,
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "where a part's alias is read",
+    "policy": {
+      "subjects": {
+        "round": {
+          "from": "rounds whose cov.x is 1",
+          "identified_by": "id",
+          "has": {
+            "cov": "d.b",
+            "lst": "d.items"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "round",
+          "checks": {
+            "in_assertion": {
+              "for": "every lst as it",
+              "assert": [
+                "it.x is cov.x",
+                "cov.s exists"
+              ]
+            },
+            "item_level": "every lst.x whose cov is at least 5 is cov",
+            "shadows": "cov.n is 2",
+            "dot": ".cov.n is 2"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the alias in the conditions of the from line, in a for line's assertions, and not in a whose or in the argument of a one-line every",
+        "rules": [
+          "parts.where",
+          "sentence.path.part",
+          "sentence.subject.from"
+        ],
+        "input": {
+          "rounds": [
+            {
+              "id": "a",
+              "cov": {
+                "n": 9
+              },
+              "d": {
+                "b": {
+                  "x": 1,
+                  "s": "t",
+                  "n": 2
+                },
+                "items": [
+                  {
+                    "x": 1,
+                    "cov": 5
+                  },
+                  {
+                    "x": 1,
+                    "cov": 1
+                  }
+                ]
+              }
+            },
+            {
+              "id": "b",
+              "d": {
+                "b": {
+                  "x": 2,
+                  "s": "t",
+                  "n": 2
+                },
+                "items": []
+              }
+            }
+          ]
+        },
+        "expressions": {
+          "r": {
+            "in_assertion": "for every lst as it: it.x equals cov.x and cov.s exists",
+            "item_level": "every lst.x whose cov is at least 5 equals cov",
+            "$applies": "cov.x is 1"
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "cov.x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "round"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "cov.x",
+                "value": 2
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "b",
+              "type": "round"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "dot",
+            "inputs": [
+              {
+                "name": "cov.n",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "round"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "in_assertion",
+            "failed_items": [],
+            "inputs": [
+              {
+                "name": "cov.s",
+                "value": "t"
+              },
+              {
+                "name": "cov.x",
+                "value": 1
+              },
+              {
+                "name": "lst[]",
+                "value": [
+                  {
+                    "cov": 5,
+                    "x": 1
+                  },
+                  {
+                    "cov": 1,
+                    "x": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "round"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "item_level",
+            "failed_items": [
+              {
+                "cause": "value",
+                "item": "item 1 of lst",
+                "path": "lst[0].x",
+                "value": 1
+              }
+            ],
+            "inputs": [
+              {
+                "name": "lst[].x",
+                "value": [
+                  1,
+                  1
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "round"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "shadows",
+            "inputs": [
+              {
+                "name": "cov.n",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "round"
+            }
+          }
+        ]
+      },
+      {
+        "description": "an alias shadows a field with the same name, and the dot in front doesn't get around it",
+        "rules": [
+          "parts.shadow",
+          "sentence.path.part"
+        ],
+        "input": {
+          "rounds": [
+            {
+              "id": "a",
+              "cov": {
+                "n": 3
+              },
+              "d": {
+                "b": {
+                  "x": 1,
+                  "s": "t",
+                  "n": 2
+                },
+                "items": [
+                  {
+                    "x": 1
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "cov.x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "round"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "dot",
+            "inputs": [
+              {
+                "name": "cov.n",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "round"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "in_assertion",
+            "failed_items": [],
+            "inputs": [
+              {
+                "name": "cov.s",
+                "value": "t"
+              },
+              {
+                "name": "cov.x",
+                "value": 1
+              },
+              {
+                "name": "lst[]",
+                "value": [
+                  {
+                    "x": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "round"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "item_level",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "item 1 of lst",
+                "path": "lst[0].cov",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "name": "lst[].x",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "round"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "shadows",
+            "inputs": [
+              {
+                "name": "cov.n",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "round"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an alias that is also a for alias",
+    "policy": {
+      "subjects": {
+        "round": {
+          "from": "rounds",
+          "identified_by": "id",
+          "has": {
+            "cov": "d.b"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "round",
+          "checks": {
+            "c": {
+              "for": "every d.items as cov",
+              "assert": "cov.x is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, and the check fails",
+        "rules": [
+          "parts.alias",
+          "parts.written_wrong",
+          "sentence.for.alias"
+        ],
+        "input": {
+          "rounds": [
+            {
+              "id": "a",
+              "d": {
+                "b": {
+                  "x": 1
+                },
+                "items": [
+                  {
+                    "x": 1
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "alias given twice"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "round"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "c",
+            "inputs": [],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "round"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "named by an alias that is a part",
+    "policy": {
+      "subjects": {
+        "round": {
+          "from": "rounds",
+          "identified_by": "id",
+          "has": {
+            "cov": "d.k"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "round",
+          "checks": {
+            "c": "$params.m named by cov is 1"
+          }
+        }
+      }
+    },
+    "params": {
+      "m": {
+        "q": 1
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, because it would otherwise read the field",
+        "rules": [
+          "sentence.path.part",
+          "parts.written_wrong"
+        ],
+        "input": {
+          "rounds": [
+            {
+              "id": "a",
+              "cov": "q",
+              "d": {
+                "k": "q"
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "named by cov reads a part, which isn't supported yet"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "round"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "c",
+            "inputs": [],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "round"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject that narrows another keeps its parts and adds its own",
+    "policy": {
+      "subjects": {
+        "round": {
+          "from": "rounds",
+          "identified_by": "id",
+          "has": {
+            "cov": "d.b"
+          }
+        },
+        "good round": {
+          "from": "round whose cov.x is 1",
+          "has": {
+            "extra": "d.e"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "good round",
+          "checks": {
+            "c": "cov.n is 2 and extra is 5"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the kept part in its conditions and in its checks, and its own part in its checks",
+        "rules": [
+          "parts.narrow",
+          "parts.where",
+          "sentence.subject.narrow"
+        ],
+        "input": {
+          "rounds": [
+            {
+              "id": "a",
+              "d": {
+                "b": {
+                  "x": 1,
+                  "n": 2
+                },
+                "e": 5
+              }
+            },
+            {
+              "id": "b",
+              "d": {
+                "b": {
+                  "x": 2,
+                  "n": 2
+                },
+                "e": 5
+              }
+            }
+          ]
+        },
+        "report": {
+          "subjects": {
+            "round": {
+              "description": "",
+              "from": "rounds",
+              "identified_by": "id",
+              "parts": {
+                "cov": {
+                  "from": "d.b",
+                  "identified_by": null
+                }
+              }
+            },
+            "good round": {
+              "description": "",
+              "from": "round whose cov.x is 1",
+              "identified_by": "id",
+              "parts": {
+                "cov": {
+                  "from": "d.b",
+                  "identified_by": null
+                },
+                "extra": {
+                  "from": "d.e",
+                  "identified_by": null
+                }
+              }
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "cov.x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "good round"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "cov.x",
+                "value": 2
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "b",
+              "type": "good round"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_assertions": [],
+            "inputs": [
+              {
+                "name": "cov.n",
+                "value": 2
+              },
+              {
+                "name": "extra",
+                "value": 5
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "good round"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject that narrows another and adds a part with a kept alias",
+    "policy": {
+      "subjects": {
+        "round": {
+          "from": "rounds",
+          "identified_by": "id",
+          "has": {
+            "cov": "d.b"
+          }
+        },
+        "good round": {
+          "from": "round whose cov.x is 1",
+          "has": {
+            "cov": "d.q"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "good round",
+          "checks": {
+            "c": "cov.n is 2"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong with alias given twice, under the part",
+        "rules": [
+          "parts.alias",
+          "parts.written_wrong",
+          "parts.narrow"
+        ],
+        "input": {
+          "rounds": [
+            {
+              "id": "a",
+              "d": {
+                "b": {
+                  "x": 1,
+                  "n": 2
+                },
+                "q": {
+                  "n": 2
+                }
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "subjects.\"good round\".has.cov",
+                "value": [
+                  "alias given twice"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "good round"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "cov.x",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "good round"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a chained subject reads its parent's parts",
+    "policy": {
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts named by $params.art",
+          "identified_by": "fingerprint",
+          "has": {
+            "pra": "attestations.pr"
+          }
+        },
+        "pull request": {
+          "from": "artifact.pra.pull_requests",
+          "identified_by": "url",
+          "has": {
+            "rev": "reviews"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pull request",
+          "checks": {
+            "parent": "artifact.pra.name is \"w\"",
+            "own": "rev.count is 2",
+            "field": "pra is 1"
+          }
+        }
+      }
+    },
+    "params": {
+      "art": "web"
+    },
+    "cases": [
+      {
+        "description": "starts from a part of the parent, reads a part of the parent by the parent's name, and reads a bare alias of the parent as a field",
+        "rules": [
+          "parts.chain",
+          "subjects.chain",
+          "sentence.subject.chain"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": {
+              "web": {
+                "fingerprint": "sha-1",
+                "pra": 1,
+                "attestations": {
+                  "pr": {
+                    "name": "w",
+                    "pull_requests": [
+                      {
+                        "url": "pr/7",
+                        "reviews": {
+                          "count": 2
+                        }
+                      },
+                      {
+                        "url": "pr/8",
+                        "reviews": {
+                          "count": 1
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "expressions": {
+          "r": {
+            "$min_subjects": "count(matching(artifact.pra.pull_requests)) >= 1",
+            "$unique_ids": "count(repeated(ids(artifact.pra.pull_requests))) == 0"
+          }
+        },
+        "report": {
+          "subjects": {
+            "artifact": {
+              "description": "",
+              "from": "trail.artifacts named by $params.art",
+              "identified_by": "fingerprint",
+              "parts": {
+                "pra": {
+                  "from": "attestations.pr",
+                  "identified_by": null
+                }
+              }
+            },
+            "pull request": {
+              "description": "",
+              "from": "artifact.pra.pull_requests",
+              "identified_by": "url",
+              "parts": {
+                "rev": {
+                  "from": "reviews",
+                  "identified_by": null
+                }
+              }
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "field",
+            "inputs": [
+              {
+                "name": "pra",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "pr/7",
+              "in": {
+                "artifact": "sha-1"
+              },
+              "type": "pull request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "own",
+            "inputs": [
+              {
+                "name": "rev.count",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "pr/7",
+              "in": {
+                "artifact": "sha-1"
+              },
+              "type": "pull request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "parent",
+            "inputs": [
+              {
+                "name": "artifact.pra.name",
+                "value": "w"
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "pr/7",
+              "in": {
+                "artifact": "sha-1"
+              },
+              "type": "pull request"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "field",
+            "inputs": [
+              {
+                "name": "pra",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "pr/8",
+              "in": {
+                "artifact": "sha-1"
+              },
+              "type": "pull request"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "own",
+            "inputs": [
+              {
+                "name": "rev.count",
+                "value": 1
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "pr/8",
+              "in": {
+                "artifact": "sha-1"
+              },
+              "type": "pull request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "parent",
+            "inputs": [
+              {
+                "name": "artifact.pra.name",
+                "value": "w"
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "pr/8",
+              "in": {
+                "artifact": "sha-1"
+              },
+              "type": "pull request"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a chained subject with a part named like its parent",
+    "policy": {
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts named by $params.art",
+          "identified_by": "fingerprint",
+          "has": {
+            "pra": "attestations.pr"
+          }
+        },
+        "pull request": {
+          "from": "artifact.pra.pull_requests",
+          "identified_by": "url",
+          "has": {
+            "artifact": "reviews"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pull request",
+          "checks": {
+            "c": "url exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "art": "web"
+    },
+    "cases": [
+      {
+        "description": "is written wrong with alias given twice",
+        "rules": [
+          "parts.alias",
+          "parts.written_wrong",
+          "parts.chain"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": {
+              "web": {
+                "fingerprint": "sha-1",
+                "attestations": {
+                  "pr": {
+                    "pull_requests": [
+                      {
+                        "url": "pr/7"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "subjects.\"pull request\".has.artifact",
+                "value": [
+                  "alias given twice"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "sha-1"
+              },
+              "type": "pull request"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "url",
+                "value": "pr/7"
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "pr/7",
+              "in": {
+                "artifact": "sha-1"
+              },
+              "type": "pull request"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject with parts and checks written with op",
+    "policy": {
+      "subjects": {
+        "s": {
+          "from": [
+            "items"
+          ],
+          "identified_by": [
+            "id"
+          ],
+          "has": {
+            "cov": "d.b",
+            "lst": "d.items"
+          },
+          "applies_to": {
+            "has_cov": {
+              "op": "present",
+              "path": [
+                "$cov",
+                "x"
+              ]
+            }
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "s",
+          "checks": {
+            "equals": {
+              "op": "equals",
+              "path": [
+                "$cov",
+                "x"
+              ],
+              "value": 1
+            },
+            "all": {
+              "op": "all",
+              "path": [
+                "$lst"
+              ],
+              "check": {
+                "op": "equals",
+                "path": [
+                  "x"
+                ],
+                "value": 1
+              }
+            },
+            "inside": {
+              "op": "all",
+              "path": [
+                "$lst"
+              ],
+              "check": {
+                "op": "equals",
+                "path": [
+                  "$cov",
+                  "x"
+                ],
+                "value": 1
+              }
+            },
+            "derived": {
+              "op": "compare",
+              "left": {
+                "count": [
+                  "$lst"
+                ]
+              },
+              "right": {
+                "literal": 2
+              },
+              "cmp": "eq"
+            },
+            "unknown": {
+              "op": "present",
+              "path": [
+                "$other",
+                "x"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads $alias as the part in a path, in a filter, inside all, and in a derived value, and keeps the dollar in the names",
+        "rules": [
+          "parts.old_syntax",
+          "name.part",
+          "parts.swap"
+        ],
+        "input": {
+          "items": [
+            {
+              "id": "a",
+              "d": {
+                "b": {
+                  "x": 1
+                },
+                "items": [
+                  {
+                    "x": 1
+                  },
+                  {
+                    "x": 2
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "expressions": {
+          "r": {
+            "equals": "$cov.x == 1",
+            "all": "every $lst: x == 1",
+            "inside": "every $lst: $cov.x == 1",
+            "derived": "count($lst) eq 2",
+            "$applies": "$cov.x is present"
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 5
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.unknown",
+                "value": [
+                  "unknown alias $other"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "$cov.x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "s"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "all",
+            "failed_items": [
+              {
+                "cause": "value",
+                "item": "item 2 of $lst",
+                "path": "item 2 of $lst",
+                "value": {
+                  "x": 2
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "name": "$lst[].x",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "s"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "derived",
+            "inputs": [
+              {
+                "name": "count($lst)",
+                "value": 2
+              },
+              {
+                "name": "$lst",
+                "value": [
+                  {
+                    "x": 1
+                  },
+                  {
+                    "x": 2
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "s"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "equals",
+            "inputs": [
+              {
+                "name": "$cov.x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "s"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "inside",
+            "failed_items": [],
+            "inputs": [
+              {
+                "name": "$lst[]",
+                "value": [
+                  {
+                    "x": 1
+                  },
+                  {
+                    "x": 2
+                  }
+                ]
+              },
+              {
+                "name": "$cov.x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "s"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "unknown",
+            "inputs": [
+              {
+                "name": "$other.x",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "s"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as the path would when the part is missing",
+        "rules": [
+          "parts.old_syntax",
+          "parts.swap"
+        ],
+        "input": {
+          "items": [
+            {
+              "id": "a",
+              "d": {}
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "$cov.x",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part with the alias of an as in the old syntax",
+    "policy": {
+      "subjects": {
+        "s": {
+          "from": [
+            "items"
+          ],
+          "identified_by": [
+            "id"
+          ],
+          "has": {
+            "cov": "d.b"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "s",
+          "checks": {
+            "c": {
+              "op": "all",
+              "path": [
+                "d",
+                "items"
+              ],
+              "as": "cov",
+              "check": {
+                "op": "present",
+                "path": [
+                  "x"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong with alias given twice",
+        "rules": [
+          "parts.alias",
+          "parts.written_wrong",
+          "parts.old_syntax"
+        ],
+        "input": {
+          "items": [
+            {
+              "id": "a",
+              "d": {
+                "b": {
+                  "x": 1
+                },
+                "items": [
+                  {
+                    "x": 1
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "alias given twice"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "ill_formed",
+                "item": "item 1 of d.items",
+                "path": "item 1 of d.items",
+                "value": {
+                  "x": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "name": "d.items[].x",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject whose parts are written wrong",
+    "policy": {
+      "subjects": {
+        "round": {
+          "from": "rounds",
+          "identified_by": "id",
+          "has": {
+            "num": 5,
+            "nofrom": {
+              "identified_by": "id"
+            },
+            "extra": {
+              "from": "x",
+              "other": 1
+            },
+            "fromnum": {
+              "from": 1
+            },
+            "idnum": {
+              "from": "x",
+              "identified_by": 1
+            },
+            "who": "x whose y is 1",
+            "each_of": "x named by each of $params.k",
+            "in_params": "$params.x",
+            "in_input": "$input.x",
+            "bare_by": "x named by foo",
+            "blank": "",
+            "idbad": {
+              "from": "x",
+              "identified_by": "y whose z is 1"
+            },
+            "$dollar": "x",
+            "with space": "x",
+            "every": "x",
+            "ok": "x"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "round",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails $well_formed with a problem under each part's alias",
+        "rules": [
+          "parts.written_wrong",
+          "parts.alias",
+          "parts.path",
+          "parts.syntax"
+        ],
+        "input": {
+          "rounds": [
+            {
+              "id": "a"
+            }
+          ]
+        },
+        "report": {
+          "subjects": {
+            "round": {
+              "description": "",
+              "from": "rounds",
+              "identified_by": "id",
+              "parts": {
+                "$dollar": {
+                  "from": "x",
+                  "identified_by": null
+                },
+                "bare_by": {
+                  "from": "<invalid from>",
+                  "identified_by": null
+                },
+                "blank": {
+                  "from": "<invalid from>",
+                  "identified_by": null
+                },
+                "each_of": {
+                  "from": "<invalid from>",
+                  "identified_by": null
+                },
+                "every": {
+                  "from": "x",
+                  "identified_by": null
+                },
+                "extra": {
+                  "from": "x",
+                  "identified_by": null
+                },
+                "fromnum": {
+                  "from": "<invalid from>",
+                  "identified_by": null
+                },
+                "idbad": {
+                  "from": "x",
+                  "identified_by": "<invalid identified_by>"
+                },
+                "idnum": {
+                  "from": "x",
+                  "identified_by": "<invalid identified_by>"
+                },
+                "in_input": {
+                  "from": "<invalid from>",
+                  "identified_by": null
+                },
+                "in_params": {
+                  "from": "<invalid from>",
+                  "identified_by": null
+                },
+                "nofrom": {
+                  "from": "<invalid from>",
+                  "identified_by": "id"
+                },
+                "num": {
+                  "from": "<invalid from>",
+                  "identified_by": null
+                },
+                "ok": {
+                  "from": "x",
+                  "identified_by": null
+                },
+                "who": {
+                  "from": "<invalid from>",
+                  "identified_by": null
+                },
+                "with space": {
+                  "from": "x",
+                  "identified_by": null
+                }
+              }
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "subjects.round.has.$dollar",
+                "value": [
+                  "invalid alias"
+                ]
+              },
+              {
+                "name": "subjects.round.has.bare_by",
+                "value": [
+                  "from: unknown alias foo"
+                ]
+              },
+              {
+                "name": "subjects.round.has.blank",
+                "value": [
+                  "from: doesn't parse"
+                ]
+              },
+              {
+                "name": "subjects.round.has.each_of",
+                "value": [
+                  "from: a part is a path: whose and named by each of can't go in it"
+                ]
+              },
+              {
+                "name": "subjects.round.has.every",
+                "value": [
+                  "invalid alias"
+                ]
+              },
+              {
+                "name": "subjects.round.has.extra",
+                "value": [
+                  "unknown field other"
+                ]
+              },
+              {
+                "name": "subjects.round.has.fromnum",
+                "value": [
+                  "invalid from"
+                ]
+              },
+              {
+                "name": "subjects.round.has.idbad",
+                "value": [
+                  "identified_by: a part is a path: whose and named by each of can't go in it"
+                ]
+              },
+              {
+                "name": "subjects.round.has.idnum",
+                "value": [
+                  "invalid identified_by"
+                ]
+              },
+              {
+                "name": "subjects.round.has.in_input",
+                "value": [
+                  "from: a part reads inside its subject, so it can't start at $params or $input"
+                ]
+              },
+              {
+                "name": "subjects.round.has.in_params",
+                "value": [
+                  "from: a part reads inside its subject, so it can't start at $params or $input"
+                ]
+              },
+              {
+                "name": "subjects.round.has.nofrom",
+                "value": [
+                  "missing from"
+                ]
+              },
+              {
+                "name": "subjects.round.has.num",
+                "value": [
+                  "not a string or an object"
+                ]
+              },
+              {
+                "name": "subjects.round.has.who",
+                "value": [
+                  "from: a part is a path: whose and named by each of can't go in it"
+                ]
+              },
+              {
+                "name": "subjects.round.has.\"with space\"",
+                "value": [
+                  "invalid alias"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "round"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "id",
+                "value": "a"
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "round"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject whose has is not an object",
+    "policy": {
+      "subjects": {
+        "round": {
+          "from": "rounds",
+          "identified_by": "id",
+          "has": [
+            "x"
+          ]
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "round",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails $well_formed under has",
+        "rules": [
+          "parts.written_wrong",
+          "parts.syntax"
+        ],
+        "input": {
+          "rounds": [
+            {
+              "id": "a"
+            }
+          ]
+        },
+        "report": {
+          "subjects": {
+            "round": {
+              "description": "",
+              "from": "rounds",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "subjects.round.has",
+                "value": [
+                  "not an object"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "round"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "id",
+                "value": "a"
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "round"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "the parts a report lists",
+    "policy": {
+      "subjects": {
+        "round": {
+          "from": "rounds",
+          "identified_by": "id",
+          "has": {
+            "a": "  d.b  ",
+            "b": {
+              "from": "d.\"x y\".z",
+              "identified_by": "attestation_id"
+            },
+            "c": "d.m named by $params.k",
+            "e": "item 3 of d.items",
+            "f": "d.items[1].y"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "round",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists every part with its path written as a sentence writes it, and null for an id it doesn't have",
+        "rules": [
+          "report.subjects",
+          "parts.syntax",
+          "parts.path"
+        ],
+        "input": {
+          "rounds": [
+            {
+              "id": "a"
+            }
+          ]
+        },
+        "report": {
+          "subjects": {
+            "round": {
+              "description": "",
+              "from": "rounds",
+              "identified_by": "id",
+              "parts": {
+                "a": {
+                  "from": "d.b",
+                  "identified_by": null
+                },
+                "b": {
+                  "from": "d.\"x y\".z",
+                  "identified_by": "attestation_id"
+                },
+                "c": {
+                  "from": "d.m named by $params.k",
+                  "identified_by": null
+                },
+                "e": {
+                  "from": "item 3 of d.items",
+                  "identified_by": null
+                },
+                "f": {
+                  "from": "d.items[1].y",
+                  "identified_by": null
+                }
+              }
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "id",
+                "value": "a"
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "round"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part whose path goes through a list",
+    "policy": {
+      "subjects": {
+        "s": {
+          "from": [],
+          "has": {
+            "reviews": "pull_requests.reviews"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "s",
+          "checks": {
+            "all_ok": "every reviews.state is \"ok\""
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "names a failed item with the full path, so no position is hidden",
+        "rules": [
+          "name.part",
+          "parts.swap"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "reviews": [
+                {
+                  "state": "ok"
+                }
+              ]
+            },
+            {
+              "reviews": [
+                {
+                  "state": "ok"
+                },
+                {
+                  "state": "ok"
+                }
+              ]
+            },
+            {
+              "reviews": [
+                {
+                  "state": "bad"
+                },
+                {
+                  "state": "ok"
+                }
+              ]
+            }
+          ]
+        },
+        "expressions": {
+          "r": {
+            "all_ok": "every reviews.state is \"ok\""
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "all_ok",
+            "failed_items": [
+              {
+                "cause": "value",
+                "item": "item 1 of pull_requests[2].reviews",
+                "path": "pull_requests[2].reviews[0].state",
+                "value": "bad"
+              }
+            ],
+            "inputs": [
+              {
+                "name": "pull_requests[].reviews[].state",
+                "value": [
+                  "ok",
+                  "ok",
+                  "ok",
+                  "bad",
+                  "ok"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "pull_requests": [
+                  {
+                    "reviews": [
+                      {
+                        "state": "ok"
+                      }
+                    ]
+                  },
+                  {
+                    "reviews": [
+                      {
+                        "state": "ok"
+                      },
+                      {
+                        "state": "ok"
+                      }
+                    ]
+                  },
+                  {
+                    "reviews": [
+                      {
+                        "state": "bad"
+                      },
+                      {
+                        "state": "ok"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -93,6 +93,83 @@
         "of": {
           "type": "string",
           "description": "The name of another subject this one builds on. A subject with of has no from or identified_by of its own."
+        },
+        "has": {
+          "type": "object",
+          "description": "The subject's parts: named paths inside it, so a check can write a short alias where a long path would go. Each key is the alias.",
+          "propertyNames": {
+            "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$",
+            "not": {
+              "enum": [
+                "a",
+                "after",
+                "an",
+                "and",
+                "as",
+                "at",
+                "before",
+                "between",
+                "count",
+                "days",
+                "each",
+                "empty",
+                "equal",
+                "every",
+                "false",
+                "first",
+                "hours",
+                "in",
+                "input",
+                "item",
+                "last",
+                "less",
+                "minutes",
+                "more",
+                "named",
+                "not",
+                "null",
+                "of",
+                "on",
+                "one",
+                "or",
+                "params",
+                "plus",
+                "seconds",
+                "some",
+                "sum",
+                "to",
+                "true",
+                "weeks",
+                "whose",
+                "within"
+              ]
+            }
+          },
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string",
+                "description": "A path inside the subject, written as in a from line, with no whose, count of or named by each of."
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "type": "string",
+                    "description": "A path inside the subject, written as above."
+                  },
+                  "identified_by": {
+                    "type": "string",
+                    "description": "A path inside the part, to the value that identifies it. Nothing reads it yet."
+                  }
+                },
+                "required": [
+                  "from"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
         }
       },
       "additionalProperties": false
