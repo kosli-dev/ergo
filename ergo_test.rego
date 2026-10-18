@@ -9449,8 +9449,12 @@ test_a_chain_from_several_parents_reads_each_parents_part_with_its_own_id if {
 test_a_chain_whose_parent_is_written_wrong_is_written_wrong_too if {
 	broken := {"artifact": {"from": "trail.artifacts whose", "identified_by": "fingerprint"}, "pull request": {"from": "artifact.pull_requests", "identified_by": "url"}}
 	_from_problems(_chain_report(_chain_doc, broken, {"c": "url exists"}, {})) == [{"name": "subjects.artifact.from", "value": ["doesn't parse"]}]
+	four := object.union(_chain_subjects, {"x": {"from": "artifact.pull_requests"}, "y": {"from": "x.reviews"}, "pull request": {"from": "y.comments"}})
+	_from_problems(_chain_report(_chain_doc, four, {"c": "url exists"}, {"name": "web"})) == [{"name": `subjects."pull request".from`, "value": ["a chain of more than three subjects isn't supported yet"]}]
 	three := object.union(_chain_subjects, {"x": {"from": "artifact.pull_requests"}, "pull request": {"from": "x.reviews"}})
-	_from_problems(_chain_report(_chain_doc, three, {"c": "url exists"}, {"name": "web"})) == [{"name": `subjects."pull request".from`, "value": ["a chain of more than two subjects isn't supported yet"]}]
+	_from_problems(_chain_report(_chain_doc, three, {"c": "url exists"}, {"name": "web"})) == []
+	grand_broken := {"artifact": {"from": "trail.artifacts whose", "identified_by": "fingerprint"}, "x": {"from": "artifact.pull_requests"}, "pull request": {"from": "x.reviews", "identified_by": "url"}}
+	_from_problems(_chain_report(_chain_doc, grand_broken, {"c": "url exists"}, {})) == [{"name": "subjects.artifact.from", "value": ["doesn't parse"]}]
 }
 
 test_a_from_line_that_starts_at_input_reads_the_input_and_one_at_params_is_written_wrong if {
@@ -11985,4 +11989,97 @@ test_a_parent_read_with_every_gives_its_child_subjects_per_parent if {
 	rep.requirements.r.status == "met"
 	broken := ergo.report({"flows": [{"artifacts": [{"fingerprint": "a", "pull_requests": [{"url": "pr/7"}]}]}, {}]}, {"subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": {"c": "url exists"}}}}, {})
 	[[r.check, r.cause, object.get(r.subject, "in", null)] | some r in broken.results; r.check != "$well_formed"] == [["$min_subjects", "absent", null], ["$unique_ids", "satisfied", null]]
+}
+
+_three_doc := {"artifacts": [
+	{"fingerprint": "sha-1", "env": "prod", "atts": {"pr": {"id": "att-1", "pull_requests": [
+		{"url": "pr/7", "state": "MERGED", "commits": [{"sha": "c1", "verified": true}, {"sha": "c2", "verified": false}]},
+		{"url": "pr/8", "state": "MERGED", "commits": []},
+		{"url": "pr/9", "state": "OPEN", "commits": [{"sha": "c9", "verified": false}, {"sha": "c9"}]},
+	]}}},
+	{"fingerprint": "sha-2", "env": "dev", "atts": {"pr": {"id": "att-2", "pull_requests": [{"url": "pr/7", "state": "MERGED", "commits": [{"sha": "c1", "verified": false}]}]}}},
+	{"fingerprint": "sha-4", "env": "prod", "atts": {"pr": {"id": "att-4", "pull_requests": [{"url": "pr/7", "state": "MERGED", "commits": [{"sha": "c1", "verified": true}, {"sha": "c1", "verified": true}]}]}}},
+]}
+
+_three_subjects := {
+	"artifact": {"from": `artifacts whose env is "prod"`, "identified_by": "fingerprint", "has": {"pr_att": {"from": "atts.pr", "identified_by": "id"}}},
+	"pull request": {"from": `artifact.pr_att.pull_requests whose state is "MERGED"`, "identified_by": "url"},
+	"commit": {"from": `"pull request".commits`, "identified_by": "sha"},
+}
+
+_three_report(doc, checks) := ergo.report(doc, {"subjects": _three_subjects, "requirements": {"r": {"subject": "commit", "checks": checks}}}, {})
+
+test_a_chain_of_three_subjects_checks_each_grandchild_and_its_rows_list_every_ancestor if {
+	rep := _three_report(_three_doc, {"c": "verified is true"})
+	[[r.check, r.subject, r.cause] | some r in rep.results] == [
+		["$well_formed", {"type": "commit", "id": null}, "satisfied"],
+		["$min_subjects", {"type": "commit", "id": null, "in": {"artifact": "sha-1", "pull request": "pr/7"}}, "satisfied"],
+		["$min_subjects", {"type": "commit", "id": null, "in": {"artifact": "sha-1", "pull request": "pr/8"}}, "value"],
+		["$min_subjects", {"type": "commit", "id": null, "in": {"artifact": "sha-4", "pull request": "pr/7"}}, "satisfied"],
+		["$unique_ids", {"type": "commit", "id": null, "in": {"artifact": "sha-1", "pull request": "pr/7"}}, "satisfied"],
+		["$unique_ids", {"type": "commit", "id": null, "in": {"artifact": "sha-1", "pull request": "pr/8"}}, "satisfied"],
+		["$unique_ids", {"type": "commit", "id": null, "in": {"artifact": "sha-4", "pull request": "pr/7"}}, "value"],
+		["c", {"type": "commit", "id": "c1", "in": {"artifact": "sha-1", "pull request": "pr/7"}}, "satisfied"],
+		["c", {"type": "commit", "id": "c2", "in": {"artifact": "sha-1", "pull request": "pr/7"}}, "value"],
+		["c", {"type": "commit", "id": "c1", "in": {"artifact": "sha-4", "pull request": "pr/7"}}, "satisfied"],
+		["c", {"type": "commit", "id": "c1", "in": {"artifact": "sha-4", "pull request": "pr/7"}}, "satisfied"],
+	]
+	rep.requirements.r.subjects == {"total": 4, "matching": 4}
+	rep.requirements.r.checks["$min_subjects"].expression == `count(matching("pull request".commits)) >= 1`
+}
+
+test_a_check_of_a_chain_of_three_subjects_reads_every_ancestor_and_its_parts_by_name if {
+	rep := _three_report(_three_doc, {"c": `artifact.fingerprint exists and "pull request".url exists and artifact.pr_att.id exists and sha exists`})
+	[[r.subject.id, r.subject.in, r.inputs] | some r in rep.results; r.check == "c"; r.subject.in.artifact == "sha-1"] == [
+		["c1", {"artifact": "sha-1", "pull request": "pr/7"}, [
+			{"name": `"pull request".url`, "value": "pr/7"},
+			{"name": "artifact.fingerprint", "value": "sha-1"},
+			{"name": "artifact.pr_att.id", "value": "att-1", "part": {"name": "artifact.pr_att", "id": "att-1"}},
+			{"name": "sha", "value": "c1"},
+		]],
+		["c2", {"artifact": "sha-1", "pull request": "pr/7"}, [
+			{"name": `"pull request".url`, "value": "pr/7"},
+			{"name": "artifact.fingerprint", "value": "sha-1"},
+			{"name": "artifact.pr_att.id", "value": "att-1", "part": {"name": "artifact.pr_att", "id": "att-1"}},
+			{"name": "sha", "value": "c2"},
+		]],
+	]
+	[r.inputs[2].part.id | some r in rep.results; r.check == "c"; r.subject.in.artifact == "sha-4"] == ["att-4", "att-4"]
+	[r.cause | some r in rep.results; r.check == "c"] == ["satisfied", "satisfied", "satisfied", "satisfied"]
+}
+
+test_scope_applies_at_every_level_of_a_chain_of_three_subjects if {
+	rep := _three_report(_three_doc, {"c": "verified is true"})
+	{r.subject.in.artifact | some r in rep.results; "in" in object.keys(r.subject)} == {"sha-1", "sha-4"}
+	{r.subject.in["pull request"] | some r in rep.results; "in" in object.keys(r.subject)} == {"pr/7", "pr/8"}
+}
+
+test_an_ancestor_of_a_chain_of_three_subjects_that_cant_be_decided_fails_min_subjects_on_its_row if {
+	doc := {"artifacts": [
+		{"fingerprint": "sha-1", "atts": {"pr": {"pull_requests": [{"url": "pr/7", "state": "MERGED", "commits": [{"sha": "c1", "verified": true}]}]}}},
+		{"fingerprint": "sha-2", "env": "prod", "atts": {"pr": {"pull_requests": [{"url": "pr/8", "commits": [{"sha": "c2", "verified": true}]}]}}},
+	]}
+	rep := _three_report(doc, {"c": "verified is true"})
+	[[r.check, r.subject, r.cause] | some r in rep.results; r.check != "$well_formed"] == [
+		["$min_subjects", {"type": "commit", "id": null, "in": {"artifact": "sha-1"}}, "absent"],
+		["$min_subjects", {"type": "commit", "id": null, "in": {"artifact": "sha-2", "pull request": "pr/8"}}, "absent"],
+	]
+	rep.requirements.r.status == "not_met"
+}
+
+test_a_chain_of_three_subjects_with_no_grandparent_or_no_parent_in_scope_fails_min_subjects_on_one_row if {
+	none := _three_report({"artifacts": [{"fingerprint": "sha-2", "env": "dev"}]}, {"c": "verified is true"})
+	[[r.cause, object.keys(r.subject)] | some r in none.results; r.check == "$min_subjects"] == [["value", {"type", "id"}]]
+	empty := _three_report({"artifacts": [{"fingerprint": "sha-1", "env": "prod", "atts": {"pr": {"pull_requests": []}}}]}, {"c": "verified is true"})
+	[[r.cause, object.keys(r.subject)] | some r in empty.results; r.check == "$min_subjects"] == [["value", {"type", "id"}]]
+	gone := _three_report({"artifacts": [{"fingerprint": "sha-1", "env": "prod"}]}, {"c": "verified is true"})
+	[[r.cause, r.subject.in] | some r in gone.results; r.check == "$min_subjects"] == [["absent", {"artifact": "sha-1"}]]
+	unread := _three_report({}, {"c": "verified is true"})
+	[[r.cause, object.keys(r.subject)] | some r in unread.results; r.check == "$min_subjects"] == [["absent", {"type", "id"}]]
+}
+
+test_a_part_named_like_a_grandparent_is_an_alias_given_twice if {
+	subjects := object.union(_three_subjects, {"commit": {"from": `"pull request".commits`, "identified_by": "sha", "has": {"artifact": "x"}}})
+	rep := ergo.report(_three_doc, {"subjects": subjects, "requirements": {"r": {"subject": "commit", "checks": {"c": "sha exists"}}}}, {})
+	[i | some r in rep.results; r.check == "$well_formed"; some i in r.inputs; startswith(i.name, "subjects.")] == [{"name": "subjects.commit.has.artifact", "value": ["alias given twice"]}]
 }
