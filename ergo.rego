@@ -790,7 +790,22 @@ _scoped_of(req) if _has_step(req)
 
 _scoped_of(_) if _parent_names != {}
 
-_scoped_of(req) if _has_parts(req)
+_scoped_of(req) if {
+	_has_parts(req)
+	_reads_whole_subject(req)
+}
+
+_reads_whole_subject(req) if _has_old_marker(req)
+
+_reads_whole_subject(req) if _has_old_marker(_subject_def(req))
+
+_has_old_marker(x) if {
+	walk(x, [_, s])
+	is_string(s)
+	startswith(s, "${\"alias\":")
+	_part_start([s])
+	_part_of([s]).old == true
+}
 
 _passes(req, check, flaw, subj) := _check_passed(check, subj, flaw) if not _scoped(req)
 
@@ -800,7 +815,7 @@ else := v if {
 	v := _check_passed(check, subj, flaw) with input as s
 }
 
-_inputs_in(req, check, subj, item) := _row_inputs(subj, check, item) if not _scoped(req)
+_inputs_in(req, check, subj, item) := _tagged(_row_inputs(subj, check, item), check, req, subj) if not _scoped(req)
 
 else := i if {
 	_scoped(req)
@@ -808,7 +823,7 @@ else := i if {
 	i := _tagged(_row_inputs(subj, check, item), check, req, subj) with input as s
 }
 
-_outcome(req, check, flaw, subj, item) := _check_outcome(check, subj, flaw, item) if not _scoped(req)
+_outcome(req, check, flaw, subj, item) := _tagged_outcome(_check_outcome(check, subj, flaw, item), check, req, subj) if not _scoped(req)
 
 else := o if {
 	_scoped(req)
@@ -816,6 +831,10 @@ else := o if {
 	raw := _check_outcome(check, subj, flaw, item) with input as s
 	o := object.union(raw, {"inputs": _tagged(raw.inputs, check, req, subj)}) with input as s
 }
+
+_tagged_outcome(raw, _, req, _) := raw if not _tagging(req)
+
+_tagged_outcome(raw, check, req, subj) := object.union(raw, {"inputs": _tagged(raw.inputs, check, req, subj)}) if _tagging(req)
 
 _tagging(req) if {
 	_has_fixed(req)
@@ -839,23 +858,19 @@ _tagging_of(req) if {
 
 _tagged(inputs, _, req, _) := inputs if not _tagging(req)
 
-_tagged(inputs, check, req, subj) := [_tagged_input(i, tags) | some i in inputs] if {
+_tagged(inputs, check, req, subj) := [_tagged_input(i, {{"name": p.name, "id": _part_id(p.ms, p.steps, p.read, subj)} | some p in parts; _mentions(i.name, p.patterns)}) | some i in inputs] if {
 	_tagging(req)
-	tags := _part_tags(check, req, subj)
+	parts := _check_parts(check, req)
 }
 
-_tagged_input(i, tags) := object.union(i, {"part": tag}) if {
-	matches := {t.tag | some t in tags; _mentions(i.name, t.tokens)}
+_tagged_input(i, matches) := object.union(i, {"part": tag}) if {
 	count(matches) == 1
 	some tag in matches
 }
 
-_tagged_input(i, tags) := i if {
-	matches := {t.tag | some t in tags; _mentions(i.name, t.tokens)}
-	count(matches) != 1
-}
+_tagged_input(i, matches) := i if count(matches) != 1
 
-_part_tags(check, req, subj) := [{"tokens": [_steps_name([ms]), _steps_name(array.concat([_p_marker(m.alias, -1, m.of, m.old)], steps))], "tag": {"name": _tag_name(m), "id": _part_id(ms, steps, read, subj)}} |
+_check_parts(check, req) := [{"patterns": [_mention_pattern(_steps_name([ms])), _mention_pattern(_steps_name(array.concat([_p_marker(m.alias, -1, m.of, m.old)], steps)))], "name": _tag_name(m), "ms": ms, "steps": steps, "read": read} |
 	some ms in {x[0] | walk(check, [_, x]); is_array(x); _part_start(x)}
 	m := json.unmarshal(substring(ms, 1, -1))
 	read := data.ergo_subject_sentences.parts[_marker_owner(req, m)][m.alias]
@@ -879,10 +894,12 @@ _id_path(read) := path if {
 	path := read.identified_by.path
 }
 
-_mentions(name, tokens) if {
-	some token in tokens
-	regex.match(concat("", [`(^|[^A-Za-z0-9_."$-])`, _quoted(replace(token, "[]", "")), `($|[^A-Za-z0-9_-])`]), replace(name, "[]", ""))
+_mentions(name, patterns) if {
+	some pattern in patterns
+	regex.match(pattern, replace(name, "[]", ""))
 }
+
+_mention_pattern(token) := concat("", [`(^|[^A-Za-z0-9_."$-])`, _quoted(replace(token, "[]", "")), `($|[^A-Za-z0-9_-])`])
 
 _quoted(text) := strings.replace_n({`\`: `\\`, ".": `\.`, "+": `\+`, "*": `\*`, "?": `\?`, "(": `\(`, ")": `\)`, "|": `\|`, "[": `\[`, "]": `\]`, "{": `\{`, "}": `\}`, "^": `\^`, "$": `\$`}, text)
 
@@ -1313,8 +1330,9 @@ _part_start(path) if {
 	is_string(path[0])
 	startswith(path[0], "${\"alias\":")
 	json.is_valid(substring(path[0], 1, -1))
-	is_object(json.unmarshal(substring(path[0], 1, -1)))
-	object.keys(json.unmarshal(substring(path[0], 1, -1))) == {"alias", "n", "of", "old"}
+	m := json.unmarshal(substring(path[0], 1, -1))
+	is_object(m)
+	object.keys(m) == {"alias", "n", "of", "old"}
 }
 
 _part_of(path) := json.unmarshal(substring(path[0], 1, -1))
@@ -6627,9 +6645,9 @@ _p_parts(subjects) := _p_no_parts if not is_object(subjects)
 
 _p_members(name, narrow) := graph.reachable(narrow, [name])
 
-_p_merged(name, own, narrow) := {a: own[_p_owner(a, name, own, narrow)][a] | some a in {a | some m in _p_members(name, narrow); some a, _ in object.get(own, m, {})}}
+_p_merged(name, own, narrow) := {a: own[_p_owner(a, members, own)][a] | some a in {a | some m in members; some a, _ in object.get(own, m, {})}} if members := sort(_p_members(name, narrow))
 
-_p_owner(a, name, own, narrow) := sort([m | some m in _p_members(name, narrow); a in object.keys(object.get(own, m, {}))])[0]
+_p_owner(a, members, own) := [m | some m in members; a in object.keys(object.get(own, m, {}))][0]
 
 _p_problems(subjects, own, narrow, descend) := {name: probs |
 	some name, def in subjects
