@@ -10465,7 +10465,7 @@ test_a_part_alias_stands_for_its_path_inside_the_subject if {
 	row := _parts_row(rep, "c")
 	row.passed
 	row.cause == "satisfied"
-	row.inputs == [{"name": "cov.x", "value": 1}]
+	_untagged(row.inputs) == [{"name": "cov.x", "value": 1}]
 	rep.requirements.r.checks.c.expression == "cov.x is 1"
 }
 
@@ -10473,7 +10473,7 @@ test_a_part_can_be_a_path_to_one_value_and_a_check_can_read_the_alias_alone if {
 	rep := _parts_report({"ratio": "dd.b.ratio"}, {"c": "ratio is at least 2"}, {"b": {"ratio": 3}})
 	row := _parts_row(rep, "c")
 	row.passed
-	row.inputs == [{"name": "ratio", "value": 3}]
+	_untagged(row.inputs) == [{"name": "ratio", "value": 3}]
 }
 
 test_a_part_in_the_long_form_works_like_one_written_as_a_line if {
@@ -10541,12 +10541,12 @@ test_the_names_in_a_row_keep_the_alias_and_the_values_are_the_full_paths if {
 	}
 	d := {"items": [{"x": 1}, {"x": 2}], "b": {"x": 1, "n": 2}}
 	rep := _parts_report(has, checks, d)
-	_parts_row(rep, "every").inputs == [{"name": "lst[].x", "value": [1, 2]}]
+	_untagged(_parts_row(rep, "every").inputs) == [{"name": "lst[].x", "value": [1, 2]}]
 	_parts_row(rep, "every").failed_items == [{"cause": "value", "item": "item 2 of lst", "path": "lst[1].x", "value": 2}]
-	_parts_row(rep, "count").inputs == [{"name": "count of lst", "value": 2}, {"name": "lst[]", "value": [{"x": 1}, {"x": 2}]}]
-	_parts_row(rep, "pos").inputs == [{"name": "pos.x", "value": 2}]
-	_parts_row(rep, "alone").inputs == [{"name": "pos", "value": {"x": 2}}]
-	_parts_row(rep, "two").inputs == [{"name": "cov.x", "value": 1}, {"name": "cov.n", "value": 2}]
+	_untagged(_parts_row(rep, "count").inputs) == [{"name": "count of lst", "value": 2}, {"name": "lst[]", "value": [{"x": 1}, {"x": 2}]}]
+	_untagged(_parts_row(rep, "pos").inputs) == [{"name": "pos.x", "value": 2}]
+	_untagged(_parts_row(rep, "alone").inputs) == [{"name": "pos", "value": {"x": 2}}]
+	_untagged(_parts_row(rep, "two").inputs) == [{"name": "cov.x", "value": 1}, {"name": "cov.n", "value": 2}]
 	rep.requirements.r.checks.every.expression == "every lst.x is 1"
 	rep.requirements.r.checks.pos.expression == "pos.x is 1"
 }
@@ -10562,7 +10562,7 @@ test_the_dot_in_front_of_a_field_does_not_get_around_an_alias if {
 	rep := ergo.report({"trail": {"name": "t1", "cov": {"x": 2}, "dd": {"b": {"x": 1}}}}, policy, {})
 	_parts_row(rep, "c").passed
 	_parts_row(rep, "d").passed
-	_parts_row(rep, "d").inputs == [{"name": "cov.x", "value": 1}]
+	_untagged(_parts_row(rep, "d").inputs) == [{"name": "cov.x", "value": 1}]
 	_parts_row(rep, "e").passed
 }
 
@@ -10593,7 +10593,7 @@ test_an_alias_works_on_the_subject_in_a_for_line_and_not_on_its_items if {
 		_parts_row(rep, c).passed
 	}
 	rep.requirements.r.checks.c.expression == "for every lst as it: it.x equals cov.x and cov.s exists"
-	_parts_row(rep, "c").inputs == [{"name": "cov.s", "value": "a"}, {"name": "cov.x", "value": 1}, {"name": "lst[]", "value": [{"sub": [1], "x": 1, "y": 2}, {"sub": [1, 1], "x": 1, "y": 3}]}]
+	_untagged(_parts_row(rep, "c").inputs) == [{"name": "cov.s", "value": "a"}, {"name": "cov.x", "value": 1}, {"name": "lst[]", "value": [{"sub": [1], "x": 1, "y": 2}, {"sub": [1, 1], "x": 1, "y": 3}]}]
 }
 
 test_a_for_line_alias_that_is_also_a_part_alias_is_written_wrong if {
@@ -10610,9 +10610,9 @@ test_a_whose_in_the_from_line_reads_the_subjects_parts if {
 	}
 	rep := ergo.report({"rounds": [{"id": "a", "dd": {"b": {"x": 1, "n": 2}}}, {"id": "b", "dd": {"b": {"x": 2, "n": 2}}}, {"id": "c", "dd": {}}]}, policy, {})
 	[[r.subject.id, r.cause, r.inputs] | some r in rep.results; r.check == "$applies"] == [
-		["a", "satisfied", [{"name": "cov.x", "value": 1}]],
-		["b", "value", [{"name": "cov.x", "value": 2}]],
-		["c", "absent", [{"name": "cov.x", "value": null}]],
+		["a", "satisfied", [{"name": "cov.x", "part": {"id": null, "name": "cov"}, "value": 1}]],
+		["b", "value", [{"name": "cov.x", "part": {"id": null, "name": "cov"}, "value": 2}]],
+		["c", "absent", [{"name": "cov.x", "part": {"id": null, "name": "cov"}, "value": null}]],
 	]
 	rep.requirements.r.checks["$applies"].expression == "cov.x is 1"
 	[r.subject.id | some r in rep.results; r.check == "c"] == ["a"]
@@ -10685,8 +10685,8 @@ test_a_chained_subject_reads_its_parents_parts_and_starts_from_one if {
 		["pr/7", "every", true, "satisfied"], ["pr/7", "field", false, "absent"], ["pr/7", "own", true, "satisfied"], ["pr/7", "parent", true, "satisfied"],
 		["pr/8", "every", true, "satisfied"], ["pr/8", "field", false, "absent"], ["pr/8", "own", false, "value"], ["pr/8", "parent", true, "satisfied"],
 	]
-	_parts_row(rep, "parent").inputs == [{"name": "artifact.pra.name", "value": "w"}]
-	_parts_row(rep, "every").inputs == [{"name": "artifact.pra.pull_requests[].url", "value": ["pr/7", "pr/8"]}]
+	_untagged(_parts_row(rep, "parent").inputs) == [{"name": "artifact.pra.name", "value": "w"}]
+	_untagged(_parts_row(rep, "every").inputs) == [{"name": "artifact.pra.pull_requests[].url", "value": ["pr/7", "pr/8"]}]
 	rep.subjects["pull request"].from == "artifact.pra.pull_requests"
 }
 
@@ -10725,7 +10725,7 @@ test_an_old_syntax_check_reads_a_part_as_a_dollar_alias_and_the_name_keeps_the_d
 	every c in ["eq", "pr", "ms", "cmp"] {
 		_parts_row(rep, c).passed
 	}
-	_parts_row(rep, "eq").inputs == [{"name": "$cov.x", "value": 1}]
+	_untagged(_parts_row(rep, "eq").inputs) == [{"name": "$cov.x", "value": 1}]
 	rep.requirements.r.checks.eq.expression == "$cov.x == 1"
 }
 
@@ -10746,14 +10746,14 @@ test_an_old_syntax_check_reads_a_part_inside_all_any_any_of_and_a_substitute if 
 		_parts_row(rep, c).passed
 	}
 	_parts_row(rep, "sub").cause == "substituted"
-	_parts_row(rep, "all").inputs == [{"name": "$lst[].x", "value": [1, 1]}]
+	_untagged(_parts_row(rep, "all").inputs) == [{"name": "$lst[].x", "value": [1, 1]}]
 }
 
 test_an_old_syntax_custom_operator_reads_a_part_through_its_path_and_inputs if {
 	checks := {"c": {"op": "even", "path": ["$cov", "n"], "inputs": [["$cov", "n"]], "expression": "n is even"}}
 	rep := _parts_report({"cov": "dd.b"}, checks, {"b": {"n": 4}})
 	_parts_row(rep, "c").passed
-	_parts_row(rep, "c").inputs == [{"name": "$cov.n", "value": 4}]
+	_untagged(_parts_row(rep, "c").inputs) == [{"name": "$cov.n", "value": 4}]
 }
 
 test_an_old_syntax_alias_that_is_not_a_part_is_still_unknown if {
@@ -11503,7 +11503,7 @@ test_a_position_in_a_list_inside_a_part_is_never_hidden_so_the_failed_item_names
 	plain := ergo.report(_hidden_doc, _swap_policy2({}, full), {})
 	row := _parts_row(alias, "every")
 	row.failed_items == [{"cause": "value", "item": "item 1 of pull_requests[2].reviews", "path": "pull_requests[2].reviews[0].state", "value": "bad"}]
-	row.inputs == [{"name": "pull_requests[].reviews[].state", "value": ["ok", "ok", "ok", "bad", "ok"]}]
+	_untagged(row.inputs) == [{"name": "pull_requests[].reviews[].state", "value": ["ok", "ok", "ok", "bad", "ok"]}]
 	_parts_row(alias, "count").inputs[1].name == "pull_requests[].reviews[]"
 	_parts_row(alias, "for").failed_items[0].item == "item 1 of pull_requests[2].reviews"
 	_parts_row(alias, "for").inputs[0].name == "pull_requests[].reviews[]"
@@ -11530,7 +11530,7 @@ test_a_position_in_a_list_inside_a_parents_part_is_never_hidden_either if {
 	rep := ergo.report(doc, {"subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": checks}}}, {"art": "web"})
 	row := _parts_row(rep, "c")
 	row.failed_items == [{"cause": "value", "item": "item 1 of artifact.pull_requests[1].reviews", "path": "artifact.pull_requests[1].reviews[0].state", "value": "bad"}]
-	row.inputs == [{"name": "artifact.pull_requests[].reviews[].state", "value": ["ok", "bad"]}]
+	_untagged(row.inputs) == [{"name": "artifact.pull_requests[].reviews[].state", "value": ["ok", "bad"]}]
 }
 
 test_a_chained_subject_that_starts_at_its_parents_part_shows_its_from_as_written_in_its_expressions if {
@@ -11551,4 +11551,142 @@ test_a_chained_subject_that_starts_deeper_in_its_parents_part_keeps_the_rest_of_
 	doc := {"trail": {"artifacts": {"web": {"fingerprint": "sha-1", "attestations": {"pr": {"pull_requests": [{"list": [{"url": "a"}]}]}}}}}}
 	rep := ergo.report(doc, {"subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": {"c": "url exists"}}}}, {"art": "web"})
 	rep.requirements.r.checks["$min_subjects"].expression == "count(matching(artifact.pra.pull_requests[0].list)) >= 1"
+}
+
+_untagged(inputs) := [object.remove(i, ["part"]) | some i in inputs]
+
+_tag_has := {
+	"coverage": {"from": "dd.cov", "identified_by": "attestation_id"},
+	"lst": "dd.items",
+	"nowhere": {"from": "dd.cov", "identified_by": "nope"},
+	"nulled": {"from": "dd.cov", "identified_by": "nothing"},
+	"obj": {"from": "dd.cov", "identified_by": "meta"},
+}
+
+_tag_doc := {"cov": {"attestation_id": "att-7", "hunks_total": 25, "hunks_acknowledged": 25, "nothing": null, "meta": {"k": [1, 2]}}, "items": [{"x": 1}, {"x": 2}]}
+
+test_an_input_read_through_a_part_is_tagged_with_the_alias_and_the_id_inside_the_part if {
+	checks := {
+		"eq": "coverage.hunks_acknowledged equals coverage.hunks_total",
+		"own": "name is \"t1\"",
+		"line": "lst.0.x is 1",
+	}
+	rep := _parts_report(_tag_has, checks, _tag_doc)
+	_parts_row(rep, "eq").inputs == [
+		{"name": "coverage.hunks_acknowledged", "part": {"id": "att-7", "name": "coverage"}, "value": 25},
+		{"name": "coverage.hunks_total", "part": {"id": "att-7", "name": "coverage"}, "value": 25},
+	]
+	_parts_row(rep, "own").inputs == [{"name": "name", "value": "t1"}]
+}
+
+test_a_part_without_an_id_or_with_an_id_that_leads_nowhere_or_to_null_is_tagged_with_a_null_id if {
+	checks := {"a": "lst[0].x is 1", "b": "nowhere.hunks_total is 25", "c": "nulled.hunks_total is 25"}
+	rep := _parts_report(_tag_has, checks, _tag_doc)
+	every c in ["a", "b", "c"] {
+		_parts_row(rep, c).inputs[0].part.id == null
+	}
+	_parts_row(rep, "a").inputs[0].part.name == "lst"
+}
+
+test_a_part_id_is_the_value_as_read_even_when_it_is_an_object if {
+	rep := _parts_report(_tag_has, {"c": "obj.hunks_total is 25"}, _tag_doc)
+	_parts_row(rep, "c").inputs[0].part == {"id": {"k": [1, 2]}, "name": "obj"}
+}
+
+test_a_part_id_is_read_for_each_subject_of_the_row if {
+	policy := {
+		"subjects": {"s": {"from": "xs", "identified_by": "n", "has": {"p": {"from": "d", "identified_by": "i"}}}},
+		"requirements": {"r": {"subject": "s", "checks": {"c": "p.v is 1"}}},
+	}
+	rep := ergo.report({"xs": [{"n": "a", "d": {"i": 1, "v": 1}}, {"n": "b", "d": {"i": "two", "v": 2}}, {"n": "c"}]}, policy, {})
+	[r.inputs[0].part.id | some r in rep.results; r.check == "c"] == [1, "two", null]
+}
+
+test_a_walk_and_a_count_and_a_for_line_tag_the_lists_they_read_through_a_part if {
+	checks := {
+		"every": "every lst.x is at least 1",
+		"count": "count of lst is 2",
+		"for": {"for": "every lst as it", "assert": "it.x is at least 1"},
+	}
+	rep := _parts_report(_tag_has, checks, _tag_doc)
+	every c in ["every", "count", "for"] {
+		every i in _parts_row(rep, c).inputs {
+			i.part == {"id": null, "name": "lst"}
+		}
+	}
+}
+
+test_an_input_that_reads_through_two_parts_in_one_value_is_not_tagged_because_it_has_no_one_part if {
+	rep := _parts_report(_tag_has, {"c": "count of lst plus coverage.hunks_total is 27"}, _tag_doc)
+	inputs := _parts_row(rep, "c").inputs
+	some i in inputs
+	contains(i.name, "plus")
+	not "part" in object.keys(i)
+	some j in inputs
+	j.name == "coverage.hunks_total"
+	j.part.name == "coverage"
+}
+
+test_a_field_of_an_item_named_like_a_part_is_not_tagged_because_it_is_not_read_through_the_part if {
+	has := {"x": "dd.cov"}
+	rep := _parts_report(has, {"c": "every dd.items.x whose x is at least 1 is at least 1"}, _tag_doc)
+	every i in _parts_row(rep, "c").inputs {
+		not "part" in object.keys(i)
+	}
+}
+
+test_a_walk_through_a_list_inside_a_part_that_names_the_full_path_is_still_tagged if {
+	has := {"reviews": {"from": "pull_requests.reviews", "identified_by": "id"}}
+	rep := ergo.report(_hidden_doc, _swap_policy2(has, {"c": "every reviews.state is \"ok\""}), {})
+	_parts_row(rep, "c").inputs == [{"name": "pull_requests[].reviews[].state", "part": {"id": null, "name": "reviews"}, "value": ["ok", "ok", "ok", "bad", "ok"]}]
+}
+
+test_an_old_syntax_input_read_through_a_part_is_tagged_with_the_alias_without_the_dollar if {
+	checks := {"c": {"op": "equals", "path": ["$coverage", "hunks_total"], "value": 25}}
+	rep := _parts_report(_tag_has, checks, _tag_doc)
+	_parts_row(rep, "c").inputs == [{"name": "$coverage.hunks_total", "part": {"id": "att-7", "name": "coverage"}, "value": 25}]
+}
+
+test_an_input_read_through_a_parents_part_is_tagged_with_the_parent_and_the_id_from_the_parents_part if {
+	subjects := {
+		"artifact": {"from": "trail.artifacts named by $params.art", "identified_by": "fingerprint", "has": {"pra": {"from": "attestations.pr", "identified_by": "att"}}},
+		"pull request": {"from": "artifact.pra.pull_requests", "identified_by": "url", "has": {"rev": "reviews"}},
+	}
+	doc := {"trail": {"artifacts": {"web": {"fingerprint": "sha-1", "attestations": {"pr": {"att": "att-3", "name": "w", "pull_requests": [{"url": "pr/7", "reviews": {"count": 2}}]}}}}}}
+	checks := {"parent": "artifact.pra.name is \"w\"", "own": "rev.count is 2", "field": "url exists"}
+	rep := ergo.report(doc, {"subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": checks}}}, {"art": "web"})
+	_parts_row(rep, "parent").inputs == [{"name": "artifact.pra.name", "part": {"id": "att-3", "name": "artifact.pra"}, "value": "w"}]
+	_parts_row(rep, "own").inputs == [{"name": "rev.count", "part": {"id": null, "name": "rev"}, "value": 2}]
+	_parts_row(rep, "field").inputs == [{"name": "url", "value": "pr/7"}]
+}
+
+test_a_violation_carries_the_tags_of_the_row_it_copies if {
+	rep := _parts_report(_tag_has, {"c": "coverage.hunks_total is 99"}, _tag_doc)
+	violation := [v | some v in ergo.violations(rep); v.check == "c"][0]
+	violation.inputs[0] == {"name": "coverage.hunks_total", "part": {"id": "att-7", "name": "coverage"}, "value": 25}
+}
+
+test_a_failed_item_and_a_ref_are_not_tagged_because_only_inputs_are if {
+	rep := _parts_report(_tag_has, {"c": "every lst.x is 1"}, _tag_doc)
+	every f in _parts_row(rep, "c").failed_items {
+		not "part" in object.keys(f)
+	}
+}
+
+test_a_policy_without_parts_gives_inputs_with_no_part_key if {
+	rep := ergo.report({"trail": {"name": "t1", "dd": {"b": {"x": 1}}}}, _parts_policy({}, {"c": "dd.b.x is 1", "d": "name is \"t1\""}), {})
+	every r in rep.results {
+		every i in r.inputs {
+			not "part" in object.keys(i)
+		}
+	}
+}
+
+test_an_applies_row_tags_the_inputs_its_conditions_read_through_a_part if {
+	policy := {
+		"subjects": {"s": {"from": "xs whose p.v is 1", "identified_by": "n", "has": {"p": {"from": "d", "identified_by": "i"}}}},
+		"requirements": {"r": {"subject": "s", "checks": {"c": "n exists"}}},
+	}
+	rep := ergo.report({"xs": [{"n": "a", "d": {"i": 9, "v": 1}}]}, policy, {})
+	[r.inputs | some r in rep.results; r.check == "$applies"] == [[{"name": "p.v", "part": {"id": 9, "name": "p"}, "value": 1}]]
 }

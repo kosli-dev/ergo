@@ -91,7 +91,17 @@
     },
     "input": {
       "type": "object",
-      "properties": {"name": {"type": "string"}, "value": true},
+      "properties": {
+        "name": {"type": "string"},
+        "value": true,
+        "part": {
+          "type": "object",
+          "description": "Present when the input was read through a part: the part's alias as the check writes it, and the id read inside the part, or null.",
+          "properties": {"name": {"type": "string"}, "id": true},
+          "required": ["name", "id"],
+          "additionalProperties": false
+        }
+      },
       "required": ["name", "value"],
       "additionalProperties": false
     },

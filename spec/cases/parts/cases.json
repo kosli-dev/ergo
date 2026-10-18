@@ -33,7 +33,8 @@
           "parts.path",
           "parts.swap",
           "sentence.path.part",
-          "name.part"
+          "name.part",
+          "parts.tag"
         ],
         "input": {
           "trail": {
@@ -46,6 +47,7 @@
                   }
                 },
                 "coverage-verification": {
+                  "attestation_id": "att-7",
                   "attestation_data": {
                     "hunks_acknowledged": 3,
                     "hunks_total": 3
@@ -87,6 +89,10 @@
             "inputs": [
               {
                 "name": "findings.truncated",
+                "part": {
+                  "id": null,
+                  "name": "findings"
+                },
                 "value": false
               }
             ],
@@ -103,11 +109,95 @@
             "inputs": [
               {
                 "name": "coverage.attestation_data.hunks_acknowledged",
+                "part": {
+                  "id": "att-7",
+                  "name": "coverage"
+                },
                 "value": 3
               },
               {
                 "name": "coverage.attestation_data.hunks_total",
+                "part": {
+                  "id": "att-7",
+                  "name": "coverage"
+                },
                 "value": 3
+              }
+            ],
+            "passed": true,
+            "requirement": "review_round",
+            "subject": {
+              "id": "t1",
+              "type": "round"
+            }
+          }
+        ]
+      },
+      {
+        "description": "tags an input with a null id when the part has no id inside it",
+        "rules": [
+          "parts.tag"
+        ],
+        "input": {
+          "trail": {
+            "name": "t1",
+            "compliance_status": {
+              "attestations_statuses": {
+                "findings": {
+                  "attestation_data": {
+                    "truncated": false
+                  }
+                },
+                "coverage-verification": {
+                  "attestation_data": {
+                    "hunks_acknowledged": 1,
+                    "hunks_total": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "complete",
+            "inputs": [
+              {
+                "name": "findings.truncated",
+                "part": {
+                  "id": null,
+                  "name": "findings"
+                },
+                "value": false
+              }
+            ],
+            "passed": true,
+            "requirement": "review_round",
+            "subject": {
+              "id": "t1",
+              "type": "round"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "every_hunk_acknowledged",
+            "inputs": [
+              {
+                "name": "coverage.attestation_data.hunks_acknowledged",
+                "part": {
+                  "id": null,
+                  "name": "coverage"
+                },
+                "value": 1
+              },
+              {
+                "name": "coverage.attestation_data.hunks_total",
+                "part": {
+                  "id": null,
+                  "name": "coverage"
+                },
+                "value": 1
               }
             ],
             "passed": true,
@@ -135,6 +225,7 @@
                   }
                 },
                 "coverage-verification": {
+                  "attestation_id": "att-7",
                   "attestation_data": {
                     "hunks_acknowledged": 3,
                     "hunks_total": 3
@@ -151,6 +242,10 @@
             "inputs": [
               {
                 "name": "findings.truncated",
+                "part": {
+                  "id": null,
+                  "name": "findings"
+                },
                 "value": true
               }
             ],
@@ -167,10 +262,18 @@
             "inputs": [
               {
                 "name": "coverage.attestation_data.hunks_acknowledged",
+                "part": {
+                  "id": "att-7",
+                  "name": "coverage"
+                },
                 "value": 3
               },
               {
                 "name": "coverage.attestation_data.hunks_total",
+                "part": {
+                  "id": "att-7",
+                  "name": "coverage"
+                },
                 "value": 3
               }
             ],
@@ -210,6 +313,10 @@
             "inputs": [
               {
                 "name": "findings.truncated",
+                "part": {
+                  "id": null,
+                  "name": "findings"
+                },
                 "value": false
               }
             ],
@@ -226,10 +333,18 @@
             "inputs": [
               {
                 "name": "coverage.attestation_data.hunks_acknowledged",
+                "part": {
+                  "id": null,
+                  "name": "coverage"
+                },
                 "value": null
               },
               {
                 "name": "coverage.attestation_data.hunks_total",
+                "part": {
+                  "id": null,
+                  "name": "coverage"
+                },
                 "value": null
               }
             ],
@@ -270,6 +385,10 @@
             "inputs": [
               {
                 "name": "findings.truncated",
+                "part": {
+                  "id": null,
+                  "name": "findings"
+                },
                 "value": null
               }
             ],
@@ -286,10 +405,18 @@
             "inputs": [
               {
                 "name": "coverage.attestation_data.hunks_acknowledged",
+                "part": {
+                  "id": null,
+                  "name": "coverage"
+                },
                 "value": null
               },
               {
                 "name": "coverage.attestation_data.hunks_total",
+                "part": {
+                  "id": null,
+                  "name": "coverage"
+                },
                 "value": null
               }
             ],
@@ -317,6 +444,7 @@
                   "attestation_data": "truncated"
                 },
                 "coverage-verification": {
+                  "attestation_id": "att-7",
                   "attestation_data": "done"
                 }
               }
@@ -330,6 +458,10 @@
             "inputs": [
               {
                 "name": "findings.truncated",
+                "part": {
+                  "id": null,
+                  "name": "findings"
+                },
                 "value": null
               }
             ],
@@ -346,10 +478,18 @@
             "inputs": [
               {
                 "name": "coverage.attestation_data.hunks_acknowledged",
+                "part": {
+                  "id": "att-7",
+                  "name": "coverage"
+                },
                 "value": null
               },
               {
                 "name": "coverage.attestation_data.hunks_total",
+                "part": {
+                  "id": "att-7",
+                  "name": "coverage"
+                },
                 "value": null
               }
             ],
@@ -381,6 +521,10 @@
             "inputs": [
               {
                 "name": "findings.truncated",
+                "part": {
+                  "id": null,
+                  "name": "findings"
+                },
                 "value": null
               }
             ],
@@ -397,10 +541,18 @@
             "inputs": [
               {
                 "name": "coverage.attestation_data.hunks_acknowledged",
+                "part": {
+                  "id": null,
+                  "name": "coverage"
+                },
                 "value": null
               },
               {
                 "name": "coverage.attestation_data.hunks_total",
+                "part": {
+                  "id": null,
+                  "name": "coverage"
+                },
                 "value": null
               }
             ],
@@ -479,10 +631,18 @@
             "inputs": [
               {
                 "name": "cov.x",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": 3
               },
               {
                 "name": "cov.n",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": 2
               }
             ],
@@ -519,10 +679,18 @@
             "inputs": [
               {
                 "name": "cov.x",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": 1
               },
               {
                 "name": "cov.n",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": 2
               }
             ],
@@ -587,10 +755,18 @@
             "inputs": [
               {
                 "name": "cov.x",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": null
               },
               {
                 "name": "cov.n",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": null
               }
             ],
@@ -627,10 +803,18 @@
             "inputs": [
               {
                 "name": "cov.x",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": null
               },
               {
                 "name": "cov.n",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": null
               }
             ],
@@ -667,10 +851,18 @@
             "inputs": [
               {
                 "name": "cov.x",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": null
               },
               {
                 "name": "cov.n",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": null
               }
             ],
@@ -723,10 +915,18 @@
             "inputs": [
               {
                 "name": "cov.x",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": null
               },
               {
                 "name": "cov.n",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": null
               }
             ],
@@ -763,10 +963,18 @@
             "inputs": [
               {
                 "name": "cov.x",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": null
               },
               {
                 "name": "cov.n",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": null
               }
             ],
@@ -803,10 +1011,18 @@
             "inputs": [
               {
                 "name": "cov.x",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": null
               },
               {
                 "name": "cov.n",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": null
               }
             ],
@@ -932,6 +1148,10 @@
             "inputs": [
               {
                 "name": "cov.x",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": 1
               }
             ],
@@ -948,6 +1168,10 @@
             "inputs": [
               {
                 "name": "cov.x",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": 2
               }
             ],
@@ -964,6 +1188,10 @@
             "inputs": [
               {
                 "name": "cov.n",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": 2
               }
             ],
@@ -981,14 +1209,26 @@
             "inputs": [
               {
                 "name": "cov.s",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": "t"
               },
               {
                 "name": "cov.x",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": 1
               },
               {
                 "name": "lst[]",
+                "part": {
+                  "id": null,
+                  "name": "lst"
+                },
                 "value": [
                   {
                     "cov": 5,
@@ -1022,6 +1262,10 @@
             "inputs": [
               {
                 "name": "lst[].x",
+                "part": {
+                  "id": null,
+                  "name": "lst"
+                },
                 "value": [
                   1,
                   1
@@ -1041,6 +1285,10 @@
             "inputs": [
               {
                 "name": "cov.n",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": 2
               }
             ],
@@ -1088,6 +1336,10 @@
             "inputs": [
               {
                 "name": "cov.x",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": 1
               }
             ],
@@ -1104,6 +1356,10 @@
             "inputs": [
               {
                 "name": "cov.n",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": 2
               }
             ],
@@ -1121,14 +1377,26 @@
             "inputs": [
               {
                 "name": "cov.s",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": "t"
               },
               {
                 "name": "cov.x",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": 1
               },
               {
                 "name": "lst[]",
+                "part": {
+                  "id": null,
+                  "name": "lst"
+                },
                 "value": [
                   {
                     "x": 1
@@ -1157,6 +1425,10 @@
             "inputs": [
               {
                 "name": "lst[].x",
+                "part": {
+                  "id": null,
+                  "name": "lst"
+                },
                 "value": [
                   1
                 ]
@@ -1175,6 +1447,10 @@
             "inputs": [
               {
                 "name": "cov.n",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": 2
               }
             ],
@@ -1462,6 +1738,10 @@
             "inputs": [
               {
                 "name": "cov.x",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": 1
               }
             ],
@@ -1478,6 +1758,10 @@
             "inputs": [
               {
                 "name": "cov.x",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": 2
               }
             ],
@@ -1495,10 +1779,18 @@
             "inputs": [
               {
                 "name": "cov.n",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": 2
               },
               {
                 "name": "extra",
+                "part": {
+                  "id": null,
+                  "name": "extra"
+                },
                 "value": 5
               }
             ],
@@ -1597,6 +1889,10 @@
             "inputs": [
               {
                 "name": "cov.x",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": null
               }
             ],
@@ -1619,7 +1915,10 @@
           "from": "trail.artifacts named by $params.art",
           "identified_by": "fingerprint",
           "has": {
-            "pra": "attestations.pr"
+            "pra": {
+              "from": "attestations.pr",
+              "identified_by": "att"
+            }
           }
         },
         "pull request": {
@@ -1649,6 +1948,7 @@
         "description": "starts from a part of the parent, reads a part of the parent by the parent's name, and reads a bare alias of the parent as a field",
         "rules": [
           "parts.chain",
+          "parts.tag",
           "subjects.chain",
           "sentence.subject.chain"
         ],
@@ -1660,6 +1960,7 @@
                 "pra": 1,
                 "attestations": {
                   "pr": {
+                    "att": "att-3",
                     "name": "w",
                     "pull_requests": [
                       {
@@ -1696,7 +1997,7 @@
               "parts": {
                 "pra": {
                   "from": "attestations.pr",
-                  "identified_by": null
+                  "identified_by": "att"
                 }
               }
             },
@@ -1739,6 +2040,10 @@
             "inputs": [
               {
                 "name": "rev.count",
+                "part": {
+                  "id": null,
+                  "name": "rev"
+                },
                 "value": 2
               }
             ],
@@ -1758,6 +2063,10 @@
             "inputs": [
               {
                 "name": "artifact.pra.name",
+                "part": {
+                  "id": "att-3",
+                  "name": "artifact.pra"
+                },
                 "value": "w"
               }
             ],
@@ -1796,6 +2105,10 @@
             "inputs": [
               {
                 "name": "rev.count",
+                "part": {
+                  "id": null,
+                  "name": "rev"
+                },
                 "value": 1
               }
             ],
@@ -1815,6 +2128,10 @@
             "inputs": [
               {
                 "name": "artifact.pra.name",
+                "part": {
+                  "id": "att-3",
+                  "name": "artifact.pra"
+                },
                 "value": "w"
               }
             ],
@@ -1954,7 +2271,10 @@
             "id"
           ],
           "has": {
-            "cov": "d.b",
+            "cov": {
+              "from": "d.b",
+              "identified_by": "i"
+            },
             "lst": "d.items"
           },
           "applies_to": {
@@ -2036,7 +2356,8 @@
         "rules": [
           "parts.old_syntax",
           "name.part",
-          "parts.swap"
+          "parts.swap",
+          "parts.tag"
         ],
         "input": {
           "items": [
@@ -2044,6 +2365,7 @@
               "id": "a",
               "d": {
                 "b": {
+                  "i": 5,
                   "x": 1
                 },
                 "items": [
@@ -2100,6 +2422,10 @@
             "inputs": [
               {
                 "name": "$cov.x",
+                "part": {
+                  "id": 5,
+                  "name": "cov"
+                },
                 "value": 1
               }
             ],
@@ -2126,6 +2452,10 @@
             "inputs": [
               {
                 "name": "$lst[].x",
+                "part": {
+                  "id": null,
+                  "name": "lst"
+                },
                 "value": [
                   1,
                   2
@@ -2145,10 +2475,18 @@
             "inputs": [
               {
                 "name": "count($lst)",
+                "part": {
+                  "id": null,
+                  "name": "lst"
+                },
                 "value": 2
               },
               {
                 "name": "$lst",
+                "part": {
+                  "id": null,
+                  "name": "lst"
+                },
                 "value": [
                   {
                     "x": 1
@@ -2172,6 +2510,10 @@
             "inputs": [
               {
                 "name": "$cov.x",
+                "part": {
+                  "id": 5,
+                  "name": "cov"
+                },
                 "value": 1
               }
             ],
@@ -2189,6 +2531,10 @@
             "inputs": [
               {
                 "name": "$lst[]",
+                "part": {
+                  "id": null,
+                  "name": "lst"
+                },
                 "value": [
                   {
                     "x": 1
@@ -2200,6 +2546,10 @@
               },
               {
                 "name": "$cov.x",
+                "part": {
+                  "id": 5,
+                  "name": "cov"
+                },
                 "value": 1
               }
             ],
@@ -2249,6 +2599,10 @@
             "inputs": [
               {
                 "name": "$cov.x",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
                 "value": null
               }
             ],
@@ -2921,6 +3275,10 @@
             "inputs": [
               {
                 "name": "pull_requests[].reviews[].state",
+                "part": {
+                  "id": null,
+                  "name": "reviews"
+                },
                 "value": [
                   "ok",
                   "ok",

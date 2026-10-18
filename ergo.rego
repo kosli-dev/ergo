@@ -716,7 +716,7 @@ _inputs_in(req, check, subj, item) := _row_inputs(subj, check, item) if not _sco
 else := i if {
 	_scoped(req)
 	s := _scope_of(req, subj)
-	i := _row_inputs(subj, check, item) with input as s
+	i := _tagged(_row_inputs(subj, check, item), check, req, subj) with input as s
 }
 
 _outcome(req, check, flaw, subj, item) := _check_outcome(check, subj, flaw, item) if not _scoped(req)
@@ -724,8 +724,65 @@ _outcome(req, check, flaw, subj, item) := _check_outcome(check, subj, flaw, item
 else := o if {
 	_scoped(req)
 	s := _scope_of(req, subj)
-	o := _check_outcome(check, subj, flaw, item) with input as s
+	raw := _check_outcome(check, subj, flaw, item) with input as s
+	o := object.union(raw, {"inputs": _tagged(raw.inputs, check, req, subj)}) with input as s
 }
+
+_tagging(req) if _has_parts(req)
+
+_tagging(req) if {
+	is_string(object.get(req, "subject", null))
+	data.ergo_subject_sentences.chains[req.subject] in _subjects_with_parts
+}
+
+_tagged(inputs, _, req, _) := inputs if not _tagging(req)
+
+_tagged(inputs, check, req, subj) := [_tagged_input(i, tags) | some i in inputs] if {
+	_tagging(req)
+	tags := _part_tags(check, req, subj)
+}
+
+_tagged_input(i, tags) := object.union(i, {"part": tag}) if {
+	matches := {t.tag | some t in tags; _mentions(i.name, t.tokens)}
+	count(matches) == 1
+	some tag in matches
+}
+
+_tagged_input(i, tags) := i if {
+	matches := {t.tag | some t in tags; _mentions(i.name, t.tokens)}
+	count(matches) != 1
+}
+
+_part_tags(check, req, subj) := [{"tokens": [_steps_name([ms]), _steps_name(array.concat([_p_marker(m.alias, -1, m.of, m.old)], steps))], "tag": {"name": _tag_name(m), "id": _part_id(ms, steps, read, subj)}} |
+	some ms in {x[0] | walk(check, [_, x]); is_array(x); _part_start(x)}
+	m := json.unmarshal(substring(ms, 1, -1))
+	read := data.ergo_subject_sentences.parts[_marker_owner(req, m)][m.alias]
+	steps := read.from.path
+]
+
+_marker_owner(req, m) := req.subject if m.of == null
+
+_marker_owner(_, m) := m.of if m.of != null
+
+_tag_name(m) := m.alias if m.of == null
+
+_tag_name(m) := concat("", [_s_key_text(m.of), ".", m.alias]) if m.of != null
+
+_part_id(ms, steps, read, subj) := value_at(subj, array.concat(array.concat([ms], steps), path)) if path := _id_path(read)
+
+_part_id(_, _, read, _) := null if not _id_path(read)
+
+_id_path(read) := path if {
+	is_object(read.identified_by)
+	path := read.identified_by.path
+}
+
+_mentions(name, tokens) if {
+	some token in tokens
+	regex.match(concat("", [`(^|[^A-Za-z0-9_."$-])`, _quoted(replace(token, "[]", "")), `($|[^A-Za-z0-9_-])`]), replace(name, "[]", ""))
+}
+
+_quoted(text) := strings.replace_n({`\`: `\\`, ".": `\.`, "+": `\+`, "*": `\*`, "?": `\?`, "(": `\(`, ")": `\)`, "|": `\|`, "[": `\[`, "]": `\]`, "{": `\{`, "}": `\}`, "^": `\^`, "$": `\$`}, text)
 
 _check_outcome(check, subj, flaw, item) := object.union(
 	{
