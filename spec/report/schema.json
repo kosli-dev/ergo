@@ -114,7 +114,7 @@
           "properties": {
             "type": {"description": "The name of the requirement's subject."},
             "id": {"description": "The subject's id, or null for the rows of the checks ergo adds to a requirement."},
-            "in": {"type": "object", "description": "Only for a subject read from another subject: the parent subject's name and its id.", "maxProperties": 1}
+            "in": {"type": "object", "description": "Only for a child subject: the name and id of each subject it was read from, its parent and, three subjects deep, its grandparent.", "maxProperties": 2}
           },
           "required": ["type", "id"],
           "additionalProperties": false

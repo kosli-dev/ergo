@@ -279,7 +279,15 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
   - `sha-4` has no `environment`, so ergo can't tell whether it's in scope. Its `$min_subjects` row fails with the cause, even with `min_subjects: 0`, and its pull requests aren't checked.
   - When no artifact is in scope, there's one `$min_subjects` row with no `in`. It fails with `value`, or passes with `min_subjects: 0`, as for any subject that finds none.
 
-  A chain of more than two subjects is written wrong, since that isn't supported yet ([#210](https://github.com/kosli-dev/ergo/issues/210)), and so is a subject that builds on a child subject with `of` or a from line that narrows it.
+  A child subject can have child subjects of its own, so a chain can be three subjects deep, like artifact, pull request and commit:
+
+  ```yaml
+  commit:
+    from: '"pull request".commits'
+    identified_by: sha
+  ```
+
+  Each commit row says which artifact and which pull request it belongs to, like `"in": {"artifact": "sha-1", "pull request": "pr/7"}`, and each pull request gets its own `$min_subjects` and `$unique_ids` rows. An artifact or a pull request that's out of scope leaves out everything below it. An artifact whose conditions can't be decided gets one failing `$min_subjects` row, with `"in": {"artifact": ...}`. A check reads any ancestor by its name, like `artifact.name` or `"pull request".title`, and its parts too. A fourth level is written wrong, with `a chain of more than three subjects isn't supported yet`, and so is a subject that builds on a child subject with `of` or a from line that narrows it.
 - `every` in front of the path walks every list along it, the last one included, as [`every`](#checks) does in a check, and each value it ends at is a subject. With this input:
 
   ```json

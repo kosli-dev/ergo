@@ -259,7 +259,7 @@ _req_problems(req) := union({_req_meta_problems(req), _type_problems(req), _rang
 
 _subject_problems(req) := (_subject_ref_problems(req) | _resolution_problems(req)) | _parent_problems(req)
 
-_parent_problems(req) := _resolution_problems({"subject": data.ergo_subject_sentences.chains[req.subject]}) if _chained(req)
+_parent_problems(req) := union({_resolution_problems({"subject": a}) | some a in _s_ancestors(req.subject, data.ergo_subject_sentences.chains)}) if _chained(req)
 
 _parent_problems(req) := set() if not _chained(req)
 
@@ -781,7 +781,8 @@ _tagging(req) if _has_parts(req)
 
 _tagging(req) if {
 	is_string(object.get(req, "subject", null))
-	data.ergo_subject_sentences.chains[req.subject] in _subjects_with_parts
+	some a in _s_ancestors(req.subject, data.ergo_subject_sentences.chains)
+	a in _subjects_with_parts
 }
 
 _tagged(inputs, _, req, _) := inputs if not _tagging(req)
@@ -4336,7 +4337,7 @@ _checks_at(_, "checks", n) := ["checks", n]
 _from_names(req, here) := ({n |
 	_from_well_formed(req)
 	n := _each_step(req).each_as
-} | {data.ergo_subject_sentences.chains[req.subject] | _chained(req); here}) | {a |
+} | {a | _chained(req); here; some a in _s_ancestors(req.subject, data.ergo_subject_sentences.chains)}) | {a |
 	is_string(object.get(req, "subject", null))
 	some a, _ in object.get(object.get(data.ergo_subject_sentences, "parts", {}), req.subject, {})
 }
@@ -4963,7 +4964,59 @@ _evaluated(doc, req, name) := e if {
 	e := _evaluation(doc, req, name)
 }
 
-_evaluated(doc, req, name) := _chain_evaluation(req, name, _parent_pick(doc, req)) if _chained(req)
+_evaluated(doc, req, name) := _chain_evaluation(req, name, _parent_pick(doc, req)) if {
+	_chained(req)
+	not _grand_chained(req)
+}
+
+_evaluated(doc, req, name) := _grand_evaluation(req, name, _parent_pick_of(doc, {"subject": grand, "checks": {}}), parent, grand) if {
+	_grand_chained(req)
+	parent := data.ergo_subject_sentences.chains[req.subject]
+	grand := data.ergo_subject_sentences.chains[parent]
+}
+
+_grand_chained(req) if {
+	_chained(req)
+	data.ergo_subject_sentences.chains[req.subject] in object.keys(data.ergo_subject_sentences.chains)
+}
+
+_grand_evaluation(req, name, gpick, _, _) := _no_parent_evaluation(req, name, gpick.cause) if "cause" in object.keys(gpick)
+
+_grand_evaluation(req, name, gpick, parent, grand) := _grand_branches(req, name, [e | some g in gpick.parents; some e in _grand_branch(req, name, parent, grand, g)]) if "parents" in object.keys(gpick)
+
+_grand_branches(req, name, es) := _parents_evaluation(req, name, es) if count(es) > 0
+
+else := _no_parent_evaluation(req, name, "none")
+
+_grand_branch(req, name, _, grand, g) := [_parent_evaluation(req, name, grand, g)] if "cause" in object.keys(g)
+
+_grand_branch(req, name, parent, grand, g) := _grand_children(req, name, parent, grand, g, pick) if {
+	"subject" in object.keys(g)
+	pick := _parent_pick_of(g.subject, {"subject": parent, "checks": {}}) with data.ergo_in as {grand: g.id} with data.ergo_parent as {grand: g.subject}
+}
+
+_grand_children(req, name, _, grand, g, pick) := [_parent_evaluation(req, name, grand, {"id": g.id, "cause": pick.cause})] if "cause" in object.keys(pick)
+
+_grand_children(req, name, parent, grand, g, pick) := [_grandchild_evaluation(req, name, parent, grand, g, p) | some p in pick.parents] if "parents" in object.keys(pick)
+
+_grandchild_evaluation(req, name, parent, grand, g, p) := e if {
+	"subject" in object.keys(p)
+	e := _evaluation(p.subject, req, name) with data.ergo_in as {grand: g.id, parent: p.id} with data.ergo_parent as {grand: g.subject, parent: p.subject}
+}
+
+_grandchild_evaluation(req, name, parent, grand, g, p) := {
+	"min_subjects": [row],
+	"unique_ids": [],
+	"applies": [],
+	"subject_rows": [],
+	"total": 0,
+	"matching": 0,
+	"scope_readable": true,
+	"rows_complete": true,
+} if {
+	"cause" in object.keys(p)
+	row := _parent_min_subjects_row(req, name, p.cause) with data.ergo_in as {grand: g.id, parent: p.id}
+}
 
 _chain_evaluation(req, name, pick) := _parents_evaluation(req, name, [_parent_evaluation(req, name, pick.parent, p) | some p in pick.parents]) if {
 	"parents" in object.keys(pick)
@@ -6540,6 +6593,8 @@ _p_alias_taken(name, alias, _, own, narrow, _) if {
 
 _p_alias_taken(name, alias, _, _, _, descend) if descend[name] == alias
 
+_p_alias_taken(name, alias, _, _, _, descend) if descend[descend[name]] == alias
+
 _p_alias_taken(_, alias, def, _, _, _) if {
 	is_array(object.get(def, "from", null))
 	count(def.from) > 0
@@ -6671,9 +6726,11 @@ _s_every_unsupported(name, fl, subjects) := ({"every can't go with a from line t
 	fl.path.steps[0] in object.keys(subjects)
 } | {"every can't go with named by each of: start the from line at a subject to read its names one subject at a time" | "named_by_each_of" in object.keys(fl)}) | {"every over more than ten steps isn't supported yet" | count(_s_model_path(fl.path)) > 10} if object.get(fl, "every", false) == true
 
-_s_chain_unsupported(name, fl, subjects, descend) := {"a chain of more than two subjects isn't supported yet" |
+_s_chain_unsupported(name, fl, subjects, descend) := {"a chain of more than three subjects isn't supported yet" |
 	_s_descends(name, fl, subjects)
-	fl.path.steps[0] in object.keys(descend)
+	parent := fl.path.steps[0]
+	parent in object.keys(descend)
+	descend[parent] in object.keys(descend)
 }
 
 _s_id_field(read) := {"identified_by": read.identified_by.path} if "path" in object.keys(object.get(read, "identified_by", {}))
@@ -6722,18 +6779,21 @@ _p_for_clash(check, _) := set() if not is_string(object.get(check, "for", ""))
 
 _p_steps_of(parts) := {alias: read.from.path | some alias, read in parts; _p_valid(read)}
 
-_p_own_context(name, eff) := {"own": _p_steps_of(object.get(eff, name, {})), "parent": null, "pparts": {}}
+_p_own_context(name, eff) := {"own": _p_steps_of(object.get(eff, name, {})), "ancestors": {}}
 
-_p_context(req, chains, parts) := {"own": _p_steps_of(object.get(parts.effective, req.subject, {})), "parent": parent, "pparts": _p_steps_of(object.get(parts.effective, parent, {}))} if {
+_p_context(req, chains, parts) := {"own": _p_steps_of(object.get(parts.effective, req.subject, {})), "ancestors": {a: _p_steps_of(object.get(parts.effective, a, {})) | some a in _s_ancestors(req.subject, chains)}} if {
 	is_string(object.get(req, "subject", null))
-	parent := chains[req.subject]
-} else := {"own": _p_steps_of(object.get(parts.effective, req.subject, {})), "parent": null, "pparts": {}} if is_string(object.get(req, "subject", null))
+} else := {"own": {}, "ancestors": {}}
 
-else := {"own": {}, "parent": null, "pparts": {}}
+_s_ancestors(name, chains) := array.concat([chains[name]], [chains[chains[name]] | chains[name] in object.keys(chains)]) if name in object.keys(chains)
+
+else := []
 
 _p_idle(pc) if {
 	pc.own == {}
-	pc.pparts == {}
+	every _, steps in pc.ancestors {
+		steps == {}
+	}
 }
 
 _p_applied(m, pc) := m if _p_idle(pc)
@@ -6808,13 +6868,15 @@ _p_path(path, pc, "o") := array.concat(array.concat([_p_marker(alias, count(pc.o
 	alias in object.keys(pc.own)
 } else := path
 
-_p_parent_path(path, pc) := array.concat(array.concat([_p_marker(path[1], count(pc.pparts[path[1]]), pc.parent, false)], pc.pparts[path[1]]), array.slice(path, 2, count(path))) if {
-	pc.parent != null
+_p_parent_path(path, pc) := array.concat(array.concat([_p_marker(path[1], count(pc.ancestors[a][path[1]]), a, false)], pc.ancestors[a][path[1]]), array.slice(path, 2, count(path))) if {
 	is_array(path)
 	count(path) > 1
-	path[0] == concat("", ["$", pc.parent])
+	is_string(path[0])
+	a := substring(path[0], 1, -1)
+	path[0] == concat("", ["$", a])
+	a in object.keys(pc.ancestors)
 	is_string(path[1])
-	path[1] in object.keys(pc.pparts)
+	path[1] in object.keys(pc.ancestors[a])
 } else := path
 
 _p_smodel(m, pc) := object.union(m, {"checks": [_p_sleaf(c, pc) | some c in m.checks]}) if m.op == "all_of"
@@ -6945,7 +7007,7 @@ _p_requirement(req, chains, parts) := object.union(object.remove(req, ["checks"]
 	aliases := _p_aliases(req, parts)
 } else := req
 
-_s_parents_of(req, chains) := {chains[req.subject]} if {
+_s_parents_of(req, chains) := {a | some a in _s_ancestors(req.subject, chains)} if {
 	is_string(object.get(req, "subject", null))
 	req.subject in object.keys(chains)
 } else := set()
