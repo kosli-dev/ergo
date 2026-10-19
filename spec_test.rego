@@ -3,16 +3,6 @@ package spec_test
 import data.ergo
 
 known_differences := {
-	"sentences / a time is after a written number / fails as unusable when the field is a string, because the written time is a number",
-	"sentences / a time is after a written number / fails as value on the same number",
-	"sentences / a time is after a written number / passes when the number is higher",
-	"sentences / a time is before a written time / fails as absent when the field is missing",
-	"sentences / a time is before a written time / fails as unusable when the field is a number, because the written time is a string",
-	"sentences / a time is before a written time / fails as unusable when the field is text that is not a time",
-	"sentences / a time is before a written time / fails as value on the same instant written in another offset",
-	"sentences / a time is before a written time / passes when the order holds",
-	"sentences / a time is on or before a written time / fails as value when it is later",
-	"sentences / a time is on or before a written time / passes on the same instant written in another offset",
 	"sentences / is in a list read with named by / fails as value when it does not",
 	"sentences / is in a list read with named by / passes when the list under the key has the value",
 	"sentences / is in a list read with named by a key that has no list / fails as absent whatever the field holds",

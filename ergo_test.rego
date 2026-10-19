@@ -8352,7 +8352,6 @@ test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
 		[`t is before y plus 1`, `"is before" can't take a count of, a sum of or a plus`],
 		[`count of xs whose sum of ys is 1 is 2`, "a sum of or a plus in the whose of a count of or a sum of isn't supported yet"],
 		[`count of xs whose n is count of ys plus 1 is 2`, "a sum of or a plus in the whose of a count of or a sum of isn't supported yet"],
-		[`t is before "2024-01-01T00:00:00Z"`, `"is before" with a value isn't supported yet: compare with a field`],
 		[`x matches $params.a named by $params.b`, `"matches" with named by in its path isn't supported yet`],
 		[`last of xs is 1`, "last of isn't supported yet"],
 	] {
@@ -12287,4 +12286,36 @@ test_a_count_in_the_whose_of_a_count_counts_through_a_list_it_walks if {
 	doc := [{"id": 1, "xs": [{"ys": [{"z": [1, 2]}, {"z": [1]}]}, {"ys": [{"z": [1]}]}]}]
 	_elapsed_rows("count of xs whose count of ys.z is 3 is 1", doc, {})[0][1] == true
 	_elapsed_rows("count of xs whose count of ys.z is 3 is 2", doc, {})[0][1] == false
+}
+
+test_a_time_phrase_with_a_written_value_fails_closed_on_every_kind_of_field if {
+	doc := {"things": [{"id": "a", "t": "2024-01-01T00:00:00Z"}, {"id": "b", "t": 5}, {"id": "c", "t": null}, {"id": "d"}, {"id": "e", "t": [1]}, {"id": "f", "t": "2025-01-01T00:00:00Z"}]}
+	rows := _sentence_rows({"c": "t is before \"2024-06-01T00:00:00Z\""}, doc, {})
+	[[r[1], r[2]] | some r in rows] == [[true, "satisfied"], [false, "unusable"], [false, "null"], [false, "absent"], [false, "unusable"], [false, "value"]]
+}
+
+test_a_time_phrase_with_a_written_value_that_is_not_a_time_is_unusable if {
+	doc := {"things": [{"id": "a", "t": "2024-01-01T00:00:00Z"}, {"id": "b", "t": 5}]}
+	every written in ["null", "true", "\"yesterday\"", "5", "\"2024-01-01\""] {
+		rows := _sentence_rows({"c": concat("", ["t is before ", written])}, doc, {})
+		count([r | some r in rows; r[1] == true]) == 0
+	}
+	[r[2] | some r in _sentence_rows({"c": "t is before null"}, doc, {})] == ["unusable", "unusable"]
+	[r[2] | some r in _sentence_rows({"c": "t is before 6"}, doc, {})] == ["unusable", "satisfied"]
+}
+
+test_a_time_phrase_with_a_written_value_shows_only_the_field_it_reads if {
+	_sentence_rows({"c": "t is on or after 5"}, {"things": [{"id": "a", "t": 5}]}, {}) == [["c", true, "satisfied", [{"name": "t", "value": 5}]]]
+}
+
+test_a_time_phrase_with_a_written_value_goes_in_a_whose if {
+	doc := {"things": [{"id": "a", "xs": [{"t": "2024-01-01T00:00:00Z", "v": "x"}, {"t": "2026-01-01T00:00:00Z", "v": ""}]}, {"id": "b", "xs": [{"t": "2024-01-01T00:00:00Z", "v": ""}]}, {"id": "c", "xs": [{"t": 5, "v": ""}]}]}
+	rows := _sentence_rows({"c": "every xs.v whose t is before \"2025-01-01T00:00:00Z\" is not empty"}, doc, {})
+	[[r[1], r[2]] | some r in rows] == [[true, "satisfied"], [false, "value"], [false, "unusable"]]
+	count_rows := _sentence_rows({"c": "count of xs whose t is before \"2025-01-01T00:00:00Z\" is 1"}, doc, {})
+	[[r[1], r[2]] | some r in count_rows] == [[true, "satisfied"], [true, "satisfied"], [false, "unusable"]]
+}
+
+test_a_hand_written_compare_time_cant_take_a_written_value if {
+	_sentence_problems({"op": "compare_time", "left": ["a"], "cmp": "lt", "right": {"literal": "2024-01-01T00:00:00Z"}}) == ["invalid right"]
 }

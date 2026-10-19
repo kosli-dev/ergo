@@ -2182,7 +2182,7 @@ _compared(check, l, r) if {
 
 _leaf_op_passed("compare_time", check, subj) if {
 	l := value_at(subj, check.left)
-	r := value_at(subj, check.right)
+	r := _simple_value(subj, check.right)
 	_rfc3339_shaped(l)
 	_rfc3339_shaped(r)
 	_cmp(check.cmp, time.parse_rfc3339_ns(l), time.parse_rfc3339_ns(r))
@@ -2190,7 +2190,7 @@ _leaf_op_passed("compare_time", check, subj) if {
 
 _leaf_op_passed("compare_time", check, subj) if {
 	l := value_at(subj, check.left)
-	r := value_at(subj, check.right)
+	r := _simple_value(subj, check.right)
 	is_number(l)
 	is_number(r)
 	_cmp(check.cmp, l, r)
@@ -2373,8 +2373,15 @@ _simple_found(_, side) := v if {
 _unusable(leaf, x) if {
 	leaf.op == "compare_time"
 	l := _found(x, leaf.left)
-	r := _found(x, leaf.right)
+	r := _simple_found(x, leaf.right)
 	not _timestamps(l, r)
+}
+
+_unusable(leaf, x) if {
+	leaf.op == "compare_time"
+	_found(x, leaf.left)
+	_basic_form(leaf.right) == "literal"
+	_written(leaf.right) == null
 }
 
 _usable_pair(cmp, l, r) if {
@@ -4107,6 +4114,13 @@ _check_inputs(subj, check, item) := [
 	check.op == "compare_time"
 	is_array(check.left)
 	is_array(check.right)
+}
+
+_check_inputs(subj, check, item) := [{"name": _item_path_name(item, check.left), "value": value_at(subj, check.left)}] if {
+	not check.inputs
+	check.op == "compare_time"
+	is_array(check.left)
+	_basic_form(check.right) == "literal"
 }
 
 _check_inputs(subj, check, item) := array.concat(_side_inputs(subj, object.get(check, "left", null), item), _side_inputs(subj, object.get(check, "right", null), item)) if {
@@ -5944,6 +5958,12 @@ _side_problem(node, here) := ({concat("", ["invalid ", f]) |
 	some f in ["left", "right"]
 	f in object.keys(node)
 	not is_array(node[f])
+	not _sentence_time_value(f, node, here)
+}
+
+_sentence_time_value("right", node, here) if {
+	_basic_form(node.right) == "literal"
+	_s_read(node, here)
 }
 
 _within_problem(node) := {"invalid within" |
@@ -7541,11 +7561,6 @@ _s_argument_unsupported(ph) := {concat("", [`"`, _s_phrase_words(ph), `" can't t
 	terms != []
 	not _s_one_path(terms)
 	not ph.op in object.keys(_s_derived_cmps)
-}
-
-_s_argument_unsupported(ph) := {concat("", [`"`, ph.op, `" with a value isn't supported yet: compare with a field`])} if {
-	ph.op in object.keys(_s_time_cmps)
-	"value" in object.keys(ph)
 }
 
 _s_argument_unsupported(ph) := {concat("", [`"`, _s_phrase_words(ph), `" with named by in its path isn't supported yet`])} if {
