@@ -19,8 +19,8 @@ execFileSync("tar", ["-xzf", bundle, "-C", runtimeDir, "/policy.wasm", "/data.js
 
 const ergoDir = path.join(runtimeDir, "ergo");
 fs.mkdirSync(ergoDir, { recursive: true });
-fs.writeFileSync(path.join(ergoDir, "entrypoint.rego"), "package entrypoint\n\nreport := data.ergo.report(input.document, input.policy, input.params)\n\nviolations := data.ergo.violations(input.report)\n\nas_sentences := data.ergo.as_sentences(input.policy)\n\nread := data.ergo.read(input.policy)\n");
-execFileSync("opa", ["build", "-t", "wasm", "-e", "entrypoint/report", "-e", "entrypoint/violations", "-e", "entrypoint/as_sentences", "-e", "entrypoint/read", "-o", path.join(ergoDir, "ergo.tar.gz"), "ergo.rego", path.join(ergoDir, "entrypoint.rego")]);
+fs.writeFileSync(path.join(ergoDir, "entrypoint.rego"), "package entrypoint\n\nreport := data.ergo.report(input.document, input.policy, input.params)\n\nviolations := data.ergo.violations(input.report)\n\nas_sentences := data.ergo.as_sentences(input.policy)\n\ncompile := data.ergo.compile(input.policy)\n");
+execFileSync("opa", ["build", "-t", "wasm", "-e", "entrypoint/report", "-e", "entrypoint/violations", "-e", "entrypoint/as_sentences", "-e", "entrypoint/compile", "-o", path.join(ergoDir, "ergo.tar.gz"), "ergo.rego", path.join(ergoDir, "entrypoint.rego")]);
 execFileSync("tar", ["-xzf", path.join(ergoDir, "ergo.tar.gz"), "-C", ergoDir, "/policy.wasm"]);
 
 const parseTime = (v) => {
