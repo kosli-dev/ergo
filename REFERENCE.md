@@ -11,6 +11,7 @@ This page describes everything ergo accepts and everything it returns. If you ha
 - [Causes](#causes)
 - [Violations](#violations)
 - [Compiling to Wasm](#compiling-to-wasm)
+- [Compiling a policy](#compiling-a-policy)
 - [Failing closed](#failing-closed)
 - [The old syntax](#the-old-syntax)
 
@@ -1456,6 +1457,72 @@ const parseTime = (v) => {
 
 const policy = await loadPolicy(wasm, undefined, { "time.parse_rfc3339_ns": parseTime });
 ```
+
+## Compiling a policy
+
+**Experimental:** `ergo.compile` may change or go away in any version of ergo.
+
+`ergo.report` reads every sentence of the policy each time it runs. When the same policy runs many times, like in a test suite, you can do that once with `ergo.compile(policy)`, save what it returns as JSON, and pass that to `ergo.report` in place of the policy. The report is the same. This is ergo's own step, not OPA's: OPA still compiles `ergo.rego` as usual.
+
+Treat a compiled policy like a compiler's object file. Make it in the build that uses it, don't commit it, and make it again whenever the policy or your copy of `ergo.rego` changes. Its shape is ergo's own and changes between versions, and ergo doesn't check that a compiled policy matches the `ergo.rego` running it, or that nobody edited it, so a stale or edited one can give a wrong report. Don't edit it. One with a field missing or of the wrong type fails like a policy ergo can't read, and compiling a compiled policy gives it back unchanged.
+
+A `make` rule keeps it fresh, since it runs again when either file changes. With this `policy.yaml`:
+
+```yaml
+subjects:
+  deployment:
+    from: deployments
+    identified_by: id
+requirements:
+  approved_deploy:
+    subject: deployment
+    checks:
+      approved: approved_by is not empty
+```
+
+this `Makefile` compiles it:
+
+```make
+compiled_policy.json: policy.yaml ergo.rego
+	opa eval -d ergo.rego -d policy.yaml --format raw \
+	  'json.marshal({"compiled_policy": data.ergo.compile({"subjects": data.subjects, "requirements": data.requirements})})' > $@
+```
+
+and `policy.rego` runs it:
+
+```rego
+package policy
+
+import data.ergo
+
+report := ergo.report(input, data.compiled_policy, {})
+```
+
+On this `input.json`:
+
+```json
+{"deployments": [{"id": "d-1", "approved_by": "alice"}, {"id": "d-2", "approved_by": ""}]}
+```
+
+`make` and then `opa eval -d ergo.rego -d policy.rego -d compiled_policy.json -i input.json --format pretty 'data.ergo.violations(data.policy.report)'` give the same violation as the policy itself:
+
+```json
+[
+  {
+    "cause": "value",
+    "check": "approved",
+    "description": "",
+    "expression": "approved_by is not empty",
+    "inputs": [{ "name": "approved_by", "value": "" }],
+    "requirement": "approved_deploy",
+    "subject": { "id": "d-2", "type": "deployment" }
+  }
+]
+```
+
+The input and the params are read on each run, so a compiled policy works with any of them. Put `compiled_policy.json` in `.gitignore`: a fresh clone gives files the time of checkout, so a committed one can look newer than an `ergo.rego` it doesn't match.
+
+Compiling is part of `ergo.rego`, not of the [spec](spec/README.md), so other implementations of ergo don't have it.
 
 ## Failing closed
 

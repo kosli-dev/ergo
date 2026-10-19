@@ -62,6 +62,16 @@ jobs:
       - name: Run the tests compiled to Wasm
         run: .github/wasm-tests.sh
 
+  tests-compiled-policy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.20.2
+      - name: Run the tests with every report made from a compiled policy
+        run: .github/compiled-tests.sh
+
   wasm-js:
     runs-on: ubuntu-latest
     steps:
