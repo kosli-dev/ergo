@@ -12112,7 +12112,7 @@ test_a_requirement_field_named_like_the_facts_ergo_works_out_once_is_unknown_and
 
 _saved(form) := json.unmarshal(json.marshal(form))
 
-_read_policies := [
+_compile_policies := [
 	_sentence_policy({"c": "x is in $params.l and y exists and y is 2", "d": {"op": "equals", "path": ["y"], "value": {"ref": ["$$params", "y"]}}}),
 	{"subjects": _three_subjects, "requirements": {"r": {"subject": "commit", "checks": {"c": "verified is true"}}, "p": {"subject": "pull request", "checks": {"c": "url exists"}}}},
 	{"subjects": {"deployment": {"from": [{"ref": ["$$params", "list"]}], "identified_by": ["id"], "applies_to": {"env": {"op": "equals", "path": ["environment"], "value": {"ref": ["$$params", "env"]}}}}}, "requirements": {"a": approved_req("deployment")}},
@@ -12123,7 +12123,7 @@ _read_policies := [
 	"policy",
 ]
 
-_read_runs := [
+_compile_runs := [
 	[0, {"things": [{"id": "a", "x": "p", "y": 1}, {"id": "b", "x": "q", "y": 2}]}, {"l": ["p"], "y": 2}],
 	[0, {"things": [{"id": "a", "x": "p", "y": 1}]}, {"l": "text"}],
 	[0, {"things": [{"id": "a", "x": {"p"}, "y": 2}]}, {}],
@@ -12138,32 +12138,32 @@ _read_runs := [
 	[7, {}, {}],
 ]
 
-test_a_report_from_a_saved_read_form_is_the_report_from_its_policy if {
-	every run in _read_runs {
-		ergo.report(run[1], _saved(ergo.read(_read_policies[run[0]])), run[2]) == ergo.report(run[1], _read_policies[run[0]], run[2])
+test_a_report_from_a_saved_compiled_policy_is_the_report_from_its_policy if {
+	every run in _compile_runs {
+		ergo.report(run[1], _saved(ergo.compile(_compile_policies[run[0]])), run[2]) == ergo.report(run[1], _compile_policies[run[0]], run[2])
 	}
 }
 
-test_a_read_form_holds_no_set_so_json_can_hold_it if {
-	every policy in _read_policies {
-		ergo.read(policy) == _saved(ergo.read(policy))
+test_a_compiled_policy_holds_no_set_so_json_can_hold_it if {
+	every policy in _compile_policies {
+		ergo.compile(policy) == _saved(ergo.compile(policy))
 	}
 }
 
-test_any_policy_gives_a_read_form if {
-	every policy in _read_policies {
-		object.keys(ergo.read(policy)) == {"ergo/read"}
+test_any_policy_compiles if {
+	every policy in _compile_policies {
+		object.keys(ergo.compile(policy)) == {"ergo/compiled"}
 	}
 }
 
-test_reading_a_read_form_gives_it_back if {
-	every policy in _read_policies {
-		ergo.read(ergo.read(policy)) == ergo.read(policy)
+test_compiling_a_compiled_policy_gives_it_back if {
+	every policy in _compile_policies {
+		ergo.compile(ergo.compile(policy)) == ergo.compile(policy)
 	}
 }
 
-test_a_read_form_reads_the_params_and_input_of_each_run_not_the_ones_it_was_read_with if {
-	form := _saved(ergo.read(_sentence_policy({"c": "x is in $params.l"})))
+test_a_compiled_policy_reads_the_params_and_input_of_each_run_not_the_ones_it_was_compiled_with if {
+	form := _saved(ergo.compile(_sentence_policy({"c": "x is in $params.l"})))
 	doc := {"things": [{"id": "a", "x": "p"}]}
 	[[r.passed, r.cause] | some r in ergo.report(doc, form, {"l": ["p"]}).results; r.check == "c"] == [[true, "satisfied"]]
 	[[r.passed, r.cause] | some r in ergo.report(doc, form, {"l": ["q"]}).results; r.check == "c"] == [[false, "value"]]
@@ -12173,26 +12173,32 @@ test_a_read_form_reads_the_params_and_input_of_each_run_not_the_ones_it_was_read
 	ergo.report(doc, form, {"l": ["q"]}).requirements.s.checks.c["$refs"] == [{"name": "$params.l", "value": ["q"]}]
 }
 
-test_a_read_form_with_a_field_missing_or_of_a_type_ergo_cant_use_fails_like_a_policy_ergo_cant_read if {
-	form := ergo.read(_sentence_policy({"c": "x is 1"}))["ergo/read"]
+test_a_compiled_policy_with_a_field_missing_or_of_a_type_ergo_cant_use_fails_like_a_policy_ergo_cant_read if {
+	form := ergo.compile(_sentence_policy({"c": "x is 1"}))["ergo/compiled"]
 	doc := {"things": [{"id": "a", "x": 1}]}
-	ergo.report(doc, {"ergo/read": form}, {}).compliant
+	ergo.report(doc, {"ergo/compiled": form}, {}).compliant
 	every broken in array.concat(
-		[{"ergo/read": null}, {"ergo/read": {}}, {"ergo/read": form, "x": 1}],
+		[{"ergo/compiled": null}, {"ergo/compiled": {}}, {"ergo/compiled": form, "x": 1}],
 		array.concat(
-			[{"ergo/read": object.remove(form, [f])} | some f, _ in form],
-			[{"ergo/read": object.union(form, {f: "x"})} | some f in ["resolved", "listed", "checks", "subject_sentences", "sentences", "policy_problems"]],
+			array.concat(
+				[{"ergo/compiled": object.remove(form, [f])} | some f, _ in form],
+				[{"ergo/compiled": object.union(form, {f: "x"})} | some f in ["resolved", "subject_sentences", "ahead", "sentences"]],
+			),
+			array.concat(
+				[{"ergo/compiled": object.union(object.remove(form, ["ahead"]), {"ahead": object.remove(form.ahead, [f])})} | some f, _ in form.ahead],
+				[{"ergo/compiled": object.union(form, {"ahead": object.union(form.ahead, {f: "x"})})} | some f, _ in form.ahead],
+			),
 		),
 	) {
 		ergo.report(doc, broken, {}) == ergo.report(doc, {"x": 1}, {})
 	}
 }
 
-test_data_named_like_what_ergo_reads_ahead_changes_no_report if {
+test_data_named_like_ergos_compile_flag_changes_no_report if {
 	policy := _sentence_policy({"c": "x is 1"})
 	doc := {"things": [{"id": "a", "x": 2}]}
 	want := ergo.report(doc, policy, {})
-	every form in [policy, ergo.read(policy)] {
-		ergo.report(doc, form, {}) == want with data.ergo_pre as {"checks": {"s": {"ill": {"check": {}, "filter": {}}, "defs": {}, "well_formed": {}}}} with data.ergo_reading as true
+	every form in [policy, ergo.compile(policy)] {
+		ergo.report(doc, form, {}) == want with data.ergo_reading as true
 	}
 }

@@ -4483,8 +4483,8 @@ _subject_row_groups(matching, req, req_name, flaws, item, prepared) := [[row |
 	ref := _entry_ref(entry, req)
 ]
 
-_well_formed_row(req, name) := v if {
-	v := data.ergo_pre.checks[name].well_formed
+_well_formed_row(req, name, parts) := v if {
+	v := parts.well_formed
 } else := _well_formed_row_of(req, name)
 
 _well_formed_row_of(req, req_name) := row if {
@@ -4599,10 +4599,10 @@ _applies_inputs(subj, req, item) := [inp |
 	inp.name == name
 ]
 
-_evaluation(doc, req, name) := object.union({"well_formed": _well_formed_row(req, name)}, _evaluation_with(doc, req, name, _fixed_of(req, name)))
+_evaluation(doc, req, name, parts) := object.union({"well_formed": _well_formed_row(req, name, parts)}, _evaluation_with(doc, req, name, _fixed_of(req, parts)))
 
-_fixed_of(req, name) := _fixed_with(req, v) if {
-	v := data.ergo_pre.checks[name].ill
+_fixed_of(req, parts) := _fixed_with(req, v) if {
+	v := parts.ill
 } else := _fixed_with(req, _ill_of(req))
 
 _ill_of(req) := {
@@ -4773,17 +4773,17 @@ _names(x) := [i | some i, _ in x] if is_array(x)
 
 _names(x) := sort(x) if is_set(x)
 
-report(doc, policy, params) := _run(doc, form.policy, _from_read_form(form), params) if {
-	form := _read_form(policy)
+report(doc, policy, params) := _run(doc, c.policy, _from_compiled(c), params) if {
+	c := _compiled(policy)
 } else := _run(doc, policy, _read(policy), params)
 
-read(policy) := policy if _read_form(policy)
+compile(policy) := policy if _compiled(policy)
 
-else := {"ergo/read": object.union({"policy": policy}, _to_read_form(r))} if r := _read_with_pre(policy)
+else := {"ergo/compiled": object.union({"policy": policy}, _to_compiled(rd))} if rd := _read_ahead(policy)
 
 else := policy
 
-_read(policy) := {"subjects": subjects, "subject_sentences": subject_sentences, "reqs": reqs, "sentences": sentences, "resolved": resolved, "pre": {}} if {
+_read(policy) := {"subjects": subjects, "subject_sentences": subject_sentences, "reqs": reqs, "sentences": sentences, "resolved": resolved, "ahead": {}} if {
 	raw := _section(policy, "requirements")
 	written_subjects := _section(policy, "subjects")
 	parts := _p_parts(written_subjects)
@@ -4795,16 +4795,16 @@ _read(policy) := {"subjects": subjects, "subject_sentences": subject_sentences, 
 	resolved := _resolved_subjects with data.ergo_subjects as subjects with data.ergo_subject_sentences as subject_sentences
 }
 
-_read_with_pre(policy) := object.union(rd, {"pre": pre}) if {
+_read_ahead(policy) := object.union(rd, {"ahead": ahead}) if {
 	rd := _read(policy)
-	pre := {
+	ahead := {
 		"policy_problems": _policy_problem_inputs(policy),
 		"listed": _reported_subjects(_section(policy, "subjects"), rd.reqs),
-		"checks": {name: {"well_formed": _well_formed_row_of(req, name), "defs": _requirement_check_defs(req), "ill": _ill_of(req)} | some name, req in rd.reqs},
-	} with data.ergo_policy_problems as _policy_problem_inputs(policy) with data.ergo_document as {} with data.ergo_params as {} with data.ergo_subjects as rd.subjects with data.ergo_resolved as rd.resolved with data.ergo_reading as true with data.ergo_pre as {} with data.ergo_unreadable as [] with data.ergo_sentences as rd.sentences with data.ergo_subject_sentences as rd.subject_sentences with input as {"ergo/names": {}}
+		"requirements": {name: {"well_formed": _well_formed_row_of(req, name), "defs": _requirement_check_defs(req), "ill": _ill_of(req)} | some name, req in rd.reqs},
+	} with data.ergo_policy_problems as _policy_problem_inputs(policy) with data.ergo_document as {} with data.ergo_params as {} with data.ergo_subjects as rd.subjects with data.ergo_resolved as rd.resolved with data.ergo_reading as true with data.ergo_unreadable as [] with data.ergo_sentences as rd.sentences with data.ergo_subject_sentences as rd.subject_sentences with input as {"ergo/names": {}}
 }
 
-_to_read_form(rd) := {
+_to_compiled(rd) := {
 	"subjects": rd.subjects,
 	"subject_sentences": object.union(rd.subject_sentences, {
 		"every": sort(rd.subject_sentences.every),
@@ -4815,66 +4815,66 @@ _to_read_form(rd) := {
 	"requirements": rd.reqs,
 	"sentences": sort(rd.sentences),
 	"resolved": {n: object.union(r, {"members": sort(r.members), "problems": sort(r.problems)}) | some n, r in rd.resolved},
-	"policy_problems": rd.pre.policy_problems,
-	"listed": rd.pre.listed,
-	"checks": rd.pre.checks,
+	"ahead": rd.ahead,
 }
 
-_from_read_form(form) := {
-	"subjects": form.subjects,
-	"subject_sentences": object.union(form.subject_sentences, {
-		"every": {x | some x in form.subject_sentences.every},
-		"narrowed": {x | some x in form.subject_sentences.narrowed},
-		"filters": {x | some x in form.subject_sentences.filters},
-		"has_problems": {n: {p | some p in ps} | some n, ps in form.subject_sentences.has_problems},
+_from_compiled(c) := {
+	"subjects": c.subjects,
+	"subject_sentences": object.union(c.subject_sentences, {
+		"every": {x | some x in c.subject_sentences.every},
+		"narrowed": {x | some x in c.subject_sentences.narrowed},
+		"filters": {x | some x in c.subject_sentences.filters},
+		"has_problems": {n: {p | some p in ps} | some n, ps in c.subject_sentences.has_problems},
 	}),
-	"reqs": form.requirements,
-	"sentences": {x | some x in form.sentences},
-	"resolved": {n: object.union(r, {"members": {m | some m in r.members}, "problems": {p | some p in r.problems}}) | some n, r in form.resolved},
-	"pre": {"policy_problems": form.policy_problems, "listed": form.listed, "checks": form.checks},
+	"reqs": c.requirements,
+	"sentences": {x | some x in c.sentences},
+	"resolved": {n: object.union(r, {"members": {m | some m in r.members}, "problems": {p | some p in r.problems}}) | some n, r in c.resolved},
+	"ahead": c.ahead,
 }
 
-_read_form(x) := form if {
+_compiled(x) := c if {
 	is_object(x)
-	object.keys(x) == {"ergo/read"}
-	form := x["ergo/read"]
-	is_object(form)
-	every f in ["resolved", "listed", "checks", "subject_sentences"] {
-		is_object(object.get(form, f, null))
-	}
-	every f in ["sentences", "policy_problems"] {
-		is_array(object.get(form, f, null))
-	}
+	object.keys(x) == {"ergo/compiled"}
+	c := x["ergo/compiled"]
+	is_object(c)
 	every f in ["policy", "subjects", "requirements"] {
-		f in object.keys(form)
+		f in object.keys(c)
 	}
+	every f in ["resolved", "subject_sentences", "ahead"] {
+		is_object(object.get(c, f, null))
+	}
+	is_array(object.get(c, "sentences", null))
 	every f in ["every", "narrowed", "filters"] {
-		is_array(object.get(form.subject_sentences, f, null))
+		is_array(object.get(c.subject_sentences, f, null))
 	}
-	is_object(object.get(form.subject_sentences, "has_problems", null))
+	is_object(object.get(c.subject_sentences, "has_problems", null))
+	every f in ["listed", "requirements"] {
+		is_object(object.get(c.ahead, f, null))
+	}
+	is_array(object.get(c.ahead, "policy_problems", null))
 }
 
-_pre_check_defs(req, name) := {n: _pre_refs(def) | some n, def in data.ergo_pre.checks[name].defs} if {
-	data.ergo_pre.checks[name].defs
+_ahead_check_defs(req, parts) := {n: _ahead_refs(def) | some n, def in parts.defs} if {
+	parts.defs
 } else := _requirement_check_defs(req)
 
-_pre_refs(def) := object.union(object.remove(def, ["$refs_of"]), {"$refs": _ref_inputs(def["$refs_of"])}) if "$refs_of" in object.keys(def)
+_ahead_refs(def) := object.union(object.remove(def, ["$refs_of"]), {"$refs": _ref_inputs(def["$refs_of"])}) if "$refs_of" in object.keys(def)
 
 else := def
 
 _listed_of(policy, rd) := v if {
-	v := rd.pre.listed
+	v := rd.ahead.listed
 } else := _reported_subjects(_section(policy, "subjects"), rd.reqs)
 
 _policy_problems_of(policy, rd) := v if {
-	v := rd.pre.policy_problems
+	v := rd.ahead.policy_problems
 } else := _policy_problem_inputs(policy)
 
 _run(doc, policy, rd, params) := r if {
 	raw := _section(policy, "requirements")
 	reqs := rd.reqs
 	unreadable := _unreadable_inputs(doc, params)
-	written := object.union(_report_of(doc, reqs), {"description": _reported_description(policy), "meta": _reported_meta(policy), "subjects": _listed_of(policy, rd)}) with data.ergo_pre as rd.pre with data.ergo_reading as false with data.ergo_policy_problems as _policy_problems_of(policy, rd) with data.ergo_document as doc with data.ergo_params as params with data.ergo_subjects as rd.subjects with data.ergo_resolved as rd.resolved with data.ergo_unreadable as unreadable with data.ergo_sentences as rd.sentences with data.ergo_subject_sentences as rd.subject_sentences with input as {"ergo/names": {}}
+	written := object.union(_report_of(doc, reqs, object.get(rd.ahead, "requirements", {})), {"description": _reported_description(policy), "meta": _reported_meta(policy), "subjects": _listed_of(policy, rd)}) with data.ergo_reading as false with data.ergo_policy_problems as _policy_problems_of(policy, rd) with data.ergo_document as doc with data.ergo_params as params with data.ergo_subjects as rd.subjects with data.ergo_resolved as rd.resolved with data.ergo_unreadable as unreadable with data.ergo_sentences as rd.sentences with data.ergo_subject_sentences as rd.subject_sentences with input as {"ergo/names": {}}
 	used := _used_subjects(reqs, rd.subjects, rd.resolved)
 	r := _reported(written, unreadable, [raw, used])
 }
@@ -5126,7 +5126,7 @@ else := set() if params == null
 
 else := {"not an object"}
 
-_report_of(doc, policy) := {
+_report_of(doc, policy, compiled) := {
 	"compliant": _policy_compliant(policy, evaluations),
 	"requirements": {name: {
 		"description": _reported_description(req),
@@ -5136,27 +5136,27 @@ _report_of(doc, policy) := {
 		"status": status,
 		"causes": _causes(status, evaluations[name]),
 		"subjects": {"total": evaluations[name].total, "matching": evaluations[name].matching},
-		"checks": _pre_check_defs(req, name),
+		"checks": _ahead_check_defs(req, object.get(compiled, name, {})),
 	} |
 		some name, req in policy
 		status := _status(req, evaluations[name])
 	},
 	"results": _results(policy, evaluations),
 } if {
-	evaluations := {name: _evaluated(doc, policy[name], name) | some name in _names(policy)}
+	evaluations := {name: _evaluated(doc, policy[name], name, object.get(compiled, name, {})) | some name in _names(policy)}
 }
 
-_evaluated(doc, req, name) := e if {
+_evaluated(doc, req, name, parts) := e if {
 	not _chained(req)
-	e := _evaluation(doc, req, name)
+	e := _evaluation(doc, req, name, parts)
 }
 
-_evaluated(doc, req, name) := _chain_evaluation(req, name, _parent_pick(doc, req)) if {
+_evaluated(doc, req, name, parts) := _chain_evaluation(req, name, _parent_pick(doc, req), parts) if {
 	_chained(req)
 	not _grand_chained(req)
 }
 
-_evaluated(doc, req, name) := _grand_evaluation(req, name, _parent_pick_of(doc, {"subject": grand, "checks": {}}), parent, grand, _fixed_of(req, name)) if {
+_evaluated(doc, req, name, parts) := _grand_evaluation(req, name, _parent_pick_of(doc, {"subject": grand, "checks": {}}), parent, grand, _fixed_of(req, parts), parts) if {
 	_grand_chained(req)
 	parent := data.ergo_subject_sentences.chains[req.subject]
 	grand := data.ergo_subject_sentences.chains[parent]
@@ -5167,13 +5167,13 @@ _grand_chained(req) if {
 	data.ergo_subject_sentences.chains[req.subject] in object.keys(data.ergo_subject_sentences.chains)
 }
 
-_grand_evaluation(req, name, gpick, _, _, _) := _no_parent_evaluation(req, name, gpick.cause) if "cause" in object.keys(gpick)
+_grand_evaluation(req, name, gpick, _, _, _, parts) := _no_parent_evaluation(req, name, gpick.cause, parts) if "cause" in object.keys(gpick)
 
-_grand_evaluation(req, name, gpick, parent, grand, fixed) := _grand_branches(req, name, [e | some g in gpick.parents; some e in _grand_branch(req, name, parent, grand, g, fixed)]) if "parents" in object.keys(gpick)
+_grand_evaluation(req, name, gpick, parent, grand, fixed, parts) := _grand_branches(req, name, [e | some g in gpick.parents; some e in _grand_branch(req, name, parent, grand, g, fixed)], parts) if "parents" in object.keys(gpick)
 
-_grand_branches(req, name, es) := _parents_evaluation(req, name, es) if count(es) > 0
+_grand_branches(req, name, es, parts) := _parents_evaluation(req, name, es, parts) if count(es) > 0
 
-else := _no_parent_evaluation(req, name, "none")
+else := _no_parent_evaluation(req, name, "none", parts)
 
 _grand_branch(req, name, _, grand, g, fixed) := [_parent_evaluation(req, name, grand, g, fixed)] if "cause" in object.keys(g)
 
@@ -5205,20 +5205,20 @@ _grandchild_evaluation(req, name, parent, grand, g, p, _) := {
 	row := _parent_min_subjects_row(req, name, p.cause) with data.ergo_in as {grand: g.id, parent: p.id}
 }
 
-_chain_evaluation(req, name, pick) := _parents_evaluation(req, name, [_parent_evaluation(req, name, pick.parent, p, fixed) | some p in pick.parents]) if {
-	fixed := _fixed_of(req, name)
+_chain_evaluation(req, name, pick, parts) := _parents_evaluation(req, name, [_parent_evaluation(req, name, pick.parent, p, fixed) | some p in pick.parents], parts) if {
+	fixed := _fixed_of(req, parts)
 	"parents" in object.keys(pick)
 	count(pick.parents) > 0
 }
 
-_chain_evaluation(req, name, pick) := _no_parent_evaluation(req, name, "none") if {
+_chain_evaluation(req, name, pick, parts) := _no_parent_evaluation(req, name, "none", parts) if {
 	"parents" in object.keys(pick)
 	count(pick.parents) == 0
 }
 
-_chain_evaluation(req, name, pick) := _no_parent_evaluation(req, name, pick.cause) if "cause" in object.keys(pick)
+_chain_evaluation(req, name, pick, parts) := _no_parent_evaluation(req, name, pick.cause, parts) if "cause" in object.keys(pick)
 
-_no_parent_evaluation(req, name, cause) := object.union(_evaluation({}, req, name), {
+_no_parent_evaluation(req, name, cause, parts) := object.union(_evaluation({}, req, name, parts), {
 	"min_subjects": [_parent_min_subjects_row(req, name, cause)],
 	"applies": [],
 	"subject_rows": [],
@@ -5247,8 +5247,8 @@ _parent_evaluation(req, name, parent, p, _) := {
 	row := _parent_min_subjects_row(req, name, p.cause) with data.ergo_in as {parent: p.id}
 }
 
-_parents_evaluation(req, name, es) := {
-	"well_formed": _well_formed_row(req, name),
+_parents_evaluation(req, name, es, parts) := {
+	"well_formed": _well_formed_row(req, name, parts),
 	"min_subjects": [row | some e in es; some row in e.min_subjects],
 	"unique_ids": [row | some e in es; some row in e.unique_ids],
 	"applies": [row | some e in es; some row in e.applies],

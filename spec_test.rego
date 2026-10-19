@@ -72,9 +72,9 @@ _topic_failures(topic) := {concat(" / ", [topic, group.description, c.descriptio
 
 _known_in(topic) := known_differences & _case_names(topic)
 
-_read_differences(topic) := {concat(" / ", [topic, group.description, c.description]) |
+_compiled_differences(topic) := {concat(" / ", [topic, group.description, c.description]) |
 	some group in data.spec.cases[topic]
-	form := json.unmarshal(json.marshal(ergo.read(group.policy)))
+	form := json.unmarshal(json.marshal(ergo.compile(group.policy)))
 	some c in group.cases
 	ergo.report(c.input, form, object.get(group, "params", {})) != _report(group, c)
 }
@@ -92,112 +92,112 @@ test_every_folder_of_cases_has_a_test_of_its_own if {t | some t, _ in data.spec.
 
 test_the_any_of_cases_pass if {
 	_topic_failures("any_of") == _known_in("any_of")
-	_read_differences("any_of") == set()
+	_compiled_differences("any_of") == set()
 }
 
 test_the_compare_cases_pass if {
 	_topic_failures("compare") == _known_in("compare")
-	_read_differences("compare") == set()
+	_compiled_differences("compare") == set()
 }
 
 test_the_compare_time_cases_pass if {
 	_topic_failures("compare_time") == _known_in("compare_time")
-	_read_differences("compare_time") == set()
+	_compiled_differences("compare_time") == set()
 }
 
 test_the_contains_cases_pass if {
 	_topic_failures("contains") == _known_in("contains")
-	_read_differences("contains") == set()
+	_compiled_differences("contains") == set()
 }
 
 test_the_custom_cases_pass if {
 	_topic_failures("custom") == _known_in("custom")
-	_read_differences("custom") == set()
+	_compiled_differences("custom") == set()
 }
 
 test_the_derived_cases_pass if {
 	_topic_failures("derived") == _known_in("derived")
-	_read_differences("derived") == set()
+	_compiled_differences("derived") == set()
 }
 
 test_the_empty_cases_pass if {
 	_topic_failures("empty") == _known_in("empty")
-	_read_differences("empty") == set()
+	_compiled_differences("empty") == set()
 }
 
 test_the_equals_cases_pass if {
 	_topic_failures("equals") == _known_in("equals")
-	_read_differences("equals") == set()
+	_compiled_differences("equals") == set()
 }
 
 test_the_for_cases_pass if {
 	_topic_failures("for") == _known_in("for")
-	_read_differences("for") == set()
+	_compiled_differences("for") == set()
 }
 
 test_the_in_cases_pass if {
 	_topic_failures("in") == _known_in("in")
-	_read_differences("in") == set()
+	_compiled_differences("in") == set()
 }
 
 test_the_lists_cases_pass if {
 	_topic_failures("lists") == _known_in("lists")
-	_read_differences("lists") == set()
+	_compiled_differences("lists") == set()
 }
 
 test_the_missing_cases_pass if {
 	_topic_failures("missing") == _known_in("missing")
-	_read_differences("missing") == set()
+	_compiled_differences("missing") == set()
 }
 
 test_the_non_empty_string_cases_pass if {
 	_topic_failures("non_empty_string") == _known_in("non_empty_string")
-	_read_differences("non_empty_string") == set()
+	_compiled_differences("non_empty_string") == set()
 }
 
 test_the_parts_cases_pass if {
 	_topic_failures("parts") == _known_in("parts")
-	_read_differences("parts") == set()
+	_compiled_differences("parts") == set()
 }
 
 test_the_patterns_cases_pass if {
 	_topic_failures("patterns") == _known_in("patterns")
-	_read_differences("patterns") == set()
+	_compiled_differences("patterns") == set()
 }
 
 test_the_present_cases_pass if {
 	_topic_failures("present") == _known_in("present")
-	_read_differences("present") == set()
+	_compiled_differences("present") == set()
 }
 
 test_the_range_cases_pass if {
 	_topic_failures("range") == _known_in("range")
-	_read_differences("range") == set()
+	_compiled_differences("range") == set()
 }
 
 test_the_requirements_cases_pass if {
 	_topic_failures("requirements") == _known_in("requirements")
-	_read_differences("requirements") == set()
+	_compiled_differences("requirements") == set()
 }
 
 test_the_sentences_cases_pass if {
 	_topic_failures("sentences") == _known_in("sentences")
-	_read_differences("sentences") == set()
+	_compiled_differences("sentences") == set()
 }
 
 test_the_subjects_cases_pass if {
 	_topic_failures("subjects") == _known_in("subjects")
-	_read_differences("subjects") == set()
+	_compiled_differences("subjects") == set()
 }
 
 test_the_substitutes_cases_pass if {
 	_topic_failures("substitutes") == _known_in("substitutes")
-	_read_differences("substitutes") == set()
+	_compiled_differences("substitutes") == set()
 }
 
 test_the_walks_cases_pass if {
 	_topic_failures("walks") == _known_in("walks")
-	_read_differences("walks") == set()
+	_compiled_differences("walks") == set()
 }
 
 test_a_case_with_the_wrong_rows_is_listed_by_name if {
@@ -358,13 +358,13 @@ test_a_known_difference_that_passes_fails_its_folder if {
 	_known_in("topic") == {"topic / group / case"} with data.spec.cases as cases with known_differences as {"topic / group / case", "other / g / c"}
 }
 
-_wrapped_read(policy) := {"wrapped": policy}
+_wrapped_compile(policy) := {"wrapped": policy}
 
-test_a_case_whose_read_form_gives_another_report_is_listed_by_name if {
-	_read_differences("topic") == {"topic / group / case"} with data.spec.cases as {"topic": [{
+test_a_case_whose_compiled_policy_gives_another_report_is_listed_by_name if {
+	_compiled_differences("topic") == {"topic / group / case"} with data.spec.cases as {"topic": [{
 		"description": "group",
 		"policy": {"subjects": {"subject": {"from": []}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
 		"cases": [{"description": "case", "input": {"x": 1}, "results": []}],
 	}]}
-		with data.ergo.read as _wrapped_read
+		with data.ergo.compile as _wrapped_compile
 }
