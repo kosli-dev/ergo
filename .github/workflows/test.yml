@@ -62,7 +62,7 @@ jobs:
       - name: Run the tests compiled to Wasm
         run: .github/wasm-tests.sh
 
-  compiled:
+  compiled-policy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
