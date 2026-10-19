@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -23,7 +23,6 @@ jobs:
       - name: Check ergo compiles where input is checked against a closed schema
         run: opa check --strict --schema .github/closed-input-schema.json ergo.rego
       - run: opa fmt --list --fail .
-      - run: opa test . --ignore .github --timeout 120s
       - name: Lint for likely bugs
         run: regal lint --format github --disable-all --enable-category bugs --disable redundant-existence-check --ignore-files '.github/**' .
       - name: Check there are no comments
@@ -40,39 +39,95 @@ jobs:
           fi
       - name: Check the tests give the same results with --strict-builtin-errors
         run: opa eval --strict-builtin-errors --ignore .github -d . --format raw 'count(data) > 0'
-      - name: Check every line is tested
+
+  tests-rego:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        part: [1, 2, 3, 4]
+    env:
+      PART: ${{ matrix.part }}
+      PARTS: ${{ strategy.job-total }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.20.2
+      - name: Run this part of the tests with coverage
         shell: bash
         run: |
-          opa test . --ignore .github --timeout 120s --coverage > "$RUNNER_TEMP/coverage.json"
+          if ! opa test . --ignore .github --timeout 120s --coverage -r "$(.github/tests.sh | .github/test-pattern.sh)" > "$RUNNER_TEMP/coverage.json"; then
+            cat "$RUNNER_TEMP/coverage.json"
+            exit 1
+          fi
           jq -e '.files["ergo.rego"]' "$RUNNER_TEMP/coverage.json" > /dev/null
-          uncovered=$(jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' "$RUNNER_TEMP/coverage.json" | sort -u)
+          jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | range(.start.row; .end.row + 1) | "\($f):\(.)"' "$RUNNER_TEMP/coverage.json" | sort -u > "$RUNNER_TEMP/not-covered-$PART.txt"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: not-covered-${{ matrix.part }}
+          path: ${{ runner.temp }}/not-covered-${{ matrix.part }}.txt
+
+  tests-rego-coverage:
+    needs: tests-rego
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: not-covered-*
+          merge-multiple: true
+          path: not-covered
+      - name: Check every line is reached by some part's tests
+        shell: bash
+        run: |
+          files=(not-covered/*.txt)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No part sent its coverage"
+            exit 1
+          fi
+          uncovered=$(cat "${files[0]}")
+          for f in "${files[@]:1}"; do
+            uncovered=$(comm -12 <(echo "$uncovered") "$f")
+          done
+          uncovered=$(grep -v '^$' <<<"$uncovered" | sort -t: -k1,1 -k2,2n | awk -F: '$1 != f || $2 != r + 1 { print } { f = $1; r = $2 }' || true)
           if [ -n "$uncovered" ]; then
             echo "No test reaches these lines:"
             echo "$uncovered"
             exit 1
           fi
 
-  wasm:
+  tests-wasm:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        part: [1, 2, 3, 4]
+    env:
+      PART: ${{ matrix.part }}
+      PARTS: ${{ strategy.job-total }}
     steps:
       - uses: actions/checkout@v7
       - uses: open-policy-agent/setup-opa@v2
         with:
           version: 1.20.2
-      - name: Run the tests compiled to Wasm
+      - name: Run this part of the tests compiled to Wasm
         run: .github/wasm-tests.sh
 
   tests-compiled-policy:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        part: [1, 2, 3, 4]
+    env:
+      PART: ${{ matrix.part }}
+      PARTS: ${{ strategy.job-total }}
     steps:
       - uses: actions/checkout@v7
       - uses: open-policy-agent/setup-opa@v2
         with:
           version: 1.20.2
-      - name: Run the tests with every report made from a compiled policy
+      - name: Run this part of the tests with every report made from a compiled policy
         run: .github/compiled-tests.sh
 
-  wasm-js:
+  tests-wasm-js:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -107,7 +162,7 @@ jobs:
       - name: Check ergo.rego and the ABNF read the same sentences
         run: '"$RUNNER_TEMP/venv/bin/python" spec/check_grammar.py'
 
-  tutorial:
+  site:
     runs-on: ubuntu-latest
     env:
       HUGO_VERSION: 0.157.0

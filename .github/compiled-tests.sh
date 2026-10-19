@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+pattern=$(.github/tests.sh | .github/test-pattern.sh)
 dir=$(mktemp -d)
 trap 'rm -rf "$dir"' EXIT
 git ls-files | grep -v -E '^(\.github|site|packages)/' | tar -cf - -T - | tar -xf - -C "$dir"
@@ -19,4 +20,4 @@ open(path, "w").write(text.replace(plain + "\n", compiled))
 PY
 
 cd "$dir"
-opa test . --timeout 120s
+opa test . --timeout 120s -r "$pattern"
