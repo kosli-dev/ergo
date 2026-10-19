@@ -2673,7 +2673,7 @@ _option_children(node, names) := [[leaf, ["options", nm, i], "option", names] |
 
 _node_problems(node, _, _, _) := {"invalid check"} if not is_object(node)
 
-_node_problems(node, kinds, names, here) := (((_op_problems(node, kinds, here) | _field_problems(node, here)) | _step_problems(node, here)) | _name_problems(node, names)) | _derived_placement_problem(node, kinds) if {
+_node_problems(node, kinds, names, here) := (((_op_problems(node, kinds, here) | _field_problems(node, here)) | _step_problems(node, here)) | _name_problems(node, names)) | _derived_placement_problem(node, kinds, here) if {
 	is_object(node)
 	not _s_unread(node, here)
 }
@@ -5717,7 +5717,24 @@ _tally_judge(side, e, flaws) := {"kept": kept, "states": ({c | some c in causes;
 	kept := count([c | some c in causes; c in {"value", "missing"}]) == 0
 }
 
-_tally_cond_cause(c, item, "") := _leaf_cause(c, item)
+_tally_cond_cause(c, item, "") := _eval_cause(passed, _ref_cause(c), states) if {
+	_derived_once(c)
+	l := _cond_side(item, c.left)
+	r := _cond_side(item, c.right)
+	passed := _eval_compared(c, l.v, r.v)
+	states := (l.states | r.states) | {"unusable" | [lf] := l.found; [rf] := r.found; not _usable_sides(c, lf, rf)}
+}
+
+_cond_side(item, side) := {"v": v, "found": v, "states": _elapsed_states(item, side)} if {
+	_basic_form(side) == "elapsed"
+	v := [x | x := _elapsed_units(side.unit, value_at(item, side.elapsed_from), value_at(item, side.elapsed_to))]
+}
+
+_cond_side(item, side) := {"v": [x | x := value_at(item, side)], "found": [x | x := _simple_found(item, side)], "states": {_read_state(item, side)}} if _basic_form(side) == "path"
+
+_cond_side(item, side) := {"v": [_written(side)], "found": [x | x := _simple_found(item, side)], "states": set()} if _basic_form(side) == "literal"
+
+_tally_cond_cause(c, item, "") := _leaf_cause(c, item) if not _derived_once(c)
 
 _tally_cond_cause(_, _, flaw) := flaw if flaw != ""
 
@@ -5927,14 +5944,21 @@ _non_negative(n) if {
 	n >= 0
 }
 
-_derived_placement_problem(node, kinds) := {concat("", [_side_form(side), " can't go here"]) |
+_derived_placement_problem(node, kinds, here) := {concat("", [_side_form(side), " can't go here"]) |
 	kinds != []
 	not _assertion_kinds(kinds)
 	some side in _derived_sides(node)
+	not _sentence_elapsed_in_whose(side, kinds, node, here)
 } | {"substitute can't go here" |
 	kinds != []
 	kinds[count(kinds) - 1] == "where"
 	"substitute" in object.keys(node)
+}
+
+_sentence_elapsed_in_whose(side, kinds, node, here) if {
+	_basic_form(side) == "elapsed"
+	kinds[count(kinds) - 1] == "where"
+	_s_read(node, here)
 }
 
 _assertion_kinds(kinds) if {
@@ -6871,7 +6895,7 @@ _s_from_used(def, read) if {
 _s_from_read(name, fl, subjects, chains) := object.union({"problems": problems, "fields": fields, "parent": parent, "every": every_list}, _p_from_part(name, fl, subjects, chains.parts)) if {
 	"path" in object.keys(fl)
 	conds := [_p_applied(_s_check([_s_cond_text(c)], {}, set()), _p_own_context(name, chains.parts)) | some c in object.get(fl, "where", [])]
-	problems := sort((((((_s_chain_unsupported(name, fl, subjects, chains.descend) | _s_every_unsupported(name, fl, subjects)) | _s_from_start_problems(fl)) | _s_from_paths_unsupported({"path": fl.path})) | _s_elapsed_unsupported({"where": object.get(fl, "where", [])})) | {concat("", ["whose: ", p]) | some c in conds; some p in object.get(c, "$sentence", [])}))
+	problems := sort((((((_s_chain_unsupported(name, fl, subjects, chains.descend) | _s_every_unsupported(name, fl, subjects)) | _s_from_start_problems(fl)) | _s_from_paths_unsupported({"path": fl.path})) | _s_elapsed_flaw({"where": object.get(fl, "where", [])})) | {concat("", ["whose: ", p]) | some c in conds; some p in object.get(c, "$sentence", [])}))
 	fields := object.union(_s_source(name, fl, subjects, chains.parts), _s_whose_filters(_s_filter_prefix(name, chains.narrow), conds))
 	parent := _s_descend_parent(name, fl, subjects)
 	every_list := object.get(fl, "every", false) == true
@@ -7419,11 +7443,19 @@ _s_derived_unsupported(a) := (_s_paths_unsupported(a) | {u | some c in object.ge
 
 _s_tally_cond_unsupported(c) := ({"a count of, a sum of or a plus in the whose of a count of or a sum of isn't supported yet" |
 	"terms" in object.keys(c)
+	not _s_one_elapsed(c.terms)
 } | {"a count of, a sum of or a plus in the whose of a count of or a sum of isn't supported yet" |
 	terms := object.get(c.phrase, "terms", [])
 	terms != []
 	not _s_one_path(terms)
+	not _s_one_elapsed(terms)
 }) | _s_argument_unsupported(c.phrase)
+
+_s_one_elapsed(terms) if {
+	count(terms) == 1
+	is_object(terms[0])
+	"elapsed_from" in object.keys(terms[0])
+}
 
 _s_assertion_unsupported(a) := _s_paths_unsupported(a) | _s_argument_unsupported(a.phrase) if object.keys(a) & {"every", "some", "terms"} == set()
 
@@ -7446,11 +7478,19 @@ _s_paths_unsupported(a) := {"last of isn't supported yet" |
 	object.get(node, "position", null) == "last"
 } | _s_elapsed_unsupported(a)
 
-_s_elapsed_unsupported(a) := {"an elapsed time isn't supported yet after every or some, in a whose or in a from line" |
-	some node in _s_nodes(_s_without_terms(a))
+_s_elapsed_unsupported(a) := _s_elapsed_flaw(_s_whose_stripped(_s_without_terms(a)))
+
+_s_elapsed_flaw(x) := {"an elapsed time isn't supported yet after every or some, or in a from line" |
+	some node in _s_nodes(x)
 	is_object(node)
 	"elapsed_from" in object.keys(node)
 }
+
+_s_whose_stripped(a) := object.union(object.remove(a, ["where"]), {"where": [_s_cond_stripped(c) | some c in a.where]}) if "where" in object.keys(a)
+
+_s_whose_stripped(a) := a if not "where" in object.keys(a)
+
+_s_cond_stripped(c) := object.union(object.remove(c, ["terms", "phrase"]), {"phrase": object.remove(c.phrase, ["terms"])})
 
 _s_without_terms(a) := object.union(object.remove(a, ["terms", "phrase"]), {"phrase": object.remove(a.phrase, ["terms"])}) if {
 	"phrase" in object.keys(a)
@@ -7527,6 +7567,10 @@ _s_order_cmps := {"is at least": "gte", "is at most": "lte", "is more than": "gt
 _s_leaf_model(a) := object.union({"op": "compare", "left": _s_left_side(a.terms, object.get(a, "where", [])), "cmp": _s_derived_cmps[a.phrase.op], "right": _s_side(a.phrase)}, object.filter(a.phrase, {"within", "max"})) if "terms" in object.keys(a)
 
 _s_leaf_model(a) := _s_plain_model(a) if not "terms" in object.keys(a)
+
+_s_cond_model(c) := _s_plain_model(c) if not "terms" in object.keys(c)
+
+_s_cond_model(c) := object.union({"op": "compare", "left": _s_bare_side(c.terms), "cmp": _s_derived_cmps[c.phrase.op], "right": _s_side(c.phrase)}, object.filter(c.phrase, {"within", "max"})) if "terms" in object.keys(c)
 
 _s_derived_cmps := {"is between": "gte", "is": "eq", "is not": "ne", "is at least": "gte", "is at most": "lte", "is more than": "gt", "is less than": "lt"}
 
@@ -7643,7 +7687,7 @@ _s_left_side(terms, where) := {"add": array.concat([_s_term_side(t) | some t in 
 	count(terms) > 1
 }
 
-_s_whose_side(t, where) := object.union(_s_term_side(t), {"whose": [_s_plain_model(c) | some c in where], "text": concat("", [_s_term_text(t), _s_where_text({"where": where})])})
+_s_whose_side(t, where) := object.union(_s_term_side(t), {"whose": [_s_cond_model(c) | some c in where], "text": concat("", [_s_term_text(t), _s_where_text({"where": where})])})
 
 _s_term_side(t) := {"literal": t} if is_number(t)
 

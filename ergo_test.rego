@@ -10321,19 +10321,47 @@ test_elapsed_works_in_each_line_of_a_list_and_under_a_for_line if {
 	_elapsed_cause({"for": "every ps as it", "assert": "days elapsed from it.p to it.q is 1"}, {"id": 1, "ps": [{"p": 1, "q": 0}]}, {}) == "value"
 }
 
-test_elapsed_is_written_wrong_after_every_or_some_in_a_whose_and_in_a_from_line if {
-	msg := "an elapsed time isn't supported yet after every or some, in a whose or in a from line"
+test_elapsed_is_written_wrong_after_every_or_some_and_in_a_from_line if {
+	msg := "an elapsed time isn't supported yet after every or some, or in a from line"
 	every check in [
-		"every xs whose days elapsed from p to q is 1 is not empty",
-		"count of xs whose days elapsed from p to q is 1 is 2",
 		"every xs is days elapsed from p to q",
 		"some xs is days elapsed from p to q",
-		"sum of xs.n whose n is days elapsed from p to q is 2",
+		"every xs is days elapsed from p to q plus 1",
 	] {
 		msg in _sentence_problems(check)
 	}
-	msg in _sentence_problems({"for": "every xs whose days elapsed from p to q is 1 as x", "assert": "x.n is 1"})
 	_from_problems(_from_report({"xs": [{"id": 1}]}, {"x": {"from": "xs whose days elapsed from p to q is 1"}}, {"c": "id exists"}, {})) == [{"name": "subjects.x.from", "value": [msg]}]
+}
+
+test_an_elapsed_time_in_a_whose_decides_each_item_of_a_count_a_sum_and_an_every if {
+	doc := [{"id": 1, "xs": [{"n": 1, "p": 0, "q": 86400}, {"n": 2, "p": 0, "q": 86400}, {"n": 4, "p": 0, "q": 172800}]}]
+	_elapsed_rows("count of xs whose days elapsed from p to q is 1 is 2", doc, {})[0][1] == true
+	_elapsed_rows("sum of xs.n whose days elapsed from p to q is 1 is 3", doc, {})[0][1] == true
+	_elapsed_rows("sum of xs.n whose days elapsed from p to q is 1 is 4", doc, {})[0][1] == false
+	_elapsed_rows("count of xs whose n is days elapsed from p to q is 1", doc, {})[0][1] == true
+	_elapsed_rows("every xs.n whose days elapsed from p to q is 1 is less than 3", doc, {})[0][1] == true
+	_elapsed_rows("every xs.n whose days elapsed from p to q is 1 is less than 2", doc, {})[0][1] == false
+}
+
+test_an_elapsed_time_in_a_whose_fails_closed_when_an_item_has_no_usable_time if {
+	items := {
+		"absent": {"n": 1, "p": 0},
+		"null": {"n": 1, "p": 0, "q": null},
+		"mixed": {"n": 1, "p": 0, "q": "2026-10-01T00:00:00Z"},
+		"text": {"n": 1, "p": 0, "q": "x"},
+	}
+	every state, item in items {
+		_elapsed_cause("count of xs whose days elapsed from p to q is 1 is 1", {"id": 1, "xs": [{"n": 1, "p": 0, "q": 86400}, item]}, {}) == state_cause[state]
+		_elapsed_cause("every xs.n whose days elapsed from p to q is 1 is 1", {"id": 1, "xs": [{"n": 1, "p": 0, "q": 86400}, item]}, {}) == state_cause[state]
+	}
+}
+
+state_cause := {"absent": "absent", "null": "null", "mixed": "unusable", "text": "unusable"}
+
+test_an_elapsed_time_in_a_whose_goes_on_a_for_line_too if {
+	doc := [{"id": 1, "xs": [{"n": 1, "p": 0, "q": 86400}, {"n": 2, "p": 0, "q": 172800}]}]
+	_elapsed_first({"for": "every xs whose days elapsed from p to q is 1 as x", "assert": "x.n is 1"}, doc, {}) == [true, "satisfied"]
+	_elapsed_first({"for": "every xs whose days elapsed from p to q is 2 as x", "assert": "x.n is 1"}, doc, {}) == [false, "value"]
 }
 
 test_an_elapsed_time_goes_in_a_plus_on_either_side_of_a_phrase if {
