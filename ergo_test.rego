@@ -10321,24 +10321,31 @@ test_elapsed_works_in_each_line_of_a_list_and_under_a_for_line if {
 	_elapsed_cause({"for": "every ps as it", "assert": "days elapsed from it.p to it.q is 1"}, {"id": 1, "ps": [{"p": 1, "q": 0}]}, {}) == "value"
 }
 
-test_elapsed_is_written_wrong_anywhere_but_alone_before_a_phrase if {
-	msg := "an elapsed time isn't supported yet except alone before a phrase"
+test_elapsed_is_written_wrong_after_every_or_some_in_a_whose_and_in_a_from_line if {
+	msg := "an elapsed time isn't supported yet after every or some, in a whose or in a from line"
 	every check in [
-		"days elapsed from p to q plus 1 is 2",
-		"1 plus days elapsed from p to q is 2",
-		"count of xs plus days elapsed from p to q is 2",
-		"n is days elapsed from p to q",
-		"days elapsed from p to q is less than days elapsed from c to d",
-		"n is at least 1 plus days elapsed from p to q",
 		"every xs whose days elapsed from p to q is 1 is not empty",
 		"count of xs whose days elapsed from p to q is 1 is 2",
 		"every xs is days elapsed from p to q",
-		"x is more than days elapsed from p to q",
+		"some xs is days elapsed from p to q",
+		"sum of xs.n whose n is days elapsed from p to q is 2",
 	] {
 		msg in _sentence_problems(check)
 	}
 	msg in _sentence_problems({"for": "every xs whose days elapsed from p to q is 1 as x", "assert": "x.n is 1"})
 	_from_problems(_from_report({"xs": [{"id": 1}]}, {"x": {"from": "xs whose days elapsed from p to q is 1"}}, {"c": "id exists"}, {})) == [{"name": "subjects.x.from", "value": [msg]}]
+}
+
+test_an_elapsed_time_goes_in_a_plus_on_either_side_of_a_phrase if {
+	doc := [{"id": 1, "n": 3, "p": 0, "q": 86400}, {"id": 2, "n": 3, "p": 0, "q": "1970-01-02T00:00:00Z"}, {"id": 3, "n": 3, "p": null, "q": 86400}, {"id": 4, "n": "3", "p": 0, "q": 86400}, {"id": 5, "n": 3, "p": 86400, "q": 0}]
+	[[r[0], r[1], r[2]] | some r in _elapsed_rows("days elapsed from p to q plus n is 4", doc, {})] == [[1, true, "satisfied"], [2, false, "unusable"], [3, false, "null"], [4, false, "unusable"], [5, false, "value"]]
+	[[r[0], r[1], r[2]] | some r in _elapsed_rows("n is days elapsed from p to q", doc, {})] == [[1, false, "value"], [2, false, "unusable"], [3, false, "null"], [4, false, "unusable"], [5, false, "value"]]
+	with_x := [object.union(d, {"x": [1, 2]}) | some d in doc]
+	[[r[0], r[1], r[2]] | some r in _elapsed_rows("n is less than 1 plus days elapsed from p to q plus count of x", with_x, {})] == [[1, true, "satisfied"], [2, false, "unusable"], [3, false, "null"], [4, false, "unusable"], [5, false, "value"]]
+}
+
+test_an_elapsed_time_on_the_right_of_is_prints_as_is_not_equals if {
+	ergo.report({"things": []}, _sentence_policy({"c": "n is days elapsed from p to q and m is not days elapsed from p to q and k is count of xs"}), {}).requirements.s.checks.c.expression == "n is days elapsed from p to q and m is not days elapsed from p to q and k equals count of xs"
 }
 
 test_elapsed_cant_take_a_phrase_that_takes_no_number if {

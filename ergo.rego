@@ -5481,7 +5481,7 @@ _where_shaped(side) if not "where" in object.keys(side)
 
 _where_shaped(side) if is_object(side.where)
 
-_operand(x) if _basic_form(x) in {"path", "count", "sum", "count_of", "sum_of"}
+_operand(x) if _basic_form(x) in {"path", "count", "sum", "count_of", "sum_of", "elapsed"}
 
 _operand(x) if {
 	_basic_form(x) == "literal"
@@ -5862,7 +5862,7 @@ _sentence_side(side) if {
 _sentence_side(side) if {
 	_side_form(side) == "add"
 	some operand in side.add
-	_basic_form(operand) in {"count_of", "sum_of"}
+	_basic_form(operand) in {"count_of", "sum_of", "elapsed"}
 }
 
 _side_paths(side) := _basic_paths(side) if _basic_form(side)
@@ -6585,21 +6585,33 @@ _s_phrase_text(ph) := _s_phrase_words(ph) if _s_args_text(ph) == ""
 _s_phrase_words(ph) := "equals" if {
 	ph.op == "is"
 	"terms" in object.keys(ph)
+	not _s_elapsed_argument(ph)
 }
 
 _s_phrase_words(ph) := "is" if {
 	ph.op == "is"
-	"value" in object.keys(ph)
+	_s_value_argument(ph)
 }
 
 _s_phrase_words(ph) := "does not equal" if {
 	ph.op == "is not"
 	"terms" in object.keys(ph)
+	not _s_elapsed_argument(ph)
 }
 
 _s_phrase_words(ph) := "is not" if {
 	ph.op == "is not"
-	"value" in object.keys(ph)
+	_s_value_argument(ph)
+}
+
+_s_value_argument(ph) if "value" in object.keys(ph)
+
+_s_value_argument(ph) if _s_elapsed_argument(ph)
+
+_s_elapsed_argument(ph) if {
+	some t in object.get(ph, "terms", [])
+	is_object(t)
+	"elapsed_from" in object.keys(t)
 }
 
 _s_phrase_words(ph) := "is one of" if {
@@ -7434,11 +7446,22 @@ _s_paths_unsupported(a) := {"last of isn't supported yet" |
 	object.get(node, "position", null) == "last"
 } | _s_elapsed_unsupported(a)
 
-_s_elapsed_unsupported(a) := {"an elapsed time isn't supported yet except alone before a phrase" |
-	some node in _s_nodes(a)
+_s_elapsed_unsupported(a) := {"an elapsed time isn't supported yet after every or some, in a whose or in a from line" |
+	some node in _s_nodes(_s_without_terms(a))
 	is_object(node)
 	"elapsed_from" in object.keys(node)
-	object.get(a, "terms", []) != [node]
+}
+
+_s_without_terms(a) := object.union(object.remove(a, ["terms", "phrase"]), {"phrase": object.remove(a.phrase, ["terms"])}) if {
+	"phrase" in object.keys(a)
+	object.keys(a) & {"every", "some"} == set()
+}
+
+_s_without_terms(a) := a if not _s_stripped(a)
+
+_s_stripped(a) if {
+	"phrase" in object.keys(a)
+	object.keys(a) & {"every", "some"} == set()
 }
 
 _s_from_paths_unsupported(a) := _s_paths_unsupported(a) | {concat("", ["unknown alias ", ref.steps[0]]) |
