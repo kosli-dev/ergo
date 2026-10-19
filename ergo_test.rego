@@ -8348,7 +8348,6 @@ test_an_assert_object_takes_only_description_and_meta if {
 
 test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
 	every pair in [
-		[`count of xs is between 1 and 3`, `"is between" after a count of, a sum of or a plus isn't supported yet`],
 		[`every xs is y plus 1`, "count of, sum of and plus after every or some aren't supported yet"],
 		[`t is before y plus 1`, `"is before" can't take a count of, a sum of or a plus`],
 		[`count of xs whose count of ys is 1 is 2`, "a count of, a sum of or a plus in the whose of a count of or a sum of isn't supported yet"],
@@ -8361,7 +8360,7 @@ test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
 	_sentence_problems({"assert": []}) == ["empty assert"]
 	_sentence_problems({"assert": ["x exists", 1]}) == ["invalid assert"]
 	_sentence_problems({"assert": ["x exists", "y is \"a"]}) == ["line 2: unclosed quote at column 6"]
-	_sentence_problems({"assert": ["x exists", "count of ys is between 1 and 2"]}) == [concat("", ["line 2: ", `"is between" after a count of, a sum of or a plus isn't supported yet`])]
+	_sentence_problems({"assert": ["x exists", "last of ys is 1"]}) == ["line 2: last of isn't supported yet"]
 }
 
 test_a_check_written_as_a_string_is_read_as_a_sentence if {
@@ -8752,7 +8751,7 @@ test_every_and_some_joined_with_and_give_one_row_with_the_failed_sentences if {
 }
 
 test_forms_a_walk_cant_take_yet_are_written_wrong if {
-	_sentence_problems(`every xs whose count of ys is between 1 and 2 is not empty`) == [`"is between" after a count of, a sum of or a plus isn't supported yet`]
+	_sentence_problems(`every xs whose last of ys is 1 is not empty`) == ["last of isn't supported yet"]
 	_sentence_problems(`every k1.k2.k3.k4.k5.k6.k7.k8.k9.k10.k11.k12 is 1`) == ["every and some over more than ten steps aren't supported yet"]
 }
 
@@ -8953,7 +8952,7 @@ test_a_for_line_written_wrong_says_why if {
 
 test_forms_ergo_does_not_run_yet_are_written_wrong_on_a_for_line_too if {
 	every pair in [
-		["every xs whose count of ys is between 1 and 2 as x", `"is between" after a count of, a sum of or a plus isn't supported yet`],
+		["every xs whose last of ys is 1 as x", "last of isn't supported yet"],
 		["every b.c.d.e.f.g.h.i.j.k.l.m as x", "every and some over more than ten steps aren't supported yet"],
 	] {
 		_sentence_problems({"assert": "x is 1", "for": pair[0]}) == [pair[1]]
@@ -10342,8 +10341,7 @@ test_elapsed_is_written_wrong_anywhere_but_alone_before_a_phrase if {
 	_from_problems(_from_report({"xs": [{"id": 1}]}, {"x": {"from": "xs whose days elapsed from p to q is 1"}}, {"c": "id exists"}, {})) == [{"name": "subjects.x.from", "value": [msg]}]
 }
 
-test_elapsed_cant_take_is_between_or_a_phrase_that_takes_no_number if {
-	_sentence_problems("days elapsed from p to q is between 1 and 2") == [`"is between" after a count of, a sum of or a plus isn't supported yet`]
+test_elapsed_cant_take_a_phrase_that_takes_no_number if {
 	_sentence_problems("days elapsed from p to q is empty") == ["is empty can't follow a count of, a sum of or a plus"]
 	_sentence_problems("days elapsed from p to q is before c") == ["is before can't follow a count of, a sum of or a plus"]
 }
@@ -12201,4 +12199,33 @@ test_data_named_like_ergos_compile_flag_changes_no_report if {
 	every form in [policy, ergo.compile(policy)] {
 		ergo.report(doc, form, {}) == want with data.ergo_reading as true
 	}
+}
+
+test_max_on_a_compare_is_for_sentences_only if {
+	_sentence_problems({"op": "compare", "left": ["n"], "cmp": "gte", "right": {"literal": 1}, "max": 2}) == ["unknown field max"]
+}
+
+test_a_between_after_a_count_reads_the_items_its_whose_keeps if {
+	doc := {"things": [{"id": "a", "xs": [{"k": 1}, {"k": 1}, {"k": 2}]}, {"id": "b", "xs": [{"k": 1}, {"k": 1}, {"k": 1}, {"k": 1}]}]}
+	rows := _sentence_rows({"c": "count of xs whose k is 1 is between 1 and 3"}, doc, {})
+	[[r[0], r[1], r[2]] | some r in rows] == [["c", true, "satisfied"], ["c", false, "value"]]
+}
+
+test_a_between_after_a_plus_is_inclusive_and_fails_closed_on_text if {
+	doc := {"things": [{"id": "a", "n": 3}, {"id": "b", "n": "3"}, {"id": "c", "n": null}, {"id": "d", "n": 1}, {"id": "e", "n": 6}]}
+	rows := _sentence_rows({"c": "n plus 1 is between 2 and 4"}, doc, {})
+	[[r[1], r[2]] | some r in rows] == [[true, "satisfied"], [false, "unusable"], [false, "null"], [true, "satisfied"], [false, "value"]]
+}
+
+test_a_between_after_a_count_goes_with_and_in_a_list_of_assertions if {
+	doc := {"things": [{"id": "a", "xs": [1, 2], "n": 1}, {"id": "b", "xs": [1, 2], "n": 2}]}
+	rows := ergo.report(doc, _sentence_policy({"c": {"assert": ["count of xs is between 1 and 2", "n is 1"]}}), {}).results
+	[[r.subject.id, r.passed, r.cause] | some r in rows; r.check == "c"] == [["a", true, "satisfied"], ["b", false, "value"]]
+}
+
+test_max_on_a_compare_must_be_a_number_with_cmp_gte_and_no_within if {
+	base := {"op": "compare", "left": ["n"], "cmp": "gte", "right": {"literal": 1}}
+	_sentence_problems(object.union(base, {"max": "x"})) == ["invalid max", "unknown field max"]
+	_sentence_problems(object.union(base, {"max": 2, "cmp": "lt"})) == ["max needs cmp gte", "unknown field max"]
+	_sentence_problems(object.union(base, {"max": 2, "within": 1})) == ["max can't go with within", "unknown field max", "within needs cmp eq"]
 }

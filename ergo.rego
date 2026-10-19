@@ -2152,11 +2152,23 @@ _compared(check, l, r) if {
 	_comparable(l, r)
 	_orderable(check.cmp, l)
 	_cmp(check.cmp, l, r)
+	_at_most_max(check, l)
+}
+
+default _at_most_max(_, _) := false
+
+_at_most_max(check, _) if not "max" in object.keys(check)
+
+_at_most_max(check, l) if {
+	is_number(l)
+	is_number(check.max)
+	l <= check.max
 }
 
 _compared(check, l, r) if {
 	not "within" in object.keys(check)
 	check.cmp in _list_cmps
+	not "max" in object.keys(check)
 	_cmp(check.cmp, l, r)
 }
 
@@ -2164,6 +2176,7 @@ _compared(check, l, r) if {
 	"within" in object.keys(check)
 	is_number(l)
 	is_number(r)
+	not "max" in object.keys(check)
 	abs(l - r) <= check.within
 }
 
@@ -2703,7 +2716,7 @@ _nested_ops := {
 	"assertion": [_leaf_ops],
 }
 
-_field_problems(node, here) := union({_side_problem(node, here), _within_problem(node), _wording_problem(node), _unknown_fields_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node, here), _misplaced_fields_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node), _json_problem(node)})
+_field_problems(node, here) := union({_side_problem(node, here), _within_problem(node), _wording_problem(node), _unknown_fields_problem(node, here), _compare_max_problem(node), _missing_fields_problem(node), _range_bounds_problem(node), _range_order_problem(node), _values_problem(node), _value_or_values_problem(node), _patterns_problem(node), _nested_wrapper_problem(node), _cmp_problem(node, here), _misplaced_fields_problem(node), _options_problem(node), _empty_options_problem(node), _empty_option_problem(node), _out_of_range_problem(node), _refs_problem(node), _json_problem(node)})
 
 _json_problem(node) := _json_problems(object.remove(_own_fields(node), ["meta"]))
 
@@ -2721,11 +2734,31 @@ _value_or_values_problem(node) := {"missing value or values" |
 	count({"value", "values"} & object.keys(node)) == 2
 }
 
-_unknown_fields_problem(node) := {concat("", ["unknown field ", _text(f)]) |
+_unknown_fields_problem(node, here) := {concat("", ["unknown field ", _text(f)]) |
 	node.op in object.keys(_op_fields)
 	some f in object.keys(node)
 	not f in _op_fields[node.op]
 	not f in {"op", "description", "meta", "expression", "substitute", "inputs", "as", "each"}
+	not _sentence_max(f, node, here)
+}
+
+_sentence_max("max", node, here) if {
+	node.op == "compare"
+	_s_read(node, here)
+}
+
+_compare_max_problem(node) := {"invalid max" |
+	node.op == "compare"
+	"max" in object.keys(node)
+	not is_number(node.max)
+} | {"max needs cmp gte" |
+	node.op == "compare"
+	"max" in object.keys(node)
+	object.get(node, "cmp", null) != "gte"
+} | {"max can't go with within" |
+	node.op == "compare"
+	"max" in object.keys(node)
+	"within" in object.keys(node)
 }
 
 _wording_problem(node) := ({"invalid description" |
@@ -7366,7 +7399,7 @@ _s_walk_too_long(a) := {"every and some over more than ten steps aren't supporte
 
 _s_assertion_unsupported(a) := _s_derived_unsupported(a) if "terms" in object.keys(a)
 
-_s_derived_unsupported(a) := ((_s_paths_unsupported(a) | {`"is between" after a count of, a sum of or a plus isn't supported yet` | a.phrase.op == "is between"}) | {u | some c in object.get(a, "where", []); some u in _s_tally_cond_unsupported(c)}) | {"every and some over more than ten steps aren't supported yet" |
+_s_derived_unsupported(a) := (_s_paths_unsupported(a) | {u | some c in object.get(a, "where", []); some u in _s_tally_cond_unsupported(c)}) | {"every and some over more than ten steps aren't supported yet" |
 	some t in array.concat(a.terms, object.get(a.phrase, "terms", []))
 	_s_derived_term(t)
 	count(_walk_steps(_s_model_path(object.get(t, "count", object.get(t, "sum", null))))) > 10
@@ -7468,11 +7501,11 @@ _s_time_cmps := {"is before": "lt", "is after": "gt", "is on or after": "gte", "
 
 _s_order_cmps := {"is at least": "gte", "is at most": "lte", "is more than": "gt", "is less than": "lt"}
 
-_s_leaf_model(a) := object.union({"op": "compare", "left": _s_left_side(a.terms, object.get(a, "where", [])), "cmp": _s_derived_cmps[a.phrase.op], "right": _s_side(a.phrase)}, object.filter(a.phrase, {"within"})) if "terms" in object.keys(a)
+_s_leaf_model(a) := object.union({"op": "compare", "left": _s_left_side(a.terms, object.get(a, "where", [])), "cmp": _s_derived_cmps[a.phrase.op], "right": _s_side(a.phrase)}, object.filter(a.phrase, {"within", "max"})) if "terms" in object.keys(a)
 
 _s_leaf_model(a) := _s_plain_model(a) if not "terms" in object.keys(a)
 
-_s_derived_cmps := {"is": "eq", "is not": "ne", "is at least": "gte", "is at most": "lte", "is more than": "gt", "is less than": "lt"}
+_s_derived_cmps := {"is between": "gte", "is": "eq", "is not": "ne", "is at least": "gte", "is at most": "lte", "is more than": "gt", "is less than": "lt"}
 
 _s_plain_model(a) := {"op": "equals", "path": _s_model_path(a.path), "value": a.phrase.value} if {
 	a.phrase.op == "is"
@@ -7566,6 +7599,8 @@ _s_side_given(ph) if "terms" in object.keys(ph)
 _s_side_given(ph) if "within" in object.keys(ph)
 
 _s_side(ph) := {"literal": ph.value} if "value" in object.keys(ph)
+
+_s_side(ph) := {"literal": ph.min} if ph.op == "is between"
 
 _s_side(ph) := _s_bare_side(ph.terms) if "terms" in object.keys(ph)
 
