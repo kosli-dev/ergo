@@ -12367,3 +12367,12 @@ test_named_by_works_after_each_phrase_that_takes_a_list if {
 	causes["kind contains $params.lists named by $params.k"] == ["unusable", "unusable", "unusable", "unusable", "absent", "unusable"]
 	causes["kind contains none of $params.lists named by $params.k"] == ["unusable", "unusable", "unusable", "unusable", "absent", "unusable"]
 }
+
+_named_count_in_whose(xs) := [[r.passed, r.cause] | some r in ergo.report({"things": [{"id": "t", "xs": xs}]}, _sentence_policy({"c": "count of xs whose count of $params.lists named by kind is 1 is 1"}), {"lists": {"a": [1]}}).results; r.check == "c"]
+
+test_a_count_named_by_a_missing_or_wrong_key_in_a_whose_fails_closed if {
+	_named_count_in_whose([{"kind": "a"}]) == [[true, "satisfied"]]
+	_named_count_in_whose([{}]) == [[false, "absent"]]
+	_named_count_in_whose([{"kind": 5}]) == [[false, "unusable"]]
+	_named_count_in_whose([{"kind": "b"}]) == [[false, "absent"]]
+}
