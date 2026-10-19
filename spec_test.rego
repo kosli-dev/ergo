@@ -2,13 +2,7 @@ package spec_test
 
 import data.ergo
 
-known_differences := {
-	"sentences / is in a list read with named by / fails as value when it does not",
-	"sentences / is in a list read with named by / passes when the list under the key has the value",
-	"sentences / is in a list read with named by a key that has no list / fails as absent whatever the field holds",
-	"sentences / matches patterns read with named by / fails as value when only a pattern under another key matches",
-	"sentences / matches patterns read with named by / passes when a pattern under the key matches",
-}
+known_differences := set()
 
 failures := union({_topic_failures(topic) | some topic, _ in data.spec.cases})
 

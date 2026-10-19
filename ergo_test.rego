@@ -8352,7 +8352,6 @@ test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
 		[`t is before y plus 1`, `"is before" can't take a count of, a sum of or a plus`],
 		[`count of xs whose sum of ys is 1 is 2`, "a sum of or a plus in the whose of a count of or a sum of isn't supported yet"],
 		[`count of xs whose n is count of ys plus 1 is 2`, "a sum of or a plus in the whose of a count of or a sum of isn't supported yet"],
-		[`x matches $params.a named by $params.b`, `"matches" with named by in its path isn't supported yet`],
 		[`last of xs is 1`, "last of isn't supported yet"],
 	] {
 		_sentence_problems(pair[0]) == [pair[1]]
@@ -12318,4 +12317,53 @@ test_a_time_phrase_with_a_written_value_goes_in_a_whose if {
 
 test_a_hand_written_compare_time_cant_take_a_written_value if {
 	_sentence_problems({"op": "compare_time", "left": ["a"], "cmp": "lt", "right": {"literal": "2024-01-01T00:00:00Z"}}) == ["invalid right"]
+}
+
+_named_params := {"lists": {"a": ["p", "q"], "b": "text", "c": null}, "pats": {"a": ["^a"], "bad": ["("]}, "k": "a", "kbad": "bad", "nk": null, "bk": {"x": 1}}
+
+_named_things := {"things": [{"id": "t1", "x": "p", "kind": "a"}, {"id": "t2", "x": "z", "kind": "b"}, {"id": "t3", "x": "p", "kind": "c"}, {"id": "t4", "x": "p", "kind": "zz"}, {"id": "t5", "x": "p"}, {"id": "t6", "x": 3, "kind": "a"}]}
+
+test_a_list_read_with_named_by_a_params_key_shows_only_the_field if {
+	rows := _sentence_rows({"c": "x is in $params.lists named by $params.k"}, _named_things, _named_params)
+	[[r[1], r[2], r[3]] | some r in rows] == [
+		[true, "satisfied", [{"name": "x", "value": "p"}]],
+		[false, "value", [{"name": "x", "value": "z"}]],
+		[true, "satisfied", [{"name": "x", "value": "p"}]],
+		[true, "satisfied", [{"name": "x", "value": "p"}]],
+		[true, "satisfied", [{"name": "x", "value": "p"}]],
+		[false, "unusable", [{"name": "x", "value": 3}]],
+	]
+}
+
+test_a_list_read_with_named_by_a_subject_field_fails_closed_when_the_key_is_unusable if {
+	rows := _sentence_rows({"c": "x is in $params.lists named by kind"}, _named_things, _named_params)
+	[[r[1], r[2]] | some r in rows] == [[true, "satisfied"], [false, "unusable"], [false, "null"], [false, "absent"], [false, "absent"], [false, "unusable"]]
+}
+
+test_a_list_read_with_named_by_a_reference_that_is_null_or_not_a_key_fails_whatever_the_field_holds if {
+	nulls := _sentence_rows({"c": "x is in $params.lists named by $params.nk"}, _named_things, _named_params)
+	{r[2] | some r in nulls} == {"null"}
+	objects := _sentence_rows({"c": "x is not in $params.lists named by $params.bk"}, _named_things, _named_params)
+	{r[2] | some r in objects} == {"unusable"}
+	missing := _sentence_rows({"c": "x is not in $params.lists named by $params.nope"}, _named_things, _named_params)
+	{r[2] | some r in missing} == {"absent"}
+}
+
+test_named_by_works_after_each_phrase_that_takes_a_list if {
+	causes := {sentence: [r[2] | some r in _sentence_rows({"c": sentence}, _named_things, _named_params)] |
+		some sentence in [
+			"x is not in $params.lists named by $params.k",
+			"x matches $params.pats named by $params.k",
+			"x does not match $params.pats named by $params.k",
+			"x matches $params.pats named by $params.kbad",
+			"kind contains $params.lists named by $params.k",
+			"kind contains none of $params.lists named by $params.k",
+		]
+	}
+	causes["x is not in $params.lists named by $params.k"] == ["value", "satisfied", "value", "value", "value", "unusable"]
+	causes["x matches $params.pats named by $params.k"] == ["value", "value", "value", "value", "value", "unusable"]
+	causes["x does not match $params.pats named by $params.k"] == ["satisfied", "satisfied", "satisfied", "satisfied", "satisfied", "unusable"]
+	causes["x matches $params.pats named by $params.kbad"] == ["unusable", "unusable", "unusable", "unusable", "unusable", "unusable"]
+	causes["kind contains $params.lists named by $params.k"] == ["unusable", "unusable", "unusable", "unusable", "absent", "unusable"]
+	causes["kind contains none of $params.lists named by $params.k"] == ["unusable", "unusable", "unusable", "unusable", "absent", "unusable"]
 }

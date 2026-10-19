@@ -980,7 +980,7 @@ A sentence that can't be read is [written wrong](#basic-operators), and the `$we
 
 for `prod: environment is "prod`. `x is not null` is written wrong too, because it could only fail: write `x exists`. So is a value that isn't a number before `within`, like `x is "a" within 1`. An object with both `assert` and `op` is read as a check with an `op`, so a [custom operator](#custom-operators) can still take `assert`.
 
-ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `last of`, a `sum of` or a `plus` in the `whose` of a `count of` or a `sum of`, a `plus` in the phrase of an `every` or `some`, an elapsed time after `every` or `some` or in a `from` line, and a list after a phrase read from a path with `named by` in it, like `matches $params.a named by $params.b`. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `last_signed: last of commits.signed is true` gives:
+ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `last of`, a `sum of` or a `plus` in the `whose` of a `count of` or a `sum of`, a `plus` in the phrase of an `every` or `some`, an elapsed time after `every` or `some` or in a `from` line. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `last_signed: last of commits.signed is true` gives:
 
 ```json
 {"name": "checks.last_signed", "value": ["last of isn't supported yet"]}

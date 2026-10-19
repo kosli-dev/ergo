@@ -7563,13 +7563,6 @@ _s_argument_unsupported(ph) := {concat("", [`"`, _s_phrase_words(ph), `" can't t
 	not ph.op in object.keys(_s_derived_cmps)
 }
 
-_s_argument_unsupported(ph) := {concat("", [`"`, _s_phrase_words(ph), `" with named by in its path isn't supported yet`])} if {
-	ph.op in _s_list_ops
-	p := _s_list_path(ph)
-	"start" in object.keys(p)
-	not _s_ref_steps(p)
-}
-
 default _s_argument_unsupported(_) := set()
 
 _s_one_path(terms) if {
@@ -7585,19 +7578,6 @@ _s_list_path(ph) := ph.path if "path" in object.keys(ph)
 _s_list_path(ph) := ph.terms[0] if {
 	"terms" in object.keys(ph)
 	_s_one_path(ph.terms)
-}
-
-_s_ref_steps(p) if {
-	every s in p.steps {
-		_s_plain_step(s)
-	}
-}
-
-_s_plain_step(s) if is_string(s)
-
-_s_plain_step(s) if {
-	is_object(s)
-	is_number(object.get(s, "index", null))
 }
 
 _s_time_cmps := {"is before": "lt", "is after": "gt", "is on or after": "gte", "is on or before": "lte"}
@@ -7666,12 +7646,27 @@ _s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(
 	not _s_field_arg(a.phrase)
 }
 
-_s_plain_model(a) := {"op": "compare", "left": _s_model_path(a.path), "cmp": _s_list_cmps[a.phrase.op], "right": _s_model_path(_s_list_path(a.phrase))} if _s_field_arg(a.phrase)
+_s_plain_model(a) := object.union({"op": "compare", "left": _s_model_path(a.path), "cmp": _s_list_cmps[a.phrase.op], "right": _s_model_path(_s_list_path(a.phrase))}, _s_shown_inputs(a)) if _s_field_arg(a.phrase)
+
+_s_shown_inputs(a) := {"inputs": [_s_model_path(a.path)]} if _s_named_arg(a.phrase)
+
+_s_shown_inputs(a) := {} if not _s_named_arg(a.phrase)
 
 _s_field_arg(ph) if {
 	ph.op in _s_list_ops
 	p := _s_list_path(ph)
 	not "start" in object.keys(p)
+}
+
+_s_field_arg(ph) if _s_named_arg(ph)
+
+_s_named_arg(ph) if {
+	ph.op in _s_list_ops
+	p := _s_list_path(ph)
+	"start" in object.keys(p)
+	some s in p.steps
+	is_object(s)
+	"named_by" in object.keys(s)
 }
 
 _s_list_cmps := {
