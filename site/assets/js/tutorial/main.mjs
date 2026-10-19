@@ -1,5 +1,5 @@
 import opa from "../../tutorial/vendor/opa-wasm.mjs";
-import { defaultCell, cellHighlight, makeRunner, bakeryBatches, defaultNames, checkLines, nameProblem, nameCoach, tutorialPolicy, lineResults, verdict, verdictWord, requirementCoach, gridFromReport, cellLine, subjectsStatus, subjectsCoach, yamlLines, layoutMetrics, createEnterGate, serializeProgress, restoreProgress, layoutLines, keyAction, goalKindAt, parseInput, clampPosition, dotTargets, resultLine, freshDraft, dimResult, jsonSegments, fieldHighlights, segmentClasses, isAt, evidence, grade, intro, makeChecker, parseTime, positions, showMeVisible, steps, straighten } from "./lib.mjs";
+import { defaultCell, cellHighlight, makeRunner, bakeryBatches, defaultNames, checkLines, nameProblem, nameCoach, tutorialPolicy, lineResults, verdict, verdictWord, requirementCoach, gridFromReport, cellLine, subjectsStatus, subjectsCoach, yamlLines, layoutMetrics, createEnterGate, serializeProgress, restoreProgress, layoutLines, keyAction, goalKindAt, parseInput, clampPosition, dotTargets, resultLine, freshDraft, dimResult, isRight, jsonSegments, fieldHighlights, segmentClasses, isAt, evidence, grade, intro, makeChecker, parseTime, positions, showMeVisible, steps, straighten } from "./lib.mjs";
 
 const root = document.getElementById("tutorial");
 const $ = (name) => root.querySelector(`[data-${name}]`);
@@ -89,7 +89,7 @@ const message = (cls, glyph, word, extra) => {
   return wrap;
 };
 
-const show = (shown) => {
+const show = (shown, right) => {
   let node;
   let key;
   if (!check) {
@@ -104,9 +104,9 @@ const show = (shown) => {
     detail.append(make("span", "tut__cause", line.cause), make("span", "tut__rest", ` · ${line.rest}`));
     const big = make("p", "tut__verdict");
     big.append(make("span", "tut__glyph", shown.passed ? "✓" : "×"), make("span", "tut__word", shown.passed ? "passed" : "failed"));
-    node = make("div", `tut__state ${shown.passed ? "is-passed" : "is-failed"}`);
+    node = make("div", `tut__state${right ? " is-right" : ""}`);
     node.append(big, detail);
-    key = `${shown.passed}:${shown.cause}:${JSON.stringify(shown.inputs)}`;
+    key = `${shown.passed}:${right}:${shown.cause}:${JSON.stringify(shown.inputs)}`;
   }
   if (key === lastKey) return;
   lastKey = key;
@@ -119,11 +119,11 @@ const showGoal = () => {
   el.goal.replaceChildren(rich(g.ask));
 };
 
-const showCoach = (say, shown, tick) => {
+const showCoach = (say, shown, tick, right) => {
   el.coach.className = `tut__coach is-${say.kind}`;
   const nodes = [rich(say.text)];
   if (tick && shown?.state === "result") {
-    nodes.unshift(make("span", `tut__mini ${shown.passed ? "t" : "f"}`, shown.passed ? "✓" : "×"));
+    nodes.unshift(make("span", `tut__mini ${right ? "t" : "o"}`, shown.passed ? "✓" : "×"));
   }
   el.coach.replaceChildren(...nodes);
 };
@@ -169,11 +169,11 @@ const evaluate = (typed = false) => {
   if (hidden) {
     if (lastKey !== "predict") renderPredict();
   } else {
-    show(result.shown);
+    show(result.shown, isRight(g, result));
   }
   met = result.met;
   showGoal();
-  showCoach(result.say, result.shown, !hidden);
+  showCoach(result.say, result.shown, !hidden, isRight(g, result));
   el.result.classList.toggle("is-dim", dimResult(g, result.shown, met));
   setNext();
   updateShowMe();
@@ -401,7 +401,7 @@ const evaluateStage = () => {
       const ok = status === "met";
       const big = make("p", "tut__verdict");
       big.append(make("span", "tut__glyph", ok ? "✓" : "×"), make("span", "tut__word", verdictWord(status)));
-      const node = make("div", `tut__state ${ok ? "is-passed" : "is-failed"}`);
+      const node = make("div", `tut__state${say.met ? " is-right" : ""}`);
       node.append(big);
       el.result.replaceChildren(node);
     }

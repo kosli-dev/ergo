@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import opa from "../../tutorial/vendor/opa-wasm.mjs";
 import * as lib from "./lib.mjs";
-import { defaultCell, cellHighlight, makeRunner, defaultNames, checkLines, slug, nameProblem, nameCoach, tutorialPolicy, lineResults, verdict, verdictWord, tapOutcome, requirementCoach, gridFromReport, cellLine, subjectsStatus, subjectsCoach, yamlLines, policyYaml, bakeryBatches, createEnterGate, serializeProgress, restoreProgress, layoutLines, splitSentences, fieldHighlights, keyAction, goalKindAt, isPretty, firstPositionOf, progressDots, stepTitles, dotTargets, resultLine, carryFrom, dimResult, freshDraft, judgePrediction, jsonSegments, fieldHighlight, segmentClasses, isAt, showMeVisible, buildPolicy, clampPosition, intro, positions, evidence, grade, makeChecker, parseInput, parseTime, steps, straighten } from "./lib.mjs";
+import { defaultCell, cellHighlight, makeRunner, defaultNames, checkLines, slug, nameProblem, nameCoach, tutorialPolicy, lineResults, verdict, verdictWord, tapOutcome, requirementCoach, gridFromReport, cellLine, subjectsStatus, subjectsCoach, yamlLines, policyYaml, bakeryBatches, createEnterGate, serializeProgress, restoreProgress, layoutLines, splitSentences, fieldHighlights, keyAction, goalKindAt, isPretty, firstPositionOf, progressDots, stepTitles, dotTargets, resultLine, carryFrom, dimResult, freshDraft, judgePrediction, isRight, jsonSegments, fieldHighlight, segmentClasses, isAt, showMeVisible, buildPolicy, clampPosition, intro, positions, evidence, grade, makeChecker, parseInput, parseTime, steps, straighten } from "./lib.mjs";
 
 const wasm = readFileSync(new URL("../../tutorial/ergo.wasm", import.meta.url));
 const ergo = await opa.loadPolicy(wasm, undefined, { "time.parse_rfc3339_ns": parseTime });
@@ -180,6 +180,12 @@ test("step 2 coaching: empty, phrase, quotes and unclosed quote", () => {
   assert.equal(say(1, 0, 'allergens does not contain "nuts').text, "A quote isn't closed. Add `\"` after nuts.");
 });
 
+test("step 2 coaching: a contraction asks for the words in full, not for a quote", () => {
+  assert.deepEqual(say(1, 0, `allergens doesn't contain "nuts"`), { kind: "unreadable", text: "Write `does not` in full. ergo reads `'` as the start of a quote." });
+  assert.equal(say(1, 0, "allergens doesn’t contain").text, "Write `does not` in full. ergo reads `'` as the start of a quote.");
+  assert.equal(say(0, 0, "allergens isn't empty").text, "Write `is not` in full. ergo reads `'` as the start of a quote.");
+});
+
 test("step 2 coaching: contains nuts passes when there are nuts", () => {
   assert.deepEqual(say(1, 0, 'allergens contains "nuts"'), { kind: "wrong", text: "That passes when there are nuts. We want the opposite." });
 });
@@ -299,6 +305,17 @@ test("after the reveal the result follows edits to the input or the check", () =
   assert.equal(grade(g3, check, 'baked_by is "Sam"', steps[2].input, "failed").say.text, "ergo says passed, cause `satisfied`.");
   assert.equal(grade(g3, check, nutFree, "{", "failed").say.text, "The input isn't valid JSON yet. Check the commas, brackets and quotes.");
   assert.equal(judgePrediction(g3, "failed", { state: "unreadable" }).correct, null);
+});
+
+test("the big result is coloured by whether the answer is right, not by whether the check passed", () => {
+  const nuts = grade(steps[1].goal, check, nutFree, steps[1].input);
+  assert.deepEqual([nuts.shown.passed, isRight(steps[1].goal, nuts)], [false, true]);
+  const milk = grade(steps[0].goal, check, "allergens is a list", steps[0].input);
+  assert.deepEqual([milk.shown.passed, isRight(steps[0].goal, milk)], [true, false]);
+  const g3 = steps[2].goal;
+  assert.equal(isRight(g3, grade(g3, check, nutFree, steps[2].input, "failed")), true);
+  assert.equal(isRight(g3, grade(g3, check, nutFree, steps[2].input, "passed")), false);
+  assert.equal(isRight(g3, grade(g3, check, nutFree, steps[2].input)), false);
 });
 
 test("prediction goals are never dimmed and have no answer to show", () => {
