@@ -2754,7 +2754,7 @@ _sentence_max("max", node, here) if {
 	_s_read(node, here)
 }
 
-_compare_max_problem(node) := {"invalid max" |
+_compare_max_problem(node) := ({"invalid max" |
 	node.op == "compare"
 	"max" in object.keys(node)
 	not is_number(node.max)
@@ -2762,7 +2762,7 @@ _compare_max_problem(node) := {"invalid max" |
 	node.op == "compare"
 	"max" in object.keys(node)
 	object.get(node, "cmp", null) != "gte"
-} | {"max can't go with within" |
+}) | {"max can't go with within" |
 	node.op == "compare"
 	"max" in object.keys(node)
 	"within" in object.keys(node)
@@ -5757,7 +5757,7 @@ _cond_tally(item, side) := {"states": {"not_an_object"}} if {
 } else := r if {
 	w := _walk(_walk_start({"path": side.count_of}, item), _walk_keys({"path": side.count_of}, item), true)
 	kept := [e.v | some e in w.items]
-	states := (({x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}) | {c | some e in w.items; some c in _tally_mark(true, e)})
+	states := ({x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}) | {c | some e in w.items; some c in _tally_mark(true, e)}
 	r := object.union({"states": states}, _tally_value("count_of", kept, states))
 }
 
