@@ -23,7 +23,6 @@ jobs:
       - name: Check ergo compiles where input is checked against a closed schema
         run: opa check --strict --schema .github/closed-input-schema.json ergo.rego
       - run: opa fmt --list --fail .
-      - run: opa test . --ignore .github --timeout 120s
       - name: Lint for likely bugs
         run: regal lint --format github --disable-all --enable-category bugs --disable redundant-existence-check --ignore-files '.github/**' .
       - name: Check there are no comments
@@ -40,10 +39,13 @@ jobs:
           fi
       - name: Check the tests give the same results with --strict-builtin-errors
         run: opa eval --strict-builtin-errors --ignore .github -d . --format raw 'count(data) > 0'
-      - name: Check every line is tested
+      - name: Run the tests and check every line is tested
         shell: bash
         run: |
-          opa test . --ignore .github --timeout 120s --coverage > "$RUNNER_TEMP/coverage.json"
+          if ! opa test . --ignore .github --timeout 120s --coverage > "$RUNNER_TEMP/coverage.json"; then
+            cat "$RUNNER_TEMP/coverage.json"
+            exit 1
+          fi
           jq -e '.files["ergo.rego"]' "$RUNNER_TEMP/coverage.json" > /dev/null
           uncovered=$(jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' "$RUNNER_TEMP/coverage.json" | sort -u)
           if [ -n "$uncovered" ]; then
@@ -54,6 +56,9 @@ jobs:
 
   tests-wasm:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        shard: [0, 1, 2, 3]
     steps:
       - uses: actions/checkout@v7
       - uses: open-policy-agent/setup-opa@v2
@@ -61,6 +66,9 @@ jobs:
           version: 1.20.2
       - name: Run the tests compiled to Wasm
         run: .github/wasm-tests.sh
+        env:
+          SHARD: ${{ matrix.shard }}
+          SHARDS: 4
 
   tests-compiled-policy:
     runs-on: ubuntu-latest

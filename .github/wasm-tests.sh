@@ -4,21 +4,30 @@ set -euo pipefail
 opa=("$@")
 [ ${#opa[@]} -eq 0 ] && opa=(opa)
 
-tests=$("${opa[@]}" test . --ignore .github --timeout 120s --format json | jq -r '.[] | "\(.package).\(.name)"' || true)
+tests=$(git ls-files '*.rego' | grep -v '^\.github/' | while read -r f; do
+  "${opa[@]}" parse "$f" --format json | jq -r '(.package.path[1:] | map(.value) | join(".")) as $p | .rules[]? | .head.ref[0].value | select(startswith("test_")) | "data.\($p).\(.)"'
+done | sort)
 if [ -z "$tests" ]; then
-  echo "opa test found no tests"
+  echo "found no tests"
   exit 1
 fi
-repeated=$(grep '#' <<<"$tests" || true)
+repeated=$(uniq -d <<<"$tests")
 if [ -n "$repeated" ]; then
   echo "Two tests share a name, so -r can't pick out each of them:"
-  sed 's/#.*//' <<<"$repeated"
+  echo "$repeated"
   exit 1
 fi
+tests=$(uniq <<<"$tests")
 
-total=$(wc -l <<<"$tests" | tr -d ' ')
+shard=${SHARD:-0}
+shards=${SHARDS:-1}
+total=0
 ran=0
+batch=0
 while read -r part; do
+  batch=$((batch + 1))
+  [ $(((batch - 1) % shards)) -eq "$shard" ] || continue
+  total=$((total + $(wc -w <<<"$part")))
   pattern="^($(tr ' ' '\n' <<<"$part" | sed 's/\./\\./g' | paste -sd'|' -))\$"
   out=$("${opa[@]}" test . --ignore .github --target wasm --timeout 120s -r "$pattern") || { echo "$out"; exit 1; }
   echo "$out"
