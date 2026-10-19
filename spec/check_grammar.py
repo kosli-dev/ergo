@@ -20,6 +20,7 @@ NON_SYNTAX = [
         r"^invalid pattern ",
         r'^"is not null" is written "exists"$',
         r'^"[^"]*" takes text$',
+        r'^"[^"]*" takes a time or a number$',
         r"^\"[^\"]*\" after every or some would check each item of the last list",
         r'^"within" only compares numbers$',
         r'^"within" needs a number of 0 or more$',
