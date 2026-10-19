@@ -5730,6 +5730,23 @@ _cond_side(item, side) := {"v": v, "found": v, "states": _elapsed_states(item, s
 	v := [x | x := _elapsed_units(side.unit, value_at(item, side.elapsed_from), value_at(item, side.elapsed_to))]
 }
 
+_cond_side(item, side) := {"v": [x | x := t.value], "found": [x | x := t.value], "states": t.states} if {
+	_basic_form(side) == "count_of"
+	t := _cond_tally(item, side)
+}
+
+_cond_tally(item, side) := {"states": {"not_an_object"}} if {
+	not _off_subject(side.count_of)
+	not is_object(item)
+} else := {"states": {_read_state(item, side.count_of)}} if {
+	not _walk_keys({"path": side.count_of}, item)
+} else := r if {
+	w := _walk(_walk_start({"path": side.count_of}, item), _walk_keys({"path": side.count_of}, item), true)
+	kept := [e.v | some e in w.items]
+	states := (({x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}) | {c | some e in w.items; some c in _tally_mark(true, e)})
+	r := object.union({"states": states}, _tally_value("count_of", kept, states))
+}
+
 _cond_side(item, side) := {"v": [x | x := value_at(item, side)], "found": [x | x := _simple_found(item, side)], "states": {_read_state(item, side)}} if _basic_form(side) == "path"
 
 _cond_side(item, side) := {"v": [_written(side)], "found": [x | x := _simple_found(item, side)], "states": set()} if _basic_form(side) == "literal"
@@ -5948,15 +5965,15 @@ _derived_placement_problem(node, kinds, here) := {concat("", [_side_form(side), 
 	kinds != []
 	not _assertion_kinds(kinds)
 	some side in _derived_sides(node)
-	not _sentence_elapsed_in_whose(side, kinds, node, here)
+	not _sentence_side_in_whose(side, kinds, node, here)
 } | {"substitute can't go here" |
 	kinds != []
 	kinds[count(kinds) - 1] == "where"
 	"substitute" in object.keys(node)
 }
 
-_sentence_elapsed_in_whose(side, kinds, node, here) if {
-	_basic_form(side) == "elapsed"
+_sentence_side_in_whose(side, kinds, node, here) if {
+	_basic_form(side) in {"elapsed", "count_of"}
 	kinds[count(kinds) - 1] == "where"
 	_s_read(node, here)
 }
@@ -7441,15 +7458,23 @@ _s_derived_unsupported(a) := (_s_paths_unsupported(a) | {u | some c in object.ge
 	count(_walk_steps(_s_model_path(object.get(t, "count", object.get(t, "sum", null))))) > 10
 }
 
-_s_tally_cond_unsupported(c) := ({"a count of, a sum of or a plus in the whose of a count of or a sum of isn't supported yet" |
+_s_tally_cond_unsupported(c) := ({"a sum of or a plus in the whose of a count of or a sum of isn't supported yet" |
 	"terms" in object.keys(c)
 	not _s_one_elapsed(c.terms)
-} | {"a count of, a sum of or a plus in the whose of a count of or a sum of isn't supported yet" |
+	not _s_one_count(c.terms)
+} | {"a sum of or a plus in the whose of a count of or a sum of isn't supported yet" |
 	terms := object.get(c.phrase, "terms", [])
 	terms != []
 	not _s_one_path(terms)
 	not _s_one_elapsed(terms)
+	not _s_one_count(terms)
 }) | _s_argument_unsupported(c.phrase)
+
+_s_one_count(terms) if {
+	count(terms) == 1
+	is_object(terms[0])
+	"count" in object.keys(terms[0])
+}
 
 _s_one_elapsed(terms) if {
 	count(terms) == 1

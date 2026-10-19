@@ -8350,7 +8350,8 @@ test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
 	every pair in [
 		[`every xs is y plus 1`, "count of, sum of and plus after every or some aren't supported yet"],
 		[`t is before y plus 1`, `"is before" can't take a count of, a sum of or a plus`],
-		[`count of xs whose count of ys is 1 is 2`, "a count of, a sum of or a plus in the whose of a count of or a sum of isn't supported yet"],
+		[`count of xs whose sum of ys is 1 is 2`, "a sum of or a plus in the whose of a count of or a sum of isn't supported yet"],
+		[`count of xs whose n is count of ys plus 1 is 2`, "a sum of or a plus in the whose of a count of or a sum of isn't supported yet"],
 		[`t is before "2024-01-01T00:00:00Z"`, `"is before" with a value isn't supported yet: compare with a field`],
 		[`x matches $params.a named by $params.b`, `"matches" with named by in its path isn't supported yet`],
 		[`last of xs is 1`, "last of isn't supported yet"],
@@ -12263,4 +12264,27 @@ test_max_on_a_compare_must_be_a_number_with_cmp_gte_and_no_within if {
 	_sentence_problems(object.union(base, {"max": "x"})) == ["invalid max", "unknown field max"]
 	_sentence_problems(object.union(base, {"max": 2, "cmp": "lt"})) == ["max needs cmp gte", "unknown field max"]
 	_sentence_problems(object.union(base, {"max": 2, "within": 1})) == ["max can't go with within", "unknown field max", "within needs cmp eq"]
+}
+
+test_a_count_in_the_whose_of_a_count_or_a_sum_leaves_out_the_items_it_fails if {
+	doc := [{"id": 1, "xs": [{"n": 2, "ys": [1, 2]}, {"n": 3, "ys": [1]}, {"n": 4, "ys": [1, 2, 3]}]}]
+	_elapsed_rows("count of xs whose count of ys is at least 2 is 2", doc, {})[0][1] == true
+	_elapsed_rows("sum of xs.n whose count of ys is at least 2 is 6", doc, {})[0][1] == true
+	_elapsed_rows("count of xs whose n is count of ys is 1", doc, {})[0][1] == true
+	_elapsed_rows("count of xs whose count of ys is at least 2 is 3", doc, {})[0][1] == false
+}
+
+test_a_count_in_the_whose_of_a_count_fails_closed_when_an_item_list_cant_be_counted if {
+	every list, cause in {"missing": "absent", "null": "null", "text": "unusable"} {
+		item := object.union({"n": 1}, {k: v | list != "missing"; k := "ys"; v := {"null": null, "text": "abc"}[list]})
+		_elapsed_cause("count of xs whose count of ys is at least 2 is 1", {"id": 1, "xs": [{"n": 1, "ys": [1, 2]}, item]}, {}) == cause
+		_elapsed_cause("sum of xs.n whose count of ys is at least 2 is 1", {"id": 1, "xs": [{"n": 1, "ys": [1, 2]}, item]}, {}) == cause
+	}
+	_elapsed_cause("count of xs whose count of ys.z is at least 1 is 1", {"id": 1, "xs": [{"ys": [{"z": [1]}]}, "a"]}, {}) == "not_an_object"
+}
+
+test_a_count_in_the_whose_of_a_count_counts_through_a_list_it_walks if {
+	doc := [{"id": 1, "xs": [{"ys": [{"z": [1, 2]}, {"z": [1]}]}, {"ys": [{"z": [1]}]}]}]
+	_elapsed_rows("count of xs whose count of ys.z is 3 is 1", doc, {})[0][1] == true
+	_elapsed_rows("count of xs whose count of ys.z is 3 is 2", doc, {})[0][1] == false
 }

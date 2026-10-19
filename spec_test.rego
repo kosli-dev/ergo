@@ -3,9 +3,6 @@ package spec_test
 import data.ergo
 
 known_differences := {
-	"derived / a count in the whose of a count / counts the items whose own count passes, and shows every item",
-	"derived / a count in the whose of a count / fails as absent when an item's list is missing, so the item cannot be decided",
-	"derived / a count in the whose of a sum / adds only the items whose own count passes",
 	"sentences / a time is after a written number / fails as unusable when the field is a string, because the written time is a number",
 	"sentences / a time is after a written number / fails as value on the same number",
 	"sentences / a time is after a written number / passes when the number is higher",
