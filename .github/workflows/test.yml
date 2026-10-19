@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -52,7 +52,7 @@ jobs:
             exit 1
           fi
 
-  wasm:
+  tests-wasm:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -72,7 +72,7 @@ jobs:
       - name: Run the tests with every report made from a compiled policy
         run: .github/compiled-tests.sh
 
-  wasm-js:
+  tests-wasm-js:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -107,7 +107,7 @@ jobs:
       - name: Check ergo.rego and the ABNF read the same sentences
         run: '"$RUNNER_TEMP/venv/bin/python" spec/check_grammar.py'
 
-  tutorial:
+  site:
     runs-on: ubuntu-latest
     env:
       HUGO_VERSION: 0.157.0
