@@ -662,6 +662,8 @@ export const coach = (goal, ctx) => {
   const { shown } = ctx;
   if (shown.state === "empty") return { kind: "empty", text: goal.start };
   if (shown.state === "unreadable") {
+    const contraction = /\b(does|is|do)n't\b/.exec(text);
+    if (contraction) return { kind: "unreadable", text: `Write \`${contraction[1]} not\` in full. ergo reads \`'\` as the start of a quote.` };
     const hint = goal.hints?.find((h) => h.re.test(text));
     if (hint) return { kind: "phrase", text: hint.text };
     if (goal.messages?.[shown.message]) return { kind: "unreadable", text: goal.messages[shown.message] };
@@ -732,6 +734,8 @@ export const resultLine = (result) => ({
 });
 
 export const dimResult = (goal, shown, met) => goal.kind === "sentence" && shown.state === "result" && !met;
+
+export const isRight = (goal, result) => (goal.kind === "predict" ? result.say.correct === true : result.met);
 
 export const showMeVisible = ({ touched, idleMs }) => touched || idleMs >= 20000;
 

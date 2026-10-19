@@ -73,7 +73,7 @@ pre.tut__input { color: var(--lime); border-color: var(--line); cursor: default;
 .tut__coach.is-done { color: var(--lime); }
 .tut__mini { font: 700 1.25em/1 var(--mono); margin-right: .45em; }
 .tut__mini.t { color: var(--lime); }
-.tut__mini.f { color: var(--signal); }
+.tut__mini.o { color: var(--muted); }
 .tut__link {
   flex: none; background: none; border: 0; padding: 2px 0; cursor: pointer; color: var(--lime);
   font: 500 clamp(14px, 3.4vw, 16px)/1.4 var(--sans); text-decoration: underline; text-underline-offset: 4px;
@@ -86,8 +86,8 @@ pre.tut__input { color: var(--lime); border-color: var(--line); cursor: default;
 .tut__verdict { margin: 0; display: flex; align-items: center; gap: clamp(10px, 3vw, 28px); line-height: 1; }
 .tut__glyph { font: 500 clamp(52px, min(22vw, 16dvh), 190px)/.8 var(--mono); }
 .tut__word { font: 700 clamp(44px, min(16vw, 14dvh), 150px)/1 var(--sans); letter-spacing: -.04em; }
-.is-passed .tut__verdict { color: var(--lime); }
-.is-failed .tut__verdict { color: var(--signal); }
+.tut__state .tut__verdict { color: var(--muted); }
+.is-right .tut__verdict { color: var(--lime); }
 .tut__detail { margin: 0; font: 500 clamp(14px, min(3.8vw, 2.6dvh), 20px)/1.4 var(--mono); overflow-wrap: anywhere; }
 .tut__cause { color: var(--paper); }
 .tut__rest { color: var(--muted); }
