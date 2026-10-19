@@ -11298,27 +11298,29 @@ _swap_scenarios := {
 	"the_part_field_is_a_list": {"doc": {"trail": {"name": "t1", "dd": [1]}}, "params": {"k": "m1"}},
 }
 
-_swap_batch_policy(has, checks, names) := {
-	"subjects": {n: object.union(_swap_subject(has), {"from": concat(".", [n, "trail"])}) | some n in names},
-	"requirements": {n: {"subject": n, "checks": checks} | some n in names},
+_swap_batch_policy(has, checks) := {
+	"subjects": {"round": object.union(_swap_subject(has), {"from": "trails"})},
+	"requirements": {"r": {"subject": "round", "checks": checks}},
 }
 
-_swap_requirement_view(rep, n) := _swap_view({"results": [r | some r in rep.results; r.requirement == n], "requirements": {"r": rep.requirements[n]}})
+_swap_scenario_rows(rep, n) := [r | some r in rep.results; r.subject.id in {n, null}]
+
+_swap_scenario_view(rep, n) := _swap_view({"results": _swap_scenario_rows(rep, n), "requirements": rep.requirements})
 
 _swap_differences(group) := {n |
 	some params in {s.params | some s in _swap_scenarios}
 	names := {m | some m, s in _swap_scenarios; s.params == params}
-	doc := {m: _swap_scenarios[m].doc | some m in names}
+	doc := {"trails": [object.union(_swap_scenarios[m].doc.trail, {"name": m}) | some m in names]}
 	checks := _swap_group_checks(group, _swap_alias, _swap_old(_swap_old_alias))
-	alias := ergo.report(doc, _swap_batch_policy(_swap_has, checks, names), params)
-	full := ergo.report(doc, _swap_batch_policy({}, _swap_group_checks(group, _swap_full, _swap_old(_swap_old_full)), names), params)
+	alias := ergo.report(doc, _swap_batch_policy(_swap_has, checks), params)
+	full := ergo.report(doc, _swap_batch_policy({}, _swap_group_checks(group, _swap_full, _swap_old(_swap_old_full))), params)
 	some n in names
 	_swap_differs(alias, full, n, checks)
 }
 
-_swap_differs(alias, full, n, _) if _swap_requirement_view(alias, n) != _swap_requirement_view(full, n)
+_swap_differs(alias, full, n, _) if _swap_scenario_view(alias, n) != _swap_scenario_view(full, n)
 
-_swap_differs(alias, _, n, checks) if object.keys(checks) - {r.check | some r in alias.results; r.requirement == n} != set()
+_swap_differs(alias, _, n, checks) if object.keys(checks) - {r.check | some r in _swap_scenario_rows(alias, n)} != set()
 
 test_a_part_gives_the_rows_of_its_full_path_in_every_scenario_in_the_first_one_line_checks if _swap_differences("lines_a") == set()
 
@@ -11335,6 +11337,10 @@ test_the_batched_swap_comparison_names_each_scenario_where_a_part_reads_the_wron
 	differences := _swap_differences("lines_b") with data.ergo_test._swap_has as object.union(_swap_has, {"by": "dd.m named by $params.j"})
 		with data.ergo_test._swap_scenarios as scenarios
 	differences == {"everything_is_there", "the_named_by_param_is_a_number", "the_subject_has_no_part_field"}
+}
+
+test_the_batched_swap_comparison_names_a_scenario_that_has_no_row_for_a_check if {
+	_swap_differs({"results": [{"check": "c", "subject": {"id": "other"}}]}, {}, "s", {"c": "x is 1"})
 }
 
 test_the_swap_comparison_would_notice_a_part_that_reads_the_wrong_path if {
