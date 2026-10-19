@@ -348,7 +348,7 @@ A number from the first to the second, both included. The bounds are numbers, an
 <path> is on or before <value or field>
 ```
 
-Both sides are timestamps in the same format, both RFC 3339 strings or both numbers, as today's `compare_time`. A timestamp that isn't RFC 3339 fails the check rather than being compared as text. Missing: `absent`. `null`: `null`. Wrong type or format: `unusable`. `is on or after` replaces `is not before`, a double negative the corpus used six times.
+Both sides are timestamps in the same format, both RFC 3339 strings or both numbers, as today's `compare_time`. A timestamp that isn't RFC 3339 fails the check rather than being compared as text. Missing: `absent`. `null`: `null`. Wrong type or format: `unusable`. A written value that isn't a time as [time.format](semantics.md#compare_time) says, like `"yesterday"` or `null`, is written wrong, with `"is before" takes a time or a number`, because the check could only fail. `is on or after` replaces `is not before`, a double negative the corpus used six times.
 
 **[sentence.phrase.aliases]**
 ```

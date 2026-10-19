@@ -5024,6 +5024,21 @@
     ]
   },
   {
+    "description": "a time phrase with a written value that isn't a time",
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "opened is before \"yesterday\""}}}},
+    "cases": [
+      {
+        "description": "is written wrong, because it could only fail",
+        "rules": ["sentence.phrase.time", "sentence.written_wrong.slot", "written_wrong"],
+        "input": {"things": [{"id": "t1", "opened": "2024-01-01T00:00:00Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["\"is before\" takes a time or a number"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
+  },
+  {
     "description": "a time is on or before a written time",
     "policy": {
       "subjects": {

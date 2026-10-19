@@ -12140,14 +12140,19 @@ test_a_time_phrase_with_a_written_value_fails_closed_on_every_kind_of_field if {
 	[[r[1], r[2]] | some r in rows] == [[true, "satisfied"], [false, "unusable"], [false, "null"], [false, "absent"], [false, "unusable"], [false, "value"]]
 }
 
-test_a_time_phrase_with_a_written_value_that_is_not_a_time_is_unusable if {
-	doc := {"things": [{"id": "a", "t": "2024-01-01T00:00:00Z"}, {"id": "b", "t": 5}]}
-	every written in ["null", "true", "\"yesterday\"", "5", "\"2024-01-01\""] {
-		rows := _sentence_rows({"c": concat("", ["t is before ", written])}, doc, {})
-		count([r | some r in rows; r[1] == true]) == 0
+test_a_written_value_after_a_time_phrase_that_isnt_a_time_is_written_wrong_because_it_could_only_fail if {
+	every pair in [[`t is before null`, `"is before" takes a time or a number`], [`t is after true`, `"is after" takes a time or a number`], [`t is on or after "yesterday"`, `"is on or after" takes a time or a number`], [`t is on or before "2024-01-01"`, `"is on or before" takes a time or a number`], [`t is before "2024-02-30T00:00:00Z"`, `"is before" takes a time or a number`]] {
+		_sentence_problems(pair[0]) == [pair[1]]
 	}
-	[r[2] | some r in _sentence_rows({"c": "t is before null"}, doc, {})] == ["unusable", "unusable"]
+}
+
+test_a_written_number_after_a_time_phrase_is_a_time_so_a_text_field_is_unusable if {
+	doc := {"things": [{"id": "a", "t": "2024-01-01T00:00:00Z"}, {"id": "b", "t": 5}]}
 	[r[2] | some r in _sentence_rows({"c": "t is before 6"}, doc, {})] == ["unusable", "satisfied"]
+}
+
+test_a_written_value_that_isnt_a_time_is_written_wrong_in_a_whose_too if {
+	_sentence_problems(`every xs.v whose t is before "soon" is true`) == [`"is before" takes a time or a number`]
 }
 
 test_a_time_phrase_with_a_written_value_shows_only_the_field_it_reads if {

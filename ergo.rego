@@ -2377,13 +2377,6 @@ _unusable(leaf, x) if {
 	not _timestamps(l, r)
 }
 
-_unusable(leaf, x) if {
-	leaf.op == "compare_time"
-	_found(x, leaf.left)
-	_basic_form(leaf.right) == "literal"
-	_written(leaf.right) == null
-}
-
 _usable_pair(cmp, l, r) if {
 	_comparable(l, r)
 	_orderable(cmp, l)
@@ -6381,7 +6374,7 @@ _s_sq_char(`\\`) := `\`
 
 _s_sq_char(c) := c if not c in {`\'`, `\\`}
 
-_s_sentence_problems(parsed) := (((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
+_s_sentence_problems(parsed) := ((((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"bare_word" in object.keys(node)
@@ -6450,6 +6443,12 @@ _s_sentence_problems(parsed) := (((((((((((((({concat("", [node.bare_word, " is 
 	node.op in {"starts with", "ends with"}
 	"value" in object.keys(node)
 	not is_string(node.value)
+}) | {concat("", [`"`, node.op, `" takes a time or a number`]) |
+	some node in _s_nodes(parsed)
+	is_object(node)
+	node.op in object.keys(_s_time_cmps)
+	"value" in object.keys(node)
+	not _s_time_value(node.value)
 }) | {concat("", [`"`, node.phrase.op, `" after every or some would check each item of the last list, not the list: put the walk on a for line`]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
@@ -7567,6 +7566,10 @@ _s_list_path(ph) := ph.terms[0] if {
 	"terms" in object.keys(ph)
 	_s_one_path(ph.terms)
 }
+
+_s_time_value(v) if is_number(v)
+
+_s_time_value(v) if _rfc3339_shaped(v)
 
 _s_time_cmps := {"is before": "lt", "is after": "gt", "is on or after": "gte", "is on or before": "lte"}
 
