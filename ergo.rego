@@ -6646,33 +6646,21 @@ _s_phrase_text(ph) := _s_phrase_words(ph) if _s_args_text(ph) == ""
 _s_phrase_words(ph) := "equals" if {
 	ph.op == "is"
 	"terms" in object.keys(ph)
-	not _s_elapsed_argument(ph)
 }
 
 _s_phrase_words(ph) := "is" if {
 	ph.op == "is"
-	_s_value_argument(ph)
+	"value" in object.keys(ph)
 }
 
 _s_phrase_words(ph) := "does not equal" if {
 	ph.op == "is not"
 	"terms" in object.keys(ph)
-	not _s_elapsed_argument(ph)
 }
 
 _s_phrase_words(ph) := "is not" if {
 	ph.op == "is not"
-	_s_value_argument(ph)
-}
-
-_s_value_argument(ph) if "value" in object.keys(ph)
-
-_s_value_argument(ph) if _s_elapsed_argument(ph)
-
-_s_elapsed_argument(ph) if {
-	some t in object.get(ph, "terms", [])
-	is_object(t)
-	"elapsed_from" in object.keys(t)
+	"value" in object.keys(ph)
 }
 
 _s_phrase_words(ph) := "is one of" if {

@@ -10372,7 +10372,7 @@ test_an_elapsed_time_goes_in_a_plus_on_either_side_of_a_phrase if {
 }
 
 test_an_elapsed_time_on_the_right_of_is_prints_as_is_not_equals if {
-	ergo.report({"things": []}, _sentence_policy({"c": "n is days elapsed from p to q and m is not days elapsed from p to q and k is count of xs"}), {}).requirements.s.checks.c.expression == "n is days elapsed from p to q and m is not days elapsed from p to q and k equals count of xs"
+	ergo.report({"things": []}, _sentence_policy({"c": "n is days elapsed from p to q and m is not days elapsed from p to q and k is count of xs"}), {}).requirements.s.checks.c.expression == "n equals days elapsed from p to q and m does not equal days elapsed from p to q and k equals count of xs"
 }
 
 test_elapsed_cant_take_a_phrase_that_takes_no_number if {
