@@ -8348,12 +8348,10 @@ test_an_assert_object_takes_only_description_and_meta if {
 
 test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
 	every pair in [
-		[`count of xs is between 1 and 3`, `"is between" after a count of, a sum of or a plus isn't supported yet`],
 		[`every xs is y plus 1`, "count of, sum of and plus after every or some aren't supported yet"],
 		[`t is before y plus 1`, `"is before" can't take a count of, a sum of or a plus`],
-		[`count of xs whose count of ys is 1 is 2`, "a count of, a sum of or a plus in the whose of a count of or a sum of isn't supported yet"],
-		[`t is before "2024-01-01T00:00:00Z"`, `"is before" with a value isn't supported yet: compare with a field`],
-		[`x matches $params.a named by $params.b`, `"matches" with named by in its path isn't supported yet`],
+		[`count of xs whose sum of ys is 1 is 2`, "a sum of or a plus in the whose of a count of or a sum of isn't supported yet"],
+		[`count of xs whose n is count of ys plus 1 is 2`, "a sum of or a plus in the whose of a count of or a sum of isn't supported yet"],
 		[`last of xs is 1`, "last of isn't supported yet"],
 	] {
 		_sentence_problems(pair[0]) == [pair[1]]
@@ -8361,7 +8359,7 @@ test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
 	_sentence_problems({"assert": []}) == ["empty assert"]
 	_sentence_problems({"assert": ["x exists", 1]}) == ["invalid assert"]
 	_sentence_problems({"assert": ["x exists", "y is \"a"]}) == ["line 2: unclosed quote at column 6"]
-	_sentence_problems({"assert": ["x exists", "count of ys is between 1 and 2"]}) == [concat("", ["line 2: ", `"is between" after a count of, a sum of or a plus isn't supported yet`])]
+	_sentence_problems({"assert": ["x exists", "last of ys is 1"]}) == ["line 2: last of isn't supported yet"]
 }
 
 test_a_check_written_as_a_string_is_read_as_a_sentence if {
@@ -8752,7 +8750,7 @@ test_every_and_some_joined_with_and_give_one_row_with_the_failed_sentences if {
 }
 
 test_forms_a_walk_cant_take_yet_are_written_wrong if {
-	_sentence_problems(`every xs whose count of ys is between 1 and 2 is not empty`) == [`"is between" after a count of, a sum of or a plus isn't supported yet`]
+	_sentence_problems(`every xs whose last of ys is 1 is not empty`) == ["last of isn't supported yet"]
 	_sentence_problems(`every k1.k2.k3.k4.k5.k6.k7.k8.k9.k10.k11.k12 is 1`) == ["every and some over more than ten steps aren't supported yet"]
 }
 
@@ -8953,7 +8951,7 @@ test_a_for_line_written_wrong_says_why if {
 
 test_forms_ergo_does_not_run_yet_are_written_wrong_on_a_for_line_too if {
 	every pair in [
-		["every xs whose count of ys is between 1 and 2 as x", `"is between" after a count of, a sum of or a plus isn't supported yet`],
+		["every xs whose last of ys is 1 as x", "last of isn't supported yet"],
 		["every b.c.d.e.f.g.h.i.j.k.l.m as x", "every and some over more than ten steps aren't supported yet"],
 	] {
 		_sentence_problems({"assert": "x is 1", "for": pair[0]}) == [pair[1]]
@@ -10322,28 +10320,62 @@ test_elapsed_works_in_each_line_of_a_list_and_under_a_for_line if {
 	_elapsed_cause({"for": "every ps as it", "assert": "days elapsed from it.p to it.q is 1"}, {"id": 1, "ps": [{"p": 1, "q": 0}]}, {}) == "value"
 }
 
-test_elapsed_is_written_wrong_anywhere_but_alone_before_a_phrase if {
-	msg := "an elapsed time isn't supported yet except alone before a phrase"
+test_elapsed_is_written_wrong_after_every_or_some_and_in_a_from_line if {
+	msg := "an elapsed time isn't supported yet after every or some, or in a from line"
 	every check in [
-		"days elapsed from p to q plus 1 is 2",
-		"1 plus days elapsed from p to q is 2",
-		"count of xs plus days elapsed from p to q is 2",
-		"n is days elapsed from p to q",
-		"days elapsed from p to q is less than days elapsed from c to d",
-		"n is at least 1 plus days elapsed from p to q",
-		"every xs whose days elapsed from p to q is 1 is not empty",
-		"count of xs whose days elapsed from p to q is 1 is 2",
 		"every xs is days elapsed from p to q",
-		"x is more than days elapsed from p to q",
+		"some xs is days elapsed from p to q",
+		"every xs is days elapsed from p to q plus 1",
 	] {
 		msg in _sentence_problems(check)
 	}
-	msg in _sentence_problems({"for": "every xs whose days elapsed from p to q is 1 as x", "assert": "x.n is 1"})
 	_from_problems(_from_report({"xs": [{"id": 1}]}, {"x": {"from": "xs whose days elapsed from p to q is 1"}}, {"c": "id exists"}, {})) == [{"name": "subjects.x.from", "value": [msg]}]
 }
 
-test_elapsed_cant_take_is_between_or_a_phrase_that_takes_no_number if {
-	_sentence_problems("days elapsed from p to q is between 1 and 2") == [`"is between" after a count of, a sum of or a plus isn't supported yet`]
+test_an_elapsed_time_in_a_whose_decides_each_item_of_a_count_a_sum_and_an_every if {
+	doc := [{"id": 1, "xs": [{"n": 1, "p": 0, "q": 86400}, {"n": 2, "p": 0, "q": 86400}, {"n": 4, "p": 0, "q": 172800}]}]
+	_elapsed_rows("count of xs whose days elapsed from p to q is 1 is 2", doc, {})[0][1] == true
+	_elapsed_rows("sum of xs.n whose days elapsed from p to q is 1 is 3", doc, {})[0][1] == true
+	_elapsed_rows("sum of xs.n whose days elapsed from p to q is 1 is 4", doc, {})[0][1] == false
+	_elapsed_rows("count of xs whose n is days elapsed from p to q is 1", doc, {})[0][1] == true
+	_elapsed_rows("every xs.n whose days elapsed from p to q is 1 is less than 3", doc, {})[0][1] == true
+	_elapsed_rows("every xs.n whose days elapsed from p to q is 1 is less than 2", doc, {})[0][1] == false
+}
+
+test_an_elapsed_time_in_a_whose_fails_closed_when_an_item_has_no_usable_time if {
+	items := {
+		"absent": {"n": 1, "p": 0},
+		"null": {"n": 1, "p": 0, "q": null},
+		"mixed": {"n": 1, "p": 0, "q": "2026-10-01T00:00:00Z"},
+		"text": {"n": 1, "p": 0, "q": "x"},
+	}
+	every state, item in items {
+		_elapsed_cause("count of xs whose days elapsed from p to q is 1 is 1", {"id": 1, "xs": [{"n": 1, "p": 0, "q": 86400}, item]}, {}) == state_cause[state]
+		_elapsed_cause("every xs.n whose days elapsed from p to q is 1 is 1", {"id": 1, "xs": [{"n": 1, "p": 0, "q": 86400}, item]}, {}) == state_cause[state]
+	}
+}
+
+state_cause := {"absent": "absent", "null": "null", "mixed": "unusable", "text": "unusable"}
+
+test_an_elapsed_time_in_a_whose_goes_on_a_for_line_too if {
+	doc := [{"id": 1, "xs": [{"n": 1, "p": 0, "q": 86400}, {"n": 2, "p": 0, "q": 172800}]}]
+	_elapsed_first({"for": "every xs whose days elapsed from p to q is 1 as x", "assert": "x.n is 1"}, doc, {}) == [true, "satisfied"]
+	_elapsed_first({"for": "every xs whose days elapsed from p to q is 2 as x", "assert": "x.n is 1"}, doc, {}) == [false, "value"]
+}
+
+test_an_elapsed_time_goes_in_a_plus_on_either_side_of_a_phrase if {
+	doc := [{"id": 1, "n": 3, "p": 0, "q": 86400}, {"id": 2, "n": 3, "p": 0, "q": "1970-01-02T00:00:00Z"}, {"id": 3, "n": 3, "p": null, "q": 86400}, {"id": 4, "n": "3", "p": 0, "q": 86400}, {"id": 5, "n": 3, "p": 86400, "q": 0}]
+	[[r[0], r[1], r[2]] | some r in _elapsed_rows("days elapsed from p to q plus n is 4", doc, {})] == [[1, true, "satisfied"], [2, false, "unusable"], [3, false, "null"], [4, false, "unusable"], [5, false, "value"]]
+	[[r[0], r[1], r[2]] | some r in _elapsed_rows("n is days elapsed from p to q", doc, {})] == [[1, false, "value"], [2, false, "unusable"], [3, false, "null"], [4, false, "unusable"], [5, false, "value"]]
+	with_x := [object.union(d, {"x": [1, 2]}) | some d in doc]
+	[[r[0], r[1], r[2]] | some r in _elapsed_rows("n is less than 1 plus days elapsed from p to q plus count of x", with_x, {})] == [[1, true, "satisfied"], [2, false, "unusable"], [3, false, "null"], [4, false, "unusable"], [5, false, "value"]]
+}
+
+test_an_elapsed_time_on_the_right_of_is_prints_as_is_not_equals if {
+	ergo.report({"things": []}, _sentence_policy({"c": "n is days elapsed from p to q and m is not days elapsed from p to q and k is count of xs"}), {}).requirements.s.checks.c.expression == "n equals days elapsed from p to q and m does not equal days elapsed from p to q and k equals count of xs"
+}
+
+test_elapsed_cant_take_a_phrase_that_takes_no_number if {
 	_sentence_problems("days elapsed from p to q is empty") == ["is empty can't follow a count of, a sum of or a plus"]
 	_sentence_problems("days elapsed from p to q is before c") == ["is before can't follow a count of, a sum of or a plus"]
 }
@@ -12048,4 +12080,146 @@ test_data_named_like_ergos_compile_flag_changes_no_report if {
 	every form in [policy, ergo.compile(policy)] {
 		ergo.report(doc, form, {}) == want with data.ergo_reading as true
 	}
+}
+
+test_max_on_a_compare_is_for_sentences_only if {
+	_sentence_problems({"op": "compare", "left": ["n"], "cmp": "gte", "right": {"literal": 1}, "max": 2}) == ["unknown field max"]
+}
+
+test_a_between_after_a_count_reads_the_items_its_whose_keeps if {
+	doc := {"things": [{"id": "a", "xs": [{"k": 1}, {"k": 1}, {"k": 2}]}, {"id": "b", "xs": [{"k": 1}, {"k": 1}, {"k": 1}, {"k": 1}]}]}
+	rows := _sentence_rows({"c": "count of xs whose k is 1 is between 1 and 3"}, doc, {})
+	[[r[0], r[1], r[2]] | some r in rows] == [["c", true, "satisfied"], ["c", false, "value"]]
+}
+
+test_a_between_after_a_plus_is_inclusive_and_fails_closed_on_text if {
+	doc := {"things": [{"id": "a", "n": 3}, {"id": "b", "n": "3"}, {"id": "c", "n": null}, {"id": "d", "n": 1}, {"id": "e", "n": 6}]}
+	rows := _sentence_rows({"c": "n plus 1 is between 2 and 4"}, doc, {})
+	[[r[1], r[2]] | some r in rows] == [[true, "satisfied"], [false, "unusable"], [false, "null"], [true, "satisfied"], [false, "value"]]
+}
+
+test_a_between_after_a_count_goes_with_and_in_a_list_of_assertions if {
+	doc := {"things": [{"id": "a", "xs": [1, 2], "n": 1}, {"id": "b", "xs": [1, 2], "n": 2}]}
+	rows := ergo.report(doc, _sentence_policy({"c": {"assert": ["count of xs is between 1 and 2", "n is 1"]}}), {}).results
+	[[r.subject.id, r.passed, r.cause] | some r in rows; r.check == "c"] == [["a", true, "satisfied"], ["b", false, "value"]]
+}
+
+test_max_on_a_compare_must_be_a_number_with_cmp_gte_and_no_within if {
+	base := {"op": "compare", "left": ["n"], "cmp": "gte", "right": {"literal": 1}}
+	_sentence_problems(object.union(base, {"max": "x"})) == ["invalid max", "unknown field max"]
+	_sentence_problems(object.union(base, {"max": 2, "cmp": "lt"})) == ["max needs cmp gte", "unknown field max"]
+	_sentence_problems(object.union(base, {"max": 2, "within": 1})) == ["max can't go with within", "unknown field max", "within needs cmp eq"]
+}
+
+test_a_count_in_the_whose_of_a_count_or_a_sum_leaves_out_the_items_it_fails if {
+	doc := [{"id": 1, "xs": [{"n": 2, "ys": [1, 2]}, {"n": 3, "ys": [1]}, {"n": 4, "ys": [1, 2, 3]}]}]
+	_elapsed_rows("count of xs whose count of ys is at least 2 is 2", doc, {})[0][1] == true
+	_elapsed_rows("sum of xs.n whose count of ys is at least 2 is 6", doc, {})[0][1] == true
+	_elapsed_rows("count of xs whose n is count of ys is 1", doc, {})[0][1] == true
+	_elapsed_rows("count of xs whose count of ys is at least 2 is 3", doc, {})[0][1] == false
+}
+
+test_a_count_in_the_whose_of_a_count_fails_closed_when_an_item_list_cant_be_counted if {
+	every list, cause in {"missing": "absent", "null": "null", "text": "unusable"} {
+		item := object.union({"n": 1}, {k: v | list != "missing"; k := "ys"; v := {"null": null, "text": "abc"}[list]})
+		_elapsed_cause("count of xs whose count of ys is at least 2 is 1", {"id": 1, "xs": [{"n": 1, "ys": [1, 2]}, item]}, {}) == cause
+		_elapsed_cause("sum of xs.n whose count of ys is at least 2 is 1", {"id": 1, "xs": [{"n": 1, "ys": [1, 2]}, item]}, {}) == cause
+	}
+	_elapsed_cause("count of xs whose count of ys.z is at least 1 is 1", {"id": 1, "xs": [{"ys": [{"z": [1]}]}, "a"]}, {}) == "not_an_object"
+}
+
+test_a_count_in_the_whose_of_a_count_counts_through_a_list_it_walks if {
+	doc := [{"id": 1, "xs": [{"ys": [{"z": [1, 2]}, {"z": [1]}]}, {"ys": [{"z": [1]}]}]}]
+	_elapsed_rows("count of xs whose count of ys.z is 3 is 1", doc, {})[0][1] == true
+	_elapsed_rows("count of xs whose count of ys.z is 3 is 2", doc, {})[0][1] == false
+}
+
+test_a_time_phrase_with_a_written_value_fails_closed_on_every_kind_of_field if {
+	doc := {"things": [{"id": "a", "t": "2024-01-01T00:00:00Z"}, {"id": "b", "t": 5}, {"id": "c", "t": null}, {"id": "d"}, {"id": "e", "t": [1]}, {"id": "f", "t": "2025-01-01T00:00:00Z"}]}
+	rows := _sentence_rows({"c": "t is before \"2024-06-01T00:00:00Z\""}, doc, {})
+	[[r[1], r[2]] | some r in rows] == [[true, "satisfied"], [false, "unusable"], [false, "null"], [false, "absent"], [false, "unusable"], [false, "value"]]
+}
+
+test_a_time_phrase_with_a_written_value_that_is_not_a_time_is_unusable if {
+	doc := {"things": [{"id": "a", "t": "2024-01-01T00:00:00Z"}, {"id": "b", "t": 5}]}
+	every written in ["null", "true", "\"yesterday\"", "5", "\"2024-01-01\""] {
+		rows := _sentence_rows({"c": concat("", ["t is before ", written])}, doc, {})
+		count([r | some r in rows; r[1] == true]) == 0
+	}
+	[r[2] | some r in _sentence_rows({"c": "t is before null"}, doc, {})] == ["unusable", "unusable"]
+	[r[2] | some r in _sentence_rows({"c": "t is before 6"}, doc, {})] == ["unusable", "satisfied"]
+}
+
+test_a_time_phrase_with_a_written_value_shows_only_the_field_it_reads if {
+	_sentence_rows({"c": "t is on or after 5"}, {"things": [{"id": "a", "t": 5}]}, {}) == [["c", true, "satisfied", [{"name": "t", "value": 5}]]]
+}
+
+test_a_time_phrase_with_a_written_value_goes_in_a_whose if {
+	doc := {"things": [{"id": "a", "xs": [{"t": "2024-01-01T00:00:00Z", "v": "x"}, {"t": "2026-01-01T00:00:00Z", "v": ""}]}, {"id": "b", "xs": [{"t": "2024-01-01T00:00:00Z", "v": ""}]}, {"id": "c", "xs": [{"t": 5, "v": ""}]}]}
+	rows := _sentence_rows({"c": "every xs.v whose t is before \"2025-01-01T00:00:00Z\" is not empty"}, doc, {})
+	[[r[1], r[2]] | some r in rows] == [[true, "satisfied"], [false, "value"], [false, "unusable"]]
+	count_rows := _sentence_rows({"c": "count of xs whose t is before \"2025-01-01T00:00:00Z\" is 1"}, doc, {})
+	[[r[1], r[2]] | some r in count_rows] == [[true, "satisfied"], [true, "satisfied"], [false, "unusable"]]
+}
+
+test_a_hand_written_compare_time_cant_take_a_written_value if {
+	_sentence_problems({"op": "compare_time", "left": ["a"], "cmp": "lt", "right": {"literal": "2024-01-01T00:00:00Z"}}) == ["invalid right"]
+}
+
+_named_params := {"lists": {"a": ["p", "q"], "b": "text", "c": null}, "pats": {"a": ["^a"], "bad": ["("]}, "k": "a", "kbad": "bad", "nk": null, "bk": {"x": 1}}
+
+_named_things := {"things": [{"id": "t1", "x": "p", "kind": "a"}, {"id": "t2", "x": "z", "kind": "b"}, {"id": "t3", "x": "p", "kind": "c"}, {"id": "t4", "x": "p", "kind": "zz"}, {"id": "t5", "x": "p"}, {"id": "t6", "x": 3, "kind": "a"}]}
+
+test_a_list_read_with_named_by_a_params_key_shows_only_the_field if {
+	rows := _sentence_rows({"c": "x is in $params.lists named by $params.k"}, _named_things, _named_params)
+	[[r[1], r[2], r[3]] | some r in rows] == [
+		[true, "satisfied", [{"name": "x", "value": "p"}]],
+		[false, "value", [{"name": "x", "value": "z"}]],
+		[true, "satisfied", [{"name": "x", "value": "p"}]],
+		[true, "satisfied", [{"name": "x", "value": "p"}]],
+		[true, "satisfied", [{"name": "x", "value": "p"}]],
+		[false, "unusable", [{"name": "x", "value": 3}]],
+	]
+}
+
+test_a_list_read_with_named_by_a_subject_field_fails_closed_when_the_key_is_unusable if {
+	rows := _sentence_rows({"c": "x is in $params.lists named by kind"}, _named_things, _named_params)
+	[[r[1], r[2]] | some r in rows] == [[true, "satisfied"], [false, "unusable"], [false, "null"], [false, "absent"], [false, "absent"], [false, "unusable"]]
+}
+
+test_a_list_read_with_named_by_a_reference_that_is_null_or_not_a_key_fails_whatever_the_field_holds if {
+	nulls := _sentence_rows({"c": "x is in $params.lists named by $params.nk"}, _named_things, _named_params)
+	{r[2] | some r in nulls} == {"null"}
+	objects := _sentence_rows({"c": "x is not in $params.lists named by $params.bk"}, _named_things, _named_params)
+	{r[2] | some r in objects} == {"unusable"}
+	missing := _sentence_rows({"c": "x is not in $params.lists named by $params.nope"}, _named_things, _named_params)
+	{r[2] | some r in missing} == {"absent"}
+}
+
+test_named_by_works_after_each_phrase_that_takes_a_list if {
+	causes := {sentence: [r[2] | some r in _sentence_rows({"c": sentence}, _named_things, _named_params)] |
+		some sentence in [
+			"x is not in $params.lists named by $params.k",
+			"x matches $params.pats named by $params.k",
+			"x does not match $params.pats named by $params.k",
+			"x matches $params.pats named by $params.kbad",
+			"kind contains $params.lists named by $params.k",
+			"kind contains none of $params.lists named by $params.k",
+		]
+	}
+	causes["x is not in $params.lists named by $params.k"] == ["value", "satisfied", "value", "value", "value", "unusable"]
+	causes["x matches $params.pats named by $params.k"] == ["value", "value", "value", "value", "value", "unusable"]
+	causes["x does not match $params.pats named by $params.k"] == ["satisfied", "satisfied", "satisfied", "satisfied", "satisfied", "unusable"]
+	causes["x matches $params.pats named by $params.kbad"] == ["unusable", "unusable", "unusable", "unusable", "unusable", "unusable"]
+	causes["kind contains $params.lists named by $params.k"] == ["unusable", "unusable", "unusable", "unusable", "absent", "unusable"]
+	causes["kind contains none of $params.lists named by $params.k"] == ["unusable", "unusable", "unusable", "unusable", "absent", "unusable"]
+}
+
+_named_count_in_whose(xs) := [[r.passed, r.cause] | some r in ergo.report({"things": [{"id": "t", "xs": xs}]}, _sentence_policy({"c": "count of xs whose count of $params.lists named by kind is 1 is 1"}), {"lists": {"a": [1]}}).results; r.check == "c"]
+
+test_a_count_named_by_a_missing_or_wrong_key_in_a_whose_fails_closed if {
+	_named_count_in_whose([{"kind": "a"}]) == [[true, "satisfied"]]
+	_named_count_in_whose([{}]) == [[false, "absent"]]
+	_named_count_in_whose([{"kind": 5}]) == [[false, "unusable"]]
+	_named_count_in_whose([{"kind": "b"}]) == [[false, "absent"]]
 }

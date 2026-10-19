@@ -11629,7 +11629,7 @@
         ],
         "expressions": {
           "s": {
-            "c": "n is days elapsed from started to ended"
+            "c": "n equals days elapsed from started to ended"
           }
         }
       },
