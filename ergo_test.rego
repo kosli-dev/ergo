@@ -1993,6 +1993,15 @@ test_a_list_index_written_with_an_exponent_reads_the_item if {
 	[verdict({"id": 1, "m": [{"k": 5}, {"k": 6}]}, check), rendered({}, check)] == [true, "m[1].k == 6"]
 }
 
+test_a_compiled_policy_reads_a_list_index_written_with_an_exponent if {
+	policy := {
+		"subjects": {"item": {"from": "items", "identified_by": "id"}},
+		"requirements": {"r": {"subject": "item", "checks": {"c": {"op": "equals", "path": ["m", 1e0, "k"], "value": 6}}}},
+	}
+	rep := ergo.report({"items": [{"id": 1, "m": [{"k": 5}, {"k": 6}]}]}, ergo.compile(policy), {})
+	[[r.passed, r.cause] | some r in rep.results; r.check == "c"] == [[true, "satisfied"]]
+}
+
 test_a_literal_list_index_written_with_an_exponent_reads_the_item if {
 	check := {"op": "equals", "path": ["a", {"literal": 10e-1}], "value": 2}
 	[verdict({"id": 1, "a": [1, 2]}, check), rendered({}, check)] == [true, "item 2 of .a == 2"]
