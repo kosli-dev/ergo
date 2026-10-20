@@ -62,7 +62,7 @@ jobs:
           fi
           jq -e '.files["ergo.rego"]' "$RUNNER_TEMP/coverage.json" > /dev/null
           jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | range(.start.row; .end.row + 1) | "\($f):\(.)"' "$RUNNER_TEMP/coverage.json" | sort -u > "$RUNNER_TEMP/not-covered-$PART.txt"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: not-covered-${{ matrix.part }}
           path: ${{ runner.temp }}/not-covered-${{ matrix.part }}.txt
