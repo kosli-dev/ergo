@@ -1983,14 +1983,24 @@ test_a_list_index_written_as_a_whole_number_reads_the_item if {
 	rendered({}, {"op": "present", "path": ["a", 1]}) == "item 2 of .a is present"
 }
 
-test_a_list_index_written_with_a_decimal_point_or_an_exponent_reads_the_item if {
-	subj := {"id": 1, "a": [1, 2]}
-	[[verdict(subj, c), rendered({}, c)] | some c in [
-		{"op": "equals", "path": ["a", 1.0], "value": 2},
-		{"op": "equals", "path": ["a", 1e0], "value": 2},
-		{"op": "equals", "path": ["a", {"literal": 10e-1}], "value": 2},
-	]] == [[true, "item 2 of .a == 2"] | some _ in [1, 2, 3]]
-	params_rows({"items": [subj]}, {"op": "present", "path": ["a", {"ref": ["$$params", "i"]}]}) == [[true, "satisfied", [{"name": ".a named by $params.i", "value": 2}]]] with data.params as {"i": 1e0}
+test_a_list_index_written_with_a_decimal_point_reads_the_item if {
+	check := {"op": "equals", "path": ["m", 1.0, "k"], "value": 6}
+	[verdict({"id": 1, "m": [{"k": 5}, {"k": 6}]}, check), rendered({}, check)] == [true, "m[1].k == 6"]
+}
+
+test_a_list_index_written_with_an_exponent_reads_the_item if {
+	check := {"op": "equals", "path": ["m", 1e0, "k"], "value": 6}
+	[verdict({"id": 1, "m": [{"k": 5}, {"k": 6}]}, check), rendered({}, check)] == [true, "m[1].k == 6"]
+}
+
+test_a_literal_list_index_written_with_an_exponent_reads_the_item if {
+	check := {"op": "equals", "path": ["a", {"literal": 10e-1}], "value": 2}
+	[verdict({"id": 1, "a": [1, 2]}, check), rendered({}, check)] == [true, "item 2 of .a == 2"]
+}
+
+test_a_ref_step_that_reads_a_list_index_written_with_an_exponent_reads_the_item if {
+	check := {"op": "present", "path": ["a", {"ref": ["$$params", "i"]}]}
+	params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check) == [[true, "satisfied", [{"name": ".a named by $params.i", "value": 2}]]] with data.params as {"i": 1e0}
 }
 
 test_a_list_index_reads_the_same_item_however_other_checks_write_it if {

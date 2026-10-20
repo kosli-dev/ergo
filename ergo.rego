@@ -1236,7 +1236,7 @@ default value_at(_, _) := null
 value_at(subj, path) := v if {
 	is_object(subj)
 	_plain_path(path)
-	v := object.get(subj, path, null)
+	v := object.get(subj, _plain_keys(path), null)
 	not is_object(v)
 } else := v if {
 	v := _resolved(subj, path)
@@ -1246,17 +1246,19 @@ value_at(subj, path) := v if {
 _field(subj, path) := v if {
 	is_object(subj)
 	_plain_path(path)
-	v := object.get(subj, path, _absent)
+	v := object.get(subj, _plain_keys(path), _absent)
 	not is_object(v)
 } else := v if {
 	v := _resolved(subj, path)
 	v != _absent
 }
 
-_resolved(subj, path) := object.get(subj, path, _absent) if {
+_resolved(subj, path) := object.get(subj, _plain_keys(path), _absent) if {
 	is_object(subj)
 	_plain_path(path)
 } else := _read_from(_start_of(subj, path), _keys_in(subj, path))
+
+_plain_keys(path) := [_key(seg) | some seg in path]
 
 _plain_path(path) if {
 	is_array(path)
@@ -3332,7 +3334,7 @@ _input_spec_path(spec) := spec if is_array(spec)
 
 _input_spec_path(spec) := object.get(spec, "path", []) if is_object(spec)
 
-_read_state(subj, path) := _plain_read_state(subj, path, object.get(subj, path, _absent)) if {
+_read_state(subj, path) := _plain_read_state(subj, path, object.get(subj, _plain_keys(path), _absent)) if {
 	is_object(subj)
 	_plain_path(path)
 } else := _any_read_state(subj, path)
