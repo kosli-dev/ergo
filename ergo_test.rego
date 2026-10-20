@@ -1931,7 +1931,7 @@ test_a_step_that_cannot_be_a_key_is_named_apart_from_a_key_that_looks_like_it if
 	rendered({}, {"op": "present", "path": ["a", "true"]}) == ".a.true is present"
 }
 
-bad_steps := [true, null, ["a"], 1.5, -1, 1.0, 1e0, {"literal": true}, {"literal": -1}]
+bad_steps := [true, null, ["a"], 1.5, -1, 2.5e0, {"literal": true}, {"literal": -1}]
 
 test_a_present_filter_with_a_step_that_cannot_be_a_key_cannot_rule_subjects_out if {
 	rows := [[rep.requirements.s.status, r.passed, r.cause] |
@@ -1971,7 +1971,7 @@ test_a_check_whose_inputs_have_a_step_that_cannot_be_a_key_is_ill_formed if {
 	[[verdict(subj, c), cause_of(subj, c)] | some c in [
 		{"op": "even", "path": ["n"], "expression": "n is even", "inputs": [["n", true]]},
 		{"op": "even", "path": ["n"], "expression": "n is even", "inputs": [{"path": ["xs"], "each": ["v", -1]}]},
-		{"op": "even", "path": ["n"], "expression": "n is even", "inputs": [{"path": ["xs", 1.0], "each": ["v"]}]},
+		{"op": "even", "path": ["n"], "expression": "n is even", "inputs": [{"path": ["xs", 1.5], "each": ["v"]}]},
 		{"op": "equals", "path": ["n"], "value": 2, "inputs": [["n", null]]},
 	]] == [[false, "ill_formed"], [false, "ill_formed"], [false, "ill_formed"], [false, "ill_formed"]]
 	verdict(subj, {"op": "even", "path": ["n"], "expression": "n is even", "inputs": [["n"], {"path": ["xs"], "each": ["v"]}]}) == true
@@ -1983,18 +1983,59 @@ test_a_list_index_written_as_a_whole_number_reads_the_item if {
 	rendered({}, {"op": "present", "path": ["a", 1]}) == "item 2 of .a is present"
 }
 
+test_a_list_index_written_with_a_decimal_point_reads_the_item if {
+	check := {"op": "equals", "path": ["m", 1.0, "k"], "value": 6}
+	[verdict({"id": 1, "m": [{"k": 5}, {"k": 6}]}, check), rendered({}, check)] == [true, "m[1].k == 6"]
+}
+
+test_a_list_index_written_with_an_exponent_reads_the_item if {
+	check := {"op": "equals", "path": ["m", 1e0, "k"], "value": 6}
+	[verdict({"id": 1, "m": [{"k": 5}, {"k": 6}]}, check), rendered({}, check)] == [true, "m[1].k == 6"]
+}
+
+test_a_compiled_policy_reads_a_list_index_written_with_an_exponent if {
+	policy := {
+		"subjects": {"item": {"from": "items", "identified_by": "id"}},
+		"requirements": {"r": {"subject": "item", "checks": {"c": {"op": "equals", "path": ["m", 1e0, "k"], "value": 6}}}},
+	}
+	rep := ergo.report({"items": [{"id": 1, "m": [{"k": 5}, {"k": 6}]}]}, ergo.compile(policy), {})
+	[[r.passed, r.cause] | some r in rep.results; r.check == "c"] == [[true, "satisfied"]]
+}
+
+test_a_literal_list_index_written_with_an_exponent_reads_the_item if {
+	check := {"op": "equals", "path": ["a", {"literal": 10e-1}], "value": 2}
+	[verdict({"id": 1, "a": [1, 2]}, check), rendered({}, check)] == [true, "item 2 of .a == 2"]
+}
+
+test_a_ref_step_that_reads_a_list_index_written_with_an_exponent_reads_the_item if {
+	check := {"op": "present", "path": ["a", {"ref": ["$$params", "i"]}]}
+	params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check) == [[true, "satisfied", [{"name": ".a named by $params.i", "value": 2}]]] with data.params as {"i": 1e0}
+}
+
+test_a_list_index_reads_the_same_item_however_other_checks_write_it if {
+	policy := {
+		"subjects": {"item": {"from": "items", "identified_by": "id"}},
+		"requirements": {"r": {"subject": "item", "checks": {
+			"c1": {"op": "present", "path": ["a", 1.0]},
+			"c2": {"op": "present", "path": ["a", 1]},
+		}}},
+	}
+	rep := ergo.report({"items": [{"id": 1, "a": [1, 2]}]}, policy, {})
+	[[r.check, r.passed, r.cause] | some r in rep.results] == [[c, true, "satisfied"] | some c in ["$well_formed", "$min_subjects", "$unique_ids", "c1", "c2"]]
+}
+
 test_a_ref_step_that_reads_something_that_cannot_be_a_key_fails_as_unusable if {
 	check := {"op": "present", "path": ["a", {"ref": ["$$params", "i"]}]}
 	params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check) == [[true, "satisfied", [{"name": ".a named by $params.i", "value": 2}]]] with data.params as {"i": 1}
 	r := params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check)[0] with data.params as {"i": -1}
 	[r[0], r[1]] == [false, "unusable"]
-	s := params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check)[0] with data.params as {"i": 1.0}
+	s := params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check)[0] with data.params as {"i": 1.5}
 	[s[0], s[1]] == [false, "unusable"]
 }
 
 test_a_from_or_id_with_a_step_that_cannot_be_a_key_is_not_well_formed if {
 	rows := [r.passed |
-		some m in [{"from": ["xs", true]}, {"from": ["xs", 1.0, {"each_as": "x"}]}, {"identified_by": ["id", null]}]
+		some m in [{"from": ["xs", true]}, {"from": ["xs", 1.5, {"each_as": "x"}]}, {"identified_by": ["id", null]}]
 		rep := report({"xs": [{"id": 1}]}, {"s": object.union({"from": ["xs"], "checks": {"c": {"op": "present", "path": ["id"]}}}, m)})
 		some r in rows_for(rep, "s", "$well_formed")
 	]

@@ -455,6 +455,22 @@
     ]
   },
   {
+    "description": "present on a list item, with the index written three ways",
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"decimal": {"op": "present", "path": ["x", 1.0]}, "digits": {"op": "present", "path": ["x", 1]}, "exponent": {"op": "present", "path": ["x", 1e0]}}}}},
+    "cases": [
+      {
+        "description": "all read the second item, because 1.0 and 1e0 are read as 1",
+        "rules": ["present.pass", "path.steps", "path.inputs"],
+        "input": {"things": [{"id": "t1", "x": ["a", "b"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "decimal", "passed": true, "cause": "satisfied", "inputs": [{"name": "item 2 of x", "value": "b"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "digits", "passed": true, "cause": "satisfied", "inputs": [{"name": "item 2 of x", "value": "b"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "exponent", "passed": true, "cause": "satisfied", "inputs": [{"name": "item 2 of x", "value": "b"}]}
+        ]
+      }
+    ]
+  },
+  {
     "description": "present on a param when the params are null",
     "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["$$params", "flag"]}}}}},
     "params": null,

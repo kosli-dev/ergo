@@ -1236,7 +1236,7 @@ default value_at(_, _) := null
 value_at(subj, path) := v if {
 	is_object(subj)
 	_plain_path(path)
-	v := object.get(subj, path, null)
+	v := object.get(subj, _plain_keys(path), null)
 	not is_object(v)
 } else := v if {
 	v := _resolved(subj, path)
@@ -1246,17 +1246,19 @@ value_at(subj, path) := v if {
 _field(subj, path) := v if {
 	is_object(subj)
 	_plain_path(path)
-	v := object.get(subj, path, _absent)
+	v := object.get(subj, _plain_keys(path), _absent)
 	not is_object(v)
 } else := v if {
 	v := _resolved(subj, path)
 	v != _absent
 }
 
-_resolved(subj, path) := object.get(subj, path, _absent) if {
+_resolved(subj, path) := object.get(subj, _plain_keys(path), _absent) if {
 	is_object(subj)
 	_plain_path(path)
 } else := _read_from(_start_of(subj, path), _keys_in(subj, path))
+
+_plain_keys(path) := [_key(seg) | some seg in path]
 
 _plain_path(path) if {
 	is_array(path)
@@ -1396,15 +1398,15 @@ _keys_of(path) := ks if {
 	count(ks) == count(rest)
 }
 
-_step_key(seg) := seg.literal if _is_literal(seg)
+_step_key(seg) := _key(seg.literal) if _is_literal(seg)
 
-_step_key(seg) := v if {
+_step_key(seg) := _key(v) if {
 	_is_ref(seg)
 	v := _ref_read(seg.ref)
 	_is_key(v)
 }
 
-_step_key(seg) := seg if {
+_step_key(seg) := _key(seg) if {
 	not _is_literal(seg)
 	not _is_ref(seg)
 	not _malformed(seg)
@@ -1462,8 +1464,15 @@ _is_key(v) if is_string(v)
 
 _is_key(v) if {
 	is_number(v)
-	regex.match(`^[0-9]+$`, json.marshal(v))
+	not _out_of_range(v)
+	v >= 0
+	v == floor(v)
 }
+
+_key(v) := floor(v) if {
+	is_number(v)
+	_is_key(v)
+} else := v
 
 _badly_stepped(p, here) if {
 	is_array(p)
@@ -1529,7 +1538,7 @@ arg(x) := x if {
 	not _malformed(x)
 }
 
-_ref_read(path) := object.get(start, [_unliteral(seg) | some seg in array.slice(path, 1, count(path))], _absent) if {
+_ref_read(path) := object.get(start, [_key(_unliteral(seg)) | some seg in array.slice(path, 1, count(path))], _absent) if {
 	_builtin(path)
 	start := _start_of(null, path)
 	is_object(start)
@@ -3325,7 +3334,7 @@ _input_spec_path(spec) := spec if is_array(spec)
 
 _input_spec_path(spec) := object.get(spec, "path", []) if is_object(spec)
 
-_read_state(subj, path) := _plain_read_state(subj, path, object.get(subj, path, _absent)) if {
+_read_state(subj, path) := _plain_read_state(subj, path, object.get(subj, _plain_keys(path), _absent)) if {
 	is_object(subj)
 	_plain_path(path)
 } else := _any_read_state(subj, path)
