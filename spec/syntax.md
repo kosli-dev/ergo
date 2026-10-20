@@ -42,7 +42,7 @@ subjects:
 
 **[path.not_a_list]** A path is a list of steps. A path that isn't a list is written wrong, even a string that names one key.
 
-**[path.steps]** A string is a key, unless it's the first step and starts with `$`: `$$input` starts the path at the input, `$$params` at the params, and `$name` at a name. Any other first step that starts with `$$` is written wrong. A whole number of 0 or more, written as digits alone, is an index. `1.0`, `-1`, `true`, `null` and a list can't be steps. `{"where": {...}}` is a selector, `{"ref": [...]}` is a ref step, and `{"literal": "$schema"}` is the key `$schema`, read as written.
+**[path.steps]** A string is a key, unless it's the first step and starts with `$`: `$$input` starts the path at the input, `$$params` at the params, and `$name` at a name. Any other first step that starts with `$$` is written wrong. A whole number of 0 or more is an index. Write it as digits alone, like `1`. `1.0` and `1e0` are read as `1` too, because some runtimes, like JavaScript's, can't tell them apart from `1`. `1.5`, `-1`, `true`, `null` and a list can't be steps. `{"where": {...}}` is a selector, `{"ref": [...]}` is a ref step, and `{"literal": "$schema"}` is the key `$schema`, read as written.
 
 ## Values
 
