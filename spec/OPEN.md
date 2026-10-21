@@ -22,19 +22,25 @@ It's put off until a control needs logic that no phrase covers. On 2026-10-16, p
 
 ### Where sentences fall short
 
-When a policy needs something no sentence can say, the first question is whether it should be a phrase. These gaps are guesses as of 2026-10-17. Only version order and reshaped evidence show up in the corpus. Date arithmetic did until #234.
+When a policy needs something no sentence can say, the first question is whether it should be a phrase. On 2026-10-21 every MUST line of Kosli's 23 SDLC controls (sdlc.kosli.com) was written against the evidence Kosli records: the CLI's attestation types, the test data in kosli-dev/sdlc-policies and the server's models. Each sentence was run on a passing and a failing input. Of 105 lines, 37 can be written today, 15 in part, 6 are human judgement or a promise about the future, and 46 need evidence Kosli doesn't record. Only a few lines are short of words:
 
-| Gap                            | Example                                                                | Where it belongs                                                                |
-| ------------------------------ | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| Calendar time                  | renewed every 12 months, a review once a year                          | `months` and `years elapsed`, once a control needs them. Fixed units run (#234) |
-| Arithmetic beyond `plus`       | coverage of at least 80% (`covered / total`), a difference, an average | more derived values next to `count of`, `sum of` and `plus`                     |
-| Uniqueness and distinct counts | no two approvers are the same user, at least 2 distinct reviewers      | a derived value, like `count of distinct approvers.username`                    |
-| Orderings of one domain        | version order, an address in a network range, a path matching a glob   | a custom operator, because each has its own rules and isn't shared widely       |
-| Decoding                       | base64 payloads, signed tokens, a hash matching some content           | before ergo, when the evidence is attested, so the report still shows the facts |
-| Recursion                      | dependencies of dependencies, chains of approvals                      | before ergo. Rego can't recurse, so a custom operator can't either              |
-| Rules across subjects          | at most 5% of deployments failed, every service deployed this week     | something on the requirement, since a check sees one subject at a time          |
+| Gap                      | Example                                                                | Needed by      | Where it belongs                                                                                                                   |
+| ------------------------ | ---------------------------------------------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Pick by order            | the author of the last commit                                          | SDLC-CTRL-0007 | a phrase, [#272](https://github.com/kosli-dev/ergo/issues/272)                                                                     |
+| A sentence in `any_of`   | the declared licence, else the one the params give for the name        | SDLC-CTRL-0004 | decided in [sentences.md](sentences.md#the-shape-of-a-sentence), not run yet, [#275](https://github.com/kosli-dev/ergo/issues/275) |
+| Parsing and decoding     | lockfile and Dockerfile lines, SPDX expressions, base64, signed tokens | SDLC-CTRL-0004 | before ergo, when the evidence is attested, so the report still shows the facts                                                    |
+| Calendar time            | renewed every 12 months                                                | none           | `months` and `years elapsed`, once a control needs them. Fixed units run (#234)                                                    |
+| Arithmetic beyond `plus` | coverage as `covered / total`, an average                              | none           | more derived values next to `count of`, `sum of` and `plus`                                                                        |
+| Distinct counts          | at least 2 distinct reviewers                                          | none           | a derived value, like `count of distinct approvers.username`                                                                       |
+| Orderings of one domain  | version order, a network range, a glob                                 | none           | a custom operator, because each has its own rules                                                                                  |
+| Recursion                | dependencies of dependencies                                           | none           | before ergo. Rego can't recurse, so a custom operator can't either                                                                 |
+| Rules across subjects    | at most 5% of deployments failed                                       | none           | something on the requirement, since a check sees one subject at a time                                                             |
+
+"Needed by" lists the SDLC controls that hit the gap. The rows marked "none" were guesses before that check, and no SDLC line needed them.
 
 A gap that many controls share becomes a phrase or a derived value, which stays readable, runs the same everywhere and fails closed in one place. A gap that belongs to one domain becomes a custom operator, with a definition that says what it means. Parsing and decoding stay out of ergo, because an operator that decodes hides the evidence from the report as much as Rego that runs before ergo does.
+
+The same check found two ways a check passes when it shouldn't. A sentence that compares a path with itself always passes, which happens when a `whose` or a one-line `every` reads a bare key that the writer meant as the subject's ([#273](https://github.com/kosli-dev/ergo/issues/273)). And numbers held as strings, as Sonar records them, are ordered as text, so `"9"` is at least `"80"` ([#274](https://github.com/kosli-dev/ergo/issues/274)).
 
 ## Derived values
 
