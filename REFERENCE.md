@@ -1,6 +1,6 @@
-# ergo reference
+# Ergo reference
 
-This page describes everything ergo accepts and everything it returns. If you haven't used ergo before, start with the [README](README.md).
+This page describes everything Ergo accepts and everything it returns. If you haven't used Ergo before, start with the [README](README.md).
 
 - [Policies](#policies)
 - [Subjects](#subjects)
@@ -52,13 +52,13 @@ Give each argument a default like this when it comes from `data`. Rego doesn't c
 
 Because each name is an object key, two requirements can't share a name, and every row in the report points back to exactly one requirement.
 
-A policy with no requirements is never compliant: it doesn't check anything, so it can't vouch for anything either. The same goes for a policy that isn't an object, or whose `requirements` isn't one. ergo leaves out any other section of the policy, so it changes nothing in the report.
+A policy with no requirements is never compliant: it doesn't check anything, so it can't vouch for anything either. The same goes for a policy that isn't an object, or whose `requirements` isn't one. Ergo leaves out any other section of the policy, so it changes nothing in the report.
 
-From your own policies, call only `ergo.report` and `ergo.violations`. Rules whose names start with `_`, like `ergo._row_cause`, are ergo's own and can change or disappear in any release. If you lint with [Regal](https://www.openpolicyagent.org/projects/regal), its `leaked-internal-reference` rule flags a call to one.
+From your own policies, call only `ergo.report` and `ergo.violations`. Rules whose names start with `_`, like `ergo._row_cause`, are Ergo's own and can change or disappear in any release. If you lint with [Regal](https://www.openpolicyagent.org/projects/regal), its `leaked-internal-reference` rule flags a call to one.
 
 ### Describing a policy
 
-A policy can have a `description` and a `meta` of its own, next to its sections. They work like a [requirement's](#requirements): `description` says what the policy asks for, `meta` keeps anything else, like the id of the control the policy checks, and ergo copies both to the top of the report and never reads them. This is where a control with several requirements keeps its text:
+A policy can have a `description` and a `meta` of its own, next to its sections. They work like a [requirement's](#requirements): `description` says what the policy asks for, `meta` keeps anything else, like the id of the control the policy checks, and Ergo copies both to the top of the report and never reads them. This is where a control with several requirements keeps its text:
 
 ```yaml
 description: Production changes are reviewed and approved
@@ -116,9 +116,9 @@ the report starts with:
 
 ### Params
 
-Params are the third argument to `ergo.report`. ergo doesn't look for them anywhere else, so the policy that calls it picks where they come from. Reading them from `data.params`, as above, means `opa eval -d params.json` passes them in when the file holds `{"params": ...}`, and a test can write `with data.params as {...}`.
+Params are the third argument to `ergo.report`. Ergo doesn't look for them anywhere else, so the policy that calls it picks where they come from. Reading them from `data.params`, as above, means `opa eval -d params.json` passes them in when the file holds `{"params": ...}`, and a test can write `with data.params as {...}`.
 
-A sentence reads them with `$params`, like `region is in $params.regions`. Params aren't part of the input, so `$input.params` doesn't reach them, and `$params` doesn't read the input. With params of `{}`, a read of a field in them, like `$params.regions`, fails as `absent`, as any missing field does. With no params, `null`, it fails as `absent` too, and that includes `exists`, which otherwise fails a missing field as `value`, and `does not exist`, which otherwise passes. So a condition like that on a param fails the requirement instead of deciding the scope. Params that are anything else, like a string or a list, can only be a mistake, so they fail every check and every `$min_subjects` row as `unusable`, even in a policy that reads no params, and `$min_subjects` says why: `{"name": "$params", "value": ["not an object"]}`. ergo has no defaults, so a policy run without its params fails instead of checking something nobody configured.
+A sentence reads them with `$params`, like `region is in $params.regions`. Params aren't part of the input, so `$input.params` doesn't reach them, and `$params` doesn't read the input. With params of `{}`, a read of a field in them, like `$params.regions`, fails as `absent`, as any missing field does. With no params, `null`, it fails as `absent` too, and that includes `exists`, which otherwise fails a missing field as `value`, and `does not exist`, which otherwise passes. So a condition like that on a param fails the requirement instead of deciding the scope. Params that are anything else, like a string or a list, can only be a mistake, so they fail every check and every `$min_subjects` row as `unusable`, even in a policy that reads no params, and `$min_subjects` says why: `{"name": "$params", "value": ["not an object"]}`. Ergo has no defaults, so a policy run without its params fails instead of checking something nobody configured.
 
 ## Subjects
 
@@ -140,7 +140,7 @@ deployment:
 
 `applies_to` and `of`, and a `from` or `identified_by` written as a list, are the [old syntax](#subjects-in-the-old-syntax).
 
-The subject's name is what the report calls each one, in every row, like `"subject": {"type": "deployment", "id": "d-2"}`, and in the descriptions of the [checks ergo adds](#checks-ergo-adds), like `The in-scope deployment count is at least 1`. So name it the way a reader would, like `deployment` or `pull request`.
+The subject's name is what the report calls each one, in every row, like `"subject": {"type": "deployment", "id": "d-2"}`, and in the descriptions of the [checks Ergo adds](#checks-ergo-adds), like `The in-scope deployment count is at least 1`. So name it the way a reader would, like `deployment` or `pull request`.
 
 A requirement names its subject with `subject`. Several requirements can name the same subject, and each one checks it on its own, with its own rows. A subject that no requirement names isn't read, so it changes nothing in the report.
 
@@ -152,7 +152,7 @@ A few details:
 - No two subjects can share an id, or their rows could be identical and the report couldn't say which one failed. If two do, `$unique_ids` fails and so does the requirement. Every subject counts, even one that its conditions leave out, and `null` is an id like any other, so two subjects without one clash.
 - An item of the list that isn't an object, like a string or a `null`, is still a subject. Its id is the item itself, and its checks fail with cause `not_an_object`.
 - Without `from`, a subject reads the input field named like it, so `artifact` reads `artifact`. A subject with nothing under it, `artifact:` alone in YAML, does the same. To check the whole input as one subject, write `from: $input`. Without `id`, each row repeats the whole subject as its id, so two identical subjects clash.
-- A subject that's written wrong fails `$well_formed` on every requirement that names it, so none of them is met. That's a subject that isn't an object, or that has a field that isn't in the table above or in the [old syntax](#subjects-in-the-old-syntax), like `subject_type`, or whose `from` or `id` can't be read, or whose `description` isn't a string. The `$well_formed` row names each field with its subject, like `{"name": "subjects.deployment.from", "value": ["doesn't parse"]}`. ergo reads such a `from` as giving no subjects (shown as `<invalid from>`), so `$min_subjects` fails as `value`, even with `min_subjects: 0`, and an `id` as giving the id `null`. The [old syntax](#subjects-in-the-old-syntax) has more ways to go wrong.
+- A subject that's written wrong fails `$well_formed` on every requirement that names it, so none of them is met. That's a subject that isn't an object, or that has a field that isn't in the table above or in the [old syntax](#subjects-in-the-old-syntax), like `subject_type`, or whose `from` or `id` can't be read, or whose `description` isn't a string. The `$well_formed` row names each field with its subject, like `{"name": "subjects.deployment.from", "value": ["doesn't parse"]}`. Ergo reads such a `from` as giving no subjects (shown as `<invalid from>`), so `$min_subjects` fails as `value`, even with `min_subjects: 0`, and an `id` as giving the id `null`. The [old syntax](#subjects-in-the-old-syntax) has more ways to go wrong.
 
 ### From lines
 
@@ -198,7 +198,7 @@ the `$applies` rows keep `d-1` and leave `d-2` out:
  "inputs": [{"name": "change_type", "value": null}, {"name": "environment", "value": "prod"}]}
 ```
 
-and the `$applies` entry's `expression` is the conditions as written, `environment is "prod" and change_type is "emergency"`. `d-3` has no `change_type`, so ergo can't tell whether it's an emergency change, and `approved` isn't met. `artifact` has no `from`, so it reads the input field `artifact`, and `signed` is met.
+and the `$applies` entry's `expression` is the conditions as written, `environment is "prod" and change_type is "emergency"`. `d-3` has no `change_type`, so Ergo can't tell whether it's an emergency change, and `approved` isn't met. `artifact` has no `from`, so it reads the input field `artifact`, and `signed` is met.
 
 - `named by $params.name` picks one key, as a [ref step](#ref-steps) does: `from: trail.artifacts named by $params.artifact_name`.
 - `named by each of $params.kinds` makes each key in the list a subject, as a [naming step](#naming-subjects) with `keys` does: `from: build.test_runs named by each of $params.kinds`.
@@ -277,7 +277,7 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
 
   - Each artifact gets its own `$min_subjects` and `$unique_ids` rows. `sha-2` has no pull requests, so it fails on its own row, unless the requirement has `min_subjects: 0`. Ids only need to be unique within each artifact, so `pr/7` under two artifacts is fine.
   - `sha-3` is out of scope, so its pull requests aren't subjects at all and it has no rows. Nothing in them is read, so `pr/9` isn't checked.
-  - `sha-4` has no `environment`, so ergo can't tell whether it's in scope. Its `$min_subjects` row fails with the cause, even with `min_subjects: 0`, and its pull requests aren't checked.
+  - `sha-4` has no `environment`, so Ergo can't tell whether it's in scope. Its `$min_subjects` row fails with the cause, even with `min_subjects: 0`, and its pull requests aren't checked.
   - When no artifact is in scope, there's one `$min_subjects` row with no `in`. It fails with `value`, or passes with `min_subjects: 0`, as for any subject that finds none.
 
   A child subject can have child subjects of its own, so a chain can be three subjects deep, like artifact, pull request and commit:
@@ -504,7 +504,7 @@ prod_deploy:
 | Field          | Meaning                                                                                                                               | Default   |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------- | --------- |
 | `description`  | What the requirement asks for, in words anyone can read. It's copied into the report.                                                 | `""`      |
-| `meta`         | Anything else you want to keep with the requirement, like a control id or an owner. It's copied into the report. ergo never reads it. | `{}`      |
+| `meta`         | Anything else you want to keep with the requirement, like a control id or an owner. It's copied into the report. Ergo never reads it. | `{}`      |
 | `subject`      | The name of the [subject](#subjects) it checks.                                                                                       | required  |
 | `require`      | `"every"`: every subject must pass every check. `"some"`: at least one subject must pass every check.                                 | `"every"` |
 | `min_subjects` | How many subjects must be left after the subject's conditions for the requirement to be met.                                          | `1`       |
@@ -516,9 +516,9 @@ A few details:
 - `min_subjects` defaults to 1 so that a typo in `from` fails the requirement instead of quietly passing it. Set it to `0` when you mean "if there are any, they must pass; if there are none, that's fine". It means the same under `every` and `some`. When none are left, the requirement is [not applicable](#the-report). That only holds for a list that's there: a `from` that leads nowhere still fails, as above. A `from` that ends with a [`keys` step](#naming-subjects) is the exception, because each key is a subject even when `from` leads nowhere.
 - Under `some`, one subject has to pass all the checks by itself. Two subjects that each pass half of them don't count.
 - A requirement with no checks, a `require` other than `every` or `some`, a check that's [written wrong](#basic-operators), or a [subject that's written wrong](#subjects), is never met. The `$well_formed` row says so, and says [what's wrong](#checks-ergo-adds), like `{"name": "require", "value": ["neither every nor some"]}`.
-- So is a requirement without a `subject`, or whose `subject` isn't in `subjects`, like a typo for `deploymnt`. The `$well_formed` row says `{"name": "subject", "value": ["missing"]}` or `{"name": "subject", "value": ["not in subjects"]}`, and ergo reads it as having no subjects, so `$min_subjects` fails too. If `subjects` itself isn't an object, every requirement that names a subject fails with `{"name": "subjects", "value": ["not an object"]}`.
-- So is a requirement with a field that isn't in the table above, like `from` or `requires`, because ergo would otherwise ignore it and check something you didn't mean. `from`, `identified_by` and `applies_to` belong to the [subject](#subjects). The `$well_formed` row lists each one in order and says what's wrong with it, the way it does for a [check that's written wrong](#checks-ergo-adds), like `{"name": "from", "value": ["unknown field"]}`. Rows for the subjects are still there.
-- So is a requirement that isn't an object, or whose `checks` isn't an object, whose `min_subjects` isn't a whole number of 0 or more, whose `subject` isn't a string with something besides whitespace in it, since rows and descriptions name the subject by it, whose `description` isn't a string, or whose `meta` isn't an object. `null` counts as the wrong type, except for `description` and `meta`: ergo only copies those, so a `null` one counts as not written, which is what YAML gives for an empty `description:`. `2.0` is a whole number, but `-1` and `0.5` aren't. It still has its entry in `requirements` and its `$well_formed` row, which shows each such field and what it should be, like `{"name": "checks", "value": ["not an object"]}`, or the whole requirement and its value, like `{"name": "requirement", "value": 5}`. ergo then reads `checks` as empty. A requirement that isn't an object gives no subjects. A `min_subjects` that isn't a number fails `$min_subjects` too.
+- So is a requirement without a `subject`, or whose `subject` isn't in `subjects`, like a typo for `deploymnt`. The `$well_formed` row says `{"name": "subject", "value": ["missing"]}` or `{"name": "subject", "value": ["not in subjects"]}`, and Ergo reads it as having no subjects, so `$min_subjects` fails too. If `subjects` itself isn't an object, every requirement that names a subject fails with `{"name": "subjects", "value": ["not an object"]}`.
+- So is a requirement with a field that isn't in the table above, like `from` or `requires`, because Ergo would otherwise ignore it and check something you didn't mean. `from`, `identified_by` and `applies_to` belong to the [subject](#subjects). The `$well_formed` row lists each one in order and says what's wrong with it, the way it does for a [check that's written wrong](#checks-ergo-adds), like `{"name": "from", "value": ["unknown field"]}`. Rows for the subjects are still there.
+- So is a requirement that isn't an object, or whose `checks` isn't an object, whose `min_subjects` isn't a whole number of 0 or more, whose `subject` isn't a string with something besides whitespace in it, since rows and descriptions name the subject by it, whose `description` isn't a string, or whose `meta` isn't an object. `null` counts as the wrong type, except for `description` and `meta`: Ergo only copies those, so a `null` one counts as not written, which is what YAML gives for an empty `description:`. `2.0` is a whole number, but `-1` and `0.5` aren't. It still has its entry in `requirements` and its `$well_formed` row, which shows each such field and what it should be, like `{"name": "checks", "value": ["not an object"]}`, or the whole requirement and its value, like `{"name": "requirement", "value": 5}`. Ergo then reads `checks` as empty. A requirement that isn't an object gives no subjects. A `min_subjects` that isn't a number fails `$min_subjects` too.
 
 ### A requirement that only applies sometimes
 
@@ -550,7 +550,7 @@ With `{"deployment": {"change_type": "bug_fix"}, "test_runs": []}`, the deployme
     ...
 ```
 
-The `$applies` row reads `{"name": "deployment.change_type", "value": "bug_fix"}`, and the `$applies` entry in `checks` records the list it was compared with, under `$refs`: `{"name": "$params.untested_change_types", "value": ["bug_fix", "refactor"]}`. A new feature with no test runs fails `tested` and `passed`, and so does a change type that isn't listed, like `hotfix`, so a new or misspelt type has to be tested until someone adds it to the list. A deployment with no `change_type` fails the requirement, because ergo can't tell whether it applies.
+The `$applies` row reads `{"name": "deployment.change_type", "value": "bug_fix"}`, and the `$applies` entry in `checks` records the list it was compared with, under `$refs`: `{"name": "$params.untested_change_types", "value": ["bug_fix", "refactor"]}`. A new feature with no test runs fails `tested` and `passed`, and so does a change type that isn't listed, like `hotfix`, so a new or misspelt type has to be tested until someone adds it to the list. A deployment with no `change_type` fails the requirement, because Ergo can't tell whether it applies.
 
 The condition lists the types that don't need tests, rather than the ones that do. `deployment.change_type is "new_development"` would also work, but then any other type, misspelt ones included, would quietly skip the tests.
 
@@ -926,7 +926,7 @@ costs_add_up: sum of stages.usd whose kind is "model" equals total_usd within 0.
 all_findings: count of findings equals claude_found plus 1
 ```
 
-all four pass. Each row shows the number ergo worked out, named after the words that asked for it as the report prints them, then the list it walked:
+all four pass. Each row shows the number Ergo worked out, named after the words that asked for it as the report prints them, then the list it walked:
 
 | check             | inputs                                                                                                |
 | ----------------- | ----------------------------------------------------------------------------------------------------- |
@@ -980,7 +980,7 @@ A sentence that can't be read is [written wrong](#basic-operators), and the `$we
 
 for `prod: environment is "prod`. `x is not null` is written wrong too, because it could only fail: write `x exists`. So is a value that isn't a number before `within`, like `x is "a" within 1`. An object with both `assert` and `op` is read as a check with an `op`, so a [custom operator](#custom-operators) can still take `assert`.
 
-ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `last of`, a `sum of` or a `plus` in the `whose` of a `count of` or a `sum of`, a `plus` in the phrase of an `every` or `some`, and an elapsed time after `every` or `some` or in a `from` line. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `last_signed: last of commits.signed is true` gives:
+Ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `last of`, a `sum of` or a `plus` in the `whose` of a `count of` or a `sum of`, a `plus` in the phrase of an `every` or `some`, and an elapsed time after `every` or `some` or in a `from` line. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `last_signed: last of commits.signed is true` gives:
 
 ```json
 {"name": "checks.last_signed", "value": ["last of isn't supported yet"]}
@@ -990,7 +990,7 @@ Until then, write those checks with an [`op`](#operators).
 
 ## Custom operators
 
-When the built-in checks can't say what you need, you can write your own operator. Sentences can't name one yet, so a check that uses one is written with `op`, as in the [old syntax](#operators). Don't name one after a built-in operator, or after `empty_string_or_list`, `not_empty_string_or_list`, `not_in` or `has_type`, which ergo keeps for [sentences](#checks). Add an `op_passed` rule to the `ergo` package from a file of your own:
+When the built-in checks can't say what you need, you can write your own operator. Sentences can't name one yet, so a check that uses one is written with `op`, as in the [old syntax](#operators). Don't name one after a built-in operator, or after `empty_string_or_list`, `not_empty_string_or_list`, `not_in` or `has_type`, which Ergo keeps for [sentences](#checks). Add an `op_passed` rule to the `ergo` package from a file of your own:
 
 ```rego
 package ergo
@@ -1003,7 +1003,7 @@ op_passed(check, subj) if {
 }
 ```
 
-Declare its name in the same file, so ergo can tell it from a typo:
+Declare its name in the same file, so Ergo can tell it from a typo:
 
 ```rego
 operators contains "even"
@@ -1011,7 +1011,7 @@ operators contains "even"
 
 An `op` that isn't built in or declared is written wrong: it fails `$well_formed`, and the check fails with cause `ill_formed`, even if an `op_passed` rule passes it. Its expression shows `<unknown op even>`, so the report points at the policy. So a misspelt operator in `applies_to` fails the requirement instead of ruling every subject out.
 
-Then use it like any other operator. ergo can't work out what your operator reads or how to describe it, so give the check an `expression` and a list of `inputs`:
+Then use it like any other operator. Ergo can't work out what your operator reads or how to describe it, so give the check an `expression` and a list of `inputs`:
 
 ```rego
 "even": {"op": "even", "path": ["n"], "expression": "n is even", "inputs": [["n"]]}
@@ -1038,14 +1038,14 @@ op_passed(check, subj) if {
 "even_batches": {"op": "multiple_of", "path": ["n"], "by": {"ref": ["$$params", "batch"]}, "expression": "n is a multiple of the batch size", "inputs": [["n"]]}
 ```
 
-ergo finds the refs in your check by itself, so they appear under `$refs` and decide the cause when they can't be read, as for built-in operators.
+Ergo finds the refs in your check by itself, so they appear under `$refs` and decide the cause when they can't be read, as for built-in operators.
 
 A custom operator works in `checks`, in `applies_to`, and on either side of a substitute. It doesn't work as the inner check of `all` or `any`, or inside an `any_of` option: there, it's written wrong, so it fails `$well_formed` and the check fails with cause `ill_formed`.
 
 Three rules:
 
 - **Fail when you can't read the data.** Check that fields are there and have the right type before you compare them. A rule that doesn't hold fails the check, which is what you want. Be careful with `not`, which turns an error into a pass.
-- **Read the document with `value_at` and `$$input`, and params with `$$params` or `arg`, not with `input` or `data`.** While ergo checks a subject, `input` holds ergo's own [names](#naming-subjects), not your input, and `data.params` may not be the params the report was given.
+- **Read the document with `value_at` and `$$input`, and params with `$$params` or `arg`, not with `input` or `data`.** While Ergo checks a subject, `input` holds Ergo's own [names](#naming-subjects), not your input, and `data.params` may not be the params the report was given.
 - **Only call `value_at`, `arg` and `leaf_passed`.** `value_at(subj, path)` reads a path, `arg(value)` reads one of your parameters, and `leaf_passed(check, subj)` runs a built-in check like `{"op": "present", "path": ["approved_by"]}` (but not `all`, `any` or `any_of`). Calling `op_passed` or `report` from your operator creates a loop, which Rego rejects, and the errors will point at `ergo.rego` rather than your file. Every other rule in `ergo.rego` starts with `_` and can change or disappear in any release.
 
 ## The report
@@ -1148,12 +1148,12 @@ The three `ill_formed` rows are the misspelt check on `d-1`, `d-2` and `d-4`. Th
 
 `description` and `meta` are the requirement's, or `""` and `{}` when it has none. They're always there, so you can read `meta.control` without first checking that `meta` exists.
 
-`subject` is the name of the subject the requirement checks, which is also a key of the report's `subjects`. It's `null` when the requirement names no subject, or one that isn't in the policy's `subjects`. `subjects.total` counts every subject found at `from`, and `subjects.matching` counts the ones left after the subject's conditions. `checks` holds each check as you wrote it, plus the `expression` ergo rendered from it. Each check has a `description` and a `meta` too, `""` and `{}` when you didn't write them. A filter in `applies_to`, in the [old syntax](#subjects-in-the-old-syntax), can have them as well, and they're checked the same way, but the report doesn't copy them: its filters all share the one `$applies` entry, with ergo's own description. A `description` or `meta` of the wrong type makes the requirement or the check [written wrong](#basic-operators), and the report shows `""` or `{}` in its place, so a tool always finds a string and an object there. If you write your own `expression`, yours is used, as long as it's a string. Any other value is ignored, and ergo renders the expression as if it weren't there. A check that uses a [`ref`](#reading-from-the-input) also gets `$refs`: the name and value of each one, as read for this report. The `$` marks it as ergo's, so it can't be mixed up with a field of your own. It also holds the [checks ergo adds](#checks-ergo-adds), each with a `description`, an `expression` and an empty `meta`.
+`subject` is the name of the subject the requirement checks, which is also a key of the report's `subjects`. It's `null` when the requirement names no subject, or one that isn't in the policy's `subjects`. `subjects.total` counts every subject found at `from`, and `subjects.matching` counts the ones left after the subject's conditions. `checks` holds each check as you wrote it, plus the `expression` Ergo rendered from it. Each check has a `description` and a `meta` too, `""` and `{}` when you didn't write them. A filter in `applies_to`, in the [old syntax](#subjects-in-the-old-syntax), can have them as well, and they're checked the same way, but the report doesn't copy them: its filters all share the one `$applies` entry, with Ergo's own description. A `description` or `meta` of the wrong type makes the requirement or the check [written wrong](#basic-operators), and the report shows `""` or `{}` in its place, so a tool always finds a string and an object there. If you write your own `expression`, yours is used, as long as it's a string. Any other value is ignored, and Ergo renders the expression as if it weren't there. A check that uses a [`ref`](#reading-from-the-input) also gets `$refs`: the name and value of each one, as read for this report. The `$` marks it as Ergo's, so it can't be mixed up with a field of your own. It also holds the [checks Ergo adds](#checks-ergo-adds), each with a `description`, an `expression` and an empty `meta`.
 
 In an expression, a value written in the policy is shown as JSON, written the same way whatever the policy looked like, so anyone can produce the same text:
 
 - A string is always in quotes: `state == "MERGED"`, `n == "1"` and `x == ""` compare against strings, and `n == 1`, `ok == true` and `x == null` don't. Only `"`, `\` and control characters are escaped, as `\"`, `\\`, `\b`, `\f`, `\n`, `\r`, `\t` or `\u0001` and so on, so `"a<b"` stays as it is.
-- A number is a plain decimal, with no exponent and no trailing zeros: `1.0`, `1.50`, `1e2` and `2.5e-3` are shown as `1`, `1.5`, `100` and `0.0025`, and `-0` as `0`. A number keeps every digit the policy wrote, so it's only shown the same by every implementation when it has at most 15 significant digits, which is as many as any language's 64-bit floating point number is sure to keep. The same goes for a number copied from the input into the report: a runtime that reads JSON into 64-bit numbers, like JavaScript, turns `12345678901234567890` into `12345678901234567000` before ergo sees it. A number in the policy has to be `0` or have a magnitude between `2.2250738585072014e-308` and `1.7976931348623157e308`, the range those numbers hold without losing digits. Elsewhere, a language like JavaScript turns `1e400` into `Infinity` and `1e-400` into `0`, so a check could pass there and fail here. A check holding such a number anywhere is written wrong: it fails `$well_formed`, the check fails with cause `ill_formed`, and the number is shown as `<number out of range>`. One in `from`, `id` or `min_subjects` fails `$well_formed`. A number in the input or the params isn't held to that range, because whoever writes the policy doesn't control them. ergo compares it exactly, so `1e400` equals `1e400` and `1e-400` doesn't equal `0`, and copies it into the report as written. An implementation that reads JSON into 64-bit numbers can't do the same, so reports only match across implementations when every number in the input and the params fits that range.
+- A number is a plain decimal, with no exponent and no trailing zeros: `1.0`, `1.50`, `1e2` and `2.5e-3` are shown as `1`, `1.5`, `100` and `0.0025`, and `-0` as `0`. A number keeps every digit the policy wrote, so it's only shown the same by every implementation when it has at most 15 significant digits, which is as many as any language's 64-bit floating point number is sure to keep. The same goes for a number copied from the input into the report: a runtime that reads JSON into 64-bit numbers, like JavaScript, turns `12345678901234567890` into `12345678901234567000` before Ergo sees it. A number in the policy has to be `0` or have a magnitude between `2.2250738585072014e-308` and `1.7976931348623157e308`, the range those numbers hold without losing digits. Elsewhere, a language like JavaScript turns `1e400` into `Infinity` and `1e-400` into `0`, so a check could pass there and fail here. A check holding such a number anywhere is written wrong: it fails `$well_formed`, the check fails with cause `ill_formed`, and the number is shown as `<number out of range>`. One in `from`, `id` or `min_subjects` fails `$well_formed`. A number in the input or the params isn't held to that range, because whoever writes the policy doesn't control them. Ergo compares it exactly, so `1e400` equals `1e400` and `1e-400` doesn't equal `0`, and copies it into the report as written. An implementation that reads JSON into 64-bit numbers can't do the same, so reports only match across implementations when every number in the input and the params fits that range.
 - A list or object has one space after each comma and colon, and its keys are sorted: `["a", 1.5, {"a": "x", "b": [true, null]}]`.
 - A ref is shown without quotes, as `$params.x`, so it can't be mistaken for the string `"$params.x"`.
 - Something that should be a string but isn't, like an `op` or `cmp` written as an object, is shown as JSON too: `<unknown op {"ref": ["a"]}>`. A string there is shown as it is, without quotes: `<unknown op nope>`.
@@ -1293,13 +1293,13 @@ requirements:
 
 and the three requirements' `subject` are `"deployment"`, `"note"` and `null`, because `other` names no subject.
 
-### Checks ergo adds
+### Checks Ergo adds
 
-ergo adds four checks of its own. They start with `$`, so they can't clash with yours.
+Ergo adds four checks of its own. They start with `$`, so they can't clash with yours.
 
 | Check           | One row per | Passes when                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | --------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `$well_formed`  | requirement | the requirement names a subject in `subjects`, the requirement and its subject have only the fields ergo knows and they have the right types, it has at least one check, a valid `require`, a well written naming step if `from` has one, a `from` or `id` written as a sentence that can be read, no step in `from` or `id` that can't be a key, no number a 64-bit float can't hold in `from`, `id` or `min_subjects`, no set or key that isn't a string in `from` or `id` and no key that isn't a string in `checks` or `applies_to`, a name that's a string, and no check that's [written wrong](#basic-operators). This depends only on how the requirement and its subject are written, never on the input or the params. |
+| `$well_formed`  | requirement | the requirement names a subject in `subjects`, the requirement and its subject have only the fields Ergo knows and they have the right types, it has at least one check, a valid `require`, a well written naming step if `from` has one, a `from` or `id` written as a sentence that can be read, no step in `from` or `id` that can't be a key, no number a 64-bit float can't hold in `from`, `id` or `min_subjects`, no set or key that isn't a string in `from` or `id` and no key that isn't a string in `checks` or `applies_to`, a name that's a string, and no check that's [written wrong](#basic-operators). This depends only on how the requirement and its subject are written, never on the input or the params. |
 | `$min_subjects` | requirement | `from` leads to a list or an object, unless it ends with a `keys` step, and at least `min_subjects` subjects are left after the subject's conditions.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | `$unique_ids`   | requirement | no two subjects share an id, counting the ones its conditions leave out.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `$applies`      | subject     | the subject passes its conditions, the `whose` of its from line or its `applies_to`. These rows only exist when the subject has conditions.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
@@ -1336,7 +1336,7 @@ The fields of the requirement and its subject get an input of the same form when
 
 | Field                                          | What's wrong                                                                                                                                                                       |
 | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| any field ergo doesn't know                    | `unknown field`                                                                                                                                                                    |
+| any field Ergo doesn't know                    | `unknown field`                                                                                                                                                                    |
 | `checks`                                       | `not an object`, `holds a key that isn't a string`, `missing`, `empty`                                                                                                             |
 | `require`                                      | `neither every nor some`                                                                                                                                                           |
 | `min_subjects`                                 | `not a whole number of 0 or more`, `number out of range`                                                                                                                           |
@@ -1354,13 +1354,13 @@ The fields of the requirement and its subject get an input of the same form when
 | `subjects.deployment.has`                      | `not an object`                                                                                                                                                                    |
 | `subjects.deployment.has.coverage`             | `not a string or an object`, `missing from`, `unknown field foo`, `invalid from`, `invalid identified_by`, `from: ...`, `identified_by: ...`, `invalid alias`, `alias given twice` |
 
-A policy written in Rego can use a key that isn't a string, like `true` or `1.5`. ergo names it `<invalid key true>` or `<invalid key 1.5>`, so two such keys never share a name. A requirement whose own name isn't a string, like `1`, or every requirement of a policy written as a list, fails `$well_formed`, which then starts with `{"name": "requirement name", "value": ["not a string"]}`. The requirement is `not_met`, so the policy isn't compliant.
+A policy written in Rego can use a key that isn't a string, like `true` or `1.5`. Ergo names it `<invalid key true>` or `<invalid key 1.5>`, so two such keys never share a name. A requirement whose own name isn't a string, like `1`, or every requirement of a policy written as a list, fails `$well_formed`, which then starts with `{"name": "requirement name", "value": ["not a string"]}`. The requirement is `not_met`, so the policy isn't compliant.
 
 Their descriptions are plain sentences, like your own checks': `The requirement is written correctly`, `The in-scope deployment count is at least 1`, `Every deployment id is unique` and `The deployment is in scope`. The details are in `expression`, `inputs` and `cause`. `$min_subjects` names its input after what it counts, like `in-scope deployment count`: only the subjects left after the subject's conditions. With `min_subjects: 0` the count can't fail, so `$min_subjects` only checks that `from` can be read, and says so: `The deployment list can be read`, with the expression `deployments can be read`. A `from` that ends with a `keys` step keeps the count, because `from` isn't read there. `$unique_ids` lists the ids that more than one subject has, once each, under `repeated deployment ids`, sorted by how they're written as JSON, so `"b"` comes before `10`, and `10` before `3`. They use the subject's name as it's written, so they read right whatever the word's plural would be.
 
 A subject that fails `$applies` gets no other rows, since it was never checked. But its `$applies` row stays, so you can see what was left out and why.
 
-A subject is only out of scope when ergo read a condition's fields and the values didn't match, so the row's cause is `value`. When a condition fails because a field it reads is missing, `null` or can't be found, ergo can't tell whether the subject is in scope. Its `$applies` row then fails with that cause, the requirement isn't met, and the row shows up in the violations. This holds with `min_subjects: 0` too, so a missing field can't quietly make a requirement pass.
+A subject is only out of scope when Ergo read a condition's fields and the values didn't match, so the row's cause is `value`. When a condition fails because a field it reads is missing, `null` or can't be found, Ergo can't tell whether the subject is in scope. Its `$applies` row then fails with that cause, the requirement isn't met, and the row shows up in the violations. This holds with `min_subjects: 0` too, so a missing field can't quietly make a requirement pass.
 
 `exists` is the exception, because a missing or `null` field is exactly what it checks for. `whose lock_release exists` leaves out a package with no `lock_release`. A parent that can't hold the field, like `"build": "abc"` for `build.fingerprint`, or a subject that isn't an object, still fails the requirement.
 
@@ -1385,7 +1385,7 @@ Rows always come in the same order, whatever order you wrote the policy in:
 3. within a requirement, subjects in the order they appear in the input, or in key order when a [naming step](#naming-subjects) reads an object
 4. within a subject, checks in name order
 
-Patterns, options, selector fields and the keys of objects written in the policy are sorted in rendered expressions too. Names, keys and strings are sorted by Unicode code point, so `！` (U+FF01) comes before `😀` (U+1F600). JavaScript's default `sort()` puts them the other way round, so an implementation there needs to compare code points. So the same policy and the same input always produce exactly the same report, byte for byte once it's written as JSON the same way, which means you can hash it and compare hashes. Every number in the report is written in its plain form, as in expressions, wherever it came from: `1.50`, `-0.0` and `1e2` in the policy, the params or the input come out as `1.5`, `0` and `100`. Two things are left as they are. A number a 64-bit float can't hold, like `1e400` in the input, is copied as written. And a report holding something JSON can't, like a set from an input written in Rego or a requirement whose name isn't a string, is left as ergo built it, so that its rows still name their requirement. `opa eval` sorts the keys. OPA's JavaScript runtime for Wasm doesn't, and it reads the report into JavaScript numbers, which writes a very large or very small one with an exponent: `1e21` and `0.0000001` come out as `1e+21` and `1e-7`. So to compare reports across runtimes, write each one with the [JSON Canonicalization Scheme (RFC 8785)](https://www.rfc-editor.org/rfc/rfc8785) before hashing: it sorts keys and writes numbers the way JavaScript does.
+Patterns, options, selector fields and the keys of objects written in the policy are sorted in rendered expressions too. Names, keys and strings are sorted by Unicode code point, so `！` (U+FF01) comes before `😀` (U+1F600). JavaScript's default `sort()` puts them the other way round, so an implementation there needs to compare code points. So the same policy and the same input always produce exactly the same report, byte for byte once it's written as JSON the same way, which means you can hash it and compare hashes. Every number in the report is written in its plain form, as in expressions, wherever it came from: `1.50`, `-0.0` and `1e2` in the policy, the params or the input come out as `1.5`, `0` and `100`. Two things are left as they are. A number a 64-bit float can't hold, like `1e400` in the input, is copied as written. And a report holding something JSON can't, like a set from an input written in Rego or a requirement whose name isn't a string, is left as Ergo built it, so that its rows still name their requirement. `opa eval` sorts the keys. OPA's JavaScript runtime for Wasm doesn't, and it reads the report into JavaScript numbers, which writes a very large or very small one with an exponent: `1e21` and `0.0000001` come out as `1e+21` and `1e-7`. So to compare reports across runtimes, write each one with the [JSON Canonicalization Scheme (RFC 8785)](https://www.rfc-editor.org/rfc/rfc8785) before hashing: it sorts keys and writes numbers the way JavaScript does.
 
 ## Causes
 
@@ -1447,9 +1447,9 @@ To decide whether to allow something, use `report.compliant`, not whether `viola
 
 ## Compiling to Wasm
 
-ergo runs in a policy compiled with `opa build -t wasm` and run with OPA's JavaScript runtime, `@open-policy-agent/opa-wasm`. One built-in is missing from that runtime: `time.parse_rfc3339_ns`, which `compare_time` uses on RFC 3339 strings. A policy with such a check fails with `not implemented: built-in function`, unless you pass the built-in in yourself, as the third argument to `loadPolicy`.
+Ergo runs in a policy compiled with `opa build -t wasm` and run with OPA's JavaScript runtime, `@open-policy-agent/opa-wasm`. One built-in is missing from that runtime: `time.parse_rfc3339_ns`, which `compare_time` uses on RFC 3339 strings. A policy with such a check fails with `not implemented: built-in function`, unless you pass the built-in in yourself, as the third argument to `loadPolicy`.
 
-ergo only passes it a time it has already checked: an uppercase `T` and `Z`, a date that exists and a year from 1678 to 2261. So it only has to turn that into nanoseconds since 1970, exactly. A JavaScript number can't hold that: today's are about 1.76×10¹⁸, where a number can only step by 256. So return the digits with `JSON.rawJSON` (Node 21 and later). This is the version ergo's CI uses, and it gives the same nanoseconds as OPA on 16,922 generated timestamps, before and after 1970:
+Ergo only passes it a time it has already checked: an uppercase `T` and `Z`, a date that exists and a year from 1678 to 2261. So it only has to turn that into nanoseconds since 1970, exactly. A JavaScript number can't hold that: today's are about 1.76×10¹⁸, where a number can only step by 256. So return the digits with `JSON.rawJSON` (Node 21 and later). This is the version Ergo's CI uses, and it gives the same nanoseconds as OPA on 16,922 generated timestamps, before and after 1970:
 
 ```js
 const parseTime = (v) => {
@@ -1462,11 +1462,11 @@ const policy = await loadPolicy(wasm, undefined, { "time.parse_rfc3339_ns": pars
 
 ## Compiling a policy
 
-**Experimental:** `ergo.compile` may change or go away in any version of ergo.
+**Experimental:** `ergo.compile` may change or go away in any version of Ergo.
 
-`ergo.report` reads every sentence of the policy each time it runs. When the same policy runs many times, like in a test suite, you can do that once with `ergo.compile(policy)`, save what it returns as JSON, and pass that to `ergo.report` in place of the policy. The report is the same. This is ergo's own step, not OPA's: OPA still compiles `ergo.rego` as usual.
+`ergo.report` reads every sentence of the policy each time it runs. When the same policy runs many times, like in a test suite, you can do that once with `ergo.compile(policy)`, save what it returns as JSON, and pass that to `ergo.report` in place of the policy. The report is the same. This is Ergo's own step, not OPA's: OPA still compiles `ergo.rego` as usual.
 
-Treat a compiled policy like a compiler's object file. Make it in the build that uses it, don't commit it, and make it again whenever the policy or your copy of `ergo.rego` changes. Its shape is ergo's own and changes between versions, and ergo doesn't check that a compiled policy matches the `ergo.rego` running it, or that nobody edited it, so a stale or edited one can give a wrong report. Don't edit it. One with a field missing or of the wrong type fails like a policy ergo can't read, and compiling a compiled policy gives it back unchanged.
+Treat a compiled policy like a compiler's object file. Make it in the build that uses it, don't commit it, and make it again whenever the policy or your copy of `ergo.rego` changes. Its shape is Ergo's own and changes between versions, and Ergo doesn't check that a compiled policy matches the `ergo.rego` running it, or that nobody edited it, so a stale or edited one can give a wrong report. Don't edit it. One with a field missing or of the wrong type fails like a policy Ergo can't read, and compiling a compiled policy gives it back unchanged.
 
 A `make` rule keeps it fresh, since it runs again when either file changes. With this `policy.yaml`:
 
@@ -1524,11 +1524,11 @@ On this `input.json`:
 
 The input and the params are read on each run, so a compiled policy works with any of them. Put `compiled_policy.json` in `.gitignore`: a fresh clone gives files the time of checkout, so a committed one can look newer than an `ergo.rego` it doesn't match.
 
-Compiling is part of `ergo.rego`, not of the [spec](spec/README.md), so other implementations of ergo don't have it.
+Compiling is part of `ergo.rego`, not of the [spec](spec/README.md), so other implementations of Ergo don't have it.
 
 ## Failing closed
 
-ergo fails a check whenever it can't be sure, instead of letting it pass. Rego doesn't do that by default in a few places, so these are handled on purpose. Some of them name the [operators](#operators) that sentences run as:
+Ergo fails a check whenever it can't be sure, instead of letting it pass. Rego doesn't do that by default in a few places, so these are handled on purpose. Some of them name the [operators](#operators) that sentences run as:
 
 - A missing, `null` or wrong-typed field fails every operator, except `missing`, which passes on a missing or `null` field.
 - `compare` needs both sides to exist and have the same type. In plain Rego, `null < 5` is true, so a missing field would otherwise pass a `lt` check. Ordering objects, lists or booleans fails too.
@@ -1543,10 +1543,10 @@ ergo fails a check whenever it can't be sure, instead of letting it pass. Rego d
 - A subject whose conditions can't be read fails the requirement instead of being left out.
 - A `ref` that can't be read fails the check, even for operators like `excludes` or `not_matches_any` that would pass on an empty value.
 - A policy with no requirements, and a requirement with no checks, are never met.
-- ergo only reads what JSON can hold. Rego can build sets and object keys that aren't strings, but JSON and YAML can't, so ergo turns both down and gives the same report however it's run. A set or such a key anywhere in the input or the params fails every check on a subject, every `$applies` row and every `$min_subjects` row with cause `unusable`, so even a requirement with no subjects isn't met. `$min_subjects` says why in its inputs, like `{"name": "$$input", "value": ["holds a set"]}`, or `$$params` for the params. In a policy, a requirement or check holding either one is [written wrong](#checks-ergo-adds), and so is a requirement whose name isn't a string. So when you build the input in Rego, make lists, `[x | ...]`, not sets, `{x | ...}`.
-- A requirement that isn't an object, a field of the wrong type, or a field ergo doesn't know, fails `$well_formed` and keeps its place in the report, so a typo in the policy can't make a requirement vanish.
+- Ergo only reads what JSON can hold. Rego can build sets and object keys that aren't strings, but JSON and YAML can't, so Ergo turns both down and gives the same report however it's run. A set or such a key anywhere in the input or the params fails every check on a subject, every `$applies` row and every `$min_subjects` row with cause `unusable`, so even a requirement with no subjects isn't met. `$min_subjects` says why in its inputs, like `{"name": "$$input", "value": ["holds a set"]}`, or `$$params` for the params. In a policy, a requirement or check holding either one is [written wrong](#checks-ergo-adds), and so is a requirement whose name isn't a string. So when you build the input in Rego, make lists, `[x | ...]`, not sets, `{x | ...}`.
+- A requirement that isn't an object, a field of the wrong type, or a field Ergo doesn't know, fails `$well_formed` and keeps its place in the report, so a typo in the policy can't make a requirement vanish.
 - A malformed timestamp fails `compare_time` rather than stopping the whole evaluation with an error.
-- Running OPA with `--strict-builtin-errors` gives the same report as running without it, because ergo checks a value's type before it passes it to a built-in like `object.get` or `count`. A [custom operator](#custom-operators) is your own Rego, so it needs the same care if you use the flag.
+- Running OPA with `--strict-builtin-errors` gives the same report as running without it, because Ergo checks a value's type before it passes it to a built-in like `object.get` or `count`. A [custom operator](#custom-operators) is your own Rego, so it needs the same care if you use the flag.
 
 ## The old syntax
 
@@ -1610,7 +1610,7 @@ subjects:
     identified_by: id
 ```
 
-- A check or a subject is only rewritten when ergo reads the sentence back into what was written, so the policy gives the same report verdicts. Anything else stays as it was, and still works.
+- A check or a subject is only rewritten when Ergo reads the sentence back into what was written, so the policy gives the same report verdicts. Anything else stays as it was, and still works.
 - `all` and `any` stay, because `every` and `some` walk every list along their path where `all` and `any` read one, so a policy could pass where it failed. Custom operators, `any_of`, substitutes, `count`, `sum` and `add`, and checks with their own `expression` stay too.
 - A subject's `applies_to` filters become its `whose` conditions only when they all can and none has a `description` or `meta`, which a condition has nowhere to keep. Their names are lost, since a condition has none.
 - The checks of a subject read from another subject, like `from: artifact.pull_requests`, stay as they are, since a sentence there reads `artifact` as that subject.
@@ -1637,7 +1637,7 @@ deployment:
     is_prod: { op: equals, path: [environment], value: prod }
 ```
 
-and gives the same report as `from: deployments whose environment is "prod"`, except that the `$applies` entry's `expression` is `environment == "prod"`. A filter that's [written wrong](#basic-operators) fails `$well_formed` on every requirement that names the subject, and every subject fails `$applies` with cause `ill_formed`, shown as `<invalid applies_to>`, and gets no other rows. So does an `applies_to` that isn't an object. A `from` or `id` written as a list is written wrong when a step can't be a key, when it has a badly written [naming step](#naming-subjects), or when a selector in `id` has a ref or `literal` deeper inside a `where` value than ergo reads. `from: []` reads the whole input.
+and gives the same report as `from: deployments whose environment is "prod"`, except that the `$applies` entry's `expression` is `environment == "prod"`. A filter that's [written wrong](#basic-operators) fails `$well_formed` on every requirement that names the subject, and every subject fails `$applies` with cause `ill_formed`, shown as `<invalid applies_to>`, and gets no other rows. So does an `applies_to` that isn't an object. A `from` or `id` written as a list is written wrong when a step can't be a key, when it has a badly written [naming step](#naming-subjects), or when a selector in `id` has a ref or `literal` deeper inside a `where` value than Ergo reads. `from: []` reads the whole input.
 
 A subject with `of` reads `from` and `identified_by` from the subject it names, and keeps only the items that pass that subject's filters and its own. Everything else about it is its own: its rows and descriptions use its name. It reports what the same subject written out in full would, except that `$well_formed` names a problem, or a `from` with a [naming step](#naming-subjects), after the subject it's written in.
 
@@ -1651,7 +1651,7 @@ A subject with `of` reads `from` and `identified_by` from the subject it names, 
 
 ### Paths
 
-A path is a list of keys that ergo follows one step at a time. `["release", "approver", "email"]` reads `release.approver.email`.
+A path is a list of keys that Ergo follows one step at a time. `["release", "approver", "email"]` reads `release.approver.email`.
 
 A key is a string, or a list index, which is a whole number of 0 or more, like `0` or `12`. Write an index as digits alone. `1.0` and `1e0` read the same item as `1`, because OPA and JavaScript can't always tell them apart, but they're harder to read. A string only picks a key of an object and a number only picks an item of a list, so `["a", "0"]` reads nothing when `a` is a list, and `["o", 0]` reads nothing when `o` is `{"0": "zero"}`. JavaScript reads both, so an implementation there has to check the type. A path that runs into something that can't hold its next key, like these, or a string, number or boolean where an object or list should be, fails its check with cause `unusable`, so `["pr", "state"]` on `"pr": "none"` isn't reported as a missing field. A parent that isn't there, or is `null`, is different: the field is just missing. A step that can't be a key, like `true`, `null`, a list, `-1` or `1.5`, can never read anything. So a check with one is written wrong: it fails `$well_formed`, its rows fail with cause `ill_formed`, even as a `present` filter, and the step is shown as `<invalid step>`. The same goes for the paths in a check's `inputs`. One in `from` or `id` fails `$well_formed`.
 
@@ -1669,7 +1669,7 @@ An empty path, `[]`, reads the item itself. Use it inside `all` or `any` when th
 }
 ```
 
-ergo names the item after its list, so this renders as `every branches: branches[] matches one of ["^main$", "^release/"]`, and the row's input is `branches[]`. An empty `each` works the same way, for a list of lists.
+Ergo names the item after its list, so this renders as `every branches: branches[] matches one of ["^main$", "^release/"]`, and the row's input is `branches[]`. An empty `each` works the same way, for a list of lists.
 
 An empty path also reads a subject that isn't an object, like each string of `"from": ["branches"]`. There, the item is named after `from` (`branches[]`), or `$input` when `from` is `[]`, because then the subject is the input and `["$$input"]` reads the same thing. That keeps it apart from a key called `input`, which is named `input`. `$min_subjects` names it the same way, as `count(matching($input))`, when `from` reads the whole input. Any other path on such a subject fails with cause `not_an_object`.
 
@@ -1728,7 +1728,7 @@ With those params, a package licensed `GPL-3.0` gives this violation:
 }
 ```
 
-A ref or a `literal` anywhere deeper inside a value, like `"value": [{"ref": [...]}]` or `"where": {"k": [{"literal": "a"}]}`, is written wrong, because ergo wouldn't read it and would compare the object instead. To compare data that holds an object that only looks like a ref or a literal, wrap the whole value in a `literal`: `{"literal": [{"ref": [...]}]}`.
+A ref or a `literal` anywhere deeper inside a value, like `"value": [{"ref": [...]}]` or `"where": {"k": [{"literal": "a"}]}`, is written wrong, because Ergo wouldn't read it and would compare the object instead. To compare data that holds an object that only looks like a ref or a literal, wrap the whole value in a `literal`: `{"literal": [{"ref": [...]}]}`.
 
 The expression says where the value comes from. What it was goes in the check's definition in the report, under `$refs`, once for the whole report and sorted by name, beside the literals the check compares against. The rows' `inputs` only hold what the check reads, like `licences[]` here, and `violations` adds the `$refs` back to each violation's `inputs`, as above. That keeps a record of what was compared, even when the params change between runs, without copying it into every row. A path that starts with `$$input` or `$$params` is something the check reads, so its value stays in the row.
 
@@ -1738,7 +1738,7 @@ In the old syntax, a path that starts with `$$params` reads the params, as `$par
 
 Some things worth knowing:
 
-- A ref that leads nowhere, or to `null`, fails the check, with cause `absent` or `null`. That cause wins over anything the subject's own fields would give, because the check can't mean anything without the value. ergo has no defaults, so put the value in the params.
+- A ref that leads nowhere, or to `null`, fails the check, with cause `absent` or `null`. That cause wins over anything the subject's own fields would give, because the check can't mean anything without the value. Ergo has no defaults, so put the value in the params.
 - A ref must be a list that starts with `$$params` or `$$input`, and it can't contain a selector or another ref. Anything else is written wrong: it fails `$well_formed`, the check fails with cause `ill_formed`, and the expression and `inputs` show `<invalid ref>`.
 - An object with a `ref` or `literal` key and any other key is a mistake, not a value, so it fails the check the same way. Otherwise a typo like `{"ref": [...], "note": "..."}` would be compared as an object, and `excludes` would pass.
 - A value that is an object with a single `ref` or `literal` key would be read as one. Wrap it in `{"literal": ...}` to take it as written. Nothing inside a `literal` is read, so `{"literal": {"literal": 1}}` is the object `{"literal": 1}`.
@@ -1762,11 +1762,11 @@ With `artifact_name` set to `app` and `attestation_name` to `pull-request`, this
 A ref step works anywhere in any path: first, in the middle or last, after a name or `$$input`, before a selector, and in `from`, `identified_by`, `each`, `left` and `right`.
 
 - The value must be a [key](#paths): a string, or a list index, which is a whole number of 0 or more. A ref that leads nowhere, to `null`, or to anything else, like a list, means the path can't be followed, so the check fails with cause `absent`, `null` or, for anything that isn't a key, `unusable`.
-- In `from`, a ref step that can't be read fails `$min_subjects`, even with `min_subjects: 0`, because ergo can't tell where the subjects would be. The `$min_subjects` row takes the ref's cause, and its definition records the ref under `$refs`, so the violation shows which param was missing.
+- In `from`, a ref step that can't be read fails `$min_subjects`, even with `min_subjects: 0`, because Ergo can't tell where the subjects would be. The `$min_subjects` row takes the ref's cause, and its definition records the ref under `$refs`, so the violation shows which param was missing.
 - A `present` filter whose path has a ref step that can't be read doesn't rule subjects out. It fails the requirement, because the field it looked for is unknown, not missing.
 - A ref step written with another key, like `{"ref": [...], "where": {...}}`, is a mistake, not a selector. It fails the check and shows as `[<invalid ref>]`. In `from`, it fails `$well_formed`.
 - A ref's own path is read as written, so a ref inside a ref isn't followed.
-- Some tools treat `$$` as an escape for `$`, like docker-compose and Make. A policy that passes through one of them reaches ergo as `$input`, which is read as a [name](#naming-subjects). No subject is called `input`, so the check fails with cause `absent`.
+- Some tools treat `$$` as an escape for `$`, like docker-compose and Make. A policy that passes through one of them reaches Ergo as `$input`, which is read as a [name](#naming-subjects). No subject is called `input`, so the check fails with cause `absent`.
 
 ### Naming subjects
 
@@ -1903,13 +1903,13 @@ These read one or two fields of a subject.
 Some things worth knowing:
 
 - A check that's written wrong fails `$well_formed`, and its rows fail with cause `ill_formed`, whatever the subject holds. So in `applies_to` it fails the requirement instead of ruling every subject out. Written wrong means:
-  - an `op` ergo doesn't know, a missing `op`, or a missing parameter
+  - an `op` Ergo doesn't know, a missing `op`, or a missing parameter
   - a `cmp` that isn't in the list above
   - a `compare` side that isn't a path, a `literal` or a [derived value](#derived-values) written as below, or a `compare_time` side that isn't a path. The `$well_formed` row says `invalid left` or `invalid right`
   - a `within` that isn't a number of 0 or more, or that's on a `cmp` other than `eq`
   - `values` that isn't a list, an empty `values` for `includes` or `excludes`, both `value` and `values`, a `min` or `max` that isn't a number, a `min` above `max`, or `patterns` that isn't a list of valid regular expressions
   - a `path`, an `each` or, on other operators than `compare` and `compare_time`, a `left` or `right` that isn't a list, even a string like `"state"` that names one key, or `as` or `each` on an operator other than `all` or `any`. The `$well_formed` row says `path not a list` (or `each not a list`), and the check's row has no `inputs`
-  - a step that can't be a [key](#paths), a number out of range, a badly written [ref](#reading-from-the-input), a ref or `literal` deeper inside a value than ergo reads, or a path that starts with a [name](#naming-subjects) nothing gave
+  - a step that can't be a [key](#paths), a number out of range, a badly written [ref](#reading-from-the-input), a ref or `literal` deeper inside a value than Ergo reads, or a path that starts with a [name](#naming-subjects) nothing gave
   - an `all` or `any` [nested](#nesting) too deep, or an alias given twice or badly written
   - a check that isn't an object, or one where it can't go, like a custom operator inside `all`
   - a field its op doesn't use, like `valeu` or `descripton`. Besides its own parameters, any check can have `description`, `meta`, `expression`, `substitute` and `inputs`. A [custom operator](#custom-operators) can have any fields.
@@ -1931,11 +1931,11 @@ Some things worth knowing:
 - To check that a list holds at least one of several values, use [`any`](#all-and-any) with `in`: `{"op": "any", "path": ["allergens"], "check": {"op": "in", "path": [], "values": ["nuts", "garlic"]}}`. Its expression is `some allergens: allergens[] in ["garlic", "nuts"]`. Keep this in mind in `applies_to`, where `includes` with `values` only keeps subjects that have every one of them.
 - `compare` and `compare_time` compare two fields of the same subject. A `compare` side can also be a fixed value, written `{"literal": 1}`, or a [derived value](#derived-values), like the length of a list.
 - `compare` with `lt`, `lte`, `gt` or `gte` needs both fields to be numbers or both to be strings. Ordering objects, lists or booleans fails with cause `unusable`, because Rego's order for them means nothing in a policy: `{"name": "ann"}` comes before `{"owner": "bob"}` only because `name` sorts before `owner`. You'd usually hit this by leaving the field off the end of a path. `eq` and `ne` work on any type. A substitute that orders objects, lists or booleans gives its check the same cause, and so does an item inside `all` or `any`.
-- `compare_time` never converts between formats, so a number against a string fails as `unusable`. With numbers, ergo can't tell seconds from milliseconds, so make sure both sides use the same unit.
+- `compare_time` never converts between formats, so a number against a string fails as `unusable`. With numbers, Ergo can't tell seconds from milliseconds, so make sure both sides use the same unit.
 - An RFC 3339 string needs an uppercase `T` and `Z`, a date that exists, and a year from 1678 to 2261, which keeps its nanoseconds since 1970 inside a 64-bit integer. Anything else fails `compare_time` as `unusable`, so `2024-02-30T00:00:00Z` isn't read as 1 March, and `2024-01-01t00:00:00z` isn't read at all.
 - Patterns in `matches_any` and `not_matches_any` aren't anchored: `svc_` matches `my_svc_account`. Use `^` and `$` when you need a full match. A pattern that isn't a string, or isn't a valid regular expression, fails either operator, even when another pattern matches. With an empty `patterns` list, `matches_any` fails and `not_matches_any` passes. When `patterns` isn't a list, both fail and the expression shows `author matches one of <invalid patterns>` or `author matches none of <invalid patterns>`. When it's missing, the expression shows `<missing patterns>` instead.
 
-These two are useful in `applies_to`, for example to leave bot accounts out of a review rule. If the author field is missing, ergo can't tell whether the subject is in scope, so the requirement fails. See [Checks ergo adds](#checks-ergo-adds).
+These two are useful in `applies_to`, for example to leave bot accounts out of a review rule. If the author field is missing, Ergo can't tell whether the subject is in scope, so the requirement fails. See [Checks Ergo adds](#checks-ergo-adds).
 
 #### Derived values
 
@@ -1989,7 +1989,7 @@ costs_add_up:
   within: 0.01
 ```
 
-all three pass. Each row shows the value ergo worked out, named after the side, beside the list it came from:
+all three pass. Each row shows the value Ergo worked out, named after the side, beside the list it came from:
 
 | check             | expression                                                          | inputs                                                                                                |
 | ----------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
@@ -2000,7 +2000,7 @@ all three pass. Each row shows the value ergo worked out, named after the side, 
 Some things worth knowing:
 
 - A list that isn't there fails the check as `absent`, a `null` one as `null`, and anything that isn't a list as `unusable`. A number to add that isn't a number, like `"0.5"`, fails it as `unusable` too, and so does a `within` comparison where either side isn't a number.
-- An item that `where` can't decide about doesn't just go uncounted. If the second finding above had no `source`, ergo couldn't tell whether it came from Claude, so the check would fail as `absent`, with `count(findings where source == "claude") = null`. A `present` condition is the exception, as everywhere: a missing field is its answer.
+- An item that `where` can't decide about doesn't just go uncounted. If the second finding above had no `source`, Ergo couldn't tell whether it came from Claude, so the check would fail as `absent`, with `count(findings where source == "claude") = null`. A `present` condition is the exception, as everywhere: a missing field is its answer.
 - `where` is one [basic operator](#basic-operators), without a substitute. Its paths start at each item, like the inner check of `all`. It can't be `all`, `any` or `any_of`, and a check inside it that's written wrong makes the whole check written wrong.
 - Derived values only go in a check of their own, a filter or a substitute, not inside `all`, `any` or `any_of`. A `literal` side can go anywhere a `compare` can.
 - Paths in a derived value read like any other: they can start with `$$input`, `$$params` or an [alias](#naming-subjects).
@@ -2049,7 +2049,7 @@ Anything that isn't a list fails too, an object included, with cause `unusable`.
 }
 ```
 
-This reads as "every commit of every pull request is signed" (ergo renders it as `every pull_requests[].commits: signed == true`). Every inner list must exist and have at least one item. If one pull request has no `commits`, the check fails, rather than being decided by the other pull requests alone.
+This reads as "every commit of every pull request is signed" (Ergo renders it as `every pull_requests[].commits: signed == true`). Every inner list must exist and have at least one item. If one pull request has no `commits`, the check fails, rather than being decided by the other pull requests alone.
 
 The inner `check` can be a basic operator, an `any_of`, or another `all` or `any`.
 

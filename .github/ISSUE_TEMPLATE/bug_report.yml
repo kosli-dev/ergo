@@ -1,5 +1,5 @@
 name: Bug report
-description: ergo gave the wrong report, or failed to run
+description: Ergo gave the wrong report, or failed to run
 title: "core: "
 labels: [bug]
 body:

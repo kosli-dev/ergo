@@ -455,7 +455,7 @@
     ]
   },
   {
-    "description": "a requirement with a field ergo doesn't know",
+    "description": "a requirement with a field Ergo doesn't know",
     "policy": {"subjects": {"subject": {"from": ["t"]}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}, "requires": "x"}}},
     "cases": [
       {
@@ -498,7 +498,7 @@
     },
     "cases": [
       {
-        "description": "copies them into the report and names the checks ergo adds after the type",
+        "description": "copies them into the report and names the checks Ergo adds after the type",
         "rules": ["report.requirements", "added.text", "added.inputs"],
         "input": {"t": [{"e": 1, "id": 1, "x": 1}]},
         "requirements": {

@@ -1,20 +1,20 @@
-# Working on ergo
+# Working on Ergo
 
-ergo is a Rego library that turns policy evaluation into a structured report. Users copy `ergo.rego` into their own projects, so it has to stay a single file with no dependencies.
+Ergo is a Rego library that turns policy evaluation into a structured report. Users copy `ergo.rego` into their own projects, so it has to stay a single file with no dependencies.
 
 ## Files
 
 - `ergo.rego` is the whole library.
 - `ergo_test.rego` holds its tests.
 - `custom_op_test.rego` defines custom operators that only the tests use.
-- `spec/` is the spec ergo implements: what each check means as named rules, the syntax, JSON Schemas for a policy and a report, and cases that pin the rules down. `spec/README.md` explains it.
+- `spec/` is the spec Ergo implements: what each check means as named rules, the syntax, JSON Schemas for a policy and a report, and cases that pin the rules down. `spec/README.md` explains it.
 - `spec_test.rego` runs every case in `spec/cases` against `ergo.rego`.
 - `README.md` walks a new user through a first policy.
 - `REFERENCE.md` describes every field, operator, cause and report entry.
 - `CONTRIBUTING.md` tells people how to report bugs and send changes, and points them here for the rules.
 - `CODE_OF_CONDUCT.md` is the Contributor Covenant 2.1, unchanged apart from the contact address.
 - `.github/ISSUE_TEMPLATE/` and `.github/pull_request_template.md` are the forms GitHub shows for new issues and pull requests.
-- `examples/` holds worked examples. Each one has an input, the same policy in plain Rego and with ergo, and tests that pin what both versions report.
+- `examples/` holds worked examples. Each one has an input, the same policy in plain Rego and with Ergo, and tests that pin what both versions report.
 
 ## Checks
 
@@ -37,9 +37,9 @@ Run them from the repo root. The last two lines use a virtual environment that h
 
 `opa fmt --list .` should print nothing. If it prints file names, run `opa fmt -w .`.
 
-The second `opa check` compiles `ergo.rego` the way a host does when it checks `input` against a closed JSON Schema, and should print nothing. If it fails with `undefined ref: input[...]`, ergo reads something from `input` that the `METADATA` annotation above `package ergo` doesn't declare.
+The second `opa check` compiles `ergo.rego` the way a host does when it checks `input` against a closed JSON Schema, and should print nothing. If it fails with `undefined ref: input[...]`, Ergo reads something from `input` that the `METADATA` annotation above `package ergo` doesn't declare.
 
-The `opa eval` command runs every test again with `--strict-builtin-errors`, which turns a built-in given the wrong type into an error, and should print `true`. If it prints an error, check the value's type before the built-in on that line, so that ergo gives the same report with or without the flag.
+The `opa eval` command runs every test again with `--strict-builtin-errors`, which turns a built-in given the wrong type into an error, and should print `true`. If it prints an error, check the value's type before the built-in on that line, so that Ergo gives the same report with or without the flag.
 
 The `regal lint` command runs [Regal](https://www.openpolicyagent.org/projects/regal)'s rules for likely bugs, and should say `No violations found`. One of them, `leaked-internal-reference`, fails when a file outside `package ergo` calls a rule whose name starts with `_`. Test files are allowed to. `redundant-existence-check` is off because it flags `_verdict_cause(passed) := "satisfied" if passed`, where `if passed` is what stops a `false` from counting as satisfied. The flags are on the command line and not in `.regal/config.yaml` because OPA would load that file as data.
 
@@ -53,9 +53,9 @@ CI also runs every test compiled to Wasm, with `.github/wasm-tests.sh`, because 
 .github/wasm-tests.sh docker run --rm -v "$PWD":/src:ro -w /src openpolicyagent/opa:1.20.2
 ```
 
-CI also runs every test with OPA's JavaScript runtime, `@open-policy-agent/opa-wasm` (`.github/wasm-js.cjs`), because that runtime brings its own versions of some built-ins, like a `sprintf` that formats lists and objects differently, and lacks others. The script compiles each test as a Wasm entrypoint, fails if ergo uses a built-in the runtime doesn't have (apart from `time.parse_rfc3339_ns`, which it passes in, as `REFERENCE.md` tells Wasm users to), and then runs every test. It also fails if `ergo.report` or `ergo.violations` needs any built-in that OPA's Wasm build runs outside the module. OPA reads the arguments of those built-ins back as Rego, so a string holding a byte-order mark fails the whole evaluation. `time.parse_rfc3339_ns` is allowed because ergo only passes it strings that already match the RFC 3339 pattern. If you add a function for users to call, add it to the entrypoint the script writes, so the check covers it. `sprintf` is one of them, so build text with `concat` instead. `concat` takes only strings, so write anything else with `_text` first. Last, it builds two reports on 100 deployments, one with checks written with `op` and one with checks written as sentences, and fails if the first uses more than 20 MB of Wasm memory or the second more than 12 MB. Wasm doesn't cache function calls and frees nothing until the report is done, so something worked out again for every row shows up there long before it slows down `opa eval`.
+CI also runs every test with OPA's JavaScript runtime, `@open-policy-agent/opa-wasm` (`.github/wasm-js.cjs`), because that runtime brings its own versions of some built-ins, like a `sprintf` that formats lists and objects differently, and lacks others. The script compiles each test as a Wasm entrypoint, fails if Ergo uses a built-in the runtime doesn't have (apart from `time.parse_rfc3339_ns`, which it passes in, as `REFERENCE.md` tells Wasm users to), and then runs every test. It also fails if `ergo.report` or `ergo.violations` needs any built-in that OPA's Wasm build runs outside the module. OPA reads the arguments of those built-ins back as Rego, so a string holding a byte-order mark fails the whole evaluation. `time.parse_rfc3339_ns` is allowed because Ergo only passes it strings that already match the RFC 3339 pattern. If you add a function for users to call, add it to the entrypoint the script writes, so the check covers it. `sprintf` is one of them, so build text with `concat` instead. `concat` takes only strings, so write anything else with `_text` first. Last, it builds two reports on 100 deployments, one with checks written with `op` and one with checks written as sentences, and fails if the first uses more than 20 MB of Wasm memory or the second more than 12 MB. Wasm doesn't cache function calls and frees nothing until the report is done, so something worked out again for every row shows up there long before it slows down `opa eval`.
 
-A `spec` job checks the spec. `python3 spec/check_rules.py` fails when a case cites a rule that doesn't exist, or when a rule has no case and isn't listed under "Rules without cases" in `spec/OPEN.md`. `.github/spec-schemas.py` builds the report for every case and fails when a report doesn't match `spec/report/schema.json`, or when ergo reads a policy as written correctly but it doesn't match `spec/policy/schema.json`. `python3 spec/sentences_corpus.py --check` fails when `spec/sentences-corpus.json` no longer holds every line of `spec/sentences-corpus.md`. `spec/check_grammar.py` reads sentences with `ergo.rego` and with a parser built from `spec/sentences.abnf`, and fails when one reads a sentence and the other rejects it as a matter of syntax. The sentences are the corpus, the cases, and a few thousand generated from the grammar and changed a little, with a fixed seed. A sentence `ergo.rego` rejects for another reason, like an unknown name, isn't a disagreement. The known ones are listed in `spec/OPEN.md`, and the script fails on a new one and when a listed one no longer disagrees. If `ergo.rego` gives a message that isn't about syntax, add it to `NON_SYNTAX` in the script.
+A `spec` job checks the spec. `python3 spec/check_rules.py` fails when a case cites a rule that doesn't exist, or when a rule has no case and isn't listed under "Rules without cases" in `spec/OPEN.md`. `.github/spec-schemas.py` builds the report for every case and fails when a report doesn't match `spec/report/schema.json`, or when Ergo reads a policy as written correctly but it doesn't match `spec/policy/schema.json`. `python3 spec/sentences_corpus.py --check` fails when `spec/sentences-corpus.json` no longer holds every line of `spec/sentences-corpus.md`. `spec/check_grammar.py` reads sentences with `ergo.rego` and with a parser built from `spec/sentences.abnf`, and fails when one reads a sentence and the other rejects it as a matter of syntax. The sentences are the corpus, the cases, and a few thousand generated from the grammar and changed a little, with a fixed seed. A sentence `ergo.rego` rejects for another reason, like an unknown name, isn't a disagreement. The known ones are listed in `spec/OPEN.md`, and the script fails on a new one and when a listed one no longer disagrees. If `ergo.rego` gives a message that isn't about syntax, add it to `NON_SYNTAX` in the script.
 
 CI also fails when a line of Rego isn't reached by any test. To list those lines yourself:
 
@@ -71,7 +71,7 @@ Every change needs tests: new behaviour, bug fixes and changes to existing behav
 
 There are no comments in the code or the tests, and it should stay that way.
 
-There are two exceptions, both above `package ergo` in `ergo.rego`. The first is the license header. Users copy that file on its own, so the header keeps the license with it. The second is the `METADATA` annotation that declares `input["ergo/names"]` as an object. While ergo checks, `input` holds ergo's names, and a host that type-checks `input` against a closed JSON Schema, like Kosli does when a policy is published, would otherwise refuse every read of them. OPA only reads a schema from an annotation, and annotations are comments.
+There are two exceptions, both above `package ergo` in `ergo.rego`. The first is the license header. Users copy that file on its own, so the header keeps the license with it. The second is the `METADATA` annotation that declares `input["ergo/names"]` as an object. While Ergo checks, `input` holds Ergo's names, and a host that type-checks `input` against a closed JSON Schema, like Kosli does when a policy is published, would otherwise refuse every read of them. OPA only reads a schema from an annotation, and annotations are comments.
 
 CI fails on any other comment in a `.rego` file. It asks `opa parse` for each file's comments, so a `#` inside a string doesn't count. To list them yourself:
 
@@ -85,7 +85,7 @@ Before removing or simplifying code, run the tests. Many of them exist to stop "
 
 ## Failing closed
 
-When ergo can't read something or isn't sure, the check fails. It never passes by accident and never disappears from the report. Every change must keep this true, and every new operator needs tests for missing, `null` and wrong-typed input.
+When Ergo can't read something or isn't sure, the check fails. It never passes by accident and never disappears from the report. Every change must keep this true, and every new operator needs tests for missing, `null` and wrong-typed input.
 
 The report must stay byte-identical for the same policy and input, whatever order the policy was written in. Sort anything that ends up in the report.
 

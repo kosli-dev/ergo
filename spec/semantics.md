@@ -1,4 +1,4 @@
-# How ergo turns a policy and an input into a report
+# How Ergo turns a policy and an input into a report
 
 Draft 0.1. This file says what a check means, whatever syntax it's written in. [syntax.md](syntax.md) says how today's policies write checks, how they can be written wrong, and how the report shows them. It covers reading values, causes, every built-in operator, and how requirements, scope, statuses and violations work. How a subject's `from` names subjects is still described only in [REFERENCE.md](../REFERENCE.md). Questions the spec hasn't settled are in [OPEN.md](OPEN.md).
 
@@ -10,7 +10,7 @@ Each rule has a name in brackets, like `[present.missing]`. The cases in [`cases
 - The **params** are a second JSON document the policy can read, or nothing.
 - A **subject** is one thing a requirement checks, found in the input by the `from` of the subject definition it names.
 - A **check** is one named test in a requirement's `checks` or in a subject definition's `applies_to`.
-- A **row** is the result of one check on one subject, or of one check ergo adds to a requirement.
+- A **row** is the result of one check on one subject, or of one check Ergo adds to a requirement.
 
 ## The model of a check
 
@@ -81,7 +81,7 @@ Every row has a cause. When a check reads several values, the row takes the firs
 
 **[value.refs]** A check that has refs gets `$refs` in its definition in the report: one entry for each ref, named as in [syntax.md](syntax.md#naming-a-path), with the value it read, or `null`. They're sorted by name.
 
-The spec only covers numbers in the input and the params that a 64-bit float keeps: `0`, or a magnitude between `2.2250738585072014e-308` and `1.7976931348623157e308`, with at most 15 significant digits. ergo doesn't control the input or the params, so it doesn't fail a check that reads any other number. An implementation compares such a number and writes it in the report as its runtime does, so reports may differ between implementations. `ergo.rego` compares it exactly and copies it as written, while one in JavaScript reads `1e400` as `Infinity` and `1e-400` as `0`.
+The spec only covers numbers in the input and the params that a 64-bit float keeps: `0`, or a magnitude between `2.2250738585072014e-308` and `1.7976931348623157e308`, with at most 15 significant digits. Ergo doesn't control the input or the params, so it doesn't fail a check that reads any other number. An implementation compares such a number and writes it in the report as its runtime does, so reports may differ between implementations. `ergo.rego` compares it exactly and copies it as written, while one in JavaScript reads `1e400` as `Infinity` and `1e-400` as `0`.
 
 ## What a row shows
 
@@ -95,7 +95,7 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 
 **[present.missing]** It fails with cause `value` when its path ends `absent` or `null`. Whether the field is there is the question it asks, so "it isn't" is a sound answer, and the cause says so.
 
-**[present.no_params]** On a path into the params, it fails with cause `absent` instead when there are no params. Then the params weren't given at all, so ergo can't tell whether the field would be there, and a policy run without its params fails instead of ruling every subject out. When the params are an object without the field, it fails with `value` as usual.
+**[present.no_params]** On a path into the params, it fails with cause `absent` instead when there are no params. Then the params weren't given at all, so Ergo can't tell whether the field would be there, and a policy run without its params fails instead of ruling every subject out. When the params are an object without the field, it fails with `value` as usual.
 
 **[present.other]** It fails with the outcome as its cause when its path ends any other way: `not_an_object`, `unusable`, `unmatched` or `ambiguous`. A ref step whose ref can't be read keeps the ref's cause too, even `absent` or `null`, because then the field it looks for is unknown, not missing.
 
@@ -261,7 +261,7 @@ A side of `compare` can also be `count_of` or `sum_of`, each with a path, `whose
 
 **[list.as]** `as` gives each item an alias, so a check nested inside can still read it once its own paths start somewhere else. An alias can only be given once along a chain of checks, so `from` and an enclosing check can't give the same one. A path can only start with an alias that `from` or an enclosing list check gives, not one given in a neighbouring `any_of` option. A check that breaks either rule is [written wrong](#the-model-of-a-check). Only `all` and `any` take `as` and `each`.
 
-**[list.inner]** The inner check is a basic operator, an `any_of`, or another `all` or `any`. One `all` or `any` can sit inside another, but not a third, so ergo can be written in a language without recursion. An `any_of` doesn't count as a level, but an `all` or `any` in one of its options does. Anything else is [written wrong](#the-model-of-a-check).
+**[list.inner]** The inner check is a basic operator, an `any_of`, or another `all` or `any`. One `all` or `any` can sit inside another, but not a third, so Ergo can be written in a language without recursion. An `any_of` doesn't count as a level, but an `all` or `any` in one of its options does. Anything else is [written wrong](#the-model-of-a-check).
 
 **[list.inputs]** When the inner check has a path that starts inside the item, the row shows that path for every item, like `cs[].s` with `[true, false, null]`. That holds for an inner `all` or `any` too, so its lists are shown. A path with no steps shows the items themselves. Any other inner check, like `compare` or `any_of`, shows the whole items. In both cases, each path into the input, the params or a name that the inner check reads follows, except names the check itself gives. With `each`, the items are the inner lists. A list that can't be read shows `[]` as its value.
 
@@ -357,7 +357,7 @@ A custom operator is for a check the built-in operators can't express. The polic
 
 **[custom.cause]** When it fails, the cause is the first, in the order of [causes](#causes), among the outcomes of the paths it reads, so a missing field fails it as `absent` and a `null` one as `null`.
 
-**[custom.refs]** ergo reads the refs in a custom operator's parameters itself, so the operator gets the values. They're recorded under `$refs` like any other, and one that can't be read fails the check with its cause.
+**[custom.refs]** Ergo reads the refs in a custom operator's parameters itself, so the operator gets the values. They're recorded under `$refs` like any other, and one that can't be read fails the check with its cause.
 
 **[custom.inputs]** The row shows each path the operator reads, in order. It has no `failed_items`.
 
@@ -365,7 +365,7 @@ A custom operator is for a check the built-in operators can't express. The polic
 
 ## Requirements
 
-A policy has two sections. `subjects` defines each kind of subject once, and `requirements` says what must be true of them. A subject definition has a way to find its subjects (`from`), a path to each subject's id (`identified_by`) and filters (`applies_to`). A requirement names one subject definition with `subject`, and has `require`, `min_subjects` and checks. It can also have a `description` and `meta`, which ergo copies into the report and never reads, and so can the policy.
+A policy has two sections. `subjects` defines each kind of subject once, and `requirements` says what must be true of them. A subject definition has a way to find its subjects (`from`), a path to each subject's id (`identified_by`) and filters (`applies_to`). A requirement names one subject definition with `subject`, and has `require`, `min_subjects` and checks. It can also have a `description` and `meta`, which Ergo copies into the report and never reads, and so can the policy.
 
 **[requirement.subject]** A requirement checks the subjects of the definition it names, with its own rows. Several requirements can name the same definition. A requirement that names none, or one that isn't in `subjects`, has no subjects, and its `$well_formed` and `$min_subjects` rows fail. The name of the definition is the `type` in each row's `subject`.
 
@@ -423,7 +423,7 @@ A subject can have parts: named paths inside itself, each with an alias, written
 
 **[scope.out]** A subject is out of scope only when every filter it fails fails with `value`, or one of them is a `present` filter that found its field missing ([present.filter]). Then its `$applies` row fails with `value`.
 
-**[scope.unreadable]** When a filter fails with any other cause, ergo can't tell whether the subject is in scope. Its `$applies` row fails with the first such cause, in the order of [causes](#causes), even when another filter would rule it out, and the requirement isn't met, even with `min_subjects: 0`. A filter written wrong gives `ill_formed`, whatever the others give.
+**[scope.unreadable]** When a filter fails with any other cause, Ergo can't tell whether the subject is in scope. Its `$applies` row fails with the first such cause, in the order of [causes](#causes), even when another filter would rule it out, and the requirement isn't met, even with `min_subjects: 0`. A filter written wrong gives `ill_formed`, whatever the others give.
 
 ## Statuses
 
@@ -435,7 +435,7 @@ A subject can have parts: named paths inside itself, each with an alias, written
 
 **[compliant]** The report is `compliant` when it has at least one requirement and none is `not_met`. A policy with no requirements is never compliant, because it doesn't check anything.
 
-**[report.requirements]** The report has an entry for each requirement, with its `description` and `meta`, or `""` and `{}` when it has none, its `require`, `subject`, the name of the subject it checks, or `null` when it names none or one that isn't in the policy's subjects, its `status`, `subjects` with `total`, the number found by `from`, and `matching`, the number in scope, `checks`, each check as written with its `description`, `meta` and `expression`, plus the checks ergo adds, and `causes`. All the filters share one `$applies` entry.
+**[report.requirements]** The report has an entry for each requirement, with its `description` and `meta`, or `""` and `{}` when it has none, its `require`, `subject`, the name of the subject it checks, or `null` when it names none or one that isn't in the policy's subjects, its `status`, `subjects` with `total`, the number found by `from`, and `matching`, the number in scope, `checks`, each check as written with its `description`, `meta` and `expression`, plus the checks Ergo adds, and `causes`. All the filters share one `$applies` entry.
 
 **[report.policy]** The report has the policy's `description` and `meta` at its top, next to `compliant`, or `""` and `{}` when the policy has none. `null` counts as none. A `description` that isn't a string, or a `meta` that isn't an object or holds something JSON can't, makes the `$well_formed` row of every requirement fail, because the policy belongs to all of them, and the report shows `""` or `{}` in its place.
 

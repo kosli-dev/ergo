@@ -1,6 +1,6 @@
-# The ergo spec
+# The Ergo spec
 
-Draft 0.1. ergo is three specs, and `ergo.rego` is an implementation of them:
+Draft 0.1. Ergo is three specs, and `ergo.rego` is an implementation of them:
 
 - [`semantics.md`](semantics.md) says what a check means, as named rules about a model of checks that doesn't depend on how they're written.
 - [`syntax.md`](syntax.md) says how today's policies write checks, how they can be written wrong, and how the report shows paths and checks. A new way of writing checks would get a file like it, reading into the same model.
@@ -9,7 +9,7 @@ Draft 0.1. ergo is three specs, and `ergo.rego` is an implementation of them:
 - [`report/schema.json`](report/schema.json) says what a report looks like, as a JSON Schema.
 - [`cases/`](cases) holds the cases that pin the rules down, one folder per topic.
 
-When an implementation and the spec disagree, the implementation is wrong. A change to ergo's behaviour starts here, with the rule and its cases, and then goes into each implementation.
+When an implementation and the spec disagree, the implementation is wrong. A change to Ergo's behaviour starts here, with the rule and its cases, and then goes into each implementation.
 
 The spec covers reading values, causes, expressions, every built-in operator, requirements, scope, substitutes, statuses, row order and violations. How a subject's `from` names subjects (`each_as` and `keys`), subjects built on another with `of`, params passed in and values JSON can't hold are still described only in [REFERENCE.md](../REFERENCE.md). [OPEN.md](OPEN.md) lists the questions the spec hasn't settled. A subject's `from` waits for [#174](https://github.com/kosli-dev/ergo/issues/174) and [#113](https://github.com/kosli-dev/ergo/issues/113), which may change how it's written. The spec will change while it's 0.x.
 

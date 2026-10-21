@@ -1,8 +1,8 @@
-# Contributing to ergo
+# Contributing to Ergo
 
 Bug reports, ideas and pull requests are all welcome. Everyone taking part follows the [code of conduct](CODE_OF_CONDUCT.md).
 
-ergo is still changing a lot before its first alpha, so the policy and report formats may change under you, and a change you propose may clash with one already in progress. Open an issue before starting anything bigger than a small fix, so we can agree on the shape first.
+Ergo is still changing a lot before its first alpha, so the policy and report formats may change under you, and a change you propose may clash with one already in progress. Open an issue before starting anything bigger than a small fix, so we can agree on the shape first.
 
 ## Reporting a bug
 
@@ -19,7 +19,7 @@ You'll need [OPA](https://www.openpolicyagent.org/docs/#1-download-opa) 1.20.2 a
 - `ergo.rego` stays a single file with no dependencies, because users copy it into their projects.
 - Every change needs tests. A bug fix starts with a test that fails because of the bug.
 - No comments in `.rego` files. When code looks simpler than it could be, a test explains why.
-- When ergo can't read something or isn't sure, the check fails. Every new operator needs tests for missing, `null` and wrong-typed input.
+- When Ergo can't read something or isn't sure, the check fails. Every new operator needs tests for missing, `null` and wrong-typed input.
 - The report stays byte-identical for the same policy and input, so sort anything that ends up in it.
 - When behaviour changes, update `REFERENCE.md` in the same pull request, and `README.md` if it changes the getting-started example.
 

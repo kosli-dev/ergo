@@ -1,6 +1,6 @@
-# ergo site
+# Ergo site
 
-The landing page and docs for ergo, built with [Hugo](https://gohugo.io/) (0.157, extended).
+The landing page and docs for Ergo, built with [Hugo](https://gohugo.io/) (0.157, extended).
 
 The docs pages aren't copied here. They're read from the repo's own `README.md` and `REFERENCE.md` when the site builds, so change the docs there and the site follows.
 
@@ -14,7 +14,7 @@ Then open http://localhost:1313.
 
 ## The tutorial
 
-`/tutorial/` teaches check sentences one step at a time, with ergo running in the reader's browser as Wasm. It needs the Wasm built from this checkout's `ergo.rego`, and the build fails without it. You need [OPA](https://www.openpolicyagent.org/), `curl`, `openssl` and Node 24:
+`/tutorial/` teaches check sentences one step at a time, with Ergo running in the reader's browser as Wasm. It needs the Wasm built from this checkout's `ergo.rego`, and the build fails without it. You need [OPA](https://www.openpolicyagent.org/), `curl`, `openssl` and Node 24:
 
 ```sh
 site/build-tutorial.sh

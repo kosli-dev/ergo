@@ -1,5 +1,5 @@
 {{ $wasm := resources.Get "tutorial/ergo.wasm" }}
-{{ if not $wasm }}{{ errorf "The tutorial needs ergo compiled to Wasm: run site/build-tutorial.sh" }}{{ end }}
+{{ if not $wasm }}{{ errorf "The tutorial needs Ergo compiled to Wasm: run site/build-tutorial.sh" }}{{ end }}
 <!doctype html>
 <html lang="{{ site.LanguageCode }}">
 <head>
@@ -18,7 +18,7 @@
 <body class="tut-body">
   <div class="tut" id="tutorial" data-wasm="{{ ($wasm | fingerprint).RelPermalink }}">
     <header class="tut__bar">
-      <a class="lockup" href="{{ "/" | relURL }}" aria-label="ergo home">{{ partial "wordmark.html" . }}</a>
+      <a class="lockup" href="{{ "/" | relURL }}" aria-label="Ergo home">{{ partial "wordmark.html" . }}</a>
       <div class="tut__tools">
         <div class="tut__menu" data-menu-wrap hidden>
           <button type="button" class="tut__more" data-menu-button aria-haspopup="menu" aria-expanded="false" aria-controls="tut-menu" aria-label="Menu">⋯</button>
@@ -56,7 +56,7 @@
     </main>
 
     <main class="tut__body tut__end" data-end hidden>
-      <p class="tut__big">That's ergo.</p>
+      <p class="tut__big">That's Ergo.</p>
       <p class="tut__line">Read <a class="tut__textlink" href="{{ "bakery/" | relURL }}">the bakery example</a> to see a whole policy, or <a class="tut__textlink" href="{{ "docs/reference/" | relURL }}">the reference</a> for every phrase.</p>
     </main>
 

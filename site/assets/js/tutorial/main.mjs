@@ -93,7 +93,7 @@ const show = (shown, right) => {
   let node;
   let key;
   if (!check) {
-    node = make("p", "tut__loading mono", "loading ergo…");
+    node = make("p", "tut__loading mono", "loading Ergo…");
     key = "loading";
   } else if (shown.state !== "result") {
     node = make("div", "tut__state");
@@ -763,12 +763,12 @@ furthest = restored.furthest;
 go(startPos, false, startPos === 0);
 try {
   const res = await fetch(root.dataset.wasm);
-  if (!res.ok) throw new Error(`couldn't fetch ergo (${res.status})`);
+  if (!res.ok) throw new Error(`couldn't fetch Ergo (${res.status})`);
   const ergo = await opa.loadPolicy(await res.arrayBuffer(), undefined, { "time.parse_rfc3339_ns": parseTime });
   check = makeChecker((doc) => ergo.evaluate(doc));
   runner.run = makeRunner((doc) => ergo.evaluate(doc));
   if (isCustom() && !el.stage.hidden) buildStage(goalNow().kind);
   evaluate();
 } catch (e) {
-  el.result.replaceChildren(make("p", "tut__loading mono", `ergo didn't load: ${e.message}`));
+  el.result.replaceChildren(make("p", "tut__loading mono", `Ergo didn't load: ${e.message}`));
 }
