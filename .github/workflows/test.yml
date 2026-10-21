@@ -20,7 +20,7 @@ jobs:
         with:
           version: 0.43.0
       - run: opa check --strict . --ignore .github
-      - name: Check ergo compiles where input is checked against a closed schema
+      - name: Check Ergo compiles where input is checked against a closed schema
         run: opa check --strict --schema .github/closed-input-schema.json ergo.rego
       - run: opa fmt --list --fail .
       - name: Lint for likely bugs

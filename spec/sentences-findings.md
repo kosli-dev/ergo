@@ -1,6 +1,6 @@
 # Sentence corpus and grammar: findings
 
-This file goes with [`sentences-corpus.md`](sentences-corpus.md) and [`sentences.md`](sentences.md). Both now follow [#174](https://github.com/kosli-dev/ergo/issues/174) as its body stood on 9 October 2026 at 15:22 UTC. This is the fourth pass. The third pass left one disagreement with the issue and filled three gaps. The issue now decides them, and this pass applies that. Step 2 of the plan, the readability test with someone who hasn't seen ergo, still isn't done.
+This file goes with [`sentences-corpus.md`](sentences-corpus.md) and [`sentences.md`](sentences.md). Both now follow [#174](https://github.com/kosli-dev/ergo/issues/174) as its body stood on 9 October 2026 at 15:22 UTC. This is the fourth pass. The third pass left one disagreement with the issue and filled three gaps. The issue now decides them, and this pass applies that. Step 2 of the plan, the readability test with someone who hasn't seen Ergo, still isn't done.
 
 ## What changed in this pass
 
@@ -70,7 +70,7 @@ The `$applies` row's `expression` is the `whose` conditions as written, joined w
 | pr-reviewer   | review-controls                        | review round (both_models_degraded)          | `…claude-review.attestation_data.degraded is true and …gemini-review.attestation_data.degraded is true and …claude-review.attestation_data.personas_ran is empty and …gemini-review.attestation_data.personas_ran is empty` |
 | pr-reviewer   | review-controls                        | review round (claude_persona_failed)         | `…claude-review.attestation_data.degraded is true and count of …claude-review.attestation_data.personas_ran is at least 1`                                                                                                  |
 | pr-reviewer   | review-controls                        | review round (gemini_persona_failed)         | `…gemini-review.attestation_data.degraded is true and count of …gemini-review.attestation_data.personas_ran is at least 1`                                                                                                  |
-| ergo          | README                                 | deployment                                   | `environment is "prod"`                                                                                                                                                                                                     |
+| Ergo          | README                                 | deployment                                   | `environment is "prod"`                                                                                                                                                                                                     |
 | DEV controls  | DEV-0102 impact analysis, new features | production deployment                        | `environment is "prod" and change_type is "new_development"`                                                                                                                                                                |
 | DEV controls  | DEV-0104 changes tracked               | production deployment                        | `environment is "prod"`                                                                                                                                                                                                     |
 | DEV controls  | DEV-0201 source managed                | production deployment                        | `environment is "prod"`                                                                                                                                                                                                     |
@@ -122,7 +122,7 @@ One change is still needed outside these files when this is built: `syntax.md` (
 
 One: server demo 0008 builds one requirement per suite in Rego. sdlc-policies 0008 already says the same thing with `named by each of`.
 
-pr-reviewer's seven custom operators all become sentences that ergo runs: `keys_match`, `persona_blob_shas named by persona`, since #213, `contains_all`, `x contains all of y`, since #224, and the other five since #173.
+pr-reviewer's seven custom operators all become sentences that Ergo runs: `keys_match`, `persona_blob_shas named by persona`, since #213, `contains_all`, `x contains all of y`, since #224, and the other five since #173.
 
 ## Changes in what passes
 

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "ergo report",
+  "title": "Ergo report",
   "type": "object",
   "properties": {
     "compliant": {"type": "boolean", "description": "true when there's at least one requirement and none is not_met"},
@@ -59,7 +59,7 @@
         },
         "checks": {
           "type": "object",
-          "description": "Each check as written, plus the checks ergo adds, which start with $.",
+          "description": "Each check as written, plus the checks Ergo adds, which start with $.",
           "additionalProperties": {
             "type": "object",
             "properties": {
@@ -113,7 +113,7 @@
           "type": "object",
           "properties": {
             "type": {"description": "The name of the requirement's subject."},
-            "id": {"description": "The subject's id, or null for the rows of the checks ergo adds to a requirement."},
+            "id": {"description": "The subject's id, or null for the rows of the checks Ergo adds to a requirement."},
             "in": {"type": "object", "description": "Only for a child subject: the name and id of each subject it was read from, its parent and, three subjects deep, its grandparent.", "maxProperties": 2}
           },
           "required": ["type", "id"],

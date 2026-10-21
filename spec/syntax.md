@@ -58,7 +58,7 @@ subjects:
 
 ## Custom operators
 
-**[custom.syntax]** A custom operator check can have any fields, besides `op`. Because ergo can't work out what the operator reads or how to describe it, the check also gives `expression`, the text the report shows, and `inputs`, a list of the paths it reads. An entry in `inputs` can be a path, or `{"path": [...], "each": [...]}` to read one field from every item of a list. `ergo.rego` needs them. An engine that knows more about the operator, like the Rust port on the `core/conformance-suite` branch, uses them when they're there.
+**[custom.syntax]** A custom operator check can have any fields, besides `op`. Because Ergo can't work out what the operator reads or how to describe it, the check also gives `expression`, the text the report shows, and `inputs`, a list of the paths it reads. An entry in `inputs` can be a path, or `{"path": [...], "each": [...]}` to read one field from every item of a list. `ergo.rego` needs them. An engine that knows more about the operator, like the Rust port on the `core/conformance-suite` branch, uses them when they're there.
 
 ## Compare
 
@@ -144,9 +144,9 @@ Each check's definition in the report has an `expression` that says what it chec
 
 **[any_of.expression]** `one of: ` followed by the options, sorted by name as text and joined with ` | `, each written `<name>(<check> and <check>)` with its checks in the order written. A missing `options` is shown as `<missing options>`, an empty one as `<empty options>`, an empty option as `<name>(<empty option>)` and one that isn't a list as `<name>(<invalid option>)`.
 
-## Checks ergo adds
+## Checks Ergo adds
 
-**[added.text]** The checks ergo adds have these descriptions and expressions, where `<type>` is the name of the requirement's subject, and `<from>` is the name of the subject's `from`, or `$input` when it has no steps. For a subject that goes on into another subject, `<from>` is its `from` as written, starting with that subject's name: `artifact.pull_requests`, or, read from a part of it, `artifact.pr_attestation.pull_requests`.
+**[added.text]** The checks Ergo adds have these descriptions and expressions, where `<type>` is the name of the requirement's subject, and `<from>` is the name of the subject's `from`, or `$input` when it has no steps. For a subject that goes on into another subject, `<from>` is its `from` as written, starting with that subject's name: `artifact.pull_requests`, or, read from a part of it, `artifact.pr_attestation.pull_requests`.
 
 | Check           | Description                                                                                           | Expression                                                  |
 | --------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
@@ -155,6 +155,6 @@ Each check's definition in the report has an `expression` that says what it chec
 | `$unique_ids`   | `Every <type> id is unique`                                                                           | `count(repeated(ids(<from>))) == 0`                         |
 | `$applies`      | `The <type> is in scope`                                                                              | the filters' expressions in name order, joined with ` and ` |
 
-**[added.inputs]** `$min_subjects` names its input `in-scope <type> count`, and `$unique_ids` names its input `repeated <type> ids`. `$well_formed` names its first two `count(checks)` and `require`, and when `require` is written wrong, its value is `["neither every nor some"]`. A field ergo doesn't know is listed with `["unknown field"]`, and `checks: {}` with `["empty"]`. A requirement without a `subject` has `{"name": "subject", "value": ["missing"]}`, and one whose `subject` isn't in `subjects` has `["not in subjects"]`.
+**[added.inputs]** `$min_subjects` names its input `in-scope <type> count`, and `$unique_ids` names its input `repeated <type> ids`. `$well_formed` names its first two `count(checks)` and `require`, and when `require` is written wrong, its value is `["neither every nor some"]`. A field Ergo doesn't know is listed with `["unknown field"]`, and `checks: {}` with `["empty"]`. A requirement without a `subject` has `{"name": "subject", "value": ["missing"]}`, and one whose `subject` isn't in `subjects` has `["not in subjects"]`.
 
 **[added.causes]** The `causes` of a requirement entry is a list of `{"cause": <cause>, "rows": <number>}`, as in `[{"cause": "value", "rows": 2}]`.

@@ -29,7 +29,7 @@ const plainWords = (message) => {
   if (quote) return `A quote is never closed (column ${quote[1]}). Text goes between two double quotes.`;
   const after = /^nothing after the path at column (\d+)/.exec(message);
   if (after) return `The sentence stops too soon (column ${after[1]}). It needs to say what the field should do.`;
-  return "ergo can't read that as a sentence yet.";
+  return "Ergo can't read that as a sentence yet.";
 };
 
 export const readReport = (report) => {
@@ -67,7 +67,7 @@ const badInput = (shown) =>
 
 const fieldFound = (field, say) => ({
   ok: ({ check, sentence, sample }) => check(sentence, sample).cause !== "absent",
-  say: say ?? (() => `ergo can't find that field in the input. The field is \`${field}\`.`),
+  say: say ?? (() => `Ergo can't find that field in the input. The field is \`${field}\`.`),
 });
 
 const defaultSample = { allergens: ["milk"] };
@@ -133,7 +133,7 @@ export const steps = [
           say: () => "That fails on this batch, which has milk and eggs. It should pass.",
         },
       ],
-      done: "That's a check. ergo read the allergens, found milk, and passed it.",
+      done: "That's a check. Ergo read the allergens, found milk, and passed it.",
     },
   },
   {
@@ -170,7 +170,7 @@ export const steps = [
           say: ({ sentence }) => otherThanNuts(sentence) ?? "That fails on a batch with milk and eggs. Only nuts should make it fail.",
         },
       ],
-      done: "ergo read the allergens, found nuts, and failed the batch. Cause: `value`.",
+      done: "Ergo read the allergens, found nuts, and failed the batch. Cause: `value`.",
     },
   },
   {
@@ -180,11 +180,11 @@ export const steps = [
     carryRoot: 1,
     goal: {
       kind: "predict",
-      ask: "Here's another batch. Nobody recorded its allergens. What will ergo say?",
+      ask: "Here's another batch. Nobody recorded its allergens. What will Ergo say?",
       expect: { passed: false, cause: "absent" },
-      prompt: "Pick one. ergo will show its answer.",
+      prompt: "Pick one. Ergo will show its answer.",
       wrong: "It fails.",
-      explain: "Cause `absent`: nobody recorded the allergens, so ergo can't tell. When ergo isn't sure, the check fails.",
+      explain: "Cause `absent`: nobody recorded the allergens, so Ergo can't tell. When Ergo isn't sure, the check fails.",
     },
   },
   {
@@ -194,11 +194,11 @@ export const steps = [
     carryRoot: 1,
     goal: {
       kind: "predict",
-      ask: "Here's another batch. Its allergens were typed as text, not a list. What will ergo say?",
+      ask: "Here's another batch. Its allergens were typed as text, not a list. What will Ergo say?",
       expect: { passed: false, cause: "unusable" },
-      prompt: "Pick one. ergo will show its answer.",
+      prompt: "Pick one. Ergo will show its answer.",
       wrong: "It fails.",
-      explain: "Cause `unusable`: the allergens are there, but not as a list, so ergo can't check them. It fails.",
+      explain: "Cause `unusable`: the allergens are there, but not as a list, so Ergo can't check them. It fails.",
     },
   },
   {
@@ -214,7 +214,7 @@ export const steps = [
       fieldFirst: "Start with the field: `bake.temp_c`",
       phraseSay: "Now say the range: `is between`",
       next: "Now the two numbers, with `and` between them.",
-      unreadable: "ergo can't read that yet. A check is the path, `is between`, then two numbers with `and` between them.",
+      unreadable: "Ergo can't read that yet. A check is the path, `is between`, then two numbers with `and` between them.",
       hints: [
         { re: /^temp_c\b/, text: "That field is inside `bake`. Write `bake.temp_c`." },
         { re: /^bake(?:\.(?!temp_c$)[\w-]*)?$/, text: "Join them with a dot: `bake.temp_c`." },
@@ -225,7 +225,7 @@ export const steps = [
       answer: { sentence: "bake.temp_c is between 175 and 200" },
       tests: [
         fieldFound("bake.temp_c", ({ sentence }) =>
-          /^\s*temp_c\b/.test(sentence) ? "That field is inside `bake`. Write `bake.temp_c`." : "ergo can't find that field in the input. The field is `bake.temp_c`."),
+          /^\s*temp_c\b/.test(sentence) ? "That field is inside `bake`. Write `bake.temp_c`." : "Ergo can't find that field in the input. The field is `bake.temp_c`."),
         {
           ok: ({ check, sentence }) => passes(check(sentence, bakeInput(175, 32))),
           say: ({ sentence }) => {
@@ -273,7 +273,7 @@ export const steps = [
       fieldFirst: "Start from the temperature check: `bake.temp_c is between 175 and 200`.",
       phraseSay: "Now say the range: `is between`",
       next: "Now the two numbers, with `and` between them.",
-      unreadable: "ergo can't read that yet. Each part is a path, `is between`, then two numbers. Join the parts with `and`.",
+      unreadable: "Ergo can't read that yet. Each part is a path, `is between`, then two numbers. Join the parts with `and`.",
       hints: [
         { re: /between\s+-?[\d.]+\s+and\s+-?[\d.]+\s+and$/, text: "Now the minutes, inside `bake` too: `bake.minutes`." },
         { re: /\sand\s+bake(?:\.(?!minutes$)[\w-]*)?$/, text: "Now the minutes, inside `bake` too: `bake.minutes`." },
@@ -315,7 +315,7 @@ export const steps = [
           say: () => "45 minutes is too long. This batch should fail.",
         },
       ],
-      done: "Both parts must pass. ergo tells you which one didn't.",
+      done: "Both parts must pass. Ergo tells you which one didn't.",
     },
   },
   {
@@ -331,14 +331,14 @@ export const steps = [
       fieldFirst: "Start with `every`, then the path through the list: `every ingredients.certified`.",
       phraseSay: "Now what it should be: `is true`",
       next: "Now the value: `true`",
-      unreadable: "ergo can't read that yet. A check on a list is `every`, the path, `is`, then the value.",
+      unreadable: "Ergo can't read that yet. A check on a list is `every`, the path, `is`, then the value.",
       hints: [
         { re: /^every$/, text: "Now the path through the list: `ingredients.certified`." },
         { re: /^every\s+[\w-]+(?:\.(?!certified$)[\w-]*)?$/, text: "The list is `ingredients`. The certificate is inside each item: `ingredients.certified`." },
       ],
       answer: { sentence: "every ingredients.certified is true" },
       tests: [
-        fieldFound("ingredients.certified", () => "ergo can't find that list in the input. The path is `ingredients.certified`."),
+        fieldFound("ingredients.certified", () => "Ergo can't find that list in the input. The path is `ingredients.certified`."),
         {
           ok: ({ sentence }) => /^\s*(every|some)\b/.test(sentence),
           say: () => "A list needs `every` in front, to look at each item.",
@@ -376,7 +376,7 @@ export const steps = [
       fieldFirst: "Start with `some`: one taster is enough. Then `tasters.verdict`.",
       phraseSay: 'Now what it should be: `is "approved"`',
       next: 'Now the value, in double quotes: `"approved"`',
-      unreadable: "ergo can't read that yet. A check on a list is `some`, the path, `is`, then the value.",
+      unreadable: "Ergo can't read that yet. A check on a list is `some`, the path, `is`, then the value.",
       hints: [
         { re: /^some$/, text: "Now the path through the list: `tasters.verdict`." },
         { re: /^some\s+[\w-]+(?:\.(?!verdict$)[\w-]*)?$/, text: "The list is `tasters`. The verdict is inside each taster: `tasters.verdict`." },
@@ -387,7 +387,7 @@ export const steps = [
           ok: ({ sentence }) => !/\sis\s+(?!not\b)[A-Za-z_][\w-]*\s*$/.test(straighten(sentence).trim()),
           say: () => 'The text goes in double quotes, like `"approved"`.',
         },
-        fieldFound("tasters.verdict", () => "ergo can't find that list in the input. The path is `tasters.verdict`."),
+        fieldFound("tasters.verdict", () => "Ergo can't find that list in the input. The path is `tasters.verdict`."),
         {
           ok: ({ sentence }) => /^\s*(every|some)\b/.test(sentence),
           say: () => "A list needs `some` in front, to look at each item.",
@@ -410,7 +410,7 @@ export const steps = [
           say: () => "That fails when everyone approves. It should pass.",
         },
       ],
-      done: "`some` means at least one, so one approval is enough. ergo looked at each taster and found Ana's.",
+      done: "`some` means at least one, so one approval is enough. Ergo looked at each taster and found Ana's.",
     },
   },
   {
@@ -430,7 +430,7 @@ export const steps = [
     goal: {
       kind: "requirement",
       ask: "Give the requirement a heading. Then find the check that fails it.",
-      done: "One failed check is enough to fail the requirement. ergo shows which one.",
+      done: "One failed check is enough to fail the requirement. Ergo shows which one.",
     },
   },
   {
@@ -439,7 +439,7 @@ export const steps = [
     collapse: true,
     goal: {
       kind: "subjects",
-      ask: "A whole day of batches in one input. Tell ergo where the list is and what tells the batches apart.",
+      ask: "A whole day of batches in one input. Tell Ergo where the list is and what tells the batches apart.",
       questions: { from: "Which key holds the list of batches?", id: "Which field tells the batches apart?" },
       done: "Four batches, one report. Tap a × to see why it failed.",
     },
@@ -647,10 +647,10 @@ export const segmentClasses = (seg, hl) => {
 };
 
 export const judgePrediction = (goal, choice, shown) => {
-  if (shown.state !== "result") return { kind: "wrong", correct: null, text: "ergo can't run it yet. Check the input and the check above." };
+  if (shown.state !== "result") return { kind: "wrong", correct: null, text: "Ergo can't run it yet. Check the input and the check above." };
   const correct = (choice === "passed") === shown.passed;
   if (shown.passed !== goal.expect.passed || shown.cause !== goal.expect.cause) {
-    return { kind: "done", correct, text: `ergo says ${shown.passed ? "passed" : "failed"}, cause \`${shown.cause}\`.` };
+    return { kind: "done", correct, text: `Ergo says ${shown.passed ? "passed" : "failed"}, cause \`${shown.cause}\`.` };
   }
   return { kind: "done", correct, text: `${correct ? "Right." : goal.wrong} ${goal.explain}` };
 };
@@ -663,7 +663,7 @@ export const coach = (goal, ctx) => {
   if (shown.state === "empty") return { kind: "empty", text: goal.start };
   if (shown.state === "unreadable") {
     const contraction = /\b(does|is|do)n't\b/.exec(text);
-    if (contraction) return { kind: "unreadable", text: `Write \`${contraction[1]} not\` in full. ergo reads \`'\` as the start of a quote.` };
+    if (contraction) return { kind: "unreadable", text: `Write \`${contraction[1]} not\` in full. Ergo reads \`'\` as the start of a quote.` };
     const hint = goal.hints?.find((h) => h.re.test(text));
     if (hint) return { kind: "phrase", text: hint.text };
     if (goal.messages?.[shown.message]) return { kind: "unreadable", text: goal.messages[shown.message] };
@@ -679,7 +679,7 @@ export const coach = (goal, ctx) => {
     }
     if (text.replace(/\s+/g, " ") === `${goal.field} ${goal.phrase}`) return { kind: "next", text: goal.next };
     if (goal.word && !text.includes('"')) return { kind: "unreadable", text: `The text goes in double quotes, like \`"${goal.word}"\`.` };
-    return { kind: "unreadable", text: goal.unreadable ?? "ergo can't read that yet. A check is the field, then the phrase, then the text in double quotes." };
+    return { kind: "unreadable", text: goal.unreadable ?? "Ergo can't read that yet. A check is the field, then the phrase, then the text in double quotes." };
   }
   if (goal.word && goal.phrase && !text.includes('"') && new RegExp(`\\b${goal.phrase}\\s+[A-Za-z_][\\w-]*$`).test(text)) {
     return { kind: "unreadable", text: `The text goes in double quotes, like \`"${goal.word}"\`.` };
@@ -749,7 +749,7 @@ export const evidence = (result) =>
 export const intro = {
   lines: [
     "We run a small bakery. Every batch of cake gets a record, like this:",
-    "We'll write checks in plain English, and ergo will run them on those records.",
+    "We'll write checks in plain English, and Ergo will run them on those records.",
   ],
   example: '{"allergens": ["milk", "eggs"]}',
 };
@@ -903,7 +903,7 @@ const nameSay = {
   empty: "A short name, no spaces. For example `nut_free`.",
   space: "No spaces. Use `_` instead.",
   taken: "That name is taken.",
-  dollar: "Names can't start with `$`. ergo keeps that for its own checks.",
+  dollar: "Names can't start with `$`. Ergo keeps that for its own checks.",
   upper: "Use lowercase letters only.",
   chars: "Use only lowercase letters, digits and `_`.",
 };

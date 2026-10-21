@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "ergo policy",
-  "description": "A policy that passes this schema can still be written wrong in ways a schema can't express, like a min above max, a step after a naming step or nesting deeper than one level. ergo reports those in $well_formed. A policy that fails this schema still gets a report, which says what's wrong.",
+  "title": "Ergo policy",
+  "description": "A policy that passes this schema can still be written wrong in ways a schema can't express, like a min above max, a step after a naming step or nesting deeper than one level. Ergo reports those in $well_formed. A policy that fails this schema still gets a report, which says what's wrong.",
   "type": "object",
   "properties": {
     "subjects": {
@@ -507,7 +507,7 @@
           "$ref": "#/$defs/builtin_check"
         },
         {
-          "description": "A custom operator. It can have any fields, and its op must be declared to ergo.",
+          "description": "A custom operator. It can have any fields, and its op must be declared to Ergo.",
           "type": "object",
           "properties": {
             "op": {

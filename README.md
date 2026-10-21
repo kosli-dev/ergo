@@ -1,12 +1,12 @@
-# ergo
+# Ergo
 
-ergo is brand new and still changing a lot before its first alpha, so expect breaking changes.
+Ergo is brand new and still changing a lot before its first alpha, so expect breaking changes.
 
 ## Getting started
 
-ergo is a single Rego file, so using it is as simple as copying it into your project.
+Ergo is a single Rego file, so using it is as simple as copying it into your project.
 
-You'll need [OPA](https://www.openpolicyagent.org/docs/#1-download-opa) 1.20.1 or later to run it, and we test ergo with OPA 1.20.2. Older versions give wrong results or don't load it: OPA 1.19 says `1 >= 100.0` is true, so a check can pass when it should fail, OPA 1.20.0 stops with `panic: illegal value` on `0.0 == 1.5`, and OPA 1.2 stops with `rego_parse_error: unexpected as keyword`. Run `opa version` to see which one you have.
+You'll need [OPA](https://www.openpolicyagent.org/docs/#1-download-opa) 1.20.1 or later to run it, and we test Ergo with OPA 1.20.2. Older versions give wrong results or don't load it: OPA 1.19 says `1 >= 100.0` is true, so a check can pass when it should fail, OPA 1.20.0 stops with `panic: illegal value` on `0.0 == 1.5`, and OPA 1.2 stops with `rego_parse_error: unexpected as keyword`. Run `opa version` to see which one you have.
 
 ### 1. Copy the library
 
@@ -49,7 +49,7 @@ Then the requirement says what must be true of them. Its `description` says what
 
 Several requirements can check the same subject. Each one gets its own rows in the report.
 
-Then a Rego file hands the policy to ergo. OPA reads every YAML and JSON file in the directory you pass with `-d`, so the YAML file becomes `data.subjects` and `data.requirements`.
+Then a Rego file hands the policy to Ergo. OPA reads every YAML and JSON file in the directory you pass with `-d`, so the YAML file becomes `data.subjects` and `data.requirements`.
 
 `policy/deploy.rego`:
 
@@ -99,7 +99,7 @@ Let's ask for the report:
 opa eval -d policy -i deployments.json --format=pretty 'data.deploy.report'
 ```
 
-The report records every check ergo ran, including the ones that passed. It comes in four parts, after the policy's own `description` and `meta`, which this one doesn't have:
+The report records every check Ergo ran, including the ones that passed. It comes in four parts, after the policy's own `description` and `meta`, which this one doesn't have:
 
 ```json
 {
@@ -114,7 +114,7 @@ The report records every check ergo ran, including the ones that passed. It come
 
 - `compliant` is the overall answer. When you need a plain yes or no to allow or block something, this is the one to use: `allow := report.compliant`.
 - `requirements` has an entry for each requirement. It repeats the requirement's `description`, and its `status` is `met`, `not_met`, or `not_applicable` when no subject was left to check. When it's `not_met`, `causes` says why, worst first, with how many rows each: here `[{"cause": "absent", "rows": 1}]`. It also says how many subjects were found and kept, and lists every check with a readable `expression`, which is the sentence as you wrote it.
-- `results` has one row per subject and check, with the value ergo read, whether the check passed, and a `cause`.
+- `results` has one row per subject and check, with the value Ergo read, whether the check passed, and a `cause`.
 - `subjects` says where each subject the requirements use comes from. Here it holds one entry, and the requirement's own entry has `"subject": "deployment"` to point at it:
 
   ```json
@@ -141,12 +141,12 @@ Here's what those rows look like for our example:
 | `d-1`   | `approved`      | `approved_by = "alice"`                  | `true`  | `satisfied` |
 | `d-2`   | `approved`      | `approved_by = null`                     | `false` | `absent`    |
 
-You didn't write the checks starting with `$`. ergo adds them for you:
+You didn't write the checks starting with `$`. Ergo adds them for you:
 
 - `$well_formed` makes sure the requirement itself makes sense, for example that it has at least one check.
 - `$min_subjects` makes sure at least one subject was found. If `from` points to nothing, this check fails, so the policy can't pass without checking anything.
 - `$unique_ids` makes sure no two deployments share an id. Otherwise their rows could look the same, and you couldn't tell which one failed.
-- `$applies` records whether each subject passed the `whose` conditions. `d-3` didn't, and the report says so rather than leaving it out. A deployment with no `environment` at all would fail `$applies` with the cause `absent`, and the requirement would fail with it, because ergo can't tell whether it's a production deployment.
+- `$applies` records whether each subject passed the `whose` conditions. `d-3` didn't, and the report says so rather than leaving it out. A deployment with no `environment` at all would fail `$applies` with the cause `absent`, and the requirement would fail with it, because Ergo can't tell whether it's a production deployment.
 
 When a check fails, `cause` tells you why. `d-2` failed with `absent` because it has no `approved_by` field at all: no approval was ever recorded. Had `approved_by` been `""`, the cause would be `value` instead, since an approval was recorded but it's empty. Both fail, but they're different problems and you'd fix them differently.
 
@@ -190,4 +190,4 @@ Bug reports, ideas and pull requests are welcome. [`CONTRIBUTING.md`](https://gi
 
 ## License
 
-ergo is licensed under the [Apache License 2.0](LICENSE).
+Ergo is licensed under the [Apache License 2.0](LICENSE).

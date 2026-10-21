@@ -2,7 +2,7 @@
 
 Draft 0.1, a proposal from [#174](https://github.com/kosli-dev/ergo/issues/174). This file says how a check written as a one-line sentence, like `approved_by is not empty`, reads into the [model](semantics.md#the-model-of-a-check), what counts as written wrong, and how the report prints it. What a check means once it's read is in [semantics.md](semantics.md), as for today's syntax in [syntax.md](syntax.md).
 
-[`sentences-corpus.md`](sentences-corpus.md) has every check from sdlc-policies, the server's demo and npm-bump policies, pr-reviewer, ergo's examples and Tore's DEV controls written both ways. Every sentence in it parses exactly one way with the phrases below. The phrases, the tally and the misfits come from it.
+[`sentences-corpus.md`](sentences-corpus.md) has every check from sdlc-policies, the server's demo and npm-bump policies, pr-reviewer, Ergo's examples and Tore's DEV controls written both ways. Every sentence in it parses exactly one way with the phrases below. The phrases, the tally and the misfits come from it.
 
 `ergo.rego` runs a check written as one or more sentences that start with a path, for every phrase, joined with `and` or listed under `assert`. It runs a `for` line before them too, but doesn't check the limit of three list walks in [sentence.for.depth](#the-for-line) yet. It runs `from` lines and string `id`s too, and chains up to three subjects deep. It runs every case in `spec/cases`, and `known_differences` in `spec_test.rego`, which lists the cases it fails, is empty. It doesn't run every form of a sentence, though: not `last of`, and not a `count of`, `sum of` or `plus` or an elapsed time in the phrase of an `every` or `some`, and no case pins them yet, see [OPEN.md](OPEN.md#sentences-the-spec-doesnt-say-enough-about-yet). Where the spec says a form runs, `ergo.rego` reports it as written wrong, with `isn't supported yet` in its message. In a `from` line or an `id`, `named by` a bare word is written wrong, with `unknown name <word>`, because there's no subject to read it from yet, and so is a `for` name used before its item gives it. A sentence can't be an `any_of` option or a substitute yet, and is written wrong there with `invalid check`.
 
@@ -220,7 +220,7 @@ A grammar word only needs quoting or a dot when it's the first key, so `a`, `an`
 
 ## Phrases
 
-Each phrase is a plain pattern: fixed words with gaps. One line is one form, and a negated form is a line of its own. An implementation matches them its own way. In Rego that's one regular expression per line, matched with `regex.find_all_string_submatch_n`, as ergo does today. No library or notation is needed.
+Each phrase is a plain pattern: fixed words with gaps. One line is one form, and a negated form is a line of its own. An implementation matches them its own way. In Rego that's one regular expression per line, matched with `regex.find_all_string_submatch_n`, as Ergo does today. No library or notation is needed.
 
 The gaps:
 

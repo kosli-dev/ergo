@@ -1,5 +1,5 @@
 /*
-  <ergo-mark>: the ergo mark, animated through the states of an evaluation.
+  <ergo-mark>: the Ergo mark, animated through the states of an evaluation.
   Geometry is the repo's logo SVG (static/brand/ergo-wordmark-white.svg), so the
   final frame is the static mark. States:
     0 [   ] nothing read   1 [ ? ] unknown   2 [ . ] subject found
@@ -85,7 +85,7 @@
         'svg{display:block;width:100%;height:auto;overflow:visible}' +
         '.sr{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}';
       root.appendChild(style);
-      var svg = el('svg', { viewBox: VIEWBOX, role: 'img', 'aria-label': 'ergo' });
+      var svg = el('svg', { viewBox: VIEWBOX, role: 'img', 'aria-label': 'Ergo' });
       var clip = el('clipPath', { id: 'plate' }, el('defs', {}, svg));
       el('rect', { x: PLATE.x, y: PLATE.y, width: PLATE.s, height: PLATE.s, rx: PLATE.r }, clip);
       var cells = el('g', { 'clip-path': 'url(#plate)' }, svg);

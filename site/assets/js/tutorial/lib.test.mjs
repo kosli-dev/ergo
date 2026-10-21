@@ -21,14 +21,14 @@ test("the policy has one subject that is the whole input, one requirement and on
   });
 });
 
-test("curly quotes become straight quotes before ergo reads them", () => {
+test("curly quotes become straight quotes before Ergo reads them", () => {
   assert.equal(straighten("allergens contains “milk”"), 'allergens contains "milk"');
   assert.equal(straighten("a is ‘b’"), "a is 'b'");
   const r = check("allergens contains “milk”", { allergens: ["milk"] });
   assert.deepEqual([r.state, r.passed, r.cause], ["result", true, "satisfied"]);
 });
 
-test("ergo gives the causes the steps explain", () => {
+test("Ergo gives the causes the steps explain", () => {
   const cause = (s, i) => { const r = check(s, i); return [r.passed, r.cause]; };
   assert.deepEqual(cause(nutFree, { allergens: ["nuts", "milk"] }), [false, "value"]);
   assert.deepEqual(cause(nutFree, { baked_by: "Sam" }), [false, "absent"]);
@@ -39,7 +39,7 @@ test("an empty sentence is empty, not an error", () => {
   assert.equal(check("   ", {}).state, "empty");
 });
 
-test("a sentence that is written wrong gives ergo's message in plain words", () => {
+test("a sentence that is written wrong gives Ergo's message in plain words", () => {
   const r = check('allergens contains "milk', { allergens: ["milk"] });
   assert.equal(r.state, "unreadable");
   assert.equal(r.message, "unclosed quote at column 20");
@@ -107,9 +107,9 @@ test("a saved screen that needs an earlier sentence starts again without it", ()
   assert.equal(clampPosition(1), 1);
 });
 
-test("the intro example is a record ergo can read, and ergo is lowercase", () => {
+test("the intro example is a record Ergo can read, and Ergo is capitalised", () => {
   assert.equal(parseInput(intro.example).ok, true);
-  assert.equal(/\bErgo\b|ERGO/.test(JSON.stringify(intro)), false);
+  assert.equal(/\bergo\b|ERGO/.test(JSON.stringify(intro)), false);
 });
 
 const say = (step, goal, sentence, input) => grade(steps[step].goal, check, sentence, input ?? steps[step].input).say;
@@ -149,7 +149,7 @@ test("step 1 coaching: text without quotes asks for quotes", () => {
 });
 
 test("step 1 coaching: the wrong field", () => {
-  assert.equal(say(0, 0, 'alergens contains "milk"').text, "ergo can't find that field in the input. The field is `allergens`.");
+  assert.equal(say(0, 0, 'alergens contains "milk"').text, "Ergo can't find that field in the input. The field is `allergens`.");
 });
 
 test("step 1 coaching: checking for eggs", () => {
@@ -181,9 +181,9 @@ test("step 2 coaching: empty, phrase, quotes and unclosed quote", () => {
 });
 
 test("step 2 coaching: a contraction asks for the words in full, not for a quote", () => {
-  assert.deepEqual(say(1, 0, `allergens doesn't contain "nuts"`), { kind: "unreadable", text: "Write `does not` in full. ergo reads `'` as the start of a quote." });
-  assert.equal(say(1, 0, "allergens doesn’t contain").text, "Write `does not` in full. ergo reads `'` as the start of a quote.");
-  assert.equal(say(0, 0, "allergens isn't empty").text, "Write `is not` in full. ergo reads `'` as the start of a quote.");
+  assert.deepEqual(say(1, 0, `allergens doesn't contain "nuts"`), { kind: "unreadable", text: "Write `does not` in full. Ergo reads `'` as the start of a quote." });
+  assert.equal(say(1, 0, "allergens doesn’t contain").text, "Write `does not` in full. Ergo reads `'` as the start of a quote.");
+  assert.equal(say(0, 0, "allergens isn't empty").text, "Write `is not` in full. Ergo reads `'` as the start of a quote.");
 });
 
 test("step 2 coaching: contains nuts passes when there are nuts", () => {
@@ -205,7 +205,7 @@ test("step 2 coaching: a sentence that fails milk and eggs", () => {
 });
 
 test("step 2 coaching: done", () => {
-  assert.deepEqual(say(1, 0, nutFree), { kind: "done", text: "ergo read the allergens, found nuts, and failed the batch. Cause: `value`." });
+  assert.deepEqual(say(1, 0, nutFree), { kind: "done", text: "Ergo read the allergens, found nuts, and failed the batch. Cause: `value`." });
 });
 
 test("step 2 coaching: a bad input doesn't hide the sentence coaching", () => {
@@ -259,11 +259,11 @@ test("steps 3 and 4 show a new batch, with nothing to remove and no delay", () =
     assert.equal(s.view?.tag, undefined);
   }
   assert.equal(steps[2].input, '{"baked_by": "Sam"}');
-  assert.equal(steps[2].goal.ask, "Here's another batch. Nobody recorded its allergens. What will ergo say?");
-  assert.equal(steps[3].goal.ask, "Here's another batch. Its allergens were typed as text, not a list. What will ergo say?");
+  assert.equal(steps[2].goal.ask, "Here's another batch. Nobody recorded its allergens. What will Ergo say?");
+  assert.equal(steps[3].goal.ask, "Here's another batch. Its allergens were typed as text, not a list. What will Ergo say?");
 });
 
-test("the predicted result for steps 3 and 4 is what ergo really says", () => {
+test("the predicted result for steps 3 and 4 is what Ergo really says", () => {
   for (const si of [2, 3]) {
     const g = steps[si].goal;
     const r = grade(g, check, nutFree, steps[si].input);
@@ -290,19 +290,19 @@ test("the reveal says if the guess was right, then explains", () => {
   const g3 = steps[2].goal;
   const right = grade(g3, check, nutFree, steps[2].input, "failed").say.text;
   const wrong = grade(g3, check, nutFree, steps[2].input, "passed").say.text;
-  assert.equal(right, "Right. Cause `absent`: nobody recorded the allergens, so ergo can't tell. When ergo isn't sure, the check fails.");
-  assert.equal(wrong, "It fails. Cause `absent`: nobody recorded the allergens, so ergo can't tell. When ergo isn't sure, the check fails.");
+  assert.equal(right, "Right. Cause `absent`: nobody recorded the allergens, so Ergo can't tell. When Ergo isn't sure, the check fails.");
+  assert.equal(wrong, "It fails. Cause `absent`: nobody recorded the allergens, so Ergo can't tell. When Ergo isn't sure, the check fails.");
   const g4 = steps[3].goal;
-  assert.equal(grade(g4, check, nutFree, steps[3].input, "passed").say.text, "It fails. Cause `unusable`: the allergens are there, but not as a list, so ergo can't check them. It fails.");
+  assert.equal(grade(g4, check, nutFree, steps[3].input, "passed").say.text, "It fails. Cause `unusable`: the allergens are there, but not as a list, so Ergo can't check them. It fails.");
   assert.match(grade(g4, check, nutFree, steps[3].input, "failed").say.text, /^Right\. Cause `unusable`/);
 });
 
 test("after the reveal the result follows edits to the input or the check", () => {
   const g3 = steps[2].goal;
   const edited = grade(g3, check, nutFree, '{"allergens": ["milk"]}', "failed");
-  assert.equal(edited.say.text, "ergo says passed, cause `satisfied`.");
+  assert.equal(edited.say.text, "Ergo says passed, cause `satisfied`.");
   assert.equal(edited.met, true);
-  assert.equal(grade(g3, check, 'baked_by is "Sam"', steps[2].input, "failed").say.text, "ergo says passed, cause `satisfied`.");
+  assert.equal(grade(g3, check, 'baked_by is "Sam"', steps[2].input, "failed").say.text, "Ergo says passed, cause `satisfied`.");
   assert.equal(grade(g3, check, nutFree, "{", "failed").say.text, "The input isn't valid JSON yet. Check the commas, brackets and quotes.");
   assert.equal(judgePrediction(g3, "failed", { state: "unreadable" }).correct, null);
 });
@@ -572,7 +572,7 @@ const metN = (si, gi, sentence, input) => grade(steps[si].goal, check, sentence,
 const T5 = "bake.temp_c is between 175 and 200";
 const T6 = `${T5} and bake.minutes is between 25 and 40`;
 
-test("ergo reads the numbers as the steps say: both ends are in, the bounds fail as value", () => {
+test("Ergo reads the numbers as the steps say: both ends are in, the bounds fail as value", () => {
   const bake = (t, m = 32) => ({ bake: { temp_c: t, minutes: m } });
   for (const t of [175, 180, 200]) assert.equal(check(T5, bake(t)).passed, true, String(t));
   for (const t of [174, 201]) assert.deepEqual([check(T5, bake(t)).passed, check(T5, bake(t)).cause], [false, "value"]);
@@ -607,7 +607,7 @@ test("step 5 coaching, state by state", () => {
 test("step 5 coaching for the wrong field and the wrong numbers", () => {
   assert.equal(sayN(4, 0, "temp_c").text, "That field is inside `bake`. Write `bake.temp_c`.");
   assert.equal(sayN(4, 0, "temp_c is between 175 and 200").text, "That field is inside `bake`. Write `bake.temp_c`.");
-  assert.equal(sayN(4, 0, "bake.tmp_c is between 175 and 200").text, "ergo can't find that field in the input. The field is `bake.temp_c`.");
+  assert.equal(sayN(4, 0, "bake.tmp_c is between 175 and 200").text, "Ergo can't find that field in the input. The field is `bake.temp_c`.");
   assert.equal(sayN(4, 0, "bake.temp_c is between 200 and 175").text, "The first number is bigger than the second. Put the smaller one first.");
   assert.equal(sayN(4, 0, "bake.temp_c is between 176 and 200").text, "The lowest allowed is 175, and this starts at 176.");
   assert.equal(sayN(4, 0, "bake.temp_c is between 175 and 199").text, "The highest allowed is 200, and this stops at 199.");
@@ -628,7 +628,7 @@ test("step 6 is met by the answer, and the shown batch fails on the minutes", ()
   assert.deepEqual([r.shown.passed, r.shown.cause], [false, "value"]);
   assert.deepEqual(r.shown.failed, [{ assertion: "bake.minutes is between 25 and 40", cause: "value" }]);
   assert.deepEqual(resultLine(r.shown), { cause: "value", rest: "bake.minutes is between 25 and 40" });
-  assert.equal(r.say.text, "Both parts must pass. ergo tells you which one didn't.");
+  assert.equal(r.say.text, "Both parts must pass. Ergo tells you which one didn't.");
 });
 
 test("step 6 is not met by sentences that let a batch through, or leave a part out", () => {
@@ -663,7 +663,7 @@ test("the result line shows the failed sentences for an and, and the evidence ot
   assert.equal(resultLine(check(T6, { bake: { temp_c: 180, minutes: 32 } })).rest, "bake.minutes = 32 · bake.temp_c = 180");
 });
 
-test("ergo reads every and some as the steps say", () => {
+test("Ergo reads every and some as the steps say", () => {
   const f = { name: "flour", certified: true };
   const b = { name: "butter", certified: true };
   const a = { name: "Ana", verdict: "approved" };
@@ -697,7 +697,7 @@ test("step 7 goal A coaching, state by state", () => {
   assert.deepEqual(sayN(6, 0, "every ingredients.certified is"), { kind: "next", text: "Now the value: `true`" });
   assert.equal(sayN(6, 0, "some ingredients.certified is true").text, "That passes as soon as one ingredient is certified. We need every one: use `every`.");
   assert.equal(sayN(6, 0, "ingredients.certified is true").text, "A list needs `every` in front, to look at each item.");
-  assert.equal(sayN(6, 0, "every ingredient.certified is true").text, "ergo can't find that list in the input. The path is `ingredients.certified`.");
+  assert.equal(sayN(6, 0, "every ingredient.certified is true").text, "Ergo can't find that list in the input. The path is `ingredients.certified`.");
   assert.equal(sayN(6, 0, "every ingredients.certified is true").kind, "done");
 });
 
@@ -887,7 +887,7 @@ test("the arrow keys and the pick keys also work with focus on a button", () => 
   assert.equal(keyAction(k("Enter", { ctrl: true }), "body", true, "sentence"), null);
 });
 
-test("Enter pressed before ergo has answered is deferred, not dropped, and a met goal still goes next", () => {
+test("Enter pressed before Ergo has answered is deferred, not dropped, and a met goal still goes next", () => {
   assert.equal(keyAction(k("Enter"), "sentence", false, "sentence", true), "defer");
   assert.equal(keyAction(k("Enter"), "sentence", false, "sentence", false), "swallow");
   assert.equal(keyAction(k("Enter"), "sentence", true, "sentence", true), "next");
@@ -1083,7 +1083,7 @@ test("step 9 runs three named checks on one batch and all of them pass", () => {
   assert.equal(verdict(report, "safe_to_sell"), "met");
 });
 
-test("ergo takes almost any check name, but the tutorial asks for lowercase letters, digits and _", () => {
+test("Ergo takes almost any check name, but the tutorial asks for lowercase letters, digits and _", () => {
   for (const name of ["nut free", "Nut_Free", "nut-free", "nut_free"]) {
     const report = run(batch9, tutorialPolicy({ name }));
     assert.equal(lineResults(report, name)[0].passed, true, name);
@@ -1103,7 +1103,7 @@ test("step 9 name coaching, state by state", () => {
   assert.equal(nameCoach("Nut_free").text, "Use lowercase letters only.");
   assert.equal(nameCoach("nut-free").text, "Use only lowercase letters, digits and `_`.");
   assert.equal(nameCoach("nut.free").text, "Use only lowercase letters, digits and `_`.");
-  assert.equal(nameCoach("$nut").text, "Names can't start with `$`. ergo keeps that for its own checks.");
+  assert.equal(nameCoach("$nut").text, "Names can't start with `$`. Ergo keeps that for its own checks.");
   assert.deepEqual(nameCoach("nut_free"), { kind: "done", text: "Every check has a name now. The report uses it on each row.", met: true });
   assert.equal(nameCoach("nuts_2").met, true);
 });
@@ -1130,7 +1130,7 @@ test("step 10 coaching and grading come from the report", () => {
   assert.deepEqual(requirementCoach({ heading: "Safe to sell", tapped: "" }, results), { kind: "phrase", text: "Not met. Tap the check that's to blame.", met: false });
   assert.deepEqual(requirementCoach({ heading: "Safe to sell", tapped: "temp_ok" }, results), { kind: "wrong", text: "That one passed. Look for the ×.", met: false });
   assert.equal(requirementCoach({ heading: "Safe to sell", tapped: "nut_free" }, results).text, "That one passed. Look for the ×.");
-  assert.deepEqual(requirementCoach({ heading: "Safe to sell", tapped: "time_ok" }, results), { kind: "done", text: "One failed check is enough to fail the requirement. ergo shows which one.", met: true });
+  assert.deepEqual(requirementCoach({ heading: "Safe to sell", tapped: "time_ok" }, results), { kind: "done", text: "One failed check is enough to fail the requirement. Ergo shows which one.", met: true });
   assert.equal(tapOutcome(results, "nope"), "none");
   assert.equal(tapOutcome(results, ""), "none");
 });
