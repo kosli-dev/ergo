@@ -6534,6 +6534,10 @@ _s_marked(p, names, own) := object.union(p, {"field": true}) if {
 } else := object.union(p, {"alias": true}) if {
 	_s_markable(p, names.for)
 	object.get(p, "dot", false) != true
+} else := object.union(p, {"part": true}) if {
+	own == false
+	_s_markable(p, names.all)
+	object.get(p, "dot", false) != true
 } else := p
 
 _s_markable(p, keys) if {
@@ -7273,7 +7277,23 @@ _p_sleaf(m, pc) := object.union(m, {
 
 _p_sleaf(m, pc) := _p_leaf(m, pc, "s") if not m.op in {"every", "some"}
 
-_p_leaf(m, pc, mode) := object.union(m, object.union({f: _p_side(m[f], pc, mode) | some f in ["path", "left", "right"]; f in object.keys(m)}, _p_extras(m, pc, mode)))
+_p_leaf(m, pc, mode) := object.union(m, object.union({f: _p_side(_p_item_right(f, m[f], pc, mode), pc, _p_side_mode(f, mode)) | some f in ["path", "left", "right"]; f in object.keys(m)}, _p_extras(m, pc, mode)))
+
+_p_side_mode("right", "i") := "o"
+
+_p_side_mode(f, mode) := mode if {
+	not f == "right"
+} else := mode if mode != "i"
+
+_p_item_right(f, side, pc, mode) := array.concat([concat("", ["$", side[0]])], array.slice(side, 1, count(side))) if {
+	f == "right"
+	mode == "i"
+	is_array(side)
+	count(side) > 0
+	is_string(side[0])
+	not startswith(side[0], "$")
+	side[0] in object.keys(pc.own)
+} else := side
 
 _p_extras(m, pc, "o") := object.union({"each": _p_path(m.each, pc, "o") | is_array(object.get(m, "each", null))}, {"inputs": [_p_input(spec, pc) | some spec in m.inputs] | is_array(object.get(m, "inputs", null))})
 
@@ -7318,7 +7338,7 @@ _p_side_one(side, _, _) := side if {
 
 _p_tally(side, pc, mode) := object.union(side, object.union({f: _p_path(side[f], pc, mode) | some f in ["count_of", "sum_of", "elapsed_from", "elapsed_to", "count", "sum"]; is_array(object.get(side, f, null))}, {"each": _p_path(side.each, pc, mode) | mode == "o"; is_array(object.get(side, "each", null))}))
 
-_p_cond(c, pc, mode) := object.union(c, object.union({f: _p_path(c[f], pc, mode) | some f in ["path", "left", "right"]; is_array(object.get(c, f, null))}, _p_extras(c, pc, mode))) if is_object(c)
+_p_cond(c, pc, mode) := object.union(c, object.union({f: _p_path(_p_item_right(f, c[f], pc, mode), pc, _p_side_mode(f, mode)) | some f in ["path", "left", "right"]; is_array(object.get(c, f, null))}, _p_extras(c, pc, mode))) if is_object(c)
 
 _p_cond(c, _, _) := c if not is_object(c)
 

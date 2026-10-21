@@ -10883,13 +10883,37 @@ test_a_field_of_the_subject_with_no_alias_in_the_way_is_read_as_before if {
 	_parts_row(rep, "c").passed
 }
 
-test_an_alias_does_not_apply_to_the_whose_or_the_argument_of_a_one_line_every if {
+test_a_part_on_the_right_after_every_is_not_the_item_compared_with_itself if {
+	rep := _parts_report(
+		{"cov": "dd.b"}, {
+			"walk": "every dd.items.cov equals cov.x",
+			"whose": "every dd.items.x whose cov equals cov.x is at least 5",
+			"plain": "cov.x equals cov.x",
+		},
+		{"b": {"x": 5}, "items": [{"cov": 5, "x": 5}]},
+	)
+	_parts_row(rep, "walk").passed
+	_parts_row(rep, "whose").passed
+	_parts_row(rep, "plain").cause == "ill_formed"
+}
+
+test_a_part_is_the_items_field_on_the_left_of_a_whose_and_the_part_on_the_right if {
 	has := {"cov": "dd.b"}
-	d := {"b": {"x": 1}, "items": [{"cov": 5, "x": 5}, {"cov": 7, "x": 6}]}
-	rep := _parts_report(has, {"w": "every dd.items.x whose cov is at least 5 is at least 5", "a": "every dd.items.x equals cov"}, d)
+	d := {"b": {"x": 5}, "items": [{"cov": 5, "x": 5}, {"cov": 7, "x": 6}]}
+	rep := _parts_report(
+		has, {
+			"w": "every dd.items.x whose cov is at least 5 is at least 5",
+			"a": "every dd.items.x is at least cov.x",
+			"r": "every dd.items.x whose x is at least cov.x is at least 5",
+			"d": "every dd.items.x equals .cov",
+		},
+		d,
+	)
 	_parts_row(rep, "w").passed
-	_parts_row(rep, "a").cause == "value"
-	_parts_row(rep, "a").failed_items == [{"cause": "value", "item": "item 2 of dd.items", "path": "dd.items[1].x", "value": 6}]
+	_parts_row(rep, "a").passed
+	_parts_row(rep, "r").passed
+	_parts_row(rep, "d").cause == "value"
+	_parts_row(rep, "d").failed_items == [{"cause": "value", "item": "item 2 of dd.items", "path": "dd.items[1].x", "value": 6}]
 }
 
 test_an_alias_works_on_the_subject_in_a_for_line_and_not_on_its_items if {

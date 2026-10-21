@@ -1090,7 +1090,7 @@
     },
     "cases": [
       {
-        "description": "reads the alias in the conditions of the from line, in a for line's assertions, and not in a whose or in the argument of a one-line every",
+        "description": "reads the alias in the conditions of the from line, in a for line's assertions, and on the right side after a one-line every, but not on the left of a whose",
         "rules": [
           "parts.where",
           "sentence.path.part",
@@ -1245,11 +1245,11 @@
             }
           },
           {
-            "cause": "value",
+            "cause": "unusable",
             "check": "item_level",
             "failed_items": [
               {
-                "cause": "value",
+                "cause": "unusable",
                 "item": "item 1 of lst",
                 "path": "lst[0].x",
                 "value": 1
