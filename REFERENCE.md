@@ -912,7 +912,15 @@ reads "for every pull request, some approver approved it and isn't its author". 
 - `failed_items` lists the items of the first list that failed. Each one has `failed_assertions`: the sentences that failed for it, each with the first cause it failed with. Pull request 8 failed because its one approver commented, and is its author.
 - `failed_assertions` is `[]` when no sentence was checked, like when `whose` leaves no approver, or a field a `whose` reads is missing.
 - `inputs` holds each list the `for` line walked, with its items, and every field of the subject the sentences read. A field read through a name, like `pr.author`, isn't listed on its own.
-- In `assert`, a bare first key is the subject's field, and a name reaches its item. Inside an item's own `whose`, a bare key is that item's field. A name hides a field of the subject with the same name.
+- In `assert`, a bare first key is the subject's field, and a name reaches its item. Inside an item's own `whose`, a bare key is that item's field. A name hides a field with the same name, the subject's or an item's, except on the left side of a `whose`: `whose env is "prod"` always reads the item's `env`. Write a dot in front to read the field a name hides: `.env`.
+
+With `for: some approvals.approver as approver`, where a commit also has an `approver` field:
+
+| sentence                                         | compares                                         |
+| ------------------------------------------------ | ------------------------------------------------ |
+| `every commits.author does not equal approver`   | each commit's `author` with the name `approver`  |
+| `every commits.author does not equal .approver`  | each commit's `author` with its own `approver`   |
+| `.approver equals approver`                      | the subject's `approver` with the name           |
 - Each list fails as a one-line `every` or `some` does: empty, missing, `null` or not a list, and `, if any,` lets an empty one pass.
 - Two items at most.
 - `named by` an alias from the `for` line reads the key its item holds. With `for: every personas_dispatched as persona`, `persona_blob_shas named by persona exists` reads `persona_blob_shas.security`, then `persona_blob_shas.style`, and so on. An item that's `null` fails as `null`, and any other item that isn't a string, a number included, as `unusable`, since it can't be a key. The row's inputs show `persona_blob_shas` itself.

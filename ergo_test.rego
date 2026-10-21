@@ -8109,11 +8109,11 @@ test_a_path_reads_params_input_lookups_positions_and_quoted_keys if {
 	_read(`first of b is 1`).assertions[0].path == {"position": "first", "steps": ["b"]}
 	_read(`last of b is 1`).assertions[0].path == {"position": "last", "steps": ["b"]}
 	_read(`"$schema" is 1`).assertions[0].path == {"steps": ["$schema"]}
-	_read(`.count is 1`).assertions[0].path == {"steps": ["count"]}
+	_read(`.count is 1`).assertions[0].path == {"steps": ["count"], "dot": true}
 	_read(`"empty" is 1`).assertions[0].path == {"steps": ["empty"]}
-	_read(`x is ."$schema"`).assertions[0].phrase == {"op": "is", "terms": [{"steps": ["$schema"]}]}
-	_read(`.x is 1`) == _read(`x is 1`)
-	_read(`x equals .total`) == _read(`x equals total`)
+	_read(`x is ."$schema"`).assertions[0].phrase == {"op": "is", "terms": [{"steps": ["$schema"], "dot": true}]}
+	_read(`.x is 1`).assertions[0].path == {"steps": ["x"], "dot": true}
+	_read(`x equals .total`).assertions[0].phrase.terms == [{"steps": ["total"], "dot": true}]
 }
 
 test_a_value_reads_as_json_and_a_single_quoted_string_keeps_its_backslashes if {
@@ -8438,8 +8438,45 @@ test_every_or_some_ending_where_it_compares_says_the_bare_name_is_the_items if {
 	_sentence_problems(`every $input.xs.y equals y`) == ["y is compared with itself: after every or some, a bare name is the item's, so compare with the subject's on a for line"]
 }
 
-test_a_for_alias_named_like_the_items_field_is_still_the_items_field_after_every if {
-	_sentence_problems({"for": "every zs as y", "assert": "every xs.y equals y"}) == ["y is compared with itself: after every or some, a bare name is the item's, so compare with the subject's on a for line"]
+_alias_things := [{
+	"id": "t1", "approver": "grace",
+	"approvals": [{"approver": "grace", "timestamp": "2026-10-20T12:00:00Z"}],
+	"commits": [{"author": "grace", "approver": "ada", "timestamp": "2026-10-20T10:00:00Z"}],
+	"environments": [{"name": "prod"}],
+	"deployments": [{"environment": "prod", "env": "prod", "ok": true}],
+}]
+
+_alias_causes(checks) := {r.check: r.cause | some r in ergo.report({"things": _alias_things}, _sentence_policy(checks), {}).results; not startswith(r.check, "$")}
+
+test_an_alias_on_the_right_after_every_reads_the_alias_not_the_items_field if {
+	_alias_causes({
+		"alias": {"for": "some approvals.approver as approver", "assert": "every commits.author does not equal approver"},
+		"path": {"for": "some approvals as approval", "assert": "every commits.timestamp is before approval.timestamp"},
+	}) == {"alias": "value", "path": "satisfied"}
+}
+
+test_a_dot_reads_the_field_where_an_alias_has_the_same_name if {
+	_alias_causes({
+		"item": {"for": "some approvals.approver as approver", "assert": "every commits.author does not equal .approver"},
+		"subject": {"for": "some approvals.approver as approver", "assert": ".approver equals approver"},
+	}) == {"item": "satisfied", "subject": "satisfied"}
+}
+
+test_the_left_of_a_whose_is_the_items_field_and_its_right_can_read_an_alias if {
+	checks := {
+		"left": {"for": `every environments as env, some deployments whose env is "prod" as deployment`, "assert": "deployment.ok is true"},
+		"right": {"for": "every environments as env, some deployments whose environment equals env.name as deployment", "assert": "deployment.ok is true"},
+	}
+	_alias_causes(checks) == {"left": "satisfied", "right": "satisfied"}
+	r := ergo.report({"things": _alias_things}, _sentence_policy(checks), {})
+	r.requirements.s.checks.left.expression == `for every environments as env, some deployments whose .env is "prod" as deployment: deployment.ok is true`
+}
+
+test_a_path_is_compared_with_itself_only_when_both_sides_read_the_same_thing if {
+	not _sentence_problems({"for": "every zs as y", "assert": "every xs.y equals y"})
+	not _sentence_problems({"for": "every environments as env, some deployments whose env equals env as deployment", "assert": "deployment.ok is true"})
+	_sentence_problems({"for": "every zs as y", "assert": "every xs.y equals .y"}) == [".y is compared with itself: after every or some, a bare name is the item's, so compare with the subject's on a for line"]
+	_sentence_problems({"for": "every zs as y", "assert": ["x exists", "y equals y"]}) == ["line 2: y is compared with itself"]
 }
 
 test_comparisons_that_can_go_either_way_are_not_read_as_a_path_compared_with_itself if {

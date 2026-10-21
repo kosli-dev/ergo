@@ -6258,7 +6258,7 @@ _s_start_of(key, steps) := {"steps": array.concat([_s_key_of(key)], steps)} if {
 	not startswith(key, ".")
 }
 
-_s_start_of(key, steps) := {"steps": array.concat([_s_key_of(substring(key, 1, -1))], steps)} if startswith(key, ".")
+_s_start_of(key, steps) := {"steps": array.concat([_s_key_of(substring(key, 1, -1))], steps), "dot": true} if startswith(key, ".")
 
 _s_key_of(text) := json.unmarshal(text) if startswith(text, `"`)
 
@@ -6383,7 +6383,7 @@ _s_sq_char(`\\`) := `\`
 
 _s_sq_char(c) := c if not c in {`\'`, `\\`}
 
-_s_sentence_problems(parsed) := (((((((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
+_s_sentence_problems(parsed) := ((((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"bare_word" in object.keys(node)
@@ -6440,12 +6440,6 @@ _s_sentence_problems(parsed) := (((((((((((((((((({concat("", [node.bare_word, "
 	some v in object.get(node, "values", [])
 	not is_object(v)
 	not _s_valid_pattern(v)
-}) | {concat("", [_s_path_text(node.path, "left"), " is compared with itself"]) |
-	some node in (_s_self_compared_nodes(parsed) - _s_whose_self_compared(parsed))
-}) | {concat("", [_s_path_text(node.path, "left"), " is compared with itself: in a whose, a bare name is the item's, so compare with the subject's under assert"]) |
-	some node in _s_whose_self_compared(parsed)
-}) | {concat("", [_s_term_text(node.phrase.terms[0]), " is compared with itself: after every or some, a bare name is the item's, so compare with the subject's on a for line"]) |
-	some node in _s_walk_self_compared(parsed)
 }) | {`"is not null" is written "exists"` |
 	some node in _s_nodes(parsed)
 	is_object(node)
@@ -6509,35 +6503,74 @@ _s_self_term(node) := node.phrase.terms[0] if {
 
 _s_self_compared(node) if {
 	is_object(node.path)
-	node.path == _s_self_term(node)
+	object.remove(node.path, ["dot"]) == object.remove(_s_self_term(node), ["dot"])
 }
 
-_s_self_compared_nodes(parsed) := {node |
-	some node in _s_nodes(parsed)
-	is_object(node)
-	_s_self_compared(node)
-}
-
-_s_whose_self_compared(parsed) := {w |
-	some node in _s_nodes(parsed)
-	is_object(node)
-	some w in object.get(node, "where", [])
-	is_object(w)
-	_s_self_compared(w)
-}
-
-_s_walk_self_compared(parsed) := {node |
-	some node in _s_nodes(parsed)
-	is_object(node)
+_s_self_problems(assertions) := ({concat("", [_s_path_text(a.path, "left"), " is compared with itself"]) |
+	some a in assertions
+	_s_self_compared(a)
+} | _s_whose_self_problems(assertions)) | {concat("", [_s_term_text(a.phrase.terms[0]), " is compared with itself: after every or some, a bare name is the item's, so compare with the subject's on a for line"]) |
+	some a in assertions
 	some q in ["every", "some"]
-	walked := object.get(node, q, null)
+	walked := object.get(a, q, null)
 	is_object(walked)
-	t := _s_self_term(node)
-	object.keys(t) == {"steps"}
+	t := _s_self_term(a)
+	object.keys(object.remove(t, ["dot", "field"])) == {"steps"}
 	k := count(t.steps)
 	k < count(walked.steps)
 	array.slice(walked.steps, count(walked.steps) - k, count(walked.steps)) == t.steps
 }
+
+_s_whose_self_problems(holders) := {concat("", [_s_path_text(w.path, "left"), " is compared with itself: in a whose, a bare name is the item's, so compare with the subject's under assert"]) |
+	some h in holders
+	some w in object.get(h, "where", [])
+	is_object(w)
+	_s_self_compared(w)
+}
+
+_s_marked(p, names, own) := object.union(p, {"field": true}) if {
+	_s_markable(p, names)
+	_s_own_field(p, own)
+} else := object.union(p, {"alias": true}) if {
+	_s_markable(p, names)
+} else := p
+
+_s_markable(p, names) if {
+	is_object(p)
+	is_array(p.steps)
+	not "start" in object.keys(p)
+	p.steps[0] in names
+}
+
+_s_own_field(_, true)
+
+_s_own_field(p, false) if object.get(p, "dot", false) == true
+
+_s_marked_term(t, names) := object.union(t, {f: _s_marked(t[f], names, false) |
+	some f in ["count", "sum", "elapsed_from", "elapsed_to"]
+	f in object.keys(t)
+}) if {
+	is_object(t)
+	not "steps" in object.keys(t)
+} else := _s_marked(t, names, false)
+
+_s_marked_phrase(ph, names) := object.union(ph, {"terms": [_s_marked_term(t, names) | some t in ph.terms]}) if is_array(object.get(ph, "terms", null))
+
+else := ph
+
+_s_marked_cond(c, names) := object.union(c, {"path": _s_marked(c.path, names, true), "phrase": _s_marked_phrase(c.phrase, names)}) if is_object(c)
+
+else := c
+
+_s_aliased(a, names) := object.union(object.union(a, {k: _s_marked(a[k], names, false) | some k in ["path", "every", "some"]; k in object.keys(a)}), object.union(
+	{"phrase": _s_marked_phrase(a.phrase, names)},
+	object.union(
+		{"terms": [_s_marked_term(t, names) | some t in a.terms] | is_array(object.get(a, "terms", null))},
+		{"where": [_s_marked_cond(c, names) | some c in a.where] | is_array(object.get(a, "where", null))},
+	),
+))
+
+_s_aliased_item(item, names) := object.union(object.union(item, {q: _s_marked(item[q], names, false) | some q in ["every", "some"]; q in object.keys(item)}), {"where": [_s_marked_cond(c, names) | some c in item.where] | is_array(object.get(item, "where", null))})
 
 _s_problems(text, pat) := [concat("", ["unclosed quote at column ", _json_text(count(closed) + 1)])] if {
 	closed := regex.find_all_string_submatch_n(pat.quotes, text, 1)[0][0]
@@ -6662,7 +6695,11 @@ _s_start_text(p, _) := "$params" if object.get(p, "start", "") == "params"
 
 _s_start_text(p, _) := "$input" if object.get(p, "start", "") == "input"
 
-_s_start_text(p, side) := concat("", [_s_dot(p.steps[0], side), _s_key_text(p.steps[0])]) if not "start" in object.keys(p)
+_s_start_text(p, side) := concat("", [_s_start_dot(p, side), _s_key_text(p.steps[0])]) if not "start" in object.keys(p)
+
+_s_start_dot(p, side) := "." if object.get(p, "field", false) == true
+
+else := _s_dot(p.steps[0], side)
 
 _s_dot(key, side) := "." if {
 	_s_needs_dot(key, side)
@@ -7449,8 +7486,21 @@ _s_check(lines, wording, problems) := object.union(wording, object.union(model, 
 	}
 	assertions := [a | some p in parsed; some a in p.assertions]
 	count({u | some a in assertions; some u in _s_assertion_unsupported(a)}) == 0
+	count(_s_self_problems(assertions)) == 0
 	model := _s_model_of(assertions)
-} else := object.union(wording, {"expression": concat(" and ", [_s_written_text(line) | some line in lines]), "$sentence": sort(_s_or_unrunnable(problems | _s_lines_problems(lines)))})
+} else := object.union(wording, {"expression": concat(" and ", [_s_written_text(line) | some line in lines]), "$sentence": sort(_s_or_unrunnable(((problems | _s_lines_problems(lines)) | _s_lines_self(lines, set()))))})
+
+_s_lines_self([line], names) := _s_line_self(line, names)
+
+_s_lines_self(lines, names) := {concat("", ["line ", _literal_text(i + 1), ": ", p]) | some i, line in lines; some p in _s_line_self(line, names)} if count(lines) > 1
+
+_s_lines_self([], _) := set()
+
+_s_line_self(line, names) := _s_self_problems([_s_aliased(a, names) | some a in parsed.assertions]) if {
+	is_string(line)
+	parsed := _sentence(line)
+	"assertions" in object.keys(parsed)
+} else := set()
 
 _s_model_of([a]) := _s_model(a)
 
@@ -7801,15 +7851,26 @@ _s_model_path(p) := array.concat(array.concat(_s_model_start(p), [_s_model_step(
 
 _s_model_start(p) := [concat("", ["$$", p.start])] if "start" in object.keys(p)
 
+_s_model_start(p) := [concat("", ["$", p.steps[0]])] if {
+	not "start" in object.keys(p)
+	object.get(p, "alias", false) == true
+}
+
 _s_model_start(p) := [{"literal": p.steps[0]}] if {
 	not "start" in object.keys(p)
-	startswith(p.steps[0], "$")
+	object.get(p, "alias", false) != true
+	_s_literal_start(p)
 }
 
 _s_model_start(p) := [p.steps[0]] if {
 	not "start" in object.keys(p)
-	not startswith(p.steps[0], "$")
+	object.get(p, "alias", false) != true
+	not _s_literal_start(p)
 }
+
+_s_literal_start(p) if startswith(p.steps[0], "$")
+
+_s_literal_start(p) if object.get(p, "field", false) == true
 
 _s_model_step(s) := s if is_string(s)
 
@@ -8131,10 +8192,10 @@ _walk_mark(i, walked) := "" if not i in walked
 
 _s_check_for(lines, ftext, wording, problems) := object.union(wording, {
 	"op": "for",
-	"items": [_s_for_item_model(item, {earlier.as | some earlier in array.slice(fl.items, 0, i)}) | some i, item in fl.items],
-	"checks": [_s_named(_s_model(a), names) | some a in assertions],
+	"items": [_s_for_item_model(item, {earlier.as | some earlier in array.slice(fl.items, 0, i)}) | some i, item in items],
+	"checks": [_s_named(_s_model(a), names) | some a in marked],
 	"assertions": texts,
-	"expression": concat("", ["for ", _s_for_line_text(fl), ": ", concat(" and ", texts)]),
+	"expression": concat("", ["for ", _s_for_line_text({"items": items}), ": ", concat(" and ", texts)]),
 }) if {
 	count(problems) == 0
 	fl := _for_line(ftext)
@@ -8146,8 +8207,19 @@ _s_check_for(lines, ftext, wording, problems) := object.union(wording, {
 	}
 	assertions := [a | some p in parsed; some a in p.assertions]
 	count(_s_for_unsupported(fl, assertions)) == 0
-	texts := [_s_assertion_text(a) | some a in assertions]
-} else := object.union(wording, {"expression": _s_for_written_text(lines, ftext), "$sentence": sort(_s_or_unrunnable(problems | _s_for_problems(lines, ftext)))})
+	items := _s_marked_items(fl)
+	marked := [_s_aliased(a, names) | some a in assertions]
+	count(_s_self_problems(marked) | _s_whose_self_problems(items)) == 0
+	texts := [_s_assertion_text(a) | some a in marked]
+} else := object.union(wording, {"expression": _s_for_written_text(lines, ftext), "$sentence": sort(_s_or_unrunnable(((problems | _s_for_problems(lines, ftext)) | _s_for_self(lines, ftext))))})
+
+_s_marked_items(fl) := [_s_aliased_item(item, {earlier.as | some earlier in array.slice(fl.items, 0, i)}) | some i, item in fl.items]
+
+_s_for_self(lines, ftext) := _s_lines_self(lines, {item.as | some item in fl.items}) | {concat("", ["for: ", p]) | some p in _s_whose_self_problems(_s_marked_items(fl))} if {
+	is_string(ftext)
+	fl := _for_line(ftext)
+	"items" in object.keys(fl)
+} else := set()
 
 _s_for_written_text(lines, ftext) := concat("", ["for ", trim_space(ftext), ": ", concat(" and ", [_s_written_text(line) | some line in lines])]) if is_string(ftext)
 
