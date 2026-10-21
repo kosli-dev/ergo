@@ -8426,16 +8426,16 @@ test_a_path_compared_with_itself_is_written_wrong_because_it_could_only_pass_or_
 }
 
 test_a_whose_that_compares_a_field_with_itself_says_the_bare_name_is_the_items if {
-	message := "type is compared with itself: in a whose, a bare name is the item's, so compare with the subject's under assert"
+	message := "type is compared with itself, because in a whose it's read from the item: to read the subject's type, compare under assert"
 	_sentence_problems(`some conditions.status whose type equals type is "OK"`) == [message]
 	_sentence_problems({"for": "some conditions whose type equals type as condition", "assert": `condition.status is "OK"`}) == [concat("", ["for: ", message])]
 }
 
 test_every_or_some_ending_where_it_compares_says_the_bare_name_is_the_items if {
-	_sentence_problems(`every conditions.type equals type`) == ["type is compared with itself: after every or some, a bare name is the item's, so compare with the subject's on a for line"]
-	_sentence_problems(`some pull_requests.commits[0].author is after author`) == ["author is compared with itself: after every or some, a bare name is the item's, so compare with the subject's on a for line"]
-	_sentence_problems(`every xs.ys.zs equals ys.zs`) == ["ys.zs is compared with itself: after every or some, a bare name is the item's, so compare with the subject's on a for line"]
-	_sentence_problems(`every $input.xs.y equals y`) == ["y is compared with itself: after every or some, a bare name is the item's, so compare with the subject's on a for line"]
+	_sentence_problems(`every conditions.type equals type`) == ["type is compared with itself, because after every or some it's read from the item: to read the subject's type, put the list on the for line and compare under assert"]
+	_sentence_problems(`some pull_requests.commits[0].author is after author`) == ["author is compared with itself, because after every or some it's read from the item: to read the subject's author, put the list on the for line and compare under assert"]
+	_sentence_problems(`every xs.ys.zs equals ys.zs`) == ["ys.zs is compared with itself, because after every or some it's read from the item: to read the subject's ys.zs, put the list on the for line and compare under assert"]
+	_sentence_problems(`every $input.xs.y equals y`) == ["y is compared with itself, because after every or some it's read from the item: to read the subject's y, put the list on the for line and compare under assert"]
 }
 
 _alias_things := [{
@@ -8469,13 +8469,13 @@ test_the_left_of_a_whose_is_the_items_field_and_its_right_can_read_an_alias if {
 	}
 	_alias_causes(checks) == {"left": "satisfied", "right": "satisfied"}
 	r := ergo.report({"things": _alias_things}, _sentence_policy(checks), {})
-	r.requirements.s.checks.left.expression == `for every environments as env, some deployments whose .env is "prod" as deployment: deployment.ok is true`
+	r.requirements.s.checks.left.expression == `for every environments as env, some deployments whose env is "prod" as deployment: deployment.ok is true`
 }
 
 test_a_path_is_compared_with_itself_only_when_both_sides_read_the_same_thing if {
 	not _sentence_problems({"for": "every zs as y", "assert": "every xs.y equals y"})
 	not _sentence_problems({"for": "every environments as env, some deployments whose env equals env as deployment", "assert": "deployment.ok is true"})
-	_sentence_problems({"for": "every zs as y", "assert": "every xs.y equals .y"}) == [".y is compared with itself: after every or some, a bare name is the item's, so compare with the subject's on a for line"]
+	_sentence_problems({"for": "every zs as y", "assert": "every xs.y equals .y"}) == ["y is compared with itself, because after every or some it's read from the item: to read the subject's y, put the list on the for line and compare under assert"]
 	_sentence_problems({"for": "every zs as y", "assert": ["x exists", "y equals y"]}) == ["line 2: y is compared with itself"]
 }
 
@@ -10881,6 +10881,50 @@ test_the_dot_in_front_of_a_field_reads_the_field_a_part_hides if {
 test_a_field_of_the_subject_with_no_alias_in_the_way_is_read_as_before if {
 	rep := _parts_report({"cov": "dd.b"}, {"c": "name is \"t1\""}, {})
 	_parts_row(rep, "c").passed
+}
+
+test_a_child_reads_its_parents_part_on_the_right_inside_an_items_scope if {
+	policy := {
+		"subjects": {
+			"artifact": {"from": "artifacts", "identified_by": "fingerprint", "has": {"pra": "attestations.pr"}},
+			"pull request": {"from": "artifact.pra.pull_requests", "identified_by": "url"},
+		},
+		"requirements": {"r": {"subject": "pull request", "checks": {
+			"every": "every reviews.by equals artifact.pra.boss",
+			"whose": `some reviews.by whose by equals artifact.pra.boss is "bob"`,
+			"for": {"for": "some reviews whose by equals artifact.pra.boss as rv", "assert": `rv.by is "bob"`},
+		}}},
+	}
+	doc := {"artifacts": [{"fingerprint": "f1", "attestations": {"pr": {"boss": "bob", "pull_requests": [{"url": "u1", "reviews": [{"by": "bob"}]}]}}}]}
+	{r.check: r.cause | some r in ergo.report(doc, policy, {}).results; not startswith(r.check, "$")} == {"every": "satisfied", "whose": "satisfied", "for": "satisfied"}
+}
+
+_parent_name_policy(checks) := {
+	"subjects": {
+		"artifact": {"from": "artifacts", "identified_by": "fingerprint", "has": {"pra": "attestations.pr"}},
+		"pull request": {"from": "artifact.pra.pull_requests", "identified_by": "url"},
+	},
+	"requirements": {"r": {"subject": "pull request", "checks": checks}},
+}
+
+_parent_name_doc := {"artifacts": [{"fingerprint": "f1", "attestations": {"pr": {"pull_requests": [{"url": "u1", "artifact": "bob", "reviews": [{"by": "bob", "artifact": "f1"}]}]}}}]}
+
+test_a_parents_name_reads_like_any_other_name if {
+	rep := ergo.report(
+		_parent_name_doc, _parent_name_policy({
+			"right": "every reviews.artifact equals artifact.fingerprint",
+			"whose_left": `some reviews.by whose artifact is "f1" is "bob"`,
+			"dot": `.artifact is "bob"`,
+		}),
+		{},
+	)
+	{r.check: r.cause | some r in rep.results; not startswith(r.check, "$")} == {"right": "satisfied", "whose_left": "satisfied", "dot": "satisfied"}
+}
+
+test_a_dot_in_a_later_for_item_reads_the_subjects_field if {
+	checks := {"c": {"for": "some approvals as ap, every .ap.r as r", "assert": "r is 1"}}
+	doc := {"things": [{"id": "t1", "ap": {"r": [1]}, "approvals": [{"r": [2]}]}]}
+	[r.cause | some r in ergo.report(doc, _sentence_policy(checks), {}).results; r.check == "c"] == ["satisfied"]
 }
 
 test_a_part_on_the_right_after_every_is_not_the_item_compared_with_itself if {

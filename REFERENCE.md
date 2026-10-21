@@ -913,6 +913,9 @@ reads "for every pull request, some approver approved it and isn't its author". 
 - `failed_assertions` is `[]` when no sentence was checked, like when `whose` leaves no approver, or a field a `whose` reads is missing.
 - `inputs` holds each list the `for` line walked, with its items, and every field of the subject the sentences read. A field read through a name, like `pr.author`, isn't listed on its own.
 - In `assert`, a bare first key is the subject's field, and a name reaches its item. Inside an item's own `whose`, a bare key is that item's field. A name hides a field with the same name, the subject's or an item's, except on the left side of a `whose`: `whose env is "prod"` always reads the item's `env`. Write a dot in front to read the field a name hides: `.env`.
+- Each list fails as a one-line `every` or `some` does: empty, missing, `null` or not a list, and `, if any,` lets an empty one pass.
+- Two items at most.
+- `named by` an alias from the `for` line reads the key its item holds. With `for: every personas_dispatched as persona`, `persona_blob_shas named by persona exists` reads `persona_blob_shas.security`, then `persona_blob_shas.style`, and so on. An item that's `null` fails as `null`, and any other item that isn't a string, a number included, as `unusable`, since it can't be a key. The row's inputs show `persona_blob_shas` itself.
 
 With `for: some approvals.approver as approver`, where a commit also has an `approver` field:
 
@@ -921,9 +924,6 @@ With `for: some approvals.approver as approver`, where a commit also has an `app
 | `every commits.author does not equal approver`   | each commit's `author` with the name `approver`  |
 | `every commits.author does not equal .approver`  | each commit's `author` with its own `approver`   |
 | `.approver equals approver`                      | the subject's `approver` with the name           |
-- Each list fails as a one-line `every` or `some` does: empty, missing, `null` or not a list, and `, if any,` lets an empty one pass.
-- Two items at most.
-- `named by` an alias from the `for` line reads the key its item holds. With `for: every personas_dispatched as persona`, `persona_blob_shas named by persona exists` reads `persona_blob_shas.security`, then `persona_blob_shas.style`, and so on. An item that's `null` fails as `null`, and any other item that isn't a string, a number included, as `unusable`, since it can't be a key. The row's inputs show `persona_blob_shas` itself.
 
 `count of`, `sum of` and `plus` work out a number to compare, as the [derived values](#derived-values) of `compare` do. With the input of [derived values](#derived-values):
 

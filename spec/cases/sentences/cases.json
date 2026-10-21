@@ -3655,7 +3655,7 @@
         "rules": ["sentence.written_wrong.self", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row", "sentence.argument.item"],
         "input": {"things": [{"id": "t1", "x": 1, "type": "x", "conditions": [{"type": "y", "status": "OK"}]}]},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["type is compared with itself: after every or some, a bare name is the item's, so compare with the subject's on a for line"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["type is compared with itself, because after every or some it's read from the item: to read the subject's type, put the list on the for line and compare under assert"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}},
           {"cause": "ill_formed", "check": "c", "inputs": [], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
@@ -3670,7 +3670,7 @@
         "rules": ["sentence.written_wrong.self", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row", "sentence.for.scope"],
         "input": {"things": [{"id": "t1", "x": 1, "type": "x", "conditions": [{"type": "y", "status": "OK"}]}]},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["for: type is compared with itself: in a whose, a bare name is the item's, so compare with the subject's under assert"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["for: type is compared with itself, because in a whose it's read from the item: to read the subject's type, compare under assert"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}},
           {"cause": "ill_formed", "check": "c", "inputs": [], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
@@ -3698,7 +3698,7 @@
         "description": "an alias on the right is the alias, the left of a whose and a dotted name are the field, and the report prints the dot where it matters",
         "rules": ["sentence.for.scope", "sentence.for.alias", "sentence.path.start", "sentence.argument.item", "sentence.print.canonical"],
         "input": {"things": [{"id": "t1", "approver": "grace", "approvals": [{"approver": "grace"}], "commits": [{"author": "grace", "approver": "ada"}], "environments": [{"name": "prod"}], "deployments": [{"environment": "prod", "env": "prod", "ok": true}]}]},
-        "expressions": {"s": {"alias_right": "for some approvals.approver as approver: every commits.author does not equal approver", "dot_right": "for some approvals.approver as approver: every commits.author does not equal .approver", "dot_subject": "for some approvals.approver as approver: .approver equals approver", "whose_left": "for every environments as env, some deployments whose .env is \"prod\" as deployment: deployment.ok is true", "whose_right": "for every environments as env, some deployments whose environment equals env.name as deployment: deployment.ok is true"}},
+        "expressions": {"s": {"alias_right": "for some approvals.approver as approver: every commits.author does not equal approver", "dot_right": "for some approvals.approver as approver: every commits.author does not equal .approver", "dot_subject": "for some approvals.approver as approver: .approver equals approver", "whose_left": "for every environments as env, some deployments whose env is \"prod\" as deployment: deployment.ok is true", "whose_right": "for every environments as env, some deployments whose environment equals env.name as deployment: deployment.ok is true"}},
         "results": [
           {"cause": "value", "check": "alias_right", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "every commits.author does not equal approver", "cause": "value"}], "item": "item 1 of approvals", "path": "item 1 of approvals", "value": null}], "inputs": [{"name": "approvals[].approver", "value": ["grace"]}, {"name": "commits[].author", "value": ["grace"]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
           {"cause": "satisfied", "check": "dot_right", "failed_items": [], "inputs": [{"name": "approvals[].approver", "value": ["grace"]}, {"name": "commits[].author", "value": ["grace"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
