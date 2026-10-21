@@ -6383,7 +6383,7 @@ _s_sq_char(`\\`) := `\`
 
 _s_sq_char(c) := c if not c in {`\'`, `\\`}
 
-_s_sentence_problems(parsed) := ((((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
+_s_sentence_problems(parsed) := (((((((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"bare_word" in object.keys(node)
@@ -6440,6 +6440,15 @@ _s_sentence_problems(parsed) := ((((((((((((((({concat("", [node.bare_word, " is
 	some v in object.get(node, "values", [])
 	not is_object(v)
 	not _s_valid_pattern(v)
+}) | {concat("", [_s_path_text(node.path, "left"), " is compared with itself"]) |
+	some node in _s_nodes(parsed)
+	is_object(node)
+	_s_self_compared(node)
+	not node in _s_whose_self_compared(parsed)
+}) | {concat("", [_s_path_text(node.path, "left"), " is compared with itself: in a whose, a bare name is the item's, so compare with the subject's under assert"]) |
+	some node in _s_whose_self_compared(parsed)
+}) | {concat("", [_s_term_text(node.phrase.terms[0]), " is compared with itself: after every or some, a bare name is the item's, so compare with the subject's on a for line"]) |
+	some node in _s_walk_self_compared(parsed)
 }) | {`"is not null" is written "exists"` |
 	some node in _s_nodes(parsed)
 	is_object(node)
@@ -6491,6 +6500,42 @@ _s_bad_name(name) if name in _s_words
 _s_bad_name(name) if name in {"params", "input"}
 
 _s_nodes(x) := {y | walk(x, [_, y])}
+
+_s_self_ops := {"is", "is not", "is at least", "is at most", "is more than", "is less than", "is before", "is after", "is on or after", "is on or before", "starts with", "ends with"}
+
+_s_self_term(node) := node.phrase.terms[0] if {
+	node.phrase.op in _s_self_ops
+	count(node.phrase.terms) == 1
+	is_object(node.phrase.terms[0])
+	"steps" in object.keys(node.phrase.terms[0])
+}
+
+_s_self_compared(node) if {
+	is_object(node.path)
+	node.path == _s_self_term(node)
+}
+
+_s_whose_self_compared(parsed) := {w |
+	some node in _s_nodes(parsed)
+	is_object(node)
+	some w in object.get(node, "where", [])
+	is_object(w)
+	_s_self_compared(w)
+}
+
+_s_walk_self_compared(parsed) := {node |
+	some node in _s_nodes(parsed)
+	is_object(node)
+	some q in ["every", "some"]
+	walked := object.get(node, q, null)
+	is_object(walked)
+	t := _s_self_term(node)
+	object.keys(t) == {"steps"}
+	object.keys(walked) == {"steps"}
+	k := count(t.steps)
+	k < count(walked.steps)
+	array.slice(walked.steps, count(walked.steps) - k, count(walked.steps)) == t.steps
+}
 
 _s_problems(text, pat) := [concat("", ["unclosed quote at column ", _json_text(count(closed) + 1)])] if {
 	closed := regex.find_all_string_submatch_n(pat.quotes, text, 1)[0][0]

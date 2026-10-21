@@ -372,6 +372,21 @@ Read as `is` or `equals`, and printed as one of them. With it in the grammar, ev
 | `every pull_requests some approvers.state is "APPROVED"` | `two quantifiers in one sentence: put them on a for line`                       |
 | `x is at least 1e400`                                    | `number out of range: 1e400`                                                    |
 
+**[sentence.written_wrong.self]** A sentence that compares a path with itself is written wrong, because it could only pass or only fail. That's `is`, `equals`, `is not` or `does not equal` a field, with or without `within`, the order and time phrases, `starts with` and `ends with`, when the field on the right is read from the same place as the path:
+
+- the same path, in an assertion or a `whose`, like `x is at least x` or `whose type equals type`
+- after `every` or `some`, the end of the path walked, because the right side starts at the item ([sentence.argument.item](#every-some-and-whose)), like `every conditions.type equals type`
+
+Most often the writer meant the subject's field. In a `whose` and after `every` or `some` it can't be reached, so the message says where to compare it:
+
+| sentence                                                   | `$well_formed` says                                                                                                         |
+| ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `x is at least x`                                          | `x is compared with itself`                                                                                                 |
+| `every conditions.type equals type`                        | `type is compared with itself: after every or some, a bare name is the item's, so compare with the subject's on a for line` |
+| `for: some conditions whose type equals type as condition` | `for: type is compared with itself: in a whose, a bare name is the item's, so compare with the subject's under assert`      |
+
+`contains`, `is in` and a right side with `plus` can go either way, so they're left alone.
+
 `environment is prod` and `approved_by is empy` parse, as comparisons with a field called `prod` or `empy`, unless the subject has no such field. That's the one mistake the grammar can't catch, so the message for a missing field in an `is` argument should suggest quotes.
 
 ## Printing the sentence

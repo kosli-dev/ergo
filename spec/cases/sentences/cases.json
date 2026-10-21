@@ -3632,6 +3632,65 @@
     ]
   },
   {
+    "description": "a path compared with itself",
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least x"}}}},
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": ["sentence.written_wrong.self", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": 1, "type": "x", "conditions": [{"type": "y", "status": "OK"}]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["x is compared with itself"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}},
+          {"cause": "ill_formed", "check": "c", "inputs": [], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every ending in the field it's compared with",
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every conditions.type equals type"}}}},
+    "cases": [
+      {
+        "description": "fails every row as ill_formed, and $well_formed says the bare name is the item's",
+        "rules": ["sentence.written_wrong.self", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row", "sentence.argument.item"],
+        "input": {"things": [{"id": "t1", "x": 1, "type": "x", "conditions": [{"type": "y", "status": "OK"}]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["type is compared with itself: after every or some, a bare name is the item's, so compare with the subject's on a for line"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}},
+          {"cause": "ill_formed", "check": "c", "inputs": [], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a whose that compares a field with itself",
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "some conditions whose type equals type as condition", "assert": "condition.status is \"OK\""}}}}},
+    "cases": [
+      {
+        "description": "fails every row as ill_formed, and $well_formed says the bare name is the item's",
+        "rules": ["sentence.written_wrong.self", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row", "sentence.for.scope"],
+        "input": {"things": [{"id": "t1", "x": 1, "type": "x", "conditions": [{"type": "y", "status": "OK"}]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["for: type is compared with itself: in a whose, a bare name is the item's, so compare with the subject's under assert"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}},
+          {"cause": "ill_formed", "check": "c", "inputs": [], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an item compared with the subject under assert",
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "some conditions as condition", "assert": ["condition.type equals type", "condition.status is \"OK\""]}}}}},
+    "cases": [
+      {
+        "description": "reads type from the subject, so no condition matches and the check fails with value",
+        "rules": ["sentence.written_wrong.self", "sentence.for.scope"],
+        "input": {"things": [{"id": "t1", "x": 1, "type": "x", "conditions": [{"type": "y", "status": "OK"}]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "condition.type equals type", "cause": "value"}], "item": "item 1 of conditions", "path": "item 1 of conditions", "value": null}], "inputs": [{"name": "conditions[]", "value": [{"status": "OK", "type": "y"}]}, {"name": "type", "value": "x"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "a regular expression that isn't valid",
     "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"(\""}}}},
     "cases": [

@@ -8414,6 +8414,39 @@ test_is_not_null_is_written_wrong_because_it_could_only_fail if {
 	_sentence_problems(`x does not equal null`) == [`"is not null" is written "exists"`]
 }
 
+test_a_path_compared_with_itself_is_written_wrong_because_it_could_only_pass_or_only_fail if {
+	every text in [
+		`x equals x`, `x does not equal x`, `x is x within 1`, `x is at least x`, `x is less than x`,
+		`x is after x`, `x is on or before x`, `x starts with x`, `x ends with x`,
+	] {
+		_sentence_problems(text) == ["x is compared with itself"]
+	}
+	_sentence_problems(`$input.x.y equals $input.x.y`) == ["$input.x.y is compared with itself"]
+	_sentence_problems({"for": "every xs as entry", "assert": "entry.y equals entry.y"}) == ["entry.y is compared with itself"]
+}
+
+test_a_whose_that_compares_a_field_with_itself_says_the_bare_name_is_the_items if {
+	message := "type is compared with itself: in a whose, a bare name is the item's, so compare with the subject's under assert"
+	_sentence_problems(`some conditions.status whose type equals type is "OK"`) == [message]
+	_sentence_problems({"for": "some conditions whose type equals type as condition", "assert": `condition.status is "OK"`}) == [concat("", ["for: ", message])]
+}
+
+test_every_or_some_ending_where_it_compares_says_the_bare_name_is_the_items if {
+	_sentence_problems(`every conditions.type equals type`) == ["type is compared with itself: after every or some, a bare name is the item's, so compare with the subject's on a for line"]
+	_sentence_problems(`some pull_requests.commits[0].author is after author`) == ["author is compared with itself: after every or some, a bare name is the item's, so compare with the subject's on a for line"]
+	_sentence_problems(`every xs.ys.zs equals ys.zs`) == ["ys.zs is compared with itself: after every or some, a bare name is the item's, so compare with the subject's on a for line"]
+}
+
+test_comparisons_that_can_go_either_way_are_not_read_as_a_path_compared_with_itself if {
+	every check in [
+		`tags contains tags`, `x is in x`, `x is more than x plus 1`, `first of commits.x equals x`,
+		`every xs.y equals $input.y`, `every xs.y equals z`, `every xs equals xs`,
+		{"for": "some conditions as condition", "assert": "condition.type equals type"},
+	] {
+		not _sentence_problems(check)
+	}
+}
+
 test_requirements_and_checks_that_are_not_objects_are_left_to_the_other_rules if {
 	ergo._s_requirements(null, {}) == null
 	ergo._s_requirements({"r": 1}, {}) == {"r": 1}
