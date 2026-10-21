@@ -1083,14 +1083,14 @@
             },
             "item_level": "every lst.x whose cov is at least 5 is cov",
             "shadows": "cov.n is 2",
-            "dot": ".cov.n is 2"
+            "dot": ".cov.n is 3"
           }
         }
       }
     },
     "cases": [
       {
-        "description": "reads the alias in the conditions of the from line, in a for line's assertions, and not in a whose or in the argument of a one-line every",
+        "description": "reads the alias in the conditions of the from line, in a for line's assertions, and on the right side after a one-line every, but not on the left of a whose",
         "rules": [
           "parts.where",
           "sentence.path.part",
@@ -1183,19 +1183,15 @@
             }
           },
           {
-            "cause": "satisfied",
+            "cause": "value",
             "check": "dot",
             "inputs": [
               {
                 "name": "cov.n",
-                "part": {
-                  "id": null,
-                  "name": "cov"
-                },
-                "value": 2
+                "value": 9
               }
             ],
-            "passed": true,
+            "passed": false,
             "requirement": "r",
             "subject": {
               "id": "a",
@@ -1249,11 +1245,11 @@
             }
           },
           {
-            "cause": "value",
+            "cause": "unusable",
             "check": "item_level",
             "failed_items": [
               {
-                "cause": "value",
+                "cause": "unusable",
                 "item": "item 1 of lst",
                 "path": "lst[0].x",
                 "value": 1
@@ -1302,7 +1298,7 @@
         ]
       },
       {
-        "description": "an alias shadows a field with the same name, and the dot in front doesn't get around it",
+        "description": "an alias shadows a field with the same name, and the dot in front reads the field",
         "rules": [
           "parts.shadow",
           "sentence.path.part"
@@ -1356,11 +1352,7 @@
             "inputs": [
               {
                 "name": "cov.n",
-                "part": {
-                  "id": null,
-                  "name": "cov"
-                },
-                "value": 2
+                "value": 3
               }
             ],
             "passed": true,
