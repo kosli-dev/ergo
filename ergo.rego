@@ -6523,12 +6523,16 @@ _s_self_problems(assertions) := ({concat("", [_s_path_text(a.path, "left"), " is
 
 _s_unmarked_text(p) := _s_path_text(object.remove(p, ["dot", "field", "own", "part", "alias"]), "left")
 
-_s_whose_self_problems(holders) := {concat("", [_s_unmarked_text(w.path), " is compared with itself, because in a whose it's read from the item: to read the subject's ", _s_unmarked_text(w.path), ", compare under assert"]) |
+_s_whose_self_problems(holders) := {concat("", [_s_unmarked_text(w.path), " is compared with itself, because in a whose it's read from the item", _s_whose_advice(h, w)]) |
 	some h in holders
 	some w in object.get(h, "where", [])
 	is_object(w)
 	_s_self_compared(w)
 }
+
+_s_whose_advice(h, w) := ", and a count or a sum can't read the subject's field there yet" if "terms" in object.keys(h)
+
+else := concat("", [": to read the subject's ", _s_unmarked_text(w.path), ", compare under assert"])
 
 _s_marked(p, names, own) := object.union(p, {"field": true, "own": own}) if {
 	_s_markable(p, names.all)

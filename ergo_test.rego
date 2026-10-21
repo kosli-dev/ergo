@@ -10927,6 +10927,24 @@ test_a_dot_in_a_later_for_item_reads_the_subjects_field if {
 	[r.cause | some r in ergo.report(doc, _sentence_policy(checks), {}).results; r.check == "c"] == ["satisfied"]
 }
 
+test_a_part_on_the_right_of_a_whose_in_a_count_or_a_sum_is_the_part if {
+	rep := _parts_report(
+		{"cov": "dd.b"}, {
+			"count": "count of dd.items whose x equals cov.x is 1",
+			"sum": "sum of dd.items.x whose x equals cov.x is 5",
+		},
+		{"b": {"x": 5}, "items": [{"x": 5}, {"x": 6}]},
+	)
+	_parts_row(rep, "count").passed
+	_parts_row(rep, "sum").passed
+}
+
+test_a_whose_in_a_count_compared_with_itself_says_the_subject_cant_be_read_there if {
+	message := "x is compared with itself, because in a whose it's read from the item, and a count or a sum can't read the subject's field there yet"
+	_sentence_problems("count of xs whose x equals x is 2") == [message]
+	_sentence_problems("sum of xs.y whose x equals .x is 2") == [message]
+}
+
 test_a_part_on_the_right_after_every_is_not_the_item_compared_with_itself if {
 	rep := _parts_report(
 		{"cov": "dd.b"}, {

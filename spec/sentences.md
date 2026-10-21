@@ -395,6 +395,7 @@ Most often the writer meant the subject's field. In a `whose` and after `every` 
 | `x is at least x`                                          | `x is compared with itself`                                                                                                                                            |
 | `every conditions.type equals type`                        | `type is compared with itself, because after every or some it's read from the item: to read the subject's type, put the list on the for line and compare under assert` |
 | `for: some conditions whose type equals type as condition` | `for: type is compared with itself, because in a whose it's read from the item: to read the subject's type, compare under assert`                                      |
+| `count of xs whose x equals x is 2`                        | `x is compared with itself, because in a whose it's read from the item, and a count or a sum can't read the subject's field there yet`                                 |
 
 `contains`, `is in` and a right side with `plus` can go either way, so they're left alone.
 
