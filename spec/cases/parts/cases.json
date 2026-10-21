@@ -1083,7 +1083,7 @@
             },
             "item_level": "every lst.x whose cov is at least 5 is cov",
             "shadows": "cov.n is 2",
-            "dot": ".cov.n is 2"
+            "dot": ".cov.n is 3"
           }
         }
       }
@@ -1183,19 +1183,15 @@
             }
           },
           {
-            "cause": "satisfied",
+            "cause": "value",
             "check": "dot",
             "inputs": [
               {
                 "name": "cov.n",
-                "part": {
-                  "id": null,
-                  "name": "cov"
-                },
-                "value": 2
+                "value": 9
               }
             ],
-            "passed": true,
+            "passed": false,
             "requirement": "r",
             "subject": {
               "id": "a",
@@ -1302,7 +1298,7 @@
         ]
       },
       {
-        "description": "an alias shadows a field with the same name, and the dot in front doesn't get around it",
+        "description": "an alias shadows a field with the same name, and the dot in front reads the field",
         "rules": [
           "parts.shadow",
           "sentence.path.part"
@@ -1356,11 +1352,7 @@
             "inputs": [
               {
                 "name": "cov.n",
-                "part": {
-                  "id": null,
-                  "name": "cov"
-                },
-                "value": 2
+                "value": 3
               }
             ],
             "passed": true,

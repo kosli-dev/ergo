@@ -10869,12 +10869,12 @@ test_an_alias_shadows_a_field_of_the_subject_with_the_same_name if {
 	_parts_row(rep, "c").passed
 }
 
-test_the_dot_in_front_of_a_field_does_not_get_around_an_alias if {
-	policy := _parts_policy({"cov": "dd.b"}, {"c": "cov.x is 1", "d": ".cov.x is 1", "e": "dd.b.x is 1 and .cov.x is 1"})
+test_the_dot_in_front_of_a_field_reads_the_field_a_part_hides if {
+	policy := _parts_policy({"cov": "dd.b"}, {"c": "cov.x is 1", "d": ".cov.x is 2", "e": "dd.b.x is 1 and .cov.x is 2"})
 	rep := ergo.report({"trail": {"name": "t1", "cov": {"x": 2}, "dd": {"b": {"x": 1}}}}, policy, {})
 	_parts_row(rep, "c").passed
 	_parts_row(rep, "d").passed
-	_untagged(_parts_row(rep, "d").inputs) == [{"name": "cov.x", "value": 1}]
+	_parts_row(rep, "d").inputs == [{"name": "cov.x", "value": 2}]
 	_parts_row(rep, "e").passed
 }
 

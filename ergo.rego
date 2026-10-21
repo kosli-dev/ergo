@@ -6529,22 +6529,23 @@ _s_whose_self_problems(holders) := {concat("", [_s_path_text(w.path, "left"), " 
 }
 
 _s_marked(p, names, own) := object.union(p, {"field": true}) if {
-	_s_markable(p, names)
-	_s_own_field(p, own)
+	_s_markable(p, names.all)
+	_s_own_field(p, names.for, own)
 } else := object.union(p, {"alias": true}) if {
-	_s_markable(p, names)
+	_s_markable(p, names.for)
+	object.get(p, "dot", false) != true
 } else := p
 
-_s_markable(p, names) if {
+_s_markable(p, keys) if {
 	is_object(p)
 	is_array(p.steps)
 	not "start" in object.keys(p)
-	p.steps[0] in names
+	p.steps[0] in keys
 }
 
-_s_own_field(_, true)
+_s_own_field(p, aliases, true) if p.steps[0] in aliases
 
-_s_own_field(p, false) if object.get(p, "dot", false) == true
+_s_own_field(p, _, _) if object.get(p, "dot", false) == true
 
 _s_marked_term(t, names) := object.union(t, {f: _s_marked(t[f], names, false) |
 	some f in ["count", "sum", "elapsed_from", "elapsed_to"]
@@ -6569,6 +6570,8 @@ _s_aliased(a, names) := object.union(object.union(a, {k: _s_marked(a[k], names, 
 		{"where": [_s_marked_cond(c, names) | some c in a.where] | is_array(object.get(a, "where", null))},
 	),
 ))
+
+_s_names(aliases, parts) := {"for": aliases, "all": (aliases | parts)}
 
 _s_aliased_item(item, names) := object.union(object.union(item, {q: _s_marked(item[q], names, false) | some q in ["every", "some"]; q in object.keys(item)}), {"where": [_s_marked_cond(c, names) | some c in item.where] | is_array(object.get(item, "where", null))})
 
@@ -7011,7 +7014,7 @@ _s_from_used(def, read) if {
 
 _s_from_read(name, fl, subjects, chains) := object.union({"problems": problems, "fields": fields, "parent": parent, "every": every_list}, _p_from_part(name, fl, subjects, chains.parts)) if {
 	"path" in object.keys(fl)
-	conds := [_p_applied(_s_check([_s_cond_text(c)], {}, set()), _p_own_context(name, chains.parts)) | some c in object.get(fl, "where", [])]
+	conds := [_p_applied(_s_check([_s_cond_text(c)], {}, set(), set()), _p_own_context(name, chains.parts)) | some c in object.get(fl, "where", [])]
 	problems := sort((((((_s_chain_unsupported(name, fl, subjects, chains.descend) | _s_every_unsupported(name, fl, subjects)) | _s_from_start_problems(fl)) | _s_from_paths_unsupported({"path": fl.path})) | _s_elapsed_flaw({"where": object.get(fl, "where", [])})) | {concat("", ["whose: ", p]) | some c in conds; some p in object.get(c, "$sentence", [])}))
 	fields := object.union(_s_source(name, fl, subjects, chains.parts), _s_whose_filters(_s_filter_prefix(name, chains.narrow), conds))
 	parent := _s_descend_parent(name, fl, subjects)
@@ -7421,14 +7424,14 @@ _s_named_model_leaf(m, names) := _s_named(m, names) if not m.op in {"every", "so
 
 _s_written_check(check) := _p_written(check, set())
 
-_p_written(check, aliases) := _s_check([check], {}, _p_named_by_problems([check], "", aliases)) if is_string(check)
+_p_written(check, aliases) := _s_check([check], {}, _p_named_by_problems([check], "", aliases), aliases) if is_string(check)
 
-_p_written(check, aliases) := _s_check(_s_lines(check.assert), object.filter(check, {"description", "meta"}), _s_form_problems(check) | _p_named_by_problems(_s_lines(check.assert), "", aliases)) if {
+_p_written(check, aliases) := _s_check(_s_lines(check.assert), object.filter(check, {"description", "meta"}), _s_form_problems(check) | _p_named_by_problems(_s_lines(check.assert), "", aliases), aliases) if {
 	_s_assert_form(check)
 	not "for" in object.keys(check)
 }
 
-_p_written(check, aliases) := _s_check_for(_s_lines(check.assert), check.for, object.filter(check, {"description", "meta"}), ((_s_form_problems(check) | _p_for_clash(check, aliases)) | _p_named_by_problems(_s_lines(check.assert), object.get(check, "for", ""), aliases))) if {
+_p_written(check, aliases) := _s_check_for(_s_lines(check.assert), check.for, object.filter(check, {"description", "meta"}), ((_s_form_problems(check) | _p_for_clash(check, aliases)) | _p_named_by_problems(_s_lines(check.assert), object.get(check, "for", ""), aliases)), aliases) if {
 	_s_assert_form(check)
 	"for" in object.keys(check)
 }
@@ -7478,7 +7481,7 @@ _s_assert_problem(a) := {"invalid assert"} if {
 	not is_array(a)
 }
 
-_s_check(lines, wording, problems) := object.union(wording, object.union(model, {"expression": _s_check_text({"assertions": assertions})})) if {
+_s_check(lines, wording, problems, parts) := object.union(wording, object.union(model, {"expression": _s_check_text({"assertions": marked})})) if {
 	count(problems) == 0
 	parsed := [_sentence(line) | some line in lines]
 	every p in parsed {
@@ -7486,9 +7489,10 @@ _s_check(lines, wording, problems) := object.union(wording, object.union(model, 
 	}
 	assertions := [a | some p in parsed; some a in p.assertions]
 	count({u | some a in assertions; some u in _s_assertion_unsupported(a)}) == 0
-	count(_s_self_problems(assertions)) == 0
-	model := _s_model_of(assertions)
-} else := object.union(wording, {"expression": concat(" and ", [_s_written_text(line) | some line in lines]), "$sentence": sort(_s_or_unrunnable(((problems | _s_lines_problems(lines)) | _s_lines_self(lines, set()))))})
+	marked := [_s_aliased(a, _s_names(set(), parts)) | some a in assertions]
+	count(_s_self_problems(marked)) == 0
+	model := _s_model_of(marked)
+} else := object.union(wording, {"expression": concat(" and ", [_s_written_text(line) | some line in lines]), "$sentence": sort(_s_or_unrunnable(((problems | _s_lines_problems(lines)) | _s_lines_self(lines, _s_names(set(), parts)))))})
 
 _s_lines_self([line], names) := _s_line_self(line, names)
 
@@ -8190,7 +8194,7 @@ _walk_mark(i, walked) := "[]" if i in walked
 
 _walk_mark(i, walked) := "" if not i in walked
 
-_s_check_for(lines, ftext, wording, problems) := object.union(wording, {
+_s_check_for(lines, ftext, wording, problems, parts) := object.union(wording, {
 	"op": "for",
 	"items": [_s_for_item_model(item, {earlier.as | some earlier in array.slice(fl.items, 0, i)}) | some i, item in items],
 	"checks": [_s_named(_s_model(a), names) | some a in marked],
@@ -8207,15 +8211,15 @@ _s_check_for(lines, ftext, wording, problems) := object.union(wording, {
 	}
 	assertions := [a | some p in parsed; some a in p.assertions]
 	count(_s_for_unsupported(fl, assertions)) == 0
-	items := _s_marked_items(fl)
-	marked := [_s_aliased(a, names) | some a in assertions]
+	items := _s_marked_items(fl, parts)
+	marked := [_s_aliased(a, _s_names(names, parts)) | some a in assertions]
 	count(_s_self_problems(marked) | _s_whose_self_problems(items)) == 0
 	texts := [_s_assertion_text(a) | some a in marked]
-} else := object.union(wording, {"expression": _s_for_written_text(lines, ftext), "$sentence": sort(_s_or_unrunnable(((problems | _s_for_problems(lines, ftext)) | _s_for_self(lines, ftext))))})
+} else := object.union(wording, {"expression": _s_for_written_text(lines, ftext), "$sentence": sort(_s_or_unrunnable(((problems | _s_for_problems(lines, ftext)) | _s_for_self(lines, ftext, parts))))})
 
-_s_marked_items(fl) := [_s_aliased_item(item, {earlier.as | some earlier in array.slice(fl.items, 0, i)}) | some i, item in fl.items]
+_s_marked_items(fl, parts) := [_s_aliased_item(item, _s_names({earlier.as | some earlier in array.slice(fl.items, 0, i)}, parts)) | some i, item in fl.items]
 
-_s_for_self(lines, ftext) := _s_lines_self(lines, {item.as | some item in fl.items}) | {concat("", ["for: ", p]) | some p in _s_whose_self_problems(_s_marked_items(fl))} if {
+_s_for_self(lines, ftext, parts) := _s_lines_self(lines, _s_names({item.as | some item in fl.items}, parts)) | {concat("", ["for: ", p]) | some p in _s_whose_self_problems(_s_marked_items(fl, parts))} if {
 	is_string(ftext)
 	fl := _for_line(ftext)
 	"items" in object.keys(fl)

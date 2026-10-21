@@ -411,7 +411,7 @@ A subject can have parts: named paths inside itself, each with an alias, written
 
 **[parts.where]** An alias is read wherever a bare first key reads the subject (see [sentence.path.start](sentences.md#paths)): in the subject's checks, in the assertions of a `for` line and in a later item of it whose path starts at the subject, in the conditions of the subject's own `from` line, and in the conditions of a subject that narrows it. It isn't read where a bare first key reads an item instead: in a `whose`, and in the argument of a one-line `every` or `some`, see [sentence.argument.item](sentences.md#every-some-and-whose). There `cov` is a field of the item, as it is for a subject with no part called `cov`.
 
-**[parts.shadow]** An alias shadows a field of the subject with the same name, so `cov.x` reads the part and not the field `cov`. The dot in front of a first key, like `.cov`, only marks a field that is named like a word of the grammar. It doesn't get around an alias, so a field named like a part of the same subject can't be read by a sentence: name the part something else.
+**[parts.shadow]** An alias shadows a field of the subject with the same name, so `cov.x` reads the part and not the field `cov`. The dot in front of a first key, like `.cov`, reads the field: `.cov.x` reads the subject's field `cov`, as it reads a field named like a word of the grammar (see [sentence.path.start](sentences.md#paths)).
 
 **[parts.narrow]** A subject that narrows another keeps its parts, and can add its own. Its checks and its conditions read them like parts of its own, and the report lists them (see [report.subjects](#statuses)).
 
