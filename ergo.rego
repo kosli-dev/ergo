@@ -6441,10 +6441,7 @@ _s_sentence_problems(parsed) := (((((((((((((((((({concat("", [node.bare_word, "
 	not is_object(v)
 	not _s_valid_pattern(v)
 }) | {concat("", [_s_path_text(node.path, "left"), " is compared with itself"]) |
-	some node in _s_nodes(parsed)
-	is_object(node)
-	_s_self_compared(node)
-	not node in _s_whose_self_compared(parsed)
+	some node in (_s_self_compared_nodes(parsed) - _s_whose_self_compared(parsed))
 }) | {concat("", [_s_path_text(node.path, "left"), " is compared with itself: in a whose, a bare name is the item's, so compare with the subject's under assert"]) |
 	some node in _s_whose_self_compared(parsed)
 }) | {concat("", [_s_term_text(node.phrase.terms[0]), " is compared with itself: after every or some, a bare name is the item's, so compare with the subject's on a for line"]) |
@@ -6515,6 +6512,12 @@ _s_self_compared(node) if {
 	node.path == _s_self_term(node)
 }
 
+_s_self_compared_nodes(parsed) := {node |
+	some node in _s_nodes(parsed)
+	is_object(node)
+	_s_self_compared(node)
+}
+
 _s_whose_self_compared(parsed) := {w |
 	some node in _s_nodes(parsed)
 	is_object(node)
@@ -6531,7 +6534,6 @@ _s_walk_self_compared(parsed) := {node |
 	is_object(walked)
 	t := _s_self_term(node)
 	object.keys(t) == {"steps"}
-	object.keys(walked) == {"steps"}
 	k := count(t.steps)
 	k < count(walked.steps)
 	array.slice(walked.steps, count(walked.steps) - k, count(walked.steps)) == t.steps

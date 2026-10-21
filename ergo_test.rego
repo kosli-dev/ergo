@@ -8435,6 +8435,11 @@ test_every_or_some_ending_where_it_compares_says_the_bare_name_is_the_items if {
 	_sentence_problems(`every conditions.type equals type`) == ["type is compared with itself: after every or some, a bare name is the item's, so compare with the subject's on a for line"]
 	_sentence_problems(`some pull_requests.commits[0].author is after author`) == ["author is compared with itself: after every or some, a bare name is the item's, so compare with the subject's on a for line"]
 	_sentence_problems(`every xs.ys.zs equals ys.zs`) == ["ys.zs is compared with itself: after every or some, a bare name is the item's, so compare with the subject's on a for line"]
+	_sentence_problems(`every $input.xs.y equals y`) == ["y is compared with itself: after every or some, a bare name is the item's, so compare with the subject's on a for line"]
+}
+
+test_a_for_alias_named_like_the_items_field_is_still_the_items_field_after_every if {
+	_sentence_problems({"for": "every zs as y", "assert": "every xs.y equals y"}) == ["y is compared with itself: after every or some, a bare name is the item's, so compare with the subject's on a for line"]
 }
 
 test_comparisons_that_can_go_either_way_are_not_read_as_a_path_compared_with_itself if {
