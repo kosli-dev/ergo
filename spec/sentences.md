@@ -4,7 +4,7 @@ Draft 0.1, a proposal from [#174](https://github.com/kosli-dev/ergo/issues/174).
 
 [`sentences-corpus.md`](sentences-corpus.md) has every check from sdlc-policies, the server's demo and npm-bump policies, pr-reviewer, Ergo's examples and Tore's DEV controls written both ways. Every sentence in it parses exactly one way with the phrases below. The phrases, the tally and the misfits come from it.
 
-`ergo.rego` runs a check written as one or more sentences that start with a path, for every phrase, joined with `and` or listed under `assert`. It runs a `for` line before them too, but doesn't check the limit of three list walks in [sentence.for.depth](#the-for-line) yet. It runs `from` lines and string `id`s too, and chains up to three subjects deep. It runs every case in `spec/cases`, and `known_differences` in `spec_test.rego`, which lists the cases it fails, is empty. It doesn't run every form of a sentence, though: not `last of`, and not a `count of`, `sum of` or `plus` or an elapsed time in the phrase of an `every` or `some`, and no case pins them yet, see [OPEN.md](OPEN.md#sentences-the-spec-doesnt-say-enough-about-yet). Where the spec says a form runs, `ergo.rego` reports it as written wrong, with `isn't supported yet` in its message. In a `from` line or an `id`, `named by` a bare word is written wrong, with `unknown name <word>`, because there's no subject to read it from yet, and so is a `for` name used before its item gives it. A sentence can't be an `any_of` option or a substitute yet, and is written wrong there with `invalid check`.
+`ergo.rego` runs a check written as one or more sentences that start with a path, for every phrase, joined with `and` or listed under `assert`. It runs a `for` line before them too, but doesn't check the limit of three list walks in [sentence.for.depth](#the-for-line) yet. It runs `from` lines and string `id`s too, and chains up to three subjects deep. It runs every case in `spec/cases`, and `known_differences` in `spec_test.rego`, which lists the cases it fails, is empty. It doesn't run every form of a sentence, though: not `last of` or `item <n> from last of` except at the start of a `for` item, and not a `count of`, `sum of` or `plus` or an elapsed time in the phrase of an `every` or `some`, and no case pins them yet, see [OPEN.md](OPEN.md#sentences-the-spec-doesnt-say-enough-about-yet). Where the spec says a form runs, `ergo.rego` reports it as written wrong, with `isn't supported yet` in its message. In a `from` line or an `id`, `named by` a bare word is written wrong, with `unknown name <word>`, because there's no subject to read it from yet, and so is a `for` name used before its item gives it. A sentence can't be an `any_of` option or a substitute yet, and is written wrong there with `invalid check`.
 
 ## The shape of a sentence
 
@@ -73,7 +73,7 @@ peer_approval:
 
 **[sentence.path.part]** A part of the subject, declared with `has` (see [parts.syntax](syntax.md#parts)), is read by its alias as a bare first key, wherever a bare first key reads the subject ([parts.where](semantics.md#parts)), and gives the rows of the path it stands for ([parts.swap](semantics.md#parts)). Inside `whose` and in the argument of a one-line `every` or `some`, it's read on the right side and never on the left of a `whose`, as a `for` alias is ([parts.where](semantics.md#parts)). `named by` a bare word that is a part's alias is written wrong, with `named by <alias> reads a part, which isn't supported yet`, because it would otherwise read the subject's field of that name. A part's own path is written as a `from` line's path is, so it never starts with an alias.
 
-**[sentence.path.index]** `item 3 of items` reads the third item of `items`, counting from 1, and `first of items` and `last of items` read the ends. The path after `of` is the whole rest of the path, so `item 3 of pull_request.commits` picks the third commit, and a field of that item has no word form: write `pull_request.commits[2].sha` with brackets, which count from 0 as [sentence.path.brackets](#paths) says. `item 0 of items` is written wrong. The report prints the word form when the position ends the path, so `commits[2]` prints as `item 3 of commits`, and prints the brackets when a key follows them. No policy in the corpus needs a position.
+**[sentence.path.index]** `item 3 of items` reads the third item of `items`, counting from 1, `item 2 from last of items` the second from the end, and `first of items` and `last of items` read the ends. The path after `of` is the whole rest of the path, so `item 3 of pull_request.commits` picks the third commit, and a field of that item has no word form in the sentence: name the item on a `for` line ([sentence.for.pick](#the-for-line)), or write `pull_request.commits[2].sha` with brackets, which count from 0 as [sentence.path.brackets](#paths) says. `item 0 of items` is written wrong. The report prints the word form when the position ends the path, so `commits[2]` prints as `item 3 of commits`, and prints the brackets when a key follows them. No policy in the corpus needs a position.
 
 **[sentence.path.argument]** The left side of a sentence is always a path. The right side can be a value or a path, and these rules decide which:
 
@@ -138,7 +138,7 @@ The map is the only way to write `subjects`, and a simple subject is a name with
 
 ## Words a field can't be called
 
-**[sentence.words]** These words are read as part of a phrase, a quantifier, a position or a value, never as the first key of a path written bare: `a`, `after`, `an`, `and`, `as`, `at`, `before`, `between`, `count`, `days`, `each`, `empty`, `equal`, `every`, `false`, `first`, `hours`, `in`, `item`, `last`, `less`, `minutes`, `more`, `named`, `not`, `null`, `of`, `on`, `one`, `or`, `plus`, `seconds`, `some`, `sum`, `to`, `true`, `weeks`, `whose`, `within`. Without this, `x is empty` could also compare `x` with a field called `empty`, `x is true` with a field called `true`, and `count of x is 1` could start from a field called `count`. A field with one of these names is written `.empty`, on either side of the sentence. The rule is the same on both sides so that it's one rule, and so that a parser never has to know which side it's on to read a key. Keys after the first are never words of the grammar, so `review.count` needs no dot.
+**[sentence.words]** These words are read as part of a phrase, a quantifier, a position or a value, never as the first key of a path written bare: `a`, `after`, `an`, `and`, `as`, `at`, `before`, `between`, `count`, `days`, `each`, `empty`, `equal`, `every`, `false`, `first`, `hours`, `in`, `item`, `last`, `less`, `minutes`, `more`, `named`, `not`, `null`, `of`, `on`, `one`, `or`, `plus`, `seconds`, `some`, `sorted`, `sum`, `to`, `true`, `weeks`, `whose`, `within`. Without this, `x is empty` could also compare `x` with a field called `empty`, `x is true` with a field called `true`, and `count of x is 1` could start from a field called `count`. A field with one of these names is written `.empty`, on either side of the sentence. The rule is the same on both sides so that it's one rule, and so that a parser never has to know which side it's on to read a key. Keys after the first are never words of the grammar, so `review.count` needs no dot.
 
 ## `every`, `some` and `whose`
 
@@ -180,7 +180,7 @@ It's a number like a `count of`, so it goes where one does: at the start of an a
 
 ## The `for` line
 
-**[sentence.for.line]** A check can have a `for` line before its `assert`. It holds one or two items separated by `, `, and each item is `every` or `some`, a path, an optional `whose` with `and`, and `as` an alias:
+**[sentence.for.line]** A check can have a `for` line before its `assert`. It holds one or two items separated by `, `, and each item is `every` or `some`, a path, an optional `whose` with `and`, and `as` an alias, or picks one item as [sentence.for.pick](#the-for-line) says:
 
 ```yaml
 peer_approved:
@@ -208,7 +208,17 @@ The left side of a `whose` is the item's field even when an alias has the same n
 
 **[sentence.for.fail]** Each item fails closed as a one-line `every` or `some` does: `some` over an empty list fails, `every` over one fails unless the item says `if any`, a missing or non-list path fails as `absent`, `null` or `unusable`, and an item a `whose` can't decide fails the try with its cause.
 
-**[sentence.for.comma]** The `, ` between items can't be confused with the `, ` between values, because the next item starts with `every` or `some` and a value can't. The tokenizer reads `for: some approvals whose role is one of "qa", "dev" as approval, every commits as commit` one way.
+**[sentence.for.pick]** An item can start with a position instead of `every` or `some`, as [sentence.path.index](#paths) writes it, and then its alias stands for one item: `for: last of commits as last_commit`. After the path and an optional `whose`, `sorted by` and a field counts the position in the order of that field instead of the list's:
+
+```yaml
+not_last_author:
+  for: last of commits sorted by timestamp as last_commit, some approvers as approver
+  assert: approver.username does not equal last_commit.author_username
+```
+
+`first of commits sorted by timestamp` is the earliest commit, `last of` the latest, and `item 2 from last of` the second latest. The field is the item's, so it can't start with `$params`, `$input` or a position, and brackets after it pick a position in the field, as in `sorted by ts[0]`. A field with the same name as a `for` alias is written with a dot, `sorted by .c`, and without one it's written wrong, with `"sorted by" reads a field of the item, not c: write .c`, so that it can't be read as the alias. `sorted by` after `every` or `some` is written wrong, since they read every item, and so is `, if any,` with a position, since an empty list has nothing to pick. A field of the picked item is read through its alias, `last_commit.author_username`. SDLC-CTRL-0007 needs it: the approver can't be whoever pushed the last commit, though they may have pushed earlier ones while pairing. `sorted` is the word spreadsheets use, so control owners know it, and no field in the corpus has that name. `latest` and `earliest` could come later as shorter words for times, if control owners ask for them.
+
+**[sentence.for.comma]** The `, ` between items can't be confused with the `, ` between values, because the next item starts with `every`, `some` or a position and a value can't. The tokenizer reads `for: some approvals whose role is one of "qa", "dev" as approval, every commits as commit` one way.
 
 **[sentence.for.assert]** A `for` line can have several assertions under `assert`, as [sentence.assert.list](#the-shape-of-a-sentence) says. sdlc-policies 0007's peer approval needs that: an approver who approved, isn't the author and approved after every commit.
 

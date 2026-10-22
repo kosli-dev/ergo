@@ -8393,14 +8393,14 @@ test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
 		[`t is before y plus 1`, `"is before" can't take a count of, a sum of or a plus`],
 		[`count of xs whose sum of ys is 1 is 2`, "a sum of or a plus in the whose of a count of or a sum of isn't supported yet"],
 		[`count of xs whose n is count of ys plus 1 is 2`, "a sum of or a plus in the whose of a count of or a sum of isn't supported yet"],
-		[`last of xs is 1`, "last of isn't supported yet"],
+		[`last of xs is 1`, "last of isn't supported yet here: pick the item on a for line, like \"for: last of commits as commit\""],
 	] {
 		_sentence_problems(pair[0]) == [pair[1]]
 	}
 	_sentence_problems({"assert": []}) == ["empty assert"]
 	_sentence_problems({"assert": ["x exists", 1]}) == ["invalid assert"]
 	_sentence_problems({"assert": ["x exists", "y is \"a"]}) == ["line 2: unclosed quote at column 6"]
-	_sentence_problems({"assert": ["x exists", "last of ys is 1"]}) == ["line 2: last of isn't supported yet"]
+	_sentence_problems({"assert": ["x exists", "last of ys is 1"]}) == ["line 2: last of isn't supported yet here: pick the item on a for line, like \"for: last of commits as commit\""]
 }
 
 test_a_check_written_as_a_string_is_read_as_a_sentence if {
@@ -8866,7 +8866,7 @@ test_every_and_some_joined_with_and_give_one_row_with_the_failed_sentences if {
 }
 
 test_forms_a_walk_cant_take_yet_are_written_wrong if {
-	_sentence_problems(`every xs whose last of ys is 1 is not empty`) == ["last of isn't supported yet"]
+	_sentence_problems(`every xs whose last of ys is 1 is not empty`) == ["last of isn't supported yet here: pick the item on a for line, like \"for: last of commits as commit\""]
 	_sentence_problems(`every k1.k2.k3.k4.k5.k6.k7.k8.k9.k10.k11.k12 is 1`) == ["every and some over more than ten steps aren't supported yet"]
 }
 
@@ -9058,7 +9058,7 @@ test_a_for_line_written_wrong_says_why if {
 	_sentence_problems({"assert": "x exists", "for": 1}) == ["invalid for"]
 	_sentence_problems({"assert": "x.a exists", "for": "every xs as x, every ys as y, every zs as z"}) == ["for: a for line holds two items at most"]
 	_sentence_problems({"assert": "x.a exists", "for": "every xs as"}) == [`for: an item ends with "as" and a name, like "every pull_requests as pr"`]
-	_sentence_problems({"assert": "x.a exists", "for": "xs as x"}) == [`for: an item starts with "every" or "some"`]
+	_sentence_problems({"assert": "x.a exists", "for": "xs as x"}) == [`for: an item starts with "every", "some" or a position, like "last of"`]
 	_sentence_problems({"assert": "x.a exists", "for": "every xs as x, every ys as x"}) == ["for: x is given twice"]
 	_sentence_problems({"assert": "x.a is 1", "for": "every xs as params"}) == ["for: params can't be an alias"]
 	_sentence_problems({"assert": "x.a is 1", "for": "some xs, if any, as x"}) == ["for: if any can't go with some"]
@@ -9067,7 +9067,7 @@ test_a_for_line_written_wrong_says_why if {
 
 test_forms_ergo_does_not_run_yet_are_written_wrong_on_a_for_line_too if {
 	every pair in [
-		["every xs whose last of ys is 1 as x", "last of isn't supported yet"],
+		["every xs whose last of ys is 1 as x", "last of isn't supported yet here: pick the item on a for line, like \"for: last of commits as commit\""],
 		["every b.c.d.e.f.g.h.i.j.k.l.m as x", "every and some over more than ten steps aren't supported yet"],
 	] {
 		_sentence_problems({"assert": "x is 1", "for": pair[0]}) == [pair[1]]
@@ -9380,7 +9380,7 @@ test_conditions_of_a_from_can_use_phrases_only_sentences_have if {
 test_a_from_or_id_written_wrong_says_why_in_well_formed if {
 	every pair in [
 		[{"from": "xs whose"}, {"name": "subjects.x.from", "value": ["doesn't parse"]}],
-		[{"from": "xs whose last of ys is 1"}, {"name": "subjects.x.from", "value": ["whose: last of isn't supported yet"]}],
+		[{"from": "xs whose last of ys is 1"}, {"name": "subjects.x.from", "value": ["whose: last of isn't supported yet here: pick the item on a for line, like \"for: last of commits as commit\""]}],
 		[{"from": "xs whose a is 1"}, {"name": "subjects.x.from", "value": ["a is a word of the grammar: write .a"]}],
 		[{"from": "xs", "identified_by": "id is 1"}, {"name": "subjects.x.identified_by", "value": [`identified_by is a path, like "id" or "build.number"`]}],
 		[{"from": "xs whose id exists", "applies_to": {"a": {"op": "present", "path": ["id"]}}}, {"name": "subjects.x.from", "value": [`applies_to can't go with a from written as a sentence: put the conditions after "whose"`]}],
@@ -12429,4 +12429,202 @@ test_a_count_named_by_a_missing_or_wrong_key_in_a_whose_fails_closed if {
 	_named_count_in_whose([{}]) == [[false, "absent"]]
 	_named_count_in_whose([{"kind": 5}]) == [[false, "unusable"]]
 	_named_count_in_whose([{"kind": "b"}]) == [[false, "absent"]]
+}
+
+_commits(ts) := [{"author": a, "timestamp": t} | some i, t in ts; a := ["ada", "grace", "linus", "ken"][i]]
+
+_picked(item, ts) := [row[1], row[2], row[3]] if {
+	some row in _for_rows({"for": concat("", [item, " as c"]), "assert": `c.author is "x"`}, [{"id": 1, "commits": _commits(ts)}], {})
+}
+
+_picked_author(item, ts) := a if {
+	[row[1] | some row in _for_rows({"for": concat("", [item, " as c"]), "assert": `c.author is "ada"`}, [{"id": 1, "commits": _commits(ts)}], {})] == ["satisfied"]
+	a := "ada"
+} else := a if {
+	some a in ["grace", "linus", "ken"]
+	[row[1] | some row in _for_rows({"for": concat("", [item, " as c"]), "assert": concat("", [`c.author is "`, a, `"`])}, [{"id": 1, "commits": _commits(ts)}], {})] == ["satisfied"]
+}
+
+test_a_for_line_picks_an_item_by_its_position_as_written if {
+	_picked_author("first of commits", [3, 1, 2]) == "ada"
+	_picked_author("item 2 of commits", [3, 1, 2]) == "grace"
+	_picked_author("last of commits", [3, 1, 2]) == "linus"
+	_picked_author("item 2 from last of commits", [3, 1, 2]) == "grace"
+}
+
+test_a_for_line_picks_an_item_by_its_position_sorted_by_a_field if {
+	_picked_author("first of commits sorted by timestamp", [3, 1, 2]) == "grace"
+	_picked_author("item 2 of commits sorted by timestamp", [3, 1, 2]) == "linus"
+	_picked_author("last of commits sorted by timestamp", [3, 1, 2]) == "ada"
+	_picked_author("item 2 from last of commits sorted by timestamp", [3, 1, 2]) == "linus"
+}
+
+test_a_picked_item_that_fails_is_named_by_where_it_is_in_the_input if {
+	_picked("last of commits sorted by timestamp", [3, 1, 2]) == [
+		"value",
+		[{"path": "item 1 of commits", "item": "item 1 of commits", "cause": "value", "value": null, "failed_assertions": [{"assertion": `c.author is "x"`, "cause": "value"}]}],
+		[{"name": "item 1 of commits", "value": {"author": "ada", "timestamp": 3}}],
+	]
+}
+
+test_a_tie_at_the_picked_position_fails_as_ambiguous_and_names_the_tied_items if {
+	_picked("last of commits sorted by timestamp", [1, 3, 3]) == [
+		"ambiguous",
+		[
+			{"path": "item 2 of commits", "item": "item 2 of commits", "cause": "ambiguous", "value": 3, "failed_assertions": []},
+			{"path": "item 3 of commits", "item": "item 3 of commits", "cause": "ambiguous", "value": 3, "failed_assertions": []},
+		],
+		[{"name": "commits[]", "value": [{"author": "ada", "timestamp": 1}, {"author": "grace", "timestamp": 3}, {"author": "linus", "timestamp": 3}]}],
+	]
+}
+
+test_a_tie_away_from_the_picked_position_doesnt_matter if {
+	_picked_author("last of commits sorted by timestamp", [1, 1, 3]) == "linus"
+}
+
+test_a_sort_field_missing_null_or_of_the_wrong_type_on_any_item_fails_without_picking if {
+	[_picked("last of commits sorted by timestamp", ts)[0] | some ts in [
+		[1, null, 3],
+		[1, "x", 3],
+		[1, "2026-10-01T00:00:00Z", 3],
+		[1, true, 3],
+		[1, [2], 3],
+	]] == ["null", "unusable", "unusable", "unusable", "unusable"]
+	rows := _for_rows({"for": "last of commits sorted by timestamp as c", "assert": "c.author exists"}, [{"id": 1, "commits": [{"author": "ada", "timestamp": 1}, {"author": "grace"}]}], {})
+	rows[0][1] == "absent"
+	rows[0][2] == [{"path": "item 2 of commits", "item": "item 2 of commits", "cause": "absent", "value": null, "failed_assertions": []}]
+}
+
+test_a_list_can_be_sorted_by_time if {
+	_picked_author("last of commits sorted by timestamp", ["2026-10-02T00:00:00Z", "2026-10-02T01:00:00+02:00", "2026-10-01T22:00:00Z"]) == "ada"
+	_picked_author("first of commits sorted by timestamp", ["2026-10-02T00:00:00Z", "2026-10-02T01:00:00+02:00", "2026-10-01T22:00:00Z"]) == "linus"
+}
+
+test_a_position_past_the_end_or_an_empty_list_fails_as_absent if {
+	[_picked(item, [1, 2])[0] | some item in ["item 3 of commits", "item 3 from last of commits sorted by timestamp"]] == ["absent", "absent"]
+	[_picked("last of commits", [])[0]] == ["absent"]
+}
+
+test_a_list_that_isnt_there_or_isnt_a_list_fails_as_a_walk_does if {
+	[row[1] | some row in _for_rows({"for": "last of commits as c", "assert": "c exists"}, [{"id": 1}, {"id": 2, "commits": 1}, {"id": 3, "commits": null}], {})] == ["absent", "unusable", "null"]
+}
+
+test_a_whose_filters_the_list_before_it_is_sorted if {
+	check := {"for": `last of approvers whose state is "APPROVED" sorted by timestamp as approval`, "assert": `approval.username is "ada"`}
+	approvers := [{"username": "ada", "state": "APPROVED", "timestamp": 3}, {"username": "grace", "state": "CHANGES_REQUESTED", "timestamp": 5}, {"username": "linus", "state": "APPROVED"}]
+	[row[1] | some row in _for_rows(check, [{"id": 1, "approvers": array.slice(approvers, 0, 2)}], {})] == ["satisfied"]
+	[row[1] | some row in _for_rows(check, [{"id": 1, "approvers": approvers}], {})] == ["absent"]
+	[row[1] | some row in _for_rows(check, [{"id": 1, "approvers": [approvers[1]]}], {})] == ["absent"]
+	[row[1] | some row in _for_rows(check, [{"id": 1, "approvers": [{"username": "ken", "timestamp": 1}, approvers[0]]}], {})] == ["absent"]
+}
+
+test_a_picked_item_and_a_walk_share_a_for_line if {
+	check := {
+		"for": "some approvers as approver, last of commits sorted by timestamp as last_commit",
+		"assert": "approver.username does not equal last_commit.author_username",
+	}
+	commits := [{"author_username": "ada", "timestamp": 2}, {"author_username": "grace", "timestamp": 1}]
+	[row[1] | some row in _for_rows(
+		check, [
+			{"id": 1, "approvers": [{"username": "grace"}], "commits": commits},
+			{"id": 2, "approvers": [{"username": "ada"}], "commits": commits},
+		],
+		{},
+	)] == ["satisfied", "value"]
+	reverse := {
+		"for": "last of commits sorted by timestamp as last_commit, some approvers as approver",
+		"assert": "approver.username does not equal last_commit.author_username",
+	}
+	[row[1] | some row in _for_rows(
+		reverse, [
+			{"id": 1, "approvers": [{"username": "grace"}], "commits": commits},
+			{"id": 2, "approvers": [{"username": "ada"}], "commits": commits},
+		],
+		{},
+	)] == ["satisfied", "value"]
+}
+
+test_a_pick_prints_as_written if {
+	check := {"for": `item 2 from last of approvers whose state is "APPROVED" sorted by timestamp as approval`, "assert": "approval exists"}
+	ergo.report({"things": [{"id": 1}]}, _sentence_policy({"c": check}), {}).requirements.s.checks.c.expression == `for item 2 from last of approvers whose state is "APPROVED" sorted by timestamp as approval: approval exists`
+}
+
+test_a_pick_written_wrong_says_why if {
+	_sentence_problems({"assert": "x exists", "for": "xs as x"}) == [`for: an item starts with "every", "some" or a position, like "last of"`]
+	_sentence_problems({"assert": "x exists", "for": "every xs sorted by t as x"}) == [`for: "sorted by" goes after a position, like "last of", not after every or some`]
+	_sentence_problems({"assert": "x exists", "for": "last of xs, if any, as x"}) == ["for: if any can't go with a position"]
+	_sentence_problems({"assert": "x exists", "for": "last of xs sorted by $params.t as x"}) == [`for: "sorted by" reads a field of each item`]
+	_sentence_problems({"assert": "x exists", "for": "last of xs sorted by last of t as x"}) == [`for: "sorted by" reads a field of each item`]
+	_sentence_problems({"assert": "x exists", "for": "last of xs sorted by y.t as x, every ys as y"}) == [`for: "sorted by" reads a field of the item, not y: write .y`]
+	_sentence_problems({"assert": "x exists", "for": "last of xs sorted by x as x"}) == [`for: "sorted by" reads a field of the item, not x: write .x`]
+}
+
+test_last_of_in_a_sentence_points_to_the_for_line if {
+	every text in ["last of xs is 1", "item 2 from last of xs is 1"] {
+		_sentence_problems({"assert": text}) == [`last of isn't supported yet here: pick the item on a for line, like "for: last of commits as commit"`]
+	}
+}
+
+test_a_pick_reads_items_that_arent_objects_as_not_an_object_when_sorted if {
+	rows := _for_rows({"for": "last of xs sorted by t as x", "assert": "x exists"}, [{"id": 1, "xs": [1, {"t": 2}]}], {})
+	rows[0][1] == "not_an_object"
+	rows[0][2] == [{"path": "item 1 of xs", "item": "item 1 of xs", "cause": "not_an_object", "value": null, "failed_assertions": []}]
+	[row[1] | some row in _for_rows({"for": "last of xs as x", "assert": "x is 1"}, [{"id": 1, "xs": [{"t": 2}, 1]}], {})] == ["satisfied"]
+}
+
+test_numbers_and_times_in_one_sort_field_fail_as_unusable_on_the_times if {
+	rows := _for_rows({"for": "last of xs sorted by t as x", "assert": "x exists"}, [{"id": 1, "xs": [{"t": 1}, {"t": "2026-10-01T00:00:00Z"}]}], {})
+	rows[0][1] == "unusable"
+	rows[0][2] == [{"path": "item 2 of xs", "item": "item 2 of xs", "cause": "unusable", "value": "2026-10-01T00:00:00Z", "failed_assertions": []}]
+}
+
+test_a_pick_sorts_every_item_a_longer_path_walks_to if {
+	check := {"for": "last of pull_requests.commits sorted by timestamp as c", "assert": `c.author is "grace"`}
+	prs := [{"commits": [{"author": "ada", "timestamp": 1}]}, {"commits": []}, {"commits": [{"author": "grace", "timestamp": 2}]}]
+	[row[1] | some row in _for_rows(check, [{"id": 1, "pull_requests": prs}], {})] == ["satisfied"]
+	rows := _for_rows(check, [{"id": 1, "pull_requests": array.concat(prs, [{"commits": 1}])}], {})
+	rows[0][1] == "unusable"
+	rows[0][2] == [{"path": "pull_requests[3].commits", "item": "pull_requests[3].commits", "cause": "unusable", "value": 1, "failed_assertions": []}]
+}
+
+test_a_pick_can_come_second_and_start_from_the_first_name if {
+	second := {"for": "some approvers as approver, item 5 of commits as c", "assert": "approver exists"}
+	[row[1] | some row in _for_rows(second, [{"id": 1, "approvers": [1], "commits": [1]}], {})] == ["absent"]
+	named := {"for": "every pull_requests as pr, last of pr.commits sorted by timestamp as c", "assert": `c.author is "grace"`}
+	[row[1] | some row in _for_rows(
+		named, [
+			{"id": 1, "pull_requests": [{"commits": [{"author": "grace", "timestamp": 2}, {"author": "ada", "timestamp": 1}]}]},
+			{"id": 2, "pull_requests": [{"commits": [{"author": "grace", "timestamp": 2}]}, {"commits": [{"author": "ada", "timestamp": 1}]}]},
+		],
+		{},
+	)] == ["satisfied", "value"]
+}
+
+test_a_pick_sorted_by_a_field_named_by_a_param_reads_the_param if {
+	check := {"for": "last of xs sorted by t named by $params.k as x", "assert": "x.n is 2"}
+	[row[1] | some row in _for_rows(check, [{"id": 1, "xs": [{"n": 1, "t": {"a": 1, "b": 9}}, {"n": 2, "t": {"a": 2, "b": 0}}]}], {"k": "a"})] == ["satisfied"]
+}
+
+test_a_pick_that_doesnt_start_from_the_first_name_fails_the_check_as_it_would_written_first if {
+	commits := [{"author": "ada", "timestamp": 2}, {"author": "grace", "timestamp": 2}]
+	first := _for_rows({"for": "last of commits sorted by timestamp as c, some approvers as approver", "assert": "approver.username does not equal c.author"}, [{"id": 1, "approvers": [{"username": "linus"}], "commits": commits}], {})
+	second := _for_rows({"for": "some approvers as approver, last of commits sorted by timestamp as c", "assert": "approver.username does not equal c.author"}, [{"id": 1, "approvers": [{"username": "linus"}], "commits": commits}], {})
+	[first[0][1], first[0][2]] == [second[0][1], second[0][2]]
+	second[0][1] == "ambiguous"
+	[f.path | some f in second[0][2]] == ["item 1 of commits", "item 2 of commits"]
+	[row[1] | some row in _for_rows({"for": "some approvers as approver, item 3 of commits as c", "assert": "approver exists"}, [{"id": 1, "approvers": [1], "commits": commits}], {})] == ["absent"]
+}
+
+test_sorted_by_reads_a_field_of_the_item_with_a_dot_or_an_index_after_it if {
+	check := {"for": "last of xs sorted by .x as x", "assert": "x.n is 2"}
+	[row[1] | some row in _for_rows(check, [{"id": 1, "xs": [{"n": 1, "x": 9}, {"n": 2, "x": 1}]}], {})] == ["value"]
+	[row[1] | some row in _for_rows(check, [{"id": 1, "xs": [{"n": 1, "x": 1}, {"n": 2, "x": 9}]}], {})] == ["satisfied"]
+	indexed := {"for": "last of xs sorted by ts[0] as x", "assert": "x.n is 2"}
+	[row[1] | some row in _for_rows(indexed, [{"id": 1, "xs": [{"n": 1, "ts": [1, 9]}, {"n": 2, "ts": [2, 0]}]}], {})] == ["satisfied"]
+	ergo.report({"things": [{"id": 1}]}, _sentence_policy({"c": indexed}), {}).requirements.s.checks.c.expression == "for last of xs sorted by ts[0] as x: x.n is 2"
+	ergo.report({"things": [{"id": 1}]}, _sentence_policy({"c": check}), {}).requirements.s.checks.c.expression == "for last of xs sorted by .x as x: x.n is 2"
+	earlier := {"for": "some ys as y, last of xs sorted by .y as x", "assert": "x.n is 2"}
+	ergo.report({"things": [{"id": 1}]}, _sentence_policy({"c": earlier}), {}).requirements.s.checks.c.expression == "for some ys as y, last of xs sorted by .y as x: x.n is 2"
+	plain := {"for": "last of xs sorted by .t as x", "assert": "x.n is 2"}
+	ergo.report({"things": [{"id": 1}]}, _sentence_policy({"c": plain}), {}).requirements.s.checks.c.expression == "for last of xs sorted by t as x: x.n is 2"
 }
