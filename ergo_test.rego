@@ -12554,7 +12554,9 @@ test_a_pick_written_wrong_says_why if {
 	_sentence_problems({"assert": "x exists", "for": "every xs sorted by t as x"}) == [`for: "sorted by" goes after a position, like "last of", not after every or some`]
 	_sentence_problems({"assert": "x exists", "for": "last of xs, if any, as x"}) == ["for: if any can't go with a position"]
 	_sentence_problems({"assert": "x exists", "for": "last of xs sorted by $params.t as x"}) == [`for: "sorted by" reads a field of each item`]
-	_sentence_problems({"assert": "x exists", "for": "last of xs sorted by y.t as x, every ys as y"}) == [`for: "sorted by" reads a field of each item`]
+	_sentence_problems({"assert": "x exists", "for": "last of xs sorted by last of t as x"}) == [`for: "sorted by" reads a field of each item`]
+	_sentence_problems({"assert": "x exists", "for": "last of xs sorted by y.t as x, every ys as y"}) == [`for: "sorted by" reads a field of the item, not y: write .y`]
+	_sentence_problems({"assert": "x exists", "for": "last of xs sorted by x as x"}) == [`for: "sorted by" reads a field of the item, not x: write .x`]
 }
 
 test_last_of_in_a_sentence_points_to_the_for_line if {
@@ -12611,4 +12613,13 @@ test_a_pick_that_doesnt_start_from_the_first_name_fails_the_check_as_it_would_wr
 	second[0][1] == "ambiguous"
 	[f.path | some f in second[0][2]] == ["item 1 of commits", "item 2 of commits"]
 	[row[1] | some row in _for_rows({"for": "some approvers as approver, item 3 of commits as c", "assert": "approver exists"}, [{"id": 1, "approvers": [1], "commits": commits}], {})] == ["absent"]
+}
+
+test_sorted_by_reads_a_field_of_the_item_with_a_dot_or_an_index_after_it if {
+	check := {"for": "last of xs sorted by .x as x", "assert": "x.n is 2"}
+	[row[1] | some row in _for_rows(check, [{"id": 1, "xs": [{"n": 1, "x": 9}, {"n": 2, "x": 1}]}], {})] == ["value"]
+	[row[1] | some row in _for_rows(check, [{"id": 1, "xs": [{"n": 1, "x": 1}, {"n": 2, "x": 9}]}], {})] == ["satisfied"]
+	indexed := {"for": "last of xs sorted by ts[0] as x", "assert": "x.n is 2"}
+	[row[1] | some row in _for_rows(indexed, [{"id": 1, "xs": [{"n": 1, "ts": [1, 9]}, {"n": 2, "ts": [2, 0]}]}], {})] == ["satisfied"]
+	ergo.report({"things": [{"id": 1}]}, _sentence_policy({"c": indexed}), {}).requirements.s.checks.c.expression == "for last of xs sorted by ts[0] as x: x.n is 2"
 }

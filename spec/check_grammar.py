@@ -24,6 +24,7 @@ NON_SYNTAX = [
         r"^\"[^\"]*\" after every or some would check each item of the last list",
         r'^"within" only compares numbers$',
         r'^"within" needs a number of 0 or more$',
+        r'^"sorted by" reads a field of the item, not ',
     ]
 ]
 

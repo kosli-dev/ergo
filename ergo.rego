@@ -6154,7 +6154,7 @@ _from_line(raw) := line if {
 	count(_s_sentence_problems(line)) == 0
 } else := {"problems": _s_problems(_s_after_every(trim_space(raw)), _s_patterns)}
 
-_s_pick_problems(parsed) := (({`an item starts with "every", "some" or a position, like "last of"` |
+_s_pick_problems(parsed) := ((({`an item starts with "every", "some" or a position, like "last of"` |
 	some item in object.get(parsed, "items", [])
 	not "position" in object.keys(object.get(item, "pick", {"position": 1}))
 } | {`"sorted by" goes after a position, like "last of", not after every or some` |
@@ -6167,12 +6167,13 @@ _s_pick_problems(parsed) := (({`an item starts with "every", "some" or a positio
 	object.get(item, "if_any", false) == true
 }) | {`"sorted by" reads a field of each item` |
 	some item in object.get(parsed, "items", [])
-	not _s_sort_field(item.sorted_by, {i.as | some i in parsed.items})
-}
-
-_s_sort_field(p, names) if {
-	object.keys(p) & {"start", "position"} == set()
-	not p.steps[0] in names
+	object.keys(item.sorted_by) & {"start", "position"} != set()
+}) | {concat("", [`"sorted by" reads a field of the item, not `, name, ": write .", name]) |
+	some item in object.get(parsed, "items", [])
+	object.keys(item.sorted_by) & {"start", "position"} == set()
+	object.get(item.sorted_by, "dot", false) != true
+	name := item.sorted_by.steps[0]
+	name in {i.as | some i in parsed.items}
 }
 
 _s_after_every(text) := m[1] if {
@@ -6221,7 +6222,7 @@ _s_item_word(q) := q if q != ""
 
 _s_sorted_by("", _) := {}
 
-_s_sorted_by(text, pat) := {"sorted_by": _s_path_of(text, pat)} if text != ""
+_s_sorted_by(text, pat) := {"sorted_by": _s_unlifted_path_of(text, pat)} if text != ""
 
 _s_if_any("") := {}
 
@@ -6258,7 +6259,9 @@ _s_term_of(text, pat) := _s_number(text) if {
 	m := regex.find_all_string_submatch_n(pat.elapsed, text, 1)[0]
 } else := _s_path_of(text, pat)
 
-_s_path_of(text, pat) := _s_lifted(object.union(_s_position_of(m[1], m[2], m[3]), _s_start_of(m[4], _s_steps_of(m[5], pat)))) if {
+_s_path_of(text, pat) := _s_lifted(_s_unlifted_path_of(text, pat))
+
+_s_unlifted_path_of(text, pat) := object.union(_s_position_of(m[1], m[2], m[3]), _s_start_of(m[4], _s_steps_of(m[5], pat))) if {
 	m := regex.find_all_string_submatch_n(pat.path_parts, text, 1)[0]
 }
 

@@ -21,7 +21,7 @@ elapsed-assertion = elapsed WS compare-phrase
 for-line          = for-item ["," WS for-item]
 for-item          = quantifier WS path [WS whose] [if-any] WS "as" WS alias
                   / position WS "of" WS plain-path [WS whose] [WS sorted-by] WS "as" WS alias
-sorted-by         = "sorted" WS "by" WS plain-path
+sorted-by         = "sorted" WS "by" WS first-key *step
 alias             = bare-key
 
 ; A subject's from: line.
