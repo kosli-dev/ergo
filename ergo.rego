@@ -2205,6 +2205,14 @@ _leaf_op_passed("compare_time", check, subj) if {
 	_cmp(check.cmp, l, r)
 }
 
+_leaf_op_passed("compare_time", check, subj) if {
+	l := value_at(subj, check.left)
+	r := _simple_value(subj, check.right)
+	_date_shaped(l)
+	_date_shaped(r)
+	_cmp(check.cmp, l, r)
+}
+
 _wants(values) := arg(values) if not _value_list(values)
 
 _wants(values) := [arg(x) | some x in values] if {
@@ -2235,7 +2243,10 @@ _orderable(c, v) if {
 	not c in _text_cmps
 }
 
-_orderable(_, v) if is_string(v)
+_orderable(c, v) if {
+	is_string(v)
+	c in _text_cmps
+}
 
 _unusable_states(leaf, x) := {"unusable" | _unusable(leaf, x)}
 
@@ -2401,6 +2412,11 @@ _timestamps(l, r) if {
 	is_number(r)
 }
 
+_timestamps(l, r) if {
+	_date_shaped(l)
+	_date_shaped(r)
+}
+
 _found(x, path) := v if {
 	v := _field(x, path)
 	v != null
@@ -2409,6 +2425,16 @@ _found(x, path) := v if {
 _rfc3339_shaped(v) if {
 	is_string(v)
 	m := regex.find_all_string_submatch_n(`^(1[6-9][0-9]{2}|2[0-2][0-9]{2})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\.[0-9]+)?(Z|[+-]([01][0-9]|2[0-3]):[0-5][0-9])$`, v, 1)[0]
+	_real_date(m)
+}
+
+_date_shaped(v) if {
+	is_string(v)
+	m := regex.find_all_string_submatch_n(`^(1[6-9][0-9]{2}|2[0-2][0-9]{2})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$`, v, 1)[0]
+	_real_date(m)
+}
+
+_real_date(m) if {
 	year := to_number(m[1])
 	year >= 1678
 	year <= 2261
@@ -2454,6 +2480,18 @@ _cmp("ends_with", l, r) if {
 	is_string(l)
 	is_string(r)
 	endswith(l, r)
+}
+
+_cmp("alphabetically_before", l, r) if {
+	is_string(l)
+	is_string(r)
+	l < r
+}
+
+_cmp("alphabetically_after", l, r) if {
+	is_string(l)
+	is_string(r)
+	l > r
 }
 
 _cmp("in", l, r) if {
@@ -2898,7 +2936,7 @@ _cmp_problem(node, here) := {"invalid cmp" |
 	not _sentence_cmp(node, here)
 }
 
-_text_cmps := {"starts_with", "ends_with"}
+_text_cmps := {"starts_with", "ends_with", "alphabetically_before", "alphabetically_after"}
 
 _sentence_cmp(node, here) if {
 	node.op == "compare"
@@ -5547,6 +5585,11 @@ _elapsed_units(unit, x, y) := _elapsed_ns(unit, _time_ns(y) - _time_ns(x)) if {
 	_rfc3339_shaped(y)
 }
 
+_elapsed_units(unit, x, y) := _elapsed_ns(unit, _time_ns(y) - _time_ns(x)) if {
+	_date_shaped(x)
+	_date_shaped(y)
+}
+
 _elapsed_units(unit, x, y) := _elapsed_ns(unit, (round(y * 1000000) - round(x * 1000000)) * 1000) if {
 	_elapsed_seconds_time(x)
 	_elapsed_seconds_time(y)
@@ -5569,11 +5612,18 @@ _elapsed_times(x, y) if {
 }
 
 _elapsed_times(x, y) if {
+	_date_shaped(x)
+	_date_shaped(y)
+}
+
+_elapsed_times(x, y) if {
 	_elapsed_seconds_time(x)
 	_elapsed_seconds_time(y)
 }
 
 _time_ns(v) := time.parse_rfc3339_ns(v) if _rfc3339_shaped(v)
+
+_time_ns(v) := time.parse_rfc3339_ns(concat("", [v, "T00:00:00Z"])) if _date_shaped(v)
 
 _elapsed_path_states(subj, path) := {s} if {
 	s := _read_state(subj, path)
@@ -6010,7 +6060,7 @@ _s_patterns := {
 	"assertions": concat("", [`(`, assertion, `)(?: +and +|$)`]),
 	"assertion": concat("", [`^(?:(every|some) +(`, path, `)|(`, left, `))(?: +whose +(`, conds, `))?(, +if +any,)? +(`, phrase, `)$`]),
 	"for_items": concat("", [`(`, for_item, `)(?:, +|$)`]),
-	"for_item": concat("", [`^(?:(every|some) +)?(`, path, `)(?: +whose +(`, conds, `))?(?: +sorted +by +(`, path, `))?(, +if +any,)? +as +(`, key, `)$`]),
+	"for_item": concat("", [`^(?:(every|some) +)?(`, path, `)(?: +whose +(`, conds, `))?(?: +sorted +by +(`, path, `)( +alphabetically)?)?(, +if +any,)? +as +(`, key, `)$`]),
 	"from": concat("", [`^(`, path, `)(?: +named +by +each +of +(`, rpath, `))?(?: +whose +(`, conds, `))?$`]),
 	"conds": concat("", [`(`, cond, `)(?: +and +|$)`]),
 	"cond": concat("", [`^(`, left, `) +(`, phrase, `)$`]),
@@ -6074,6 +6124,8 @@ _s_patterns := {
 		["matches", `matches +`, list, "list"],
 		["starts with", `starts +with +`, operand, "operand"],
 		["ends with", `ends +with +`, operand, "operand"],
+		["is alphabetically before", `is +alphabetically +before +`, operand, "operand"],
+		["is alphabetically after", `is +alphabetically +after +`, operand, "operand"],
 		["is at least", `is +at +least +`, operand, "operand"],
 		["is at most", `is +at +most +`, operand, "operand"],
 		["is more than", `is +more +than +`, operand, "operand"],
@@ -6098,10 +6150,10 @@ _s_patterns := {
 	cond := concat("", [`(?:`, derived, `|`, path, `) +(?:`, phrase, `)`])
 	conds := concat("", [cond, `(?: +and +`, cond, `)*`])
 	assertion := concat("", [`(?:(?:every|some) +`, path, `|`, left, `)(?: +whose +`, conds, `)?(?:, +if +any,)? +(?:`, phrase, `)`])
-	for_item := concat("", [`(?:(?:every|some) +)?`, path, `(?: +whose +`, conds, `)?(?: +sorted +by +`, path, `)?(?:, +if +any,)? +as +`, key])
+	for_item := concat("", [`(?:(?:every|some) +)?`, path, `(?: +whose +`, conds, `)?(?: +sorted +by +`, path, `(?: +alphabetically)?)?(?:, +if +any,)? +as +`, key])
 }
 
-_s_words := {"a", "after", "an", "and", "as", "at", "before", "between", "count", "days", "each", "empty", "equal", "every", "false", "first", "hours", "in", "item", "last", "less", "minutes", "more", "named", "not", "null", "of", "on", "one", "or", "plus", "seconds", "some", "sorted", "sum", "to", "true", "weeks", "whose", "within"}
+_s_words := {"a", "after", "alphabetically", "an", "and", "as", "at", "before", "between", "count", "days", "each", "empty", "equal", "every", "false", "first", "hours", "in", "item", "last", "less", "minutes", "more", "named", "not", "null", "of", "on", "one", "or", "plus", "seconds", "some", "sorted", "sum", "to", "true", "weeks", "whose", "within"}
 
 _s_pieces(pattern, text) := [m[1] | some m in matches] if {
 	matches := regex.find_all_string_submatch_n(pattern, text, -1)
@@ -6211,8 +6263,8 @@ _s_assertion_of(text, pat) := out if {
 _s_for_item_of(text, pat) := out if {
 	m := regex.find_all_string_submatch_n(pat.for_item, text, 1)[0]
 	out := object.union(
-		{_s_item_word(m[1]): _s_path_of(m[2], pat), "as": m[6]},
-		object.union(object.union(_s_where_of(m[3], pat), _s_if_any(m[5])), _s_sorted_by(m[4], pat)),
+		{_s_item_word(m[1]): _s_path_of(m[2], pat), "as": m[7]},
+		object.union(object.union(_s_where_of(m[3], pat), _s_if_any(m[6])), _s_sorted_by(m[4], m[5], pat)),
 	)
 }
 
@@ -6220,9 +6272,18 @@ _s_item_word("") := "pick"
 
 _s_item_word(q) := q if q != ""
 
-_s_sorted_by("", _) := {}
+_s_sorted_by("", _, _) := {}
 
-_s_sorted_by(text, pat) := {"sorted_by": _s_unlifted_path_of(text, pat)} if text != ""
+_s_sorted_by(text, "", pat) := {"sorted_by": _s_unlifted_path_of(text, pat)} if text != ""
+
+_s_sorted_by(text, alphabetically, pat) := {"sorted_by": _s_unlifted_path_of(text, pat), "alphabetically": true} if {
+	text != ""
+	alphabetically != ""
+}
+
+_s_alphabetically_text(item) := " alphabetically" if object.get(item, "alphabetically", false) == true
+
+else := ""
 
 _s_if_any("") := {}
 
@@ -6486,15 +6547,15 @@ _s_sentence_problems(parsed) := (((((((((((((((({concat("", [node.bare_word, " i
 }) | {concat("", [`"`, node.op, `" takes text`]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
-	node.op in {"starts with", "ends with"}
+	node.op in {"starts with", "ends with", "is alphabetically before", "is alphabetically after"}
 	"value" in object.keys(node)
 	not is_string(node.value)
-}) | {concat("", [`"`, node.op, `" takes a time or a number`]) |
+}) | {concat("", [`"`, node.op, `" takes `, _s_takes[node.op]]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
-	node.op in object.keys(_s_time_cmps)
+	node.op in object.keys(_s_takes)
 	"value" in object.keys(node)
-	not _s_time_value(node.value)
+	not _s_takes_value(node.op, node.value)
 }) | {concat("", [`"`, node.phrase.op, `" after every or some would check each item of the last list, not the list: put the walk on a for line`]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
@@ -6529,7 +6590,7 @@ _s_bad_name(name) if name in {"params", "input"}
 
 _s_nodes(x) := {y | walk(x, [_, y])}
 
-_s_self_ops := {"is", "is not", "is at least", "is at most", "is more than", "is less than", "is before", "is after", "is on or after", "is on or before", "starts with", "ends with"}
+_s_self_ops := {"is", "is not", "is at least", "is at most", "is more than", "is less than", "is before", "is after", "is on or after", "is on or before", "starts with", "ends with", "is alphabetically before", "is alphabetically after"}
 
 _s_self_term(node) := node.phrase.terms[0] if {
 	node.phrase.op in _s_self_ops
@@ -6681,7 +6742,7 @@ _s_for_item_text(item) := concat("", [_s_quantified_text(item), " as ", item.as]
 
 _s_for_item_text(item) := concat("", [_s_path_text(item.pick, "left"), _s_where_text(item), _s_sorted_by_text(item), " as ", item.as]) if "pick" in object.keys(item)
 
-_s_sorted_by_text(item) := concat("", [" sorted by ", _s_path_text(item.sorted_by, "left")]) if "sorted_by" in object.keys(item)
+_s_sorted_by_text(item) := concat("", [" sorted by ", _s_path_text(item.sorted_by, "left"), _s_alphabetically_text(item)]) if "sorted_by" in object.keys(item)
 
 else := ""
 
@@ -7763,9 +7824,28 @@ _s_list_path(ph) := ph.terms[0] if {
 	_s_one_path(ph.terms)
 }
 
+_s_takes := object.union({op: "a time or a number" | some op, _ in _s_time_cmps}, {op: "a number" | some op, _ in _s_order_cmps})
+
+_s_takes_value(op, v) if {
+	op in object.keys(_s_time_cmps)
+	_s_time_value(v)
+}
+
+_s_takes_value(op, v) if {
+	op in object.keys(_s_order_cmps)
+	is_number(v)
+}
+
+_s_takes_value(_, v) if {
+	is_object(v)
+	"out_of_range" in object.keys(v)
+}
+
 _s_time_value(v) if is_number(v)
 
 _s_time_value(v) if _rfc3339_shaped(v)
+
+_s_time_value(v) if _date_shaped(v)
 
 _s_time_cmps := {"is before": "lt", "is after": "gt", "is on or after": "gte", "is on or before": "lte"}
 
@@ -7871,7 +7951,7 @@ _s_plain_model(a) := {"op": "range", "path": _s_model_path(a.path), "min": a.phr
 
 _s_compare_ops := object.union(
 	object.union({op: ["compare", cmp] | some op, cmp in _s_order_cmps}, {op: ["compare_time", cmp] | some op, cmp in _s_time_cmps}),
-	{"starts with": ["compare", "starts_with"], "ends with": ["compare", "ends_with"]},
+	{"starts with": ["compare", "starts_with"], "ends with": ["compare", "ends_with"], "is alphabetically before": ["compare", "alphabetically_before"], "is alphabetically after": ["compare", "alphabetically_after"]},
 )
 
 _s_contains_ops := {
@@ -8363,7 +8443,7 @@ _s_for_item_model(item, names) := {
 	"whose": [_s_named(_s_leaf_model(c), names) | some c in object.get(item, "where", [])],
 	"if_any": false,
 	"as": item.as,
-	"pick": object.union({"at": _s_pick_at(item.pick.position), "from_last": _s_picks_from_last(item.pick)}, {"by": _s_model_path(item.sorted_by) | "sorted_by" in object.keys(item)}),
+	"pick": object.union({"at": _s_pick_at(item.pick.position), "from_last": _s_picks_from_last(item.pick)}, object.union({"by": _s_model_path(item.sorted_by) | "sorted_by" in object.keys(item)}, {"alphabetically": true | object.get(item, "alphabetically", false) == true})),
 } if "pick" in object.keys(item)
 
 _s_pick_at(n) := n if is_number(n)
@@ -8506,15 +8586,21 @@ else := _walk_worst(fails) if {
 
 _for_list_input(item, w) := [_walk_name(item.path, w.walked), [_walk_shown(e.v) | some e in w.items]]
 
-_for_sort_key(item, e, names) := _for_sortable(v) if {
+_for_sort_key(item, e, names) := _for_sortable(v, object.get(item.pick, "alphabetically", false)) if {
 	"by" in object.keys(item.pick)
 	is_object(e.iv)
 	v := _resolved(e.iv, item.pick.by) with input as {"ergo/names": names}
 }
 
-_for_sortable(v) := ["number", v] if is_number(v)
+_for_sortable(v, false) := ["number", v] if is_number(v)
 
-_for_sortable(v) := ["time", _time_ns(v)] if _rfc3339_shaped(v)
+_for_sortable(v, false) := ["time", _time_ns(v)] if _rfc3339_shaped(v)
+
+_for_sortable(v, false) := ["date", v] if _date_shaped(v)
+
+_for_sortable(v, true) := ["text", v] if is_string(v)
+
+_for_kept_kind(kinds) := [k | some k in ["number", "time", "date", "text"]; k in kinds][0]
 
 _for_unsortable(item, _, _) := [] if not "by" in object.keys(item.pick)
 
@@ -8525,7 +8611,7 @@ _for_unsortable(item, items, names) := array.concat(unread, mixed) if {
 	mixed := [{"path": e.i, "item": e.i, "cause": "unusable", "value": _for_sort_shown(item, e, names)} |
 		count(kinds) > 1
 		some e in items
-		_for_sort_key(item, e, names)[0] == "time"
+		_for_sort_key(item, e, names)[0] != _for_kept_kind(kinds)
 	]
 }
 

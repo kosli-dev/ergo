@@ -1930,29 +1930,44 @@
     ]
   },
   {
-    "description": "is at least a string",
+    "description": "is at least a written string",
     "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least \"b\""}}}},
     "cases": [
       {
-        "description": "passes on a later string",
-        "rules": ["sentence.phrase.order", "sentence.value.scalar", "compare.pass"],
+        "description": "is written wrong, because two strings aren't ordered",
+        "rules": ["sentence.phrase.order", "sentence.written_wrong.slot", "written_wrong"],
         "input": {"things": [{"id": "t1", "x": "c"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "c"}]}
-        ],
-        "expressions": {"s": {"c": "x is at least \"b\""}}
-      },
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["\"is at least\" takes a number"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is alphabetically after a string compares by code point",
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is alphabetically after \"a\""}}}},
+    "cases": [
       {
-        "description": "passes on the same string",
-        "rules": ["sentence.phrase.order", "sentence.value.scalar", "compare.pass"],
+        "description": "passes on \"b\"",
+        "rules": ["sentence.phrase.alphabetical", "compare.alphabetical"],
         "input": {"things": [{"id": "t1", "x": "b"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "b"}]}
+        ],
+        "expressions": {"s": {"c": "x is alphabetically after \"a\""}}
+      },
+      {
+        "description": "fails as value on \"Z\", which comes before \"a\"",
+        "rules": ["sentence.phrase.alphabetical", "compare.alphabetical"],
+        "input": {"things": [{"id": "t1", "x": "Z"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "Z"}]}
         ]
       },
       {
-        "description": "fails as value on an earlier string",
-        "rules": ["sentence.phrase.order", "sentence.value.scalar", "compare.pass"],
+        "description": "fails as value on \"a\" itself",
+        "rules": ["sentence.phrase.alphabetical", "compare.alphabetical"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a"}]}
@@ -1960,33 +1975,72 @@
       },
       {
         "description": "fails as unusable on a number",
-        "rules": ["sentence.phrase.order", "sentence.value.scalar", "compare.pass"],
+        "rules": ["sentence.phrase.alphabetical", "compare.alphabetical"],
         "input": {"things": [{"id": "t1", "x": 5}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 5}]}
+        ]
+      },
+      {
+        "description": "fails as absent when missing",
+        "rules": ["sentence.phrase.alphabetical", "compare.alphabetical"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+        ]
+      },
+      {
+        "description": "fails as null on null",
+        "rules": ["sentence.phrase.alphabetical", "compare.alphabetical"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
         ]
       }
     ]
   },
   {
-    "description": "is more than a string compares by code point",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is more than \"a\""}}}},
+    "description": "is alphabetically before a field",
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is alphabetically before y"}}}},
     "cases": [
       {
-        "description": "passes on \"b\"",
-        "rules": ["sentence.phrase.order", "compare.pass"],
-        "input": {"things": [{"id": "t1", "x": "b"}]},
+        "description": "passes on \"Z\" before \"a\", since uppercase comes first",
+        "rules": ["sentence.phrase.alphabetical", "compare.alphabetical"],
+        "input": {"things": [{"id": "t1", "x": "Z", "y": "a"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "b"}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "Z"}, {"name": "y", "value": "a"}]}
         ],
-        "expressions": {"s": {"c": "x is more than \"a\""}}
+        "expressions": {"s": {"c": "x is alphabetically before y"}}
       },
       {
-        "description": "fails as value on \"Z\", which comes before \"a\"",
-        "rules": ["sentence.phrase.order", "compare.pass"],
-        "input": {"things": [{"id": "t1", "x": "Z"}]},
+        "description": "orders a character above U+FFFF after one below it",
+        "rules": ["sentence.phrase.alphabetical", "compare.alphabetical"],
+        "input": {"things": [{"id": "t1", "x": "！", "y": "😀"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "Z"}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "！"}, {"name": "y", "value": "😀"}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the field is a number",
+        "rules": ["sentence.phrase.alphabetical", "compare.alphabetical"],
+        "input": {"things": [{"id": "t1", "x": "a", "y": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a"}, {"name": "y", "value": 1}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is alphabetically before a written value that isn't text",
+    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is alphabetically before 3"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, because it could only fail",
+        "rules": ["sentence.phrase.alphabetical", "sentence.written_wrong.slot", "written_wrong"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["\"is alphabetically before\" takes text"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
         ]
       }
     ]
@@ -2184,11 +2238,11 @@
     "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least y"}}}},
     "cases": [
       {
-        "description": "passes when the left string is later",
-        "rules": ["sentence.phrase.order", "sentence.value.path"],
-        "input": {"things": [{"id": "t1", "x": "b", "y": "a"}]},
+        "description": "fails as unusable on two strings, so numbers held as strings aren't ordered as text",
+        "rules": ["sentence.phrase.order", "sentence.value.path", "compare.fail"],
+        "input": {"things": [{"id": "t1", "x": "9", "y": "80"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "b"}, {"name": "y", "value": "a"}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "9"}, {"name": "y", "value": "80"}]}
         ],
         "expressions": {"s": {"c": "x is at least y"}}
       },

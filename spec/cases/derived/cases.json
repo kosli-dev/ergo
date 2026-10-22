@@ -13080,5 +13080,165 @@
         }
       }
     ]
+  },
+  {
+    "description": "days elapsed between two dates",
+    "policy": {
+      "subjects": {
+        "vuln": {
+          "from": [
+            "vulns"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "vuln",
+          "checks": {
+            "c": "days elapsed from started to ended is 17"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "counts whole days between two dates",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "time.format",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": "2026-09-15",
+              "ended": "2026-10-02"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": 17
+              },
+              {
+                "name": "started",
+                "value": "2026-09-15"
+              },
+              {
+                "name": "ended",
+                "value": "2026-10-02"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "days elapsed from started to ended is 17"
+          }
+        }
+      },
+      {
+        "description": "counts 29 February in a leap year",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "time.format"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": "2024-02-14",
+              "ended": "2024-03-02"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": 17
+              },
+              {
+                "name": "started",
+                "value": "2024-02-14"
+              },
+              {
+                "name": "ended",
+                "value": "2024-03-02"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable on a date and a time, even at midnight",
+        "rules": [
+          "sentence.derived.elapsed",
+          "tally.elapsed",
+          "time.fail"
+        ],
+        "input": {
+          "vulns": [
+            {
+              "id": "v1",
+              "started": "2026-09-15",
+              "ended": "2026-10-02T00:00:00Z"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "days elapsed from started to ended",
+                "value": null
+              },
+              {
+                "name": "started",
+                "value": "2026-09-15"
+              },
+              {
+                "name": "ended",
+                "value": "2026-10-02T00:00:00Z"
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
