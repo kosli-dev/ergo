@@ -6010,7 +6010,7 @@ _s_patterns := {
 	"assertions": concat("", [`(`, assertion, `)(?: +and +|$)`]),
 	"assertion": concat("", [`^(?:(every|some) +(`, path, `)|(`, left, `))(?: +whose +(`, conds, `))?(, +if +any,)? +(`, phrase, `)$`]),
 	"for_items": concat("", [`(`, for_item, `)(?:, +|$)`]),
-	"for_item": concat("", [`^(every|some) +(`, path, `)(?: +whose +(`, conds, `))?(, +if +any,)? +as +(`, key, `)$`]),
+	"for_item": concat("", [`^(?:(every|some) +)?(`, path, `)(?: +whose +(`, conds, `))?(?: +sorted +by +(`, path, `))?(, +if +any,)? +as +(`, key, `)$`]),
 	"from": concat("", [`^(`, path, `)(?: +named +by +each +of +(`, rpath, `))?(?: +whose +(`, conds, `))?$`]),
 	"conds": concat("", [`(`, cond, `)(?: +and +|$)`]),
 	"cond": concat("", [`^(`, left, `) +(`, phrase, `)$`]),
@@ -6019,7 +6019,7 @@ _s_patterns := {
 	"plain": concat("", [`^(`, path, `) +(\S.*)$`]),
 	"quantified": concat("", [`^(every|some) +(`, path, `) +(\S.*)$`]),
 	"path": concat("", [`^`, path, `$`]),
-	"path_parts": concat("", [`^(?:(item +([1-9][0-9]*)|first|last) +of +)?(`, start, `)((?:`, step, `)*)$`]),
+	"path_parts": concat("", [`^(?:(item +([1-9][0-9]*)( +from +last)?|first|last) +of +)?(`, start, `)((?:`, step, `)*)$`]),
 	"steps": concat("", [`\.(`, key, `|`, dq, `)| +named +by +(`, ref, `)|\[(`, ref, `)\]|\[(`, dq, `)\]|\[(0|[1-9][0-9]*)\]`]),
 	"terms": concat("", [`(`, term, `)(?: +plus +|$)`]),
 	"number": concat("", [`^`, num, `$`]),
@@ -6043,7 +6043,7 @@ _s_patterns := {
 	step := concat("", [`\.(?:`, key, `|`, dq, `)| +named +by +(?:`, ref, `)|\[(?:`, ref, `|`, dq, `|0|[1-9][0-9]*)\]`])
 	start := concat("", [`\$params|\$input|\.?(?:`, key, `|`, dq, `)`])
 	rstart := concat("", [`\$params|\$input|`, key, `|\.(?:`, key, `|`, dq, `)`])
-	pos := `(?:item +[1-9][0-9]*|first|last) +of +`
+	pos := `(?:item +[1-9][0-9]*(?: +from +last)?|first|last) +of +`
 	plain := concat("", [`(?:`, start, `)(?:`, step, `)*`])
 	path := concat("", [`(?:`, pos, `)?`, plain])
 	rpath := concat("", [`(?:`, pos, `)?(?:`, rstart, `)(?:`, step, `)*`])
@@ -6098,10 +6098,10 @@ _s_patterns := {
 	cond := concat("", [`(?:`, derived, `|`, path, `) +(?:`, phrase, `)`])
 	conds := concat("", [cond, `(?: +and +`, cond, `)*`])
 	assertion := concat("", [`(?:(?:every|some) +`, path, `|`, left, `)(?: +whose +`, conds, `)?(?:, +if +any,)? +(?:`, phrase, `)`])
-	for_item := concat("", [`(?:every|some) +`, path, `(?: +whose +`, conds, `)?(?:, +if +any,)? +as +`, key])
+	for_item := concat("", [`(?:(?:every|some) +)?`, path, `(?: +whose +`, conds, `)?(?: +sorted +by +`, path, `)?(?:, +if +any,)? +as +`, key])
 }
 
-_s_words := {"a", "after", "an", "and", "as", "at", "before", "between", "count", "days", "each", "empty", "equal", "every", "false", "first", "hours", "in", "item", "last", "less", "minutes", "more", "named", "not", "null", "of", "on", "one", "or", "plus", "seconds", "some", "sum", "to", "true", "weeks", "whose", "within"}
+_s_words := {"a", "after", "an", "and", "as", "at", "before", "between", "count", "days", "each", "empty", "equal", "every", "false", "first", "hours", "in", "item", "last", "less", "minutes", "more", "named", "not", "null", "of", "on", "one", "or", "plus", "seconds", "some", "sorted", "sum", "to", "true", "weeks", "whose", "within"}
 
 _s_pieces(pattern, text) := [m[1] | some m in matches] if {
 	matches := regex.find_all_string_submatch_n(pattern, text, -1)
@@ -6142,8 +6142,8 @@ _for_line_problems(text, pat) := ["a for line holds two items at most"] if {
 	pieces := _s_pieces(pat.for_items, text)
 	count(pieces) > 2
 	count([a | some a in pieces; _s_for_item_of(a, pat)]) == count(pieces)
-} else := [`an item starts with "every" or "some"`] if {
-	not regex.match(`^(?:every|some) `, text)
+} else := [`an item starts with "every", "some" or a position, like "last of"`] if {
+	not regex.match(`^(?:every|some|first|last|item) `, text)
 } else := [`an item ends with "as" and a name, like "every pull_requests as pr"`] if {
 	not regex.match(` as +[^ ,]+$`, text)
 } else := _s_problems(text, pat)
@@ -6153,6 +6153,27 @@ _from_line(raw) := line if {
 	line := _s_from_of(trim_space(raw), pat)
 	count(_s_sentence_problems(line)) == 0
 } else := {"problems": _s_problems(_s_after_every(trim_space(raw)), _s_patterns)}
+
+_s_pick_problems(parsed) := (({`an item starts with "every", "some" or a position, like "last of"` |
+	some item in object.get(parsed, "items", [])
+	not "position" in object.keys(object.get(item, "pick", {"position": 1}))
+} | {`"sorted by" goes after a position, like "last of", not after every or some` |
+	some item in object.get(parsed, "items", [])
+	"sorted_by" in object.keys(item)
+	not "pick" in object.keys(item)
+}) | {"if any can't go with a position" |
+	some item in object.get(parsed, "items", [])
+	"pick" in object.keys(item)
+	object.get(item, "if_any", false) == true
+}) | {`"sorted by" reads a field of each item` |
+	some item in object.get(parsed, "items", [])
+	not _s_sort_field(item.sorted_by, {i.as | some i in parsed.items})
+}
+
+_s_sort_field(p, names) if {
+	object.keys(p) & {"start", "position"} == set()
+	not p.steps[0] in names
+}
 
 _s_after_every(text) := m[1] if {
 	m := regex.find_all_string_submatch_n(`^every +(\S.*)$`, text, 1)[0]
@@ -6189,10 +6210,18 @@ _s_assertion_of(text, pat) := out if {
 _s_for_item_of(text, pat) := out if {
 	m := regex.find_all_string_submatch_n(pat.for_item, text, 1)[0]
 	out := object.union(
-		{m[1]: _s_path_of(m[2], pat), "as": m[5]},
-		object.union(_s_where_of(m[3], pat), _s_if_any(m[4])),
+		{_s_item_word(m[1]): _s_path_of(m[2], pat), "as": m[6]},
+		object.union(object.union(_s_where_of(m[3], pat), _s_if_any(m[5])), _s_sorted_by(m[4], pat)),
 	)
 }
+
+_s_item_word("") := "pick"
+
+_s_item_word(q) := q if q != ""
+
+_s_sorted_by("", _) := {}
+
+_s_sorted_by(text, pat) := {"sorted_by": _s_path_of(text, pat)} if text != ""
 
 _s_if_any("") := {}
 
@@ -6229,7 +6258,7 @@ _s_term_of(text, pat) := _s_number(text) if {
 	m := regex.find_all_string_submatch_n(pat.elapsed, text, 1)[0]
 } else := _s_path_of(text, pat)
 
-_s_path_of(text, pat) := _s_lifted(object.union(_s_position_of(m[1], m[2]), _s_start_of(m[3], _s_steps_of(m[4], pat)))) if {
+_s_path_of(text, pat) := _s_lifted(object.union(_s_position_of(m[1], m[2], m[3]), _s_start_of(m[4], _s_steps_of(m[5], pat)))) if {
 	m := regex.find_all_string_submatch_n(pat.path_parts, text, 1)[0]
 }
 
@@ -6240,11 +6269,16 @@ _s_lifted(path) := object.union(object.remove(path, ["steps"]), {"position": las
 	"index" in object.keys(last)
 } else := path
 
-_s_position_of("", _) := {}
+_s_position_of("", _, _) := {}
 
-_s_position_of(word, "") := {"position": word} if word != ""
+_s_position_of(word, "", _) := {"position": word} if word != ""
 
-_s_position_of(_, digits) := {"position": to_number(digits)} if digits != ""
+_s_position_of(_, digits, "") := {"position": to_number(digits)} if digits != ""
+
+_s_position_of(_, digits, from_last) := {"position": to_number(digits), "from_last": true} if {
+	digits != ""
+	from_last != ""
+}
 
 _s_start_of("$params", steps) := {"start": "params", "steps": steps}
 
@@ -6383,7 +6417,7 @@ _s_sq_char(`\\`) := `\`
 
 _s_sq_char(c) := c if not c in {`\'`, `\\`}
 
-_s_sentence_problems(parsed) := ((((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
+_s_sentence_problems(parsed) := (((((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"bare_word" in object.keys(node)
@@ -6400,7 +6434,7 @@ _s_sentence_problems(parsed) := ((((((((((((((({concat("", [node.bare_word, " is
 	name := item.as
 	parsed.items[j].as == name
 	j < i
-}) | {"if any can't go with some" |
+}) | _s_pick_problems(parsed)) | {"if any can't go with some" |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"some" in object.keys(node)
@@ -6410,7 +6444,7 @@ _s_sentence_problems(parsed) := ((((((((((((((({concat("", [node.bare_word, " is
 	node != parsed
 	is_object(node)
 	"where" in object.keys(node)
-	object.keys(node) & {"every", "some"} == set()
+	object.keys(node) & {"every", "some", "pick"} == set()
 	not _s_derived_term(object.get(node, "terms", [null])[count(object.get(node, "terms", [null])) - 1])
 }) | {concat("", [node.phrase.op, " can't follow a count of, a sum of or a plus"]) |
 	some node in _s_nodes(parsed)
@@ -6583,7 +6617,7 @@ _s_aliased(a, names) := object.union(object.union(a, {k: _s_marked(a[k], names, 
 
 _s_names(aliases, parts) := {"for": aliases, "all": (aliases | parts)}
 
-_s_aliased_item(item, names) := object.union(object.union(item, {q: _s_marked(item[q], names, false) | some q in ["every", "some"]; q in object.keys(item)}), {"where": [_s_marked_cond(c, names) | some c in item.where] | is_array(object.get(item, "where", null))})
+_s_aliased_item(item, names) := object.union(object.union(item, {q: _s_marked(item[q], names, false) | some q in ["every", "some", "pick"]; q in object.keys(item)}), {"where": [_s_marked_cond(c, names) | some c in item.where] | is_array(object.get(item, "where", null))})
 
 _s_problems(text, pat) := [concat("", ["unclosed quote at column ", _json_text(count(closed) + 1)])] if {
 	closed := regex.find_all_string_submatch_n(pat.quotes, text, 1)[0][0]
@@ -6640,7 +6674,13 @@ _s_each_text(parsed) := concat("", [" named by each of ", _s_path_text(parsed.na
 
 _s_each_text(parsed) := "" if not "named_by_each_of" in object.keys(parsed)
 
-_s_for_item_text(item) := concat("", [_s_quantified_text(item), " as ", item.as])
+_s_for_item_text(item) := concat("", [_s_quantified_text(item), " as ", item.as]) if not "pick" in object.keys(item)
+
+_s_for_item_text(item) := concat("", [_s_path_text(item.pick, "left"), _s_where_text(item), _s_sorted_by_text(item), " as ", item.as]) if "pick" in object.keys(item)
+
+_s_sorted_by_text(item) := concat("", [" sorted by ", _s_path_text(item.sorted_by, "left")]) if "sorted_by" in object.keys(item)
+
+else := ""
 
 _s_assertion_text(a) := concat(" ", [_s_quantified_text(a), _s_phrase_text(a.phrase)]) if _s_quantifier_of(a) != ""
 
@@ -6652,7 +6692,9 @@ _s_quantifier_of(a) := "every" if "every" in object.keys(a)
 
 _s_quantifier_of(a) := "some" if "some" in object.keys(a)
 
-_s_quantifier_of(a) := "" if object.keys(a) & {"every", "some"} == set()
+_s_quantifier_of(a) := "pick" if "pick" in object.keys(a)
+
+_s_quantifier_of(a) := "" if object.keys(a) & {"every", "some", "pick"} == set()
 
 _s_if_any_text(a) := ", if any," if object.get(a, "if_any", false) == true
 
@@ -6694,11 +6736,15 @@ _s_term_text(t) := _s_path_text(t, "right") if {
 
 _s_path_text(p, side) := concat("", [_s_position_text(p), _s_start_text(p, side), concat("", [_s_step_text(s) | some s in array.slice(p.steps, _s_first_step(p), count(p.steps))])])
 
-_s_position_text(p) := concat("", ["item ", _json_text(p.position), " of "]) if is_number(object.get(p, "position", null))
+_s_position_text(p) := concat("", ["item ", _json_text(p.position), _s_from_last_text(p), " of "]) if is_number(object.get(p, "position", null))
 
 _s_position_text(p) := concat("", [p.position, " of "]) if is_string(object.get(p, "position", null))
 
 _s_position_text(p) := "" if not "position" in object.keys(p)
+
+_s_from_last_text(p) := " from last" if object.get(p, "from_last", false) == true
+
+else := ""
 
 _s_first_step(p) := 0 if "start" in object.keys(p)
 
@@ -7647,11 +7693,15 @@ _s_model(a) := {
 	q != ""
 }
 
-_s_paths_unsupported(a) := {"last of isn't supported yet" |
+_s_paths_unsupported(a) := {`last of isn't supported yet here: pick the item on a for line, like "for: last of commits as commit"` |
 	some node in _s_nodes(a)
 	is_object(node)
-	object.get(node, "position", null) == "last"
+	_s_from_last(node)
 } | _s_elapsed_unsupported(a)
+
+_s_from_last(node) if object.get(node, "position", null) == "last"
+
+_s_from_last(node) if object.get(node, "from_last", false) == true
 
 _s_elapsed_unsupported(a) := _s_elapsed_flaw(_s_whose_stripped(_s_without_terms(a)))
 
@@ -8283,7 +8333,11 @@ _s_names_not_given(x, later) := {concat("", ["unknown alias ", ref.steps[0]]) |
 	ref.steps[0] in later
 }
 
-_s_item_unsupported(item) := (_s_paths_unsupported(item) | {u | some c in object.get(item, "where", []); some u in _s_cond_unsupported(c)}) | _s_walk_too_long(item)
+_s_item_unsupported(item) := (_s_paths_unsupported(_s_unpicked(item)) | {u | some c in object.get(item, "where", []); some u in _s_cond_unsupported(c)}) | _s_walk_too_long(_s_unpicked(item))
+
+_s_unpicked(item) := object.union(object.remove(item, ["pick"]), {"pick": object.remove(item.pick, ["position", "from_last"])}) if "pick" in object.keys(item)
+
+else := item
 
 _s_for_item_model(item, names) := {
 	"q": q,
@@ -8291,7 +8345,27 @@ _s_for_item_model(item, names) := {
 	"whose": [_s_named(_s_leaf_model(c), names) | some c in object.get(item, "where", [])],
 	"if_any": object.get(item, "if_any", false),
 	"as": item.as,
-} if q := _s_quantifier_of(item)
+} if {
+	q := _s_quantifier_of(item)
+	q != "pick"
+}
+
+_s_for_item_model(item, names) := {
+	"q": "every",
+	"path": _s_named_path(_s_model_path(_s_unpicked(item).pick), names),
+	"whose": [_s_named(_s_leaf_model(c), names) | some c in object.get(item, "where", [])],
+	"if_any": false,
+	"as": item.as,
+	"pick": object.union({"at": _s_pick_at(item.pick.position), "from_last": _s_picks_from_last(item.pick)}, {"by": _s_model_path(item.sorted_by) | "sorted_by" in object.keys(item)}),
+} if "pick" in object.keys(item)
+
+_s_pick_at(n) := n if is_number(n)
+
+_s_pick_at(n) := 1 if n in {"first", "last"}
+
+_s_picks_from_last(p) if p.position == "last"
+
+else := object.get(p, "from_last", false)
 
 _s_named(m, names) := object.union(m, {f: _s_named_side(m[f], names) | some f in ["path", "left", "right"]; f in object.keys(m)})
 
@@ -8351,6 +8425,11 @@ _for_row(check, subj) := object.union(_for_outer(check, subj, _for_names), {"cau
 _for_outer(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(check, subj, names, check.items[0], w), "failed": []} if {
 	w := _for_walk(check.items[0], subj, names)
 	"unread" in object.keys(w)
+} else := {"cause": cause, "inputs": _for_inputs(check, subj, names, check.items[0], _for_walk(check.items[0], subj, names)), "failed": _for_failed(cause, [object.union(f, {"lines": []}) | some f in pre.fails])} if {
+	pre := _for_pre(check, subj, names)
+	pre != null
+	"pick" in object.keys(check.items[1])
+	cause := _for_pick_failure(pre)
 } else := {"cause": cause, "inputs": inputs, "failed": failed} if {
 	item := check.items[0]
 	w := _for_walk(item, subj, names)
@@ -8362,10 +8441,130 @@ _for_outer(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(chec
 	inputs := _for_inputs(check, subj, names, item, w)
 }
 
-_for_walk(item, subj, names) := w if {
+_for_walk(item, subj, names) := _for_picked(item, w, names) if {
 	keys := _walk_keys(item, subj) with input as {"ergo/names": names}
-	w := _walk(_walk_start(item, subj), keys, item.if_any == true) with input as {"ergo/names": names}
+	w := _walk(_walk_start(item, subj), keys, _for_empty_ok(item)) with input as {"ergo/names": names}
 } else := {"items": [], "fails": [], "walked": set(), "trail": [], "unread": _read_state(subj, item.path)}
+
+_for_empty_ok(item) if "pick" in object.keys(item)
+
+else := item.if_any == true
+
+_for_picked(item, w, _) := w if not "pick" in object.keys(item)
+
+_for_picked(item, w, _) := w if {
+	"pick" in object.keys(item)
+	w.walked == set()
+}
+
+_for_picked(item, w, names) := _for_pick_sorted(item, object.union(w, {"items": kept}), w.items, names) if {
+	"pick" in object.keys(item)
+	w.walked != set()
+	judged := [[e, _for_whose(item, e, names)] | some e in w.items]
+	whose_fails := [{"path": j[0].i, "item": j[0].i, "cause": j[1].undecided[0], "value": null} | some j in judged; j[1].undecided != []]
+	kept := [j[0] | some j in judged; j[1].undecided == []; j[1].kept]
+	_for_no_fails(w, whose_fails)
+}
+
+_for_picked(item, w, names) := object.union(w, {"items": [], "fails": array.concat(w.fails, whose_fails), "input": _for_list_input(item, w)}) if {
+	"pick" in object.keys(item)
+	w.walked != set()
+	whose_fails := [{"path": e.i, "item": e.i, "cause": wh.undecided[0], "value": null} | some e in w.items; wh := _for_whose(item, e, names); wh.undecided != []]
+	not _for_no_fails(w, whose_fails)
+}
+
+_for_no_fails(w, whose_fails) if {
+	w.fails == []
+	whose_fails == []
+}
+
+_for_pick_sorted(item, w, read, names) := object.union(w, {"items": [], "fails": bad, "input": _for_list_input(item, object.union(w, {"items": read}))}) if {
+	bad := _for_unsortable(item, w.items, names)
+	bad != []
+} else := object.union(w, {"items": read, "unread": "absent"}) if {
+	not _for_pick_index(item, w.items, names)
+} else := object.union(w, {"items": [], "fails": tied, "input": _for_list_input(item, object.union(w, {"items": read}))}) if {
+	tied := _for_tied(item, w.items, names)
+	count(tied) > 1
+} else := object.union(w, {"items": [e], "input": [_path_name(e.i), _walk_shown(e.v)]}) if {
+	e := w.items[_for_pick_index(item, w.items, names)]
+}
+
+_for_pick_failure(w) := w.unread if "unread" in object.keys(w)
+
+else := _walk_worst(fails) if {
+	fails := array.concat(w.fails, _walk_stop(w))
+	fails != []
+}
+
+_for_list_input(item, w) := [_walk_name(item.path, w.walked), [_walk_shown(e.v) | some e in w.items]]
+
+_for_sort_key(item, e, names) := _for_sortable(v) if {
+	"by" in object.keys(item.pick)
+	is_object(e.iv)
+	v := _resolved(e.iv, item.pick.by) with input as {"ergo/names": names}
+}
+
+_for_sortable(v) := ["number", v] if is_number(v)
+
+_for_sortable(v) := ["time", _time_ns(v)] if _rfc3339_shaped(v)
+
+_for_unsortable(item, _, _) := [] if not "by" in object.keys(item.pick)
+
+_for_unsortable(item, items, names) := array.concat(unread, mixed) if {
+	"by" in object.keys(item.pick)
+	unread := [{"path": e.i, "item": e.i, "cause": _for_sort_state(item, e, names), "value": _for_sort_shown(item, e, names)} | some e in items; not _for_sort_key(item, e, names)]
+	kinds := {_for_sort_key(item, e, names)[0] | some e in items}
+	mixed := [{"path": e.i, "item": e.i, "cause": "unusable", "value": _for_sort_shown(item, e, names)} |
+		count(kinds) > 1
+		some e in items
+		_for_sort_key(item, e, names)[0] == "time"
+	]
+}
+
+_for_sort_state(item, e, names) := s if {
+	is_object(e.iv)
+	s := _read_state(e.iv, item.pick.by) with input as {"ergo/names": names}
+	s != "value"
+} else := "unusable" if is_object(e.iv)
+
+else := "not_an_object"
+
+_for_sort_shown(item, e, names) := _walk_shown(v) if {
+	is_object(e.iv)
+	v := _resolved(e.iv, item.pick.by) with input as {"ergo/names": names}
+}
+
+else := null
+
+_for_order(item, items, names) := [pair[2] | some pair in sort([[_for_sort_key(item, e, names)[1], i, i] | some i, e in items])] if "by" in object.keys(item.pick)
+
+_for_order(item, items, _) := numbers.range(0, count(items) - 1) if not "by" in object.keys(item.pick)
+
+_for_pick_index(item, items, names) := order[_for_pick_slot(item.pick, count(order))] if {
+	order := _for_order(item, items, names)
+	count(items) > 0
+}
+
+_for_pick_slot(pick, n) := pick.at - 1 if {
+	not pick.from_last
+	pick.at <= n
+}
+
+_for_pick_slot(pick, n) := n - pick.at if {
+	pick.from_last
+	pick.at <= n
+}
+
+_for_tied(item, _, _) := [] if not "by" in object.keys(item.pick)
+
+_for_tied(item, items, names) := [{"path": e.i, "item": e.i, "cause": "ambiguous", "value": _for_sort_shown(item, e, names)} |
+	some e in items
+	_for_sort_key(item, e, names)[1] == key
+] if {
+	"by" in object.keys(item.pick)
+	key := _for_sort_key(item, items[_for_pick_index(item, items, names)], names)[1]
+}
 
 _for_pre(check, subj, names) := _for_walk(check.items[1], subj, names) if {
 	count(check.items) == 2
@@ -8475,7 +8674,7 @@ _for_failed(cause, fails) := [{"path": _path_name(f.path), "item": _path_name(f.
 
 _for_inputs(check, subj, names, item, w) := [{"name": pair[0], "value": pair[1]} | some pair in sort(_for_input_pairs(check, subj, names, item, w))]
 
-_for_input_pairs(check, subj, names, item, w) := (((({[_walk_name(item.path, w.walked), [_walk_shown(e.v) | some e in w.items]]} | _for_inner_pairs(check, subj, names, item, w)) | {[_path_name(shown), value_at(subj, shown)] |
+_for_input_pairs(check, subj, names, item, w) := (((({object.get(w, "input", _for_list_input(item, w))} | _for_inner_pairs(check, subj, names, item, w)) | {[_path_name(shown), value_at(subj, shown)] |
 	some c in check.checks
 	not _walks(c)
 	some p in _leaf_paths(c)
@@ -8510,7 +8709,7 @@ _for_inner_pairs(check, subj, names, item, w) := {[_for_list_name(check.items[1]
 	values := [_walk_shown(e2.v) | some iw in inner; some e2 in iw.items]
 }
 
-_for_inner_pairs(check, subj, names, _, _) := {[_for_list_name(check.items[1].path, iw.walked), [_walk_shown(e.v) | some e in iw.items]]} if {
+_for_inner_pairs(check, subj, names, _, _) := {object.get(iw, "input", [_for_list_name(check.items[1].path, iw.walked), [_walk_shown(e.v) | some e in iw.items]])} if {
 	count(check.items) == 2
 	not _for_from_first(check)
 	iw := _for_walk(check.items[1], subj, names)

@@ -16,9 +16,12 @@ if-any            = "," WS "if" WS "any,"
 derived-assertion = derived-left WS compare-phrase
 elapsed-assertion = elapsed WS compare-phrase
 
-; A for: line walks one or two lists and gives each item an alias.
+; A for: line walks one or two lists and gives each item an alias, or
+; picks one item of a list by its position.
 for-line          = for-item ["," WS for-item]
 for-item          = quantifier WS path [WS whose] [if-any] WS "as" WS alias
+                  / position WS "of" WS plain-path [WS whose] [WS sorted-by] WS "as" WS alias
+sorted-by         = "sorted" WS "by" WS plain-path
 alias             = bare-key
 
 ; A subject's from: line.
@@ -72,13 +75,13 @@ value             = string / number / "true" / "false" / "null"
 ; On the right side of a phrase a quoted string is a value, so a path
 ; there can't start with a quoted key unless a "." is in front of it.
 ; A position picks one item of the list a path ends at, counting from 1:
-; item 3 of items, first of items, last of items. items[2] is the same
-; item as item 3 of items.
+; item 3 of items, item 2 from last of items, first of items, last of
+; items. items[2] is the same item as item 3 of items.
 path              = plain-path / position WS "of" WS plain-path
 plain-path        = start *step
 right-path        = plain-right / position WS "of" WS plain-right
 plain-right       = ("$params" / "$input" / bare-key / "." key) *step
-position          = "item" WS positive / "first" / "last"
+position          = "item" WS positive [WS "from" WS "last"] / "first" / "last"
 positive          = %x31-39 *DIGIT
 start             = "$params" / "$input" / first-key
 first-key         = bare-key / "." key / quoted-key

@@ -5648,5 +5648,993 @@
         ]
       }
     ]
+  },
+  {
+    "description": "the latest commit picked on a for line",
+    "policy": {
+      "subjects": {
+        "pull_request": {
+          "from": [
+            "pull_requests"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pull_request",
+          "checks": {
+            "c": {
+              "for": "some approvers as approver, last of commits sorted by timestamp as last_commit",
+              "assert": "approver.username does not equal last_commit.author_username"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "picks the item with the largest timestamp, wherever it is in the list",
+        "rules": [
+          "sentence.for.pick",
+          "for.pick",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.for.line",
+          "for.try",
+          "for.pass"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [
+                {
+                  "username": "grace"
+                }
+              ],
+              "commits": [
+                {
+                  "sha": "c1",
+                  "author_username": "ada",
+                  "timestamp": 2
+                },
+                {
+                  "sha": "c2",
+                  "author_username": "grace",
+                  "timestamp": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "name": "item 1 of commits",
+                "value": {
+                  "author_username": "ada",
+                  "sha": "c1",
+                  "timestamp": 2
+                }
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as value when the approver wrote the latest commit, and names it by its place in the list",
+        "rules": [
+          "sentence.for.pick",
+          "for.pick",
+          "for.inputs",
+          "for.failed_items",
+          "for.try",
+          "for.pass"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [
+                {
+                  "username": "ada"
+                }
+              ],
+              "commits": [
+                {
+                  "sha": "c1",
+                  "author_username": "ada",
+                  "timestamp": 2
+                },
+                {
+                  "sha": "c2",
+                  "author_username": "grace",
+                  "timestamp": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.username does not equal last_commit.author_username",
+                    "cause": "value"
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "path": "item 1 of approvers",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "ada"
+                  }
+                ]
+              },
+              {
+                "name": "item 1 of commits",
+                "value": {
+                  "author_username": "ada",
+                  "sha": "c1",
+                  "timestamp": 2
+                }
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as ambiguous when another item ties with the one picked, and names every tied item",
+        "rules": [
+          "sentence.for.pick",
+          "for.pick",
+          "for.inputs",
+          "for.failed_items"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [
+                {
+                  "username": "linus"
+                }
+              ],
+              "commits": [
+                {
+                  "sha": "c1",
+                  "author_username": "ada",
+                  "timestamp": 2
+                },
+                {
+                  "sha": "c2",
+                  "author_username": "grace",
+                  "timestamp": 2
+                },
+                {
+                  "sha": "c3",
+                  "author_username": "linus",
+                  "timestamp": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "ambiguous",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "ambiguous",
+                "failed_assertions": [],
+                "item": "item 1 of commits",
+                "path": "item 1 of commits",
+                "value": 2
+              },
+              {
+                "cause": "ambiguous",
+                "failed_assertions": [],
+                "item": "item 2 of commits",
+                "path": "item 2 of commits",
+                "value": 2
+              }
+            ],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "linus"
+                  }
+                ]
+              },
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author_username": "ada",
+                    "sha": "c1",
+                    "timestamp": 2
+                  },
+                  {
+                    "author_username": "grace",
+                    "sha": "c2",
+                    "timestamp": 2
+                  },
+                  {
+                    "author_username": "linus",
+                    "sha": "c3",
+                    "timestamp": 1
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a tie away from the picked item doesn't matter",
+        "rules": [
+          "sentence.for.pick",
+          "for.pick",
+          "for.inputs",
+          "for.failed_items"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [
+                {
+                  "username": "linus"
+                }
+              ],
+              "commits": [
+                {
+                  "sha": "c1",
+                  "author_username": "ada",
+                  "timestamp": 1
+                },
+                {
+                  "sha": "c2",
+                  "author_username": "grace",
+                  "timestamp": 1
+                },
+                {
+                  "sha": "c3",
+                  "author_username": "linus",
+                  "timestamp": 2
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.username does not equal last_commit.author_username",
+                    "cause": "value"
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "path": "item 1 of approvers",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "linus"
+                  }
+                ]
+              },
+              {
+                "name": "item 3 of commits",
+                "value": {
+                  "author_username": "linus",
+                  "sha": "c3",
+                  "timestamp": 2
+                }
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when an item has no timestamp, without picking",
+        "rules": [
+          "sentence.for.pick",
+          "for.pick",
+          "for.inputs",
+          "for.failed_items"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [
+                {
+                  "username": "linus"
+                }
+              ],
+              "commits": [
+                {
+                  "sha": "c1",
+                  "author_username": "ada",
+                  "timestamp": 2
+                },
+                {
+                  "sha": "c2",
+                  "author_username": "grace"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "item 2 of commits",
+                "path": "item 2 of commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "linus"
+                  }
+                ]
+              },
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author_username": "ada",
+                    "sha": "c1",
+                    "timestamp": 2
+                  },
+                  {
+                    "author_username": "grace",
+                    "sha": "c2"
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when a timestamp is neither a number nor a time",
+        "rules": [
+          "sentence.for.pick",
+          "for.pick",
+          "for.inputs",
+          "for.failed_items"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [
+                {
+                  "username": "linus"
+                }
+              ],
+              "commits": [
+                {
+                  "sha": "c1",
+                  "author_username": "ada",
+                  "timestamp": 2
+                },
+                {
+                  "sha": "c2",
+                  "author_username": "grace",
+                  "timestamp": "yesterday"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of commits",
+                "path": "item 2 of commits",
+                "value": "yesterday"
+              }
+            ],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "linus"
+                  }
+                ]
+              },
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author_username": "ada",
+                    "sha": "c1",
+                    "timestamp": 2
+                  },
+                  {
+                    "author_username": "grace",
+                    "sha": "c2",
+                    "timestamp": "yesterday"
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "sorts times by the moment they name, not as text",
+        "rules": [
+          "sentence.for.pick",
+          "for.pick",
+          "for.inputs",
+          "for.failed_items"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [
+                {
+                  "username": "grace"
+                }
+              ],
+              "commits": [
+                {
+                  "sha": "c1",
+                  "author_username": "ada",
+                  "timestamp": "2026-10-02T00:00:00Z"
+                },
+                {
+                  "sha": "c2",
+                  "author_username": "grace",
+                  "timestamp": "2026-10-02T01:00:00+02:00"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "name": "item 1 of commits",
+                "value": {
+                  "author_username": "ada",
+                  "sha": "c1",
+                  "timestamp": "2026-10-02T00:00:00Z"
+                }
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as absent on an empty list, since there's nothing to pick",
+        "rules": [
+          "sentence.for.pick",
+          "for.pick",
+          "for.inputs",
+          "for.failed_items"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvers": [
+                {
+                  "username": "grace"
+                }
+              ],
+              "commits": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "username": "grace"
+                  }
+                ]
+              },
+              {
+                "name": "commits[]",
+                "value": []
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "the second latest approval, filtered before it is sorted",
+    "policy": {
+      "subjects": {
+        "pull_request": {
+          "from": [
+            "pull_requests"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pull_request",
+          "checks": {
+            "c": {
+              "for": "item 2 from last of approvals whose state is \"APPROVED\" sorted by approved_at as approval",
+              "assert": "approval.by is \"ada\""
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "drops the items the whose leaves out before sorting",
+        "rules": [
+          "sentence.for.pick",
+          "for.pick",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.path.index"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvals": [
+                {
+                  "by": "ada",
+                  "state": "APPROVED",
+                  "approved_at": 1
+                },
+                {
+                  "by": "grace",
+                  "state": "CHANGES_REQUESTED",
+                  "approved_at": 3
+                },
+                {
+                  "by": "linus",
+                  "state": "APPROVED",
+                  "approved_at": 2
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "name": "item 1 of approvals",
+                "value": {
+                  "approved_at": 1,
+                  "by": "ada",
+                  "state": "APPROVED"
+                }
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails with the cause of an item the whose can't decide",
+        "rules": [
+          "sentence.for.pick",
+          "for.pick",
+          "for.inputs",
+          "for.failed_items"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvals": [
+                {
+                  "by": "ada",
+                  "state": "APPROVED",
+                  "approved_at": 1
+                },
+                {
+                  "by": "grace",
+                  "approved_at": 3
+                },
+                {
+                  "by": "linus",
+                  "state": "APPROVED",
+                  "approved_at": 2
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "item 2 of approvals",
+                "path": "item 2 of approvals",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "name": "approvals[]",
+                "value": [
+                  {
+                    "approved_at": 1,
+                    "by": "ada",
+                    "state": "APPROVED"
+                  },
+                  {
+                    "approved_at": 3,
+                    "by": "grace"
+                  },
+                  {
+                    "approved_at": 2,
+                    "by": "linus",
+                    "state": "APPROVED"
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when fewer items are left than the position",
+        "rules": [
+          "sentence.for.pick",
+          "for.pick",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.path.index"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "approvals": [
+                {
+                  "by": "ada",
+                  "state": "APPROVED",
+                  "approved_at": 1
+                },
+                {
+                  "by": "grace",
+                  "state": "CHANGES_REQUESTED",
+                  "approved_at": 3
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "name": "approvals[]",
+                "value": [
+                  {
+                    "approved_at": 1,
+                    "by": "ada",
+                    "state": "APPROVED"
+                  },
+                  {
+                    "approved_at": 3,
+                    "by": "grace",
+                    "state": "CHANGES_REQUESTED"
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "the last tag as written",
+    "policy": {
+      "subjects": {
+        "release": {
+          "from": [
+            "releases"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "last of tags as tag",
+              "assert": "tag is \"v2\""
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "without sorted by, picks by the order of the list",
+        "rules": [
+          "sentence.for.pick",
+          "for.pick",
+          "for.inputs",
+          "for.failed_items",
+          "sentence.path.index"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "tags": [
+                "v10",
+                "v2"
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "name": "item 2 of tags",
+                "value": "v2"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "sorted by after every",
+    "policy": {
+      "subjects": {
+        "pull_request": {
+          "from": [
+            "pull_requests"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pull_request",
+          "checks": {
+            "c": {
+              "for": "every commits sorted by timestamp as commit",
+              "assert": "commit.signed is true"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, since every reads all the items",
+        "rules": [
+          "sentence.for.pick"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "pr1",
+              "commits": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "for: \"sorted by\" goes after a position, like \"last of\", not after every or some"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "pull_request"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "c",
+            "inputs": [],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "pr1",
+              "type": "pull_request"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

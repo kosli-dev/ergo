@@ -865,7 +865,7 @@ The check's `expression` is `approved_by is not empty and reviewed_at is before 
 - `every` and `some` paths can be ten steps long.
 - `contains` and the other list phrases can't follow `every` or `some`, because the last list is walked too, so `every pull_requests.labels does not contain "hotfix"` would ask each label. It's written wrong, and the message says to put the walk on a `for` line.
 
-A `for` line names the items of one or two lists, so the sentences under `assert` can read an item and the subject together. Each item is `every` or `some`, a path, an optional `whose`, and `as` an alias. The second item can walk a list inside the first, by its alias.
+A `for` line names the items of one or two lists, so the sentences under `assert` can read an item and the subject together. Each item is `every` or `some`, a path, an optional `whose`, and `as` an alias, or picks one item by its position, as below. The second item can walk a list inside the first, by its alias.
 
 An alias is a short word that stands for something longer: `as pr` makes `pr` an alias for each pull request in turn. With the input above:
 
@@ -924,6 +924,60 @@ With `for: some approvals.approver as approver`, where a commit also has an `app
 | `every commits.author does not equal approver`   | each commit's `author` with the name `approver`  |
 | `every commits.author does not equal .approver`  | each commit's `author` with its own `approver`   |
 | `.approver equals approver`                      | the subject's `approver` with the name           |
+
+A `for` item can start with a position instead of `every` or `some`, and then its alias stands for that one item: `first of commits`, `item 2 of commits`, `last of commits`, or `item 2 from last of commits`. Positions count from 1. Add `sorted by` and a field of each item to count in the order of that field rather than the order of the list. With this input:
+
+```json
+{"pull_requests": [{"number": 7,
+  "approvers": [{"username": "ada"}],
+  "commits": [
+    {"sha": "a1", "author_username": "ada",   "timestamp": 1760000200},
+    {"sha": "a2", "author_username": "grace", "timestamp": 1760000100}
+  ]}]}
+```
+
+```yaml
+not_last_author:
+  description: The approver didn't push the last commit
+  for: last of commits sorted by timestamp as last_commit, some approvers as approver
+  assert: approver.username does not equal last_commit.author_username
+```
+
+picks `a1`, the commit with the latest `timestamp`, wherever it is in the list, and gives:
+
+```json
+{
+  "cause": "value",
+  "check": "not_last_author",
+  "failed_items": [
+    {
+      "cause": "value",
+      "failed_assertions": [
+        {"assertion": "approver.username does not equal last_commit.author_username", "cause": "value"}
+      ],
+      "item": "item 1 of commits",
+      "path": "item 1 of commits",
+      "value": null
+    }
+  ],
+  "inputs": [
+    {"name": "approvers[]", "value": [{"username": "ada"}]},
+    {"name": "item 1 of commits", "value": {"author_username": "ada", "sha": "a1", "timestamp": 1760000200}}
+  ],
+  "passed": false,
+  "requirement": "review",
+  "subject": {"id": 7, "type": "pull_request"}
+}
+```
+
+- The `expression` says how the item was picked, `for last of commits sorted by timestamp as last_commit, …`, and `inputs` says which item that was in the input, `item 1 of commits`.
+- `first of commits sorted by timestamp` is the earliest, `last of` the latest, and `item 2 from last of` the second latest.
+- A `whose` goes before `sorted by`, and keeps the items to sort: `last of approvers whose state is "APPROVED" sorted by timestamp as approval` is the latest approval. An item the `whose` can't decide fails the check with its cause.
+- `sorted by` sorts numbers, and [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339) times by the moment they name, so `2026-10-02T01:00:00+02:00` comes before `2026-10-02T00:00:00Z`. Strings can't be sorted as text yet. An item whose field is missing, `null` or anything else fails the check as `absent`, `null` or `unusable`, without picking, since the order can't be known. Numbers mixed with times fail the times as `unusable`.
+- When another item has the same value as the one picked, nothing is picked and the check fails as `ambiguous`, listing the items that tie. With both commits at `1760000200` above, `failed_items` holds `item 1 of commits` and `item 2 of commits`, each with the `timestamp` as `value`. A tie elsewhere in the list doesn't matter.
+- A position past the end of the list, or an empty list, fails as `absent`.
+- `sorted by` reads a field of the item, so it can't start with `$params`, `$input` or a name from the `for` line. It can't go after `every` or `some`, and `, if any,` can't go with a position.
+- A field of the picked item is read through its name, `last_commit.author_username`. In a sentence, `last of commits.author_username` would be the last of a list at `commits.author_username`.
 
 `count of`, `sum of` and `plus` work out a number to compare, as the [derived values](#derived-values) of `compare` do. With the input of [derived values](#derived-values):
 
@@ -988,10 +1042,10 @@ A sentence that can't be read is [written wrong](#basic-operators), and the `$we
 
 for `prod: environment is "prod`. `x is not null` is written wrong too, because it could only fail: write `x exists`. So is a value that isn't a number before `within`, like `x is "a" within 1`. A sentence that compares a path with itself, like `x is at least x`, is written wrong too, because it could only pass or only fail. That happens most often in a `whose`, or after `every` or `some`, where a bare name is the item's: `every conditions.type equals type` compares each condition's `type` with itself. To compare an item with the subject, use a [`for` line](#checks) and put the comparison under `assert`. An object with both `assert` and `op` is read as a check with an `op`, so a [custom operator](#custom-operators) can still take `assert`.
 
-Ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `last of`, a `sum of` or a `plus` in the `whose` of a `count of` or a `sum of`, a `plus` in the phrase of an `every` or `some`, and an elapsed time after `every` or `some` or in a `from` line. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `last_signed: last of commits.signed is true` gives:
+Ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `last of` and `item <n> from last of` anywhere but at the start of a `for` item, a `sum of` or a `plus` in the `whose` of a `count of` or a `sum of`, a `plus` in the phrase of an `every` or `some`, and an elapsed time after `every` or `some` or in a `from` line. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `last_signed: last of commits.signed is true` gives:
 
 ```json
-{"name": "checks.last_signed", "value": ["last of isn't supported yet"]}
+{"name": "checks.last_signed", "value": ["last of isn't supported yet here: pick the item on a for line, like \"for: last of commits as commit\""]}
 ```
 
 Until then, write those checks with an [`op`](#operators).
@@ -1405,7 +1459,7 @@ Every row has a `cause`. A missing field, a field set to `null`, and a selector 
 | `substituted`   | The check failed, but its substitute passed.                                                                                                                             |
 | `ill_formed`    | The check is written wrong, so it can't be run. `$well_formed` fails too.                                                                                                |
 | `not_an_object` | The subject isn't an object, so it has no fields.                                                                                                                        |
-| `ambiguous`     | A selector matched more than one item.                                                                                                                                   |
+| `ambiguous`     | A selector matched more than one item, or another item ties with the one a `for` line picks `sorted by` a field.                                                         |
 | `unmatched`     | A selector matched nothing, although the list was there.                                                                                                                 |
 | `unusable`      | A value the check reads is there, but it's not the kind the check needs, like a string for `range`, a string where a path needs an object, or a param of the wrong type. |
 | `absent`        | A field the check reads isn't there.                                                                                                                                     |
