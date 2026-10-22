@@ -145,7 +145,7 @@
       "type": "array",
       "items": {
         "type": "object",
-        "properties": {"assertion": {"type": "string"}, "cause": {"$ref": "#/$defs/cause"}},
+        "properties": {"assertion": {"type": "string"}, "cause": {"$ref": "#/$defs/cause"}, "items": {"type": "array", "items": {"type": "string"}, "description": "Only on entries of for checks with two items: the items of the second list the sentence failed for, in path order."}},
         "required": ["assertion", "cause"],
         "additionalProperties": false
       }

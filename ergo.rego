@@ -8548,7 +8548,7 @@ _for_picked(item, w, names) := _for_pick_sorted(item, object.union(w, {"items": 
 	"pick" in object.keys(item)
 	w.walked != set()
 	judged := [[e, _for_whose(item, e, names)] | some e in w.items]
-	whose_fails := [{"path": j[0].i, "item": j[0].i, "cause": j[1].undecided[0], "value": null} | some j in judged; j[1].undecided != []]
+	whose_fails := [{"path": j[0].i, "item": j[0].i, "cause": j[1].undecided[0], "value": _walk_shown(j[0].v)} | some j in judged; j[1].undecided != []]
 	kept := [j[0] | some j in judged; j[1].undecided == []; j[1].kept]
 	_for_no_fails(w, whose_fails)
 }
@@ -8556,7 +8556,7 @@ _for_picked(item, w, names) := _for_pick_sorted(item, object.union(w, {"items": 
 _for_picked(item, w, names) := object.union(w, {"items": [], "fails": array.concat(w.fails, whose_fails), "input": _for_list_input(item, w)}) if {
 	"pick" in object.keys(item)
 	w.walked != set()
-	whose_fails := [{"path": e.i, "item": e.i, "cause": wh.undecided[0], "value": null} | some e in w.items; wh := _for_whose(item, e, names); wh.undecided != []]
+	whose_fails := [{"path": e.i, "item": e.i, "cause": wh.undecided[0], "value": _walk_shown(e.v)} | some e in w.items; wh := _for_whose(item, e, names); wh.undecided != []]
 	not _for_no_fails(w, whose_fails)
 }
 
@@ -8716,9 +8716,9 @@ _for_inner_next(check, subj, bound, [], true) := _for_lines(check, subj, bound)
 
 _for_failure(_, [], false, _) := null
 
-_for_failure(e, undecided, _, res) := {"path": e.i, "item": e.i, "cause": res.cause, "value": null, "lines": res.lines} if undecided != []
+_for_failure(e, undecided, _, res) := {"path": e.i, "item": e.i, "cause": res.cause, "value": _walk_shown(e.v), "lines": res.lines} if undecided != []
 
-_for_failure(e, [], true, res) := {"path": e.i, "item": e.i, "cause": res.cause, "value": null, "lines": res.lines} if not res.passed
+_for_failure(e, [], true, res) := {"path": e.i, "item": e.i, "cause": res.cause, "value": _walk_shown(e.v), "lines": res.lines} if not res.passed
 
 _for_failure(_, [], true, res) := null if res.passed
 
@@ -8746,11 +8746,15 @@ _for_lines(check, subj, names) := {"passed": count(lines) == 0, "cause": _all_of
 
 _for_merge_lines(_, "satisfied", _) := []
 
-_for_merge_lines(check, cause, fails) := [{"assertion": a, "cause": causes[0]} |
+_for_merge_lines(check, cause, fails) := [{"assertion": a, "cause": causes[0], "items": [_for_item_name(p) | some p in sort({f.path | some f in fails; some l in f.lines; l.assertion == a})]} |
 	some a in check.assertions
 	causes := [l.cause | some f in fails; some l in f.lines; l.assertion == a]
 	count(causes) > 0
 ] if cause != "satisfied"
+
+_for_item_name(p) := _path_name(array.concat([substring(p[0], 1, -1)], array.slice(p, 1, count(p)))) if _starts_at_name(p)
+
+else := _path_name(p)
 
 _for_verdict(item, w, judged, fails) := _walk_stop(w)[0].cause if {
 	w.walked == set()

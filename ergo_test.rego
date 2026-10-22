@@ -8965,10 +8965,10 @@ test_a_for_line_lists_each_first_item_that_failed_with_the_lines_it_failed if {
 	rows := _for_rows(_peer_approval, _peer_things, {})
 	[[row[0], row[1]] | some row in rows] == [["peer", "satisfied"], ["fails", "value"], ["nostate", "absent"]]
 	rows[1][2] == [
-		{"path": "item 1 of approvers", "item": "item 1 of approvers", "cause": "value", "value": null, "failed_assertions": [{"assertion": "approver.timestamp is after commit.timestamp", "cause": "value"}]},
-		{"path": "item 2 of approvers", "item": "item 2 of approvers", "cause": "value", "value": null, "failed_assertions": [{"assertion": "approver.username does not equal author", "cause": "value"}]},
+		{"path": "item 1 of approvers", "item": "item 1 of approvers", "cause": "value", "value": _peer_things[1].approvers[0], "failed_assertions": [{"assertion": "approver.timestamp is after commit.timestamp", "cause": "value", "items": ["item 2 of commits"]}]},
+		{"path": "item 2 of approvers", "item": "item 2 of approvers", "cause": "value", "value": _peer_things[1].approvers[1], "failed_assertions": [{"assertion": "approver.username does not equal author", "cause": "value", "items": ["item 1 of commits", "item 2 of commits"]}]},
 	]
-	rows[2][2] == [{"path": "item 1 of approvers", "item": "item 1 of approvers", "cause": "absent", "value": null, "failed_assertions": []}]
+	rows[2][2] == [{"path": "item 1 of approvers", "item": "item 1 of approvers", "cause": "absent", "value": _peer_things[2].approvers[0], "failed_assertions": []}]
 	rows[0][2] == []
 }
 
@@ -8994,7 +8994,7 @@ test_a_second_item_can_walk_a_list_inside_the_first if {
 	]
 	rows := _for_rows(check, things, {})
 	[[row[0], row[1]] | some row in rows] == [[1, "satisfied"], [2, "value"]]
-	rows[1][2] == [{"path": "item 2 of pull_requests", "item": "item 2 of pull_requests", "cause": "value", "value": null, "failed_assertions": [{"assertion": "approver.username does not equal pr.author", "cause": "value"}]}]
+	rows[1][2] == [{"path": "item 2 of pull_requests", "item": "item 2 of pull_requests", "cause": "value", "value": things[1].pull_requests[1], "failed_assertions": [{"assertion": "approver.username does not equal pr.author", "cause": "value", "items": ["item 1 of pr.approvers"]}]}]
 	rows[1][3] == [
 		{"name": "pr.approvers[]", "value": array.concat(things[1].pull_requests[0].approvers, things[1].pull_requests[1].approvers)},
 		{"name": "pull_requests[]", "value": things[1].pull_requests},
@@ -9005,7 +9005,7 @@ test_an_item_that_no_approver_passes_fails_without_lines_when_whose_left_every_o
 	check := {"for": `every pull_requests as pr, some pr.approvers whose state is "APPROVED" as approver`, "assert": "approver.username does not equal pr.author"}
 	rows := _for_rows(check, [{"id": 1, "pull_requests": [{"author": "ann", "approvers": [{"username": "bob", "state": "COMMENTED"}]}]}], {})
 	rows[0][1] == "value"
-	rows[0][2] == [{"path": "item 1 of pull_requests", "item": "item 1 of pull_requests", "cause": "value", "value": null, "failed_assertions": []}]
+	rows[0][2] == [{"path": "item 1 of pull_requests", "item": "item 1 of pull_requests", "cause": "value", "value": {"author": "ann", "approvers": [{"username": "bob", "state": "COMMENTED"}]}, "failed_assertions": []}]
 }
 
 test_a_for_list_fails_closed_as_a_walk_does if {
@@ -9024,8 +9024,8 @@ test_an_item_a_whose_cant_decide_fails_with_its_cause_before_any_line_is_read if
 	check := {"for": "every xs whose s is at least 1 as x", "assert": `x.k is "a"`}
 	rows := _for_rows(check, [{"id": 1, "xs": [{"k": "a", "s": 1}, {"k": "a"}]}, {"id": 2, "xs": [{"k": "a", "s": "1"}]}], {})
 	[[row[0], row[1], row[2]] | some row in rows] == [
-		[1, "absent", [{"path": "item 2 of xs", "item": "item 2 of xs", "cause": "absent", "value": null, "failed_assertions": []}]],
-		[2, "unusable", [{"path": "item 1 of xs", "item": "item 1 of xs", "cause": "unusable", "value": null, "failed_assertions": []}]],
+		[1, "absent", [{"path": "item 2 of xs", "item": "item 2 of xs", "cause": "absent", "value": {"k": "a"}, "failed_assertions": []}]],
+		[2, "unusable", [{"path": "item 1 of xs", "item": "item 1 of xs", "cause": "unusable", "value": {"k": "a", "s": "1"}, "failed_assertions": []}]],
 	]
 }
 
@@ -9060,7 +9060,7 @@ test_an_every_in_the_assertion_walks_inside_the_named_item if {
 test_each_item_lists_every_line_it_failed_with_the_first_cause_of_each if {
 	check := {"for": "every xs as x", "assert": ["x.a is 2", "x.b is 2", "x.c is 1"]}
 	rows := _for_rows(check, [{"id": 1, "xs": [{"a": 1, "b": 2}, {"a": 2, "b": 2, "c": 1}]}], {})
-	rows[0][2] == [{"path": "item 1 of xs", "item": "item 1 of xs", "cause": "absent", "value": null, "failed_assertions": [{"assertion": "x.a is 2", "cause": "value"}, {"assertion": "x.c is 1", "cause": "absent"}]}]
+	rows[0][2] == [{"path": "item 1 of xs", "item": "item 1 of xs", "cause": "absent", "value": {"a": 1, "b": 2}, "failed_assertions": [{"assertion": "x.a is 2", "cause": "value"}, {"assertion": "x.c is 1", "cause": "absent"}]}]
 }
 
 test_a_for_line_on_a_subject_that_isnt_an_object_fails_like_any_path_does if {
@@ -9094,14 +9094,14 @@ test_a_for_list_whose_named_by_cant_be_read_fails_with_its_cause_as_a_walk_does 
 	inner := {"for": "every xs as x, every m named by $params.k as y", "assert": "y is 1"}
 	_for_rows(inner, [{"id": 1, "xs": [1], "m": {"a": [1]}}], {}) == [[
 		1, "absent",
-		[{"path": "item 1 of xs", "item": "item 1 of xs", "cause": "absent", "value": null, "failed_assertions": []}],
+		[{"path": "item 1 of xs", "item": "item 1 of xs", "cause": "absent", "value": 1, "failed_assertions": []}],
 		[{"name": "m named by $params.k", "value": []}, {"name": "xs[]", "value": [1]}],
 	]]
 }
 
 test_a_second_item_a_whose_cant_decide_fails_the_first_item_with_its_cause if {
 	check := {"for": "every xs as x, every ys whose s is 1 as y", "assert": "x is 1"}
-	_for_rows(check, [{"id": 1, "xs": [1], "ys": [{"s": 1}, {"t": 1}]}], {})[0][2] == [{"path": "item 1 of xs", "item": "item 1 of xs", "cause": "absent", "value": null, "failed_assertions": []}]
+	_for_rows(check, [{"id": 1, "xs": [1], "ys": [{"s": 1}, {"t": 1}]}], {})[0][2] == [{"path": "item 1 of xs", "item": "item 1 of xs", "cause": "absent", "value": 1, "failed_assertions": []}]
 }
 
 test_a_for_line_whose_param_cant_be_used_fails_as_unusable_and_keeps_its_inputs if {
@@ -12475,7 +12475,7 @@ test_a_for_line_picks_an_item_by_its_position_sorted_by_a_field if {
 test_a_picked_item_that_fails_is_named_by_where_it_is_in_the_input if {
 	_picked("last of commits sorted by timestamp", [3, 1, 2]) == [
 		"value",
-		[{"path": "item 1 of commits", "item": "item 1 of commits", "cause": "value", "value": null, "failed_assertions": [{"assertion": `c.author is "x"`, "cause": "value"}]}],
+		[{"path": "item 1 of commits", "item": "item 1 of commits", "cause": "value", "value": {"author": "ada", "timestamp": 3}, "failed_assertions": [{"assertion": `c.author is "x"`, "cause": "value"}]}],
 		[{"name": "item 1 of commits", "value": {"author": "ada", "timestamp": 3}}],
 	]
 }
@@ -12654,4 +12654,43 @@ test_a_written_value_after_an_order_phrase_has_to_be_a_number if {
 
 test_a_written_date_after_a_time_phrase_is_a_time if {
 	[r.cause | some r in ergo.report({"things": [{"id": 1, "x": "2026-09-30"}, {"id": 2, "x": "2026-10-01"}]}, _sentence_policy({"c": "x is before \"2026-10-01\""}), {}).results; r.check == "c"] == ["satisfied", "value"]
+}
+
+test_a_failed_line_names_the_items_of_the_second_list_it_failed_on if {
+	rows := _for_rows(_peer_approval, _peer_things, {})
+	[[f.item, f.failed_assertions] | some f in rows[1][2]] == [
+		["item 1 of approvers", [{"assertion": "approver.timestamp is after commit.timestamp", "cause": "value", "items": ["item 2 of commits"]}]],
+		["item 2 of approvers", [{"assertion": "approver.username does not equal author", "cause": "value", "items": ["item 1 of commits", "item 2 of commits"]}]],
+	]
+}
+
+test_the_items_of_the_second_list_are_in_list_order_not_alphabetical if {
+	check := {"for": "some approvers as approver, every commits as commit", "assert": "approver.t is more than commit.t"}
+	commits := [{"t": t} | some t in [1, 9, 1, 1, 1, 1, 1, 1, 1, 9]]
+	rows := _for_rows(check, [{"id": 1, "approvers": [{"t": 5}], "commits": commits}], {})
+	rows[0][2][0].failed_assertions[0].items == ["item 2 of commits", "item 10 of commits"]
+}
+
+test_a_second_item_that_cant_be_read_is_named_with_the_line_it_failed if {
+	check := {"for": "some approvers as approver, every commits as commit", "assert": "approver.t is more than commit.t"}
+	rows := _for_rows(check, [{"id": 1, "approvers": [{"t": 5}], "commits": [{"t": 1}, {}]}], {})
+	rows[0][1] == "absent"
+	rows[0][2][0].failed_assertions == [{"assertion": "approver.t is more than commit.t", "cause": "absent", "items": ["item 2 of commits"]}]
+}
+
+test_a_failed_line_names_the_items_of_a_second_list_walked_inside_the_first if {
+	check := {"for": "every pull_requests as pr, some pr.approvers as approver", "assert": "approver.username does not equal pr.author"}
+	rows := _for_rows(check, [{"id": 1, "pull_requests": [{"author": "ann", "approvers": [{"username": "bob"}]}, {"author": "cat", "approvers": [{"username": "cat"}]}]}], {})
+	rows[0][2][0].failed_assertions == [{"assertion": "approver.username does not equal pr.author", "cause": "value", "items": ["item 1 of pr.approvers"]}]
+}
+
+test_a_failed_line_after_a_picked_item_names_the_items_of_the_second_list if {
+	check := {"for": "last of commits sorted by t as last_commit, some approvers as approver", "assert": "approver.u does not equal last_commit.u"}
+	rows := _for_rows(check, [{"id": 1, "approvers": [{"u": "ada"}, {"u": "ada"}], "commits": [{"u": "ada", "t": 2}, {"u": "bob", "t": 1}]}], {})
+	rows[0][2] == [{"path": "item 1 of commits", "item": "item 1 of commits", "cause": "value", "value": {"u": "ada", "t": 2}, "failed_assertions": [{"assertion": "approver.u does not equal last_commit.u", "cause": "value", "items": ["item 1 of approvers", "item 2 of approvers"]}]}]
+}
+
+test_a_for_item_that_failed_shows_the_item_as_its_value if {
+	rows := _for_rows({"for": "every xs as x", "assert": "x.k is 1"}, [{"id": 1, "xs": [{"k": 1}, {"k": 2}]}], {})
+	rows[0][2] == [{"path": "item 2 of xs", "item": "item 2 of xs", "cause": "value", "value": {"k": 2}, "failed_assertions": [{"assertion": "x.k is 1", "cause": "value"}]}]
 }
