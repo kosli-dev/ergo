@@ -6895,9 +6895,11 @@ test_eq_and_ne_still_compare_objects_lists_and_booleans if {
 	cause_of(ordering_doc, {"op": "compare", "left": ["f"], "right": ["t"], "cmp": "eq"}) == "value"
 }
 
-test_a_filter_ordering_objects_cannot_rule_subjects_out if {
+test_a_filter_ordering_objects_or_strings_cannot_rule_subjects_out if {
 	every filter in [
 		{"op": "compare", "left": ["a"], "right": ["b"], "cmp": "lt"},
+		{"op": "compare", "left": ["z"], "right": ["s"], "cmp": "gt"},
+		{"op": "equals", "path": ["n"], "value": 5, "substitute": {"op": "compare", "left": ["z"], "right": ["s"], "cmp": "gt"}},
 		{"op": "any_of", "options": {"o": [{"op": "compare", "left": ["xs"], "right": ["ys"], "cmp": "lt"}]}},
 		{"op": "equals", "path": ["n"], "value": 5, "substitute": {"op": "compare", "left": ["a"], "right": ["b"], "cmp": "lt"}},
 		{"op": "present", "path": ["missing"], "substitute": {"op": "compare", "left": ["a"], "right": ["b"], "cmp": "lt"}},
