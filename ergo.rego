@@ -8303,7 +8303,11 @@ _s_check_for(lines, ftext, wording, problems, parts) := object.union(wording, {
 	texts := [_s_assertion_text(a) | some a in marked]
 } else := object.union(wording, {"expression": _s_for_written_text(lines, ftext), "$sentence": sort(_s_or_unrunnable(((problems | _s_for_problems(lines, ftext)) | _s_for_self(lines, ftext, parts))))})
 
-_s_marked_items(fl, parts) := [_s_aliased_item(item, _s_names({earlier.as | some earlier in array.slice(fl.items, 0, i)}, parts)) | some i, item in fl.items]
+_s_marked_items(fl, parts) := [_s_sort_marked(_s_aliased_item(item, _s_names({earlier.as | some earlier in array.slice(fl.items, 0, i)}, parts)), _s_names({i.as | some i in fl.items}, parts)) | some i, item in fl.items]
+
+_s_sort_marked(item, names) := object.union(object.remove(item, ["sorted_by"]), {"sorted_by": _s_marked(item.sorted_by, names, false)}) if "sorted_by" in object.keys(item)
+
+else := item
 
 _s_for_self(lines, ftext, parts) := _s_lines_self(lines, _s_names({item.as | some item in fl.items}, parts)) | {concat("", ["for: ", p]) | some p in _s_whose_self_problems(_s_marked_items(fl, parts))} if {
 	is_string(ftext)

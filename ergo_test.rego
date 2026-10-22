@@ -12622,4 +12622,9 @@ test_sorted_by_reads_a_field_of_the_item_with_a_dot_or_an_index_after_it if {
 	indexed := {"for": "last of xs sorted by ts[0] as x", "assert": "x.n is 2"}
 	[row[1] | some row in _for_rows(indexed, [{"id": 1, "xs": [{"n": 1, "ts": [1, 9]}, {"n": 2, "ts": [2, 0]}]}], {})] == ["satisfied"]
 	ergo.report({"things": [{"id": 1}]}, _sentence_policy({"c": indexed}), {}).requirements.s.checks.c.expression == "for last of xs sorted by ts[0] as x: x.n is 2"
+	ergo.report({"things": [{"id": 1}]}, _sentence_policy({"c": check}), {}).requirements.s.checks.c.expression == "for last of xs sorted by .x as x: x.n is 2"
+	earlier := {"for": "some ys as y, last of xs sorted by .y as x", "assert": "x.n is 2"}
+	ergo.report({"things": [{"id": 1}]}, _sentence_policy({"c": earlier}), {}).requirements.s.checks.c.expression == "for some ys as y, last of xs sorted by .y as x: x.n is 2"
+	plain := {"for": "last of xs sorted by .t as x", "assert": "x.n is 2"}
+	ergo.report({"things": [{"id": 1}]}, _sentence_policy({"c": plain}), {}).requirements.s.checks.c.expression == "for last of xs sorted by t as x: x.n is 2"
 }
