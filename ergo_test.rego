@@ -707,7 +707,7 @@ test_compare_lt_when_equal if verdict({"a": 1, "b": 1}, compare_ab("lt")) == fal
 
 test_compare_lte_when_equal if verdict({"a": 1, "b": 1}, compare_ab("lte")) == true
 
-test_compare_compares_strings if verdict({"a": "abc", "b": "abd"}, compare_ab("lt")) == true
+test_compare_does_not_order_two_strings if cause_of({"a": "abc", "b": "abd"}, compare_ab("lt")) == "unusable"
 
 test_compare_rejects_unknown_cmp if verdict({"a": 1, "b": 1}, compare_ab("congruent")) == false
 
@@ -926,8 +926,16 @@ test_compare_time_rejects_an_out_of_range_month if {
 	verdict({"start": "2024-13-01T00:00:00Z", "end": "2024-01-01T00:00:00Z"}, compare_time_span("lt")) == false
 }
 
-test_compare_time_rejects_a_date_without_a_time if {
-	verdict({"start": "2024-01-01", "end": "2024-06-01"}, compare_time_span("lt")) == false
+test_compare_time_orders_two_dates_without_a_time if {
+	verdict({"start": "2024-01-01", "end": "2024-06-01"}, compare_time_span("lt")) == true
+}
+
+test_compare_time_rejects_a_date_against_a_time_even_at_midnight if {
+	verdict({"start": "2024-01-01", "end": "2024-06-01T00:00:00Z"}, compare_time_span("lt")) == false
+}
+
+test_compare_time_rejects_a_date_that_doesnt_exist if {
+	verdict({"start": "2023-02-29", "end": "2024-06-01"}, compare_time_span("lt")) == false
 }
 
 test_rfc3339_gate_accepts_valid_timestamps if {
@@ -5965,7 +5973,7 @@ peer_doc := {"pull_requests": [
 peer_check := {"op": "any", "path": ["approvers"], "as": "approver", "check": {"op": "any_of", "options": {"peer": [
 	{"op": "equals", "path": ["state"], "value": "APPROVED"},
 	{"op": "compare", "left": ["username"], "right": ["$pr", "author"], "cmp": "ne"},
-	{"op": "all", "path": ["$pr", "commits"], "check": {"op": "compare", "left": ["$approver", "timestamp"], "right": ["timestamp"], "cmp": "gt"}},
+	{"op": "all", "path": ["$pr", "commits"], "check": {"op": "compare_time", "left": ["$approver", "timestamp"], "right": ["timestamp"], "cmp": "gt"}},
 ]}}}
 
 peer_rows(check) := [[r.subject.id, r.passed, r.cause] | some r in rows_for(report(peer_doc, review_req(check)), "s", "c")]
@@ -6868,10 +6876,13 @@ test_ordering_objects_lists_or_booleans_fails_as_unusable if {
 	}
 }
 
-test_ordering_numbers_and_strings_still_works if {
+test_ordering_numbers_still_works if {
 	verdict(ordering_doc, {"op": "compare", "left": ["n"], "right": ["m"], "cmp": "lt"}) == true
-	verdict(ordering_doc, {"op": "compare", "left": ["z"], "right": ["s"], "cmp": "gt"}) == true
 	cause_of(ordering_doc, {"op": "compare", "left": ["m"], "right": ["n"], "cmp": "lt"}) == "value"
+}
+
+test_ordering_two_strings_fails_as_unusable if {
+	cause_of(ordering_doc, {"op": "compare", "left": ["z"], "right": ["s"], "cmp": "gt"}) == "unusable"
 }
 
 test_ordering_a_number_against_a_string_fails_as_unusable if {
@@ -6884,9 +6895,11 @@ test_eq_and_ne_still_compare_objects_lists_and_booleans if {
 	cause_of(ordering_doc, {"op": "compare", "left": ["f"], "right": ["t"], "cmp": "eq"}) == "value"
 }
 
-test_a_filter_ordering_objects_cannot_rule_subjects_out if {
+test_a_filter_ordering_objects_or_strings_cannot_rule_subjects_out if {
 	every filter in [
 		{"op": "compare", "left": ["a"], "right": ["b"], "cmp": "lt"},
+		{"op": "compare", "left": ["z"], "right": ["s"], "cmp": "gt"},
+		{"op": "equals", "path": ["n"], "value": 5, "substitute": {"op": "compare", "left": ["z"], "right": ["s"], "cmp": "gt"}},
 		{"op": "any_of", "options": {"o": [{"op": "compare", "left": ["xs"], "right": ["ys"], "cmp": "lt"}]}},
 		{"op": "equals", "path": ["n"], "value": 5, "substitute": {"op": "compare", "left": ["a"], "right": ["b"], "cmp": "lt"}},
 		{"op": "present", "path": ["missing"], "substitute": {"op": "compare", "left": ["a"], "right": ["b"], "cmp": "lt"}},
@@ -12343,7 +12356,7 @@ test_a_time_phrase_with_a_written_value_fails_closed_on_every_kind_of_field if {
 }
 
 test_a_written_value_after_a_time_phrase_that_isnt_a_time_is_written_wrong_because_it_could_only_fail if {
-	every pair in [[`t is before null`, `"is before" takes a time or a number`], [`t is after true`, `"is after" takes a time or a number`], [`t is on or after "yesterday"`, `"is on or after" takes a time or a number`], [`t is on or before "2024-01-01"`, `"is on or before" takes a time or a number`], [`t is before "2024-02-30T00:00:00Z"`, `"is before" takes a time or a number`]] {
+	every pair in [[`t is before null`, `"is before" takes a time or a number`], [`t is after true`, `"is after" takes a time or a number`], [`t is on or after "yesterday"`, `"is on or after" takes a time or a number`], [`t is on or before "2024-02-30"`, `"is on or before" takes a time or a number`], [`t is before "2024-02-30T00:00:00Z"`, `"is before" takes a time or a number`]] {
 		_sentence_problems(pair[0]) == [pair[1]]
 	}
 }
@@ -12627,4 +12640,18 @@ test_sorted_by_reads_a_field_of_the_item_with_a_dot_or_an_index_after_it if {
 	ergo.report({"things": [{"id": 1}]}, _sentence_policy({"c": earlier}), {}).requirements.s.checks.c.expression == "for some ys as y, last of xs sorted by .y as x: x.n is 2"
 	plain := {"for": "last of xs sorted by .t as x", "assert": "x.n is 2"}
 	ergo.report({"things": [{"id": 1}]}, _sentence_policy({"c": plain}), {}).requirements.s.checks.c.expression == "for last of xs sorted by t as x: x.n is 2"
+}
+
+test_a_number_out_of_range_after_a_time_or_order_phrase_is_reported_once if {
+	_sentence_problems({"assert": "x is before 1e400"}) == ["number out of range: 1e400"]
+	_sentence_problems({"assert": "x is at least 1e400"}) == ["number out of range: 1e400"]
+}
+
+test_a_written_value_after_an_order_phrase_has_to_be_a_number if {
+	_sentence_problems({"assert": "x is at most \"3\""}) == [`"is at most" takes a number`]
+	_sentence_problems({"assert": "x is less than true"}) == [`"is less than" takes a number`]
+}
+
+test_a_written_date_after_a_time_phrase_is_a_time if {
+	[r.cause | some r in ergo.report({"things": [{"id": 1, "x": "2026-09-30"}, {"id": 2, "x": "2026-10-01"}]}, _sentence_policy({"c": "x is before \"2026-10-01\""}), {}).results; r.check == "c"] == ["satisfied", "value"]
 }

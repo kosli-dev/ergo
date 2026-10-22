@@ -21,7 +21,7 @@ elapsed-assertion = elapsed WS compare-phrase
 for-line          = for-item ["," WS for-item]
 for-item          = quantifier WS path [WS whose] [if-any] WS "as" WS alias
                   / position WS "of" WS plain-path [WS whose] [WS sorted-by] WS "as" WS alias
-sorted-by         = "sorted" WS "by" WS first-key *step
+sorted-by         = "sorted" WS "by" WS first-key *step [WS "alphabetically"]
 alias             = bare-key
 
 ; A subject's from: line.
@@ -46,7 +46,7 @@ operand           = value / field
 ; Phrases. compare-phrase is the subset a derived value can take.
 phrase            = one-of-phrase / exists-phrase / empty-phrase / type-phrase
                   / contains-phrase / contains-all-phrase / matches-phrase
-                  / starts-phrase / time-phrase / compare-phrase
+                  / starts-phrase / alphabetical-phrase / time-phrase / compare-phrase
 compare-phrase    = within-phrase / order-phrase / between-phrase / is-phrase
 
 is-phrase         = ("is" WS "not" / "does" WS "not" WS "equal") WS operand
@@ -64,6 +64,7 @@ contains-phrase   = ("contains" / "does" WS "not" WS "contain") WS operand
 contains-all-phrase = ("contains" WS "all" WS "of" / "contains" WS "none" WS "of") WS list
 matches-phrase    = ("matches" / "does" WS "not" WS "match") WS list
 starts-phrase     = ("starts" WS "with" / "ends" WS "with") WS operand
+alphabetical-phrase = "is" WS "alphabetically" WS ("before" / "after") WS operand
 time-phrase       = ("is" WS "before" / "is" WS "after" / "is" WS "on" WS "or" WS "after" / "is" WS "on" WS "or" WS "before") WS operand
 
 list              = values / right-path

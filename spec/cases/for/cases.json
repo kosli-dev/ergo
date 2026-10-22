@@ -6636,5 +6636,498 @@
         ]
       }
     ]
+  },
+  {
+    "description": "the first owner alphabetically",
+    "policy": {
+      "subjects": {
+        "team": {
+          "from": [
+            "teams"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "team",
+          "checks": {
+            "c": {
+              "for": "first of owners sorted by name alphabetically as owner",
+              "assert": "owner.name is \"Zoe\""
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "sorts uppercase before lowercase, so Zoe comes before adam",
+        "rules": [
+          "sentence.for.pick",
+          "for.pick",
+          "for.inputs",
+          "for.failed_items",
+          "compare.alphabetical"
+        ],
+        "input": {
+          "teams": [
+            {
+              "id": "t1",
+              "owners": [
+                {
+                  "name": "adam"
+                },
+                {
+                  "name": "Zoe"
+                },
+                {
+                  "name": "bob"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "name": "item 2 of owners",
+                "value": {
+                  "name": "Zoe"
+                }
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "team"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "for first of owners sorted by name alphabetically as owner: owner.name is \"Zoe\""
+          }
+        }
+      },
+      {
+        "description": "fails as unusable without picking when a name isn't a string",
+        "rules": [
+          "sentence.for.pick",
+          "for.pick",
+          "for.inputs",
+          "for.failed_items"
+        ],
+        "input": {
+          "teams": [
+            {
+              "id": "t1",
+              "owners": [
+                {
+                  "name": "Zoe"
+                },
+                {
+                  "name": 7
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of owners",
+                "path": "item 2 of owners",
+                "value": 7
+              }
+            ],
+            "inputs": [
+              {
+                "name": "owners[]",
+                "value": [
+                  {
+                    "name": "Zoe"
+                  },
+                  {
+                    "name": 7
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "team"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as ambiguous when two owners share the first name",
+        "rules": [
+          "sentence.for.pick",
+          "for.pick",
+          "for.inputs",
+          "for.failed_items"
+        ],
+        "input": {
+          "teams": [
+            {
+              "id": "t1",
+              "owners": [
+                {
+                  "name": "Zoe"
+                },
+                {
+                  "name": "Zoe"
+                },
+                {
+                  "name": "adam"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "ambiguous",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "ambiguous",
+                "failed_assertions": [],
+                "item": "item 1 of owners",
+                "path": "item 1 of owners",
+                "value": "Zoe"
+              },
+              {
+                "cause": "ambiguous",
+                "failed_assertions": [],
+                "item": "item 2 of owners",
+                "path": "item 2 of owners",
+                "value": "Zoe"
+              }
+            ],
+            "inputs": [
+              {
+                "name": "owners[]",
+                "value": [
+                  {
+                    "name": "Zoe"
+                  },
+                  {
+                    "name": "Zoe"
+                  },
+                  {
+                    "name": "adam"
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "team"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "the second last owner alphabetically",
+    "policy": {
+      "subjects": {
+        "team": {
+          "from": [
+            "teams"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "team",
+          "checks": {
+            "c": {
+              "for": "item 2 from last of owners sorted by name alphabetically as owner",
+              "assert": "owner.name is \"adam\""
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "counts from the end of the order",
+        "rules": [
+          "sentence.for.pick",
+          "for.pick",
+          "for.inputs",
+          "for.failed_items",
+          "compare.alphabetical",
+          "sentence.path.index"
+        ],
+        "input": {
+          "teams": [
+            {
+              "id": "t1",
+              "owners": [
+                {
+                  "name": "adam"
+                },
+                {
+                  "name": "Zoe"
+                },
+                {
+                  "name": "bob"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "name": "item 1 of owners",
+                "value": {
+                  "name": "adam"
+                }
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "team"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "the latest audit by date",
+    "policy": {
+      "subjects": {
+        "site": {
+          "from": [
+            "sites"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "site",
+          "checks": {
+            "c": {
+              "for": "last of audits sorted by held_on as audit",
+              "assert": "audit.passed is true"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "sorts dates by day",
+        "rules": [
+          "sentence.for.pick",
+          "for.pick",
+          "for.inputs",
+          "for.failed_items",
+          "time.format",
+          "time.pass"
+        ],
+        "input": {
+          "sites": [
+            {
+              "id": "s1",
+              "audits": [
+                {
+                  "held_on": "2026-10-02",
+                  "passed": true
+                },
+                {
+                  "held_on": "2026-09-15",
+                  "passed": false
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "name": "item 1 of audits",
+                "value": {
+                  "held_on": "2026-10-02",
+                  "passed": true
+                }
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "s1",
+              "type": "site"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails the dates as unusable when they're mixed with times",
+        "rules": [
+          "sentence.for.pick",
+          "for.pick",
+          "for.inputs",
+          "for.failed_items",
+          "time.fail"
+        ],
+        "input": {
+          "sites": [
+            {
+              "id": "s1",
+              "audits": [
+                {
+                  "held_on": "2026-10-02",
+                  "passed": true
+                },
+                {
+                  "held_on": "2026-10-03T00:00:00Z",
+                  "passed": true
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of audits",
+                "path": "item 1 of audits",
+                "value": "2026-10-02"
+              }
+            ],
+            "inputs": [
+              {
+                "name": "audits[]",
+                "value": [
+                  {
+                    "held_on": "2026-10-02",
+                    "passed": true
+                  },
+                  {
+                    "held_on": "2026-10-03T00:00:00Z",
+                    "passed": true
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "s1",
+              "type": "site"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable on a date that doesn't exist",
+        "rules": [
+          "sentence.for.pick",
+          "for.pick",
+          "for.inputs",
+          "for.failed_items",
+          "time.format"
+        ],
+        "input": {
+          "sites": [
+            {
+              "id": "s1",
+              "audits": [
+                {
+                  "held_on": "2026-02-29",
+                  "passed": true
+                },
+                {
+                  "held_on": "2026-03-01",
+                  "passed": true
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of audits",
+                "path": "item 1 of audits",
+                "value": "2026-02-29"
+              }
+            ],
+            "inputs": [
+              {
+                "name": "audits[]",
+                "value": [
+                  {
+                    "held_on": "2026-02-29",
+                    "passed": true
+                  },
+                  {
+                    "held_on": "2026-03-01",
+                    "passed": true
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "s1",
+              "type": "site"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

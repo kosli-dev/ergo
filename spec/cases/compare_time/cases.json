@@ -178,9 +178,39 @@
         ]
       },
       {
-        "description": "fails as unusable on a date with no time",
-        "rules": ["time.format"],
+        "description": "passes on two dates with no time, in order",
+        "rules": ["time.format", "time.pass"],
         "input": {"things": [{"a": "2024-01-01", "b": "2024-01-02", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [{"name": ".a", "value": "2024-01-01"}, {"name": "b", "value": "2024-01-02"}]
+          }
+        ]
+      },
+      {
+        "description": "fails as value on two dates out of order",
+        "rules": ["time.format", "time.pass"],
+        "input": {"things": [{"a": "2024-01-02", "b": "2024-01-01", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": ".a", "value": "2024-01-02"}, {"name": "b", "value": "2024-01-01"}]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable on a date and a time, even at midnight",
+        "rules": ["time.format", "time.fail"],
+        "input": {"things": [{"a": "2024-01-01", "b": "2024-01-02T00:00:00Z", "id": "t1"}]},
         "results": [
           {
             "requirement": "s",
@@ -188,7 +218,22 @@
             "check": "c",
             "passed": false,
             "cause": "unusable",
-            "inputs": [{"name": ".a", "value": "2024-01-01"}, {"name": "b", "value": "2024-01-02"}]
+            "inputs": [{"name": ".a", "value": "2024-01-01"}, {"name": "b", "value": "2024-01-02T00:00:00Z"}]
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable on a date with no time that doesn't exist",
+        "rules": ["time.format"],
+        "input": {"things": [{"a": "2023-02-29", "b": "2024-01-01", "id": "t1"}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": "t1"},
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [{"name": ".a", "value": "2023-02-29"}, {"name": "b", "value": "2024-01-01"}]
           }
         ]
       },
