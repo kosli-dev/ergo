@@ -897,8 +897,8 @@ reads "for every pull request, some approver approved it and isn't its author". 
     {
       "cause": "value",
       "failed_assertions": [
-        {"assertion": "approver.state is \"APPROVED\"", "cause": "value", "items": ["item 1 of pr.approvers"]},
-        {"assertion": "approver.username does not equal pr.author", "cause": "value", "items": ["item 1 of pr.approvers"]}
+        {"assertion": "approver.state is \"APPROVED\"", "cause": "value", "items": [{"cause": "value", "item": "item 1 of pr.approvers"}]},
+        {"assertion": "approver.username does not equal pr.author", "cause": "value", "items": [{"cause": "value", "item": "item 1 of pr.approvers"}]}
       ],
       "item": "item 2 of pull_requests",
       "path": "item 2 of pull_requests",
@@ -919,7 +919,7 @@ reads "for every pull request, some approver approved it and isn't its author". 
 ```
 
 - `failed_items` lists the items of the first list that failed, each with what its alias stands for as its `value`. Each one has `failed_assertions`: the sentences that failed for it, each with the first cause it failed with. Pull request 8 failed because its one approver commented, and is its author.
-- With two items, a failed sentence that reads the second item's alias also has `items`: the items of the second list it failed for, in list order. Here `item 1 of pr.approvers` is pull request 8's first approver. With `for: some approvers as approver, every commits as commit`, an approver who approved before the last commit fails `approver.timestamp is after commit.timestamp` with `"items": ["item 2 of commits"]`, so you can see which commit came later. A sentence that doesn't read `commit`, like `approver.username does not equal author`, has no `items`, because it fails the same way for every commit.
+- With two items, a failed sentence that reads the second item's alias also has `items`: the items of the second list it failed for, in list order, each with the cause it failed with. Here `item 1 of pr.approvers` is pull request 8's first approver. With `for: some approvers as approver, every commits as commit`, an approver who approved before the last commit fails `approver.timestamp is after commit.timestamp` with `"items": [{"cause": "value", "item": "item 2 of commits"}]`, so you can see which commit came later. Each item has its own cause: a commit with no `timestamp` would be listed there with `"cause": "absent"`. A sentence that doesn't read `commit`, like `approver.username does not equal author`, has no `items`, because it fails the same way for every commit.
 - `failed_assertions` is `[]` when no sentence was checked, like when `whose` leaves no approver, or a field a `whose` reads is missing.
 - When the second item failed before any sentence was checked, the item of the first list has its own `failed_items`, saying where. With `for: some approvers as approver, every commits whose kind is "code" as commit` and a commit with no `kind`, `{"t": 2}`, the approver's entry has `"failed_assertions": []` and:
 
@@ -927,7 +927,7 @@ reads "for every pull request, some approver approved it and isn't its author". 
   "failed_items": [{"cause": "absent", "item": "item 2 of commits", "path": "item 2 of commits", "value": {"t": 2}}]
   ```
 
-  A pull request with no `commits` gives `{"cause": "absent", "item": "commits", "path": "commits", "value": null}` there.
+  A pull request with no `commits` fails every approver the same way, so the row lists the list once, in place of the approvers: `{"cause": "absent", "failed_assertions": [], "item": "commits", "path": "commits", "value": null}`. A list inside the first, like `pr.approvers`, is listed under each pull request, because each has its own.
 - `inputs` holds each list the `for` line walked, with its items, and every field of the subject the sentences read. A field read through a name, like `pr.author`, isn't listed on its own.
 - In `assert`, a bare first key is the subject's field, and a name reaches its item. Inside an item's own `whose`, a bare key is that item's field. A name hides a field with the same name, the subject's or an item's, except on the left side of a `whose`: `whose env is "prod"` always reads the item's `env`. Write a dot in front to read the field a name hides: `.env`.
 - Each list fails as a one-line `every` or `some` does: empty, missing, `null` or not a list, and `, if any,` lets an empty one pass.
@@ -970,7 +970,7 @@ picks `a1`, the commit with the latest `timestamp`, wherever it is in the list, 
     {
       "cause": "value",
       "failed_assertions": [
-        {"assertion": "approver.username does not equal last_commit.author_username", "cause": "value", "items": ["item 1 of approvers"]}
+        {"assertion": "approver.username does not equal last_commit.author_username", "cause": "value", "items": [{"cause": "value", "item": "item 1 of approvers"}]}
       ],
       "item": "item 1 of commits",
       "path": "item 1 of commits",

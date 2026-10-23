@@ -8524,8 +8524,34 @@ _for_outer(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(chec
 	judged := [_for_judge_outer(check, subj, names, item, e, pre) | some e in w.items]
 	fails := array.concat(array.concat([object.union(f, {"lines": []}) | some f in w.fails], [object.union(f, {"lines": []}) | some f in _walk_stop(w)]), [j.failure | some j in judged; j.failure != null])
 	cause := _for_verdict(item, w, judged, fails)
-	failed := _for_failed(cause, fails)
+	failed := _for_failed(cause, _for_shared(check, fails, pre))
 	inputs := _for_inputs(check, subj, names, item, w)
+}
+
+_for_unwalked(check, w) := [f | some f in array.concat(w.fails, _walk_stop(w))] if not "unread" in object.keys(w)
+
+else := [{"path": check.items[1].path, "item": check.items[1].path, "cause": w.unread, "value": null}]
+
+_for_shared(_, fails, null) := fails
+
+_for_shared(check, fails, pre) := array.concat([trimmed[i] | some i, f in fails; not _for_only_shared(f, trimmed[i])], used) if {
+	pre != null
+	listed := [object.union(f, {"lines": []}) | some f in _for_unwalked(check, pre)]
+	paths := {f.path | some f in listed}
+	trimmed := [object.union(f, {"inner": [g | some g in object.get(f, "inner", []); not g.path in paths]}) | some f in fails]
+	used := [g | some g in listed; _for_shared_used(g, fails)]
+}
+
+_for_shared_used(g, fails) if {
+	some f in fails
+	some h in object.get(f, "inner", [])
+	h.path == g.path
+}
+
+_for_only_shared(f, t) if {
+	f.lines == []
+	object.get(f, "inner", []) != []
+	t.inner == []
 }
 
 _for_walk(item, subj, names) := _for_picked(item, w, names) if {
@@ -8726,7 +8752,7 @@ _for_inner(check, subj, names, w) := {"passed": false, "cause": "not_an_object",
 	check.items[1].path[0] == concat("", ["$", check.items[0].as])
 	count(check.items[1].path) > 1
 	not is_object(names[check.items[0].as])
-} else := {"passed": false, "cause": w.unread, "lines": []} if {
+} else := {"passed": false, "cause": w.unread, "lines": [], "unchecked": _for_unwalked(check, w)} if {
 	"unread" in object.keys(w)
 } else := {"passed": cause == "satisfied", "cause": cause, "lines": lines, "unchecked": [f | some f in fails; f.lines == []]} if {
 	item := check.items[1]
@@ -8752,7 +8778,13 @@ _for_merge_lines(check, cause, fails) := [object.union({"assertion": a, "cause":
 	count(causes) > 0
 ] if cause != "satisfied"
 
-_for_line_items(check, i, a, fails) := {"items": [_for_item_name(p) | some p in sort({f.path | some f in fails; some l in f.lines; l.assertion == a})]} if _reads_name(check.checks[i], check.items[1].as)
+_for_line_items(check, i, a, fails) := {"items": [{"item": _for_item_name(f.path), "cause": l.cause} |
+	some p in sort({f.path | some f in fails; some l in f.lines; l.assertion == a})
+	some f in fails
+	f.path == p
+	some l in f.lines
+	l.assertion == a
+]} if _reads_name(check.checks[i], check.items[1].as)
 
 else := {}
 

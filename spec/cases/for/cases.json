@@ -2785,7 +2785,10 @@
                     "assertion": "approver.username does not equal pr.author",
                     "cause": "value",
                     "items": [
-                      "item 1 of pr.approvers"
+                      {
+                        "cause": "value",
+                        "item": "item 1 of pr.approvers"
+                      }
                     ]
                   }
                 ],
@@ -3163,7 +3166,10 @@
                     "assertion": "approver.username does not equal pr.author",
                     "cause": "absent",
                     "items": [
-                      "item 1 of pr.approvers"
+                      {
+                        "cause": "absent",
+                        "item": "item 1 of pr.approvers"
+                      }
                     ]
                   }
                 ],
@@ -3488,7 +3494,10 @@
                     "assertion": "commit.signed is true",
                     "cause": "value",
                     "items": [
-                      "item 1 of pr.commits"
+                      {
+                        "cause": "value",
+                        "item": "item 1 of pr.commits"
+                      }
                     ]
                   }
                 ],
@@ -3729,7 +3738,10 @@
                     "assertion": "approver.timestamp is after commit.timestamp",
                     "cause": "value",
                     "items": [
-                      "item 2 of commits"
+                      {
+                        "cause": "value",
+                        "item": "item 2 of commits"
+                      }
                     ]
                   }
                 ],
@@ -3841,7 +3853,10 @@
                     "assertion": "approver.timestamp is after commit.timestamp",
                     "cause": "value",
                     "items": [
-                      "item 2 of commits"
+                      {
+                        "cause": "value",
+                        "item": "item 2 of commits"
+                      }
                     ]
                   }
                 ],
@@ -4013,7 +4028,10 @@
                     "assertion": "approver.timestamp is after commit.timestamp",
                     "cause": "unusable",
                     "items": [
-                      "item 1 of commits"
+                      {
+                        "cause": "unusable",
+                        "item": "item 1 of commits"
+                      }
                     ]
                   }
                 ],
@@ -4060,7 +4078,7 @@
         ]
       },
       {
-        "description": "with every commits and no commits the approver fails as value, and with if any it passes",
+        "description": "with every commits and no commits the check fails as value and lists the commits list once, and with if any it passes",
         "rules": [
           "sentence.for.line",
           "sentence.for.assert",
@@ -4070,7 +4088,7 @@
           "for.inputs",
           "sentence.for.scope",
           "sentence.for.fail",
-          "for.second_failures"
+          "for.shared_failures"
         ],
         "input": {
           "prs": [
@@ -4096,21 +4114,9 @@
               {
                 "cause": "value",
                 "failed_assertions": [],
-                "failed_items": [
-                  {
-                    "cause": "value",
-                    "item": "commits",
-                    "path": "commits",
-                    "value": []
-                  }
-                ],
-                "item": "item 1 of approvers",
-                "path": "item 1 of approvers",
-                "value": {
-                  "state": "APPROVED",
-                  "timestamp": "2026-10-05T00:00:00Z",
-                  "username": "bob"
-                }
+                "item": "commits",
+                "path": "commits",
+                "value": []
               }
             ],
             "inputs": [
@@ -4143,7 +4149,7 @@
         ]
       },
       {
-        "description": "a missing commits list fails the approver as absent, with no sentence listed",
+        "description": "a missing commits list fails the check as absent and lists the list once, not under each approver",
         "rules": [
           "sentence.for.line",
           "sentence.for.assert",
@@ -4153,7 +4159,7 @@
           "for.inputs",
           "sentence.for.scope",
           "for.failed_items",
-          "for.second_failures",
+          "for.shared_failures",
           "sentence.for.fail"
         ],
         "input": {
@@ -4179,21 +4185,9 @@
               {
                 "cause": "absent",
                 "failed_assertions": [],
-                "failed_items": [
-                  {
-                    "cause": "absent",
-                    "item": "commits",
-                    "path": "commits",
-                    "value": null
-                  }
-                ],
-                "item": "item 1 of approvers",
-                "path": "item 1 of approvers",
-                "value": {
-                  "state": "APPROVED",
-                  "timestamp": "2026-10-05T00:00:00Z",
-                  "username": "bob"
-                }
+                "item": "commits",
+                "path": "commits",
+                "value": null
               }
             ],
             "inputs": [
@@ -4371,7 +4365,10 @@
                     "assertion": "approval.at is after commit.at",
                     "cause": "value",
                     "items": [
-                      "item 1 of commits"
+                      {
+                        "cause": "value",
+                        "item": "item 1 of commits"
+                      }
                     ]
                   }
                 ],
@@ -4862,7 +4859,8 @@
         "rules": [
           "for.flaws",
           "for.failed_items",
-          "for.pass"
+          "for.pass",
+          "for.second_failures"
         ],
         "input": {
           "releases": [
@@ -4890,6 +4888,14 @@
               {
                 "cause": "absent",
                 "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "g.shas named by $params.k",
+                    "path": "g.shas named by $params.k",
+                    "value": null
+                  }
+                ],
                 "item": "item 1 of groups",
                 "path": "item 1 of groups",
                 "value": {
@@ -6020,7 +6026,10 @@
                     "assertion": "approver.username does not equal last_commit.author_username",
                     "cause": "value",
                     "items": [
-                      "item 1 of commits"
+                      {
+                        "cause": "value",
+                        "item": "item 1 of commits"
+                      }
                     ]
                   }
                 ],
@@ -6204,7 +6213,10 @@
                     "assertion": "approver.username does not equal last_commit.author_username",
                     "cause": "value",
                     "items": [
-                      "item 3 of commits"
+                      {
+                        "cause": "value",
+                        "item": "item 3 of commits"
+                      }
                     ]
                   }
                 ],
