@@ -6350,14 +6350,28 @@
         },
         "results": [
           {
-            "requirement": "s",
-            "subject": {
-              "type": "release",
-              "id": "r1"
-            },
-            "check": "c",
-            "passed": false,
             "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "count of pr.reviews is at least 2",
+                    "cause": "value"
+                  }
+                ],
+                "item": "item 2 of pull_requests",
+                "path": "item 2 of pull_requests",
+                "value": {
+                  "reviews": [
+                    {
+                      "id": 0
+                    }
+                  ]
+                }
+              }
+            ],
             "inputs": [
               {
                 "name": "pull_requests[]",
@@ -6382,20 +6396,12 @@
                 ]
               }
             ],
-            "failed_items": [
-              {
-                "path": "item 2 of pull_requests",
-                "item": "item 2 of pull_requests",
-                "cause": "value",
-                "value": null,
-                "failed_assertions": [
-                  {
-                    "assertion": "count of pr.reviews is at least 2",
-                    "cause": "value"
-                  }
-                ]
-              }
-            ]
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
           }
         ]
       },
@@ -6429,14 +6435,24 @@
         },
         "results": [
           {
-            "requirement": "s",
-            "subject": {
-              "type": "release",
-              "id": "r1"
-            },
-            "check": "c",
-            "passed": false,
             "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "count of pr.reviews is at least 2",
+                    "cause": "value"
+                  }
+                ],
+                "item": "item 1 of pull_requests",
+                "path": "item 1 of pull_requests",
+                "value": {
+                  "reviews": []
+                }
+              }
+            ],
             "inputs": [
               {
                 "name": "pull_requests[]",
@@ -6447,20 +6463,12 @@
                 ]
               }
             ],
-            "failed_items": [
-              {
-                "path": "item 1 of pull_requests",
-                "item": "item 1 of pull_requests",
-                "cause": "value",
-                "value": null,
-                "failed_assertions": [
-                  {
-                    "assertion": "count of pr.reviews is at least 2",
-                    "cause": "value"
-                  }
-                ]
-              }
-            ]
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
           }
         ]
       },
@@ -6505,14 +6513,22 @@
         },
         "results": [
           {
-            "requirement": "s",
-            "subject": {
-              "type": "release",
-              "id": "r1"
-            },
-            "check": "c",
-            "passed": false,
             "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "count of pr.reviews is at least 2",
+                    "cause": "absent"
+                  }
+                ],
+                "item": "item 2 of pull_requests",
+                "path": "item 2 of pull_requests",
+                "value": {}
+              }
+            ],
             "inputs": [
               {
                 "name": "pull_requests[]",
@@ -6531,20 +6547,12 @@
                 ]
               }
             ],
-            "failed_items": [
-              {
-                "path": "item 2 of pull_requests",
-                "item": "item 2 of pull_requests",
-                "cause": "absent",
-                "value": null,
-                "failed_assertions": [
-                  {
-                    "assertion": "count of pr.reviews is at least 2",
-                    "cause": "absent"
-                  }
-                ]
-              }
-            ]
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
           }
         ]
       },
@@ -6581,14 +6589,24 @@
         },
         "results": [
           {
-            "requirement": "s",
-            "subject": {
-              "type": "release",
-              "id": "r1"
-            },
-            "check": "c",
-            "passed": false,
             "cause": "null",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [
+                  {
+                    "assertion": "count of pr.reviews is at least 2",
+                    "cause": "null"
+                  }
+                ],
+                "item": "item 1 of pull_requests",
+                "path": "item 1 of pull_requests",
+                "value": {
+                  "reviews": null
+                }
+              }
+            ],
             "inputs": [
               {
                 "name": "pull_requests[]",
@@ -6599,20 +6617,12 @@
                 ]
               }
             ],
-            "failed_items": [
-              {
-                "path": "item 1 of pull_requests",
-                "item": "item 1 of pull_requests",
-                "cause": "null",
-                "value": null,
-                "failed_assertions": [
-                  {
-                    "assertion": "count of pr.reviews is at least 2",
-                    "cause": "null"
-                  }
-                ]
-              }
-            ]
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
           }
         ]
       },
@@ -6649,14 +6659,24 @@
         },
         "results": [
           {
-            "requirement": "s",
-            "subject": {
-              "type": "release",
-              "id": "r1"
-            },
-            "check": "c",
-            "passed": false,
             "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "count of pr.reviews is at least 2",
+                    "cause": "unusable"
+                  }
+                ],
+                "item": "item 1 of pull_requests",
+                "path": "item 1 of pull_requests",
+                "value": {
+                  "reviews": "two"
+                }
+              }
+            ],
             "inputs": [
               {
                 "name": "pull_requests[]",
@@ -6667,20 +6687,12 @@
                 ]
               }
             ],
-            "failed_items": [
-              {
-                "path": "item 1 of pull_requests",
-                "item": "item 1 of pull_requests",
-                "cause": "unusable",
-                "value": null,
-                "failed_assertions": [
-                  {
-                    "assertion": "count of pr.reviews is at least 2",
-                    "cause": "unusable"
-                  }
-                ]
-              }
-            ]
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
           }
         ]
       }
@@ -10775,14 +10787,25 @@
         },
         "results": [
           {
-            "requirement": "s",
-            "subject": {
-              "id": "v1",
-              "type": "vuln"
-            },
-            "check": "c",
-            "passed": false,
             "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "days elapsed from pr.opened to pr.closed is at most 2",
+                    "cause": "value"
+                  }
+                ],
+                "item": "item 2 of pull_requests",
+                "path": "item 2 of pull_requests",
+                "value": {
+                  "closed": 259200,
+                  "opened": 0
+                }
+              }
+            ],
             "inputs": [
               {
                 "name": "pull_requests[]",
@@ -10798,20 +10821,12 @@
                 ]
               }
             ],
-            "failed_items": [
-              {
-                "cause": "value",
-                "failed_assertions": [
-                  {
-                    "assertion": "days elapsed from pr.opened to pr.closed is at most 2",
-                    "cause": "value"
-                  }
-                ],
-                "item": "item 2 of pull_requests",
-                "path": "item 2 of pull_requests",
-                "value": null
-              }
-            ]
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            }
           }
         ],
         "expressions": {
@@ -10850,24 +10865,8 @@
         },
         "results": [
           {
-            "requirement": "s",
-            "subject": {
-              "id": "v1",
-              "type": "vuln"
-            },
-            "check": "c",
-            "passed": false,
             "cause": "absent",
-            "inputs": [
-              {
-                "name": "pull_requests[]",
-                "value": [
-                  {
-                    "opened": 0
-                  }
-                ]
-              }
-            ],
+            "check": "c",
             "failed_items": [
               {
                 "cause": "absent",
@@ -10879,9 +10878,27 @@
                 ],
                 "item": "item 1 of pull_requests",
                 "path": "item 1 of pull_requests",
-                "value": null
+                "value": {
+                  "opened": 0
+                }
               }
-            ]
+            ],
+            "inputs": [
+              {
+                "name": "pull_requests[]",
+                "value": [
+                  {
+                    "opened": 0
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "v1",
+              "type": "vuln"
+            }
           }
         ],
         "expressions": {
