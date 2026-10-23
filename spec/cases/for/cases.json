@@ -2965,6 +2965,7 @@
           "for.pass",
           "for.inputs",
           "for.failed_items",
+          "for.second_failures",
           "sentence.for.fail"
         ],
         "input": {
@@ -2996,6 +2997,14 @@
               {
                 "cause": "absent",
                 "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "pr.approvers",
+                    "path": "pr.approvers",
+                    "value": null
+                  }
+                ],
                 "item": "item 2 of pull_requests",
                 "path": "item 2 of pull_requests",
                 "value": {
@@ -3049,6 +3058,7 @@
           "for.pass",
           "for.inputs",
           "for.failed_items",
+          "for.second_failures",
           "sentence.for.fail"
         ],
         "input": {
@@ -3072,6 +3082,14 @@
               {
                 "cause": "value",
                 "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "value",
+                    "item": "pr.approvers",
+                    "path": "pr.approvers",
+                    "value": []
+                  }
+                ],
                 "item": "item 1 of pull_requests",
                 "path": "item 1 of pull_requests",
                 "value": {
@@ -3202,6 +3220,7 @@
           "for.pass",
           "for.inputs",
           "for.failed_items",
+          "for.second_failures",
           "sentence.whose.undecided"
         ],
         "input": {
@@ -3229,6 +3248,16 @@
               {
                 "cause": "absent",
                 "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "item 1 of pr.approvers",
+                    "path": "item 1 of pr.approvers",
+                    "value": {
+                      "username": "lee"
+                    }
+                  }
+                ],
                 "item": "item 1 of pull_requests",
                 "path": "item 1 of pull_requests",
                 "value": {
@@ -4040,7 +4069,8 @@
           "for.pass",
           "for.inputs",
           "sentence.for.scope",
-          "sentence.for.fail"
+          "sentence.for.fail",
+          "for.second_failures"
         ],
         "input": {
           "prs": [
@@ -4066,6 +4096,14 @@
               {
                 "cause": "value",
                 "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "value",
+                    "item": "commits",
+                    "path": "commits",
+                    "value": []
+                  }
+                ],
                 "item": "item 1 of approvers",
                 "path": "item 1 of approvers",
                 "value": {
@@ -4115,6 +4153,7 @@
           "for.inputs",
           "sentence.for.scope",
           "for.failed_items",
+          "for.second_failures",
           "sentence.for.fail"
         ],
         "input": {
@@ -4140,6 +4179,14 @@
               {
                 "cause": "absent",
                 "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "commits",
+                    "path": "commits",
+                    "value": null
+                  }
+                ],
                 "item": "item 1 of approvers",
                 "path": "item 1 of approvers",
                 "value": {

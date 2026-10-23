@@ -8716,9 +8716,9 @@ _for_inner_next(check, subj, bound, [], true) := _for_lines(check, subj, bound)
 
 _for_failure(_, [], false, _) := null
 
-_for_failure(e, undecided, _, res) := {"path": e.i, "item": e.i, "cause": res.cause, "value": _walk_shown(e.v), "lines": res.lines} if undecided != []
+_for_failure(e, undecided, _, res) := {"path": e.i, "item": e.i, "cause": res.cause, "value": _walk_shown(e.v), "lines": res.lines, "inner": object.get(res, "unchecked", [])} if undecided != []
 
-_for_failure(e, [], true, res) := {"path": e.i, "item": e.i, "cause": res.cause, "value": _walk_shown(e.v), "lines": res.lines} if not res.passed
+_for_failure(e, [], true, res) := {"path": e.i, "item": e.i, "cause": res.cause, "value": _walk_shown(e.v), "lines": res.lines, "inner": object.get(res, "unchecked", [])} if not res.passed
 
 _for_failure(_, [], true, res) := null if res.passed
 
@@ -8728,7 +8728,7 @@ _for_inner(check, subj, names, w) := {"passed": false, "cause": "not_an_object",
 	not is_object(names[check.items[0].as])
 } else := {"passed": false, "cause": w.unread, "lines": []} if {
 	"unread" in object.keys(w)
-} else := {"passed": cause == "satisfied", "cause": cause, "lines": lines} if {
+} else := {"passed": cause == "satisfied", "cause": cause, "lines": lines, "unchecked": [f | some f in fails; f.lines == []]} if {
 	item := check.items[1]
 	judged := [_for_judge_inner(check, subj, names, item, e) | some e in w.items]
 	fails := array.concat(array.concat([object.union(f, {"lines": []}) | some f in w.fails], [object.union(f, {"lines": []}) | some f in _walk_stop(w)]), [j.failure | some j in judged; j.failure != null])
@@ -8790,11 +8790,19 @@ _for_verdict(item, w, judged, fails) := _walk_stop(w)[0].cause if {
 
 _for_failed("satisfied", _) := []
 
-_for_failed(cause, fails) := [{"path": _path_name(f.path), "item": _path_name(f.item), "cause": f.cause, "value": f.value, "failed_assertions": f.lines} |
+_for_failed(cause, fails) := [object.union({"path": _path_name(f.path), "item": _path_name(f.item), "cause": f.cause, "value": f.value, "failed_assertions": f.lines}, _for_unchecked(object.get(f, "inner", []))) |
 	some p in sort({f.path | some f in fails})
 	some f in fails
 	f.path == p
 ] if cause != "satisfied"
+
+_for_unchecked([]) := {}
+
+_for_unchecked(inner) := {"failed_items": [{"path": _for_item_name(f.path), "item": _for_item_name(f.item), "cause": f.cause, "value": f.value} |
+	some p in sort({f.path | some f in inner})
+	some f in inner
+	f.path == p
+]} if inner != []
 
 _for_inputs(check, subj, names, item, w) := [{"name": pair[0], "value": pair[1]} | some pair in sort(_for_input_pairs(check, subj, names, item, w))]
 
