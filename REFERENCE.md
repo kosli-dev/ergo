@@ -840,6 +840,56 @@ The check's `expression` is `approved_by is not empty and reviewed_at is before 
 
 `failed_assertions` is `[]` when the check passes. The row's cause is the first, in the order of [causes](#causes), among the sentences that failed. To get a row for each sentence, write them as separate checks. A problem with one line of a list starts with its number in the `$well_formed` row, like `line 2: unclosed quote at column 6`.
 
+A sentence has no `or`. When a check can pass in more than one way, write the ways as named options under `any_of`, each one sentence or a list of them. The check passes when every sentence of one option passes. With this input:
+
+```json
+{"components": [
+  {"name": "click", "licenses": [{"license": {"id": "BSD-3-Clause"}}]},
+  {"name": "prometheus-client"},
+  {"name": "leftpad", "licenses": [{"license": {"id": "WTFPL"}}]}
+]}
+```
+
+and these params:
+
+```json
+{"allowed_licenses": ["BSD-3-Clause", "Apache-2.0"], "known_package_licenses": {"prometheus-client": "Apache-2.0"}}
+```
+
+this check, on a subject `component` with `from: components`, takes the licence the SBOM declares, or else the one the params give for the component's name:
+
+```yaml
+licence_allowed:
+  description: The licence is allowed
+  any_of:
+    declared: some licenses.license.id is in $params.allowed_licenses
+    known:
+      - licenses does not exist
+      - $params.known_package_licenses named by name is in $params.allowed_licenses
+```
+
+click passes on `declared` and prometheus-client on `known`. leftpad fails both, and its row is:
+
+```json
+{
+  "cause": "absent",
+  "check": "licence_allowed",
+  "inputs": [
+    {"name": "$params.known_package_licenses named by name", "value": null},
+    {"name": "licenses", "value": [{"license": {"id": "WTFPL"}}]},
+    {"name": "licenses[].license.id", "value": ["WTFPL"]},
+    {"name": "name", "value": "leftpad"}
+  ],
+  "passed": false,
+  "requirement": "licences",
+  "subject": {"id": "leftpad", "type": "component"}
+}
+```
+
+The row reads every field the options read, once each. Its cause is the first, in the order of [causes](#causes), among the options, and an option's cause is the first among its sentences. Here `known` fails as `absent`, because the params have no licence for leftpad. An option with an `exists` sentence whose field is missing fails as `value` instead, as an [old-syntax `any_of`](#any_of) does. The row has no `failed_assertions`. The check's `expression` is `one of: declared(some licenses.license.id is in $params.allowed_licenses) | known(licenses does not exist and $params.known_package_licenses named by name is in $params.allowed_licenses)`, with the options sorted by name.
+
+An `any_of` takes `description` and `meta`, but not `for` or `assert`. An `any_of` that isn't an object, an empty one, an empty option, or an option that isn't a sentence or a list of them is written wrong, with `invalid any_of`, `empty any_of`, `empty option <name>` or `invalid option <name>`. A problem with a sentence starts with its option's name, like `option known: line 2: doesn't parse`.
+
 `every` and `some` check each item of the lists along a path. `every pull_requests.commits.signed is true` walks the pull requests, then the commits of each, and checks each commit's `signed`. It passes when every one does. `some` passes when at least one does. With this input:
 
 ```json
@@ -1060,7 +1110,7 @@ A sentence that can't be read is [written wrong](#basic-operators), and the `$we
 
 for `prod: environment is "prod`. `x is not null` is written wrong too, because it could only fail: write `x exists`. So is a value that isn't a number before `within`, like `x is "a" within 1`. A sentence that compares a path with itself, like `x is at least x`, is written wrong too, because it could only pass or only fail. That happens most often in a `whose`, or after `every` or `some`, where a bare name is the item's: `every conditions.type equals type` compares each condition's `type` with itself. To compare an item with the subject, use a [`for` line](#checks) and put the comparison under `assert`. An object with both `assert` and `op` is read as a check with an `op`, so a [custom operator](#custom-operators) can still take `assert`.
 
-Ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `last of` and `item <n> from last of` anywhere but at the start of a `for` item, a `sum of` or a `plus` in the `whose` of a `count of` or a `sum of`, a `plus` in the phrase of an `every` or `some`, and an elapsed time after `every` or `some` or in a `from` line. A sentence can't be an `any_of` option or a substitute yet either, and fails there as `invalid check`. So `last_signed: last of commits.signed is true` gives:
+Ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `last of` and `item <n> from last of` anywhere but at the start of a `for` item, a `sum of` or a `plus` in the `whose` of a `count of` or a `sum of`, a `plus` in the phrase of an `every` or `some`, and an elapsed time after `every` or `some` or in a `from` line. A sentence can't be a [substitute](#substitutes) either, or a check in an option of an [`any_of`](#any_of) written with `op`, and fails there as `invalid check`. So `last_signed: last of commits.signed is true` gives:
 
 ```json
 {"name": "checks.last_signed", "value": ["last of isn't supported yet here: pick the item on a for line, like \"for: last of commits as commit\""]}

@@ -4,7 +4,7 @@ Draft 0.1, a proposal from [#174](https://github.com/kosli-dev/ergo/issues/174).
 
 [`sentences-corpus.md`](sentences-corpus.md) has every check from sdlc-policies, the server's demo and npm-bump policies, pr-reviewer, Ergo's examples and Tore's DEV controls written both ways. Every sentence in it parses exactly one way with the phrases below. The phrases, the tally and the misfits come from it.
 
-`ergo.rego` runs a check written as one or more sentences that start with a path, for every phrase, joined with `and` or listed under `assert`. It runs a `for` line before them too, but doesn't check the limit of three list walks in [sentence.for.depth](#the-for-line) yet. It runs `from` lines and string `id`s too, and chains up to three subjects deep. It runs every case in `spec/cases`, and `known_differences` in `spec_test.rego`, which lists the cases it fails, is empty. It doesn't run every form of a sentence, though: not `last of` or `item <n> from last of` except at the start of a `for` item, and not a `count of`, `sum of` or `plus` or an elapsed time in the phrase of an `every` or `some`, and no case pins them yet, see [OPEN.md](OPEN.md#sentences-the-spec-doesnt-say-enough-about-yet). Where the spec says a form runs, `ergo.rego` reports it as written wrong, with `isn't supported yet` in its message. In a `from` line or an `id`, `named by` a bare word is written wrong, with `unknown name <word>`, because there's no subject to read it from yet, and so is a `for` name used before its item gives it. A sentence can't be an `any_of` option or a substitute yet, and is written wrong there with `invalid check`.
+`ergo.rego` runs a check written as one or more sentences that start with a path, for every phrase, joined with `and` or listed under `assert`. It runs a `for` line before them too, but doesn't check the limit of three list walks in [sentence.for.depth](#the-for-line) yet. It runs `from` lines and string `id`s too, and chains up to three subjects deep. It runs every case in `spec/cases`, and `known_differences` in `spec_test.rego`, which lists the cases it fails, is empty. It doesn't run every form of a sentence, though: not `last of` or `item <n> from last of` except at the start of a `for` item, and not a `count of`, `sum of` or `plus` or an elapsed time in the phrase of an `every` or `some`, and no case pins them yet, see [OPEN.md](OPEN.md#sentences-the-spec-doesnt-say-enough-about-yet). Where the spec says a form runs, `ergo.rego` reports it as written wrong, with `isn't supported yet` in its message. In a `from` line or an `id`, `named by` a bare word is written wrong, with `unknown name <word>`, because there's no subject to read it from yet, and so is a `for` name used before its item gives it. A sentence can't be a substitute, or a check in an option of an `any_of` written with `op`, and is written wrong there with `invalid check`.
 
 ## The shape of a sentence
 
@@ -50,7 +50,25 @@ A check that walks two lists, or compares an item with its subject, puts the wal
 - `and` does two jobs and nothing else: it joins the conditions of a `whose`, and it joins whole assertions, see [sentence.assert.list](#the-shape-of-a-sentence). Each side of an `and` is a whole condition or a whole assertion, so the result is a flat list, not a tree. An `and` never joins a `whose` to its assertion
 - no `or`, and no brackets except the lookups in [sentence.path.brackets](#paths)
 
-"Or" is an `any_of` in the policy around the sentence, because each option has a name and the report says which one passed. Every expression language gets asked for `or` and brackets, and the answer here is no.
+"Or" is an `any_of` in the policy around the sentences, see [sentence.any_of](#the-shape-of-a-sentence), because each option has a name the report can show. Every expression language gets asked for `or` and brackets, and the answer here is no.
+
+**[sentence.any_of]** A check can be an object with `any_of` and optionally `description` and `meta`. `any_of` holds named options, and each option is a sentence or a list of sentences:
+
+```yaml
+licence_allowed:
+  description: The licence is allowed
+  any_of:
+    declared: some licenses.license.id is in $params.allowed_licenses
+    known:
+      - licenses does not exist
+      - $params.known_package_licenses named by name is in $params.allowed_licenses
+```
+
+It reads into an [`any_of`](semantics.md#any_of) whose options hold what their sentences read into, one check for each assertion, so an option written `x is 1 and y is 2` holds two. It passes as [any_of.pass](semantics.md#any_of) says, and its cause, as [any_of.cause](semantics.md#any_of) says, takes each assertion's own cause, whether it walks a list with `every` or `some` or works out a `count of`. Its row shows every path its assertions read, once each, sorted by name, and has no `failed_items` and no `failed_assertions`. A ref works as [any_of.refs](semantics.md#any_of) says: one of the wrong type fails the row as `unusable`, even when another option passes, while a missing one only fails the options that read it.
+
+**[sentence.any_of.written_wrong]** An `any_of` that isn't an object is written wrong with `invalid any_of`, an empty one with `empty any_of`, an empty option with `empty option <name>`, and an option that isn't a string or a list of strings with `invalid option <name>`. Any field besides `any_of`, `description` and `meta`, `for` included, is written wrong with `unknown field <name>`, and an object with both `assert` and `any_of` is a check with `assert` and an `unknown field any_of`. A problem with a sentence starts with its option's name, like `option known: line 2: doesn't parse`.
+
+**[sentence.any_of.expression]** Its `expression` is `one of: ` and the options, sorted by name as text and joined with ` | `, each written `<name>(<assertion> and <assertion>)`, like `one of: declared(some licenses.license.id is in $params.allowed_licenses) | known(licenses does not exist and $params.known_package_licenses named by name is in $params.allowed_licenses)`.
 
 **[sentence.assert.list]** `assert` can be a list, or one line with `and` between assertions. Both mean the same: each assertion starts from the subject, or from the `for` names, whether it's on its own line or after an `and`, see [sentence.assert.and](#the-shape-of-a-sentence). The report shows the list form whichever was written, and its `expression` joins the lines with `and`, so a failed row can say which line failed. Its row is one row for the check, and says which ones failed in `failed_assertions`, see [all_of.failed_assertions](semantics.md#all_of):
 

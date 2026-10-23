@@ -273,11 +273,13 @@ A side of `compare` can also be `count_of` or `sum_of`, each with a path, `whose
 
 `any_of` takes named options, each a list of checks that must all pass, and passes when one of its options does.
 
-**[any_of.options]** There's at least one option, and each option has at least one check. A check in an option is a basic operator, an `all` or an `any`, not another `any_of`.
+**[any_of.options]** There's at least one option, and each option has at least one check. A check in an option is a basic operator, an `all` or an `any`, not another `any_of`. In an `any_of` read from sentences, see [sentence.any_of](sentences.md#the-shape-of-a-sentence), it can also be an `every`, a `some` or a `compare` with a `count_of`, `sum_of`, `add` or `elapsed` side, and never an `all` or an `any`.
 
 **[any_of.pass]** It passes when every check of at least one option passes.
 
 **[any_of.cause]** Each option that fails has a cause: `value` when one of its `present` checks found its field missing, and otherwise the first, in the order of [causes](#causes), among its checks, or `value`. The row takes the first among its options.
+
+**[any_of.refs]** A ref that ends anything but `found`, as [value.ref](#values) says, fails the checks that read it, and so their option, but not the others: when another option passes, so does the row. A ref that reads the wrong kind of value for its check, like a `values` ref that isn't a list, fails the row as `unusable`, even when another option passes.
 
 **[any_of.inputs]** The row shows every path any option reads, once each, sorted by name. For an `all` or `any` in an option, that's its list, with the whole items, and the names it reads.
 

@@ -5575,5 +5575,1133 @@
         ]
       }
     ]
+  },
+  {
+    "description": "an any_of of sentences",
+    "policy": {
+      "subjects": {
+        "component": {
+          "from": "components",
+          "identified_by": "name"
+        }
+      },
+      "requirements": {
+        "licences": {
+          "subject": "component",
+          "checks": {
+            "allowed": {
+              "description": "The licence is allowed",
+              "any_of": {
+                "declared": "some licenses.license.id is in $params.allowed_licenses",
+                "known": [
+                  "licenses does not exist",
+                  "$params.known_package_licenses named by name is in $params.allowed_licenses"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "allowed_licenses": [
+        "BSD-3-Clause",
+        "Apache-2.0"
+      ],
+      "known_package_licenses": {
+        "prometheus-client": "Apache-2.0"
+      }
+    },
+    "cases": [
+      {
+        "description": "passes when every sentence of one option passes, and fails with the first cause among its options",
+        "rules": [
+          "sentence.any_of",
+          "sentence.any_of.expression",
+          "any_of.pass",
+          "any_of.cause"
+        ],
+        "input": {
+          "components": [
+            {
+              "name": "click",
+              "licenses": [
+                {
+                  "license": {
+                    "id": "BSD-3-Clause"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "prometheus-client"
+            },
+            {
+              "name": "leftpad",
+              "licenses": [
+                {
+                  "license": {
+                    "id": "WTFPL"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "allowed",
+            "inputs": [
+              {
+                "name": "$params.known_package_licenses named by name",
+                "value": null
+              },
+              {
+                "name": "licenses",
+                "value": [
+                  {
+                    "license": {
+                      "id": "BSD-3-Clause"
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "licenses[].license.id",
+                "value": [
+                  "BSD-3-Clause"
+                ]
+              },
+              {
+                "name": "name",
+                "value": "click"
+              }
+            ],
+            "passed": true,
+            "requirement": "licences",
+            "subject": {
+              "id": "click",
+              "type": "component"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "allowed",
+            "inputs": [
+              {
+                "name": "$params.known_package_licenses named by name",
+                "value": "Apache-2.0"
+              },
+              {
+                "name": "licenses",
+                "value": null
+              },
+              {
+                "name": "licenses.license.id",
+                "value": []
+              },
+              {
+                "name": "name",
+                "value": "prometheus-client"
+              }
+            ],
+            "passed": true,
+            "requirement": "licences",
+            "subject": {
+              "id": "prometheus-client",
+              "type": "component"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "allowed",
+            "inputs": [
+              {
+                "name": "$params.known_package_licenses named by name",
+                "value": null
+              },
+              {
+                "name": "licenses",
+                "value": [
+                  {
+                    "license": {
+                      "id": "WTFPL"
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "licenses[].license.id",
+                "value": [
+                  "WTFPL"
+                ]
+              },
+              {
+                "name": "name",
+                "value": "leftpad"
+              }
+            ],
+            "passed": false,
+            "requirement": "licences",
+            "subject": {
+              "id": "leftpad",
+              "type": "component"
+            }
+          }
+        ],
+        "expressions": {
+          "licences": {
+            "allowed": "one of: declared(some licenses.license.id is in $params.allowed_licenses) | known(licenses does not exist and $params.known_package_licenses named by name is in $params.allowed_licenses)"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "an any_of of sentences with a param that isn't a list",
+    "policy": {
+      "subjects": {
+        "component": {
+          "from": "components",
+          "identified_by": "name"
+        }
+      },
+      "requirements": {
+        "licences": {
+          "subject": "component",
+          "checks": {
+            "allowed": {
+              "description": "The licence is allowed",
+              "any_of": {
+                "declared": "some licenses.license.id is in $params.allowed_licenses",
+                "known": [
+                  "licenses does not exist",
+                  "$params.known_package_licenses named by name is in $params.allowed_licenses"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "allowed_licenses": "BSD-3-Clause",
+      "known_package_licenses": {}
+    },
+    "cases": [
+      {
+        "description": "fails as unusable even when another option passes",
+        "rules": [
+          "sentence.any_of",
+          "value.ref"
+        ],
+        "input": {
+          "components": [
+            {
+              "name": "prometheus-client"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "allowed",
+            "inputs": [
+              {
+                "name": "$params.known_package_licenses named by name",
+                "value": null
+              },
+              {
+                "name": "licenses",
+                "value": null
+              },
+              {
+                "name": "licenses.license.id",
+                "value": []
+              },
+              {
+                "name": "name",
+                "value": "prometheus-client"
+              }
+            ],
+            "passed": false,
+            "requirement": "licences",
+            "subject": {
+              "id": "prometheus-client",
+              "type": "component"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an any_of of sentences that walk, count and ask whether a field exists",
+    "policy": {
+      "subjects": {
+        "thing": {
+          "from": [
+            "things"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "any_of": {
+                "nested": [
+                  "x exists",
+                  "x.y is 1"
+                ],
+                "none": "count of xs is 0",
+                "signed": "every xs.signed is true"
+              }
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "takes each sentence's own cause, and an option whose field is missing fails as value",
+        "rules": [
+          "sentence.any_of",
+          "any_of.cause",
+          "any_of.inputs"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "xs": [
+                {
+                  "signed": true
+                }
+              ]
+            },
+            {
+              "id": "t2",
+              "xs": [
+                {
+                  "signed": false
+                }
+              ]
+            },
+            {
+              "id": "t3",
+              "x": {},
+              "xs": [
+                {
+                  "signed": false
+                }
+              ]
+            },
+            {
+              "id": "t4",
+              "x": {
+                "y": 1
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "count of xs",
+                "value": 1
+              },
+              {
+                "name": "x",
+                "value": null
+              },
+              {
+                "name": "x.y",
+                "value": null
+              },
+              {
+                "name": "xs[]",
+                "value": [
+                  {
+                    "signed": true
+                  }
+                ]
+              },
+              {
+                "name": "xs[].signed",
+                "value": [
+                  true
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "count of xs",
+                "value": 1
+              },
+              {
+                "name": "x",
+                "value": null
+              },
+              {
+                "name": "x.y",
+                "value": null
+              },
+              {
+                "name": "xs[]",
+                "value": [
+                  {
+                    "signed": false
+                  }
+                ]
+              },
+              {
+                "name": "xs[].signed",
+                "value": [
+                  false
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t2",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "count of xs",
+                "value": 1
+              },
+              {
+                "name": "x",
+                "value": {}
+              },
+              {
+                "name": "x.y",
+                "value": null
+              },
+              {
+                "name": "xs[]",
+                "value": [
+                  {
+                    "signed": false
+                  }
+                ]
+              },
+              {
+                "name": "xs[].signed",
+                "value": [
+                  false
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t3",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "count of xs",
+                "value": null
+              },
+              {
+                "name": "x",
+                "value": {
+                  "y": 1
+                }
+              },
+              {
+                "name": "x.y",
+                "value": 1
+              },
+              {
+                "name": "xs",
+                "value": []
+              },
+              {
+                "name": "xs.signed",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t4",
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "one of: nested(x exists and x.y is 1) | none(count of xs is 0) | signed(every xs.signed is true)"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "an any_of of sentences written wrong",
+    "policy": {
+      "subjects": {
+        "thing": {
+          "from": [
+            "things"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "not_object": {
+              "any_of": "x is 1"
+            },
+            "empty": {
+              "any_of": {}
+            },
+            "empty_option": {
+              "any_of": {
+                "o": []
+              }
+            },
+            "number": {
+              "any_of": {
+                "o": 1
+              }
+            },
+            "with_for": {
+              "any_of": {
+                "o": "x is 1"
+              },
+              "for": "every xs as x"
+            },
+            "bad_line": {
+              "any_of": {
+                "o": [
+                  "x is 1",
+                  "x is"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails well_formed and every row as ill_formed",
+        "rules": [
+          "sentence.any_of.written_wrong",
+          "written_wrong",
+          "written_wrong.row"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "x": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 6
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.bad_line",
+                "value": [
+                  "option o: line 2: doesn't parse"
+                ]
+              },
+              {
+                "name": "checks.empty",
+                "value": [
+                  "empty any_of"
+                ]
+              },
+              {
+                "name": "checks.empty_option",
+                "value": [
+                  "empty option o"
+                ]
+              },
+              {
+                "name": "checks.not_object",
+                "value": [
+                  "invalid any_of"
+                ]
+              },
+              {
+                "name": "checks.number",
+                "value": [
+                  "invalid option o"
+                ]
+              },
+              {
+                "name": "checks.with_for",
+                "value": [
+                  "unknown field for"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "bad_line",
+            "inputs": [],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "empty",
+            "inputs": [],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "empty_option",
+            "inputs": [],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "not_object",
+            "inputs": [],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "number",
+            "inputs": [],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "ill_formed",
+            "check": "with_for",
+            "inputs": [],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "bad_line": "one of: o(x is 1 and x is)",
+            "empty": "one of: <empty options>",
+            "empty_option": "one of: o(<empty option>)",
+            "not_object": "<invalid any_of>",
+            "number": "one of: o(<invalid option>)",
+            "with_for": "one of: o(x is 1)"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "an any_of of sentences with a name that starts like another",
+    "policy": {
+      "subjects": {
+        "thing": {
+          "from": [
+            "things"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "any_of": {
+                "a!": "x is 2",
+                "a": "x is 1",
+                "a b": "x is 3"
+              }
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "sorts its options by name, not by the text they print",
+        "rules": [
+          "sentence.any_of.expression"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "x": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "one of: a(x is 1) | a b(x is 3) | a!(x is 2)"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "an any_of of sentences that read a part",
+    "policy": {
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id",
+          "has": {
+            "cov": "attestations.cov"
+          }
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "any_of": {
+                "covered": [
+                  "cov exists",
+                  "cov.pct is at least 80"
+                ],
+                "waived": "waived is true"
+              }
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the part by its alias in each option",
+        "rules": [
+          "sentence.any_of",
+          "parts.where",
+          "any_of.cause"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "waived": false,
+              "attestations": {
+                "cov": {
+                  "pct": 90
+                }
+              }
+            },
+            {
+              "id": "b",
+              "waived": true,
+              "attestations": {}
+            },
+            {
+              "id": "c",
+              "waived": false,
+              "attestations": {}
+            },
+            {
+              "id": "d",
+              "waived": false,
+              "attestations": {
+                "cov": {}
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "cov",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
+                "value": {
+                  "pct": 90
+                }
+              },
+              {
+                "name": "cov.pct",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
+                "value": 90
+              },
+              {
+                "name": "waived",
+                "value": false
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "cov",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
+                "value": null
+              },
+              {
+                "name": "cov.pct",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
+                "value": null
+              },
+              {
+                "name": "waived",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "b",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "cov",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
+                "value": null
+              },
+              {
+                "name": "cov.pct",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
+                "value": null
+              },
+              {
+                "name": "waived",
+                "value": false
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "c",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "cov",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
+                "value": {}
+              },
+              {
+                "name": "cov.pct",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
+                "value": null
+              },
+              {
+                "name": "waived",
+                "value": false
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "d",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an any_of of sentences that read a parent subject",
+    "policy": {
+      "subjects": {
+        "pr": {
+          "from": "prs",
+          "identified_by": "id"
+        },
+        "commit": {
+          "from": "pr.commits",
+          "identified_by": "sha"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "commit",
+          "checks": {
+            "c": {
+              "any_of": {
+                "signed": "signed is true",
+                "by_bot": "pr.author is \"bot\""
+              }
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the parent by its name in each option",
+        "rules": [
+          "sentence.any_of",
+          "sentence.subject.chain"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "1",
+              "author": "bot",
+              "commits": [
+                {
+                  "sha": "a",
+                  "signed": false
+                }
+              ]
+            },
+            {
+              "id": "2",
+              "author": "ann",
+              "commits": [
+                {
+                  "sha": "b",
+                  "signed": true
+                },
+                {
+                  "sha": "c",
+                  "signed": false
+                },
+                {
+                  "sha": "d"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "pr.author",
+                "value": "bot"
+              },
+              {
+                "name": "signed",
+                "value": false
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "in": {
+                "pr": "1"
+              },
+              "type": "commit"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "pr.author",
+                "value": "ann"
+              },
+              {
+                "name": "signed",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "b",
+              "in": {
+                "pr": "2"
+              },
+              "type": "commit"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "pr.author",
+                "value": "ann"
+              },
+              {
+                "name": "signed",
+                "value": false
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "c",
+              "in": {
+                "pr": "2"
+              },
+              "type": "commit"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "pr.author",
+                "value": "ann"
+              },
+              {
+                "name": "signed",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "d",
+              "in": {
+                "pr": "2"
+              },
+              "type": "commit"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

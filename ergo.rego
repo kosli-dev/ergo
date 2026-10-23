@@ -912,6 +912,7 @@ _check_outcome(check, subj, flaw, item) := object.union(
 	_failed_items_field(check, subj, flaw, item),
 ) if {
 	not _all_of_run(check, flaw)
+	not _any_of_run(check, flaw)
 	not _walk_run(check, flaw)
 	not _derived_once(check)
 }
@@ -1073,6 +1074,42 @@ _check_outcome(check, subj, flaw, item) := {
 	outs := [_assertion_out(c, subj, flaw, item) | some c in check.checks]
 	failed := [{"assertion": check.assertions[i], "cause": o.cause} | some i, o in outs; o.cause != "satisfied"]
 }
+
+_any_of_run(check, flaw) if {
+	check.op == "sentence_any_of"
+	flaw != "ill_formed"
+}
+
+_check_outcome(check, subj, flaw, item) := {
+	"inputs": [{"name": pair[0], "value": pair[1]} | some pair in sort({[i.name, i.value] | some o in outs; some i in o.inputs})],
+	"passed": cause == "satisfied",
+	"cause": cause,
+} if {
+	_any_of_run(check, flaw)
+	outs := [_assertion_out(c, subj, flaw, item) | some c in check.checks]
+	lines := [_option_line_cause(c, outs[i].cause, subj) | some i, c in check.checks]
+	cause := _any_of_lines_cause(check.option_of, lines, flaw)
+}
+
+_option_line_cause(c, cause, subj) := "missing" if {
+	cause == "value"
+	not _walks(c)
+	_asks_presence(c, subj)
+	_read_state(subj, c.path) in {"absent", "null"}
+} else := cause
+
+_any_of_lines_cause(_, _, flaw) := flaw if flaw != ""
+
+_any_of_lines_cause(option_of, lines, "") := "satisfied" if {
+	some nm in option_of
+	every i, n in option_of {
+		_line_passed_or_elsewhere(n, nm, lines[i])
+	}
+} else := _worst_or_value({_group_cause({lines[i] | some i, n in option_of; n == nm}) | some nm in option_of})
+
+_line_passed_or_elsewhere(n, nm, _) if n != nm
+
+_line_passed_or_elsewhere(_, _, "satisfied")
 
 _assertion_out(c, subj, "", item) := {"cause": e.cause, "inputs": _with_key_fields(subj, c, item, e.inputs)} if {
 	_derived_once(c)
@@ -2615,6 +2652,7 @@ _required_fields := {
 	"not_in": {"path", "values"},
 	"has_type": {"path", "type"},
 	"all_of": {"checks", "assertions"},
+	"sentence_any_of": {"checks", "assertions", "option_of"},
 	"every": {"path", "check", "whose", "if_any"},
 	"for": {"items", "checks", "assertions"},
 	"some": {"path", "check", "whose", "if_any"},
@@ -2683,7 +2721,7 @@ _children(node, names) := array.concat(array.concat(array.concat(_inner_child(no
 default _assertion_children(_, _) := []
 
 _assertion_children(node, names) := [[c, ["checks", i], "assertion", names] | some i, c in node.checks] if {
-	node.op == "all_of"
+	node.op in {"all_of", "sentence_any_of"}
 	is_array(node.checks)
 }
 
@@ -2737,7 +2775,7 @@ _op_problems(node, _, here) := {concat("", ["unknown op ", _text(node.op)])} if 
 	not _sentence_op(node, here)
 }
 
-_sentence_ops := {"empty_string_or_list", "not_empty_string_or_list", "not_in", "has_type", "all_of", "every", "some", "for"}
+_sentence_ops := {"empty_string_or_list", "not_empty_string_or_list", "not_in", "has_type", "all_of", "sentence_any_of", "every", "some", "for"}
 
 _sentence_op(node, here) if {
 	node.op in _sentence_ops
@@ -4018,7 +4056,7 @@ _expression_of(check, _) := "one of: <missing options>" if {
 	not "options" in object.keys(check)
 }
 
-_expression_of(check, item) := _one_of([_option_text(nm, group, [_top_option_describe(group[k], item) | some k in _names(group)]) | some nm, group in check.options]) if {
+_expression_of(check, item) := _one_of([[_text(nm), _option_text(nm, group, [_top_option_describe(group[k], item) | some k in _names(group)])] | some nm, group in check.options]) if {
 	not _written_expression(check)
 	check.op == "any_of"
 	"options" in object.keys(check)
@@ -4078,7 +4116,7 @@ _element_describe(check, item, _) := _nested_describe(check, item) if {
 	not _quantified(check)
 }
 
-_element_describe(check, item, given) := _one_of([_option_text(nm, group, [_element_option_describe(group[k], item, given) | some k in _names(group)]) | some nm, group in check.options]) if _combinator(check)
+_element_describe(check, item, given) := _one_of([[_text(nm), _option_text(nm, group, [_element_option_describe(group[k], item, given) | some k in _names(group)])] | some nm, group in check.options]) if _combinator(check)
 
 _element_describe(check, item, given) := _element_list_describe(check, item, given) if _quantified(check)
 
@@ -4108,11 +4146,11 @@ _inner_describe(check, item) := _any_of_describe(check, item) if _combinator(che
 
 _inner_describe(check, _) := "<nested too deep>" if _quantified(check)
 
-_any_of_describe(check, item) := _one_of([_option_text(nm, group, [_inner_option_describe(group[k], item) | some k in _names(group)]) | some nm, group in check.options])
+_any_of_describe(check, item) := _one_of([[_text(nm), _option_text(nm, group, [_inner_option_describe(group[k], item) | some k in _names(group)])] | some nm, group in check.options])
 
 _one_of(parts) := "one of: <empty options>" if count(parts) == 0
 
-_one_of(parts) := concat("", ["one of: ", concat(" | ", sort(parts))]) if count(parts) > 0
+_one_of(parts) := concat("", ["one of: ", concat(" | ", [p[1] | some p in sort(parts)])]) if count(parts) > 0
 
 _option_text(nm, group, texts) := concat("", [_text(nm), "(", _option_body(group, texts), ")"])
 
@@ -4740,7 +4778,7 @@ _with_ref_answer(check) := _ref_answered_compare(check) if {
 	check.op == "compare"
 } else := object.union(check, {"checks": [_ref_answered_compare(c) | some c in check.checks]}) if {
 	is_object(check)
-	check.op in {"all_of", "for"}
+	check.op in {"all_of", "sentence_any_of", "for"}
 	is_array(check.checks)
 } else := check
 
@@ -7379,14 +7417,14 @@ _p_parent_path(path, pc) := array.concat(array.concat([_p_marker(path[1], count(
 	path[1] in object.keys(pc.ancestors[a])
 } else := path
 
-_p_smodel(m, pc) := object.union(m, {"checks": [_p_sleaf(c, pc) | some c in m.checks]}) if m.op == "all_of"
+_p_smodel(m, pc) := object.union(m, {"checks": [_p_sleaf(c, pc) | some c in m.checks]}) if m.op in {"all_of", "sentence_any_of"}
 
 _p_smodel(m, pc) := object.union(m, {
 	"checks": [_p_sleaf(c, pc) | some c in m.checks],
 	"items": [object.union(item, {"path": _p_path(item.path, pc, "s"), "whose": [_p_leaf(c, pc, "i") | some c in item.whose]}) | some item in m.items],
 }) if m.op == "for"
 
-_p_smodel(m, pc) := _p_sleaf(m, pc) if not m.op in {"all_of", "for"}
+_p_smodel(m, pc) := _p_sleaf(m, pc) if not m.op in {"all_of", "sentence_any_of", "for"}
 
 _p_sleaf(m, pc) := object.union(m, {
 	"path": _p_path(m.path, pc, "s"),
@@ -7548,14 +7586,14 @@ _s_parent_named(written, model, names) := _s_named_model(model, names) if {
 	not "$sentence" in object.keys(model)
 }
 
-_s_named_model(m, names) := object.union(m, {"checks": [_s_named_model_leaf(c, names) | some c in m.checks]}) if m.op == "all_of"
+_s_named_model(m, names) := object.union(m, {"checks": [_s_named_model_leaf(c, names) | some c in m.checks]}) if m.op in {"all_of", "sentence_any_of"}
 
 _s_named_model(m, names) := object.union(m, {
 	"checks": [_s_named_model_leaf(c, names) | some c in m.checks],
 	"items": [object.union(item, {"path": _s_named_path(item.path, names), "whose": [_s_named(c, names) | some c in item.whose]}) | some item in m.items],
 }) if m.op == "for"
 
-_s_named_model(m, names) := _s_named_model_leaf(m, names) if not m.op in {"all_of", "for"}
+_s_named_model(m, names) := _s_named_model_leaf(m, names) if not m.op in {"all_of", "sentence_any_of", "for"}
 
 _s_named_model_leaf(m, names) := object.union(m, {
 	"path": _s_named_path(m.path, names),
@@ -7579,6 +7617,8 @@ _p_written(check, aliases, parents) := _s_check_for(_s_lines(check.assert), chec
 	"for" in object.keys(check)
 }
 
+_p_written(check, aliases, parents) := _s_any_of(check, aliases, aliases | parents) if _s_any_of_form(check)
+
 _s_lines(a) := a if is_array(a)
 
 _s_lines(a) := [a] if not is_array(a)
@@ -7588,6 +7628,82 @@ _p_written(check, _, _) := check if not _s_written_as_sentence(check)
 _s_written_as_sentence(check) if is_string(check)
 
 _s_written_as_sentence(check) if _s_assert_form(check)
+
+_s_written_as_sentence(check) if _s_any_of_form(check)
+
+_s_any_of_form(check) if {
+	is_object(check)
+	"any_of" in object.keys(check)
+	not "assert" in object.keys(check)
+	not "op" in object.keys(check)
+}
+
+_s_any_of(check, aliases, names) := object.union(object.filter(check, {"description", "meta"}), {
+	"op": "sentence_any_of",
+	"checks": [object.remove(p[0], ["expression"]) | some p in pairs],
+	"assertions": [p[1] | some p in pairs],
+	"option_of": [p[2] | some p in pairs],
+	"expression": _one_of([[_text(nm), _option_text(nm, texts, texts)] | some nm in _names(options); texts := [p[1] | some p in pairs; p[2] == nm]]),
+}) if {
+	count(_s_any_of_problems(check)) == 0
+	options := {nm: _s_check(_s_lines(o), {}, _p_named_by_problems(_s_lines(o), "", aliases), names) | some nm, o in check.any_of}
+	every m in options {
+		not "$sentence" in object.keys(m)
+	}
+	pairs := [p | some nm in _names(options); some p in _s_option_lines(options[nm], nm)]
+} else := object.union(object.filter(check, {"description", "meta"}), {
+	"expression": _s_any_of_written(check.any_of),
+	"$sentence": sort(_s_or_unrunnable(_s_any_of_problems(check) | _s_options_problems(check.any_of, aliases, names))),
+})
+
+_s_option_lines(m, nm) := [[c, m.assertions[i], nm] | some i, c in m.checks] if m.op == "all_of"
+
+_s_option_lines(m, nm) := [[m, m.expression, nm]] if m.op != "all_of"
+
+_s_any_of_problems(check) := {concat("", ["unknown field ", _text(f)]) | some f in object.keys(check); not f in {"any_of", "description", "meta"}} | _s_options_shape(check.any_of)
+
+_s_options_shape(options) := {"invalid any_of"} if not is_object(options)
+
+_s_options_shape({}) := {"empty any_of"}
+
+_s_options_shape(options) := {_s_option_shape(nm, o) | some nm, o in options; _s_option_shape(nm, o) != ""} if {
+	is_object(options)
+	options != {}
+}
+
+_s_option_shape(nm, o) := concat("", ["empty option ", _text(nm)]) if o == []
+
+else := concat("", ["invalid option ", _text(nm)]) if not _s_option_written(o)
+
+else := ""
+
+_s_option_written(o) if is_string(o)
+
+_s_option_written(o) if {
+	is_array(o)
+	every line in o {
+		is_string(line)
+	}
+}
+
+_s_options_problems(options, aliases, names) := {concat("", ["option ", _text(nm), ": ", p]) |
+	some nm, o in options
+	_s_option_written(o)
+	o != []
+	m := _s_check(_s_lines(o), {}, _p_named_by_problems(_s_lines(o), "", aliases), names)
+	some p in object.get(m, "$sentence", [])
+} if is_object(options)
+
+else := set()
+
+_s_any_of_written(options) := _one_of([[_text(nm), _s_option_written_text(nm, o)] | some nm, o in options]) if is_object(options)
+
+else := "<invalid any_of>"
+
+_s_option_written_text(nm, o) := _option_text(nm, texts, texts) if {
+	_s_option_written(o)
+	texts := [_s_written_text(line) | some line in _s_lines(o)]
+} else := _option_text(nm, null, [])
 
 _s_assert_form(check) if {
 	is_object(check)

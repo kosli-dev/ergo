@@ -235,7 +235,7 @@
       }
     },
     "sentence_check": {
-      "description": "A check written as a sentence, alone or under assert. spec/sentences.md and spec/sentences.abnf say how a sentence is written.",
+      "description": "A check written as a sentence, alone, under assert, or as the options of an any_of. spec/sentences.md and spec/sentences.abnf say how a sentence is written.",
       "anyOf": [
         {
           "type": "string"
@@ -276,6 +276,46 @@
           },
           "required": [
             "assert"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "any_of": {
+              "type": "object",
+              "description": "Named options. The check passes when every sentence of one option passes.",
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1
+                  }
+                ]
+              },
+              "minProperties": 1
+            },
+            "description": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "meta": {
+              "type": [
+                "object",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "any_of"
           ],
           "additionalProperties": false
         }
