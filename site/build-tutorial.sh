@@ -20,5 +20,12 @@ if [ "$actual" != 'sha512-ymR/nFS3nO9o24j9xowGGQaf+Gmb813QcxUpVZkfRlJkawKWqSIlln
   echo "opa-wasm doesn't match its pinned hash" >&2
   exit 1
 fi
-tar -xzf "$dir/pkg.tgz" -C "$dir" package/dist/opa-wasm-browser.esm.js
+tar -xzf "$dir/pkg.tgz" -C "$dir" package/dist/opa-wasm-browser.esm.js package/package.json
 mv "$dir/package/dist/opa-wasm-browser.esm.js" "$out/vendor/opa-wasm.mjs"
+wasm_version=$(sed -n 's/^  "version": "\(.*\)",$/\1/p' "$dir/package/package.json")
+opa_version=$(opa version | sed -n 's/^Version: //p')
+if [ -z "$wasm_version" ] || [ -z "$opa_version" ]; then
+  echo "couldn't read the opa-wasm or OPA version" >&2
+  exit 1
+fi
+printf 'export const runtime = { name: "opa-wasm", version: "%s", compiled_by: { name: "opa", version: "%s" } };\n' "$wasm_version" "$opa_version" > "$out/runtime.mjs"
