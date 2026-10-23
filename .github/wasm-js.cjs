@@ -28,7 +28,9 @@ const parseTime = (v) => {
   return JSON.rawJSON(String(BigInt(Date.parse(time + zone)) / 1000n * 1000000000n + BigInt(fraction.padEnd(9, "0").slice(0, 9))));
 };
 
-const load = (dir, memory) => loadPolicy(fs.readFileSync(path.join(dir, "policy.wasm")), memory, { "time.parse_rfc3339_ns": parseTime });
+const hosted = { "time.parse_rfc3339_ns": parseTime, "opa.runtime": () => ({}) };
+
+const load = (dir, memory) => loadPolicy(fs.readFileSync(path.join(dir, "policy.wasm")), memory, hosted);
 
 const builtinsOf = (policy) => {
   const { builtins, opa_json_dump } = policy.wasmInstance.exports;
@@ -38,14 +40,14 @@ const builtinsOf = (policy) => {
 };
 
 Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([policy, ergo]) => {
-  const outside = builtinsOf(ergo).filter((b) => b !== "time.parse_rfc3339_ns");
+  const outside = builtinsOf(ergo).filter((b) => !hosted[b]);
   if (outside.length > 0) {
     console.error(`ergo uses built-ins that OPA's Wasm build runs outside the module: ${outside.join(", ")}`);
     process.exit(1);
   }
 
   const needed = builtinsOf(policy);
-  const missing = needed.filter((b) => !provided[b] && b !== "time.parse_rfc3339_ns");
+  const missing = needed.filter((b) => !provided[b] && !hosted[b]);
   if (missing.length > 0) {
     console.error(`ergo uses built-ins the Wasm JS runtime doesn't have: ${missing.join(", ")}`);
     process.exit(1);

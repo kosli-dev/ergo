@@ -98,7 +98,7 @@ Three ways to settle it:
 
 ## Rules without cases
 
-Every rule needs a case, apart from the ones listed here. The `sentence` rules here are for forms `ergo.rego` doesn't run or check yet. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.
+Every rule needs a case, apart from the ones listed here. The `sentence` rules here are for forms `ergo.rego` doesn't run or check yet. `report.engine` gives different values for each engine, so a case can't pin it, and `ergo_test.rego` tests it instead. `policy.version` waits for `ergo.rego` to read `ergo` from a policy, and `report.hash` for the question about numbers above. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.
 
 - `compare.derived`
 - `sentence.forms`
@@ -107,7 +107,6 @@ Every rule needs a case, apart from the ones listed here. The `sentence` rules h
 - `sentence.argument.subject`
 - `sentence.for.depth`
 - `policy.version`
-- `report.version`
 - `report.engine`
 - `report.hash`
 

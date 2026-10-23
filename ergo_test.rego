@@ -2811,6 +2811,57 @@ test_every_requirement_field_ergo_knows_is_well_formed if {
 	rows_for(report({"items": [{"id": 1}]}, {"s": req}), "s", "$well_formed")[0].passed == true
 }
 
+_engine_policy := {"subjects": {"x": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "x", "checks": {"c": "id is 1"}}}}
+
+_engine_doc := {"xs": [{"id": 1}, {"id": 2}]}
+
+test_the_report_says_which_version_of_the_spec_it_follows if {
+	ergo.report(_engine_doc, _engine_policy, {}).ergo == "v0.1"
+}
+
+test_the_report_says_which_version_of_the_spec_it_follows_whatever_version_the_policy_names if {
+	ergo.report(_engine_doc, object.union(_engine_policy, {"ergo": "v9.9"}), {}).ergo == "v0.1"
+}
+
+test_the_report_names_the_engine_and_the_opa_version_it_ran_on if {
+	rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as {"version": "1.20.2"}
+	rep.engine == {"name": "ergo.rego", "version": ergo.version, "runtime": {"name": "opa", "version": "1.20.2"}}
+}
+
+test_the_report_copies_only_the_opa_version_because_the_runtime_also_holds_every_environment_variable if {
+	rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as {"version": "1.20.2", "commit": "abc", "env": {"TOKEN": "secret"}}
+	rep.engine.runtime == {"name": "opa", "version": "1.20.2"}
+}
+
+test_the_runtime_is_null_when_opa_doesnt_say_as_when_used_as_a_go_library if {
+	rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as {}
+	rep.engine.runtime == null
+}
+
+test_a_runtime_version_that_isnt_a_string_gives_null_and_changes_no_verdict if {
+	every rt in [{"version": 1}, {"version": null}, null, "1.20.2", []] {
+		rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as rt
+		rep.engine.runtime == null
+		object.remove(rep, ["engine"]) == object.remove(ergo.report(_engine_doc, _engine_policy, {}), ["engine"])
+	}
+}
+
+test_a_compiled_policy_gives_the_same_ergo_and_engine if {
+	rep := ergo.report(_engine_doc, ergo.compile(_engine_policy), {}) with opa.runtime as {"version": "1.20.2"}
+	rep.ergo == "v0.1"
+	rep.engine == {"name": "ergo.rego", "version": ergo.version, "runtime": {"name": "opa", "version": "1.20.2"}}
+}
+
+test_the_version_is_a_plain_semantic_version_so_a_release_tag_can_be_checked_against_it if {
+	regex.match(`^[0-9]+\.[0-9]+\.[0-9]+$`, ergo.version)
+}
+
+test_a_report_that_cant_read_its_input_still_says_its_version_and_engine if {
+	rep := ergo.report("not an object", _engine_policy, "not params") with opa.runtime as {"version": "1.20.2"}
+	rep.ergo == "v0.1"
+	rep.engine.name == "ergo.rego"
+}
+
 test_a_requirement_description_and_meta_are_carried_into_the_report if {
 	meta := {"control": "SDLC-CTRL-0007", "frameworks": ["SOC 2", "ISO 27001"], "none": []}
 	rep := report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"description": "Every item has an id", "meta": meta})})
@@ -4098,7 +4149,7 @@ test_requirement_entry_carries_exactly_the_documented_keys if {
 }
 
 test_report_carries_exactly_the_documented_keys if {
-	object.keys(solo({}, is_merged)) == {"compliant", "description", "meta", "requirements", "results", "subjects"}
+	object.keys(solo({}, is_merged)) == {"compliant", "description", "engine", "ergo", "meta", "requirements", "results", "subjects"}
 }
 
 test_report_is_deterministic if {
@@ -6223,23 +6274,23 @@ test_the_report_never_reads_data_params if {
 	[r.cause | some r in rows_for(unset, "s", "c")] == ["absent"]
 }
 
-empty_report := {"compliant": false, "description": "", "meta": {}, "requirements": {}, "results": [], "subjects": {}}
+empty_report := {"compliant": false, "description": "", "ergo": "v0.1", "meta": {}, "requirements": {}, "results": [], "subjects": {}}
 
 test_a_policy_without_requirements_is_not_compliant if {
-	ergo.report({"items": [{"id": 1}]}, {}, {}) == empty_report
-	ergo.report({"items": [{"id": 1}]}, {"requirements": {}}, {}) == empty_report
-	ergo.report({"items": [{"id": 1}]}, {"requirments": params_req({"op": "present", "path": ["id"]})}, {}) == empty_report
+	object.remove(ergo.report({"items": [{"id": 1}]}, {}, {}), ["engine"]) == empty_report
+	object.remove(ergo.report({"items": [{"id": 1}]}, {"requirements": {}}, {}), ["engine"]) == empty_report
+	object.remove(ergo.report({"items": [{"id": 1}]}, {"requirments": params_req({"op": "present", "path": ["id"]})}, {}), ["engine"]) == empty_report
 }
 
 test_a_policy_that_is_not_an_object_is_not_compliant if {
 	every policy in [null, true, 1, "requirements", [], [params_req({"op": "present", "path": ["id"]})]] {
-		ergo.report({"items": [{"id": 1}]}, policy, {}) == empty_report
+		object.remove(ergo.report({"items": [{"id": 1}]}, policy, {}), ["engine"]) == empty_report
 	}
 }
 
 test_requirements_that_are_not_an_object_are_not_compliant if {
 	every reqs in [null, true, 1, "", "s", []] {
-		ergo.report({"items": [{"id": 1}]}, {"requirements": reqs}, {}) == empty_report
+		object.remove(ergo.report({"items": [{"id": 1}]}, {"requirements": reqs}, {}), ["engine"]) == empty_report
 	}
 	ergo.report({"items": [{"id": 1}]}, {"requirements": [params_req({"op": "present", "path": ["id"]}).s]}, {}).compliant == false
 }

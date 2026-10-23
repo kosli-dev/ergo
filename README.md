@@ -99,12 +99,21 @@ Let's ask for the report:
 opa eval -d policy -i deployments.json --format=pretty 'data.deploy.report'
 ```
 
-The report records every check Ergo ran, including the ones that passed. It comes in four parts, after the policy's own `description` and `meta`, which this one doesn't have:
+The report records every check Ergo ran, including the ones that passed. It comes in four parts, after the policy's own `description` and `meta`, which this one doesn't have, and `engine` and `ergo`, which say what made the report and which version of the [spec](spec/README.md#versions) it follows:
 
 ```json
 {
   "compliant": false,
   "description": "",
+  "engine": {
+    "name": "ergo.rego",
+    "runtime": {
+      "name": "opa",
+      "version": "1.20.2"
+    },
+    "version": "0.1.0"
+  },
+  "ergo": "v0.1",
   "meta": {},
   "requirements": { ... },
   "results": [ ... ],

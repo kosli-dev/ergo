@@ -38,7 +38,7 @@
       "additionalProperties": {"$ref": "#/$defs/subject"}
     }
   },
-  "required": ["compliant", "description", "meta", "requirements", "results", "subjects"],
+  "required": ["compliant", "description", "engine", "ergo", "meta", "requirements", "results", "subjects"],
   "additionalProperties": false,
   "$defs": {
     "cause": {"enum": ["satisfied", "substituted", "ill_formed", "not_an_object", "ambiguous", "unmatched", "unusable", "absent", "null", "value"]},

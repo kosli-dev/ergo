@@ -104,6 +104,15 @@ the report starts with:
 {
   "compliant": true,
   "description": "Production changes are reviewed and approved",
+  "engine": {
+    "name": "ergo.rego",
+    "runtime": {
+      "name": "opa",
+      "version": "1.20.2"
+    },
+    "version": "0.1.0"
+  },
+  "ergo": "v0.1",
   "meta": {
     "control": "DEV-0401",
     "title": "Security testing and code review"
@@ -1186,6 +1195,15 @@ Three rules:
 {
   "compliant": false,
   "description": "",
+  "engine": {
+    "name": "ergo.rego",
+    "runtime": {
+      "name": "opa",
+      "version": "1.20.2"
+    },
+    "version": "0.1.0"
+  },
+  "ergo": "v0.1",
   "meta": {},
   "requirements": { ... },
   "results": [ ... ],
@@ -1196,6 +1214,8 @@ Three rules:
 `compliant` is `true` when there's at least one requirement and none of them is `not_met`.
 
 `description` and `meta` are the [policy's](#describing-a-policy), or `""` and `{}` when it has none.
+
+`ergo` is the version of the [spec](spec/README.md#versions) the report follows. `engine` says what made it: `ergo.rego`, its version, which a policy can read as `ergo.version`, and as `runtime` the version of OPA it ran on. Ergo copies only that version, never the rest of `opa.runtime()`, which also holds every environment variable. `runtime` is `null` when OPA doesn't give a version. The `opa` command always gives one, but OPA used as a Go library only gives one when the program sets its runtime with `rego.Runtime`, and on [Wasm](#compiling-to-wasm) it's what the host passes in.
 
 `subjects` says where the subjects come from, as [Subjects in the report](#subjects-in-the-report) shows.
 
@@ -1577,7 +1597,10 @@ To decide whether to allow something, use `report.compliant`, not whether `viola
 
 ## Compiling to Wasm
 
-Ergo runs in a policy compiled with `opa build -t wasm` and run with OPA's JavaScript runtime, `@open-policy-agent/opa-wasm`. One built-in is missing from that runtime: `time.parse_rfc3339_ns`, which `compare_time` uses on RFC 3339 strings. A policy with such a check fails with `not implemented: built-in function`, unless you pass the built-in in yourself, as the third argument to `loadPolicy`.
+Ergo runs in a policy compiled with `opa build -t wasm` and run with OPA's JavaScript runtime, `@open-policy-agent/opa-wasm`. Two built-ins are missing from that runtime, and you pass them in yourself, as the third argument to `loadPolicy`:
+
+- `opa.runtime`, which every report reads for its `engine`. Without it, every report fails with `not implemented: built-in function`. Pass `() => ({})`, so the report says `runtime: null`, because the JavaScript runtime isn't OPA and has no OPA version to give.
+- `time.parse_rfc3339_ns`, which `compare_time` uses on RFC 3339 strings. Without it, only a policy with such a check fails.
 
 Ergo only passes it a time it has already checked: an uppercase `T` and `Z`, a date that exists and a year from 1678 to 2261. So it only has to turn that into nanoseconds since 1970, exactly. A JavaScript number can't hold that: today's are about 1.76×10¹⁸, where a number can only step by 256. So return the digits with `JSON.rawJSON` (Node 21 and later). This is the version Ergo's CI uses, and it gives the same nanoseconds as OPA on 16,922 generated timestamps, before and after 1970:
 
@@ -1587,7 +1610,7 @@ const parseTime = (v) => {
   return JSON.rawJSON(String(BigInt(Date.parse(time + zone)) / 1000n * 1000000000n + BigInt(fraction.padEnd(9, "0").slice(0, 9))));
 };
 
-const policy = await loadPolicy(wasm, undefined, { "time.parse_rfc3339_ns": parseTime });
+const policy = await loadPolicy(wasm, undefined, { "time.parse_rfc3339_ns": parseTime, "opa.runtime": () => ({}) });
 ```
 
 ## Compiling a policy

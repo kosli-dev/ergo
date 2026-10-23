@@ -5001,8 +5001,15 @@ _run(doc, policy, rd, params) := r if {
 	unreadable := _unreadable_inputs(doc, params)
 	written := object.union(_report_of(doc, reqs, object.get(rd.ahead, "requirements", {})), {"description": _reported_description(policy), "meta": _reported_meta(policy), "subjects": _listed_of(policy, rd)}) with data.ergo_reading as false with data.ergo_policy_problems as _policy_problems_of(policy, rd) with data.ergo_document as doc with data.ergo_params as params with data.ergo_subjects as rd.subjects with data.ergo_resolved as rd.resolved with data.ergo_unreadable as unreadable with data.ergo_sentences as rd.sentences with data.ergo_subject_sentences as rd.subject_sentences with input as {"ergo/names": {}}
 	used := _used_subjects(reqs, rd.subjects, rd.resolved)
-	r := _reported(written, unreadable, [raw, used])
+	r := object.union(_reported(written, unreadable, [raw, used]), {"ergo": "v0.1", "engine": {"name": "ergo.rego", "version": version, "runtime": _runtime(opa.runtime())}})
 }
+
+version := "0.1.0"
+
+_runtime(rt) := {"name": "opa", "version": rt.version} if {
+	is_object(rt)
+	is_string(rt.version)
+} else := null
 
 _used_subjects(reqs, subjects, resolved) := {name: subjects[name] |
 	some req in reqs
