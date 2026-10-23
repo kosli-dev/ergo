@@ -8,10 +8,21 @@ Draft 0.1. Ergo is three specs, and `ergo.rego` is an implementation of them:
 - [`policy/schema.json`](policy/schema.json) describes today's syntax as a JSON Schema.
 - [`report/schema.json`](report/schema.json) says what a report looks like, as a JSON Schema.
 - [`cases/`](cases) holds the cases that pin the rules down, one folder per topic.
+- [`CHANGELOG.md`](CHANGELOG.md) says what each version of the spec changed.
 
 When an implementation and the spec disagree, the implementation is wrong. A change to Ergo's behaviour starts here, with the rule and its cases, and then goes into each implementation.
 
 The spec covers reading values, causes, expressions, every built-in operator, requirements, scope, substitutes, statuses, row order and violations. How a subject's `from` names subjects (`each_as` and `keys`), subjects built on another with `of`, params passed in and values JSON can't hold are still described only in [REFERENCE.md](../REFERENCE.md). [OPEN.md](OPEN.md) lists the questions the spec hasn't settled. A subject's `from` waits for [#174](https://github.com/kosli-dev/ergo/issues/174) and [#113](https://github.com/kosli-dev/ergo/issues/113), which may change how it's written. The spec will change while it's 0.x.
+
+## Versions
+
+The spec has one version, for the policy, the report and what one means for the other. A change that turns a cause from `absent` into `null` touches neither schema, but it changes the report, so it needs a version too. A policy names the version it's written for in `ergo` ([policy.version](syntax.md#policies)), and a report the version it follows ([report.version](semantics.md#statuses)).
+
+The spec stays `0.x` until 1.0, and any minor version may break policies and reports written for the one before. A released version is tagged `spec-v0.1`, its schemas are published at `https://ergo.kosli.com/spec/0.1/`, and it doesn't change after that. The spec on `main` is the next version, so the first change after a release moves the version in both schemas, their `$id` and `ergo`, to the next one. [CHANGELOG.md](CHANGELOG.md) says what each version changed, and whether reports changed with it.
+
+Each implementation has a version of its own, which the report gives in `engine` ([report.engine](semantics.md#statuses)), and its changelog says which version of the spec it follows.
+
+`ergo.rego` doesn't read `ergo` from a policy or put `ergo` and `engine` in a report yet, so the schemas don't require them yet.
 
 ## Cases
 
