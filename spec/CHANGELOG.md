@@ -4,7 +4,7 @@ Each version says whether reports changed, so that anyone who only stores report
 
 ## 0.1, not released yet
 
-The first version. Reports change: they get `ergo` and `engine` at their top.
+The first version. Policies need `ergo: v0.1` at their top, and reports get `ergo` and `engine` there.
 
 - One version for the policy, the report and what one means for the other. A policy names it in `ergo`, and a report in `ergo` too.
 - A report says what made it in `engine`.

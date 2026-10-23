@@ -94,7 +94,7 @@ Three ways to settle it:
 
 ## Numbers in a report's hash
 
-[report.hash](semantics.md#statuses) writes the report as RFC 8785 says, and RFC 8785 writes every number as a 64-bit float. Ergo copies numbers from the input into the report with every digit, so a report holding `1.00000000000000000001` hashes as if it held `1`. Two reports that differ only there get the same hash. The open question is whether that's fine, or whether the hash should write numbers as the report does.
+[report.hash](semantics.md#statuses) writes the report as RFC 8785 says, and RFC 8785 writes every number as a 64-bit float. Ergo copies numbers from the input into the report with every digit, so a report holding `1.00000000000000000001` hashes as if it held `1`. Two reports that differ only there get the same hash. A number too big or too small for a 64-bit float, like `1e400`, can't be written that way at all, and implementations already write it differently in the report (see [Values](semantics.md#values)). The open question is whether that's fine, or whether the hash should write numbers as the report does.
 
 ## Rules without cases
 

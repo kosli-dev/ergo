@@ -455,7 +455,7 @@ A subject can have parts: named paths inside itself, each with an alias, written
 
 **[report.engine]** The report has `engine` at its top, saying what made it: `name` and `version`, both strings, like `{"name": "ergo.rego", "version": "0.1.0"}`, and `runtime`, what the engine ran on, as `{"name": ..., "version": ...}`, or `null` when the engine can't tell. An engine never puts anything else from its runtime in the report. A runtime it can't read gives `null` and doesn't change any verdict.
 
-**[report.hash]** The hash of a report is the SHA-256, in lowercase hex, of the report without `engine`, written as [RFC 8785](https://www.rfc-editor.org/rfc/rfc8785) says. So the same policy, input, params and spec version give the same hash whichever engine made the report. An implementation doesn't have to compute it.
+**[report.hash]** The hash of a report is the SHA-256, in lowercase hex, of the report without `engine`, written as [RFC 8785](https://www.rfc-editor.org/rfc/rfc8785) says. So the same policy, input, params and spec version give the same hash whichever engine made the report, apart from numbers that a 64-bit float doesn't keep (see [OPEN.md](OPEN.md#numbers-in-a-reports-hash)). An implementation doesn't have to compute it.
 
 **[report.subjects]** The report has `subjects` at its top, with an entry for each subject a requirement uses, by name. That's the subject it names, the subjects that one narrows or reads from, and so on all the way back. A subject no requirement uses isn't listed. An entry has:
 
