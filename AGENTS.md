@@ -23,6 +23,7 @@ Run these before saying a change is done:
 ```sh
 opa check --strict . --ignore .github
 opa check --strict --schema .github/closed-input-schema.json ergo.rego
+opa capabilities --current | jq '.builtins |= map(select(.nondeterministic != true))' > /tmp/ergo-deterministic.json && opa check --strict --capabilities /tmp/ergo-deterministic.json ergo.rego
 opa fmt --list .
 opa test . --ignore .github --timeout 120s
 opa eval --strict-builtin-errors --ignore .github -d . --format raw 'count(data) > 0'
@@ -38,6 +39,8 @@ Run them from the repo root. The last two lines use a virtual environment that h
 `opa fmt --list .` should print nothing. If it prints file names, run `opa fmt -w .`.
 
 The second `opa check` compiles `ergo.rego` the way a host does when it checks `input` against a closed JSON Schema, and should print nothing. If it fails with `undefined ref: input[...]`, Ergo reads something from `input` that the `METADATA` annotation above `package ergo` doesn't declare.
+
+The third `opa check` compiles `ergo.rego` without the built-ins OPA marks as nondeterministic, like `opa.runtime`, `time.now_ns` and `http.send`, and should print nothing. Their answer depends on the machine, not on the policy and the input, and a report must depend only on the policy, the input and the params. A host that runs other people's policies in a sandbox can leave those built-ins out, and then Ergo wouldn't compile there. If it fails with `undefined function`, find a way that doesn't read the machine.
 
 The `opa eval` command runs every test again with `--strict-builtin-errors`, which turns a built-in given the wrong type into an error, and should print `true`. If it prints an error, check the value's type before the built-in on that line, so that Ergo gives the same report with or without the flag.
 

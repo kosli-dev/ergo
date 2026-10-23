@@ -22,6 +22,10 @@ jobs:
       - run: opa check --strict . --ignore .github
       - name: Check Ergo compiles where input is checked against a closed schema
         run: opa check --strict --schema .github/closed-input-schema.json ergo.rego
+      - name: Check Ergo compiles without built-ins whose answer depends on the machine
+        run: |
+          opa capabilities --current | jq '.builtins |= map(select(.nondeterministic != true))' > "$RUNNER_TEMP/deterministic.json"
+          opa check --strict --capabilities "$RUNNER_TEMP/deterministic.json" ergo.rego
       - run: opa fmt --list --fail .
       - name: Lint for likely bugs
         run: regal lint --format github --disable-all --enable-category bugs --disable redundant-existence-check --ignore-files '.github/**' .
