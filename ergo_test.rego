@@ -7610,7 +7610,7 @@ test_a_badly_written_subject_fails_every_requirement_that_names_it if {
 test_a_subject_no_requirement_names_leaves_the_report_unchanged if {
 	policy := subject_policy({"deployment": prod_deployment}, {"a": approved_req("deployment")})
 	rep := ergo.report(deployments_doc, policy, {})
-	with_unused := object.union(policy, {"ergo_spec": "v0.1", "subjects": {"deployment": prod_deployment, "release": {"from": "releases", "zz": 1}}})
+	with_unused := object.union(policy, {"subjects": {"deployment": prod_deployment, "release": {"from": "releases", "zz": 1}}})
 	ergo.report(deployments_doc, with_unused, {}) == rep
 }
 
@@ -7805,7 +7805,7 @@ test_filters_that_are_not_an_object_on_either_subject_rule_no_one_out if {
 
 test_a_subject_no_requirement_names_does_not_change_how_numbers_are_written if {
 	policy := subject_policy({"i": {"from": ["items"], "identified_by": ["id"]}}, {"r": {"subject": "i", "checks": {"c": {"op": "equals", "path": ["n"], "value": 1.50}}}})
-	with_unused := object.union(policy, {"ergo_spec": "v0.1", "subjects": {"unused": {"from": [{"where": {"k": {1}}}]}}})
+	with_unused := object.union(policy, {"subjects": {"unused": {"from": [{"where": {"k": {1}}}]}}})
 	json.marshal(ergo.report({"items": [{"id": 1, "n": 1.5}]}, with_unused, {})) == json.marshal(ergo.report({"items": [{"id": 1, "n": 1.5}]}, policy, {}))
 }
 
@@ -7872,7 +7872,7 @@ test_a_requirement_that_holds_has_no_causes if {
 	met := ergo.report({"deployments": [causes_doc.deployments[0], causes_doc.deployments[2]]}, causes_policy(approved_check), {}).requirements.r
 	[met.status, met.causes] == ["met", []]
 	policy := causes_policy(approved_check)
-	optional := object.union(policy, {"ergo_spec": "v0.1", "requirements": {"r": object.union(policy.requirements.r, {"min_subjects": 0})}})
+	optional := object.union(policy, {"requirements": {"r": object.union(policy.requirements.r, {"min_subjects": 0})}})
 	not_applicable := ergo.report({"deployments": [causes_doc.deployments[2]]}, optional, {}).requirements.r
 	[not_applicable.status, not_applicable.causes] == ["not_applicable", []]
 }
@@ -8109,7 +8109,7 @@ test_a_derived_value_reads_a_name_given_by_from if {
 	[[r.check, r.passed, r.cause] | some r in rep.results; r.check == "c"] == [["c", true, "satisfied"]]
 	rep.requirements.r.checks.c.expression == "count($it.xs) eq 2"
 	unknown := object.union(check, {"left": {"count": ["$other", "xs"]}})
-	[[r.check, r.cause] | some r in ergo.report({"items": [{"id": 1, "xs": [1, 2]}]}, object.union(policy, {"ergo_spec": "v0.1", "requirements": {"r": {"subject": "i", "checks": {"c": unknown}}}}), {}).results; r.check == "c"] == [["c", "ill_formed"]]
+	[[r.check, r.cause] | some r in ergo.report({"items": [{"id": 1, "xs": [1, 2]}]}, object.union(policy, {"requirements": {"r": {"subject": "i", "checks": {"c": unknown}}}}), {}).results; r.check == "c"] == [["c", "ill_formed"]]
 }
 
 one_check_policy(check) := lifted({"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": check}}})
@@ -11325,7 +11325,7 @@ test_a_problem_in_a_parent_subjects_has_fails_the_requirements_of_its_chained_ch
 }
 
 test_a_chained_child_cannot_read_a_part_the_parent_does_not_have if {
-	policy := object.union(_parts_chain, {"ergo_spec": "v0.1", "requirements": {"r": {"subject": "pull request", "checks": {"c": "artifact.nope.name is \"w\""}}}})
+	policy := object.union(_parts_chain, {"requirements": {"r": {"subject": "pull request", "checks": {"c": "artifact.nope.name is \"w\""}}}})
 	rep := ergo.report(_parts_chain_doc, policy, {"art": "web"})
 	_parts_row(rep, "c").cause == "absent"
 }
