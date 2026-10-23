@@ -279,6 +279,8 @@ A side of `compare` can also be `count_of` or `sum_of`, each with a path, `whose
 
 **[any_of.cause]** Each option that fails has a cause: `value` when one of its `present` checks found its field missing, and otherwise the first, in the order of [causes](#causes), among its checks, or `value`. The row takes the first among its options.
 
+**[any_of.refs]** A ref that ends anything but `found`, as [value.ref](#values) says, fails the checks that read it, and so their option, but not the others: when another option passes, so does the row. A ref that reads the wrong kind of value for its check, like a `values` ref that isn't a list, fails the row as `unusable`, even when another option passes.
+
 **[any_of.inputs]** The row shows every path any option reads, once each, sorted by name. For an `all` or `any` in an option, that's its list, with the whole items, and the names it reads.
 
 **[any_of.no_failed_items]** An `any_of` row has no `failed_items`, even with an `all` or `any` inside it.

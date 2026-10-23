@@ -463,5 +463,198 @@
         }
       }
     ]
+  },
+  {
+    "description": "any_of with a ref to a missing param",
+    "policy": {
+      "subjects": {
+        "thing": {
+          "from": [
+            "things"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "op": "any_of",
+              "options": {
+                "one": [
+                  {
+                    "op": "equals",
+                    "path": [
+                      "x"
+                    ],
+                    "value": 1
+                  }
+                ],
+                "listed": [
+                  {
+                    "op": "in",
+                    "path": [
+                      "x"
+                    ],
+                    "values": {
+                      "ref": [
+                        "$$params",
+                        "l"
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails only the option that reads it",
+        "rules": [
+          "any_of.refs",
+          "value.ref"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "x": 1
+            },
+            {
+              "id": "t2",
+              "x": 2
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 2
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t2",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "any_of with a ref to a param of the wrong type",
+    "policy": {
+      "subjects": {
+        "thing": {
+          "from": [
+            "things"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "op": "any_of",
+              "options": {
+                "one": [
+                  {
+                    "op": "equals",
+                    "path": [
+                      "x"
+                    ],
+                    "value": 1
+                  }
+                ],
+                "listed": [
+                  {
+                    "op": "in",
+                    "path": [
+                      "x"
+                    ],
+                    "values": {
+                      "ref": [
+                        "$$params",
+                        "l"
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "l": "text"
+    },
+    "cases": [
+      {
+        "description": "fails the row as unusable even when another option passes",
+        "rules": [
+          "any_of.refs",
+          "in.values"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "x": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

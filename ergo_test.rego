@@ -8873,7 +8873,7 @@ test_an_any_of_row_reads_every_input_once_and_lists_no_failed_lines if {
 	[row | some row in r.results; row.check == "c"] == [{"requirement": "s", "subject": {"type": "thing", "id": "a"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 2}, {"name": "y", "value": 1}]}]
 }
 
-test_an_any_of_fails_as_unusable_when_a_param_cant_be_read_even_if_another_option_passes if {
+test_an_any_of_fails_as_unusable_when_a_param_is_the_wrong_type_even_if_another_option_passes if {
 	r := ergo.report({"things": [{"id": "a", "x": 1}]}, _sentence_policy({"c": {"any_of": {"a": "x is 1", "b": "x is in $params.l"}}}), {"l": "text"})
 	[[row.passed, row.cause] | some row in r.results; row.check == "c"] == [[false, "unusable"]]
 }
