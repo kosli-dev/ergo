@@ -24,6 +24,7 @@ Here is a policy that says "_every production deployment must have an approver_"
 `policy/policy.yaml`:
 
 ```yaml
+ergo_spec: v0.1
 subjects:
   deployment:
     from: deployments whose environment is "prod"
@@ -38,7 +39,9 @@ requirements:
         assert: approved_by is a non-empty string
 ```
 
-A policy describes what to check, not how to check it. First it says what it's about, the things we call _subjects_. Each kind of subject gets a name, here `deployment`, that the report uses for each one, and says where to find them:
+`ergo_spec` says which version of Ergo's [spec](spec/README.md#versions) the policy is written for. Ergo reads only the version it follows, so a policy without it, or written for another version, fails.
+
+A policy describes what to check, not how to check it. Then it says what it's about, the things we call _subjects_. Each kind of subject gets a name, here `deployment`, that the report uses for each one, and says where to find them:
 
 - `from` says where the subjects are in the input. `deployments` means `input.deployments`, and `release.deployments` would mean `input.release.deployments`. `whose` keeps only the ones this policy is about, here the deployments whose `environment` is `prod`.
 - `identified_by` names the field that tells the subjects apart, here `id`. No two subjects can share one.
@@ -49,7 +52,7 @@ Then the requirement says what must be true of them. Its `description` says what
 
 Several requirements can check the same subject. Each one gets its own rows in the report.
 
-Then a Rego file hands the policy to Ergo. OPA reads every YAML and JSON file in the directory you pass with `-d`, so the YAML file becomes `data.subjects` and `data.requirements`.
+Then a Rego file hands the policy to Ergo. OPA reads every YAML and JSON file in the directory you pass with `-d`, so the YAML file becomes `data.ergo_spec`, `data.subjects` and `data.requirements`.
 
 `policy/deploy.rego`:
 
@@ -57,6 +60,10 @@ Then a Rego file hands the policy to Ergo. OPA reads every YAML and JSON file in
 package deploy
 
 import data.ergo
+
+default ergo_spec := null
+
+ergo_spec := data.ergo_spec
 
 default subjects := {}
 
@@ -66,14 +73,14 @@ default requirements := {}
 
 requirements := data.requirements
 
-report := ergo.report(input, {"subjects": subjects, "requirements": requirements}, {})
+report := ergo.report(input, {"ergo_spec": ergo_spec, "subjects": subjects, "requirements": requirements}, {})
 
 violations := ergo.violations(report)
 ```
 
-`ergo.report` takes the input, the policy and the params. The policy holds the subjects and the requirements, and this one has no params, so they're `{}`.
+`ergo.report` takes the input, the policy and the params. The policy holds its version, the subjects and the requirements, and this one has no params, so they're `{}`. The version comes from the YAML file and isn't written in the Rego, so that it always says what the file was written for.
 
-The defaults keep the report defined when the file leaves out `subjects:` or `requirements:`, or spells one wrong. That report still fails: with no requirements it isn't compliant, and with no subjects the requirement names one that isn't there.
+The defaults keep the report defined when the file leaves out `ergo_spec:`, `subjects:` or `requirements:`, or spells one wrong. That report still fails: without `ergo_spec` every requirement is written wrong, with no requirements it isn't compliant, and with no subjects the requirement names one that isn't there.
 
 #### The old way of writing checks
 

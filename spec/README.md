@@ -22,11 +22,9 @@ The spec stays `0.x` until 1.0, and any minor version may break policies and rep
 
 Each implementation has a version of its own, which the report gives in `engine` ([report.engine](semantics.md#statuses)), and its changelog says which version of the spec it follows.
 
-`ergo.rego` doesn't read `ergo_spec` from a policy yet, so the policy schema doesn't require it yet.
-
 ## Cases
 
-A topic's `cases.json` holds a list of groups. A group has a `description`, a `policy` with its `subjects` and `requirements`, `params` when the policy takes any, and its `cases`. Each case has:
+A topic's `cases.json` holds a list of groups. A group has a `description`, a `policy` with its `ergo_spec`, `subjects` and `requirements`, `params` when the policy takes any, and its `cases`. Each case has:
 
 - `description`: what should happen and why
 - `rules`: the rules in `semantics.md` and `syntax.md` it tests

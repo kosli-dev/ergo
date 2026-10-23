@@ -43,6 +43,7 @@
     }
   },
   "required": [
+    "ergo_spec",
     "subjects",
     "requirements"
   ],

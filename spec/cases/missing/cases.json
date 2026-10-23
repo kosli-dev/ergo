@@ -1,7 +1,7 @@
 [
   {
     "description": "missing on a field of the subject",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "missing", "path": ["x"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "missing", "path": ["x"]}}}}},
     "cases": [
       {
         "description": "passes when the field is missing",
@@ -48,7 +48,7 @@
   },
   {
     "description": "missing on a nested field",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "missing", "path": ["x", "y"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "missing", "path": ["x", "y"]}}}}},
     "cases": [
       {
         "description": "passes when the parent is missing",
@@ -70,7 +70,7 @@
   },
   {
     "description": "missing through a selector",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "missing", "path": ["xs", {"where": {"k": "a"}}, "v"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "missing", "path": ["xs", {"where": {"k": "a"}}, "v"]}}}}},
     "cases": [
       {
         "description": "passes when the list to select from is missing",
@@ -92,7 +92,7 @@
   },
   {
     "description": "missing on a param the params don't have",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "missing", "path": ["$$params", "flag"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "missing", "path": ["$$params", "flag"]}}}}},
     "params": {},
     "cases": [
       {
@@ -107,7 +107,7 @@
   },
   {
     "description": "missing as a filter",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"], "applies_to": {"unset": {"op": "missing", "path": ["x"]}}}}, "requirements": {"s": {"subject": "thing", "min_subjects": 0, "checks": {"c": {"op": "present", "path": ["id"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"], "applies_to": {"unset": {"op": "missing", "path": ["x"]}}}}, "requirements": {"s": {"subject": "thing", "min_subjects": 0, "checks": {"c": {"op": "present", "path": ["id"]}}}}},
     "cases": [
       {
         "description": "rules out a subject whose field is there",

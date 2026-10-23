@@ -1,7 +1,7 @@
 [
   {
     "description": "matches_any",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": ["z", "^b", "svc_"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": ["z", "^b", "svc_"]}}}}},
     "cases": [
       {
         "description": "passes when one pattern matches anywhere in the string",
@@ -40,7 +40,7 @@
   },
   {
     "description": "not_matches_any",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "not_matches_any", "path": ["x"], "patterns": ["^b"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "not_matches_any", "path": ["x"], "patterns": ["^b"]}}}}},
     "cases": [
       {
         "description": "passes when no pattern matches",
@@ -79,7 +79,7 @@
   },
   {
     "description": "matches_any with no patterns",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": []}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": []}}}}},
     "cases": [
       {
         "description": "fails as value",
@@ -94,7 +94,7 @@
   },
   {
     "description": "not_matches_any with no patterns",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "not_matches_any", "path": ["x"], "patterns": []}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "not_matches_any", "path": ["x"], "patterns": []}}}}},
     "cases": [
       {
         "description": "passes on any string",
@@ -108,7 +108,7 @@
   },
   {
     "description": "a pattern with a dot",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": ["^a.b$"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": ["^a.b$"]}}}}},
     "cases": [
       {
         "description": "doesn't match a newline",
@@ -122,7 +122,7 @@
   },
   {
     "description": "a pattern ending with a dollar",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": ["a$"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": ["a$"]}}}}},
     "cases": [
       {
         "description": "doesn't match before a final newline",
@@ -136,7 +136,7 @@
   },
   {
     "description": "a case-insensitive pattern",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": ["(?i)^A"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": ["(?i)^A"]}}}}},
     "cases": [
       {
         "description": "matches the other case",
@@ -150,7 +150,7 @@
   },
   {
     "description": "a pattern with a Unicode class",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": ["^\\p{L}+$"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": ["^\\p{L}+$"]}}}}},
     "cases": [
       {
         "description": "matches letters outside ASCII",
@@ -164,7 +164,7 @@
   },
   {
     "description": "patterns read through refs",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": [{"ref": ["$$params", "p"]}]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": [{"ref": ["$$params", "p"]}]}}}}},
     "params": {"p": "b"},
     "cases": [
       {
@@ -180,7 +180,7 @@
   },
   {
     "description": "a pattern read through a ref that isn't valid",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": [{"ref": ["$$params", "p"]}]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": [{"ref": ["$$params", "p"]}]}}}}},
     "params": {"p": "("},
     "cases": [
       {
@@ -195,7 +195,7 @@
   },
   {
     "description": "patterns read through a ref to a list",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": {"ref": ["$$params", "ps"]}}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": {"ref": ["$$params", "ps"]}}}}}},
     "params": {"ps": ["c"]},
     "cases": [
       {
@@ -211,7 +211,7 @@
   },
   {
     "description": "patterns read through a ref that isn't a list",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": {"ref": ["$$params", "ps"]}}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "matches_any", "path": ["x"], "patterns": {"ref": ["$$params", "ps"]}}}}}},
     "params": {"ps": "c"},
     "cases": [
       {
@@ -227,6 +227,7 @@
   {
     "description": "matches_any written wrong",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["things"],

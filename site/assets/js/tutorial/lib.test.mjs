@@ -16,6 +16,7 @@ const nutFree = 'allergens does not contain "nuts"';
 
 test("the policy has one subject that is the whole input, one requirement and one check", () => {
   assert.deepEqual(buildPolicy("x is 1"), {
+    ergo_spec: "v0.1",
     subjects: { batch: { from: "$input" } },
     requirements: { tutorial: { subject: "batch", checks: { sentence: "x is 1" } } },
   });
@@ -1277,6 +1278,7 @@ test("the slug of a heading is lowercase words joined with _", () => {
 test("the YAML is built from the reader's own parts", () => {
   const policy = tutorialPolicy({ name: "no_nuts", heading: "Safe to sell", from: "batches", id: "id" });
   assert.equal(policyYaml(policy), [
+    "ergo_spec: v0.1",
     "subjects:",
     "  batch:",
     "    from: batches",
@@ -1323,7 +1325,7 @@ test("the YAML policy, read back, gives exactly the report of step 11", () => {
 
 test("every YAML line says where it came from", () => {
   const lines = yamlLines(tutorialPolicy({ name: "no_nuts", heading: "Safe", from: "batches", id: "id" }));
-  assert.equal(lines.length, 12);
+  assert.equal(lines.length, 13);
   assert.equal(lines.every((l) => typeof l.note === "string" && l.note.length > 0), true);
   assert.equal(lines.find((l) => l.text.includes("no_nuts")).note, "You named this in step 9 and wrote it in step 2.");
   assert.equal(lines.find((l) => l.text.includes("temp_ok")).note, "The name is from step 9. You wrote the sentence in step 5.");

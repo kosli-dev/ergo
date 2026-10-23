@@ -5,6 +5,7 @@ import data.baking
 report := r if {
 	r := baking.report
 		with input as {"batches": data.examples.baking.batches}
+		with data.baking.ergo_spec as data.examples.baking.ergo.baking.ergo_spec
 		with data.baking.subjects as data.examples.baking.ergo.baking.subjects
 		with data.baking.requirements as data.examples.baking.ergo.baking.requirements
 }
@@ -12,6 +13,7 @@ report := r if {
 violations := v if {
 	v := baking.violations
 		with input as {"batches": data.examples.baking.batches}
+		with data.baking.ergo_spec as data.examples.baking.ergo.baking.ergo_spec
 		with data.baking.subjects as data.examples.baking.ergo.baking.subjects
 		with data.baking.requirements as data.examples.baking.ergo.baking.requirements
 }
@@ -52,6 +54,7 @@ test_only_the_nut_check_is_violated if {
 workings_table := w if {
 	w := baking.workings_table
 		with input as {"batches": data.examples.baking.batches}
+		with data.baking.ergo_spec as data.examples.baking.ergo.baking.ergo_spec
 		with data.baking.subjects as data.examples.baking.ergo.baking.subjects
 		with data.baking.requirements as data.examples.baking.ergo.baking.requirements
 }
@@ -111,9 +114,11 @@ test_workings_table_leaves_out_the_checks_ergo_adds if {
 	)}
 	w := baking.workings_table
 		with input as {"batches": data.examples.baking.batches}
+		with data.baking.ergo_spec as data.examples.baking.ergo.baking.ergo_spec
 		with data.baking.subjects as subjects
 		with data.baking.requirements as data.examples.baking.ergo.baking.requirements
 	some r in baking.report.results with input as {"batches": data.examples.baking.batches}
+		with data.baking.ergo_spec as data.examples.baking.ergo.baking.ergo_spec
 		with data.baking.subjects as subjects
 		with data.baking.requirements as data.examples.baking.ergo.baking.requirements
 	r.check == "$applies"

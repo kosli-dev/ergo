@@ -2,6 +2,7 @@
   {
     "description": "any_of",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["things"],
@@ -72,6 +73,7 @@
   {
     "description": "any_of with a present check in an option",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["things"],
@@ -99,6 +101,7 @@
   {
     "description": "any_of with options in a list",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["things"],
@@ -127,6 +130,7 @@
   {
     "description": "any_of with eleven options in a list",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["things"],
@@ -195,6 +199,7 @@
   {
     "description": "any_of with all in an option",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["things"],
@@ -223,6 +228,7 @@
   {
     "description": "any_of inside all",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["things"],
@@ -259,6 +265,7 @@
   {
     "description": "any_of with names in an option",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "pull request": {
           "from": ["prs", {"each_as": "pr"}],
@@ -301,6 +308,7 @@
   {
     "description": "any_of written wrong",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["things"],
@@ -374,6 +382,7 @@
   {
     "description": "any_of with a name that starts like another",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": [
@@ -467,6 +476,7 @@
   {
     "description": "any_of with a ref to a missing param",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": [
@@ -572,6 +582,7 @@
   {
     "description": "any_of with a ref to a param of the wrong type",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": [
