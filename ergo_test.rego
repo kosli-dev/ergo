@@ -2846,6 +2846,57 @@ test_a_runtime_version_that_isnt_a_string_gives_null_and_changes_no_verdict if {
 	}
 }
 
+test_a_host_can_name_the_runtime_it_gives_ergo if {
+	rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as {"name": "opa-wasm", "version": "1.10.0"}
+	rep.engine.runtime == {"name": "opa-wasm", "version": "1.10.0"}
+}
+
+test_a_runtime_that_cant_tell_its_version_is_named_without_one if {
+	rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as {"name": "opa-wasm"}
+	rep.engine.runtime == {"name": "opa-wasm"}
+}
+
+test_a_named_runtime_with_a_version_that_isnt_a_string_is_named_without_one if {
+	every v in [1, null, [], {}] {
+		rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as {"name": "opa-wasm", "version": v}
+		rep.engine.runtime == {"name": "opa-wasm"}
+	}
+}
+
+test_a_name_that_isnt_a_string_gives_null_rather_than_guessing_opa if {
+	every n in [1, null, [], {}] {
+		rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as {"name": n, "version": "1.10.0"}
+		rep.engine.runtime == null
+	}
+}
+
+test_the_runtime_says_what_compiled_the_policy_when_the_host_says_so if {
+	rt := {"name": "opa-wasm", "version": "1.10.0", "compiled_by": {"name": "opa", "version": "1.20.2"}}
+	rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as rt
+	rep.engine.runtime == rt
+}
+
+test_what_compiled_the_policy_can_be_named_without_a_version if {
+	every v in [{}, {"version": 1}, {"version": null}] {
+		rt := object.union({"name": "opa"}, v)
+		rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as {"name": "opa-wasm", "compiled_by": rt}
+		rep.engine.runtime == {"name": "opa-wasm", "compiled_by": {"name": "opa"}}
+	}
+}
+
+test_what_compiled_the_policy_is_left_out_when_it_has_no_name_ergo_can_read if {
+	every c in [null, "opa", [], {}, {"version": "1.20.2"}, {"name": 1, "version": "1.20.2"}] {
+		rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as {"name": "opa-wasm", "compiled_by": c}
+		rep.engine.runtime == {"name": "opa-wasm"}
+	}
+}
+
+test_only_the_fields_the_spec_names_are_copied_from_a_host_runtime if {
+	rt := {"name": "opa-wasm", "version": "1.10.0", "env": {"TOKEN": "secret"}, "compiled_by": {"name": "opa", "version": "1.20.2", "env": {"TOKEN": "secret"}}}
+	rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as rt
+	rep.engine.runtime == {"name": "opa-wasm", "version": "1.10.0", "compiled_by": {"name": "opa", "version": "1.20.2"}}
+}
+
 test_a_compiled_policy_gives_the_same_ergo_and_engine if {
 	rep := ergo.report(_engine_doc, ergo.compile(_engine_policy), {}) with opa.runtime as {"version": "1.20.2"}
 	rep.ergo == "v0.1"

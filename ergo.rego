@@ -5006,10 +5006,28 @@ _run(doc, policy, rd, params) := r if {
 
 version := "0.1.0-dev"
 
-_runtime(rt) := {"name": "opa", "version": rt.version} if {
-	is_object(rt)
-	is_string(rt.version)
+_runtime(rt) := object.union(object.union({"name": name}, _string_field(rt, "version")), _compiled_by(rt)) if {
+	name := _runtime_name(rt)
 } else := null
+
+_runtime_name(rt) := rt.name if {
+	is_object(rt)
+	is_string(rt.name)
+} else := "opa" if {
+	is_object(rt)
+	not "name" in object.keys(rt)
+	is_string(rt.version)
+}
+
+_string_field(x, f) := {f: x[f]} if is_string(x[f])
+
+else := {}
+
+_compiled_by(rt) := {"compiled_by": object.union({"name": rt.compiled_by.name}, _string_field(rt.compiled_by, "version"))} if {
+	is_object(rt)
+	is_object(rt.compiled_by)
+	is_string(rt.compiled_by.name)
+} else := {}
 
 _used_subjects(reqs, subjects, resolved) := {name: subjects[name] |
 	some req in reqs

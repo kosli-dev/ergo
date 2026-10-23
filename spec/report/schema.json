@@ -16,8 +16,18 @@
           "anyOf": [
             {
               "type": "object",
-              "properties": {"name": {"type": "string"}, "version": {"type": "string"}},
-              "required": ["name", "version"],
+              "properties": {
+                "name": {"type": "string"},
+                "version": {"type": "string"},
+                "compiled_by": {
+                  "type": "object",
+                  "description": "What compiled the policy, when that isn't what runs it",
+                  "properties": {"name": {"type": "string"}, "version": {"type": "string"}},
+                  "required": ["name"],
+                  "additionalProperties": false
+                }
+              },
+              "required": ["name"],
               "additionalProperties": false
             },
             {"type": "null"}
