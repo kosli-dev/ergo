@@ -92,6 +92,10 @@ Three ways to settle it:
 - An elapsed time in a subject's `from` line, like `vulns whose days elapsed from started to ended is 1`: what the `$applies` row shows for it, and which paths its `inputs` list.
 - A `plus` in the `whose` of a `count of` or a `sum of`, like `count of xs whose a plus b is 3 is 1`: whether a `whose` condition can have `plus` on its left.
 
+## Numbers in a report's hash
+
+[report.hash](semantics.md#statuses) writes the report as RFC 8785 says, and RFC 8785 writes every number as a 64-bit float. Ergo copies numbers from the input into the report with every digit, so a report holding `1.00000000000000000001` hashes as if it held `1`. Two reports that differ only there get the same hash. The open question is whether that's fine, or whether the hash should write numbers as the report does.
+
 ## Rules without cases
 
 Every rule needs a case, apart from the ones listed here. The `sentence` rules here are for forms `ergo.rego` doesn't run or check yet. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.
@@ -102,6 +106,10 @@ Every rule needs a case, apart from the ones listed here. The `sentence` rules h
 - `sentence.subject.depth`
 - `sentence.argument.subject`
 - `sentence.for.depth`
+- `policy.version`
+- `report.version`
+- `report.engine`
+- `report.hash`
 
 ## Sentences the ABNF and ergo.rego read differently
 
