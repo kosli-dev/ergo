@@ -8836,6 +8836,92 @@ test_every_assertion_is_unusable_when_the_input_holds_something_json_cant if {
 	[[row.cause, row.failed_assertions] | some row in r.results; row.check == "c"] == [["unusable", [{"assertion": "x is 1", "cause": "unusable"}, {"assertion": "x exists", "cause": "unusable"}]]]
 }
 
+test_an_any_of_of_sentences_passes_when_every_line_of_one_option_passes if {
+	doc := {"components": [
+		{"name": "click", "licenses": [{"license": {"id": "BSD-3-Clause"}}]},
+		{"name": "prometheus-client"},
+		{"name": "leftpad", "licenses": [{"license": {"id": "WTFPL"}}]},
+	]}
+	policy := {"subjects": {"component": {"from": "components", "identified_by": "name"}}, "requirements": {"s": {"subject": "component", "checks": {"c": {"description": "The licence is allowed", "meta": {"k": 1}, "any_of": {
+		"declared": "some licenses.license.id is in $params.allowed",
+		"known": ["licenses does not exist", "$params.known named by name is in $params.allowed"],
+	}}}}}}
+	r := ergo.report(doc, policy, {"allowed": ["BSD-3-Clause", "Apache-2.0"], "known": {"prometheus-client": "Apache-2.0"}})
+	object.filter(r.requirements.s.checks.c, {"description", "meta", "expression"}) == {"description": "The licence is allowed", "meta": {"k": 1}, "expression": "one of: declared(some licenses.license.id is in $params.allowed) | known(licenses does not exist and $params.known named by name is in $params.allowed)"}
+	[[row.subject.id, row.passed, row.cause] | some row in r.results; row.check == "c"] == [["click", true, "satisfied"], ["prometheus-client", true, "satisfied"], ["leftpad", false, "absent"]]
+}
+
+test_an_any_of_of_sentences_gives_the_same_causes_as_the_any_of_it_reads_into if {
+	sentences := {"any_of": {"b": "z is 1", "a": ["x exists", "x.y is 1"]}}
+	old := {"op": "any_of", "options": {"b": [{"op": "equals", "path": ["z"], "value": 1}], "a": [{"op": "present", "path": ["x"]}, {"op": "equals", "path": ["x", "y"], "value": 1}]}}
+	doc := {"things": [{"id": "1", "z": 1}, {"id": "2", "x": {"y": 1}}, {"id": "3", "z": 2}, {"id": "4", "x": {}, "z": 2}, {"id": "5", "x": 3, "z": 2}, {"id": "6", "x": {"y": 2}}, {"id": "7", "x": null, "z": null}]}
+	r := ergo.report(doc, _sentence_policy({"new": sentences, "old": old}), {})
+	causes := {c: [[row.subject.id, row.cause, row.inputs] | some row in r.results; row.check == c] | some c in ["new", "old"]}
+	causes.new == causes.old
+	[x[1] | some x in causes.new] == ["satisfied", "satisfied", "value", "absent", "unusable", "absent", "null"]
+}
+
+test_an_option_of_an_any_of_can_hold_every_some_and_counts if {
+	check := {"any_of": {"none": "count of xs is 0", "all_ok": "every xs.ok is true", "one": "some xs.n is 3"}}
+	r := ergo.report({"things": [{"id": "a", "xs": []}, {"id": "b", "xs": [{"ok": true}]}, {"id": "c", "xs": [{"ok": false, "n": 3}]}, {"id": "d", "xs": [{"ok": false, "n": 2}]}, {"id": "e"}]}, _sentence_policy({"c": check}), {})
+	[[row.subject.id, row.cause] | some row in r.results; row.check == "c"] == [["a", "satisfied"], ["b", "satisfied"], ["c", "satisfied"], ["d", "value"], ["e", "absent"]]
+	r.requirements.s.checks.c.expression == "one of: all_ok(every xs.ok is true) | none(count of xs is 0) | one(some xs.n is 3)"
+}
+
+test_an_any_of_row_reads_every_input_once_and_lists_no_failed_lines if {
+	r := ergo.report({"things": [{"id": "a", "x": 2, "y": 1}]}, _sentence_policy({"c": {"any_of": {"a": "x is 1 and y is 1", "b": ["x is 3", "y exists"]}}}), {})
+	[row | some row in r.results; row.check == "c"] == [{"requirement": "s", "subject": {"type": "thing", "id": "a"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 2}, {"name": "y", "value": 1}]}]
+}
+
+test_an_any_of_fails_as_unusable_when_a_param_cant_be_read_even_if_another_option_passes if {
+	r := ergo.report({"things": [{"id": "a", "x": 1}]}, _sentence_policy({"c": {"any_of": {"a": "x is 1", "b": "x is in $params.l"}}}), {"l": "text"})
+	[[row.passed, row.cause] | some row in r.results; row.check == "c"] == [[false, "unusable"]]
+}
+
+test_an_any_of_of_sentences_fails_as_unusable_when_the_input_holds_something_json_cant if {
+	r := ergo.report({"things": [{"id": "a", "x": 1, "s": {1}}]}, _sentence_policy({"c": {"any_of": {"a": "x is 1"}}}), {})
+	[[row.passed, row.cause] | some row in r.results; row.check == "c"] == [[false, "unusable"]]
+}
+
+test_an_any_of_of_sentences_is_written_wrong_when_its_shape_or_a_line_is if {
+	every pair in [
+		[{"any_of": "x is 1"}, ["invalid any_of"], "<invalid any_of>"],
+		[{"any_of": {}}, ["empty any_of"], "one of: <empty options>"],
+		[{"any_of": {"a": []}}, ["empty option a"], "one of: a(<empty option>)"],
+		[{"any_of": {"a": 1, "b": "x is 1"}}, ["invalid option a"], "one of: a(<invalid option>) | b(x is 1)"],
+		[{"any_of": {"a": ["x is 1", 2]}}, ["invalid option a"], "one of: a(<invalid option>)"],
+		[{"any_of": {"a": "x is 1"}, "for": "every xs as x"}, ["unknown field for"], "one of: a(x is 1)"],
+		[{"any_of": {"a": "x is", "b": ["x is 1", "x is"]}}, ["option a: doesn't parse", "option b: line 2: doesn't parse"], "one of: a(x is) | b(x is 1 and x is)"],
+		[{"any_of": {"a": "x is 1"}, "assert": "x is 1"}, ["unknown field any_of"], "x is 1"],
+	] {
+		r := ergo.report({"things": [{"id": "t1", "x": 1}]}, _sentence_policy({"c": pair[0]}), {})
+		_sentence_problems(pair[0]) == pair[1]
+		r.requirements.s.checks.c.expression == pair[2]
+		[row.cause | some row in r.results; row.check == "c"] == ["ill_formed"]
+	}
+}
+
+test_the_check_an_any_of_of_sentences_reads_into_is_an_unknown_op_in_todays_syntax if {
+	_sentence_problems({"op": "sentence_any_of", "checks": [{"op": "present", "path": ["x"]}], "assertions": ["x exists"], "option_of": ["a"]}) == ["unknown op sentence_any_of"]
+}
+
+test_a_sentence_in_an_option_of_todays_any_of_is_still_an_invalid_check if {
+	r := ergo.report({"things": []}, _sentence_policy({"c": {"op": "any_of", "options": {"a": ["x is 1"]}}}), {})
+	r.results[0].inputs[2] == {"name": "checks.c.options.a.0", "value": ["invalid check"]}
+}
+
+test_an_option_of_an_any_of_reads_a_part_by_its_alias if {
+	policy := {"subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"cov": "attestations.cov"}}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"any_of": {"high": "cov.pct is at least 80", "waived": "waived is true"}}}}}}
+	r := ergo.report({"things": [{"id": "a", "attestations": {"cov": {"pct": 90}}}, {"id": "b", "waived": true, "attestations": {"cov": {"pct": 10}}}, {"id": "c", "waived": false, "attestations": {"cov": {"pct": 10}}}]}, policy, {})
+	[[row.subject.id, row.cause] | some row in r.results; row.check == "c"] == [["a", "satisfied"], ["b", "satisfied"], ["c", "value"]]
+}
+
+test_an_option_of_an_any_of_reads_a_parent_subject_by_its_name if {
+	policy := {"subjects": {"pr": {"from": "prs", "identified_by": "id"}, "commit": {"from": "pr.commits", "identified_by": "sha"}}, "requirements": {"s": {"subject": "commit", "checks": {"c": {"any_of": {"signed": "signed is true", "bot": "pr.author is \"bot\""}}}}}}
+	r := ergo.report({"prs": [{"id": "1", "author": "bot", "commits": [{"sha": "a", "signed": false}]}, {"id": "2", "author": "ann", "commits": [{"sha": "b", "signed": true}, {"sha": "c", "signed": false}]}]}, policy, {})
+	[[row.subject.id, row.cause] | some row in r.results; row.check == "c"] == [["a", "satisfied"], ["b", "satisfied"], ["c", "value"]]
+}
+
 _walk_rows(checks, doc, params) := [[r.subject.id, r.check, r.cause, object.get(r, "failed_items", object.get(r, "failed_assertions", []))] | some r in ergo.report(doc, _sentence_policy(checks), params).results; not startswith(r.check, "$")]
 
 test_every_and_some_read_into_a_walk_with_its_conditions if {
