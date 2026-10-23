@@ -6,7 +6,7 @@ import * as lib from "./lib.mjs";
 import { defaultCell, cellHighlight, makeRunner, defaultNames, checkLines, slug, nameProblem, nameCoach, tutorialPolicy, lineResults, verdict, verdictWord, tapOutcome, requirementCoach, gridFromReport, cellLine, subjectsStatus, subjectsCoach, yamlLines, policyYaml, bakeryBatches, createEnterGate, serializeProgress, restoreProgress, layoutLines, splitSentences, fieldHighlights, keyAction, goalKindAt, isPretty, firstPositionOf, progressDots, stepTitles, dotTargets, resultLine, carryFrom, dimResult, freshDraft, judgePrediction, isRight, jsonSegments, fieldHighlight, segmentClasses, isAt, showMeVisible, buildPolicy, clampPosition, intro, positions, evidence, grade, makeChecker, parseInput, parseTime, steps, straighten } from "./lib.mjs";
 
 const wasm = readFileSync(new URL("../../tutorial/ergo.wasm", import.meta.url));
-const ergo = await opa.loadPolicy(wasm, undefined, { "time.parse_rfc3339_ns": parseTime, "opa.runtime": () => ({}) });
+const ergo = await opa.loadPolicy(wasm, undefined, { "time.parse_rfc3339_ns": parseTime });
 const check = makeChecker((doc) => ergo.evaluate(doc));
 
 const goalMet = (step, goal, sentence, input) =>

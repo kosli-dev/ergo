@@ -764,7 +764,7 @@ go(startPos, false, startPos === 0);
 try {
   const res = await fetch(root.dataset.wasm);
   if (!res.ok) throw new Error(`couldn't fetch Ergo (${res.status})`);
-  const ergo = await opa.loadPolicy(await res.arrayBuffer(), undefined, { "time.parse_rfc3339_ns": parseTime, "opa.runtime": () => ({}) });
+  const ergo = await opa.loadPolicy(await res.arrayBuffer(), undefined, { "time.parse_rfc3339_ns": parseTime });
   check = makeChecker((doc) => ergo.evaluate(doc));
   runner.run = makeRunner((doc) => ergo.evaluate(doc));
   if (isCustom() && !el.stage.hidden) buildStage(goalNow().kind);

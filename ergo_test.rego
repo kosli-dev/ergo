@@ -2811,6 +2811,38 @@ test_every_requirement_field_ergo_knows_is_well_formed if {
 	rows_for(report({"items": [{"id": 1}]}, {"s": req}), "s", "$well_formed")[0].passed == true
 }
 
+_engine_policy := {"subjects": {"x": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "x", "checks": {"c": "id is 1"}}}}
+
+_engine_doc := {"xs": [{"id": 1}, {"id": 2}]}
+
+test_the_report_says_which_version_of_the_spec_it_follows if {
+	ergo.report(_engine_doc, _engine_policy, {}).ergo == "v0.1"
+}
+
+test_the_report_says_which_version_of_the_spec_it_follows_whatever_version_the_policy_names if {
+	ergo.report(_engine_doc, object.union(_engine_policy, {"ergo": "v9.9"}), {}).ergo == "v0.1"
+}
+
+test_the_engine_gives_only_its_name_and_version_because_anything_about_the_machine_would_make_the_report_depend_on_more_than_the_policy_and_input if {
+	ergo.report(_engine_doc, _engine_policy, {}).engine == {"name": "ergo.rego", "version": ergo.version}
+}
+
+test_a_compiled_policy_gives_the_same_ergo_and_engine if {
+	rep := ergo.report(_engine_doc, ergo.compile(_engine_policy), {})
+	rep.ergo == "v0.1"
+	rep.engine == {"name": "ergo.rego", "version": ergo.version}
+}
+
+test_the_version_on_main_ends_in_dev_because_only_the_release_workflow_drops_it if {
+	regex.match(`^[0-9]+\.[0-9]+\.[0-9]+-dev$`, ergo.version)
+}
+
+test_a_report_that_cant_read_its_input_still_says_its_version_and_engine if {
+	rep := ergo.report("not an object", _engine_policy, "not params")
+	rep.ergo == "v0.1"
+	rep.engine.name == "ergo.rego"
+}
+
 test_a_requirement_description_and_meta_are_carried_into_the_report if {
 	meta := {"control": "SDLC-CTRL-0007", "frameworks": ["SOC 2", "ISO 27001"], "none": []}
 	rep := report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"description": "Every item has an id", "meta": meta})})
@@ -4098,7 +4130,7 @@ test_requirement_entry_carries_exactly_the_documented_keys if {
 }
 
 test_report_carries_exactly_the_documented_keys if {
-	object.keys(solo({}, is_merged)) == {"compliant", "description", "meta", "requirements", "results", "subjects"}
+	object.keys(solo({}, is_merged)) == {"compliant", "description", "engine", "ergo", "meta", "requirements", "results", "subjects"}
 }
 
 test_report_is_deterministic if {
@@ -6223,7 +6255,7 @@ test_the_report_never_reads_data_params if {
 	[r.cause | some r in rows_for(unset, "s", "c")] == ["absent"]
 }
 
-empty_report := {"compliant": false, "description": "", "meta": {}, "requirements": {}, "results": [], "subjects": {}}
+empty_report := {"compliant": false, "description": "", "engine": {"name": "ergo.rego", "version": ergo.version}, "ergo": "v0.1", "meta": {}, "requirements": {}, "results": [], "subjects": {}}
 
 test_a_policy_without_requirements_is_not_compliant if {
 	ergo.report({"items": [{"id": 1}]}, {}, {}) == empty_report

@@ -22,7 +22,7 @@ The spec stays `0.x` until 1.0, and any minor version may break policies and rep
 
 Each implementation has a version of its own, which the report gives in `engine` ([report.engine](semantics.md#statuses)), and its changelog says which version of the spec it follows.
 
-`ergo.rego` doesn't read `ergo` from a policy or put `ergo` and `engine` in a report yet, so the schemas don't require them yet.
+`ergo.rego` doesn't read `ergo` from a policy yet, so the policy schema doesn't require it yet.
 
 ## Cases
 

@@ -10,21 +10,9 @@
       "description": "What made the report. A report's hash leaves it out.",
       "properties": {
         "name": {"type": "string"},
-        "version": {"type": "string"},
-        "runtime": {
-          "description": "What the engine ran on, or null when it can't tell",
-          "anyOf": [
-            {
-              "type": "object",
-              "properties": {"name": {"type": "string"}, "version": {"type": "string"}},
-              "required": ["name", "version"],
-              "additionalProperties": false
-            },
-            {"type": "null"}
-          ]
-        }
+        "version": {"type": "string"}
       },
-      "required": ["name", "version", "runtime"],
+      "required": ["name", "version"],
       "additionalProperties": false
     },
     "compliant": {"type": "boolean", "description": "true when there's at least one requirement and none is not_met"},
@@ -38,7 +26,7 @@
       "additionalProperties": {"$ref": "#/$defs/subject"}
     }
   },
-  "required": ["compliant", "description", "meta", "requirements", "results", "subjects"],
+  "required": ["compliant", "description", "engine", "ergo", "meta", "requirements", "results", "subjects"],
   "additionalProperties": false,
   "$defs": {
     "cause": {"enum": ["satisfied", "substituted", "ill_formed", "not_an_object", "ambiguous", "unmatched", "unusable", "absent", "null", "value"]},

@@ -104,6 +104,11 @@ the report starts with:
 {
   "compliant": true,
   "description": "Production changes are reviewed and approved",
+  "engine": {
+    "name": "ergo.rego",
+    "version": "0.1.0-dev"
+  },
+  "ergo": "v0.1",
   "meta": {
     "control": "DEV-0401",
     "title": "Security testing and code review"
@@ -1186,6 +1191,11 @@ Three rules:
 {
   "compliant": false,
   "description": "",
+  "engine": {
+    "name": "ergo.rego",
+    "version": "0.1.0-dev"
+  },
+  "ergo": "v0.1",
   "meta": {},
   "requirements": { ... },
   "results": [ ... ],
@@ -1196,6 +1206,8 @@ Three rules:
 `compliant` is `true` when there's at least one requirement and none of them is `not_met`.
 
 `description` and `meta` are the [policy's](#describing-a-policy), or `""` and `{}` when it has none.
+
+`ergo` is the version of the [spec](spec/README.md#versions) the report follows. `engine` says what made it: `ergo.rego` and its version, which a policy can read as `ergo.version`. It doesn't say which OPA ran it, because that would make the report depend on the machine and not only on the policy, the input and the params. If you need to know, record it next to the report.
 
 `subjects` says where the subjects come from, as [Subjects in the report](#subjects-in-the-report) shows.
 

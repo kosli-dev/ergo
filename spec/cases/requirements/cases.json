@@ -804,6 +804,41 @@
             ]
           }
         ]
+      },
+      {
+        "description": "gives the version of the spec the implementation follows, though the policy names none",
+        "rules": [
+          "report.version"
+        ],
+        "input": {
+          "t": [
+            {
+              "id": 1,
+              "x": 1
+            }
+          ]
+        },
+        "report": {
+          "ergo": "v0.1"
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "subject",
+              "id": 1
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ]
+          }
+        ]
       }
     ]
   },
