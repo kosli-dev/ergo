@@ -8901,6 +8901,23 @@ test_an_any_of_of_sentences_is_written_wrong_when_its_shape_or_a_line_is if {
 	}
 }
 
+test_an_any_of_sorts_its_options_by_name_and_not_by_the_text_they_print if {
+	r := ergo.report(
+		{"things": []}, _sentence_policy({
+			"new": {"any_of": {"a!": "x is 2", "a": "x is 1"}},
+			"old": {"op": "any_of", "options": {"a!": [{"op": "equals", "path": ["x"], "value": 2}], "a": [{"op": "equals", "path": ["x"], "value": 1}]}},
+		}),
+		{},
+	)
+	r.requirements.s.checks.new.expression == "one of: a(x is 1) | a!(x is 2)"
+	r.requirements.s.checks.old.expression == "one of: a(x == 1) | a!(x == 2)"
+}
+
+test_a_missing_param_only_fails_the_options_of_an_any_of_that_read_it if {
+	rows := _sentence_rows({"c": {"any_of": {"a": "x is 1", "b": "x is in $params.l"}}}, {"things": [{"id": "t", "x": 1}, {"id": "u", "x": 2}]}, {})
+	[[row[1], row[2]] | some row in rows] == [[true, "satisfied"], [false, "absent"]]
+}
+
 test_the_check_an_any_of_of_sentences_reads_into_is_an_unknown_op_in_todays_syntax if {
 	_sentence_problems({"op": "sentence_any_of", "checks": [{"op": "present", "path": ["x"]}], "assertions": ["x exists"], "option_of": ["a"]}) == ["unknown op sentence_any_of"]
 }

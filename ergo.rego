@@ -4056,7 +4056,7 @@ _expression_of(check, _) := "one of: <missing options>" if {
 	not "options" in object.keys(check)
 }
 
-_expression_of(check, item) := _one_of([_option_text(nm, group, [_top_option_describe(group[k], item) | some k in _names(group)]) | some nm, group in check.options]) if {
+_expression_of(check, item) := _one_of([[_text(nm), _option_text(nm, group, [_top_option_describe(group[k], item) | some k in _names(group)])] | some nm, group in check.options]) if {
 	not _written_expression(check)
 	check.op == "any_of"
 	"options" in object.keys(check)
@@ -4116,7 +4116,7 @@ _element_describe(check, item, _) := _nested_describe(check, item) if {
 	not _quantified(check)
 }
 
-_element_describe(check, item, given) := _one_of([_option_text(nm, group, [_element_option_describe(group[k], item, given) | some k in _names(group)]) | some nm, group in check.options]) if _combinator(check)
+_element_describe(check, item, given) := _one_of([[_text(nm), _option_text(nm, group, [_element_option_describe(group[k], item, given) | some k in _names(group)])] | some nm, group in check.options]) if _combinator(check)
 
 _element_describe(check, item, given) := _element_list_describe(check, item, given) if _quantified(check)
 
@@ -4146,11 +4146,11 @@ _inner_describe(check, item) := _any_of_describe(check, item) if _combinator(che
 
 _inner_describe(check, _) := "<nested too deep>" if _quantified(check)
 
-_any_of_describe(check, item) := _one_of([_option_text(nm, group, [_inner_option_describe(group[k], item) | some k in _names(group)]) | some nm, group in check.options])
+_any_of_describe(check, item) := _one_of([[_text(nm), _option_text(nm, group, [_inner_option_describe(group[k], item) | some k in _names(group)])] | some nm, group in check.options])
 
 _one_of(parts) := "one of: <empty options>" if count(parts) == 0
 
-_one_of(parts) := concat("", ["one of: ", concat(" | ", sort(parts))]) if count(parts) > 0
+_one_of(parts) := concat("", ["one of: ", concat(" | ", [p[1] | some p in sort(parts)])]) if count(parts) > 0
 
 _option_text(nm, group, texts) := concat("", [_text(nm), "(", _option_body(group, texts), ")"])
 
@@ -7643,7 +7643,7 @@ _s_any_of(check, aliases, names) := object.union(object.filter(check, {"descript
 	"checks": [object.remove(p[0], ["expression"]) | some p in pairs],
 	"assertions": [p[1] | some p in pairs],
 	"option_of": [p[2] | some p in pairs],
-	"expression": _one_of([_option_text(nm, texts, texts) | some nm in _names(options); texts := [p[1] | some p in pairs; p[2] == nm]]),
+	"expression": _one_of([[_text(nm), _option_text(nm, texts, texts)] | some nm in _names(options); texts := [p[1] | some p in pairs; p[2] == nm]]),
 }) if {
 	count(_s_any_of_problems(check)) == 0
 	options := {nm: _s_check(_s_lines(o), {}, _p_named_by_problems(_s_lines(o), "", aliases), names) | some nm, o in check.any_of}
@@ -7696,7 +7696,7 @@ _s_options_problems(options, aliases, names) := {concat("", ["option ", _text(nm
 
 else := set()
 
-_s_any_of_written(options) := _one_of([_s_option_written_text(nm, o) | some nm, o in options]) if is_object(options)
+_s_any_of_written(options) := _one_of([[_text(nm), _s_option_written_text(nm, o)] | some nm, o in options]) if is_object(options)
 
 else := "<invalid any_of>"
 

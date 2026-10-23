@@ -370,5 +370,98 @@
         }
       }
     ]
+  },
+  {
+    "description": "any_of with a name that starts like another",
+    "policy": {
+      "subjects": {
+        "thing": {
+          "from": [
+            "things"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "op": "any_of",
+              "options": {
+                "a!": [
+                  {
+                    "op": "equals",
+                    "path": [
+                      "x"
+                    ],
+                    "value": 2
+                  }
+                ],
+                "a": [
+                  {
+                    "op": "equals",
+                    "path": [
+                      "x"
+                    ],
+                    "value": 1
+                  }
+                ],
+                "a b": [
+                  {
+                    "op": "equals",
+                    "path": [
+                      "x"
+                    ],
+                    "value": 3
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "sorts its options by name, not by the text they print",
+        "rules": [
+          "any_of.expression"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "x": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "one of: a(x == 1) | a b(x == 3) | a!(x == 2)"
+          }
+        }
+      }
+    ]
   }
 ]

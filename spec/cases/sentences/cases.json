@@ -6271,5 +6271,437 @@
         }
       }
     ]
+  },
+  {
+    "description": "an any_of of sentences with a name that starts like another",
+    "policy": {
+      "subjects": {
+        "thing": {
+          "from": [
+            "things"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "any_of": {
+                "a!": "x is 2",
+                "a": "x is 1",
+                "a b": "x is 3"
+              }
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "sorts its options by name, not by the text they print",
+        "rules": [
+          "sentence.any_of.expression"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "x": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "one of: a(x is 1) | a b(x is 3) | a!(x is 2)"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "an any_of of sentences that read a part",
+    "policy": {
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id",
+          "has": {
+            "cov": "attestations.cov"
+          }
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "any_of": {
+                "covered": [
+                  "cov exists",
+                  "cov.pct is at least 80"
+                ],
+                "waived": "waived is true"
+              }
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the part by its alias in each option",
+        "rules": [
+          "sentence.any_of",
+          "parts.where",
+          "any_of.cause"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "waived": false,
+              "attestations": {
+                "cov": {
+                  "pct": 90
+                }
+              }
+            },
+            {
+              "id": "b",
+              "waived": true,
+              "attestations": {}
+            },
+            {
+              "id": "c",
+              "waived": false,
+              "attestations": {}
+            },
+            {
+              "id": "d",
+              "waived": false,
+              "attestations": {
+                "cov": {}
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "cov",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
+                "value": {
+                  "pct": 90
+                }
+              },
+              {
+                "name": "cov.pct",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
+                "value": 90
+              },
+              {
+                "name": "waived",
+                "value": false
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "cov",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
+                "value": null
+              },
+              {
+                "name": "cov.pct",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
+                "value": null
+              },
+              {
+                "name": "waived",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "b",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "cov",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
+                "value": null
+              },
+              {
+                "name": "cov.pct",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
+                "value": null
+              },
+              {
+                "name": "waived",
+                "value": false
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "c",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "cov",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
+                "value": {}
+              },
+              {
+                "name": "cov.pct",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
+                "value": null
+              },
+              {
+                "name": "waived",
+                "value": false
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "d",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an any_of of sentences that read a parent subject",
+    "policy": {
+      "subjects": {
+        "pr": {
+          "from": "prs",
+          "identified_by": "id"
+        },
+        "commit": {
+          "from": "pr.commits",
+          "identified_by": "sha"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "commit",
+          "checks": {
+            "c": {
+              "any_of": {
+                "signed": "signed is true",
+                "by_bot": "pr.author is \"bot\""
+              }
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the parent by its name in each option",
+        "rules": [
+          "sentence.any_of",
+          "sentence.subject.chain"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "1",
+              "author": "bot",
+              "commits": [
+                {
+                  "sha": "a",
+                  "signed": false
+                }
+              ]
+            },
+            {
+              "id": "2",
+              "author": "ann",
+              "commits": [
+                {
+                  "sha": "b",
+                  "signed": true
+                },
+                {
+                  "sha": "c",
+                  "signed": false
+                },
+                {
+                  "sha": "d"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "pr.author",
+                "value": "bot"
+              },
+              {
+                "name": "signed",
+                "value": false
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "in": {
+                "pr": "1"
+              },
+              "type": "commit"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "pr.author",
+                "value": "ann"
+              },
+              {
+                "name": "signed",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "b",
+              "in": {
+                "pr": "2"
+              },
+              "type": "commit"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "pr.author",
+                "value": "ann"
+              },
+              {
+                "name": "signed",
+                "value": false
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "c",
+              "in": {
+                "pr": "2"
+              },
+              "type": "commit"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "pr.author",
+                "value": "ann"
+              },
+              {
+                "name": "signed",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "d",
+              "in": {
+                "pr": "2"
+              },
+              "type": "commit"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
