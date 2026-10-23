@@ -8536,17 +8536,28 @@ _for_shared(_, fails, null) := fails
 
 _for_shared(check, fails, pre) := array.concat([trimmed[i] | some i, f in fails; not _for_only_shared(f, trimmed[i])], used) if {
 	pre != null
-	listed := [object.union(f, {"lines": []}) | some f in _for_unwalked(check, pre)]
-	paths := {f.path | some f in listed}
-	trimmed := [object.union(f, {"inner": [g | some g in object.get(f, "inner", []); not g.path in paths]}) | some f in fails]
-	used := [g | some g in listed; _for_shared_used(g, fails)]
+	walked := {f.path | some f in _for_unwalked(check, pre)}
+	paths := {h.path | some f in fails; some h in object.get(f, "inner", []); _for_outer_free(check, h, walked)}
+	trimmed := [_for_trim(f, paths) | some f in fails]
+	used := [object.union([h | some f in fails; some h in object.get(f, "inner", []); h.path == p][0], {"lines": []}) | some p in sort(paths)]
 }
 
-_for_shared_used(g, fails) if {
-	some f in fails
-	some h in object.get(f, "inner", [])
-	h.path == g.path
+_for_outer_free(_, h, walked) if h.path in walked
+
+_for_outer_free(check, _, _) if not _for_whose_reads(check.items[1].whose, check.items[0].as)
+
+_for_whose_reads(whose, name) if {
+	some c in whose
+	_reads_name(c, name)
 }
+
+_for_trim(f, paths) := object.union(f, {"inner": own, "cause": _walk_worst([{"cause": c} | some c in _for_own_causes(f.lines, own)])}) if {
+	own := [g | some g in object.get(f, "inner", []); not g.path in paths]
+	count(own) < count(object.get(f, "inner", []))
+	count(f.lines) + count(own) > 0
+} else := object.union(f, {"inner": [g | some g in object.get(f, "inner", []); not g.path in paths]})
+
+_for_own_causes(lines, own) := ({l.cause | some l in lines; not "items" in object.keys(l)} | {i.cause | some l in lines; some i in object.get(l, "items", [])}) | {g.cause | some g in own}
 
 _for_only_shared(f, t) if {
 	f.lines == []

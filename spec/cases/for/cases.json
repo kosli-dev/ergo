@@ -7387,5 +7387,379 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a list beside the first that fails before any sentence, with a whose that doesn't read the first item",
+    "policy": {
+      "subjects": {
+        "pull request": {
+          "from": [
+            "pull_requests"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pull request",
+          "checks": {
+            "c": {
+              "for": "some approvers as approver, every commits whose kind is \"code\" as commit",
+              "assert": "approver.t is more than commit.t"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "a commit the whose can't decide is listed once, not under each approver",
+        "rules": [
+          "for.failed_items",
+          "for.second_failures",
+          "for.shared_failures"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "p1",
+              "approvers": [
+                {
+                  "t": 5
+                },
+                {
+                  "t": 6
+                }
+              ],
+              "commits": [
+                {
+                  "t": 1,
+                  "kind": "code"
+                },
+                {
+                  "t": 2
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "item 2 of commits",
+                "path": "item 2 of commits",
+                "value": {
+                  "t": 2
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "t": 5
+                  },
+                  {
+                    "t": 6
+                  }
+                ]
+              },
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "kind": "code",
+                    "t": 1
+                  },
+                  {
+                    "t": 2
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p1",
+              "type": "pull request"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a list beside the first that fails before any sentence, with a whose that reads the first item",
+    "policy": {
+      "subjects": {
+        "pull request": {
+          "from": [
+            "pull_requests"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pull request",
+          "checks": {
+            "c": {
+              "for": "some approvers as approver, every commits whose author does not equal approver.u as commit",
+              "assert": "approver.t is more than commit.t"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "a commit the whose can't decide is listed under each approver, since the answer depends on the approver",
+        "rules": [
+          "for.failed_items",
+          "for.second_failures",
+          "for.shared_failures"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "p1",
+              "approvers": [
+                {
+                  "u": "bob",
+                  "t": 5
+                },
+                {
+                  "u": "cat",
+                  "t": 6
+                }
+              ],
+              "commits": [
+                {
+                  "t": 1,
+                  "author": "ann"
+                },
+                {
+                  "t": 2
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "item 2 of commits",
+                    "path": "item 2 of commits",
+                    "value": {
+                      "t": 2
+                    }
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "path": "item 1 of approvers",
+                "value": {
+                  "t": 5,
+                  "u": "bob"
+                }
+              },
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "item 2 of commits",
+                    "path": "item 2 of commits",
+                    "value": {
+                      "t": 2
+                    }
+                  }
+                ],
+                "item": "item 2 of approvers",
+                "path": "item 2 of approvers",
+                "value": {
+                  "t": 6,
+                  "u": "cat"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "t": 5,
+                    "u": "bob"
+                  },
+                  {
+                    "t": 6,
+                    "u": "cat"
+                  }
+                ]
+              },
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "author": "ann",
+                    "t": 1
+                  },
+                  {
+                    "t": 2
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p1",
+              "type": "pull request"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a list beside the first with a broken list inside it",
+    "policy": {
+      "subjects": {
+        "pull request": {
+          "from": [
+            "pull_requests"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pull request",
+          "checks": {
+            "c": {
+              "for": "every approvers as approver, every commits.files as file",
+              "assert": "approver.t is more than file.t"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "the broken list is listed once, and an approver that also failed a sentence keeps its own cause",
+        "rules": [
+          "for.failed_items",
+          "for.second_items",
+          "for.shared_failures"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "p1",
+              "approvers": [
+                {
+                  "t": 5
+                },
+                {
+                  "t": 0
+                }
+              ],
+              "commits": [
+                {
+                  "files": [
+                    {
+                      "t": 1
+                    }
+                  ]
+                },
+                {}
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.t is more than file.t",
+                    "cause": "value",
+                    "items": [
+                      {
+                        "cause": "value",
+                        "item": "item 1 of commits[0].files"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of approvers",
+                "path": "item 2 of approvers",
+                "value": {
+                  "t": 0
+                }
+              },
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "commits[1].files",
+                "path": "commits[1].files",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "t": 5
+                  },
+                  {
+                    "t": 0
+                  }
+                ]
+              },
+              {
+                "name": "commits[].files[]",
+                "value": [
+                  {
+                    "t": 1
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p1",
+              "type": "pull request"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
