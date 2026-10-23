@@ -12768,10 +12768,10 @@ test_a_for_item_whose_path_ends_at_a_field_shows_what_its_alias_stands_for_as_it
 	rows[0][2] == [{"path": "item 2 of prs", "item": "item 2 of prs", "cause": "value", "value": "bob", "failed_assertions": [{"assertion": `who is "ann"`, "cause": "value"}]}]
 }
 
-test_each_second_list_item_a_line_failed_for_has_its_own_cause if {
+test_each_second_list_item_a_line_failed_for_has_its_own_cause_and_the_line_has_the_worst if {
 	check := {"for": "some xs as x, every ys as y", "assert": "x.t is more than y.t"}
 	rows := _for_rows(check, [{"id": 1, "xs": [{"t": 5}], "ys": [{"t": 1}, {"t": 9}, {}]}], {})
-	rows[0][2][0].failed_assertions == [{"assertion": "x.t is more than y.t", "cause": "value", "items": [{"item": "item 2 of ys", "cause": "value"}, {"item": "item 3 of ys", "cause": "absent"}]}]
+	rows[0][2][0].failed_assertions == [{"assertion": "x.t is more than y.t", "cause": "absent", "items": [{"item": "item 2 of ys", "cause": "value"}, {"item": "item 3 of ys", "cause": "absent"}]}]
 }
 
 test_a_second_list_beside_the_first_that_cant_be_walked_is_listed_once_in_place_of_each_first_item if {

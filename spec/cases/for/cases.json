@@ -7761,5 +7761,121 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a sentence that fails for second-list items with different causes",
+    "policy": {
+      "subjects": {
+        "pull request": {
+          "from": [
+            "pull_requests"
+          ],
+          "identified_by": [
+            "id"
+          ]
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pull request",
+          "checks": {
+            "c": {
+              "for": "some approvers as approver, every commits as commit",
+              "assert": "approver.t is more than commit.t"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "each commit has its own cause, and the sentence has the first of them in the order of causes",
+        "rules": [
+          "for.failed_items",
+          "for.second_items"
+        ],
+        "input": {
+          "pull_requests": [
+            {
+              "id": "p1",
+              "approvers": [
+                {
+                  "t": 5
+                }
+              ],
+              "commits": [
+                {
+                  "t": 1
+                },
+                {
+                  "t": 9
+                },
+                {}
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.t is more than commit.t",
+                    "cause": "absent",
+                    "items": [
+                      {
+                        "cause": "value",
+                        "item": "item 2 of commits"
+                      },
+                      {
+                        "cause": "absent",
+                        "item": "item 3 of commits"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "path": "item 1 of approvers",
+                "value": {
+                  "t": 5
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "t": 5
+                  }
+                ]
+              },
+              {
+                "name": "commits[]",
+                "value": [
+                  {
+                    "t": 1
+                  },
+                  {
+                    "t": 9
+                  },
+                  {}
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p1",
+              "type": "pull request"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

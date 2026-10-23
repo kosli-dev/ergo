@@ -8524,7 +8524,7 @@ _for_outer(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(chec
 	judged := [_for_judge_outer(check, subj, names, item, e, pre) | some e in w.items]
 	fails := array.concat(array.concat([object.union(f, {"lines": []}) | some f in w.fails], [object.union(f, {"lines": []}) | some f in _walk_stop(w)]), [j.failure | some j in judged; j.failure != null])
 	cause := _for_verdict(item, w, judged, fails)
-	failed := _for_failed(cause, _for_shared(check, fails, pre))
+	failed := _for_failed(cause, _for_shared(check, fails, pre, names))
 	inputs := _for_inputs(check, subj, names, item, w)
 }
 
@@ -8532,32 +8532,33 @@ _for_unwalked(check, w) := [f | some f in array.concat(w.fails, _walk_stop(w))] 
 
 else := [{"path": check.items[1].path, "item": check.items[1].path, "cause": w.unread, "value": null}]
 
-_for_shared(_, fails, null) := fails
+_for_shared(_, fails, null, _) := fails
 
-_for_shared(check, fails, pre) := array.concat([trimmed[i] | some i, f in fails; not _for_only_shared(f, trimmed[i])], used) if {
+_for_shared(check, fails, pre, names) := array.concat([trimmed[i] | some i, f in fails; not _for_only_shared(f, trimmed[i])], shared) if {
 	pre != null
-	walked := {f.path | some f in _for_unwalked(check, pre)}
-	paths := {h.path | some f in fails; some h in object.get(f, "inner", []); _for_outer_free(check, h, walked)}
-	trimmed := [_for_trim(f, paths) | some f in fails]
-	used := [object.union([h | some f in fails; some h in object.get(f, "inner", []); h.path == p][0], {"lines": []}) | some p in sort(paths)]
+	seen := {h.path | some f in fails; some h in object.get(f, "inner", [])}
+	shared := [g | some g in array.concat([object.union(f, {"lines": []}) | some f in _for_unwalked(check, pre)], _for_free_undecided(check, pre, names)); g.path in seen]
+	paths := {g.path | some g in shared}
+	trimmed := [_for_trim(f, [g | some g in object.get(f, "inner", []); not g.path in paths]) | some f in fails]
 }
 
-_for_outer_free(_, h, walked) if h.path in walked
+_for_free_undecided(check, _, _) := [] if _for_whose_reads(check.items[1].whose, check.items[0].as)
 
-_for_outer_free(check, _, _) if not _for_whose_reads(check.items[1].whose, check.items[0].as)
+_for_free_undecided(check, pre, names) := [{"path": e.i, "item": e.i, "cause": wh.undecided[0], "value": _walk_shown(e.v), "lines": []} |
+	some e in pre.items
+	wh := _for_whose(check.items[1], e, names)
+	wh.undecided != []
+] if not _for_whose_reads(check.items[1].whose, check.items[0].as)
 
 _for_whose_reads(whose, name) if {
 	some c in whose
 	_reads_name(c, name)
 }
 
-_for_trim(f, paths) := object.union(f, {"inner": own, "cause": _walk_worst([{"cause": c} | some c in _for_own_causes(f.lines, own)])}) if {
-	own := [g | some g in object.get(f, "inner", []); not g.path in paths]
+_for_trim(f, own) := object.union(f, {"inner": own, "cause": _walk_worst([{"cause": c} | some c in ({l.cause | some l in f.lines} | {g.cause | some g in own})])}) if {
 	count(own) < count(object.get(f, "inner", []))
 	count(f.lines) + count(own) > 0
-} else := object.union(f, {"inner": [g | some g in object.get(f, "inner", []); not g.path in paths]})
-
-_for_own_causes(lines, own) := ({l.cause | some l in lines; not "items" in object.keys(l)} | {i.cause | some l in lines; some i in object.get(l, "items", [])}) | {g.cause | some g in own}
+} else := object.union(f, {"inner": own})
 
 _for_only_shared(f, t) if {
 	f.lines == []
@@ -8783,7 +8784,7 @@ _for_lines(check, subj, names) := {"passed": count(lines) == 0, "cause": _all_of
 
 _for_merge_lines(_, "satisfied", _) := []
 
-_for_merge_lines(check, cause, fails) := [object.union({"assertion": a, "cause": causes[0]}, _for_line_items(check, i, a, fails)) |
+_for_merge_lines(check, cause, fails) := [object.union({"assertion": a, "cause": _walk_worst([{"cause": c} | some c in causes])}, _for_line_items(check, i, a, fails)) |
 	some i, a in check.assertions
 	causes := [l.cause | some f in fails; some l in f.lines; l.assertion == a]
 	count(causes) > 0
