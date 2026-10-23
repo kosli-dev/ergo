@@ -8746,11 +8746,38 @@ _for_lines(check, subj, names) := {"passed": count(lines) == 0, "cause": _all_of
 
 _for_merge_lines(_, "satisfied", _) := []
 
-_for_merge_lines(check, cause, fails) := [{"assertion": a, "cause": causes[0], "items": [_for_item_name(p) | some p in sort({f.path | some f in fails; some l in f.lines; l.assertion == a})]} |
-	some a in check.assertions
+_for_merge_lines(check, cause, fails) := [object.union({"assertion": a, "cause": causes[0]}, _for_line_items(check, i, a, fails)) |
+	some i, a in check.assertions
 	causes := [l.cause | some f in fails; some l in f.lines; l.assertion == a]
 	count(causes) > 0
 ] if cause != "satisfied"
+
+_for_line_items(check, i, a, fails) := {"items": [_for_item_name(p) | some p in sort({f.path | some f in fails; some l in f.lines; l.assertion == a})]} if _reads_name(check.checks[i], check.items[1].as)
+
+else := {}
+
+_reads_name(c, name) if {
+	walk(c, [at, x])
+	not _under_data(at)
+	not _under_literal(c, at)
+	_name_read(x, name)
+}
+
+_under_data(at) if {
+	some k in at
+	k in {"value", "values", "patterns", "min", "max"}
+}
+
+_name_read(x, name) if {
+	is_array(x)
+	count(x) > 0
+	x[0] == concat("", ["$", name])
+}
+
+_name_read(x, name) if {
+	is_object(x)
+	x.named_by == name
+}
 
 _for_item_name(p) := _path_name(array.concat([substring(p[0], 1, -1)], array.slice(p, 1, count(p)))) if _starts_at_name(p)
 

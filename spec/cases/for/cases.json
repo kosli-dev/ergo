@@ -3682,11 +3682,7 @@
                 "failed_assertions": [
                   {
                     "assertion": "approver.username does not equal author",
-                    "cause": "value",
-                    "items": [
-                      "item 1 of commits",
-                      "item 2 of commits"
-                    ]
+                    "cause": "value"
                   }
                 ],
                 "item": "item 2 of approvers",
@@ -3810,11 +3806,7 @@
                 "failed_assertions": [
                   {
                     "assertion": "approver.username does not equal author",
-                    "cause": "value",
-                    "items": [
-                      "item 1 of commits",
-                      "item 2 of commits"
-                    ]
+                    "cause": "value"
                   },
                   {
                     "assertion": "approver.timestamp is after commit.timestamp",
