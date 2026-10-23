@@ -2,12 +2,11 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import opa from "../../tutorial/vendor/opa-wasm.mjs";
-import { runtime } from "../../tutorial/runtime.mjs";
 import * as lib from "./lib.mjs";
 import { defaultCell, cellHighlight, makeRunner, defaultNames, checkLines, slug, nameProblem, nameCoach, tutorialPolicy, lineResults, verdict, verdictWord, tapOutcome, requirementCoach, gridFromReport, cellLine, subjectsStatus, subjectsCoach, yamlLines, policyYaml, bakeryBatches, createEnterGate, serializeProgress, restoreProgress, layoutLines, splitSentences, fieldHighlights, keyAction, goalKindAt, isPretty, firstPositionOf, progressDots, stepTitles, dotTargets, resultLine, carryFrom, dimResult, freshDraft, judgePrediction, isRight, jsonSegments, fieldHighlight, segmentClasses, isAt, showMeVisible, buildPolicy, clampPosition, intro, positions, evidence, grade, makeChecker, parseInput, parseTime, steps, straighten } from "./lib.mjs";
 
 const wasm = readFileSync(new URL("../../tutorial/ergo.wasm", import.meta.url));
-const ergo = await opa.loadPolicy(wasm, undefined, { "time.parse_rfc3339_ns": parseTime, "opa.runtime": () => runtime });
+const ergo = await opa.loadPolicy(wasm, undefined, { "time.parse_rfc3339_ns": parseTime });
 const check = makeChecker((doc) => ergo.evaluate(doc));
 
 const goalMet = (step, goal, sentence, input) =>
@@ -20,14 +19,6 @@ test("the policy has one subject that is the whole input, one requirement and on
     subjects: { batch: { from: "$input" } },
     requirements: { tutorial: { subject: "batch", checks: { sentence: "x is 1" } } },
   });
-});
-
-test("the report says the tutorial ran on opa-wasm, built by the OPA that compiled it", () => {
-  const report = ergo.evaluate({ input: { x: 1 }, policy: buildPolicy("x is 1") })[0].result;
-  assert.deepEqual(report.engine.runtime, runtime);
-  assert.equal(runtime.name, "opa-wasm");
-  assert.match(runtime.version, /^\d+\.\d+\.\d+$/);
-  assert.match(runtime.compiled_by.version, /^\d+\.\d+\.\d+$/);
 });
 
 test("curly quotes become straight quotes before Ergo reads them", () => {

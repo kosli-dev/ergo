@@ -28,15 +28,7 @@ const parseTime = (v) => {
   return JSON.rawJSON(String(BigInt(Date.parse(time + zone)) / 1000n * 1000000000n + BigInt(fraction.padEnd(9, "0").slice(0, 9))));
 };
 
-const host = { name: "opa-wasm", version: require(path.join(runtime, "package.json")).version, compiled_by: { name: "opa", version: /^Version: (.+)$/m.exec(execFileSync("opa", ["version"], { encoding: "utf8" }))[1] } };
-
-const sorted = (v) => (v && typeof v === "object" && !Array.isArray(v) ? Object.fromEntries(Object.keys(v).sort().map((k) => [k, sorted(v[k])])) : v);
-
-const sameAs = (a, b) => JSON.stringify(sorted(a)) === JSON.stringify(sorted(b));
-
-const hosted = { "time.parse_rfc3339_ns": parseTime, "opa.runtime": () => host };
-
-const load = (dir, memory) => loadPolicy(fs.readFileSync(path.join(dir, "policy.wasm")), memory, hosted);
+const load = (dir, memory) => loadPolicy(fs.readFileSync(path.join(dir, "policy.wasm")), memory, { "time.parse_rfc3339_ns": parseTime });
 
 const builtinsOf = (policy) => {
   const { builtins, opa_json_dump } = policy.wasmInstance.exports;
@@ -46,14 +38,14 @@ const builtinsOf = (policy) => {
 };
 
 Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([policy, ergo]) => {
-  const outside = builtinsOf(ergo).filter((b) => !hosted[b]);
+  const outside = builtinsOf(ergo).filter((b) => b !== "time.parse_rfc3339_ns");
   if (outside.length > 0) {
     console.error(`ergo uses built-ins that OPA's Wasm build runs outside the module: ${outside.join(", ")}`);
     process.exit(1);
   }
 
   const needed = builtinsOf(policy);
-  const missing = needed.filter((b) => !provided[b] && !hosted[b]);
+  const missing = needed.filter((b) => !provided[b] && b !== "time.parse_rfc3339_ns");
   if (missing.length > 0) {
     console.error(`ergo uses built-ins the Wasm JS runtime doesn't have: ${missing.join(", ")}`);
     process.exit(1);
@@ -102,9 +94,8 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
   const measure = async (name, policy, rows, matching, budgetMB) => {
     const fresh = await load(ergoDir);
     const report = fresh.evaluate({ document, policy, params: {} }, "entrypoint/report")[0].result;
-    if (!sameAs(report.engine.runtime, host)) console.error(`The report's runtime is ${JSON.stringify(report.engine.runtime)}, not the ${JSON.stringify(host)} the host passed in`);
     const usedMB = (fresh.wasmInstance.exports.opa_heap_ptr_get() - fresh.baseHeapPtr) / 1e6;
-    const sound = report.results.length === rows && report.requirements.approved.subjects.matching === matching && sameAs(report.engine.runtime, host);
+    const sound = report.results.length === rows && report.requirements.approved.subjects.matching === matching;
     console.log(`A report on 100 deployments ${name} used ${usedMB.toFixed(1)} MB of Wasm memory (budget ${budgetMB} MB)`);
     if (!sound) console.error("The memory budget's report didn't come out as expected, so its measurement can't be trusted");
     if (usedMB > budgetMB) console.error(`That's over the budget. Wasm doesn't cache function calls and frees nothing until the report is done, so look for something worked out again per row, or a large regular expression compiled for every report, or for every parent of a subject read from another subject.`);

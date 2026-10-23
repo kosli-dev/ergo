@@ -1,5 +1,4 @@
 import opa from "../../tutorial/vendor/opa-wasm.mjs";
-import { runtime } from "../../tutorial/runtime.mjs";
 import { defaultCell, cellHighlight, makeRunner, bakeryBatches, defaultNames, checkLines, nameProblem, nameCoach, tutorialPolicy, lineResults, verdict, verdictWord, requirementCoach, gridFromReport, cellLine, subjectsStatus, subjectsCoach, yamlLines, layoutMetrics, createEnterGate, serializeProgress, restoreProgress, layoutLines, keyAction, goalKindAt, parseInput, clampPosition, dotTargets, resultLine, freshDraft, dimResult, isRight, jsonSegments, fieldHighlights, segmentClasses, isAt, evidence, grade, intro, makeChecker, parseTime, positions, showMeVisible, steps, straighten } from "./lib.mjs";
 
 const root = document.getElementById("tutorial");
@@ -765,7 +764,7 @@ go(startPos, false, startPos === 0);
 try {
   const res = await fetch(root.dataset.wasm);
   if (!res.ok) throw new Error(`couldn't fetch Ergo (${res.status})`);
-  const ergo = await opa.loadPolicy(await res.arrayBuffer(), undefined, { "time.parse_rfc3339_ns": parseTime, "opa.runtime": () => runtime });
+  const ergo = await opa.loadPolicy(await res.arrayBuffer(), undefined, { "time.parse_rfc3339_ns": parseTime });
   check = makeChecker((doc) => ergo.evaluate(doc));
   runner.run = makeRunner((doc) => ergo.evaluate(doc));
   if (isCustom() && !el.stage.hidden) buildStage(goalNow().kind);

@@ -106,10 +106,6 @@ the report starts with:
   "description": "Production changes are reviewed and approved",
   "engine": {
     "name": "ergo.rego",
-    "runtime": {
-      "name": "opa",
-      "version": "1.20.2"
-    },
     "version": "0.1.0-dev"
   },
   "ergo": "v0.1",
@@ -1197,10 +1193,6 @@ Three rules:
   "description": "",
   "engine": {
     "name": "ergo.rego",
-    "runtime": {
-      "name": "opa",
-      "version": "1.20.2"
-    },
     "version": "0.1.0-dev"
   },
   "ergo": "v0.1",
@@ -1215,7 +1207,7 @@ Three rules:
 
 `description` and `meta` are the [policy's](#describing-a-policy), or `""` and `{}` when it has none.
 
-`ergo` is the version of the [spec](spec/README.md#versions) the report follows. `engine` says what made it: `ergo.rego`, its version, which a policy can read as `ergo.version`, and as `runtime` what it ran on. Ergo reads that from `opa.runtime()` and copies only `name`, `version` and `compiled_by`, and only when they're strings, never the rest, which also holds every environment variable. OPA gives a version and no name, so the name is `opa`. `runtime` is `null` when Ergo can't tell what ran it: OPA used as a Go library gives nothing unless the program sets its runtime with `rego.Runtime`, and on [Wasm](#compiling-to-wasm) it's what the host passes in.
+`ergo` is the version of the [spec](spec/README.md#versions) the report follows. `engine` says what made it: `ergo.rego` and its version, which a policy can read as `ergo.version`. It doesn't say which OPA ran it, because that would make the report depend on the machine and not only on the policy, the input and the params. If you need to know, record it next to the report.
 
 `subjects` says where the subjects come from, as [Subjects in the report](#subjects-in-the-report) shows.
 
@@ -1597,10 +1589,7 @@ To decide whether to allow something, use `report.compliant`, not whether `viola
 
 ## Compiling to Wasm
 
-Ergo runs in a policy compiled with `opa build -t wasm` and run with OPA's JavaScript runtime, `@open-policy-agent/opa-wasm`. Two built-ins are missing from that runtime, and you pass them in yourself, as the third argument to `loadPolicy`:
-
-- `opa.runtime`, which every report reads for its `engine`. Without it, every report fails with `not implemented: built-in function`. Return what runs the policy, with the opa-wasm version you installed and, under `compiled_by`, the OPA that built the module, so the report can say so. `version` can be left out of either. `() => ({})` works too, and gives `runtime: null`.
-- `time.parse_rfc3339_ns`, which `compare_time` uses on RFC 3339 strings. Without it, only a policy with such a check fails.
+Ergo runs in a policy compiled with `opa build -t wasm` and run with OPA's JavaScript runtime, `@open-policy-agent/opa-wasm`. One built-in is missing from that runtime: `time.parse_rfc3339_ns`, which `compare_time` uses on RFC 3339 strings. A policy with such a check fails with `not implemented: built-in function`, unless you pass the built-in in yourself, as the third argument to `loadPolicy`.
 
 Ergo only passes it a time it has already checked: an uppercase `T` and `Z`, a date that exists and a year from 1678 to 2261. So it only has to turn that into nanoseconds since 1970, exactly. A JavaScript number can't hold that: today's are about 1.76×10¹⁸, where a number can only step by 256. So return the digits with `JSON.rawJSON` (Node 21 and later). This is the version Ergo's CI uses, and it gives the same nanoseconds as OPA on 16,922 generated timestamps, before and after 1970:
 
@@ -1610,9 +1599,7 @@ const parseTime = (v) => {
   return JSON.rawJSON(String(BigInt(Date.parse(time + zone)) / 1000n * 1000000000n + BigInt(fraction.padEnd(9, "0").slice(0, 9))));
 };
 
-const runtime = () => ({ name: "opa-wasm", version: "1.10.0", compiled_by: { name: "opa", version: "1.20.2" } });
-
-const policy = await loadPolicy(wasm, undefined, { "time.parse_rfc3339_ns": parseTime, "opa.runtime": runtime });
+const policy = await loadPolicy(wasm, undefined, { "time.parse_rfc3339_ns": parseTime });
 ```
 
 ## Compiling a policy

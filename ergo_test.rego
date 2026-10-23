@@ -2823,84 +2823,14 @@ test_the_report_says_which_version_of_the_spec_it_follows_whatever_version_the_p
 	ergo.report(_engine_doc, object.union(_engine_policy, {"ergo": "v9.9"}), {}).ergo == "v0.1"
 }
 
-test_the_report_names_the_engine_and_the_opa_version_it_ran_on if {
-	rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as {"version": "1.20.2"}
-	rep.engine == {"name": "ergo.rego", "version": ergo.version, "runtime": {"name": "opa", "version": "1.20.2"}}
-}
-
-test_the_report_copies_only_the_opa_version_because_the_runtime_also_holds_every_environment_variable if {
-	rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as {"version": "1.20.2", "commit": "abc", "env": {"TOKEN": "secret"}}
-	rep.engine.runtime == {"name": "opa", "version": "1.20.2"}
-}
-
-test_the_runtime_is_null_when_opa_doesnt_say_as_when_used_as_a_go_library if {
-	rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as {}
-	rep.engine.runtime == null
-}
-
-test_a_runtime_version_that_isnt_a_string_gives_null_and_changes_no_verdict if {
-	every rt in [{"version": 1}, {"version": null}, null, "1.20.2", []] {
-		rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as rt
-		rep.engine.runtime == null
-		object.remove(rep, ["engine"]) == object.remove(ergo.report(_engine_doc, _engine_policy, {}), ["engine"])
-	}
-}
-
-test_a_host_can_name_the_runtime_it_gives_ergo if {
-	rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as {"name": "opa-wasm", "version": "1.10.0"}
-	rep.engine.runtime == {"name": "opa-wasm", "version": "1.10.0"}
-}
-
-test_a_runtime_that_cant_tell_its_version_is_named_without_one if {
-	rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as {"name": "opa-wasm"}
-	rep.engine.runtime == {"name": "opa-wasm"}
-}
-
-test_a_named_runtime_with_a_version_that_isnt_a_string_is_named_without_one if {
-	every v in [1, null, [], {}] {
-		rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as {"name": "opa-wasm", "version": v}
-		rep.engine.runtime == {"name": "opa-wasm"}
-	}
-}
-
-test_a_name_that_isnt_a_string_gives_null_rather_than_guessing_opa if {
-	every n in [1, null, [], {}] {
-		rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as {"name": n, "version": "1.10.0"}
-		rep.engine.runtime == null
-	}
-}
-
-test_the_runtime_says_what_compiled_the_policy_when_the_host_says_so if {
-	rt := {"name": "opa-wasm", "version": "1.10.0", "compiled_by": {"name": "opa", "version": "1.20.2"}}
-	rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as rt
-	rep.engine.runtime == rt
-}
-
-test_what_compiled_the_policy_can_be_named_without_a_version if {
-	every v in [{}, {"version": 1}, {"version": null}] {
-		rt := object.union({"name": "opa"}, v)
-		rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as {"name": "opa-wasm", "compiled_by": rt}
-		rep.engine.runtime == {"name": "opa-wasm", "compiled_by": {"name": "opa"}}
-	}
-}
-
-test_what_compiled_the_policy_is_left_out_when_it_has_no_name_ergo_can_read if {
-	every c in [null, "opa", [], {}, {"version": "1.20.2"}, {"name": 1, "version": "1.20.2"}] {
-		rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as {"name": "opa-wasm", "compiled_by": c}
-		rep.engine.runtime == {"name": "opa-wasm"}
-	}
-}
-
-test_only_the_fields_the_spec_names_are_copied_from_a_host_runtime if {
-	rt := {"name": "opa-wasm", "version": "1.10.0", "env": {"TOKEN": "secret"}, "compiled_by": {"name": "opa", "version": "1.20.2", "env": {"TOKEN": "secret"}}}
-	rep := ergo.report(_engine_doc, _engine_policy, {}) with opa.runtime as rt
-	rep.engine.runtime == {"name": "opa-wasm", "version": "1.10.0", "compiled_by": {"name": "opa", "version": "1.20.2"}}
+test_the_engine_gives_only_its_name_and_version_because_anything_about_the_machine_would_make_the_report_depend_on_more_than_the_policy_and_input if {
+	ergo.report(_engine_doc, _engine_policy, {}).engine == {"name": "ergo.rego", "version": ergo.version}
 }
 
 test_a_compiled_policy_gives_the_same_ergo_and_engine if {
-	rep := ergo.report(_engine_doc, ergo.compile(_engine_policy), {}) with opa.runtime as {"version": "1.20.2"}
+	rep := ergo.report(_engine_doc, ergo.compile(_engine_policy), {})
 	rep.ergo == "v0.1"
-	rep.engine == {"name": "ergo.rego", "version": ergo.version, "runtime": {"name": "opa", "version": "1.20.2"}}
+	rep.engine == {"name": "ergo.rego", "version": ergo.version}
 }
 
 test_the_version_on_main_ends_in_dev_because_only_the_release_workflow_drops_it if {
@@ -2908,7 +2838,7 @@ test_the_version_on_main_ends_in_dev_because_only_the_release_workflow_drops_it 
 }
 
 test_a_report_that_cant_read_its_input_still_says_its_version_and_engine if {
-	rep := ergo.report("not an object", _engine_policy, "not params") with opa.runtime as {"version": "1.20.2"}
+	rep := ergo.report("not an object", _engine_policy, "not params")
 	rep.ergo == "v0.1"
 	rep.engine.name == "ergo.rego"
 }
@@ -6325,23 +6255,23 @@ test_the_report_never_reads_data_params if {
 	[r.cause | some r in rows_for(unset, "s", "c")] == ["absent"]
 }
 
-empty_report := {"compliant": false, "description": "", "ergo": "v0.1", "meta": {}, "requirements": {}, "results": [], "subjects": {}}
+empty_report := {"compliant": false, "description": "", "engine": {"name": "ergo.rego", "version": ergo.version}, "ergo": "v0.1", "meta": {}, "requirements": {}, "results": [], "subjects": {}}
 
 test_a_policy_without_requirements_is_not_compliant if {
-	object.remove(ergo.report({"items": [{"id": 1}]}, {}, {}), ["engine"]) == empty_report
-	object.remove(ergo.report({"items": [{"id": 1}]}, {"requirements": {}}, {}), ["engine"]) == empty_report
-	object.remove(ergo.report({"items": [{"id": 1}]}, {"requirments": params_req({"op": "present", "path": ["id"]})}, {}), ["engine"]) == empty_report
+	ergo.report({"items": [{"id": 1}]}, {}, {}) == empty_report
+	ergo.report({"items": [{"id": 1}]}, {"requirements": {}}, {}) == empty_report
+	ergo.report({"items": [{"id": 1}]}, {"requirments": params_req({"op": "present", "path": ["id"]})}, {}) == empty_report
 }
 
 test_a_policy_that_is_not_an_object_is_not_compliant if {
 	every policy in [null, true, 1, "requirements", [], [params_req({"op": "present", "path": ["id"]})]] {
-		object.remove(ergo.report({"items": [{"id": 1}]}, policy, {}), ["engine"]) == empty_report
+		ergo.report({"items": [{"id": 1}]}, policy, {}) == empty_report
 	}
 }
 
 test_requirements_that_are_not_an_object_are_not_compliant if {
 	every reqs in [null, true, 1, "", "s", []] {
-		object.remove(ergo.report({"items": [{"id": 1}]}, {"requirements": reqs}, {}), ["engine"]) == empty_report
+		ergo.report({"items": [{"id": 1}]}, {"requirements": reqs}, {}) == empty_report
 	}
 	ergo.report({"items": [{"id": 1}]}, {"requirements": [params_req({"op": "present", "path": ["id"]}).s]}, {}).compliant == false
 }
