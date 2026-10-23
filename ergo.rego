@@ -5004,7 +5004,7 @@ _run(doc, policy, rd, params) := r if {
 	r := object.union(_reported(written, unreadable, [raw, used]), {"ergo": "v0.1", "engine": {"name": "ergo.rego", "version": version, "runtime": _runtime(opa.runtime())}})
 }
 
-version := "0.1.0"
+version := "0.1.0-dev"
 
 _runtime(rt) := {"name": "opa", "version": rt.version} if {
 	is_object(rt)

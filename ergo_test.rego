@@ -2852,8 +2852,8 @@ test_a_compiled_policy_gives_the_same_ergo_and_engine if {
 	rep.engine == {"name": "ergo.rego", "version": ergo.version, "runtime": {"name": "opa", "version": "1.20.2"}}
 }
 
-test_the_version_is_a_plain_semantic_version_so_a_release_tag_can_be_checked_against_it if {
-	regex.match(`^[0-9]+\.[0-9]+\.[0-9]+$`, ergo.version)
+test_the_version_on_main_ends_in_dev_because_only_the_release_workflow_drops_it if {
+	regex.match(`^[0-9]+\.[0-9]+\.[0-9]+-dev$`, ergo.version)
 }
 
 test_a_report_that_cant_read_its_input_still_says_its_version_and_engine if {

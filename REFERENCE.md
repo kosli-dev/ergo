@@ -110,7 +110,7 @@ the report starts with:
       "name": "opa",
       "version": "1.20.2"
     },
-    "version": "0.1.0"
+    "version": "0.1.0-dev"
   },
   "ergo": "v0.1",
   "meta": {
@@ -1201,7 +1201,7 @@ Three rules:
       "name": "opa",
       "version": "1.20.2"
     },
-    "version": "0.1.0"
+    "version": "0.1.0-dev"
   },
   "ergo": "v0.1",
   "meta": {},
