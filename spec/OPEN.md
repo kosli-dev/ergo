@@ -96,6 +96,18 @@ Three ways to settle it:
 
 [report.hash](semantics.md#statuses) writes the report as RFC 8785 says, and RFC 8785 writes every number as a 64-bit float. Ergo copies numbers from the input into the report with every digit, so a report holding `1.00000000000000000001` hashes as if it held `1`. Two reports that differ only there get the same hash. A number too big or too small for a 64-bit float, like `1e400`, can't be written that way at all, and implementations already write it differently in the report (see [Values](semantics.md#values)). The open question is whether that's fine, or whether the hash should write numbers as the report does.
 
+## What `engine` says about the runtime
+
+[report.engine](semantics.md#statuses) lets `runtime` be a name and a version and nothing else, and `ergo.rego` always names it `opa` and copies only the `version` of `opa.runtime()`. That leaves out facts that would help someone find out what made a report. With Wasm in JavaScript, two things decide how built-ins behave: the OPA that compiled the module and the package that runs it, like `@open-policy-agent/opa-wasm` 1.10.0. Neither is OPA's runtime, so a JavaScript host can only pass `{}` and get `runtime: null`.
+
+Some ways to say more:
+
+- `ergo.rego` reads `name` from `opa.runtime()` when it's a string, and uses `opa` otherwise. A host passes `{"name": "opa-wasm", "version": "1.10.0"}`. OPA's own `opa.runtime()` has no `name`, so reports from OPA don't change.
+- `runtime` can have a name without a version, like `{"name": "opa-wasm"}`, for a host that can't tell its version.
+- `runtime` can say what compiled the policy too, like `{"name": "opa-wasm", "version": "1.10.0", "compiled_by": {"name": "opa", "version": "1.20.2"}}`. Rego can't read the version of the OPA that compiled it, so the host would have to pass that in too.
+
+Whatever the shape, an engine copies only the fields the spec names, and only when they're strings, never the whole of what its runtime gives. `opa.runtime()` holds every environment variable, and a report gets stored and shown to people.
+
 ## Rules without cases
 
 Every rule needs a case, apart from the ones listed here. The `sentence` rules here are for forms `ergo.rego` doesn't run or check yet. `report.engine` gives different values for each engine, so a case can't pin it, and `ergo_test.rego` tests it instead. `policy.version` waits for `ergo.rego` to read `ergo` from a policy, and `report.hash` for the question about numbers above. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.
