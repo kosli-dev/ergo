@@ -2846,5 +2846,141 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a part read in a check with named by on its right side",
+    "policy": {
+      "ergo_spec": "v0.1",
+      "subjects": {
+        "t": {
+          "from": "things",
+          "identified_by": "id",
+          "has": {
+            "cov": "d.b"
+          }
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "t",
+          "checks": {
+            "c": "cov.x is one of $params.allowed named by id"
+          }
+        }
+      }
+    },
+    "params": {
+      "allowed": {
+        "a": [
+          1
+        ]
+      }
+    },
+    "cases": [
+      {
+        "description": "shows the part's value in its inputs",
+        "rules": ["parts.swap", "parts.tag"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "d": {
+                "b": {
+                  "x": 1
+                }
+              }
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "met",
+            "subjects": {
+              "matching": 1,
+              "total": 1
+            }
+          }
+        },
+        "compliant": true,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "t"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope t count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "t"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated t ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "t"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "cov.x",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
+                "value": 1
+              },
+              {
+                "name": "id",
+                "value": "a"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "t"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

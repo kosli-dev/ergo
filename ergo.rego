@@ -40,10 +40,6 @@ _is_root(name) if {
 	not "of" in object.keys(def)
 }
 
-default _links(_) := false
-
-_links(name) if _of_edges(_raw_subject(name), data.ergo_subjects) != []
-
 _filters_of(name) := object.get(_raw_subject(name), "applies_to", {})
 
 _built_on_count(name) := count(graph.reachable(_of_graph, [name]))
@@ -55,7 +51,7 @@ default _resolved_subjects := {}
 _resolution(name) := object.union({"members": members, "problems": problems}, resolved) if {
 	members := {m | some m in graph.reachable(_of_graph, [name])}
 	resolved := _resolved_def(members)
-	problems := _member_problems(members) | _loop_problems(name, members)
+	problems := _member_problems(members)
 }
 
 _resolved_def(members) := {"def": def, "filter_owners": owners} if {
@@ -293,13 +289,6 @@ _member_problems(members) := union({
 	},
 })
 
-_loop_problems(name, members) := {[["subjects", name, "from"], "leads to a loop"] |
-	count(members) > 0
-	every m in members {
-		_links(m)
-	}
-}
-
 _subject_ref_problems(req) := (({["subject", "missing"] |
 	is_object(req)
 	not "subject" in object.keys(req)
@@ -363,6 +352,10 @@ _range_problems(req) := {["min_subjects", "number out of range"] |
 _unknown_problems(req) := {[f, "unknown field"] | some f in _unknown_req_fields(req)}
 
 _checks_problems(req) := {["checks", "missing"] | is_object(req); not "checks" in object.keys(req)} | {["checks", "empty"] | req.checks == {}}
+
+_reserved_name_problems(req) := {[_field_path_name(["checks", name]), "name reserved"] | some name, _ in _checks_of(req); name in _reserved_checks}
+
+_reserved_checks := {"$applies", "$min_subjects", "$unique_ids", "$well_formed"}
 
 _require_problems(req) := {["require", "neither every nor some"] | is_object(req); not _require_of(req) in {"every", "some"}}
 
@@ -3179,7 +3172,7 @@ _well_formed(req) if {
 }
 
 _check_problem_inputs(req) := [{"name": name, "value": sort({p[1] | some p in problems; p[0] == name})} | some name in sort({p[0] | some p in problems})] if {
-	problems := _own_check_problems(req) | {p | some a in _ancestors_of(req); some p in _own_check_problems({"subject": a, "checks": {}})}
+	problems := (_own_check_problems(req) | _reserved_name_problems(req)) | {p | some a in _ancestors_of(req); some p in _own_check_problems({"subject": a, "checks": {}})}
 }
 
 _own_check_problems(req) := {_placed_problem(req, f, n, check, p) |
@@ -3251,6 +3244,7 @@ _requirement_checks_written_or_added(req) := object.union(
 	object.union(
 		{name: def |
 			some name, check in _checks_of(req)
+			not name in _reserved_checks
 			def := _check_def(check, _s_written_here(req, "checks", name))
 		},
 		object.union(_min_subjects_def(req), _unique_ids_def(req)),
@@ -3688,9 +3682,10 @@ _reported_subject_name(req) := req.subject if {
 	req.subject in object.keys(data.ergo_subjects)
 } else := null
 
-_listed_subject_graph := {name: array.concat(_of_edges(def, data.ergo_subjects), [chains[name] | name in object.keys(chains)]) |
+_listed_subject_graph := {name: array.concat(array.concat(_of_edges(def, data.ergo_subjects), [chains[name] | name in object.keys(chains)]), [follows[name] | name in object.keys(follows)]) |
 	some name, def in data.ergo_subjects
 	chains := object.get(data.ergo_subject_sentences, "chains", {})
+	follows := object.get(data.ergo_subject_sentences, "follows", {})
 }
 
 _listed_subject_names(reqs) := graph.reachable(_listed_subject_graph, {req.subject |
@@ -5594,12 +5589,12 @@ _s_from_used(def, read) if {
 	not "of" in object.keys(def)
 }
 
-_s_from_read(name, fl, subjects, chains) := object.union({"problems": problems, "fields": fields, "parent": parent, "every": every_list}, _p_from_part(name, fl, subjects, chains.parts)) if {
+_s_from_read(name, fl, subjects, chains) := object.union(object.union({"problems": problems, "fields": fields, "parent": parent, "every": every_list}, _p_from_part(name, fl, subjects, chains.parts)), _s_follows(name, fl, subjects, chains)) if {
 	"path" in object.keys(fl)
 	names := {a | some a in _s_ancestors(name, chains.descend)}
 	keep := names | object.keys(_p_steps_of(object.get(chains.parts, name, {})))
 	conds := [_p_applied(_s_parent_named(t, _s_check([t], {}, set(), keep), names), {"own": _p_steps_of(object.get(chains.parts, name, {})), "ancestors": {a: _p_steps_of(object.get(chains.parts, a, {})) | some a in names}}) | some c in object.get(fl, "where", []); t := _s_cond_text(_s_from_cond(c, names, keep))]
-	problems := sort((((((_s_chain_unsupported(name, fl, subjects, chains.descend) | _s_every_unsupported(name, fl, subjects)) | _s_from_start_problems(fl)) | _s_from_paths_unsupported({"path": fl.path})) | _s_elapsed_flaw({"where": object.get(fl, "where", [])})) | {concat("", ["whose: ", p]) | some c in conds; some p in object.get(c, "$sentence", [])}))
+	problems := sort((((((((_s_chain_unsupported(name, fl, subjects, chains) | _s_loop(name, fl, subjects, chains)) | _s_blank_start(fl, subjects)) | _s_every_unsupported(name, fl, subjects)) | _s_from_start_problems(fl)) | _s_from_paths_unsupported({"path": fl.path})) | _s_elapsed_flaw({"where": object.get(fl, "where", [])})) | {concat("", ["whose: ", p]) | some c in conds; some p in object.get(c, "$sentence", [])}))
 	fields := object.union(_s_source(name, fl, subjects, chains.parts), _s_whose_filters(_s_filter_prefix(name, chains.narrow), conds))
 	parent := _s_descend_parent(name, fl, subjects)
 	every_list := object.get(fl, "every", false) == true
@@ -5715,20 +5710,47 @@ _s_every_unsupported(name, fl, subjects) := ({"every can't go with a from line t
 	fl.path.steps[0] in object.keys(subjects)
 } | {"every can't go with named by each of: start the from line at a subject to read its names one subject at a time" | "named_by_each_of" in object.keys(fl)}) | {"every over more than ten steps isn't supported yet" | count(_s_model_path(fl.path)) > 10} if object.get(fl, "every", false) == true
 
-_s_chain_unsupported(name, fl, subjects, descend) := {"a chain of more than three subjects isn't supported yet" |
+_s_chain_unsupported(name, fl, subjects, chains) := {"a chain of more than three subjects isn't supported yet" |
 	_s_descends(name, fl, subjects)
 	parent := fl.path.steps[0]
-	parent in object.keys(descend)
-	descend[parent] in object.keys(descend)
+	parent in object.keys(chains.descend)
+	chains.descend[parent] in object.keys(chains.descend)
+	not _s_in_loop(name, fl, subjects, chains)
+}
+
+_s_loop(name, fl, subjects, chains) := {"leads to a loop" | _s_in_loop(name, fl, subjects, chains)}
+
+_s_in_loop(name, fl, subjects, chains) if {
+	_s_starts_at_subject(name, fl, subjects)
+	links := {n: array.concat(object.get(chains.narrow, n, []), [p | some p in [object.get(chains.descend, n, null)]; p != null]) | some n, _ in subjects}
+	some m in graph.reachable(links, [fl.path.steps[0]])
+	m in graph.reachable(links, links[m])
+}
+
+_s_follows(name, fl, subjects, chains) := {"follows": fl.path.steps[0]} if {
+	_s_in_loop(name, fl, subjects, chains)
+} else := {"follows": fl.path.steps[0]} if {
+	_s_blank_start(fl, subjects) != set()
+} else := {}
+
+_s_starts_at_subject(name, fl, subjects) if _s_descends(name, fl, subjects)
+
+_s_starts_at_subject(name, fl, subjects) if _s_narrows(name, fl, subjects)
+
+_s_blank_start(fl, subjects) := {concat("", ["\"", fl.path.steps[0], "\" isn't a subject name"]) |
+	not "start" in object.keys(fl.path)
+	is_string(fl.path.steps[0])
+	fl.path.steps[0] in object.keys(subjects)
+	trim_space(fl.path.steps[0]) == ""
 }
 
 _s_id_field(read) := {"identified_by": read.identified_by.path} if "path" in object.keys(object.get(read, "identified_by", {}))
 
 else := {}
 
-_s_subject_sentences(subjects, reads, parts) := {"from_parts": {name: r.part | some name, r in reads; _s_from_used(subjects[name], r)}, "lines": parts.lines, "parts": parts.effective, "has_problems": parts.problems, "chains": {name: p | some name, r in reads; _s_from_used(subjects[name], r); p := object.get(r, "parent", null); p != null}, "every": {name | some name, r in reads; _s_from_used(subjects[name], r); object.get(r, "every", false) == true}, "narrowed": {name | some name, r in reads; _s_from_used(subjects[name], r); "of" in object.keys(r.fields)}, "filters": {[name, n] | some name, r in reads; _s_from_used(subjects[name], r); some n, _ in object.get(r.fields, "applies_to", {})}, "problems": {name: probs | some name, def in subjects; probs := _s_subject_problems(name, def, reads); probs != {}}} if is_object(subjects)
+_s_subject_sentences(subjects, reads, parts) := {"from_parts": {name: r.part | some name, r in reads; _s_from_used(subjects[name], r)}, "lines": parts.lines, "parts": parts.effective, "has_problems": parts.problems, "chains": {name: p | some name, r in reads; _s_from_used(subjects[name], r); p := object.get(r, "parent", null); p != null}, "every": {name | some name, r in reads; _s_from_used(subjects[name], r); object.get(r, "every", false) == true}, "narrowed": {name | some name, r in reads; _s_from_used(subjects[name], r); "of" in object.keys(r.fields)}, "filters": {[name, n] | some name, r in reads; _s_from_used(subjects[name], r); some n, _ in object.get(r.fields, "applies_to", {})}, "problems": {name: probs | some name, def in subjects; probs := _s_subject_problems(name, def, reads); probs != {}}, "follows": {name: r.follows | some name, r in reads; "follows" in object.keys(r)}} if is_object(subjects)
 
-_s_subject_sentences(subjects, _, _) := {"from_parts": {}, "lines": {}, "parts": {}, "has_problems": {}, "chains": {}, "every": set(), "narrowed": set(), "filters": set(), "problems": {}} if not is_object(subjects)
+_s_subject_sentences(subjects, _, _) := {"from_parts": {}, "lines": {}, "parts": {}, "has_problems": {}, "chains": {}, "every": set(), "narrowed": set(), "filters": set(), "problems": {}, "follows": {}} if not is_object(subjects)
 
 _s_subject_problems(name, def, reads) := {f: ps | some f in ["applies_to", "from", "identified_by", "of"]; ps := _s_field_problems(name, def, f, reads); ps != []} if is_object(def)
 
@@ -5893,7 +5915,7 @@ _p_sleaf(m, pc) := object.union(m, {
 
 _p_sleaf(m, pc) := _p_leaf(m, pc, "s") if not m.op in {"every", "some"}
 
-_p_leaf(m, pc, mode) := object.union(m, {f: _p_item_side(f, m[f], pc, mode) | some f in ["path", "left", "right"]; f in object.keys(m)})
+_p_leaf(m, pc, mode) := object.union(object.union(m, {f: _p_item_side(f, m[f], pc, mode) | some f in ["path", "left", "right"]; f in object.keys(m)}), {"inputs": [_p_side(i, pc, mode) | some i in m.inputs] | is_array(object.get(m, "inputs", null))})
 
 _p_item_side(f, side, pc, mode) := _p_path(_p_own_named(side), pc, "o") if {
 	_p_own_on_item_right(f, side, pc, mode)
@@ -6968,7 +6990,7 @@ _s_picks_from_last(p) if p.position == "last"
 
 else := object.get(p, "from_last", false)
 
-_s_named(m, names) := object.union(m, {f: _s_named_side(m[f], names) | some f in ["path", "left", "right"]; f in object.keys(m)})
+_s_named(m, names) := object.union(object.union(m, {f: _s_named_side(m[f], names) | some f in ["path", "left", "right"]; f in object.keys(m)}), {"inputs": [_s_named_side(i, names) | some i in m.inputs] | is_array(object.get(m, "inputs", null))})
 
 _s_named_side(side, names) := _s_named_path(side, names) if is_array(side)
 
@@ -7364,11 +7386,18 @@ _for_unchecked(inner) := {"failed_items": [{"path": _for_item_name(f.path), "ite
 
 _for_inputs(check, subj, names, item, w) := [{"name": pair[0], "value": pair[1]} | some pair in sort(_for_input_pairs(check, subj, names, item, w))]
 
-_for_input_pairs(check, subj, names, item, w) := (((({object.get(w, "input", _for_list_input(item, w))} | _for_inner_pairs(check, subj, names, item, w)) | {[_path_name(shown), _value_at(subj, shown)] |
+_for_input_pairs(check, subj, names, item, w) := ((((({object.get(w, "input", _for_list_input(item, w))} | _for_inner_pairs(check, subj, names, item, w)) | {[_path_name(shown), _value_at(subj, shown)] |
 	some c in check.checks
 	not _walks(c)
 	some p in _leaf_paths(c)
 	shown := _before_names(p)
+}) | {[_path_name(shown), _value_at(subj, shown)] |
+	some c in check.checks
+	not _walks(c)
+	some p in _leaf_paths(c)
+	_starts_at_name(p)
+	not p[0] in {concat("", ["$", item.as]) | some item in check.items}
+	shown := _before_later_names(p)
 }) | {[i.name, i.value] |
 	some c in check.checks
 	some side in _derived_sides(c)
@@ -7438,6 +7467,8 @@ _before_names(p) := p if {
 	i := min([j | some j, step in p; _name_step(step)])
 	i > 0
 }
+
+_before_later_names(p) := array.slice(p, 0, min(array.concat([count(p)], [j | some j, step in p; j > 0; _name_step(step)])))
 
 _has_name_step(p) if {
 	is_array(p)

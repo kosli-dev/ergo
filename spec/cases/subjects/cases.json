@@ -5783,7 +5783,7 @@
     "cases": [
       {
         "description": "lead to a loop, named after from, and the requirement finds no subjects",
-        "rules": ["subjects.sentence", "sentence.subject.narrow", "written_wrong.row"],
+        "rules": ["subjects.sentence", "sentence.subject.narrow", "written_wrong.row", "report.subjects"],
         "input": {
           "x": [
             {
@@ -5802,6 +5802,22 @@
             "subjects": {
               "matching": 0,
               "total": 0
+            }
+          }
+        },
+        "report": {
+          "subjects": {
+            "x": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": null,
+              "parts": {}
+            },
+            "y": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": null,
+              "parts": {}
             }
           }
         },
@@ -6421,6 +6437,789 @@
         "requirements": {"s": {"status": "not_met"}},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "subjects.thing.from", "value": ["not a string"]}, {"name": "subjects.thing.identified_by", "value": ["not a string"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that narrows a subject whose name is blank",
+    "policy": {
+      "ergo_spec": "v0.1",
+      "subjects": {
+        " ": {
+          "from": "things",
+          "identified_by": "id"
+        },
+        "b": {
+          "from": "\" \" whose id is \"a\""
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "b",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong under from, saying the name isn't a subject name",
+        "rules": ["subjects.sentence", "report.subjects"],
+        "input": {
+          "things": [
+            {
+              "id": "a"
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met",
+            "subjects": {
+              "matching": 0,
+              "total": 0
+            }
+          }
+        },
+        "compliant": false,
+        "report": {
+          "subjects": {
+            " ": {
+              "description": "",
+              "from": "things",
+              "identified_by": "id",
+              "parts": {}
+            },
+            "b": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": null,
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "subjects.b.from",
+                "value": [
+                  "\" \" isn't a subject name"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "b"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that reads a child subject of a subject whose name is blank",
+    "policy": {
+      "ergo_spec": "v0.1",
+      "subjects": {
+        " ": {
+          "from": "things",
+          "identified_by": "id"
+        },
+        "b": {
+          "from": "\" \".kids"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "b",
+          "checks": {
+            "c": "v exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong under from, saying the name isn't a subject name",
+        "rules": ["subjects.sentence", "report.subjects"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "kids": [
+                {
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met",
+            "subjects": {
+              "matching": 0,
+              "total": 0
+            }
+          }
+        },
+        "compliant": false,
+        "report": {
+          "subjects": {
+            " ": {
+              "description": "",
+              "from": "things",
+              "identified_by": "id",
+              "parts": {}
+            },
+            "b": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": null,
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "subjects.b.from",
+                "value": [
+                  "\" \" isn't a subject name"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "b"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "child subjects that read each other",
+    "policy": {
+      "ergo_spec": "v0.1",
+      "subjects": {
+        "b": {
+          "from": "kid.x"
+        },
+        "kid": {
+          "from": "b.kids"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "kid",
+          "checks": {
+            "c": "v exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lead to a loop, named after from",
+        "rules": ["subjects.chain", "report.subjects"],
+        "input": {
+          "bs": []
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met",
+            "subjects": {
+              "matching": 0,
+              "total": 0
+            }
+          }
+        },
+        "compliant": false,
+        "report": {
+          "subjects": {
+            "b": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": null,
+              "parts": {}
+            },
+            "kid": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": null,
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "subjects.kid.from",
+                "value": [
+                  "leads to a loop"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "three child subjects that read each other in a ring",
+    "policy": {
+      "ergo_spec": "v0.1",
+      "subjects": {
+        "p": {
+          "from": "q.x"
+        },
+        "q": {
+          "from": "r.x"
+        },
+        "r": {
+          "from": "p.x"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "p",
+          "checks": {
+            "c": "v exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lead to a loop, named after from",
+        "rules": ["subjects.chain", "report.subjects"],
+        "input": {
+          "bs": []
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met",
+            "subjects": {
+              "matching": 0,
+              "total": 0
+            }
+          }
+        },
+        "compliant": false,
+        "report": {
+          "subjects": {
+            "p": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": null,
+              "parts": {}
+            },
+            "q": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": null,
+              "parts": {}
+            },
+            "r": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": null,
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "subjects.p.from",
+                "value": [
+                  "leads to a loop"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "p"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a subject that narrows it",
+    "policy": {
+      "ergo_spec": "v0.1",
+      "subjects": {
+        "b": {
+          "from": "kid"
+        },
+        "kid": {
+          "from": "b.kids"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "kid",
+          "checks": {
+            "c": "v exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "leads to a loop, named after from",
+        "rules": ["subjects.chain", "report.subjects"],
+        "input": {
+          "bs": []
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met",
+            "subjects": {
+              "matching": 0,
+              "total": 0
+            }
+          }
+        },
+        "compliant": false,
+        "report": {
+          "subjects": {
+            "b": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": null,
+              "parts": {}
+            },
+            "kid": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": null,
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "subjects.kid.from",
+                "value": [
+                  "leads to a loop"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject whose check reads its parent with named by on its right side",
+    "policy": {
+      "ergo_spec": "v0.1",
+      "subjects": {
+        "t": {
+          "from": "ts",
+          "identified_by": "id"
+        },
+        "kid": {
+          "from": "t.kids"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "kid",
+          "checks": {
+            "c": "t.x is one of $params.allowed named by n"
+          }
+        }
+      }
+    },
+    "params": {
+      "allowed": {
+        "a": [
+          1
+        ]
+      }
+    },
+    "cases": [
+      {
+        "description": "shows the parent's value in its inputs",
+        "rules": ["subjects.chain"],
+        "input": {
+          "ts": [
+            {
+              "id": "a",
+              "x": 1,
+              "kids": [
+                {
+                  "n": "a"
+                }
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "met",
+            "subjects": {
+              "matching": 1,
+              "total": 1
+            }
+          }
+        },
+        "compliant": true,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope kid count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "t": "a"
+              },
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated kid ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "t": "a"
+              },
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "t.x",
+                "value": 1
+              },
+              {
+                "name": "n",
+                "value": "a"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": {
+                "n": "a"
+              },
+              "in": {
+                "t": "a"
+              },
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject that narrows a subject in a loop",
+    "policy": {
+      "ergo_spec": "v0.1",
+      "subjects": {
+        "pa": {
+          "from": "pb"
+        },
+        "pb": {
+          "from": "pa"
+        },
+        "pc": {
+          "from": "pa"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pc",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "leads to a loop, named after its own from",
+        "rules": ["subjects.sentence", "report.subjects"],
+        "input": {
+          "pa": [
+            {
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met",
+            "subjects": {
+              "matching": 0,
+              "total": 0
+            }
+          }
+        },
+        "compliant": false,
+        "report": {
+          "subjects": {
+            "pa": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": null,
+              "parts": {}
+            },
+            "pb": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": null,
+              "parts": {}
+            },
+            "pc": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": null,
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "subjects.pc.from",
+                "value": [
+                  "leads to a loop"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "pc"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a subject in a loop",
+    "policy": {
+      "ergo_spec": "v0.1",
+      "subjects": {
+        "pa": {
+          "from": "pb.x"
+        },
+        "pb": {
+          "from": "pa.x"
+        },
+        "pc": {
+          "from": "pa.kids"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pc",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "leads to a loop, named after its own from",
+        "rules": ["subjects.chain", "report.subjects"],
+        "input": {},
+        "requirements": {
+          "s": {
+            "status": "not_met",
+            "subjects": {
+              "matching": 0,
+              "total": 0
+            }
+          }
+        },
+        "compliant": false,
+        "report": {
+          "subjects": {
+            "pa": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": null,
+              "parts": {}
+            },
+            "pb": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": null,
+              "parts": {}
+            },
+            "pc": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": null,
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "subjects.pc.from",
+                "value": [
+                  "leads to a loop"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "pc"
+            }
+          }
         ]
       }
     ]
