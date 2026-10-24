@@ -1,5 +1,5 @@
 ; The grammar of checks written as sentences, in ABNF (RFC 5234).
-; sentences.md says what each form means and what it can't say here.
+; syntax.md says what each form means and what it can't say here.
 ; Every quoted string is case-sensitive, as if written with RFC 7405's %s.
 ; WS between two words is one space when the report prints a sentence.
 ; Spaces at either end of a line are dropped before it's read.
@@ -72,7 +72,7 @@ values            = value *("," [WS] value)
 value             = string / number / "true" / "false" / "null"
 
 ; Paths. The first key of a path, when bare, is never a word of the
-; grammar (sentences.md lists them); "." in front of it lifts that.
+; grammar (syntax.md lists them); "." in front of it lifts that.
 ; On the right side of a phrase a quoted string is a value, so a path
 ; there can't start with a quoted key unless a "." is in front of it.
 ; A position picks one item of the list a path ends at, counting from 1:

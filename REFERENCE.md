@@ -641,7 +641,7 @@ A policy can hold several requirements with different subjects over the same inp
 
 ## Checks
 
-A check is a sentence: one line of English. [spec/sentences.md](spec/sentences.md) has the full grammar. Write the sentence on its own, or under `assert` when the check has a `description` or `meta`:
+A check is a sentence: one line of English. [spec/syntax.md](spec/syntax.md) has the full grammar. Write the sentence on its own, or under `assert` when the check has a `description` or `meta`:
 
 ```yaml
 ergo_spec: v0.1
@@ -1142,6 +1142,8 @@ Ergo doesn't run every sentence the spec describes yet. These are written wrong 
 ```
 
 Pick the item on a `for` line instead, as the message says.
+
+In a `from` line or an `identified_by`, `named by` a bare word is written wrong too, with `unknown name <word>`, because there's no subject to read it from yet. And Ergo doesn't check the limit of three list walks that [sentence.for.depth](spec/syntax.md#the-for-line) sets.
 
 ## The report
 
