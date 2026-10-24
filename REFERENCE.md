@@ -907,7 +907,7 @@ click passes on `declared` and prometheus-client on `known`. leftpad fails both,
 
 The row reads every field the options read, once each. Its cause is the first, in the order of [causes](#causes), among the options, and an option's cause is the first among its sentences. Here `known` fails as `absent`, because the params have no licence for leftpad. An option with an `exists` sentence whose field is missing fails as `value` instead. The row has no `failed_assertions`. The check's `expression` is `one of: declared(some licenses.license.id is in $params.allowed_licenses) | known(licenses does not exist and $params.known_package_licenses named by name is in $params.allowed_licenses)`, with the options sorted by name.
 
-An `any_of` takes `description` and `meta`, but not `for` or `assert`. An `any_of` that isn't an object, an empty one, an empty option, or an option that isn't a sentence or a list of them is written wrong, with `invalid any_of`, `empty any_of`, `empty option <name>` or `invalid option <name>`. A problem with a sentence starts with its option's name, like `option known: line 2: doesn't parse`.
+An `any_of` takes `description` and `meta`, but not `for` or `assert`. An `any_of` that isn't an object, an empty one, an empty option, or an option that isn't a sentence or a list of them is written wrong, with `invalid any_of`, `empty any_of`, `empty option <name>` or `invalid option <name>`. A problem with a sentence starts with its option's name, and with the line's number when the option has more than one, like `option known: line 2: doesn't parse` or `option fast: values of mixed types`.
 
 `every` and `some` check each item of the lists along a path. `every pull_requests.commits.signed is true` walks the pull requests, then the commits of each, and checks each commit's `signed`. It passes when every one does. `some` passes when at least one does. With this input:
 
@@ -1435,7 +1435,7 @@ the inputs are:
 ]
 ```
 
-A sentence in an `any_of` option that doesn't parse is listed under the check, with the option's name in front, like `option standard: line 2: doesn't parse` under `checks.permitted`. A name that needs quotes is quoted: `checks."a.b"`.
+A problem with a sentence in an `any_of` option is listed under the check, with the option's name in front, like `option standard: line 2: doesn't parse` or `option standard: line 1: values of mixed types` under `checks.permitted`. A name that needs quotes is quoted: `checks."a.b"`.
 
 The fields of the requirement and its subject get an input of the same form when something is wrong with them. The requirement's own fields come first, named after the field, and then the subject's, named after the subject and the field. Each group is sorted by field. `require` is shown with its value when it's fine, and with what's wrong instead when it isn't, so no name appears twice. With a requirement like this on the same subject, with `from: deployments`:
 

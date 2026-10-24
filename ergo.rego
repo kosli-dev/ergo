@@ -2328,7 +2328,7 @@ _required_fields := {
 	"not_in": {"path", "values"},
 	"has_type": {"path", "type"},
 	"all_of": {"checks", "assertions"},
-	"sentence_any_of": {"checks", "assertions", "option_of"},
+	"sentence_any_of": {"checks", "assertions", "option_of", "places"},
 	"every": {"path", "check", "whose", "if_any"},
 	"for": {"items", "checks", "assertions"},
 	"some": {"path", "check", "whose", "if_any"},
@@ -3181,7 +3181,7 @@ _check_problem_inputs(req) := [{"name": name, "value": sort({p[1] | some p in pr
 	problems := _own_check_problems(req) | {p | some a in _ancestors_of(req); some p in _own_check_problems({"subject": a, "checks": {}})}
 }
 
-_own_check_problems(req) := {[_field_path_name(_problem_at(req, f, n, p[0])), p[1]] |
+_own_check_problems(req) := {_placed_problem(req, f, n, check, p) |
 	some f in ["applies_to", "checks"]
 	some n, check in _req_checks(req, f)
 	here := _s_written_here(req, f, n)
@@ -3200,6 +3200,13 @@ _req_checks(req, "checks") := _checks_of(req)
 _problem_at(req, "applies_to", n, _) := ["subjects", _resolution_of(req).filter_owners[n], "from"]
 
 _problem_at(_, "checks", n, at) := array.concat(["checks", n], at)
+
+_placed_problem(req, f, n, check, p) := [_field_path_name(["checks", n]), concat("", [check.places[p[0][1]], ": ", p[1]])] if {
+	f == "checks"
+	check.op == "sentence_any_of"
+	count(p[0]) > 1
+	p[0][0] == "checks"
+} else := [_field_path_name(_problem_at(req, f, n, p[0])), p[1]]
 
 _from_names(req, here) := ({n |
 	_from_well_formed(req)
@@ -5966,6 +5973,7 @@ _s_any_of(check, aliases, names) := object.union(object.filter(check, {"descript
 	"checks": [object.remove(p[0], ["expression"]) | some p in pairs],
 	"assertions": [p[1] | some p in pairs],
 	"option_of": [p[2] | some p in pairs],
+	"places": [place | some nm in _names(options); some place in _s_option_places(nm, _s_lines(check.any_of[nm]))],
 	"expression": _one_of([[_text(nm), _option_text(nm, texts, texts)] | some nm in _names(options); texts := [p[1] | some p in pairs; p[2] == nm]]),
 }) if {
 	count(_s_any_of_problems(check)) == 0
@@ -5982,6 +5990,12 @@ _s_any_of(check, aliases, names) := object.union(object.filter(check, {"descript
 _s_option_lines(m, nm) := [[c, m.assertions[i], nm] | some i, c in m.checks] if m.op == "all_of"
 
 _s_option_lines(m, nm) := [[m, m.expression, nm]] if m.op != "all_of"
+
+_s_option_places(nm, lines) := [_s_option_place(nm, i, count(lines)) | some i, line in lines; some _ in _sentence(line).assertions]
+
+_s_option_place(nm, _, 1) := concat("", ["option ", _text(nm)])
+
+_s_option_place(nm, i, n) := concat("", ["option ", _text(nm), ": line ", _literal_text(i + 1)]) if n > 1
 
 _s_any_of_problems(check) := {concat("", ["unknown field ", _text(f)]) | some f in object.keys(check); not f in {"any_of", "description", "meta"}} | _s_options_shape(check.any_of)
 
