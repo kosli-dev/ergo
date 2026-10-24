@@ -854,6 +854,15 @@ test_a_ref_step_that_reads_something_that_cannot_be_a_key_fails_as_unusable if {
 	[s[0], s[1]] == [false, "unusable"]
 }
 
+test_a_ref_step_that_reads_a_number_too_big_to_be_a_list_position_fails_as_unusable_so_does_not_exist_cannot_pass if {
+	check := ".a named by $params.i does not exist"
+	params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check) == [[true, "satisfied", [{"name": ".a named by $params.i", "value": null}]]] with data.params as {"i": 9007199254740991}
+	r := params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check)[0] with data.params as {"i": 9007199254740992}
+	[r[0], r[1]] == [false, "unusable"]
+	s := params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check)[0] with data.params as {"i": 1e20}
+	[s[0], s[1]] == [false, "unusable"]
+}
+
 test_a_check_with_a_number_too_big_for_a_float_fails_closed if {
 	stopped(solo({"id": 1, "n": 1e400}, "n is 1e400"))
 }
