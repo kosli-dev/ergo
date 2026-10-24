@@ -799,8 +799,7 @@
         "rules": ["sentence.every.walk", "sentence.written_wrong.slot", "written_wrong"],
         "input": {"things": [{"id": "t1", "pull_requests": [{"labels": ["hotfix"]}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["\"does not contain\" after every or some would check each item of the last list, not the list: put the walk on a for line"]}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["\"does not contain\" after every or some would check each item of the last list, not the list: put the walk on a for line"]}]}
         ]
       }
     ]

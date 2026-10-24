@@ -438,7 +438,7 @@ Read as `is` or `equals`, and printed as one of them. With it in the grammar, ev
 
 ## Written wrong
 
-**[sentence.written_wrong.slot]** A sentence that doesn't parse is written wrong, as any check that can't be read into the model is (see [written_wrong](semantics.md#the-model-of-a-check)). Its rows fail with `ill_formed` and `$well_formed` lists it. Because the grammar is flat, the message can name the slot, what it expected and the column:
+**[sentence.written_wrong.slot]** A sentence that doesn't parse is written wrong, as any check that can't be read into the model is (see [written_wrong](semantics.md#the-model-of-a-check)). `$well_formed` lists it, and the requirement gets no other row. Because the grammar is flat, the message can name the slot, what it expected and the column:
 
 | sentence                                                 | `$well_formed` says                                                             |
 | -------------------------------------------------------- | ------------------------------------------------------------------------------- |

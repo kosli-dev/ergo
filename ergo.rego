@@ -420,8 +420,6 @@ _with_fixed(req) := object.union(req, {"ergo/fixed": {
 	"scoped": _scoped_of(req),
 }}) if is_object(req)
 
-else := req
-
 _each_step_of(req) := step if {
 	f := _from_of(req)
 	is_array(f)
@@ -531,8 +529,6 @@ _every_kept(e, false) if _walk_container(e.v)
 
 _every_end_fail(e) := {"path": e.c, "item": e.c, "cause": _walk_stop_state(e.v), "value": _walk_shown(e.v)}
 
-_target_cause(_, req) := "value" if not _from_well_formed(req)
-
 _keys_step(req) if "keys" in object.keys(_each_step(req))
 
 default _target_state(_, _) := "absent"
@@ -625,8 +621,6 @@ _raw_entries(doc, req) := [] if {
 	_every_from(req)
 	not is_object(doc)
 }
-
-_raw_entries(_, req) := [] if not _from_well_formed(req)
 
 _raw_entries(doc, req) := [{"key": k, "subject": object.get(_keyed(doc, req), [k], _absent)} | some k in sort({k | some k in _listed_keys(_each_step(req))})] if {
 	_from_well_formed(req)
@@ -817,9 +811,9 @@ _check_outcome(check, subj, flaw) := {
 	"passed": _check_passed(check, subj, flaw),
 	"cause": _row_cause(check, subj, flaw),
 } if {
-	not _all_of_run(check, flaw)
-	not _any_of_run(check, flaw)
-	not _walk_run(check, flaw)
+	not _all_of_run(check)
+	not _any_of_run(check)
+	not _walk_run(check)
 	not _derived_once(check)
 }
 
@@ -931,36 +925,34 @@ _first_or_null([x]) := x
 
 _first_or_null([]) := null
 
-_check_outcome(check, subj, flaw) := {
+_check_outcome(check, subj, _) := {
 	"inputs": _with_key_fields(subj, check, r.inputs),
 	"passed": r.cause == "satisfied",
 	"cause": r.cause,
 	"failed_items": r.failed,
 } if {
 	_walks(check)
-	_walk_run(check, flaw)
+	_walk_run(check)
 	r := _walk_row(check, subj)
 }
 
-_walk_run(check, flaw) if {
+_walk_run(check) if {
 	check.op in {"every", "some", "for"}
-	flaw != "ill_formed"
 }
 
-_check_outcome(check, subj, flaw) := {
+_check_outcome(check, subj, _) := {
 	"inputs": r.inputs,
 	"passed": r.cause == "satisfied",
 	"cause": r.cause,
 	"failed_items": r.failed,
 } if {
 	check.op == "for"
-	_walk_run(check, flaw)
+	_walk_run(check)
 	r := _for_row(check, subj)
 }
 
-_all_of_run(check, flaw) if {
+_all_of_run(check) if {
 	check.op == "all_of"
-	flaw != "ill_formed"
 }
 
 _check_outcome(check, subj, flaw) := {
@@ -969,14 +961,13 @@ _check_outcome(check, subj, flaw) := {
 	"cause": _all_of_cause(failed),
 	"failed_assertions": failed,
 } if {
-	_all_of_run(check, flaw)
+	_all_of_run(check)
 	outs := [_assertion_out(c, subj, flaw) | some c in check.checks]
 	failed := [{"assertion": check.assertions[i], "cause": o.cause} | some i, o in outs; o.cause != "satisfied"]
 }
 
-_any_of_run(check, flaw) if {
+_any_of_run(check) if {
 	check.op == "sentence_any_of"
-	flaw != "ill_formed"
 }
 
 _check_outcome(check, subj, flaw) := {
@@ -984,7 +975,7 @@ _check_outcome(check, subj, flaw) := {
 	"passed": cause == "satisfied",
 	"cause": cause,
 } if {
-	_any_of_run(check, flaw)
+	_any_of_run(check)
 	outs := [_assertion_out(c, subj, flaw) | some c in check.checks]
 	lines := [_option_line_cause(c, outs[i].cause, subj) | some i, c in check.checks]
 	cause := _any_of_lines_cause(check.option_of, lines, flaw)
@@ -1076,11 +1067,6 @@ _subject_ref(subj, req) := {
 _subject_id(subj, req) := _value_at(subj, _id_of(req)) if {
 	is_object(subj)
 	is_array(_id_of(req))
-}
-
-_subject_id(subj, req) := null if {
-	is_object(subj)
-	not is_array(_id_of(req))
 }
 
 _subject_id(subj, _) := subj if not is_object(subj)
@@ -2356,21 +2342,13 @@ _required_fields := {
 	"any_of": {"options"},
 }
 
-_flaw(check, names, here) := _flaw_given(check, names, _ill_formed(check, names, here))
-
-_flaw_given(check, names, ill) := "ill_formed" if {
-	ill
-} else := "unusable" if {
+_flaw(check, names) := "unusable" if {
 	_param_broken(check, names)
 } else := "unusable" if {
 	_unreadable_input
 } else := ""
 
 _unreadable_input if data.ergo_unreadable != []
-
-default _ill_formed(_, _, _) := false
-
-_ill_formed(check, names, here) if count(_check_problems(check, names, here)) > 0
 
 _check_problems(check, names, here) := {[node[1], msg] |
 	some node in _static_nodes(check, names)
@@ -2801,7 +2779,7 @@ _is_collection(v) if is_array(v)
 
 _is_collection(v) if is_object(v)
 
-_cause_precedence := ["ill_formed", "not_an_object", "ambiguous", "unusable", "absent", "null"]
+_cause_precedence := ["not_an_object", "ambiguous", "unusable", "absent", "null"]
 
 _worst_read(subj, check) := _worst_or_value(_check_states(check, subj)) if not _unreadable_ref(check)
 
@@ -2944,9 +2922,7 @@ _applies_cause(_, _, _, true) := "satisfied"
 
 _applies_cause(subj, req, flaws, false) := _scope_cause(_failed_filter_causes(subj, req, flaws))
 
-_scope_cause(causes) := "ill_formed" if {
-	"ill_formed" in causes
-} else := "value" if {
+_scope_cause(causes) := "value" if {
 	"missing" in causes
 } else := "value" if {
 	causes == {"value"}
@@ -3004,8 +2980,6 @@ _option_body(group, texts) := concat(" and ", texts) if {
 default _two_sided(_) := false
 
 _two_sided(check) if check.op in {"compare", "compare_time"}
-
-default _check_inputs(_, _) := []
 
 _check_inputs(subj, check) := [_echoed(subj, check.inputs[k]) | some k in _names(check.inputs)] if {
 	check.inputs
@@ -3204,14 +3178,20 @@ _well_formed(req) if {
 }
 
 _check_problem_inputs(req) := [{"name": name, "value": sort({p[1] | some p in problems; p[0] == name})} | some name in sort({p[0] | some p in problems})] if {
-	problems := {[_field_path_name(_problem_at(req, f, n, p[0])), p[1]] |
-		some f in ["applies_to", "checks"]
-		some n, check in _req_checks(req, f)
-		here := _s_written_here(req, f, n)
-		found := _check_problems(check, _from_names(req, here), here)
-		some p in found
-	}
+	problems := _own_check_problems(req) | {p | some a in _ancestors_of(req); some p in _own_check_problems({"subject": a, "checks": {}})}
 }
+
+_own_check_problems(req) := {[_field_path_name(_problem_at(req, f, n, p[0])), p[1]] |
+	some f in ["applies_to", "checks"]
+	some n, check in _req_checks(req, f)
+	here := _s_written_here(req, f, n)
+	found := _check_problems(check, _from_names(req, here), here)
+	some p in found
+}
+
+_ancestors_of(req) := _s_ancestors(req.subject, data.ergo_subject_sentences.chains) if _chained(req)
+
+else := []
 
 _req_checks(req, "applies_to") := _applies_to_of(req)
 
@@ -3389,29 +3369,14 @@ _applies_inputs(subj, req) := [inp |
 	inp.name == name
 ]
 
-_evaluation(doc, req, name, parts) := object.union({"well_formed": _well_formed_row(req, name, parts)}, _evaluation_with(doc, req, name, _fixed_of(req, parts)))
+_evaluation(doc, req, name, parts) := object.union({"well_formed": _well_formed_row(req, name, parts)}, _evaluation_with(doc, req, name, _fixed(req)))
 
-_fixed_of(req, parts) := _fixed_with(req, v) if {
-	v := parts.ill
-} else := _fixed_with(req, _ill_of(req))
-
-_ill_of(req) := {
-	"filter": {n: _ill_formed(check, _from_names(req, here), here) |
+_fixed(req) := {
+	"filter_flaws": {n: _flaw(check, _from_names(req, here)) |
 		some n, check in _applies_to_of(req)
 		here := _s_written_here(req, "applies_to", n)
 	},
-	"check": {n: _ill_formed(check, _from_names(req, here), here) |
-		some n, check in _checks_of(req)
-		here := _s_written_here(req, "checks", n)
-	},
-}
-
-_fixed_with(req, ill) := {
-	"filter_flaws": {n: _flaw_given(check, _from_names(req, here), ill.filter[n]) |
-		some n, check in _applies_to_of(req)
-		here := _s_written_here(req, "applies_to", n)
-	},
-	"check_flaws": {n: _flaw_given(check, _from_names(req, here), ill.check[n]) |
+	"check_flaws": {n: _flaw(check, _from_names(req, here)) |
 		some n, check in _checks_of(req)
 		here := _s_written_here(req, "checks", n)
 	},
@@ -3600,7 +3565,7 @@ _read_ahead(policy) := object.union(rd, {"ahead": ahead}) if {
 	ahead := {
 		"policy_problems": _policy_problem_inputs(policy),
 		"listed": _reported_subjects(_section(policy, "subjects"), rd.reqs),
-		"requirements": {name: {"well_formed": _well_formed_row_of(req, name), "defs": _requirement_check_defs(req), "ill": _ill_of(req)} | some name, req in rd.reqs},
+		"requirements": {name: {"well_formed": _well_formed_row_of(req, name), "defs": _requirement_check_defs(req)} | some name, req in rd.reqs},
 	} with data.ergo_policy_problems as _policy_problem_inputs(policy) with data.ergo_document as {} with data.ergo_params as {} with data.ergo_subjects as rd.subjects with data.ergo_resolved as rd.resolved with data.ergo_reading as true with data.ergo_unreadable as [] with data.ergo_sentences as rd.sentences with data.ergo_subject_sentences as rd.subject_sentences with input as {"ergo/names": {}}
 }
 
@@ -3860,7 +3825,25 @@ _report_of(doc, policy, compiled) := {
 	},
 	"results": _results(policy, evaluations),
 } if {
-	evaluations := {name: _evaluated(doc, policy[name], name, object.get(compiled, name, {})) | some name in _names(policy)}
+	evaluations := {name: _checked(doc, policy[name], name, object.get(compiled, name, {})) | some name in _names(policy)}
+}
+
+_checked(doc, req, name, parts) := _checked_with(doc, req, name, parts, _well_formed_row(req, name, parts))
+
+_checked_with(_, _, _, _, row) := _written_wrong(row) if not row.passed
+
+_checked_with(doc, req, name, parts, row) := _evaluated(doc, req, name, object.union(parts, {"well_formed": row})) if row.passed
+
+_written_wrong(row) := {
+	"well_formed": row,
+	"min_subjects": [],
+	"unique_ids": [],
+	"applies": [],
+	"subject_rows": [],
+	"total": 0,
+	"matching": 0,
+	"scope_readable": true,
+	"rows_complete": true,
 }
 
 _evaluated(doc, req, name, parts) := e if {
@@ -3873,7 +3856,7 @@ _evaluated(doc, req, name, parts) := _chain_evaluation(req, name, _parent_pick(d
 	not _grand_chained(req)
 }
 
-_evaluated(doc, req, name, parts) := _grand_evaluation(req, name, _parent_pick_of(doc, {"subject": grand, "checks": {}}), parent, grand, _fixed_of(req, parts), parts) if {
+_evaluated(doc, req, name, parts) := _grand_evaluation(req, name, _parent_pick_of(doc, {"subject": grand, "checks": {}}), parent, grand, _fixed(req), parts) if {
 	_grand_chained(req)
 	parent := data.ergo_subject_sentences.chains[req.subject]
 	grand := data.ergo_subject_sentences.chains[parent]
@@ -3923,7 +3906,7 @@ _grandchild_evaluation(req, name, parent, grand, g, p, _) := {
 }
 
 _chain_evaluation(req, name, pick, parts) := _parents_evaluation(req, name, [_parent_evaluation(req, name, pick.parent, p, fixed) | some p in pick.parents], parts) if {
-	fixed := _fixed_of(req, parts)
+	fixed := _fixed(req)
 	"parents" in object.keys(pick)
 	count(pick.parents) > 0
 }
@@ -4001,7 +3984,7 @@ _parent_pick_of(doc, preq) := {"cause": c} if {
 	flaws := {n: flaw |
 		some n, check in _applies_to_of(preq)
 		here := _s_written_here(preq, "applies_to", n)
-		flaw := _flaw(check, _from_names(preq, here), here)
+		flaw := _flaw(check, _from_names(preq, here))
 	}
 	refs := {i: _entry_ref_of(entry, preq) | some i, entry in raw}
 	matches := {i: _subject_matches(entry.subject, preq, flaws) | some i, entry in raw}

@@ -7167,7 +7167,7 @@
     },
     "cases": [
       {
-        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": [
           "sentence.derived.compare",
           "sentence.written_wrong.slot",
@@ -7208,17 +7208,6 @@
                 ]
               }
             ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "type": "release",
-              "id": "r1"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "ill_formed",
-            "inputs": []
           }
         ]
       }
@@ -8005,7 +7994,7 @@
     },
     "cases": [
       {
-        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": [
           "sentence.derived.compare",
           "sentence.written_wrong.slot",
@@ -8046,17 +8035,6 @@
                 ]
               }
             ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "type": "release",
-              "id": "r1"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "ill_formed",
-            "inputs": []
           }
         ]
       }
@@ -8083,7 +8061,7 @@
     },
     "cases": [
       {
-        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": [
           "sentence.derived.compare",
           "sentence.written_wrong.slot",
@@ -8124,17 +8102,6 @@
                 ]
               }
             ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "type": "release",
-              "id": "r1"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "ill_formed",
-            "inputs": []
           }
         ]
       }
@@ -10840,17 +10807,6 @@
                 ]
               }
             ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "id": "v1",
-              "type": "vuln"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "ill_formed",
-            "inputs": []
           }
         ],
         "expressions": {
@@ -12692,7 +12648,7 @@
     },
     "cases": [
       {
-        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": [
           "sentence.derived.elapsed",
           "sentence.derived.compare",
@@ -12735,17 +12691,6 @@
                 ]
               }
             ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "id": "v1",
-              "type": "vuln"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "ill_formed",
-            "inputs": []
           }
         ],
         "expressions": {
@@ -12777,7 +12722,7 @@
     },
     "cases": [
       {
-        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": [
           "sentence.derived.elapsed",
           "sentence.written_wrong.slot",
@@ -12819,17 +12764,6 @@
                 ]
               }
             ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "id": "v1",
-              "type": "vuln"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "ill_formed",
-            "inputs": []
           }
         ],
         "expressions": {

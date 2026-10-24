@@ -4966,7 +4966,7 @@
     },
     "cases": [
       {
-        "description": "fails every row as ill_formed with no inputs, and $well_formed lists the problem",
+        "description": "fails $well_formed, which lists the problem, and the requirement gets no other row",
         "rules": [
           "sentence.for.line",
           "written_wrong",
@@ -5015,17 +5015,6 @@
                 ]
               }
             ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "type": "release",
-              "id": "r1"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "ill_formed",
-            "inputs": []
           }
         ]
       }
@@ -5055,7 +5044,7 @@
     },
     "cases": [
       {
-        "description": "fails every row as ill_formed with no inputs, and $well_formed lists the problem",
+        "description": "fails $well_formed, which lists the problem, and the requirement gets no other row",
         "rules": [
           "sentence.for.alias",
           "written_wrong",
@@ -5104,17 +5093,6 @@
                 ]
               }
             ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "type": "release",
-              "id": "r1"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "ill_formed",
-            "inputs": []
           }
         ]
       }
@@ -5144,7 +5122,7 @@
     },
     "cases": [
       {
-        "description": "fails every row as ill_formed with no inputs, and $well_formed lists the problem",
+        "description": "fails $well_formed, which lists the problem, and the requirement gets no other row",
         "rules": [
           "sentence.for.alias",
           "written_wrong",
@@ -5193,17 +5171,6 @@
                 ]
               }
             ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "type": "release",
-              "id": "r1"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "ill_formed",
-            "inputs": []
           }
         ]
       }
@@ -5233,7 +5200,7 @@
     },
     "cases": [
       {
-        "description": "fails every row as ill_formed with no inputs, and $well_formed lists the problem",
+        "description": "fails $well_formed, which lists the problem, and the requirement gets no other row",
         "rules": [
           "sentence.for.alias",
           "written_wrong",
@@ -5282,17 +5249,6 @@
                 ]
               }
             ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "type": "release",
-              "id": "r1"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "ill_formed",
-            "inputs": []
           }
         ]
       }
@@ -5322,7 +5278,7 @@
     },
     "cases": [
       {
-        "description": "fails every row as ill_formed with no inputs, and $well_formed lists the problem",
+        "description": "fails $well_formed, which lists the problem, and the requirement gets no other row",
         "rules": [
           "sentence.for.alias",
           "written_wrong",
@@ -5371,17 +5327,6 @@
                 ]
               }
             ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "type": "release",
-              "id": "r1"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "ill_formed",
-            "inputs": []
           }
         ]
       }
@@ -6792,17 +6737,6 @@
             "requirement": "s",
             "subject": {
               "id": null,
-              "type": "pull_request"
-            }
-          },
-          {
-            "cause": "ill_formed",
-            "check": "c",
-            "inputs": [],
-            "passed": false,
-            "requirement": "s",
-            "subject": {
-              "id": "pr1",
               "type": "pull_request"
             }
           }
