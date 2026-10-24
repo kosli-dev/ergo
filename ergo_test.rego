@@ -3002,6 +3002,14 @@ test_the_applies_row_lists_each_field_its_filters_read_once_in_name_order if {
 	[i.name | some i in rows_for(rep, "s", "$applies")[0].inputs] == ["kind", "status"]
 }
 
+test_the_report_never_reads_data_params if {
+	policy := lifted(params_req("name is $params.artifact_name"))
+	rep := ergo.report({"items": [{"id": 1, "name": "app"}]}, policy, {"artifact_name": "app"}) with data.params as {"artifact_name": "web"}
+	[[r.passed, r.inputs] | some r in rows_for(rep, "s", "c")] == [[true, [{"name": "name", "value": "app"}, {"name": "$params.artifact_name", "value": "app"}]]]
+	unset := ergo.report({"items": [{"id": 1, "name": "app"}]}, policy, {}) with data.params as {"artifact_name": "app"}
+	[r.cause | some r in rows_for(unset, "s", "c")] == ["absent"]
+}
+
 empty_report := {"compliant": false, "description": "", "engine": {"name": "ergo.rego", "version": ergo.version}, "ergo": "v0.1", "meta": {}, "requirements": {}, "results": [], "subjects": {}}
 
 test_a_policy_without_requirements_is_not_compliant if {
