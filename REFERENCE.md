@@ -164,7 +164,7 @@ A few details:
 - No two subjects can share an id, or their rows could be identical and the report couldn't say which one failed. If two do, `$unique_ids` fails and so does the requirement. Every subject counts, even one that its conditions leave out, and `null` is an id like any other, so two subjects without one clash.
 - An item of the list that isn't an object, like a string or a `null`, is still a subject. Its id is the item itself, and its checks fail with cause `not_an_object`.
 - Without `from`, a subject reads the input field named like it, so `artifact` reads `artifact`. A subject with nothing under it, `artifact:` alone in YAML, does the same. To check the whole input as one subject, write `from: $input`. Without `identified_by`, each row repeats the whole subject as its id, so two identical subjects clash.
-- A subject that's written wrong fails `$well_formed` on every requirement that names it, so none of them is met. That's a subject that isn't an object, or that has a field that isn't in the table above, like `subject_type`, `applies_to` or `of`, or whose `from` or `identified_by` isn't a string or can't be read, or whose `description` isn't a string. The `$well_formed` row names each field with its subject, like `{"name": "subjects.deployment.from", "value": ["doesn't parse"]}` or `{"name": "subjects.deployment.from", "value": ["not a string"]}` for a list. Ergo reads such a `from` as giving no subjects (shown as `<invalid from>`), so `$min_subjects` fails as `value`, even with `min_subjects: 0`, and an `identified_by` as giving the id `null`.
+- A subject that's written wrong fails `$well_formed` on every requirement that names it, so none of them is met. That's a subject that isn't an object, or that has a field that isn't in the table above, like `subject_type`, `applies_to` or `of`, or whose `from` or `identified_by` isn't a string or can't be read, or whose `description` isn't a string. The `$well_formed` row names each field with its subject, like `{"name": "subjects.deployment.from", "value": ["doesn't parse"]}` or `{"name": "subjects.deployment.from", "value": ["not a string"]}` for a list. A subject with an unknown field is still found and checked. A `from` that isn't a string or can't be read gives no subjects (shown as `<invalid from>`), so `$min_subjects` fails as `value`, even with `min_subjects: 0`, and an `identified_by` that can't be read gives the id `null`.
 
 ### From lines
 
@@ -301,7 +301,7 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
     identified_by: sha
   ```
 
-  Each commit row says which artifact and which pull request it belongs to, like `"in": {"artifact": "sha-1", "pull request": "pr/7"}`, and each pull request gets its own `$min_subjects` and `$unique_ids` rows. An artifact or a pull request that's out of scope leaves out everything below it. An artifact whose conditions can't be decided gets one failing `$min_subjects` row, with `"in": {"artifact": ...}`. A check reads any ancestor by its name, like `artifact.name` or `"pull request".title`, and its parts too. A fourth level is written wrong, with `a chain of more than three subjects isn't supported yet`, and so is a subject that builds on a child subject with `of` or a from line that narrows it.
+  Each commit row says which artifact and which pull request it belongs to, like `"in": {"artifact": "sha-1", "pull request": "pr/7"}`, and each pull request gets its own `$min_subjects` and `$unique_ids` rows. An artifact or a pull request that's out of scope leaves out everything below it. An artifact whose conditions can't be decided gets one failing `$min_subjects` row, with `"in": {"artifact": ...}`. A check reads any ancestor by its name, like `artifact.name` or `"pull request".title`, and its parts too. A fourth level is written wrong, with `a chain of more than three subjects isn't supported yet`, and so is a subject whose from line narrows a child subject.
 - `every` in front of the path walks every list along it, the last one included, as [`every`](#checks) does in a check, and each value it ends at is a subject. With this input:
 
   ```json
@@ -1434,7 +1434,7 @@ the inputs are:
 ]
 ```
 
-A sentence in an `any_of` option is named further in, like `checks.permitted.options.standard.1` for the second sentence of an option. A name that needs quotes is quoted: `checks."a.b"`.
+A sentence in an `any_of` option that doesn't parse is listed under the check, with the option's name in front, like `option standard: line 2: doesn't parse` under `checks.permitted`. A name that needs quotes is quoted: `checks."a.b"`.
 
 The fields of the requirement and its subject get an input of the same form when something is wrong with them. The requirement's own fields come first, named after the field, and then the subject's, named after the subject and the field. Each group is sorted by field. `require` is shown with its value when it's fine, and with what's wrong instead when it isn't, so no name appears twice. With a requirement like this on the same subject, with `from: deployments`:
 
