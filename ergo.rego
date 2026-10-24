@@ -5234,11 +5234,15 @@ _spec_problems(v) := {"missing"} if v == null
 
 else := {"not a string"} if not is_string(v)
 
-else := {"unknown version"} if v != _spec
+else := {concat("", ["not a version ", v])} if not _is_version(v)
+
+else := {concat("", ["unsupported version ", v, ", expected ", _spec])} if v != _spec
 
 else := set()
 
 _spec := "v0.1"
+
+_is_version(v) if regex.match(`^v[0-9]+\.[0-9]+$`, v)
 
 _policy_field_problems(f, v) := {_wrong_type_problems[f]} if not _has_type(f, v)
 

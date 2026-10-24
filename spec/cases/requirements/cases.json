@@ -1432,7 +1432,7 @@
     },
     "cases": [
       {
-        "description": "fails the $well_formed row of every requirement because an implementation follows one version",
+        "description": "fails the $well_formed row of every requirement, and the row names both versions",
         "rules": [
           "policy.version"
         ],
@@ -1464,7 +1464,7 @@
               {
                 "name": "policy ergo_spec",
                 "value": [
-                  "unknown version"
+                  "unsupported version v9.9, expected v0.1"
                 ]
               }
             ],
@@ -1490,7 +1490,139 @@
               {
                 "name": "policy ergo_spec",
                 "value": [
-                  "unknown version"
+                  "unsupported version v9.9, expected v0.1"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "t",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": 1,
+              "type": "subject"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "t",
+            "subject": {
+              "id": 1,
+              "type": "subject"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a policy whose ergo_spec is a string that isn't a version",
+    "policy": {
+      "ergo_spec": "V0.1",
+      "subjects": {
+        "subject": {
+          "from": "t",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "subject",
+          "checks": {
+            "c": "x exists"
+          }
+        },
+        "t": {
+          "subject": "subject",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails the $well_formed row of every requirement, and the row shows the value",
+        "rules": [
+          "policy.version"
+        ],
+        "input": {
+          "t": [
+            {
+              "id": 1,
+              "x": 1
+            }
+          ]
+        },
+        "report": {
+          "ergo": "v0.1"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "policy ergo_spec",
+                "value": [
+                  "not a version V0.1"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "policy ergo_spec",
+                "value": [
+                  "not a version V0.1"
                 ]
               }
             ],

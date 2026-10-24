@@ -3057,12 +3057,29 @@ test_an_ergo_spec_that_is_not_a_string_is_written_wrong_because_yaml_reads_0_1_a
 }
 
 test_an_engine_reads_only_the_version_it_follows_so_any_other_ergo_spec_is_written_wrong if {
-	every v in ["v0.2", "v1.0", "0.1", "V0.1", "v0.1.0", " v0.1", ""] {
+	every v in ["v0.2", "v1.0", "v10.25"] {
+		expected := concat("", ["unsupported version ", v, ", expected v0.1"])
 		_spec_rows(two_reqs_policy({"ergo_spec": v})) == [false, [
-			["s", false, [{"name": "policy ergo_spec", "value": ["unknown version"]}]],
-			["t", false, [{"name": "policy ergo_spec", "value": ["unknown version"]}]],
+			["s", false, [{"name": "policy ergo_spec", "value": [expected]}]],
+			["t", false, [{"name": "policy ergo_spec", "value": [expected]}]],
 		]]
 	}
+}
+
+test_an_ergo_spec_that_is_not_shaped_like_a_version_is_written_wrong_and_the_row_shows_it if {
+	every v in ["0.1", "V0.1", "v0.1.0", " v0.1", "v0.1 ", "v.1", "v1", ""] {
+		expected := concat("", ["not a version ", v])
+		_spec_rows(two_reqs_policy({"ergo_spec": v})) == [false, [
+			["s", false, [{"name": "policy ergo_spec", "value": [expected]}]],
+			["t", false, [{"name": "policy ergo_spec", "value": [expected]}]],
+		]]
+	}
+}
+
+test_the_expected_version_in_the_row_is_the_one_the_report_says_it_follows if {
+	rep := ergo.report({"items": [{"id": 1}]}, two_reqs_policy({"ergo_spec": "v0.2"}), {})
+	row := [i.value[0] | some r in rep.results; r.check == "$well_formed"; some i in r.inputs; i.name == "policy ergo_spec"][0]
+	endswith(row, concat("", [", expected ", rep.ergo]))
 }
 
 test_the_policys_own_problems_are_sorted_by_name if {
