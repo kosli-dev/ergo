@@ -1540,5 +1540,21 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a requirement whose check doesn't parse, on a subject with a condition",
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things whose x exists", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is \"a"}}}},
+    "cases": [
+      {
+        "description": "gets only its $well_formed row, but still lists every check with its expression, the ones Ergo adds included",
+        "rules": ["well_formed", "written_wrong"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "requirements": {"s": {"status": "not_met", "subjects": {"matching": 0, "total": 0}}},
+        "expressions": {"s": {"$applies": "x exists", "$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "c": "x is \"a"}},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["unclosed quote at column 6"]}]}
+        ]
+      }
+    ]
   }
 ]
