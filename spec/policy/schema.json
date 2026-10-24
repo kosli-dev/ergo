@@ -520,54 +520,12 @@
         },
         "inputs": {
           "type": "array"
-        },
-        "substitute": {
-          "$ref": "#/$defs/check"
         }
       }
     },
-    "builtin_ops": {
-      "enum": [
-        "equals",
-        "in",
-        "present",
-        "missing",
-        "non_empty_string",
-        "empty",
-        "matches_any",
-        "not_matches_any",
-        "range",
-        "includes",
-        "excludes",
-        "compare",
-        "compare_time",
-        "all",
-        "any",
-        "any_of"
-      ]
-    },
     "check": {
-      "description": "A check in checks or applies_to. It can have a substitute, and its op can be a custom operator.",
-      "anyOf": [
-        {
-          "$ref": "#/$defs/builtin_check"
-        },
-        {
-          "description": "A custom operator. It can have any fields, and its op must be declared to Ergo.",
-          "type": "object",
-          "properties": {
-            "op": {
-              "type": "string",
-              "not": {
-                "$ref": "#/$defs/builtin_ops"
-              }
-            }
-          },
-          "required": [
-            "op"
-          ]
-        }
-      ]
+      "description": "A check in checks or applies_to.",
+      "$ref": "#/$defs/builtin_check"
     },
     "builtin_check": {
       "type": "object",
@@ -844,7 +802,7 @@
       "unevaluatedProperties": false
     },
     "inner_check": {
-      "description": "The check inside all or any. It can't be a custom operator, and a substitute on it is ignored.",
+      "description": "The check inside all or any.",
       "$ref": "#/$defs/builtin_check"
     },
     "option": {

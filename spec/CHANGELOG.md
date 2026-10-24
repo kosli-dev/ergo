@@ -10,3 +10,5 @@ The first version. Policies need `ergo_spec: v0.1` at their top, and reports get
 - A report says what made it in `engine`.
 - A report's hash is the SHA-256 of the report without `engine`, written as RFC 8785 says.
 - The schemas have `$id`s under `https://ergo.kosli.com/spec/0.1/`.
+- Custom operators go, because a sentence can't call one. They come back once a definition format is built, see [OPEN.md](OPEN.md#custom-operators).
+- Substitutes go, since an `any_of` of sentences says the same. Reports lose the `substituted` cause.

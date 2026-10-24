@@ -12,7 +12,7 @@ Draft 0.1. Ergo is three specs, and `ergo.rego` is an implementation of them:
 
 When an implementation and the spec disagree, the implementation is wrong. A change to Ergo's behaviour starts here, with the rule and its cases, and then goes into each implementation.
 
-The spec covers reading values, causes, expressions, every built-in operator, requirements, scope, substitutes, statuses, row order and violations. How a subject's `from` names subjects (`each_as` and `keys`), subjects built on another with `of`, params passed in and values JSON can't hold are still described only in [REFERENCE.md](../REFERENCE.md). [OPEN.md](OPEN.md) lists the questions the spec hasn't settled. A subject's `from` waits for [#174](https://github.com/kosli-dev/ergo/issues/174) and [#113](https://github.com/kosli-dev/ergo/issues/113), which may change how it's written. The spec will change while it's 0.x.
+The spec covers reading values, causes, expressions, every built-in operator, requirements, scope, statuses, row order and violations. How a subject's `from` names subjects (`each_as` and `keys`), subjects built on another with `of`, params passed in and values JSON can't hold are still described only in [REFERENCE.md](../REFERENCE.md). [OPEN.md](OPEN.md) lists the questions the spec hasn't settled. A subject's `from` waits for [#174](https://github.com/kosli-dev/ergo/issues/174) and [#113](https://github.com/kosli-dev/ergo/issues/113), which may change how it's written. The spec will change while it's 0.x.
 
 ## Versions
 
@@ -73,14 +73,6 @@ and this is the case:
 ## Running the cases
 
 `spec_test.rego` runs every case against `ergo.rego`, with one test for each folder of cases, so no test runs long enough to hit the timeout. A new folder needs its test added there too, and a test fails until it is. Its `known_differences` lists the cases an implementation is known to fail, which is where it still differs from the spec. A folder's test fails when another case in it fails, and also when a listed case passes, so the list stays true.
-
-The cases in `cases/custom` use three custom operators that a runner has to supply, each failing when a field it reads isn't found:
-
-- `even`, which reads `path` and passes when it holds an even whole number
-- `multiple_of`, which reads `path` and takes `by`, and passes when the field is a whole multiple of `by`
-- `both_present`, which reads every path in `paths` and passes when they're all found
-
-`custom_op_test.rego` defines them for `ergo.rego`.
 
 To list the cases `ergo.rego` fails:
 

@@ -38,7 +38,7 @@ subjects:
 
 **[parts.written_wrong]** A part written wrong makes its subject written wrong, so the `$well_formed` row of every requirement that uses the subject fails. It lists the problems under the part's alias, like `subjects.round.has.coverage`, and under `subjects.round.has` when `has` isn't an object, which is written `not an object`. A part that's neither a string nor an object is written `not a string or an object`, and an object without `from` `missing from`. A field other than `from` and `identified_by` is written `unknown field <name>`, and a `from` or `identified_by` that isn't a string `invalid from` or `invalid identified_by`. A path that can't be read is written `from: <problem>` or `identified_by: <problem>`, with the problems of a path in a `from` line, or `a part is a path: whose and named by each of can't go in it` and `a part reads inside its subject, so it can't start at $params or $input`. A bad alias is written `invalid alias` and a repeated one `alias given twice`. A part written wrong is never read as an alias, and the report still lists it, see [report.subjects](semantics.md#statuses).
 
-**[parts.old_syntax]** A check written with `op` reads a part as `$alias` in the first step of a path, like `["$coverage", "attestation_data", "hunks_total"]`, wherever it can read an alias given by `as`, including in the paths of a derived value and of a custom operator's `inputs`, in a substitute, and in the filters of `applies_to`. Inside an item of `all` or `any`, `$alias` still reads the subject, as any alias from outside the item does. Any other `$name` that nothing gave is `unknown alias $<name>` as before.
+**[parts.old_syntax]** A check written with `op` reads a part as `$alias` in the first step of a path, like `["$coverage", "attestation_data", "hunks_total"]`, wherever it can read an alias given by `as`, including in the paths of a derived value and of `inputs`, and in the filters of `applies_to`. Inside an item of `all` or `any`, `$alias` still reads the subject, as any alias from outside the item does. Any other `$name` that nothing gave is `unknown alias $<name>` as before.
 
 ## Paths
 
@@ -54,14 +54,6 @@ subjects:
 
 **[value.nested]** A ref or literal anywhere deeper inside a value, like `[{"ref": [...]}]`, is written wrong, because it would be compared as an object. So is an object with a `ref` or `literal` key and any other key, or a ref whose path doesn't start with `$$input` or `$$params`. What's wrong is written `ref inside <field>`, `literal inside <field>` or `invalid ref`.
 
-## Substitutes
-
-**[substitute.syntax]** A check's `substitute` field holds its substitute, written like any other check.
-
-## Custom operators
-
-**[custom.syntax]** A custom operator check can have any fields, besides `op`. Because Ergo can't work out what the operator reads or how to describe it, the check also gives `expression`, the text the report shows, and `inputs`, a list of the paths it reads. An entry in `inputs` can be a path, or `{"path": [...], "each": [...]}` to read one field from every item of a list. `ergo.rego` needs them. An engine that knows more about the operator, like the Rust port on the `core/conformance-suite` branch, uses them when they're there.
-
 ## Compare
 
 **[compare.derived]** A side of `compare` can also be a `literal`, or a value worked out from the subject: `count`, `sum` or `add`. [REFERENCE.md](../REFERENCE.md#derived-values) says how each one is written and read. A side that isn't a path, a `literal` or one of those is written wrong, and the `$well_formed` row says `invalid left` or `invalid right`. `compare` also takes `within` with `eq`.
@@ -70,7 +62,7 @@ subjects:
 
 **[written_wrong.row]** A check [written wrong](semantics.md#the-model-of-a-check) makes the `$well_formed` row list it in its `inputs`, after `count(checks)` and `require`, sorted by name, with the list of what's wrong, sorted. A check of the requirement is named `checks.<name>`. A filter is named `subjects.<subject>.applies_to.<name>`, and a field of a subject definition `subjects.<subject>.<field>`, like `subjects.deployment.from`. An `ergo_spec`, `description` or `meta` of the policy that's written wrong comes last, named `policy ergo_spec`, `policy description` or `policy meta` and sorted by name, in words and not as a path, because a name that starts with `$` is one a check can read.
 
-**[written_wrong.fields]** A check is written wrong when a parameter its operator needs is missing, which is written `missing <field>`, or when it has a field its operator doesn't take, written `unknown field <name>`. Besides its own parameters, any check can have `description`, `meta`, `expression`, `substitute` and `inputs`. A path that isn't a list is written `path not a list`, and one with a step that can't be a step is written `step that can't be a key in path`. The same goes for `left`, `right` and `each`.
+**[written_wrong.fields]** A check is written wrong when a parameter its operator needs is missing, which is written `missing <field>`, or when it has a field its operator doesn't take, written `unknown field <name>`. Besides its own parameters, any check can have `description`, `meta`, `expression` and `inputs`. A path that isn't a list is written `path not a list`, and one with a step that can't be a step is written `step that can't be a key in path`. The same goes for `left`, `right` and `each`.
 
 **[written_wrong.inputs]** A check whose path is missing or isn't a list has nothing to name, so its row's `inputs` is `[]`. So does a `compare` or `compare_time` whose `left` or `right` is missing or isn't a list, and an `all` or `any` whose inner check is missing or isn't an object.
 
@@ -84,9 +76,9 @@ subjects:
 
 **[compare.written_wrong]** A `cmp` that isn't one of `eq`, `ne`, `gt`, `gte`, `lt` and `lte` is written `invalid cmp`. A `compare` or `compare_time` check has no `path`.
 
-**[list.written_wrong]** An alias in `as` must be a string that doesn't start with `$` and isn't `params` or `input`, which would name like the params and the input, or it's written `invalid alias`. An alias already given is written `alias given twice`, and a path starting with an alias nothing gave is written `unknown alias $<alias>`. `as` or `each` on another operator is written `as can't go here` or `each can't go here`. A missing inner check is written `missing check`, one that isn't an object `invalid check`, a third level `nested too deep`, and a custom operator `<op> can't go here` (see [REFERENCE.md](../REFERENCE.md#custom-operators)).
+**[list.written_wrong]** An alias in `as` must be a string that doesn't start with `$` and isn't `params` or `input`, which would name like the params and the input, or it's written `invalid alias`. An alias already given is written `alias given twice`, and a path starting with an alias nothing gave is written `unknown alias $<alias>`. `as` or `each` on another operator is written `as can't go here` or `each can't go here`. A missing inner check is written `missing check`, one that isn't an object `invalid check`, and a third level `nested too deep`.
 
-**[any_of.written_wrong]** `options` is an object of named options, or a list of them, named by their position as text: `"0"`, `"1"` and so on. A missing `options` is written `missing options`, an empty one `empty options`, an empty option `empty option <name>`, an option that isn't a list `option <name> not a list`, and an `any_of` or custom operator inside an option `<op> can't go here`.
+**[any_of.written_wrong]** `options` is an object of named options, or a list of them, named by their position as text: `"0"`, `"1"` and so on. A missing `options` is written `missing options`, an empty one `empty options`, an empty option `empty option <name>`, an option that isn't a list `option <name> not a list`, and an `any_of` inside an option `any_of can't go here`.
 
 ## Naming a path
 
@@ -139,8 +131,6 @@ Each check's definition in the report has an `expression` that says what it chec
 **[compare.expression]** `<left> <cmp> <right>`, like `x lt $input.limit`, with `cmp` as written.
 
 **[time.expression]** Written like `compare`'s.
-
-**[substitute.expression]** A check with a substitute is shown as `<check>, or substitute: <substitute>`, like `pull_request is present, or substitute: verified == true`.
 
 **[list.expression]** `every <list>: <inner>` or `some <list>: <inner>`, with the inner check's paths named inside the item. With `each`, the list is shown as `<list>[].<each>`, and with `as`, it's followed by ` as $<alias>`. A path with no steps in the inner check is named `<list>[]`, like `every bs: bs[] matches one of ["^main$"]`. A missing or badly written inner check is shown as `<missing check>`, `<invalid check>`, `<nested too deep>` or `<op can't go here>`, and a bad alias as `<invalid alias>` or `<alias given twice>`.
 

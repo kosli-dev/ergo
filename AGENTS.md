@@ -6,7 +6,6 @@ Ergo is a Rego library that turns policy evaluation into a structured report. Us
 
 - `ergo.rego` is the whole library.
 - `ergo_test.rego` holds its tests.
-- `custom_op_test.rego` defines custom operators that only the tests use.
 - `spec/` is the spec Ergo implements: what each check means as named rules, the syntax, JSON Schemas for a policy and a report, and cases that pin the rules down. `spec/README.md` explains it.
 - `spec_test.rego` runs every case in `spec/cases` against `ergo.rego`.
 - `README.md` walks a new user through a first policy.

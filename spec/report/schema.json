@@ -29,7 +29,7 @@
   "required": ["compliant", "description", "engine", "ergo", "meta", "requirements", "results", "subjects"],
   "additionalProperties": false,
   "$defs": {
-    "cause": {"enum": ["satisfied", "substituted", "ill_formed", "not_an_object", "ambiguous", "unmatched", "unusable", "absent", "null", "value"]},
+    "cause": {"enum": ["satisfied", "ill_formed", "not_an_object", "ambiguous", "unmatched", "unusable", "absent", "null", "value"]},
     "subject": {
       "type": "object",
       "properties": {
@@ -150,8 +150,8 @@
       "required": ["requirement", "subject", "check", "inputs", "passed", "cause"],
       "additionalProperties": false,
       "if": {"properties": {"passed": {"const": true}}},
-      "then": {"properties": {"cause": {"enum": ["satisfied", "substituted"]}}},
-      "else": {"properties": {"cause": {"not": {"enum": ["satisfied", "substituted"]}}}}
+      "then": {"properties": {"cause": {"const": "satisfied"}}},
+      "else": {"properties": {"cause": {"not": {"const": "satisfied"}}}}
     },
     "failed_assertions": {
       "type": "array",
