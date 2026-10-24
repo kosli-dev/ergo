@@ -1,7 +1,7 @@
 [
   {
     "description": "a check with a substitute",
-    "policy": {"subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["pull_request"], "substitute": {"op": "equals", "path": ["verified"], "value": true}}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["pull_request"], "substitute": {"op": "equals", "path": ["verified"], "value": true}}}}}},
     "cases": [
       {
         "description": "passes as satisfied when the check passes",
@@ -68,7 +68,7 @@
   },
   {
     "description": "a substitute whose field is null",
-    "policy": {"subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["s"], "value": "M", "substitute": {"op": "equals", "path": ["w"], "value": true}}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["s"], "value": "M", "substitute": {"op": "equals", "path": ["w"], "value": true}}}}}},
     "cases": [
       {
         "description": "doesn't change the cause",
@@ -90,7 +90,7 @@
   },
   {
     "description": "a substitute whose path runs into a string",
-    "policy": {"subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["s"], "value": "M", "substitute": {"op": "equals", "path": ["w", "x"], "value": true}}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["s"], "value": "M", "substitute": {"op": "equals", "path": ["w", "x"], "value": true}}}}}},
     "cases": [
       {
         "description": "gives the row its unusable cause",
@@ -105,6 +105,7 @@
   {
     "description": "a substitute whose selector matches several items",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["t"],
@@ -154,6 +155,7 @@
   {
     "description": "a substitute ordering two objects",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["t"],
@@ -187,7 +189,7 @@
   },
   {
     "description": "a substitute with a ref that can't be read",
-    "policy": {"subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["a"], "substitute": {"op": "equals", "path": ["b"], "value": {"ref": ["$$params", "w"]}}}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["a"], "substitute": {"op": "equals", "path": ["b"], "value": {"ref": ["$$params", "w"]}}}}}}},
     "params": {},
     "cases": [
       {
@@ -203,7 +205,7 @@
   },
   {
     "description": "a substitute reading the same path as its check",
-    "policy": {"subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["s"], "value": "M", "substitute": {"op": "equals", "path": ["s"], "value": "N"}}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "equals", "path": ["s"], "value": "M", "substitute": {"op": "equals", "path": ["s"], "value": "N"}}}}}},
     "cases": [
       {
         "description": "shows the path once",
@@ -217,7 +219,7 @@
   },
   {
     "description": "a substitute written wrong",
-    "policy": {"subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["n"], "substitute": {"op": "nope", "path": ["n"]}}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["n"], "substitute": {"op": "nope", "path": ["n"]}}}}}},
     "cases": [
       {
         "description": "fails the check as ill_formed even though the check passes",
@@ -233,6 +235,7 @@
   {
     "description": "a substitute with a substitute of its own",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["t"],
@@ -261,6 +264,7 @@
   {
     "description": "a substitute on the inner check of all",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["t"],
@@ -297,6 +301,7 @@
   {
     "description": "a substitute on a check in an any_of option",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["t"],
@@ -324,6 +329,7 @@
   {
     "description": "a substitute on all",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["t"],
@@ -360,6 +366,7 @@
   {
     "description": "an any_of as a substitute",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {"from": ["t"], "identified_by": ["id"]}
       },
@@ -381,6 +388,7 @@
   {
     "description": "a filter whose substitute is missing",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["t"],
@@ -428,6 +436,7 @@
   {
     "description": "a present filter whose substitute orders a number and a string",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["t"],

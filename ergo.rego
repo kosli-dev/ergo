@@ -5001,7 +5001,7 @@ _run(doc, policy, rd, params) := r if {
 	unreadable := _unreadable_inputs(doc, params)
 	written := object.union(_report_of(doc, reqs, object.get(rd.ahead, "requirements", {})), {"description": _reported_description(policy), "meta": _reported_meta(policy), "subjects": _listed_of(policy, rd)}) with data.ergo_reading as false with data.ergo_policy_problems as _policy_problems_of(policy, rd) with data.ergo_document as doc with data.ergo_params as params with data.ergo_subjects as rd.subjects with data.ergo_resolved as rd.resolved with data.ergo_unreadable as unreadable with data.ergo_sentences as rd.sentences with data.ergo_subject_sentences as rd.subject_sentences with input as {"ergo/names": {}}
 	used := _used_subjects(reqs, rd.subjects, rd.resolved)
-	r := object.union(_reported(written, unreadable, [raw, used]), {"ergo": "v0.1", "engine": {"name": "ergo.rego", "version": version}})
+	r := object.union(_reported(written, unreadable, [raw, used]), {"ergo": _spec, "engine": {"name": "ergo.rego", "version": version}})
 }
 
 version := "0.1.0-dev"
@@ -5219,12 +5219,30 @@ _section(policy, name) := object.get(policy, name, {}) if is_object(policy)
 
 _section(policy, _) := null if not is_object(policy)
 
-_policy_problem_inputs(policy) := [{"name": concat(" ", ["policy", f]), "value": sort(_policy_field_problems(f, policy[f]))} |
+_policy_problem_inputs(policy) := [{"name": concat(" ", ["policy", f]), "value": sort(problems)} |
 	is_object(policy)
-	some f in ["description", "meta"]
-	f in object.keys(policy)
-	count(_policy_field_problems(f, policy[f])) > 0
+	some f in ["description", "ergo_spec", "meta"]
+	problems := _policy_problems_at(f, policy)
+	count(problems) > 0
 ]
+
+_policy_problems_at("ergo_spec", policy) := _spec_problems(object.get(policy, "ergo_spec", null))
+
+_policy_problems_at(f, policy) := _policy_field_problems(f, policy[f]) if f in {"description", "meta"}
+
+_spec_problems(v) := {"missing"} if v == null
+
+else := {"not a string"} if not is_string(v)
+
+else := {concat("", ["not a version ", v])} if not _is_version(v)
+
+else := {concat("", ["unsupported version ", v, ", expected ", _spec])} if v != _spec
+
+else := set()
+
+_spec := "v0.1"
+
+_is_version(v) if regex.match(`^v[0-9]+\.[0-9]+$`, v)
 
 _policy_field_problems(f, v) := {_wrong_type_problems[f]} if not _has_type(f, v)
 

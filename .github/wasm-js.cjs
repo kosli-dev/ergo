@@ -65,6 +65,7 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
 
   const document = { deployments: Array.from({ length: 100 }, (_, i) => ({ id: `d-${i}`, environment: i % 3 ? "prod" : "staging", ...(i % 2 ? { approved_by: "a" } : {}), tests: [{ ok: i % 5 > 0 }, { ok: true }] })) };
   const budgetPolicy = {
+    ergo_spec: "v0.1",
     subjects: { deployment: { from: ["deployments"], identified_by: ["id"], applies_to: { is_prod: { op: "equals", path: ["environment"], value: "prod" } } } },
     requirements: {
       approved: { subject: "deployment", checks: { approved: { op: "non_empty_string", path: ["approved_by"] } } },
@@ -72,6 +73,7 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
     },
   };
   const sentencePolicy = {
+    ergo_spec: "v0.1",
     subjects: budgetPolicy.subjects,
     requirements: {
       approved: {
@@ -85,6 +87,7 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
     },
   };
   const chainPolicy = {
+    ergo_spec: "v0.1",
     subjects: {
       deployment: { from: 'deployments whose environment is "prod"', identified_by: "id" },
       test: { from: "deployment.tests" },

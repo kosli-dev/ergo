@@ -1,7 +1,7 @@
 [
   {
     "description": "all",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["cs"], "check": {"op": "equals", "path": ["s"], "value": true}}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["cs"], "check": {"op": "equals", "path": ["s"], "value": true}}}}}},
     "cases": [
       {
         "description": "passes when every item passes",
@@ -88,7 +88,7 @@
   },
   {
     "description": "any",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "any", "path": ["cs"], "check": {"op": "non_empty_string", "path": ["u"]}}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "any", "path": ["cs"], "check": {"op": "non_empty_string", "path": ["u"]}}}}}},
     "cases": [
       {
         "description": "passes when one item passes, with no failed items",
@@ -135,7 +135,7 @@
   },
   {
     "description": "all with present inside",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["cs"], "check": {"op": "present", "path": ["x"]}}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["cs"], "check": {"op": "present", "path": ["x"]}}}}}},
     "cases": [
       {
         "description": "lists an item missing the field with cause value",
@@ -157,7 +157,7 @@
   },
   {
     "description": "all with an empty path inside",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["bs"], "check": {"op": "matches_any", "path": [], "patterns": ["^main$"]}}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["bs"], "check": {"op": "matches_any", "path": [], "patterns": ["^main$"]}}}}}},
     "cases": [
       {
         "description": "reads each item itself and names it after the list",
@@ -181,6 +181,7 @@
   {
     "description": "all with compare inside",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["things"],
@@ -216,7 +217,7 @@
   },
   {
     "description": "all with a ref that can't be read",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["cs"], "check": {"op": "equals", "path": ["x"], "value": {"ref": ["$$params", "want"]}}}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["cs"], "check": {"op": "equals", "path": ["x"], "value": {"ref": ["$$params", "want"]}}}}}}},
     "params": {},
     "cases": [
       {
@@ -239,7 +240,7 @@
   },
   {
     "description": "all with each",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["prs"], "check": {"op": "equals", "path": ["s"], "value": true}, "each": ["cs"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["prs"], "check": {"op": "equals", "path": ["s"], "value": true}, "each": ["cs"]}}}}},
     "cases": [
       {
         "description": "passes when every item of every inner list passes",
@@ -283,7 +284,7 @@
   },
   {
     "description": "any with each",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "any", "path": ["prs"], "check": {"op": "equals", "path": ["s"], "value": true}, "each": ["cs"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "any", "path": ["prs"], "check": {"op": "equals", "path": ["s"], "value": true}, "each": ["cs"]}}}}},
     "cases": [
       {
         "description": "passes when an item of any inner list passes",
@@ -321,7 +322,7 @@
   },
   {
     "description": "all with an empty each",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["xss"], "check": {"op": "equals", "path": [], "value": 1}, "each": []}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "all", "path": ["xss"], "check": {"op": "equals", "path": [], "value": 1}, "each": []}}}}},
     "cases": [
       {
         "description": "checks the items of a list of lists",
@@ -345,6 +346,7 @@
   {
     "description": "a nested list check",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "pull request": {
           "from": ["prs", {"each_as": "pr"}],
@@ -397,6 +399,7 @@
   {
     "description": "a list check reading a name from from",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "pull request": {
           "from": ["prs", {"each_as": "pr"}],
@@ -433,6 +436,7 @@
   {
     "description": "a nested list check on an empty path",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["things"],
@@ -469,6 +473,7 @@
   {
     "description": "all and any written wrong",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["things"],
@@ -589,6 +594,7 @@
   {
     "description": "as with params or input as the name",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}},
       "requirements": {
         "s": {

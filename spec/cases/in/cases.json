@@ -1,7 +1,7 @@
 [
   {
     "description": "in a list",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": ["b", "a"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": ["b", "a"]}}}}},
     "cases": [
       {
         "description": "passes when the field is one of the values",
@@ -34,7 +34,7 @@
   },
   {
     "description": "in a list of numbers",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": [1, 2]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": [1, 2]}}}}},
     "cases": [
       {
         "description": "passes on 1.0, because numbers compare by value",
@@ -56,7 +56,7 @@
   },
   {
     "description": "in a list holding null",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": ["a", null]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": ["a", null]}}}}},
     "cases": [
       {
         "description": "fails as absent on a missing field",
@@ -86,7 +86,7 @@
   },
   {
     "description": "in an empty list",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": []}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": []}}}}},
     "cases": [
       {
         "description": "fails as value",
@@ -102,6 +102,7 @@
   {
     "description": "in strings and a ref",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["things"],
@@ -130,7 +131,7 @@
   },
   {
     "description": "in values with a ref among them",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": [{"ref": ["$$params", "want"]}, "z"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": [{"ref": ["$$params", "want"]}, "z"]}}}}},
     "params": {},
     "cases": [
       {
@@ -145,7 +146,7 @@
   },
   {
     "description": "in values read through a ref",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}}}}},
     "params": {"allowed": ["a", "b"]},
     "cases": [
       {
@@ -161,7 +162,7 @@
   },
   {
     "description": "in values read through a ref that isn't a list",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}}}}},
     "params": {"allowed": "a"},
     "cases": [
       {
@@ -176,7 +177,7 @@
   },
   {
     "description": "in values with a ref among them that reads another type",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": ["a", {"ref": ["$$params", "want"]}]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": ["a", {"ref": ["$$params", "want"]}]}}}}},
     "params": {"want": 1},
     "cases": [
       {
@@ -192,7 +193,7 @@
   },
   {
     "description": "in values read through a ref that holds values of mixed types",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}}}}},
     "params": {"allowed": ["a", 1]},
     "cases": [
       {
@@ -208,7 +209,7 @@
   },
   {
     "description": "is not one of a list",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not one of \"prod\", \"staging\""}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not one of \"prod\", \"staging\""}}}},
     "cases": [
       {
         "description": "passes on a string that is none of them, fails as value on one of them, and fails as unusable on another type",
@@ -224,7 +225,7 @@
   },
   {
     "description": "in values read through a ref that holds an object like a ref",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": {"ref": ["$$params", "allowed"]}}}}}},
     "params": {"allowed": [{"ref": ["q"]}]},
     "cases": [
       {
@@ -239,7 +240,7 @@
   },
   {
     "description": "in values held in a literal",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": {"literal": [{"ref": ["q"]}]}}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "in", "path": ["x"], "values": {"literal": [{"ref": ["q"]}]}}}}}},
     "cases": [
       {
         "description": "compares the object as it is",
@@ -255,6 +256,7 @@
   {
     "description": "in written wrong",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["things"],

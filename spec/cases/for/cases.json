@@ -2,6 +2,7 @@
   {
     "description": "every over one list on a for line",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "release": {
           "from": [
@@ -484,6 +485,7 @@
   {
     "description": "every with if any on a for line",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "release": {
           "from": [
@@ -751,6 +753,7 @@
   {
     "description": "some over one list on a for line",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "release": {
           "from": [
@@ -1126,6 +1129,7 @@
   {
     "description": "whose on a for item",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "release": {
           "from": [
@@ -2090,6 +2094,7 @@
   {
     "description": "a name that hides a field of the subject",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "release": {
           "from": [
@@ -2226,6 +2231,7 @@
   {
     "description": "a bare key in assert is a field of the subject",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "release": {
           "from": [
@@ -2443,6 +2449,7 @@
   {
     "description": "a bare key in an item's whose is a field of the item",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "release": {
           "from": [
@@ -2607,6 +2614,7 @@
   {
     "description": "two items, the second walking a list inside the first",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "release": {
           "from": [
@@ -3363,6 +3371,7 @@
   {
     "description": "an outer some and an inner every",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "release": {
           "from": [
@@ -3548,6 +3557,7 @@
   {
     "description": "two items over sibling lists, with two assertions",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "pr": {
           "from": [
@@ -4224,6 +4234,7 @@
   {
     "description": "a whose value that is a comma list, before a second item",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "pr": {
           "from": [
@@ -4417,6 +4428,7 @@
   {
     "description": "a whose that reads a $params list",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "release": {
           "from": [
@@ -4587,6 +4599,7 @@
   {
     "description": "a whose that reads a $params list that isn't a list",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "release": {
           "from": [
@@ -4662,6 +4675,7 @@
   {
     "description": "an assertion that reads a $params list",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "release": {
           "from": [
@@ -4763,6 +4777,7 @@
   {
     "description": "a path that is named by a param",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "release": {
           "from": [
@@ -4830,6 +4845,7 @@
   {
     "description": "a second item whose path is named by a param",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "release": {
           "from": [
@@ -4943,6 +4959,7 @@
   {
     "description": "a for line on a subject that isn't an object",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": [
@@ -4994,6 +5011,7 @@
   {
     "description": "a for line with three items",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "release": {
           "from": [
@@ -5086,6 +5104,7 @@
   {
     "description": "a for line that gives a name twice",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "release": {
           "from": [
@@ -5178,6 +5197,7 @@
   {
     "description": "a for line that names an item params",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "release": {
           "from": [
@@ -5270,6 +5290,7 @@
   {
     "description": "a for line that names an item with a word of the grammar",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "release": {
           "from": [
@@ -5362,6 +5383,7 @@
   {
     "description": "a for line that names an item input",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "release": {
           "from": [
@@ -5454,6 +5476,7 @@
   {
     "description": "a name whose path goes on past its list",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "release": {
           "from": [
@@ -5626,6 +5649,7 @@
   {
     "description": "a second item that reads into a first item that isn't an object",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "release": {
           "from": [
@@ -5733,6 +5757,7 @@
   {
     "description": "named by a name from the for line",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": [
@@ -5889,6 +5914,7 @@
   {
     "description": "the latest commit picked on a for line",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "pull_request": {
           "from": [
@@ -6528,6 +6554,7 @@
   {
     "description": "the second latest approval, filtered before it is sorted",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "pull_request": {
           "from": [
@@ -6749,6 +6776,7 @@
   {
     "description": "the last tag as written",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "release": {
           "from": [
@@ -6817,6 +6845,7 @@
   {
     "description": "sorted by after every",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "pull_request": {
           "from": [
@@ -6898,6 +6927,7 @@
   {
     "description": "the first owner alphabetically",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "team": {
           "from": [
@@ -7109,6 +7139,7 @@
   {
     "description": "the second last owner alphabetically",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "team": {
           "from": [
@@ -7187,6 +7218,7 @@
   {
     "description": "the latest audit by date",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "site": {
           "from": [
@@ -7391,6 +7423,7 @@
   {
     "description": "a list beside the first that fails before any sentence, with a whose that doesn't read the first item",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "pull request": {
           "from": [
@@ -7499,6 +7532,7 @@
   {
     "description": "a list beside the first that fails before any sentence, with a whose that reads the first item",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "pull request": {
           "from": [
@@ -7642,6 +7676,7 @@
   {
     "description": "a list beside the first with a broken list inside it",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "pull request": {
           "from": [
@@ -7765,6 +7800,7 @@
   {
     "description": "a sentence that fails for second-list items with different causes",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "pull request": {
           "from": [

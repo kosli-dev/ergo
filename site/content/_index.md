@@ -104,6 +104,7 @@ start:
       body: Say what you're judging, what's in scope and what must hold.
       code: |-
         report := ergo.report(input, {
+          "ergo_spec": data.ergo_spec,
           "subjects": data.subjects,
           "requirements": data.requirements,
         }, {})

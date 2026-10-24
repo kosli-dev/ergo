@@ -2,6 +2,7 @@
   {
     "description": "a subject whose from is a path in a string",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "deployment": {
           "from": "data.deployments",
@@ -217,6 +218,7 @@
   {
     "description": "a subject whose id is a dotted string",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "deployment": {
           "from": "deployments",
@@ -463,6 +465,7 @@
   {
     "description": "a subject whose id is a plain key in a string",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "deployment": {
           "from": "deployments",
@@ -574,6 +577,7 @@
   {
     "description": "a from line with whose and two conditions",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "deployment": {
           "from": "deployments whose environment is \"prod\" and change_type is \"emergency\"",
@@ -1078,6 +1082,7 @@
   {
     "description": "a from line with its conditions in the other order",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "deployment": {
           "from": "deployments whose change_type is \"emergency\" and environment is \"prod\"",
@@ -1217,6 +1222,7 @@
   {
     "description": "a condition with count of",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "pr": {
           "from": "pulls whose count of reviews is at least 1",
@@ -1483,6 +1489,7 @@
   {
     "description": "a from line with named by a param",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "artifact": {
           "from": "artifacts named by $params.name",
@@ -1677,6 +1684,7 @@
   {
     "description": "a from line with named by each of a param list",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "scan": {
           "from": "scans named by each of $params.required",
@@ -1820,6 +1828,7 @@
   {
     "description": "a subject's own name in its own from",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "lockfile": {
           "from": "lockfile whose status is \"COMPLETE\"",
@@ -1978,6 +1987,7 @@
   {
     "description": "a subject with no from",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "artifact": {
           "identified_by": "id"
@@ -2178,6 +2188,7 @@
   {
     "description": "a subject with nothing under it",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "artifact": null
       },
@@ -2390,6 +2401,7 @@
   {
     "description": "a subject with from as an empty list",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "artifact": {
           "from": [],
@@ -2513,6 +2525,7 @@
   {
     "description": "a from line that doesn't parse",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "deployment": {
           "from": "deployments whose environment is \"prod",
@@ -2620,6 +2633,7 @@
   {
     "description": "an id that isn't a path",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "deployment": {
           "from": "deployments",
@@ -2743,6 +2757,7 @@
   {
     "description": "a from line next to applies_to",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "deployment": {
           "from": "deployments",
@@ -2858,6 +2873,7 @@
   {
     "description": "a subject that goes on into another subject",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "artifact": {
           "from": "artifacts",
@@ -3266,6 +3282,7 @@
   {
     "description": "a subject that goes on into one of several subjects that its own conditions pick",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "artifact": {
           "from": "artifacts whose environment is \"prod\"",
@@ -3866,6 +3883,7 @@
   {
     "description": "a chain of three subjects",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "artifact": {
           "from": "artifacts whose env is \"prod\"",
@@ -4446,6 +4464,7 @@
   {
     "description": "a chain of four subjects",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "artifact": {
           "from": "artifacts whose env is \"prod\"",
@@ -4556,6 +4575,7 @@
   {
     "description": "a from line with every",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "pull request": {
           "from": "every artifacts.pull_requests",
@@ -5124,6 +5144,7 @@
   {
     "description": "a from line with every that starts at another subject",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "artifact": {
           "from": "artifacts",
@@ -5232,6 +5253,7 @@
   {
     "description": "a from line with every and named by each of",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "scan": {
           "from": "every artifacts.attestations named by each of $params.scans"
@@ -5339,6 +5361,7 @@
   {
     "description": "a subject that narrows another",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "defect": {
           "from": "defects whose status exists",
@@ -5554,6 +5577,7 @@
   {
     "description": "a subject that narrows one whose name has a space",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "defect": {
           "from": "defects",
@@ -5755,6 +5779,7 @@
   {
     "description": "subjects that narrow each other",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "x": {
           "from": "y whose id exists"
@@ -5867,6 +5892,7 @@
   {
     "description": "the report lists the subjects the requirements use",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "deployment": {
           "from": "  deployments   whose environment is \"prod\" ",
@@ -5935,6 +5961,7 @@
   {
     "description": "a subject that narrows another",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "round": {
           "from": "rounds",
@@ -5987,6 +6014,7 @@
   {
     "description": "a subject read from another subject",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "artifact": {
           "from": "trail.artifacts",
@@ -6036,6 +6064,7 @@
   {
     "description": "subjects written as lists",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "base": {
           "from": [
@@ -6134,6 +6163,7 @@
   {
     "description": "a subject with no from and no identified_by",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "deployments": {}
       },
@@ -6170,6 +6200,7 @@
   {
     "description": "a subject written wrong",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "broken": {
           "from": "deployments whose",
@@ -6209,6 +6240,7 @@
   {
     "description": "a requirement with no subject, or one that isn't there",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "deployment": {
           "from": "deployments"

@@ -1,7 +1,7 @@
 [
   {
     "description": "a custom operator",
-    "policy": {"subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "even", "path": ["n"], "expression": "n is even", "inputs": [["n"]]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "even", "path": ["n"], "expression": "n is even", "inputs": [["n"]]}}}}},
     "cases": [
       {
         "description": "passes when the operator says so",
@@ -41,6 +41,7 @@
   {
     "description": "a custom operator with a parameter read through a ref",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["t"],
@@ -78,6 +79,7 @@
   {
     "description": "a custom operator with a ref that can't be read",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["t"],
@@ -106,7 +108,7 @@
   },
   {
     "description": "a custom operator reading two fields",
-    "policy": {"subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "both_present", "expression": "a and b are present", "inputs": [["a"], ["b"]], "paths": [["a"], ["b"]]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "both_present", "expression": "a and b are present", "inputs": [["a"], ["b"]], "paths": [["a"], ["b"]]}}}}},
     "cases": [
       {
         "description": "shows each field it reads",
@@ -128,7 +130,7 @@
   },
   {
     "description": "an operator nobody supplied",
-    "policy": {"subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "nope", "path": ["n"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["t"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "nope", "path": ["n"]}}}}},
     "cases": [
       {
         "description": "is written wrong, so a typo can't pass",
@@ -152,6 +154,7 @@
   {
     "description": "a custom operator as a filter",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["t"],
@@ -191,6 +194,7 @@
   {
     "description": "a custom operator as a substitute",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
           "from": ["t"],
@@ -218,7 +222,7 @@
   },
   {
     "description": "an op that isn't a string",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": ["range"], "path": ["x"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": ["range"], "path": ["x"]}}}}},
     "cases": [
       {
         "description": "is an unknown op and nothing else, though a list names an operator's entry in the table of operators",

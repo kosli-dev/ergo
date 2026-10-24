@@ -1,7 +1,7 @@
 [
   {
     "description": "non_empty_string",
-    "policy": {"subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "non_empty_string", "path": ["x"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "non_empty_string", "path": ["x"]}}}}},
     "cases": [
       {
         "description": "passes on a string",

@@ -2,6 +2,7 @@
   {
     "description": "a subject with two parts, one written as a line and one with an id",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "round": {
           "from": "trail",
@@ -570,6 +571,7 @@
   {
     "description": "the same check written with an alias and with the path it stands for",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "s": {
           "from": "items",
@@ -1060,6 +1062,7 @@
   {
     "description": "where a part's alias is read",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "round": {
           "from": "rounds whose cov.x is 1",
@@ -1460,6 +1463,7 @@
   {
     "description": "an alias that is also a for alias",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "round": {
           "from": "rounds",
@@ -1551,6 +1555,7 @@
   {
     "description": "named by an alias that is a part",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "round": {
           "from": "rounds",
@@ -1637,6 +1642,7 @@
   {
     "description": "a subject that narrows another keeps its parts and adds its own",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "round": {
           "from": "rounds",
@@ -1800,6 +1806,7 @@
   {
     "description": "a subject that narrows another and adds a part with a kept alias",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "round": {
           "from": "rounds",
@@ -1902,6 +1909,7 @@
   {
     "description": "a chained subject reads its parent's parts",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "artifact": {
           "from": "trail.artifacts named by $params.art",
@@ -2144,6 +2152,7 @@
   {
     "description": "a chained subject with a part named like its parent",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "artifact": {
           "from": "trail.artifacts named by $params.art",
@@ -2251,6 +2260,7 @@
   {
     "description": "a subject with parts and checks written with op",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "s": {
           "from": [
@@ -2609,6 +2619,7 @@
   {
     "description": "a part with the alias of an as in the old syntax",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "s": {
           "from": [
@@ -2731,6 +2742,7 @@
   {
     "description": "a subject whose parts are written wrong",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "round": {
           "from": "rounds",
@@ -3002,6 +3014,7 @@
   {
     "description": "a subject whose has is not an object",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "round": {
           "from": "rounds",
@@ -3094,6 +3107,7 @@
   {
     "description": "the parts a report lists",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "round": {
           "from": "rounds",
@@ -3189,6 +3203,7 @@
   {
     "description": "a part whose path goes through a list",
     "policy": {
+      "ergo_spec": "v0.1",
       "subjects": {
         "s": {
           "from": [],

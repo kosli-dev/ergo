@@ -7,6 +7,7 @@ export const parseTime = (v) => {
 export const straighten = (text) => text.replace(/[“”]/g, '"').replace(/[‘’]/g, "'");
 
 export const buildPolicy = (sentence) => ({
+  ergo_spec: "v0.1",
   subjects: { batch: { from: "$input" } },
   requirements: { tutorial: { subject: "batch", checks: { sentence } } },
 });
@@ -914,6 +915,7 @@ export const nameCoach = (name) => {
 };
 
 export const tutorialPolicy = ({ name = defaultNames.name, heading = defaultNames.heading, from = null, id = null } = {}) => ({
+  ergo_spec: "v0.1",
   subjects: { batch: from === null ? { from: "$input" } : { from, identified_by: id } },
   requirements: {
     [slug(heading)]: {
@@ -1020,6 +1022,7 @@ export const yamlLines = (policy) => {
   const add = (text, step, note) => lines.push({ text, step, note });
   const [key, req] = Object.entries(policy.requirements)[0];
   const subj = policy.subjects.batch;
+  add(`ergo_spec: ${policy.ergo_spec}`, null, "The version of Ergo's spec this policy is written for.");
   add("subjects:", null, "A policy has two parts: what you look at, and what must be true of it.");
   add("  batch:", 11, "The thing each check is run on. You found its list in step 11.");
   add(`    from: ${subj.from ?? ""}`, 11, "You said where the batches are in step 11.");
