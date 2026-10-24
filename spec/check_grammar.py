@@ -33,7 +33,7 @@ NON_SYNTAX = [
 VOCABULARY = ["x", "y", "items", "status", "a_b", "k-1", "_id", "Count", "env", "sha", "pr", "commits", "owner"]
 GRAMMAR_WORDS = re.findall(
     r"`([a-z]+)`",
-    re.search(r"^\*\*\[sentence\.words\]\*\* [^:]*: (.*?)\. Without", open("spec/sentences.md").read(), re.M).group(1),
+    re.search(r"^\*\*\[sentence\.words\]\*\* [^:]*: (.*?)\. Without", open("spec/syntax.md").read(), re.M).group(1),
 )
 ASCII_POOL = [chr(c) for c in range(0x20, 0x7F) if chr(c) != "`"]
 OTHER_POOL = [0xE9, 0x65E5, 0x1F600, 0xFEFF, 0x2028, 0xA0]

@@ -3,8 +3,7 @@
 Draft 0.1. Ergo's spec is in these files, and `ergo.rego` is an implementation of it:
 
 - [`semantics.md`](semantics.md) says what a check means, as named rules about a model of checks that doesn't depend on how they're written.
-- [`syntax.md`](syntax.md) says how a policy is laid out, how it can be written wrong, and how the report names paths and shows the checks Ergo adds.
-- [`sentences.md`](sentences.md) says how checks and `from` lines are written, as one-line sentences like `approved_by is not empty`. [`sentences.abnf`](sentences.abnf) is its grammar, [`sentences-corpus.md`](sentences-corpus.md) every real check written that way, and [`sentences-findings.md`](sentences-findings.md) what writing them found. `ergo.rego` runs checks written as sentences, apart from the forms `sentences.md` lists as not run yet.
+- [`syntax.md`](syntax.md) says how a policy is written: its sections and fields, its parts, and its checks and `from` lines as one-line sentences like `approved_by is not empty`, how it can be written wrong, and how the report names paths and shows the checks Ergo adds. [`sentences.abnf`](sentences.abnf) is the grammar of the sentences, [`sentences-corpus.md`](sentences-corpus.md) every real check written that way, and [`sentences-findings.md`](sentences-findings.md) what writing them found. `ergo.rego` runs checks written as sentences, apart from the forms [OPEN.md](OPEN.md#sentences-the-spec-doesnt-say-enough-about-yet) lists as not run yet.
 - [`policy/schema.json`](policy/schema.json) describes a policy as a JSON Schema.
 - [`report/schema.json`](report/schema.json) says what a report looks like, as a JSON Schema.
 - [`cases/`](cases) holds the cases that pin the rules down, one folder per topic.
@@ -12,7 +11,7 @@ Draft 0.1. Ergo's spec is in these files, and `ergo.rego` is an implementation o
 
 When an implementation and the spec disagree, the implementation is wrong. A change to Ergo's behaviour starts here, with the rule and its cases, and then goes into each implementation.
 
-The spec covers reading values, causes, expressions, every built-in operator, requirements, scope, statuses, row order and violations. Params passed in and values JSON can't hold are still described only in [REFERENCE.md](../REFERENCE.md). [OPEN.md](OPEN.md) lists the questions the spec hasn't settled. The spec will change while it's 0.x.
+The spec covers reading values, causes, expressions, every operator of the model, requirements, scope, statuses, row order and violations. Params passed in and values JSON can't hold are still described only in [REFERENCE.md](../REFERENCE.md). [OPEN.md](OPEN.md) lists the questions the spec hasn't settled. The spec will change while it's 0.x.
 
 ## Versions
 

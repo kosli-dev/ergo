@@ -641,7 +641,7 @@ A policy can hold several requirements with different subjects over the same inp
 
 ## Checks
 
-A check is a sentence: one line of English. [spec/sentences.md](spec/sentences.md) has the full grammar. Write the sentence on its own, or under `assert` when the check has a `description` or `meta`:
+A check is a sentence: one line of English. [spec/syntax.md](spec/syntax.md) has the full grammar. Write the sentence on its own, or under `assert` when the check has a `description` or `meta`:
 
 ```yaml
 ergo_spec: v0.1

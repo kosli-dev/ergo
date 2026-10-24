@@ -59,7 +59,7 @@
         },
         "from": {
           "type": "string",
-          "description": "A from line: a path, optionally named by each of a list, optionally whose and conditions. spec/sentences.md says how it's written."
+          "description": "A from line: a path, optionally named by each of a list, optionally whose and conditions. spec/syntax.md says how it's written."
         },
         "identified_by": {
           "type": "string",
@@ -193,7 +193,7 @@
       }
     },
     "sentence_check": {
-      "description": "A check written as a sentence, alone, under assert, or as the options of an any_of. spec/sentences.md and spec/sentences.abnf say how a sentence is written.",
+      "description": "A check written as a sentence, alone, under assert, or as the options of an any_of. spec/syntax.md and spec/sentences.abnf say how a sentence is written.",
       "anyOf": [
         {
           "type": "string"

@@ -1,6 +1,6 @@
 # Sentence corpus and grammar: findings
 
-This file goes with [`sentences-corpus.md`](sentences-corpus.md) and [`sentences.md`](sentences.md). Both now follow [#174](https://github.com/kosli-dev/ergo/issues/174) as its body stood on 9 October 2026 at 15:22 UTC. This is the fourth pass. The third pass left one disagreement with the issue and filled three gaps. The issue now decides them, and this pass applies that. Step 2 of the plan, the readability test with someone who hasn't seen Ergo, still isn't done.
+This file goes with [`sentences-corpus.md`](sentences-corpus.md) and [`syntax.md`](syntax.md). Both now follow [#174](https://github.com/kosli-dev/ergo/issues/174) as its body stood on 9 October 2026 at 15:22 UTC. This is the fourth pass. The third pass left one disagreement with the issue and filled three gaps. The issue now decides them, and this pass applies that. Step 2 of the plan, the readability test with someone who hasn't seen Ergo, still isn't done.
 
 ## What changed in this pass
 
@@ -145,7 +145,7 @@ Not run again. This pass adds `count of` and `sum of` to a `whose` and changes h
 
 ## What writing the ABNF settled
 
-The grammar in [`sentences.abnf`](sentences.abnf) had to pick where the prose left room. Each of these is now in [`sentences.md`](sentences.md), and each can be undone before anything implements it:
+The grammar in [`sentences.abnf`](sentences.abnf) had to pick where the prose left room. Each of these is now in [`syntax.md`](syntax.md), and each can be undone before anything implements it:
 
 - A grammar word can't be a bare first key on the left side either, not only on the right. `count is at least 1` would otherwise read as a field called `count` or the start of `count of`. Write `.count is at least 1`. One rule for both sides.
 - `, if any,` goes after the `whose`, not before it: `every items whose kind is "a", if any, is at least 2`. On a `for` line it goes before `as`.
@@ -160,3 +160,31 @@ The grammar in [`sentences.abnf`](sentences.abnf) had to pick where the prose le
 The count against the grammar is done, with Lark's Earley parser: all 306 corpus lines read exactly one way once the two rules the ABNF can't hold are applied, the grammar words and the `for` names. The scripts are outside the repo, like the tokenizer before them.
 
 On 2026-10-14 the word that filters items changed from `where` to `whose`: `deployments whose environment is "prod"`. In the readability test, both readers who don't program read `deployments where environment is "prod"` as all the deployments with a remark about them, and listed every one, while every engineer read it as a filter. A `whose` clause in English can only narrow.
+
+## How the prose was checked
+
+A throwaway tokenizer in JavaScript, outside the repo, turned each phrase above into a regular expression and tried every way to cut each line into a quantifier, a path, `whose` conditions, assertions joined with `and`, and a phrase. It counted every reading.
+
+The corpus has 336 lines: 231 assertions, 14 `for` lines and 91 `from` lines. sdlc-policies 0004's `artifact` and its server copy have no `from` any more. With the rules in this file, which are the rules #174 now states, every line parses exactly one way. Without them, 194 lines parse more than one way:
+
+| cause                                                                  | lines | rule that removes it                            |
+| ---------------------------------------------------------------------- | ----: | ----------------------------------------------- |
+| a quoted string could be text or a quoted key, `is "prod"`             | 84    | [sentence.path.argument](syntax.md#paths)                |
+| a grammar word could be a field, `is empty` against `is <field empty>` | 59    | [sentence.words](syntax.md#words-a-field-cant-be-called) |
+| `true`, `false` or `null` could be a field                             | 50    | both of the above                               |
+| the reference after `named by` could end at more than one key          | 24    | [sentence.path.dynamic](syntax.md#paths)                 |
+
+Some lines have two causes. The tokenizer also applied [sentence.subject.own](syntax.md#subjects) to every `from` line, and found the same six chains the corpus marks.
+
+28 made-up lines test what the corpus doesn't reach:
+
+- `count of x whose n is m plus k is t` read three ways until [sentence.derived.plus](syntax.md#derived-values) was written. Under the grammar it reads one way, with `m plus k` inside the condition. A `for` item named `every` reads one way until [sentence.for.alias](syntax.md#the-for-line) forbids it.
+- `if any` with `some`, two quantifiers in one sentence, `count of ... is empty`, `whose count of reviews is empty` and the bare key `foo$bar` parse no way, as they should.
+- `whose count of reviews is at least 1 and state is "open"` and `some orders.id whose sum of items.price is more than 100 is not empty` read one way.
+- `every items.price whose kind is "a" and qty is 1 is at least 2 and owner is "x"` reads one way, with `owner` on the subject. So do `state is "MERGED" and every commits.verified is true` and `every items.price whose kind is "a" is at least 2 and some items.owner is "x"`, two quantified assertions on one line.
+- `format is in "spdx", "cyclonedx"` prints as `is one of`, `username is one of $params.internal_staff` as `is in`, `approved_by is not author` as `does not equal`, and `environment does not equal "prod"` as `is not`.
+- `"production deployment".pull_requests` reads one way, as a chain from that subject.
+
+Every line also prints back exactly as written, `from` lines included.
+
+The ABNF came later, from these rules, and was checked the same way. A script turned it into a grammar for Lark, a Python parser whose Earley mode keeps every reading, and counted the readings of each of the corpus's 306 sentences, `for` lines and `from` lines. One made-up line that used a field called `a` was changed first, since `a` is a grammar word. Two rules can't be written in ABNF and were applied after parsing: a bare first key is never a grammar word, and a `for` name is never one nor `params` or `input`. With the grammar alone, 95 lines read more than one way, every one of them because a grammar word could be a field, as in `is not empty` read as `is not .empty` and `is true` as `equals .true`. With the word rule, every line reads exactly one way. The first version of the ABNF also let a quoted string on the right side be a key, so `state is "MERGED"` read twice and 80 lines read two or four ways. That rule is in the grammar now, as `right-path`, so a parser gets it without reading this file. The made-up lines above were counted too, with the same results. `every commits, if any, as commit`, `x is ."$schema"`, `item 3 of commits is not empty`, `x equals last of items` and `commits[2].sha is "x"` each read one way, and `item 0 of items is 1` and `first is 1` read no way.

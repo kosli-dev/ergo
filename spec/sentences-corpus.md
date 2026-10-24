@@ -1,6 +1,6 @@
 # Checks as sentences: the corpus
 
-Every check, filter and `from` in the policies [#174](https://github.com/kosli-dev/ergo/issues/174) asked to try, written today's way and as a sentence. The sentences follow [`sentences.md`](sentences.md), and every one of them parses exactly one way with the tokenizer described there. The tally, the misfits and the open questions are [at the end](#tally).
+Every check, filter and `from` in the policies [#174](https://github.com/kosli-dev/ergo/issues/174) asked to try, written today's way and as a sentence. The sentences follow [`syntax.md`](syntax.md), and every one of them parses exactly one way with the tokenizer described there. The tally, the misfits and the open questions are [at the end](#tally).
 
 The sources, as of 9 October 2026:
 
