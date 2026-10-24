@@ -1983,20 +1983,11 @@ problem_inputs(rep) := [i |
 	not i.name in {"count(checks)", "require"}
 ]
 
-test_every_badly_written_check_fails_well_formed if {
-	checks := {sprintf("c%d", [i]): c | some i, c in badly_written}
-	rep := report(typo_doc, {"s": {"from": "items", "identified_by": "id", "checks": checks}})
-	rows_for(rep, "s", "$well_formed")[0].passed == false
-	every i, _ in badly_written {
-		some p in problem_inputs(rep)
-		p.name == sprintf("checks.c%d", [i])
-	}
-}
-
-test_a_ref_that_reads_the_wrong_kind_of_value_leaves_well_formed_alone_because_params_are_input if {
-	every check in ["s matches $input.params.word", "n is one of $input.params.word"] {
+test_every_badly_written_check_fails_well_formed_and_says_what_is_wrong if {
+	every case in badly_written {
+		[check, at, want] := case
 		rep := report(typo_doc, {"s": {"from": "items", "identified_by": "id", "checks": {"c": check}}})
-		rows_for(rep, "s", "$well_formed")[0].passed == true
+		problem_inputs(rep) == [{"name": concat("", ["checks.c", at]), "value": want}]
 	}
 }
 
@@ -2010,25 +2001,18 @@ test_a_dollar_word_in_a_sentence_is_not_an_alias_so_it_stays_an_unknown_name if 
 }
 
 odd_checks := [
-	{"op": "any_of", "options": 5},
-	{"op": "any_of", "options": {"a": 5}},
-	{"op": "all", "path": 5, "check": {"op": "present", "path": []}},
-	{"op": "range", "path": ["n"], "min": {"ref": 5}, "max": 1},
-	{"op": "compare", "left": 5, "right": ["a"], "cmp": "eq"},
-	{"op": "present", "path": "x"},
-	{"op": "present", "path": {"a": 1}},
-	{"op": "all", "path": ["xs"], "each": 5, "check": {"op": "present", "path": []}},
-	{"op": "all", "path": ["xs"], "check": {"op": "all", "path": ["ys"], "check": {"op": "all", "path": [], "check": {}}}},
-	{"op": {"x": 1}},
-	{"op": null},
-	{"op": "all"},
-	{"op": "any_of", "options": []},
-	{"op": "all", "path": ["xs"], "check": {"op": "any", "check": {"op": "present", "path": []}}},
-	{"op": "all", "path": ["xs"], "check": {"op": "any", "path": ["ys"]}},
+	true,
+	[],
+	{},
+	{"assert": {"x": 1}},
+	{"any_of": 5},
+	{"any_of": {"a": 5}},
+	{"for": 5, "assert": "x"},
+	{"for": "every xs as x", "assert": "x exists", "any_of": {"o": 5}},
 ]
 
 test_every_check_however_badly_written_keeps_an_expression_in_its_definition if {
-	checks := {sprintf("c%d", [i]): c | some i, c in array.concat(badly_written, odd_checks)}
+	checks := {sprintf("c%d", [i]): c | some i, c in array.concat([c | some [c, _, _] in badly_written], odd_checks)}
 	defs := report({}, {"s": {"checks": checks}}).requirements.s.checks
 	every name, _ in checks {
 		is_string(defs[name].expression)
@@ -2935,14 +2919,6 @@ test_a_check_without_refs_has_no_refs_in_its_definition if {
 	not "$refs" in object.keys(in_doc({}, {"id": 1}, "id exists").requirements.s.checks.c)
 }
 
-test_a_literal_or_selector_in_from_is_not_well_formed_so_it_cannot_pass_by_finding_nothing if {
-	every f in [["a", {"literal": "$x"}], ["a", {"where": {"id": 1}}]] {
-		rep := report({"a": {"$x": [{"id": 1}]}}, {"s": {"from": f, "min_subjects": 0, "checks": {"c": "id exists"}}})
-		rows_for(rep, "s", "$well_formed")[0].passed == false
-		rep.requirements.s.status == "not_met"
-	}
-}
-
 params_req(check) := {"s": {"from": "items", "identified_by": "id", "checks": {"c": check}}}
 
 params_rows(doc, check) := [[r.passed, r.cause, r.inputs] | some r in rows_for(report(doc, params_req(check)), "s", "c")]
@@ -3142,76 +3118,62 @@ test_a_present_filter_with_a_ref_step_still_rules_out_a_missing_field if {
 typo_doc := {"params": {"word": "x", "none": null, "nine": 9}, "items": [{"id": 1, "n": 1, "s": "a", "xs": [1], "t": "2026-01-01T00:00:00Z"}]}
 
 badly_written := [
-	{"op": "nope", "path": ["n"]},
-	{"op": "undeclared", "path": ["n"]},
-	{"path": ["n"]},
-	{"op": 3, "path": ["n"]},
-	{"op": "compare", "left": ["n"], "right": ["n"], "cmp": "bad"},
-	{"op": "compare", "left": ["n"], "right": ["n"]},
-	{"op": "compare_time", "left": ["t"], "right": ["t"], "cmp": "before"},
-	{"op": "compare", "left": ["n"], "cmp": "eq"},
-	{"op": "in", "path": ["n"], "values": "notalist"},
-	{"op": "in", "path": ["n"], "values": {"literal": "notalist"}},
-	{"op": "in", "path": ["n"]},
-	{"op": "range", "path": ["n"], "min": "a", "max": 5},
-	{"op": "range", "path": ["n"], "min": 0},
-	{"op": "range", "path": ["n"], "min": 9, "max": 0},
-	{"op": "equals", "path": ["n"], "value": 1, "as": "x"},
-	{"op": "present", "path": ["n"], "each": ["a"]},
-	{"op": "missing", "path": ["n"], "value": null},
-	{"op": "empty", "path": ["xs"], "check": {"op": "present", "path": []}},
-	{"op": "any_of", "as": "x", "options": {"o": [{"op": "equals", "path": ["n"], "value": 1}]}},
-	{"op": "any_of", "options": {"o": [{"op": "equals", "path": ["n"], "value": 1, "each": []}]}},
-	{"op": "equals", "path": ["n"]},
-	{"op": "includes", "path": ["xs"]},
-	{"op": "excludes", "path": ["xs"]},
-	{"op": "present"},
-	{"op": "non_empty_string"},
-	{"op": "missing"},
-	{"op": "empty"},
-	{"op": "matches_any", "path": ["s"], "patterns": "a"},
-	{"op": "matches_any", "path": ["s"], "patterns": [3]},
-	{"op": "matches_any", "path": ["s"], "patterns": ["("]},
-	{"op": "not_matches_any", "path": ["s"], "patterns": ["b", "("]},
-	{"op": "not_matches_any", "path": ["s"]},
-	{"op": "all", "path": ["xs"]},
-	{"op": "all", "path": ["xs"], "each": {"x": 1}, "check": {"op": "present", "path": []}},
-	{"op": "any", "path": ["xs"], "each": true, "check": {"op": "present", "path": []}},
-	{"op": "all", "path": ["xs"], "each": false, "check": {"op": "present", "path": []}},
-	{"op": "all", "path": ["xs"], "each": null, "check": {"op": "present", "path": []}},
-	{"op": "all", "path": ["xs"], "each": 0, "check": {"op": "present", "path": []}},
-	{"op": "any", "path": ["xs"], "check": "present"},
-	{"op": "any", "check": {"op": "present", "path": []}},
-	{"op": "all", "path": ["xs"], "check": {"op": "nope", "path": []}},
-	{"op": "all", "path": ["xs"], "check": {"op": "even", "path": []}},
-	{"op": "all", "path": ["xs"], "check": {"op": "equals", "path": []}},
-	{"op": "any_of", "options": {"o": [{"op": "any_of", "options": {"p": [{"op": "present", "path": ["id"]}]}}]}},
-	{"op": "any_of", "options": {"o": [{"op": "even", "path": ["n"]}]}},
-	{"op": "any_of", "options": {"o": [{"op": "compare", "left": ["n"], "right": ["n"], "cmp": "bad"}]}},
-	{"any_of": {"o": "present"}},
-	{"op": "any_of", "options": {"o": []}},
-	{"op": "any_of", "options": {"o": {"op": "present", "path": ["n"]}}},
-	{"any_of": {}},
-	{"op": "any_of", "options": [[{"op": "present", "path": ["n"]}], []]},
-	{"op": "any_of", "options": "o"},
-	{"op": "any_of"},
-	{"op": "all", "path": ["xs"], "check": {"op": "any_of", "options": {"o": [{"op": "any_of", "options": {"p": [{"op": "present", "path": []}]}}]}}},
-	{"op": "all", "path": ["xs"], "check": {"op": "any_of", "options": {"o": [{"op": "all", "path": [], "check": {"op": "range", "path": [], "min": "a", "max": 1}}]}}},
-	{"op": "all", "path": ["xs"], "check": {"op": "all", "path": [], "check": {"op": "any_of", "options": {"o": [{"op": "all", "path": [], "check": {"op": "present", "path": []}}]}}}},
-	{"op": "all", "path": ["xs"], "check": {"op": "all", "path": [], "check": {"op": "any_of", "options": {"o": [{"op": "in", "path": [], "values": 1}]}}}},
-	{"op": "all", "path": ["xs"], "check": {"op": "any_of", "options": {"o": [{"op": "all", "path": [], "check": {"op": "any_of", "options": {"p": [{"op": "in", "path": [], "values": 1}]}}}]}}},
-	{"op": "any_of", "options": {"o": [{"op": "all", "path": ["xs"], "check": {"op": "any_of", "options": {"p": [{"op": "all", "path": [], "check": {"op": "any_of", "options": {"q": [{"op": "compare", "left": [], "right": [], "cmp": "bad"}]}}}]}}}]}},
+	[`n is one of 1, "a"`, "", ["values of mixed types"]],
+	["n is between 9 and 0", "", ["min above max"]],
+	[`s matches "("`, "", [`invalid pattern "("`]],
+	[`s does not match "b" or "("`, "", ["doesn't parse"]],
+	["xs[9007199254740992] exists", "", ["9007199254740992 can't be a list position"]],
+	["item 9007199254740992 of xs exists", "", ["9007199254740992 can't be a list position"]],
+	["n is $foo", "", ["unknown name $foo"]],
+	["n is", "", ["doesn't parse"]],
+	["n is at least 1e400", "", ["number out of range: 1e400"]],
+	["n is at least n", "", ["n is compared with itself"]],
+	["empty is 1", "", ["empty is a word of the grammar: write .empty"]],
+	["some xs, if any, exists", "", ["if any can't go with some"]],
+	[`t is before "yesterday"`, "", [`"is before" takes a time or a number`]],
+	[`every xs.v is one of 1, "a"`, ".check", ["values of mixed types"]],
+	[`count of xs whose v is one of 1, "a" is 0`, ".left.whose.0", ["values of mixed types"]],
+	["count of xs whose v is between 9 and 0 is 0", "", ["min above max"]],
+	[`count of xs whose v matches "(" is 0`, "", [`invalid pattern "("`]],
+	["count of xs whose $foo exists is 0", "", ["unknown name $foo"]],
+	["count of xs whose v[9007199254740992] exists is 0", "", ["9007199254740992 can't be a list position"]],
+	[`every xs whose v is one of 1, "a" is 1`, ".whose.0", ["values of mixed types"]],
+	["n exists whose v is 1", "", ["doesn't parse"]],
+	["every xs some ys is 1", "", ["two quantifiers in one sentence: put them on a for line"]],
+	[{"assert": "n exists", "description": 5}, "", ["invalid description"]],
+	[{"assert": "n exists", "meta": "high"}, "", ["invalid meta"]],
+	[{"assert": "n exists", "meta": []}, "", ["invalid meta"]],
+	[{"assert": "n exists", "zz": 1}, "", ["unknown field zz"]],
+	[{"assert": 5}, "", ["invalid assert"]],
+	[{"assert": []}, "", ["empty assert"]],
+	[{"assert": ["n exists", "n is"]}, "", ["line 2: doesn't parse"]],
+	[{"for": "every xs as x"}, "", ["missing assert"]],
+	[{"assert": "x exists", "for": "every xs"}, "", [`for: an item ends with "as" and a name, like "every pull_requests as pr"`]],
+	[{"assert": "x exists", "for": "every xs as x, every x.ys as x"}, "", ["for: x is given twice"]],
+	[{"assert": "x exists", "for": `every xs whose v is one of 1, "a" as x`}, ".items.0.whose.0", ["values of mixed types"]],
+	[{"assert": `x is one of 1, "a"`, "for": "every xs as x"}, ".checks.0", ["values of mixed types"]],
+	[{"assert": "n exists", "for": 5}, "", ["invalid for"]],
+	[{"any_of": {"o": "n is"}}, "", ["option o: doesn't parse"]],
+	[{"any_of": {"o": ["n exists", "n is one of 1, \"a\""]}}, ".checks.1", ["values of mixed types"]],
+	[{"any_of": {}}, "", ["empty any_of"]],
+	[{"any_of": {"o": []}}, "", ["empty option o"]],
+	[{"any_of": "o"}, "", ["invalid any_of"]],
+	[{"any_of": {"o": "n exists"}, "assert": "n exists"}, "", ["unknown field any_of"]],
+	[5, "", ["invalid check"]],
+	[null, "", ["invalid check"]],
 ]
 
 test_a_check_whose_ref_reads_the_wrong_kind_of_value_fails_and_is_not_ill_formed if {
 	every check in ["s matches $input.params.word", "n is one of $input.params.word"] {
 		rep := report(typo_doc, {"s": {"from": "items", "identified_by": "id", "checks": {"c": check}}})
 		[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "unusable"]]
+		rows_for(rep, "s", "$well_formed")[0].passed == true
 	}
 }
 
 test_a_badly_written_check_is_ill_formed if {
-	every check in badly_written {
+	every case in badly_written {
+		check := case[0]
 		rep := report(typo_doc, {"s": {"from": "items", "identified_by": "id", "checks": {"c": check}}})
 		[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "ill_formed"]]
 	}
@@ -3223,6 +3185,27 @@ test_a_badly_written_filter_fails_well_formed_too if {
 	rep := ergo.report({"things": [{"x": 1}]}, filter_policy({"b": {"from": `things whose x is one of 1, "a"`}}), {})
 	problem_inputs(rep) == [{"name": "subjects.b.from", "value": ["values of mixed types"]}]
 	[[r.passed, r.cause] | some r in rows_for(rep, "s", "$applies")] == [[false, "ill_formed"]]
+}
+
+badly_written_filters := [
+	[`x is one of 1, "a"`, "values of mixed types"],
+	["x is between 9 and 0", "min above max"],
+	[`x matches "("`, `invalid pattern "("`],
+	["x is $foo", "unknown name $foo"],
+	["xs[9007199254740992] exists", "9007199254740992 can't be a list position"],
+	["x is at least x", "whose: x is compared with itself"],
+	["x is at least 1e400", "number out of range: 1e400"],
+	[`x is before "yesterday"`, `"is before" takes a time or a number`],
+	["x is", "doesn't parse"],
+]
+
+test_every_badly_written_filter_fails_well_formed_and_says_what_is_wrong if {
+	every case in badly_written_filters {
+		[whose, want] := case
+		rep := ergo.report({"things": [{"x": 1}]}, filter_policy({"b": {"from": concat(" whose ", ["things", whose])}}), {})
+		problem_inputs(rep) == [{"name": "subjects.b.from", "value": [want]}]
+		rep.compliant == false
+	}
 }
 
 test_a_badly_written_filter_is_named_after_the_subject_whose_from_line_holds_it if {
