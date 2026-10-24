@@ -5129,21 +5129,14 @@ _s_marked_phrase(ph, names) := object.union(ph, {"terms": [_s_marked_term(t, nam
 
 else := ph
 
-_s_marked_cond(c, names) := object.union(c, {"path": _s_marked(c.path, names, true), "phrase": _s_marked_phrase(c.phrase, names)}) if {
-	is_object(c)
-	"path" in object.keys(c)
-} else := object.union(c, {"terms": [_s_own_term(t, names) | some t in c.terms], "phrase": _s_marked_phrase(c.phrase, names)}) if {
-	is_object(c)
-	is_array(object.get(c, "terms", null))
-} else := c
+_s_marked_cond(c, names) := object.union(c, {"path": _s_marked(c.path, names, true), "phrase": _s_marked_phrase(c.phrase, names)}) if "path" in object.keys(c)
+
+else := object.union(c, {"terms": [_s_own_term(t, names) | some t in c.terms], "phrase": _s_marked_phrase(c.phrase, names)})
 
 _s_own_term(t, names) := object.union(t, {f: _s_marked(t[f], names, true) |
 	some f in ["count", "sum", "elapsed_from", "elapsed_to"]
 	f in object.keys(t)
-}) if {
-	is_object(t)
-	not "steps" in object.keys(t)
-} else := _s_marked(t, names, true)
+})
 
 _s_aliased(a, names) := object.union(object.union(a, {k: _s_marked(a[k], names, false) | some k in ["path", "every", "some"]; k in object.keys(a)}), object.union(
 	{"phrase": _s_marked_phrase(a.phrase, names)},
