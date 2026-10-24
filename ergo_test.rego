@@ -12614,3 +12614,12 @@ test_a_derived_check_with_its_own_inputs_is_read_the_slow_way_and_gives_the_same
 	verdicts[0] == [[1, true, "satisfied"], [2, false, "unusable"], [3, false, "value"]]
 	verdicts[1] == verdicts[0]
 }
+
+test_a_plus_under_a_for_line_shows_the_sum_and_each_term if {
+	check := {"for": "every xs as x", "assert": ["x.a is 1", "n plus 2 is 3"]}
+	[[r.cause, r.inputs] | some r in ergo.report({"things": [{"id": 1, "n": 1, "xs": [{"a": 1}]}]}, _sentence_policy({"c": check}), {}).results; r.check == "c"] == [["satisfied", [
+		{"name": "n", "value": 1},
+		{"name": "n plus 2", "value": 3},
+		{"name": "xs[]", "value": [{"a": 1}]},
+	]]]
+}

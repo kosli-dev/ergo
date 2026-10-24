@@ -5743,6 +5743,8 @@ _basic_inputs(subj, side, item) := [
 
 _side_inputs(subj, side, item) := _basic_inputs(subj, side, item) if _basic_form(side)
 
+_side_inputs(subj, side, item) := array.concat([_derived_input(subj, side, _side_text(item, side))], [i | some operand in side.add; some i in _basic_inputs(subj, operand, item)]) if _side_form(side) == "add"
+
 _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "values": []} if {
 	path := side[_basic_form(side)]
 	not _off_subject(path)
