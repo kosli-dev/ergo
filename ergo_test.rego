@@ -4970,6 +4970,26 @@ test_a_whose_in_a_childs_from_line_reads_a_part_of_the_parent_by_its_name if {
 	]
 }
 
+test_a_count_on_the_left_of_a_whose_in_a_check_reads_the_items_own_field_not_the_parent if {
+	rep := ergo.report({"bs": [{"id": "b1", "kids": [{"id": "k1", "items": [{"b": {"kids": [1, 2, 3]}, "v": 3}, {"b": {"kids": []}, "v": 1}]}]}]}, {"ergo_spec": "v0.1", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "every items.v whose count of b.kids is at least v is 3"}}}}, {})
+	[r.cause | some r in rep.results; r.check == "c"] == ["satisfied"]
+}
+
+test_a_count_on_the_left_of_a_whose_in_a_childs_from_line_reads_the_childs_own_field_not_the_parent if {
+	rep := ergo.report({"bs": [{"id": "b1", "kids": [{"id": "k1", "b": {"kids": [1, 2]}, "v": 2}, {"id": "k2", "v": 1}]}]}, {"ergo_spec": "v0.1", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids whose count of b.kids is at least v", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
+	[[r.subject.id, r.cause] | some r in rep.results; r.check == "$applies"] == [["k1", "satisfied"], ["k2", "absent"]]
+	rep.requirements.r.checks["$applies"].expression == "count of .b.kids is at least v"
+}
+
+test_a_dot_before_a_part_on_the_left_of_a_whose_in_a_from_line_reads_the_field_not_the_part if {
+	doc := {"kids": [{"id": "k1", "att": {"id": 1}, "atts": {"pr": {"id": 2}}}, {"id": "k2", "atts": {"pr": {"id": 1}}}]}
+	subjects := {"kid": {"from": "kids whose .att.id is 1", "identified_by": "id", "has": {"att": {"from": "atts.pr", "identified_by": "id"}}}}
+	rep := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": {"subject": "kid", "checks": {"c": "id exists"}}}}, {})
+	[[r.subject.id, r.cause] | some r in rep.results; r.check == "$applies"] == [["k1", "satisfied"], ["k2", "absent"]]
+	plain := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": object.union(subjects, {"kid": object.union(subjects.kid, {"from": "kids whose att.id is 1"})}), "requirements": {"r": {"subject": "kid", "checks": {"c": "id exists"}}}}, {})
+	[[r.subject.id, r.cause] | some r in plain.results; r.check == "$applies"] == [["k1", "value"], ["k2", "satisfied"]]
+}
+
 test_a_whose_in_a_childs_from_line_that_reads_a_missing_field_of_the_parent_fails_as_absent if {
 	_applies_of(_kids_report("b.kids whose v equals b.nope")) == [
 		["k1", "absent", [{"name": "b.nope", "value": null}, {"name": "v", "value": 1}]],

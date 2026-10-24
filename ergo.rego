@@ -5106,9 +5106,21 @@ _s_marked_phrase(ph, names) := object.union(ph, {"terms": [_s_marked_term(t, nam
 
 else := ph
 
-_s_marked_cond(c, names) := object.union(c, {"path": _s_marked(c.path, names, true), "phrase": _s_marked_phrase(c.phrase, names)}) if is_object(c)
+_s_marked_cond(c, names) := object.union(c, {"path": _s_marked(c.path, names, true), "phrase": _s_marked_phrase(c.phrase, names)}) if {
+	is_object(c)
+	"path" in object.keys(c)
+} else := object.union(c, {"terms": [_s_own_term(t, names) | some t in c.terms], "phrase": _s_marked_phrase(c.phrase, names)}) if {
+	is_object(c)
+	is_array(object.get(c, "terms", null))
+} else := c
 
-else := c
+_s_own_term(t, names) := object.union(t, {f: _s_marked(t[f], names, true) |
+	some f in ["count", "sum", "elapsed_from", "elapsed_to"]
+	f in object.keys(t)
+}) if {
+	is_object(t)
+	not "steps" in object.keys(t)
+} else := _s_marked(t, names, true)
 
 _s_aliased(a, names) := object.union(object.union(a, {k: _s_marked(a[k], names, false) | some k in ["path", "every", "some"]; k in object.keys(a)}), object.union(
 	{"phrase": _s_marked_phrase(a.phrase, names)},
@@ -5569,17 +5581,41 @@ _s_from_used(def, read) if {
 _s_from_read(name, fl, subjects, chains) := object.union({"problems": problems, "fields": fields, "parent": parent, "every": every_list}, _p_from_part(name, fl, subjects, chains.parts)) if {
 	"path" in object.keys(fl)
 	names := {a | some a in _s_ancestors(name, chains.descend)}
-	conds := [_p_applied(_s_parent_named(t, _s_check([t], {}, set(), names), names), {"own": _p_steps_of(object.get(chains.parts, name, {})), "ancestors": {a: _p_steps_of(object.get(chains.parts, a, {})) | some a in names}}) | some c in object.get(fl, "where", []); t := _s_cond_text(_s_from_cond(c, names))]
+	keep := names | object.keys(_p_steps_of(object.get(chains.parts, name, {})))
+	conds := [_p_applied(_s_parent_named(t, _s_check([t], {}, set(), keep), names), {"own": _p_steps_of(object.get(chains.parts, name, {})), "ancestors": {a: _p_steps_of(object.get(chains.parts, a, {})) | some a in names}}) | some c in object.get(fl, "where", []); t := _s_cond_text(_s_from_cond(c, names, keep))]
 	problems := sort((((((_s_chain_unsupported(name, fl, subjects, chains.descend) | _s_every_unsupported(name, fl, subjects)) | _s_from_start_problems(fl)) | _s_from_paths_unsupported({"path": fl.path})) | _s_elapsed_flaw({"where": object.get(fl, "where", [])})) | {concat("", ["whose: ", p]) | some c in conds; some p in object.get(c, "$sentence", [])}))
 	fields := object.union(_s_source(name, fl, subjects, chains.parts), _s_whose_filters(_s_filter_prefix(name, chains.narrow), conds))
 	parent := _s_descend_parent(name, fl, subjects)
 	every_list := object.get(fl, "every", false) == true
 } else := {"problems": object.get(fl, "problems", ["doesn't parse"]), "fields": {}}
 
-_s_from_cond(c, names) := object.union(m, {"path": object.union(m.path, {"own": false})}) if {
-	m := _s_marked_cond(c, _s_names(set(), names))
-	object.get(object.get(m, "path", {}), "field", false) == true
-} else := _s_marked_cond(c, _s_names(set(), names))
+_s_from_cond(c, names, keep) := object.union(c, object.union(
+	{"path": _s_from_dot(c.path, names, keep) | is_object(object.get(c, "path", null))},
+	object.union(
+		{"terms": [_s_from_term(t, names, keep) | some t in c.terms] | is_array(object.get(c, "terms", null))},
+		{"phrase": _s_from_phrase(c.phrase, keep) | is_object(object.get(c, "phrase", null))},
+	),
+))
+
+_s_from_phrase(ph, keep) := object.union(ph, object.union(
+	{"path": _s_from_dot(ph.path, set(), keep) | is_object(object.get(ph, "path", null))},
+	{"terms": [_s_from_term(t, set(), keep) | some t in ph.terms] | is_array(object.get(ph, "terms", null))},
+))
+
+_s_from_term(t, names, keep) := object.union(t, {f: _s_from_dot(t[f], names, keep) |
+	some f in ["count", "sum", "elapsed_from", "elapsed_to"]
+	f in object.keys(t)
+}) if {
+	is_object(t)
+	not "steps" in object.keys(t)
+} else := _s_from_dot(t, names, keep)
+
+_s_from_dot(p, names, keep) := object.union(p, {"field": true, "own": false}) if {
+	_s_markable(p, keep)
+	object.get(p, "dot", false) == true
+} else := object.union(p, {"field": true, "own": false}) if {
+	_s_markable(p, names)
+} else := p
 
 _p_from_part(name, fl, subjects, eff) := {"part": rest[0]} if {
 	_s_descends(name, fl, subjects)
