@@ -7457,7 +7457,7 @@ test_a_compiled_policy_with_a_field_missing_or_of_a_type_ergo_cant_use_fails_lik
 		[{"ergo/compiled": null}, {"ergo/compiled": {}}, {"ergo/compiled": form, "x": 1}],
 		array.concat(
 			array.concat(
-				[{"ergo/compiled": object.remove(form, [f])} | some f, _ in form],
+				[{"ergo/compiled": object.remove(form, [f])} | some f, _ in form; f != "engine"],
 				[{"ergo/compiled": object.union(form, {f: "x"})} | some f in ["resolved", "subject_sentences", "ahead", "sentences"]],
 			),
 			array.concat(
@@ -7468,6 +7468,53 @@ test_a_compiled_policy_with_a_field_missing_or_of_a_type_ergo_cant_use_fails_lik
 	) {
 		ergo.report(doc, broken, {}) == ergo.report(doc, {"x": 1}, {})
 	}
+}
+
+test_a_compiled_policy_says_which_engine_compiled_it if {
+	ergo.compile(_sentence_policy({"c": "x is 1"}))["ergo/compiled"].engine == {"name": "ergo.rego", "version": ergo.version}
+}
+
+_stale_rows(form) := [[r.requirement, r.check, r.passed, problem_inputs_of(r)] | some r in ergo.report({"things": [{"id": "a", "x": 1}]}, {"ergo/compiled": form}, {}).results]
+
+test_a_compiled_policy_without_an_engine_fails_its_well_formed_rows if {
+	form := object.remove(ergo.compile(_sentence_policy({"c": "x is 1"}))["ergo/compiled"], ["engine"])
+	_stale_rows(form) == [["s", "$well_formed", false, [{"name": "ergo/compiled engine", "value": ["missing"]}]]]
+}
+
+test_a_compiled_policy_from_another_engine_fails_its_well_formed_rows if {
+	want := [["s", "$well_formed", false, [{"name": "ergo/compiled engine", "value": [concat("", ["compiled by another engine, expected ergo.rego ", ergo.version])]}]]]
+	form := ergo.compile(_sentence_policy({"c": "x is 1"}))["ergo/compiled"]
+	every engine in [{"name": "ergo.rego", "version": "0.0.9"}, {"name": "other", "version": ergo.version}, {"name": "ergo.rego"}, "ergo.rego", 1, {}] {
+		_stale_rows(object.union(object.remove(form, ["engine"]), {"engine": engine})) == want
+	}
+}
+
+test_a_compiled_policy_from_another_engine_is_read_from_its_policy_because_its_other_fields_may_mean_something_else_now if {
+	form := object.remove(ergo.compile(_sentence_policy({"c": "x is 1"}))["ergo/compiled"], ["engine"])
+	stale := object.union(form, {"requirements": {}, "sentences": [], "resolved": {}, "ahead": {}})
+	_stale_rows(stale) == _stale_rows(form)
+	_stale_rows(object.union(form, {"policy": _sentence_policy({"c": {"op": "empty", "path": ["xs"]}})})) == [["s", "$well_formed", false, [
+		{"name": "checks.c", "value": ["missing assert", "unknown field op", "unknown field path"]},
+		{"name": "ergo/compiled engine", "value": ["missing"]},
+	]]]
+}
+
+test_a_compiled_policy_from_another_engine_lists_its_engine_before_the_policys_own_problems if {
+	form := object.remove(ergo.compile(object.remove(_sentence_policy({"c": "x is 1"}), ["ergo_spec"]))["ergo/compiled"], ["engine"])
+	_stale_rows(form) == [["s", "$well_formed", false, [
+		{"name": "ergo/compiled engine", "value": ["missing"]},
+		{"name": "policy ergo_spec", "value": ["missing"]},
+	]]]
+}
+
+test_compiling_a_policy_compiled_by_another_engine_gives_it_back_so_the_report_still_says_so if {
+	stale := {"ergo/compiled": object.remove(ergo.compile(_sentence_policy({"c": "x is 1"}))["ergo/compiled"], ["engine"])}
+	ergo.compile(stale) == stale
+}
+
+test_a_compiled_policy_from_another_engine_without_its_policy_fails_like_a_policy_ergo_cant_read if {
+	form := object.remove(ergo.compile(_sentence_policy({"c": "x is 1"}))["ergo/compiled"], ["engine", "policy"])
+	ergo.report({"things": [{"id": "a", "x": 1}]}, {"ergo/compiled": form}, {}) == ergo.report({"things": [{"id": "a", "x": 1}]}, {"x": 1}, {})
 }
 
 test_data_named_like_ergos_compile_flag_changes_no_report if {
