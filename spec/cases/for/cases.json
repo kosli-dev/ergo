@@ -7705,5 +7705,160 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a for line on a child subject whose assertion reads the parent",
+    "policy": {
+      "ergo_spec": "v0.1",
+      "subjects": {
+        "t": {
+          "from": "ts",
+          "identified_by": "id"
+        },
+        "kid": {
+          "from": "t.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "kid",
+          "checks": {
+            "f": {
+              "for": "every rs as r",
+              "assert": "r.v is at least t.x"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "shows the parent's field in its inputs",
+        "rules": ["for.inputs", "subjects.chain"],
+        "input": {
+          "ts": [
+            {
+              "id": "t1",
+              "x": 1,
+              "kids": [
+                {
+                  "id": "k1",
+                  "rs": [
+                    {
+                      "v": 1
+                    },
+                    {
+                      "v": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "met",
+            "subjects": {
+              "matching": 1,
+              "total": 1
+            }
+          }
+        },
+        "compliant": true,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope kid count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "t": "t1"
+              },
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated kid ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "t": "t1"
+              },
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "f",
+            "failed_items": [],
+            "inputs": [
+              {
+                "name": "rs[]",
+                "value": [
+                  {
+                    "v": 1
+                  },
+                  {
+                    "v": 2
+                  }
+                ]
+              },
+              {
+                "name": "t.x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "t": "t1"
+              },
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

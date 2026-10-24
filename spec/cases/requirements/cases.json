@@ -1652,5 +1652,76 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a check named like one of Ergo's own rows that is also written wrong another way",
+    "policy": {
+      "ergo_spec": "v0.1",
+      "subjects": {
+        "b": {
+          "from": "things"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "b",
+          "checks": {
+            "$unique_ids": "x is"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the check once, with both problems",
+        "rules": ["well_formed.reserved", "written_wrong.row"],
+        "input": {
+          "things": [
+            {
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met",
+            "subjects": {
+              "matching": 0,
+              "total": 0
+            }
+          }
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.$unique_ids",
+                "value": [
+                  "doesn't parse",
+                  "name reserved"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "b"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

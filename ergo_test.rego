@@ -8234,9 +8234,14 @@ test_a_chain_through_a_subject_that_narrows_without_a_loop_is_not_a_loop if {
 	subject_problems({"p": {"from": "q.x"}, "q": {"from": "r"}, "r": {"from": "bs"}}, "p", {"bs": []}) == []
 }
 
-test_a_chain_four_subjects_deep_with_a_loop_further_up_is_still_too_deep if {
-	subjects := {"a": {"from": "b.x"}, "b": {"from": "c.x"}, "c": {"from": "d.x"}, "d": {"from": "e.x"}, "e": {"from": "d.y"}}
+test_a_chain_four_subjects_deep_without_a_loop_is_still_too_deep if {
+	subjects := {"a": {"from": "b.x"}, "b": {"from": "c.x"}, "c": {"from": "d.x"}, "d": {"from": "e.x"}, "e": {"from": "es"}}
 	subject_problems(subjects, "a", {}) == [{"name": "subjects.a.from", "value": ["a chain of more than three subjects isn't supported yet"]}]
+}
+
+test_a_chain_that_reaches_a_loop_further_up_leads_to_a_loop if {
+	subjects := {"a": {"from": "b.x"}, "b": {"from": "c.x"}, "c": {"from": "d.x"}, "d": {"from": "e.x"}, "e": {"from": "d.y"}}
+	subject_problems(subjects, "a", {}) == [{"name": "subjects.a.from", "value": ["leads to a loop"]}]
 }
 
 named_by_rows(subjects, subject, check, inp) := [[r.passed, r.inputs] |
@@ -8252,4 +8257,38 @@ test_a_part_read_with_named_by_on_the_right_side_shows_the_parts_value if {
 test_a_parent_read_with_named_by_on_the_right_side_shows_the_parents_value if {
 	subjects := {"t": {"from": "ts", "identified_by": "id"}, "kid": {"from": "t.kids"}}
 	named_by_rows(subjects, "kid", "t.x is one of $params.allowed named by n", {"ts": [{"id": "a", "x": 1, "kids": [{"n": "a"}]}]}) == [[true, [{"name": "t.x", "value": 1}, {"name": "n", "value": "a"}]]]
+}
+
+test_a_check_named_like_one_of_ergos_own_rows_that_does_not_parse_is_listed_once if {
+	rep := report({"items": [{"id": 1}]}, {"s": object.union(object.remove(typed_req, ["checks"]), {"checks": {"$unique_ids": "id is"}})})
+	problem_inputs(rep) == [{"name": "checks.$unique_ids", "value": ["doesn't parse", "name reserved"]}]
+}
+
+test_a_subject_that_leads_into_a_loop_is_named_after_its_own_from if {
+	every subjects in [
+		{"pa": {"from": "pb"}, "pb": {"from": "pa"}, "pc": {"from": "pa"}},
+		{"pa": {"from": "pb.x"}, "pb": {"from": "pa.x"}, "pc": {"from": "pa.kids"}},
+		{"pa": {"from": "pb.x"}, "pb": {"from": "pa.x"}, "pc": {"from": "pa"}},
+	] {
+		subject_problems(subjects, "pc", {}) == [{"name": "subjects.pc.from", "value": ["leads to a loop"]}]
+	}
+}
+
+listed_subjects(subjects, subject) := object.keys(ergo.report({}, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"s": {"subject": subject, "checks": {"c": "v exists"}}}}, {}).subjects)
+
+test_the_report_lists_every_subject_a_from_line_written_wrong_starts_at if {
+	listed_subjects({"x": {"from": "y"}, "y": {"from": "z"}, "z": {"from": "x"}}, "x") == {"x", "y", "z"}
+	listed_subjects({"p": {"from": "q.x"}, "q": {"from": "r.x"}, "r": {"from": "p.x"}}, "p") == {"p", "q", "r"}
+	listed_subjects({"b": {"from": "kid"}, "kid": {"from": "b.kids"}}, "kid") == {"b", "kid"}
+	listed_subjects({"pa": {"from": "pb"}, "pb": {"from": "pa"}, "pc": {"from": "pa"}, "t": {"from": "things"}}, "pc") == {"pa", "pb", "pc"}
+	listed_subjects({" ": {"from": "things"}, "b": {"from": `" ".kids`}}, "b") == {" ", "b"}
+}
+
+test_a_for_row_shows_the_parent_fields_its_assertions_read if {
+	subjects := {"t": {"from": "ts", "identified_by": "id", "has": {"cov": "d.c"}}, "kid": {"from": "t.kids", "identified_by": "id"}}
+	inp := {"ts": [{"id": "t1", "x": 1, "d": {"c": {"q": 3}}, "kids": [{"id": "k1", "rs": [{"v": 1}, {"v": 2}]}]}]}
+	rs := {"name": "rs[]", "value": [{"v": 1}, {"v": 2}]}
+	named_by_rows(subjects, "kid", {"for": "every rs as r", "assert": "r.v is at least t.x"}, inp) == [[true, [rs, {"name": "t.x", "value": 1}]]]
+	named_by_rows(subjects, "kid", {"for": "every rs as r", "assert": "r.v is at least t.y"}, inp) == [[false, [rs, {"name": "t.y", "value": null}]]]
+	named_by_rows(subjects, "kid", {"for": "every rs as r", "assert": "r.v is at most t.cov.q"}, inp) == [[true, [rs, {"name": "t.cov.q", "part": {"id": null, "name": "t.cov"}, "value": 3}]]]
 }
