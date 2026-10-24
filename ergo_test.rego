@@ -5870,6 +5870,11 @@ _listed_reqs(name) := {"r": {"subject": name, "checks": {"c": "id exists"}}}
 
 _listed(subjects, name) := ergo.report({}, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": _listed_reqs(name)}, {}).subjects
 
+test_the_report_lists_a_subject_from_the_line_read_with_the_policy_not_by_reading_it_again if {
+	read := {"lines": {"d": ergo._from_line("xs")}}
+	ergo._subject_text("d", {"from": "ys"}) == "xs" with data.ergo_subject_sentences as read
+}
+
 test_the_report_lists_a_subject_with_its_description_from_and_id if {
 	subjects := {"deployment": {"from": `deployments whose environment is "prod"`, "identified_by": "id", "description": "A deployment to production"}}
 	_listed(subjects, "deployment") == {"deployment": {"description": "A deployment to production", "from": `deployments whose environment is "prod"`, "identified_by": "id", "parts": {}}}
