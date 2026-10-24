@@ -13,12 +13,7 @@
         "s": {
           "subject": "deployment",
           "checks": {
-            "c": {
-              "op": "present",
-              "path": [
-                "x"
-              ]
-            }
+            "c": "x exists"
           }
         }
       }
@@ -26,12 +21,7 @@
     "cases": [
       {
         "description": "reads each item of the list at the path, in list order, with a string id",
-        "rules": [
-          "subjects.sentence",
-          "sentence.subject.from",
-          "subjects.from",
-          "subjects.id"
-        ],
+        "rules": ["subjects.sentence", "sentence.subject.from", "subjects.from", "subjects.id"],
         "input": {
           "data": {
             "deployments": [
@@ -145,11 +135,7 @@
       },
       {
         "description": "fails $min_subjects as absent when the path isn't in the input",
-        "rules": [
-          "subjects.sentence",
-          "sentence.subject.from",
-          "subjects.from"
-        ],
+        "rules": ["subjects.sentence", "sentence.subject.from", "subjects.from"],
         "input": {
           "data": {}
         },
@@ -229,12 +215,7 @@
         "s": {
           "subject": "deployment",
           "checks": {
-            "c": {
-              "op": "present",
-              "path": [
-                "x"
-              ]
-            }
+            "c": "x exists"
           }
         }
       }
@@ -242,10 +223,7 @@
     "cases": [
       {
         "description": "reads the id inside each subject along the path",
-        "rules": [
-          "subjects.sentence",
-          "subjects.id"
-        ],
+        "rules": ["subjects.sentence", "subjects.id"],
         "input": {
           "deployments": [
             {
@@ -351,10 +329,7 @@
       },
       {
         "description": "gives a null id when the path doesn't end found, and the subject still gets its rows",
-        "rules": [
-          "subjects.sentence",
-          "subjects.id"
-        ],
+        "rules": ["subjects.sentence", "subjects.id"],
         "input": {
           "deployments": [
             {
@@ -476,12 +451,7 @@
         "s": {
           "subject": "deployment",
           "checks": {
-            "c": {
-              "op": "present",
-              "path": [
-                "x"
-              ]
-            }
+            "c": "x exists"
           }
         }
       }
@@ -489,10 +459,7 @@
     "cases": [
       {
         "description": "reads the id from the field of that name",
-        "rules": [
-          "subjects.sentence",
-          "subjects.id"
-        ],
+        "rules": ["subjects.sentence", "subjects.id"],
         "input": {
           "deployments": [
             {
@@ -588,12 +555,7 @@
         "s": {
           "subject": "deployment",
           "checks": {
-            "c": {
-              "op": "present",
-              "path": [
-                "x"
-              ]
-            }
+            "c": "x exists"
           },
           "min_subjects": 0
         }
@@ -602,14 +564,7 @@
     "cases": [
       {
         "description": "joins the conditions as written in the $applies row, and keeps only the subjects that pass both",
-        "rules": [
-          "subjects.sentence",
-          "sentence.subject.from",
-          "sentence.subject.applies",
-          "scope.filters",
-          "scope.out",
-          "sentence.phrase.is"
-        ],
+        "rules": ["subjects.sentence", "sentence.subject.from", "sentence.subject.applies", "scope.filters", "scope.out", "sentence.phrase.is"],
         "input": {
           "deployments": [
             {
@@ -780,11 +735,7 @@
       },
       {
         "description": "fails the requirement as absent for a subject a condition can't decide, even with min_subjects 0",
-        "rules": [
-          "sentence.subject.applies",
-          "scope.unreadable",
-          "subjects.sentence"
-        ],
+        "rules": ["sentence.subject.applies", "scope.unreadable", "subjects.sentence"],
         "input": {
           "deployments": [
             {
@@ -881,12 +832,7 @@
       },
       {
         "description": "fails the requirement as unusable for a subject whose field has another type than the value, even with min_subjects 0",
-        "rules": [
-          "sentence.subject.applies",
-          "scope.unreadable",
-          "subjects.sentence",
-          "sentence.phrase.is"
-        ],
+        "rules": ["sentence.subject.applies", "scope.unreadable", "subjects.sentence", "sentence.phrase.is"],
         "input": {
           "deployments": [
             {
@@ -984,10 +930,7 @@
       },
       {
         "description": "fails as absent when the first condition can't be decided, even though the second rules the subject out",
-        "rules": [
-          "sentence.subject.applies",
-          "scope.unreadable"
-        ],
+        "rules": ["sentence.subject.applies", "scope.unreadable"],
         "input": {
           "deployments": [
             {
@@ -1093,12 +1036,7 @@
         "s": {
           "subject": "deployment",
           "checks": {
-            "c": {
-              "op": "present",
-              "path": [
-                "x"
-              ]
-            }
+            "c": "x exists"
           }
         }
       }
@@ -1106,11 +1044,7 @@
     "cases": [
       {
         "description": "keeps the written order in the expression, and lists the inputs sorted by name",
-        "rules": [
-          "sentence.subject.applies",
-          "subjects.sentence",
-          "sentence.subject.from"
-        ],
+        "rules": ["sentence.subject.applies", "subjects.sentence", "sentence.subject.from"],
         "input": {
           "deployments": [
             {
@@ -1233,12 +1167,7 @@
         "s": {
           "subject": "pr",
           "checks": {
-            "c": {
-              "op": "present",
-              "path": [
-                "x"
-              ]
-            }
+            "c": "x exists"
           },
           "min_subjects": 0
         }
@@ -1247,13 +1176,7 @@
     "cases": [
       {
         "description": "counts the items of the list and keeps subjects with enough",
-        "rules": [
-          "sentence.subject.condition",
-          "sentence.subject.applies",
-          "subjects.sentence",
-          "sentence.phrase.order",
-          "scope.out"
-        ],
+        "rules": ["sentence.subject.condition", "sentence.subject.applies", "subjects.sentence", "sentence.phrase.order", "scope.out"],
         "input": {
           "pulls": [
             {
@@ -1392,10 +1315,7 @@
       },
       {
         "description": "fails the requirement as absent for a subject whose list is missing",
-        "rules": [
-          "sentence.subject.condition",
-          "scope.unreadable"
-        ],
+        "rules": ["sentence.subject.condition", "scope.unreadable"],
         "input": {
           "pulls": [
             {
@@ -1500,12 +1420,7 @@
         "s": {
           "subject": "artifact",
           "checks": {
-            "c": {
-              "op": "present",
-              "path": [
-                "x"
-              ]
-            }
+            "c": "x exists"
           }
         }
       }
@@ -1516,11 +1431,7 @@
     "cases": [
       {
         "description": "reads the key the param holds",
-        "rules": [
-          "subjects.sentence",
-          "sentence.subject.from",
-          "sentence.path.dynamic"
-        ],
+        "rules": ["subjects.sentence", "sentence.subject.from", "sentence.path.dynamic"],
         "input": {
           "artifacts": {
             "web": {
@@ -1606,11 +1517,7 @@
       },
       {
         "description": "fails $min_subjects as absent when the object has no such key",
-        "rules": [
-          "subjects.sentence",
-          "subjects.from",
-          "sentence.path.dynamic"
-        ],
+        "rules": ["subjects.sentence", "subjects.from", "sentence.path.dynamic"],
         "input": {
           "artifacts": {
             "api": {
@@ -1695,12 +1602,7 @@
         "s": {
           "subject": "scan",
           "checks": {
-            "c": {
-              "op": "present",
-              "path": [
-                "x"
-              ]
-            }
+            "c": "x exists"
           }
         }
       }
@@ -1715,11 +1617,7 @@
     "cases": [
       {
         "description": "makes each listed key a subject, identified by its key, and a key the object doesn't have is still a subject",
-        "rules": [
-          "subjects.sentence",
-          "sentence.subject.from",
-          "sentence.path.keys"
-        ],
+        "rules": ["subjects.sentence", "sentence.subject.from", "sentence.path.keys"],
         "input": {
           "scans": {
             "sast": {
@@ -1839,12 +1737,7 @@
         "s": {
           "subject": "lockfile",
           "checks": {
-            "c": {
-              "op": "present",
-              "path": [
-                "x"
-              ]
-            }
+            "c": "x exists"
           },
           "min_subjects": 0
         }
@@ -1853,13 +1746,7 @@
     "cases": [
       {
         "description": "is the input field, never the subject",
-        "rules": [
-          "sentence.subject.own",
-          "subjects.sentence",
-          "sentence.subject.from",
-          "sentence.phrase.is",
-          "scope.out"
-        ],
+        "rules": ["sentence.subject.own", "subjects.sentence", "sentence.subject.from", "sentence.phrase.is", "scope.out"],
         "input": {
           "lockfile": [
             {
@@ -1997,12 +1884,7 @@
         "s": {
           "subject": "artifact",
           "checks": {
-            "c": {
-              "op": "present",
-              "path": [
-                "x"
-              ]
-            }
+            "c": "x exists"
           }
         }
       }
@@ -2010,11 +1892,7 @@
     "cases": [
       {
         "description": "reads the input field of its own name, and can still have an id",
-        "rules": [
-          "subjects.no_from",
-          "sentence.subject.short",
-          "subjects.id"
-        ],
+        "rules": ["subjects.no_from", "sentence.subject.short", "subjects.id"],
         "input": {
           "artifact": [
             {
@@ -2102,10 +1980,7 @@
       },
       {
         "description": "takes an object as the only subject",
-        "rules": [
-          "subjects.no_from",
-          "sentence.subject.short"
-        ],
+        "rules": ["subjects.no_from", "sentence.subject.short"],
         "input": {
           "artifact": {
             "id": "a1",
@@ -2196,12 +2071,7 @@
         "s": {
           "subject": "artifact",
           "checks": {
-            "c": {
-              "op": "present",
-              "path": [
-                "x"
-              ]
-            }
+            "c": "x exists"
           }
         }
       }
@@ -2209,10 +2079,7 @@
     "cases": [
       {
         "description": "reads the input field of its own name",
-        "rules": [
-          "subjects.no_from",
-          "sentence.subject.short"
-        ],
+        "rules": ["subjects.no_from", "sentence.subject.short"],
         "input": {
           "artifact": [
             {
@@ -2325,10 +2192,7 @@
       },
       {
         "description": "fails $min_subjects as absent when the input has no such field",
-        "rules": [
-          "subjects.no_from",
-          "subjects.from"
-        ],
+        "rules": ["subjects.no_from", "subjects.from"],
         "input": {
           "other": [
             {
@@ -2404,22 +2268,15 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "artifact": {
-          "from": [],
-          "identified_by": [
-            "id"
-          ]
-        }
+          "from": "$input",
+          "identified_by": "id"
+          }
       },
       "requirements": {
         "s": {
           "subject": "artifact",
           "checks": {
-            "c": {
-              "op": "present",
-              "path": [
-                "x"
-              ]
-            }
+            "c": "x exists"
           }
         }
       }
@@ -2427,10 +2284,7 @@
     "cases": [
       {
         "description": "reads the whole input, not a field named like the subject",
-        "rules": [
-          "subjects.no_from",
-          "subjects.from"
-        ],
+        "rules": ["subjects.no_from", "subjects.from"],
         "input": {
           "id": "whole",
           "x": 1,
@@ -2536,12 +2390,7 @@
         "s": {
           "subject": "deployment",
           "checks": {
-            "c": {
-              "op": "present",
-              "path": [
-                "x"
-              ]
-            }
+            "c": "x exists"
           }
         }
       }
@@ -2549,11 +2398,7 @@
     "cases": [
       {
         "description": "is written wrong and $well_formed lists it under the subject's from",
-        "rules": [
-          "subjects.sentence",
-          "well_formed",
-          "written_wrong.row"
-        ],
+        "rules": ["subjects.sentence", "well_formed", "written_wrong.row"],
         "input": {
           "deployments": [
             {
@@ -2644,12 +2489,7 @@
         "s": {
           "subject": "deployment",
           "checks": {
-            "c": {
-              "op": "present",
-              "path": [
-                "x"
-              ]
-            }
+            "c": "x exists"
           }
         }
       }
@@ -2657,11 +2497,7 @@
     "cases": [
       {
         "description": "is written wrong and $well_formed lists it under the subject's id",
-        "rules": [
-          "subjects.sentence",
-          "well_formed",
-          "written_wrong.row"
-        ],
+        "rules": ["subjects.sentence", "well_formed", "written_wrong.row"],
         "input": {
           "deployments": [
             {
@@ -2755,117 +2591,19 @@
     ]
   },
   {
-    "description": "a from line next to applies_to",
-    "policy": {
-      "ergo_spec": "v0.1",
-      "subjects": {
-        "deployment": {
-          "from": "deployments",
-          "identified_by": "id",
-          "applies_to": {
-            "f": {
-              "op": "present",
-              "path": [
-                "x"
-              ]
-            }
-          }
-        }
-      },
-      "requirements": {
-        "s": {
-          "subject": "deployment",
-          "checks": {
-            "c": {
-              "op": "present",
-              "path": [
-                "x"
-              ]
-            }
-          }
-        }
-      }
-    },
+    "description": "a subject with applies_to",
+    "policy": {"ergo_spec": "v0.1", "subjects": {"deployment": {"from": "deployments", "identified_by": "id", "applies_to": {"f": {"op": "present", "path": ["x"]}}}}, "requirements": {"s": {"subject": "deployment", "checks": {"c": "x exists"}}}},
     "cases": [
       {
-        "description": "is written wrong and $well_formed lists it under the subject's from",
-        "rules": [
-          "subjects.sentence",
-          "well_formed",
-          "written_wrong.row"
-        ],
-        "input": {
-          "deployments": [
-            {
-              "id": "d1",
-              "x": 1
-            }
-          ]
-        },
-        "requirements": {
-          "s": {
-            "status": "not_met"
-          }
-        },
+        "description": "is written wrong:  lists applies_to as an unknown field, and the conditions go after whose",
+        "rules": ["subjects.sentence", "well_formed", "written_wrong.row"],
+        "input": {"deployments": [{"id": "d1", "x": 1}]},
+        "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {
-            "requirement": "s",
-            "subject": {
-              "type": "deployment",
-              "id": null
-            },
-            "check": "$well_formed",
-            "passed": false,
-            "cause": "value",
-            "inputs": [
-              {
-                "name": "count(checks)",
-                "value": 1
-              },
-              {
-                "name": "require",
-                "value": "every"
-              },
-              {
-                "name": "subjects.deployment.from",
-                "value": [
-                  "applies_to can't go with a from written as a sentence: put the conditions after \"whose\""
-                ]
-              }
-            ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "type": "deployment",
-              "id": null
-            },
-            "check": "$min_subjects",
-            "passed": false,
-            "cause": "value",
-            "inputs": [
-              {
-                "name": "in-scope deployment count",
-                "value": 0
-              }
-            ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "type": "deployment",
-              "id": null
-            },
-            "check": "$unique_ids",
-            "passed": true,
-            "cause": "satisfied",
-            "inputs": [
-              {
-                "name": "repeated deployment ids",
-                "value": []
-              }
-            ]
-          }
+          {"requirement": "s", "subject": {"type": "deployment", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "subjects.deployment.applies_to", "value": ["unknown field"]}]},
+          {"requirement": "s", "subject": {"type": "deployment", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope deployment count", "value": 1}]},
+          {"requirement": "s", "subject": {"type": "deployment", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated deployment ids", "value": []}]},
+          {"requirement": "s", "subject": {"type": "deployment", "id": "d1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
         ]
       }
     ]
@@ -2897,13 +2635,7 @@
       {
         "description": "reads its path from the parent's one subject, and every row but $well_formed carries the parent's id under in",
         "expressions": {"s": {"$min_subjects": "count(matching(artifact.pulls)) >= 1", "$unique_ids": "count(repeated(ids(artifact.pulls))) == 0"}},
-        "rules": [
-          "added.text",
-          "subjects.chain",
-          "sentence.subject.chain",
-          "sentence.path.start",
-          "sentence.phrase.exists"
-        ],
+        "rules": ["added.text", "subjects.chain", "sentence.subject.chain", "sentence.path.start", "sentence.phrase.exists"],
         "input": {
           "artifacts": [
             {
@@ -3046,11 +2778,7 @@
       },
       {
         "description": "with more than one parent subject, reads the subjects of each and counts them per parent",
-        "rules": [
-          "subjects.chain",
-          "subjects.chain.count",
-          "sentence.subject.chain"
-        ],
+        "rules": ["subjects.chain", "subjects.chain.count", "sentence.subject.chain"],
         "input": {
           "artifacts": [
             {
@@ -3207,9 +2935,7 @@
       },
       {
         "description": "with no parent subject, finds none and fails min_subjects as value",
-        "rules": [
-          "subjects.chain"
-        ],
+        "rules": ["subjects.chain"],
         "input": {
           "artifacts": []
         },
@@ -3305,10 +3031,7 @@
     "cases": [
       {
         "description": "checks ids are unique within each parent, so the same id under two parents is fine",
-        "rules": [
-          "subjects.chain",
-          "subjects.chain.count"
-        ],
+        "rules": ["subjects.chain", "subjects.chain.count"],
         "input": {
           "artifacts": [
             {
@@ -3521,9 +3244,7 @@
       },
       {
         "description": "gives no rows for a parent its conditions leave out, even when its subjects repeat an id or fail",
-        "rules": [
-          "subjects.chain.scope"
-        ],
+        "rules": ["subjects.chain.scope"],
         "input": {
           "artifacts": [
             {
@@ -3652,9 +3373,7 @@
       },
       {
         "description": "fails min_subjects as absent on the row of a parent whose conditions can't be decided, and doesn't check its subjects",
-        "rules": [
-          "subjects.chain.scope"
-        ],
+        "rules": ["subjects.chain.scope"],
         "input": {
           "artifacts": [
             {
@@ -3796,10 +3515,7 @@
       },
       {
         "description": "with every parent left out, fails min_subjects as value on one row without in",
-        "rules": [
-          "subjects.chain.count",
-          "subjects.chain.scope"
-        ],
+        "rules": ["subjects.chain.count", "subjects.chain.scope"],
         "input": {
           "artifacts": [
             {
@@ -3910,9 +3626,7 @@
     "cases": [
       {
         "description": "checks each grandchild, counts per direct parent, and every row but $well_formed carries every ancestor's id under in",
-        "rules": [
-          "subjects.chain.levels"
-        ],
+        "rules": ["subjects.chain.levels"],
         "input": {
           "artifacts": [
             {
@@ -4119,9 +3833,7 @@
       },
       {
         "description": "leaves out everything below a subject that's out of scope at any level",
-        "rules": [
-          "subjects.chain.levels"
-        ],
+        "rules": ["subjects.chain.levels"],
         "input": {
           "artifacts": [
             {
@@ -4272,9 +3984,7 @@
       },
       {
         "description": "fails min_subjects as absent on the row of an ancestor whose conditions can't be decided, with in up to that ancestor",
-        "rules": [
-          "subjects.chain.levels"
-        ],
+        "rules": ["subjects.chain.levels"],
         "input": {
           "artifacts": [
             {
@@ -4382,10 +4092,7 @@
       },
       {
         "description": "with no direct parent at all, fails min_subjects as value on one row without in",
-        "rules": [
-          "subjects.chain.levels",
-          "subjects.chain.count"
-        ],
+        "rules": ["subjects.chain.levels", "subjects.chain.count"],
         "input": {
           "artifacts": [
             {
@@ -4494,9 +4201,7 @@
     "cases": [
       {
         "description": "is written wrong",
-        "rules": [
-          "subjects.chain.levels"
-        ],
+        "rules": ["subjects.chain.levels"],
         "input": {
           "artifacts": []
         },
@@ -4594,10 +4299,7 @@
     "cases": [
       {
         "description": "reads one flat list from every list along the path, with no in, and counts it once",
-        "rules": [
-          "subjects.every",
-          "sentence.subject.every"
-        ],
+        "rules": ["subjects.every", "sentence.subject.every"],
         "input": {
           "artifacts": [
             {
@@ -4746,9 +4448,7 @@
       },
       {
         "description": "checks ids are unique across every list",
-        "rules": [
-          "subjects.every.count"
-        ],
+        "rules": ["subjects.every.count"],
         "input": {
           "artifacts": [
             {
@@ -4866,9 +4566,7 @@
       },
       {
         "description": "with only empty lists, finds none and fails min_subjects as value",
-        "rules": [
-          "subjects.every.count"
-        ],
+        "rules": ["subjects.every.count"],
         "input": {
           "artifacts": [
             {
@@ -4939,9 +4637,7 @@
       },
       {
         "description": "fails min_subjects with the worst cause of a broken branch, lists each one, and still checks the subjects it read",
-        "rules": [
-          "subjects.every.broken"
-        ],
+        "rules": ["subjects.every.broken"],
         "input": {
           "artifacts": [
             {
@@ -5059,9 +4755,7 @@
       },
       {
         "description": "fails min_subjects as unusable when no list is along the path, as every does in a check",
-        "rules": [
-          "subjects.every.broken"
-        ],
+        "rules": ["subjects.every.broken"],
         "input": {
           "artifacts": {
             "pull_requests": {
@@ -5167,9 +4861,7 @@
     "cases": [
       {
         "description": "is written wrong",
-        "rules": [
-          "sentence.subject.every"
-        ],
+        "rules": ["sentence.subject.every"],
         "input": {
           "artifacts": [
             {
@@ -5276,9 +4968,7 @@
     "cases": [
       {
         "description": "is written wrong",
-        "rules": [
-          "sentence.subject.every"
-        ],
+        "rules": ["sentence.subject.every"],
         "input": {
           "artifacts": [
             {
@@ -5383,12 +5073,7 @@
     "cases": [
       {
         "description": "keeps the subjects that pass the parent's conditions and its own, parent's first in the expression",
-        "rules": [
-          "sentence.subject.narrow",
-          "subjects.sentence",
-          "sentence.phrase.is",
-          "scope.filters"
-        ],
+        "rules": ["sentence.subject.narrow", "subjects.sentence", "sentence.phrase.is", "scope.filters"],
         "input": {
           "defects": [
             {
@@ -5602,11 +5287,7 @@
     "cases": [
       {
         "description": "names the parent in quotes and keeps what passes every condition along the chain",
-        "rules": [
-          "sentence.subject.quoted",
-          "sentence.subject.narrow",
-          "subjects.sentence"
-        ],
+        "rules": ["sentence.subject.quoted", "sentence.subject.narrow", "subjects.sentence"],
         "input": {
           "defects": [
             {
@@ -5800,11 +5481,7 @@
     "cases": [
       {
         "description": "lead to a loop, named after from, and the requirement finds no subjects",
-        "rules": [
-          "subjects.sentence",
-          "sentence.subject.narrow",
-          "written_wrong.row"
-        ],
+        "rules": ["subjects.sentence", "sentence.subject.narrow", "written_wrong.row"],
         "input": {
           "x": [
             {
@@ -5890,6 +5567,167 @@
     ]
   },
   {
+    "description": "a subject that narrows another and has its own identified_by",
+    "policy": {
+      "ergo_spec": "v0.1",
+      "subjects": {
+        "defect": {
+          "from": "defects",
+          "identified_by": "id"
+        },
+        "critical defect": {
+          "from": "defect whose severity is \"critical\"",
+          "identified_by": "team"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "critical defect",
+          "checks": {
+            "c": "team exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong and keeps the id of the one it narrows",
+        "rules": ["subjects.narrow.id", "sentence.subject.narrow", "written_wrong.row"],
+        "input": {
+          "defects": [
+            {
+              "id": 1,
+              "severity": "critical",
+              "team": "a"
+            },
+            {
+              "id": 2,
+              "severity": "low",
+              "team": "a"
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met",
+            "subjects": {
+              "matching": 1,
+              "total": 2
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "subjects.\"critical defect\".identified_by",
+                "value": [
+                  "not allowed on a subject that narrows another"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "critical defect"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope critical defect count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "critical defect"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated critical defect ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "critical defect"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "severity",
+                "value": "critical"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": 1,
+              "type": "critical defect"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "severity",
+                "value": "low"
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": 2,
+              "type": "critical defect"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "team",
+                "value": "a"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": 1,
+              "type": "critical defect"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "the report lists the subjects the requirements use",
     "policy": {
       "ergo_spec": "v0.1",
@@ -5916,9 +5754,7 @@
     "cases": [
       {
         "description": "lists a subject with its description, its from line printed the same way whatever the spaces, and its id",
-        "rules": [
-          "report.subjects"
-        ],
+        "rules": ["report.subjects"],
         "input": {},
         "report": {
           "subjects": {
@@ -5934,10 +5770,7 @@
       },
       {
         "description": "names the subject in the requirement entry, and lists no subject that no requirement uses",
-        "rules": [
-          "report.requirements",
-          "report.subjects"
-        ],
+        "rules": ["report.requirements", "report.subjects"],
         "input": {},
         "report": {
           "subjects": {
@@ -5987,9 +5820,7 @@
     "cases": [
       {
         "description": "lists both subjects, and the narrowing one has the id of the one it narrows",
-        "rules": [
-          "report.subjects"
-        ],
+        "rules": ["report.subjects"],
         "input": {},
         "report": {
           "subjects": {
@@ -6037,9 +5868,7 @@
     "cases": [
       {
         "description": "lists the parent it is read from too",
-        "rules": [
-          "report.subjects"
-        ],
+        "rules": ["report.subjects"],
         "input": {},
         "report": {
           "subjects": {
@@ -6053,105 +5882,6 @@
               "description": "",
               "from": "artifact.pull_requests",
               "identified_by": "url",
-              "parts": {}
-            }
-          }
-        },
-        "results": []
-      }
-    ]
-  },
-  {
-    "description": "subjects written as lists",
-    "policy": {
-      "ergo_spec": "v0.1",
-      "subjects": {
-        "base": {
-          "from": [
-            "components"
-          ],
-          "identified_by": [
-            "name"
-          ]
-        },
-        "locked": {
-          "of": "base",
-          "applies_to": {
-            "locked": {
-              "op": "present",
-              "path": [
-                "lock_release"
-              ]
-            },
-            "exempt": {
-              "op": "equals",
-              "path": [
-                "exempt"
-              ],
-              "value": false
-            }
-          }
-        },
-        "odd": {
-          "from": [
-            "things"
-          ],
-          "applies_to": {
-            "b": {
-              "op": "present",
-              "path": [
-                "b"
-              ]
-            },
-            "a": {
-              "op": "even",
-              "path": [
-                "n"
-              ]
-            }
-          }
-        }
-      },
-      "requirements": {
-        "s": {
-          "subject": "locked",
-          "checks": {
-            "c": "id exists"
-          }
-        },
-        "t": {
-          "subject": "odd",
-          "checks": {
-            "c": "id exists"
-          }
-        }
-      }
-    },
-    "cases": [
-      {
-        "description": "prints the path and the conditions sorted by name as a sentence, and shows a condition that is not a sentence by its name",
-        "rules": [
-          "report.subjects"
-        ],
-        "input": {},
-        "report": {
-          "subjects": {
-            "base": {
-              "description": "",
-              "from": "components",
-              "identified_by": "name",
-              "parts": {}
-            },
-            "locked": {
-              "description": "",
-              "from": "base whose exempt is false and lock_release exists",
-              "identified_by": "name",
-              "parts": {}
-            },
-            "odd": {
-              "description": "",
-              "from": "things whose <condition a> and b exists",
-              "identified_by": null,
               "parts": {}
             }
           }
@@ -6179,9 +5909,7 @@
     "cases": [
       {
         "description": "reads the input field named like it, and has no id path",
-        "rules": [
-          "report.subjects"
-        ],
+        "rules": ["report.subjects"],
         "input": {},
         "report": {
           "subjects": {
@@ -6219,9 +5947,7 @@
     "cases": [
       {
         "description": "still has its entry, with <invalid from> and an empty description",
-        "rules": [
-          "report.subjects"
-        ],
+        "rules": ["report.subjects"],
         "input": {},
         "report": {
           "subjects": {
@@ -6263,10 +5989,7 @@
     "cases": [
       {
         "description": "has subject null, and no subject is listed",
-        "rules": [
-          "report.requirements",
-          "report.subjects"
-        ],
+        "rules": ["report.requirements", "report.subjects"],
         "input": {},
         "report": {
           "subjects": {}
@@ -6280,6 +6003,23 @@
           }
         },
         "results": []
+      }
+    ]
+  },
+  {
+    "description": "a subject with from and identified_by written as lists",
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, finds no subjects, and $well_formed lists both fields as not a string",
+        "rules": ["policy.old_fields", "subjects.sentence", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "requirements": {"s": {"status": "not_met"}},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "subjects.thing.from", "value": ["not a string"]}, {"name": "subjects.thing.identified_by", "value": ["not a string"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$min_subjects", "passed": false, "cause": "value", "inputs": [{"name": "in-scope thing count", "value": 0}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated thing ids", "value": []}]}
+        ]
       }
     ]
   }

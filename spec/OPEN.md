@@ -32,14 +32,6 @@ A gap that many controls share becomes a phrase or a derived value, which stays 
 
 The same check found two ways a check passes when it shouldn't. A sentence that compares a path with itself always passes, which happens when a `whose` or a one-line `every` reads a bare key that the writer meant as the subject's ([#273](https://github.com/kosli-dev/ergo/issues/273)). And numbers held as strings, as Sonar records them, are ordered as text, so `"9"` is at least `"80"` ([#274](https://github.com/kosli-dev/ergo/issues/274)).
 
-## Derived values
-
-Derived values on a side of `compare` (`count`, `sum`, `add`, `literal`, and `within`, from [#173](https://github.com/kosli-dev/ergo/issues/173)) have an entry in `policy/schema.json` and a rule in `syntax.md`, `compare.derived`. They have no rules in `semantics.md` and no cases yet, so what a derived side reads, when it fails and how it's shown in `expression` and `inputs` is only in [REFERENCE.md](../REFERENCE.md#derived-values).
-
-## Subjects built on another
-
-A subject with `of` (see [REFERENCE.md](../REFERENCE.md#a-subject-built-on-another)) has an entry in `policy/schema.json`, but no rules and no cases yet.
-
 ## Parts
 
 A subject's parts (`has`, see [syntax.md](syntax.md#parts)) leave a few things open:
@@ -90,7 +82,6 @@ Three ways to settle it:
 
 Every rule needs a case, apart from the ones listed here. The `sentence` rules here are for forms `ergo.rego` doesn't run or check yet. `report.engine` gives different values for each engine, so a case can't pin it, and `ergo_test.rego` tests it instead. `report.hash` waits for the question about numbers above. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.
 
-- `compare.derived`
 - `sentence.forms`
 - `sentence.flat`
 - `sentence.subject.depth`

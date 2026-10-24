@@ -102,7 +102,7 @@ peer_approval:
 
 **[sentence.path.dynamic]** `<path> named by <reference>` reads the key that the reference holds, as a ref step does today, and the path can go on after it: `artifacts_statuses named by $params.artifact_name.attestations_statuses`. The reference is `$params` or `$input` plus one key, or one bare key. A bare key is an alias from a `for` line, like `persona_blob_shas named by persona`, or else a field, read where a bare first key would be read (see [sentence.path.start](#paths)): `$params.max_days_by_severity named by severity` reads the subject's `severity`, and inside a `whose` the item's. Without that limit, `named by $params.a.b` could end the reference after `a` or after `b`, and the tokenizer found 24 lines in the corpus that read two ways because of it.
 
-**[sentence.path.brackets]** Brackets are the other spelling: `artifacts_statuses[$params.artifact_name]`, `persona_blob_shas[persona]`, and `items[2]` for a position. In brackets the type decides, as in JSON: a string picks a key and a number picks a position. The report prints the word form.
+**[sentence.path.brackets]** Brackets are the other spelling: `artifacts_statuses[$params.artifact_name]`, `persona_blob_shas[persona]`, and `items[2]` for a position. In brackets the type decides, as in JSON: a string picks a key and a number picks a position. The report prints the word form. A position above 9007199254740991, the largest whole number a 64-bit float holds exactly, is written wrong, in brackets or after `item`, with `<number> can't be a list position`.
 
 **[sentence.path.keys]** In `from`, `<path> named by each of <list>` makes each listed key a subject, as `keys` does today: `artifact.attestations named by each of $params.required_scans`. There is no bracket form for it, because `a[x]` picks one thing in every language, and a parameter meant to be one name that arrives as a list would turn one subject into several instead of failing. `from` doesn't name its subjects: the checks that used `each_as` names have a `for` line, where the subject's fields are bare.
 
@@ -416,6 +416,7 @@ Read as `is` or `equals`, and printed as one of them. With it in the grammar, ev
 | `some approvers, if any, is not empty`                   | `if any can't go with some`                                                     |
 | `every pull_requests some approvers.state is "APPROVED"` | `two quantifiers in one sentence: put them on a for line`                       |
 | `x is at least 1e400`                                    | `number out of range: 1e400`                                                    |
+| `items[9007199254740992] does not exist`                 | `9007199254740992 can't be a list position`                                     |
 
 **[sentence.written_wrong.self]** A sentence that compares a path with itself is written wrong, because it could only pass or only fail. That's `is`, `equals`, `is not` or `does not equal` a field, with or without `within`, the order and time phrases, `starts with` and `ends with`, when the field on the right is read from the same place as the path:
 

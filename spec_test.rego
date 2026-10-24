@@ -6,16 +6,20 @@ known_differences := set()
 
 failures := union({_topic_failures(topic) | some topic, _ in data.spec.cases})
 
-_topic_failures(topic) := {concat(" / ", [topic, group.description, c.description]) |
-	some group in data.spec.cases[topic]
+_topic_failures(topic) := _failures(topic, data.spec.cases[topic])
+
+_failures(topic, groups) := {concat(" / ", [topic, group.description, c.description]) |
+	some group in groups
 	some c in group.cases
 	not _passes(group, c)
 }
 
 _known_in(topic) := known_differences & _case_names(topic)
 
-_compiled_differences(topic) := {concat(" / ", [topic, group.description, c.description]) |
-	some group in data.spec.cases[topic]
+_compiled_differences(topic) := _differences_compiled(topic, data.spec.cases[topic])
+
+_differences_compiled(topic, groups) := {concat(" / ", [topic, group.description, c.description]) |
+	some group in groups
 	form := json.unmarshal(json.marshal(ergo.compile(group.policy)))
 	some c in group.cases
 	ergo.report(c.input, form, object.get(group, "params", {})) != _report(group, c)
@@ -28,7 +32,7 @@ _case_names(topic) := {concat(" / ", [topic, group.description, c.description]) 
 
 test_every_known_difference_names_a_case if known_differences - union({_case_names(topic) | some topic, _ in data.spec.cases}) == set()
 
-_tested_topics := {"any_of", "compare", "compare_time", "contains", "derived", "empty", "equals", "for", "in", "lists", "missing", "non_empty_string", "parts", "patterns", "present", "range", "requirements", "sentences", "subjects", "walks"}
+_tested_topics := {"any_of", "compare", "compare_time", "contains", "derived", "equals", "for", "in", "missing", "non_empty_string", "parts", "patterns", "present", "range", "requirements", "sentences", "subjects", "walks"}
 
 test_every_folder_of_cases_has_a_test_of_its_own if {t | some t, _ in data.spec.cases} == _tested_topics
 
@@ -57,11 +61,6 @@ test_the_derived_cases_pass if {
 	_compiled_differences("derived") == set()
 }
 
-test_the_empty_cases_pass if {
-	_topic_failures("empty") == _known_in("empty")
-	_compiled_differences("empty") == set()
-}
-
 test_the_equals_cases_pass if {
 	_topic_failures("equals") == _known_in("equals")
 	_compiled_differences("equals") == set()
@@ -75,11 +74,6 @@ test_the_for_cases_pass if {
 test_the_in_cases_pass if {
 	_topic_failures("in") == _known_in("in")
 	_compiled_differences("in") == set()
-}
-
-test_the_lists_cases_pass if {
-	_topic_failures("lists") == _known_in("lists")
-	_compiled_differences("lists") == set()
 }
 
 test_the_missing_cases_pass if {
@@ -117,10 +111,20 @@ test_the_requirements_cases_pass if {
 	_compiled_differences("requirements") == set()
 }
 
-test_the_sentences_cases_pass if {
-	_topic_failures("sentences") == _known_in("sentences")
-	_compiled_differences("sentences") == set()
+_half(topic, n) := [group | some i, group in data.spec.cases[topic]; i % 2 == n]
+
+_half_passes(topic, n) if _failures(topic, _half(topic, n)) == known_differences & {concat(" / ", [topic, group.description, c.description]) |
+	some group in _half(topic, n)
+	some c in group.cases
 }
+
+test_the_even_sentences_cases_pass if _half_passes("sentences", 0)
+
+test_the_odd_sentences_cases_pass if _half_passes("sentences", 1)
+
+test_the_even_sentences_cases_pass_compiled if _differences_compiled("sentences", _half("sentences", 0)) == set()
+
+test_the_odd_sentences_cases_pass_compiled if _differences_compiled("sentences", _half("sentences", 1)) == set()
 
 test_the_subjects_cases_pass if {
 	_topic_failures("subjects") == _known_in("subjects")
@@ -135,7 +139,7 @@ test_the_walks_cases_pass if {
 test_a_case_with_the_wrong_rows_is_listed_by_name if {
 	failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
 		"description": "group",
-		"policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": []}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+		"policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "$input"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
 		"cases": [{"description": "case", "input": {"x": 1}, "results": []}],
 	}]}
 }
@@ -143,7 +147,7 @@ test_a_case_with_the_wrong_rows_is_listed_by_name if {
 test_a_case_with_the_wrong_status_is_listed_by_name if {
 	failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
 		"description": "group",
-		"policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": []}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+		"policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "$input"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
 		"cases": [{"description": "case", "input": {"x": 1}, "status": {"s": "not_met"}, "results": [{
 			"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c",
 			"passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}],
@@ -154,7 +158,7 @@ test_a_case_with_the_wrong_status_is_listed_by_name if {
 test_a_case_with_the_wrong_expression_is_listed_by_name if {
 	failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
 		"description": "group",
-		"policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": []}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+		"policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "$input"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
 		"cases": [{"description": "case", "input": {"x": 1}, "expressions": {"s": {"c": "y is present"}}, "results": [{
 			"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c",
 			"passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}],
@@ -165,7 +169,7 @@ test_a_case_with_the_wrong_expression_is_listed_by_name if {
 test_a_case_with_the_wrong_refs_is_listed_by_name if {
 	failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
 		"description": "group",
-		"policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": []}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+		"policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "$input"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
 		"cases": [{"description": "case", "input": {"x": 1}, "refs": {"s": {"c": [{"name": "$$params.x", "value": 1}]}}, "results": [{
 			"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c",
 			"passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}],
@@ -177,7 +181,7 @@ test_a_case_with_the_wrong_requirement_entry_is_listed_by_name if {
 	every want in [{"subjects": {"matching": 2, "total": 1}}, {"checks": {"$min_subjects": {"description": "nope"}}}] {
 		failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
 			"description": "group",
-			"policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": []}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+			"policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "$input"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
 			"cases": [{"description": "case", "input": {"x": 1}, "requirements": {"s": want}, "results": [{
 				"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c",
 				"passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}],
@@ -189,7 +193,7 @@ test_a_case_with_the_wrong_requirement_entry_is_listed_by_name if {
 test_a_case_with_the_wrong_violations_is_listed_by_name if {
 	failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
 		"description": "group",
-		"policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": []}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+		"policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "$input"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
 		"cases": [{"description": "case", "input": {"x": 1}, "violations": [{}], "results": [{
 			"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c",
 			"passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}],
@@ -200,7 +204,7 @@ test_a_case_with_the_wrong_violations_is_listed_by_name if {
 test_a_case_with_the_wrong_compliant_is_listed_by_name if {
 	failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
 		"description": "group",
-		"policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": []}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+		"policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "$input"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
 		"cases": [{"description": "case", "input": {"x": 1}, "compliant": false, "results": [{
 			"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c",
 			"passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}],
@@ -211,7 +215,7 @@ test_a_case_with_the_wrong_compliant_is_listed_by_name if {
 test_a_case_with_the_wrong_report_field_is_listed_by_name if {
 	failures == {"topic / group / case"} with data.spec.cases as {"topic": [{
 		"description": "group",
-		"policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": []}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+		"policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "$input"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
 		"cases": [{"description": "case", "input": {"x": 1}, "report": {"description": "nope"}, "results": [{
 			"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c",
 			"passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}],
@@ -280,7 +284,7 @@ _compared(check, c) if {
 test_a_known_difference_that_passes_fails_its_folder if {
 	cases := {"topic": [{
 		"description": "group",
-		"policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": []}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+		"policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "$input"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
 		"cases": [{"description": "case", "input": {"x": 1}, "results": [{
 			"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c",
 			"passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}],
@@ -295,7 +299,7 @@ _wrapped_compile(policy) := {"wrapped": policy}
 test_a_case_whose_compiled_policy_gives_another_report_is_listed_by_name if {
 	_compiled_differences("topic") == {"topic / group / case"} with data.spec.cases as {"topic": [{
 		"description": "group",
-		"policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": []}}, "requirements": {"s": {"subject": "subject", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+		"policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "$input"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
 		"cases": [{"description": "case", "input": {"x": 1}, "results": []}],
 	}]}
 		with data.ergo.compile as _wrapped_compile

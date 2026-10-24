@@ -29,14 +29,7 @@
     "cases": [
       {
         "description": "reads each alias as the path inside the subject, and the names in the rows and expressions keep the alias",
-        "rules": [
-          "parts.syntax",
-          "parts.path",
-          "parts.swap",
-          "sentence.path.part",
-          "name.part",
-          "parts.tag"
-        ],
+        "rules": ["parts.syntax", "parts.path", "parts.swap", "sentence.path.part", "name.part", "parts.tag"],
         "input": {
           "trail": {
             "name": "t1",
@@ -136,9 +129,7 @@
       },
       {
         "description": "tags an input with a null id when the part has no id inside it",
-        "rules": [
-          "parts.tag"
-        ],
+        "rules": ["parts.tag"],
         "input": {
           "trail": {
             "name": "t1",
@@ -212,9 +203,7 @@
       },
       {
         "description": "fails as value when a field of a part holds the wrong value",
-        "rules": [
-          "parts.swap"
-        ],
+        "rules": ["parts.swap"],
         "input": {
           "trail": {
             "name": "t1",
@@ -289,10 +278,7 @@
       },
       {
         "description": "fails as absent when the part is missing, as the full path would",
-        "rules": [
-          "parts.swap",
-          "path.absent"
-        ],
+        "rules": ["parts.swap", "path.absent"],
         "input": {
           "trail": {
             "name": "t1",
@@ -360,10 +346,7 @@
       },
       {
         "description": "fails as absent when the part is null, because a step follows it",
-        "rules": [
-          "parts.swap",
-          "path.absent"
-        ],
+        "rules": ["parts.swap", "path.absent"],
         "input": {
           "trail": {
             "name": "t1",
@@ -432,10 +415,7 @@
       },
       {
         "description": "fails as unusable when the part is a string, as the full path would",
-        "rules": [
-          "parts.swap",
-          "path.unusable"
-        ],
+        "rules": ["parts.swap", "path.unusable"],
         "input": {
           "trail": {
             "name": "t1",
@@ -505,10 +485,7 @@
       },
       {
         "description": "fails as unusable when something on the way to the part can't hold a key",
-        "rules": [
-          "parts.swap",
-          "path.unusable"
-        ],
+        "rules": ["parts.swap", "path.unusable"],
         "input": {
           "trail": {
             "name": "t1",
@@ -594,10 +571,7 @@
     "cases": [
       {
         "description": "gives the same row apart from the names of the inputs",
-        "rules": [
-          "parts.swap",
-          "name.part"
-        ],
+        "rules": ["parts.swap", "name.part"],
         "input": {
           "items": [
             {
@@ -727,9 +701,7 @@
       },
       {
         "description": "gives the same rows when the part is missing, null or a string",
-        "rules": [
-          "parts.swap"
-        ],
+        "rules": ["parts.swap"],
         "input": {
           "items": [
             {
@@ -899,10 +871,7 @@
       },
       {
         "description": "gives the same rows when the subject is not an object",
-        "rules": [
-          "parts.swap",
-          "path.not_an_object"
-        ],
+        "rules": ["parts.swap", "path.not_an_object"],
         "input": {
           "items": [
             "text",
@@ -1094,11 +1063,7 @@
     "cases": [
       {
         "description": "reads the alias in the conditions of the from line, in a for line's assertions, and on the right side after a one-line every, but not on the left of a whose",
-        "rules": [
-          "parts.where",
-          "sentence.path.part",
-          "sentence.subject.from"
-        ],
+        "rules": ["parts.where", "sentence.path.part", "sentence.subject.from"],
         "input": {
           "rounds": [
             {
@@ -1302,10 +1267,7 @@
       },
       {
         "description": "an alias shadows a field with the same name, and the dot in front reads the field",
-        "rules": [
-          "parts.shadow",
-          "sentence.path.part"
-        ],
+        "rules": ["parts.shadow", "sentence.path.part"],
         "input": {
           "rounds": [
             {
@@ -1488,11 +1450,7 @@
     "cases": [
       {
         "description": "is written wrong, and the check fails",
-        "rules": [
-          "parts.alias",
-          "parts.written_wrong",
-          "sentence.for.alias"
-        ],
+        "rules": ["parts.alias", "parts.written_wrong", "sentence.for.alias"],
         "input": {
           "rounds": [
             {
@@ -1582,10 +1540,7 @@
     "cases": [
       {
         "description": "is written wrong, because it would otherwise read the field",
-        "rules": [
-          "sentence.path.part",
-          "parts.written_wrong"
-        ],
+        "rules": ["sentence.path.part", "parts.written_wrong"],
         "input": {
           "rounds": [
             {
@@ -1670,11 +1625,7 @@
     "cases": [
       {
         "description": "reads the kept part in its conditions and in its checks, and its own part in its checks",
-        "rules": [
-          "parts.narrow",
-          "parts.where",
-          "sentence.subject.narrow"
-        ],
+        "rules": ["parts.narrow", "parts.where", "sentence.subject.narrow"],
         "input": {
           "rounds": [
             {
@@ -1834,11 +1785,7 @@
     "cases": [
       {
         "description": "is written wrong with alias given twice, under the part",
-        "rules": [
-          "parts.alias",
-          "parts.written_wrong",
-          "parts.narrow"
-        ],
+        "rules": ["parts.alias", "parts.written_wrong", "parts.narrow"],
         "input": {
           "rounds": [
             {
@@ -1946,12 +1893,7 @@
     "cases": [
       {
         "description": "starts from a part of the parent, reads a part of the parent by the parent's name, and reads a bare alias of the parent as a field",
-        "rules": [
-          "parts.chain",
-          "parts.tag",
-          "subjects.chain",
-          "sentence.subject.chain"
-        ],
+        "rules": ["parts.chain", "parts.tag", "subjects.chain", "sentence.subject.chain"],
         "input": {
           "trail": {
             "artifacts": {
@@ -2184,11 +2126,7 @@
     "cases": [
       {
         "description": "is written wrong with alias given twice",
-        "rules": [
-          "parts.alias",
-          "parts.written_wrong",
-          "parts.chain"
-        ],
+        "rules": ["parts.alias", "parts.written_wrong", "parts.chain"],
         "input": {
           "trail": {
             "artifacts": {
@@ -2258,488 +2196,6 @@
     ]
   },
   {
-    "description": "a subject with parts and checks written with op",
-    "policy": {
-      "ergo_spec": "v0.1",
-      "subjects": {
-        "s": {
-          "from": [
-            "items"
-          ],
-          "identified_by": [
-            "id"
-          ],
-          "has": {
-            "cov": {
-              "from": "d.b",
-              "identified_by": "i"
-            },
-            "lst": "d.items"
-          },
-          "applies_to": {
-            "has_cov": {
-              "op": "present",
-              "path": [
-                "$cov",
-                "x"
-              ]
-            }
-          }
-        }
-      },
-      "requirements": {
-        "r": {
-          "subject": "s",
-          "checks": {
-            "equals": {
-              "op": "equals",
-              "path": [
-                "$cov",
-                "x"
-              ],
-              "value": 1
-            },
-            "all": {
-              "op": "all",
-              "path": [
-                "$lst"
-              ],
-              "check": {
-                "op": "equals",
-                "path": [
-                  "x"
-                ],
-                "value": 1
-              }
-            },
-            "inside": {
-              "op": "all",
-              "path": [
-                "$lst"
-              ],
-              "check": {
-                "op": "equals",
-                "path": [
-                  "$cov",
-                  "x"
-                ],
-                "value": 1
-              }
-            },
-            "derived": {
-              "op": "compare",
-              "left": {
-                "count": [
-                  "$lst"
-                ]
-              },
-              "right": {
-                "literal": 2
-              },
-              "cmp": "eq"
-            },
-            "unknown": {
-              "op": "present",
-              "path": [
-                "$other",
-                "x"
-              ]
-            }
-          }
-        }
-      }
-    },
-    "cases": [
-      {
-        "description": "reads $alias as the part in a path, in a filter, inside all, and in a derived value, and keeps the dollar in the names",
-        "rules": [
-          "parts.old_syntax",
-          "name.part",
-          "parts.swap",
-          "parts.tag"
-        ],
-        "input": {
-          "items": [
-            {
-              "id": "a",
-              "d": {
-                "b": {
-                  "i": 5,
-                  "x": 1
-                },
-                "items": [
-                  {
-                    "x": 1
-                  },
-                  {
-                    "x": 2
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        "expressions": {
-          "r": {
-            "equals": "$cov.x == 1",
-            "all": "every $lst: x == 1",
-            "inside": "every $lst: $cov.x == 1",
-            "derived": "count($lst) eq 2",
-            "$applies": "$cov.x is present"
-          }
-        },
-        "results": [
-          {
-            "cause": "value",
-            "check": "$well_formed",
-            "inputs": [
-              {
-                "name": "count(checks)",
-                "value": 5
-              },
-              {
-                "name": "require",
-                "value": "every"
-              },
-              {
-                "name": "checks.unknown",
-                "value": [
-                  "unknown alias $other"
-                ]
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": null,
-              "type": "s"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "$applies",
-            "inputs": [
-              {
-                "name": "$cov.x",
-                "part": {
-                  "id": 5,
-                  "name": "cov"
-                },
-                "value": 1
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "a",
-              "type": "s"
-            }
-          },
-          {
-            "cause": "value",
-            "check": "all",
-            "failed_items": [
-              {
-                "cause": "value",
-                "item": "item 2 of $lst",
-                "path": "item 2 of $lst",
-                "value": {
-                  "x": 2
-                }
-              }
-            ],
-            "inputs": [
-              {
-                "name": "$lst[].x",
-                "part": {
-                  "id": null,
-                  "name": "lst"
-                },
-                "value": [
-                  1,
-                  2
-                ]
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "a",
-              "type": "s"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "derived",
-            "inputs": [
-              {
-                "name": "count($lst)",
-                "part": {
-                  "id": null,
-                  "name": "lst"
-                },
-                "value": 2
-              },
-              {
-                "name": "$lst",
-                "part": {
-                  "id": null,
-                  "name": "lst"
-                },
-                "value": [
-                  {
-                    "x": 1
-                  },
-                  {
-                    "x": 2
-                  }
-                ]
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "a",
-              "type": "s"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "equals",
-            "inputs": [
-              {
-                "name": "$cov.x",
-                "part": {
-                  "id": 5,
-                  "name": "cov"
-                },
-                "value": 1
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "a",
-              "type": "s"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "inside",
-            "failed_items": [],
-            "inputs": [
-              {
-                "name": "$lst[]",
-                "part": {
-                  "id": null,
-                  "name": "lst"
-                },
-                "value": [
-                  {
-                    "x": 1
-                  },
-                  {
-                    "x": 2
-                  }
-                ]
-              },
-              {
-                "name": "$cov.x",
-                "part": {
-                  "id": 5,
-                  "name": "cov"
-                },
-                "value": 1
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "a",
-              "type": "s"
-            }
-          },
-          {
-            "cause": "ill_formed",
-            "check": "unknown",
-            "inputs": [
-              {
-                "name": "$other.x",
-                "value": null
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "a",
-              "type": "s"
-            }
-          }
-        ]
-      },
-      {
-        "description": "fails as the path would when the part is missing",
-        "rules": [
-          "parts.old_syntax",
-          "parts.swap"
-        ],
-        "input": {
-          "items": [
-            {
-              "id": "a",
-              "d": {}
-            }
-          ]
-        },
-        "results": [
-          {
-            "cause": "value",
-            "check": "$applies",
-            "inputs": [
-              {
-                "name": "$cov.x",
-                "part": {
-                  "id": null,
-                  "name": "cov"
-                },
-                "value": null
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "a",
-              "type": "s"
-            }
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "description": "a part with the alias of an as in the old syntax",
-    "policy": {
-      "ergo_spec": "v0.1",
-      "subjects": {
-        "s": {
-          "from": [
-            "items"
-          ],
-          "identified_by": [
-            "id"
-          ],
-          "has": {
-            "cov": "d.b"
-          }
-        }
-      },
-      "requirements": {
-        "r": {
-          "subject": "s",
-          "checks": {
-            "c": {
-              "op": "all",
-              "path": [
-                "d",
-                "items"
-              ],
-              "as": "cov",
-              "check": {
-                "op": "present",
-                "path": [
-                  "x"
-                ]
-              }
-            }
-          }
-        }
-      }
-    },
-    "cases": [
-      {
-        "description": "is written wrong with alias given twice",
-        "rules": [
-          "parts.alias",
-          "parts.written_wrong",
-          "parts.old_syntax"
-        ],
-        "input": {
-          "items": [
-            {
-              "id": "a",
-              "d": {
-                "b": {
-                  "x": 1
-                },
-                "items": [
-                  {
-                    "x": 1
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        "results": [
-          {
-            "cause": "value",
-            "check": "$well_formed",
-            "inputs": [
-              {
-                "name": "count(checks)",
-                "value": 1
-              },
-              {
-                "name": "require",
-                "value": "every"
-              },
-              {
-                "name": "checks.c",
-                "value": [
-                  "alias given twice"
-                ]
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": null,
-              "type": "s"
-            }
-          },
-          {
-            "cause": "ill_formed",
-            "check": "c",
-            "failed_items": [
-              {
-                "cause": "ill_formed",
-                "item": "item 1 of d.items",
-                "path": "item 1 of d.items",
-                "value": {
-                  "x": 1
-                }
-              }
-            ],
-            "inputs": [
-              {
-                "name": "d.items[].x",
-                "value": [
-                  1
-                ]
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "a",
-              "type": "s"
-            }
-          }
-        ]
-      }
-    ]
-  },
-  {
     "description": "a subject whose parts are written wrong",
     "policy": {
       "ergo_spec": "v0.1",
@@ -2792,12 +2248,7 @@
     "cases": [
       {
         "description": "fails $well_formed with a problem under each part's alias",
-        "rules": [
-          "parts.written_wrong",
-          "parts.alias",
-          "parts.path",
-          "parts.syntax"
-        ],
+        "rules": ["parts.written_wrong", "parts.alias", "parts.path", "parts.syntax"],
         "input": {
           "rounds": [
             {
@@ -3036,10 +2487,7 @@
     "cases": [
       {
         "description": "fails $well_formed under has",
-        "rules": [
-          "parts.written_wrong",
-          "parts.syntax"
-        ],
+        "rules": ["parts.written_wrong", "parts.syntax"],
         "input": {
           "rounds": [
             {
@@ -3136,11 +2584,7 @@
     "cases": [
       {
         "description": "lists every part with its path written as a sentence writes it, and null for an id it doesn't have",
-        "rules": [
-          "report.subjects",
-          "parts.syntax",
-          "parts.path"
-        ],
+        "rules": ["report.subjects", "parts.syntax", "parts.path"],
         "input": {
           "rounds": [
             {
@@ -3206,7 +2650,7 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "s": {
-          "from": [],
+          "from": "$input",
           "has": {
             "reviews": "pull_requests.reviews"
           }
@@ -3224,10 +2668,7 @@
     "cases": [
       {
         "description": "names a failed item with the full path, so no position is hidden",
-        "rules": [
-          "name.part",
-          "parts.swap"
-        ],
+        "rules": ["name.part", "parts.swap"],
         "input": {
           "pull_requests": [
             {

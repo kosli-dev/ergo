@@ -1,16 +1,16 @@
 [
   {
     "description": "present on a field of the subject",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "passes on a string",
-        "rules": ["present.pass", "path.inputs", "present.expression", "render.path"],
+        "rules": ["present.pass", "path.inputs", "sentence.print.canonical"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
         ],
-        "expressions": {"s": {"c": "x is present"}}
+        "expressions": {"s": {"c": "x exists"}}
       },
       {
         "description": "passes on an empty string",
@@ -88,7 +88,7 @@
   },
   {
     "description": "present on a nested field",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x", "y"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x.y exists"}}}},
     "cases": [
       {
         "description": "fails as value when the parent is missing",
@@ -126,7 +126,7 @@
   },
   {
     "description": "present on a list item",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x", 1]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "item 2 of x exists"}}}},
     "cases": [
       {
         "description": "passes when the item is there",
@@ -163,101 +163,19 @@
     ]
   },
   {
-    "description": "present with an empty path",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": []}}}}},
-    "cases": [
-      {
-        "description": "passes on a subject that isn't an object, because an empty path reads the subject itself",
-        "rules": ["present.pass", "path.empty", "path.inputs", "name.subject"],
-        "input": {"things": ["a"]},
-        "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "a"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "things[]", "value": "a"}]}
-        ]
-      },
-      {
-        "description": "fails as value on a null subject",
-        "rules": ["present.missing", "path.empty", "path.null", "name.subject"],
-        "input": {"things": [null]},
-        "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "things[]", "value": null}]}
-        ]
-      }
-    ]
-  },
-  {
-    "description": "present through a selector",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["xs", {"where": {"k": "a"}}, "v"]}}}}},
-    "cases": [
-      {
-        "description": "passes when the one matching item has the field",
-        "rules": ["present.pass", "path.selector", "path.inputs"],
-        "input": {"things": [{"id": "t1", "xs": [{"k": "a", "v": 1}, {"k": "b"}]}]},
-        "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "xs.[k==\"a\"].v", "value": 1}]}
-        ]
-      },
-      {
-        "description": "fails as value when the matching item lacks the field",
-        "rules": ["present.missing", "path.selector"],
-        "input": {"things": [{"id": "t1", "xs": [{"k": "a"}]}]},
-        "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "xs.[k==\"a\"].v", "value": null}]}
-        ]
-      },
-      {
-        "description": "fails as value when the list to select from is missing",
-        "rules": ["present.missing", "path.absent"],
-        "input": {"things": [{"id": "t1"}]},
-        "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "xs.[k==\"a\"].v", "value": null}]}
-        ]
-      },
-      {
-        "description": "fails as unmatched when no item matches",
-        "rules": ["present.other", "path.selector"],
-        "input": {"things": [{"id": "t1", "xs": [{"k": "b", "v": 1}]}]},
-        "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unmatched", "inputs": [{"name": "xs.[k==\"a\"].v", "value": null}]}
-        ]
-      },
-      {
-        "description": "fails as ambiguous when two items match",
-        "rules": ["present.other", "path.selector"],
-        "input": {"things": [{"id": "t1", "xs": [{"k": "a", "v": 1}, {"k": "a", "v": 2}]}]},
-        "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ambiguous", "inputs": [{"name": "xs.[k==\"a\"].v", "value": null}]}
-        ]
-      }
-    ]
-  },
-  {
-    "description": "present through a selector with two fields, onto a key that needs quotes",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["xs", {"where": {"k": "a", "b": 2}}, "a.b"]}}}}},
-    "cases": [
-      {
-        "description": "names the selector's fields in order and quotes the key",
-        "rules": ["present.pass", "name.selector", "name.keys", "path.inputs"],
-        "input": {"things": [{"id": "t1", "xs": [{"k": "a", "b": 2, "a.b": 1}, {"k": "a", "b": 3}]}]},
-        "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "xs.[b==2 and k==\"a\"].\"a.b\"", "value": 1}]}
-        ]
-      }
-    ]
-  },
-  {
     "description": "present on the input and with a ref step",
     "policy": {
       "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
-          "from": ["things"],
-          "identified_by": ["id"]
-        }
+          "from": "things",
+          "identified_by": "id"
+          }
       },
       "requirements": {
         "s": {
           "subject": "thing",
-          "checks": {"by_ref": {"op": "present", "path": ["x", {"ref": ["$$params", "key"]}]}, "on_input": {"op": "present", "path": ["$$input", "flag"]}}
+          "checks": {"by_ref": "x named by $params.key exists", "on_input": "$input.flag exists"}
         }
       }
     },
@@ -285,7 +203,7 @@
   },
   {
     "description": "present with a ref step that can't be read",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x", {"ref": ["$$params", "key"]}]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x named by $params.key exists"}}}},
     "params": {"key": ["a"]},
     "cases": [
       {
@@ -300,7 +218,7 @@
   },
   {
     "description": "present with a ref step whose param is missing",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x", {"ref": ["$$params", "key"]}]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x named by $params.key exists"}}}},
     "params": {},
     "cases": [
       {
@@ -314,67 +232,20 @@
     ]
   },
   {
-    "description": "present written wrong",
-    "policy": {
-      "ergo_spec": "v0.1",
-      "subjects": {
-        "thing": {
-          "from": ["things"],
-          "identified_by": ["id"]
-        }
-      },
-      "requirements": {
-        "s": {
-          "subject": "thing",
-          "checks": {"bad_step": {"op": "present", "path": ["x", true]}, "extra_field": {"op": "present", "path": ["x"], "value": 1}, "no_path": {"op": "present"}, "string_path": {"op": "present", "path": "x"}}
-        }
-      }
-    },
-    "cases": [
-      {
-        "description": "fails every check as ill_formed whatever the subject holds",
-        "rules": ["written_wrong.fields", "written_wrong", "written_wrong.row", "path.inputs", "name.invalid_step", "written_wrong.inputs", "path.not_a_list", "path.steps"],
-        "input": {"things": [{"id": "t1", "x": 1}]},
-        "results": [
-          {
-            "requirement": "s",
-            "subject": {"type": "thing", "id": null},
-            "check": "$well_formed",
-            "passed": false,
-            "cause": "value",
-            "inputs": [
-              {"name": "count(checks)", "value": 4},
-              {"name": "require", "value": "every"},
-              {"name": "checks.bad_step", "value": ["step that can't be a key in path"]},
-              {"name": "checks.extra_field", "value": ["unknown field value"]},
-              {"name": "checks.no_path", "value": ["missing path"]},
-              {"name": "checks.string_path", "value": ["path not a list"]}
-            ]
-          },
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "bad_step", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x.<invalid step>", "value": null}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "extra_field", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": 1}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "no_path", "passed": false, "cause": "ill_formed", "inputs": []},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "string_path", "passed": false, "cause": "ill_formed", "inputs": []}
-        ]
-      }
-    ]
-  },
-  {
     "description": "present as a filter",
     "policy": {
       "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
-          "from": ["things"],
-          "identified_by": ["id"],
-          "applies_to": {"complete": {"op": "equals", "path": ["status"], "value": "COMPLETE"}, "recorded": {"op": "present", "path": ["status"]}}
-        }
+          "from": "things whose status is \"COMPLETE\" and status exists",
+          "identified_by": "id"
+          }
       },
       "requirements": {
         "s": {
           "subject": "thing",
           "min_subjects": 0,
-          "checks": {"c": {"op": "present", "path": ["x"]}}
+          "checks": {"c": "x exists"}
         }
       }
     },
@@ -418,16 +289,15 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
-          "from": ["things"],
-          "identified_by": ["id"],
-          "applies_to": {"recorded": {"op": "present", "path": ["build", "fingerprint"]}}
-        }
+          "from": "things whose build.fingerprint exists",
+          "identified_by": "id"
+          }
       },
       "requirements": {
         "s": {
           "subject": "thing",
           "min_subjects": 0,
-          "checks": {"c": {"op": "present", "path": ["x"]}}
+          "checks": {"c": "x exists"}
         }
       }
     },
@@ -445,38 +315,8 @@
     ]
   },
   {
-    "description": "present on a key that from names but the input doesn't have",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"test run": {"from": ["runs", {"each_as": "run", "keys": ["unit"]}]}}, "requirements": {"s": {"subject": "test run", "checks": {"c": {"op": "present", "path": ["result"]}}}}},
-    "cases": [
-      {
-        "description": "fails as value",
-        "rules": ["present.missing", "path.inputs"],
-        "input": {"runs": {}},
-        "results": [
-          {"requirement": "s", "subject": {"type": "test run", "id": "unit"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "result", "value": null}]}
-        ]
-      }
-    ]
-  },
-  {
-    "description": "present on a list item, with the index written three ways",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"decimal": {"op": "present", "path": ["x", 1.0]}, "digits": {"op": "present", "path": ["x", 1]}, "exponent": {"op": "present", "path": ["x", 1e0]}}}}},
-    "cases": [
-      {
-        "description": "all read the second item, because 1.0 and 1e0 are read as 1",
-        "rules": ["present.pass", "path.steps", "path.inputs"],
-        "input": {"things": [{"id": "t1", "x": ["a", "b"]}]},
-        "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "decimal", "passed": true, "cause": "satisfied", "inputs": [{"name": "item 2 of x", "value": "b"}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "digits", "passed": true, "cause": "satisfied", "inputs": [{"name": "item 2 of x", "value": "b"}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "exponent", "passed": true, "cause": "satisfied", "inputs": [{"name": "item 2 of x", "value": "b"}]}
-        ]
-      }
-    ]
-  },
-  {
     "description": "present on a param when the params are null",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["$$params", "flag"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$params.flag exists"}}}},
     "params": null,
     "cases": [
       {
@@ -491,7 +331,7 @@
   },
   {
     "description": "present on a param the params don't have",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["$$params", "flag"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$params.flag exists"}}}},
     "params": {},
     "cases": [
       {
