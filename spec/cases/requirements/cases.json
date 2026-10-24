@@ -373,7 +373,7 @@
     "cases": [
       {
         "description": "fails the subject's $applies row as ill_formed",
-        "rules": ["scope.unreadable", "written_wrong"],
+        "rules": ["scope.unreadable", "written_wrong", "written_wrong.fields"],
         "input": {"t": [{"e": "q", "id": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [

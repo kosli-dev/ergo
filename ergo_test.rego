@@ -6530,7 +6530,7 @@ test_a_badly_written_check_is_ill_formed if {
 	}
 }
 
-test_an_op_ergo_does_not_have_is_written_wrong_since_a_policy_cant_add_operators if {
+test_an_op_ergo_does_not_have_is_written_wrong if {
 	rep := report(typo_doc, {"s": {"from": ["items"], "identified_by": ["id"], "checks": {"c": {"op": "even", "path": ["n"], "expression": "n is even", "inputs": [["n"]]}}}})
 	[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "ill_formed"]]
 	problem_inputs(rep) == [{"name": "checks.c", "value": ["unknown op even"]}]
