@@ -3029,20 +3029,13 @@ _valid_patterns(v) if {
 _own_fields(node) := object.remove(node, ["check", "options"])
 
 _step_problems(node, here) := {concat("", [f, " not a list"]) |
-	some f in ["path", "left", "right", "each"]
+	some f in ["path", "each"]
 	f in object.keys(node)
-	not _side_field(node, f)
-	not _checked_as_side(node, f)
 	not is_array(node[f])
 } | {concat("", ["step that can't be a key in ", f]) |
 	some f in ["path", "left", "right", "each", "inputs"]
 	some p in _own_paths(node, f)
 	_badly_stepped(p, here)
-}
-
-_checked_as_side(node, f) if {
-	node.op == "compare_time"
-	f in {"left", "right"}
 }
 
 _own_paths(node, f) := [node[f]] if {
@@ -3369,14 +3362,7 @@ default _check_passed(_, _, _) := false
 
 _check_passed(check, subj, "") if _op_passed(check, subj)
 
-default _read_paths(_) := []
-
-_read_paths(check) := [_input_spec_path(spec) | some spec in check.inputs] if _cause_from_inputs(check)
-
-_read_paths(check) := [side | some side in [check.left, check.right]; is_array(side)] if {
-	not _cause_from_inputs(check)
-	_two_sided(check)
-}
+_read_paths(check) := [side | some side in [check.left, check.right]; is_array(side)] if _two_sided(check)
 
 _list_reads(check) := array.concat(array.concat([check.path], _named_each(check)), _element_name_reads(check))
 
@@ -3385,16 +3371,11 @@ _named_each(check) := [check.each] if _named(object.get(check, "each", []))
 _named_each(check) := [] if not _named(object.get(check, "each", []))
 
 _read_paths(check) := [check.path] if {
-	not _cause_from_inputs(check)
 	not _two_sided(check)
 	not _quantified(check)
 	not _combinator(check)
 	check.path
 }
-
-_input_spec_path(spec) := spec if is_array(spec)
-
-_input_spec_path(spec) := object.get(spec, "path", []) if is_object(spec)
 
 _read_state(subj, path) := _plain_read_state(subj, path, object.get(subj, _plain_keys(path), _absent)) if {
 	is_object(subj)
@@ -3503,40 +3484,23 @@ _worst_or_value(states) := c if {
 	c := _worst_of(states)
 } else := "value"
 
-default _has_inputs(_) := false
-
-_has_inputs(check) if check.inputs
-
-default _cause_from_inputs(_) := false
-
-_cause_from_inputs(check) if {
-	_has_inputs(check)
-	not check.op in (_leaf_ops | {"all", "any", "any_of"})
-}
-
-_check_states(check, subj) := {_read_state(subj, p) | some p in _read_paths(check)} if _cause_from_inputs(check)
-
 _check_states(check, subj) := (_answered(check, subj, {_read_state(subj, p) | some p in _read_paths(check)}) | _unusable_states(check, subj)) | _derived_states(check, subj) if {
-	not _cause_from_inputs(check)
 	not _quantified(check)
 	not _combinator(check)
 	not _list_flawed(check, subj)
 }
 
 _check_states(check, subj) := _list_flaw(check, subj) if {
-	not _cause_from_inputs(check)
 	not _quantified(check)
 	not _combinator(check)
 	_list_flawed(check, subj)
 }
 
 _check_states(check, subj) := {_list_cause(check, subj)} if {
-	not _cause_from_inputs(check)
 	_quantified(check)
 }
 
 _check_states(check, subj) := {_option_cause(group, subj) | some group in check.options} if {
-	not _cause_from_inputs(check)
 	_combinator(check)
 }
 
@@ -5778,8 +5742,6 @@ _basic_inputs(subj, side, item) := [
 ] if _basic_form(side) == "elapsed"
 
 _side_inputs(subj, side, item) := _basic_inputs(subj, side, item) if _basic_form(side)
-
-_side_inputs(subj, side, item) := array.concat([_derived_input(subj, side, _side_text(item, side))], [i | some operand in side.add; some i in _basic_inputs(subj, operand, item)]) if _side_form(side) == "add"
 
 _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "values": []} if {
 	path := side[_basic_form(side)]

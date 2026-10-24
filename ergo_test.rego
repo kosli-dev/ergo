@@ -10948,6 +10948,23 @@ test_an_old_syntax_check_reads_a_part_as_a_dollar_alias_and_the_name_keeps_the_d
 	rep.requirements.r.checks.eq.expression == "$cov.x == 1"
 }
 
+test_an_old_syntax_check_reads_a_part_through_its_path_and_inputs if {
+	checks := {"c": {"op": "equals", "path": ["$cov", "n"], "value": 4, "inputs": [["$cov", "n"]]}}
+	rep := _parts_report({"cov": "dd.b"}, checks, {"b": {"n": 4}})
+	_parts_row(rep, "c").passed
+	_untagged(_parts_row(rep, "c").inputs) == [{"name": "$cov.n", "value": 4}]
+}
+
+test_an_old_syntax_check_with_object_and_odd_inputs_still_reads_its_part_and_shows_no_marker if {
+	checks := {"c": {"op": "equals", "path": ["$cov", "n"], "value": 4, "inputs": [{"path": ["$cov", "n"], "each": ["$cov", "x"]}, 5, ["$cov", "x"]]}}
+	rep := _parts_report({"cov": "dd.b"}, checks, {"b": {"n": 4, "x": 1}})
+	row := _parts_row(rep, "c")
+	row.passed
+	every i in row.inputs {
+		not contains(i.name, "alias")
+	}
+}
+
 test_an_old_syntax_check_reads_a_part_inside_all_any_and_any_of if {
 	has := {"cov": "dd.b", "lst": "dd.items"}
 	checks := {
@@ -12586,4 +12603,14 @@ test_a_second_list_inside_the_first_whose_ref_cant_be_read_is_named_under_each_f
 	check := {"for": "every prs as pr, every pr.m named by $params.k as y", "assert": "y is 1"}
 	rows := _for_rows(check, [{"id": 1, "prs": [{"m": {"a": [1]}}]}], {})
 	rows[0][2] == [{"path": "item 1 of prs", "item": "item 1 of prs", "cause": "absent", "value": {"m": {"a": [1]}}, "failed_assertions": [], "failed_items": [{"path": "pr.m named by $params.k", "item": "pr.m named by $params.k", "cause": "absent", "value": null}]}]
+}
+
+test_a_derived_check_with_its_own_inputs_is_read_the_slow_way_and_gives_the_same_verdicts if {
+	check := {"op": "compare", "left": {"add": [["n"], {"count": ["xs"]}, {"literal": 1}]}, "cmp": "eq", "right": {"literal": 4}}
+	doc := {"things": [{"id": 1, "n": 1, "xs": [1, 2]}, {"id": 2, "n": "1", "xs": []}, {"id": 3, "n": 1, "xs": []}]}
+	verdicts := [[[r.subject.id, r.passed, r.cause] | some r in ergo.report(doc, _sentence_policy({"c": c}), {}).results; r.check == "c"] |
+		some c in [check, object.union(check, {"inputs": [["n"], ["xs"]]})]
+	]
+	verdicts[0] == [[1, true, "satisfied"], [2, false, "unusable"], [3, false, "value"]]
+	verdicts[1] == verdicts[0]
 }
