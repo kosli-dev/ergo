@@ -3245,6 +3245,20 @@ test_an_index_that_cannot_be_a_key_is_written_wrong_wherever_it_sits if {
 	got == [[false, [concat("", [prefix, big, " can't be a list position"])]] | some prefix in ["", "", "", "", "for: ", "", ""]]
 }
 
+named_by_then_each_of_policy(from) := {"ergo_spec": "v0.1", "subjects": {"b": {"from": from}}, "requirements": {"s": {"subject": "b", "checks": {"c": "x is 1"}}}}
+
+test_a_from_line_can_read_a_key_named_by_a_param_before_naming_each_subject if {
+	every from in [
+		"top named by $params.g named by each of $params.keys",
+		"top named by $input.g named by each of $params.keys",
+		"top[$params.g] named by each of $params.keys whose x exists",
+	] {
+		rep := ergo.report({"g": "m", "top": {"m": {"k1": {"x": 1}, "k2": {"x": 2}}}}, named_by_then_each_of_policy(from), {"g": "m", "keys": ["k1", "k2"]})
+		rows_for(rep, "s", "$well_formed")[0].passed == true
+		[[r.subject.id, r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [["k1", true, "satisfied"], ["k2", false, "value"]]
+	}
+}
+
 test_the_largest_position_a_float_holds_exactly_is_well_written if {
 	rep := ergo.report(
 		{"things": [{"items": [1]}]}, {"ergo_spec": "v0.1", "subjects": {"b": {"from": "things"}}, "requirements": {"s": {"subject": "b", "checks": {

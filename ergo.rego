@@ -458,6 +458,8 @@ _from_well_formed(req) if {
 
 _plain_step(seg) if not is_object(seg)
 
+_plain_step(seg) if _is_ref(seg)
+
 _valid_name(n) if {
 	is_string(n)
 	n != ""

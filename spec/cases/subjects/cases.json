@@ -5852,6 +5852,150 @@
     ]
   },
   {
+    "description": "a from line that reads a key named by a param before naming each subject",
+    "policy": {
+      "ergo_spec": "v0.1",
+      "subjects": {
+        "setting": {
+          "from": "settings named by $params.group named by each of $params.names"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "setting",
+          "checks": {
+            "c": "enabled is true"
+          }
+        }
+      }
+    },
+    "params": {
+      "group": "security",
+      "names": [
+        "mfa",
+        "sso"
+      ]
+    },
+    "cases": [
+      {
+        "description": "is written correctly and gives one subject per listed key under the key the param names",
+        "rules": ["sentence.path.dynamic", "sentence.path.keys", "subjects.sentence"],
+        "input": {
+          "settings": {
+            "security": {
+              "mfa": {
+                "enabled": true
+              },
+              "sso": {
+                "enabled": false
+              }
+            },
+            "billing": {
+              "mfa": {
+                "enabled": false
+              }
+            }
+          }
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met",
+            "subjects": {
+              "matching": 2,
+              "total": 2
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "setting"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope setting count",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "setting"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated setting ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "setting"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "enabled",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "mfa",
+              "type": "setting"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "enabled",
+                "value": false
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "sso",
+              "type": "setting"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "the report lists the subjects the requirements use",
     "policy": {
       "ergo_spec": "v0.1",
