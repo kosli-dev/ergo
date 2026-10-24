@@ -263,6 +263,8 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
    "inputs": [{"name": "artifact.branch", "value": "main"}, {"name": "base", "value": "dev"}]}
   ```
 
+  On the left of a `whose`, `artifact.branch` is the pull request's own field, as in any `whose`.
+
   When the artifact is several subjects, the pull requests of each are read and checked in turn. With this input:
 
   ```json

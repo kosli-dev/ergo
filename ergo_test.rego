@@ -4940,7 +4940,34 @@ test_a_whose_in_a_childs_from_line_reads_the_parent_by_its_name if {
 		["k1", "satisfied", [{"name": "b.x", "value": 1}, {"name": "v", "value": 1}]],
 		["k2", "value", [{"name": "b.x", "value": 1}, {"name": "v", "value": 2}]],
 	]
-	_applies_of(_kids_report("b.kids whose b.x equals v")) == _applies_of(_kids_report("b.kids whose v equals b.x"))
+}
+
+test_the_parents_name_on_the_left_of_a_whose_in_a_childs_from_line_is_the_childs_own_field if {
+	rep := ergo.report({"bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "b": {"x": 2}, "v": 2}, {"id": "k2", "v": 1}]}]}, {"ergo_spec": "v0.1", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids whose b.x equals v", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
+	_applies_of(rep) == [
+		["k1", "satisfied", [{"name": "b.x", "value": 2}, {"name": "v", "value": 2}]],
+		["k2", "absent", [{"name": "b.x", "value": null}, {"name": "v", "value": 1}]],
+	]
+	rep.requirements.r.checks["$applies"].expression == ".b.x equals v"
+}
+
+test_a_dot_before_the_parents_name_in_a_childs_from_line_reads_the_childs_own_field if {
+	rep := ergo.report({"bs": [{"id": "b1", "kids": [{"id": "k1", "b": 1}, {"id": "k2", "b": 5}]}]}, {"ergo_spec": "v0.1", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids whose .b equals 1", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "b exists"}}}}, {})
+	_applies_of(rep) == [
+		["k1", "satisfied", [{"name": "b", "value": 1}]],
+		["k2", "value", [{"name": "b", "value": 5}]],
+	]
+	rep.requirements.r.checks["$applies"].expression == ".b is 1"
+}
+
+test_a_whose_in_a_childs_from_line_reads_a_part_of_the_parent_by_its_name if {
+	doc := {"bs": [{"id": "b1", "meta": {"tag": {"id": "t1", "x": 1}}, "kids": [{"id": "k1", "v": 1}, {"id": "k2", "v": 2}]}]}
+	subjects := {"b": {"from": "bs", "identified_by": "id", "has": {"tag": {"from": "meta.tag", "identified_by": "id"}}}, "kid": {"from": "b.kids whose v equals b.tag.x", "identified_by": "id"}}
+	rep := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
+	_applies_of(rep) == [
+		["k1", "satisfied", [{"name": "b.tag.x", "value": 1, "part": {"name": "b.tag", "id": "t1"}}, {"name": "v", "value": 1}]],
+		["k2", "value", [{"name": "b.tag.x", "value": 1, "part": {"name": "b.tag", "id": "t1"}}, {"name": "v", "value": 2}]],
+	]
 }
 
 test_a_whose_in_a_childs_from_line_that_reads_a_missing_field_of_the_parent_fails_as_absent if {
