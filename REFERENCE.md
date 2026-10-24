@@ -247,6 +247,24 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
 
   A check reads the artifact by its name, like `artifact.name`. Only checks written as sentences can read it.
 
+  So can a `whose` in the child's `from` line. With `{"params": {"artifact_name": "web"}}` and this input:
+
+  ```json
+  {"trail": {"artifacts": {"web": {"fingerprint": "sha-1", "branch": "main", "pull_requests": [
+    {"url": "pr/7", "base": "main"},
+    {"url": "pr/8", "base": "dev"}
+  ]}}}}
+  ```
+
+  `from: artifact.pull_requests whose base is artifact.branch` keeps `pr/7` and leaves `pr/8` out of scope:
+
+  ```json
+  {"check": "$applies", "subject": {"type": "pull request", "id": "pr/8", "in": {"artifact": "sha-1"}}, "passed": false, "cause": "value",
+   "inputs": [{"name": "artifact.branch", "value": "main"}, {"name": "base", "value": "dev"}]}
+  ```
+
+  On the left of a `whose`, `artifact.branch` is the pull request's own field, as in any `whose`.
+
   When the artifact is several subjects, the pull requests of each are read and checked in turn. With this input:
 
   ```json
@@ -463,7 +481,7 @@ and written out in full, its inputs are named `compliance_status.attestations_st
 - A path is written as in a [from line](#from-lines): keys joined by `.`, keys in quotes, positions, and `named by` a key of `$params` or `$input`. It is a path inside the subject, so it can't start at `$params` or `$input`, and it can't have `whose`, `count of` or `named by each of`.
 - A part can be any path, even one that ends at a single value: `ratio: compliance_status.attestations_statuses.coverage.attestation_data.ratio` makes `ratio is at least 0.8` read the same.
 - Keep the data's own names, as `findings` and `coverage` do, because a reader who knows the data finds `coverage.attestation_data.hunks_total` where they'd look for it.
-- An alias is read wherever a bare first key reads the subject: in the subject's checks, in the assertions of a `for` line, and in the conditions of the subject's `from` line and of a subject that narrows it. In a `whose` and after a one-line `every` or `some`, where a bare first key is a field of the item, it's read on the right side and never on the left of a `whose`, as a `for` line's name is: `every items.price is at most limit` reads the part `limit`, `whose limit is at least 4` reads the item's `limit`, and `.limit` on the right reads the item's. `named by` a part's alias is written wrong, with `named by coverage reads a part, which isn't supported yet`.
+- An alias is read wherever a bare first key reads the subject: in the subject's checks, in the assertions of a `for` line, and in the conditions of the subject's `from` line and of a subject that narrows it, where `.limit` reads the field instead. In a `whose` and after a one-line `every` or `some`, where a bare first key is a field of the item, it's read on the right side and never on the left of a `whose`, as a `for` line's name is: `every items.price is at most limit` reads the part `limit`, `whose limit is at least 4` reads the item's `limit`, and `.limit` on the right reads the item's. `named by` a part's alias is written wrong, with `named by coverage reads a part, which isn't supported yet`.
 - An alias shadows a field of the subject with the same name. To read the field, put a dot in front: `.coverage` is the subject's field `coverage`, not the part.
 - An alias is a bare word that isn't a word of the grammar, `params` or `input`, or it is written wrong with `invalid alias`. Two aliases with the same name are written wrong with `alias given twice`: two parts of a subject, a part and one a subject keeps from a subject it narrows, a part and an alias of a `for` line in a check of the subject, and a part and the name of the parent a child subject reads from.
 - A subject that narrows another keeps its parts and can add its own. The report lists them all.
@@ -998,7 +1016,7 @@ reads "for every pull request, some approver approved it and isn't its author". 
 
   What fails the same way for every approver is listed once in the row's `failed_items` instead, in place of the approvers that failed only because of it. That's a missing `commits` list, `{"cause": "absent", "failed_assertions": [], "item": "commits", "path": "commits", "value": null}`, or a commit that `whose kind is "code"` can't decide, because that `whose` doesn't read `approver`. An approver that's still listed has the cause of what's left under it. A list inside the first, like `pr.approvers`, is listed under each pull request, because each has its own.
 - `inputs` holds each list the `for` line walked, with its items, and every field of the subject the sentences read. A field read through a name, like `pr.author`, isn't listed on its own.
-- In `assert`, a bare first key is the subject's field, and a name reaches its item. Inside an item's own `whose`, a bare key is that item's field. A name hides a field with the same name, the subject's or an item's, except on the left side of a `whose`: `whose env is "prod"` always reads the item's `env`. Write a dot in front to read the field a name hides: `.env`.
+- In `assert`, a bare first key is the subject's field, and a name reaches its item. Inside an item's own `whose`, a bare key is that item's field. A name hides a field with the same name, the subject's or an item's, except on the left side of a `whose`: `whose env is "prod"` always reads the item's `env`, and so does `whose count of env is 2`. Write a dot in front to read the field a name hides: `.env`.
 - Each list fails as a one-line `every` or `some` does: empty, missing, `null` or not a list, and `, if any,` lets an empty one pass.
 - Two items at most.
 - `named by` an alias from the `for` line reads the key its item holds. With `for: every personas_dispatched as persona`, `persona_blob_shas named by persona exists` reads `persona_blob_shas.security`, then `persona_blob_shas.style`, and so on. An item that's `null` fails as `null`, and any other item that isn't a string, a number included, as `unusable`, since it can't be a key. The row's inputs show `persona_blob_shas` itself.

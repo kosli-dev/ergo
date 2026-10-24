@@ -6455,5 +6455,157 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a count on the left of a whose",
+    "policy": {
+      "ergo_spec": "v0.1",
+      "subjects": {
+        "b": {
+          "from": "bs",
+          "identified_by": "id"
+        },
+        "kid": {
+          "from": "b.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "kid",
+          "checks": {
+            "c": "every items.v whose count of b.kids is at least v is 3"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "counts the item's own field, even when its first key is the parent subject's name",
+        "rules": ["sentence.path.start", "sentence.subject.chain"],
+        "input": {
+          "bs": [
+            {
+              "id": "b1",
+              "kids": [
+                {
+                  "id": "k1",
+                  "items": [
+                    {
+                      "b": {
+                        "kids": [
+                          1,
+                          2,
+                          3
+                        ]
+                      },
+                      "v": 3
+                    },
+                    {
+                      "b": {
+                        "kids": []
+                      },
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "met",
+            "subjects": {
+              "matching": 1,
+              "total": 1
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope kid count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "b": "b1"
+              },
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated kid ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "b": "b1"
+              },
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "name": "items[].v",
+                "value": [
+                  3,
+                  1
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "b": "b1"
+              },
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

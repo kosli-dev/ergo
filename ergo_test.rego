@@ -4938,6 +4938,88 @@ test_a_check_of_a_chain_reads_the_parent_by_its_name if {
 	]
 }
 
+_kids_doc := {"bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "v": 1}, {"id": "k2", "v": 2}]}]}
+
+_kids_report(from) := ergo.report(_kids_doc, {"ergo_spec": "v0.1", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": from, "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
+
+_applies_of(rep) := [[r.subject.id, r.cause, r.inputs] | some r in rep.results; r.check == "$applies"]
+
+test_a_whose_in_a_childs_from_line_reads_the_parent_by_its_name if {
+	_applies_of(_kids_report("b.kids whose v equals b.x")) == [
+		["k1", "satisfied", [{"name": "b.x", "value": 1}, {"name": "v", "value": 1}]],
+		["k2", "value", [{"name": "b.x", "value": 1}, {"name": "v", "value": 2}]],
+	]
+}
+
+test_the_parents_name_on_the_left_of_a_whose_in_a_childs_from_line_is_the_childs_own_field if {
+	rep := ergo.report({"bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "b": {"x": 2}, "v": 2}, {"id": "k2", "v": 1}]}]}, {"ergo_spec": "v0.1", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids whose b.x equals v", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
+	_applies_of(rep) == [
+		["k1", "satisfied", [{"name": "b.x", "value": 2}, {"name": "v", "value": 2}]],
+		["k2", "absent", [{"name": "b.x", "value": null}, {"name": "v", "value": 1}]],
+	]
+	rep.requirements.r.checks["$applies"].expression == ".b.x equals v"
+}
+
+test_a_dot_before_the_parents_name_in_a_childs_from_line_reads_the_childs_own_field if {
+	rep := ergo.report({"bs": [{"id": "b1", "kids": [{"id": "k1", "b": 1}, {"id": "k2", "b": 5}]}]}, {"ergo_spec": "v0.1", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids whose .b equals 1", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "b exists"}}}}, {})
+	_applies_of(rep) == [
+		["k1", "satisfied", [{"name": "b", "value": 1}]],
+		["k2", "value", [{"name": "b", "value": 5}]],
+	]
+	rep.requirements.r.checks["$applies"].expression == ".b is 1"
+}
+
+test_a_whose_in_a_childs_from_line_reads_a_part_of_the_parent_by_its_name if {
+	doc := {"bs": [{"id": "b1", "meta": {"tag": {"id": "t1", "x": 1}}, "kids": [{"id": "k1", "v": 1}, {"id": "k2", "v": 2}]}]}
+	subjects := {"b": {"from": "bs", "identified_by": "id", "has": {"tag": {"from": "meta.tag", "identified_by": "id"}}}, "kid": {"from": "b.kids whose v equals b.tag.x", "identified_by": "id"}}
+	rep := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
+	_applies_of(rep) == [
+		["k1", "satisfied", [{"name": "b.tag.x", "value": 1, "part": {"name": "b.tag", "id": "t1"}}, {"name": "v", "value": 1}]],
+		["k2", "value", [{"name": "b.tag.x", "value": 1, "part": {"name": "b.tag", "id": "t1"}}, {"name": "v", "value": 2}]],
+	]
+}
+
+test_a_count_on_the_left_of_a_whose_in_a_check_reads_the_items_own_field_not_the_parent if {
+	rep := ergo.report({"bs": [{"id": "b1", "kids": [{"id": "k1", "items": [{"b": {"kids": [1, 2, 3]}, "v": 3}, {"b": {"kids": []}, "v": 1}]}]}]}, {"ergo_spec": "v0.1", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "every items.v whose count of b.kids is at least v is 3"}}}}, {})
+	[r.cause | some r in rep.results; r.check == "c"] == ["satisfied"]
+}
+
+test_a_count_on_the_left_of_a_whose_in_a_childs_from_line_reads_the_childs_own_field_not_the_parent if {
+	rep := ergo.report({"bs": [{"id": "b1", "kids": [{"id": "k1", "b": {"kids": [1, 2]}, "v": 2}, {"id": "k2", "v": 1}]}]}, {"ergo_spec": "v0.1", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids whose count of b.kids is at least v", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
+	[[r.subject.id, r.cause] | some r in rep.results; r.check == "$applies"] == [["k1", "satisfied"], ["k2", "absent"]]
+	rep.requirements.r.checks["$applies"].expression == "count of .b.kids is at least v"
+}
+
+test_a_dot_before_a_part_on_the_left_of_a_whose_in_a_from_line_reads_the_field_not_the_part if {
+	doc := {"kids": [{"id": "k1", "att": {"id": 1}, "atts": {"pr": {"id": 2}}}, {"id": "k2", "atts": {"pr": {"id": 1}}}]}
+	subjects := {"kid": {"from": "kids whose .att.id is 1", "identified_by": "id", "has": {"att": {"from": "atts.pr", "identified_by": "id"}}}}
+	rep := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": {"subject": "kid", "checks": {"c": "id exists"}}}}, {})
+	[[r.subject.id, r.cause] | some r in rep.results; r.check == "$applies"] == [["k1", "satisfied"], ["k2", "absent"]]
+	plain := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": object.union(subjects, {"kid": object.union(subjects.kid, {"from": "kids whose att.id is 1"})}), "requirements": {"r": {"subject": "kid", "checks": {"c": "id exists"}}}}, {})
+	[[r.subject.id, r.cause] | some r in plain.results; r.check == "$applies"] == [["k1", "value"], ["k2", "satisfied"]]
+}
+
+test_a_whose_in_a_childs_from_line_that_reads_a_missing_field_of_the_parent_fails_as_absent if {
+	_applies_of(_kids_report("b.kids whose v equals b.nope")) == [
+		["k1", "absent", [{"name": "b.nope", "value": null}, {"name": "v", "value": 1}]],
+		["k2", "absent", [{"name": "b.nope", "value": null}, {"name": "v", "value": 2}]],
+	]
+}
+
+test_a_whose_in_the_from_lines_of_a_chain_of_three_subjects_reads_every_ancestor_by_its_name if {
+	doc := {"tops": [{"id": "t1", "y": 2, "bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "v": 1, "w": 2}, {"id": "k2", "v": 2, "w": 2}]}, {"id": "b2", "x": 3, "kids": [{"id": "k3", "v": 3, "w": 2}]}]}]}
+	subjects := {
+		"top": {"from": "tops", "identified_by": "id"},
+		"b": {"from": "top.bs whose x is less than top.y", "identified_by": "id"},
+		"kid": {"from": "b.kids whose w equals top.y and v equals b.x", "identified_by": "id"},
+	}
+	rep := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
+	[[r.subject.id, r.subject.in, r.cause, r.inputs] | some r in rep.results; r.check == "$applies"] == [
+		["k1", {"top": "t1", "b": "b1"}, "satisfied", [{"name": "b.x", "value": 1}, {"name": "top.y", "value": 2}, {"name": "v", "value": 1}, {"name": "w", "value": 2}]],
+		["k2", {"top": "t1", "b": "b1"}, "value", [{"name": "b.x", "value": 1}, {"name": "top.y", "value": 2}, {"name": "v", "value": 2}, {"name": "w", "value": 2}]],
+	]
+}
+
 _chain_min_cause(rep) := [[r.cause, object.keys(r.subject)] | some r in rep.results; r.check == "$min_subjects"]
 
 test_a_chain_with_no_parent_or_an_unreadable_one_finds_no_subjects if {

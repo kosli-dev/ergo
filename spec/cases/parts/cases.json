@@ -2680,5 +2680,171 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a part written with a dot on the left of a whose in the subject's own from line",
+    "policy": {
+      "ergo_spec": "v0.1",
+      "subjects": {
+        "kid": {
+          "from": "kids whose .att.id is 1",
+          "identified_by": "id",
+          "has": {
+            "att": {
+              "from": "atts.pr",
+              "identified_by": "id"
+            }
+          }
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "kid",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the field, not the part",
+        "rules": ["parts.where", "sentence.path.start"],
+        "input": {
+          "kids": [
+            {
+              "id": "k1",
+              "att": {
+                "id": 1
+              },
+              "atts": {
+                "pr": {
+                  "id": 2
+                }
+              }
+            },
+            {
+              "id": "k2",
+              "atts": {
+                "pr": {
+                  "id": 1
+                }
+              }
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met",
+            "subjects": {
+              "matching": 1,
+              "total": 2
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope kid count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated kid ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "att.id",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "k1",
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "att.id",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "k2",
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "id",
+                "value": "k1"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "k1",
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
