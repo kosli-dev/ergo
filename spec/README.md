@@ -38,12 +38,13 @@ A topic's `cases.json` holds a list of groups. A group has a `description`, a `p
 - `violations` (optional): the violations the report must give, all of them, in order
 - `report` (optional): fields the report must have at its top, like `{"description": "", "meta": {}}`
 
-Here is one case, from `cases/present`. Its group's policy has a `thing` subject read from `things`, and a requirement `s` that checks `{"op": "present", "path": ["x"]}`:
+Here is one case, from `cases/present`. Its group's policy has a `thing` subject read from `things`, and a requirement `s` that checks `x exists`:
 
 ```json
 {
-  "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}},
-  "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x"]}}}}
+  "ergo_spec": "v0.1",
+  "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+  "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}
 }
 ```
 

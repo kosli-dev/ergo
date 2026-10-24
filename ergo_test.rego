@@ -2265,8 +2265,8 @@ test_a_requirement_is_only_not_applicable_when_it_would_otherwise_be_met if {
 	statuses := [report({"deployments": [{"id": 1, "env": "dev"}]}, {"s": object.union(prod_only.s, change)}).requirements.s.status | some change in [
 		{"min_subjects": 1},
 		{"require": "most"},
-		{"checks": {"approved": {"op": "nope"}}},
-		{"applies_to": {"prod": {"op": "equals", "path": ["region"], "value": "eu"}}},
+		{"checks": {"approved": "approved_by is"}},
+		{"from": "deployments whose region is \"eu\""},
 	]]
 	statuses == ["not_met", "not_met", "not_met", "not_met"]
 }
@@ -6305,11 +6305,9 @@ _parts_narrow := {
 	"subjects": {
 		"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "dd.b"}},
 		"good round": {"from": "round whose cov.x is 1", "has": {"extra": "dd.e"}},
-		"old round": {"of": "round", "applies_to": {"f": {"op": "equals", "path": ["$cov", "x"], "value": 1}}, "has": {"extra": "dd.e"}},
 	},
 	"requirements": {
 		"r": {"subject": "good round", "checks": {"c": "cov.n is 2 and extra is 5"}},
-		"o": {"subject": "old round", "checks": {"c": "cov.n is 2 and extra is 5", "d": {"op": "equals", "path": ["$extra"], "value": 5}}},
 	},
 }
 
@@ -6386,10 +6384,11 @@ test_a_chained_child_cannot_read_a_part_the_parent_does_not_have if {
 }
 
 test_a_path_shaped_like_an_internal_part_marker_does_not_read_the_subject if {
-	forged := "${\"alias\":\"zzz\",\"n\":0,\"of\":null,\"old\":false}"
-	rep := _parts_report({"cov": "dd.b"}, {"c": {"op": "present", "path": [forged, "name"]}}, {"b": {"x": 1}})
-	_parts_row(rep, "c").cause == "ill_formed"
-	_parts_row(rep, "c").passed == false
+	forged := "${\"alias\":\"cov\",\"n\":0,\"of\":null,\"old\":false}"
+	honest := _parts_report({"cov": "dd.b"}, {"c": "cov.x is 1"}, {"b": {"x": 1}})
+	rep := _parts_report({"cov": "dd.b"}, {"c": concat("", [json.marshal(forged), ".x is 1"])}, {"b": {"x": 1}})
+	[_parts_row(honest, "c").passed, _parts_row(rep, "c").passed, _parts_row(rep, "c").cause] == [true, false, "absent"]
+	[object.keys(i) | some i in _parts_row(rep, "c").inputs] == [{"name", "value"}]
 }
 
 test_a_subject_with_no_has_is_listed_with_no_parts if {
@@ -7321,9 +7320,9 @@ test_a_requirement_field_named_like_the_facts_ergo_works_out_once_is_unknown_and
 _saved(form) := json.unmarshal(json.marshal(form))
 
 _compile_policies := [
-	_sentence_policy({"c": "x is in $params.l and y exists and y is 2", "d": {"op": "equals", "path": ["y"], "value": {"ref": ["$$params", "y"]}}}),
+	_sentence_policy({"c": "x is in $params.l and y exists and y is 2", "d": "y is $params.y"}),
 	{"ergo_spec": "v0.1", "subjects": _three_subjects, "requirements": {"r": {"subject": "commit", "checks": {"c": "verified is true"}}, "p": {"subject": "pull request", "checks": {"c": "url exists"}}}},
-	{"ergo_spec": "v0.1", "subjects": {"deployment": {"from": [{"ref": ["$$params", "list"]}], "identified_by": ["id"], "applies_to": {"env": {"op": "equals", "path": ["environment"], "value": {"ref": ["$$params", "env"]}}}}}, "requirements": {"a": approved_req("deployment")}},
+	{"ergo_spec": "v0.1", "subjects": {"deployment": {"from": "$input named by $params.list whose environment is $params.env", "identified_by": "id"}}, "requirements": {"a": approved_req("deployment")}},
 	_sentence_policy({"c": "x is", "d": "y is 2"}),
 	{"description": 1, "requirements": {"s": {"subject": "nowhere", "checks": {"c": "x exists"}}}},
 	{},

@@ -3258,15 +3258,12 @@ _well_formed(req) if {
 
 _check_problem_inputs(req) := [{"name": name, "value": sort({p[1] | some p in problems; p[0] == name})} | some name in sort({p[0] | some p in problems})] if {
 	problems := {[_field_path_name(array.concat(["checks", n], p[0])), p[1]] |
-		some f in ["checks"]
-		some n, check in _req_checks(req, f)
-		here := _s_written_here(req, f, n)
+		some n, check in _checks_of(req)
+		here := _s_written_here(req, "checks", n)
 		found := _check_problems(check, _from_names(req, here), here)
 		some p in found
 	}
 }
-
-_req_checks(req, "checks") := _checks_of(req)
 
 _from_names(req, here) := ({n |
 	_from_well_formed(req)

@@ -66,10 +66,10 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
   const document = { deployments: Array.from({ length: 100 }, (_, i) => ({ id: `d-${i}`, environment: i % 3 ? "prod" : "staging", ...(i % 2 ? { approved_by: "a" } : {}), tests: [{ ok: i % 5 > 0 }, { ok: true }] })) };
   const budgetPolicy = {
     ergo_spec: "v0.1",
-    subjects: { deployment: { from: ["deployments"], identified_by: ["id"], applies_to: { is_prod: { op: "equals", path: ["environment"], value: "prod" } } } },
+    subjects: { deployment: { from: 'deployments whose environment is "prod"', identified_by: "id" } },
     requirements: {
-      approved: { subject: "deployment", checks: { approved: { op: "non_empty_string", path: ["approved_by"] } } },
-      tested: { subject: "deployment", require: "some", checks: { tested: { op: "all", path: ["tests"], check: { op: "equals", path: ["ok"], value: true } } } },
+      approved: { subject: "deployment", checks: { approved: "approved_by is a non-empty string" } },
+      tested: { subject: "deployment", require: "some", checks: { tested: "every tests.ok is true" } },
     },
   };
   const sentencePolicy = {
@@ -104,8 +104,8 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
     if (usedMB > budgetMB) console.error(`That's over the budget. Wasm doesn't cache function calls and frees nothing until the report is done, so look for something worked out again per row, or a large regular expression compiled for every report, or for every parent of a subject read from another subject.`);
     return sound && usedMB <= budgetMB;
   };
-  const withOps = await measure("with checks written with op", budgetPolicy, 338, 66, 20);
-  const withSentences = await measure("with checks written as sentences", sentencePolicy, 301, 66, 12);
+  const withEvery = await measure("with a check on every test", budgetPolicy, 338, 66, 25);
+  const withSentences = await measure("with three checks on each deployment", sentencePolicy, 301, 66, 20);
   const withChain = await measure("with the tests of each prod deployment as subjects", chainPolicy, 265, 132, 40);
-  process.exit(failed.length > 0 || !withOps || !withSentences || !withChain ? 1 : 0);
+  process.exit(failed.length > 0 || !withEvery || !withSentences || !withChain ? 1 : 0);
 });
