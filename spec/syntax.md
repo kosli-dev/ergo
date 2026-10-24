@@ -16,7 +16,7 @@ Draft 0.1. This file covers what a policy holds around its sentences: its sectio
 
 A subject can have parts, named paths inside itself. What a part means is in [semantics.md](semantics.md#parts), and how a sentence reads one in [sentences.md](sentences.md#paths).
 
-**[parts.syntax]** `has` on a subject definition is an object. Each key is a part's alias, and each value is the part: a path in a string, or an object with `from`, a path in a string, and optionally `identified_by`, a path in a string that is read inside the part. The report shows `identified_by`, and tags the inputs read through the part with the id it leads to, see [parts.tag](semantics.md#parts). A part is written the same way whichever syntax the subject's checks use. A subject that narrows another, with `of` or a from line, can have `has` too.
+**[parts.syntax]** `has` on a subject definition is an object. Each key is a part's alias, and each value is the part: a path in a string, or an object with `from`, a path in a string, and optionally `identified_by`, a path in a string that is read inside the part. The report shows `identified_by`, and tags the inputs read through the part with the id it leads to, see [parts.tag](semantics.md#parts). A part is written the same way whichever syntax the subject's checks use. A subject whose from line narrows another can have `has` too.
 
 ```yaml
 subjects:
