@@ -2438,38 +2438,6 @@
                 ]
               }
             ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "type": "deployment",
-              "id": null
-            },
-            "check": "$min_subjects",
-            "passed": false,
-            "cause": "value",
-            "inputs": [
-              {
-                "name": "in-scope deployment count",
-                "value": 0
-              }
-            ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "type": "deployment",
-              "id": null
-            },
-            "check": "$unique_ids",
-            "passed": true,
-            "cause": "satisfied",
-            "inputs": [
-              {
-                "name": "repeated deployment ids",
-                "value": []
-              }
-            ]
           }
         ]
       }
@@ -2537,54 +2505,6 @@
                 ]
               }
             ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "type": "deployment",
-              "id": null
-            },
-            "check": "$min_subjects",
-            "passed": true,
-            "cause": "satisfied",
-            "inputs": [
-              {
-                "name": "in-scope deployment count",
-                "value": 1
-              }
-            ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "type": "deployment",
-              "id": null
-            },
-            "check": "$unique_ids",
-            "passed": true,
-            "cause": "satisfied",
-            "inputs": [
-              {
-                "name": "repeated deployment ids",
-                "value": []
-              }
-            ]
-          },
-          {
-            "requirement": "s",
-            "subject": {
-              "type": "deployment",
-              "id": null
-            },
-            "check": "c",
-            "passed": true,
-            "cause": "satisfied",
-            "inputs": [
-              {
-                "name": "x",
-                "value": 1
-              }
-            ]
           }
         ]
       }
@@ -2600,10 +2520,7 @@
         "input": {"deployments": [{"id": "d1", "x": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "deployment", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "subjects.deployment.applies_to", "value": ["unknown field"]}]},
-          {"requirement": "s", "subject": {"type": "deployment", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope deployment count", "value": 1}]},
-          {"requirement": "s", "subject": {"type": "deployment", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated deployment ids", "value": []}]},
-          {"requirement": "s", "subject": {"type": "deployment", "id": "d1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "deployment", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "subjects.deployment.applies_to", "value": ["unknown field"]}]}
         ]
       }
     ]
@@ -4240,38 +4157,6 @@
               "id": null,
               "type": "review"
             }
-          },
-          {
-            "cause": "value",
-            "check": "$min_subjects",
-            "inputs": [
-              {
-                "name": "in-scope review count",
-                "value": 0
-              }
-            ],
-            "passed": false,
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "review"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "$unique_ids",
-            "inputs": [
-              {
-                "name": "repeated review ids",
-                "value": []
-              }
-            ],
-            "passed": true,
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "review"
-            }
           }
         ]
       }
@@ -4905,38 +4790,6 @@
               "id": null,
               "type": "pull request"
             }
-          },
-          {
-            "cause": "value",
-            "check": "$min_subjects",
-            "inputs": [
-              {
-                "name": "in-scope pull request count",
-                "value": 0
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": null,
-              "type": "pull request"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "$unique_ids",
-            "inputs": [
-              {
-                "name": "repeated pull request ids",
-                "value": []
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": null,
-              "type": "pull request"
-            }
           }
         ]
       }
@@ -5006,38 +4859,6 @@
               }
             ],
             "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": null,
-              "type": "scan"
-            }
-          },
-          {
-            "cause": "value",
-            "check": "$min_subjects",
-            "inputs": [
-              {
-                "name": "in-scope scan count",
-                "value": 0
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": null,
-              "type": "scan"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "$unique_ids",
-            "inputs": [
-              {
-                "name": "repeated scan ids",
-                "value": []
-              }
-            ],
-            "passed": true,
             "requirement": "r",
             "subject": {
               "id": null,
@@ -5529,38 +5350,6 @@
               "id": null,
               "type": "x"
             }
-          },
-          {
-            "cause": "value",
-            "check": "$min_subjects",
-            "inputs": [
-              {
-                "name": "in-scope x count",
-                "value": 0
-              }
-            ],
-            "passed": false,
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "x"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "$unique_ids",
-            "inputs": [
-              {
-                "name": "repeated x ids",
-                "value": []
-              }
-            ],
-            "passed": true,
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "x"
-            }
           }
         ]
       }
@@ -5591,7 +5380,7 @@
     },
     "cases": [
       {
-        "description": "is written wrong and keeps the id of the one it narrows",
+        "description": "is written wrong, and $well_formed says identified_by isn't allowed there",
         "rules": ["subjects.narrow.id", "sentence.subject.narrow", "written_wrong.row"],
         "input": {
           "defects": [
@@ -5611,8 +5400,8 @@
           "s": {
             "status": "not_met",
             "subjects": {
-              "matching": 1,
-              "total": 2
+              "matching": 0,
+              "total": 0
             }
           }
         },
@@ -5642,86 +5431,6 @@
               "id": null,
               "type": "critical defect"
             }
-          },
-          {
-            "cause": "satisfied",
-            "check": "$min_subjects",
-            "inputs": [
-              {
-                "name": "in-scope critical defect count",
-                "value": 1
-              }
-            ],
-            "passed": true,
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "critical defect"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "$unique_ids",
-            "inputs": [
-              {
-                "name": "repeated critical defect ids",
-                "value": []
-              }
-            ],
-            "passed": true,
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "critical defect"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "$applies",
-            "inputs": [
-              {
-                "name": "severity",
-                "value": "critical"
-              }
-            ],
-            "passed": true,
-            "requirement": "s",
-            "subject": {
-              "id": 1,
-              "type": "critical defect"
-            }
-          },
-          {
-            "cause": "value",
-            "check": "$applies",
-            "inputs": [
-              {
-                "name": "severity",
-                "value": "low"
-              }
-            ],
-            "passed": false,
-            "requirement": "s",
-            "subject": {
-              "id": 2,
-              "type": "critical defect"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "c",
-            "inputs": [
-              {
-                "name": "team",
-                "value": "a"
-              }
-            ],
-            "passed": true,
-            "requirement": "s",
-            "subject": {
-              "id": 1,
-              "type": "critical defect"
-            }
           }
         ]
       }
@@ -5748,8 +5457,8 @@
     },
     "cases": [
       {
-        "description": "fails $applies as ill_formed even when another condition would rule the subject out, and $well_formed names the from line",
-        "rules": ["scope.unreadable", "written_wrong.row", "subjects.sentence"],
+        "description": "is written wrong, and $well_formed names the from line and is the requirement's only row",
+        "rules": ["well_formed", "written_wrong.row", "subjects.sentence"],
         "input": {
           "things": [
             {
@@ -5762,7 +5471,7 @@
             "status": "not_met",
             "subjects": {
               "matching": 0,
-              "total": 1
+              "total": 0
             }
           }
         },
@@ -5790,60 +5499,6 @@
             "requirement": "s",
             "subject": {
               "id": null,
-              "type": "b"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "$min_subjects",
-            "inputs": [
-              {
-                "name": "in-scope b count",
-                "value": 0
-              }
-            ],
-            "passed": true,
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "b"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "$unique_ids",
-            "inputs": [
-              {
-                "name": "repeated b ids",
-                "value": []
-              }
-            ],
-            "passed": true,
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "b"
-            }
-          },
-          {
-            "cause": "ill_formed",
-            "check": "$applies",
-            "inputs": [
-              {
-                "name": "x",
-                "value": 1
-              },
-              {
-                "name": "y",
-                "value": null
-              }
-            ],
-            "passed": false,
-            "requirement": "s",
-            "subject": {
-              "id": {
-                "x": 1
-              },
               "type": "b"
             }
           }
@@ -6284,9 +5939,7 @@
         "input": {"things": [{"id": "t1", "x": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "subjects.thing.from", "value": ["not a string"]}, {"name": "subjects.thing.identified_by", "value": ["not a string"]}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$min_subjects", "passed": false, "cause": "value", "inputs": [{"name": "in-scope thing count", "value": 0}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated thing ids", "value": []}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "subjects.thing.from", "value": ["not a string"]}, {"name": "subjects.thing.identified_by", "value": ["not a string"]}]}
         ]
       }
     ]

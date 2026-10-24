@@ -51,6 +51,8 @@ inputs_of(subj, check) := row.inputs if {
 	row.check == "c"
 }
 
+stopped(rep) if [[r.check, r.passed, r.cause] | some r in rep.results] == [["$well_formed", false, "value"]]
+
 cause_of(subj, check) := row.cause if {
 	some row in solo(subj, check).results
 	row.check == "c"
@@ -465,52 +467,6 @@ test_compare_lte_when_equal if verdict({"a": 1, "b": 1}, compare_ab("lte")) == t
 
 test_compare_does_not_order_two_strings if cause_of({"a": "abc", "b": "abd"}, compare_ab("lt")) == "unusable"
 
-attestations_array := {"attestations": [
-	{"attestation_type": "unit_test", "payload": "wrong"},
-	{"attestation_type": "pull_request", "payload": "right"},
-]}
-
-attestations_map := {"attestations": {
-	"a-unit": {"attestation_type": "unit_test", "payload": "wrong"},
-	"a-pr": {"attestation_type": "pull_request", "payload": "right"},
-}}
-
-pr_payload := {
-	"op": "equals",
-	"path": ["attestations", {"where": {"attestation_type": "pull_request"}}, "payload"],
-	"value": "right",
-}
-
-test_selector_reads_the_selected_element_not_a_sibling if {
-	check := object.union(pr_payload, {"value": "wrong"})
-	verdict(attestations_array, check) == false
-	verdict(attestations_map, check) == false
-}
-
-test_selector_fails_closed_when_nothing_matches if {
-	doc := {"attestations": [{"attestation_type": "unit_test", "payload": "right"}]}
-	verdict(doc, pr_payload) == false
-}
-
-test_selector_fails_closed_when_two_elements_match if {
-	doc := {"attestations": [
-		{"attestation_type": "pull_request", "payload": "right"},
-		{"attestation_type": "pull_request", "payload": "right"},
-	]}
-	verdict(doc, pr_payload) == false
-}
-
-test_selector_fails_closed_on_a_missing_collection if verdict({}, pr_payload) == false
-
-test_selector_fails_closed_on_a_scalar_collection if {
-	verdict({"attestations": "not-a-collection"}, pr_payload) == false
-}
-
-test_selector_fails_closed_on_an_empty_where if {
-	check := object.union(pr_payload, {"path": ["attestations", {"where": {}}, "payload"]})
-	verdict(attestations_array, check) == false
-}
-
 service_accounts := ["svc_.*", `.*\[bot\]`, `noreply@github\.com`]
 
 matches(op) := concat(" ", ["author", {"matches_any": "matches", "not_matches_any": "does not match"}[op], concat(", ", [json.marshal(p) | some p in service_accounts])])
@@ -677,17 +633,9 @@ test_compare_time_rejects_a_missing_side if {
 	verdict({"end": "2024-01-01T00:00:00Z"}, compare_time_span("lt")) == false
 }
 
-all_verified := {
-	"op": "all",
-	"path": ["commits"],
-	"check": {"op": "equals", "path": ["verified"], "value": true},
-}
+all_verified := "every commits.verified is true"
 
-any_approved := {
-	"op": "any",
-	"path": ["approvers"],
-	"check": {"op": "equals", "path": ["state"], "value": "APPROVED"},
-}
+any_approved := `some approvers.state is "APPROVED"`
 
 test_all_when_one_element_fails if {
 	verdict({"commits": [{"verified": true}, {"verified": false}]}, all_verified) == false
@@ -713,19 +661,9 @@ test_any_over_empty_collection if verdict({"approvers": []}, any_approved) == fa
 
 test_any_rejects_missing_path if verdict({}, any_approved) == false
 
-every_commit_signed := {
-	"op": "all",
-	"path": ["prs"],
-	"each": ["commits"],
-	"check": {"op": "equals", "path": ["signed"], "value": true},
-}
+every_commit_signed := "every prs.commits.signed is true"
 
-any_commit_signed := {
-	"op": "any",
-	"path": ["prs"],
-	"each": ["commits"],
-	"check": {"op": "equals", "path": ["signed"], "value": true},
-}
+any_commit_signed := "some prs.commits.signed is true"
 
 test_each_fails_when_one_element_of_one_inner_collection_fails if {
 	verdict(
@@ -754,26 +692,6 @@ test_each_rejects_a_missing_outer_collection if verdict({}, every_commit_signed)
 
 test_each_under_any_fails_when_no_element_passes if {
 	verdict({"prs": [{"commits": [{"signed": false}]}]}, any_commit_signed) == false
-}
-
-identified := {
-	"op": "all",
-	"path": ["prs"],
-	"each": ["commits"],
-	"check": {"op": "any_of", "options": {
-		"linked_account": ["author_username is a non-empty string"],
-		"web_flow": [{"op": "matches_any", "path": ["author"], "patterns": [`noreply@github\.com`]}],
-	}},
-}
-
-test_an_any_of_element_check_fails_when_an_element_satisfies_neither_option if {
-	verdict(
-		{"prs": [{"commits": [
-			{"author_username": "alice"},
-			{"author_username": null, "author": "Bob <bob@example.com>"},
-		]}]},
-		identified,
-	) == false
 }
 
 branch_req(check) := {"s": {"from": "branches", "checks": {"c": check}}}
@@ -812,9 +730,7 @@ test_any_of_rejects_a_subject_missing_one_of_the_fields if {
 	verdict({"type": "Story"}, flavoured) == false
 }
 
-test_any_of_fails_closed_on_empty_options if {
-	verdict({"type": "Story"}, {"any_of": {}}) == false
-}
+test_any_of_fails_closed_on_empty_options if stopped(solo({"type": "Story"}, {"any_of": {}}))
 
 test_any_of_with_single_leaf_options_is_a_plain_disjunction if {
 	single := {"any_of": {"by_type": "type is \"Story\"", "by_state": "state is \"DONE\""}}
@@ -939,13 +855,12 @@ test_a_ref_step_that_reads_something_that_cannot_be_a_key_fails_as_unusable if {
 }
 
 test_a_check_with_a_number_too_big_for_a_float_fails_closed if {
-	check := "n is 1e400"
-	[verdict({"id": 1, "n": 1e400}, check), cause_of({"id": 1, "n": 1e400}, check)] == [false, "ill_formed"]
+	stopped(solo({"id": 1, "n": 1e400}, "n is 1e400"))
 }
 
 test_a_check_with_a_number_too_small_for_a_float_fails_closed_so_it_cannot_pass_as_zero if {
-	check := "n is 1e-400"
-	[verdict({"id": 1, "n": 0}, check), verdict({"id": 1, "n": 1e-400}, check)] == [false, false]
+	stopped(solo({"id": 1, "n": 0}, "n is 1e-400"))
+	stopped(solo({"id": 1, "n": 1e-400}, "n is 1e-400"))
 }
 
 test_a_number_a_float_cannot_hold_in_the_input_is_compared_exactly if {
@@ -966,7 +881,7 @@ test_a_number_at_the_edge_of_a_float_still_works if {
 	verdict({"id": 1, "n": 1.7976931348623157e308}, "n is 1.7976931348623157e308") == true
 	verdict({"id": 1, "n": 2.2250738585072014e-308}, "n is 2.2250738585072014e-308") == true
 	verdict({"id": 1, "n": 0}, "n is 0") == true
-	verdict({"id": 1, "n": 2.2250738585072e-308}, "n is 2.2250738585072e-308") == false
+	stopped(solo({"id": 1, "n": 2.2250738585072e-308}, "n is 2.2250738585072e-308"))
 }
 
 test_a_requirement_with_a_number_out_of_range_is_not_well_formed if {
@@ -1016,10 +931,6 @@ test_rows_are_produced_even_for_an_empty_subject if {
 	every row in check_rows {
 		row.passed == false
 	}
-}
-
-test_unknown_op_produces_a_failing_row_not_a_gap if {
-	verdict({"id": "x"}, {"op": "no_such_op", "path": ["id"]}) == false
 }
 
 test_rows_from_different_requirements_are_labelled_separately if {
@@ -1250,12 +1161,11 @@ test_a_violation_for_a_from_that_reads_nothing_says_what_failed if {
 	[[v.description, v.expression, v.cause] | some v in ergo.violations(rep)] == [["The thing list can be read", "items can be read", "absent"]]
 }
 
-test_min_subjects_fails_like_well_formed_when_from_is_written_wrong_even_at_zero if {
+test_a_from_written_wrong_stops_at_well_formed_even_with_min_subjects_zero if {
 	every f in [5, ["items"], "items whose"] {
 		every n in [0, 1] {
 			req := {"s": object.union(min_subjects_req(n).s, {"from": f})}
-			rep := report({"items": [{"id": "a"}]}, req)
-			[[r.passed, r.cause] | some r in rows_for(rep, "s", "$min_subjects")] == [[false, "value"]]
+			stopped(report({"items": [{"id": "a"}]}, req))
 		}
 	}
 }
@@ -1925,7 +1835,7 @@ test_a_requirement_that_is_not_an_object_finds_no_subjects_so_it_cannot_claim_th
 	rep := report({"items": [{"id": 1}]}, {"s": 5})
 	rep.requirements.s.subjects == {"total": 0, "matching": 0}
 	rep.requirements.s.checks["$min_subjects"].expression == "count(matching(<invalid from>)) >= 1"
-	[[r.passed, r.cause] | some r in rows_for(rep, "s", "$min_subjects")] == [[false, "value"]]
+	stopped(rep)
 }
 
 test_a_from_that_is_not_a_list_records_no_refs_because_it_is_never_read if {
@@ -1941,7 +1851,7 @@ test_a_field_of_the_right_type_adds_no_input_to_well_formed if {
 
 test_checks_that_are_not_an_object_give_no_rows_named_by_list_index if {
 	rep := report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"checks": ["id exists"]})})
-	[r.check | some r in rep.results] == ["$well_formed", "$min_subjects", "$unique_ids"]
+	stopped(rep)
 	rows_for(rep, "s", "$well_formed")[0].inputs[0] == {"name": "count(checks)", "value": 0}
 }
 
@@ -1951,18 +1861,14 @@ test_a_from_that_is_not_a_list_gives_no_subjects if {
 	rep.requirements.s.checks["$min_subjects"].expression == "count(matching(<invalid from>)) >= 1"
 }
 
-test_an_id_that_is_not_a_list_gives_a_null_id if {
-	rep := report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"identified_by": 5})})
-	[r.subject.id | some r in rows_for(rep, "s", "c")] == [null]
+test_an_id_that_is_not_a_string_stops_at_well_formed if {
+	stopped(report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"identified_by": 5})}))
 }
 
-test_a_min_subjects_that_is_not_a_number_fails_min_subjects_whatever_opa_thinks_of_comparing_it if {
-	rows := [[r.passed, r.cause] |
-		some m in ["0", null, [], {}]
-		rep := report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"min_subjects": m})})
-		some r in rows_for(rep, "s", "$min_subjects")
-	]
-	rows == [[false, "value"], [false, "value"], [false, "value"], [false, "value"]]
+test_a_min_subjects_that_is_not_a_number_stops_at_well_formed_whatever_opa_thinks_of_comparing_it if {
+	every m in ["0", null, [], {}] {
+		stopped(report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"min_subjects": m})}))
+	}
 }
 
 test_min_subjects_names_the_whole_input_like_the_checks_do_when_from_reads_it if {
@@ -2042,11 +1948,10 @@ test_a_check_description_or_meta_of_the_wrong_type_is_written_wrong_and_never_re
 		{"name": "checks.m", "value": ["invalid meta"]},
 		{"name": "checks.n", "value": ["invalid meta"]},
 	]
-	[[r.check, r.passed, r.cause] | some r in rep.results; r.check in {"d", "m", "n"}] == [["d", false, "ill_formed"], ["m", false, "ill_formed"], ["n", false, "ill_formed"]]
+	stopped(rep)
 	rep.requirements.s.checks.d.description == ""
 	rep.requirements.s.checks.m.meta == {}
 	rep.requirements.s.checks.n.meta == {}
-	[v.description | some v in ergo.violations(rep); v.check == "d"] == [""]
 }
 
 test_every_check_in_the_report_has_a_description_and_meta_even_the_ones_ergo_adds if {
@@ -2395,9 +2300,9 @@ test_checks_come_out_in_name_order_whatever_the_runtime if {
 	[r.check | some r in rep.results; not startswith(r.check, "$")] == ["a", "b", "c", "delta", "gamma"]
 }
 
-test_a_policy_written_as_a_set_still_gets_its_rows if {
+test_a_policy_written_as_a_set_still_gets_a_row if {
 	policy := {"ergo_spec": "v0.1", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {{"subject": "item", "checks": {"c": "id exists"}}}}
-	[r.check | some r in ergo.report({"items": [{"id": 1}]}, policy, {}).results] == ["$well_formed", "$min_subjects", "$unique_ids", "c"]
+	stopped(ergo.report({"items": [{"id": 1}]}, policy, {}))
 }
 
 checks_for(subject) := ergo.report({"xs": [{"id": 1}]}, {"ergo_spec": "v0.1", "requirements": {"s": {"subject": subject, "checks": {"c": "id exists"}}}}, {}).requirements.s.checks
@@ -3163,7 +3068,7 @@ badly_written := [
 	[null, "", ["invalid check"]],
 ]
 
-test_a_check_whose_ref_reads_the_wrong_kind_of_value_fails_and_is_not_ill_formed if {
+test_a_check_whose_ref_reads_the_wrong_kind_of_value_fails_as_unusable_and_is_not_written_wrong if {
 	every check in ["s matches $input.params.word", "n is one of $input.params.word"] {
 		rep := report(typo_doc, {"s": {"from": "items", "identified_by": "id", "checks": {"c": check}}})
 		[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "unusable"]]
@@ -3171,11 +3076,9 @@ test_a_check_whose_ref_reads_the_wrong_kind_of_value_fails_and_is_not_ill_formed
 	}
 }
 
-test_a_badly_written_check_is_ill_formed if {
+test_a_badly_written_check_stops_its_requirement_at_well_formed if {
 	every case in badly_written {
-		check := case[0]
-		rep := report(typo_doc, {"s": {"from": "items", "identified_by": "id", "checks": {"c": check}}})
-		[[r.passed, r.cause] | some r in rows_for(rep, "s", "c")] == [[false, "ill_formed"]]
+		stopped(report(typo_doc, {"s": {"from": "items", "identified_by": "id", "checks": {"c": case[0]}}}))
 	}
 }
 
@@ -3184,7 +3087,7 @@ filter_policy(subjects) := {"ergo_spec": "v0.1", "subjects": subjects, "requirem
 test_a_badly_written_filter_fails_well_formed_too if {
 	rep := ergo.report({"things": [{"x": 1}]}, filter_policy({"b": {"from": `things whose x is one of 1, "a"`}}), {})
 	problem_inputs(rep) == [{"name": "subjects.b.from", "value": ["values of mixed types"]}]
-	[[r.passed, r.cause] | some r in rows_for(rep, "s", "$applies")] == [[false, "ill_formed"]]
+	stopped(rep)
 }
 
 badly_written_filters := [
@@ -3214,11 +3117,25 @@ test_a_badly_written_filter_is_named_after_the_subject_whose_from_line_holds_it 
 	problem_inputs(rep) == [{"name": "subjects.thing.from", "value": ["values of mixed types"]}]
 }
 
-test_a_badly_written_filter_wins_over_one_that_rules_the_subject_out_because_scope_cannot_be_trusted if {
+test_a_badly_written_filter_on_a_parent_or_a_grandparent_stops_the_child_at_well_formed if {
+	subjects := {
+		"artifact": {"from": `artifacts whose x is one of 1, "a"`, "identified_by": "id"},
+		"pr": {"from": "artifact.prs", "identified_by": "url"},
+		"commit": {"from": "pr.commits", "identified_by": "sha"},
+	}
+	doc := {"artifacts": [{"id": "a", "x": 1, "prs": [{"url": "p", "commits": [{"sha": "s"}]}]}]}
+	every name in ["pr", "commit"] {
+		rep := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"s": {"subject": name, "checks": {"c": "x exists"}}}}, {})
+		stopped(rep)
+		problem_inputs(rep) == [{"name": "subjects.artifact.from", "value": ["values of mixed types"]}]
+	}
+}
+
+test_a_badly_written_filter_stops_the_requirement_even_when_another_condition_rules_the_subject_out if {
 	rep := ergo.report({"things": [{"x": 1}]}, filter_policy({"b": {"from": `things whose x is one of 1, "a" and y exists`}}), {})
-	[[r.passed, r.cause] | some r in rows_for(rep, "s", "$applies")] == [[false, "ill_formed"]]
+	stopped(rep)
 	rep.requirements.s.status == "not_met"
-	[v.check | some v in ergo.violations(rep)] == ["$well_formed", "$applies"]
+	[v.check | some v in ergo.violations(rep)] == ["$well_formed"]
 }
 
 test_an_index_that_cannot_be_a_key_is_written_wrong_wherever_it_sits if {
@@ -3518,7 +3435,7 @@ test_a_requirement_without_a_subject_fails_well_formed_and_checks_nothing if {
 	rep := ergo.report(deployments_doc, subject_policy({"deployment": prod_deployment}, {"s": object.remove(approved_req("deployment"), ["subject"])}), {})
 	rep.requirements.s.status == "not_met"
 	well_formed_problems(rep, "s") == [{"name": "subject", "value": ["missing"]}]
-	[[r.check, r.passed] | some r in rep.results; r.check != "$well_formed"] == [["$min_subjects", false], ["$unique_ids", true]]
+	stopped(rep)
 }
 
 test_a_subject_that_is_not_in_subjects_fails_well_formed_and_checks_nothing if {
@@ -3530,7 +3447,7 @@ test_a_subject_that_is_not_in_subjects_fails_well_formed_and_checks_nothing if {
 		rep := ergo.report(deployments_doc, policy, {})
 		rep.requirements.s.status == "not_met"
 		well_formed_problems(rep, "s") == [{"name": "subject", "value": ["not in subjects"]}]
-		[[r.check, r.passed] | some r in rep.results; r.check != "$well_formed"] == [["$min_subjects", false], ["$unique_ids", true]]
+		stopped(rep)
 	}
 }
 
@@ -3692,7 +3609,7 @@ test_causes_count_the_rows_violations_returns if {
 	rep := ergo.report(causes_doc, causes_policy(approved_check), {})
 	vs := ergo.violations(rep)
 	rep.requirements.r.causes == [{"cause": c, "rows": n} |
-		some c in ["ill_formed", "not_an_object", "ambiguous", "unusable", "absent", "null", "value"]
+		some c in ["not_an_object", "ambiguous", "unusable", "absent", "null", "value"]
 		n := count([v | some v in vs; v.cause == c])
 		n > 0
 	]
@@ -4051,12 +3968,9 @@ test_a_sentence_check_reports_its_description_meta_and_printed_sentence_only if 
 	r.compliant
 }
 
-test_a_sentence_written_wrong_fails_its_rows_and_lists_its_problems if {
+test_a_sentence_written_wrong_stops_at_well_formed_and_lists_its_problems if {
 	r := ergo.report({"things": [{"id": "t1", "x": "a"}]}, _sentence_policy({"c": `x is "a`}), {})
-	[[row.check, row.passed, row.cause, row.inputs] | some row in r.results; row.check in {"$well_formed", "c"}] == [
-		["$well_formed", false, "value", [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["unclosed quote at column 6"]}]],
-		["c", false, "ill_formed", []],
-	]
+	[[row.check, row.passed, row.cause, row.inputs] | some row in r.results] == [["$well_formed", false, "value", [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["unclosed quote at column 6"]}]]]
 	r.requirements.s.checks.c.expression == `x is "a`
 }
 
@@ -4085,7 +3999,7 @@ test_forms_ergo_does_not_run_yet_are_written_wrong_as_not_supported_yet if {
 
 test_a_check_written_as_a_string_is_read_as_a_sentence if {
 	rendered({}, "present") == "present"
-	[[r.passed, r.cause] | some r in solo({}, "present").results; r.check == "c"] == [[false, "ill_formed"]]
+	stopped(solo({}, "present"))
 	_sentence_problems("present") == [`nothing after the path at column 8: expected a phrase, like "is" or "exists"`]
 }
 
@@ -4414,7 +4328,7 @@ test_an_any_of_of_sentences_is_written_wrong_when_its_shape_or_a_line_is if {
 		r := ergo.report({"things": [{"id": "t1", "x": 1}]}, _sentence_policy({"c": pair[0]}), {})
 		_sentence_problems(pair[0]) == pair[1]
 		r.requirements.s.checks.c.expression == pair[2]
-		[row.cause | some row in r.results; row.check == "c"] == ["ill_formed"]
+		stopped(r)
 	}
 }
 
@@ -5151,7 +5065,7 @@ test_a_from_line_that_starts_at_input_reads_the_input_and_one_at_params_is_writt
 
 test_a_from_line_keeps_every_condition_past_a_hundred if {
 	conds := concat(" and ", array.concat([`id is 1` | some _ in numbers.range(1, 100)], [`env is "prod"`]))
-	rep := _from_report({"ds": [{"id": 1, "env": "dev"}]}, {"d": {"from": concat("", ["ds whose ", conds]), "id": "id"}}, {"c": "id exists"}, {})
+	rep := _from_report({"ds": [{"id": 1, "env": "dev"}]}, {"d": {"from": concat("", ["ds whose ", conds]), "identified_by": "id"}}, {"c": "id exists"}, {})
 	rep.requirements.r.status == "not_met"
 	[r.cause | some r in rep.results; r.check == "$applies"] == ["value"]
 	endswith(rep.requirements.r.checks["$applies"].expression, `and env is "prod"`)
@@ -5259,7 +5173,7 @@ test_a_subject_cant_build_on_a_subject_read_from_another_yet if {
 	every pair in [[{"from": "pr whose ok is true"}, "from"]] {
 		rep := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": object.union(base, {"okpr": pair[0]}), "requirements": {"r": {"subject": "okpr", "checks": {"c": "url exists"}}}}, {})
 		_from_problems(rep) == [{"name": concat("", ["subjects.okpr.", pair[1]]), "value": ["can't build on a subject read from another subject yet"]}]
-		[r.check | some r in rep.results] == ["$well_formed", "$min_subjects", "$unique_ids"]
+		stopped(rep)
 	}
 }
 
@@ -6320,13 +6234,12 @@ test_a_part_on_the_right_after_every_is_not_the_item_compared_with_itself if {
 		{"cov": "dd.b"}, {
 			"walk": "every dd.items.cov equals cov.x",
 			"whose": "every dd.items.x whose cov equals cov.x is at least 5",
-			"plain": "cov.x equals cov.x",
 		},
 		{"b": {"x": 5}, "items": [{"cov": 5, "x": 5}]},
 	)
 	_parts_row(rep, "walk").passed
 	_parts_row(rep, "whose").passed
-	_parts_row(rep, "plain").cause == "ill_formed"
+	stopped(_parts_report({"cov": "dd.b"}, {"plain": "cov.x equals cov.x"}, {"b": {"x": 5}}))
 }
 
 test_a_part_is_the_items_field_on_the_left_of_a_whose_and_the_part_on_the_right if {
@@ -6368,7 +6281,7 @@ test_a_for_line_alias_that_is_also_a_part_alias_is_written_wrong if {
 	has := {"cov": "dd.b"}
 	rep := _parts_report(has, {"c": {"for": "every dd.items as cov", "assert": "cov.x is 1"}}, {"items": [{"x": 1}]})
 	_parts_problems(rep)["checks.c"] == ["alias given twice"]
-	_parts_row(rep, "c").cause == "ill_formed"
+	stopped(rep)
 }
 
 test_a_whose_in_the_from_line_reads_the_subjects_parts if {
@@ -6883,8 +6796,7 @@ test_a_group_of_options_that_is_not_a_list_or_holds_a_non_object_is_written_wron
 	every level in ["a", "b", "c", "d"] {
 		every options in [{"g": "nope"}, ["nope"], {"g": [5]}, [[5]]] {
 			check := _deep_at(level, _swap_old_alias, options)
-			rep := ergo.report(_parts_doc(_swap_good), _swap_policy(_swap_has, {"c": check}), {})
-			[r.cause | some r in rep.results; r.check == "c"] == ["ill_formed"]
+			stopped(ergo.report(_parts_doc(_swap_good), _swap_policy(_swap_has, {"c": check}), {}))
 		}
 	}
 }
@@ -6899,14 +6811,12 @@ _deep_nest(n, leaf) := {"op": "all", "path": ["xs"], "check": {"op": "all", "pat
 
 test_a_nested_check_that_is_not_an_object_is_written_wrong_at_every_depth_and_does_not_hide_the_row if {
 	every n in [1, 2, 3, 4] {
-		rep := ergo.report(_parts_doc(_swap_good), _swap_policy(_swap_has, {"c": _deep_nest(n, 5)}), {})
-		[r.cause | some r in rep.results; r.check == "c"] == ["ill_formed"]
+		stopped(ergo.report(_parts_doc(_swap_good), _swap_policy(_swap_has, {"c": _deep_nest(n, 5)}), {}))
 	}
 }
 
 test_a_check_or_a_filter_that_is_not_an_object_is_written_wrong_when_a_subject_has_parts if {
-	rep := ergo.report(_parts_doc(_swap_good), _swap_policy(_swap_has, {"c": 5}), {})
-	[r.cause | some r in rep.results; r.check == "c"] == ["ill_formed"]
+	stopped(ergo.report(_parts_doc(_swap_good), _swap_policy(_swap_has, {"c": 5}), {}))
 }
 
 test_a_requirement_that_reads_parts_only_by_name_runs_without_a_scope_because_a_scope_makes_opa_work_out_every_row_again if {
@@ -6921,10 +6831,7 @@ test_an_old_syntax_side_that_is_not_a_path_or_a_known_shape_is_left_as_written i
 		"b": {"op": "compare", "left": {"add": [5, ["$cov", "x"]]}, "right": {"literal": 1}, "cmp": "lt"},
 		"c": {"op": "compare", "left": {"count_of": ["$lst"], "whose": [5], "text": "t"}, "right": {"literal": 1}, "cmp": "lt"},
 	}
-	rep := _parts_report(_swap_has, checks, _swap_good)
-	every c in ["a", "b", "c"] {
-		[r.cause | some r in rep.results; r.check == c] == ["ill_formed"]
-	}
+	stopped(_parts_report(_swap_has, checks, _swap_good))
 }
 
 test_a_part_with_a_key_that_is_not_a_string_is_written_wrong_and_is_not_listed if {
@@ -6934,7 +6841,7 @@ test_a_part_with_a_key_that_is_not_a_string_is_written_wrong_and_is_not_listed i
 	problems["subjects.round.has.<invalid key 1>"] == ["invalid alias"]
 	problems["subjects.round.has.<invalid key true>"] == ["invalid alias"]
 	rep.subjects.round.parts == {"ok": {"from": "dd.d", "identified_by": null}}
-	_parts_row(rep, "c").passed
+	stopped(rep)
 }
 
 _hidden_doc := {"pull_requests": [
@@ -7025,7 +6932,6 @@ test_an_input_read_through_a_part_is_tagged_with_the_alias_and_the_id_inside_the
 	checks := {
 		"eq": "coverage.hunks_acknowledged equals coverage.hunks_total",
 		"own": "name is \"t1\"",
-		"line": "lst.0.x is 1",
 	}
 	rep := _parts_report(_tag_has, checks, _tag_doc)
 	_parts_row(rep, "eq").inputs == [
@@ -7372,14 +7278,15 @@ test_a_part_named_like_a_grandparent_is_an_alias_given_twice if {
 	[i | some r in rep.results; r.check == "$well_formed"; some i in r.inputs; startswith(i.name, "subjects.")] == [{"name": "subjects.commit.has.artifact", "value": ["alias given twice"]}]
 }
 
-test_a_requirement_field_named_like_the_facts_ergo_works_out_once_is_unknown_and_changes_no_row if {
+test_a_requirement_field_named_like_the_facts_ergo_works_out_once_is_unknown_and_stops_the_requirement if {
 	subjects := {"artifact": {"from": "artifacts", "identified_by": "fingerprint", "has": {"pr_att": "atts.pr"}}, "pull request": {"from": "artifact.pull_requests", "identified_by": "url"}}
 	doc := {"artifacts": [{"fingerprint": "a", "atts": {"pr": {"id": "x"}}, "pull_requests": [{"url": "pr/7"}]}, {"fingerprint": "b", "pull_requests": [{"url": "pr/8"}]}]}
 	plain := {"subject": "pull request", "checks": {"c": "url exists and artifact.pr_att.id exists"}}
 	odd := object.union(plain, {"ergo/fixed": {"each_step": [{"each_as": "x"}], "has_parts": true, "tagging": false, "scoped": false}})
 	clean := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": plain}}, {})
 	marked := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": odd}}, {})
-	[r | some r in marked.results; r.check != "$well_formed"] == [r | some r in clean.results; r.check != "$well_formed"]
+	stopped(marked)
+	[r.subject.id | some r in clean.results; r.check == "c"] == ["pr/7", "pr/8"]
 	[i | some r in marked.results; r.check == "$well_formed"; some i in r.inputs; i.name == `"ergo/fixed"`] == [{"name": `"ergo/fixed"`, "value": ["unknown field"]}]
 }
 

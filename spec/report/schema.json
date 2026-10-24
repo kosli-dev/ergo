@@ -29,7 +29,7 @@
   "required": ["compliant", "description", "engine", "ergo", "meta", "requirements", "results", "subjects"],
   "additionalProperties": false,
   "$defs": {
-    "cause": {"enum": ["satisfied", "ill_formed", "not_an_object", "ambiguous", "unusable", "absent", "null", "value"]},
+    "cause": {"enum": ["satisfied", "not_an_object", "ambiguous", "unusable", "absent", "null", "value"]},
     "subject": {
       "type": "object",
       "properties": {

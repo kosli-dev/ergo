@@ -1449,7 +1449,7 @@
     },
     "cases": [
       {
-        "description": "is written wrong, and the check fails",
+        "description": "is written wrong, and the check gets no row",
         "rules": ["parts.alias", "parts.written_wrong", "sentence.for.alias"],
         "input": {
           "rounds": [
@@ -1492,17 +1492,6 @@
             "requirement": "r",
             "subject": {
               "id": null,
-              "type": "round"
-            }
-          },
-          {
-            "cause": "ill_formed",
-            "check": "c",
-            "inputs": [],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "a",
               "type": "round"
             }
           }
@@ -1576,17 +1565,6 @@
             "requirement": "r",
             "subject": {
               "id": null,
-              "type": "round"
-            }
-          },
-          {
-            "cause": "ill_formed",
-            "check": "c",
-            "inputs": [],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "a",
               "type": "round"
             }
           }
@@ -1826,26 +1804,6 @@
             "requirement": "r",
             "subject": {
               "id": null,
-              "type": "good round"
-            }
-          },
-          {
-            "cause": "absent",
-            "check": "$applies",
-            "inputs": [
-              {
-                "name": "cov.x",
-                "part": {
-                  "id": null,
-                  "name": "cov"
-                },
-                "value": null
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "a",
               "type": "good round"
             }
           }
@@ -2171,25 +2129,6 @@
               "id": null,
               "type": "pull request"
             }
-          },
-          {
-            "cause": "satisfied",
-            "check": "c",
-            "inputs": [
-              {
-                "name": "url",
-                "value": "pr/7"
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "pr/7",
-              "in": {
-                "artifact": "sha-1"
-              },
-              "type": "pull request"
-            }
           }
         ]
       }
@@ -2441,22 +2380,6 @@
               "id": null,
               "type": "round"
             }
-          },
-          {
-            "cause": "satisfied",
-            "check": "c",
-            "inputs": [
-              {
-                "name": "id",
-                "value": "a"
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "a",
-              "type": "round"
-            }
           }
         ]
       }
@@ -2531,22 +2454,6 @@
               "id": null,
               "type": "round"
             }
-          },
-          {
-            "cause": "satisfied",
-            "check": "c",
-            "inputs": [
-              {
-                "name": "id",
-                "value": "a"
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "a",
-              "type": "round"
-            }
           }
         ]
       }
@@ -2561,7 +2468,7 @@
           "from": "rounds",
           "identified_by": "id",
           "has": {
-            "a": "  d.b  ",
+            "p": "  d.b  ",
             "b": {
               "from": "d.\"x y\".z",
               "identified_by": "attestation_id"
@@ -2599,7 +2506,7 @@
               "from": "rounds",
               "identified_by": "id",
               "parts": {
-                "a": {
+                "p": {
                   "from": "d.b",
                   "identified_by": null
                 },

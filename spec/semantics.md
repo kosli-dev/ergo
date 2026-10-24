@@ -22,7 +22,7 @@ A syntax reads each check into this model. Everything below is said in terms of 
 - A **value** is a JSON value or a ref.
 - A **ref** is a path that starts at the input or the params and whose steps are all keys or indexes.
 
-**[written_wrong]** A check that can't be read into this model is written wrong. Each of its rows fails with cause `ill_formed`, whatever the subject holds, and the requirement's `$well_formed` row fails with cause `value` and lists what's wrong. [syntax.md](syntax.md#written-wrong) says what counts as written wrong in a sentence, and [written_wrong.row](syntax.md#written-wrong) how it's reported.
+**[written_wrong]** A check that can't be read into this model is written wrong. The requirement's `$well_formed` row fails with cause `value` and lists what's wrong, and the requirement gets no other row, as [well_formed](#requirements) says. [syntax.md](syntax.md#written-wrong) says what counts as written wrong in a sentence, and [written_wrong.row](syntax.md#written-wrong) how it's reported.
 
 ## Reading a path
 
@@ -55,13 +55,12 @@ Reading a path ends in one of these outcomes. Each one except `found` is also a 
 Every row has a cause. When a check reads several values, the row takes the first cause in this order:
 
 1. `satisfied`
-2. `ill_formed`
-3. `not_an_object`
-4. `ambiguous`
-5. `unusable`
-6. `absent`
-7. `null`
-8. `value`
+2. `not_an_object`
+3. `ambiguous`
+4. `unusable`
+5. `absent`
+6. `null`
+7. `value`
 
 `satisfied` means the row passed. Every other cause means it failed. `value` means everything was read and the values didn't pass. `ambiguous` means a position on a `for` line picked items that tie, see [for.pick](#for), and the other causes are the outcomes of reading a path.
 
@@ -301,7 +300,7 @@ A side of `compare` can also be `count_of` or `sum_of`, each with a path, `whose
 
 A policy has two sections. `subjects` defines each kind of subject once, and `requirements` says what must be true of them. A subject definition has a way to find its subjects (`from`), which can end with filters after `whose`, and a path to each subject's id (`identified_by`). A requirement names one subject definition with `subject`, and has `require`, `min_subjects` and checks. It can also have a `description` and `meta`, which Ergo copies into the report and never reads, and so can the policy.
 
-**[requirement.subject]** A requirement checks the subjects of the definition it names, with its own rows. Several requirements can name the same definition. A requirement that names none, or one that isn't in `subjects`, has no subjects, and its `$well_formed` and `$min_subjects` rows fail. The name of the definition is the `type` in each row's `subject`.
+**[requirement.subject]** A requirement checks the subjects of the definition it names, with its own rows. Several requirements can name the same definition. A requirement that names none, or one that isn't in `subjects`, is written wrong, so its `$well_formed` row fails. The name of the definition is the `type` in each row's `subject`.
 
 **[subjects.from]** A subject definition's `from` is a path into the input. When it ends `found` on a list, each item is a subject, in list order. When it ends `found` on an object, that object is the only subject. With no steps, it reads the whole input. Anything else gives no subjects, and the requirement's `$min_subjects` row fails with the path's outcome, or with `unusable` when it read something that's neither a list nor an object, a `null` input included as `null`. That holds even with `min_subjects: 0`, because that's what a typo in `from` looks like.
 
@@ -335,7 +334,7 @@ A policy has two sections. `subjects` defines each kind of subject once, and `re
 
 **[unique_ids]** No two subjects can share an id, counting the ones the subject's filters leave out, and `null` counts as an id like any other. The `$unique_ids` row fails with `value` when two do. Its input lists each id more than one subject has, once, sorted by its JSON text as shown in [syntax.md](syntax.md#expressions), so `"b"` comes before `10`, and `10` before `3`.
 
-**[well_formed]** The `$well_formed` row passes when the requirement can be read into the model, names a subject definition that can be read too, and has at least one check. Otherwise it fails with `value`, and the requirement is never met. Its inputs start with `count(checks)` and `require`. A requirement that's written wrong still gets its rows for its subjects.
+**[well_formed]** The `$well_formed` row passes when the requirement can be read into the model, names a subject definition that can be read too, and has at least one check. Otherwise it fails with `value`, and the requirement is never met. Its inputs start with `count(checks)` and `require`. A requirement that's written wrong gets only that row: Ergo doesn't read its subjects, so it has no `$min_subjects`, `$unique_ids`, `$applies` or check rows, and its `subjects` counts are 0. The policy alone decides whether it's written wrong, so it fails on every input, and any other row would be checked against a policy Ergo couldn't read as written. Other requirements of the policy still get their rows.
 
 ## Parts
 
