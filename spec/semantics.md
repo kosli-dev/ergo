@@ -61,17 +61,16 @@ Reading a path ends in one of these outcomes. Each one except `found` is also a 
 Every row has a cause. When a check reads several values, the row takes the first cause in this order:
 
 1. `satisfied`
-2. `substituted`
-3. `ill_formed`
-4. `not_an_object`
-5. `ambiguous`
-6. `unmatched`
-7. `unusable`
-8. `absent`
-9. `null`
-10. `value`
+2. `ill_formed`
+3. `not_an_object`
+4. `ambiguous`
+5. `unmatched`
+6. `unusable`
+7. `absent`
+8. `null`
+9. `value`
 
-`satisfied` and `substituted` mean the row passed. Every other cause means it failed. `value` means everything was read and the values didn't pass.
+`satisfied` means the row passed. Every other cause means it failed. `value` means everything was read and the values didn't pass.
 
 ## Values
 
@@ -340,40 +339,6 @@ A side of `compare` can also be `count_of` or `sum_of`, each with a path, `whose
 **[for.shared_failures]** When the second item doesn't start at the first item's alias, some of what [for.second_failures](#for) lists is the same for every item of the first list: a list that failed while walking and a path whose ref step can't be read, and, when none of the second item's `whose` checks reads the first item's alias, the items that can't be read or that a `whose` couldn't decide. Each of those is listed once in the row's `failed_items`, with `failed_assertions` `[]`, instead of under each item of the first list. An item of the first list that failed only because of them isn't listed, and one that is listed has as its cause the first, in the order of [causes](#causes), among the causes of its sentences and of what's still in its `failed_items`. The row's cause doesn't change.
 
 **[for.flaws]** When a ref the check reads can't be used, or the input or params hold something JSON can't, it fails as `unusable` and `failed_items` is `[]`, as [walk.flaws](#every-and-some) says. On a subject that isn't an object, with an item's path that starts at the subject, it fails as `not_an_object`. A second item whose path reads into the first item's name fails that item as `not_an_object` when it isn't an object. When a ref step in the first item's path can't be read, it fails with the ref's cause, `failed_items` is `[]`, and that path's input holds `[]`. In the second item's path, the first list's item fails with the ref's cause instead, and the path is listed as [for.second_failures](#for) and [for.shared_failures](#for) say.
-
-## Substitutes
-
-A check in `checks` or `applies_to` can have a substitute: another check that satisfies it when the first one fails. It's for other evidence that the same requirement was met, like an attestation from a verified committer standing in for the pull request a repository's first commit can't have.
-
-**[substitute.pass]** When the check passes, the row passes with `satisfied`. When it fails and the substitute passes, the row passes with `substituted`.
-
-**[substitute.cause]** When both fail, the row takes the first cause, in the order of [causes](#causes), among the check's own cause and the substitute's, except that the substitute's `absent`, `null` and `value` don't count, because a substitute is usually missing. A substitute whose path runs into the wrong kind of value, whose selector matches nothing or several items, or whose values are the wrong kind for its operator gives its cause to the row. So does a ref in it that can't be read. In `applies_to`, a substitute that's missing doesn't stop a filter from ruling the subject out, but one with any other problem does.
-
-**[substitute.written_wrong]** A substitute that's written wrong makes the check written wrong, so its row fails as `ill_formed` even when the check itself passes.
-
-**[substitute.where]** A substitute's own substitute is ignored, and so is a substitute on the inner check of an `all` or `any`, or on a check in an `any_of` option. A substitute can be any check that can go in `checks`, an `all`, `any` or `any_of` included.
-
-**[substitute.inputs]** The row shows the check's inputs, then the substitute's, leaving out a path already shown. An `all` or `any` row keeps the `failed_items` of the check itself, even when the substitute passed.
-
-## Custom operators
-
-A custom operator is for a check the built-in operators can't express. The policy uses it by name, with its own parameters, and doesn't say how it works: whoever runs the policy supplies it, the way Cucumber is given step definitions that feature files never mention. How it's written depends on the engine, like a Rego rule or a CEL expression, so this section only covers what the policy and the report see. [OPEN.md](OPEN.md#custom-operators) lists what the engines don't agree on yet.
-
-**[custom.use]** A check uses a custom operator like any other, with `op` set to its name and any parameters the operator takes.
-
-**[custom.unknown]** An operator that isn't built in and that nobody supplied is [written wrong](#the-model-of-a-check), so a misspelt operator fails, and in `applies_to` it fails the requirement instead of ruling every subject out.
-
-**[custom.pass]** The check passes when the operator says it does, given the values its parameters hold.
-
-**[custom.fail]** When the operator says it doesn't and every field it reads was found, the check fails with `value`.
-
-**[custom.cause]** When it fails, the cause is the first, in the order of [causes](#causes), among the outcomes of the paths it reads, so a missing field fails it as `absent` and a `null` one as `null`.
-
-**[custom.refs]** Ergo reads the refs in a custom operator's parameters itself, so the operator gets the values. They're recorded under `$refs` like any other, and one that can't be read fails the check with its cause.
-
-**[custom.inputs]** The row shows each path the operator reads, in order. It has no `failed_items`.
-
-**[custom.where]** A custom operator works in `checks`, in `applies_to` and as a substitute, and as a filter it follows the same [scope](#scope) rules as any other.
 
 ## Requirements
 
