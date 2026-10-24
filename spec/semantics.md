@@ -1,6 +1,6 @@
 # How Ergo turns a policy and an input into a report
 
-Draft 0.1. This file says what a check means, whatever syntax it's written in. [syntax.md](syntax.md) says how today's policies write checks, how they can be written wrong, and how the report shows them. It covers reading values, causes, every built-in operator, and how requirements, scope, statuses and violations work. How a subject's `from` names subjects is still described only in [REFERENCE.md](../REFERENCE.md). Questions the spec hasn't settled are in [OPEN.md](OPEN.md).
+Draft 0.1. This file says what a check means, whatever syntax it's written in. [sentences.md](sentences.md) says how checks and `from` lines are written, and [syntax.md](syntax.md) how a policy is laid out, how it can be written wrong, and how the report names paths. It covers reading values, causes, every built-in operator, and how requirements, scope, statuses and violations work. Questions the spec hasn't settled are in [OPEN.md](OPEN.md).
 
 Each rule has a name in brackets, like `[present.missing]`. The cases in [`cases/`](cases) list the rules they test, so you can find the cases for a rule and the rule behind a case. An implementation follows every rule here, and where it does something else, it's wrong, whatever `ergo.rego` does.
 
@@ -9,7 +9,7 @@ Each rule has a name in brackets, like `[present.missing]`. The cases in [`cases
 - The **input** is the JSON document being checked.
 - The **params** are a second JSON document the policy can read, or nothing.
 - A **subject** is one thing a requirement checks, found in the input by the `from` of the subject definition it names.
-- A **check** is one named test in a requirement's `checks` or in a subject definition's `applies_to`.
+- A **check** is one named test in a requirement's `checks`. A condition after `whose` in a subject's `from` line is a check too, called a **filter**.
 - A **row** is the result of one check on one subject, or of one check Ergo adds to a requirement.
 
 ## The model of a check
@@ -22,7 +22,7 @@ A syntax reads each check into this model. Everything below is said in terms of 
 - A **value** is a JSON value or a ref.
 - A **ref** is a path that starts at the input or the params and whose steps are all keys or indexes.
 
-**[written_wrong]** A check that can't be read into this model is written wrong. Each of its rows fails with cause `ill_formed`, whatever the subject holds, and the requirement's `$well_formed` row fails with cause `value` and lists what's wrong. A check written wrong in `applies_to` fails the requirement instead of ruling subjects out. [syntax.md](syntax.md#checks-written-wrong) says what counts as written wrong in today's syntax and how it's reported.
+**[written_wrong]** A check that can't be read into this model is written wrong. Each of its rows fails with cause `ill_formed`, whatever the subject holds, and the requirement's `$well_formed` row fails with cause `value` and lists what's wrong. [sentences.md](sentences.md#written-wrong) says what counts as written wrong in a sentence, and [syntax.md](syntax.md#checks-written-wrong) how it's reported.
 
 ## Reading a path
 
@@ -35,12 +35,8 @@ Reading a path ends in one of these outcomes. Each one except `found` is also a 
 | `absent`        | A key isn't in its object, an index is past the end of its list, or a step comes after a value that's missing or `null`. |
 | `unusable`      | A step comes after a value that can't hold it.                                                                           |
 | `not_an_object` | The path reads a field of a subject that isn't an object.                                                                |
-| `unmatched`     | A selector found no item in a list that's there.                                                                         |
-| `ambiguous`     | A selector found more than one item.                                                                                     |
 
 **[path.start]** A path starts at the subject, the input, the params or an alias. With no params, a path into the params ends `absent`. Params that are there but aren't an object fail the whole report, as [REFERENCE.md](../REFERENCE.md#params) says.
-
-**[path.empty]** A path with no steps reads its starting value itself, so on a subject it never ends `not_an_object`. A `null` subject ends `null`.
 
 **[path.not_an_object]** A path with steps that starts at a subject that isn't an object ends `not_an_object`, `null` subjects included.
 
@@ -50,11 +46,9 @@ Reading a path ends in one of these outcomes. Each one except `found` is also a 
 
 **[path.unusable]** A key on anything but an object, or an index on anything but a list, ends `unusable`. So does any step after a string, number or boolean. So the key `y` on `"x": "a"` and on `"x": [{"y": 1}]` ends `unusable`, and the index `1` on `"x": {"1": "a"}` does too.
 
-**[path.selector]** A selector reads the one item of a list, or of an object's values, whose fields equal every field the selector gives. No match ends `unmatched`, and more than one ends `ambiguous`. A selector on a value that's missing or `null` ends `absent`, the same as a key would.
-
 **[path.ref_step]** A ref step reads its ref first and uses the value as the key for that step. If the ref ends anything but `found`, the path ends there with the ref's outcome, and a value that can't be a key ends `unusable`.
 
-**[path.field_step]** A field step reads one field of the value bare keys read from at that point, the subject or, inside a `whose` or the phrase of a one-line `every` or `some`, the item, and uses it as the key for that step. A field that's missing ends the path `absent`, a `null` one `null`, and one that isn't a string, a number included, `unusable`. On a subject or item that isn't an object, the path ends `not_an_object`. The step is part of its path, as a `named_by` step is, so in a check that reads two paths, the other path's cause can come first, where a ref that can't be read would decide the cause. The row's `inputs` show the field too, unless it's read on an item. Only sentences can write such a step, as `<path> named by <field>`; in today's syntax it's a step that can't be a key.
+**[path.field_step]** A field step reads one field of the value bare keys read from at that point, the subject or, inside a `whose` or the phrase of a one-line `every` or `some`, the item, and uses it as the key for that step. A field that's missing ends the path `absent`, a `null` one `null`, and one that isn't a string, a number included, `unusable`. On a subject or item that isn't an object, the path ends `not_an_object`. The step is part of its path, as a `named_by` step is, so in a check that reads two paths, the other path's cause can come first, where a ref that can't be read would decide the cause. The row's `inputs` show the field too, unless it's read on an item. Sentences write such a step as `<path> named by <field>`.
 
 ## Causes
 
@@ -64,13 +58,12 @@ Every row has a cause. When a check reads several values, the row takes the firs
 2. `ill_formed`
 3. `not_an_object`
 4. `ambiguous`
-5. `unmatched`
-6. `unusable`
-7. `absent`
-8. `null`
-9. `value`
+5. `unusable`
+6. `absent`
+7. `null`
+8. `value`
 
-`satisfied` means the row passed. Every other cause means it failed. `value` means everything was read and the values didn't pass.
+`satisfied` means the row passed. Every other cause means it failed. `value` means everything was read and the values didn't pass. `ambiguous` means a position on a `for` line picked items that tie, see [for.pick](#for), and the other causes are the outcomes of reading a path.
 
 ## Values
 
@@ -96,9 +89,9 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 
 **[present.no_params]** On a path into the params, it fails with cause `absent` instead when there are no params. Then the params weren't given at all, so Ergo can't tell whether the field would be there, and a policy run without its params fails instead of ruling every subject out. When the params are an object without the field, it fails with `value` as usual.
 
-**[present.other]** It fails with the outcome as its cause when its path ends any other way: `not_an_object`, `unusable`, `unmatched` or `ambiguous`. A ref step whose ref can't be read keeps the ref's cause too, even `absent` or `null`, because then the field it looks for is unknown, not missing.
+**[present.other]** It fails with the outcome as its cause when its path ends any other way: `not_an_object` or `unusable`. A ref step whose ref can't be read keeps the ref's cause too, even `absent` or `null`, because then the field it looks for is unknown, not missing.
 
-**[present.filter]** In `applies_to`, a `present` filter that fails with cause `value` rules the subject out, whatever the other filters give. Its `$applies` row fails with cause `value`, and the subject gets no other rows. Any other cause fails the requirement, as it does for every filter. **[applies.inputs]** The `$applies` row lists each path its filters read once, sorted by name.
+**[present.filter]** A `present` filter that fails with cause `value` rules the subject out, whatever the other filters give. Its `$applies` row fails with cause `value`, and the subject gets no other rows. Any other cause fails the requirement, as it does for every filter. **[applies.inputs]** The `$applies` row lists each path its filters read once, sorted by name.
 
 ## `missing`
 
@@ -108,7 +101,7 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 
 **[missing.fail]** It fails with cause `value` where `present` would pass, so a field that's there fails it whatever it holds, `false` and `""` included. Everywhere else, it fails with the cause `present` would give, so with no params a `missing` check on a path into the params fails as `absent` instead of passing.
 
-**[missing.filter]** In `applies_to`, it rules out a subject whose field is there, with cause `value`, as any filter does.
+**[missing.filter]** As a filter, it rules out a subject whose field is there, with cause `value`, as any filter does.
 
 ## `equals`
 
@@ -130,7 +123,7 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 
 ## `has_type`
 
-`has_type` takes a path and a `type`, one of `list`, `string`, `number`, `boolean` and `object`, and asks whether the field has that JSON type. It's what the sentence `is a <type>` reads into, see [sentence.phrase.type](sentences.md#phrases), and today's syntax can't use it (see [sentence_ops.syntax](syntax.md#policies)).
+`has_type` takes a path and a `type`, one of `list`, `string`, `number`, `boolean` and `object`, and asks whether the field has that JSON type. It's what the sentence `is a <type>` reads into, see [sentence.phrase.type](sentences.md#phrases).
 
 **[has_type.pass]** It passes when its path ends `found` and the value has the type.
 
@@ -138,7 +131,7 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 
 ## `not_in`
 
-`not_in` takes a path and a list of values, written like the values of [`in`](#in), and asks whether the field is none of them. It's what the sentences `is not one of` and `is not in` read into, see [sentence.phrase.one_of](sentences.md#phrases), and today's syntax can't use it (see [sentence_ops.syntax](syntax.md#policies)).
+`not_in` takes a path and a list of values, written like the values of [`in`](#in), and asks whether the field is none of them. It's what the sentences `is not one of` and `is not in` read into, see [sentence.phrase.one_of](sentences.md#phrases).
 
 **[not_in.pass]** It passes when its path ends `found`, the value read has the type of the values, and it [equals](#values) none of them. Any value passes when the list is empty.
 
@@ -156,13 +149,9 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 
 `empty` takes a path and asks whether the field is an empty list.
 
-**[empty.pass]** It passes when its path ends `found` and the value is `[]`.
-
-**[empty.fail]** It fails with the path's outcome as its cause when the path ends anything but `found`. A list with items fails with `value`. Anything else that was read, `""` and `{}` included, fails with `unusable`.
-
 ## `empty_string_or_list` and `not_empty_string_or_list`
 
-`empty_string_or_list` takes a path and asks whether the field is `""` or `[]`. `not_empty_string_or_list` asks whether it's a string or a list with something in it. They're what the sentences `is empty` and `is not empty` read into, see [sentence.phrase.empty](sentences.md#phrases), and today's syntax can't use them (see [sentence_ops.syntax](syntax.md#policies)).
+`empty_string_or_list` takes a path and asks whether the field is `""` or `[]`. `not_empty_string_or_list` asks whether it's a string or a list with something in it. They're what the sentences `is empty` and `is not empty` read into, see [sentence.phrase.empty](sentences.md#phrases).
 
 **[empty_string_or_list.pass]** `empty_string_or_list` passes when its path ends `found` and the value is `""` or `[]`. `not_empty_string_or_list` passes when its path ends `found` and the value is a string with at least one character or a list with at least one item.
 
@@ -171,8 +160,6 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 ## `range`
 
 `range` takes a path, a `min` and a `max`, and asks whether the field is a number between them, both included.
-
-**[range.bounds]** `min` and `max` are numbers, or refs, and `min` isn't above `max`. When a ref reads something other than a number, or the bounds it reads put `min` above `max`, the check fails with `unusable`.
 
 **[range.pass]** It passes when its path ends `found`, the value is a number, and `min <= value <= max`, compared by value.
 
@@ -210,15 +197,15 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 
 **[compare.inputs]** Its row has two entries in `inputs`, `left` then `right`.
 
-**[compare.text]** Two more comparisons, `starts_with` and `ends_with`, are what the sentences `starts with` and `ends with` read into, see [sentence.phrase.starts](sentences.md#phrases), and today's syntax can't use them (see [sentence_ops.syntax](syntax.md#policies)). They pass when both values are strings and the left one starts, or ends, with the right one, code point by code point. Anything but two strings, two numbers included, fails with `unusable`, and the rest is as [compare.fail](#compare) says.
+**[compare.text]** Two more comparisons, `starts_with` and `ends_with`, are what the sentences `starts with` and `ends with` read into, see [sentence.phrase.starts](sentences.md#phrases). They pass when both values are strings and the left one starts, or ends, with the right one, code point by code point. Anything but two strings, two numbers included, fails with `unusable`, and the rest is as [compare.fail](#compare) says.
 
-**[compare.alphabetical]** Two more comparisons, `alphabetically_before` and `alphabetically_after`, are what the sentences `is alphabetically before` and `is alphabetically after` read into, see [sentence.phrase.alphabetical](sentences.md#phrases), and today's syntax can't use them (see [sentence_ops.syntax](syntax.md#policies)). They pass when both values are strings and the left one comes before, or after, the right one, compared code point by code point, so `"Z"` comes before `"a"` and `"！"` (U+FF01) before `"😀"` (U+1F600). Equal strings fail both. Anything but two strings, two numbers included, fails with `unusable`, and the rest is as [compare.fail](#compare) says.
+**[compare.alphabetical]** Two more comparisons, `alphabetically_before` and `alphabetically_after`, are what the sentences `is alphabetically before` and `is alphabetically after` read into, see [sentence.phrase.alphabetical](sentences.md#phrases). They pass when both values are strings and the left one comes before, or after, the right one, compared code point by code point, so `"Z"` comes before `"a"` and `"！"` (U+FF01) before `"😀"` (U+1F600). Equal strings fail both. Anything but two strings, two numbers included, fails with `unusable`, and the rest is as [compare.fail](#compare) says.
 
-**[compare.list]** Eight more comparisons, `in`, `not_in`, `includes`, `excludes`, `includes_all`, `excludes_all`, `matches_any` and `not_matches_any`, are what the sentences `is one of`, `is not one of`, `contains`, `does not contain`, `contains all of`, `contains none of`, `matches` and `does not match` read into when what follows is a field, see [sentence.phrase.field](sentences.md#phrases), and today's syntax can't use them (see [sentence_ops.syntax](syntax.md#policies)). Each means what [`in`](#in), [`not_in`](#not_in), [`includes` and `excludes`](#includes-and-excludes) and [`matches_any` and `not_matches_any`](#matches_any-and-not_matches_any) say, with the right side's value as their value, values or patterns, and the check as a whole passes and fails as they say, so `compare.pass` and `compare.fail` don't apply to them. The right side decides first. When it ends anything but `found`, the row fails with that outcome, whatever the left side is. When it was read but can't be used, it fails with `unusable`, again whatever the left side is: a value that isn't a list after `in`, `not_in`, `includes_all`, `excludes_all`, `matches_any` or `not_matches_any`, a list whose values have more than one type after `in`, `not_in`, `includes_all` or `excludes_all`, an empty list after `includes_all` or `excludes_all`, and patterns that aren't all valid regular expressions. Anything that was read is usable after `includes` and `excludes`. Only then are the left side's outcome and type looked at, as the rules named above say. The row has the two entries of [compare.inputs](#compare).
+**[compare.list]** Eight more comparisons, `in`, `not_in`, `includes`, `excludes`, `includes_all`, `excludes_all`, `matches_any` and `not_matches_any`, are what the sentences `is one of`, `is not one of`, `contains`, `does not contain`, `contains all of`, `contains none of`, `matches` and `does not match` read into when what follows is a field, see [sentence.phrase.field](sentences.md#phrases). Each means what [`in`](#in), [`not_in`](#not_in), [`includes` and `excludes`](#includes-and-excludes) and [`matches_any` and `not_matches_any`](#matches_any-and-not_matches_any) say, with the right side's value as their value, values or patterns, and the check as a whole passes and fails as they say, so `compare.pass` and `compare.fail` don't apply to them. The right side decides first. When it ends anything but `found`, the row fails with that outcome, whatever the left side is. When it was read but can't be used, it fails with `unusable`, again whatever the left side is: a value that isn't a list after `in`, `not_in`, `includes_all`, `excludes_all`, `matches_any` or `not_matches_any`, a list whose values have more than one type after `in`, `not_in`, `includes_all` or `excludes_all`, an empty list after `includes_all` or `excludes_all`, and patterns that aren't all valid regular expressions. Anything that was read is usable after `includes` and `excludes`. Only then are the left side's outcome and type looked at, as the rules named above say. The row has the two entries of [compare.inputs](#compare).
 
 ## Counts and sums in sentences
 
-A side of `compare` can also be `count_of` or `sum_of`, each with a path, `whose`, a list of basic checks, and `text`, the words that wrote it, or an `elapsed` side, see [tally.elapsed](#counts-and-sums-in-sentences). `add` can take `text` too, and `count_of`, `sum_of` and `elapsed` among the sides it adds up. They're what `count of`, `sum of` and `plus` read into, see [sentence.derived.count](sentences.md#derived-values), and today's syntax can't use them (see [sentence_ops.syntax](syntax.md#policies)).
+A side of `compare` can also be `count_of` or `sum_of`, each with a path, `whose`, a list of basic checks, and `text`, the words that wrote it, or an `elapsed` side, see [tally.elapsed](#counts-and-sums-in-sentences). `add` can take `text` too, and `count_of`, `sum_of` and `elapsed` among the sides it adds up. They're what `count of`, `sum of` and `plus` read into, see [sentence.derived.count](sentences.md#derived-values).
 
 **[tally.walk]** The path is walked as [walk.lists](#every-and-some) says, except that an empty list adds nothing instead of failing. A list that's missing, `null` or not a list fails the side as `absent`, `null` or `unusable`, and so does a path where no step walks a list, as [walk.lists](#every-and-some) says. On a subject that isn't an object, with a path that starts at the subject, it fails as `not_an_object`, and so does an item that isn't an object when the path goes on into it, as [walk.flaws](#every-and-some) says for `every`. A ref the side reads that can't be used, in its path or its `whose` checks, fails it as `unusable`, and one that's missing or `null` fails it as `absent` or `null`, even when the list is empty.
 
@@ -250,29 +237,9 @@ A side of `compare` can also be `count_of` or `sum_of`, each with a path, `whose
 
 `all` takes a path to a list and an inner check, and asks whether every item passes the check. `any` asks whether at least one does. Both can also take `each`, a path inside each item to an inner list, and `as`, an alias for each item.
 
-**[list.read]** The path must end `found` on a list. A list that's missing fails the check as `absent`, a `null` one as `null`, and anything else, an object included, as `unusable`. An empty list fails as `value`, because no items isn't proof of anything.
-
-**[list.items]** The inner check runs on each item, with the item as its subject, so its paths start inside the item. A path with no steps reads the item itself, and an item that isn't an object fails a path with steps as `not_an_object`.
-
-**[list.pass]** `all` passes when the list isn't empty and every item passes. `any` passes when it isn't empty and at least one item does.
-
-**[list.cause]** When the items decide the result and it fails, the cause is the first, in the order of [causes](#causes), among the items that failed. So when one item fails as `value` and another is missing its field, the check fails as `absent`, because the second one might have passed.
-
-**[list.each]** With `each`, the check runs on every item of every inner list. Every inner list must be readable, a list and not empty, for `all` and `any` alike. One that isn't fails the check with the cause it would give as a list, even when an item elsewhere passes.
-
-**[list.as]** `as` gives each item an alias, so a check nested inside can still read it once its own paths start somewhere else. An alias can only be given once along a chain of checks, so `from` and an enclosing check can't give the same one. A path can only start with an alias that `from` or an enclosing list check gives, not one given in a neighbouring `any_of` option. A check that breaks either rule is [written wrong](#the-model-of-a-check). Only `all` and `any` take `as` and `each`.
-
-**[list.inner]** The inner check is a basic operator, an `any_of`, or another `all` or `any`. One `all` or `any` can sit inside another, but not a third, so Ergo can be written in a language without recursion. An `any_of` doesn't count as a level, but an `all` or `any` in one of its options does. Anything else is [written wrong](#the-model-of-a-check).
-
-**[list.inputs]** When the inner check has a path that starts inside the item, the row shows that path for every item, like `cs[].s` with `[true, false, null]`. That holds for an inner `all` or `any` too, so its lists are shown. A path with no steps shows the items themselves. Any other inner check, like `compare` or `any_of`, shows the whole items. In both cases, each path into the input, the params or a name that the inner check reads follows, except names the check itself gives. With `each`, the items are the inner lists. A list that can't be read shows `[]` as its value.
-
-**[list.failed_items]** The row also has `failed_items`, the items that made it fail, in list order. Each one has its `path`, like `item 2 of cs` or, with `each`, `item 2 of prs[0].cs`, its `item`, the path of the list item it belongs to, its own `cause`, and its `value`. For `all` and `any`, the entry is the list item itself, so `item` is the same as `path`. With `each`, an inner list that can't be read or is empty is listed in place of its items, like `prs[1].cs` with the value it read, or `null`. An item that a `present` check finds missing is listed with cause `value`. For a nested check, only the outer items are listed. `failed_items` is `[]` when the check passes, even for an `any` with items that failed, and when the list itself can't be read. When the check is written wrong, every item is listed as `ill_formed`, and when a ref can't be read, every failing item is listed with the ref's cause.
-
 ## `any_of`
 
 `any_of` takes named options, each a list of checks that must all pass, and passes when one of its options does.
-
-**[any_of.options]** There's at least one option, and each option has at least one check. A check in an option is a basic operator, an `all` or an `any`, not another `any_of`. In an `any_of` read from sentences, see [sentence.any_of](sentences.md#the-shape-of-a-sentence), it can also be an `every`, a `some` or a `compare` with a `count_of`, `sum_of`, `add` or `elapsed` side, and never an `all` or an `any`.
 
 **[any_of.pass]** It passes when every check of at least one option passes.
 
@@ -282,11 +249,9 @@ A side of `compare` can also be `count_of` or `sum_of`, each with a path, `whose
 
 **[any_of.inputs]** The row shows every path any option reads, once each, sorted by name. For an `all` or `any` in an option, that's its list, with the whole items, and the names it reads.
 
-**[any_of.no_failed_items]** An `any_of` row has no `failed_items`, even with an `all` or `any` inside it.
-
 ## `all_of`
 
-`all_of` takes `checks`, a list of basic checks, and `assertions`, the text of each one. It's what a check written as several sentences reads into, joined with `and` or listed under `assert`, see [sentence.assert.list](sentences.md#the-shape-of-a-sentence), and today's syntax can't use it (see [sentence_ops.syntax](syntax.md#policies)). It's one check, with one row per subject, because its sentences say one thing together, and a policy that wants a row for each writes them as separate checks.
+`all_of` takes `checks`, a list of basic checks, and `assertions`, the text of each one. It's what a check written as several sentences reads into, joined with `and` or listed under `assert`, see [sentence.assert.list](sentences.md#the-shape-of-a-sentence). It's one check, with one row per subject, because its sentences say one thing together, and a policy that wants a row for each writes them as separate checks.
 
 **[all_of.pass]** It passes when every one of its checks passes.
 
@@ -298,7 +263,7 @@ A side of `compare` can also be `count_of` or `sum_of`, each with a path, `whose
 
 ## `every` and `some`
 
-`every` and `some` take a path, a basic check, `whose`, a list of basic checks, and `if_any`. They're what the sentences `every <path> …` and `some <path> …` read into, see [sentence.every.walk](sentences.md#every-some-and-whose), and today's syntax can't use them (see [sentence_ops.syntax](syntax.md#policies)).
+`every` and `some` take a path, a basic check, `whose`, a list of basic checks, and `if_any`. They're what the sentences `every <path> …` and `some <path> …` read into, see [sentence.every.walk](sentences.md#every-some-and-whose).
 
 **[walk.lists]** The path is read one step at a time. At a step where at least one value read so far is a list, and the step isn't a position, every one of those values is walked: each of its items goes on along the path in its place. At that step, a value that's missing, `null` or not a list fails as `absent`, `null` or `unusable`, and an empty list fails as `value`, unless `if_any` is true, when it's skipped. After the last step, a value that's a list is walked the same way. A path where no step walks a list fails at the first value along it that isn't an object, with `absent` when it's missing, `null` when it's `null`, and `unusable` otherwise, or at the value the path ends at, as `unusable`, when every value along it is an object. That place is the one entry in `failed_items`, so a lone list that's `null` fails as `null`, as it does when another item's list is walked.
 
@@ -316,7 +281,7 @@ A side of `compare` can also be `count_of` or `sum_of`, each with a path, `whose
 
 ## `for`
 
-`for` takes `items`, one or two, each with `every` or `some`, a path, `whose`, `if_any` and an alias, and `checks` and `assertions`, as `all_of` does. It's what a check with a `for` line reads into, see [sentence.for.line](sentences.md#the-for-line), and today's syntax can't use it (see [sentence_ops.syntax](syntax.md#policies)).
+`for` takes `items`, one or two, each with `every` or `some`, a path, `whose`, `if_any` and an alias, and `checks` and `assertions`, as `all_of` does. It's what a check with a `for` line reads into, see [sentence.for.line](sentences.md#the-for-line).
 
 **[for.walk]** Each item's path is walked as an `every` or `some` path is, see [walk.lists](#every-and-some), and its alias stands for the value the path ends at in each item of the innermost list walked. The `whose` checks read from that item, and an item is undecided or left out as [walk.items](#every-and-some) says. An item `whose` keeps, whose path ends at a value that's missing or that can't be read, fails as `absent` or `unusable` without its checks being run. The second item's path and its `whose` checks can start at the first item's alias, and then it's walked again for each item of the first list.
 
@@ -324,7 +289,7 @@ A side of `compare` can also be `count_of` or `sum_of`, each with a path, `whose
 
 **[for.try]** The checks read the subject, with each alias standing for its item. With one item, an item passes when all the checks pass. With two, an item of the first list passes when the second item passes for it, as [walk.every](#every-and-some) or [walk.some](#every-and-some) says, where an item of the second list passes when all the checks pass. A failed item's cause is the first, in the order of [causes](#causes), among the checks that failed, or what failed in the second item's walk.
 
-**[for.named_by]** A path with a `named_by` step reads the key that the step's alias holds for the item being tried, as a ref step reads a key from the params. When the alias holds `null`, the check fails as `null`, and when it holds anything else that isn't a string, a number included, as `unusable`. The alias has to be given before it's used: in the `assert` lines, or in a later item's path or `whose`. Only sentences can write such a step, as `<path> named by <alias>`; in today's syntax it's a step that can't be a key.
+**[for.named_by]** A path with a `named_by` step reads the key that the step's alias holds for the item being tried, as a ref step reads a key from the params. When the alias holds `null`, the check fails as `null`, and when it holds anything else that isn't a string, a number included, as `unusable`. The alias has to be given before it's used: in the `assert` lines, or in a later item's path or `whose`. Sentences write such a step as `<path> named by <alias>`.
 
 **[for.pass]** The check passes or fails as the first item does, by [walk.every](#every-and-some) or [walk.some](#every-and-some), with its items judged as [for.try](#for) says.
 
@@ -342,15 +307,15 @@ A side of `compare` can also be `count_of` or `sum_of`, each with a path, `whose
 
 ## Requirements
 
-A policy has two sections. `subjects` defines each kind of subject once, and `requirements` says what must be true of them. A subject definition has a way to find its subjects (`from`), a path to each subject's id (`identified_by`) and filters (`applies_to`). A requirement names one subject definition with `subject`, and has `require`, `min_subjects` and checks. It can also have a `description` and `meta`, which Ergo copies into the report and never reads, and so can the policy.
+A policy has two sections. `subjects` defines each kind of subject once, and `requirements` says what must be true of them. A subject definition has a way to find its subjects (`from`), which can end with filters after `whose`, and a path to each subject's id (`identified_by`). A requirement names one subject definition with `subject`, and has `require`, `min_subjects` and checks. It can also have a `description` and `meta`, which Ergo copies into the report and never reads, and so can the policy.
 
 **[requirement.subject]** A requirement checks the subjects of the definition it names, with its own rows. Several requirements can name the same definition. A requirement that names none, or one that isn't in `subjects`, has no subjects, and its `$well_formed` and `$min_subjects` rows fail. The name of the definition is the `type` in each row's `subject`.
 
 **[subjects.from]** A subject definition's `from` is a path into the input. When it ends `found` on a list, each item is a subject, in list order. When it ends `found` on an object, that object is the only subject. With no steps, it reads the whole input. Anything else gives no subjects, and the requirement's `$min_subjects` row fails with the path's outcome, or with `unusable` when it read something that's neither a list nor an object, a `null` input included as `null`. That holds even with `min_subjects: 0`, because that's what a typo in `from` looks like.
 
-**[subjects.no_from]** A subject definition without `from`, or with nothing at all, `null` in YAML, reads the input field named like the subject, as `from: [<name>]` would. So `artifact:` alone reads `artifact`. `from: []` reads the whole input. A definition with `of` takes its `from` from the subject it builds on.
+**[subjects.no_from]** A subject definition without `from`, or with nothing at all, `null` in YAML, reads the input field named like the subject, as `from: <name>` would. So `artifact:` alone reads `artifact`. `from: $input` reads the whole input.
 
-**[subjects.sentence]** `from` can be a string, read as a `from` line (see [sentence.subject.from](sentences.md#subjects)), and `identified_by` a string, read as a path. A `from` line's path reads into the input, `named by` reads a key the way a ref step does, and `named by each of` makes each key in the list a subject, as a naming step with `keys` does. Its `whose` conditions are the subject's filters, in the order written, so the `$applies` row joins them with ` and ` in that order, each printed in the report's spelling. A path that starts at `$input` reads into the input as one without it does, and `$input` alone reads the whole input. A path can't start at `$params`. A `from` line can't go with `applies_to`. One whose path is another subject's name and nothing more narrows that subject, as `of` does: its subjects are that subject's, kept when they pass that subject's filters and its own, and the `$applies` row prints the conditions of from lines along the chain outermost first, then any `applies_to` filters along it, sorted by name. A loop in that chain is named after `from`. One that goes on into another subject is a chain, see [subjects.chain](#requirements).
+**[subjects.sentence]** `from` is a string, read as a `from` line (see [sentence.subject.from](sentences.md#subjects)), and `identified_by` a string, read as a path. A `from` or an `identified_by` written any other way, like a list, is written wrong (see [policy.old_fields](syntax.md#policies)). A `from` line's path reads into the input, `named by` reads a key the way a ref step does, and `named by each of` makes each key in the list a subject. Its `whose` conditions are the subject's filters, in the order written, so the `$applies` row joins them with ` and ` in that order, each printed in the report's spelling. A path that starts at `$input` reads into the input as one without it does, and `$input` alone reads the whole input. A path can't start at `$params`. One whose path is another subject's name and nothing more narrows that subject: its subjects are that subject's, kept when they pass that subject's filters and its own, and the `$applies` row prints the conditions of from lines along the chain outermost first. A loop in that chain is named after `from`. One that goes on into another subject is a chain, see [subjects.chain](#requirements).
 
 **[subjects.chain]** A `from` line whose path starts at another subject's name and goes on, like `artifact.pull_requests`, makes a child subject: it reads the rest of its path from each subject of that one, the parent. The parent's own `from` and conditions pick its subjects first, and the child's subjects are read from each of them in turn, in the order the parent's are. Every row of the requirement but `$well_formed` carries the id of the parent it was read from under `in`, like `"in": {"artifact": "sha-1"}`, and `$well_formed` has no `in`, since it's about the requirement as written. A check written as a sentence reads the parent by its name, `artifact.name`, and a bare first key that's the parent's name is the parent, not a field, wherever it is in the sentence. A check written with `op` can't reach the parent. A parent that's written wrong makes the requirement written wrong too, and its problems are listed in `$well_formed`. A parent can itself be a child subject, see [subjects.chain.levels](#requirements). A subject that builds on a child subject, with `of` or a from line that narrows it, is written wrong. A `from` or `identified_by` string that can't be read is written wrong, and `$well_formed` lists its problems under `subjects.<name>.from` or `subjects.<name>.identified_by`.
 
@@ -372,9 +337,9 @@ A policy has two sections. `subjects` defines each kind of subject once, and `re
 
 **[require]** `require` is `every` or `some`, and `every` by default. Under `every`, every subject in scope must pass every check. Under `some`, at least one subject in scope must pass every check by itself, so two subjects that each pass half the checks don't meet it.
 
-**[min_subjects]** `min_subjects` is a whole number of 0 or more, and 1 by default. The `$min_subjects` row passes when `from` could be read and at least that many subjects are left after the subject's `applies_to`. Its input is the number left. Otherwise it fails with `value`, or with the cause in [subjects.from].
+**[min_subjects]** `min_subjects` is a whole number of 0 or more, and 1 by default. The `$min_subjects` row passes when `from` could be read and at least that many subjects are left after the subject's filters. Its input is the number left. Otherwise it fails with `value`, or with the cause in [subjects.from].
 
-**[unique_ids]** No two subjects can share an id, counting the ones the subject's `applies_to` leaves out, and `null` counts as an id like any other. The `$unique_ids` row fails with `value` when two do. Its input lists each id more than one subject has, once, sorted by its JSON text as shown in [syntax.md](syntax.md#expressions), so `"b"` comes before `10`, and `10` before `3`.
+**[unique_ids]** No two subjects can share an id, counting the ones the subject's filters leave out, and `null` counts as an id like any other. The `$unique_ids` row fails with `value` when two do. Its input lists each id more than one subject has, once, sorted by its JSON text as shown in [syntax.md](syntax.md#expressions), so `"b"` comes before `10`, and `10` before `3`.
 
 **[well_formed]** The `$well_formed` row passes when the requirement can be read into the model, names a subject definition that can be read too, and has at least one check. Otherwise it fails with `value`, and the requirement is never met. Its inputs start with `count(checks)` and `require`. A requirement that's written wrong still gets its rows for its subjects.
 
@@ -384,7 +349,7 @@ A subject can have parts: named paths inside itself, each with an alias, written
 
 **[parts.swap]** A part's alias stands for its path inside the subject. A check that starts a path with the alias gives exactly the rows that the same check gives with the path written out in its place: the same `passed`, the same `cause` and the same values. A part that is missing, `null` or the wrong type fails the check as the full path would, with `absent`, `null`, `unusable`, or `not_an_object` when the subject isn't an object, and a `named by` in the path that can't be read fails it as it would there. Only the names differ. A row's `expression`, its `inputs` and the paths of its `failed_items` keep the alias, see [name.part](syntax.md#naming-a-path).
 
-**[parts.tag]** An entry in a row's `inputs` that was read through a part has `part`, `{"name": ..., "id": ...}`, besides its `name` and `value`. `name` is the alias as the check writes it, without the `$` of the old syntax, so it is also a key of the subject's `parts` in the report. For a part of a child subject's parent it is the parent's name and the alias, like `artifact.pr_attestation`. `id` is the value at the part's `identified_by`, read inside the part for the row's subject (the parent's, for a parent's part), as it is: any JSON value. It is `null` when the part has no `identified_by`, or when it leads nowhere or to `null`. An entry that reads through two parts in one value, like the sum of a `count of` one and a field of another, has no `part`, and neither has an entry that doesn't go through a part, so a policy without parts gives the same inputs as before. The tag is for readers and tools: it never changes `passed`, `cause` or a value. It is on `inputs` and so on the inputs of a violation, and not on `failed_items`. A walk that goes through a list inside the part names the entry with the full path, and the entry keeps its tag.
+**[parts.tag]** An entry in a row's `inputs` that was read through a part has `part`, `{"name": ..., "id": ...}`, besides its `name` and `value`. `name` is the alias as the check writes it, so it is also a key of the subject's `parts` in the report. For a part of a child subject's parent it is the parent's name and the alias, like `artifact.pr_attestation`. `id` is the value at the part's `identified_by`, read inside the part for the row's subject (the parent's, for a parent's part), as it is: any JSON value. It is `null` when the part has no `identified_by`, or when it leads nowhere or to `null`. An entry that reads through two parts in one value, like the sum of a `count of` one and a field of another, has no `part`, and neither has an entry that doesn't go through a part, so a policy without parts gives the same inputs as before. The tag is for readers and tools: it never changes `passed`, `cause` or a value. It is on `inputs` and so on the inputs of a violation, and not on `failed_items`. A walk that goes through a list inside the part names the entry with the full path, and the entry keeps its tag.
 
 **[parts.where]** An alias is read wherever a bare first key reads the subject (see [sentence.path.start](sentences.md#paths)): in the subject's checks, in the assertions of a `for` line and in a later item of it whose path starts at the subject, in the conditions of the subject's own `from` line, and in the conditions of a subject that narrows it. Where a bare first key reads an item instead, in a `whose` and in the argument of a one-line `every` or `some`, an alias is read on the right side, as a `for` alias is (see [sentence.for.scope](sentences.md#the-for-line)), and never on the left of a `whose`: `whose cov is at least 5` reads the item's `cov`, and `every lst.x is at least cov.x` reads the part's. The item's own field on the right is written `.cov`.
 
@@ -396,11 +361,11 @@ A subject can have parts: named paths inside itself, each with an alias, written
 
 ## Scope
 
-**[scope.filters]** A subject is in scope when it passes every filter in its definition's `applies_to`. Each subject gets one `$applies` row when the definition has filters, and a subject that's out of scope gets no other rows, but its `$applies` row stays.
+**[scope.filters]** A subject is in scope when it passes every filter in its definition's `from` line. Each subject gets one `$applies` row when the definition has filters, and a subject that's out of scope gets no other rows, but its `$applies` row stays.
 
 **[scope.out]** A subject is out of scope only when every filter it fails fails with `value`, or one of them is a `present` filter that found its field missing ([present.filter]). Then its `$applies` row fails with `value`.
 
-**[scope.unreadable]** When a filter fails with any other cause, Ergo can't tell whether the subject is in scope. Its `$applies` row fails with the first such cause, in the order of [causes](#causes), even when another filter would rule it out, and the requirement isn't met, even with `min_subjects: 0`. A filter written wrong gives `ill_formed`, whatever the others give.
+**[scope.unreadable]** When a filter fails with any other cause, Ergo can't tell whether the subject is in scope. Its `$applies` row fails with the first such cause, in the order of [causes](#causes), even when another filter would rule it out, and the requirement isn't met, even with `min_subjects: 0`.
 
 ## Statuses
 
@@ -425,7 +390,7 @@ A subject can have parts: named paths inside itself, each with an alias, written
 **[report.subjects]** The report has `subjects` at its top, with an entry for each subject a requirement uses, by name. That's the subject it names, the subjects that one narrows or reads from, and so on all the way back. A subject no requirement uses isn't listed. An entry has:
 
 - `description`, the subject's description, or `""` when it has none or it isn't a string
-- `from`, how the subject is found, written as a `from` line: the line itself, printed the same way whatever spaces it was written with, or for a subject written as a list, its path followed by `whose` and its conditions, which are sorted by name. A naming step at the end of the path is shown as `named by each of <ref>` when its keys come from a ref, as `<each of "a", "b">` when they're listed, and as `<each as name>` when it has none. Anything with no sentence form is shown in angle brackets, never left out: a condition that can't be written as a sentence is shown as `<condition name>`, and `applies_to` that isn't an object as `<invalid applies_to>`. A subject without `from` reads the input field named like it. A `from` that is written wrong is `<invalid from>`.
+- `from`, how the subject is found, written as a `from` line: the line itself, printed the same way whatever spaces it was written with. A subject without `from` reads the input field named like it. A `from` that is written wrong, or isn't a string, is `<invalid from>`.
 - `identified_by`, the path of the subject's id, or `null` when it has none, because the whole subject is its id. A subject that narrows another has the id of the one it narrows. An id that is written wrong is `<invalid identified_by>`.
 - `parts`, every part the subject has, including the ones it keeps from a subject it narrows, by alias. Each is `{"from": ..., "identified_by": ...}`: `from` is the part's path written the way a sentence writes it, so `  dd.b ` is `dd.b` and `x[$params.k]` is `x named by $params.k`, and `identified_by` is the path of the part's id, or `null` when it has none. A part written as one line has no id. A part written wrong is listed as best it can be: `<invalid from>` for a path that can't be read and `<invalid identified_by>` for an id that can't, and a part that is neither a string nor an object has `<invalid from>` and `null`.
 

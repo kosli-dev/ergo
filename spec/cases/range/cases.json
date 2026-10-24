@@ -1,16 +1,16 @@
 [
   {
     "description": "range between two numbers",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "range", "path": ["x"], "max": 3, "min": 1}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is between 1 and 3"}}}},
     "cases": [
       {
         "description": "passes inside the range",
-        "rules": ["range.pass", "render.path", "range.expression"],
+        "rules": ["range.pass", "sentence.print.canonical"],
         "input": {"things": [{"id": "t1", "x": 2}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2}]}
         ],
-        "expressions": {"s": {"c": "x >= 1 and x <= 3"}}
+        "expressions": {"s": {"c": "x is between 1 and 3"}}
       },
       {
         "description": "passes on min",
@@ -64,108 +64,16 @@
   },
   {
     "description": "range with bounds written in other forms",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "range", "path": ["x"], "max": 20.0, "min": 1.5}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is between 1.5 and 20"}}}},
     "cases": [
       {
         "description": "shows them in plain decimal",
-        "rules": ["render.value", "render.path", "range.expression"],
+        "rules": ["sentence.print.canonical"],
         "input": {"things": [{"id": "t1", "x": 2}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2}]}
         ],
-        "expressions": {"s": {"c": "x >= 1.5 and x <= 20"}}
-      }
-    ]
-  },
-  {
-    "description": "range with bounds read through refs",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "range", "path": ["x"], "max": {"ref": ["$$params", "hi"]}, "min": {"ref": ["$$params", "lo"]}}}}}},
-    "params": {"hi": 3, "lo": 1},
-    "cases": [
-      {
-        "description": "passes inside the range read",
-        "rules": ["range.bounds", "range.pass", "value.ref", "render.path", "range.expression", "value.refs"],
-        "input": {"things": [{"id": "t1", "x": 2}]},
-        "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2}]}
-        ],
-        "expressions": {"s": {"c": "x >= $params.lo and x <= $params.hi"}},
-        "refs": {"s": {"c": [{"name": "$params.hi", "value": 3}, {"name": "$params.lo", "value": 1}]}}
-      }
-    ]
-  },
-  {
-    "description": "range with a bound read through a ref that isn't a number",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "range", "path": ["x"], "max": 3, "min": {"ref": ["$$params", "lo"]}}}}}},
-    "params": {"lo": "1"},
-    "cases": [
-      {
-        "description": "fails as unusable",
-        "rules": ["range.bounds"],
-        "input": {"things": [{"id": "t1", "x": 2}]},
-        "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 2}]}
-        ]
-      }
-    ]
-  },
-  {
-    "description": "range with bounds read through refs that put min above max",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "range", "path": ["x"], "max": 3, "min": {"ref": ["$$params", "lo"]}}}}}},
-    "params": {"lo": 5},
-    "cases": [
-      {
-        "description": "fails as unusable",
-        "rules": ["range.bounds"],
-        "input": {"things": [{"id": "t1", "x": 2}]},
-        "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 2}]}
-        ]
-      }
-    ]
-  },
-  {
-    "description": "range written wrong",
-    "policy": {
-      "ergo_spec": "v0.1",
-      "subjects": {
-        "thing": {
-          "from": ["things"],
-          "identified_by": ["id"]
-        }
-      },
-      "requirements": {
-        "s": {
-          "subject": "thing",
-          "checks": {"min_above_max": {"op": "range", "path": ["x"], "max": 1, "min": 3}, "min_string": {"op": "range", "path": ["x"], "max": 3, "min": "1"}, "no_max": {"op": "range", "path": ["x"], "min": 1}}
-        }
-      }
-    },
-    "cases": [
-      {
-        "description": "fails every check as ill_formed and says why",
-        "rules": ["range.bounds", "written_wrong", "written_wrong.row", "range.written_wrong", "render.path", "range.expression"],
-        "input": {"things": [{"id": "t1", "x": 2}]},
-        "results": [
-          {
-            "requirement": "s",
-            "subject": {"type": "thing", "id": null},
-            "check": "$well_formed",
-            "passed": false,
-            "cause": "value",
-            "inputs": [
-              {"name": "count(checks)", "value": 3},
-              {"name": "require", "value": "every"},
-              {"name": "checks.min_above_max", "value": ["min above max"]},
-              {"name": "checks.min_string", "value": ["invalid min"]},
-              {"name": "checks.no_max", "value": ["missing max"]}
-            ]
-          },
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "min_above_max", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": 2}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "min_string", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": 2}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "no_max", "passed": false, "cause": "ill_formed", "inputs": [{"name": "x", "value": 2}]}
-        ],
-        "expressions": {"s": {"min_above_max": "x >= 3 and x <= 1", "min_string": "x >= \"1\" and x <= 3", "no_max": "x >= 1 and x <= <missing max>"}}
+        "expressions": {"s": {"c": "x is between 1.5 and 20"}}
       }
     ]
   }
