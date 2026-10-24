@@ -8292,3 +8292,19 @@ test_a_for_row_shows_the_parent_fields_its_assertions_read if {
 	named_by_rows(subjects, "kid", {"for": "every rs as r", "assert": "r.v is at least t.y"}, inp) == [[false, [rs, {"name": "t.y", "value": null}]]]
 	named_by_rows(subjects, "kid", {"for": "every rs as r", "assert": "r.v is at most t.cov.q"}, inp) == [[true, [rs, {"name": "t.cov.q", "part": {"id": null, "name": "t.cov"}, "value": 3}]]]
 }
+
+test_a_whose_with_plus_on_its_left_is_written_wrong if {
+	inp := {"ts": [{"id": "t1", "p": 1, "q": 1, "xs": [{"p": 1, "q": 1, "v": 1}], "kids": [{"p": 1, "q": 1}]}]}
+	every case in [
+		[{"t": {"from": "ts whose p plus q is 2"}}, "t", "v exists", "subjects.t.from", "doesn't parse"],
+		[{"u": {"from": "ts", "identified_by": "id"}, "kid": {"from": "u.kids whose u.p plus q is 2"}}, "kid", "v exists", "subjects.kid.from", "doesn't parse"],
+		[{"u": {"from": "ts", "identified_by": "id"}}, "u", "every xs.v whose p plus q is 2 is 1", "checks.c", "doesn't parse"],
+		[{"u": {"from": "ts", "identified_by": "id"}}, "u", {"for": "every xs whose p plus q is 2 as x", "assert": "x.v is 1"}, "checks.c", "for: doesn't parse"],
+		[{"u": {"from": "ts", "identified_by": "id"}}, "u", "count of xs whose p plus q is 2 is 1", "checks.c", "doesn't parse"],
+	] {
+		[subjects, subject, check, at, problem] := case
+		rows := [r | some r in ergo.report(inp, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"s": {"subject": subject, "checks": {"c": check}}}}, {}).results]
+		[r.check | some r in rows] == ["$well_formed"]
+		{"name": at, "value": [problem]} in rows[0].inputs
+	}
+}
