@@ -8173,3 +8173,83 @@ test_as_sentences_leaves_an_old_any_of_and_an_object_value_as_written if {
 	}
 	as_sentences_checks(checks) == checks
 }
+
+reserved_check_rows(name) := report({"items": [{"id": 1}]}, {"s": object.union(object.remove(typed_req, ["checks"]), {"checks": {name: "id exists"}})})
+
+test_a_check_named_like_one_of_ergos_own_rows_is_written_wrong if {
+	every name in ["$applies", "$min_subjects", "$unique_ids", "$well_formed"] {
+		rep := reserved_check_rows(name)
+		problem_inputs(rep) == [{"name": concat(".", ["checks", name]), "value": ["name reserved"]}]
+		[r.passed | some r in rep.results] == [false]
+	}
+}
+
+test_a_check_named_like_an_ergo_row_ergo_never_adds_is_allowed if {
+	rep := reserved_check_rows("$other")
+	problem_inputs(rep) == []
+	[r.passed | some r in rows_for(rep, "s", "$other")] == [true]
+}
+
+test_a_check_named_like_one_of_ergos_own_rows_leaves_only_ergos_check_in_the_requirement if {
+	rep := report({"items": [{"id": 1}]}, {"s": object.union(object.remove(typed_req, ["checks"]), {"checks": {"$well_formed": "id is 2", "$applies": "id is 2"}})})
+	object.keys(rep.requirements.s.checks) == {"$min_subjects", "$unique_ids", "$well_formed"}
+	rep.requirements.s.checks["$well_formed"].expression == "count(problems) == 0"
+}
+
+subject_problems(subjects, subject, inp) := [i |
+	some r in ergo.report(inp, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"s": {"subject": subject, "checks": {"c": "v exists"}}}}, {}).results
+	r.check == "$well_formed"
+	some i in r.inputs
+	not i.name in {"count(checks)", "require"}
+]
+
+test_a_from_line_that_starts_at_a_blank_subject_name_is_written_wrong_under_from if {
+	every case in [[" ", `" " whose id is "a"`], [" ", `" ".kids`], ["", `"" whose id is "a"`], ["", `"".kids`]] {
+		[name, from] := case
+		subjects := {name: {"from": "things", "identified_by": "id"}, "b": {"from": from}}
+		subject_problems(subjects, "b", {"things": [{"id": "a", "kids": [{"v": 1}]}]}) == [{"name": "subjects.b.from", "value": [concat("", [`"`, name, `" isn't a subject name`])]}]
+	}
+}
+
+test_child_subjects_that_read_each_other_lead_to_a_loop_not_a_chain_too_deep if {
+	subjects := {"b": {"from": "kid.x"}, "kid": {"from": "b.kids"}}
+	every name in ["b", "kid"] {
+		subject_problems(subjects, name, {}) == [{"name": concat("", ["subjects.", name, ".from"]), "value": ["leads to a loop"]}]
+	}
+}
+
+test_every_subject_in_a_loop_through_child_subjects_is_named_after_its_own_from if {
+	every subjects in [
+		{"p": {"from": "q.x"}, "q": {"from": "r.x"}, "r": {"from": "p.x"}},
+		{"p": {"from": "q"}, "q": {"from": "r.x"}, "r": {"from": "p"}},
+		{"p": {"from": "q.x"}, "q": {"from": "r"}, "r": {"from": "p"}},
+	] {
+		every name in ["p", "q", "r"] {
+			subject_problems(subjects, name, {}) == [{"name": concat("", ["subjects.", name, ".from"]), "value": ["leads to a loop"]}]
+		}
+	}
+}
+
+test_a_chain_through_a_subject_that_narrows_without_a_loop_is_not_a_loop if {
+	subject_problems({"p": {"from": "q.x"}, "q": {"from": "r"}, "r": {"from": "bs"}}, "p", {"bs": []}) == []
+}
+
+test_a_chain_four_subjects_deep_with_a_loop_further_up_is_still_too_deep if {
+	subjects := {"a": {"from": "b.x"}, "b": {"from": "c.x"}, "c": {"from": "d.x"}, "d": {"from": "e.x"}, "e": {"from": "d.y"}}
+	subject_problems(subjects, "a", {}) == [{"name": "subjects.a.from", "value": ["a chain of more than three subjects isn't supported yet"]}]
+}
+
+named_by_rows(subjects, subject, check, inp) := [[r.passed, r.inputs] |
+	some r in ergo.report(inp, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"s": {"subject": subject, "checks": {"c": check}}}}, {"allowed": {"a": [1]}}).results
+	r.check == "c"
+]
+
+test_a_part_read_with_named_by_on_the_right_side_shows_the_parts_value if {
+	subjects := {"t": {"from": "things", "identified_by": "id", "has": {"cov": "d.b"}}}
+	named_by_rows(subjects, "t", "cov.x is one of $params.allowed named by id", {"things": [{"id": "a", "d": {"b": {"x": 1}}}]}) == [[true, [{"name": "cov.x", "part": {"id": null, "name": "cov"}, "value": 1}, {"name": "id", "value": "a"}]]]
+}
+
+test_a_parent_read_with_named_by_on_the_right_side_shows_the_parents_value if {
+	subjects := {"t": {"from": "ts", "identified_by": "id"}, "kid": {"from": "t.kids"}}
+	named_by_rows(subjects, "kid", "t.x is one of $params.allowed named by n", {"ts": [{"id": "a", "x": 1, "kids": [{"n": "a"}]}]}) == [[true, [{"name": "t.x", "value": 1}, {"name": "n", "value": "a"}]]]
+}

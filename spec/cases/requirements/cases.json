@@ -1556,5 +1556,101 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a check named like one of Ergo's own rows",
+    "policy": {
+      "ergo_spec": "v0.1",
+      "subjects": {
+        "b": {
+          "from": "things"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "b",
+          "checks": {
+            "$well_formed": "x is 2",
+            "$min_subjects": "x is 2",
+            "$unique_ids": "x is 2",
+            "$applies": "x is 2"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, and the requirement lists only Ergo's check of that name",
+        "rules": ["well_formed.reserved", "written_wrong.row"],
+        "input": {
+          "things": [
+            {
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met",
+            "subjects": {
+              "matching": 0,
+              "total": 0
+            },
+            "checks": {
+              "$well_formed": {
+                "expression": "count(problems) == 0"
+              }
+            }
+          }
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 4
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "checks.$applies",
+                "value": [
+                  "name reserved"
+                ]
+              },
+              {
+                "name": "checks.$min_subjects",
+                "value": [
+                  "name reserved"
+                ]
+              },
+              {
+                "name": "checks.$unique_ids",
+                "value": [
+                  "name reserved"
+                ]
+              },
+              {
+                "name": "checks.$well_formed",
+                "value": [
+                  "name reserved"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "b"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
