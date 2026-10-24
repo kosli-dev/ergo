@@ -1720,6 +1720,7 @@ Most sentences run as one of these operators, as the table in [Checks](#checks) 
 `ergo.as_sentences(policy)` rewrites a policy written with `op` as sentences, wherever a sentence says exactly the same. With this `policy.yaml`:
 
 ```yaml
+ergo_spec: v0.1
 subjects:
   deployment:
     from: [deployments]
@@ -1742,12 +1743,13 @@ this command:
 
 ```sh
 opa eval -d ergo.rego -d policy.yaml --format raw \
-  'yaml.marshal(data.ergo.as_sentences({"subjects": data.subjects, "requirements": data.requirements}))'
+  'yaml.marshal(data.ergo.as_sentences({"ergo_spec": data.ergo_spec, "subjects": data.subjects, "requirements": data.requirements}))'
 ```
 
 prints:
 
 ```yaml
+ergo_spec: v0.1
 requirements:
   approved:
     checks:
@@ -1861,7 +1863,7 @@ Every subject reads the same value. These only mean this as the first step of a 
 A check's fixed values can be read this way too. Write `{"ref": path}` in place of the value, where the path starts with `$$params` or `$$input`. This works for `value`, `values`, `patterns`, `min`, `max`, each item in a `values` or `patterns` list, and the values in a selector's `where`, and as a step of a path (see [Ref steps](#ref-steps)). It's how a policy takes params:
 
 ```rego
-ergo.report({"packages": packages}, {"subjects": {"package": {"from": ["packages"], "identified_by": ["name"]}}, "requirements": {"licences": {
+ergo.report({"packages": packages}, {"ergo_spec": "v0.1", "subjects": {"package": {"from": ["packages"], "identified_by": ["name"]}}, "requirements": {"licences": {
 	"subject": "package",
 	"checks": {"approved": {
 		"op": "any",

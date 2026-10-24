@@ -3083,10 +3083,10 @@ test_a_policy_with_ergo_spec_and_no_requirements_is_still_not_compliant if {
 	ergo.report({"items": [{"id": 1}]}, {"ergo_spec": "v0.1", "requirements": {}}, {}).compliant == false
 }
 
-test_a_policy_description_and_meta_are_kept_when_it_is_rewritten_as_sentences if {
+test_a_policy_ergo_spec_description_and_meta_are_kept_when_it_is_rewritten_as_sentences if {
 	policy := two_reqs_policy({"description": "d", "meta": {"control": "DEV-0401"}})
 	converted := ergo.as_sentences(policy)
-	[converted.description, converted.meta] == ["d", {"control": "DEV-0401"}]
+	[converted.ergo_spec, converted.description, converted.meta] == ["v0.1", "d", {"control": "DEV-0401"}]
 }
 
 problem_inputs_of(row) := [i |
