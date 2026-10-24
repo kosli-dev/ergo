@@ -1,16 +1,16 @@
 [
   {
     "description": "compare with eq",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "compare", "cmp": "eq", "left": ["a"], "right": ["b"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a equals b"}}}},
     "cases": [
       {
         "description": "passes on 1 and 1.0",
-        "rules": ["compare.pass", "value.equal", "render.path", "compare.expression"],
+        "rules": ["compare.pass", "value.equal", "sentence.print.canonical"],
         "input": {"things": [{"a": 1, "b": 1.0, "id": "t1"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": ".a", "value": 1}, {"name": "b", "value": 1}]}
         ],
-        "expressions": {"s": {"c": ".a eq b"}}
+        "expressions": {"s": {"c": ".a equals b"}}
       },
       {
         "description": "passes on equal objects",
@@ -55,7 +55,7 @@
   },
   {
     "description": "compare with ne",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "compare", "cmp": "ne", "left": ["a"], "right": ["b"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a does not equal b"}}}},
     "cases": [
       {
         "description": "passes on two different strings",
@@ -85,16 +85,16 @@
   },
   {
     "description": "compare with lt",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "compare", "cmp": "lt", "left": ["a"], "right": ["b"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a is less than b"}}}},
     "cases": [
       {
         "description": "passes on two numbers in order",
-        "rules": ["compare.pass", "render.path", "compare.expression"],
+        "rules": ["compare.pass", "sentence.print.canonical"],
         "input": {"things": [{"a": 1, "b": 2, "id": "t1"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": ".a", "value": 1}, {"name": "b", "value": 2}]}
         ],
-        "expressions": {"s": {"c": ".a lt b"}}
+        "expressions": {"s": {"c": ".a is less than b"}}
       },
       {
         "description": "fails as value on two numbers out of order",
@@ -147,7 +147,7 @@
   },
   {
     "description": "compare with gte",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "compare", "cmp": "gte", "left": ["a"], "right": ["b"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a is at least b"}}}},
     "cases": [
       {
         "description": "passes on 2 and 2.0",
@@ -161,11 +161,11 @@
   },
   {
     "description": "compare against the input",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "compare", "cmp": "lt", "left": ["a"], "right": ["$$input", "limit"]}}}}},
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a is less than $input.limit"}}}},
     "cases": [
       {
         "description": "names the path into the input",
-        "rules": ["compare.inputs", "compare.expression", "path.start", "render.path", "path.steps"],
+        "rules": ["compare.inputs", "sentence.print.canonical", "path.start", "path.steps"],
         "input": {"limit": 5, "things": [{"a": 1, "id": "t1"}]},
         "results": [
           {
@@ -177,59 +177,7 @@
             "inputs": [{"name": ".a", "value": 1}, {"name": "$input.limit", "value": 5}]
           }
         ],
-        "expressions": {"s": {"c": ".a lt $input.limit"}}
-      }
-    ]
-  },
-  {
-    "description": "compare written wrong",
-    "policy": {
-      "ergo_spec": "v0.1",
-      "subjects": {
-        "thing": {
-          "from": ["things"],
-          "identified_by": ["id"]
-        }
-      },
-      "requirements": {
-        "s": {
-          "subject": "thing",
-          "checks": {
-            "bad_cmp": {"op": "compare", "cmp": "le", "left": ["a"], "right": ["b"]},
-            "left_string": {"op": "compare", "cmp": "lt", "left": "a", "right": ["b"]},
-            "no_right": {"op": "compare", "cmp": "lt", "left": ["a"]},
-            "with_path": {"op": "compare", "path": ["a"], "cmp": "lt", "left": ["a"], "right": ["b"]}
-          }
-        }
-      }
-    },
-    "cases": [
-      {
-        "description": "fails every check as ill_formed and says why",
-        "rules": ["compare.inputs", "render.missing", "written_wrong", "written_wrong.row", "compare.written_wrong", "render.path", "compare.expression", "written_wrong.inputs"],
-        "input": {"things": [{"a": 1, "b": 2, "id": "t1"}]},
-        "results": [
-          {
-            "requirement": "s",
-            "subject": {"type": "thing", "id": null},
-            "check": "$well_formed",
-            "passed": false,
-            "cause": "value",
-            "inputs": [
-              {"name": "count(checks)", "value": 4},
-              {"name": "require", "value": "every"},
-              {"name": "checks.bad_cmp", "value": ["invalid cmp"]},
-              {"name": "checks.left_string", "value": ["invalid left"]},
-              {"name": "checks.no_right", "value": ["missing right"]},
-              {"name": "checks.with_path", "value": ["unknown field path"]}
-            ]
-          },
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "bad_cmp", "passed": false, "cause": "ill_formed", "inputs": [{"name": ".a", "value": 1}, {"name": "b", "value": 2}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "left_string", "passed": false, "cause": "ill_formed", "inputs": []},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "no_right", "passed": false, "cause": "ill_formed", "inputs": []},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "with_path", "passed": false, "cause": "ill_formed", "inputs": [{"name": ".a", "value": 1}, {"name": "b", "value": 2}]}
-        ],
-        "expressions": {"s": {"bad_cmp": ".a le b", "left_string": "<invalid left> lt b", "no_right": ".a lt <missing right>"}}
+        "expressions": {"s": {"c": ".a is less than $input.limit"}}
       }
     ]
   }

@@ -29,7 +29,7 @@
   "required": ["compliant", "description", "engine", "ergo", "meta", "requirements", "results", "subjects"],
   "additionalProperties": false,
   "$defs": {
-    "cause": {"enum": ["satisfied", "ill_formed", "not_an_object", "ambiguous", "unmatched", "unusable", "absent", "null", "value"]},
+    "cause": {"enum": ["satisfied", "ill_formed", "not_an_object", "ambiguous", "unusable", "absent", "null", "value"]},
     "subject": {
       "type": "object",
       "properties": {
@@ -80,7 +80,8 @@
               "meta": {"type": "object"},
               "$refs": {"type": "array", "items": {"$ref": "#/$defs/input"}}
             },
-            "required": ["description", "expression", "meta"]
+            "required": ["description", "expression", "meta"],
+            "additionalProperties": false
           }
         },
         "description": {"type": "string"},
@@ -137,10 +138,10 @@
         "cause": {"$ref": "#/$defs/cause"},
         "failed_items": {
           "type": "array",
-          "description": "Only on rows of all, any, every, some and for checks, and on the $min_subjects row of a subject whose from line has every.",
+          "description": "Only on rows of every, some and for checks, and on the $min_subjects row of a subject whose from line has every.",
           "items": {
             "type": "object",
-            "properties": {"path": {"type": "string"}, "item": {"type": "string", "description": "The path of the list item the entry belongs to. For all and any, the same as path."}, "cause": {"$ref": "#/$defs/cause"}, "value": true, "failed_assertions": {"$ref": "#/$defs/failed_assertions", "description": "Only on entries of for checks: the sentences that failed for that item, in the order written."}, "failed_items": {"type": "array", "description": "Only on entries of for checks with two items, when the second item failed for that item before any sentence was checked: those failures, in path order.", "items": {"type": "object", "properties": {"path": {"type": "string"}, "item": {"type": "string"}, "cause": {"$ref": "#/$defs/cause"}, "value": true}, "required": ["path", "item", "cause", "value"], "additionalProperties": false}}},
+            "properties": {"path": {"type": "string"}, "item": {"type": "string", "description": "The list item the entry belongs to, like item 2 of tests. For a list that failed while walking, the same as path."}, "cause": {"$ref": "#/$defs/cause"}, "value": true, "failed_assertions": {"$ref": "#/$defs/failed_assertions", "description": "Only on entries of for checks: the sentences that failed for that item, in the order written."}, "failed_items": {"type": "array", "description": "Only on entries of for checks with two items, when the second item failed for that item before any sentence was checked: those failures, in path order.", "items": {"type": "object", "properties": {"path": {"type": "string"}, "item": {"type": "string"}, "cause": {"$ref": "#/$defs/cause"}, "value": true}, "required": ["path", "item", "cause", "value"], "additionalProperties": false}}},
             "required": ["path", "item", "cause", "value"],
             "additionalProperties": false
           }

@@ -84,7 +84,7 @@ The defaults keep the report defined when the file leaves out `ergo_spec:`, `sub
 
 #### The old way of writing checks
 
-Before sentences, a check was an object with an `op` and a `path`, like `{op: non_empty_string, path: [approved_by]}`, and a subject used `applies_to` filters written the same way. That still works, but it's going away. We'll say when, well in advance. `ergo.as_sentences` rewrites a policy written that way as sentences, as "Moving a policy to sentences" in the [reference](REFERENCE.md) shows.
+Before 0.1, a check was an object with an `op` and a `path`, like `{op: non_empty_string, path: [approved_by]}`, and a subject used `applies_to` filters written the same way. Spec 0.1 doesn't read that syntax any more. A policy written that way is written wrong, and the report says so. `ergo.as_sentences` rewrites what it can as sentences, and [Moving a policy to sentences](REFERENCE.md#moving-a-policy-to-sentences) in the reference shows what it leaves for you to rewrite.
 
 ### 3. Get the report
 

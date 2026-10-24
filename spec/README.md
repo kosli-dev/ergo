@@ -1,18 +1,18 @@
 # The Ergo spec
 
-Draft 0.1. Ergo is three specs, and `ergo.rego` is an implementation of them:
+Draft 0.1. Ergo's spec is in these files, and `ergo.rego` is an implementation of it:
 
 - [`semantics.md`](semantics.md) says what a check means, as named rules about a model of checks that doesn't depend on how they're written.
-- [`syntax.md`](syntax.md) says how today's policies write checks, how they can be written wrong, and how the report shows paths and checks. A new way of writing checks would get a file like it, reading into the same model.
-- [`sentences.md`](sentences.md) is a draft of the next way, from [#174](https://github.com/kosli-dev/ergo/issues/174): every check a one-line sentence like `approved_by is not empty`. [`sentences.abnf`](sentences.abnf) is its grammar, [`sentences-corpus.md`](sentences-corpus.md) every real check written that way, and [`sentences-findings.md`](sentences-findings.md) what writing them found. `ergo.rego` runs checks written as sentences, apart from the forms `sentences.md` lists as not run yet.
-- [`policy/schema.json`](policy/schema.json) describes today's syntax as a JSON Schema.
+- [`syntax.md`](syntax.md) says how a policy is laid out, how it can be written wrong, and how the report names paths and shows the checks Ergo adds.
+- [`sentences.md`](sentences.md) says how checks and `from` lines are written, as one-line sentences like `approved_by is not empty`. [`sentences.abnf`](sentences.abnf) is its grammar, [`sentences-corpus.md`](sentences-corpus.md) every real check written that way, and [`sentences-findings.md`](sentences-findings.md) what writing them found. `ergo.rego` runs checks written as sentences, apart from the forms `sentences.md` lists as not run yet.
+- [`policy/schema.json`](policy/schema.json) describes a policy as a JSON Schema.
 - [`report/schema.json`](report/schema.json) says what a report looks like, as a JSON Schema.
 - [`cases/`](cases) holds the cases that pin the rules down, one folder per topic.
 - [`CHANGELOG.md`](CHANGELOG.md) says what each version of the spec changed.
 
 When an implementation and the spec disagree, the implementation is wrong. A change to Ergo's behaviour starts here, with the rule and its cases, and then goes into each implementation.
 
-The spec covers reading values, causes, expressions, every built-in operator, requirements, scope, statuses, row order and violations. How a subject's `from` names subjects (`each_as` and `keys`), subjects built on another with `of`, params passed in and values JSON can't hold are still described only in [REFERENCE.md](../REFERENCE.md). [OPEN.md](OPEN.md) lists the questions the spec hasn't settled. A subject's `from` waits for [#174](https://github.com/kosli-dev/ergo/issues/174) and [#113](https://github.com/kosli-dev/ergo/issues/113), which may change how it's written. The spec will change while it's 0.x.
+The spec covers reading values, causes, expressions, every built-in operator, requirements, scope, statuses, row order and violations. Params passed in and values JSON can't hold are still described only in [REFERENCE.md](../REFERENCE.md). [OPEN.md](OPEN.md) lists the questions the spec hasn't settled. The spec will change while it's 0.x.
 
 ## Versions
 
@@ -38,12 +38,13 @@ A topic's `cases.json` holds a list of groups. A group has a `description`, a `p
 - `violations` (optional): the violations the report must give, all of them, in order
 - `report` (optional): fields the report must have at its top, like `{"description": "", "meta": {}}`
 
-Here is one case, from `cases/present`. Its group's policy has a `thing` subject read from `things`, and a requirement `s` that checks `{"op": "present", "path": ["x"]}`:
+Here is one case, from `cases/present`. Its group's policy has a `thing` subject read from `things`, and a requirement `s` that checks `x exists`:
 
 ```json
 {
-  "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}},
-  "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x"]}}}}
+  "ergo_spec": "v0.1",
+  "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+  "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}
 }
 ```
 

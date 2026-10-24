@@ -5,12 +5,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "release": {
-          "from": [
-            "releases"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "releases",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -488,12 +484,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "release": {
-          "from": [
-            "releases"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "releases",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -756,12 +748,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "release": {
-          "from": [
-            "releases"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "releases",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -1132,12 +1120,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "release": {
-          "from": [
-            "releases"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "releases",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -2097,12 +2081,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "release": {
-          "from": [
-            "releases"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "releases",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -2234,12 +2214,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "release": {
-          "from": [
-            "releases"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "releases",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -2452,12 +2428,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "release": {
-          "from": [
-            "releases"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "releases",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -2617,12 +2589,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "release": {
-          "from": [
-            "releases"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "releases",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -3374,12 +3342,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "release": {
-          "from": [
-            "releases"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "releases",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -3560,12 +3524,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "pr": {
-          "from": [
-            "prs"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "prs",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -4237,12 +4197,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "pr": {
-          "from": [
-            "prs"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "prs",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -4431,12 +4387,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "release": {
-          "from": [
-            "releases"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "releases",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -4602,12 +4554,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "release": {
-          "from": [
-            "releases"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "releases",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -4678,12 +4626,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "release": {
-          "from": [
-            "releases"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "releases",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -4780,12 +4724,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "release": {
-          "from": [
-            "releases"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "releases",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -4848,12 +4788,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "release": {
-          "from": [
-            "releases"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "releases",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -4962,9 +4898,7 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
-          "from": [
-            "things"
-          ]
+          "from": "things"
         }
       },
       "requirements": {
@@ -5014,12 +4948,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "release": {
-          "from": [
-            "releases"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "releases",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -5107,12 +5037,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "release": {
-          "from": [
-            "releases"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "releases",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -5200,12 +5126,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "release": {
-          "from": [
-            "releases"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "releases",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -5293,12 +5215,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "release": {
-          "from": [
-            "releases"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "releases",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -5386,12 +5304,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "release": {
-          "from": [
-            "releases"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "releases",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -5479,12 +5393,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "release": {
-          "from": [
-            "releases"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "releases",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -5652,12 +5562,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "release": {
-          "from": [
-            "releases"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "releases",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -5760,12 +5666,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "thing": {
-          "from": [
-            "things"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "things",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -5917,12 +5819,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "pull_request": {
-          "from": [
-            "pull_requests"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "pull_requests",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -6557,12 +6455,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "pull_request": {
-          "from": [
-            "pull_requests"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "pull_requests",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -6779,12 +6673,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "release": {
-          "from": [
-            "releases"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "releases",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -6848,12 +6738,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "pull_request": {
-          "from": [
-            "pull_requests"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "pull_requests",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -6930,12 +6816,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "team": {
-          "from": [
-            "teams"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "teams",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -7142,12 +7024,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "team": {
-          "from": [
-            "teams"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "teams",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -7221,12 +7099,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "site": {
-          "from": [
-            "sites"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "sites",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -7426,12 +7300,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "pull request": {
-          "from": [
-            "pull_requests"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "pull_requests",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -7535,12 +7405,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "pull request": {
-          "from": [
-            "pull_requests"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "pull_requests",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -7679,12 +7545,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "pull request": {
-          "from": [
-            "pull_requests"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "pull_requests",
+          "identified_by": "id"
         }
       },
       "requirements": {
@@ -7803,12 +7665,8 @@
       "ergo_spec": "v0.1",
       "subjects": {
         "pull request": {
-          "from": [
-            "pull_requests"
-          ],
-          "identified_by": [
-            "id"
-          ]
+          "from": "pull_requests",
+          "identified_by": "id"
         }
       },
       "requirements": {
