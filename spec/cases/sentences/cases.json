@@ -4720,6 +4720,20 @@
     ]
   },
   {
+    "description": "an any_of whose options hold sentences written wrong",
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"permitted": {"any_of": {"a": ["x exists", "x exists"], "b": ["x is one of 1, \"a\"", "x exists"], "c": "x exists and x is one of 1, \"a\""}}}}}},
+    "cases": [
+      {
+        "description": "lists each problem under the check, named by its option and, when the option has more than one, its line",
+        "rules": ["written_wrong", "written_wrong.row", "sentence.any_of.written_wrong"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.permitted", "value": ["option b: line 1: values of mixed types", "option c: values of mixed types"]}]}
+        ]
+      }
+    ]
+  },
+  {
     "description": "contains all of values of mixed types",
     "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"all": "x contains all of \"a\", 1", "none": "x contains none of \"a\", 1"}}}},
     "cases": [
