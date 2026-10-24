@@ -1299,6 +1299,7 @@ _is_key(v) if {
 	is_number(v)
 	not _out_of_range(v)
 	v >= 0
+	v <= 9007199254740991
 	v == floor(v)
 }
 

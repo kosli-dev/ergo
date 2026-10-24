@@ -18,7 +18,7 @@ A syntax reads each check into this model. Everything below is said in terms of 
 
 - A **check** has an operator, like `equals` or `every`, and the parameters that operator takes.
 - A **path** has a start and a list of steps. It starts at the subject, at the input, at the params, or at an alias given by a subject's `from` or by an enclosing list check.
-- A **step** is a key (a string, which reads a key of an object), an index (a whole number of 0 or more, which reads an item of a list), or a ref step (a ref whose value is the key).
+- A **step** is a key (a string, which reads a key of an object), an index (a whole number from 0 to 9007199254740991, which reads an item of a list), or a ref step (a ref whose value is the key).
 - A **value** is a JSON value or a ref.
 - A **ref** is a path that starts at the input or the params and whose steps are all keys or indexes.
 

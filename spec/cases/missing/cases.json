@@ -84,6 +84,21 @@
     ]
   },
   {
+    "description": "missing with a ref step that reads a number too big to be a list position",
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x[$params.i] does not exist"}}}},
+    "params": {"i": 9007199254740992},
+    "cases": [
+      {
+        "description": "fails as unusable, because the item it looks for is unknown, not missing",
+        "rules": ["missing.fail", "path.ref_step"],
+        "input": {"things": [{"id": "t1", "x": [1]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x named by $params.i", "value": null}]}
+        ]
+      }
+    ]
+  },
+  {
     "description": "missing as a filter",
     "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things whose x does not exist", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "min_subjects": 0, "checks": {"c": "id exists"}}}},
     "cases": [
