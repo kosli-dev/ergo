@@ -14,6 +14,9 @@ problems = []
 for case in cases:
     for e in report.iter_errors(case["report"]):
         problems.append(f"{case['where']}: report doesn't match report/schema.json at /{'/'.join(map(str, e.absolute_path))}: {e.message}")
+    for r in case["report"]["results"]:
+        if r["check"] == "$well_formed" and not r["passed"] and not any(isinstance(i["value"], list) for i in r["inputs"]):
+            problems.append(f"{case['where']}: $well_formed fails for requirement {r['requirement']} without naming a problem")
     well_formed = all(r["passed"] for r in case["report"]["results"] if r["check"] == "$well_formed")
     if well_formed:
         for e in policy.iter_errors(case["policy"]):
