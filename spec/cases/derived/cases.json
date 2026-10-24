@@ -7167,7 +7167,7 @@
     },
     "cases": [
       {
-        "description": "fails $well_formed, which says why, and gets no other row",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": [
           "sentence.derived.compare",
           "sentence.written_wrong.slot",
@@ -7994,7 +7994,7 @@
     },
     "cases": [
       {
-        "description": "fails $well_formed, which says why, and gets no other row",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": [
           "sentence.derived.compare",
           "sentence.written_wrong.slot",
@@ -8061,7 +8061,7 @@
     },
     "cases": [
       {
-        "description": "fails $well_formed, which says why, and gets no other row",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": [
           "sentence.derived.compare",
           "sentence.written_wrong.slot",
@@ -12648,7 +12648,7 @@
     },
     "cases": [
       {
-        "description": "fails $well_formed, which says why, and gets no other row",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": [
           "sentence.derived.elapsed",
           "sentence.derived.compare",
@@ -12722,7 +12722,7 @@
     },
     "cases": [
       {
-        "description": "fails $well_formed, which says why, and gets no other row",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": [
           "sentence.derived.elapsed",
           "sentence.written_wrong.slot",

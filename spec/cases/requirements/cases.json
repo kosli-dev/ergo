@@ -1498,7 +1498,7 @@
     "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
     "cases": [
       {
-        "description": "is written wrong: it has no assert, each of its fields is unknown, and it gets no row but $well_formed",
+        "description": "is written wrong: it has no assert, each of its fields is unknown, and the requirement gets no row but $well_formed",
         "rules": ["policy.old_fields", "written_wrong", "written_wrong.row"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "requirements": {"s": {"status": "not_met"}},

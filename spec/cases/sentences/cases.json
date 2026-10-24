@@ -29,7 +29,7 @@
     "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"assert": "x is \"a\"", "path": ["x"]}}}}},
     "cases": [
       {
-        "description": "is written wrong, and gets no row but $well_formed",
+        "description": "is written wrong, and the requirement gets no row but $well_formed",
         "rules": ["sentence.check", "written_wrong", "written_wrong.row"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
@@ -3509,7 +3509,7 @@
     "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is \"a"}}}},
     "cases": [
       {
-        "description": "fails $well_formed, which says why, and gets no other row",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": ["sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
@@ -3530,7 +3530,7 @@
     "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "environment is \"prod"}}}},
     "cases": [
       {
-        "description": "fails $well_formed, which says why, and gets no other row",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": ["sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
@@ -3551,7 +3551,7 @@
     "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x"}}}},
     "cases": [
       {
-        "description": "fails $well_formed, which says why, and gets no other row",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": ["sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
@@ -3572,7 +3572,7 @@
     "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least 1e400"}}}},
     "cases": [
       {
-        "description": "fails $well_formed, which says why, and gets no other row",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": ["sentence.value.scalar", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
@@ -3593,7 +3593,7 @@
     "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "items[9007199254740992] does not exist"}}}},
     "cases": [
       {
-        "description": "fails $well_formed, which says why, and gets no other row",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": ["sentence.path.brackets", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"things": [{"id": "t1", "items": [1]}]},
         "results": [
@@ -3614,7 +3614,7 @@
     "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "empty is 1"}}}},
     "cases": [
       {
-        "description": "fails $well_formed, which says why, and gets no other row",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": ["sentence.words", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
@@ -3635,7 +3635,7 @@
     "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$foo.x exists"}}}},
     "cases": [
       {
-        "description": "fails $well_formed, which says why, and gets no other row",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": ["sentence.path.start", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
@@ -3656,7 +3656,7 @@
     "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is between 5 and 1"}}}},
     "cases": [
       {
-        "description": "fails $well_formed, which says why, and gets no other row",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": ["sentence.phrase.between", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
@@ -3677,7 +3677,7 @@
     "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not null"}}}},
     "cases": [
       {
-        "description": "fails $well_formed, which says why, and gets no other row",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": ["sentence.phrase.is", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
@@ -3698,7 +3698,7 @@
     "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least x"}}}},
     "cases": [
       {
-        "description": "fails $well_formed, which says why, and gets no other row",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": ["sentence.written_wrong.self", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"things": [{"id": "t1", "x": 1, "type": "x", "conditions": [{"type": "y", "status": "OK"}]}]},
         "results": [
@@ -3712,7 +3712,7 @@
     "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every conditions.type equals type"}}}},
     "cases": [
       {
-        "description": "fails $well_formed, which says the bare name is the item's, and gets no other row",
+        "description": "fails $well_formed, which says the bare name is the item's, and the requirement gets no other row",
         "rules": ["sentence.written_wrong.self", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row", "sentence.argument.item"],
         "input": {"things": [{"id": "t1", "x": 1, "type": "x", "conditions": [{"type": "y", "status": "OK"}]}]},
         "results": [
@@ -3726,7 +3726,7 @@
     "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "some conditions whose type equals type as condition", "assert": "condition.status is \"OK\""}}}}},
     "cases": [
       {
-        "description": "fails $well_formed, which says the bare name is the item's, and gets no other row",
+        "description": "fails $well_formed, which says the bare name is the item's, and the requirement gets no other row",
         "rules": ["sentence.written_wrong.self", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row", "sentence.for.scope"],
         "input": {"things": [{"id": "t1", "x": 1, "type": "x", "conditions": [{"type": "y", "status": "OK"}]}]},
         "results": [
@@ -3773,7 +3773,7 @@
     "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"(\""}}}},
     "cases": [
       {
-        "description": "fails $well_formed, which says why, and gets no other row",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": ["sentence.phrase.matches", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
@@ -3794,7 +3794,7 @@
     "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not match \"^a\", \"(\""}}}},
     "cases": [
       {
-        "description": "fails $well_formed, which says why, and gets no other row",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": ["sentence.phrase.matches", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
@@ -3815,7 +3815,7 @@
     "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 1 within"}}}},
     "cases": [
       {
-        "description": "fails $well_formed, which says why, and gets no other row",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": ["sentence.phrase.within", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
@@ -3836,7 +3836,7 @@
     "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"a(?=b)\""}}}},
     "cases": [
       {
-        "description": "fails $well_formed, which says why, and gets no other row",
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
         "rules": ["sentence.phrase.matches", "patterns.syntax", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
@@ -5939,7 +5939,7 @@
     },
     "cases": [
       {
-        "description": "fails $well_formed and gets no other row",
+        "description": "fails $well_formed, and the requirement gets no other row",
         "rules": ["sentence.any_of.written_wrong", "written_wrong", "written_wrong.row"],
         "input": {
           "things": [

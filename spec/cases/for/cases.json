@@ -4966,7 +4966,7 @@
     },
     "cases": [
       {
-        "description": "fails $well_formed, which lists the problem, and gets no other row",
+        "description": "fails $well_formed, which lists the problem, and the requirement gets no other row",
         "rules": [
           "sentence.for.line",
           "written_wrong",
@@ -5044,7 +5044,7 @@
     },
     "cases": [
       {
-        "description": "fails $well_formed, which lists the problem, and gets no other row",
+        "description": "fails $well_formed, which lists the problem, and the requirement gets no other row",
         "rules": [
           "sentence.for.alias",
           "written_wrong",
@@ -5122,7 +5122,7 @@
     },
     "cases": [
       {
-        "description": "fails $well_formed, which lists the problem, and gets no other row",
+        "description": "fails $well_formed, which lists the problem, and the requirement gets no other row",
         "rules": [
           "sentence.for.alias",
           "written_wrong",
@@ -5200,7 +5200,7 @@
     },
     "cases": [
       {
-        "description": "fails $well_formed, which lists the problem, and gets no other row",
+        "description": "fails $well_formed, which lists the problem, and the requirement gets no other row",
         "rules": [
           "sentence.for.alias",
           "written_wrong",
@@ -5278,7 +5278,7 @@
     },
     "cases": [
       {
-        "description": "fails $well_formed, which lists the problem, and gets no other row",
+        "description": "fails $well_formed, which lists the problem, and the requirement gets no other row",
         "rules": [
           "sentence.for.alias",
           "written_wrong",
