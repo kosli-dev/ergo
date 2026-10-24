@@ -163,15 +163,15 @@ On 2026-10-14 the word that filters items changed from `where` to `whose`: `depl
 
 ## How the prose was checked
 
-A throwaway tokenizer in JavaScript, outside the repo, turned each phrase above into a regular expression and tried every way to cut each line into a quantifier, a path, `whose` conditions, assertions joined with `and`, and a phrase. It counted every reading.
+A throwaway tokenizer in JavaScript, outside the repo, turned each phrase of [syntax.md](syntax.md#phrases) into a regular expression and tried every way to cut each line into a quantifier, a path, `whose` conditions, assertions joined with `and`, and a phrase. It counted every reading.
 
-The corpus has 336 lines: 231 assertions, 14 `for` lines and 91 `from` lines. sdlc-policies 0004's `artifact` and its server copy have no `from` any more. With the rules in this file, which are the rules #174 now states, every line parses exactly one way. Without them, 194 lines parse more than one way:
+The corpus has 336 lines: 231 assertions, 14 `for` lines and 91 `from` lines. sdlc-policies 0004's `artifact` and its server copy have no `from` any more. With the rules now in [syntax.md](syntax.md), which are the rules #174 states, every line parses exactly one way. Without them, 194 lines parse more than one way:
 
-| cause                                                                  | lines | rule that removes it                            |
-| ---------------------------------------------------------------------- | ----: | ----------------------------------------------- |
+| cause                                                                  | lines | rule that removes it                                     |
+| ---------------------------------------------------------------------- | ----: | -------------------------------------------------------- |
 | a quoted string could be text or a quoted key, `is "prod"`             | 84    | [sentence.path.argument](syntax.md#paths)                |
 | a grammar word could be a field, `is empty` against `is <field empty>` | 59    | [sentence.words](syntax.md#words-a-field-cant-be-called) |
-| `true`, `false` or `null` could be a field                             | 50    | both of the above                               |
+| `true`, `false` or `null` could be a field                             | 50    | both of the above                                        |
 | the reference after `named by` could end at more than one key          | 24    | [sentence.path.dynamic](syntax.md#paths)                 |
 
 Some lines have two causes. The tokenizer also applied [sentence.subject.own](syntax.md#subjects) to every `from` line, and found the same six chains the corpus marks.

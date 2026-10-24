@@ -22,7 +22,7 @@ A syntax reads each check into this model. Everything below is said in terms of 
 - A **value** is a JSON value or a ref.
 - A **ref** is a path that starts at the input or the params and whose steps are all keys or indexes.
 
-**[written_wrong]** A check that can't be read into this model is written wrong. Each of its rows fails with cause `ill_formed`, whatever the subject holds, and the requirement's `$well_formed` row fails with cause `value` and lists what's wrong. [syntax.md](syntax.md#written-wrong) says what counts as written wrong in a sentence, and [syntax.md](syntax.md#written-wrong) how it's reported.
+**[written_wrong]** A check that can't be read into this model is written wrong. Each of its rows fails with cause `ill_formed`, whatever the subject holds, and the requirement's `$well_formed` row fails with cause `value` and lists what's wrong. [syntax.md](syntax.md#written-wrong) says what counts as written wrong in a sentence, and [written_wrong.row](syntax.md#written-wrong) how it's reported.
 
 ## Reading a path
 
