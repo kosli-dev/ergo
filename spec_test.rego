@@ -6,16 +6,20 @@ known_differences := set()
 
 failures := union({_topic_failures(topic) | some topic, _ in data.spec.cases})
 
-_topic_failures(topic) := {concat(" / ", [topic, group.description, c.description]) |
-	some group in data.spec.cases[topic]
+_topic_failures(topic) := _failures(topic, data.spec.cases[topic])
+
+_failures(topic, groups) := {concat(" / ", [topic, group.description, c.description]) |
+	some group in groups
 	some c in group.cases
 	not _passes(group, c)
 }
 
 _known_in(topic) := known_differences & _case_names(topic)
 
-_compiled_differences(topic) := {concat(" / ", [topic, group.description, c.description]) |
-	some group in data.spec.cases[topic]
+_compiled_differences(topic) := _differences_compiled(topic, data.spec.cases[topic])
+
+_differences_compiled(topic, groups) := {concat(" / ", [topic, group.description, c.description]) |
+	some group in groups
 	form := json.unmarshal(json.marshal(ergo.compile(group.policy)))
 	some c in group.cases
 	ergo.report(c.input, form, object.get(group, "params", {})) != _report(group, c)
@@ -107,10 +111,20 @@ test_the_requirements_cases_pass if {
 	_compiled_differences("requirements") == set()
 }
 
-test_the_sentences_cases_pass if {
-	_topic_failures("sentences") == _known_in("sentences")
-	_compiled_differences("sentences") == set()
+_half(topic, n) := [group | some i, group in data.spec.cases[topic]; i % 2 == n]
+
+_half_passes(topic, n) if _failures(topic, _half(topic, n)) == known_differences & {concat(" / ", [topic, group.description, c.description]) |
+	some group in _half(topic, n)
+	some c in group.cases
 }
+
+test_the_even_sentences_cases_pass if _half_passes("sentences", 0)
+
+test_the_odd_sentences_cases_pass if _half_passes("sentences", 1)
+
+test_the_even_sentences_cases_pass_compiled if _differences_compiled("sentences", _half("sentences", 0)) == set()
+
+test_the_odd_sentences_cases_pass_compiled if _differences_compiled("sentences", _half("sentences", 1)) == set()
 
 test_the_subjects_cases_pass if {
 	_topic_failures("subjects") == _known_in("subjects")
