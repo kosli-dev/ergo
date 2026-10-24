@@ -4929,6 +4929,41 @@ test_a_check_of_a_chain_reads_the_parent_by_its_name if {
 	]
 }
 
+_kids_doc := {"bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "v": 1}, {"id": "k2", "v": 2}]}]}
+
+_kids_report(from) := ergo.report(_kids_doc, {"ergo_spec": "v0.1", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": from, "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
+
+_applies_of(rep) := [[r.subject.id, r.cause, r.inputs] | some r in rep.results; r.check == "$applies"]
+
+test_a_whose_in_a_childs_from_line_reads_the_parent_by_its_name if {
+	_applies_of(_kids_report("b.kids whose v equals b.x")) == [
+		["k1", "satisfied", [{"name": "b.x", "value": 1}, {"name": "v", "value": 1}]],
+		["k2", "value", [{"name": "b.x", "value": 1}, {"name": "v", "value": 2}]],
+	]
+	_applies_of(_kids_report("b.kids whose b.x equals v")) == _applies_of(_kids_report("b.kids whose v equals b.x"))
+}
+
+test_a_whose_in_a_childs_from_line_that_reads_a_missing_field_of_the_parent_fails_as_absent if {
+	_applies_of(_kids_report("b.kids whose v equals b.nope")) == [
+		["k1", "absent", [{"name": "b.nope", "value": null}, {"name": "v", "value": 1}]],
+		["k2", "absent", [{"name": "b.nope", "value": null}, {"name": "v", "value": 2}]],
+	]
+}
+
+test_a_whose_in_the_from_lines_of_a_chain_of_three_subjects_reads_every_ancestor_by_its_name if {
+	doc := {"tops": [{"id": "t1", "y": 2, "bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "v": 1, "w": 2}, {"id": "k2", "v": 2, "w": 2}]}, {"id": "b2", "x": 3, "kids": [{"id": "k3", "v": 3, "w": 2}]}]}]}
+	subjects := {
+		"top": {"from": "tops", "identified_by": "id"},
+		"b": {"from": "top.bs whose x is less than top.y", "identified_by": "id"},
+		"kid": {"from": "b.kids whose w equals top.y and v equals b.x", "identified_by": "id"},
+	}
+	rep := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
+	[[r.subject.id, r.subject.in, r.cause, r.inputs] | some r in rep.results; r.check == "$applies"] == [
+		["k1", {"top": "t1", "b": "b1"}, "satisfied", [{"name": "b.x", "value": 1}, {"name": "top.y", "value": 2}, {"name": "v", "value": 1}, {"name": "w", "value": 2}]],
+		["k2", {"top": "t1", "b": "b1"}, "value", [{"name": "b.x", "value": 1}, {"name": "top.y", "value": 2}, {"name": "v", "value": 2}, {"name": "w", "value": 2}]],
+	]
+}
+
 _chain_min_cause(rep) := [[r.cause, object.keys(r.subject)] | some r in rep.results; r.check == "$min_subjects"]
 
 test_a_chain_with_no_parent_or_an_unreadable_one_finds_no_subjects if {

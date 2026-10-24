@@ -5568,7 +5568,8 @@ _s_from_used(def, read) if {
 
 _s_from_read(name, fl, subjects, chains) := object.union({"problems": problems, "fields": fields, "parent": parent, "every": every_list}, _p_from_part(name, fl, subjects, chains.parts)) if {
 	"path" in object.keys(fl)
-	conds := [_p_applied(_s_check([_s_cond_text(c)], {}, set(), set()), _p_own_context(name, chains.parts)) | some c in object.get(fl, "where", [])]
+	names := {a | some a in _s_ancestors(name, chains.descend)}
+	conds := [_p_applied(_s_parent_named(t, _s_check([t], {}, set(), names), names), _p_own_context(name, chains.parts)) | some c in object.get(fl, "where", []); t := _s_cond_text(c)]
 	problems := sort((((((_s_chain_unsupported(name, fl, subjects, chains.descend) | _s_every_unsupported(name, fl, subjects)) | _s_from_start_problems(fl)) | _s_from_paths_unsupported({"path": fl.path})) | _s_elapsed_flaw({"where": object.get(fl, "where", [])})) | {concat("", ["whose: ", p]) | some c in conds; some p in object.get(c, "$sentence", [])}))
 	fields := object.union(_s_source(name, fl, subjects, chains.parts), _s_whose_filters(_s_filter_prefix(name, chains.narrow), conds))
 	parent := _s_descend_parent(name, fl, subjects)

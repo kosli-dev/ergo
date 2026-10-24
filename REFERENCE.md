@@ -247,6 +247,22 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
 
   A check reads the artifact by its name, like `artifact.name`. Only checks written as sentences can read it.
 
+  So can a `whose` in the child's `from` line. With `{"params": {"artifact_name": "web"}}` and this input:
+
+  ```json
+  {"trail": {"artifacts": {"web": {"fingerprint": "sha-1", "branch": "main", "pull_requests": [
+    {"url": "pr/7", "base": "main"},
+    {"url": "pr/8", "base": "dev"}
+  ]}}}}
+  ```
+
+  `from: artifact.pull_requests whose base is artifact.branch` keeps `pr/7` and leaves `pr/8` out of scope:
+
+  ```json
+  {"check": "$applies", "subject": {"type": "pull request", "id": "pr/8", "in": {"artifact": "sha-1"}}, "passed": false, "cause": "value",
+   "inputs": [{"name": "artifact.branch", "value": "main"}, {"name": "base", "value": "dev"}]}
+  ```
+
   When the artifact is several subjects, the pull requests of each are read and checked in turn. With this input:
 
   ```json
