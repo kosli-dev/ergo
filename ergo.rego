@@ -3536,11 +3536,15 @@ _names(x) := sort(x) if is_set(x)
 
 report(doc, policy, params) := _run(doc, c.policy, _from_compiled(c), params) if {
 	c := _compiled(policy)
+} else := _run(doc, c.policy, _stale_read(c), params) if {
+	c := _stale_compiled(policy)
 } else := _run(doc, policy, _read(policy), params)
 
 compile(policy) := policy if _compiled(policy)
 
-else := {"ergo/compiled": object.union({"policy": policy}, _to_compiled(rd))} if rd := _read_ahead(policy)
+else := policy if _stale_compiled(policy)
+
+else := {"ergo/compiled": object.union({"policy": policy, "engine": _engine}, _to_compiled(rd))} if rd := _read_ahead(policy)
 
 else := policy
 
@@ -3605,11 +3609,27 @@ _from_compiled(c) := {
 	"ahead": c.ahead,
 }
 
+_stale_compiled(x) := c if {
+	is_object(x)
+	object.keys(x) == {"ergo/compiled"}
+	c := x["ergo/compiled"]
+	is_object(c)
+	"policy" in object.keys(c)
+	object.get(c, "engine", null) != _engine
+}
+
+_stale_read(c) := object.union(_read(c.policy), {"ahead": {"policy_problems": array.concat([_engine_problem(object.get(c, "engine", null))], _policy_problem_inputs(c.policy))}})
+
+_engine_problem(null) := {"name": "ergo/compiled engine", "value": ["missing"]}
+
+_engine_problem(e) := {"name": "ergo/compiled engine", "value": [concat("", ["compiled by another engine, expected ", _engine.name, " ", _engine.version])]} if e != null
+
 _compiled(x) := c if {
 	is_object(x)
 	object.keys(x) == {"ergo/compiled"}
 	c := x["ergo/compiled"]
 	is_object(c)
+	c.engine == _engine
 	every f in ["policy", "subjects", "requirements"] {
 		f in object.keys(c)
 	}
@@ -3649,10 +3669,12 @@ _run(doc, policy, rd, params) := r if {
 	unreadable := _unreadable_inputs(doc, params)
 	written := object.union(_report_of(doc, reqs, object.get(rd.ahead, "requirements", {})), {"description": _reported_description(policy), "meta": _reported_meta(policy), "subjects": _listed_of(policy, rd)}) with data.ergo_reading as false with data.ergo_policy_problems as _policy_problems_of(policy, rd) with data.ergo_document as doc with data.ergo_params as params with data.ergo_subjects as rd.subjects with data.ergo_resolved as rd.resolved with data.ergo_unreadable as unreadable with data.ergo_sentences as rd.sentences with data.ergo_subject_sentences as rd.subject_sentences with input as {"ergo/names": {}}
 	used := _used_subjects(reqs, rd.subjects, rd.resolved)
-	r := object.union(_reported(written, unreadable, [raw, used]), {"ergo": _spec, "engine": {"name": "ergo.rego", "version": version}})
+	r := object.union(_reported(written, unreadable, [raw, used]), {"ergo": _spec, "engine": _engine})
 }
 
 version := "0.1.0-dev"
+
+_engine := {"name": "ergo.rego", "version": version}
 
 _used_subjects(reqs, subjects, resolved) := {name: subjects[name] |
 	some req in reqs
