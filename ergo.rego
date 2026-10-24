@@ -324,7 +324,7 @@ _subject_ref_problems(req) := (({["subject", "missing"] |
 _def_problems(def) := union({
 	{[f, _subject_wrong_type_problems[f]] | some f in _wrong_typed(def, _subject_wrong_type_problems)},
 	{[f, "unknown field"] | some f in _unknown_subject_fields(def)},
-	{[f, "not allowed with of"] | "of" in object.keys(def); some f in ["from", "identified_by"]; f in object.keys(def)},
+	{[f, "not allowed on a subject that narrows another"] | "of" in object.keys(def); some f in ["from", "identified_by"]; f in object.keys(def)},
 	_path_problems(def, "from"),
 	_path_problems(def, "identified_by"),
 	_def_json_problems(def),

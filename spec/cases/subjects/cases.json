@@ -5567,6 +5567,167 @@
     ]
   },
   {
+    "description": "a subject that narrows another and has its own identified_by",
+    "policy": {
+      "ergo_spec": "v0.1",
+      "subjects": {
+        "defect": {
+          "from": "defects",
+          "identified_by": "id"
+        },
+        "critical defect": {
+          "from": "defect whose severity is \"critical\"",
+          "identified_by": "team"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "critical defect",
+          "checks": {
+            "c": "team exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong and keeps the id of the one it narrows",
+        "rules": ["subjects.narrow.id", "sentence.subject.narrow", "written_wrong.row"],
+        "input": {
+          "defects": [
+            {
+              "id": 1,
+              "severity": "critical",
+              "team": "a"
+            },
+            {
+              "id": 2,
+              "severity": "low",
+              "team": "a"
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met",
+            "subjects": {
+              "matching": 1,
+              "total": 2
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "subjects.\"critical defect\".identified_by",
+                "value": [
+                  "not allowed on a subject that narrows another"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "critical defect"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope critical defect count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "critical defect"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated critical defect ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "critical defect"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "severity",
+                "value": "critical"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": 1,
+              "type": "critical defect"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "severity",
+                "value": "low"
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": 2,
+              "type": "critical defect"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "team",
+                "value": "a"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": 1,
+              "type": "critical defect"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "the report lists the subjects the requirements use",
     "policy": {
       "ergo_spec": "v0.1",

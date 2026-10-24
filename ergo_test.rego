@@ -5117,7 +5117,7 @@ test_a_from_line_can_narrow_a_subject_written_with_op if {
 
 test_a_narrowing_subject_takes_its_id_from_the_one_it_narrows if {
 	subjects := {"defect": {"from": "defects", "identified_by": "id"}, "critical defect": {"from": `defect whose severity is "critical"`, "identified_by": "team"}}
-	_from_problems(_narrow_report(subjects, "critical defect")) == [{"name": `subjects."critical defect".identified_by`, "value": ["not allowed with of"]}]
+	_from_problems(_narrow_report(subjects, "critical defect")) == [{"name": `subjects."critical defect".identified_by`, "value": ["not allowed on a subject that narrows another"]}]
 }
 
 test_subjects_that_narrow_each_other_lead_to_a_loop if {

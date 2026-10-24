@@ -216,7 +216,7 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
 - `named by $params.name` picks one key: `from: trail.artifacts named by $params.artifact_name`.
 - `named by each of $params.kinds` makes each key in the list a subject: `from: build.test_runs named by each of $params.kinds`.
 - A subject's own name at the start of its `from` is the input field, so `lockfile` can have `from: lockfile whose status is "COMPLETE"`.
-- A `from` line that's another subject's name, with or without a `whose`, narrows that subject, as in [a subject built on another](#a-subject-built-on-another): `critical defect` with `from: defect whose severity is "critical"` keeps the defects that pass `defect`'s conditions and its own. A name with a space goes in quotes, so the whole line goes in single quotes in YAML: `from: '"critical defect" whose team is "b"'`. It takes its `id` from the subject it narrows, so an `id` of its own is written wrong.
+- A `from` line that's another subject's name, with or without a `whose`, narrows that subject, as in [a subject built on another](#a-subject-built-on-another): `critical defect` with `from: defect whose severity is "critical"` keeps the defects that pass `defect`'s conditions and its own. A name with a space goes in quotes, so the whole line goes in single quotes in YAML: `from: '"critical defect" whose team is "b"'`. It takes its id from the subject it narrows, so an `identified_by` of its own is written wrong, with `not allowed on a subject that narrows another`.
 - A `from` line that starts at another subject's name and goes on reads the rest of its path from that subject. With `{"params": {"artifact_name": "web"}}` and this input:
 
   ```json
