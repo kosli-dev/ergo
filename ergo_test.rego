@@ -6701,30 +6701,13 @@ _swap_fors := [
 	{"for": "every @cov.items as it", "assert": "it.x is @uno"},
 ]
 
-_swap_old(p) := [
-	{"op": "present", "path": array.concat(p.cov, ["x"])},
-	{"op": "equals", "path": array.concat(p.cov, ["x"]), "value": 1},
-	{"op": "compare", "left": array.concat(p.cov, ["x"]), "right": array.concat(p.cov, ["n"]), "cmp": "lt"},
-	{"op": "compare", "left": {"count": p.lst}, "right": {"literal": 2}, "cmp": "eq"},
-	{"op": "compare", "left": {"sum": p.lst, "each": ["n"]}, "right": array.concat(p.cov, ["n"]), "cmp": "eq"},
-	{"op": "compare", "left": {"add": [array.concat(p.cov, ["x"]), {"literal": 1}]}, "right": {"literal": 2}, "cmp": "eq"},
-	{"op": "all", "path": p.lst, "check": "x is 1"},
-	{"op": "any", "path": p.lst, "as": "q", "check": "x is 1"},
-	{"op": "any_of", "options": {"a": [{"op": "present", "path": array.concat(p.cov, ["x"])}], "b": [{"op": "equals", "path": p.uno, "value": 1}]}},
-]
-
 _swap_old_alias := {"cov": ["$cov"], "lst": ["$lst"], "uno": ["$uno"]}
 
-_swap_old_full := {"cov": ["dd", "b"], "lst": ["dd", "items"], "uno": ["dd", "b", "x"]}
-
-_swap_checks(replacements, old, lines, walks, fors) := object.union(
+_swap_checks(replacements, lines, walks, fors) := object.union(
 	{sprintf("l%02d", [i]): strings.replace_n(replacements, line) | some i, line in lines},
 	object.union(
 		{sprintf("w%02d", [i]): strings.replace_n(replacements, line) | some i, line in walks},
-		object.union(
-			{sprintf("f%02d", [i]): _swap_for(replacements, item) | some i, item in fors},
-			{sprintf("o%02d", [i]): item | some i, item in old},
-		),
+		{sprintf("f%02d", [i]): _swap_for(replacements, item) | some i, item in fors},
 	),
 )
 
@@ -6769,15 +6752,13 @@ _swap_good := {
 	"m": {"m1": {"x": 1}},
 }
 
-_swap_group_checks("lines_a", replacements, _) := _swap_checks(replacements, [], array.slice(_swap_lines, 0, 13), [], [])
+_swap_group_checks("lines_a", replacements) := _swap_checks(replacements, array.slice(_swap_lines, 0, 13), [], [])
 
-_swap_group_checks("lines_b", replacements, _) := _swap_checks(replacements, [], array.slice(_swap_lines, 13, count(_swap_lines)), [], [])
+_swap_group_checks("lines_b", replacements) := _swap_checks(replacements, array.slice(_swap_lines, 13, count(_swap_lines)), [], [])
 
-_swap_group_checks("walks", replacements, _) := _swap_checks(replacements, [], [], _swap_walks, [])
+_swap_group_checks("walks", replacements) := _swap_checks(replacements, [], _swap_walks, [])
 
-_swap_group_checks("fors", replacements, _) := _swap_checks(replacements, [], [], [], _swap_fors)
-
-_swap_group_checks("old", replacements, old) := _swap_checks(replacements, old, [], [], [])
+_swap_group_checks("fors", replacements) := _swap_checks(replacements, [], [], _swap_fors)
 
 _swap_good_with(f, v) := {"trail": {"name": "t1", "dd": object.union(_swap_good, {f: v})}}
 
@@ -6824,9 +6805,9 @@ _swap_differences(group) := {n |
 	some params in {s.params | some s in _swap_scenarios}
 	names := {m | some m, s in _swap_scenarios; s.params == params}
 	doc := {"trails": [object.union(_swap_scenarios[m].doc.trail, {"name": m}) | some m in names]}
-	checks := _swap_group_checks(group, _swap_alias, _swap_old(_swap_old_alias))
+	checks := _swap_group_checks(group, _swap_alias)
 	alias := ergo.report(doc, _swap_batch_policy(_swap_has, checks), params)
-	full := ergo.report(doc, _swap_batch_policy({}, _swap_group_checks(group, _swap_full, _swap_old(_swap_old_full))), params)
+	full := ergo.report(doc, _swap_batch_policy({}, _swap_group_checks(group, _swap_full)), params)
 	some n in names
 	_swap_differs(alias, full, n, checks)
 }
@@ -6842,8 +6823,6 @@ test_a_part_gives_the_rows_of_its_full_path_in_every_scenario_in_the_other_one_l
 test_a_part_gives_the_rows_of_its_full_path_in_every_scenario_in_the_checks_that_walk_lists if _swap_differences("walks") == set()
 
 test_a_part_gives_the_rows_of_its_full_path_in_every_scenario_in_the_for_line_checks if _swap_differences("fors") == set()
-
-test_a_part_gives_the_rows_of_its_full_path_in_every_scenario_in_the_old_syntax_checks if _swap_differences("old") == set()
 
 test_the_batched_swap_comparison_names_each_scenario_where_a_part_reads_the_wrong_path if {
 	scenarios := {n: _swap_scenarios[n] | some n in {"everything_is_there", "the_named_by_param_is_a_number", "the_subject_has_no_part_field"}}
@@ -6864,15 +6843,15 @@ test_the_swap_comparison_would_notice_a_part_that_reads_the_wrong_path if {
 
 test_the_swap_comparison_sees_rows_of_every_kind_of_outcome if {
 	text := _swap_scenarios.an_object_part_is_text
-	one := ergo.report(text.doc, _swap_policy(_swap_has, _swap_group_checks("lines_a", _swap_alias, [])), text.params)
+	one := ergo.report(text.doc, _swap_policy(_swap_has, _swap_group_checks("lines_a", _swap_alias)), text.params)
 	{"unusable"} - {r.cause | some r in one.results; startswith(r.check, "l")} == set()
-	walks := ergo.report(_swap_scenarios.the_list_holds_a_number_and_a_null.doc, _swap_policy(_swap_has, _swap_group_checks("walks", _swap_alias, [])), {"k": "m1"})
+	walks := ergo.report(_swap_scenarios.the_list_holds_a_number_and_a_null.doc, _swap_policy(_swap_has, _swap_group_checks("walks", _swap_alias)), {"k": "m1"})
 	{"value", "satisfied"} - {r.cause | some r in walks.results; startswith(r.check, "w")} == set()
 }
 
 test_the_swap_comparison_sees_a_subject_that_is_not_an_object if {
 	nothing := _swap_scenarios.the_part_field_is_text
-	rep := ergo.report(nothing.doc, _swap_policy(_swap_has, _swap_group_checks("fors", _swap_alias, [])), nothing.params)
+	rep := ergo.report(nothing.doc, _swap_policy(_swap_has, _swap_group_checks("fors", _swap_alias)), nothing.params)
 	{"unusable"} - {r.cause | some r in rep.results; startswith(r.check, "f")} == set()
 }
 

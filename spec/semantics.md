@@ -145,10 +145,6 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 
 **[non_empty_string.fail]** It fails with the path's outcome as its cause when the path ends anything but `found`. When the field was read, it fails with `value`, whatever its type, because checking the type is what it's for.
 
-## `empty`
-
-`empty` takes a path and asks whether the field is an empty list.
-
 ## `empty_string_or_list` and `not_empty_string_or_list`
 
 `empty_string_or_list` takes a path and asks whether the field is `""` or `[]`. `not_empty_string_or_list` asks whether it's a string or a list with something in it. They're what the sentences `is empty` and `is not empty` read into, see [sentence.phrase.empty](sentences.md#phrases).
