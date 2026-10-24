@@ -1529,6 +1529,11 @@ _key_name(k) := _json_text(k) if {
 	not _plain_key(k)
 }
 
+_key_name(k) := _literal_text(k) if {
+	is_number(k)
+	_is_key(k)
+}
+
 _key_name(k) := "<invalid step>" if {
 	not is_string(k)
 	not _is_key(k)
@@ -2975,7 +2980,9 @@ _applies_cause(_, _, _, true) := "satisfied"
 
 _applies_cause(subj, req, flaws, false) := _scope_cause(_failed_filter_causes(subj, req, flaws))
 
-_scope_cause(causes) := "value" if {
+_scope_cause(causes) := "ill_formed" if {
+	"ill_formed" in causes
+} else := "value" if {
 	"missing" in causes
 } else := "value" if {
 	causes == {"value"}
@@ -3257,13 +3264,22 @@ _well_formed(req) if {
 }
 
 _check_problem_inputs(req) := [{"name": name, "value": sort({p[1] | some p in problems; p[0] == name})} | some name in sort({p[0] | some p in problems})] if {
-	problems := {[_field_path_name(array.concat(["checks", n], p[0])), p[1]] |
-		some n, check in _checks_of(req)
-		here := _s_written_here(req, "checks", n)
+	problems := {[_field_path_name(_problem_at(req, f, n, p[0])), p[1]] |
+		some f in ["applies_to", "checks"]
+		some n, check in _req_checks(req, f)
+		here := _s_written_here(req, f, n)
 		found := _check_problems(check, _from_names(req, here), here)
 		some p in found
 	}
 }
+
+_req_checks(req, "applies_to") := _applies_to_of(req)
+
+_req_checks(req, "checks") := _checks_of(req)
+
+_problem_at(req, "applies_to", n, _) := ["subjects", _resolution_of(req).filter_owners[n], "from"]
+
+_problem_at(_, "checks", n, at) := array.concat(["checks", n], at)
 
 _from_names(req, here) := ({n |
 	_from_well_formed(req)
@@ -4821,7 +4837,7 @@ _s_unlifted_path_of(text, pat) := object.union(_s_position_of(m[1], m[2], m[3]),
 	m := regex.find_all_string_submatch_n(pat.path_parts, text, 1)[0]
 }
 
-_s_lifted(path) := object.union(object.remove(path, ["steps"]), {"position": last.index + 1, "steps": array.slice(path.steps, 0, count(path.steps) - 1)}) if {
+_s_lifted(path) := object.union(object.union(object.remove(path, ["steps"]), object.remove(last, ["index"])), {"position": last.index + 1, "steps": array.slice(path.steps, 0, count(path.steps) - 1)}) if {
 	not "position" in object.keys(path)
 	last := path.steps[count(path.steps) - 1]
 	is_object(last)
@@ -4832,9 +4848,9 @@ _s_position_of("", _, _) := {}
 
 _s_position_of(word, "", _) := {"position": word} if word != ""
 
-_s_position_of(_, digits, "") := {"position": to_number(digits)} if digits != ""
+_s_position_of(_, digits, "") := _s_counted("position", digits) if digits != ""
 
-_s_position_of(_, digits, from_last) := {"position": to_number(digits), "from_last": true} if {
+_s_position_of(_, digits, from_last) := object.union(_s_counted("position", digits), {"from_last": true}) if {
 	digits != ""
 	from_last != ""
 }
@@ -4870,7 +4886,11 @@ _s_step_of(m) := {"named_by": _s_ref_of(m[3])} if m[3] != ""
 
 _s_step_of(m) := _s_key_of(m[4]) if m[4] != ""
 
-_s_step_of(m) := {"index": to_number(m[5])} if m[5] != ""
+_s_step_of(m) := _s_counted("index", m[5]) if m[5] != ""
+
+_s_counted(f, digits) := {f: to_number(digits)} if to_number(digits) <= 9007199254740991
+
+_s_counted(f, digits) := {f: to_number(digits), "bad_index": digits} if to_number(digits) > 9007199254740991
 
 _s_ref_of(text) := {"start": "params", "steps": [_s_key_of(substring(text, 8, -1))]} if startswith(text, "$params.")
 
@@ -4976,7 +4996,7 @@ _s_sq_char(`\\`) := `\`
 
 _s_sq_char(c) := c if not c in {`\'`, `\\`}
 
-_s_sentence_problems(parsed) := (((((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
+_s_sentence_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"bare_word" in object.keys(node)
@@ -5022,6 +5042,10 @@ _s_sentence_problems(parsed) := (((((((((((((((({concat("", [node.bare_word, " i
 	is_number(node.min)
 	is_number(node.max)
 	node.min > node.max
+}) | {concat("", [node.bad_index, " can't be a list position"]) |
+	some node in _s_nodes(parsed)
+	is_object(node)
+	"bad_index" in object.keys(node)
 }) | {concat("", ["number out of range: ", node.out_of_range]) |
 	some node in _s_nodes(parsed)
 	is_object(node)

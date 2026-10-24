@@ -3217,6 +3217,83 @@ test_a_badly_written_check_is_ill_formed if {
 	}
 }
 
+filter_policy(subjects) := {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"s": {"subject": "b", "min_subjects": 0, "checks": {"c": "x exists"}}}}
+
+test_a_badly_written_filter_fails_well_formed_too if {
+	rep := ergo.report({"things": [{"x": 1}]}, filter_policy({"b": {"from": `things whose x is one of 1, "a"`}}), {})
+	problem_inputs(rep) == [{"name": "subjects.b.from", "value": ["values of mixed types"]}]
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "$applies")] == [[false, "ill_formed"]]
+}
+
+test_a_badly_written_filter_is_named_after_the_subject_whose_from_line_holds_it if {
+	subjects := {"thing": {"from": `things whose x is one of 1, "a"`}, "b": {"from": "thing whose y exists"}}
+	rep := ergo.report({"things": [{"x": 1, "y": 1}]}, filter_policy(subjects), {})
+	problem_inputs(rep) == [{"name": "subjects.thing.from", "value": ["values of mixed types"]}]
+}
+
+test_a_badly_written_filter_wins_over_one_that_rules_the_subject_out_because_scope_cannot_be_trusted if {
+	rep := ergo.report({"things": [{"x": 1}]}, filter_policy({"b": {"from": `things whose x is one of 1, "a" and y exists`}}), {})
+	[[r.passed, r.cause] | some r in rows_for(rep, "s", "$applies")] == [[false, "ill_formed"]]
+	rep.requirements.s.status == "not_met"
+	[v.check | some v in ergo.violations(rep)] == ["$well_formed", "$applies"]
+}
+
+test_an_index_that_cannot_be_a_key_is_written_wrong_wherever_it_sits if {
+	big := "99999999999999999999"
+	checks := [
+		concat("", ["items[", big, "] does not exist"]),
+		concat("", ["item ", big, " of items does not exist"]),
+		concat("", ["count of items whose v[", big, "] exists is 0"]),
+		{"for": "every items as i", "assert": concat("", ["i.v[", big, "] does not exist"])},
+		{"for": concat("", ["every items whose v[", big, "] does not exist as i"]), "assert": "i exists"},
+	]
+	subjects := [
+		{"from": concat("", ["things[", big, "].items"])},
+		{"from": concat("", ["things whose items[", big, "] does not exist"])},
+	]
+	policies := array.concat(
+		[{"ergo_spec": "v0.1", "subjects": {"b": {"from": "things"}}, "requirements": {"s": {"subject": "b", "checks": {"c": c}}}} | some c in checks],
+		[filter_policy({"b": def}) | some def in subjects],
+	)
+	got := [[rep.compliant, [p | some i in problem_inputs(rep); some p in i.value]] |
+		some policy in policies
+		rep := ergo.report({"things": [{"items": [1]}]}, policy, {})
+	]
+	got == [[false, [concat("", [prefix, big, " can't be a list position"])]] | some prefix in ["", "", "", "", "for: ", "", ""]]
+}
+
+test_the_largest_position_a_float_holds_exactly_is_well_written if {
+	rep := ergo.report(
+		{"things": [{"items": [1]}]}, {"ergo_spec": "v0.1", "subjects": {"b": {"from": "things"}}, "requirements": {"s": {"subject": "b", "checks": {
+			"c": "items[9007199254740991] does not exist",
+			"d": "item 9007199254740991 of items does not exist",
+		}}}},
+		{},
+	)
+	rep.compliant == true
+}
+
+test_an_identified_by_with_an_index_that_cannot_be_a_key_is_written_wrong if {
+	rep := ergo.report({"things": [{"items": [1]}]}, filter_policy({"b": {"from": "things", "identified_by": "items[99999999999999999999]"}}), {})
+	rows_for(rep, "s", "$well_formed")[0].passed == false
+	rep.compliant == false
+}
+
+test_a_problem_inside_a_sentence_is_named_by_the_position_where_it_sits if {
+	rep := ergo.report(
+		{"things": [{"items": [1]}]}, {"ergo_spec": "v0.1", "subjects": {"b": {"from": "things"}}, "requirements": {"s": {"subject": "b", "checks": {
+			"k": `count of items whose x is one of 1, "a" and y is one of true, 2 is 0`,
+			"e": {"for": `every items whose x is one of 1, "a" as i`, "assert": "i.y exists"},
+		}}}},
+		{},
+	)
+	problem_inputs(rep) == [
+		{"name": "checks.e.items.0.whose.0", "value": ["values of mixed types"]},
+		{"name": "checks.k.left.whose.0", "value": ["values of mixed types"]},
+		{"name": "checks.k.left.whose.1", "value": ["values of mixed types"]},
+	]
+}
+
 test_a_range_with_equal_bounds_is_well_written if {
 	verdict({"n": 1}, "n is between 1 and 1") == true
 }

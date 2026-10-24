@@ -3598,6 +3598,28 @@
     ]
   },
   {
+    "description": "a position too big to be held exactly",
+    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "items[9007199254740992] does not exist"}}}},
+    "cases": [
+      {
+        "description": "fails every row as ill_formed with no inputs, and $well_formed says why",
+        "rules": ["sentence.path.brackets", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "items": [1]}]},
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {"type": "thing", "id": null},
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["9007199254740992 can't be a list position"]}]
+          },
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "ill_formed", "inputs": []}
+        ]
+      }
+    ]
+  },
+  {
     "description": "a bare grammar word as the first key",
     "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "empty is 1"}}}},
     "cases": [
