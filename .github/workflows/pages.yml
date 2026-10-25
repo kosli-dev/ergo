@@ -29,11 +29,14 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 0
       - uses: open-policy-agent/setup-opa@v2
         with:
           version: 1.20.2
       - name: Build the tutorial's Wasm
         run: site/build-tutorial.sh
+      - name: Write the released specs' schemas
+        run: site/spec-schemas.sh
       - id: pages
         uses: actions/configure-pages@v6
       - name: Build

@@ -13,12 +13,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: open-policy-agent/setup-opa@v2
         with:
           version: 1.20.2
       - uses: open-policy-agent/setup-regal@v2.0.0
         with:
           version: 0.43.0
+      - name: Check the version isn't below the latest release
+        shell: bash
+        run: |
+          version=$(sed -n 's/^version := "\([0-9]*\.[0-9]*\.[0-9]*\)-dev"$/\1/p' ergo.rego)
+          if [ -z "$version" ]; then
+            echo 'ergo.rego must say version := "X.Y.Z-dev" on main'
+            exit 1
+          fi
+          latest=$(git tag --list 'rego-v*' | grep -E '^rego-v[0-9]+\.[0-9]+\.[0-9]+$' | sed 's/^rego-v//' | sort -V | tail -n 1 || true)
+          if [ -n "$latest" ]; then
+            if [ "$latest" = "$version" ]; then
+              echo "::warning::ergo.rego says $version-dev, but rego-v$latest is already released. Merge the pull request that moves main to the next version."
+              exit 0
+            fi
+            highest=$(printf '%s\n%s\n' "$latest" "$version" | sort -V | tail -n 1)
+            if [ "$highest" != "$version" ]; then
+              echo "ergo.rego says $version-dev, but rego-v$latest is already released. Change it to a version above $latest, like the next minor."
+              exit 1
+            fi
+          fi
       - run: opa check --strict . --ignore .github
       - name: Check Ergo compiles where input is checked against a closed schema
         run: opa check --strict --schema .github/closed-input-schema.json ergo.rego
@@ -172,6 +194,8 @@ jobs:
       HUGO_VERSION: 0.157.0
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: open-policy-agent/setup-opa@v2
         with:
           version: 1.20.2
@@ -186,5 +210,7 @@ jobs:
         run: site/build-tutorial.sh
       - name: Test the tutorial
         run: node --test site/assets/js/tutorial/lib.test.mjs
+      - name: Write the released specs' schemas
+        run: site/spec-schemas.sh
       - name: Build the site
         run: hugo --source site --gc --minify --destination "$RUNNER_TEMP/public"
