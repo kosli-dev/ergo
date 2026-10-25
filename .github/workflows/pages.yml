@@ -37,6 +37,8 @@ jobs:
         run: site/build-tutorial.sh
       - name: Write the released specs' schemas
         run: site/spec-schemas.sh
+      - name: Write the latest release's versions
+        run: site/release-data.sh
       - id: pages
         uses: actions/configure-pages@v6
       - name: Build

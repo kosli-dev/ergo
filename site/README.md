@@ -26,6 +26,10 @@ Then open http://localhost:1313/tutorial/. The script writes `site/assets/tutori
 
 The logic that builds the policy and grades each step is in `assets/js/tutorial/lib.mjs`, with no page code in it. The steps' text, hints and goals are in the same file.
 
+## The latest release
+
+`site/release-data.sh` reads the newest `rego-v*` and `spec-v*` tags and writes them to `site/data/release.json`, which the home page uses for its "Latest release" line. `site/spec-schemas.sh` does the same for the released specs' schemas. Both need the tags, both write files that git ignores, and a checkout without tags builds without the line.
+
 ## Files
 
 | What | Where |

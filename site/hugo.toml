@@ -30,6 +30,9 @@ disableKinds = ["taxonomy", "term", "rss"]
     source = "assets"
     target = "assets"
   [[module.mounts]]
+    source = "data"
+    target = "data"
+  [[module.mounts]]
     source = "static"
     target = "static"
   [[module.mounts]]

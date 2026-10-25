@@ -3,3 +3,4 @@ resources/
 .hugo_build.lock
 assets/tutorial/
 static/spec/
+data/release.json
