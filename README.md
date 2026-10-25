@@ -1,21 +1,61 @@
 # Ergo
 
-Ergo is brand new and still changing a lot before its first alpha, so expect breaking changes.
+Ergo checks that your deployments, pull requests or expenses follow rules written as plain sentences, like `approved_by is a non-empty string`, and gives back a report that says what it checked, what it found and why each check passed or failed. Whoever owns a rule can write it, and whoever has to trust the result can read the report without knowing how it was computed.
+
+Ergo is at 0.1. Any 0.x release may still change what a policy says or what a report shows, and [`CHANGELOG.md`](CHANGELOG.md) says when it does.
+
+## What Ergo does
+
+### Policies read like sentences
+
+A check is one line: `approved_by is a non-empty string`, `every commits.verified is true`, `some licenses is in $params.allowed_licenses`. Sentences can also count, compare times, match patterns and allow a margin, as in `count of approvers is at least 2`, `reviewed_at is before deployed_at`, `branch matches '^release/'` or `cost is 2.5 within 0.01`. When a check can pass in more than one way, `any_of` names the ways.
+
+### The policy says what it's about
+
+`from: deployments whose environment is "prod"` picks the subjects, which is what Ergo calls the things a policy checks. When a rule only applies sometimes, `whose` says when, and a subject can be built on another, like the pull requests of each artifact. Values that change between runs, like `$params.allowed_licenses`, come from outside the policy. There are no defaults, so a policy run without its params fails instead of checking something nobody configured.
+
+### Every run gives a report
+
+The report has one row per subject and check, passed or failed alike, with the value Ergo read. A failed row also has a cause: `absent` when the field isn't there, `null` when it holds `null`, `value` when it was read fine and just doesn't pass, and `unusable` when it's the wrong kind of thing.
+
+The report has the same shape whatever the policy, so you can keep reports and compare them, and a reporting tool can read all of them the same way. `compliant` gives the yes or no, and `ergo.violations` gives the failed rows that are problems, each with its description and its sentence, for whoever has to fix them.
+
+### Ergo adds checks of its own
+
+A subject the policy isn't about is recorded as out of scope and stays in the report. A policy that finds nothing to check fails, unless it says finding nothing is fine. Two subjects with the same id fail, and so does a policy that's written wrong, with a row that says what's wrong.
+
+A missing field, a `null`, a wrong type or an empty list where a check expects items fails the check, unless the policy says it's fine, like `, if any,` or `does not exist`.
+
+### The same input gives the same report
+
+Ergo reads no clock and nothing random, and sorts everything it writes. The same policy, input and params give the same report, row for row, whatever order the policy was written in.
+
+### One file, with a spec behind it
+
+Ergo is one file for [Open Policy Agent](https://www.openpolicyagent.org/), with no dependencies. Run it with `opa eval`, or compile it to Wasm and run it with OPA's JavaScript runtime, as [REFERENCE.md](REFERENCE.md#compiling-to-wasm) shows.
+
+Every rule Ergo follows is written down in the [spec](spec/README.md), with cases that pin it, and both the policy and the report have a JSON Schema. A policy says which spec version it's written for, and a report says which engine made it and which version it follows, so other tools can read the reports.
 
 ## Getting started
 
-Ergo is a single Rego file, so using it is as simple as copying it into your project.
+Ergo is a single file. Download it into your project and write a policy next to it.
 
 You'll need [OPA](https://www.openpolicyagent.org/docs/#1-download-opa) 1.20.1 or later to run it, and we test Ergo with OPA 1.20.2. Older versions give wrong results or don't load it: OPA 1.19 says `1 >= 100.0` is true, so a check can pass when it should fail, OPA 1.20.0 stops with `panic: illegal value` on `0.0 == 1.5`, and OPA 1.2 stops with `rego_parse_error: unexpected as keyword`. Run `opa version` to see which one you have.
 
-### 1. Copy the library
+### 1. Download Ergo
 
-Copy `ergo.rego` into the directory that holds your policies:
+Download `ergo.rego` from the [latest release](https://github.com/kosli-dev/ergo/releases/latest) into the directory that holds your policies:
+
+```sh
+curl -L --create-dirs -o policy/ergo.rego https://github.com/kosli-dev/ergo/releases/latest/download/ergo.rego
+```
 
 ```
 policy/
   ergo.rego
 ```
+
+Each release has a version, like `0.1.0`, and the file says which one it is. To stay on one, download it from that release instead of the latest, like `https://github.com/kosli-dev/ergo/releases/download/rego-v0.1.0/ergo.rego`.
 
 ### 2. Write a policy
 
@@ -41,7 +81,7 @@ requirements:
 
 `ergo_spec` says which version of Ergo's [spec](spec/README.md#versions) the policy is written for. Ergo reads only the version it follows, so a policy without it, or written for another version, fails.
 
-A policy describes what to check, not how to check it. Then it says what it's about, the things we call _subjects_. Each kind of subject gets a name, here `deployment`, that the report uses for each one, and says where to find them:
+A policy says what to check. First it says what it's about, the things we call _subjects_. Each kind of subject gets a name, here `deployment`, that the report uses for each one, and says where to find them:
 
 - `from` says where the subjects are in the input. `deployments` means `input.deployments`, and `release.deployments` would mean `input.release.deployments`. `whose` keeps only the ones this policy is about, here the deployments whose `environment` is `prod`.
 - `identified_by` names the field that tells the subjects apart, here `id`. No two subjects can share one.
@@ -100,7 +140,7 @@ With the following `deployments.json` input:
 }
 ```
 
-Let's ask for the report:
+Ask for the report:
 
 ```sh
 opa eval -d policy -i deployments.json --format=pretty 'data.deploy.report'
@@ -162,8 +202,6 @@ You didn't write the checks starting with `$`. Ergo adds them for you:
 
 When a check fails, `cause` tells you why. `d-2` failed with `absent` because it has no `approved_by` field at all: no approval was ever recorded. Had `approved_by` been `""`, the cause would be `value` instead, since an approval was recorded but it's empty. Both fail, but they're different problems and you'd fix them differently.
 
-Whatever the policy, the report always has the same shape. You can store it, compare it, or hand it to someone who doesn't read Rego, and they'll still see what was checked, what was found, and what passed.
-
 ### 4. Get the violations
 
 Because the report has everything, it gets long. When all you want is to tell someone what went wrong, ask for the violations instead:
@@ -194,7 +232,7 @@ The [reference](REFERENCE.md) covers every field, operator and cause, including 
 
 ### Updating
 
-Copy the new `ergo.rego` over the old one and run your policy's tests.
+Download the new `ergo.rego` over the old one and run your policy's tests. [`CHANGELOG.md`](CHANGELOG.md) says what each release changed, and which spec version it follows.
 
 ## Contributing
 
