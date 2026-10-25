@@ -11,6 +11,10 @@
         <a class="btn btn--primary" href="{{ "docs/getting-started/" | relURL }}">{{ $c.hero.primary }} <span aria-hidden="true">→</span></a>
         <a class="btn btn--outline" href="{{ site.Params.repo }}">{{ partial "github-icon.html" . }}{{ $c.hero.secondary }}</a>
       </div>
+      {{- with hugo.Data.release.rego }}
+      <p class="hero__release">Latest release: <a href="{{ site.Params.repo }}/releases/tag/rego-v{{ . }}">ergo.rego {{ . }}</a>
+        {{- with hugo.Data.release.spec }}, <a href="{{ site.Params.repo }}/blob/spec-v{{ . }}/spec/README.md">spec {{ . }}</a>{{ end }}</p>
+      {{- end }}
     </div>
 
     {{ partial "hero-fromto.html" . }}

@@ -212,5 +212,7 @@ jobs:
         run: node --test site/assets/js/tutorial/lib.test.mjs
       - name: Write the released specs' schemas
         run: site/spec-schemas.sh
+      - name: Write the latest release's versions
+        run: site/release-data.sh
       - name: Build the site
         run: hugo --source site --gc --minify --destination "$RUNNER_TEMP/public"
