@@ -35,12 +35,14 @@ The areas are listed in [`AGENTS.md`](AGENTS.md#commits), and CI checks the titl
 
 ## Releases
 
-A release is a tag on a commit of `main`, pushed after the test workflow passed on that commit:
+A release is a tag on the commit at the tip of `main`, pushed after the test workflow passed on that commit. `.github/release.sh` makes and pushes the tags:
 
 ```sh
-git tag rego-v0.1.0 <commit>
-git push origin rego-v0.1.0
+.github/release.sh rego-v0.1.0
+.github/release.sh rego-v0.2.0 spec-v0.2
 ```
+
+It runs the checks below on `origin/main` first, so a tag that would fail in the workflow is never pushed, shows the commit and the tags, and pushes only when you answer `y`. It needs `gh` logged in, to see whether the tests passed.
 
 Changelogs are written by hand, in the pull request that makes the change. The first change after a release adds the next heading, `## X.Y.Z` in `CHANGELOG.md` or `## X.Y` in `spec/CHANGELOG.md`, and the release workflow needs that exact text.
 
@@ -52,7 +54,7 @@ For the spec, the tag is `spec-vX.Y`. The `$id` of both schemas, `_spec` in `erg
 
 `site/spec-schemas.sh` reads the schemas of every `spec-vX.Y` tag when the site is built. It fails the build when a tag's schemas don't name that version, so a bad tag has to be deleted.
 
-If a job fails because the test workflow hasn't finished on that commit, wait and re-run the failed jobs. If only the bump job fails, re-run the failed jobs too. For anything else, delete the tag with `git push --delete origin rego-vX.Y.Z` (or `spec-vX.Y`), delete the release if one was created, with `gh release delete rego-vX.Y.Z --yes`, fix `main` and tag again.
+If a job fails because the test workflow hasn't finished on that commit, wait and re-run the failed jobs. If only the bump job fails, re-run the failed jobs too. For anything else, delete the tag with `git push --delete origin rego-vX.Y.Z` (or `spec-vX.Y`) and `git tag -d rego-vX.Y.Z`, delete the release if one was created, with `gh release delete rego-vX.Y.Z --yes`, fix `main` and run the script again.
 
 ## License
 
