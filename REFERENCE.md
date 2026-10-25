@@ -1708,7 +1708,7 @@ a check written as `{op: non_empty_string, path: [approved_by]}` has no `assert`
 {"name": "checks.approved", "value": ["missing assert", "unknown field op", "unknown field path"]}
 ```
 
-A `from` written as the list `[deployments]` isn't a string. The subject finds nothing (`<invalid from>`), and `$well_formed` has:
+A `from` written as the list `[deployments]` isn't a string. The requirement is written wrong, the subject is listed with `<invalid from>`, and `$well_formed` has:
 
 ```json
 {"name": "subjects.deployment.from", "value": ["not a string"]}
