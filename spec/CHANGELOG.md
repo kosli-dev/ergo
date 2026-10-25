@@ -2,7 +2,7 @@
 
 Each version says whether reports changed, so that anyone who only stores reports knows when to look.
 
-## 0.1, not released yet
+## 0.1
 
 The first version. Policies need `ergo_spec: v0.1` at their top, and reports get `ergo` and `engine` there.
 

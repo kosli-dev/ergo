@@ -11,6 +11,7 @@ Ergo is a Rego library that turns policy evaluation into a structured report. Us
 - `README.md` walks a new user through a first policy.
 - `REFERENCE.md` describes every field, operator, cause and report entry.
 - `CONTRIBUTING.md` tells people how to report bugs and send changes, and points them here for the rules.
+- `CHANGELOG.md` says what each release of `ergo.rego` changed. The spec has its own in `spec/CHANGELOG.md`.
 - `CODE_OF_CONDUCT.md` is the Contributor Covenant 2.1, unchanged apart from the contact address.
 - `.github/ISSUE_TEMPLATE/` and `.github/pull_request_template.md` are the forms GitHub shows for new issues and pull requests.
 - `examples/` holds worked examples. Each one has an input, the same policy in plain Rego and with Ergo, and tests that pin what both versions report.
@@ -58,6 +59,8 @@ CI also runs every test compiled to Wasm, with `.github/wasm-tests.sh`, because 
 CI also runs every test with OPA's JavaScript runtime, `@open-policy-agent/opa-wasm` (`.github/wasm-js.cjs`), because that runtime brings its own versions of some built-ins, like a `sprintf` that formats lists and objects differently, and lacks others. The script compiles each test as a Wasm entrypoint, fails if Ergo uses a built-in the runtime doesn't have (apart from `time.parse_rfc3339_ns`, which it passes in, as `REFERENCE.md` tells Wasm users to), and then runs every test. It also fails if `ergo.report` or `ergo.violations` needs any built-in that OPA's Wasm build runs outside the module. OPA reads the arguments of those built-ins back as Rego, so a string holding a byte-order mark fails the whole evaluation. `time.parse_rfc3339_ns` is allowed because Ergo only passes it strings that already match the RFC 3339 pattern. If you add a function for users to call, add it to the entrypoint the script writes, so the check covers it. `sprintf` is one of them, so build text with `concat` instead. `concat` takes only strings, so write anything else with `_text` first. Last, it builds two reports on 100 deployments, one with checks written with `op` and one with checks written as sentences, and fails if the first uses more than 20 MB of Wasm memory or the second more than 12 MB. Wasm doesn't cache function calls and frees nothing until the report is done, so something worked out again for every row shows up there long before it slows down `opa eval`.
 
 A `spec` job checks the spec. `python3 spec/check_rules.py` fails when a case cites a rule that doesn't exist, or when a rule has no case and isn't listed under "Rules without cases" in `spec/OPEN.md`. `.github/spec-schemas.py` builds the report for every case and fails when a report doesn't match `spec/report/schema.json`, when Ergo reads a policy as written correctly but it doesn't match `spec/policy/schema.json`, or when a `$well_formed` row fails without naming what's wrong. `python3 spec/sentences_corpus.py --check` fails when `spec/sentences-corpus.json` no longer holds every line of `spec/sentences-corpus.md`. `spec/check_grammar.py` reads sentences with `ergo.rego` and with a parser built from `spec/sentences.abnf`, and fails when one reads a sentence and the other rejects it as a matter of syntax. The sentences are the corpus, the cases, and a few thousand generated from the grammar and changed a little, with a fixed seed. A sentence `ergo.rego` rejects for another reason, like an unknown name, isn't a disagreement. The known ones are listed in `spec/OPEN.md`, and the script fails on a new one and when a listed one no longer disagrees. If `ergo.rego` gives a message that isn't about syntax, add it to `NON_SYNTAX` in the script.
+
+`main` always carries a `-dev` version, like `0.1.0-dev`, and a test fails without one. The `checks` job shows a warning when that version equals the latest `rego-v*` tag, and fails when it's below it. A release is a tag, and `.github/workflows/release.yml` does the rest, with the steps in `CONTRIBUTING.md`. The site build runs `site/spec-schemas.sh` before Hugo, so the released schemas come from their tags and nothing is committed.
 
 CI also fails when a line of Rego isn't reached by any test. To list those lines yourself:
 
@@ -120,7 +123,7 @@ When talking to people:
 The first line names the part of the repo that changed, then says what the change does, in the imperative and in lowercase:
 
 - `core:` the library and its tests
-- `docs:` `README.md`, `REFERENCE.md`, `AGENTS.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md` and the issue and pull request templates
+- `docs:` `README.md`, `REFERENCE.md`, `AGENTS.md`, `CONTRIBUTING.md`, `CHANGELOG.md`, `CODE_OF_CONDUCT.md` and the issue and pull request templates
 - `site:` the website in `site/`
 - `ci:` workflows and Dependabot
 - `examples:` the worked examples in `examples/`
