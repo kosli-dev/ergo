@@ -3666,7 +3666,7 @@ _run(doc, policy, rd, params) := r if {
 	r := object.union(_reported(written, unreadable, [raw, used]), {"ergo": _spec, "engine": _engine})
 }
 
-version := "0.1.0-dev"
+version := "0.2.0-dev"
 
 _engine := {"name": "ergo.rego", "version": version}
 
