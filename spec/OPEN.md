@@ -72,7 +72,6 @@ Three ways to settle it:
 - `count of`, `sum of` and `plus` in the phrase of an `every` or `some`, like `every xs is count of ys`, and an elapsed time there, like `every xs is days elapsed from started to ended`: [sentence.argument.item](syntax.md#every-some-and-whose) says a path in the argument starts at the item, but not what the row's `inputs` show for a number worked out from each item.
 - An elapsed time in the `whose` of a `count of`, a `sum of` or an `every`, when an item can't be decided: which path `failed_items` names when the check reads two, `started` or `ended`.
 - An elapsed time in a subject's `from` line, like `vulns whose days elapsed from started to ended is 1`: what the `$applies` row shows for it, and which paths its `inputs` list.
-- A `some` or `every` in a subject's `from` line, like `releases whose some files.path does not match "^docs/"`: whether its `$applies` row lists the items that failed, as a check row does with `failed_items`. It doesn't yet.
 - A `plus` in the `whose` of a `count of` or a `sum of`, like `count of xs whose a plus b is 3 is 1`: whether a `whose` condition can have `plus` on its left.
 
 ## Numbers in a report's hash

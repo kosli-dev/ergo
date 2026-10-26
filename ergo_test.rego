@@ -4947,6 +4947,93 @@ test_the_applies_row_of_a_some_condition_reads_the_same_inputs_and_causes_as_the
 	as_condition.requirements.r.checks["$applies"].expression == sentence
 }
 
+_applies_failures_of(rep) := {r.subject.id: object.filter(r, ["failed_items", "failed_assertions"]) | some r in rep.results; r.check == "$applies"}
+
+_check_failures_of(rep) := {r.subject.id: object.filter(r, ["failed_items", "failed_assertions"]) | some r in rep.results; r.check == "c"}
+
+_as_condition_and_as_check(sentences) := [
+	_from_report(_releases, {"release": {"from": concat(" whose ", ["releases", concat(" and ", sentences)]), "identified_by": "id"}}, {"c": "ticket exists"}, {}),
+	_from_report(_releases, {"release": {"from": "releases", "identified_by": "id"}}, {"c": {"assert": sentences}}, {}),
+]
+
+test_the_applies_row_of_a_some_or_every_condition_lists_the_failed_items_its_check_row_lists if {
+	every sentence in [`some files.path does not match "^docs/"`, `every files.path matches "^docs/"`, `every files.path, if any, matches "^docs/"`] {
+		both := _as_condition_and_as_check([sentence])
+		_applies_failures_of(both[0]) == _check_failures_of(both[1])
+	}
+	rows := _applies_failures_of(_from_report(_releases, {"release": {"from": `releases whose some files.path does not match "^docs/"`, "identified_by": "id"}}, {"c": "ticket exists"}, {}))
+	rows.mixed == {"failed_items": []}
+	rows.docs.failed_items != []
+	not "failed_assertions" in object.keys(rows.docs)
+}
+
+test_the_applies_row_of_several_conditions_lists_the_failed_assertions_its_check_row_lists_and_no_failed_items if {
+	every sentences in [
+		[`ticket is "ok"`, `some files.path does not match "^docs/"`],
+		[`some files.path does not match "^docs/"`, `ticket is "ok"`],
+		[`ticket is "open"`, `every files.path matches "^docs/"`],
+		[`ticket is "ok"`, `ticket is "open"`, `ticket exists`],
+	] {
+		both := _as_condition_and_as_check(sentences)
+		_applies_failures_of(both[0]) == _check_failures_of(both[1])
+		every _, row in _applies_failures_of(both[0]) {
+			object.keys(row) == {"failed_assertions"}
+		}
+	}
+	rows := _applies_failures_of(_from_report(_releases, {"release": {"from": `releases whose ticket is "ok" and every files.path matches "^docs/"`, "identified_by": "id"}}, {"c": "ticket exists"}, {}))
+	rows.docs == {"failed_assertions": []}
+	rows.mixed.failed_assertions == [{"assertion": `every files.path matches "^docs/"`, "cause": "value"}]
+	rows.unset.failed_assertions == [{"assertion": `every files.path matches "^docs/"`, "cause": "absent"}]
+}
+
+test_the_applies_row_of_a_plain_condition_has_no_more_fields_than_the_check_row_of_the_same_sentence if {
+	every sentence in [`ticket is "ok"`, `ticket is "open"`, `ticket exists`, `count of files is at least 2`, `sum of files.size is at least 2`] {
+		both := _as_condition_and_as_check([sentence])
+		every _, row in _applies_failures_of(both[0]) {
+			row == {}
+		}
+		_applies_failures_of(both[0]) == _check_failures_of(both[1])
+	}
+}
+
+test_the_applies_row_of_a_some_condition_whose_param_cant_be_used_fails_as_unusable_with_no_failed_items_like_its_check_row if {
+	sentence := `some files.path matches $params.pattern`
+	as_condition := _from_report(_releases, {"release": {"from": concat(" whose ", ["releases", sentence]), "identified_by": "id"}}, {"c": "ticket exists"}, {"pattern": 5})
+	as_check := _from_report(_releases, {"release": {"from": "releases", "identified_by": "id"}}, {"c": sentence}, {"pattern": 5})
+	_applies_failures_of(as_condition) == _check_failures_of(as_check)
+	every _, row in _applies_failures_of(as_condition) {
+		row == {"failed_items": []}
+	}
+	{[r.passed, r.cause] | some r in as_condition.results; r.check == "$applies"} == {[false, "unusable"]}
+}
+
+test_an_applies_row_that_fails_with_a_cause_other_than_value_is_a_violation_with_the_failed_items_or_assertions if {
+	some_rep := _from_report(_releases, {"release": {"from": `releases whose some files.path does not match "^docs/"`, "identified_by": "id"}}, {"c": "ticket exists"}, {})
+	some_violations := {v.subject.id: object.filter(v, ["failed_items", "failed_assertions"]) | some v in ergo.violations(some_rep); v.check == "$applies"}
+	some_violations.unset == {"failed_items": [{"path": "files", "item": "files", "cause": "absent", "value": null}]}
+	some_violations.null.failed_items[0].cause == "null"
+	not "mixed" in object.keys(some_violations)
+	not "docs" in object.keys(some_violations)
+	many_rep := _from_report(_releases, {"release": {"from": `releases whose ticket is "ok" and every files.path matches "^docs/"`, "identified_by": "id"}}, {"c": "ticket exists"}, {})
+	many_violations := {v.subject.id: object.filter(v, ["failed_items", "failed_assertions"]) | some v in ergo.violations(many_rep); v.check == "$applies"}
+	many_violations.unset == {"failed_assertions": [{"assertion": `every files.path matches "^docs/"`, "cause": "absent"}]}
+	not "mixed" in object.keys(many_violations)
+}
+
+test_an_applies_row_of_a_child_subject_and_of_a_subject_that_reads_its_parent_has_the_same_fields if {
+	doc := {"artifact": {"id": "sha", "owner": "ann", "releases": [{"id": 1, "files": [{"owner": "ann"}]}, {"id": 2, "files": [{"owner": "bob"}]}]}}
+	subjects := {"artifact": {"identified_by": "id"}, "release": {"from": "artifact.releases whose some files.owner is artifact.owner and id exists", "identified_by": "id"}}
+	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "release", "checks": {"c": "id exists"}}}}, {})
+	{r.subject.id: r.failed_assertions | some r in rep.results; r.check == "$applies"} == {1: [], 2: [{"assertion": "some files.owner equals artifact.owner", "cause": "value"}]}
+	single := {"artifact": {"identified_by": "id"}, "release": {"from": "artifact.releases whose some files.owner is artifact.owner", "identified_by": "id"}}
+	one := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": single, "requirements": {"r": {"subject": "release", "checks": {"c": "id exists"}}}}, {})
+	{r.subject.id: r.failed_items | some r in one.results; r.check == "$applies"} == {1: [], 2: [{"path": "files[0].owner", "item": "item 1 of files", "cause": "value", "value": "bob"}]}
+	chain := {"releases": {"from": "releases", "identified_by": "id"}, "source": {"from": `releases whose some files.path does not match "^docs/"`}}
+	cdoc := {"releases": [{"id": 3, "files": [{"path": "a.go"}]}, {"id": 4, "files": [{"path": "docs/a"}]}]}
+	crep := ergo.report(cdoc, {"ergo_spec": "v0.2-dev", "subjects": chain, "requirements": {"r": {"subject": "source", "checks": {"c": "id exists"}}}}, {})
+	{r.subject.id: count(r.failed_items) | some r in crep.results; r.check == "$applies"} == {3: 0, 4: 1}
+}
+
 test_a_from_condition_written_with_some_prints_in_the_spelling_of_the_report_and_joins_with_and if {
 	rep := _from_report(_releases, {"release": {"from": `releases whose some  files.path   matches "x" and ticket   is "ok" and every files.path, if any, does not match "y"`, "identified_by": "id"}}, {"c": "ticket exists"}, {})
 	rep.requirements.r.checks["$applies"].expression == `some files.path matches "x" and ticket is "ok" and every files.path, if any, does not match "y"`

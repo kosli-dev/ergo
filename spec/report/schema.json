@@ -138,7 +138,7 @@
         "cause": {"$ref": "#/$defs/cause"},
         "failed_items": {
           "type": "array",
-          "description": "Only on rows of every, some and for checks, and on the $min_subjects row of a subject whose from line has every.",
+          "description": "Only on rows of every, some and for checks, on the $applies row of a subject whose from line has one condition, a some or an every, and on the $min_subjects row of a subject whose from line has every.",
           "items": {
             "type": "object",
             "properties": {"path": {"type": "string"}, "item": {"type": "string", "description": "The list item the entry belongs to, like item 2 of tests. For a list that failed while walking, the same as path."}, "cause": {"$ref": "#/$defs/cause"}, "value": true, "failed_assertions": {"$ref": "#/$defs/failed_assertions", "description": "Only on entries of for checks: the sentences that failed for that item, in the order written."}, "failed_items": {"type": "array", "description": "Only on entries of for checks with two items, when the second item failed for that item before any sentence was checked: those failures, in path order.", "items": {"type": "object", "properties": {"path": {"type": "string"}, "item": {"type": "string"}, "cause": {"$ref": "#/$defs/cause"}, "value": true}, "required": ["path", "item", "cause", "value"], "additionalProperties": false}}},
@@ -146,7 +146,7 @@
             "additionalProperties": false
           }
         },
-        "failed_assertions": {"$ref": "#/$defs/failed_assertions", "description": "Only on rows of checks written as several sentences without a for line: the ones that failed, in the order written."}
+        "failed_assertions": {"$ref": "#/$defs/failed_assertions", "description": "Only on rows of checks written as several sentences without a for line, and on the $applies row of a subject whose from line has several conditions: the ones that failed, in the order written."}
       },
       "required": ["requirement", "subject", "check", "inputs", "passed", "cause"],
       "additionalProperties": false,
