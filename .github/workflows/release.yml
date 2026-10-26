@@ -54,6 +54,10 @@ jobs:
             echo "CHANGELOG.md has no \"## $VERSION\" heading"
             exit 1
           fi
+          if grep -q '^_spec := "v.*-dev"$' ergo.rego; then
+            echo "ergo.rego says $(grep -m 1 '^_spec := ' ergo.rego), a spec that isn't released. Release the spec first, or with this tag."
+            exit 1
+          fi
       - uses: open-policy-agent/setup-opa@v2
         with:
           version: 1.20.2
@@ -196,6 +200,10 @@ jobs:
       - name: Check the schemas, ergo.rego and the changelog name this version
         shell: bash
         run: |
+          if grep -q '^_spec := "v.*-dev"$' ergo.rego; then
+            echo "ergo.rego says $(grep -m 1 '^_spec := ' ergo.rego), so this spec isn't ready. Drop -dev from the spec everywhere first."
+            exit 1
+          fi
           for name in policy report; do
             if ! grep -q "^ *\"\\\$id\": *\".*/spec/$VERSION/$name.schema.json\"" "spec/$name/schema.json"; then
               echo "spec/$name/schema.json has a \$id that doesn't end in /spec/$VERSION/$name.schema.json"
