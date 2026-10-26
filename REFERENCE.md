@@ -215,6 +215,43 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
 
 - `named by $params.name` picks one key: `from: trail.artifacts named by $params.artifact_name`.
 - `named by each of $params.kinds` makes each key in the list a subject: `from: build.test_runs named by each of $params.kinds`.
+- A condition can ask about the items of a list with a one-line `some` or `every`, written as in a [check](#checks). With this policy:
+
+  ```yaml
+  subjects:
+    release:
+      from: releases whose some files.path does not match "^docs/"
+      identified_by: version
+  requirements:
+    ticketed:
+      subject: release
+      min_subjects: 0
+      checks:
+        approved: ticket.status is "approved"
+  ```
+
+  and this input:
+
+  ```json
+  {"releases": [
+    {"version": "1.4.0", "files": [{"path": "docs/upgrade.md"}, {"path": "src/api.go"}], "ticket": {"status": "approved"}},
+    {"version": "1.4.1", "files": [{"path": "docs/upgrade.md"}], "ticket": {"status": "open"}},
+    {"version": "1.4.2", "files": [], "ticket": {"status": "open"}}
+  ]}
+  ```
+
+  the `$applies` rows keep `1.4.0`, which changes a file outside `docs/`, and leave the other two out. They read what the same sentence reads as a check:
+
+  ```json
+  {"check": "$applies", "subject": {"id": "1.4.0", "type": "release"}, "passed": true, "cause": "satisfied",
+   "inputs": [{"name": "files[].path", "value": ["docs/upgrade.md", "src/api.go"]}]}
+  {"check": "$applies", "subject": {"id": "1.4.1", "type": "release"}, "passed": false, "cause": "value",
+   "inputs": [{"name": "files[].path", "value": ["docs/upgrade.md"]}]}
+  {"check": "$applies", "subject": {"id": "1.4.2", "type": "release"}, "passed": false, "cause": "value",
+   "inputs": [{"name": "files[].path", "value": []}]}
+  ```
+
+  A release with no `files` field at all isn't out of scope: Ergo can't tell, so the row fails as `absent` (`null` and `unusable` for a `null` or a wrong type), with the input `{"name": "files.path", "value": []}`, and the requirement isn't met. `every files.path matches "^docs/"` keeps the releases that only change documentation, and `every files.path, if any, matches "^docs/"` keeps the ones with no files too. `some` takes no `, if any,`. A bare name after `some` or `every` is the item's, and a parent subject's name on the right is the parent. The condition can't have a `whose` of its own, and a `whose` in a check or on a `for` line takes no `some` or `every` condition.
 - A subject's own name at the start of its `from` is the input field, so `lockfile` can have `from: lockfile whose status is "COMPLETE"`.
 - A `from` line that's another subject's name, with or without a `whose`, narrows that subject, as in [a subject built on another](#a-subject-built-on-another): `critical defect` with `from: defect whose severity is "critical"` keeps the defects that pass `defect`'s conditions and its own. A name with a space goes in quotes, so the whole line goes in single quotes in YAML: `from: '"critical defect" whose team is "b"'`. It takes its id from the subject it narrows, so an `identified_by` of its own is written wrong, with `not allowed on a subject that narrows another`.
 - A `from` line that starts at another subject's name and goes on reads the rest of its path from that subject. With `{"params": {"artifact_name": "web"}}` and this input:

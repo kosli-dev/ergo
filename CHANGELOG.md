@@ -4,6 +4,10 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 ## 0.2.0
 
+### New
+
+- A subject's `from` line can ask about the items of a list with a one-line `some` or `every`, like `release whose some files.path does not match "^docs/"` or `release whose every files.path, if any, matches "^docs/"`. It works in plain subjects, in `every` lines, in child subjects and in subjects that narrow another. The `$applies` row reads the same inputs and gives the same cause as the sentence does as a check. A subject whose list is missing, `null` or not a list fails the requirement as `absent`, `null` or `unusable`, as any condition that can't be decided does. A `whose` in a check or on a `for` line still takes no `some` or `every`, and a `some` or `every` condition with a `whose` of its own is written wrong with `a condition after whose can't have a whose of its own`.
+
 ### Changed
 
 - This version follows spec 0.2, which is unreleased, so `ergo_spec` is `v0.2-dev` and the report's `ergo` was `v0.1` and is now `v0.2-dev`. A policy that says `v0.1` is written wrong here, with `unsupported version v0.1, expected v0.2-dev`, and still works with `rego-v0.1.0`. Change `ergo_spec: v0.1` to `ergo_spec: v0.2-dev` to move a policy.

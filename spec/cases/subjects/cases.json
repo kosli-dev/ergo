@@ -1407,6 +1407,1970 @@
     ]
   },
   {
+    "description": "a condition with some",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "release": {
+          "from": "releases whose some files.path does not match \"^docs/\"",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "ticket exists"
+          },
+          "min_subjects": 0
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "keeps a subject when some item of the list passes, and rules out one where none does or that has no items",
+        "rules": ["sentence.subject.condition", "sentence.subject.applies", "subjects.sentence", "scope.out", "sentence.whose.undecided"],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "files": [
+                {
+                  "path": "docs/upgrade.md"
+                },
+                {
+                  "path": "src/api.go"
+                }
+              ],
+              "ticket": "ok"
+            },
+            {
+              "id": "r2",
+              "files": [
+                {
+                  "path": "docs/upgrade.md"
+                }
+              ],
+              "ticket": "ok"
+            },
+            {
+              "id": "r3",
+              "files": [],
+              "ticket": "ok"
+            }
+          ]
+        },
+        "expressions": {
+          "s": {
+            "$applies": "some files.path does not match \"^docs/\""
+          }
+        },
+        "requirements": {
+          "s": {
+            "status": "met"
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope release count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated release ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files[].path",
+                "value": [
+                  "docs/upgrade.md",
+                  "src/api.go"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files[].path",
+                "value": [
+                  "docs/upgrade.md"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r2",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files[].path",
+                "value": []
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r3",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "ticket",
+                "value": "ok"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails the requirement as absent, null or unusable for a subject whose list or field the condition can't read, even with min_subjects 0",
+        "rules": ["sentence.subject.condition", "sentence.subject.applies", "scope.unreadable", "sentence.whose.undecided"],
+        "input": {
+          "releases": [
+            {
+              "id": "r4",
+              "ticket": "ok"
+            },
+            {
+              "id": "r5",
+              "files": null,
+              "ticket": "ok"
+            },
+            {
+              "id": "r6",
+              "files": "docs/upgrade.md",
+              "ticket": "ok"
+            },
+            {
+              "id": "r7",
+              "files": [
+                {
+                  "path": "docs/upgrade.md"
+                },
+                {
+                  "name": "x"
+                }
+              ],
+              "ticket": "ok"
+            },
+            {
+              "id": "r8",
+              "files": [
+                {
+                  "path": "docs/upgrade.md"
+                },
+                {
+                  "path": 5
+                }
+              ],
+              "ticket": "ok"
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope release count",
+                "value": 0
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated release ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files.path",
+                "value": []
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r4",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files.path",
+                "value": []
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r5",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files.path",
+                "value": []
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r6",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files[].path",
+                "value": [
+                  "docs/upgrade.md",
+                  null
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r7",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files[].path",
+                "value": [
+                  "docs/upgrade.md",
+                  5
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r8",
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a condition with every",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "release": {
+          "from": "releases whose every files.path matches \"^docs/\"",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "ticket exists"
+          },
+          "min_subjects": 0
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "keeps a subject when every item passes, and rules out one with an item that fails or with no items",
+        "rules": ["sentence.subject.condition", "sentence.subject.applies", "subjects.sentence", "scope.out", "sentence.whose.every"],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "files": [
+                {
+                  "path": "docs/upgrade.md"
+                },
+                {
+                  "path": "src/api.go"
+                }
+              ],
+              "ticket": "ok"
+            },
+            {
+              "id": "r2",
+              "files": [
+                {
+                  "path": "docs/upgrade.md"
+                }
+              ],
+              "ticket": "ok"
+            },
+            {
+              "id": "r3",
+              "files": [],
+              "ticket": "ok"
+            }
+          ]
+        },
+        "expressions": {
+          "s": {
+            "$applies": "every files.path matches \"^docs/\""
+          }
+        },
+        "requirements": {
+          "s": {
+            "status": "met"
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope release count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated release ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files[].path",
+                "value": [
+                  "docs/upgrade.md",
+                  "src/api.go"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files[].path",
+                "value": [
+                  "docs/upgrade.md"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r2",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files[].path",
+                "value": []
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r3",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "ticket",
+                "value": "ok"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r2",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails the requirement for a subject whose list or field the condition can't read",
+        "rules": ["sentence.subject.condition", "sentence.subject.applies", "scope.unreadable", "sentence.whose.undecided"],
+        "input": {
+          "releases": [
+            {
+              "id": "r4",
+              "ticket": "ok"
+            },
+            {
+              "id": "r5",
+              "files": null,
+              "ticket": "ok"
+            },
+            {
+              "id": "r6",
+              "files": "docs/upgrade.md",
+              "ticket": "ok"
+            },
+            {
+              "id": "r7",
+              "files": [
+                {
+                  "path": "docs/upgrade.md"
+                },
+                {
+                  "name": "x"
+                }
+              ],
+              "ticket": "ok"
+            },
+            {
+              "id": "r8",
+              "files": [
+                {
+                  "path": "docs/upgrade.md"
+                },
+                {
+                  "path": 5
+                }
+              ],
+              "ticket": "ok"
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope release count",
+                "value": 0
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated release ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files.path",
+                "value": []
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r4",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files.path",
+                "value": []
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r5",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files.path",
+                "value": []
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r6",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files[].path",
+                "value": [
+                  "docs/upgrade.md",
+                  null
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r7",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files[].path",
+                "value": [
+                  "docs/upgrade.md",
+                  5
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r8",
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a condition with every and if any",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "release": {
+          "from": "releases whose every files.path, if any, matches \"^docs/\"",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "ticket exists"
+          },
+          "min_subjects": 0
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "keeps a subject with no items, as every does in a check",
+        "rules": ["sentence.subject.condition", "sentence.subject.applies", "subjects.sentence", "scope.out", "sentence.whose.every"],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "files": [
+                {
+                  "path": "docs/upgrade.md"
+                },
+                {
+                  "path": "src/api.go"
+                }
+              ],
+              "ticket": "ok"
+            },
+            {
+              "id": "r2",
+              "files": [
+                {
+                  "path": "docs/upgrade.md"
+                }
+              ],
+              "ticket": "ok"
+            },
+            {
+              "id": "r3",
+              "files": [],
+              "ticket": "ok"
+            }
+          ]
+        },
+        "expressions": {
+          "s": {
+            "$applies": "every files.path, if any, matches \"^docs/\""
+          }
+        },
+        "requirements": {
+          "s": {
+            "status": "met"
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope release count",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated release ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files[].path",
+                "value": [
+                  "docs/upgrade.md",
+                  "src/api.go"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files[].path",
+                "value": [
+                  "docs/upgrade.md"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r2",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files[].path",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r3",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "ticket",
+                "value": "ok"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r2",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "ticket",
+                "value": "ok"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r3",
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a condition with some after another condition",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "release": {
+          "from": "releases whose ticket is \"ok\" and some files.path does not match \"^docs/\"",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "ticket exists"
+          },
+          "min_subjects": 0
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "joins the conditions with and in the expression, and keeps a subject that passes both",
+        "rules": ["sentence.subject.condition", "sentence.subject.applies", "subjects.sentence", "scope.out"],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "files": [
+                {
+                  "path": "docs/upgrade.md"
+                },
+                {
+                  "path": "src/api.go"
+                }
+              ],
+              "ticket": "ok"
+            },
+            {
+              "id": "r2",
+              "files": [
+                {
+                  "path": "docs/upgrade.md"
+                }
+              ],
+              "ticket": "ok"
+            },
+            {
+              "id": "r9",
+              "files": [
+                {
+                  "path": "src/api.go"
+                }
+              ],
+              "ticket": "no"
+            }
+          ]
+        },
+        "expressions": {
+          "s": {
+            "$applies": "ticket is \"ok\" and some files.path does not match \"^docs/\""
+          }
+        },
+        "requirements": {
+          "s": {
+            "status": "met"
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope release count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated release ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files[].path",
+                "value": [
+                  "docs/upgrade.md",
+                  "src/api.go"
+                ]
+              },
+              {
+                "name": "ticket",
+                "value": "ok"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files[].path",
+                "value": [
+                  "docs/upgrade.md"
+                ]
+              },
+              {
+                "name": "ticket",
+                "value": "ok"
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r2",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files[].path",
+                "value": [
+                  "src/api.go"
+                ]
+              },
+              {
+                "name": "ticket",
+                "value": "no"
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r9",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "ticket",
+                "value": "ok"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a condition with some in the from line of a child subject",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts",
+          "identified_by": "id"
+        },
+        "release": {
+          "from": "artifact.releases whose some files.owner is artifact.owner",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "ticket exists"
+          },
+          "min_subjects": 0
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the parent's field by its name on the right side, and the item's field for a bare name",
+        "rules": ["sentence.subject.condition", "sentence.subject.applies", "sentence.subject.chain", "sentence.argument.item", "scope.out"],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "owner": "ann",
+                "releases": [
+                  {
+                    "id": "r1",
+                    "files": [
+                      {
+                        "owner": "ann"
+                      }
+                    ],
+                    "ticket": "ok"
+                  },
+                  {
+                    "id": "r2",
+                    "files": [
+                      {
+                        "owner": "bob"
+                      }
+                    ],
+                    "ticket": "ok"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "expressions": {
+          "s": {
+            "$applies": "some files.owner equals artifact.owner"
+          }
+        },
+        "requirements": {
+          "s": {
+            "status": "met"
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope release count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated release ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files[].owner",
+                "value": [
+                  "ann"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "release"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files[].owner",
+                "value": [
+                  "bob"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r2",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "ticket",
+                "value": "ok"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a condition with some in a from line with every",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "release": {
+          "from": "every artifacts.releases whose some files.path does not match \"^docs/\"",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "ticket exists"
+          },
+          "min_subjects": 0
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "keeps the releases of every artifact that pass the condition",
+        "rules": ["sentence.subject.condition", "sentence.subject.applies", "sentence.subject.every", "scope.out"],
+        "input": {
+          "artifacts": [
+            {
+              "releases": [
+                {
+                  "id": "r1",
+                  "files": [
+                    {
+                      "path": "docs/upgrade.md"
+                    },
+                    {
+                      "path": "src/api.go"
+                    }
+                  ],
+                  "ticket": "ok"
+                }
+              ]
+            },
+            {
+              "releases": [
+                {
+                  "id": "r2",
+                  "files": [
+                    {
+                      "path": "docs/upgrade.md"
+                    }
+                  ],
+                  "ticket": "ok"
+                },
+                {
+                  "id": "r3",
+                  "files": [],
+                  "ticket": "ok"
+                }
+              ]
+            }
+          ]
+        },
+        "expressions": {
+          "s": {
+            "$applies": "some files.path does not match \"^docs/\""
+          }
+        },
+        "requirements": {
+          "s": {
+            "status": "met"
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "failed_items": [],
+            "inputs": [
+              {
+                "name": "in-scope release count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated release ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files[].path",
+                "value": [
+                  "docs/upgrade.md",
+                  "src/api.go"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files[].path",
+                "value": [
+                  "docs/upgrade.md"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r2",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files[].path",
+                "value": []
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r3",
+              "type": "release"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "ticket",
+                "value": "ok"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a condition with some in the from line of a subject that narrows another",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "releases": {
+          "from": "releases",
+          "identified_by": "id"
+        },
+        "source": {
+          "from": "releases whose some files.path does not match \"^docs/\""
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "source",
+          "checks": {
+            "c": "ticket exists"
+          },
+          "min_subjects": 0
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "keeps the subjects of the parent that pass the condition",
+        "rules": ["sentence.subject.condition", "sentence.subject.applies", "sentence.subject.narrow", "scope.out"],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "files": [
+                {
+                  "path": "docs/upgrade.md"
+                },
+                {
+                  "path": "src/api.go"
+                }
+              ],
+              "ticket": "ok"
+            },
+            {
+              "id": "r2",
+              "files": [
+                {
+                  "path": "docs/upgrade.md"
+                }
+              ],
+              "ticket": "ok"
+            }
+          ]
+        },
+        "expressions": {
+          "s": {
+            "$applies": "some files.path does not match \"^docs/\""
+          }
+        },
+        "requirements": {
+          "s": {
+            "status": "met"
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "source"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope source count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "source"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated source ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "source"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files[].path",
+                "value": [
+                  "docs/upgrade.md",
+                  "src/api.go"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "source"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "inputs": [
+              {
+                "name": "files[].path",
+                "value": [
+                  "docs/upgrade.md"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r2",
+              "type": "source"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "ticket",
+                "value": "ok"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "source"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a condition with some with if any",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "release": {
+          "from": "releases whose some files.path, if any, matches \"x\""
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "ticket exists"
+          },
+          "min_subjects": 0
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, and $well_formed names the from line and is the requirement's only row",
+        "rules": ["sentence.subject.condition", "sentence.subject.from", "subjects.sentence"],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "files": [
+                {
+                  "path": "docs/upgrade.md"
+                },
+                {
+                  "path": "src/api.go"
+                }
+              ],
+              "ticket": "ok"
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "subjects.release.from",
+                "value": [
+                  "if any can't go with some"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a condition with some with a whose of its own",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "release": {
+          "from": "releases whose some files whose kind is \"src\" matches \"x\""
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "ticket exists"
+          },
+          "min_subjects": 0
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, and $well_formed names the from line and is the requirement's only row",
+        "rules": ["sentence.subject.condition", "sentence.subject.from", "subjects.sentence"],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "files": [
+                {
+                  "path": "docs/upgrade.md"
+                },
+                {
+                  "path": "src/api.go"
+                }
+              ],
+              "ticket": "ok"
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "subjects.release.from",
+                "value": [
+                  "a condition after whose can't have a whose of its own"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a condition with a count of with a whose of its own",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "release": {
+          "from": "releases whose count of files whose path is \"x\" is at least 1"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "ticket exists"
+          },
+          "min_subjects": 0
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, and $well_formed names the from line and is the requirement's only row",
+        "rules": ["sentence.subject.condition", "sentence.subject.from", "subjects.sentence"],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "files": [
+                {
+                  "path": "docs/upgrade.md"
+                },
+                {
+                  "path": "src/api.go"
+                }
+              ],
+              "ticket": "ok"
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "subjects.release.from",
+                "value": [
+                  "a condition after whose can't have a whose of its own"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a from line with named by a param",
     "policy": {
       "ergo_spec": "v0.2-dev",

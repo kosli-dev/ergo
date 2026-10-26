@@ -4879,6 +4879,138 @@ test_conditions_of_a_from_can_use_phrases_only_sentences_have if {
 	[[r[0], r[1], r[2]] | some r in _from_rows(rep)] == [[1, "$applies", "satisfied"], [2, "$applies", "value"], [1, "c", "satisfied"]]
 }
 
+_releases := {"releases": [
+	{"id": "mixed", "files": [{"path": "docs/upgrade.md"}, {"path": "src/api.go"}], "ticket": "ok"},
+	{"id": "docs", "files": [{"path": "docs/upgrade.md"}], "ticket": "ok"},
+	{"id": "none", "files": [], "ticket": "ok"},
+	{"id": "unset", "ticket": "ok"},
+	{"id": "null", "files": null, "ticket": "ok"},
+	{"id": "text", "files": "docs/upgrade.md", "ticket": "ok"},
+	{"id": "gap", "files": [{"path": "docs/upgrade.md"}, {"name": "x"}], "ticket": "ok"},
+	{"id": "number", "files": [{"path": "docs/upgrade.md"}, {"path": 5}], "ticket": "ok"},
+]}
+
+_release_outcomes(line) := {r[0]: r[2] | some r in _from_rows(_from_report(_releases, {"release": {"from": line, "identified_by": "id"}}, {"c": "ticket exists"}, {})); r[1] == "$applies"}
+
+test_a_from_condition_can_ask_whether_some_item_of_a_list_passes if {
+	_release_outcomes(`releases whose some files.path does not match "^docs/"`) == {
+		"mixed": "satisfied",
+		"docs": "value",
+		"none": "value",
+		"unset": "absent",
+		"null": "null",
+		"text": "unusable",
+		"gap": "absent",
+		"number": "unusable",
+	}
+}
+
+test_a_from_condition_can_ask_whether_every_item_of_a_list_passes if {
+	_release_outcomes(`releases whose every files.path matches "^docs/"`) == {
+		"mixed": "value",
+		"docs": "satisfied",
+		"none": "value",
+		"unset": "absent",
+		"null": "null",
+		"text": "unusable",
+		"gap": "absent",
+		"number": "unusable",
+	}
+}
+
+test_a_from_condition_with_every_and_if_any_keeps_a_release_with_no_files_in_scope if {
+	_release_outcomes(`releases whose every files.path, if any, matches "^docs/"`) == {
+		"mixed": "value",
+		"docs": "satisfied",
+		"none": "satisfied",
+		"unset": "absent",
+		"null": "null",
+		"text": "unusable",
+		"gap": "absent",
+		"number": "unusable",
+	}
+}
+
+test_a_release_the_condition_cannot_decide_fails_its_requirement_and_does_not_drop_out_of_scope if {
+	rep := _from_report(_releases, {"release": {"from": `releases whose some files.path does not match "^docs/"`, "identified_by": "id"}}, {"c": "ticket exists"}, {})
+	rep.requirements.r.status == "not_met"
+	{c.cause | some c in rep.requirements.r.causes; c.cause != "value"} == {"absent", "null", "unusable"}
+}
+
+test_the_applies_row_of_a_some_condition_reads_the_same_inputs_and_causes_as_the_same_sentence_as_a_check if {
+	sentence := `some files.path does not match "^docs/"`
+	as_condition := _from_report(_releases, {"release": {"from": concat(" whose ", ["releases", sentence]), "identified_by": "id"}}, {"c": "ticket exists"}, {})
+	as_check := _from_report(_releases, {"release": {"from": "releases", "identified_by": "id"}}, {"c": sentence}, {})
+	condition_rows := {r.subject.id: [r.cause, r.inputs] | some r in as_condition.results; r.check == "$applies"}
+	check_rows := {r.subject.id: [r.cause, r.inputs] | some r in as_check.results; r.check == "c"}
+	condition_rows == check_rows
+	as_condition.requirements.r.checks["$applies"].expression == sentence
+}
+
+test_a_from_condition_written_with_some_prints_in_the_spelling_of_the_report_and_joins_with_and if {
+	rep := _from_report(_releases, {"release": {"from": `releases whose some  files.path   matches "x" and ticket   is "ok" and every files.path, if any, does not match "y"`, "identified_by": "id"}}, {"c": "ticket exists"}, {})
+	rep.requirements.r.checks["$applies"].expression == `some files.path matches "x" and ticket is "ok" and every files.path, if any, does not match "y"`
+}
+
+test_a_from_condition_with_some_reads_a_bare_name_on_its_right_side_from_the_item if {
+	doc := {"releases": [
+		{"id": 1, "steward": "bob", "files": [{"owner": "ann", "steward": "ann"}]},
+		{"id": 2, "steward": "ann", "files": [{"owner": "ann", "steward": "bob"}]},
+		{"id": 3, "steward": "ann", "files": [{"owner": "ann"}]},
+	]}
+	rep := _from_report(doc, {"release": {"from": "releases whose some files.owner is steward", "identified_by": "id"}}, {"c": "id exists"}, {})
+	{r.subject.id: r.cause | some r in rep.results; r.check == "$applies"} == {1: "satisfied", 2: "value", 3: "absent"}
+}
+
+test_a_from_condition_with_some_reads_a_parent_subject_by_its_name if {
+	doc := {"artifact": {"id": "sha", "owner": "ann", "releases": [{"id": 1, "files": [{"owner": "ann"}]}, {"id": 2, "files": [{"owner": "bob"}]}]}}
+	subjects := {"artifact": {"identified_by": "id"}, "release": {"from": "artifact.releases whose some files.owner is artifact.owner", "identified_by": "id"}}
+	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "release", "checks": {"c": "id exists"}}}}, {})
+	[[r.subject.id, r.subject["in"], r.cause] | some r in rep.results; r.check == "$applies"] == [[1, {"artifact": "sha"}, "satisfied"], [2, {"artifact": "sha"}, "value"]]
+}
+
+test_a_from_condition_with_some_works_on_every_from_lines_and_narrowing_chains if {
+	doc := {"artifacts": [{"releases": [{"id": 1, "files": [{"path": "a.go"}]}, {"id": 2, "files": [{"path": "docs/a"}]}]}], "releases": [{"id": 3, "files": [{"path": "a.go"}]}, {"id": 4, "files": [{"path": "docs/a"}]}]}
+	every_rep := _from_report(doc, {"release": {"from": `every artifacts.releases whose some files.path does not match "^docs/"`, "identified_by": "id"}}, {"c": "id exists"}, {})
+	{r.subject.id: r.cause | some r in every_rep.results; r.check == "$applies"} == {1: "satisfied", 2: "value"}
+	subjects := {"releases": {"from": "releases", "identified_by": "id"}, "source": {"from": `releases whose some files.path does not match "^docs/"`}}
+	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "source", "checks": {"c": "id exists"}}}}, {})
+	{r.subject.id: r.cause | some r in rep.results; r.check == "$applies"} == {3: "satisfied", 4: "value"}
+}
+
+test_a_from_condition_with_some_walks_as_many_lists_as_a_check_does if {
+	deep := {"x": {"id": 1, "p": [{"q": [{"r": [{"s": [{"t": [{"u": 1}]}]}]}]}]}}
+	hit := _from_report(deep, {"x": {"from": "x whose some p.q.r.s.t.u is 1"}}, {"c": "id exists"}, {})
+	miss := _from_report(deep, {"x": {"from": "x whose some p.q.r.s.t.u is 2"}}, {"c": "id exists"}, {})
+	[r.cause | some r in hit.results; r.check == "$applies"] == ["satisfied"]
+	[r.cause | some r in miss.results; r.check == "$applies"] == ["value"]
+}
+
+test_a_from_condition_with_if_any_after_some_or_a_whose_of_its_own_is_written_wrong if {
+	_from_problems(_from_report(_releases, {"release": {"from": `releases whose some files.path, if any, matches "x"`}}, {"c": "ticket exists"}, {})) == [{"name": "subjects.release.from", "value": ["if any can't go with some"]}]
+	_from_problems(_from_report(_releases, {"release": {"from": `releases whose some files whose kind is "src" matches "x"`}}, {"c": "ticket exists"}, {})) == [{"name": "subjects.release.from", "value": ["a condition after whose can't have a whose of its own"]}]
+	_from_problems(_from_report(_releases, {"release": {"from": `releases whose ticket is "ok" and every files whose kind is "src" matches "x"`}}, {"c": "ticket exists"}, {})) == [{"name": "subjects.release.from", "value": ["a condition after whose can't have a whose of its own"]}]
+	every line in [`releases whose count of files whose path is "x" is at least 1`, `releases whose sum of files.size whose path is "x" is at least 1`, `releases whose ticket is "ok" and count of files whose path is "x" is at least 1`] {
+		_from_problems(_from_report(_releases, {"release": {"from": line}}, {"c": "ticket exists"}, {})) == [{"name": "subjects.release.from", "value": ["a condition after whose can't have a whose of its own"]}]
+	}
+	_read(`count of files whose path is "x" is at least 1`).assertions[0].where != []
+	_from_problems(_from_report(_releases, {"release": {"from": `releases whose some files.path`}}, {"c": "ticket exists"}, {})) != []
+}
+
+test_a_whose_in_a_check_or_a_for_line_still_takes_no_some_or_every_condition if {
+	_read(`some a whose some b.c is 1 is 2`) == {"problems": ["doesn't parse"]}
+	_read(`every a whose every b.c is 1 is 2`) == {"problems": ["doesn't parse"]}
+	_read(`some a whose some b.c is 1`) == {"problems": ["doesn't parse"]}
+	ergo._for_line(`every a whose some b.c is 1 as x`) == {"problems": ["doesn't parse"]}
+	ergo._for_line(`last of a whose every b.c is 1 as x`) == {"problems": ["doesn't parse"]}
+	ergo._from_line(`releases whose some files.path matches "x"`) != {"problems": ["doesn't parse"]}
+}
+
+test_a_from_condition_that_cannot_be_turned_back_into_text_is_written_wrong_and_never_dropped if {
+	read := ergo._s_from_read("x", {"path": {"steps": ["xs"]}, "where": [{"nonsense": true, "phrase": {"op": "is", "value": 1}}]}, {"x": {"from": "xs"}}, {"parts": {}, "descend": {}, "narrow": {}})
+	"whose: a condition can't be read" in read.problems
+}
+
 test_a_from_or_id_written_wrong_says_why_in_well_formed if {
 	every pair in [
 		[{"from": "xs whose"}, {"name": "subjects.x.from", "value": ["doesn't parse"]}],
