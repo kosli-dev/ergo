@@ -1,6 +1,6 @@
 # How a policy is written
 
-Draft 0.1. This file says how a policy is written: its sections and fields, its parts, the sentences its checks and `from` lines are written as, what counts as written wrong, and how the report names paths and shows the checks Ergo adds. What a check means once it's read is in [semantics.md](semantics.md).
+Draft 0.2-dev. This file says how a policy is written: its sections and fields, its parts, the sentences its checks and `from` lines are written as, what counts as written wrong, and how the report names paths and shows the checks Ergo adds. What a check means once it's read is in [semantics.md](semantics.md).
 
 [`policy/schema.json`](policy/schema.json) describes a policy as a JSON Schema, [`sentences.abnf`](sentences.abnf) is the grammar of the sentences, [`sentences-corpus.md`](sentences-corpus.md) has every real check written as one, and [`sentences-findings.md`](sentences-findings.md) what writing them found. The forms of a sentence no implementation runs yet are listed in [OPEN.md](OPEN.md#sentences-the-spec-doesnt-say-enough-about-yet).
 

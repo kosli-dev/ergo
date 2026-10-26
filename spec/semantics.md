@@ -1,6 +1,6 @@
 # How Ergo turns a policy and an input into a report
 
-Draft 0.1. This file says what a check means, whatever syntax it's written in. [syntax.md](syntax.md) says how a policy is written, its sentences included, how it can be written wrong, and how the report names paths. It covers reading values, causes, every operator of the model, and how requirements, scope, statuses and violations work. Questions the spec hasn't settled are in [OPEN.md](OPEN.md).
+Draft 0.2-dev. This file says what a check means, whatever syntax it's written in. [syntax.md](syntax.md) says how a policy is written, its sentences included, how it can be written wrong, and how the report names paths. It covers reading values, causes, every operator of the model, and how requirements, scope, statuses and violations work. Questions the spec hasn't settled are in [OPEN.md](OPEN.md).
 
 Each rule has a name in brackets, like `[present.missing]`. The cases in [`cases/`](cases) list the rules they test, so you can find the cases for a rule and the rule behind a case. An implementation follows every rule here, and where it does something else, it's wrong, whatever `ergo.rego` does.
 
