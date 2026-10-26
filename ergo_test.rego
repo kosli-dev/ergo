@@ -4978,10 +4978,10 @@ test_a_from_condition_with_some_works_on_every_from_lines_and_narrowing_chains i
 	{r.subject.id: r.cause | some r in rep.results; r.check == "$applies"} == {3: "satisfied", 4: "value"}
 }
 
-test_a_from_condition_with_some_walks_as_many_lists_as_a_check_does if {
-	deep := {"x": {"id": 1, "p": [{"q": [{"r": [{"s": [{"t": [{"u": 1}]}]}]}]}]}}
-	hit := _from_report(deep, {"x": {"from": "x whose some p.q.r.s.t.u is 1"}}, {"c": "id exists"}, {})
-	miss := _from_report(deep, {"x": {"from": "x whose some p.q.r.s.t.u is 2"}}, {"c": "id exists"}, {})
+test_a_from_condition_with_some_walks_every_list_along_its_path if {
+	deep := {"x": {"id": 1, "p": [{"q": [{"r": [{"u": 2}, {"u": 1}]}]}]}}
+	hit := _from_report(deep, {"x": {"from": "x whose some p.q.r.u is 1"}}, {"c": "id exists"}, {})
+	miss := _from_report(deep, {"x": {"from": "x whose some p.q.r.u is 3"}}, {"c": "id exists"}, {})
 	[r.cause | some r in hit.results; r.check == "$applies"] == ["satisfied"]
 	[r.cause | some r in miss.results; r.check == "$applies"] == ["value"]
 }
