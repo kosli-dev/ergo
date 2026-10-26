@@ -271,6 +271,10 @@ _member_problems(members) := union({
 		some m in members
 		not _raw_subject(m)
 	},
+	{[["subjects", m], "it is a word of the grammar, so a subject can't be called it"] |
+		some m in members
+		m == "it"
+	},
 	{[["subjects", m, f], p] |
 		some m in members
 		some f, ps in object.get(data.ergo_subject_sentences.problems, m, {})
@@ -1133,6 +1137,14 @@ _read_from(start, keys) := _read_at(start, keys, [i | some i, seg in keys; is_ob
 
 _read_from(start, []) := start
 
+_read_from(start, keys) := object.get({"it": start}, array.concat(["it"], keys), _absent) if {
+	is_array(start)
+	count(keys) > 0
+	every seg in keys {
+		not is_object(seg)
+	}
+}
+
 _read_at(start, keys, []) := object.get(start, keys, _absent)
 
 default _named(_) := false
@@ -1370,12 +1382,18 @@ _written(x) := x if {
 
 _field_path_name(path) := concat(".", [_segment_name(path[i]) | some i in _names(path)])
 
-_path_name(path) := _visible_path_name(_visible(path))
+_path_name([]) := "it"
+
+_path_name(path) := _visible_path_name(_visible(path)) if path != []
 
 _visible_path_name(path) := concat("", ["item ", _literal_text(path[count(path) - 1] + 1), " of ", _steps_name(array.slice(path, 0, count(path) - 1))]) if {
 	is_array(path)
 	count(path) > 1
 	_index_step(path[count(path) - 1])
+} else := concat("", ["item ", _literal_text(path[0] + 1), " of it"]) if {
+	is_array(path)
+	count(path) == 1
+	_index_step(path[0])
 } else := _steps_name(path)
 
 _ref_name(path) := concat("", ["item ", _literal_text(path[count(path) - 1] + 1), " of ", _plain_steps_name(array.slice(path, 0, count(path) - 1))]) if {
@@ -1389,7 +1407,11 @@ _index_step(s) if {
 	_is_key(s)
 }
 
-_steps_name(path) := concat("", [_step_name(i, visible[i]) | visible := _visible(path); some i in _names(visible)])
+_steps_name(path) := concat("", array.concat(_it_root(visible), [_step_name(i, visible[i]) | some i in _names(visible)])) if visible := _visible(path)
+
+_it_root(visible) := ["it"] if _index_step(visible[0])
+
+_it_root(visible) := [] if not _index_step(visible[0])
 
 _plain_steps_name(path) := concat("", [_plain_step_name(i, path[i]) | some i in _names(path)])
 
@@ -1488,7 +1510,7 @@ _named_by(p) if {
 	is_string(p.ref[1])
 }
 
-_item_path_name(path) := _path_name(path) if path != []
+_item_path_name(path) := _path_name(path)
 
 _segment_name(p) := _key_name(p) if not is_object(p)
 
@@ -2743,10 +2765,23 @@ _any_read_state(subj, path) := "not_an_object" if {
 	start := _start_of(subj, path)
 	not is_object(start)
 	not _reads_itself(path)
+	not _position_first(path)
 	not _params_not_given(path)
 }
 
 _reads_itself(path) if _keys_of(path) == []
+
+_reads_subject(path) if path == []
+
+_reads_subject(path) if _list_subject_path(path)
+
+_list_subject_path(path) if {
+	is_array(path)
+	count(path) > 0
+	_index_step(path[0])
+}
+
+_position_first(path) if _index_step(_keys_of(path)[0])
 
 _any_read_state(_, path) := _name_step_state(path) if _name_step_state(path)
 
@@ -2787,6 +2822,14 @@ _any_read_state(subj, path) := "unusable" if {
 	start := _start_of(subj, path)
 	is_object(start)
 	_blocked(start, _keys_in(subj, path))
+}
+
+_any_read_state(subj, path) := "unusable" if {
+	_position_first(path)
+	start := _start_of(subj, path)
+	start != null
+	not is_array(start)
+	not is_object(start)
 }
 
 _any_read_state(subj, path) := "value" if {
@@ -4324,6 +4367,7 @@ _side_inputs(subj, side) := array.concat([_derived_input(subj, side, _side_text(
 _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "values": []} if {
 	path := side[_basic_form(side)]
 	not _off_subject(path)
+	not _reads_subject(path)
 	not is_object(subj)
 } else := {"states": {_read_state(subj, path)}, "list": _path_name(path), "values": []} if {
 	path := side[_basic_form(side)]
@@ -4363,6 +4407,7 @@ _cond_side(item, side) := {"v": [x | x := t.value], "found": [x | x := t.value],
 
 _cond_tally(item, side) := {"states": {"not_an_object"}} if {
 	not _off_subject(side.count_of)
+	not _reads_subject(side.count_of)
 	not is_object(item)
 } else := {"states": {_read_state(item, side.count_of)}} if {
 	not _walk_keys({"path": side.count_of}, item)
@@ -4634,7 +4679,7 @@ _s_patterns := {
 	for_item := concat("", [`(?:(?:every|some) +)?`, path, `(?: +whose +`, conds, `)?(?: +sorted +by +`, path, `(?: +alphabetically)?)?(?:, +if +any,)? +as +`, key])
 }
 
-_s_words := {"a", "after", "alphabetically", "an", "and", "as", "at", "before", "between", "count", "days", "each", "empty", "equal", "every", "false", "first", "hours", "in", "item", "last", "less", "minutes", "more", "named", "not", "null", "of", "on", "one", "or", "plus", "seconds", "some", "sorted", "sum", "to", "true", "weeks", "whose", "within"}
+_s_words := {"a", "after", "alphabetically", "an", "and", "as", "at", "before", "between", "count", "days", "each", "empty", "equal", "every", "false", "first", "hours", "in", "it", "item", "last", "less", "minutes", "more", "named", "not", "null", "of", "on", "one", "or", "plus", "seconds", "some", "sorted", "sum", "to", "true", "weeks", "whose", "within"}
 
 _s_pieces(pattern, text) := [m[1] | some m in matches] if {
 	matches := regex.find_all_string_submatch_n(pattern, text, -1)
@@ -4833,6 +4878,7 @@ _s_unlifted_path_of(text, pat) := object.union(_s_position_of(m[1], m[2], m[3]),
 
 _s_lifted(path) := object.union(object.union(object.remove(path, ["steps"]), object.remove(last, ["index"])), {"position": last.index + 1, "steps": array.slice(path.steps, 0, count(path.steps) - 1)}) if {
 	not "position" in object.keys(path)
+	object.get(path, "it", false) != true
 	last := path.steps[count(path.steps) - 1]
 	is_object(last)
 	"index" in object.keys(last)
@@ -4853,7 +4899,12 @@ _s_start_of("$params", steps) := {"start": "params", "steps": steps}
 
 _s_start_of("$input", steps) := {"start": "input", "steps": steps}
 
-_s_start_of(key, steps) := {"steps": array.concat([key], steps), "bare_word": key} if key in _s_words
+_s_start_of("it", steps) := {"steps": array.concat(["it"], steps), "it": true}
+
+_s_start_of(key, steps) := {"steps": array.concat([key], steps), "bare_word": key} if {
+	key in _s_words
+	key != "it"
+}
 
 _s_start_of(key, steps) := {"steps": array.concat([_s_key_of(key)], steps)} if {
 	not key in _s_words
@@ -4990,7 +5041,85 @@ _s_sq_char(`\\`) := `\`
 
 _s_sq_char(c) := c if not c in {`\'`, `\\`}
 
-_s_sentence_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
+_s_sentence_problems(parsed) := _s_base_problems(parsed) | _s_it_problems(parsed)
+
+_s_it_problems(parsed) := ({_s_it_step_message(node) |
+	some node in _s_nodes(parsed)
+	is_object(node)
+	node.it == true
+	_s_it_followed(node)
+} | {"it can't name a key" |
+	some node in _s_nodes(parsed)
+	is_object(node)
+	node.bad_name == "it"
+}) | {"it can only start an assertion: write it first, like it is not empty" |
+	_s_it_total(parsed) > count(_s_it_allowed(parsed))
+}
+
+_s_it_whole(x) if {
+	is_object(x)
+	x.it == true
+	x.steps == ["it"]
+}
+
+_s_it_followed(node) if count(node.steps) > 1
+
+_s_it_step_message(node) := concat("", ["it is the whole subject: write ", _s_key_text(node.steps[1]), ", not it.", _s_key_text(node.steps[1])]) if {
+	count(node.steps) > 1
+	is_string(node.steps[1])
+}
+
+else := "it is the whole subject: nothing can follow it"
+
+_s_it_total(parsed) := count([1 |
+	walk(parsed, [_, x])
+	_s_it_whole(x)
+])
+
+_s_it_allowed(parsed) := array.concat(
+	array.concat(
+		[1 |
+			some a in object.get(parsed, "assertions", [])
+			_s_it_whole(object.get(a, "path", null))
+		],
+		[1 |
+			some a in object.get(parsed, "assertions", [])
+			some q in ["every", "some"]
+			_s_it_whole(object.get(a, q, null))
+		],
+	),
+	array.concat(
+		[1 |
+			some a in _s_own_holders(parsed)
+			some t in object.get(a, "terms", [])
+			is_object(t)
+			some k in ["count", "sum"]
+			_s_it_whole(object.get(t, k, null))
+		],
+		array.concat(
+			[1 |
+				some c in _s_from_conds(parsed)
+				_s_it_whole(object.get(c, "path", null))
+			],
+			[1 |
+				some c in _s_from_conds(parsed)
+				some q in ["every", "some"]
+				_s_it_whole(object.get(c, q, null))
+			],
+		),
+	),
+)
+
+_s_own_holders(parsed) := array.concat(object.get(parsed, "assertions", []), _s_from_conds(parsed))
+
+_s_from_conds(parsed) := object.get(parsed, "where", []) if {
+	not "assertions" in object.keys(parsed)
+	not "items" in object.keys(parsed)
+}
+
+else := []
+
+_s_base_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " is a word of the grammar: write .", node.bare_word]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"bare_word" in object.keys(node)
@@ -4998,6 +5127,7 @@ _s_sentence_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " 
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"bad_name" in object.keys(node)
+	node.bad_name != "it"
 }) | {concat("", [node.as, " can't be an alias"]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
@@ -5159,6 +5289,7 @@ _s_marked(p, names, own) := object.union(p, {"field": true, "own": own}) if {
 
 _s_markable(p, keys) if {
 	is_object(p)
+	object.get(p, "it", false) != true
 	is_array(p.steps)
 	not "start" in object.keys(p)
 	p.steps[0] in keys
@@ -5344,6 +5475,8 @@ _s_start_dot(p, side) := "." if {
 	object.get(p, "field", false) == true
 	object.get(p, "own", false) != true
 }
+
+else := "" if object.get(p, "it", false) == true
 
 else := _s_dot(p.steps[0], side)
 
@@ -6618,19 +6751,27 @@ _s_model_path(p) := array.concat(array.concat(_s_model_start(p), [_s_model_step(
 
 _s_model_start(p) := [concat("", ["$$", p.start])] if "start" in object.keys(p)
 
+_s_model_start(p) := [] if {
+	not "start" in object.keys(p)
+	object.get(p, "it", false) == true
+}
+
 _s_model_start(p) := [concat("", ["$", p.steps[0]])] if {
 	not "start" in object.keys(p)
+	object.get(p, "it", false) != true
 	object.get(p, "alias", false) == true
 }
 
 _s_model_start(p) := [{"literal": p.steps[0]}] if {
 	not "start" in object.keys(p)
+	object.get(p, "it", false) != true
 	object.get(p, "alias", false) != true
 	_s_literal_start(p)
 }
 
 _s_model_start(p) := [p.steps[0]] if {
 	not "start" in object.keys(p)
+	object.get(p, "it", false) != true
 	object.get(p, "alias", false) != true
 	not _s_literal_start(p)
 }
@@ -6670,6 +6811,7 @@ _walk_row(check, subj) := object.union(_walk_read_row(check, subj), {"cause": "u
 	_walk_flawed(check)
 } else := {"cause": "not_an_object", "inputs": [], "failed": []} if {
 	not _off_subject(check.path)
+	not _reads_subject(check.path)
 	not is_object(subj)
 } else := _walk_read_row(check, subj)
 
@@ -6859,9 +7001,8 @@ _walk_stop(w) := [] if w.walked != set()
 
 _walk_stop(w) := [{"path": e.c, "item": e.c, "cause": _walk_stop_state(e.v), "value": _walk_shown(e.v)} | e := _walk_stopped_at(w.trail)] if w.walked == set()
 
-_walk_stopped_at(trail) := [e | some i, e in trail; i > 0; not _walk_container(e.v)][0] if {
-	some i, e in trail
-	i > 0
+_walk_stopped_at(trail) := [e | some e in trail; not _walk_container(e.v)][0] if {
+	some e in trail
 	not _walk_container(e.v)
 } else := trail[count(trail) - 1]
 
@@ -6949,7 +7090,18 @@ _walk_root_name(path) := [] if {
 	count(_visible_root(_part_of(path))) == 0
 }
 
-_walk_root_name(path) := [] if not _named(path)
+_walk_root_name([]) := ["it"]
+
+_walk_root_name(path) := [] if {
+	not _named(path)
+	not _reads_subject(path)
+}
+
+_walk_root_name(path) := ["it"] if {
+	not _named(path)
+	path != []
+	_reads_subject(path)
+}
 
 _walk_steps(path) := array.slice(path, count(_walk_root(path)), count(path))
 

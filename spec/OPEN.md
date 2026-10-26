@@ -68,6 +68,7 @@ Three ways to settle it:
 
 `ergo.rego` doesn't run these forms, and the spec doesn't pin down their rows, so there are no cases for them. A case for each can go in once the question is settled, and be listed in `known_differences` in `spec_test.rego` while `ergo.rego` fails it.
 
+- `it` on the right side of a phrase, like `x is it` or `x is one of it`: left out for now, so it's written wrong (see [#323](https://github.com/kosli-dev/ergo/issues/323)).
 - `last of`: what a row's `inputs` name is. `first of xs` prints `item 1 of xs`, because the position is known when the sentence is read. The last position isn't, and an empty list has no item to number. It could print `last of xs`, or `item 3 of xs` for a list of three and something else for an empty one. The meaning is clear: the last item, absent on an empty list, `unusable` on something that isn't a list, as `first of` is.
 - `count of`, `sum of` and `plus` in the phrase of an `every` or `some`, like `every xs is count of ys`, and an elapsed time there, like `every xs is days elapsed from started to ended`: [sentence.argument.item](syntax.md#every-some-and-whose) says a path in the argument starts at the item, but not what the row's `inputs` show for a number worked out from each item.
 - An elapsed time in the `whose` of a `count of`, a `sum of` or an `every`, when an item can't be decided: which path `failed_items` names when the check reads two, `started` or `ended`.

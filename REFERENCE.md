@@ -845,7 +845,7 @@ They run as `compare` with `in`, `not_in`, `includes`, `excludes`, `includes_all
 
 The thing on the right is a value when it's in quotes, a number, `true`, `false` or `null`, and a field otherwise. A list of values is separated by `, `. A string can be in single quotes, which keep backslashes as written, so `'^\s*FROM'` needs no doubled backslash.
 
-A path is keys joined by `.`, like `build.commit.sha`. A key with anything but letters, digits, `_` and `-` goes in double quotes, like `labels."app.kubernetes.io/name"`. `$params.regions` reads the params and `$input.repo` the input. `artifacts named by $params.name` reads the key the param holds, and so does `artifacts[$params.name]`. `named by` a bare field reads the key the subject holds, as below. `item 2 of commits`, `first of commits` and `commits[1]` read one item of a list. A position above 9007199254740991, the largest whole number a 64-bit float holds exactly, is written wrong, with `9007199254740992 can't be a list position`, and one read from a param, like `commits[$params.n]`, fails the check as `unusable`. A path can't start with a word the sentences use, like `empty`, `count` or `true`. Put a dot in front, `.empty is 1`, to read a field with that name.
+A path is keys joined by `.`, like `build.commit.sha`. A key with anything but letters, digits, `_` and `-` goes in double quotes, like `labels."app.kubernetes.io/name"`. `$params.regions` reads the params and `$input.repo` the input. `artifacts named by $params.name` reads the key the param holds, and so does `artifacts[$params.name]`. `named by` a bare field reads the key the subject holds, as below. `item 2 of commits`, `first of commits` and `commits[1]` read one item of a list. A position above 9007199254740991, the largest whole number a 64-bit float holds exactly, is written wrong, with `9007199254740992 can't be a list position`, and one read from a param, like `commits[$params.n]`, fails the check as `unusable`. A path can't start with a word the sentences use, like `empty`, `count`, `true` or `it`. Put a dot in front, `.empty is 1`, to read a field with that name. `it` is the [subject itself](#the-subject-itself), so a field called `it` is `.it`.
 
 `named by` a bare field picks the key from the subject, so a limit can depend on a field like the severity. With the params `{"max_days": {"critical": 1, "high": 5}}`, this policy:
 
@@ -1205,6 +1205,79 @@ Ergo doesn't run every sentence the spec describes yet. These are written wrong 
 Pick the item on a `for` line instead, as the message says.
 
 In a `from` line or an `identified_by`, `named by` a bare word is written wrong too, with `unknown name <word>`, because there's no subject to read it from yet. And Ergo doesn't check the limit of three list walks that [sentence.for.depth](spec/syntax.md#the-for-line) sets.
+
+### The subject itself
+
+A list of plain values, like ids, regions or tags, can be a subject, and `it` is how a check says something about the value. With these params:
+
+```json
+{"allowed_regions": ["eu-west-1"]}
+```
+
+this input:
+
+```json
+{"deployment": {"id": "d-17", "regions": ["eu-west-1", "us-east-1"]}}
+```
+
+and this policy:
+
+```yaml
+ergo_spec: v0.2-dev
+subjects:
+  region:
+    from: every deployment.regions
+requirements:
+  allowed:
+    subject: region
+    checks:
+      allowed: it is one of $params.allowed_regions
+```
+
+each region is a subject, with the region as its id, and the one that isn't allowed fails. The check's `expression` is `it is in $params.allowed_regions`, and the rows are:
+
+```json
+{"check": "allowed", "subject": {"id": "eu-west-1", "type": "region"}, "passed": true, "cause": "satisfied",
+ "inputs": [{"name": "it", "value": "eu-west-1"}], "requirement": "allowed"}
+{"check": "allowed", "subject": {"id": "us-east-1", "type": "region"}, "passed": false, "cause": "value",
+ "inputs": [{"name": "it", "value": "us-east-1"}], "requirement": "allowed"}
+```
+
+`it` is the whole subject, whatever it holds. `it is an object` passes for an object, and a subject that is `null` or the wrong type for the phrase fails the way the same phrase fails on a field holding that value: `it is a string` on `null` fails as `null`, on `3` as `value`, and `it is at least 2` on `"a"` as `unusable`. Two regions with the same name still fail `$unique_ids`, because ids are the values.
+
+`it` is also the path after `every`, `some`, `count of` and `sum of`, so a subject that is a list can be checked item by item. With `from: every releases.tags` and the input `{"releases": {"tags": [["a", "b"], [1, "x"]]}}`, `every it is a string` passes the first tag list and fails the second, with the row:
+
+```json
+{"check": "c", "subject": {"id": [1, "x"], "type": "tags"}, "passed": false, "cause": "value",
+ "failed_items": [{"cause": "value", "item": "item 1 of it", "path": "item 1 of it", "value": 1}],
+ "inputs": [{"name": "it[]", "value": [1, "x"]}], "requirement": "r"}
+```
+
+A position is written in words, as for a field. With the input `{"releases": {"tags": [["a", "b"], [1, "x"], []]}}` and the same `from`, `first of it is "a"` gives:
+
+```json
+{"check": "c", "subject": {"id": ["a", "b"], "type": "tags"}, "passed": true, "cause": "satisfied",
+ "inputs": [{"name": "item 1 of it", "value": "a"}], "requirement": "r"}
+{"check": "c", "subject": {"id": [1, "x"], "type": "tags"}, "passed": false, "cause": "unusable",
+ "inputs": [{"name": "item 1 of it", "value": 1}], "requirement": "r"}
+{"check": "c", "subject": {"id": [], "type": "tags"}, "passed": false, "cause": "absent",
+ "inputs": [{"name": "item 1 of it", "value": null}], "requirement": "r"}
+```
+
+`1` can't be compared with `"a"`, so the second list fails as `unusable`, and the empty one has no first item, so it fails as `absent`, as `first of v` does on a field. Brackets, like `it[0]`, are written wrong.
+
+`it` goes where an assertion starts: the left side of a check, after `and`, in an `any_of` option, and in a `whose` condition of a `from` line, like `from: every ws whose it starts with "b"`, where it reads each value the `from` line finds. Its `$applies` row names it `it`. After a `for` line it's still the subject, not the item of the `for`. Everywhere else it's written wrong, and the `$well_formed` row says how:
+
+| Sentence                     | `$well_formed` says                                                    |
+| ---------------------------- | ---------------------------------------------------------------------- |
+| `it.name is 1`               | `it is the whole subject: write name, not it.name`                     |
+| `it[0] is 1`                 | `it is the whole subject: nothing can follow it`                       |
+| `x is it`                    | `it can only start an assertion: write it first, like it is not empty` |
+| `$params.m named by it is 1` | `it can't name a key`                                                  |
+
+A subject can't be called `it`. A requirement that uses one is written wrong, and `$well_formed` says `it is a word of the grammar, so a subject can't be called it` under `subjects.it`.
+
+Reading the subject from the right side of a phrase, like `x equals it`, is left out for now.
 
 ## The report
 

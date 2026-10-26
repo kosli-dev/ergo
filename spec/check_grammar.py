@@ -27,6 +27,9 @@ NON_SYNTAX = [
         r'^"within" only compares numbers$',
         r'^"within" needs a number of 0 or more$',
         r'^"sorted by" reads a field of the item, not ',
+        r"^it is the whole subject: ",
+        r"^it can only start an assertion: ",
+        r"^it can't name a key$",
     ]
 ]
 
