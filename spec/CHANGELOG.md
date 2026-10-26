@@ -6,11 +6,12 @@ Each version says whether reports changed, so that anyone who only stores report
 
 ### New
 
-- A `whose` in a subject's `from` line takes a one-line `some` or `every` as a condition ([sentence.subject.condition](syntax.md#subjects)), like `release whose some files.path does not match "^docs/"`. Its `$applies` row gives the inputs and the cause the same sentence gives as a check row. Reports for policies written before don't change, and a policy that used to be written wrong there is now read.
+- A `whose` in a subject's `from` line takes a one-line `some` or `every` as a condition ([sentence.subject.condition](syntax.md#subjects)), like `release whose some files.path does not match "^docs/"`. Its `$applies` row gives the inputs and the cause the same sentence gives as a check row. It doesn't change the report of a policy that was read before, and a `from` line that used to be written wrong is now read.
 
 ### Changed
 
-- `main` follows the unreleased 0.2, so `ergo_spec` is `v0.2-dev` and a report's `ergo` says `v0.2-dev`. A policy that says `v0.1` is written wrong on `main`, with `unsupported version v0.1, expected v0.2-dev`. [policy.version](syntax.md#policies) takes an optional `-dev` after the version, so `v0.2-dev` is a version and `v0.2-beta` is not. The `$id` of both schemas is under `https://ergo.kosli.com/spec/0.2-dev/`. Reports change in `ergo`, from `v0.1` to `v0.2-dev`.
+- A policy says `ergo_spec: v0.2`, and the report's `ergo` changes from `"ergo": "v0.1"` to `"ergo": "v0.2"`. A policy that says `v0.1` is written wrong, with `unsupported version v0.1, expected v0.2`. The schemas are under `https://ergo.kosli.com/spec/0.2/`.
+- [policy.version](syntax.md#policies) takes an optional `-dev` after the version, which `main` uses until a version is released, like `v0.2-dev`. `v0.2-beta` is still not a version.
 
 ## 0.1
 
