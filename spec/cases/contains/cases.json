@@ -8,7 +8,7 @@
         "rules": ["contains.pass", "sentence.print.canonical"],
         "input": {"things": [{"id": "t1", "x": ["b", "a"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["b", "a"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["b", "a"], "locations": ["/things/0/x"]}]}
         ],
         "expressions": {"s": {"c": "x contains \"a\""}}
       },
@@ -17,7 +17,7 @@
         "rules": ["contains.fail"],
         "input": {"things": [{"id": "t1", "x": ["b"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["b"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["b"], "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -25,7 +25,7 @@
         "rules": ["contains.pass", "contains.fail"],
         "input": {"things": [{"id": "t1", "x": []}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": []}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": [], "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -33,7 +33,7 @@
         "rules": ["contains.fail"],
         "input": {"things": [{"id": "t1", "x": "abc"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "abc"}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "abc", "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -41,7 +41,7 @@
         "rules": ["contains.fail"],
         "input": {"things": [{"id": "t1", "x": {"a": "a"}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": {"a": "a"}}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": {"a": "a"}, "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -49,7 +49,7 @@
         "rules": ["contains.fail", "path.absent"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
         ]
       },
       {
@@ -57,7 +57,7 @@
         "rules": ["contains.fail", "path.null"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null, "locations": ["/things/0/x"]}]}
         ]
       }
     ]
@@ -71,7 +71,7 @@
         "rules": ["contains.pass", "value.equal"],
         "input": {"things": [{"id": "t1", "x": [2, 1.0]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": [2, 1]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": [2, 1], "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -79,8 +79,8 @@
         "rules": ["contains.fail"],
         "input": {"things": [{"id": "t1", "x": ["1", 1]}, {"id": "t2", "x": [1, null]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["1", 1]}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": [1, null]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["1", 1], "locations": ["/things/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": [1, null], "locations": ["/things/1/x"]}]}
         ]
       },
       {
@@ -88,7 +88,7 @@
         "rules": ["contains.fail", "value.equal"],
         "input": {"things": [{"id": "t1", "x": ["1"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["1"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["1"], "locations": ["/things/0/x"]}]}
         ]
       }
     ]
@@ -102,7 +102,7 @@
         "rules": ["contains.pass", "sentence.print.canonical"],
         "input": {"things": [{"id": "t1", "x": ["a", "c", "b"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["a", "c", "b"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["a", "c", "b"], "locations": ["/things/0/x"]}]}
         ],
         "expressions": {"s": {"c": "x contains all of \"b\", \"a\""}}
       },
@@ -111,7 +111,7 @@
         "rules": ["contains.fail"],
         "input": {"things": [{"id": "t1", "x": ["a"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["a"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}]}
         ]
       }
     ]
@@ -125,7 +125,7 @@
         "rules": ["contains.pass", "sentence.print.canonical"],
         "input": {"things": [{"id": "t1", "x": ["b"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["b"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["b"], "locations": ["/things/0/x"]}]}
         ],
         "expressions": {"s": {"c": "x does not contain \"a\""}}
       },
@@ -134,7 +134,7 @@
         "rules": ["contains.pass"],
         "input": {"things": [{"id": "t1", "x": []}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": []}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": [], "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -142,7 +142,7 @@
         "rules": ["contains.fail"],
         "input": {"things": [{"id": "t1", "x": [1, 2]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": [1, 2]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": [1, 2], "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -150,7 +150,7 @@
         "rules": ["contains.fail"],
         "input": {"things": [{"id": "t1", "x": ["a"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["a"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -158,7 +158,7 @@
         "rules": ["contains.fail"],
         "input": {"things": [{"id": "t1", "x": "b"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "b"}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "b", "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -166,7 +166,7 @@
         "rules": ["contains.fail", "path.absent"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
         ]
       }
     ]
@@ -180,7 +180,7 @@
         "rules": ["contains.pass", "sentence.print.canonical"],
         "input": {"things": [{"id": "t1", "x": ["salt"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["salt"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["salt"], "locations": ["/things/0/x"]}]}
         ],
         "expressions": {"s": {"c": "x contains none of \"nuts\", \"garlic\""}}
       },
@@ -189,7 +189,7 @@
         "rules": ["contains.fail"],
         "input": {"things": [{"id": "t1", "x": ["garlic"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["garlic"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["garlic"], "locations": ["/things/0/x"]}]}
         ]
       }
     ]
@@ -204,7 +204,7 @@
         "rules": ["value.ref", "sentence.print.canonical"],
         "input": {"things": [{"id": "t1", "x": ["a"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": ["a"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}]}
         ],
         "expressions": {"s": {"c": "x does not contain $params.banned"}}
       }
@@ -220,7 +220,7 @@
         "rules": ["contains.value", "sentence.print.canonical"],
         "input": {"things": [{"id": "t1", "x": ["a"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["a"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}]}
         ],
         "expressions": {"s": {"c": "x contains none of $params.banned"}}
       }
@@ -236,7 +236,7 @@
         "rules": ["contains.value"],
         "input": {"things": [{"id": "t1", "x": ["a"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["a"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}]}
         ]
       }
     ]
@@ -251,8 +251,8 @@
         "rules": ["contains.value"],
         "input": {"things": [{"id": "t1", "x": ["b"]}, {"id": "t2"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["b"]}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["b"], "locations": ["/things/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": null, "locations": ["/things/1"]}]}
         ]
       }
     ]

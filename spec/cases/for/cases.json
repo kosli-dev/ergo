@@ -69,6 +69,10 @@
                   {
                     "signed": true
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1"
                 ]
               }
             ],
@@ -120,7 +124,10 @@
                 "path": "item 2 of commits",
                 "value": {
                   "signed": false
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/1"
+                ]
               }
             ],
             "inputs": [
@@ -133,6 +140,10 @@
                   {
                     "signed": false
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1"
                 ]
               }
             ],
@@ -190,7 +201,10 @@
                 "path": "item 1 of commits",
                 "value": {
                   "signed": false
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/0"
+                ]
               },
               {
                 "cause": "unusable",
@@ -204,7 +218,10 @@
                 "path": "item 3 of commits",
                 "value": {
                   "signed": 1
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/2"
+                ]
               }
             ],
             "inputs": [
@@ -220,6 +237,11 @@
                   {
                     "signed": 1
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1",
+                  "/releases/0/commits/2"
                 ]
               }
             ],
@@ -270,7 +292,10 @@
                 ],
                 "item": "item 2 of commits",
                 "path": "item 2 of commits",
-                "value": {}
+                "value": {},
+                "locations": [
+                  "/releases/0/commits/1"
+                ]
               }
             ],
             "inputs": [
@@ -281,6 +306,10 @@
                     "signed": true
                   },
                   {}
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1"
                 ]
               }
             ],
@@ -324,7 +353,10 @@
             "inputs": [
               {
                 "name": "commits[]",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "failed_items": [
@@ -333,7 +365,10 @@
                 "item": "commits",
                 "cause": "value",
                 "value": [],
-                "failed_assertions": []
+                "failed_assertions": [],
+                "locations": [
+                  "/releases/0/commits"
+                ]
               }
             ]
           }
@@ -369,7 +404,10 @@
             "inputs": [
               {
                 "name": "commits",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "failed_items": [
@@ -378,7 +416,10 @@
                 "item": "commits",
                 "cause": "absent",
                 "value": null,
-                "failed_assertions": []
+                "failed_assertions": [],
+                "locations": [
+                  "/releases/0"
+                ]
               }
             ]
           }
@@ -415,7 +456,10 @@
             "inputs": [
               {
                 "name": "commits",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "failed_items": [
@@ -424,7 +468,10 @@
                 "item": "commits",
                 "cause": "null",
                 "value": null,
-                "failed_assertions": []
+                "failed_assertions": [],
+                "locations": [
+                  "/releases/0/commits"
+                ]
               }
             ]
           }
@@ -461,7 +508,10 @@
             "inputs": [
               {
                 "name": "commits",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "failed_items": [
@@ -470,7 +520,10 @@
                 "item": "commits",
                 "cause": "unusable",
                 "value": "abc",
-                "failed_assertions": []
+                "failed_assertions": [],
+                "locations": [
+                  "/releases/0/commits"
+                ]
               }
             ]
           }
@@ -533,7 +586,10 @@
             "inputs": [
               {
                 "name": "commits[]",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "failed_items": []
@@ -569,7 +625,10 @@
             "inputs": [
               {
                 "name": "commits",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "failed_items": [
@@ -578,7 +637,10 @@
                 "item": "commits",
                 "cause": "absent",
                 "value": null,
-                "failed_assertions": []
+                "failed_assertions": [],
+                "locations": [
+                  "/releases/0"
+                ]
               }
             ]
           }
@@ -614,7 +676,10 @@
             "inputs": [
               {
                 "name": "commits",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "failed_items": [
@@ -623,7 +688,10 @@
                 "item": "commits",
                 "cause": "null",
                 "value": null,
-                "failed_assertions": []
+                "failed_assertions": [],
+                "locations": [
+                  "/releases/0/commits"
+                ]
               }
             ]
           }
@@ -661,7 +729,10 @@
             "inputs": [
               {
                 "name": "commits",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "failed_items": [
@@ -672,7 +743,10 @@
                 "value": {
                   "a": 1
                 },
-                "failed_assertions": []
+                "failed_assertions": [],
+                "locations": [
+                  "/releases/0/commits"
+                ]
               }
             ]
           }
@@ -718,7 +792,10 @@
                 "path": "item 1 of commits",
                 "value": {
                   "signed": false
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/0"
+                ]
               }
             ],
             "inputs": [
@@ -728,6 +805,9 @@
                   {
                     "signed": false
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0"
                 ]
               }
             ],
@@ -811,6 +891,10 @@
                   {
                     "signed": false
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1"
                 ]
               }
             ],
@@ -860,7 +944,10 @@
                 "path": "item 1 of commits",
                 "value": {
                   "signed": false
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/0"
+                ]
               },
               {
                 "cause": "value",
@@ -874,7 +961,10 @@
                 "path": "item 2 of commits",
                 "value": {
                   "signed": false
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/1"
+                ]
               }
             ],
             "inputs": [
@@ -887,6 +977,10 @@
                   {
                     "signed": false
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1"
                 ]
               }
             ],
@@ -930,7 +1024,10 @@
             "inputs": [
               {
                 "name": "commits[]",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "failed_items": [
@@ -939,7 +1036,10 @@
                 "item": "commits",
                 "cause": "value",
                 "value": [],
-                "failed_assertions": []
+                "failed_assertions": [],
+                "locations": [
+                  "/releases/0/commits"
+                ]
               }
             ]
           }
@@ -975,7 +1075,10 @@
             "inputs": [
               {
                 "name": "commits",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "failed_items": [
@@ -984,7 +1087,10 @@
                 "item": "commits",
                 "cause": "absent",
                 "value": null,
-                "failed_assertions": []
+                "failed_assertions": [],
+                "locations": [
+                  "/releases/0"
+                ]
               }
             ]
           }
@@ -1030,7 +1136,10 @@
                 "path": "item 1 of commits",
                 "value": {
                   "signed": false
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/0"
+                ]
               },
               {
                 "cause": "absent",
@@ -1042,7 +1151,10 @@
                 ],
                 "item": "item 2 of commits",
                 "path": "item 2 of commits",
-                "value": {}
+                "value": {},
+                "locations": [
+                  "/releases/0/commits/1"
+                ]
               }
             ],
             "inputs": [
@@ -1053,6 +1165,10 @@
                     "signed": false
                   },
                   {}
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1"
                 ]
               }
             ],
@@ -1105,6 +1221,10 @@
                   {
                     "signed": true
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1"
                 ]
               }
             ],
@@ -1196,6 +1316,10 @@
                     "kind": "code",
                     "signed": true
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1"
                 ]
               }
             ],
@@ -1222,6 +1346,10 @@
                     "kind": "code",
                     "signed": true
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1"
                 ]
               }
             ],
@@ -1248,6 +1376,10 @@
                     "kind": "code",
                     "signed": true
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1"
                 ]
               }
             ],
@@ -1300,7 +1432,10 @@
                 "value": {
                   "kind": "code",
                   "signed": false
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/1"
+                ]
               }
             ],
             "inputs": [
@@ -1315,6 +1450,10 @@
                     "kind": "code",
                     "signed": false
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1"
                 ]
               }
             ],
@@ -1342,7 +1481,10 @@
                 "value": {
                   "kind": "code",
                   "signed": false
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/1"
+                ]
               }
             ],
             "inputs": [
@@ -1357,6 +1499,10 @@
                     "kind": "code",
                     "signed": false
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1"
                 ]
               }
             ],
@@ -1384,7 +1530,10 @@
                 "value": {
                   "kind": "code",
                   "signed": false
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/1"
+                ]
               }
             ],
             "inputs": [
@@ -1399,6 +1548,10 @@
                     "kind": "code",
                     "signed": false
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1"
                 ]
               }
             ],
@@ -1453,6 +1606,9 @@
                     "kind": "doc",
                     "signed": true
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0"
                 ]
               }
             ],
@@ -1475,6 +1631,9 @@
                     "kind": "doc",
                     "signed": true
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0"
                 ]
               }
             ],
@@ -1497,6 +1656,9 @@
                     "kind": "doc",
                     "signed": true
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0"
                 ]
               }
             ],
@@ -1543,7 +1705,10 @@
                 "path": "item 1 of commits",
                 "value": {
                   "signed": true
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/0"
+                ]
               }
             ],
             "inputs": [
@@ -1557,6 +1722,10 @@
                     "kind": "code",
                     "signed": true
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1"
                 ]
               }
             ],
@@ -1578,7 +1747,10 @@
                 "path": "item 1 of commits",
                 "value": {
                   "signed": true
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/0"
+                ]
               }
             ],
             "inputs": [
@@ -1592,6 +1764,10 @@
                     "kind": "code",
                     "signed": true
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1"
                 ]
               }
             ],
@@ -1617,6 +1793,10 @@
                     "kind": "code",
                     "signed": true
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1"
                 ]
               }
             ],
@@ -1667,7 +1847,10 @@
                 "path": "item 1 of commits",
                 "value": {
                   "signed": true
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/0"
+                ]
               },
               {
                 "cause": "value",
@@ -1682,7 +1865,10 @@
                 "value": {
                   "kind": "code",
                   "signed": false
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/1"
+                ]
               }
             ],
             "inputs": [
@@ -1696,6 +1882,10 @@
                     "kind": "code",
                     "signed": false
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1"
                 ]
               }
             ],
@@ -1717,7 +1907,10 @@
                 "path": "item 1 of commits",
                 "value": {
                   "signed": true
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/0"
+                ]
               },
               {
                 "cause": "value",
@@ -1732,7 +1925,10 @@
                 "value": {
                   "kind": "code",
                   "signed": false
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/1"
+                ]
               }
             ],
             "inputs": [
@@ -1746,6 +1942,10 @@
                     "kind": "code",
                     "signed": false
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1"
                 ]
               }
             ],
@@ -1767,7 +1967,10 @@
                 "path": "item 1 of commits",
                 "value": {
                   "signed": true
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/0"
+                ]
               },
               {
                 "cause": "value",
@@ -1782,7 +1985,10 @@
                 "value": {
                   "kind": "code",
                   "signed": false
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/1"
+                ]
               }
             ],
             "inputs": [
@@ -1796,6 +2002,10 @@
                     "kind": "code",
                     "signed": false
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1"
                 ]
               }
             ],
@@ -1844,7 +2054,10 @@
                 "value": {
                   "kind": null,
                   "signed": true
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/0"
+                ]
               }
             ],
             "inputs": [
@@ -1855,6 +2068,9 @@
                     "kind": null,
                     "signed": true
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0"
                 ]
               }
             ],
@@ -1877,7 +2093,10 @@
                 "value": {
                   "kind": null,
                   "signed": true
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/0"
+                ]
               }
             ],
             "inputs": [
@@ -1888,6 +2107,9 @@
                     "kind": null,
                     "signed": true
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0"
                 ]
               }
             ],
@@ -1910,7 +2132,10 @@
                 "value": {
                   "kind": null,
                   "signed": true
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/0"
+                ]
               }
             ],
             "inputs": [
@@ -1921,6 +2146,9 @@
                     "kind": null,
                     "signed": true
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0"
                 ]
               }
             ],
@@ -1974,7 +2202,10 @@
                     "code"
                   ],
                   "signed": true
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/0"
+                ]
               }
             ],
             "inputs": [
@@ -1987,6 +2218,9 @@
                     ],
                     "signed": true
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0"
                 ]
               }
             ],
@@ -2011,7 +2245,10 @@
                     "code"
                   ],
                   "signed": true
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/0"
+                ]
               }
             ],
             "inputs": [
@@ -2024,6 +2261,9 @@
                     ],
                     "signed": true
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0"
                 ]
               }
             ],
@@ -2048,7 +2288,10 @@
                     "code"
                   ],
                   "signed": true
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/0"
+                ]
               }
             ],
             "inputs": [
@@ -2061,6 +2304,9 @@
                     ],
                     "signed": true
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0"
                 ]
               }
             ],
@@ -2137,6 +2383,9 @@
                   {
                     "signed": true
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0"
                 ]
               }
             ],
@@ -2184,7 +2433,10 @@
                 "path": "item 1 of commits",
                 "value": {
                   "x": 1
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/0"
+                ]
               }
             ],
             "inputs": [
@@ -2194,6 +2446,9 @@
                   {
                     "x": 1
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0"
                 ]
               }
             ],
@@ -2276,11 +2531,18 @@
                   {
                     "author": "cat"
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1"
                 ]
               },
               {
                 "name": "owner",
-                "value": "ann"
+                "value": "ann",
+                "locations": [
+                  "/releases/0/owner"
+                ]
               }
             ],
             "failed_items": []
@@ -2328,7 +2590,10 @@
                 "path": "item 2 of commits",
                 "value": {
                   "author": "ann"
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/1"
+                ]
               }
             ],
             "inputs": [
@@ -2341,11 +2606,18 @@
                   {
                     "author": "ann"
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1"
                 ]
               },
               {
                 "name": "owner",
-                "value": "ann"
+                "value": "ann",
+                "locations": [
+                  "/releases/0/owner"
+                ]
               }
             ],
             "passed": false,
@@ -2394,7 +2666,10 @@
                 "path": "item 1 of commits",
                 "value": {
                   "author": "bob"
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/0"
+                ]
               }
             ],
             "inputs": [
@@ -2404,11 +2679,17 @@
                   {
                     "author": "bob"
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0"
                 ]
               },
               {
                 "name": "owner",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0"
+                ]
               }
             ],
             "passed": false,
@@ -2495,11 +2776,18 @@
                     "role": "qa",
                     "approved_at": "2026-10-01T00:00:00Z"
                   }
+                ],
+                "locations": [
+                  "/releases/0/approvals/0",
+                  "/releases/0/approvals/1"
                 ]
               },
               {
                 "name": "started_at",
-                "value": "2026-10-05T00:00:00Z"
+                "value": "2026-10-05T00:00:00Z",
+                "locations": [
+                  "/releases/0/started_at"
+                ]
               }
             ],
             "failed_items": []
@@ -2550,7 +2838,10 @@
                 "value": {
                   "approved_at": "2026-10-01T00:00:00Z",
                   "role": "qa"
-                }
+                },
+                "locations": [
+                  "/releases/0/approvals/1"
+                ]
               }
             ],
             "inputs": [
@@ -2565,11 +2856,18 @@
                     "approved_at": "2026-10-01T00:00:00Z",
                     "role": "qa"
                   }
+                ],
+                "locations": [
+                  "/releases/0/approvals/0",
+                  "/releases/0/approvals/1"
                 ]
               },
               {
                 "name": "started_at",
-                "value": "2026-09-05T00:00:00Z"
+                "value": "2026-09-05T00:00:00Z",
+                "locations": [
+                  "/releases/0/started_at"
+                ]
               }
             ],
             "passed": false,
@@ -2676,6 +2974,11 @@
                     "username": "dan",
                     "state": "APPROVED"
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/approvers/0",
+                  "/releases/0/pull_requests/1/approvers/0",
+                  "/releases/0/pull_requests/1/approvers/1"
                 ]
               },
               {
@@ -2703,6 +3006,10 @@
                       }
                     ]
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0",
+                  "/releases/0/pull_requests/1"
                 ]
               }
             ],
@@ -2778,7 +3085,10 @@
                     }
                   ],
                   "author": "eve"
-                }
+                },
+                "locations": [
+                  "/releases/0/pull_requests/1"
+                ]
               }
             ],
             "inputs": [
@@ -2793,6 +3103,10 @@
                     "state": "APPROVED",
                     "username": "eve"
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/approvers/0",
+                  "/releases/0/pull_requests/1/approvers/0"
                 ]
               },
               {
@@ -2816,6 +3130,10 @@
                     ],
                     "author": "eve"
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0",
+                  "/releases/0/pull_requests/1"
                 ]
               }
             ],
@@ -2885,7 +3203,10 @@
                     }
                   ],
                   "author": "fay"
-                }
+                },
+                "locations": [
+                  "/releases/0/pull_requests/1"
+                ]
               }
             ],
             "inputs": [
@@ -2900,6 +3221,10 @@
                     "state": "PENDING",
                     "username": "gus"
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/approvers/0",
+                  "/releases/0/pull_requests/1/approvers/0"
                 ]
               },
               {
@@ -2923,6 +3248,10 @@
                     ],
                     "author": "fay"
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0",
+                  "/releases/0/pull_requests/1"
                 ]
               }
             ],
@@ -2981,14 +3310,20 @@
                     "cause": "absent",
                     "item": "pr.approvers",
                     "path": "pr.approvers",
-                    "value": null
+                    "value": null,
+                    "locations": [
+                      "/releases/0/pull_requests/1"
+                    ]
                   }
                 ],
                 "item": "item 2 of pull_requests",
                 "path": "item 2 of pull_requests",
                 "value": {
                   "author": "hal"
-                }
+                },
+                "locations": [
+                  "/releases/0/pull_requests/1"
+                ]
               }
             ],
             "inputs": [
@@ -2999,6 +3334,9 @@
                     "state": "APPROVED",
                     "username": "bob"
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/approvers/0"
                 ]
               },
               {
@@ -3016,6 +3354,10 @@
                   {
                     "author": "hal"
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0",
+                  "/releases/0/pull_requests/1"
                 ]
               }
             ],
@@ -3066,7 +3408,10 @@
                     "cause": "value",
                     "item": "pr.approvers",
                     "path": "pr.approvers",
-                    "value": []
+                    "value": [],
+                    "locations": [
+                      "/releases/0/pull_requests/0/approvers"
+                    ]
                   }
                 ],
                 "item": "item 1 of pull_requests",
@@ -3074,13 +3419,19 @@
                 "value": {
                   "approvers": [],
                   "author": "ian"
-                }
+                },
+                "locations": [
+                  "/releases/0/pull_requests/0"
+                ]
               }
             ],
             "inputs": [
               {
                 "name": "pr.approvers[]",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               },
               {
                 "name": "pull_requests[]",
@@ -3089,6 +3440,9 @@
                     "approvers": [],
                     "author": "ian"
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0"
                 ]
               }
             ],
@@ -3158,7 +3512,10 @@
                     }
                   ],
                   "author": "jo"
-                }
+                },
+                "locations": [
+                  "/releases/0/pull_requests/0"
+                ]
               }
             ],
             "inputs": [
@@ -3168,6 +3525,9 @@
                   {
                     "state": "APPROVED"
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/approvers/0"
                 ]
               },
               {
@@ -3181,6 +3541,9 @@
                     ],
                     "author": "jo"
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0"
                 ]
               }
             ],
@@ -3237,7 +3600,10 @@
                     "path": "item 1 of pr.approvers",
                     "value": {
                       "username": "lee"
-                    }
+                    },
+                    "locations": [
+                      "/releases/0/pull_requests/0/approvers/0"
+                    ]
                   }
                 ],
                 "item": "item 1 of pull_requests",
@@ -3249,7 +3615,10 @@
                     }
                   ],
                   "author": "kim"
-                }
+                },
+                "locations": [
+                  "/releases/0/pull_requests/0"
+                ]
               }
             ],
             "inputs": [
@@ -3259,6 +3628,9 @@
                   {
                     "username": "lee"
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/approvers/0"
                 ]
               },
               {
@@ -3272,6 +3644,9 @@
                     ],
                     "author": "kim"
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0"
                 ]
               }
             ],
@@ -3315,11 +3690,17 @@
             "inputs": [
               {
                 "name": "pr.approvers",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               },
               {
                 "name": "pull_requests[]",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "failed_items": [
@@ -3328,7 +3709,10 @@
                 "item": "pull_requests",
                 "cause": "value",
                 "value": [],
-                "failed_assertions": []
+                "failed_assertions": [],
+                "locations": [
+                  "/releases/0/pull_requests"
+                ]
               }
             ]
           }
@@ -3406,6 +3790,9 @@
                   {
                     "signed": false
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/commits/0"
                 ]
               },
               {
@@ -3421,6 +3808,10 @@
                   {
                     "commits": []
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0",
+                  "/releases/0/pull_requests/1"
                 ]
               }
             ],
@@ -3482,7 +3873,10 @@
                       "signed": false
                     }
                   ]
-                }
+                },
+                "locations": [
+                  "/releases/0/pull_requests/0"
+                ]
               }
             ],
             "inputs": [
@@ -3492,6 +3886,9 @@
                   {
                     "signed": false
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/commits/0"
                 ]
               },
               {
@@ -3504,6 +3901,9 @@
                       }
                     ]
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0"
                 ]
               }
             ],
@@ -3610,11 +4010,18 @@
                     "state": "APPROVED",
                     "timestamp": "2026-10-03T00:00:00Z"
                   }
+                ],
+                "locations": [
+                  "/prs/0/approvers/0",
+                  "/prs/0/approvers/1"
                 ]
               },
               {
                 "name": "author",
-                "value": "ann"
+                "value": "ann",
+                "locations": [
+                  "/prs/0/author"
+                ]
               },
               {
                 "name": "commits[]",
@@ -3625,6 +4032,10 @@
                   {
                     "timestamp": "2026-10-02T00:00:00Z"
                   }
+                ],
+                "locations": [
+                  "/prs/0/commits/0",
+                  "/prs/0/commits/1"
                 ]
               }
             ],
@@ -3699,7 +4110,10 @@
                   "state": "APPROVED",
                   "timestamp": "2026-10-05T00:00:00Z",
                   "username": "ann"
-                }
+                },
+                "locations": [
+                  "/prs/0/approvers/1"
+                ]
               },
               {
                 "cause": "value",
@@ -3721,7 +4135,10 @@
                   "state": "APPROVED",
                   "timestamp": "2026-10-01T12:00:00Z",
                   "username": "bob"
-                }
+                },
+                "locations": [
+                  "/prs/0/approvers/2"
+                ]
               }
             ],
             "inputs": [
@@ -3743,11 +4160,19 @@
                     "timestamp": "2026-10-01T12:00:00Z",
                     "username": "bob"
                   }
+                ],
+                "locations": [
+                  "/prs/0/approvers/0",
+                  "/prs/0/approvers/1",
+                  "/prs/0/approvers/2"
                 ]
               },
               {
                 "name": "author",
-                "value": "ann"
+                "value": "ann",
+                "locations": [
+                  "/prs/0/author"
+                ]
               },
               {
                 "name": "commits[]",
@@ -3758,6 +4183,10 @@
                   {
                     "timestamp": "2026-10-02T00:00:00Z"
                   }
+                ],
+                "locations": [
+                  "/prs/0/commits/0",
+                  "/prs/0/commits/1"
                 ]
               }
             ],
@@ -3836,7 +4265,10 @@
                   "state": "APPROVED",
                   "timestamp": "2026-10-01T12:00:00Z",
                   "username": "ann"
-                }
+                },
+                "locations": [
+                  "/prs/0/approvers/0"
+                ]
               }
             ],
             "inputs": [
@@ -3848,11 +4280,17 @@
                     "timestamp": "2026-10-01T12:00:00Z",
                     "username": "ann"
                   }
+                ],
+                "locations": [
+                  "/prs/0/approvers/0"
                 ]
               },
               {
                 "name": "author",
-                "value": "ann"
+                "value": "ann",
+                "locations": [
+                  "/prs/0/author"
+                ]
               },
               {
                 "name": "commits[]",
@@ -3863,6 +4301,10 @@
                   {
                     "timestamp": "2026-10-02T00:00:00Z"
                   }
+                ],
+                "locations": [
+                  "/prs/0/commits/0",
+                  "/prs/0/commits/1"
                 ]
               }
             ],
@@ -3930,11 +4372,17 @@
                     "state": "PENDING",
                     "timestamp": "2026-10-05T00:00:00Z"
                   }
+                ],
+                "locations": [
+                  "/prs/0/approvers/0"
                 ]
               },
               {
                 "name": "author",
-                "value": "ann"
+                "value": "ann",
+                "locations": [
+                  "/prs/0/author"
+                ]
               },
               {
                 "name": "commits[]",
@@ -3945,6 +4393,10 @@
                   {
                     "timestamp": "2026-10-02T00:00:00Z"
                   }
+                ],
+                "locations": [
+                  "/prs/0/commits/0",
+                  "/prs/0/commits/1"
                 ]
               }
             ],
@@ -4011,7 +4463,10 @@
                   "state": "APPROVED",
                   "timestamp": "2026-10-05T00:00:00Z",
                   "username": "bob"
-                }
+                },
+                "locations": [
+                  "/prs/0/approvers/0"
+                ]
               }
             ],
             "inputs": [
@@ -4023,11 +4478,17 @@
                     "timestamp": "2026-10-05T00:00:00Z",
                     "username": "bob"
                   }
+                ],
+                "locations": [
+                  "/prs/0/approvers/0"
                 ]
               },
               {
                 "name": "author",
-                "value": "ann"
+                "value": "ann",
+                "locations": [
+                  "/prs/0/author"
+                ]
               },
               {
                 "name": "commits[]",
@@ -4035,6 +4496,9 @@
                   {
                     "timestamp": "yesterday"
                   }
+                ],
+                "locations": [
+                  "/prs/0/commits/0"
                 ]
               }
             ],
@@ -4086,7 +4550,10 @@
                 "failed_assertions": [],
                 "item": "commits",
                 "path": "commits",
-                "value": []
+                "value": [],
+                "locations": [
+                  "/prs/0/commits"
+                ]
               }
             ],
             "inputs": [
@@ -4098,15 +4565,24 @@
                     "timestamp": "2026-10-05T00:00:00Z",
                     "username": "bob"
                   }
+                ],
+                "locations": [
+                  "/prs/0/approvers/0"
                 ]
               },
               {
                 "name": "author",
-                "value": "ann"
+                "value": "ann",
+                "locations": [
+                  "/prs/0/author"
+                ]
               },
               {
                 "name": "commits[]",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": false,
@@ -4157,7 +4633,10 @@
                 "failed_assertions": [],
                 "item": "commits",
                 "path": "commits",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/prs/0"
+                ]
               }
             ],
             "inputs": [
@@ -4169,15 +4648,24 @@
                     "timestamp": "2026-10-05T00:00:00Z",
                     "username": "bob"
                   }
+                ],
+                "locations": [
+                  "/prs/0/approvers/0"
                 ]
               },
               {
                 "name": "author",
-                "value": "ann"
+                "value": "ann",
+                "locations": [
+                  "/prs/0/author"
+                ]
               },
               {
                 "name": "commits",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": false,
@@ -4270,6 +4758,10 @@
                     "role": "dev",
                     "at": "2026-10-03T00:00:00Z"
                   }
+                ],
+                "locations": [
+                  "/prs/0/approvals/0",
+                  "/prs/0/approvals/1"
                 ]
               },
               {
@@ -4278,6 +4770,9 @@
                   {
                     "at": "2026-10-01T00:00:00Z"
                   }
+                ],
+                "locations": [
+                  "/prs/0/commits/0"
                 ]
               }
             ],
@@ -4344,7 +4839,10 @@
                 "value": {
                   "at": "2026-09-30T00:00:00Z",
                   "role": "qa"
-                }
+                },
+                "locations": [
+                  "/prs/0/approvals/1"
+                ]
               }
             ],
             "inputs": [
@@ -4359,6 +4857,10 @@
                     "at": "2026-09-30T00:00:00Z",
                     "role": "qa"
                   }
+                ],
+                "locations": [
+                  "/prs/0/approvals/0",
+                  "/prs/0/approvals/1"
                 ]
               },
               {
@@ -4367,6 +4869,9 @@
                   {
                     "at": "2026-10-01T00:00:00Z"
                   }
+                ],
+                "locations": [
+                  "/prs/0/commits/0"
                 ]
               }
             ],
@@ -4468,6 +4973,11 @@
                     "kind": "test",
                     "signed": true
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1",
+                  "/releases/0/commits/2"
                 ]
               }
             ],
@@ -4519,7 +5029,10 @@
                 "value": {
                   "kind": "test",
                   "signed": false
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/1"
+                ]
               }
             ],
             "inputs": [
@@ -4534,6 +5047,10 @@
                     "kind": "test",
                     "signed": false
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1"
                 ]
               }
             ],
@@ -4611,6 +5128,9 @@
                     "kind": "code",
                     "signed": false
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0"
                 ]
               }
             ],
@@ -4691,7 +5211,10 @@
                 "path": "item 2 of commits",
                 "value": {
                   "author": "zed"
-                }
+                },
+                "locations": [
+                  "/releases/0/commits/1"
+                ]
               }
             ],
             "inputs": [
@@ -4704,6 +5227,10 @@
                   {
                     "author": "zed"
                   }
+                ],
+                "locations": [
+                  "/releases/0/commits/0",
+                  "/releases/0/commits/1"
                 ]
               }
             ],
@@ -4773,7 +5300,10 @@
             "inputs": [
               {
                 "name": "shas named by $params.k",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "failed_items": []
@@ -4845,7 +5375,10 @@
                     "cause": "absent",
                     "item": "g.shas named by $params.k",
                     "path": "g.shas named by $params.k",
-                    "value": null
+                    "value": null,
+                    "locations": [
+                      "/releases/0/groups/0/shas"
+                    ]
                   }
                 ],
                 "item": "item 1 of groups",
@@ -4858,13 +5391,19 @@
                       }
                     ]
                   }
-                }
+                },
+                "locations": [
+                  "/releases/0/groups/0"
+                ]
               }
             ],
             "inputs": [
               {
                 "name": "g.shas named by $params.k",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               },
               {
                 "name": "groups[]",
@@ -4878,6 +5417,9 @@
                       ]
                     }
                   }
+                ],
+                "locations": [
+                  "/releases/0/groups/0"
                 ]
               }
             ],
@@ -5002,16 +5544,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "checks.c",
                 "value": [
                   "for: a for line holds two items at most"
+                ],
+                "locations": [
+
                 ]
               }
             ]
@@ -5080,16 +5631,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "checks.c",
                 "value": [
                   "for: x is given twice"
+                ],
+                "locations": [
+
                 ]
               }
             ]
@@ -5158,16 +5718,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "checks.c",
                 "value": [
                   "for: params can't be an alias"
+                ],
+                "locations": [
+
                 ]
               }
             ]
@@ -5236,16 +5805,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "checks.c",
                 "value": [
                   "for: empty can't be an alias"
+                ],
+                "locations": [
+
                 ]
               }
             ]
@@ -5314,16 +5892,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "checks.c",
                 "value": [
                   "for: input can't be an alias"
+                ],
+                "locations": [
+
                 ]
               }
             ]
@@ -5390,6 +5977,10 @@
                 "value": [
                   "Fix",
                   "Add"
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/title",
+                  "/releases/0/pull_requests/1/title"
                 ]
               }
             ],
@@ -5432,7 +6023,10 @@
                 "failed_assertions": [],
                 "item": "item 2 of pull_requests",
                 "path": "item 2 of pull_requests",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/pull_requests/1"
+                ]
               }
             ],
             "inputs": [
@@ -5441,6 +6035,10 @@
                 "value": [
                   "Fix",
                   null
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/title",
+                  "/releases/0/pull_requests/1"
                 ]
               }
             ],
@@ -5479,7 +6077,10 @@
                 "failed_assertions": [],
                 "item": "item 1 of pull_requests",
                 "path": "item 1 of pull_requests",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/pull_requests/0"
+                ]
               }
             ],
             "inputs": [
@@ -5487,6 +6088,9 @@
                 "name": "pull_requests[].title",
                 "value": [
                   null
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0"
                 ]
               }
             ],
@@ -5559,14 +6163,20 @@
                 "failed_assertions": [],
                 "item": "item 1 of pull_requests",
                 "path": "item 1 of pull_requests",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/releases/0/pull_requests/0"
+                ]
               },
               {
                 "cause": "not_an_object",
                 "failed_assertions": [],
                 "item": "item 2 of pull_requests",
                 "path": "item 2 of pull_requests",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/pull_requests/1"
+                ]
               }
             ],
             "inputs": [
@@ -5576,6 +6186,9 @@
                   {
                     "username": "bob"
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/2/approvers/0"
                 ]
               },
               {
@@ -5591,6 +6204,11 @@
                     ],
                     "author": "ann"
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0",
+                  "/releases/0/pull_requests/1",
+                  "/releases/0/pull_requests/2"
                 ]
               }
             ],
@@ -5673,6 +6291,10 @@
                 "value": [
                   "security",
                   "style"
+                ],
+                "locations": [
+                  "/things/0/dispatched/0",
+                  "/things/0/dispatched/1"
                 ]
               },
               {
@@ -5680,7 +6302,10 @@
                 "value": {
                   "security": "3f2a000000000000000000000000000000000000",
                   "style": "9c1b000000000000000000000000000000000000"
-                }
+                },
+                "locations": [
+                  "/things/0/shas"
+                ]
               }
             ],
             "passed": true,
@@ -5704,7 +6329,10 @@
                 ],
                 "item": "item 1 of dispatched",
                 "path": "item 1 of dispatched",
-                "value": "security"
+                "value": "security",
+                "locations": [
+                  "/things/1/dispatched/0"
+                ]
               },
               {
                 "cause": "absent",
@@ -5716,7 +6344,10 @@
                 ],
                 "item": "item 2 of dispatched",
                 "path": "item 2 of dispatched",
-                "value": "perf"
+                "value": "perf",
+                "locations": [
+                  "/things/1/dispatched/1"
+                ]
               },
               {
                 "cause": "unusable",
@@ -5728,7 +6359,10 @@
                 ],
                 "item": "item 3 of dispatched",
                 "path": "item 3 of dispatched",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/things/1/dispatched/2"
+                ]
               }
             ],
             "inputs": [
@@ -5738,13 +6372,21 @@
                   "security",
                   "perf",
                   5
+                ],
+                "locations": [
+                  "/things/1/dispatched/0",
+                  "/things/1/dispatched/1",
+                  "/things/1/dispatched/2"
                 ]
               },
               {
                 "name": "shas",
                 "value": {
                   "security": "x"
-                }
+                },
+                "locations": [
+                  "/things/1/shas"
+                ]
               }
             ],
             "passed": false,
@@ -5828,6 +6470,9 @@
                   {
                     "username": "grace"
                   }
+                ],
+                "locations": [
+                  "/pull_requests/0/approvers/0"
                 ]
               },
               {
@@ -5836,7 +6481,10 @@
                   "author_username": "ada",
                   "sha": "c1",
                   "timestamp": 2
-                }
+                },
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ]
               }
             ],
             "passed": true,
@@ -5906,7 +6554,10 @@
                 "path": "item 1 of approvers",
                 "value": {
                   "username": "ada"
-                }
+                },
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ]
               }
             ],
             "inputs": [
@@ -5916,6 +6567,9 @@
                   {
                     "username": "ada"
                   }
+                ],
+                "locations": [
+                  "/pull_requests/0/approvers/0"
                 ]
               },
               {
@@ -5924,7 +6578,10 @@
                   "author_username": "ada",
                   "sha": "c1",
                   "timestamp": 2
-                }
+                },
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ]
               }
             ],
             "passed": false,
@@ -5983,14 +6640,20 @@
                 "failed_assertions": [],
                 "item": "item 1 of commits",
                 "path": "item 1 of commits",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/pull_requests/0/commits/0/timestamp"
+                ]
               },
               {
                 "cause": "ambiguous",
                 "failed_assertions": [],
                 "item": "item 2 of commits",
                 "path": "item 2 of commits",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/pull_requests/0/commits/1/timestamp"
+                ]
               }
             ],
             "inputs": [
@@ -6000,6 +6663,9 @@
                   {
                     "username": "linus"
                   }
+                ],
+                "locations": [
+                  "/pull_requests/0/approvers/0"
                 ]
               },
               {
@@ -6020,6 +6686,11 @@
                     "sha": "c3",
                     "timestamp": 1
                   }
+                ],
+                "locations": [
+                  "/pull_requests/0/commits/0",
+                  "/pull_requests/0/commits/1",
+                  "/pull_requests/0/commits/2"
                 ]
               }
             ],
@@ -6093,7 +6764,10 @@
                 "path": "item 1 of approvers",
                 "value": {
                   "username": "linus"
-                }
+                },
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ]
               }
             ],
             "inputs": [
@@ -6103,6 +6777,9 @@
                   {
                     "username": "linus"
                   }
+                ],
+                "locations": [
+                  "/pull_requests/0/approvers/0"
                 ]
               },
               {
@@ -6111,7 +6788,10 @@
                   "author_username": "linus",
                   "sha": "c3",
                   "timestamp": 2
-                }
+                },
+                "locations": [
+                  "/pull_requests/0/commits/2"
+                ]
               }
             ],
             "passed": false,
@@ -6164,7 +6844,10 @@
                 "failed_assertions": [],
                 "item": "item 2 of commits",
                 "path": "item 2 of commits",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/pull_requests/0/commits/1"
+                ]
               }
             ],
             "inputs": [
@@ -6174,6 +6857,9 @@
                   {
                     "username": "linus"
                   }
+                ],
+                "locations": [
+                  "/pull_requests/0/approvers/0"
                 ]
               },
               {
@@ -6188,6 +6874,10 @@
                     "author_username": "grace",
                     "sha": "c2"
                   }
+                ],
+                "locations": [
+                  "/pull_requests/0/commits/0",
+                  "/pull_requests/0/commits/1"
                 ]
               }
             ],
@@ -6242,7 +6932,10 @@
                 "failed_assertions": [],
                 "item": "item 2 of commits",
                 "path": "item 2 of commits",
-                "value": "yesterday"
+                "value": "yesterday",
+                "locations": [
+                  "/pull_requests/0/commits/1/timestamp"
+                ]
               }
             ],
             "inputs": [
@@ -6252,6 +6945,9 @@
                   {
                     "username": "linus"
                   }
+                ],
+                "locations": [
+                  "/pull_requests/0/approvers/0"
                 ]
               },
               {
@@ -6267,6 +6963,10 @@
                     "sha": "c2",
                     "timestamp": "yesterday"
                   }
+                ],
+                "locations": [
+                  "/pull_requests/0/commits/0",
+                  "/pull_requests/0/commits/1"
                 ]
               }
             ],
@@ -6323,6 +7023,9 @@
                   {
                     "username": "grace"
                   }
+                ],
+                "locations": [
+                  "/pull_requests/0/approvers/0"
                 ]
               },
               {
@@ -6331,7 +7034,10 @@
                   "author_username": "ada",
                   "sha": "c1",
                   "timestamp": "2026-10-02T00:00:00Z"
-                }
+                },
+                "locations": [
+                  "/pull_requests/0/commits/0"
+                ]
               }
             ],
             "passed": true,
@@ -6376,11 +7082,17 @@
                   {
                     "username": "grace"
                   }
+                ],
+                "locations": [
+                  "/pull_requests/0/approvers/0"
                 ]
               },
               {
                 "name": "commits[]",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": false,
@@ -6462,7 +7174,10 @@
                   "approved_at": 1,
                   "by": "ada",
                   "state": "APPROVED"
-                }
+                },
+                "locations": [
+                  "/pull_requests/0/approvals/0"
+                ]
               }
             ],
             "passed": true,
@@ -6518,7 +7233,10 @@
                 "value": {
                   "approved_at": 3,
                   "by": "grace"
-                }
+                },
+                "locations": [
+                  "/pull_requests/0/approvals/1"
+                ]
               }
             ],
             "inputs": [
@@ -6539,6 +7257,11 @@
                     "by": "linus",
                     "state": "APPROVED"
                   }
+                ],
+                "locations": [
+                  "/pull_requests/0/approvals/0",
+                  "/pull_requests/0/approvals/1",
+                  "/pull_requests/0/approvals/2"
                 ]
               }
             ],
@@ -6598,6 +7321,10 @@
                     "by": "grace",
                     "state": "CHANGES_REQUESTED"
                   }
+                ],
+                "locations": [
+                  "/pull_requests/0/approvals/0",
+                  "/pull_requests/0/approvals/1"
                 ]
               }
             ],
@@ -6663,7 +7390,10 @@
             "inputs": [
               {
                 "name": "item 2 of tags",
-                "value": "v2"
+                "value": "v2",
+                "locations": [
+                  "/releases/0/tags/1"
+                ]
               }
             ],
             "passed": true,
@@ -6720,16 +7450,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "checks.c",
                 "value": [
                   "for: \"sorted by\" goes after a position, like \"last of\", not after every or some"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -6804,7 +7543,10 @@
                 "name": "item 2 of owners",
                 "value": {
                   "name": "Zoe"
-                }
+                },
+                "locations": [
+                  "/teams/0/owners/1"
+                ]
               }
             ],
             "passed": true,
@@ -6854,7 +7596,10 @@
                 "failed_assertions": [],
                 "item": "item 2 of owners",
                 "path": "item 2 of owners",
-                "value": 7
+                "value": 7,
+                "locations": [
+                  "/teams/0/owners/1/name"
+                ]
               }
             ],
             "inputs": [
@@ -6867,6 +7612,10 @@
                   {
                     "name": 7
                   }
+                ],
+                "locations": [
+                  "/teams/0/owners/0",
+                  "/teams/0/owners/1"
                 ]
               }
             ],
@@ -6915,14 +7664,20 @@
                 "failed_assertions": [],
                 "item": "item 1 of owners",
                 "path": "item 1 of owners",
-                "value": "Zoe"
+                "value": "Zoe",
+                "locations": [
+                  "/teams/0/owners/0/name"
+                ]
               },
               {
                 "cause": "ambiguous",
                 "failed_assertions": [],
                 "item": "item 2 of owners",
                 "path": "item 2 of owners",
-                "value": "Zoe"
+                "value": "Zoe",
+                "locations": [
+                  "/teams/0/owners/1/name"
+                ]
               }
             ],
             "inputs": [
@@ -6938,6 +7693,11 @@
                   {
                     "name": "adam"
                   }
+                ],
+                "locations": [
+                  "/teams/0/owners/0",
+                  "/teams/0/owners/1",
+                  "/teams/0/owners/2"
                 ]
               }
             ],
@@ -7013,7 +7773,10 @@
                 "name": "item 1 of owners",
                 "value": {
                   "name": "adam"
-                }
+                },
+                "locations": [
+                  "/teams/0/owners/0"
+                ]
               }
             ],
             "passed": true,
@@ -7088,7 +7851,10 @@
                 "value": {
                   "held_on": "2026-10-02",
                   "passed": true
-                }
+                },
+                "locations": [
+                  "/sites/0/audits/0"
+                ]
               }
             ],
             "passed": true,
@@ -7136,7 +7902,10 @@
                 "failed_assertions": [],
                 "item": "item 1 of audits",
                 "path": "item 1 of audits",
-                "value": "2026-10-02"
+                "value": "2026-10-02",
+                "locations": [
+                  "/sites/0/audits/0/held_on"
+                ]
               }
             ],
             "inputs": [
@@ -7151,6 +7920,10 @@
                     "held_on": "2026-10-03T00:00:00Z",
                     "passed": true
                   }
+                ],
+                "locations": [
+                  "/sites/0/audits/0",
+                  "/sites/0/audits/1"
                 ]
               }
             ],
@@ -7199,7 +7972,10 @@
                 "failed_assertions": [],
                 "item": "item 1 of audits",
                 "path": "item 1 of audits",
-                "value": "2026-02-29"
+                "value": "2026-02-29",
+                "locations": [
+                  "/sites/0/audits/0/held_on"
+                ]
               }
             ],
             "inputs": [
@@ -7214,6 +7990,10 @@
                     "held_on": "2026-03-01",
                     "passed": true
                   }
+                ],
+                "locations": [
+                  "/sites/0/audits/0",
+                  "/sites/0/audits/1"
                 ]
               }
             ],
@@ -7294,7 +8074,10 @@
                 "path": "item 2 of commits",
                 "value": {
                   "t": 2
-                }
+                },
+                "locations": [
+                  "/pull_requests/0/commits/1"
+                ]
               }
             ],
             "inputs": [
@@ -7307,6 +8090,10 @@
                   {
                     "t": 6
                   }
+                ],
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
                 ]
               },
               {
@@ -7319,6 +8106,10 @@
                   {
                     "t": 2
                   }
+                ],
+                "locations": [
+                  "/pull_requests/0/commits/0",
+                  "/pull_requests/0/commits/1"
                 ]
               }
             ],
@@ -7404,7 +8195,10 @@
                     "path": "item 2 of commits",
                     "value": {
                       "t": 2
-                    }
+                    },
+                    "locations": [
+                      "/pull_requests/0/commits/1"
+                    ]
                   }
                 ],
                 "item": "item 1 of approvers",
@@ -7412,7 +8206,10 @@
                 "value": {
                   "t": 5,
                   "u": "bob"
-                }
+                },
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ]
               },
               {
                 "cause": "absent",
@@ -7424,7 +8221,10 @@
                     "path": "item 2 of commits",
                     "value": {
                       "t": 2
-                    }
+                    },
+                    "locations": [
+                      "/pull_requests/0/commits/1"
+                    ]
                   }
                 ],
                 "item": "item 2 of approvers",
@@ -7432,7 +8232,10 @@
                 "value": {
                   "t": 6,
                   "u": "cat"
-                }
+                },
+                "locations": [
+                  "/pull_requests/0/approvers/1"
+                ]
               }
             ],
             "inputs": [
@@ -7447,6 +8250,10 @@
                     "t": 6,
                     "u": "cat"
                   }
+                ],
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
                 ]
               },
               {
@@ -7459,6 +8266,10 @@
                   {
                     "t": 2
                   }
+                ],
+                "locations": [
+                  "/pull_requests/0/commits/0",
+                  "/pull_requests/0/commits/1"
                 ]
               }
             ],
@@ -7551,14 +8362,20 @@
                 "path": "item 2 of approvers",
                 "value": {
                   "t": 0
-                }
+                },
+                "locations": [
+                  "/pull_requests/0/approvers/1"
+                ]
               },
               {
                 "cause": "absent",
                 "failed_assertions": [],
                 "item": "commits[1].files",
                 "path": "commits[1].files",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/pull_requests/0/commits/1"
+                ]
               }
             ],
             "inputs": [
@@ -7571,6 +8388,10 @@
                   {
                     "t": 0
                   }
+                ],
+                "locations": [
+                  "/pull_requests/0/approvers/0",
+                  "/pull_requests/0/approvers/1"
                 ]
               },
               {
@@ -7579,6 +8400,9 @@
                   {
                     "t": 1
                   }
+                ],
+                "locations": [
+                  "/pull_requests/0/commits/0/files/0"
                 ]
               }
             ],
@@ -7670,7 +8494,10 @@
                 "path": "item 1 of approvers",
                 "value": {
                   "t": 5
-                }
+                },
+                "locations": [
+                  "/pull_requests/0/approvers/0"
+                ]
               }
             ],
             "inputs": [
@@ -7680,6 +8507,9 @@
                   {
                     "t": 5
                   }
+                ],
+                "locations": [
+                  "/pull_requests/0/approvers/0"
                 ]
               },
               {
@@ -7692,6 +8522,11 @@
                     "t": 9
                   },
                   {}
+                ],
+                "locations": [
+                  "/pull_requests/0/commits/0",
+                  "/pull_requests/0/commits/1",
+                  "/pull_requests/0/commits/2"
                 ]
               }
             ],
@@ -7774,11 +8609,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -7794,7 +8635,10 @@
             "inputs": [
               {
                 "name": "in-scope kid count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/ts/0/kids/0"
+                ]
               }
             ],
             "passed": true,
@@ -7813,7 +8657,10 @@
             "inputs": [
               {
                 "name": "repeated kid ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -7840,11 +8687,18 @@
                   {
                     "v": 2
                   }
+                ],
+                "locations": [
+                  "/ts/0/kids/0/rs/0",
+                  "/ts/0/kids/0/rs/1"
                 ]
               },
               {
                 "name": "t.x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/ts/0/x"
+                ]
               }
             ],
             "passed": true,
@@ -7916,7 +8770,10 @@
                 ],
                 "item": "item 1 of commits",
                 "path": "item 1 of commits",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/commits/0"
+                ]
               }
             ],
             "inputs": [
@@ -7924,6 +8781,9 @@
                 "name": "commits[]",
                 "value": [
                   null
+                ],
+                "locations": [
+                  "/releases/0/commits/0"
                 ]
               }
             ],
@@ -7934,6 +8794,20 @@
               "type": "release"
             }
           }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "two items over lists of different lengths",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": {"for": "every pull_requests as pr, every pr.commits as commit", "assert": "commit.signed is true"}}}}},
+    "cases": [
+      {
+        "description": "has one location per item in each list, the second list across the items of the first",
+        "rules": ["location.each"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}, {"signed": true}]}, {"commits": [{"signed": true}]}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/releases/0/pull_requests/0/commits/0", "/releases/0/pull_requests/0/commits/1", "/releases/0/pull_requests/1/commits/0"], "name": "pr.commits[]", "value": [{"signed": true}, {"signed": true}, {"signed": true}]}, {"locations": ["/releases/0/pull_requests/0", "/releases/0/pull_requests/1"], "name": "pull_requests[]", "value": [{"commits": [{"signed": true}, {"signed": true}]}, {"commits": [{"signed": true}]}]}], "passed": true, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
         ]
       }
     ]
@@ -7998,7 +8872,10 @@
                 ],
                 "item": "item 2 of batches",
                 "path": "item 2 of batches",
-                "value": []
+                "value": [],
+                "locations": [
+                  "/releases/0/batches/1"
+                ]
               }
             ],
             "inputs": [
@@ -8010,6 +8887,10 @@
                     "y"
                   ],
                   []
+                ],
+                "locations": [
+                  "/releases/0/batches/0",
+                  "/releases/0/batches/1"
                 ]
               }
             ],
@@ -8020,6 +8901,70 @@
               "type": "release"
             }
           }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a picked item",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"pull_request": {"from": "pull_requests", "identified_by": "id"}}, "requirements": {"s": {"subject": "pull_request", "checks": {"c": {"for": "some approvers as approver, last of commits sorted by timestamp as last_commit", "assert": "approver.username does not equal last_commit.author_username"}}}}},
+    "cases": [
+      {
+        "description": "has the location of the item it picked, not of the list",
+        "rules": ["location.each"],
+        "input": {"pull_requests": [{"id": "pr1", "approvers": [{"username": "grace"}], "commits": [{"sha": "c1", "author_username": "ada", "timestamp": 2}, {"sha": "c2", "author_username": "grace", "timestamp": 1}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/pull_requests/0/approvers/0"], "name": "approvers[]", "value": [{"username": "grace"}]}, {"locations": ["/pull_requests/0/commits/0"], "name": "item 1 of commits", "value": {"author_username": "ada", "sha": "c1", "timestamp": 2}}], "passed": true, "requirement": "s", "subject": {"id": "pr1", "type": "pull_request"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a second item that fails for an item of the first",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"pull request": {"from": "pull_requests", "identified_by": "id"}}, "requirements": {"r": {"subject": "pull request", "checks": {"c": {"for": "some approvers as approver, every commits whose author does not equal approver.u as commit", "assert": "approver.t is more than commit.t"}}}}},
+    "cases": [
+      {
+        "description": "has a location for the failed item and for each of its nested failed_items",
+        "rules": ["location.failed_items"],
+        "input": {"pull_requests": [{"id": "p1", "approvers": [{"u": "bob", "t": 5}], "commits": [{"t": 1, "author": "ann"}, {"t": 2}]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "item 2 of commits", "locations": ["/pull_requests/0/commits/1"], "path": "item 2 of commits", "value": {"t": 2}}], "item": "item 1 of approvers", "locations": ["/pull_requests/0/approvers/0"], "path": "item 1 of approvers", "value": {"t": 5, "u": "bob"}}], "inputs": [{"locations": ["/pull_requests/0/approvers/0"], "name": "approvers[]", "value": [{"t": 5, "u": "bob"}]}, {"locations": ["/pull_requests/0/commits/0", "/pull_requests/0/commits/1"], "name": "commits[]", "value": [{"author": "ann", "t": 1}, {"t": 2}]}], "passed": false, "requirement": "r", "subject": {"id": "p1", "type": "pull request"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a list that can't be read",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": {"for": "every pull_requests as pr, every pr.commits as commit", "assert": "commit.signed is true"}}}}},
+    "cases": [
+      {
+        "description": "has a location for the failed item where its read stopped",
+        "rules": ["location.failed_items"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}]}, {"id": 2}]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "pr.commits", "locations": ["/releases/0/pull_requests/1"], "path": "pr.commits", "value": null}], "item": "item 2 of pull_requests", "locations": ["/releases/0/pull_requests/1"], "path": "item 2 of pull_requests", "value": {"id": 2}}], "inputs": [{"locations": ["/releases/0/pull_requests/0/commits/0"], "name": "pr.commits[]", "value": [{"signed": true}]}, {"locations": ["/releases/0/pull_requests/0", "/releases/0/pull_requests/1"], "name": "pull_requests[]", "value": [{"commits": [{"signed": true}]}, {"id": 2}]}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line whose second item is read from the first",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": {"for": "every pull_requests.meta as m, every m.commits as c", "assert": "c.signed is true"}}}}},
+    "cases": [
+      {
+        "description": "points a failed item at the value it read, and the alias m at the meta it stands for",
+        "rules": ["location.failed_items", "location.start"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"meta": {"commits": "zz"}, "commits": [{"signed": true}]}]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [], "failed_items": [{"cause": "unusable", "item": "m.commits", "locations": ["/releases/0/pull_requests/0/meta/commits"], "path": "m.commits", "value": "zz"}], "item": "item 1 of pull_requests", "locations": ["/releases/0/pull_requests/0/meta"], "path": "item 1 of pull_requests", "value": {"commits": "zz"}}], "inputs": [{"locations": [], "name": "m.commits", "value": []}, {"locations": ["/releases/0/pull_requests/0/meta"], "name": "pull_requests[].meta", "value": [{"commits": "zz"}]}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      },
+      {
+        "description": "stops a nested failed item at the meta that has no commits",
+        "rules": ["location.failed_items", "location.read"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"meta": {"n": 1}, "commits": [{"signed": true}]}, {"meta": {"commits": []}}]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "m.commits", "locations": ["/releases/0/pull_requests/0/meta"], "path": "m.commits", "value": null}], "item": "item 1 of pull_requests", "locations": ["/releases/0/pull_requests/0/meta"], "path": "item 1 of pull_requests", "value": {"n": 1}}, {"cause": "value", "failed_assertions": [], "failed_items": [{"cause": "value", "item": "m.commits", "locations": ["/releases/0/pull_requests/1/meta/commits"], "path": "m.commits", "value": []}], "item": "item 2 of pull_requests", "locations": ["/releases/0/pull_requests/1/meta"], "path": "item 2 of pull_requests", "value": {"commits": []}}], "inputs": [{"locations": [], "name": "m.commits[]", "value": []}, {"locations": ["/releases/0/pull_requests/0/meta", "/releases/0/pull_requests/1/meta"], "name": "pull_requests[].meta", "value": [{"n": 1}, {"commits": []}]}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
         ]
       }
     ]

@@ -77,7 +77,7 @@ test_workings_table_shows_the_good_batch_clause_by_clause if {
 			"requirement": "cake_batch",
 			"clause": "Must not contain nut allergens",
 			"check": "nut_free",
-			"inputs": [{"name": "allergens", "value": ["milk", "eggs"]}],
+			"inputs": [{"name": "allergens", "value": ["milk", "eggs"], "locations": ["/batches/0/allergens"]}],
 			"expression": `allergens does not contain "nuts"`,
 			"passed": true,
 		},
@@ -85,7 +85,7 @@ test_workings_table_shows_the_good_batch_clause_by_clause if {
 			"requirement": "cake_batch",
 			"clause": "Bake temperature 175–200°C inclusive",
 			"check": "temp_ok",
-			"inputs": [{"name": "bake.temp_c", "value": 180}],
+			"inputs": [{"name": "bake.temp_c", "value": 180, "locations": ["/batches/0/bake/temp_c"]}],
 			"expression": "bake.temp_c is between 175 and 200",
 			"passed": true,
 		},
@@ -93,7 +93,7 @@ test_workings_table_shows_the_good_batch_clause_by_clause if {
 			"requirement": "cake_batch",
 			"clause": "Bake time 25–40 minutes inclusive",
 			"check": "time_ok",
-			"inputs": [{"name": "bake.minutes", "value": 32}],
+			"inputs": [{"name": "bake.minutes", "value": 32, "locations": ["/batches/0/bake/minutes"]}],
 			"expression": "bake.minutes is between 25 and 40",
 			"passed": true,
 		},
@@ -103,7 +103,7 @@ test_workings_table_shows_the_good_batch_clause_by_clause if {
 test_workings_table_shows_a_missing_allergen_record_as_null if {
 	some row in workings_table["cake-batch-2026-03-18-004"]
 	row.check == "nut_free"
-	row.inputs == [{"name": "allergens", "value": null}]
+	row.inputs == [{"name": "allergens", "value": null, "locations": ["/batches/3"]}]
 	row.passed == false
 }
 

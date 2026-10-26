@@ -9,6 +9,7 @@ Each release names the version of the spec it follows. The spec's own changes ar
 - A subject's `from` line can ask about the items of a list with a one-line `some` or `every`, like `release whose some files.path does not match "^docs/"` or `release whose every files.path, if any, matches "^docs/"`. It works in plain subjects, in `every` lines, in child subjects and in subjects that narrow another. The `$applies` row reads the same inputs and gives the same cause as the sentence does as a check. A subject whose list is missing, `null` or not a list fails the requirement as `absent`, `null` or `unusable`, as any condition that can't be decided does. A `whose` in a check or on a `for` line still takes no `some` or `every`, and a `some` or `every` condition with a `whose` of its own is written wrong with `a condition after whose can't have a whose of its own`.
 - `it` is the subject itself. A list of plain values, like ids, regions or tags, can now be checked: with a subject read from `every deployment.regions`, `it is one of $params.allowed_regions` fails the region that isn't allowed. `it` works for any subject (a string, a number, a list, an object, `null`) and fails the way the same phrase fails on a field holding that value. It starts a check, an assertion after `and`, an `any_of` option, a `whose` condition in a `from` line, and the path after `every`, `some`, `count of` and `sum of`, so `every it is a string` and `count of it is 2` check a subject that is a list. A position works on a subject that is a list, written in words as for a field: `first of it`, `item 2 of it`. A row's `inputs` name it `it`, and a failed item `item 1 of it`. Anywhere else `it` is written wrong, with a message that says why, like `it is the whole subject: write name, not it.name`. See [REFERENCE.md](REFERENCE.md#the-subject-itself).
 - `ergo.as_sentences` rewrites a check from before 0.1 whose path is empty, `[]`, with `it`, so `{op: equals, path: [], value: "x"}` becomes `it is "x"`, where it was left as it was. A path that starts at a field called `it` is written `.it`.
+- Every entry in a row's `inputs`, in a check's `$refs` and in `failed_items` says where Ergo read its value, in `locations`: JSON Pointers like `/deployments/3/approved_by`, or `$params:` and a pointer for a value read from the params. A tool can use them to show the spot in the input for a row. A list read with `every` or `some` has one for each item, and a number worked out with `count of`, `sum of`, `plus` or `days elapsed from` lists where it came from. A read that stops early points at the last value it reached, so a pointer never leads to a value Ergo didn't read. [Where a value was read](REFERENCE.md#where-a-value-was-read) shows it.
 
 ### Changed
 
@@ -24,7 +25,7 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
   ```json
   {"check": "$applies", "subject": {"id": "d-2", "type": "deployment"}, "passed": false, "cause": "value",
-   "inputs": [{"name": "change_type", "value": "standard"}, {"name": "environment", "value": "prod"}],
+   "inputs": [{"name": "change_type", "value": "standard", "locations": ["/deployments/0/change_type"]}, {"name": "environment", "value": "prod", "locations": ["/deployments/0/environment"]}],
    "failed_assertions": [{"assertion": "change_type is \"emergency\"", "cause": "value"}]}
   ```
 
@@ -39,9 +40,10 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
   ```json
   {"check": "$applies", "subject": {"id": "1.4.1", "type": "release"}, "passed": false, "cause": "value",
-   "inputs": [{"name": "files[].path", "value": ["docs/typo.md"]}],
-   "failed_items": [{"path": "files[0].path", "item": "item 1 of files", "cause": "value", "value": "docs/typo.md"}]}
+   "inputs": [{"name": "files[].path", "value": ["docs/typo.md"], "locations": ["/releases/0/files/0/path"]}],
+   "failed_items": [{"path": "files[0].path", "item": "item 1 of files", "cause": "value", "value": "docs/typo.md", "locations": ["/releases/0/files/0/path"]}]}
   ```
+- Every entry of `inputs`, `$refs` and `failed_items` in a report gains `locations`, and the entries of `$well_formed` have `[]`. For the second deployment in `{"deployments": [...]}`, an input that was `{"name": "approved_by", "value": null}` is now `{"name": "approved_by", "value": null, "locations": ["/deployments/1"]}`. Two reads with the same name and value used to be one entry. They are now one only when their locations match too, so a parent's `b.x` and a child's own `.b.x` that print the same and are read from different places each keep an entry.
 
 - A subject called `it` is written wrong, for each requirement that uses it. Rename it.
 - `it` is a word of the grammar, like `empty` and `count`. A bare `it` at the start of a path now reads the subject, where it read the field `it`, and a field called `it` is written `.it`, in a policy and in the report. A `for` alias or a part called `it` is now written wrong, so rename it. The report changes for a policy that has a bare `it` in a check or a subject, or a field called `it`. With the subject `{"id": "a", "it": 1}`, `it is 1` used to read the field and pass:
@@ -53,13 +55,13 @@ Each release names the version of the spec it follows. The spec's own changes ar
   Now it reads the whole subject and fails:
 
   ```json
-  {"check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "it", "value": {"id": "a", "it": 1}}]}
+  {"check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "it", "value": {"id": "a", "it": 1}, "locations": ["/xs/0"]}]}
   ```
 
   Write `.it is 1` to read the field, and the input is named `.it`:
 
   ```json
-  {"check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": ".it", "value": 1}]}
+  {"check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": ".it", "value": 1, "locations": ["/xs/0/it"]}]}
   ```
 
 ### Fixed
@@ -73,7 +75,7 @@ Each release names the version of the spec it follows. The spec's own changes ar
   Now it fails as `null`:
 
   ```json
-  {"check": "c", "passed": false, "cause": "null", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "every c.files is a string", "cause": "null"}], "item": "item 1 of commits", "path": "item 1 of commits", "value": null}]}
+  {"check": "c", "passed": false, "cause": "null", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "every c.files is a string", "cause": "null"}], "item": "item 1 of commits", "path": "item 1 of commits", "value": null, "locations": ["/releases/0/commits/0"]}]}
   ```
 
 - A position at the start of a path from a `for` alias reads the alias as a list, as it does on a field, where it failed as `not_an_object`. With `for: every batches as b` and `assert: first of b is "x"`, on the release `{"id": "r1", "batches": [["x", "y"], []]}`, the row was:

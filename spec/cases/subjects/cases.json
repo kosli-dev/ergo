@@ -59,11 +59,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -79,7 +85,11 @@
             "inputs": [
               {
                 "name": "in-scope deployment count",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/data/deployments/0",
+                  "/data/deployments/1"
+                ]
               }
             ]
           },
@@ -95,7 +105,10 @@
             "inputs": [
               {
                 "name": "repeated deployment ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -111,7 +124,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/data/deployments/0/x"
+                ]
               }
             ]
           },
@@ -127,7 +143,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/data/deployments/1/x"
+                ]
               }
             ]
           }
@@ -157,11 +176,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -177,7 +202,10 @@
             "inputs": [
               {
                 "name": "in-scope deployment count",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -193,7 +221,10 @@
             "inputs": [
               {
                 "name": "repeated deployment ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -253,11 +284,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -273,7 +310,11 @@
             "inputs": [
               {
                 "name": "in-scope deployment count",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/deployments/0",
+                  "/deployments/1"
+                ]
               }
             ]
           },
@@ -289,7 +330,10 @@
             "inputs": [
               {
                 "name": "repeated deployment ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -305,7 +349,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/deployments/0/x"
+                ]
               }
             ]
           },
@@ -321,7 +368,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/deployments/1/x"
+                ]
               }
             ]
           }
@@ -359,11 +409,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -379,7 +435,11 @@
             "inputs": [
               {
                 "name": "in-scope deployment count",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/deployments/0",
+                  "/deployments/1"
+                ]
               }
             ]
           },
@@ -397,6 +457,10 @@
                 "name": "repeated deployment ids",
                 "value": [
                   null
+                ],
+                "locations": [
+                  "/deployments/0/meta",
+                  "/deployments/1"
                 ]
               }
             ]
@@ -413,7 +477,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/deployments/0/x"
+                ]
               }
             ]
           },
@@ -429,7 +496,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/deployments/1/x"
+                ]
               }
             ]
           }
@@ -481,11 +551,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -501,7 +577,10 @@
             "inputs": [
               {
                 "name": "in-scope deployment count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/deployments/0"
+                ]
               }
             ]
           },
@@ -517,7 +596,10 @@
             "inputs": [
               {
                 "name": "repeated deployment ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -533,7 +615,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/deployments/0/x"
+                ]
               }
             ]
           }
@@ -615,11 +700,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -635,7 +726,10 @@
             "inputs": [
               {
                 "name": "in-scope deployment count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/deployments/0"
+                ]
               }
             ]
           },
@@ -651,7 +745,10 @@
             "inputs": [
               {
                 "name": "repeated deployment ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -668,11 +765,17 @@
             "inputs": [
               {
                 "name": "change_type",
-                "value": "emergency"
+                "value": "emergency",
+                "locations": [
+                  "/deployments/0/change_type"
+                ]
               },
               {
                 "name": "environment",
-                "value": "prod"
+                "value": "prod",
+                "locations": [
+                  "/deployments/0/environment"
+                ]
               }
             ]
           },
@@ -694,11 +797,17 @@
             "inputs": [
               {
                 "name": "change_type",
-                "value": "emergency"
+                "value": "emergency",
+                "locations": [
+                  "/deployments/1/change_type"
+                ]
               },
               {
                 "name": "environment",
-                "value": "staging"
+                "value": "staging",
+                "locations": [
+                  "/deployments/1/environment"
+                ]
               }
             ]
           },
@@ -720,11 +829,17 @@
             "inputs": [
               {
                 "name": "change_type",
-                "value": "normal"
+                "value": "normal",
+                "locations": [
+                  "/deployments/2/change_type"
+                ]
               },
               {
                 "name": "environment",
-                "value": "prod"
+                "value": "prod",
+                "locations": [
+                  "/deployments/2/environment"
+                ]
               }
             ]
           },
@@ -740,7 +855,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/deployments/0/x"
+                ]
               }
             ]
           }
@@ -781,11 +899,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -801,7 +925,10 @@
             "inputs": [
               {
                 "name": "in-scope deployment count",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -817,7 +944,10 @@
             "inputs": [
               {
                 "name": "repeated deployment ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -839,11 +969,17 @@
             "inputs": [
               {
                 "name": "change_type",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/deployments/0"
+                ]
               },
               {
                 "name": "environment",
-                "value": "prod"
+                "value": "prod",
+                "locations": [
+                  "/deployments/0/environment"
+                ]
               }
             ]
           }
@@ -885,11 +1021,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -905,7 +1047,10 @@
             "inputs": [
               {
                 "name": "in-scope deployment count",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -921,7 +1066,10 @@
             "inputs": [
               {
                 "name": "repeated deployment ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -943,11 +1091,17 @@
             "inputs": [
               {
                 "name": "change_type",
-                "value": true
+                "value": true,
+                "locations": [
+                  "/deployments/0/change_type"
+                ]
               },
               {
                 "name": "environment",
-                "value": "prod"
+                "value": "prod",
+                "locations": [
+                  "/deployments/0/environment"
+                ]
               }
             ]
           }
@@ -983,11 +1137,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -1003,7 +1163,10 @@
             "inputs": [
               {
                 "name": "in-scope deployment count",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -1019,7 +1182,10 @@
             "inputs": [
               {
                 "name": "repeated deployment ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -1045,11 +1211,17 @@
             "inputs": [
               {
                 "name": "change_type",
-                "value": "normal"
+                "value": "normal",
+                "locations": [
+                  "/deployments/0/change_type"
+                ]
               },
               {
                 "name": "environment",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/deployments/0"
+                ]
               }
             ]
           }
@@ -1108,11 +1280,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -1128,7 +1306,10 @@
             "inputs": [
               {
                 "name": "in-scope deployment count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/deployments/0"
+                ]
               }
             ]
           },
@@ -1144,7 +1325,10 @@
             "inputs": [
               {
                 "name": "repeated deployment ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -1161,11 +1345,17 @@
             "inputs": [
               {
                 "name": "change_type",
-                "value": "emergency"
+                "value": "emergency",
+                "locations": [
+                  "/deployments/0/change_type"
+                ]
               },
               {
                 "name": "environment",
-                "value": "prod"
+                "value": "prod",
+                "locations": [
+                  "/deployments/0/environment"
+                ]
               }
             ]
           },
@@ -1181,7 +1371,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/deployments/0/x"
+                ]
               }
             ]
           }
@@ -1248,11 +1441,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -1268,7 +1467,10 @@
             "inputs": [
               {
                 "name": "in-scope pr count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/pulls/0"
+                ]
               }
             ]
           },
@@ -1284,7 +1486,10 @@
             "inputs": [
               {
                 "name": "repeated pr ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -1300,13 +1505,21 @@
             "inputs": [
               {
                 "name": "count of reviews",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/pulls/0/reviews/0",
+                  "/pulls/0/reviews/1"
+                ]
               },
               {
                 "name": "reviews[]",
                 "value": [
                   {},
                   {}
+                ],
+                "locations": [
+                  "/pulls/0/reviews/0",
+                  "/pulls/0/reviews/1"
                 ]
               }
             ]
@@ -1323,11 +1536,17 @@
             "inputs": [
               {
                 "name": "count of reviews",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               },
               {
                 "name": "reviews[]",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -1343,7 +1562,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/pulls/0/x"
+                ]
               }
             ]
           }
@@ -1378,11 +1600,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -1398,7 +1626,10 @@
             "inputs": [
               {
                 "name": "in-scope pr count",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -1414,7 +1645,10 @@
             "inputs": [
               {
                 "name": "repeated pr ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -1430,11 +1664,17 @@
             "inputs": [
               {
                 "name": "count of reviews",
-                "value": null
+                "value": null,
+                "locations": [
+
+                ]
               },
               {
                 "name": "reviews",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -1513,11 +1753,13 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": []
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": []
               }
             ],
             "passed": true,
@@ -1533,7 +1775,10 @@
             "inputs": [
               {
                 "name": "in-scope release count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/releases/0"
+                ]
               }
             ],
             "passed": true,
@@ -1549,7 +1794,8 @@
             "inputs": [
               {
                 "name": "repeated release ids",
-                "value": []
+                "value": [],
+                "locations": []
               }
             ],
             "passed": true,
@@ -1569,6 +1815,10 @@
                 "value": [
                   "docs/upgrade.md",
                   "src/api.go"
+                ],
+                "locations": [
+                  "/releases/0/files/0/path",
+                  "/releases/0/files/1/path"
                 ]
               }
             ],
@@ -1587,7 +1837,10 @@
                 "cause": "value",
                 "item": "item 1 of files",
                 "path": "files[0].path",
-                "value": "docs/upgrade.md"
+                "value": "docs/upgrade.md",
+                "locations": [
+                  "/releases/1/files/0/path"
+                ]
               }
             ],
             "inputs": [
@@ -1595,6 +1848,9 @@
                 "name": "files[].path",
                 "value": [
                   "docs/upgrade.md"
+                ],
+                "locations": [
+                  "/releases/1/files/0/path"
                 ]
               }
             ],
@@ -1613,13 +1869,17 @@
                 "cause": "value",
                 "item": "files",
                 "path": "files",
-                "value": []
+                "value": [],
+                "locations": [
+                  "/releases/2/files"
+                ]
               }
             ],
             "inputs": [
               {
                 "name": "files[].path",
-                "value": []
+                "value": [],
+                "locations": []
               }
             ],
             "passed": false,
@@ -1635,7 +1895,10 @@
             "inputs": [
               {
                 "name": "ticket",
-                "value": "ok"
+                "value": "ok",
+                "locations": [
+                  "/releases/0/ticket"
+                ]
               }
             ],
             "passed": true,
@@ -1704,11 +1967,13 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": []
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": []
               }
             ],
             "passed": true,
@@ -1724,7 +1989,8 @@
             "inputs": [
               {
                 "name": "in-scope release count",
-                "value": 0
+                "value": 0,
+                "locations": []
               }
             ],
             "passed": true,
@@ -1740,7 +2006,8 @@
             "inputs": [
               {
                 "name": "repeated release ids",
-                "value": []
+                "value": [],
+                "locations": []
               }
             ],
             "passed": true,
@@ -1758,13 +2025,17 @@
                 "cause": "absent",
                 "item": "files",
                 "path": "files",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0"
+                ]
               }
             ],
             "inputs": [
               {
                 "name": "files.path",
-                "value": []
+                "value": [],
+                "locations": []
               }
             ],
             "passed": false,
@@ -1782,13 +2053,17 @@
                 "cause": "null",
                 "item": "files",
                 "path": "files",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/1/files"
+                ]
               }
             ],
             "inputs": [
               {
                 "name": "files.path",
-                "value": []
+                "value": [],
+                "locations": []
               }
             ],
             "passed": false,
@@ -1806,13 +2081,17 @@
                 "cause": "unusable",
                 "item": "files",
                 "path": "files",
-                "value": "docs/upgrade.md"
+                "value": "docs/upgrade.md",
+                "locations": [
+                  "/releases/2/files"
+                ]
               }
             ],
             "inputs": [
               {
                 "name": "files.path",
-                "value": []
+                "value": [],
+                "locations": []
               }
             ],
             "passed": false,
@@ -1830,13 +2109,19 @@
                 "cause": "value",
                 "item": "item 1 of files",
                 "path": "files[0].path",
-                "value": "docs/upgrade.md"
+                "value": "docs/upgrade.md",
+                "locations": [
+                  "/releases/3/files/0/path"
+                ]
               },
               {
                 "cause": "absent",
                 "item": "item 2 of files",
                 "path": "files[1].path",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/3/files/1"
+                ]
               }
             ],
             "inputs": [
@@ -1845,6 +2130,10 @@
                 "value": [
                   "docs/upgrade.md",
                   null
+                ],
+                "locations": [
+                  "/releases/3/files/0/path",
+                  "/releases/3/files/1"
                 ]
               }
             ],
@@ -1863,13 +2152,19 @@
                 "cause": "value",
                 "item": "item 1 of files",
                 "path": "files[0].path",
-                "value": "docs/upgrade.md"
+                "value": "docs/upgrade.md",
+                "locations": [
+                  "/releases/4/files/0/path"
+                ]
               },
               {
                 "cause": "unusable",
                 "item": "item 2 of files",
                 "path": "files[1].path",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/releases/4/files/1/path"
+                ]
               }
             ],
             "inputs": [
@@ -1878,6 +2173,10 @@
                 "value": [
                   "docs/upgrade.md",
                   5
+                ],
+                "locations": [
+                  "/releases/4/files/0/path",
+                  "/releases/4/files/1/path"
                 ]
               }
             ],
@@ -1963,11 +2262,13 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": []
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": []
               }
             ],
             "passed": true,
@@ -1983,7 +2284,10 @@
             "inputs": [
               {
                 "name": "in-scope release count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/releases/1"
+                ]
               }
             ],
             "passed": true,
@@ -1999,7 +2303,8 @@
             "inputs": [
               {
                 "name": "repeated release ids",
-                "value": []
+                "value": [],
+                "locations": []
               }
             ],
             "passed": true,
@@ -2017,7 +2322,10 @@
                 "cause": "value",
                 "item": "item 2 of files",
                 "path": "files[1].path",
-                "value": "src/api.go"
+                "value": "src/api.go",
+                "locations": [
+                  "/releases/0/files/1/path"
+                ]
               }
             ],
             "inputs": [
@@ -2026,6 +2334,10 @@
                 "value": [
                   "docs/upgrade.md",
                   "src/api.go"
+                ],
+                "locations": [
+                  "/releases/0/files/0/path",
+                  "/releases/0/files/1/path"
                 ]
               }
             ],
@@ -2045,6 +2357,9 @@
                 "name": "files[].path",
                 "value": [
                   "docs/upgrade.md"
+                ],
+                "locations": [
+                  "/releases/1/files/0/path"
                 ]
               }
             ],
@@ -2063,13 +2378,17 @@
                 "cause": "value",
                 "item": "files",
                 "path": "files",
-                "value": []
+                "value": [],
+                "locations": [
+                  "/releases/2/files"
+                ]
               }
             ],
             "inputs": [
               {
                 "name": "files[].path",
-                "value": []
+                "value": [],
+                "locations": []
               }
             ],
             "passed": false,
@@ -2085,7 +2404,10 @@
             "inputs": [
               {
                 "name": "ticket",
-                "value": "ok"
+                "value": "ok",
+                "locations": [
+                  "/releases/1/ticket"
+                ]
               }
             ],
             "passed": true,
@@ -2154,11 +2476,13 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": []
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": []
               }
             ],
             "passed": true,
@@ -2174,7 +2498,8 @@
             "inputs": [
               {
                 "name": "in-scope release count",
-                "value": 0
+                "value": 0,
+                "locations": []
               }
             ],
             "passed": true,
@@ -2190,7 +2515,8 @@
             "inputs": [
               {
                 "name": "repeated release ids",
-                "value": []
+                "value": [],
+                "locations": []
               }
             ],
             "passed": true,
@@ -2208,13 +2534,17 @@
                 "cause": "absent",
                 "item": "files",
                 "path": "files",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0"
+                ]
               }
             ],
             "inputs": [
               {
                 "name": "files.path",
-                "value": []
+                "value": [],
+                "locations": []
               }
             ],
             "passed": false,
@@ -2232,13 +2562,17 @@
                 "cause": "null",
                 "item": "files",
                 "path": "files",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/1/files"
+                ]
               }
             ],
             "inputs": [
               {
                 "name": "files.path",
-                "value": []
+                "value": [],
+                "locations": []
               }
             ],
             "passed": false,
@@ -2256,13 +2590,17 @@
                 "cause": "unusable",
                 "item": "files",
                 "path": "files",
-                "value": "docs/upgrade.md"
+                "value": "docs/upgrade.md",
+                "locations": [
+                  "/releases/2/files"
+                ]
               }
             ],
             "inputs": [
               {
                 "name": "files.path",
-                "value": []
+                "value": [],
+                "locations": []
               }
             ],
             "passed": false,
@@ -2280,7 +2618,10 @@
                 "cause": "absent",
                 "item": "item 2 of files",
                 "path": "files[1].path",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/3/files/1"
+                ]
               }
             ],
             "inputs": [
@@ -2289,6 +2630,10 @@
                 "value": [
                   "docs/upgrade.md",
                   null
+                ],
+                "locations": [
+                  "/releases/3/files/0/path",
+                  "/releases/3/files/1"
                 ]
               }
             ],
@@ -2307,7 +2652,10 @@
                 "cause": "unusable",
                 "item": "item 2 of files",
                 "path": "files[1].path",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/releases/4/files/1/path"
+                ]
               }
             ],
             "inputs": [
@@ -2316,6 +2664,10 @@
                 "value": [
                   "docs/upgrade.md",
                   5
+                ],
+                "locations": [
+                  "/releases/4/files/0/path",
+                  "/releases/4/files/1/path"
                 ]
               }
             ],
@@ -2401,11 +2753,13 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": []
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": []
               }
             ],
             "passed": true,
@@ -2421,7 +2775,11 @@
             "inputs": [
               {
                 "name": "in-scope release count",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/1",
+                  "/releases/2"
+                ]
               }
             ],
             "passed": true,
@@ -2437,7 +2795,8 @@
             "inputs": [
               {
                 "name": "repeated release ids",
-                "value": []
+                "value": [],
+                "locations": []
               }
             ],
             "passed": true,
@@ -2455,7 +2814,10 @@
                 "cause": "value",
                 "item": "item 2 of files",
                 "path": "files[1].path",
-                "value": "src/api.go"
+                "value": "src/api.go",
+                "locations": [
+                  "/releases/0/files/1/path"
+                ]
               }
             ],
             "inputs": [
@@ -2464,6 +2826,10 @@
                 "value": [
                   "docs/upgrade.md",
                   "src/api.go"
+                ],
+                "locations": [
+                  "/releases/0/files/0/path",
+                  "/releases/0/files/1/path"
                 ]
               }
             ],
@@ -2483,6 +2849,9 @@
                 "name": "files[].path",
                 "value": [
                   "docs/upgrade.md"
+                ],
+                "locations": [
+                  "/releases/1/files/0/path"
                 ]
               }
             ],
@@ -2500,7 +2869,8 @@
             "inputs": [
               {
                 "name": "files[].path",
-                "value": []
+                "value": [],
+                "locations": []
               }
             ],
             "passed": true,
@@ -2516,7 +2886,10 @@
             "inputs": [
               {
                 "name": "ticket",
-                "value": "ok"
+                "value": "ok",
+                "locations": [
+                  "/releases/1/ticket"
+                ]
               }
             ],
             "passed": true,
@@ -2532,7 +2905,10 @@
             "inputs": [
               {
                 "name": "ticket",
-                "value": "ok"
+                "value": "ok",
+                "locations": [
+                  "/releases/2/ticket"
+                ]
               }
             ],
             "passed": true,
@@ -2541,6 +2917,173 @@
               "id": "r3",
               "type": "release"
             }
+          }
+        ]
+      },
+      {
+        "description": "does not keep a subject whose list is missing, null, not a list or has an item without the field, and points at the last value it reached",
+        "rules": [
+          "sentence.subject.condition",
+          "sentence.subject.applies",
+          "subjects.sentence",
+          "scope.out",
+          "sentence.whose.every",
+          "location.each",
+          "location.read"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r4",
+              "ticket": "ok"
+            },
+            {
+              "id": "r5",
+              "files": null,
+              "ticket": "ok"
+            },
+            {
+              "id": "r6",
+              "files": "docs/upgrade.md",
+              "ticket": "ok"
+            },
+            {
+              "id": "r7",
+              "files": [
+                {
+                  "path": "docs/upgrade.md"
+                },
+                {
+                  "name": "x"
+                }
+              ],
+              "ticket": "ok"
+            }
+          ]
+        },
+        "requirements": {
+          "s": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "r4",
+              "type": "release"
+            },
+            "check": "$applies",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "files.path",
+                "value": [],
+                "locations": []
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "files",
+                "item": "files",
+                "cause": "absent",
+                "value": null,
+                "locations": [
+                  "/releases/0"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "r5",
+              "type": "release"
+            },
+            "check": "$applies",
+            "passed": false,
+            "cause": "null",
+            "inputs": [
+              {
+                "name": "files.path",
+                "value": [],
+                "locations": []
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "files",
+                "item": "files",
+                "cause": "null",
+                "value": null,
+                "locations": [
+                  "/releases/1/files"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "r6",
+              "type": "release"
+            },
+            "check": "$applies",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "files.path",
+                "value": [],
+                "locations": []
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "files",
+                "item": "files",
+                "cause": "unusable",
+                "value": "docs/upgrade.md",
+                "locations": [
+                  "/releases/2/files"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "r7",
+              "type": "release"
+            },
+            "check": "$applies",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "files[].path",
+                "value": [
+                  "docs/upgrade.md",
+                  null
+                ],
+                "locations": [
+                  "/releases/3/files/0/path",
+                  "/releases/3/files/1"
+                ]
+              }
+            ],
+            "failed_items": [
+              {
+                "path": "files[1].path",
+                "item": "item 2 of files",
+                "cause": "absent",
+                "value": null,
+                "locations": [
+                  "/releases/3/files/1"
+                ]
+              }
+            ]
           }
         ]
       }
@@ -2621,11 +3164,13 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": []
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": []
               }
             ],
             "passed": true,
@@ -2641,7 +3186,10 @@
             "inputs": [
               {
                 "name": "in-scope release count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/releases/0"
+                ]
               }
             ],
             "passed": true,
@@ -2657,7 +3205,8 @@
             "inputs": [
               {
                 "name": "repeated release ids",
-                "value": []
+                "value": [],
+                "locations": []
               }
             ],
             "passed": true,
@@ -2677,11 +3226,18 @@
                 "value": [
                   "docs/upgrade.md",
                   "src/api.go"
+                ],
+                "locations": [
+                  "/releases/0/files/0/path",
+                  "/releases/0/files/1/path"
                 ]
               },
               {
                 "name": "ticket",
-                "value": "ok"
+                "value": "ok",
+                "locations": [
+                  "/releases/0/ticket"
+                ]
               }
             ],
             "passed": true,
@@ -2705,11 +3261,17 @@
                 "name": "files[].path",
                 "value": [
                   "docs/upgrade.md"
+                ],
+                "locations": [
+                  "/releases/1/files/0/path"
                 ]
               },
               {
                 "name": "ticket",
-                "value": "ok"
+                "value": "ok",
+                "locations": [
+                  "/releases/1/ticket"
+                ]
               }
             ],
             "passed": false,
@@ -2733,11 +3295,17 @@
                 "name": "files[].path",
                 "value": [
                   "src/api.go"
+                ],
+                "locations": [
+                  "/releases/2/files/0/path"
                 ]
               },
               {
                 "name": "ticket",
-                "value": "no"
+                "value": "no",
+                "locations": [
+                  "/releases/2/ticket"
+                ]
               }
             ],
             "passed": false,
@@ -2753,7 +3321,10 @@
             "inputs": [
               {
                 "name": "ticket",
-                "value": "ok"
+                "value": "ok",
+                "locations": [
+                  "/releases/0/ticket"
+                ]
               }
             ],
             "passed": true,
@@ -2842,11 +3413,13 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": []
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": []
               }
             ],
             "passed": true,
@@ -2862,7 +3435,10 @@
             "inputs": [
               {
                 "name": "in-scope release count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/trail/artifacts/0/releases/0"
+                ]
               }
             ],
             "passed": true,
@@ -2881,7 +3457,8 @@
             "inputs": [
               {
                 "name": "repeated release ids",
-                "value": []
+                "value": [],
+                "locations": []
               }
             ],
             "passed": true,
@@ -2903,6 +3480,9 @@
                 "name": "files[].owner",
                 "value": [
                   "ann"
+                ],
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0/owner"
                 ]
               }
             ],
@@ -2924,7 +3504,10 @@
                 "cause": "value",
                 "item": "item 1 of files",
                 "path": "files[0].owner",
-                "value": "bob"
+                "value": "bob",
+                "locations": [
+                  "/trail/artifacts/0/releases/1/files/0/owner"
+                ]
               }
             ],
             "inputs": [
@@ -2932,6 +3515,9 @@
                 "name": "files[].owner",
                 "value": [
                   "bob"
+                ],
+                "locations": [
+                  "/trail/artifacts/0/releases/1/files/0/owner"
                 ]
               }
             ],
@@ -2951,7 +3537,10 @@
             "inputs": [
               {
                 "name": "ticket",
-                "value": "ok"
+                "value": "ok",
+                "locations": [
+                  "/trail/artifacts/0/releases/0/ticket"
+                ]
               }
             ],
             "passed": true,
@@ -3047,11 +3636,13 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": []
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": []
               }
             ],
             "passed": true,
@@ -3068,7 +3659,10 @@
             "inputs": [
               {
                 "name": "in-scope release count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/artifacts/0/releases/0"
+                ]
               }
             ],
             "passed": true,
@@ -3084,7 +3678,8 @@
             "inputs": [
               {
                 "name": "repeated release ids",
-                "value": []
+                "value": [],
+                "locations": []
               }
             ],
             "passed": true,
@@ -3104,6 +3699,10 @@
                 "value": [
                   "docs/upgrade.md",
                   "src/api.go"
+                ],
+                "locations": [
+                  "/artifacts/0/releases/0/files/0/path",
+                  "/artifacts/0/releases/0/files/1/path"
                 ]
               }
             ],
@@ -3122,7 +3721,10 @@
                 "cause": "value",
                 "item": "item 1 of files",
                 "path": "files[0].path",
-                "value": "docs/upgrade.md"
+                "value": "docs/upgrade.md",
+                "locations": [
+                  "/artifacts/1/releases/0/files/0/path"
+                ]
               }
             ],
             "inputs": [
@@ -3130,6 +3732,9 @@
                 "name": "files[].path",
                 "value": [
                   "docs/upgrade.md"
+                ],
+                "locations": [
+                  "/artifacts/1/releases/0/files/0/path"
                 ]
               }
             ],
@@ -3148,13 +3753,17 @@
                 "cause": "value",
                 "item": "files",
                 "path": "files",
-                "value": []
+                "value": [],
+                "locations": [
+                  "/artifacts/1/releases/1/files"
+                ]
               }
             ],
             "inputs": [
               {
                 "name": "files[].path",
-                "value": []
+                "value": [],
+                "locations": []
               }
             ],
             "passed": false,
@@ -3170,7 +3779,10 @@
             "inputs": [
               {
                 "name": "ticket",
-                "value": "ok"
+                "value": "ok",
+                "locations": [
+                  "/artifacts/0/releases/0/ticket"
+                ]
               }
             ],
             "passed": true,
@@ -3253,11 +3865,13 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": []
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": []
               }
             ],
             "passed": true,
@@ -3273,7 +3887,10 @@
             "inputs": [
               {
                 "name": "in-scope source count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/releases/0"
+                ]
               }
             ],
             "passed": true,
@@ -3289,7 +3906,8 @@
             "inputs": [
               {
                 "name": "repeated source ids",
-                "value": []
+                "value": [],
+                "locations": []
               }
             ],
             "passed": true,
@@ -3309,6 +3927,10 @@
                 "value": [
                   "docs/upgrade.md",
                   "src/api.go"
+                ],
+                "locations": [
+                  "/releases/0/files/0/path",
+                  "/releases/0/files/1/path"
                 ]
               }
             ],
@@ -3327,7 +3949,10 @@
                 "cause": "value",
                 "item": "item 1 of files",
                 "path": "files[0].path",
-                "value": "docs/upgrade.md"
+                "value": "docs/upgrade.md",
+                "locations": [
+                  "/releases/1/files/0/path"
+                ]
               }
             ],
             "inputs": [
@@ -3335,6 +3960,9 @@
                 "name": "files[].path",
                 "value": [
                   "docs/upgrade.md"
+                ],
+                "locations": [
+                  "/releases/1/files/0/path"
                 ]
               }
             ],
@@ -3351,7 +3979,10 @@
             "inputs": [
               {
                 "name": "ticket",
-                "value": "ok"
+                "value": "ok",
+                "locations": [
+                  "/releases/0/ticket"
+                ]
               }
             ],
             "passed": true,
@@ -3416,17 +4047,20 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": []
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": []
               },
               {
                 "name": "subjects.release.from",
                 "value": [
                   "if any can't go with some"
-                ]
+                ],
+                "locations": []
               }
             ],
             "passed": false,
@@ -3491,17 +4125,20 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": []
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": []
               },
               {
                 "name": "subjects.release.from",
                 "value": [
                   "a condition after whose can't have a whose of its own"
-                ]
+                ],
+                "locations": []
               }
             ],
             "passed": false,
@@ -3566,17 +4203,20 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": []
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": []
               },
               {
                 "name": "subjects.release.from",
                 "value": [
                   "a condition after whose can't have a whose of its own"
-                ]
+                ],
+                "locations": []
               }
             ],
             "passed": false,
@@ -3641,11 +4281,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -3661,7 +4307,10 @@
             "inputs": [
               {
                 "name": "in-scope artifact count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/artifacts/web"
+                ]
               }
             ]
           },
@@ -3677,7 +4326,10 @@
             "inputs": [
               {
                 "name": "repeated artifact ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -3693,7 +4345,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/artifacts/web/x"
+                ]
               }
             ]
           }
@@ -3728,11 +4383,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -3748,7 +4409,10 @@
             "inputs": [
               {
                 "name": "in-scope artifact count",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -3764,7 +4428,10 @@
             "inputs": [
               {
                 "name": "repeated artifact ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -3835,7 +4502,12 @@
             "inputs": [
               {
                 "name": "in-scope scan count",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/scans/sast",
+                  "/scans/sca",
+                  "/scans"
+                ]
               }
             ]
           },
@@ -3851,7 +4523,10 @@
             "inputs": [
               {
                 "name": "repeated scan ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -3867,7 +4542,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/scans/sast/x"
+                ]
               }
             ]
           },
@@ -3883,7 +4561,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/scans/sca"
+                ]
               }
             ]
           },
@@ -3899,7 +4580,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/scans"
+                ]
               }
             ]
           }
@@ -3963,11 +4647,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -3983,7 +4673,10 @@
             "inputs": [
               {
                 "name": "in-scope lockfile count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/lockfile/0"
+                ]
               }
             ]
           },
@@ -3999,7 +4692,10 @@
             "inputs": [
               {
                 "name": "repeated lockfile ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -4015,7 +4711,10 @@
             "inputs": [
               {
                 "name": "status",
-                "value": "COMPLETE"
+                "value": "COMPLETE",
+                "locations": [
+                  "/lockfile/0/status"
+                ]
               }
             ]
           },
@@ -4031,7 +4730,10 @@
             "inputs": [
               {
                 "name": "status",
-                "value": "PENDING"
+                "value": "PENDING",
+                "locations": [
+                  "/lockfile/1/status"
+                ]
               }
             ]
           },
@@ -4047,7 +4749,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/lockfile/0/x"
+                ]
               }
             ]
           }
@@ -4104,11 +4809,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -4124,7 +4835,10 @@
             "inputs": [
               {
                 "name": "in-scope artifact count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/artifact/0"
+                ]
               }
             ]
           },
@@ -4140,7 +4854,10 @@
             "inputs": [
               {
                 "name": "repeated artifact ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -4156,7 +4873,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/artifact/0/x"
+                ]
               }
             ]
           }
@@ -4184,11 +4904,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -4204,7 +4930,10 @@
             "inputs": [
               {
                 "name": "in-scope artifact count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/artifact"
+                ]
               }
             ]
           },
@@ -4220,7 +4949,10 @@
             "inputs": [
               {
                 "name": "repeated artifact ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -4236,7 +4968,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/artifact/x"
+                ]
               }
             ]
           }
@@ -4296,11 +5031,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -4316,7 +5057,11 @@
             "inputs": [
               {
                 "name": "in-scope artifact count",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/artifact/0",
+                  "/artifact/1"
+                ]
               }
             ]
           },
@@ -4332,7 +5077,10 @@
             "inputs": [
               {
                 "name": "repeated artifact ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -4350,7 +5098,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/artifact/0/x"
+                ]
               }
             ]
           },
@@ -4368,7 +5119,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/artifact/1/x"
+                ]
               }
             ]
           }
@@ -4402,11 +5156,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -4422,7 +5182,10 @@
             "inputs": [
               {
                 "name": "in-scope artifact count",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -4438,7 +5201,10 @@
             "inputs": [
               {
                 "name": "repeated artifact ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -4500,11 +5266,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -4520,7 +5292,10 @@
             "inputs": [
               {
                 "name": "in-scope artifact count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  ""
+                ]
               }
             ]
           },
@@ -4536,7 +5311,10 @@
             "inputs": [
               {
                 "name": "repeated artifact ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           },
@@ -4552,7 +5330,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/x"
+                ]
               }
             ]
           }
@@ -4609,16 +5390,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "subjects.deployment.from",
                 "value": [
                   "unclosed quote at column 34"
+                ],
+                "locations": [
+
                 ]
               }
             ]
@@ -4676,16 +5466,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "subjects.deployment.identified_by",
                 "value": [
                   "identified_by is a path, like \"id\" or \"build.number\""
+                ],
+                "locations": [
+
                 ]
               }
             ]
@@ -4704,7 +5503,7 @@
         "input": {"deployments": [{"id": "d1", "x": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "deployment", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "subjects.deployment.applies_to", "value": ["unknown field"]}]}
+          {"requirement": "s", "subject": {"type": "deployment", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "subjects.deployment.applies_to", "value": ["unknown field"], "locations": []}]}
         ]
       }
     ]
@@ -4770,11 +5569,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -4790,7 +5595,11 @@
             "inputs": [
               {
                 "name": "in-scope pull_request count",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/artifacts/0/pulls/0",
+                  "/artifacts/0/pulls/1"
+                ]
               }
             ],
             "passed": true,
@@ -4809,7 +5618,10 @@
             "inputs": [
               {
                 "name": "repeated pull_request ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -4829,11 +5641,17 @@
             "inputs": [
               {
                 "name": "artifact.name",
-                "value": "web"
+                "value": "web",
+                "locations": [
+                  "/artifacts/0/name"
+                ]
               },
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/artifacts/0/pulls/0/x"
+                ]
               }
             ],
             "passed": true,
@@ -4858,11 +5676,17 @@
             "inputs": [
               {
                 "name": "artifact.name",
-                "value": "web"
+                "value": "web",
+                "locations": [
+                  "/artifacts/0/name"
+                ]
               },
               {
                 "name": "x",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/artifacts/0/pulls/1"
+                ]
               }
             ],
             "passed": false,
@@ -4913,11 +5737,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -4933,7 +5763,10 @@
             "inputs": [
               {
                 "name": "in-scope pull_request count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/artifacts/0/pulls/0"
+                ]
               }
             ],
             "passed": true,
@@ -4952,7 +5785,10 @@
             "inputs": [
               {
                 "name": "in-scope pull_request count",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               }
             ],
             "passed": false,
@@ -4971,7 +5807,10 @@
             "inputs": [
               {
                 "name": "repeated pull_request ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -4990,7 +5829,10 @@
             "inputs": [
               {
                 "name": "repeated pull_request ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -5015,11 +5857,17 @@
             "inputs": [
               {
                 "name": "artifact.name",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/artifacts/0"
+                ]
               },
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/artifacts/0/pulls/0/x"
+                ]
               }
             ],
             "passed": false,
@@ -5056,11 +5904,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -5076,7 +5930,10 @@
             "inputs": [
               {
                 "name": "in-scope pull_request count",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               }
             ],
             "passed": false,
@@ -5092,7 +5949,10 @@
             "inputs": [
               {
                 "name": "repeated pull_request ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -5177,11 +6037,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -5197,7 +6063,11 @@
             "inputs": [
               {
                 "name": "in-scope pull_request count",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/artifacts/0/pulls/0",
+                  "/artifacts/0/pulls/1"
+                ]
               }
             ],
             "passed": true,
@@ -5216,7 +6086,10 @@
             "inputs": [
               {
                 "name": "in-scope pull_request count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/artifacts/1/pulls/0"
+                ]
               }
             ],
             "passed": true,
@@ -5237,6 +6110,10 @@
                 "name": "repeated pull_request ids",
                 "value": [
                   "p1"
+                ],
+                "locations": [
+                  "/artifacts/0/pulls/0/id",
+                  "/artifacts/0/pulls/1/id"
                 ]
               }
             ],
@@ -5256,7 +6133,10 @@
             "inputs": [
               {
                 "name": "repeated pull_request ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -5276,11 +6156,17 @@
             "inputs": [
               {
                 "name": "approvals",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/artifacts/0/pulls/0/approvals"
+                ]
               },
               {
                 "name": "artifact.id",
-                "value": "a1"
+                "value": "a1",
+                "locations": [
+                  "/artifacts/0/id"
+                ]
               }
             ],
             "passed": true,
@@ -5300,11 +6186,17 @@
             "inputs": [
               {
                 "name": "approvals",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/artifacts/0/pulls/1/approvals"
+                ]
               },
               {
                 "name": "artifact.id",
-                "value": "a1"
+                "value": "a1",
+                "locations": [
+                  "/artifacts/0/id"
+                ]
               }
             ],
             "passed": true,
@@ -5324,11 +6216,17 @@
             "inputs": [
               {
                 "name": "approvals",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/artifacts/1/pulls/0/approvals"
+                ]
               },
               {
                 "name": "artifact.id",
-                "value": "a2"
+                "value": "a2",
+                "locations": [
+                  "/artifacts/1/id"
+                ]
               }
             ],
             "passed": true,
@@ -5394,11 +6292,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -5414,7 +6318,10 @@
             "inputs": [
               {
                 "name": "in-scope pull_request count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/artifacts/0/pulls/0"
+                ]
               }
             ],
             "passed": true,
@@ -5433,7 +6340,10 @@
             "inputs": [
               {
                 "name": "repeated pull_request ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -5453,11 +6363,17 @@
             "inputs": [
               {
                 "name": "approvals",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/artifacts/0/pulls/0/approvals"
+                ]
               },
               {
                 "name": "artifact.id",
-                "value": "a1"
+                "value": "a1",
+                "locations": [
+                  "/artifacts/0/id"
+                ]
               }
             ],
             "passed": true,
@@ -5517,11 +6433,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -5537,7 +6459,10 @@
             "inputs": [
               {
                 "name": "in-scope pull_request count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/artifacts/0/pulls/0"
+                ]
               }
             ],
             "passed": true,
@@ -5556,7 +6481,10 @@
             "inputs": [
               {
                 "name": "in-scope pull_request count",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               }
             ],
             "passed": false,
@@ -5575,7 +6503,10 @@
             "inputs": [
               {
                 "name": "repeated pull_request ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -5595,11 +6526,17 @@
             "inputs": [
               {
                 "name": "approvals",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/artifacts/0/pulls/0/approvals"
+                ]
               },
               {
                 "name": "artifact.id",
-                "value": "a1"
+                "value": "a1",
+                "locations": [
+                  "/artifacts/0/id"
+                ]
               }
             ],
             "passed": true,
@@ -5647,11 +6584,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -5667,7 +6610,10 @@
             "inputs": [
               {
                 "name": "in-scope pull_request count",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               }
             ],
             "passed": false,
@@ -5683,7 +6629,10 @@
             "inputs": [
               {
                 "name": "repeated pull_request ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -5758,11 +6707,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -5778,7 +6733,10 @@
             "inputs": [
               {
                 "name": "in-scope kid count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/bs/0/kids/0"
+                ]
               }
             ],
             "passed": true,
@@ -5797,7 +6755,10 @@
             "inputs": [
               {
                 "name": "repeated kid ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -5816,11 +6777,17 @@
             "inputs": [
               {
                 "name": "b.x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/bs/0/x"
+                ]
               },
               {
                 "name": "v",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/bs/0/kids/0/v"
+                ]
               }
             ],
             "passed": true,
@@ -5839,11 +6806,17 @@
             "inputs": [
               {
                 "name": "b.x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/bs/0/x"
+                ]
               },
               {
                 "name": "v",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/bs/0/kids/1/v"
+                ]
               }
             ],
             "passed": false,
@@ -5862,7 +6835,10 @@
             "inputs": [
               {
                 "name": "v",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/bs/0/kids/0/v"
+                ]
               }
             ],
             "passed": true,
@@ -5909,11 +6885,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -5929,7 +6911,10 @@
             "inputs": [
               {
                 "name": "in-scope kid count",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               }
             ],
             "passed": false,
@@ -5948,7 +6933,10 @@
             "inputs": [
               {
                 "name": "repeated kid ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -5967,11 +6955,17 @@
             "inputs": [
               {
                 "name": "b.x",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/bs/0"
+                ]
               },
               {
                 "name": "v",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/bs/0/kids/0/v"
+                ]
               }
             ],
             "passed": false,
@@ -6057,11 +7051,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -6077,7 +7077,10 @@
             "inputs": [
               {
                 "name": "in-scope kid count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/bs/0/kids/0"
+                ]
               }
             ],
             "passed": true,
@@ -6096,7 +7099,10 @@
             "inputs": [
               {
                 "name": "repeated kid ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -6115,11 +7121,17 @@
             "inputs": [
               {
                 "name": "b.x",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/bs/0/kids/0/b/x"
+                ]
               },
               {
                 "name": "v",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/bs/0/kids/0/v"
+                ]
               }
             ],
             "passed": true,
@@ -6138,11 +7150,17 @@
             "inputs": [
               {
                 "name": "b.x",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/bs/0/kids/1"
+                ]
               },
               {
                 "name": "v",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/bs/0/kids/1/v"
+                ]
               }
             ],
             "passed": false,
@@ -6161,7 +7179,10 @@
             "inputs": [
               {
                 "name": "v",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/bs/0/kids/0/v"
+                ]
               }
             ],
             "passed": true,
@@ -6254,11 +7275,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -6274,7 +7301,11 @@
             "inputs": [
               {
                 "name": "in-scope commit count",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/artifacts/0/pulls/0/commits/0",
+                  "/artifacts/0/pulls/0/commits/1"
+                ]
               }
             ],
             "passed": true,
@@ -6294,7 +7325,10 @@
             "inputs": [
               {
                 "name": "in-scope commit count",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               }
             ],
             "passed": false,
@@ -6314,7 +7348,10 @@
             "inputs": [
               {
                 "name": "repeated commit ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -6334,7 +7371,10 @@
             "inputs": [
               {
                 "name": "repeated commit ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -6355,15 +7395,24 @@
             "inputs": [
               {
                 "name": "artifact.id",
-                "value": "a1"
+                "value": "a1",
+                "locations": [
+                  "/artifacts/0/id"
+                ]
               },
               {
                 "name": "pull_request.id",
-                "value": "p1"
+                "value": "p1",
+                "locations": [
+                  "/artifacts/0/pulls/0/id"
+                ]
               },
               {
                 "name": "verified",
-                "value": true
+                "value": true,
+                "locations": [
+                  "/artifacts/0/pulls/0/commits/0/verified"
+                ]
               }
             ],
             "passed": true,
@@ -6389,15 +7438,24 @@
             "inputs": [
               {
                 "name": "artifact.id",
-                "value": "a1"
+                "value": "a1",
+                "locations": [
+                  "/artifacts/0/id"
+                ]
               },
               {
                 "name": "pull_request.id",
-                "value": "p1"
+                "value": "p1",
+                "locations": [
+                  "/artifacts/0/pulls/0/id"
+                ]
               },
               {
                 "name": "verified",
-                "value": false
+                "value": false,
+                "locations": [
+                  "/artifacts/0/pulls/0/commits/1/verified"
+                ]
               }
             ],
             "passed": false,
@@ -6479,11 +7537,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -6499,7 +7563,10 @@
             "inputs": [
               {
                 "name": "in-scope commit count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/artifacts/0/pulls/0/commits/0"
+                ]
               }
             ],
             "passed": true,
@@ -6519,7 +7586,10 @@
             "inputs": [
               {
                 "name": "repeated commit ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -6540,15 +7610,24 @@
             "inputs": [
               {
                 "name": "artifact.id",
-                "value": "a1"
+                "value": "a1",
+                "locations": [
+                  "/artifacts/0/id"
+                ]
               },
               {
                 "name": "pull_request.id",
-                "value": "p1"
+                "value": "p1",
+                "locations": [
+                  "/artifacts/0/pulls/0/id"
+                ]
               },
               {
                 "name": "verified",
-                "value": true
+                "value": true,
+                "locations": [
+                  "/artifacts/0/pulls/0/commits/0/verified"
+                ]
               }
             ],
             "passed": true,
@@ -6617,11 +7696,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -6637,7 +7722,10 @@
             "inputs": [
               {
                 "name": "in-scope commit count",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               }
             ],
             "passed": false,
@@ -6656,7 +7744,10 @@
             "inputs": [
               {
                 "name": "in-scope commit count",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               }
             ],
             "passed": false,
@@ -6700,11 +7791,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -6720,7 +7817,10 @@
             "inputs": [
               {
                 "name": "in-scope commit count",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               }
             ],
             "passed": false,
@@ -6736,7 +7836,10 @@
             "inputs": [
               {
                 "name": "repeated commit ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -6803,16 +7906,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "subjects.review.from",
                 "value": [
                   "a chain of more than three subjects isn't supported yet"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -6899,11 +8011,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -6920,7 +8038,12 @@
             "inputs": [
               {
                 "name": "in-scope pull request count",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/artifacts/0/pull_requests/0",
+                  "/artifacts/0/pull_requests/1",
+                  "/artifacts/2/pull_requests/0"
+                ]
               }
             ],
             "passed": true,
@@ -6936,7 +8059,10 @@
             "inputs": [
               {
                 "name": "repeated pull request ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -6952,7 +8078,10 @@
             "inputs": [
               {
                 "name": "approvals",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/artifacts/0/pull_requests/0/approvals"
+                ]
               }
             ],
             "passed": true,
@@ -6968,7 +8097,10 @@
             "inputs": [
               {
                 "name": "approvals",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/artifacts/0/pull_requests/1/approvals"
+                ]
               }
             ],
             "passed": false,
@@ -6984,7 +8116,10 @@
             "inputs": [
               {
                 "name": "approvals",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/artifacts/2/pull_requests/0/approvals"
+                ]
               }
             ],
             "passed": true,
@@ -7031,11 +8166,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -7052,7 +8193,11 @@
             "inputs": [
               {
                 "name": "in-scope pull request count",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/artifacts/0/pull_requests/0",
+                  "/artifacts/1/pull_requests/0"
+                ]
               }
             ],
             "passed": true,
@@ -7070,6 +8215,10 @@
                 "name": "repeated pull request ids",
                 "value": [
                   "pr/7"
+                ],
+                "locations": [
+                  "/artifacts/0/pull_requests/0/url",
+                  "/artifacts/1/pull_requests/0/url"
                 ]
               }
             ],
@@ -7086,7 +8235,10 @@
             "inputs": [
               {
                 "name": "approvals",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/artifacts/0/pull_requests/0/approvals"
+                ]
               }
             ],
             "passed": true,
@@ -7102,7 +8254,10 @@
             "inputs": [
               {
                 "name": "approvals",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/artifacts/1/pull_requests/0/approvals"
+                ]
               }
             ],
             "passed": true,
@@ -7136,11 +8291,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -7157,7 +8318,10 @@
             "inputs": [
               {
                 "name": "in-scope pull request count",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               }
             ],
             "passed": false,
@@ -7173,7 +8337,10 @@
             "inputs": [
               {
                 "name": "repeated pull request ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -7219,11 +8386,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -7241,25 +8414,37 @@
                 "cause": "absent",
                 "item": "artifacts[1].pull_requests",
                 "path": "artifacts[1].pull_requests",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/artifacts/1"
+                ]
               },
               {
                 "cause": "null",
                 "item": "artifacts[2].pull_requests",
                 "path": "artifacts[2].pull_requests",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/artifacts/2/pull_requests"
+                ]
               },
               {
                 "cause": "unusable",
                 "item": "artifacts[3].pull_requests",
                 "path": "artifacts[3].pull_requests",
-                "value": "none"
+                "value": "none",
+                "locations": [
+                  "/artifacts/3/pull_requests"
+                ]
               }
             ],
             "inputs": [
               {
                 "name": "in-scope pull request count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/artifacts/0/pull_requests/0"
+                ]
               }
             ],
             "passed": false,
@@ -7275,7 +8460,10 @@
             "inputs": [
               {
                 "name": "repeated pull request ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -7291,7 +8479,10 @@
             "inputs": [
               {
                 "name": "approvals",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/artifacts/0/pull_requests/0/approvals"
+                ]
               }
             ],
             "passed": true,
@@ -7325,11 +8516,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -7349,13 +8546,19 @@
                 "path": "artifacts.pull_requests",
                 "value": {
                   "url": "pr/7"
-                }
+                },
+                "locations": [
+                  "/artifacts/pull_requests"
+                ]
               }
             ],
             "inputs": [
               {
                 "name": "in-scope pull request count",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               }
             ],
             "passed": false,
@@ -7371,7 +8574,10 @@
             "inputs": [
               {
                 "name": "repeated pull request ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -7436,16 +8642,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "subjects.\"pull request\".from",
                 "value": [
                   "every can't go with a from line that starts at another subject yet"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -7510,16 +8725,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "subjects.scan.from",
                 "value": [
                   "every can't go with named by each of: start the from line at a subject to read its names one subject at a time"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -7603,11 +8827,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -7623,7 +8853,11 @@
             "inputs": [
               {
                 "name": "in-scope critical defect count",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/defects/0",
+                  "/defects/2"
+                ]
               }
             ],
             "passed": true,
@@ -7639,7 +8873,10 @@
             "inputs": [
               {
                 "name": "repeated critical defect ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -7656,11 +8893,17 @@
             "inputs": [
               {
                 "name": "severity",
-                "value": "critical"
+                "value": "critical",
+                "locations": [
+                  "/defects/0/severity"
+                ]
               },
               {
                 "name": "status",
-                "value": "open"
+                "value": "open",
+                "locations": [
+                  "/defects/0/status"
+                ]
               }
             ],
             "passed": true,
@@ -7682,11 +8925,17 @@
             "inputs": [
               {
                 "name": "severity",
-                "value": "low"
+                "value": "low",
+                "locations": [
+                  "/defects/1/severity"
+                ]
               },
               {
                 "name": "status",
-                "value": "open"
+                "value": "open",
+                "locations": [
+                  "/defects/1/status"
+                ]
               }
             ],
             "passed": false,
@@ -7703,11 +8952,17 @@
             "inputs": [
               {
                 "name": "severity",
-                "value": "critical"
+                "value": "critical",
+                "locations": [
+                  "/defects/2/severity"
+                ]
               },
               {
                 "name": "status",
-                "value": "open"
+                "value": "open",
+                "locations": [
+                  "/defects/2/status"
+                ]
               }
             ],
             "passed": true,
@@ -7723,7 +8978,10 @@
             "inputs": [
               {
                 "name": "team",
-                "value": "a"
+                "value": "a",
+                "locations": [
+                  "/defects/0/team"
+                ]
               }
             ],
             "passed": true,
@@ -7739,7 +8997,10 @@
             "inputs": [
               {
                 "name": "team",
-                "value": "b"
+                "value": "b",
+                "locations": [
+                  "/defects/2/team"
+                ]
               }
             ],
             "passed": true,
@@ -7825,11 +9086,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -7845,7 +9112,10 @@
             "inputs": [
               {
                 "name": "in-scope team a defect count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/defects/0"
+                ]
               }
             ],
             "passed": true,
@@ -7861,7 +9131,10 @@
             "inputs": [
               {
                 "name": "repeated team a defect ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -7878,11 +9151,17 @@
             "inputs": [
               {
                 "name": "severity",
-                "value": "critical"
+                "value": "critical",
+                "locations": [
+                  "/defects/0/severity"
+                ]
               },
               {
                 "name": "team",
-                "value": "a"
+                "value": "a",
+                "locations": [
+                  "/defects/0/team"
+                ]
               }
             ],
             "passed": true,
@@ -7904,11 +9183,17 @@
             "inputs": [
               {
                 "name": "severity",
-                "value": "low"
+                "value": "low",
+                "locations": [
+                  "/defects/1/severity"
+                ]
               },
               {
                 "name": "team",
-                "value": "a"
+                "value": "a",
+                "locations": [
+                  "/defects/1/team"
+                ]
               }
             ],
             "passed": false,
@@ -7930,11 +9215,17 @@
             "inputs": [
               {
                 "name": "severity",
-                "value": "critical"
+                "value": "critical",
+                "locations": [
+                  "/defects/2/severity"
+                ]
               },
               {
                 "name": "team",
-                "value": "b"
+                "value": "b",
+                "locations": [
+                  "/defects/2/team"
+                ]
               }
             ],
             "passed": false,
@@ -7950,7 +9241,10 @@
             "inputs": [
               {
                 "name": "team",
-                "value": "a"
+                "value": "a",
+                "locations": [
+                  "/defects/0/team"
+                ]
               }
             ],
             "passed": true,
@@ -8033,16 +9327,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "subjects.x.from",
                 "value": [
                   "leads to a loop"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -8114,16 +9417,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "subjects.\"critical defect\".identified_by",
                 "value": [
                   "not allowed on a subject that narrows another"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -8184,16 +9496,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "subjects.b.from",
                 "value": [
                   "values of mixed types"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -8270,11 +9591,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -8290,7 +9617,11 @@
             "inputs": [
               {
                 "name": "in-scope setting count",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/settings/security/mfa",
+                  "/settings/security/sso"
+                ]
               }
             ],
             "passed": true,
@@ -8306,7 +9637,10 @@
             "inputs": [
               {
                 "name": "repeated setting ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -8322,7 +9656,10 @@
             "inputs": [
               {
                 "name": "enabled",
-                "value": true
+                "value": true,
+                "locations": [
+                  "/settings/security/mfa/enabled"
+                ]
               }
             ],
             "passed": true,
@@ -8338,7 +9675,10 @@
             "inputs": [
               {
                 "name": "enabled",
-                "value": false
+                "value": false,
+                "locations": [
+                  "/settings/security/sso/enabled"
+                ]
               }
             ],
             "passed": false,
@@ -8641,7 +9981,7 @@
         "input": {"things": [{"id": "t1", "x": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "subjects.thing.from", "value": ["not a string"]}, {"name": "subjects.thing.identified_by", "value": ["not a string"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "subjects.thing.from", "value": ["not a string"], "locations": []}, {"name": "subjects.thing.identified_by", "value": ["not a string"], "locations": []}]}
         ]
       }
     ]
@@ -8712,16 +10052,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "subjects.b.from",
                 "value": [
                   "\" \" isn't a subject name"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -8807,16 +10156,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "subjects.b.from",
                 "value": [
                   "\" \" isn't a subject name"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -8892,16 +10250,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "subjects.kid.from",
                 "value": [
                   "leads to a loop"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -8986,16 +10353,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "subjects.p.from",
                 "value": [
                   "leads to a loop"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -9071,16 +10447,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "subjects.kid.from",
                 "value": [
                   "leads to a loop"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -9158,11 +10543,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -9178,7 +10569,10 @@
             "inputs": [
               {
                 "name": "in-scope kid count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/ts/0/kids/0"
+                ]
               }
             ],
             "passed": true,
@@ -9197,7 +10591,10 @@
             "inputs": [
               {
                 "name": "repeated kid ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -9216,11 +10613,17 @@
             "inputs": [
               {
                 "name": "t.x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/ts/0/x"
+                ]
               },
               {
                 "name": "n",
-                "value": "a"
+                "value": "a",
+                "locations": [
+                  "/ts/0/kids/0/n"
+                ]
               }
             ],
             "passed": true,
@@ -9313,16 +10716,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "subjects.pc.from",
                 "value": [
                   "leads to a loop"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -9405,16 +10817,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "subjects.pc.from",
                 "value": [
                   "leads to a loop"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -9425,6 +10846,211 @@
               "type": "pc"
             }
           }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject read from the values of an object",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"scan": {"from": "scans named by each of $params.required", "identified_by": "name"}}, "requirements": {"s": {"subject": "scan", "checks": {"c": "x exists"}}}},
+    "params": {"required": ["sast", "sca/x", "secrets"]},
+    "cases": [
+      {
+        "description": "starts a subject at its key, escaped, and at the object when the key isn't there",
+        "rules": ["location.start", "location"],
+        "input": {"scans": {"sast": {"name": "other", "x": 1}, "sca/x": {"x": 2}}},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/scans/sast/x"], "name": "x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "sast", "type": "scan"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/scans/sca~1x/x"], "name": "x", "value": 2}], "passed": true, "requirement": "s", "subject": {"id": "sca/x", "type": "scan"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/scans"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "secrets", "type": "scan"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"artifact": {"from": "trail.artifacts", "identified_by": "fingerprint"}, "pull request": {"from": "artifact.pull_requests", "identified_by": "url"}}, "requirements": {"s": {"subject": "pull request", "checks": {"c": "url exists and artifact.fingerprint exists and by exists"}}}},
+    "cases": [
+      {
+        "description": "starts a child at its parent's location, and a path through the parent's name at the parent's",
+        "rules": ["location.start"],
+        "input": {"trail": {"artifacts": [{"fingerprint": "a", "pull_requests": [{"url": "u1", "by": "x"}, {"url": "u2"}]}, {"fingerprint": "b", "pull_requests": [{"url": "u3", "by": "y"}]}]}},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_assertions": [], "inputs": [{"locations": ["/trail/artifacts/0/fingerprint"], "name": "artifact.fingerprint", "value": "a"}, {"locations": ["/trail/artifacts/0/pull_requests/0/by"], "name": "by", "value": "x"}, {"locations": ["/trail/artifacts/0/pull_requests/0/url"], "name": "url", "value": "u1"}], "passed": true, "requirement": "s", "subject": {"id": "u1", "in": {"artifact": "a"}, "type": "pull request"}},
+          {"cause": "value", "check": "c", "failed_assertions": [{"assertion": "by exists", "cause": "value"}], "inputs": [{"locations": ["/trail/artifacts/0/fingerprint"], "name": "artifact.fingerprint", "value": "a"}, {"locations": ["/trail/artifacts/0/pull_requests/1"], "name": "by", "value": null}, {"locations": ["/trail/artifacts/0/pull_requests/1/url"], "name": "url", "value": "u2"}], "passed": false, "requirement": "s", "subject": {"id": "u2", "in": {"artifact": "a"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "c", "failed_assertions": [], "inputs": [{"locations": ["/trail/artifacts/1/fingerprint"], "name": "artifact.fingerprint", "value": "b"}, {"locations": ["/trail/artifacts/1/pull_requests/0/by"], "name": "by", "value": "y"}, {"locations": ["/trail/artifacts/1/pull_requests/0/url"], "name": "url", "value": "u3"}], "passed": true, "requirement": "s", "subject": {"id": "u3", "in": {"artifact": "b"}, "type": "pull request"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject read with every",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"item": {"from": "every things.xs", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": "id exists"}}}},
+    "cases": [
+      {
+        "description": "starts each subject where the walk found it",
+        "rules": ["location.start"],
+        "input": {"things": {"xs": [{"id": "a"}, {"id": "b"}]}},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/xs/0/id"], "name": "id", "value": "a"}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "item"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/xs/1/id"], "name": "id", "value": "b"}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with two conditions on one field",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things whose state is \"live\" and state is not \"old\"", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "lists the field once in the $applies row, with its location",
+        "rules": ["location.merged", "location.start"],
+        "input": {"things": [{"id": "t1", "state": "live", "x": 1}, {"id": "t2", "state": "old"}]},
+        "results": [
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/things/0/state"], "name": "state", "value": "live"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}, "failed_assertions": []},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/things/1/state"], "name": "state", "value": "old"}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}, "failed_assertions": [{"assertion": "state is \"live\"", "cause": "value"}, {"assertion": "state is not \"old\"", "cause": "value"}]},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a $min_subjects row counting subjects",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things whose state is \"live\"", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "lists the location of each subject it counts, in the order of the rows",
+        "rules": ["location.worked_out"],
+        "input": {"things": [{"id": "t1", "state": "live", "x": 1}, {"id": "t2", "state": "old"}, {"id": "t3", "state": "live"}]},
+        "results": [
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/things/0", "/things/2"], "name": "in-scope thing count", "value": 2}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "thing"}},
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/things/0/state"], "name": "state", "value": "live"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/things/1/state"], "name": "state", "value": "old"}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/things/2/state"], "name": "state", "value": "live"}], "passed": true, "requirement": "s", "subject": {"id": "t3", "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/2"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t3", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "lists no location when it counts no subject",
+        "rules": ["location.worked_out"],
+        "input": {"things": [{"id": "t2", "state": "old"}]},
+        "results": [
+          {"cause": "value", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope thing count", "value": 0}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/things/0/state"], "name": "state", "value": "old"}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a $unique_ids row with repeated ids",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists"}}}},
+    "cases": [
+      {
+        "description": "lists the location of the id of every subject that shares one, ordered by id, then by subject",
+        "rules": ["location.worked_out"],
+        "input": {"things": [{"id": 3}, {"id": "b"}, {"id": 10}, {"id": "a"}, {"id": 3}, {"id": "b"}, {"id": 10}, {"id": 10}]},
+        "results": [
+          {"cause": "value", "check": "$unique_ids", "inputs": [{"locations": ["/things/1/id", "/things/5/id", "/things/2/id", "/things/6/id", "/things/7/id", "/things/0/id", "/things/4/id"], "name": "repeated thing ids", "value": ["b", 10, 3]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/id"], "name": "id", "value": 3}], "passed": true, "requirement": "s", "subject": {"id": 3, "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/1/id"], "name": "id", "value": "b"}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/2/id"], "name": "id", "value": 10}], "passed": true, "requirement": "s", "subject": {"id": 10, "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/3/id"], "name": "id", "value": "a"}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/4/id"], "name": "id", "value": 3}], "passed": true, "requirement": "s", "subject": {"id": 3, "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/5/id"], "name": "id", "value": "b"}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/6/id"], "name": "id", "value": 10}], "passed": true, "requirement": "s", "subject": {"id": 10, "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/7/id"], "name": "id", "value": 10}], "passed": true, "requirement": "s", "subject": {"id": 10, "type": "thing"}}
+        ]
+      },
+      {
+        "description": "lists no location when no id is shared",
+        "rules": ["location.worked_out"],
+        "input": {"things": [{"id": 1}, {"id": 2}]},
+        "results": [
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated thing ids", "value": []}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/id"], "name": "id", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": 1, "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/1/id"], "name": "id", "value": 2}], "passed": true, "requirement": "s", "subject": {"id": 2, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a $well_formed row",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists"}}}},
+    "cases": [
+      {
+        "description": "has inputs with no locations, because they read the policy",
+        "rules": ["location.worked_out"],
+        "input": {"things": [{"id": 1}]},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/id"], "name": "id", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": 1, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a $well_formed row that lists a problem",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "require": "most", "checks": {"c": "id exists"}}}},
+    "cases": [
+      {
+        "description": "has no locations for the problem either",
+        "rules": ["location.worked_out"],
+        "input": {"things": [{"id": 1}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": ["neither every nor some"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with every where a list can't be read",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"pull request": {"from": "every artifacts.pull_requests", "identified_by": "url"}}, "requirements": {"r": {"subject": "pull request", "checks": {"c": "approvals is at least 1"}}}},
+    "cases": [
+      {
+        "description": "gives each failed item of the $min_subjects row the location where its read stopped",
+        "rules": ["location.failed_items"],
+        "input": {"artifacts": [{"pull_requests": [{"url": "pr/7", "approvals": 2}]}, {}, {"pull_requests": null}, {"pull_requests": "none"}]},
+        "results": [
+          {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "absent", "item": "artifacts[1].pull_requests", "locations": ["/artifacts/1"], "path": "artifacts[1].pull_requests", "value": null}, {"cause": "null", "item": "artifacts[2].pull_requests", "locations": ["/artifacts/2/pull_requests"], "path": "artifacts[2].pull_requests", "value": null}, {"cause": "unusable", "item": "artifacts[3].pull_requests", "locations": ["/artifacts/3/pull_requests"], "path": "artifacts[3].pull_requests", "value": "none"}], "inputs": [{"locations": ["/artifacts/0/pull_requests/0"], "name": "in-scope pull request count", "value": 1}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "pull request"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/artifacts/0/pull_requests/0/approvals"], "name": "approvals", "value": 2}], "passed": true, "requirement": "r", "subject": {"id": "pr/7", "type": "pull request"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject that reads its parent and itself under the same name",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids", "identified_by": "id"}}, "requirements": {"s": {"subject": "kid", "checks": {"c": "b.x is 1 and .b.x is 1", "d": "b.x is 1 and b.x is 1"}}}},
+    "cases": [
+      {
+        "description": "lists each read once when it reads one place, and twice when two places print the same name and value",
+        "rules": ["location.merged"],
+        "input": {"bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "b": {"x": 1}}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_assertions": [], "inputs": [{"locations": ["/bs/0/kids/0/b/x"], "name": "b.x", "value": 1}, {"locations": ["/bs/0/x"], "name": "b.x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "k1", "in": {"b": "b1"}, "type": "kid"}},
+          {"cause": "satisfied", "check": "d", "failed_assertions": [], "inputs": [{"locations": ["/bs/0/x"], "name": "b.x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "k1", "in": {"b": "b1"}, "type": "kid"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with a some or every condition that fails on some items",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"release": {"from": "releases whose some files.path does not match \"^docs/\"", "identified_by": "id"}, "module": {"from": "modules whose every files.path matches \"^docs/\"", "identified_by": "id"}}, "requirements": {"r": {"subject": "release", "checks": {"c": "id exists"}}, "m": {"subject": "module", "checks": {"c": "id exists"}}}},
+    "cases": [
+      {
+        "description": "gives each failed item of the $applies row the location where its value was read",
+        "rules": ["location.failed_items", "location.read", "scope.failures"],
+        "input": {"releases": [{"id": "r1", "files": [{"path": "docs/a.md"}, {"path": "src/x.go"}]}, {"id": "r2", "files": [{"path": "docs/a.md"}]}, {"id": "r3", "files": [{"path": "docs/a.md"}, {"name": "x"}]}], "modules": [{"id": "m1", "files": [{"path": "docs/a.md"}, {"path": "src/x.go"}]}, {"id": "m2", "files": [{"path": "docs/a.md"}, {"name": "x"}]}, {"id": "m3", "files": [{"path": "docs/a.md"}]}]},
+        "requirements": {"m": {"status": "not_met"}, "r": {"status": "not_met"}},
+        "results": [
+          {"cause": "value", "check": "$applies", "failed_items": [{"cause": "value", "item": "item 2 of files", "locations": ["/modules/0/files/1/path"], "path": "files[1].path", "value": "src/x.go"}], "inputs": [{"locations": ["/modules/0/files/0/path", "/modules/0/files/1/path"], "name": "files[].path", "value": ["docs/a.md", "src/x.go"]}], "passed": false, "requirement": "m", "subject": {"id": "m1", "type": "module"}},
+          {"cause": "absent", "check": "$applies", "failed_items": [{"cause": "absent", "item": "item 2 of files", "locations": ["/modules/1/files/1"], "path": "files[1].path", "value": null}], "inputs": [{"locations": ["/modules/1/files/0/path", "/modules/1/files/1"], "name": "files[].path", "value": ["docs/a.md", null]}], "passed": false, "requirement": "m", "subject": {"id": "m2", "type": "module"}},
+          {"cause": "satisfied", "check": "$applies", "failed_items": [], "inputs": [{"locations": ["/modules/2/files/0/path"], "name": "files[].path", "value": ["docs/a.md"]}], "passed": true, "requirement": "m", "subject": {"id": "m3", "type": "module"}},
+          {"cause": "satisfied", "check": "$applies", "failed_items": [], "inputs": [{"locations": ["/releases/0/files/0/path", "/releases/0/files/1/path"], "name": "files[].path", "value": ["docs/a.md", "src/x.go"]}], "passed": true, "requirement": "r", "subject": {"id": "r1", "type": "release"}},
+          {"cause": "value", "check": "$applies", "failed_items": [{"cause": "value", "item": "item 1 of files", "locations": ["/releases/1/files/0/path"], "path": "files[0].path", "value": "docs/a.md"}], "inputs": [{"locations": ["/releases/1/files/0/path"], "name": "files[].path", "value": ["docs/a.md"]}], "passed": false, "requirement": "r", "subject": {"id": "r2", "type": "release"}},
+          {"cause": "absent", "check": "$applies", "failed_items": [{"cause": "value", "item": "item 1 of files", "locations": ["/releases/2/files/0/path"], "path": "files[0].path", "value": "docs/a.md"}, {"cause": "absent", "item": "item 2 of files", "locations": ["/releases/2/files/1"], "path": "files[1].path", "value": null}], "inputs": [{"locations": ["/releases/2/files/0/path", "/releases/2/files/1"], "name": "files[].path", "value": ["docs/a.md", null]}], "passed": false, "requirement": "r", "subject": {"id": "r3", "type": "release"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/modules/2/id"], "name": "id", "value": "m3"}], "passed": true, "requirement": "m", "subject": {"id": "m3", "type": "module"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/releases/0/id"], "name": "id", "value": "r1"}], "passed": true, "requirement": "r", "subject": {"id": "r1", "type": "release"}}
         ]
       }
     ]

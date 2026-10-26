@@ -102,11 +102,17 @@
       "required": ["causes", "checks", "description", "meta", "require", "status", "subject", "subjects"],
       "additionalProperties": false
     },
+    "locations": {
+      "type": "array",
+      "description": "Where the value was read, as JSON Pointers from the root of the input, or $params: and a pointer from the root of the params. Empty when no location could be given.",
+      "items": {"type": "string", "pattern": "^(\\$params:)?(/([^~/]|~[01])*)*$"}
+    },
     "input": {
       "type": "object",
       "properties": {
         "name": {"type": "string"},
         "value": true,
+        "locations": {"$ref": "#/$defs/locations"},
         "part": {
           "type": "object",
           "description": "Present when the input was read through a part: the part's alias as the check writes it, and the id read inside the part, or null.",
@@ -115,7 +121,7 @@
           "additionalProperties": false
         }
       },
-      "required": ["name", "value"],
+      "required": ["name", "value", "locations"],
       "additionalProperties": false
     },
     "row": {
@@ -141,8 +147,8 @@
           "description": "Only on rows of every, some and for checks, on the $applies row of a subject whose from line has one condition, a some or an every, and on the $min_subjects row of a subject whose from line has every.",
           "items": {
             "type": "object",
-            "properties": {"path": {"type": "string"}, "item": {"type": "string", "description": "The list item the entry belongs to, like item 2 of tests. For a list that failed while walking, the same as path."}, "cause": {"$ref": "#/$defs/cause"}, "value": true, "failed_assertions": {"$ref": "#/$defs/failed_assertions", "description": "Only on entries of for checks: the sentences that failed for that item, in the order written."}, "failed_items": {"type": "array", "description": "Only on entries of for checks with two items, when the second item failed for that item before any sentence was checked: those failures, in path order.", "items": {"type": "object", "properties": {"path": {"type": "string"}, "item": {"type": "string"}, "cause": {"$ref": "#/$defs/cause"}, "value": true}, "required": ["path", "item", "cause", "value"], "additionalProperties": false}}},
-            "required": ["path", "item", "cause", "value"],
+            "properties": {"path": {"type": "string"}, "item": {"type": "string", "description": "The list item the entry belongs to, like item 2 of tests. For a list that failed while walking, the same as path."}, "cause": {"$ref": "#/$defs/cause"}, "value": true, "locations": {"$ref": "#/$defs/locations"}, "failed_assertions": {"$ref": "#/$defs/failed_assertions", "description": "Only on entries of for checks: the sentences that failed for that item, in the order written."}, "failed_items": {"type": "array", "description": "Only on entries of for checks with two items, when the second item failed for that item before any sentence was checked: those failures, in path order.", "items": {"type": "object", "properties": {"path": {"type": "string"}, "item": {"type": "string"}, "cause": {"$ref": "#/$defs/cause"}, "value": true, "locations": {"$ref": "#/$defs/locations"}}, "required": ["path", "item", "cause", "value", "locations"], "additionalProperties": false}}},
+            "required": ["path", "item", "cause", "value", "locations"],
             "additionalProperties": false
           }
         },

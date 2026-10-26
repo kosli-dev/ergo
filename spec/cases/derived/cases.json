@@ -56,7 +56,11 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "findings[]",
@@ -67,6 +71,10 @@
                   {
                     "id": 2
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
                 ]
               }
             ]
@@ -118,7 +126,12 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1",
+                  "/releases/0/findings/2"
+                ]
               },
               {
                 "name": "findings[]",
@@ -132,6 +145,11 @@
                   {
                     "id": 3
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1",
+                  "/releases/0/findings/2"
                 ]
               }
             ]
@@ -168,11 +186,17 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               },
               {
                 "name": "findings[]",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -210,11 +234,17 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": null
+                "value": null,
+                "locations": [
+
+                ]
               },
               {
                 "name": "findings",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -253,11 +283,17 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": null
+                "value": null,
+                "locations": [
+
+                ]
               },
               {
                 "name": "findings",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -296,11 +332,17 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": null
+                "value": null,
+                "locations": [
+
+                ]
               },
               {
                 "name": "findings",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -341,11 +383,17 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": null
+                "value": null,
+                "locations": [
+
+                ]
               },
               {
                 "name": "findings",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -403,11 +451,17 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               },
               {
                 "name": "findings[]",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -445,11 +499,17 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": null
+                "value": null,
+                "locations": [
+
+                ]
               },
               {
                 "name": "findings",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -515,7 +575,11 @@
             "inputs": [
               {
                 "name": "count of findings whose severity is \"high\"",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "findings[]",
@@ -526,6 +590,10 @@
                   {
                     "severity": "low"
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
                 ]
               }
             ]
@@ -572,7 +640,10 @@
             "inputs": [
               {
                 "name": "count of findings whose severity is \"high\"",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/releases/0/findings/0"
+                ]
               },
               {
                 "name": "findings[]",
@@ -580,6 +651,9 @@
                   {
                     "severity": "low"
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0"
                 ]
               }
             ]
@@ -624,7 +698,11 @@
             "inputs": [
               {
                 "name": "count of findings whose severity is \"high\"",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "findings[]",
@@ -635,6 +713,10 @@
                   {
                     "severity": "low"
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
                 ]
               }
             ]
@@ -679,7 +761,11 @@
             "inputs": [
               {
                 "name": "count of findings whose severity is \"high\"",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "findings[]",
@@ -690,6 +776,10 @@
                   {
                     "severity": 5
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
                 ]
               }
             ]
@@ -735,7 +825,11 @@
             "inputs": [
               {
                 "name": "count of findings whose severity is \"high\"",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "findings[]",
@@ -744,6 +838,10 @@
                     "severity": "high"
                   },
                   {}
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
                 ]
               }
             ]
@@ -791,7 +889,11 @@
             "inputs": [
               {
                 "name": "count of findings whose severity is \"high\"",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "findings[]",
@@ -802,6 +904,10 @@
                   {
                     "severity": null
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
                 ]
               }
             ]
@@ -840,11 +946,17 @@
             "inputs": [
               {
                 "name": "count of findings whose severity is \"high\"",
-                "value": null
+                "value": null,
+                "locations": [
+
+                ]
               },
               {
                 "name": "findings",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -912,7 +1024,12 @@
             "inputs": [
               {
                 "name": "count of findings whose severity exists",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1",
+                  "/releases/0/findings/2"
+                ]
               },
               {
                 "name": "findings[]",
@@ -924,6 +1041,11 @@
                   {
                     "severity": "high"
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1",
+                  "/releases/0/findings/2"
                 ]
               }
             ]
@@ -1000,7 +1122,12 @@
             "inputs": [
               {
                 "name": "count of pull_requests.commits",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/pull_requests/0/commits/0",
+                  "/releases/0/pull_requests/0/commits/1",
+                  "/releases/0/pull_requests/1/commits/0"
+                ]
               },
               {
                 "name": "pull_requests[].commits[]",
@@ -1014,6 +1141,11 @@
                   {
                     "sha": "c"
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/commits/0",
+                  "/releases/0/pull_requests/0/commits/1",
+                  "/releases/0/pull_requests/1/commits/0"
                 ]
               }
             ]
@@ -1067,7 +1199,12 @@
             "inputs": [
               {
                 "name": "count of pull_requests.commits",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/pull_requests/0/commits/0",
+                  "/releases/0/pull_requests/0/commits/1",
+                  "/releases/0/pull_requests/0/commits/2"
+                ]
               },
               {
                 "name": "pull_requests[].commits[]",
@@ -1081,6 +1218,11 @@
                   {
                     "sha": "c"
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/commits/0",
+                  "/releases/0/pull_requests/0/commits/1",
+                  "/releases/0/pull_requests/0/commits/2"
                 ]
               }
             ]
@@ -1124,11 +1266,17 @@
             "inputs": [
               {
                 "name": "count of pull_requests.commits",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               },
               {
                 "name": "pull_requests[].commits[]",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -1164,11 +1312,17 @@
             "inputs": [
               {
                 "name": "count of pull_requests.commits",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               },
               {
                 "name": "pull_requests[].commits",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -1216,7 +1370,10 @@
             "inputs": [
               {
                 "name": "count of pull_requests.commits",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/pull_requests/0/commits/0"
+                ]
               },
               {
                 "name": "pull_requests[].commits[]",
@@ -1224,6 +1381,9 @@
                   {
                     "sha": "a"
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/commits/0"
                 ]
               }
             ]
@@ -1274,7 +1434,10 @@
             "inputs": [
               {
                 "name": "count of pull_requests.commits",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/pull_requests/0/commits/0"
+                ]
               },
               {
                 "name": "pull_requests[].commits[]",
@@ -1282,6 +1445,9 @@
                   {
                     "sha": "a"
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/commits/0"
                 ]
               }
             ]
@@ -1332,7 +1498,10 @@
             "inputs": [
               {
                 "name": "count of pull_requests.commits",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/pull_requests/0/commits/0"
+                ]
               },
               {
                 "name": "pull_requests[].commits[]",
@@ -1340,6 +1509,9 @@
                   {
                     "sha": "a"
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/commits/0"
                 ]
               }
             ]
@@ -1378,11 +1550,17 @@
             "inputs": [
               {
                 "name": "count of pull_requests.commits",
-                "value": null
+                "value": null,
+                "locations": [
+
+                ]
               },
               {
                 "name": "pull_requests.commits",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -1447,13 +1625,21 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": 30
+                "value": 30,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   10,
                   20
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
                 ]
               }
             ]
@@ -1502,13 +1688,21 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": 35
+                "value": 35,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   10,
                   25
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
                 ]
               }
             ]
@@ -1545,11 +1739,17 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               },
               {
                 "name": "items[].usd",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -1593,13 +1793,21 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   10,
                   null
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1"
                 ]
               }
             ]
@@ -1646,13 +1854,21 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   10,
                   null
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
                 ]
               }
             ]
@@ -1699,13 +1915,21 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   10,
                   "20"
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
                 ]
               }
             ]
@@ -1752,13 +1976,21 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   10,
                   true
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
                 ]
               }
             ]
@@ -1797,11 +2029,17 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": null
+                "value": null,
+                "locations": [
+
+                ]
               },
               {
                 "name": "items.usd",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -1840,11 +2078,17 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": null
+                "value": null,
+                "locations": [
+
+                ]
               },
               {
                 "name": "items.usd",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -1883,11 +2127,17 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": null
+                "value": null,
+                "locations": [
+
+                ]
               },
               {
                 "name": "items.usd",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -1934,7 +2184,12 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1",
+                  "/releases/0/items/2/usd"
+                ]
               },
               {
                 "name": "items[].usd",
@@ -1942,6 +2197,11 @@
                   null,
                   null,
                   "x"
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1",
+                  "/releases/0/items/2/usd"
                 ]
               }
             ]
@@ -2000,11 +2260,17 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               },
               {
                 "name": "items[].usd",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -2047,13 +2313,21 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   1,
                   -1
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
                 ]
               }
             ]
@@ -2119,13 +2393,21 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": 0.3
+                "value": 0.3,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   0.1,
                   0.2
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
                 ]
               }
             ]
@@ -2194,13 +2476,21 @@
             "inputs": [
               {
                 "name": "sum of items.usd whose kind is \"a\"",
-                "value": 10
+                "value": 10,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   10,
                   20
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
                 ]
               }
             ]
@@ -2251,13 +2541,21 @@
             "inputs": [
               {
                 "name": "sum of items.usd whose kind is \"a\"",
-                "value": 10
+                "value": 10,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   10,
                   null
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1"
                 ]
               }
             ]
@@ -2306,13 +2604,21 @@
             "inputs": [
               {
                 "name": "sum of items.usd whose kind is \"a\"",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   10,
                   5
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
                 ]
               }
             ]
@@ -2361,13 +2667,21 @@
             "inputs": [
               {
                 "name": "sum of items.usd whose kind is \"a\"",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   10,
                   null
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1"
                 ]
               }
             ]
@@ -2410,12 +2724,18 @@
             "inputs": [
               {
                 "name": "sum of items.usd whose kind is \"a\"",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/releases/0/items/0/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   20
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd"
                 ]
               }
             ]
@@ -2480,12 +2800,18 @@
             "inputs": [
               {
                 "name": "sum of items.usd whose kind is \"a\"",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/releases/0/items/0/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   20
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd"
                 ]
               }
             ]
@@ -2551,13 +2877,21 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": 1.4
+                "value": 1.4,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   0.7,
                   0.7
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
                 ]
               }
             ]
@@ -2606,13 +2940,21 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": 1.6
+                "value": 1.6,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   0.7,
                   0.9
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
                 ]
               }
             ]
@@ -2656,13 +2998,21 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   1,
                   1
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
                 ]
               }
             ]
@@ -2706,13 +3056,21 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": 1.5
+                "value": 1.5,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   0.5,
                   1
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
                 ]
               }
             ]
@@ -2755,12 +3113,18 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/items/0/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   "x"
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd"
                 ]
               }
             ]
@@ -2828,18 +3192,29 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": 0.3
+                "value": 0.3,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   0.1,
                   0.2
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
                 ]
               },
               {
                 "name": "total",
-                "value": 0.305
+                "value": 0.305,
+                "locations": [
+                  "/releases/0/total"
+                ]
               }
             ]
           }
@@ -2883,18 +3258,29 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": 0.3
+                "value": 0.3,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   0.1,
                   0.2
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
                 ]
               },
               {
                 "name": "total",
-                "value": 0.5
+                "value": 0.5,
+                "locations": [
+                  "/releases/0/total"
+                ]
               }
             ]
           }
@@ -2939,18 +3325,29 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": 0.3
+                "value": 0.3,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   0.1,
                   0.2
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
                 ]
               },
               {
                 "name": "total",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0"
+                ]
               }
             ]
           }
@@ -2992,17 +3389,26 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/items/0/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   null
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd"
                 ]
               },
               {
                 "name": "total",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0"
+                ]
               }
             ]
           }
@@ -3060,11 +3466,17 @@
             "inputs": [
               {
                 "name": "base plus 2",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/releases/0/base"
+                ]
               },
               {
                 "name": "base",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/base"
+                ]
               }
             ]
           }
@@ -3100,11 +3512,17 @@
             "inputs": [
               {
                 "name": "base plus 2",
-                "value": 6
+                "value": 6,
+                "locations": [
+                  "/releases/0/base"
+                ]
               },
               {
                 "name": "base",
-                "value": 4
+                "value": 4,
+                "locations": [
+                  "/releases/0/base"
+                ]
               }
             ]
           }
@@ -3140,11 +3558,17 @@
             "inputs": [
               {
                 "name": "base plus 2",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/base"
+                ]
               },
               {
                 "name": "base",
-                "value": "3"
+                "value": "3",
+                "locations": [
+                  "/releases/0/base"
+                ]
               }
             ]
           }
@@ -3179,11 +3603,17 @@
             "inputs": [
               {
                 "name": "base plus 2",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0"
+                ]
               },
               {
                 "name": "base",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0"
+                ]
               }
             ]
           }
@@ -3219,11 +3649,17 @@
             "inputs": [
               {
                 "name": "base plus 2",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/base"
+                ]
               },
               {
                 "name": "base",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/base"
+                ]
               }
             ]
           }
@@ -3281,11 +3717,17 @@
             "inputs": [
               {
                 "name": "2 plus base",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/releases/0/base"
+                ]
               },
               {
                 "name": "base",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/base"
+                ]
               }
             ]
           }
@@ -3344,15 +3786,25 @@
             "inputs": [
               {
                 "name": "base plus extra",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/releases/0/base",
+                  "/releases/0/extra"
+                ]
               },
               {
                 "name": "base",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/0/base"
+                ]
               },
               {
                 "name": "extra",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/extra"
+                ]
               }
             ]
           }
@@ -3389,15 +3841,25 @@
             "inputs": [
               {
                 "name": "base plus extra",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/base",
+                  "/releases/0/extra"
+                ]
               },
               {
                 "name": "base",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/base"
+                ]
               },
               {
                 "name": "extra",
-                "value": "x"
+                "value": "x",
+                "locations": [
+                  "/releases/0/extra"
+                ]
               }
             ]
           }
@@ -3433,15 +3895,25 @@
             "inputs": [
               {
                 "name": "base plus extra",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/base",
+                  "/releases/0"
+                ]
               },
               {
                 "name": "base",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/base"
+                ]
               },
               {
                 "name": "extra",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0"
+                ]
               }
             ]
           }
@@ -3500,15 +3972,25 @@
             "inputs": [
               {
                 "name": "base plus extra",
-                "value": 0.3
+                "value": 0.3,
+                "locations": [
+                  "/releases/0/base",
+                  "/releases/0/extra"
+                ]
               },
               {
                 "name": "base",
-                "value": 0.1
+                "value": 0.1,
+                "locations": [
+                  "/releases/0/base"
+                ]
               },
               {
                 "name": "extra",
-                "value": 0.2
+                "value": 0.2,
+                "locations": [
+                  "/releases/0/extra"
+                ]
               }
             ]
           }
@@ -3576,15 +4058,27 @@
             "inputs": [
               {
                 "name": "base plus count of findings",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/releases/0/base",
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "base",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/base"
+                ]
               },
               {
                 "name": "count of findings",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "findings[]",
@@ -3595,6 +4089,10 @@
                   {
                     "id": 1
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
                 ]
               }
             ]
@@ -3633,19 +4131,31 @@
             "inputs": [
               {
                 "name": "base plus count of findings",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/base"
+                ]
               },
               {
                 "name": "base",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/base"
+                ]
               },
               {
                 "name": "count of findings",
-                "value": null
+                "value": null,
+                "locations": [
+
+                ]
               },
               {
                 "name": "findings",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -3684,19 +4194,31 @@
             "inputs": [
               {
                 "name": "base plus count of findings",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/base"
+                ]
               },
               {
                 "name": "base",
-                "value": "x"
+                "value": "x",
+                "locations": [
+                  "/releases/0/base"
+                ]
               },
               {
                 "name": "count of findings",
-                "value": null
+                "value": null,
+                "locations": [
+
+                ]
               },
               {
                 "name": "findings",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -3764,11 +4286,20 @@
             "inputs": [
               {
                 "name": "count of findings plus base",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1",
+                  "/releases/0/base"
+                ]
               },
               {
                 "name": "count of findings",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "findings[]",
@@ -3779,11 +4310,18 @@
                   {
                     "id": 1
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
                 ]
               },
               {
                 "name": "base",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/base"
+                ]
               }
             ]
           }
@@ -3850,11 +4388,19 @@
             "inputs": [
               {
                 "name": "count of findings plus 1",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "count of findings",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "findings[]",
@@ -3865,6 +4411,10 @@
                   {
                     "id": 1
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
                 ]
               }
             ]
@@ -3930,20 +4480,33 @@
             "inputs": [
               {
                 "name": "fee plus sum of items.usd",
-                "value": 0.3
+                "value": 0.3,
+                "locations": [
+                  "/releases/0/fee",
+                  "/releases/0/items/0/usd"
+                ]
               },
               {
                 "name": "fee",
-                "value": 0.2
+                "value": 0.2,
+                "locations": [
+                  "/releases/0/fee"
+                ]
               },
               {
                 "name": "sum of items.usd",
-                "value": 0.1
+                "value": 0.1,
+                "locations": [
+                  "/releases/0/items/0/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   0.1
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd"
                 ]
               }
             ]
@@ -4015,11 +4578,21 @@
             "inputs": [
               {
                 "name": "1 plus count of findings whose severity is \"high\"",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1",
+                  "/releases/0/findings/2"
+                ]
               },
               {
                 "name": "count of findings whose severity is \"high\"",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1",
+                  "/releases/0/findings/2"
+                ]
               },
               {
                 "name": "findings[]",
@@ -4033,6 +4606,11 @@
                   {
                     "severity": "low"
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1",
+                  "/releases/0/findings/2"
                 ]
               }
             ]
@@ -4093,15 +4671,24 @@
             "inputs": [
               {
                 "name": "total",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/releases/0/total"
+                ]
               },
               {
                 "name": "base plus 2",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/releases/0/base"
+                ]
               },
               {
                 "name": "base",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/base"
+                ]
               }
             ]
           }
@@ -4138,15 +4725,24 @@
             "inputs": [
               {
                 "name": "total",
-                "value": 6
+                "value": 6,
+                "locations": [
+                  "/releases/0/total"
+                ]
               },
               {
                 "name": "base plus 2",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/releases/0/base"
+                ]
               },
               {
                 "name": "base",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/base"
+                ]
               }
             ]
           }
@@ -4182,15 +4778,24 @@
             "inputs": [
               {
                 "name": "total",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/releases/0/total"
+                ]
               },
               {
                 "name": "base plus 2",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0"
+                ]
               },
               {
                 "name": "base",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0"
+                ]
               }
             ]
           }
@@ -4259,15 +4864,27 @@
             "inputs": [
               {
                 "name": "total",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/releases/0/total"
+                ]
               },
               {
                 "name": "count of findings plus base",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1",
+                  "/releases/0/base"
+                ]
               },
               {
                 "name": "count of findings",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "findings[]",
@@ -4278,11 +4895,18 @@
                   {
                     "id": 1
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
                 ]
               },
               {
                 "name": "base",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/base"
+                ]
               }
             ]
           }
@@ -4351,19 +4975,34 @@
             "inputs": [
               {
                 "name": "total",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/releases/0/total"
+                ]
               },
               {
                 "name": "base plus count of findings",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/releases/0/base",
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "base",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/base"
+                ]
               },
               {
                 "name": "count of findings",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "findings[]",
@@ -4374,6 +5013,10 @@
                   {
                     "id": 1
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
                 ]
               }
             ]
@@ -4452,7 +5095,12 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1",
+                  "/releases/0/findings/2"
+                ]
               },
               {
                 "name": "findings[]",
@@ -4466,15 +5114,28 @@
                   {
                     "id": 2
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1",
+                  "/releases/0/findings/2"
                 ]
               },
               {
                 "name": "count of items plus 1",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/items/0",
+                  "/releases/0/items/1"
+                ]
               },
               {
                 "name": "count of items",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/0/items/0",
+                  "/releases/0/items/1"
+                ]
               },
               {
                 "name": "items[]",
@@ -4485,6 +5146,10 @@
                   {
                     "id": 1
                   }
+                ],
+                "locations": [
+                  "/releases/0/items/0",
+                  "/releases/0/items/1"
                 ]
               }
             ]
@@ -4552,7 +5217,11 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "findings[]",
@@ -4563,11 +5232,18 @@
                   {
                     "id": 1
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
                 ]
               },
               {
                 "name": "limit",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/0/limit"
+                ]
               }
             ]
           }
@@ -4612,7 +5288,11 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "findings[]",
@@ -4623,11 +5303,18 @@
                   {
                     "id": 1
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
                 ]
               },
               {
                 "name": "limit",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0"
+                ]
               }
             ]
           }
@@ -4665,15 +5352,24 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": null
+                "value": null,
+                "locations": [
+
+                ]
               },
               {
                 "name": "findings",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               },
               {
                 "name": "limit",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/limit"
+                ]
               }
             ]
           }
@@ -4740,7 +5436,11 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "findings[]",
@@ -4751,11 +5451,18 @@
                   {
                     "id": 1
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
                 ]
               },
               {
                 "name": "limit",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/limit"
+                ]
               }
             ]
           }
@@ -4801,7 +5508,11 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "findings[]",
@@ -4812,11 +5523,18 @@
                   {
                     "id": 1
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
                 ]
               },
               {
                 "name": "limit",
-                "value": "3"
+                "value": "3",
+                "locations": [
+                  "/releases/0/limit"
+                ]
               }
             ]
           }
@@ -4880,7 +5598,11 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "findings[]",
@@ -4891,6 +5613,10 @@
                   {
                     "id": 1
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
                 ]
               }
             ]
@@ -4936,7 +5662,12 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1",
+                  "/releases/0/findings/2"
+                ]
               },
               {
                 "name": "findings[]",
@@ -4950,6 +5681,11 @@
                   {
                     "id": 2
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1",
+                  "/releases/0/findings/2"
                 ]
               }
             ]
@@ -5011,7 +5747,10 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/releases/0/findings/0"
+                ]
               },
               {
                 "name": "findings[]",
@@ -5019,6 +5758,9 @@
                   {
                     "id": 0
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0"
                 ]
               }
             ]
@@ -5061,7 +5803,11 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "findings[]",
@@ -5072,6 +5818,10 @@
                   {
                     "id": 1
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
                 ]
               }
             ]
@@ -5136,7 +5886,11 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "findings[]",
@@ -5147,6 +5901,10 @@
                   {
                     "id": 1
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
                 ]
               }
             ]
@@ -5192,7 +5950,12 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1",
+                  "/releases/0/findings/2"
+                ]
               },
               {
                 "name": "findings[]",
@@ -5206,6 +5969,11 @@
                   {
                     "id": 2
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1",
+                  "/releases/0/findings/2"
                 ]
               }
             ]
@@ -5270,7 +6038,11 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "findings[]",
@@ -5281,6 +6053,10 @@
                   {
                     "id": 1
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
                 ]
               }
             ]
@@ -5326,7 +6102,12 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1",
+                  "/releases/0/findings/2"
+                ]
               },
               {
                 "name": "findings[]",
@@ -5340,6 +6121,11 @@
                   {
                     "id": 2
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1",
+                  "/releases/0/findings/2"
                 ]
               }
             ]
@@ -5401,7 +6187,10 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/releases/0/findings/0"
+                ]
               },
               {
                 "name": "findings[]",
@@ -5409,6 +6198,9 @@
                   {
                     "id": 0
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0"
                 ]
               }
             ]
@@ -5451,7 +6243,11 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "findings[]",
@@ -5462,6 +6258,10 @@
                   {
                     "id": 1
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
                 ]
               }
             ]
@@ -5528,13 +6328,21 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": 10
+                "value": 10,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   4,
                   6
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
                 ]
               }
             ]
@@ -5579,13 +6387,21 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": 9
+                "value": 9,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   4,
                   5
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
                 ]
               }
             ]
@@ -5628,12 +6444,18 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/items/0/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   "x"
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd"
                 ]
               }
             ]
@@ -5718,6 +6540,10 @@
                 "value": [
                   "x",
                   ""
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/title",
+                  "/releases/0/pull_requests/1/title"
                 ]
               }
             ],
@@ -5769,6 +6595,9 @@
                 "name": "pull_requests[].title",
                 "value": [
                   ""
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/title"
                 ]
               }
             ],
@@ -5777,7 +6606,10 @@
                 "path": "pull_requests[0].title",
                 "item": "item 1 of pull_requests",
                 "cause": "value",
-                "value": ""
+                "value": "",
+                "locations": [
+                  "/releases/0/pull_requests/0/title"
+                ]
               }
             ]
           }
@@ -5824,6 +6656,9 @@
                 "name": "pull_requests[].title",
                 "value": [
                   "x"
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/title"
                 ]
               }
             ],
@@ -5881,6 +6716,10 @@
                 "value": [
                   "x",
                   ""
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/title",
+                  "/releases/0/pull_requests/1/title"
                 ]
               }
             ],
@@ -5939,6 +6778,10 @@
                 "value": [
                   "x",
                   "y"
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/title",
+                  "/releases/0/pull_requests/1/title"
                 ]
               }
             ],
@@ -5947,7 +6790,10 @@
                 "path": "pull_requests[1].reviews",
                 "item": "item 2 of pull_requests",
                 "cause": "absent",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/pull_requests/1"
+                ]
               }
             ]
           }
@@ -5993,6 +6839,9 @@
                 "name": "pull_requests[].title",
                 "value": [
                   "x"
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/title"
                 ]
               }
             ],
@@ -6001,7 +6850,10 @@
                 "path": "pull_requests[0].reviews",
                 "item": "item 1 of pull_requests",
                 "cause": "null",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/pull_requests/0/reviews"
+                ]
               }
             ]
           }
@@ -6047,6 +6899,9 @@
                 "name": "pull_requests[].title",
                 "value": [
                   "x"
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/title"
                 ]
               }
             ],
@@ -6055,7 +6910,10 @@
                 "path": "pull_requests[0].reviews",
                 "item": "item 1 of pull_requests",
                 "cause": "unusable",
-                "value": "none"
+                "value": "none",
+                "locations": [
+                  "/releases/0/pull_requests/0/reviews"
+                ]
               }
             ]
           }
@@ -6171,6 +7029,10 @@
                       }
                     ]
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0",
+                  "/releases/0/pull_requests/1"
                 ]
               }
             ],
@@ -6241,7 +7103,10 @@
                       "id": 0
                     }
                   ]
-                }
+                },
+                "locations": [
+                  "/releases/0/pull_requests/1"
+                ]
               }
             ],
             "inputs": [
@@ -6265,6 +7130,10 @@
                       }
                     ]
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0",
+                  "/releases/0/pull_requests/1"
                 ]
               }
             ],
@@ -6322,7 +7191,10 @@
                 "path": "item 1 of pull_requests",
                 "value": {
                   "reviews": []
-                }
+                },
+                "locations": [
+                  "/releases/0/pull_requests/0"
+                ]
               }
             ],
             "inputs": [
@@ -6332,6 +7204,9 @@
                   {
                     "reviews": []
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0"
                 ]
               }
             ],
@@ -6398,7 +7273,10 @@
                 ],
                 "item": "item 2 of pull_requests",
                 "path": "item 2 of pull_requests",
-                "value": {}
+                "value": {},
+                "locations": [
+                  "/releases/0/pull_requests/1"
+                ]
               }
             ],
             "inputs": [
@@ -6416,6 +7294,10 @@
                     ]
                   },
                   {}
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0",
+                  "/releases/0/pull_requests/1"
                 ]
               }
             ],
@@ -6476,7 +7358,10 @@
                 "path": "item 1 of pull_requests",
                 "value": {
                   "reviews": null
-                }
+                },
+                "locations": [
+                  "/releases/0/pull_requests/0"
+                ]
               }
             ],
             "inputs": [
@@ -6486,6 +7371,9 @@
                   {
                     "reviews": null
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0"
                 ]
               }
             ],
@@ -6546,7 +7434,10 @@
                 "path": "item 1 of pull_requests",
                 "value": {
                   "reviews": "two"
-                }
+                },
+                "locations": [
+                  "/releases/0/pull_requests/0"
+                ]
               }
             ],
             "inputs": [
@@ -6556,6 +7447,9 @@
                   {
                     "reviews": "two"
                   }
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0"
                 ]
               }
             ],
@@ -6627,13 +7521,21 @@
             "inputs": [
               {
                 "name": "count of $params.approvers",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "$params:/approvers/0",
+                  "$params:/approvers/1"
+                ]
               },
               {
                 "name": "$params.approvers[]",
                 "value": [
                   "ann",
                   "bob"
+                ],
+                "locations": [
+                  "$params:/approvers/0",
+                  "$params:/approvers/1"
                 ]
               }
             ]
@@ -6703,12 +7605,18 @@
             "inputs": [
               {
                 "name": "count of $params.approvers",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "$params:/approvers/0"
+                ]
               },
               {
                 "name": "$params.approvers[]",
                 "value": [
                   "ann"
+                ],
+                "locations": [
+                  "$params:/approvers/0"
                 ]
               }
             ]
@@ -6771,11 +7679,17 @@
             "inputs": [
               {
                 "name": "count of $params.approvers",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               },
               {
                 "name": "$params.approvers[]",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -6837,11 +7751,17 @@
             "inputs": [
               {
                 "name": "count of $params.approvers",
-                "value": null
+                "value": null,
+                "locations": [
+
+                ]
               },
               {
                 "name": "$params.approvers",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -6905,11 +7825,17 @@
             "inputs": [
               {
                 "name": "count of $params.approvers",
-                "value": null
+                "value": null,
+                "locations": [
+
+                ]
               },
               {
                 "name": "$params.approvers",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -6973,11 +7899,17 @@
             "inputs": [
               {
                 "name": "count of $params.approvers",
-                "value": null
+                "value": null,
+                "locations": [
+
+                ]
               },
               {
                 "name": "$params.approvers",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -7045,13 +7977,21 @@
             "inputs": [
               {
                 "name": "sum of $params.budgets.usd",
-                "value": 0.3
+                "value": 0.3,
+                "locations": [
+                  "$params:/budgets/0/usd",
+                  "$params:/budgets/1/usd"
+                ]
               },
               {
                 "name": "$params.budgets[].usd",
                 "value": [
                   0.1,
                   0.2
+                ],
+                "locations": [
+                  "$params:/budgets/0/usd",
+                  "$params:/budgets/1/usd"
                 ]
               }
             ]
@@ -7123,7 +8063,11 @@
             "inputs": [
               {
                 "name": "count of findings",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
+                ]
               },
               {
                 "name": "findings[]",
@@ -7134,11 +8078,18 @@
                   {
                     "id": 1
                   }
+                ],
+                "locations": [
+                  "/releases/0/findings/0",
+                  "/releases/0/findings/1"
                 ]
               },
               {
                 "name": "$params.limit",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "$params:/limit"
+                ]
               }
             ]
           }
@@ -7195,16 +8146,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "checks.c",
                 "value": [
                   "is empty can't follow a count of, a sum of or a plus"
+                ],
+                "locations": [
+
                 ]
               }
             ]
@@ -7267,13 +8227,21 @@
             "inputs": [
               {
                 "name": "count of x",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/0/x/0",
+                  "/releases/0/x/1"
+                ]
               },
               {
                 "name": "x[]",
                 "value": [
                   1,
                   2
+                ],
+                "locations": [
+                  "/releases/0/x/0",
+                  "/releases/0/x/1"
                 ]
               }
             ]
@@ -7318,12 +8286,18 @@
             "inputs": [
               {
                 "name": "count of x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/releases/0/x/0"
+                ]
               },
               {
                 "name": "x[]",
                 "value": [
                   1
+                ],
+                "locations": [
+                  "/releases/0/x/0"
                 ]
               }
             ]
@@ -7365,7 +8339,12 @@
             "inputs": [
               {
                 "name": "count of x",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/x/0",
+                  "/releases/0/x/1",
+                  "/releases/0/x/2"
+                ]
               },
               {
                 "name": "x[]",
@@ -7373,6 +8352,11 @@
                   1,
                   2,
                   3
+                ],
+                "locations": [
+                  "/releases/0/x/0",
+                  "/releases/0/x/1",
+                  "/releases/0/x/2"
                 ]
               }
             ]
@@ -7415,7 +8399,13 @@
             "inputs": [
               {
                 "name": "count of x",
-                "value": 4
+                "value": 4,
+                "locations": [
+                  "/releases/0/x/0",
+                  "/releases/0/x/1",
+                  "/releases/0/x/2",
+                  "/releases/0/x/3"
+                ]
               },
               {
                 "name": "x[]",
@@ -7424,6 +8414,12 @@
                   2,
                   3,
                   4
+                ],
+                "locations": [
+                  "/releases/0/x/0",
+                  "/releases/0/x/1",
+                  "/releases/0/x/2",
+                  "/releases/0/x/3"
                 ]
               }
             ]
@@ -7461,11 +8457,17 @@
             "inputs": [
               {
                 "name": "count of x",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               },
               {
                 "name": "x[]",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -7504,11 +8506,17 @@
             "inputs": [
               {
                 "name": "count of x",
-                "value": null
+                "value": null,
+                "locations": [
+
+                ]
               },
               {
                 "name": "x",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -7547,11 +8555,17 @@
             "inputs": [
               {
                 "name": "count of x",
-                "value": null
+                "value": null,
+                "locations": [
+
+                ]
               },
               {
                 "name": "x",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -7590,11 +8604,17 @@
             "inputs": [
               {
                 "name": "count of x",
-                "value": null
+                "value": null,
+                "locations": [
+
+                ]
               },
               {
                 "name": "x",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -7660,13 +8680,21 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   1,
                   1
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
                 ]
               }
             ]
@@ -7716,13 +8744,21 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   1,
                   2
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
                 ]
               }
             ]
@@ -7760,11 +8796,17 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": 0
+                "value": 0,
+                "locations": [
+
+                ]
               },
               {
                 "name": "items[].usd",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ]
           }
@@ -7810,13 +8852,21 @@
             "inputs": [
               {
                 "name": "sum of items.usd",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
+                ]
               },
               {
                 "name": "items[].usd",
                 "value": [
                   1,
                   "2"
+                ],
+                "locations": [
+                  "/releases/0/items/0/usd",
+                  "/releases/0/items/1/usd"
                 ]
               }
             ]
@@ -7875,11 +8925,17 @@
             "inputs": [
               {
                 "name": "base plus 2",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/releases/0/base"
+                ]
               },
               {
                 "name": "base",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/releases/0/base"
+                ]
               }
             ]
           }
@@ -7920,11 +8976,17 @@
             "inputs": [
               {
                 "name": "base plus 2",
-                "value": 7
+                "value": 7,
+                "locations": [
+                  "/releases/0/base"
+                ]
               },
               {
                 "name": "base",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/releases/0/base"
+                ]
               }
             ]
           }
@@ -7961,11 +9023,17 @@
             "inputs": [
               {
                 "name": "base plus 2",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0"
+                ]
               },
               {
                 "name": "base",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0"
+                ]
               }
             ]
           }
@@ -8022,16 +9090,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "checks.c",
                 "value": [
                   "is empty can't follow a count of, a sum of or a plus"
+                ],
+                "locations": [
+
                 ]
               }
             ]
@@ -8089,16 +9166,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "checks.c",
                 "value": [
                   "doesn't parse"
+                ],
+                "locations": [
+
                 ]
               }
             ]
@@ -8147,11 +9233,17 @@
             "inputs": [
               {
                 "name": "count of xs.n",
-                "value": null
+                "value": null,
+                "locations": [
+
+                ]
               },
               {
                 "name": "xs.n",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": false,
@@ -8167,11 +9259,17 @@
             "inputs": [
               {
                 "name": "count of xs.n",
-                "value": null
+                "value": null,
+                "locations": [
+
+                ]
               },
               {
                 "name": "xs.n",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": false,
@@ -8217,12 +9315,18 @@
             "inputs": [
               {
                 "name": "count of xs.n",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/things/0/xs/0"
+                ]
               },
               {
                 "name": "xs[].n",
                 "value": [
                   null
+                ],
+                "locations": [
+                  "/things/0/xs/0"
                 ]
               }
             ],
@@ -8239,13 +9343,21 @@
             "inputs": [
               {
                 "name": "count of xs.n",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/things/1/xs/0/n",
+                  "/things/1/xs/1/n"
+                ]
               },
               {
                 "name": "xs[].n",
                 "value": [
                   1,
                   null
+                ],
+                "locations": [
+                  "/things/1/xs/0/n",
+                  "/things/1/xs/1/n"
                 ]
               }
             ],
@@ -8307,7 +9419,10 @@
             "inputs": [
               {
                 "name": "count of xs whose k is in $params.missing",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/things/0/xs/0"
+                ]
               },
               {
                 "name": "xs[]",
@@ -8315,6 +9430,9 @@
                   {
                     "k": "a"
                   }
+                ],
+                "locations": [
+                  "/things/0/xs/0"
                 ]
               }
             ],
@@ -8379,11 +9497,17 @@
             "inputs": [
               {
                 "name": "count of xs whose k is in $params.missing",
-                "value": null
+                "value": null,
+                "locations": [
+
+                ]
               },
               {
                 "name": "xs[]",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": false,
@@ -8399,7 +9523,10 @@
             "inputs": [
               {
                 "name": "count of xs whose k is in $params.missing",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/things/1/xs/0"
+                ]
               },
               {
                 "name": "xs[]",
@@ -8407,6 +9534,9 @@
                   {
                     "k": "a"
                   }
+                ],
+                "locations": [
+                  "/things/1/xs/0"
                 ]
               }
             ],
@@ -8471,15 +9601,25 @@
             "inputs": [
               {
                 "name": "seconds elapsed from first_seen_ts to now_ts",
-                "value": 302400
+                "value": 302400,
+                "locations": [
+                  "/vulns/0/first_seen_ts",
+                  "/vulns/0/now_ts"
+                ]
               },
               {
                 "name": "first_seen_ts",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/first_seen_ts"
+                ]
               },
               {
                 "name": "now_ts",
-                "value": "2026-10-04T12:00:00Z"
+                "value": "2026-10-04T12:00:00Z",
+                "locations": [
+                  "/vulns/0/now_ts"
+                ]
               }
             ]
           }
@@ -8520,15 +9660,25 @@
             "inputs": [
               {
                 "name": "seconds elapsed from first_seen_ts to now_ts",
-                "value": 604800
+                "value": 604800,
+                "locations": [
+                  "/vulns/0/first_seen_ts",
+                  "/vulns/0/now_ts"
+                ]
               },
               {
                 "name": "first_seen_ts",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/first_seen_ts"
+                ]
               },
               {
                 "name": "now_ts",
-                "value": "2026-10-08T00:00:00Z"
+                "value": "2026-10-08T00:00:00Z",
+                "locations": [
+                  "/vulns/0/now_ts"
+                ]
               }
             ]
           }
@@ -8591,15 +9741,25 @@
             "inputs": [
               {
                 "name": "minutes elapsed from first_seen_ts to now_ts",
-                "value": 5040
+                "value": 5040,
+                "locations": [
+                  "/vulns/0/first_seen_ts",
+                  "/vulns/0/now_ts"
+                ]
               },
               {
                 "name": "first_seen_ts",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/first_seen_ts"
+                ]
               },
               {
                 "name": "now_ts",
-                "value": "2026-10-04T12:00:00Z"
+                "value": "2026-10-04T12:00:00Z",
+                "locations": [
+                  "/vulns/0/now_ts"
+                ]
               }
             ]
           }
@@ -8640,15 +9800,25 @@
             "inputs": [
               {
                 "name": "minutes elapsed from first_seen_ts to now_ts",
-                "value": 10080
+                "value": 10080,
+                "locations": [
+                  "/vulns/0/first_seen_ts",
+                  "/vulns/0/now_ts"
+                ]
               },
               {
                 "name": "first_seen_ts",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/first_seen_ts"
+                ]
               },
               {
                 "name": "now_ts",
-                "value": "2026-10-08T00:00:00Z"
+                "value": "2026-10-08T00:00:00Z",
+                "locations": [
+                  "/vulns/0/now_ts"
+                ]
               }
             ]
           }
@@ -8711,15 +9881,25 @@
             "inputs": [
               {
                 "name": "hours elapsed from first_seen_ts to now_ts",
-                "value": 84
+                "value": 84,
+                "locations": [
+                  "/vulns/0/first_seen_ts",
+                  "/vulns/0/now_ts"
+                ]
               },
               {
                 "name": "first_seen_ts",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/first_seen_ts"
+                ]
               },
               {
                 "name": "now_ts",
-                "value": "2026-10-04T12:00:00Z"
+                "value": "2026-10-04T12:00:00Z",
+                "locations": [
+                  "/vulns/0/now_ts"
+                ]
               }
             ]
           }
@@ -8760,15 +9940,25 @@
             "inputs": [
               {
                 "name": "hours elapsed from first_seen_ts to now_ts",
-                "value": 168
+                "value": 168,
+                "locations": [
+                  "/vulns/0/first_seen_ts",
+                  "/vulns/0/now_ts"
+                ]
               },
               {
                 "name": "first_seen_ts",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/first_seen_ts"
+                ]
               },
               {
                 "name": "now_ts",
-                "value": "2026-10-08T00:00:00Z"
+                "value": "2026-10-08T00:00:00Z",
+                "locations": [
+                  "/vulns/0/now_ts"
+                ]
               }
             ]
           }
@@ -8831,15 +10021,25 @@
             "inputs": [
               {
                 "name": "days elapsed from first_seen_ts to now_ts",
-                "value": 3.5
+                "value": 3.5,
+                "locations": [
+                  "/vulns/0/first_seen_ts",
+                  "/vulns/0/now_ts"
+                ]
               },
               {
                 "name": "first_seen_ts",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/first_seen_ts"
+                ]
               },
               {
                 "name": "now_ts",
-                "value": "2026-10-04T12:00:00Z"
+                "value": "2026-10-04T12:00:00Z",
+                "locations": [
+                  "/vulns/0/now_ts"
+                ]
               }
             ]
           }
@@ -8880,15 +10080,25 @@
             "inputs": [
               {
                 "name": "days elapsed from first_seen_ts to now_ts",
-                "value": 7
+                "value": 7,
+                "locations": [
+                  "/vulns/0/first_seen_ts",
+                  "/vulns/0/now_ts"
+                ]
               },
               {
                 "name": "first_seen_ts",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/first_seen_ts"
+                ]
               },
               {
                 "name": "now_ts",
-                "value": "2026-10-08T00:00:00Z"
+                "value": "2026-10-08T00:00:00Z",
+                "locations": [
+                  "/vulns/0/now_ts"
+                ]
               }
             ]
           }
@@ -8951,15 +10161,25 @@
             "inputs": [
               {
                 "name": "weeks elapsed from first_seen_ts to now_ts",
-                "value": 0.5
+                "value": 0.5,
+                "locations": [
+                  "/vulns/0/first_seen_ts",
+                  "/vulns/0/now_ts"
+                ]
               },
               {
                 "name": "first_seen_ts",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/first_seen_ts"
+                ]
               },
               {
                 "name": "now_ts",
-                "value": "2026-10-04T12:00:00Z"
+                "value": "2026-10-04T12:00:00Z",
+                "locations": [
+                  "/vulns/0/now_ts"
+                ]
               }
             ]
           }
@@ -9000,15 +10220,25 @@
             "inputs": [
               {
                 "name": "weeks elapsed from first_seen_ts to now_ts",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/vulns/0/first_seen_ts",
+                  "/vulns/0/now_ts"
+                ]
               },
               {
                 "name": "first_seen_ts",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/first_seen_ts"
+                ]
               },
               {
                 "name": "now_ts",
-                "value": "2026-10-08T00:00:00Z"
+                "value": "2026-10-08T00:00:00Z",
+                "locations": [
+                  "/vulns/0/now_ts"
+                ]
               }
             ]
           }
@@ -9079,23 +10309,39 @@
             "inputs": [
               {
                 "name": "days elapsed from first_seen_ts to now_ts",
-                "value": 3.5
+                "value": 3.5,
+                "locations": [
+                  "/vulns/0/first_seen_ts",
+                  "/vulns/0/now_ts"
+                ]
               },
               {
                 "name": "first_seen_ts",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/first_seen_ts"
+                ]
               },
               {
                 "name": "now_ts",
-                "value": "2026-10-04T12:00:00Z"
+                "value": "2026-10-04T12:00:00Z",
+                "locations": [
+                  "/vulns/0/now_ts"
+                ]
               },
               {
                 "name": "$params.max_days named by severity",
-                "value": 4
+                "value": 4,
+                "locations": [
+                  "$params:/max_days/high"
+                ]
               },
               {
                 "name": "severity",
-                "value": "high"
+                "value": "high",
+                "locations": [
+                  "/vulns/0/severity"
+                ]
               }
             ]
           }
@@ -9137,23 +10383,39 @@
             "inputs": [
               {
                 "name": "days elapsed from first_seen_ts to now_ts",
-                "value": 4
+                "value": 4,
+                "locations": [
+                  "/vulns/0/first_seen_ts",
+                  "/vulns/0/now_ts"
+                ]
               },
               {
                 "name": "first_seen_ts",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/first_seen_ts"
+                ]
               },
               {
                 "name": "now_ts",
-                "value": "2026-10-05T00:00:00Z"
+                "value": "2026-10-05T00:00:00Z",
+                "locations": [
+                  "/vulns/0/now_ts"
+                ]
               },
               {
                 "name": "$params.max_days named by severity",
-                "value": 4
+                "value": 4,
+                "locations": [
+                  "$params:/max_days/high"
+                ]
               },
               {
                 "name": "severity",
-                "value": "high"
+                "value": "high",
+                "locations": [
+                  "/vulns/0/severity"
+                ]
               }
             ]
           }
@@ -9196,23 +10458,39 @@
             "inputs": [
               {
                 "name": "days elapsed from first_seen_ts to now_ts",
-                "value": 3.5
+                "value": 3.5,
+                "locations": [
+                  "/vulns/0/first_seen_ts",
+                  "/vulns/0/now_ts"
+                ]
               },
               {
                 "name": "first_seen_ts",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/first_seen_ts"
+                ]
               },
               {
                 "name": "now_ts",
-                "value": "2026-10-04T12:00:00Z"
+                "value": "2026-10-04T12:00:00Z",
+                "locations": [
+                  "/vulns/0/now_ts"
+                ]
               },
               {
                 "name": "$params.max_days named by severity",
-                "value": null
+                "value": null,
+                "locations": [
+                  "$params:/max_days"
+                ]
               },
               {
                 "name": "severity",
-                "value": "low"
+                "value": "low",
+                "locations": [
+                  "/vulns/0/severity"
+                ]
               }
             ]
           }
@@ -9275,15 +10553,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": 1.5
+                "value": 1.5,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": 100
+                "value": 100,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": 129700
+                "value": 129700,
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -9323,15 +10611,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": 86405
+                "value": 86405,
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -9394,15 +10692,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": "2026-01-01T00:00:00Z"
+                "value": "2026-01-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": "2026-01-01T01:00:00+01:00"
+                "value": "2026-01-01T01:00:00+01:00",
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -9442,15 +10750,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -9513,15 +10831,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": "2026-01-02T00:00:00Z"
+                "value": "2026-01-02T00:00:00Z",
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": "2026-01-01T00:00:00Z"
+                "value": "2026-01-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -9562,15 +10890,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": 4
+                "value": 4,
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -9633,15 +10971,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0"
+                ]
               },
               {
                 "name": "ended",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -9682,15 +11030,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0"
+                ]
               },
               {
                 "name": "started",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0"
+                ]
               }
             ]
           }
@@ -9732,15 +11090,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -9782,15 +11150,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -9832,15 +11210,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0"
+                ]
               },
               {
                 "name": "started",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0"
+                ]
               }
             ]
           }
@@ -9882,15 +11270,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": true
+                "value": true,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -9934,16 +11332,26 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
                 "value": [
                   1
+                ],
+                "locations": [
+                  "/vulns/0/ended"
                 ]
               }
             ]
@@ -9988,17 +11396,27 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
                 "value": {
                   "a": 1
-                }
+                },
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -10041,15 +11459,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": "yesterday"
+                "value": "yesterday",
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -10092,15 +11520,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": "2026-01-01t00:00:00Z"
+                "value": "2026-01-01t00:00:00Z",
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -10143,15 +11581,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": "2026-01-01T00:00:00z"
+                "value": "2026-01-01T00:00:00z",
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -10194,15 +11642,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": "2026-02-30T00:00:00Z"
+                "value": "2026-02-30T00:00:00Z",
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -10245,15 +11703,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": "1677-12-31T00:00:00Z"
+                "value": "1677-12-31T00:00:00Z",
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -10296,15 +11764,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": "2262-01-01T00:00:00Z"
+                "value": "2262-01-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -10346,15 +11824,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -10396,15 +11884,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": "2026-10-01T00:00:00Z"
+                "value": "2026-10-01T00:00:00Z",
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -10495,6 +11993,10 @@
                     "closed": 172800,
                     "opened": 0
                   }
+                ],
+                "locations": [
+                  "/vulns/0/pull_requests/0",
+                  "/vulns/0/pull_requests/1"
                 ]
               }
             ],
@@ -10558,7 +12060,10 @@
                 "value": {
                   "closed": 259200,
                   "opened": 0
-                }
+                },
+                "locations": [
+                  "/vulns/0/pull_requests/1"
+                ]
               }
             ],
             "inputs": [
@@ -10573,6 +12078,10 @@
                     "closed": 259200,
                     "opened": 0
                   }
+                ],
+                "locations": [
+                  "/vulns/0/pull_requests/0",
+                  "/vulns/0/pull_requests/1"
                 ]
               }
             ],
@@ -10635,7 +12144,10 @@
                 "path": "item 1 of pull_requests",
                 "value": {
                   "opened": 0
-                }
+                },
+                "locations": [
+                  "/vulns/0/pull_requests/0"
+                ]
               }
             ],
             "inputs": [
@@ -10645,6 +12157,9 @@
                   {
                     "opened": 0
                   }
+                ],
+                "locations": [
+                  "/vulns/0/pull_requests/0"
                 ]
               }
             ],
@@ -10719,19 +12234,33 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "ended",
-                "value": 86400
+                "value": 86400,
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "hours elapsed from started to ended",
-                "value": 24
+                "value": 24,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               }
             ],
             "failed_assertions": []
@@ -10794,16 +12323,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "checks.c",
                 "value": [
                   "days is a word of the grammar: write .days"
+                ],
+                "locations": [
+
                 ]
               }
             ]
@@ -10864,7 +12402,10 @@
             "inputs": [
               {
                 "name": ".days",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/vulns/0/days"
+                ]
               }
             ]
           }
@@ -10927,15 +12468,25 @@
             "inputs": [
               {
                 "name": "days elapsed from .to to .days",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/vulns/0/to",
+                  "/vulns/0/days"
+                ]
               },
               {
                 "name": ".to",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/vulns/0/to"
+                ]
               },
               {
                 "name": ".days",
-                "value": 86400
+                "value": 86400,
+                "locations": [
+                  "/vulns/0/days"
+                ]
               }
             ]
           }
@@ -10999,19 +12550,33 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended plus 1",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "days elapsed from started to ended",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": 86400
+                "value": 86400,
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -11053,19 +12618,33 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended plus 1",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "days elapsed from started to ended",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": 172800
+                "value": 172800,
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -11102,19 +12681,33 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended plus 1",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": 86400
+                "value": 86400,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -11152,19 +12745,33 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended plus 1",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0"
+                ]
               },
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0"
+                ]
               },
               {
                 "name": "started",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0"
+                ]
               }
             ]
           }
@@ -11223,19 +12830,33 @@
             "inputs": [
               {
                 "name": "1 plus days elapsed from started to ended",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "days elapsed from started to ended",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": 86400
+                "value": 86400,
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -11278,19 +12899,33 @@
             "inputs": [
               {
                 "name": "1 plus days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0"
+                ]
               },
               {
                 "name": "ended",
-                "value": 86400
+                "value": 86400,
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -11350,19 +12985,32 @@
             "inputs": [
               {
                 "name": "n",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/vulns/0/n"
+                ]
               },
               {
                 "name": "days elapsed from started to ended",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": 86400
+                "value": 86400,
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -11405,19 +13053,32 @@
             "inputs": [
               {
                 "name": "n",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/vulns/0/n"
+                ]
               },
               {
                 "name": "days elapsed from started to ended",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": 86400
+                "value": 86400,
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -11456,19 +13117,32 @@
             "inputs": [
               {
                 "name": "n",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/vulns/0/n"
+                ]
               },
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0"
+                ]
               },
               {
                 "name": "started",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0"
+                ]
               }
             ]
           }
@@ -11529,23 +13203,40 @@
             "inputs": [
               {
                 "name": "n",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/vulns/0/n"
+                ]
               },
               {
                 "name": "1 plus days elapsed from started to ended",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "days elapsed from started to ended",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": 86400
+                "value": 86400,
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -11589,23 +13280,40 @@
             "inputs": [
               {
                 "name": "n",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/vulns/0/n"
+                ]
               },
               {
                 "name": "1 plus days elapsed from started to ended",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "days elapsed from started to ended",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": 86400
+                "value": 86400,
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -11679,6 +13387,10 @@
                 "value": [
                   "x",
                   ""
+                ],
+                "locations": [
+                  "/vulns/0/xs/0/title",
+                  "/vulns/0/xs/1/title"
                 ]
               }
             ],
@@ -11737,6 +13449,10 @@
                 "value": [
                   "x",
                   ""
+                ],
+                "locations": [
+                  "/vulns/0/xs/0/title",
+                  "/vulns/0/xs/1/title"
                 ]
               }
             ],
@@ -11784,6 +13500,9 @@
                 "name": "xs[].title",
                 "value": [
                   ""
+                ],
+                "locations": [
+                  "/vulns/0/xs/0/title"
                 ]
               }
             ],
@@ -11792,7 +13511,10 @@
                 "path": "xs[0].title",
                 "item": "item 1 of xs",
                 "cause": "value",
-                "value": ""
+                "value": "",
+                "locations": [
+                  "/vulns/0/xs/0/title"
+                ]
               }
             ]
           }
@@ -11838,6 +13560,9 @@
                 "name": "xs[].title",
                 "value": [
                   "x"
+                ],
+                "locations": [
+                  "/vulns/0/xs/0/title"
                 ]
               }
             ],
@@ -11913,7 +13638,12 @@
             "inputs": [
               {
                 "name": "count of xs whose days elapsed from started to ended is 1",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/vulns/0/xs/0",
+                  "/vulns/0/xs/1",
+                  "/vulns/0/xs/2"
+                ]
               },
               {
                 "name": "xs[]",
@@ -11930,6 +13660,11 @@
                     "started": 0,
                     "ended": 172800
                   }
+                ],
+                "locations": [
+                  "/vulns/0/xs/0",
+                  "/vulns/0/xs/1",
+                  "/vulns/0/xs/2"
                 ]
               }
             ]
@@ -11983,7 +13718,11 @@
             "inputs": [
               {
                 "name": "count of xs whose days elapsed from started to ended is 1",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/vulns/0/xs/0",
+                  "/vulns/0/xs/1"
+                ]
               },
               {
                 "name": "xs[]",
@@ -11996,6 +13735,10 @@
                     "started": 0,
                     "ended": 172800
                   }
+                ],
+                "locations": [
+                  "/vulns/0/xs/0",
+                  "/vulns/0/xs/1"
                 ]
               }
             ]
@@ -12048,7 +13791,12 @@
             "inputs": [
               {
                 "name": "count of xs whose days elapsed from started to ended is 1",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/vulns/0/xs/0",
+                  "/vulns/0/xs/1",
+                  "/vulns/0/xs/2"
+                ]
               },
               {
                 "name": "xs[]",
@@ -12065,6 +13813,11 @@
                     "started": 86400,
                     "ended": 0
                   }
+                ],
+                "locations": [
+                  "/vulns/0/xs/0",
+                  "/vulns/0/xs/1",
+                  "/vulns/0/xs/2"
                 ]
               }
             ]
@@ -12115,7 +13868,11 @@
             "inputs": [
               {
                 "name": "count of xs whose days elapsed from started to ended is 1",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/xs/0",
+                  "/vulns/0/xs/1"
+                ]
               },
               {
                 "name": "xs[]",
@@ -12127,6 +13884,10 @@
                   {
                     "started": 0
                   }
+                ],
+                "locations": [
+                  "/vulns/0/xs/0",
+                  "/vulns/0/xs/1"
                 ]
               }
             ]
@@ -12198,7 +13959,11 @@
             "inputs": [
               {
                 "name": "count of prs whose count of reviews is at least 2",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/releases/0/prs/0",
+                  "/releases/0/prs/1"
+                ]
               },
               {
                 "name": "prs[]",
@@ -12214,6 +13979,10 @@
                       1
                     ]
                   }
+                ],
+                "locations": [
+                  "/releases/0/prs/0",
+                  "/releases/0/prs/1"
                 ]
               }
             ]
@@ -12268,7 +14037,11 @@
             "inputs": [
               {
                 "name": "count of prs whose count of reviews is at least 2",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/releases/0/prs/0",
+                  "/releases/0/prs/1"
+                ]
               },
               {
                 "name": "prs[]",
@@ -12280,6 +14053,10 @@
                     ]
                   },
                   {}
+                ],
+                "locations": [
+                  "/releases/0/prs/0",
+                  "/releases/0/prs/1"
                 ]
               }
             ]
@@ -12354,13 +14131,21 @@
             "inputs": [
               {
                 "name": "sum of prs.n whose count of reviews is at least 2",
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/releases/0/prs/0/n",
+                  "/releases/0/prs/1/n"
+                ]
               },
               {
                 "name": "prs[].n",
                 "value": [
                   5,
                   7
+                ],
+                "locations": [
+                  "/releases/0/prs/0/n",
+                  "/releases/0/prs/1/n"
                 ]
               }
             ]
@@ -12425,15 +14210,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": 86400
+                "value": 86400,
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -12475,15 +14270,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": 172800
+                "value": 172800,
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -12520,15 +14325,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": 259200
+                "value": 259200,
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -12565,15 +14380,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": 86400
+                "value": 86400,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ]
           }
@@ -12611,15 +14436,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0"
+                ]
               },
               {
                 "name": "started",
-                "value": 0
+                "value": 0,
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0"
+                ]
               }
             ]
           }
@@ -12678,16 +14513,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "checks.c",
                 "value": [
                   "is empty can't follow a count of, a sum of or a plus"
+                ],
+                "locations": [
+
                 ]
               }
             ]
@@ -12751,16 +14595,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "checks.c",
                 "value": [
                   "doesn't parse"
+                ],
+                "locations": [
+
                 ]
               }
             ]
@@ -12818,15 +14671,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": 17
+                "value": 17,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": "2026-09-15"
+                "value": "2026-09-15",
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": "2026-10-02"
+                "value": "2026-10-02",
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ],
             "passed": true,
@@ -12866,15 +14729,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": 17
+                "value": 17,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": "2024-02-14"
+                "value": "2024-02-14",
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": "2024-03-02"
+                "value": "2024-03-02",
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ],
             "passed": true,
@@ -12909,15 +14782,25 @@
             "inputs": [
               {
                 "name": "days elapsed from started to ended",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/vulns/0/started",
+                  "/vulns/0/ended"
+                ]
               },
               {
                 "name": "started",
-                "value": "2026-09-15"
+                "value": "2026-09-15",
+                "locations": [
+                  "/vulns/0/started"
+                ]
               },
               {
                 "name": "ended",
-                "value": "2026-10-02T00:00:00Z"
+                "value": "2026-10-02T00:00:00Z",
+                "locations": [
+                  "/vulns/0/ended"
+                ]
               }
             ],
             "passed": false,
@@ -12927,6 +14810,120 @@
               "type": "vuln"
             }
           }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of a list",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings is 2"}}}},
+    "cases": [
+      {
+        "description": "gives the count the locations of the items it counted",
+        "rules": ["location.worked_out", "location.each"],
+        "input": {"releases": [{"id": "r1", "findings": [{"id": 0}, {"id": 1}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/releases/0/findings/0", "/releases/0/findings/1"], "name": "count of findings", "value": 2}, {"locations": ["/releases/0/findings/0", "/releases/0/findings/1"], "name": "findings[]", "value": [{"id": 0}, {"id": 1}]}], "passed": true, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      },
+      {
+        "description": "gives a count of no items no locations",
+        "rules": ["location.worked_out", "location.each"],
+        "input": {"releases": [{"id": "r1", "findings": []}]},
+        "results": [
+          {"cause": "value", "check": "c", "inputs": [{"locations": [], "name": "count of findings", "value": 0}, {"locations": [], "name": "findings[]", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of a list with whose",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings whose severity is \"high\" is 1"}}}},
+    "cases": [
+      {
+        "description": "gives the count the locations of every item read, kept or not",
+        "rules": ["location.worked_out"],
+        "input": {"releases": [{"id": "r1", "findings": [{"severity": "high"}, {"severity": "low"}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/releases/0/findings/0", "/releases/0/findings/1"], "name": "count of findings whose severity is \"high\"", "value": 1}, {"locations": ["/releases/0/findings/0", "/releases/0/findings/1"], "name": "findings[]", "value": [{"severity": "high"}, {"severity": "low"}]}], "passed": true, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of lists inside lists",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of pull_requests.commits is 3"}}}},
+    "cases": [
+      {
+        "description": "gives the count one location per item of every inner list",
+        "rules": ["location.worked_out", "location.each"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"sha": "a"}, {"sha": "b"}]}, {"commits": [{"sha": "c"}]}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/releases/0/pull_requests/0/commits/0", "/releases/0/pull_requests/0/commits/1", "/releases/0/pull_requests/1/commits/0"], "name": "count of pull_requests.commits", "value": 3}, {"locations": ["/releases/0/pull_requests/0/commits/0", "/releases/0/pull_requests/0/commits/1", "/releases/0/pull_requests/1/commits/0"], "name": "pull_requests[].commits[]", "value": [{"sha": "a"}, {"sha": "b"}, {"sha": "c"}]}], "passed": true, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "sum of a field",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "sum of items.usd is 30"}}}},
+    "cases": [
+      {
+        "description": "gives the sum the locations of the values it added",
+        "rules": ["location.worked_out", "location.each"],
+        "input": {"releases": [{"id": "r1", "items": [{"usd": 10}, {"usd": 20}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/releases/0/items/0/usd", "/releases/0/items/1/usd"], "name": "sum of items.usd", "value": 30}, {"locations": ["/releases/0/items/0/usd", "/releases/0/items/1/usd"], "name": "items[].usd", "value": [10, 20]}], "passed": true, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a path plus a count",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "base plus count of findings is 5"}}}},
+    "cases": [
+      {
+        "description": "gives the plus the locations of the entries after it, once each, in their order",
+        "rules": ["location.worked_out"],
+        "input": {"releases": [{"id": "r1", "base": 3, "findings": [{"id": 0}, {"id": 1}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/releases/0/base", "/releases/0/findings/0", "/releases/0/findings/1"], "name": "base plus count of findings", "value": 5}, {"locations": ["/releases/0/base"], "name": "base", "value": 3}, {"locations": ["/releases/0/findings/0", "/releases/0/findings/1"], "name": "count of findings", "value": 2}, {"locations": ["/releases/0/findings/0", "/releases/0/findings/1"], "name": "findings[]", "value": [{"id": 0}, {"id": 1}]}], "passed": true, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a path plus a sum",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "fee plus sum of items.usd is 40"}}}},
+    "cases": [
+      {
+        "description": "gives the plus the location of the path and then of every value summed",
+        "rules": ["location.worked_out"],
+        "input": {"releases": [{"id": "r1", "fee": 10, "items": [{"usd": 10}, {"usd": 20}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/releases/0/fee", "/releases/0/items/0/usd", "/releases/0/items/1/usd"], "name": "fee plus sum of items.usd", "value": 40}, {"locations": ["/releases/0/fee"], "name": "fee", "value": 10}, {"locations": ["/releases/0/items/0/usd", "/releases/0/items/1/usd"], "name": "sum of items.usd", "value": 30}, {"locations": ["/releases/0/items/0/usd", "/releases/0/items/1/usd"], "name": "items[].usd", "value": [10, 20]}], "passed": true, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "days elapsed between two numbers",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"vuln": {"from": "vulns", "identified_by": "id"}}, "requirements": {"s": {"subject": "vuln", "checks": {"c": "days elapsed from started to ended is 1.5"}}}},
+    "cases": [
+      {
+        "description": "gives the elapsed time the locations of both ends",
+        "rules": ["location.worked_out"],
+        "input": {"vulns": [{"id": "v1", "started": 100, "ended": 129700}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/vulns/0/started", "/vulns/0/ended"], "name": "days elapsed from started to ended", "value": 1.5}, {"locations": ["/vulns/0/started"], "name": "started", "value": 100}, {"locations": ["/vulns/0/ended"], "name": "ended", "value": 129700}], "passed": true, "requirement": "s", "subject": {"id": "v1", "type": "vuln"}}
+        ]
+      },
+      {
+        "description": "points at the subject for an end that isn't there",
+        "rules": ["location.worked_out", "location.read"],
+        "input": {"vulns": [{"id": "v1", "started": 100}]},
+        "results": [
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/vulns/0/started", "/vulns/0"], "name": "days elapsed from started to ended", "value": null}, {"locations": ["/vulns/0/started"], "name": "started", "value": 100}, {"locations": ["/vulns/0"], "name": "ended", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "v1", "type": "vuln"}}
         ]
       }
     ]

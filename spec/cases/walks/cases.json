@@ -8,7 +8,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.is"],
         "input": {"releases": [{"id": "r1", "commits": [{"signed": true}, {"signed": true}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "commits[].signed", "value": [true, true]}], "failed_items": []}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "commits[].signed", "value": [true, true], "locations": ["/releases/0/commits/0/signed", "/releases/0/commits/1/signed"]}], "failed_items": []}
         ],
         "expressions": {"s": {"c": "every commits.signed is true"}}
       },
@@ -17,7 +17,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.is"],
         "input": {"releases": [{"id": "r1", "commits": [{"signed": true}, {"signed": false}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "commits[].signed", "value": [true, false]}], "failed_items": [{"path": "commits[1].signed", "item": "item 2 of commits", "cause": "value", "value": false}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "commits[].signed", "value": [true, false], "locations": ["/releases/0/commits/0/signed", "/releases/0/commits/1/signed"]}], "failed_items": [{"path": "commits[1].signed", "item": "item 2 of commits", "cause": "value", "value": false, "locations": ["/releases/0/commits/1/signed"]}]}
         ]
       },
       {
@@ -25,7 +25,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items"],
         "input": {"releases": [{"id": "r1", "commits": [{"signed": false}, {"signed": true}, {"signed": false}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "commits[].signed", "value": [false, true, false]}], "failed_items": [{"path": "commits[0].signed", "item": "item 1 of commits", "cause": "value", "value": false}, {"path": "commits[2].signed", "item": "item 3 of commits", "cause": "value", "value": false}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "commits[].signed", "value": [false, true, false], "locations": ["/releases/0/commits/0/signed", "/releases/0/commits/1/signed", "/releases/0/commits/2/signed"]}], "failed_items": [{"path": "commits[0].signed", "item": "item 1 of commits", "cause": "value", "value": false, "locations": ["/releases/0/commits/0/signed"]}, {"path": "commits[2].signed", "item": "item 3 of commits", "cause": "value", "value": false, "locations": ["/releases/0/commits/2/signed"]}]}
         ]
       },
       {
@@ -33,7 +33,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.every.empty"],
         "input": {"releases": [{"id": "r1", "commits": []}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "commits[].signed", "value": []}], "failed_items": [{"path": "commits", "item": "commits", "cause": "value", "value": []}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "commits[].signed", "value": [], "locations": []}], "failed_items": [{"path": "commits", "item": "commits", "cause": "value", "value": [], "locations": ["/releases/0/commits"]}]}
         ]
       },
       {
@@ -41,7 +41,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.absent"],
         "input": {"releases": [{"id": "r1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "commits.signed", "value": []}], "failed_items": [{"path": "commits", "item": "commits", "cause": "absent", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "commits.signed", "value": [], "locations": []}], "failed_items": [{"path": "commits", "item": "commits", "cause": "absent", "value": null, "locations": ["/releases/0"]}]}
         ]
       },
       {
@@ -49,7 +49,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.absent"],
         "input": {"releases": [{"id": "r1", "commits": null}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "commits.signed", "value": []}], "failed_items": [{"path": "commits", "item": "commits", "cause": "null", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "commits.signed", "value": [], "locations": []}], "failed_items": [{"path": "commits", "item": "commits", "cause": "null", "value": null, "locations": ["/releases/0/commits"]}]}
         ]
       },
       {
@@ -57,7 +57,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.unusable"],
         "input": {"releases": [{"id": "r1", "commits": "abc"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "commits.signed", "value": []}], "failed_items": [{"path": "commits", "item": "commits", "cause": "unusable", "value": "abc"}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "commits.signed", "value": [], "locations": []}], "failed_items": [{"path": "commits", "item": "commits", "cause": "unusable", "value": "abc", "locations": ["/releases/0/commits"]}]}
         ]
       },
       {
@@ -65,7 +65,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.unusable"],
         "input": {"releases": [{"id": "r1", "commits": {"signed": true}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "commits.signed", "value": []}], "failed_items": [{"path": "commits.signed", "item": "commits.signed", "cause": "unusable", "value": true}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "commits.signed", "value": [], "locations": []}], "failed_items": [{"path": "commits.signed", "item": "commits.signed", "cause": "unusable", "value": true, "locations": ["/releases/0/commits/signed"]}]}
         ]
       },
       {
@@ -73,7 +73,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.absent"],
         "input": {"releases": [{"id": "r1", "commits": [{"signed": true}, {}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "commits[].signed", "value": [true, null]}], "failed_items": [{"path": "commits[1].signed", "item": "item 2 of commits", "cause": "absent", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "commits[].signed", "value": [true, null], "locations": ["/releases/0/commits/0/signed", "/releases/0/commits/1"]}], "failed_items": [{"path": "commits[1].signed", "item": "item 2 of commits", "cause": "absent", "value": null, "locations": ["/releases/0/commits/1"]}]}
         ]
       },
       {
@@ -81,7 +81,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.null"],
         "input": {"releases": [{"id": "r1", "commits": [{"signed": null}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "commits[].signed", "value": [null]}], "failed_items": [{"path": "commits[0].signed", "item": "item 1 of commits", "cause": "null", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "commits[].signed", "value": [null], "locations": ["/releases/0/commits/0/signed"]}], "failed_items": [{"path": "commits[0].signed", "item": "item 1 of commits", "cause": "null", "value": null, "locations": ["/releases/0/commits/0/signed"]}]}
         ]
       },
       {
@@ -89,7 +89,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.is"],
         "input": {"releases": [{"id": "r1", "commits": [{"signed": "yes"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "commits[].signed", "value": ["yes"]}], "failed_items": [{"path": "commits[0].signed", "item": "item 1 of commits", "cause": "unusable", "value": "yes"}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "commits[].signed", "value": ["yes"], "locations": ["/releases/0/commits/0/signed"]}], "failed_items": [{"path": "commits[0].signed", "item": "item 1 of commits", "cause": "unusable", "value": "yes", "locations": ["/releases/0/commits/0/signed"]}]}
         ]
       },
       {
@@ -97,7 +97,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.absent"],
         "input": {"releases": [{"id": "r1", "commits": [{"signed": false}, {}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "commits[].signed", "value": [false, null]}], "failed_items": [{"path": "commits[0].signed", "item": "item 1 of commits", "cause": "value", "value": false}, {"path": "commits[1].signed", "item": "item 2 of commits", "cause": "absent", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "commits[].signed", "value": [false, null], "locations": ["/releases/0/commits/0/signed", "/releases/0/commits/1"]}], "failed_items": [{"path": "commits[0].signed", "item": "item 1 of commits", "cause": "value", "value": false, "locations": ["/releases/0/commits/0/signed"]}, {"path": "commits[1].signed", "item": "item 2 of commits", "cause": "absent", "value": null, "locations": ["/releases/0/commits/1"]}]}
         ]
       }
     ]
@@ -111,7 +111,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}]}, {"commits": [{"signed": true}, {"signed": true}]}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true, true, true]}], "failed_items": []}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true, true, true], "locations": ["/releases/0/pull_requests/0/commits/0/signed", "/releases/0/pull_requests/1/commits/0/signed", "/releases/0/pull_requests/1/commits/1/signed"]}], "failed_items": []}
         ]
       },
       {
@@ -119,7 +119,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.absent"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}, {"signed": false}]}, {}, {"commits": [{"sha": "c1"}]}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true, false, null]}], "failed_items": [{"path": "pull_requests[0].commits[1].signed", "item": "item 2 of pull_requests[0].commits", "cause": "value", "value": false}, {"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "absent", "value": null}, {"path": "pull_requests[2].commits[0].signed", "item": "item 1 of pull_requests[2].commits", "cause": "absent", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true, false, null], "locations": ["/releases/0/pull_requests/0/commits/0/signed", "/releases/0/pull_requests/0/commits/1/signed", "/releases/0/pull_requests/2/commits/0"]}], "failed_items": [{"path": "pull_requests[0].commits[1].signed", "item": "item 2 of pull_requests[0].commits", "cause": "value", "value": false, "locations": ["/releases/0/pull_requests/0/commits/1/signed"]}, {"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "absent", "value": null, "locations": ["/releases/0/pull_requests/1"]}, {"path": "pull_requests[2].commits[0].signed", "item": "item 1 of pull_requests[2].commits", "cause": "absent", "value": null, "locations": ["/releases/0/pull_requests/2/commits/0"]}]}
         ]
       },
       {
@@ -127,7 +127,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.every.empty"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}]}, {"commits": []}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true]}], "failed_items": [{"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "value", "value": []}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true], "locations": ["/releases/0/pull_requests/0/commits/0/signed"]}], "failed_items": [{"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "value", "value": [], "locations": ["/releases/0/pull_requests/1/commits"]}]}
         ]
       },
       {
@@ -135,7 +135,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.null"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}]}, {"commits": null}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true]}], "failed_items": [{"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "null", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true], "locations": ["/releases/0/pull_requests/0/commits/0/signed"]}], "failed_items": [{"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "null", "value": null, "locations": ["/releases/0/pull_requests/1/commits"]}]}
         ]
       },
       {
@@ -143,7 +143,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.unusable"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}]}, {"commits": "x"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true]}], "failed_items": [{"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "unusable", "value": "x"}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true], "locations": ["/releases/0/pull_requests/0/commits/0/signed"]}], "failed_items": [{"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "unusable", "value": "x", "locations": ["/releases/0/pull_requests/1/commits"]}]}
         ]
       },
       {
@@ -151,7 +151,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.unusable", "path.absent"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": false}]}, {"commits": "x"}, {}, {"commits": []}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [false]}], "failed_items": [{"path": "pull_requests[0].commits[0].signed", "item": "item 1 of pull_requests[0].commits", "cause": "value", "value": false}, {"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "unusable", "value": "x"}, {"path": "pull_requests[2].commits", "item": "pull_requests[2].commits", "cause": "absent", "value": null}, {"path": "pull_requests[3].commits", "item": "pull_requests[3].commits", "cause": "value", "value": []}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [false], "locations": ["/releases/0/pull_requests/0/commits/0/signed"]}], "failed_items": [{"path": "pull_requests[0].commits[0].signed", "item": "item 1 of pull_requests[0].commits", "cause": "value", "value": false, "locations": ["/releases/0/pull_requests/0/commits/0/signed"]}, {"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "unusable", "value": "x", "locations": ["/releases/0/pull_requests/1/commits"]}, {"path": "pull_requests[2].commits", "item": "pull_requests[2].commits", "cause": "absent", "value": null, "locations": ["/releases/0/pull_requests/2"]}, {"path": "pull_requests[3].commits", "item": "pull_requests[3].commits", "cause": "value", "value": [], "locations": ["/releases/0/pull_requests/3/commits"]}]}
         ]
       },
       {
@@ -159,7 +159,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.every.empty"],
         "input": {"releases": [{"id": "r1", "pull_requests": []}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "pull_requests[].commits.signed", "value": []}], "failed_items": [{"path": "pull_requests", "item": "pull_requests", "cause": "value", "value": []}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "pull_requests[].commits.signed", "value": [], "locations": []}], "failed_items": [{"path": "pull_requests", "item": "pull_requests", "cause": "value", "value": [], "locations": ["/releases/0/pull_requests"]}]}
         ]
       },
       {
@@ -167,7 +167,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.absent"],
         "input": {"releases": [{"id": "r1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests.commits.signed", "value": []}], "failed_items": [{"path": "pull_requests", "item": "pull_requests", "cause": "absent", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests.commits.signed", "value": [], "locations": []}], "failed_items": [{"path": "pull_requests", "item": "pull_requests", "cause": "absent", "value": null, "locations": ["/releases/0"]}]}
         ]
       },
       {
@@ -175,7 +175,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.absent"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests[].commits.signed", "value": [null]}], "failed_items": [{"path": "pull_requests[0].commits.signed", "item": "item 1 of pull_requests", "cause": "absent", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests[].commits.signed", "value": [null], "locations": ["/releases/0/pull_requests/0"]}], "failed_items": [{"path": "pull_requests[0].commits.signed", "item": "item 1 of pull_requests", "cause": "absent", "value": null, "locations": ["/releases/0/pull_requests/0"]}]}
         ]
       }
     ]
@@ -189,7 +189,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.matches"],
         "input": {"releases": [{"id": "r1", "branches": ["release/1", "release/2"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "branches[]", "value": ["release/1", "release/2"]}], "failed_items": []}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "branches[]", "value": ["release/1", "release/2"], "locations": ["/releases/0/branches/0", "/releases/0/branches/1"]}], "failed_items": []}
         ],
         "expressions": {"s": {"c": "every branches matches \"^release/\""}}
       },
@@ -198,7 +198,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.matches"],
         "input": {"releases": [{"id": "r1", "branches": ["release/1", "main"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "branches[]", "value": ["release/1", "main"]}], "failed_items": [{"path": "item 2 of branches", "item": "item 2 of branches", "cause": "value", "value": "main"}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "branches[]", "value": ["release/1", "main"], "locations": ["/releases/0/branches/0", "/releases/0/branches/1"]}], "failed_items": [{"path": "item 2 of branches", "item": "item 2 of branches", "cause": "value", "value": "main", "locations": ["/releases/0/branches/1"]}]}
         ]
       },
       {
@@ -206,7 +206,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.matches"],
         "input": {"releases": [{"id": "r1", "branches": ["release/1", 5]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "branches[]", "value": ["release/1", 5]}], "failed_items": [{"path": "item 2 of branches", "item": "item 2 of branches", "cause": "unusable", "value": 5}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "branches[]", "value": ["release/1", 5], "locations": ["/releases/0/branches/0", "/releases/0/branches/1"]}], "failed_items": [{"path": "item 2 of branches", "item": "item 2 of branches", "cause": "unusable", "value": 5, "locations": ["/releases/0/branches/1"]}]}
         ]
       },
       {
@@ -214,7 +214,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.matches", "path.null"],
         "input": {"releases": [{"id": "r1", "branches": [null]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "branches[]", "value": [null]}], "failed_items": [{"path": "item 1 of branches", "item": "item 1 of branches", "cause": "null", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "branches[]", "value": [null], "locations": ["/releases/0/branches/0"]}], "failed_items": [{"path": "item 1 of branches", "item": "item 1 of branches", "cause": "null", "value": null, "locations": ["/releases/0/branches/0"]}]}
         ]
       },
       {
@@ -222,7 +222,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.every.empty"],
         "input": {"releases": [{"id": "r1", "branches": []}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "branches[]", "value": []}], "failed_items": [{"path": "branches", "item": "branches", "cause": "value", "value": []}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "branches[]", "value": [], "locations": []}], "failed_items": [{"path": "branches", "item": "branches", "cause": "value", "value": [], "locations": ["/releases/0/branches"]}]}
         ]
       }
     ]
@@ -236,7 +236,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.empty"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"labels": ["bug"]}, {"labels": ["a", "b"]}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "pull_requests[].labels[]", "value": ["bug", "a", "b"]}], "failed_items": []}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "pull_requests[].labels[]", "value": ["bug", "a", "b"], "locations": ["/releases/0/pull_requests/0/labels/0", "/releases/0/pull_requests/1/labels/0", "/releases/0/pull_requests/1/labels/1"]}], "failed_items": []}
         ]
       },
       {
@@ -244,7 +244,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.empty"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"labels": ["bug"]}, {"labels": ["a", ""]}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "pull_requests[].labels[]", "value": ["bug", "a", ""]}], "failed_items": [{"path": "item 2 of pull_requests[1].labels", "item": "item 2 of pull_requests[1].labels", "cause": "value", "value": ""}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "pull_requests[].labels[]", "value": ["bug", "a", ""], "locations": ["/releases/0/pull_requests/0/labels/0", "/releases/0/pull_requests/1/labels/0", "/releases/0/pull_requests/1/labels/1"]}], "failed_items": [{"path": "item 2 of pull_requests[1].labels", "item": "item 2 of pull_requests[1].labels", "cause": "value", "value": "", "locations": ["/releases/0/pull_requests/1/labels/1"]}]}
         ]
       },
       {
@@ -252,7 +252,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.empty", "sentence.every.empty"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"labels": ["bug"]}, {"labels": []}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "pull_requests[].labels[]", "value": ["bug"]}], "failed_items": [{"path": "pull_requests[1].labels", "item": "pull_requests[1].labels", "cause": "value", "value": []}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "pull_requests[].labels[]", "value": ["bug"], "locations": ["/releases/0/pull_requests/0/labels/0"]}], "failed_items": [{"path": "pull_requests[1].labels", "item": "pull_requests[1].labels", "cause": "value", "value": [], "locations": ["/releases/0/pull_requests/1/labels"]}]}
         ]
       },
       {
@@ -260,7 +260,7 @@
         "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.empty"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"labels": [5]}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "pull_requests[].labels[]", "value": [5]}], "failed_items": [{"path": "item 1 of pull_requests[0].labels", "item": "item 1 of pull_requests[0].labels", "cause": "unusable", "value": 5}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "pull_requests[].labels[]", "value": [5], "locations": ["/releases/0/pull_requests/0/labels/0"]}], "failed_items": [{"path": "item 1 of pull_requests[0].labels", "item": "item 1 of pull_requests[0].labels", "cause": "unusable", "value": 5, "locations": ["/releases/0/pull_requests/0/labels/0"]}]}
         ]
       }
     ]
@@ -274,7 +274,7 @@
         "rules": ["sentence.every.if_any", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": []}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "pull_requests[].commits[].signed", "value": []}], "failed_items": []}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [], "locations": []}], "failed_items": []}
         ],
         "expressions": {"s": {"c": "every pull_requests.commits.signed, if any, is true"}}
       },
@@ -283,7 +283,7 @@
         "rules": ["sentence.every.if_any", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items"],
         "input": {"releases": [{"id": "r1", "pull_requests": []}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "pull_requests[].commits.signed", "value": []}], "failed_items": []}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "pull_requests[].commits.signed", "value": [], "locations": []}], "failed_items": []}
         ]
       },
       {
@@ -291,7 +291,7 @@
         "rules": ["sentence.every.if_any", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": []}, {"commits": [{"signed": true}]}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true]}], "failed_items": []}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true], "locations": ["/releases/0/pull_requests/1/commits/0/signed"]}], "failed_items": []}
         ]
       },
       {
@@ -299,7 +299,7 @@
         "rules": ["sentence.every.if_any", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": []}, {"commits": [{"signed": false}]}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [false]}], "failed_items": [{"path": "pull_requests[1].commits[0].signed", "item": "item 1 of pull_requests[1].commits", "cause": "value", "value": false}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [false], "locations": ["/releases/0/pull_requests/1/commits/0/signed"]}], "failed_items": [{"path": "pull_requests[1].commits[0].signed", "item": "item 1 of pull_requests[1].commits", "cause": "value", "value": false, "locations": ["/releases/0/pull_requests/1/commits/0/signed"]}]}
         ]
       },
       {
@@ -307,7 +307,7 @@
         "rules": ["sentence.every.if_any", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.absent"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}]}, {}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true]}], "failed_items": [{"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "absent", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true], "locations": ["/releases/0/pull_requests/0/commits/0/signed"]}], "failed_items": [{"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "absent", "value": null, "locations": ["/releases/0/pull_requests/1"]}]}
         ]
       },
       {
@@ -315,7 +315,7 @@
         "rules": ["sentence.every.if_any", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.null"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}]}, {"commits": null}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true]}], "failed_items": [{"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "null", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true], "locations": ["/releases/0/pull_requests/0/commits/0/signed"]}], "failed_items": [{"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "null", "value": null, "locations": ["/releases/0/pull_requests/1/commits"]}]}
         ]
       },
       {
@@ -323,7 +323,7 @@
         "rules": ["sentence.every.if_any", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.unusable"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}]}, {"commits": 3}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true]}], "failed_items": [{"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "unusable", "value": 3}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true], "locations": ["/releases/0/pull_requests/0/commits/0/signed"]}], "failed_items": [{"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "unusable", "value": 3, "locations": ["/releases/0/pull_requests/1/commits"]}]}
         ]
       },
       {
@@ -331,7 +331,7 @@
         "rules": ["sentence.every.if_any", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.unusable"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": 3}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "pull_requests[].commits.signed", "value": [null]}], "failed_items": [{"path": "pull_requests[0].commits.signed", "item": "item 1 of pull_requests", "cause": "unusable", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "pull_requests[].commits.signed", "value": [null], "locations": ["/releases/0/pull_requests/0/commits"]}], "failed_items": [{"path": "pull_requests[0].commits.signed", "item": "item 1 of pull_requests", "cause": "unusable", "value": null, "locations": ["/releases/0/pull_requests/0/commits"]}]}
         ]
       },
       {
@@ -339,7 +339,7 @@
         "rules": ["sentence.every.if_any", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.absent"],
         "input": {"releases": [{"id": "r1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests.commits.signed", "value": []}], "failed_items": [{"path": "pull_requests", "item": "pull_requests", "cause": "absent", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests.commits.signed", "value": [], "locations": []}], "failed_items": [{"path": "pull_requests", "item": "pull_requests", "cause": "absent", "value": null, "locations": ["/releases/0"]}]}
         ]
       },
       {
@@ -347,7 +347,7 @@
         "rules": ["sentence.every.if_any", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.absent"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{}]}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [null]}], "failed_items": [{"path": "pull_requests[0].commits[0].signed", "item": "item 1 of pull_requests[0].commits", "cause": "absent", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [null], "locations": ["/releases/0/pull_requests/0/commits/0"]}], "failed_items": [{"path": "pull_requests[0].commits[0].signed", "item": "item 1 of pull_requests[0].commits", "cause": "absent", "value": null, "locations": ["/releases/0/pull_requests/0/commits/0"]}]}
         ]
       }
     ]
@@ -361,7 +361,7 @@
         "rules": ["sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.is"],
         "input": {"releases": [{"id": "r1", "approvers": [{"state": "CHANGES"}, {"state": "APPROVED"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].state", "value": ["CHANGES", "APPROVED"]}], "failed_items": []}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].state", "value": ["CHANGES", "APPROVED"], "locations": ["/releases/0/approvers/0/state", "/releases/0/approvers/1/state"]}], "failed_items": []}
         ],
         "expressions": {"s": {"c": "some approvers.state is \"APPROVED\""}}
       },
@@ -370,7 +370,7 @@
         "rules": ["sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.is"],
         "input": {"releases": [{"id": "r1", "approvers": [{"state": "CHANGES"}, {"state": "COMMENTED"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].state", "value": ["CHANGES", "COMMENTED"]}], "failed_items": [{"path": "approvers[0].state", "item": "item 1 of approvers", "cause": "value", "value": "CHANGES"}, {"path": "approvers[1].state", "item": "item 2 of approvers", "cause": "value", "value": "COMMENTED"}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].state", "value": ["CHANGES", "COMMENTED"], "locations": ["/releases/0/approvers/0/state", "/releases/0/approvers/1/state"]}], "failed_items": [{"path": "approvers[0].state", "item": "item 1 of approvers", "cause": "value", "value": "CHANGES", "locations": ["/releases/0/approvers/0/state"]}, {"path": "approvers[1].state", "item": "item 2 of approvers", "cause": "value", "value": "COMMENTED", "locations": ["/releases/0/approvers/1/state"]}]}
         ]
       },
       {
@@ -378,7 +378,7 @@
         "rules": ["sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.is"],
         "input": {"releases": [{"id": "r1", "approvers": []}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].state", "value": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "value", "value": []}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].state", "value": [], "locations": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "value", "value": [], "locations": ["/releases/0/approvers"]}]}
         ]
       },
       {
@@ -386,7 +386,7 @@
         "rules": ["sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.is", "path.absent"],
         "input": {"releases": [{"id": "r1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers.state", "value": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "absent", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers.state", "value": [], "locations": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "absent", "value": null, "locations": ["/releases/0"]}]}
         ]
       },
       {
@@ -394,7 +394,7 @@
         "rules": ["sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.is", "path.absent"],
         "input": {"releases": [{"id": "r1", "approvers": null}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "approvers.state", "value": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "null", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "approvers.state", "value": [], "locations": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "null", "value": null, "locations": ["/releases/0/approvers"]}]}
         ]
       },
       {
@@ -402,7 +402,7 @@
         "rules": ["sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.is", "path.unusable"],
         "input": {"releases": [{"id": "r1", "approvers": "ann"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "approvers.state", "value": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "unusable", "value": "ann"}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "approvers.state", "value": [], "locations": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "unusable", "value": "ann", "locations": ["/releases/0/approvers"]}]}
         ]
       },
       {
@@ -410,7 +410,7 @@
         "rules": ["sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.is", "path.absent"],
         "input": {"releases": [{"id": "r1", "approvers": [{}, {"state": "APPROVED"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].state", "value": [null, "APPROVED"]}], "failed_items": []}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].state", "value": [null, "APPROVED"], "locations": ["/releases/0/approvers/0", "/releases/0/approvers/1/state"]}], "failed_items": []}
         ]
       },
       {
@@ -418,7 +418,7 @@
         "rules": ["sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.is", "path.absent"],
         "input": {"releases": [{"id": "r1", "approvers": [{"state": "CHANGES"}, {}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers[].state", "value": ["CHANGES", null]}], "failed_items": [{"path": "approvers[0].state", "item": "item 1 of approvers", "cause": "value", "value": "CHANGES"}, {"path": "approvers[1].state", "item": "item 2 of approvers", "cause": "absent", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers[].state", "value": ["CHANGES", null], "locations": ["/releases/0/approvers/0/state", "/releases/0/approvers/1"]}], "failed_items": [{"path": "approvers[0].state", "item": "item 1 of approvers", "cause": "value", "value": "CHANGES", "locations": ["/releases/0/approvers/0/state"]}, {"path": "approvers[1].state", "item": "item 2 of approvers", "cause": "absent", "value": null, "locations": ["/releases/0/approvers/1"]}]}
         ]
       },
       {
@@ -426,7 +426,7 @@
         "rules": ["sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.is", "path.null"],
         "input": {"releases": [{"id": "r1", "approvers": [{"state": null}, {"state": "CHANGES"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "approvers[].state", "value": [null, "CHANGES"]}], "failed_items": [{"path": "approvers[0].state", "item": "item 1 of approvers", "cause": "null", "value": null}, {"path": "approvers[1].state", "item": "item 2 of approvers", "cause": "value", "value": "CHANGES"}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "approvers[].state", "value": [null, "CHANGES"], "locations": ["/releases/0/approvers/0/state", "/releases/0/approvers/1/state"]}], "failed_items": [{"path": "approvers[0].state", "item": "item 1 of approvers", "cause": "null", "value": null, "locations": ["/releases/0/approvers/0/state"]}, {"path": "approvers[1].state", "item": "item 2 of approvers", "cause": "value", "value": "CHANGES", "locations": ["/releases/0/approvers/1/state"]}]}
         ]
       }
     ]
@@ -440,7 +440,7 @@
         "rules": ["sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.is"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"approvers": []}, {"approvers": [{"state": "APPROVED"}]}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "pull_requests[].approvers[].state", "value": ["APPROVED"]}], "failed_items": []}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "pull_requests[].approvers[].state", "value": ["APPROVED"], "locations": ["/releases/0/pull_requests/1/approvers/0/state"]}], "failed_items": []}
         ]
       },
       {
@@ -448,7 +448,7 @@
         "rules": ["sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.is"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"approvers": [{"state": "CHANGES"}]}, {"approvers": []}, {}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests[].approvers[].state", "value": ["CHANGES"]}], "failed_items": [{"path": "pull_requests[0].approvers[0].state", "item": "item 1 of pull_requests[0].approvers", "cause": "value", "value": "CHANGES"}, {"path": "pull_requests[1].approvers", "item": "pull_requests[1].approvers", "cause": "value", "value": []}, {"path": "pull_requests[2].approvers", "item": "pull_requests[2].approvers", "cause": "absent", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests[].approvers[].state", "value": ["CHANGES"], "locations": ["/releases/0/pull_requests/0/approvers/0/state"]}], "failed_items": [{"path": "pull_requests[0].approvers[0].state", "item": "item 1 of pull_requests[0].approvers", "cause": "value", "value": "CHANGES", "locations": ["/releases/0/pull_requests/0/approvers/0/state"]}, {"path": "pull_requests[1].approvers", "item": "pull_requests[1].approvers", "cause": "value", "value": [], "locations": ["/releases/0/pull_requests/1/approvers"]}, {"path": "pull_requests[2].approvers", "item": "pull_requests[2].approvers", "cause": "absent", "value": null, "locations": ["/releases/0/pull_requests/2"]}]}
         ]
       }
     ]
@@ -463,7 +463,7 @@
         "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.some.walk", "walk.some"],
         "input": {"releases": [{"id": "r1", "approvers": [{"username": "zed", "state": "APPROVED"}, {"username": "ann", "state": "CHANGES"}, {"username": "ann", "state": "APPROVED"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": ["zed", "ann", "ann"]}], "failed_items": []}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": ["zed", "ann", "ann"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username", "/releases/0/approvers/2/username"]}], "failed_items": []}
         ],
         "expressions": {"s": {"c": "some approvers.username whose state is \"APPROVED\" is in $params.staff"}}
       },
@@ -472,7 +472,7 @@
         "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.some.walk", "walk.some"],
         "input": {"releases": [{"id": "r1", "approvers": [{"username": "zed", "state": "APPROVED"}, {"username": "ann", "state": "CHANGES"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["zed", "ann"]}], "failed_items": [{"path": "approvers[0].username", "item": "item 1 of approvers", "cause": "value", "value": "zed"}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["zed", "ann"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username"]}], "failed_items": [{"path": "approvers[0].username", "item": "item 1 of approvers", "cause": "value", "value": "zed", "locations": ["/releases/0/approvers/0/username"]}]}
         ]
       },
       {
@@ -480,7 +480,7 @@
         "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.some.walk", "walk.some"],
         "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann", "state": "CHANGES"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["ann"]}], "failed_items": []}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["ann"], "locations": ["/releases/0/approvers/0/username"]}], "failed_items": []}
         ]
       },
       {
@@ -488,7 +488,7 @@
         "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.whose.undecided", "sentence.some.walk", "walk.some", "path.absent"],
         "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann"}, {"username": "ann", "state": "APPROVED"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": ["ann", "ann"]}], "failed_items": []}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": ["ann", "ann"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username"]}], "failed_items": []}
         ]
       },
       {
@@ -496,7 +496,7 @@
         "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.whose.undecided", "sentence.some.walk", "walk.some", "path.absent"],
         "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann"}, {"username": "zed", "state": "APPROVED"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers[].username", "value": ["ann", "zed"]}], "failed_items": [{"path": "approvers[0].state", "item": "item 1 of approvers", "cause": "absent", "value": null}, {"path": "approvers[1].username", "item": "item 2 of approvers", "cause": "value", "value": "zed"}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers[].username", "value": ["ann", "zed"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username"]}], "failed_items": [{"path": "approvers[0].state", "item": "item 1 of approvers", "cause": "absent", "value": null, "locations": ["/releases/0/approvers/0"]}, {"path": "approvers[1].username", "item": "item 2 of approvers", "cause": "value", "value": "zed", "locations": ["/releases/0/approvers/1/username"]}]}
         ]
       },
       {
@@ -504,7 +504,7 @@
         "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.whose.undecided", "sentence.some.walk", "walk.some", "path.null"],
         "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann", "state": null}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "approvers[].username", "value": ["ann"]}], "failed_items": [{"path": "approvers[0].state", "item": "item 1 of approvers", "cause": "null", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "approvers[].username", "value": ["ann"], "locations": ["/releases/0/approvers/0/username"]}], "failed_items": [{"path": "approvers[0].state", "item": "item 1 of approvers", "cause": "null", "value": null, "locations": ["/releases/0/approvers/0/state"]}]}
         ]
       },
       {
@@ -512,7 +512,7 @@
         "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.some.walk", "walk.some"],
         "input": {"releases": [{"id": "r1", "approvers": []}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "value", "value": []}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": [], "locations": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "value", "value": [], "locations": ["/releases/0/approvers"]}]}
         ]
       }
     ]
@@ -527,7 +527,7 @@
         "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.walk", "sentence.whose.every", "walk.every"],
         "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann", "state": "APPROVED"}, {"username": "zed", "state": "CHANGES"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": ["ann", "zed"]}], "failed_items": []}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": ["ann", "zed"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username"]}], "failed_items": []}
         ]
       },
       {
@@ -535,7 +535,7 @@
         "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.walk", "sentence.whose.every", "walk.every"],
         "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann", "state": "APPROVED"}, {"username": "zed", "state": "APPROVED"}, {"username": "bob", "state": "CHANGES"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["ann", "zed", "bob"]}], "failed_items": [{"path": "approvers[1].username", "item": "item 2 of approvers", "cause": "value", "value": "zed"}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["ann", "zed", "bob"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username", "/releases/0/approvers/2/username"]}], "failed_items": [{"path": "approvers[1].username", "item": "item 2 of approvers", "cause": "value", "value": "zed", "locations": ["/releases/0/approvers/1/username"]}]}
         ]
       },
       {
@@ -543,7 +543,7 @@
         "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.walk", "sentence.whose.undecided", "walk.every", "path.absent"],
         "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann", "state": "APPROVED"}, {"username": "zed"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers[].username", "value": ["ann", "zed"]}], "failed_items": [{"path": "approvers[1].state", "item": "item 2 of approvers", "cause": "absent", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers[].username", "value": ["ann", "zed"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username"]}], "failed_items": [{"path": "approvers[1].state", "item": "item 2 of approvers", "cause": "absent", "value": null, "locations": ["/releases/0/approvers/1"]}]}
         ]
       },
       {
@@ -551,7 +551,7 @@
         "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.walk", "sentence.whose.undecided", "walk.every", "path.null"],
         "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann", "state": "APPROVED"}, {"username": "zed", "state": null}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "approvers[].username", "value": ["ann", "zed"]}], "failed_items": [{"path": "approvers[1].state", "item": "item 2 of approvers", "cause": "null", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "approvers[].username", "value": ["ann", "zed"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username"]}], "failed_items": [{"path": "approvers[1].state", "item": "item 2 of approvers", "cause": "null", "value": null, "locations": ["/releases/0/approvers/1/state"]}]}
         ]
       },
       {
@@ -559,7 +559,7 @@
         "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.walk", "sentence.whose.every", "sentence.every.empty", "walk.every"],
         "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann", "state": "CHANGES"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["ann"]}], "failed_items": []}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["ann"], "locations": ["/releases/0/approvers/0/username"]}], "failed_items": []}
         ]
       },
       {
@@ -567,7 +567,7 @@
         "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.empty", "walk.every"],
         "input": {"releases": [{"id": "r1", "approvers": []}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "value", "value": []}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": [], "locations": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "value", "value": [], "locations": ["/releases/0/approvers"]}]}
         ]
       },
       {
@@ -575,7 +575,7 @@
         "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.walk", "walk.every", "path.absent"],
         "input": {"releases": [{"id": "r1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers.username", "value": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "absent", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers.username", "value": [], "locations": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "absent", "value": null, "locations": ["/releases/0"]}]}
         ]
       }
     ]
@@ -590,7 +590,7 @@
         "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.if_any", "sentence.whose.every", "walk.every"],
         "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann", "state": "CHANGES"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": ["ann"]}], "failed_items": []}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": ["ann"], "locations": ["/releases/0/approvers/0/username"]}], "failed_items": []}
         ],
         "expressions": {"s": {"c": "every approvers.username whose state is \"APPROVED\", if any, is in $params.staff"}}
       },
@@ -599,7 +599,7 @@
         "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.if_any", "walk.every"],
         "input": {"releases": [{"id": "r1", "approvers": []}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": []}], "failed_items": []}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": [], "locations": []}], "failed_items": []}
         ]
       },
       {
@@ -607,7 +607,7 @@
         "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.if_any", "walk.every"],
         "input": {"releases": [{"id": "r1", "approvers": [{"username": "zed", "state": "APPROVED"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["zed"]}], "failed_items": [{"path": "approvers[0].username", "item": "item 1 of approvers", "cause": "value", "value": "zed"}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["zed"], "locations": ["/releases/0/approvers/0/username"]}], "failed_items": [{"path": "approvers[0].username", "item": "item 1 of approvers", "cause": "value", "value": "zed", "locations": ["/releases/0/approvers/0/username"]}]}
         ]
       },
       {
@@ -615,7 +615,7 @@
         "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.if_any", "sentence.whose.undecided", "walk.every", "path.absent"],
         "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers[].username", "value": ["ann"]}], "failed_items": [{"path": "approvers[0].state", "item": "item 1 of approvers", "cause": "absent", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers[].username", "value": ["ann"], "locations": ["/releases/0/approvers/0/username"]}], "failed_items": [{"path": "approvers[0].state", "item": "item 1 of approvers", "cause": "absent", "value": null, "locations": ["/releases/0/approvers/0"]}]}
         ]
       },
       {
@@ -623,7 +623,7 @@
         "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.if_any", "walk.every", "path.absent"],
         "input": {"releases": [{"id": "r1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers.username", "value": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "absent", "value": null}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers.username", "value": [], "locations": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "absent", "value": null, "locations": ["/releases/0"]}]}
         ]
       }
     ]
@@ -638,8 +638,8 @@
         "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.whose.undecided", "sentence.phrase.exists", "sentence.every.walk"],
         "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann", "comment": "ok"}, {"username": "zed"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "e", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": ["ann", "zed"]}], "failed_items": []},
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "s2", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["ann", "zed"]}], "failed_items": [{"path": "approvers[1].username", "item": "item 2 of approvers", "cause": "value", "value": "zed"}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "e", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": ["ann", "zed"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username"]}], "failed_items": []},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "s2", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["ann", "zed"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username"]}], "failed_items": [{"path": "approvers[1].username", "item": "item 2 of approvers", "cause": "value", "value": "zed", "locations": ["/releases/0/approvers/1/username"]}]}
         ]
       },
       {
@@ -647,8 +647,8 @@
         "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.whose.undecided", "sentence.phrase.exists", "sentence.some.walk"],
         "input": {"releases": [{"id": "r1", "approvers": [{"username": "zed", "comment": "ok"}, {"username": "bob"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "e", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["zed", "bob"]}], "failed_items": [{"path": "approvers[0].username", "item": "item 1 of approvers", "cause": "value", "value": "zed"}]},
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "s2", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": ["zed", "bob"]}], "failed_items": []}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "e", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["zed", "bob"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username"]}], "failed_items": [{"path": "approvers[0].username", "item": "item 1 of approvers", "cause": "value", "value": "zed", "locations": ["/releases/0/approvers/0/username"]}]},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "s2", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": ["zed", "bob"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username"]}], "failed_items": []}
         ]
       }
     ]
@@ -662,7 +662,7 @@
         "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.whose.undecided", "sentence.every.walk", "walk.every", "sentence.phrase.order"],
         "input": {"releases": [{"id": "r1", "reviews": [{"name": "ann", "rank": 3}, {"name": "zed", "rank": "high"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "reviews[].name", "value": ["ann", "zed"]}], "failed_items": [{"path": "reviews[1].rank", "item": "item 2 of reviews", "cause": "unusable", "value": "high"}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "reviews[].name", "value": ["ann", "zed"], "locations": ["/releases/0/reviews/0/name", "/releases/0/reviews/1/name"]}], "failed_items": [{"path": "reviews[1].rank", "item": "item 2 of reviews", "cause": "unusable", "value": "high", "locations": ["/releases/0/reviews/1/rank"]}]}
         ]
       }
     ]
@@ -676,7 +676,7 @@
         "rules": ["sentence.argument.item", "sentence.whose.item", "sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.time"],
         "input": {"releases": [{"id": "r1", "last_commit_timestamp": "2026-12-01T00:00:00Z", "approvers": [{"state": "APPROVED", "timestamp": "2026-10-02T00:00:00Z", "last_commit_timestamp": "2026-10-01T00:00:00Z"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].timestamp", "value": ["2026-10-02T00:00:00Z"]}], "failed_items": []}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].timestamp", "value": ["2026-10-02T00:00:00Z"], "locations": ["/releases/0/approvers/0/timestamp"]}], "failed_items": []}
         ],
         "expressions": {"s": {"c": "some approvers.timestamp whose state is \"APPROVED\" is after last_commit_timestamp"}}
       },
@@ -685,7 +685,7 @@
         "rules": ["sentence.argument.item", "sentence.whose.item", "sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.time"],
         "input": {"releases": [{"id": "r1", "last_commit_timestamp": "2026-10-01T00:00:00Z", "approvers": [{"state": "APPROVED", "timestamp": "2026-10-02T00:00:00Z", "last_commit_timestamp": "2026-12-01T00:00:00Z"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].timestamp", "value": ["2026-10-02T00:00:00Z"]}], "failed_items": [{"path": "approvers[0].timestamp", "item": "item 1 of approvers", "cause": "value", "value": "2026-10-02T00:00:00Z"}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].timestamp", "value": ["2026-10-02T00:00:00Z"], "locations": ["/releases/0/approvers/0/timestamp"]}], "failed_items": [{"path": "approvers[0].timestamp", "item": "item 1 of approvers", "cause": "value", "value": "2026-10-02T00:00:00Z", "locations": ["/releases/0/approvers/0/timestamp"]}]}
         ]
       },
       {
@@ -693,7 +693,7 @@
         "rules": ["sentence.argument.item", "sentence.whose.item", "sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.time", "path.absent"],
         "input": {"releases": [{"id": "r1", "last_commit_timestamp": "2026-10-01T00:00:00Z", "approvers": [{"state": "APPROVED", "timestamp": "2026-10-02T00:00:00Z"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers[].timestamp", "value": ["2026-10-02T00:00:00Z"]}], "failed_items": [{"path": "approvers[0].timestamp", "item": "item 1 of approvers", "cause": "absent", "value": "2026-10-02T00:00:00Z"}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers[].timestamp", "value": ["2026-10-02T00:00:00Z"], "locations": ["/releases/0/approvers/0/timestamp"]}], "failed_items": [{"path": "approvers[0].timestamp", "item": "item 1 of approvers", "cause": "absent", "value": "2026-10-02T00:00:00Z", "locations": ["/releases/0/approvers/0/timestamp"]}]}
         ]
       }
     ]
@@ -708,8 +708,8 @@
         "rules": ["sentence.argument.item", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of"],
         "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann", "staff": ["zed"]}]}], "staff": ["zed"]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "i", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["ann"]}], "failed_items": [{"path": "approvers[0].username", "item": "item 1 of approvers", "cause": "value", "value": "ann"}]},
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "p", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": ["ann"]}], "failed_items": []}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "i", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["ann"], "locations": ["/releases/0/approvers/0/username"]}], "failed_items": [{"path": "approvers[0].username", "item": "item 1 of approvers", "cause": "value", "value": "ann", "locations": ["/releases/0/approvers/0/username"]}]},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "p", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": ["ann"], "locations": ["/releases/0/approvers/0/username"]}], "failed_items": []}
         ]
       }
     ]
@@ -723,9 +723,9 @@
         "rules": ["sentence.assert.and", "all_of.pass", "all_of.cause", "all_of.inputs", "all_of.failed_assertions", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items"],
         "input": {"releases": [{"id": "r1", "state": "MERGED", "commits": [{"signed": true}], "approvers": [{"state": "APPROVED"}], "items": [{"price": 3, "kind": "a"}], "owner": "x"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "commits[].signed", "value": [true]}, {"name": "state", "value": "MERGED"}], "failed_assertions": []},
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "d", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].state", "value": ["APPROVED"]}, {"name": "state", "value": "MERGED"}], "failed_assertions": []},
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "w", "passed": true, "cause": "satisfied", "inputs": [{"name": "items[].price", "value": [3]}, {"name": "owner", "value": "x"}], "failed_assertions": []}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "commits[].signed", "value": [true], "locations": ["/releases/0/commits/0/signed"]}, {"name": "state", "value": "MERGED", "locations": ["/releases/0/state"]}], "failed_assertions": []},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "d", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].state", "value": ["APPROVED"], "locations": ["/releases/0/approvers/0/state"]}, {"name": "state", "value": "MERGED", "locations": ["/releases/0/state"]}], "failed_assertions": []},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "w", "passed": true, "cause": "satisfied", "inputs": [{"name": "items[].price", "value": [3], "locations": ["/releases/0/items/0/price"]}, {"name": "owner", "value": "x", "locations": ["/releases/0/owner"]}], "failed_assertions": []}
         ]
       },
       {
@@ -733,9 +733,9 @@
         "rules": ["sentence.assert.and", "all_of.pass", "all_of.cause", "all_of.inputs", "all_of.failed_assertions", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items"],
         "input": {"releases": [{"id": "r1", "state": "MERGED", "commits": [{"signed": true}, {"signed": false}], "approvers": [{"state": "APPROVED"}], "items": [{"price": 1, "kind": "a"}], "owner": "x"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "commits[].signed", "value": [true, false]}, {"name": "state", "value": "MERGED"}], "failed_assertions": [{"assertion": "every commits.signed is true", "cause": "value"}]},
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "d", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].state", "value": ["APPROVED"]}, {"name": "state", "value": "MERGED"}], "failed_assertions": []},
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "w", "passed": false, "cause": "value", "inputs": [{"name": "items[].price", "value": [1]}, {"name": "owner", "value": "x"}], "failed_assertions": [{"assertion": "every items.price whose kind is \"a\" is at least 2", "cause": "value"}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "commits[].signed", "value": [true, false], "locations": ["/releases/0/commits/0/signed", "/releases/0/commits/1/signed"]}, {"name": "state", "value": "MERGED", "locations": ["/releases/0/state"]}], "failed_assertions": [{"assertion": "every commits.signed is true", "cause": "value"}]},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "d", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].state", "value": ["APPROVED"], "locations": ["/releases/0/approvers/0/state"]}, {"name": "state", "value": "MERGED", "locations": ["/releases/0/state"]}], "failed_assertions": []},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "w", "passed": false, "cause": "value", "inputs": [{"name": "items[].price", "value": [1], "locations": ["/releases/0/items/0/price"]}, {"name": "owner", "value": "x", "locations": ["/releases/0/owner"]}], "failed_assertions": [{"assertion": "every items.price whose kind is \"a\" is at least 2", "cause": "value"}]}
         ]
       },
       {
@@ -743,9 +743,9 @@
         "rules": ["sentence.assert.and", "all_of.pass", "all_of.cause", "all_of.inputs", "all_of.failed_assertions", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.some.walk", "walk.some"],
         "input": {"releases": [{"id": "r1", "state": "OPEN", "commits": [{"signed": true}], "approvers": [{"state": "APPROVED"}], "items": [{"price": 3, "kind": "a"}], "owner": "y"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "commits[].signed", "value": [true]}, {"name": "state", "value": "OPEN"}], "failed_assertions": [{"assertion": "state is \"MERGED\"", "cause": "value"}]},
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "d", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].state", "value": ["APPROVED"]}, {"name": "state", "value": "OPEN"}], "failed_assertions": [{"assertion": "state is \"MERGED\"", "cause": "value"}]},
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "w", "passed": false, "cause": "value", "inputs": [{"name": "items[].price", "value": [3]}, {"name": "owner", "value": "y"}], "failed_assertions": [{"assertion": "owner is \"x\"", "cause": "value"}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "commits[].signed", "value": [true], "locations": ["/releases/0/commits/0/signed"]}, {"name": "state", "value": "OPEN", "locations": ["/releases/0/state"]}], "failed_assertions": [{"assertion": "state is \"MERGED\"", "cause": "value"}]},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "d", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].state", "value": ["APPROVED"], "locations": ["/releases/0/approvers/0/state"]}, {"name": "state", "value": "OPEN", "locations": ["/releases/0/state"]}], "failed_assertions": [{"assertion": "state is \"MERGED\"", "cause": "value"}]},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "w", "passed": false, "cause": "value", "inputs": [{"name": "items[].price", "value": [3], "locations": ["/releases/0/items/0/price"]}, {"name": "owner", "value": "y", "locations": ["/releases/0/owner"]}], "failed_assertions": [{"assertion": "owner is \"x\"", "cause": "value"}]}
         ]
       },
       {
@@ -753,9 +753,9 @@
         "rules": ["sentence.assert.and", "all_of.pass", "all_of.cause", "all_of.inputs", "all_of.failed_assertions", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.some.walk", "walk.some", "path.absent"],
         "input": {"releases": [{"id": "r1", "state": "OPEN", "approvers": [{"state": "CHANGES"}], "items": [{"price": 1, "kind": "a"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "commits.signed", "value": []}, {"name": "state", "value": "OPEN"}], "failed_assertions": [{"assertion": "every commits.signed is true", "cause": "absent"}, {"assertion": "state is \"MERGED\"", "cause": "value"}]},
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "d", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].state", "value": ["CHANGES"]}, {"name": "state", "value": "OPEN"}], "failed_assertions": [{"assertion": "state is \"MERGED\"", "cause": "value"}, {"assertion": "some approvers.state is \"APPROVED\"", "cause": "value"}]},
-          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "w", "passed": false, "cause": "absent", "inputs": [{"name": "items[].price", "value": [1]}, {"name": "owner", "value": null}], "failed_assertions": [{"assertion": "every items.price whose kind is \"a\" is at least 2", "cause": "value"}, {"assertion": "owner is \"x\"", "cause": "absent"}]}
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "commits.signed", "value": [], "locations": []}, {"name": "state", "value": "OPEN", "locations": ["/releases/0/state"]}], "failed_assertions": [{"assertion": "every commits.signed is true", "cause": "absent"}, {"assertion": "state is \"MERGED\"", "cause": "value"}]},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "d", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].state", "value": ["CHANGES"], "locations": ["/releases/0/approvers/0/state"]}, {"name": "state", "value": "OPEN", "locations": ["/releases/0/state"]}], "failed_assertions": [{"assertion": "state is \"MERGED\"", "cause": "value"}, {"assertion": "some approvers.state is \"APPROVED\"", "cause": "value"}]},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "w", "passed": false, "cause": "absent", "inputs": [{"name": "items[].price", "value": [1], "locations": ["/releases/0/items/0/price"]}, {"name": "owner", "value": null, "locations": ["/releases/0"]}], "failed_assertions": [{"assertion": "every items.price whose kind is \"a\" is at least 2", "cause": "value"}, {"assertion": "owner is \"x\"", "cause": "absent"}]}
         ]
       }
     ]
@@ -770,8 +770,8 @@
         "rules": ["walk.flaws", "sentence.every.if_any"],
         "input": {"things": [{"id": "t1", "xs": [{"v": 2, "kind": "a"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "xs[].v", "value": [2]}], "failed_items": []},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "n", "passed": false, "cause": "absent", "inputs": [{"name": "xs named by $params.k", "value": []}], "failed_items": []}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "xs[].v", "value": [2], "locations": ["/things/0/xs/0/v"]}], "failed_items": []},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "n", "passed": false, "cause": "absent", "inputs": [{"name": "xs named by $params.k", "value": [], "locations": []}], "failed_items": []}
         ]
       }
     ]
@@ -799,7 +799,136 @@
         "rules": ["sentence.every.walk", "sentence.written_wrong.slot", "written_wrong"],
         "input": {"things": [{"id": "t1", "pull_requests": [{"labels": ["hotfix"]}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["\"does not contain\" after every or some would check each item of the last list, not the list: put the walk on a for line"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["\"does not contain\" after every or some would check each item of the last list, not the list: put the walk on a for line"], "locations": []}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every over nested lists of different lengths",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.commits.signed is true"}}}},
+    "cases": [
+      {
+        "description": "has one location per value, in the order of the walk, when the lists differ in length",
+        "rules": ["location.each"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}, {"signed": true}, {"signed": true}]}, {"commits": [{"signed": true}]}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/releases/0/pull_requests/0/commits/0/signed", "/releases/0/pull_requests/0/commits/1/signed", "/releases/0/pull_requests/0/commits/2/signed", "/releases/0/pull_requests/1/commits/0/signed"], "name": "pull_requests[].commits[].signed", "value": [true, true, true, true]}], "passed": true, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "some with a whose",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some approvers.username whose state is \"APPROVED\" is in $params.staff"}}}},
+    "params": {"staff": ["bob"]},
+    "cases": [
+      {
+        "description": "has a location for every item the walk read, including the ones whose left out",
+        "rules": ["location.each"],
+        "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann", "state": "COMMENTED"}, {"username": "bob", "state": "APPROVED"}, {"username": "cat", "state": "APPROVED"}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username", "/releases/0/approvers/2/username"], "name": "approvers[].username", "value": ["ann", "bob", "cat"]}], "passed": true, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every that stops before it walks a list",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.commits.signed is true"}}}},
+    "cases": [
+      {
+        "description": "has no values and no locations when the first list is missing",
+        "rules": ["location.each"],
+        "input": {"releases": [{"id": "r1"}]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "item": "pull_requests", "locations": ["/releases/0"], "path": "pull_requests", "value": null}], "inputs": [{"locations": [], "name": "pull_requests.commits.signed", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      },
+      {
+        "description": "has no values and no locations when the first list is null",
+        "rules": ["location.each"],
+        "input": {"releases": [{"id": "r1", "pull_requests": null}]},
+        "results": [
+          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "item": "pull_requests", "locations": ["/releases/0/pull_requests"], "path": "pull_requests", "value": null}], "inputs": [{"locations": [], "name": "pull_requests.commits.signed", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every on a path that has no list",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every x.y is 1"}}}},
+    "cases": [
+      {
+        "description": "has no values and no locations when nothing along the path is a list",
+        "rules": ["location.each"],
+        "input": {"things": [{"id": "t1", "x": {"y": {"z": 1}}}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "item": "x.y", "locations": ["/things/0/x/y"], "path": "x.y", "value": {"z": 1}}], "inputs": [{"locations": [], "name": "x.y", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every where a value is missing at the end of its path",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.commits.signed is true"}}}},
+    "cases": [
+      {
+        "description": "has the location where each item's read stopped",
+        "rules": ["location.each"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}, {"sha": "x"}]}, {"commits": "none"}]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "absent", "item": "item 2 of pull_requests[0].commits", "locations": ["/releases/0/pull_requests/0/commits/1"], "path": "pull_requests[0].commits[1].signed", "value": null}, {"cause": "unusable", "item": "pull_requests[1].commits", "locations": ["/releases/0/pull_requests/1/commits"], "path": "pull_requests[1].commits", "value": "none"}], "inputs": [{"locations": ["/releases/0/pull_requests/0/commits/0/signed", "/releases/0/pull_requests/0/commits/1"], "name": "pull_requests[].commits[].signed", "value": [true, null]}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every over a field of each item, where it fails",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.title is \"x\""}}}},
+    "cases": [
+      {
+        "description": "points a failed item at the field it read, not at the item",
+        "rules": ["location.failed_items", "location.each"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"title": "x"}, {"title": "y"}]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "item": "item 2 of pull_requests", "locations": ["/releases/0/pull_requests/1/title"], "path": "pull_requests[1].title", "value": "y"}], "inputs": [{"locations": ["/releases/0/pull_requests/0/title", "/releases/0/pull_requests/1/title"], "name": "pull_requests[].title", "value": ["x", "y"]}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      },
+      {
+        "description": "points a failed item at where the read stopped when the field is missing",
+        "rules": ["location.failed_items", "location.read"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"title": "x"}, {}]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "item": "item 2 of pull_requests", "locations": ["/releases/0/pull_requests/1"], "path": "pull_requests[1].title", "value": null}], "inputs": [{"locations": ["/releases/0/pull_requests/0/title", "/releases/0/pull_requests/1"], "name": "pull_requests[].title", "value": ["x", null]}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every over the items themselves, where it fails",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every scores is 1"}}}},
+    "cases": [
+      {
+        "description": "points a failed item at the item when the item is the value",
+        "rules": ["location.failed_items"],
+        "input": {"releases": [{"id": "r1", "scores": [1, 2]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "item": "item 2 of scores", "locations": ["/releases/0/scores/1"], "path": "item 2 of scores", "value": 2}], "inputs": [{"locations": ["/releases/0/scores/0", "/releases/0/scores/1"], "name": "scores[]", "value": [1, 2]}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every over a list that is missing",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.title is \"x\""}}}},
+    "cases": [
+      {
+        "description": "keeps no values and no locations, and its failed item says where the walk stopped",
+        "rules": ["location.each", "location.failed_items"],
+        "input": {"releases": [{"id": "r1", "other": {}}]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "item": "pull_requests", "locations": ["/releases/0"], "path": "pull_requests", "value": null}], "inputs": [{"locations": [], "name": "pull_requests.title", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
         ]
       }
     ]

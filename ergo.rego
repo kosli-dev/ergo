@@ -218,7 +218,7 @@ _unknown_subject_fields(def) := sort([f |
 
 _unknown_req_fields(req) := [] if not is_object(req)
 
-_not_an_object_inputs(req) := [{"name": "requirement", "value": req}] if not is_object(req)
+_not_an_object_inputs(req) := [{"name": "requirement", "value": req, "locations": []}] if not is_object(req)
 
 _not_an_object_inputs(req) := [] if is_object(req)
 
@@ -365,7 +365,7 @@ _require_problems(req) := {["require", "neither every nor some"] | is_object(req
 
 _path_problems(req, f) := {[f, "number out of range"] | is_array(_req_field(req, f, null)); _out_of_range(req[f])}
 
-_field_problem_inputs(req) := [{"name": _field_name(f), "value": sort({p[1] | some p in problems; p[0] == f})} | some f in sort({p[0] | some p in problems})] if {
+_field_problem_inputs(req) := [{"name": _field_name(f), "value": sort({p[1] | some p in problems; p[0] == f}), "locations": []} | some f in sort({p[0] | some p in problems})] if {
 	problems := _req_problems(req)
 }
 
@@ -515,8 +515,8 @@ _every_from(req) if {
 	req.subject in object.get(data.ergo_subject_sentences, "every", set())
 }
 
-_every_walk(doc, keys) := {"subjects": [e.v | some e in w.items; _every_kept(e, last)], "fails": array.concat(array.concat(w.fails, _walk_stop(w)), [_every_end_fail(e) | some e in w.items; not _every_kept(e, last)])} if {
-	w := _walk({"c": [], "v": doc, "i": null, "iv": null, "r": []}, keys, true)
+_every_walk(doc, keys) := {"subjects": [{"subject": e.v, "at": _walk_at(w, e)} | some e in w.items; _every_kept(e, last)], "fails": array.concat(array.concat(w.fails, _walk_stop(w)), [object.union(_every_end_fail(e), {"at": _walk_at(w, e)}) | some e in w.items; not _every_kept(e, last)])} if {
+	w := _walk({"c": [], "v": doc, "i": null, "iv": null, "r": [], "a": _doc_at}, keys, true)
 	last := count(keys) in w.walked
 }
 
@@ -586,12 +586,13 @@ _from_ref_states(req) := {_ref_state(seg.ref) | some seg in _from_path(req); _is
 
 _keys_refs(step) := {step.keys.ref} if _is_ref(step.keys)
 
-_listed_subjects(doc, req) := coll if {
+_listed_subjects(doc, req) := [{"subject": subj, "at": concat("", [base, "/", format_int(i, 10)])} | some i, subj in coll] if {
 	coll := _target(doc, req)
 	is_array(coll)
+	base := _pointer(_doc_at, doc, _from_keys(req))
 }
 
-_listed_subjects(doc, req) := [coll] if {
+_listed_subjects(doc, req) := [{"subject": coll, "at": _pointer(_doc_at, doc, _from_keys(req))}] if {
 	coll := _target(doc, req)
 	is_object(coll)
 }
@@ -601,13 +602,13 @@ _listed_subjects(doc, req) := [] if {
 	not is_object(_target(doc, req))
 }
 
-_raw_entries(doc, req) := [{"subject": subj} | some subj in _listed_subjects(doc, req)] if {
+_raw_entries(doc, req) := [entry | some entry in _listed_subjects(doc, req)] if {
 	not _stepped(req)
 	_from_well_formed(req)
 	not _every_from(req)
 }
 
-_raw_entries(doc, req) := [{"subject": subj} | some subj in _every_walk(doc, _from_keys(req)).subjects] if {
+_raw_entries(doc, req) := _every_walk(doc, _from_keys(req)).subjects if {
 	_from_well_formed(req)
 	_every_from(req)
 	is_object(doc)
@@ -619,7 +620,7 @@ _raw_entries(doc, req) := [] if {
 	not is_object(doc)
 }
 
-_raw_entries(doc, req) := [{"key": k, "subject": object.get(_keyed(doc, req), [k], _absent)} | some k in sort({k | some k in _listed_keys(_each_step(req))})] if {
+_raw_entries(doc, req) := [{"key": k, "subject": object.get(_keyed(doc, req), [k], _absent), "at": _pointer(_doc_at, doc, array.concat(_from_keys(req), [k]))} | some k in sort({k | some k in _listed_keys(_each_step(req))})] if {
 	_from_well_formed(req)
 	"keys" in object.keys(_each_step(req))
 	_listed_keys(_each_step(req))
@@ -638,7 +639,14 @@ _keyed(doc, req) := coll if {
 
 _keyed(doc, req) := {} if not is_object(_target(doc, req))
 
-_scope_of(req, subj) := {"ergo/names": object.union(object.union(names, _parent_names), _subject_name(req, subj))} if names := _each_names(req, subj)
+_scope_of(req, subj) := {"ergo/names": object.union(object.union(object.union(names, _parent_names), _subject_name(req, subj)), {"$at": {"names": _name_ats(req), "subject": _subject_at}})} if names := _each_names(req, subj)
+
+_name_ats(req) := object.union({_each_step(req).each_as: _subject_at}, _parent_ats) if {
+	_has_step(req)
+	_from_well_formed(req)
+}
+
+_name_ats(req) := _parent_ats if not _has_step(req)
 
 _subject_name(req, subj) := {"ergo/subject": subj} if _has_parts(req)
 
@@ -912,7 +920,7 @@ _basic_eval(subj, side) := {"v": v, "found": [x | x := _simple_found(subj, side)
 
 _basic_eval(subj, side) := {"v": [_written(side)], "found": [x | x := _simple_found(subj, side)], "states": set(), "inputs": []} if _basic_form(side) == "literal"
 
-_basic_eval(subj, side) := {"v": v, "found": v, "states": t.states, "inputs": [{"name": side.text, "value": object.get(t, "value", null)}, {"name": t.list, "value": t.values}]} if {
+_basic_eval(subj, side) := {"v": v, "found": v, "states": t.states, "inputs": _tally_inputs(side, t)} if {
 	_basic_form(side) in {"count_of", "sum_of"}
 	t := _tally(subj, side)
 	v := [x | x := t.value]
@@ -925,9 +933,10 @@ _basic_eval(subj, side) := {"v": v, "found": v, "states": _elapsed_states(subj, 
 
 _side_eval(subj, side) := _basic_eval(subj, side) if _basic_form(side)
 
-_side_eval(subj, side) := {"v": v, "found": v, "states": union({o.states | some o in ops}), "inputs": array.concat([{"name": _side_text(side), "value": _first_or_null(v)}], [i | some o in ops; some i in o.inputs])} if {
+_side_eval(subj, side) := {"v": v, "found": v, "states": union({o.states | some o in ops}), "inputs": array.concat([_number_input(_side_text(side), _first_or_null(v), operands)], operands)} if {
 	_side_form(side) == "add"
 	ops := [_operand_eval(subj, operand) | some operand in side.add]
+	operands := [i | some o in ops; some i in o.inputs]
 	v := _added(side, ops)
 }
 
@@ -978,7 +987,7 @@ _all_of_run(check) if {
 }
 
 _check_outcome(check, subj, flaw) := {
-	"inputs": [{"name": pair[0], "value": pair[1]} | some pair in sort({[i.name, i.value] | some o in outs; some i in o.inputs})],
+	"inputs": _merged_inputs([i | some o in outs; some i in o.inputs]),
 	"passed": count(failed) == 0,
 	"cause": _all_of_cause(failed),
 	"failed_assertions": failed,
@@ -993,7 +1002,7 @@ _any_of_run(check) if {
 }
 
 _check_outcome(check, subj, flaw) := {
-	"inputs": [{"name": pair[0], "value": pair[1]} | some pair in sort({[i.name, i.value] | some o in outs; some i in o.inputs})],
+	"inputs": _merged_inputs([i | some o in outs; some i in o.inputs]),
 	"passed": cause == "satisfied",
 	"cause": cause,
 } if {
@@ -1210,6 +1219,113 @@ _subject_part(path) if {
 	_part_start(path)
 	_part_of(path).of == null
 }
+
+default _at_ctx := {}
+
+_at_ctx := input["ergo/names"]["$at"] if is_object(input["ergo/names"]["$at"])
+
+default _doc_at := ""
+
+_doc_at := _at_ctx.doc if is_string(_at_ctx.doc)
+
+default _subject_at := "~~"
+
+_subject_at := _at_ctx.subject if is_string(_at_ctx.subject)
+
+default _parent_ats := {}
+
+_parent_ats := _at_ctx.names if is_object(_at_ctx.names)
+
+_name_at(name) := _parent_ats[name]
+
+_row_input(at) := {"ergo/names": {"$at": {"names": _parent_ats, "subject": at}}}
+
+_start_at(path) := _subject_at if not _named(path)
+
+_start_at(path) := "" if path[0] == "$$input"
+
+_start_at(path) := "$params:" if path[0] == "$$params"
+
+_start_at(path) := _name_at(substring(path[0], 1, -1)) if {
+	_named(path)
+	not _builtin(path)
+	not _part_start(path)
+}
+
+_start_at(path) := _subject_at if _subject_part(path)
+
+_start_at(path) := _name_at(_part_of(path).of) if {
+	_part_start(path)
+	not _subject_part(path)
+}
+
+_escaped(k) := replace(replace(k, "~", "~0"), "/", "~1") if is_string(k)
+
+_escaped(k) := format_int(k, 10) if is_number(k)
+
+_probe(start, keys) := object.get(start, keys, _absent) if is_object(start)
+
+_probe(start, keys) := object.get({"v": start}, array.concat(["v"], keys), _absent) if not is_object(start)
+
+_reached(start, keys) := max({0} | {i |
+	count(keys) > 0
+	some i in numbers.range(1, count(keys))
+	_probe(start, array.slice(keys, 0, i)) != _absent
+})
+
+_pointer(base, start, keys) := _joined(base, keys) if _probe(start, keys) != _absent
+
+else := _joined(base, array.slice(keys, 0, _reached(start, keys)))
+
+_joined(base, []) := base
+
+_joined(base, keys) := concat("", [base, "/", concat("/", [_escaped(k) | some k in keys])]) if count(keys) > 0
+
+_resolved_prefix(subj, steps) := ks if {
+	read := {i: k | some i, seg in steps; k := _field_step_key(subj, seg)}
+	missing := {i | some i, _ in steps; not i in object.keys(read)}
+	n := min(missing | {count(steps)})
+	ks := [read[i] | some i in numbers.range(0, n - 1); n > 0]
+}
+
+_leading_keys(subj, path) := _resolved_prefix(subj, _path_steps(path))
+
+_first_seen(xs) := [p[1] | some p in sort([[s[1], s[0]] | some j, s in sorted; _starts_group(sorted, j)])] if sorted := sort([[x, i] | some i, x in xs])
+
+_starts_group(_, 0)
+
+_starts_group(sorted, j) if {
+	j > 0
+	sorted[j][0] != sorted[j - 1][0]
+}
+
+_number_input(name, value, inputs) := {"name": name, "value": value, "locations": _first_seen([l | some i in inputs; some l in i.locations])}
+
+_locations_of(subj, path) := [at] if at := _at(subj, path)
+
+else := []
+
+_at(subj, path) := _joined(_subject_at, keys) if {
+	is_object(subj)
+	_plain_path(path)
+	keys := _plain_keys(path)
+	object.get(subj, keys, _absent) != _absent
+} else := _pointer(_subject_at, subj, _plain_keys(path)) if {
+	is_object(subj)
+	_plain_path(path)
+} else := _pointer(_start_at(path), start, _leading_keys(subj, path)) if {
+	start := _start_of(subj, path)
+}
+
+_path_input(subj, path) := {"name": _item_path_name(path), "value": _value_at(subj, path), "locations": [at]} if at := _at(subj, path)
+
+else := {"name": _item_path_name(path), "value": _value_at(subj, path), "locations": []}
+
+_merged_inputs(inputs) := [object.union(_with_part({"name": t[0], "value": t[1]}, t[2]), {"locations": t[3]}) | some t in sort({[i.name, i.value, object.get(i, "part", null), i.locations] | some i in inputs})]
+
+_with_part(entry, null) := entry
+
+_with_part(entry, part) := object.union(entry, {"part": part}) if part != null
 
 default _off_subject(_) := false
 
@@ -2975,7 +3091,15 @@ _ref_shown(r) := v if {
 	v != _absent
 }
 
-_ref_inputs(check) := [{"name": pair[0], "value": pair[1]} | some pair in sort({[_ref_name(r), _ref_shown(r)] | some r in _check_refs(check)})]
+_ref_inputs(check) := [{"name": pair[0], "value": pair[1], "locations": pair[2]} | some pair in sort({[_ref_name(r), _ref_shown(r), _ref_locations(r)] | some r in _check_refs(check)})]
+
+_ref_locations(r) := [_ref_at(r)] if _builtin(r)
+
+_ref_locations(r) := [] if not _builtin(r)
+
+_ref_at(r) := _pointer(_start_at(r), start, [_key(seg) | some seg in array.slice(r, 1, count(r))]) if {
+	start := _start_of(null, r)
+}
 
 _verdict_cause(passed) := "satisfied" if passed
 
@@ -3035,11 +3159,11 @@ _check_inputs(subj, check) := [_echoed(subj, check.inputs[k]) | some k in _names
 	check.inputs
 }
 
-_echoed(subj, spec) := {"name": _item_path_name(spec), "value": _value_at(subj, spec)} if is_array(spec)
+_echoed(subj, spec) := _path_input(subj, spec) if is_array(spec)
 
 _check_inputs(subj, check) := [
-	{"name": _item_path_name(check.left), "value": _value_at(subj, check.left)},
-	{"name": _item_path_name(check.right), "value": _value_at(subj, check.right)},
+	_path_input(subj, check.left),
+	_path_input(subj, check.right),
 ] if {
 	not check.inputs
 	check.op == "compare_time"
@@ -3047,7 +3171,7 @@ _check_inputs(subj, check) := [
 	is_array(check.right)
 }
 
-_check_inputs(subj, check) := [{"name": _item_path_name(check.left), "value": _value_at(subj, check.left)}] if {
+_check_inputs(subj, check) := [_path_input(subj, check.left)] if {
 	not check.inputs
 	check.op == "compare_time"
 	is_array(check.left)
@@ -3067,7 +3191,7 @@ _check_inputs(subj, check) := _derived_eval(check, subj).inputs if {
 	_derived_once(check)
 }
 
-_check_inputs(subj, check) := [{"name": _item_path_name(check.path), "value": _value_at(subj, check.path)}] if {
+_check_inputs(subj, check) := [_path_input(subj, check.path)] if {
 	not check.inputs
 	not _two_sided(check)
 	is_array(check.path)
@@ -3082,7 +3206,7 @@ _leaf_paths(leaf) := [leaf.path] if {
 
 _row_inputs(subj, check) := _with_key_fields(subj, check, _check_inputs(subj, check))
 
-_with_key_fields(subj, check, inputs) := _once(array.concat(inputs, [{"name": _item_path_name([f]), "value": _value_at(subj, [f])} | some f in _key_fields(check)])) if count(_key_fields(check)) > 0
+_with_key_fields(subj, check, inputs) := _once(array.concat(inputs, [_path_input(subj, [f]) | some f in _key_fields(check)])) if count(_key_fields(check)) > 0
 
 else := inputs
 
@@ -3208,7 +3332,7 @@ _well_formed_named(req, name) if {
 
 _name_problem_inputs(name) := [] if is_string(name)
 
-_name_problem_inputs(name) := [{"name": "requirement name", "value": ["not a string"]}] if not is_string(name)
+_name_problem_inputs(name) := [{"name": "requirement name", "value": ["not a string"], "locations": []}] if not is_string(name)
 
 default _well_formed(_) := false
 
@@ -3227,7 +3351,7 @@ _well_formed(req) if {
 	_policy_problems == []
 }
 
-_check_problem_inputs(req) := [{"name": name, "value": sort({p[1] | some p in problems; p[0] == name})} | some name in sort({p[0] | some p in problems})] if {
+_check_problem_inputs(req) := [{"name": name, "value": sort({p[1] | some p in problems; p[0] == name}), "locations": []} | some name in sort({p[0] | some p in problems})] if {
 	problems := (_own_check_problems(req) | _reserved_name_problems(req)) | {p | some a in _ancestors_of(req); some p in _own_check_problems({"subject": a, "checks": {}})}
 }
 
@@ -3268,13 +3392,13 @@ _from_names(req, here) := ({n |
 
 _well_formed_inputs(req) := array.concat(
 	array.concat(
-		[{"name": "count(checks)", "value": count(_checks_of(req))}],
+		[{"name": "count(checks)", "value": count(_checks_of(req)), "locations": []}],
 		_echo(req, "require", _require_of(req)),
 	),
 	array.concat(array.concat(array.concat(_not_an_object_inputs(req), _field_problem_inputs(req)), _check_problem_inputs(req)), _policy_problems),
 )
 
-_echo(req, f, v) := [{"name": _field_name(f), "value": v}] if not _has_problems(req, f)
+_echo(req, f, v) := [{"name": _field_name(f), "value": v, "locations": []}] if not _has_problems(req, f)
 
 _echo(req, f, _) := [] if _has_problems(req, f)
 
@@ -3308,7 +3432,31 @@ _requirement_checks_written_or_added(req) := object.union(
 	object.union(_applies_def(req), _well_formed_def),
 )
 
-_subject_row_groups(matching, req, req_name, flaws, prepared) := [[row |
+_subject_row_groups(matching, req, req_name, flaws, prepared) := [rows |
+	some entry in matching
+	ref := _entry_ref(entry, req)
+	rows := _subject_rows(entry, ref, req, req_name, flaws, prepared)
+]
+
+_anchored(row, at) := object.union(row, {"inputs": _tie_sorted(_anchored_all(row.inputs, at))}) if not "failed_items" in object.keys(row)
+
+else := object.union(row, {"inputs": _tie_sorted(_anchored_all(row.inputs, at)), "failed_items": [_anchored_failed(f, at) | some f in row.failed_items]})
+
+_anchored_failed(f, at) := object.union(f, {"locations": [replace(l, "~~", at) | some l in f.locations], "failed_items": _anchored_all(f.failed_items, at)}) if "failed_items" in object.keys(f)
+
+else := _anchored_all([f], at)[0]
+
+_tie_sorted(xs) := xs if count(xs) < 2
+
+else := xs if count({x.name | some x in xs}) == count(xs)
+
+else := [xs[t[2]] | some t in sort([[_first_read(xs, xs[i]), xs[i].locations, i] | some i, _ in xs])]
+
+_first_read(xs, x) := min({j | some j, y in xs; y.name == x.name; y.value == x.value; object.get(y, "part", null) == object.get(x, "part", null)})
+
+_anchored_all(xs, at) := [object.union(x, {"locations": [replace(l, "~~", at) | some l in x.locations]}) | some x in xs]
+
+_subject_rows(entry, ref, req, req_name, flaws, prepared) := [row |
 	some check_name in _names(prepared)
 	row := object.union(
 		{
@@ -3316,11 +3464,8 @@ _subject_row_groups(matching, req, req_name, flaws, prepared) := [[row |
 			"subject": ref,
 			"check": check_name,
 		},
-		_outcome(req, prepared[check_name], flaws[check_name], entry.subject),
+		_anchored(_outcome(req, prepared[check_name], flaws[check_name], entry.subject), entry.at),
 	)
-] |
-	some entry in matching
-	ref := _entry_ref(entry, req)
 ]
 
 _well_formed_row(req, name, parts) := v if {
@@ -3339,19 +3484,24 @@ _well_formed_row_of(req, req_name) := row if {
 	}
 }
 
-_min_subjects_row(doc, req, req_name, matching) := object.union(
+_min_subjects_row(doc, req, req_name, matching, at) := object.union(
 	{
 		"requirement": req_name,
 		"subject": _req_subject_ref(req),
 		"check": "$min_subjects",
-		"inputs": array.concat([{"name": _subject_count_name(req), "value": matching}], data.ergo_unreadable),
+		"inputs": array.concat([{"name": _subject_count_name(req), "value": matching, "locations": at}], data.ergo_unreadable),
 		"passed": _enough_subjects(doc, req, matching),
 		"cause": _min_subjects_cause(doc, req, matching),
 	},
 	_every_failed_items(doc, req),
 )
 
-_every_failed_items(doc, req) := {"failed_items": _walk_failed("", _every_walk(doc, _from_keys(req)).fails)} if {
+_every_failed_items(doc, req) := {"failed_items": [{"path": _path_name(f.path), "item": _path_name(f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f)} |
+	fails := _every_walk(doc, _from_keys(req)).fails
+	some p in sort({f.path | some f in fails})
+	some f in fails
+	f.path == p
+]} if {
 	_every_from(req)
 	is_object(doc)
 	_from_well_formed(req)
@@ -3381,16 +3531,28 @@ _min_subjects_cause(_, req, _) := _from_cause(req) if {
 	_from_unreadable(req)
 }
 
-_unique_ids_row(refs, req, req_name) := {
+_unique_ids_row(raw, refs, req, req_name) := {
 	"requirement": req_name,
 	"subject": _req_subject_ref(req),
 	"check": "$unique_ids",
-	"inputs": [{"name": _repeated_ids_name(req), "value": repeated}],
+	"inputs": [{"name": _repeated_ids_name(req), "value": repeated, "locations": [l |
+		some id in repeated
+		some i, entry in raw
+		refs[i].id == id
+		some l in _id_locations(entry, req)
+	]}],
 	"passed": count(repeated) == 0,
 	"cause": _verdict_cause(count(repeated) == 0),
 } if {
 	repeated := _repeated_ids(refs)
 }
+
+_id_locations(entry, req) := ls if ls := _locations_of(entry.subject, _id_of(req)) with input as _id_input(entry, req)
+
+_id_input(entry, req) := scope if {
+	_scoped(req)
+	scope := _scope_of(req, entry.subject) with input as _row_input(entry.at)
+} else := _row_input(entry.at)
 
 _repeated_ids(refs) := [pair[1] | some pair in sort({[_literal_text(id), id] | some id in _repeats(sort([ref.id | some ref in refs]))})]
 
@@ -3400,18 +3562,9 @@ _repeats(sorted) := {x |
 	x == sorted[i - 1]
 }
 
-_applies_rows(raw, refs, evals, req, req_name) := [object.union(
-	{
-		"requirement": req_name,
-		"subject": refs[i],
-		"check": "$applies",
-		"inputs": _applies_inputs(evals[i], req),
-		"passed": _subject_matches(evals[i], req),
-		"cause": _applies_cause(evals[i], _subject_matches(evals[i], req)),
-	},
-	_applies_failures(evals[i], req),
-) |
-	some i, _ in raw
+_applies_rows(raw, refs, evals, req, req_name) := [row |
+	some i, entry in raw
+	row := _applies_row(refs[i], entry, evals[i], req, req_name)
 ] if {
 	_size(_applies_to_of(req)) > 0
 }
@@ -3420,7 +3573,21 @@ _applies_rows(_, _, _, req, _) := [] if {
 	_size(_applies_to_of(req)) == 0
 }
 
-_applies_failures(evals, req) := {"failed_items": e.failed_items} if {
+_applies_row(ref, entry, evals, req, req_name) := object.union(
+	{
+		"requirement": req_name,
+		"subject": ref,
+		"check": "$applies",
+		"inputs": _tie_sorted(_anchored_all(_applies_inputs(evals, req), entry.at)),
+		"passed": matched,
+		"cause": _applies_cause(evals, matched),
+	},
+	_applies_failures(evals, req, entry.at),
+) if {
+	matched := _subject_matches(evals, req)
+}
+
+_applies_failures(evals, req, at) := {"failed_items": [_anchored_failed(f, at) | some f in e.failed_items]} if {
 	count(evals) == 1
 	some e in evals
 	"failed_items" in object.keys(e)
@@ -3431,15 +3598,16 @@ _applies_failures(evals, req) := {"failed_items": e.failed_items} if {
 	count(evals) > 1
 } else := {}
 
-_applies_inputs(evals, req) := [inp |
-	read := {inp |
-		some name in _applies_to_names(req)
-		some inp in evals[name].inputs
-	}
-	some name in sort({inp.name | some inp in read})
-	some inp in read
-	inp.name == name
-]
+_applies_inputs(evals, req) := _merged_inputs([inp |
+	some name in _applies_to_names(req)
+	some inp in evals[name].inputs
+]) if count(evals) != 1
+
+_applies_inputs(evals, _) := [inputs[t[4]] | some t in sort([[i.name, i.value, object.get(i, "part", null), i.locations, idx] | some idx, i in inputs])] if {
+	count(evals) == 1
+	some e in evals
+	inputs := e.inputs
+}
 
 _evaluation(doc, req, name, parts) := object.union({"well_formed": _well_formed_row(req, name, parts)}, _evaluation_with(doc, req, name, _fixed(req)))
 
@@ -3456,8 +3624,8 @@ _fixed(req) := {
 }
 
 _evaluation_with(doc, written, name, fixed) := {
-	"min_subjects": [_min_subjects_row(doc, req, name, count(matching))],
-	"unique_ids": [_unique_ids_row(refs, req, name)],
+	"min_subjects": [_min_subjects_row(doc, req, name, count(matching), [m.at | some m in matching])],
+	"unique_ids": [_unique_ids_row(raw, refs, req, name)],
 	"applies": applies,
 	"subject_rows": groups,
 	"total": count(raw),
@@ -3685,9 +3853,9 @@ _stale_compiled(x) := c if {
 
 _stale_read(c) := object.union(_read(c.policy), {"ahead": {"policy_problems": array.concat([_engine_problem(object.get(c, "engine", null))], _policy_problem_inputs(c.policy))}})
 
-_engine_problem(null) := {"name": "ergo/compiled engine", "value": ["missing"]}
+_engine_problem(null) := {"name": "ergo/compiled engine", "value": ["missing"], "locations": []}
 
-_engine_problem(e) := {"name": "ergo/compiled engine", "value": [concat("", ["compiled by another engine, expected ", _engine.name, " ", _engine.version])]} if e != null
+_engine_problem(e) := {"name": "ergo/compiled engine", "value": [concat("", ["compiled by another engine, expected ", _engine.name, " ", _engine.version])], "locations": []} if e != null
 
 _compiled(x) := c if {
 	is_object(x)
@@ -3852,7 +4020,7 @@ _section(policy, name) := object.get(policy, name, {}) if is_object(policy)
 
 _section(policy, _) := null if not is_object(policy)
 
-_policy_problem_inputs(policy) := [{"name": concat(" ", ["policy", f]), "value": sort(problems)} |
+_policy_problem_inputs(policy) := [{"name": concat(" ", ["policy", f]), "value": sort(problems), "locations": []} |
 	is_object(policy)
 	some f in ["description", "ergo_spec", "meta"]
 	problems := _policy_problems_at(f, policy)
@@ -3893,7 +4061,7 @@ _reported(written, unreadable, sections) := _plain_numbers(written) if {
 	count(_json_problems(sections)) == 0
 } else := written
 
-_unreadable_inputs(doc, params) := [{"name": name, "value": sort(problems)} |
+_unreadable_inputs(doc, params) := [{"name": name, "value": sort(problems), "locations": []} |
 	some [name, problems] in [["$input", _json_problems(doc)], ["$params", (_json_problems(params) | _params_shape_problems(params))]]
 	count(problems) > 0
 ]
@@ -3975,7 +4143,7 @@ _grand_branch(req, name, _, grand, g, fixed) := [_parent_evaluation(req, name, g
 
 _grand_branch(req, name, parent, grand, g, fixed) := _grand_children(req, name, parent, grand, g, pick, fixed) if {
 	"subject" in object.keys(g)
-	pick := _parent_pick_of(g.subject, {"subject": parent, "checks": {}}) with data.ergo_in as {grand: g.id} with data.ergo_parent as {grand: g.subject}
+	pick := _parent_pick_of(g.subject, {"subject": parent, "checks": {}}) with data.ergo_in as {grand: g.id} with data.ergo_parent as {grand: g.subject} with input as {"ergo/names": {"$at": {"doc": g.at, "names": {grand: g.at}}}}
 }
 
 _grand_children(req, name, _, grand, g, pick, fixed) := [_parent_evaluation(req, name, grand, {"id": g.id, "cause": pick.cause}, fixed)] if "cause" in object.keys(pick)
@@ -3984,7 +4152,7 @@ _grand_children(req, name, parent, grand, g, pick, fixed) := [_grandchild_evalua
 
 _grandchild_evaluation(req, name, parent, grand, g, p, fixed) := e if {
 	"subject" in object.keys(p)
-	e := _evaluation_with(p.subject, req, name, fixed) with data.ergo_in as {grand: g.id, parent: p.id} with data.ergo_parent as {grand: g.subject, parent: p.subject}
+	e := _evaluation_with(p.subject, req, name, fixed) with data.ergo_in as {grand: g.id, parent: p.id} with data.ergo_parent as {grand: g.subject, parent: p.subject} with input as {"ergo/names": {"$at": {"doc": p.at, "names": {grand: g.at, parent: p.at}}}}
 }
 
 _grandchild_evaluation(req, name, parent, grand, g, p, _) := {
@@ -4026,7 +4194,7 @@ _no_parent_evaluation(req, name, cause, parts) := object.union(_evaluation({}, r
 
 _parent_evaluation(req, name, parent, p, fixed) := e if {
 	"subject" in object.keys(p)
-	e := _evaluation_with(p.subject, req, name, fixed) with data.ergo_in as {parent: p.id} with data.ergo_parent as {parent: p.subject}
+	e := _evaluation_with(p.subject, req, name, fixed) with data.ergo_in as {parent: p.id} with data.ergo_parent as {parent: p.subject} with input as {"ergo/names": {"$at": {"doc": p.at, "names": {parent: p.at}}}}
 }
 
 _parent_evaluation(req, name, parent, p, _) := {
@@ -4084,7 +4252,10 @@ _parent_pick_of(doc, preq) := {"cause": c} if {
 	}
 	refs := {i: _entry_ref_of(entry, preq) | some i, entry in raw}
 	evals := {i: _applies_evals(preq, entry.subject, flaws) | some i, entry in raw}
-	applies := _applies_rows(raw, refs, evals, preq, "")
+	applies := {i: {"passed": matched, "cause": _applies_cause(evals[i], matched)} |
+		some i, _ in raw
+		matched := _subject_matches(evals[i], preq)
+	}
 	r := _parent_pick_from(raw, refs, applies, preq)
 }
 
@@ -4093,9 +4264,9 @@ _parent_pick_from(raw, refs, applies, preq) := {"parent": preq.subject, "parents
 	some p in _parent_of(entry, refs[i], applies, i, preq)
 ]}
 
-_parent_of(entry, ref, _, _, preq) := [{"subject": entry.subject, "id": ref.id}] if _size(_applies_to_of(preq)) == 0
+_parent_of(entry, ref, _, _, preq) := [{"subject": entry.subject, "id": ref.id, "at": entry.at}] if _size(_applies_to_of(preq)) == 0
 
-_parent_of(entry, ref, applies, i, preq) := [{"subject": entry.subject, "id": ref.id}] if {
+_parent_of(entry, ref, applies, i, preq) := [{"subject": entry.subject, "id": ref.id, "at": entry.at}] if {
 	_size(_applies_to_of(preq)) > 0
 	applies[i].passed
 }
@@ -4114,7 +4285,7 @@ _parent_min_subjects_row(req, name, "none") := {
 	"requirement": name,
 	"subject": _req_subject_ref(req),
 	"check": "$min_subjects",
-	"inputs": array.concat([{"name": _subject_count_name(req), "value": 0}], data.ergo_unreadable),
+	"inputs": array.concat([{"name": _subject_count_name(req), "value": 0, "locations": []}], data.ergo_unreadable),
 	"passed": _min_subjects_of(req) == 0,
 	"cause": _verdict_cause(_min_subjects_of(req) == 0),
 }
@@ -4123,7 +4294,7 @@ _parent_min_subjects_row(req, name, cause) := {
 	"requirement": name,
 	"subject": _req_subject_ref(req),
 	"check": "$min_subjects",
-	"inputs": array.concat([{"name": _subject_count_name(req), "value": 0}], data.ergo_unreadable),
+	"inputs": array.concat([{"name": _subject_count_name(req), "value": 0, "locations": []}], data.ergo_unreadable),
 	"passed": false,
 	"cause": cause,
 } if cause != "none"
@@ -4345,31 +4516,39 @@ _usable_sides(check, l, r) if {
 	_numbers(l, r)
 }
 
-_basic_inputs(subj, side) := [{"name": _item_path_name(side), "value": _value_at(subj, side)}] if _basic_form(side) == "path"
+_basic_inputs(subj, side) := [_path_input(subj, side)] if _basic_form(side) == "path"
 
 _basic_inputs(_, side) := [] if _basic_form(side) == "literal"
 
-_basic_inputs(subj, side) := [{"name": side.text, "value": object.get(r, "value", null)}, {"name": r.list, "value": r.values}] if {
+_basic_inputs(subj, side) := _tally_inputs(side, r) if {
 	_basic_form(side) in {"count_of", "sum_of"}
 	r := _tally(subj, side)
 }
 
-_basic_inputs(subj, side) := [
-	{"name": side.text, "value": _first_or_null([x | x := _basic_value(subj, side)])},
-	{"name": _item_path_name(side.elapsed_from), "value": _value_at(subj, side.elapsed_from)},
-	{"name": _item_path_name(side.elapsed_to), "value": _value_at(subj, side.elapsed_to)},
-] if _basic_form(side) == "elapsed"
+_tally_inputs(side, t) := [
+	{"name": side.text, "value": object.get(t, "value", null), "locations": t.locations},
+	{"name": t.list, "value": t.values, "locations": t.locations},
+]
+
+_basic_inputs(subj, side) := [_number_input(side.text, _first_or_null([x | x := _basic_value(subj, side)]), [from, to]), from, to] if {
+	_basic_form(side) == "elapsed"
+	from := _path_input(subj, side.elapsed_from)
+	to := _path_input(subj, side.elapsed_to)
+}
 
 _side_inputs(subj, side) := _basic_inputs(subj, side) if _basic_form(side)
 
-_side_inputs(subj, side) := array.concat([_derived_input(subj, side, _side_text(side))], [i | some operand in side.add; some i in _basic_inputs(subj, operand)]) if _side_form(side) == "add"
+_side_inputs(subj, side) := array.concat([_derived_input(subj, side, _side_text(side), operands)], operands) if {
+	_side_form(side) == "add"
+	operands := [i | some operand in side.add; some i in _basic_inputs(subj, operand)]
+}
 
-_tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "values": []} if {
+_tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "values": [], "locations": []} if {
 	path := side[_basic_form(side)]
 	not _off_subject(path)
 	not _reads_subject(path)
 	not is_object(subj)
-} else := {"states": {_read_state(subj, path)}, "list": _path_name(path), "values": []} if {
+} else := {"states": {_read_state(subj, path)}, "list": _path_name(path), "values": [], "locations": []} if {
 	path := side[_basic_form(side)]
 	not _walk_keys({"path": path}, subj)
 } else := r if {
@@ -4379,7 +4558,7 @@ _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "v
 	judged := [_tally_judge(side, e, flaws) | some e in w.items]
 	kept := [e.v | some i, e in w.items; judged[i].kept]
 	states := ((({x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}) | {c | some j in judged; some c in j.states}) | _tally_number_states(f, kept)) | {fl | some fl in flaws; fl != ""}
-	r := object.union({"states": states, "list": _walk_name(side[f], w.walked), "values": [_walk_shown(e.v) | some e in w.items]}, _tally_value(f, kept, states))
+	r := object.union({"states": states, "list": _walk_name(side[f], w.walked), "values": [_walk_shown(e.v) | some e in w.items], "locations": _walk_locations(w)}, _tally_value(f, kept, states))
 }
 
 _tally_judge(side, e, flaws) := {"kept": kept, "states": ({c | some c in causes; not c in {"satisfied", "value", "missing"}} | _tally_mark(kept, e))} if {
@@ -4473,9 +4652,9 @@ _written_exponent([_]) := 0
 
 _written_exponent([_, e]) := to_number(e)
 
-_derived_input(subj, side, name) := {"name": name, "value": v} if {
+_derived_input(subj, side, name, operands) := _number_input(name, v, operands) if {
 	v := _side_value(subj, side)
-} else := {"name": name, "value": null}
+} else := _number_input(name, null, operands)
 
 _side_text(side) := side.text if {
 	_side_form(side) == "add"
@@ -6819,7 +6998,7 @@ _walk_flawed(check) if _param_broken(check, set())
 
 _walk_flawed(_) if _unreadable_input
 
-_walk_read_row(check, subj) := {"cause": state, "inputs": [{"name": _path_name(check.path), "value": []}], "failed": []} if {
+_walk_read_row(check, subj) := {"cause": state, "inputs": [{"name": _path_name(check.path), "value": [], "locations": []}], "failed": []} if {
 	state := _read_state(subj, check.path)
 	not _walk_keys(check, subj)
 }
@@ -6827,7 +7006,7 @@ _walk_read_row(check, subj) := {"cause": state, "inputs": [{"name": _path_name(c
 _walk_read_row(check, subj) := {"cause": cause, "inputs": inputs, "failed": failed} if {
 	keys := _walk_keys(check, subj)
 	w := _walk(_walk_start(check, subj), keys, check.if_any == true)
-	judged := [_walk_judge(check, e) | some e in w.items]
+	judged := [_walk_judge(check, w, e) | some e in w.items]
 	fails := array.concat(array.concat(w.fails, [j.failure | some j in judged; j.failure != null]), _walk_stop(w))
 	cause := _walk_cause(check, w, judged, fails)
 	failed := _walk_failed(cause, fails)
@@ -6839,7 +7018,25 @@ _walk_keys(check, subj) := ks if {
 	ks := _keys_in(subj, check.path)
 }
 
-_walk_start(check, subj) := {"c": _walk_root(check.path), "v": _start_of(subj, check.path), "i": null, "iv": null, "r": []}
+_walk_start(check, subj) := {"c": _walk_root(check.path), "v": _start_of(subj, check.path), "i": null, "iv": null, "r": [], "a": _walk_base(check.path)}
+
+_walk_base(path) := base if base := _start_at(path)
+
+else := ""
+
+_walk_at(w, e) := _joined(w.trail[0].a, array.slice(e.c, count(w.trail[0].c), count(e.c))) if not _walk_marked(e.v)
+
+else := _pointer(w.trail[0].a, w.trail[0].v, array.slice(e.c, count(w.trail[0].c), count(e.c)))
+
+_walk_locations(w) := [_walk_at(w, e) | some e in w.items]
+
+_item_at(w, e) := _pointer(w.trail[0].a, w.trail[0].v, array.slice(e.i, count(w.trail[0].c), count(e.i)))
+
+_fail_locations(f) := [f.at] if "at" in object.keys(f)
+
+else := []
+
+_item_read_at(w, e, path) := _pointer(_item_at(w, e), e.iv, _resolved_prefix(e.iv, path))
 
 _walk_root(path) := [path[0]] if _named(path)
 
@@ -6858,7 +7055,7 @@ _walk(start, keys, if_any) := {"items": items, "fails": fails, "walked": walked,
 	r9 := _walk_level(r8.entries, keys, 9, if_any)
 	r10 := _walk_level(r9.entries, keys, 10, if_any)
 	levels := [r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10]
-	fails := [f | some r in levels; some f in r.fails]
+	fails := [object.union(f, {"at": _pointer(start.a, start.v, array.slice(f.path, count(start.c), count(f.path)))}) | some r in levels; some f in r.fails]
 	walked := {i | some i, r in levels; r.walked}
 	items := [e | some e in r10.entries; e.i != null]
 	trail := array.concat([start], [r.entries[0] | some i, r in levels; i < count(keys); count(r.entries) == 1])
@@ -6963,25 +7160,25 @@ _walk_marked(v) if v == _absent
 
 _walk_marked(v) if v == _unusable_mark
 
-_walk_judge(check, e) := {"kept": kept, "passed": passed, "failure": failure} if {
+_walk_judge(check, w, e) := {"kept": kept, "passed": passed, "failure": failure} if {
 	undecided := [[c, cause] | some c in check.whose; cause := _row_cause(c, e.iv, ""); not cause in {"satisfied", "value"}]
 	kept := count([c | some c in check.whose; _row_cause(c, e.iv, "") == "value"]) == 0
 	leaf := _walk_target(check.check, e.r)
 	passed := _walk_passed(undecided, kept, leaf, e.iv)
-	failure := _walk_failure(e, undecided, kept, leaf, passed)
+	failure := _walk_failure(w, e, undecided, kept, leaf, passed)
 }
 
 default _walk_passed(_, _, _, _) := false
 
 _walk_passed([], true, leaf, v) if _op_passed(leaf, v)
 
-_walk_failure(e, [], true, leaf, false) := {"path": e.c, "item": e.i, "cause": _row_cause(leaf, e.iv, ""), "value": _walk_shown(e.v)}
+_walk_failure(w, e, [], true, leaf, false) := {"path": e.c, "item": e.i, "cause": _row_cause(leaf, e.iv, ""), "value": _walk_shown(e.v), "at": _walk_at(w, e)}
 
-_walk_failure(e, undecided, _, _, _) := {"path": array.concat(e.i, _walk_first_path(undecided[0][0])), "item": e.i, "cause": undecided[0][1], "value": _walk_first_value(undecided[0][0], e.iv)} if undecided != []
+_walk_failure(w, e, undecided, _, _, _) := {"path": array.concat(e.i, _walk_first_path(undecided[0][0])), "item": e.i, "cause": undecided[0][1], "value": _walk_first_value(undecided[0][0], e.iv), "at": _item_read_at(w, e, _walk_first_path(undecided[0][0]))} if undecided != []
 
-_walk_failure(_, [], false, _, _) := null
+_walk_failure(_, _, [], false, _, _) := null
 
-_walk_failure(_, [], true, _, true) := null
+_walk_failure(_, _, [], true, _, true) := null
 
 _walk_first_path(c) := _condition_paths(c)[0]
 
@@ -6999,7 +7196,7 @@ _walk_cause(check, w, judged, fails) := _walk_verdict(check.op, check.if_any == 
 
 _walk_stop(w) := [] if w.walked != set()
 
-_walk_stop(w) := [{"path": e.c, "item": e.c, "cause": _walk_stop_state(e.v), "value": _walk_shown(e.v)} | e := _walk_stopped_at(w.trail)] if w.walked == set()
+_walk_stop(w) := [{"path": e.c, "item": e.c, "cause": _walk_stop_state(e.v), "value": _walk_shown(e.v), "at": _walk_at(w, e)} | e := _walk_stopped_at(w.trail)] if w.walked == set()
 
 _walk_stopped_at(trail) := [e | some e in trail; not _walk_container(e.v)][0] if {
 	some e in trail
@@ -7041,13 +7238,13 @@ _walk_worst(fails) := [c | some c in array.concat(_cause_precedence, ["value"]);
 
 _walk_failed("satisfied", _) := []
 
-_walk_failed(cause, fails) := [{"path": _path_name(f.path), "item": _path_name(f.item), "cause": f.cause, "value": f.value} |
+_walk_failed(cause, fails) := [{"path": _path_name(f.path), "item": _path_name(f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f)} |
 	some p in sort({f.path | some f in fails})
 	some f in fails
 	f.path == p
 ] if cause != "satisfied"
 
-_walk_inputs(check, w) := [{"name": _walk_name(check.path, w.walked), "value": [_walk_shown(e.v) | some e in w.items]}]
+_walk_inputs(check, w) := [{"name": _walk_name(check.path, w.walked), "value": [_walk_shown(e.v) | some e in w.items], "locations": _walk_locations(w)}]
 
 _walk_name(path, walked) := _walk_shown_name(_walk_unaliased(path, _walk_crossed(path, walked)), walked)
 
@@ -7250,6 +7447,8 @@ _s_named_step(i, step, names) := concat("", ["$", step]) if {
 
 _for_names := object.get(input, "ergo/names", {})
 
+_bound(names, name, v, at) := object.union(names, {name: v, "$at": object.union(object.get(names, "$at", {}), {"names": object.union(object.get(object.get(names, "$at", {}), "names", {}), {name: at})})})
+
 _for_row(check, subj) := object.union(_for_outer(check, subj, _for_names), {"cause": "unusable", "failed": []}) if {
 	_walk_flawed(check)
 } else := {"cause": "not_an_object", "inputs": [], "failed": []} if {
@@ -7270,7 +7469,7 @@ _for_outer(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(chec
 	item := check.items[0]
 	w := _for_walk(item, subj, names)
 	pre := _for_pre(check, subj, names)
-	judged := [_for_judge_outer(check, subj, names, item, e, pre) | some e in w.items]
+	judged := [_for_judge_outer(check, subj, names, item, e, pre, w) | some e in w.items]
 	fails := array.concat(array.concat([object.union(f, {"lines": []}) | some f in w.fails], [object.union(f, {"lines": []}) | some f in _walk_stop(w)]), [j.failure | some j in judged; j.failure != null])
 	cause := _for_verdict(item, w, judged, fails)
 	failed := _for_failed(cause, _for_shared(check, fails, pre, names))
@@ -7279,7 +7478,7 @@ _for_outer(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(chec
 
 _for_unwalked(check, w) := [f | some f in array.concat(w.fails, _walk_stop(w))] if not "unread" in object.keys(w)
 
-else := [{"path": check.items[1].path, "item": check.items[1].path, "cause": w.unread, "value": null}]
+else := [object.union({"path": check.items[1].path, "item": check.items[1].path, "cause": w.unread, "value": null}, object.get(w, "unread_at", {}))]
 
 _for_shared(_, fails, null, _) := fails
 
@@ -7293,7 +7492,7 @@ _for_shared(check, fails, pre, names) := array.concat([trimmed[i] | some i, f in
 
 _for_free_undecided(check, _, _) := [] if _for_whose_reads(check.items[1].whose, check.items[0].as)
 
-_for_free_undecided(check, pre, names) := [{"path": e.i, "item": e.i, "cause": wh.undecided[0], "value": _walk_shown(e.v), "lines": []} |
+_for_free_undecided(check, pre, names) := [{"path": e.i, "item": e.i, "cause": wh.undecided[0], "value": _walk_shown(e.v), "lines": [], "at": _walk_at(pre, e)} |
 	some e in pre.items
 	wh := _for_whose(check.items[1], e, names)
 	wh.undecided != []
@@ -7318,7 +7517,13 @@ _for_only_shared(f, t) if {
 _for_walk(item, subj, names) := _for_picked(item, w, names) if {
 	keys := _walk_keys(item, subj) with input as {"ergo/names": names}
 	w := _walk(_walk_start(item, subj), keys, _for_empty_ok(item)) with input as {"ergo/names": names}
-} else := {"items": [], "fails": [], "walked": set(), "trail": [], "unread": _read_state(subj, item.path)}
+} else := object.union({"items": [], "fails": [], "walked": set(), "trail": [], "unread": _read_state(subj, item.path)}, _unread_at(subj, item, names))
+
+_unread_at(subj, item, names) := {"unread_at": {"at": at}} if at := _unread_pointer(subj, item.path) with input as {"ergo/names": names}
+
+else := {}
+
+_unread_pointer(subj, path) := _pointer(_start_at(path), start, _leading_keys(subj, path)) if start := _start_of(subj, path)
 
 _for_empty_ok(item) if "pick" in object.keys(item)
 
@@ -7335,7 +7540,7 @@ _for_picked(item, w, names) := _for_pick_sorted(item, object.union(w, {"items": 
 	"pick" in object.keys(item)
 	w.walked != set()
 	judged := [[e, _for_whose(item, e, names)] | some e in w.items]
-	whose_fails := [{"path": j[0].i, "item": j[0].i, "cause": j[1].undecided[0], "value": _walk_shown(j[0].v)} | some j in judged; j[1].undecided != []]
+	whose_fails := [{"path": j[0].i, "item": j[0].i, "cause": j[1].undecided[0], "value": _walk_shown(j[0].v), "at": _walk_at(w, j[0])} | some j in judged; j[1].undecided != []]
 	kept := [j[0] | some j in judged; j[1].undecided == []; j[1].kept]
 	_for_no_fails(w, whose_fails)
 }
@@ -7343,7 +7548,7 @@ _for_picked(item, w, names) := _for_pick_sorted(item, object.union(w, {"items": 
 _for_picked(item, w, names) := object.union(w, {"items": [], "fails": array.concat(w.fails, whose_fails), "input": _for_list_input(item, w)}) if {
 	"pick" in object.keys(item)
 	w.walked != set()
-	whose_fails := [{"path": e.i, "item": e.i, "cause": wh.undecided[0], "value": _walk_shown(e.v)} | some e in w.items; wh := _for_whose(item, e, names); wh.undecided != []]
+	whose_fails := [{"path": e.i, "item": e.i, "cause": wh.undecided[0], "value": _walk_shown(e.v), "at": _walk_at(w, e)} | some e in w.items; wh := _for_whose(item, e, names); wh.undecided != []]
 	not _for_no_fails(w, whose_fails)
 }
 
@@ -7353,14 +7558,14 @@ _for_no_fails(w, whose_fails) if {
 }
 
 _for_pick_sorted(item, w, read, names) := object.union(w, {"items": [], "fails": bad, "input": _for_list_input(item, object.union(w, {"items": read}))}) if {
-	bad := _for_unsortable(item, w.items, names)
+	bad := _for_unsortable(item, w, names)
 	bad != []
 } else := object.union(w, {"items": read, "unread": "absent"}) if {
 	not _for_pick_index(item, w.items, names)
 } else := object.union(w, {"items": [], "fails": tied, "input": _for_list_input(item, object.union(w, {"items": read}))}) if {
-	tied := _for_tied(item, w.items, names)
+	tied := _for_tied(item, w, names)
 	count(tied) > 1
-} else := object.union(w, {"items": [e], "input": [_path_name(e.i), _walk_shown(e.v)]}) if {
+} else := object.union(w, {"items": [e], "input": [_path_name(e.i), _walk_shown(e.v), [_walk_at(w, e)]]}) if {
 	e := w.items[_for_pick_index(item, w.items, names)]
 }
 
@@ -7371,7 +7576,7 @@ else := _walk_worst(fails) if {
 	fails != []
 }
 
-_for_list_input(item, w) := [_walk_name(item.path, w.walked), [_walk_shown(e.v) | some e in w.items]]
+_for_list_input(item, w) := [_walk_name(item.path, w.walked), [_walk_shown(e.v) | some e in w.items], _walk_locations(w)]
 
 _for_sort_key(item, e, names) := _for_sortable(v, object.get(item.pick, "alphabetically", false)) if {
 	"by" in object.keys(item.pick)
@@ -7391,11 +7596,12 @@ _for_kept_kind(kinds) := [k | some k in ["number", "time", "date", "text"]; k in
 
 _for_unsortable(item, _, _) := [] if not "by" in object.keys(item.pick)
 
-_for_unsortable(item, items, names) := array.concat(unread, mixed) if {
+_for_unsortable(item, w, names) := array.concat(unread, mixed) if {
 	"by" in object.keys(item.pick)
-	unread := [{"path": e.i, "item": e.i, "cause": _for_sort_state(item, e, names), "value": _for_sort_shown(item, e, names)} | some e in items; not _for_sort_key(item, e, names)]
+	items := w.items
+	unread := [{"path": e.i, "item": e.i, "cause": _for_sort_state(item, e, names), "value": _for_sort_shown(item, e, names), "at": _for_sort_at(item, w, e, names)} | some e in items; not _for_sort_key(item, e, names)]
 	kinds := {_for_sort_key(item, e, names)[0] | some e in items}
-	mixed := [{"path": e.i, "item": e.i, "cause": "unusable", "value": _for_sort_shown(item, e, names)} |
+	mixed := [{"path": e.i, "item": e.i, "cause": "unusable", "value": _for_sort_shown(item, e, names), "at": _for_sort_at(item, w, e, names)} |
 		count(kinds) > 1
 		some e in items
 		_for_sort_key(item, e, names)[0] != _for_kept_kind(kinds)
@@ -7409,6 +7615,10 @@ _for_sort_state(item, e, names) := s if {
 } else := "unusable" if is_object(e.iv)
 
 else := "not_an_object"
+
+_for_sort_at(item, w, e, names) := _item_read_at(w, e, item.pick.by) if is_object(e.iv) with input as {"ergo/names": names}
+
+else := _item_at(w, e)
 
 _for_sort_shown(item, e, names) := _walk_shown(v) if {
 	is_object(e.iv)
@@ -7438,12 +7648,12 @@ _for_pick_slot(pick, n) := n - pick.at if {
 
 _for_tied(item, _, _) := [] if not "by" in object.keys(item.pick)
 
-_for_tied(item, items, names) := [{"path": e.i, "item": e.i, "cause": "ambiguous", "value": _for_sort_shown(item, e, names)} |
-	some e in items
+_for_tied(item, w, names) := [{"path": e.i, "item": e.i, "cause": "ambiguous", "value": _for_sort_shown(item, e, names), "at": _for_sort_at(item, w, e, names)} |
+	some e in w.items
 	_for_sort_key(item, e, names)[1] == key
 ] if {
 	"by" in object.keys(item.pick)
-	key := _for_sort_key(item, items[_for_pick_index(item, items, names)], names)[1]
+	key := _for_sort_key(item, w.items[_for_pick_index(item, w.items, names)], names)[1]
 }
 
 _for_pre(check, subj, names) := _for_walk(check.items[1], subj, names) if {
@@ -7459,14 +7669,14 @@ _for_from_first(check) if {
 	step.named_by == check.items[0].as
 }
 
-_for_judge_outer(check, subj, names, item, e, pre) := {"passed": res.passed, "kept": wh.kept, "failure": _for_failure(e, wh.undecided, wh.kept, res), "lines": res.lines} if {
+_for_judge_outer(check, subj, names, item, e, pre, w) := {"passed": res.passed, "kept": wh.kept, "failure": _for_failure(e, wh.undecided, wh.kept, res, _walk_at(w, e)), "lines": res.lines} if {
 	wh := _for_whose(item, e, names)
-	res := _for_outer_next(check, subj, object.union(names, {item.as: e.v}), wh.undecided, wh.kept, pre)
+	res := _for_outer_next(check, subj, _bound(names, item.as, e.v, _walk_at(w, e)), wh.undecided, wh.kept, pre)
 }
 
-_for_judge_inner(check, subj, names, item, e) := {"passed": res.passed, "kept": wh.kept, "failure": _for_failure(e, wh.undecided, wh.kept, res), "lines": res.lines} if {
+_for_judge_inner(check, subj, names, item, e, w) := {"passed": res.passed, "kept": wh.kept, "failure": _for_failure(e, wh.undecided, wh.kept, res, _walk_at(w, e)), "lines": res.lines} if {
 	wh := _for_whose(item, e, names)
-	res := _for_inner_next(check, subj, object.union(names, {item.as: e.v}), wh.undecided, wh.kept)
+	res := _for_inner_next(check, subj, _bound(names, item.as, e.v, _walk_at(w, e)), wh.undecided, wh.kept)
 }
 
 _for_whose(item, e, names) := {"undecided": _for_undecided(undecided, kept, e.v), "kept": kept} if {
@@ -7501,13 +7711,13 @@ _for_inner_next(_, _, _, [], false) := {"passed": false, "cause": "value", "line
 
 _for_inner_next(check, subj, bound, [], true) := _for_lines(check, subj, bound)
 
-_for_failure(_, [], false, _) := null
+_for_failure(_, [], false, _, _) := null
 
-_for_failure(e, undecided, _, res) := {"path": e.i, "item": e.i, "cause": res.cause, "value": _walk_shown(e.v), "lines": res.lines, "inner": object.get(res, "unchecked", [])} if undecided != []
+_for_failure(e, undecided, _, res, at) := {"path": e.i, "item": e.i, "cause": res.cause, "value": _walk_shown(e.v), "lines": res.lines, "inner": object.get(res, "unchecked", []), "at": at} if undecided != []
 
-_for_failure(e, [], true, res) := {"path": e.i, "item": e.i, "cause": res.cause, "value": _walk_shown(e.v), "lines": res.lines, "inner": object.get(res, "unchecked", [])} if not res.passed
+_for_failure(e, [], true, res, at) := {"path": e.i, "item": e.i, "cause": res.cause, "value": _walk_shown(e.v), "lines": res.lines, "inner": object.get(res, "unchecked", []), "at": at} if not res.passed
 
-_for_failure(_, [], true, res) := null if res.passed
+_for_failure(_, [], true, res, _) := null if res.passed
 
 _for_inner(check, subj, names, w) := {"passed": false, "cause": "not_an_object", "lines": []} if {
 	check.items[1].path[0] == concat("", ["$", check.items[0].as])
@@ -7517,7 +7727,7 @@ _for_inner(check, subj, names, w) := {"passed": false, "cause": "not_an_object",
 	"unread" in object.keys(w)
 } else := {"passed": cause == "satisfied", "cause": cause, "lines": lines, "unchecked": [f | some f in fails; f.lines == []]} if {
 	item := check.items[1]
-	judged := [_for_judge_inner(check, subj, names, item, e) | some e in w.items]
+	judged := [_for_judge_inner(check, subj, names, item, e, w) | some e in w.items]
 	fails := array.concat(array.concat([object.union(f, {"lines": []}) | some f in w.fails], [object.union(f, {"lines": []}) | some f in _walk_stop(w)]), [j.failure | some j in judged; j.failure != null])
 	cause := _for_verdict(item, w, judged, fails)
 	lines := _for_merge_lines(check, cause, fails)
@@ -7583,7 +7793,7 @@ _for_verdict(item, w, judged, fails) := _walk_stop(w)[0].cause if {
 
 _for_failed("satisfied", _) := []
 
-_for_failed(cause, fails) := [object.union({"path": _path_name(f.path), "item": _path_name(f.item), "cause": f.cause, "value": f.value, "failed_assertions": f.lines}, _for_unchecked(object.get(f, "inner", []))) |
+_for_failed(cause, fails) := [object.union({"path": _path_name(f.path), "item": _path_name(f.item), "cause": f.cause, "value": f.value, "failed_assertions": f.lines, "locations": _fail_locations(f)}, _for_unchecked(object.get(f, "inner", []))) |
 	some p in sort({f.path | some f in fails})
 	some f in fails
 	f.path == p
@@ -7591,37 +7801,37 @@ _for_failed(cause, fails) := [object.union({"path": _path_name(f.path), "item": 
 
 _for_unchecked([]) := {}
 
-_for_unchecked(inner) := {"failed_items": [{"path": _for_item_name(f.path), "item": _for_item_name(f.item), "cause": f.cause, "value": f.value} |
+_for_unchecked(inner) := {"failed_items": [{"path": _for_item_name(f.path), "item": _for_item_name(f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f)} |
 	some p in sort({f.path | some f in inner})
 	some f in inner
 	f.path == p
 ]} if inner != []
 
-_for_inputs(check, subj, names, item, w) := [{"name": pair[0], "value": pair[1]} | some pair in sort(_for_input_pairs(check, subj, names, item, w))]
+_for_inputs(check, subj, names, item, w) := _merged_inputs([{"name": t[0], "value": t[1], "locations": t[2]} | some t in _for_input_pairs(check, subj, names, item, w)])
 
-_for_input_pairs(check, subj, names, item, w) := ((((({object.get(w, "input", _for_list_input(item, w))} | _for_inner_pairs(check, subj, names, item, w)) | {[_path_name(shown), _value_at(subj, shown)] |
+_for_input_pairs(check, subj, names, item, w) := ((((({object.get(w, "input", _for_list_input(item, w))} | _for_inner_pairs(check, subj, names, item, w)) | {[_path_name(shown), _value_at(subj, shown), _locations_of(subj, shown)] |
 	some c in check.checks
 	not _walks(c)
 	some p in _leaf_paths(c)
 	shown := _before_names(p)
-}) | {[_path_name(shown), _value_at(subj, shown)] |
+}) | {[_path_name(shown), _value_at(subj, shown), _locations_of(subj, shown)] |
 	some c in check.checks
 	not _walks(c)
 	some p in _leaf_paths(c)
 	_starts_at_name(p)
 	not p[0] in {concat("", ["$", item.as]) | some item in check.items}
 	shown := _before_later_names(p)
-}) | {[i.name, i.value] |
+}) | {[i.name, i.value, i.locations] |
 	some c in check.checks
 	some side in _derived_sides(c)
 	not _tally_named(side)
 	some i in _side_inputs(subj, side)
-}) | {[i.name, i.value] |
+}) | {[i.name, i.value, i.locations] |
 	some c in check.checks
 	_walks(c)
 	not _for_named(c.path)
 	some i in _walk_read_row(c, subj).inputs
-}) | {[_path_name([f]), _value_at(subj, [f])] |
+}) | {[_path_name([f]), _value_at(subj, [f]), _locations_of(subj, [f])] |
 	some f in _for_key_fields(check)
 }
 
@@ -7633,15 +7843,16 @@ _for_key_fields(check) := {seg.named_by_field |
 
 _for_inner_pairs(check, _, _, _, _) := set() if count(check.items) == 1
 
-_for_inner_pairs(check, subj, names, item, w) := {[_for_list_name(check.items[1].path, walked), values]} if {
+_for_inner_pairs(check, subj, names, item, w) := {[_for_list_name(check.items[1].path, walked), values, locations]} if {
 	count(check.items) == 2
 	_for_from_first(check)
-	inner := [_for_walk(check.items[1], subj, object.union(names, {item.as: e.v})) | some e in w.items]
+	inner := [_for_walk(check.items[1], subj, _bound(names, item.as, e.v, _walk_at(w, e))) | some e in w.items]
 	walked := {i | some iw in inner; some i in iw.walked}
 	values := [_walk_shown(e2.v) | some iw in inner; some e2 in iw.items]
+	locations := [_walk_at(iw, e2) | some iw in inner; some e2 in iw.items]
 }
 
-_for_inner_pairs(check, subj, names, _, _) := {object.get(iw, "input", [_for_list_name(check.items[1].path, iw.walked), [_walk_shown(e.v) | some e in iw.items]])} if {
+_for_inner_pairs(check, subj, names, _, _) := {object.get(iw, "input", [_for_list_name(check.items[1].path, iw.walked), [_walk_shown(e.v) | some e in iw.items], _walk_locations(iw)])} if {
 	count(check.items) == 2
 	not _for_from_first(check)
 	iw := _for_walk(check.items[1], subj, names)

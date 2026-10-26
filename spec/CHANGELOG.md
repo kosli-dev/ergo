@@ -8,10 +8,12 @@ Each version says whether reports changed, so that anyone who only stores report
 
 - A `whose` in a subject's `from` line takes a one-line `some` or `every` as a condition ([sentence.subject.condition](syntax.md#subjects)), like `release whose some files.path does not match "^docs/"`. Its `$applies` row gives the inputs and the cause the same sentence gives as a check row. It doesn't change the report of a policy that was read before, and a `from` line that used to be written wrong is now read.
 - `it` is the subject itself, for a subject of any type, so a list of plain values like ids, regions or tags can be checked: with `from: every deployment.regions`, `it is one of $params.allowed_regions` fails the region that isn't allowed. It starts an assertion, a `whose` condition of a `from` line, and the path after `every`, `some`, `count of` and `sum of`. A position works on a subject that is a list, written in words as for a field: `first of it`, `item 2 of it`. A row's `inputs` name it `it`, and a failed item `item 1 of it`. See [sentence.path.it](syntax.md#paths). Written anywhere else, `it` is written wrong ([sentence.path.it.step](syntax.md#paths), [sentence.path.it.place](syntax.md#paths)).
+- Every entry in a row's `inputs`, in a check's `$refs` and in `failed_items` has `locations`, where its value was read: JSON Pointers like `/deployments/3/approved_by`, or `$params:` and a pointer for the params ([location](semantics.md#where-a-value-was-read)). A read that stops early points at the last value it reached, and a worked-out number lists the locations of what it was worked out from.
 
 ### Changed
 
 - A policy says `ergo_spec: v0.2`, and the report's `ergo` changes from `"ergo": "v0.1"` to `"ergo": "v0.2"`. A policy that says `v0.1` is written wrong, with `unsupported version v0.1, expected v0.2`. The schemas are under `https://ergo.kosli.com/spec/0.2/`.
+- Reports change: `locations` is required on every entry of `inputs`, `$refs` and `failed_items`, and is `[]` on the entries of `$well_formed`. For the second deployment in `{"deployments": [...]}`, an input that was `{"name": "approved_by", "value": null}` is now `{"name": "approved_by", "value": null, "locations": ["/deployments/1"]}`. Two reads with the same name and value are merged into one entry only when their locations match too, so a report that listed one entry may list two.
 - [policy.version](syntax.md#policies) takes an optional `-dev` after the version, which `main` uses until a version is released, like `v0.2-dev`. `v0.2-beta` is still not a version.
 - An `$applies` row has the fields the row of a check would have if its conditions were the assertions of that check ([scope.failures](semantics.md#scope)). A subject's `from` line with one `some` or `every` condition gives a row `failed_items`, as a check does, and `[]` when it passes. One with two or more conditions gives it `failed_assertions`, with an entry for each condition that failed, in the order written, and `[]` when it passes. The violations keep them. A row of a single plain condition, like `environment is "prod"`, doesn't change. For `from: deployments whose environment is "prod" and change_type is "emergency"`, the row of a deployment with `change_type` set to `standard` was:
 
@@ -24,7 +26,7 @@ Each version says whether reports changed, so that anyone who only stores report
 
   ```json
   {"check": "$applies", "subject": {"id": "d-2", "type": "deployment"}, "passed": false, "cause": "value",
-   "inputs": [{"name": "change_type", "value": "standard"}, {"name": "environment", "value": "prod"}],
+   "inputs": [{"name": "change_type", "value": "standard", "locations": ["/deployments/0/change_type"]}, {"name": "environment", "value": "prod", "locations": ["/deployments/0/environment"]}],
    "failed_assertions": [{"assertion": "change_type is \"emergency\"", "cause": "value"}]}
   ```
 
@@ -39,8 +41,8 @@ Each version says whether reports changed, so that anyone who only stores report
 
   ```json
   {"check": "$applies", "subject": {"id": "1.4.1", "type": "release"}, "passed": false, "cause": "value",
-   "inputs": [{"name": "files[].path", "value": ["docs/typo.md"]}],
-   "failed_items": [{"path": "files[0].path", "item": "item 1 of files", "cause": "value", "value": "docs/typo.md"}]}
+   "inputs": [{"name": "files[].path", "value": ["docs/typo.md"], "locations": ["/releases/0/files/0/path"]}],
+   "failed_items": [{"path": "files[0].path", "item": "item 1 of files", "cause": "value", "value": "docs/typo.md", "locations": ["/releases/0/files/0/path"]}]}
   ```
 
 - A subject called `it` is written wrong ([sentence.path.it.name](syntax.md#paths)), for the requirements that use it.

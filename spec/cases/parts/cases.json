@@ -87,7 +87,10 @@
                   "id": null,
                   "name": "findings"
                 },
-                "value": false
+                "value": false,
+                "locations": [
+                  "/trail/compliance_status/attestations_statuses/findings/attestation_data/truncated"
+                ]
               }
             ],
             "passed": true,
@@ -107,7 +110,10 @@
                   "id": "att-7",
                   "name": "coverage"
                 },
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/trail/compliance_status/attestations_statuses/coverage-verification/attestation_data/hunks_acknowledged"
+                ]
               },
               {
                 "name": "coverage.attestation_data.hunks_total",
@@ -115,7 +121,10 @@
                   "id": "att-7",
                   "name": "coverage"
                 },
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/trail/compliance_status/attestations_statuses/coverage-verification/attestation_data/hunks_total"
+                ]
               }
             ],
             "passed": true,
@@ -161,7 +170,10 @@
                   "id": null,
                   "name": "findings"
                 },
-                "value": false
+                "value": false,
+                "locations": [
+                  "/trail/compliance_status/attestations_statuses/findings/attestation_data/truncated"
+                ]
               }
             ],
             "passed": true,
@@ -181,7 +193,10 @@
                   "id": null,
                   "name": "coverage"
                 },
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/trail/compliance_status/attestations_statuses/coverage-verification/attestation_data/hunks_acknowledged"
+                ]
               },
               {
                 "name": "coverage.attestation_data.hunks_total",
@@ -189,7 +204,10 @@
                   "id": null,
                   "name": "coverage"
                 },
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/trail/compliance_status/attestations_statuses/coverage-verification/attestation_data/hunks_total"
+                ]
               }
             ],
             "passed": true,
@@ -236,7 +254,10 @@
                   "id": null,
                   "name": "findings"
                 },
-                "value": true
+                "value": true,
+                "locations": [
+                  "/trail/compliance_status/attestations_statuses/findings/attestation_data/truncated"
+                ]
               }
             ],
             "passed": false,
@@ -256,7 +277,10 @@
                   "id": "att-7",
                   "name": "coverage"
                 },
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/trail/compliance_status/attestations_statuses/coverage-verification/attestation_data/hunks_acknowledged"
+                ]
               },
               {
                 "name": "coverage.attestation_data.hunks_total",
@@ -264,7 +288,10 @@
                   "id": "att-7",
                   "name": "coverage"
                 },
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/trail/compliance_status/attestations_statuses/coverage-verification/attestation_data/hunks_total"
+                ]
               }
             ],
             "passed": true,
@@ -304,7 +331,10 @@
                   "id": null,
                   "name": "findings"
                 },
-                "value": false
+                "value": false,
+                "locations": [
+                  "/trail/compliance_status/attestations_statuses/findings/attestation_data/truncated"
+                ]
               }
             ],
             "passed": true,
@@ -324,7 +354,10 @@
                   "id": null,
                   "name": "coverage"
                 },
-                "value": null
+                "value": null,
+                "locations": [
+                  "/trail/compliance_status/attestations_statuses"
+                ]
               },
               {
                 "name": "coverage.attestation_data.hunks_total",
@@ -332,7 +365,10 @@
                   "id": null,
                   "name": "coverage"
                 },
-                "value": null
+                "value": null,
+                "locations": [
+                  "/trail/compliance_status/attestations_statuses"
+                ]
               }
             ],
             "passed": false,
@@ -373,7 +409,10 @@
                   "id": null,
                   "name": "findings"
                 },
-                "value": null
+                "value": null,
+                "locations": [
+                  "/trail/compliance_status/attestations_statuses/findings/attestation_data"
+                ]
               }
             ],
             "passed": false,
@@ -393,7 +432,10 @@
                   "id": null,
                   "name": "coverage"
                 },
-                "value": null
+                "value": null,
+                "locations": [
+                  "/trail/compliance_status/attestations_statuses/coverage-verification/attestation_data"
+                ]
               },
               {
                 "name": "coverage.attestation_data.hunks_total",
@@ -401,7 +443,10 @@
                   "id": null,
                   "name": "coverage"
                 },
-                "value": null
+                "value": null,
+                "locations": [
+                  "/trail/compliance_status/attestations_statuses/coverage-verification/attestation_data"
+                ]
               }
             ],
             "passed": false,
@@ -443,7 +488,10 @@
                   "id": null,
                   "name": "findings"
                 },
-                "value": null
+                "value": null,
+                "locations": [
+                  "/trail/compliance_status/attestations_statuses/findings/attestation_data"
+                ]
               }
             ],
             "passed": false,
@@ -463,7 +511,10 @@
                   "id": "att-7",
                   "name": "coverage"
                 },
-                "value": null
+                "value": null,
+                "locations": [
+                  "/trail/compliance_status/attestations_statuses/coverage-verification/attestation_data"
+                ]
               },
               {
                 "name": "coverage.attestation_data.hunks_total",
@@ -471,7 +522,10 @@
                   "id": "att-7",
                   "name": "coverage"
                 },
-                "value": null
+                "value": null,
+                "locations": [
+                  "/trail/compliance_status/attestations_statuses/coverage-verification/attestation_data"
+                ]
               }
             ],
             "passed": false,
@@ -503,7 +557,10 @@
                   "id": null,
                   "name": "findings"
                 },
-                "value": null
+                "value": null,
+                "locations": [
+                  "/trail/compliance_status"
+                ]
               }
             ],
             "passed": false,
@@ -523,7 +580,10 @@
                   "id": null,
                   "name": "coverage"
                 },
-                "value": null
+                "value": null,
+                "locations": [
+                  "/trail/compliance_status"
+                ]
               },
               {
                 "name": "coverage.attestation_data.hunks_total",
@@ -531,7 +591,10 @@
                   "id": null,
                   "name": "coverage"
                 },
-                "value": null
+                "value": null,
+                "locations": [
+                  "/trail/compliance_status"
+                ]
               }
             ],
             "passed": false,
@@ -611,7 +674,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/items/0/d/b/x"
+                ]
               },
               {
                 "name": "cov.n",
@@ -619,7 +685,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/items/0/d/b/n"
+                ]
               }
             ],
             "passed": true,
@@ -635,11 +704,17 @@
             "inputs": [
               {
                 "name": "d.b.x",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/items/0/d/b/x"
+                ]
               },
               {
                 "name": "d.b.n",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/items/0/d/b/n"
+                ]
               }
             ],
             "passed": true,
@@ -659,7 +734,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/items/1/d/b/x"
+                ]
               },
               {
                 "name": "cov.n",
@@ -667,7 +745,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/items/1/d/b/n"
+                ]
               }
             ],
             "passed": false,
@@ -683,11 +764,17 @@
             "inputs": [
               {
                 "name": "d.b.x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/items/1/d/b/x"
+                ]
               },
               {
                 "name": "d.b.n",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/items/1/d/b/n"
+                ]
               }
             ],
             "passed": false,
@@ -733,7 +820,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/0/d"
+                ]
               },
               {
                 "name": "cov.n",
@@ -741,7 +831,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/0/d"
+                ]
               }
             ],
             "passed": false,
@@ -757,11 +850,17 @@
             "inputs": [
               {
                 "name": "d.b.x",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/0/d"
+                ]
               },
               {
                 "name": "d.b.n",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/0/d"
+                ]
               }
             ],
             "passed": false,
@@ -781,7 +880,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/1/d/b"
+                ]
               },
               {
                 "name": "cov.n",
@@ -789,7 +891,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/1/d/b"
+                ]
               }
             ],
             "passed": false,
@@ -805,11 +910,17 @@
             "inputs": [
               {
                 "name": "d.b.x",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/1/d/b"
+                ]
               },
               {
                 "name": "d.b.n",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/1/d/b"
+                ]
               }
             ],
             "passed": false,
@@ -829,7 +940,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/2/d/b"
+                ]
               },
               {
                 "name": "cov.n",
@@ -837,7 +951,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/2/d/b"
+                ]
               }
             ],
             "passed": false,
@@ -853,11 +970,17 @@
             "inputs": [
               {
                 "name": "d.b.x",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/2/d/b"
+                ]
               },
               {
                 "name": "d.b.n",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/2/d/b"
+                ]
               }
             ],
             "passed": false,
@@ -890,7 +1013,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/0"
+                ]
               },
               {
                 "name": "cov.n",
@@ -898,7 +1024,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/0"
+                ]
               }
             ],
             "passed": false,
@@ -914,11 +1043,17 @@
             "inputs": [
               {
                 "name": "d.b.x",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/0"
+                ]
               },
               {
                 "name": "d.b.n",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/0"
+                ]
               }
             ],
             "passed": false,
@@ -938,7 +1073,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/1"
+                ]
               },
               {
                 "name": "cov.n",
@@ -946,7 +1084,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/1"
+                ]
               }
             ],
             "passed": false,
@@ -962,11 +1103,17 @@
             "inputs": [
               {
                 "name": "d.b.x",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/1"
+                ]
               },
               {
                 "name": "d.b.n",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/1"
+                ]
               }
             ],
             "passed": false,
@@ -986,7 +1133,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/2"
+                ]
               },
               {
                 "name": "cov.n",
@@ -994,7 +1144,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/2"
+                ]
               }
             ],
             "passed": false,
@@ -1010,11 +1163,17 @@
             "inputs": [
               {
                 "name": "d.b.x",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/2"
+                ]
               },
               {
                 "name": "d.b.n",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/items/2"
+                ]
               }
             ],
             "passed": false,
@@ -1120,7 +1279,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/rounds/0/d/b/x"
+                ]
               }
             ],
             "passed": true,
@@ -1140,7 +1302,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/rounds/1/d/b/x"
+                ]
               }
             ],
             "passed": false,
@@ -1156,7 +1321,10 @@
             "inputs": [
               {
                 "name": "cov.n",
-                "value": 9
+                "value": 9,
+                "locations": [
+                  "/rounds/0/cov/n"
+                ]
               }
             ],
             "passed": false,
@@ -1177,7 +1345,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": "t"
+                "value": "t",
+                "locations": [
+                  "/rounds/0/d/b/s"
+                ]
               },
               {
                 "name": "cov.x",
@@ -1185,7 +1356,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/rounds/0/d/b/x"
+                ]
               },
               {
                 "name": "lst[]",
@@ -1202,6 +1376,10 @@
                     "cov": 1,
                     "x": 1
                   }
+                ],
+                "locations": [
+                  "/rounds/0/d/items/0",
+                  "/rounds/0/d/items/1"
                 ]
               }
             ],
@@ -1220,7 +1398,10 @@
                 "cause": "unusable",
                 "item": "item 1 of lst",
                 "path": "lst[0].x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/rounds/0/d/items/0/x"
+                ]
               }
             ],
             "inputs": [
@@ -1233,6 +1414,10 @@
                 "value": [
                   1,
                   1
+                ],
+                "locations": [
+                  "/rounds/0/d/items/0/x",
+                  "/rounds/0/d/items/1/x"
                 ]
               }
             ],
@@ -1253,7 +1438,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/rounds/0/d/b/n"
+                ]
               }
             ],
             "passed": true,
@@ -1301,7 +1489,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/rounds/0/d/b/x"
+                ]
               }
             ],
             "passed": true,
@@ -1317,7 +1508,10 @@
             "inputs": [
               {
                 "name": "cov.n",
-                "value": 3
+                "value": 3,
+                "locations": [
+                  "/rounds/0/cov/n"
+                ]
               }
             ],
             "passed": true,
@@ -1338,7 +1532,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": "t"
+                "value": "t",
+                "locations": [
+                  "/rounds/0/d/b/s"
+                ]
               },
               {
                 "name": "cov.x",
@@ -1346,7 +1543,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/rounds/0/d/b/x"
+                ]
               },
               {
                 "name": "lst[]",
@@ -1358,6 +1558,9 @@
                   {
                     "x": 1
                   }
+                ],
+                "locations": [
+                  "/rounds/0/d/items/0"
                 ]
               }
             ],
@@ -1376,7 +1579,10 @@
                 "cause": "absent",
                 "item": "item 1 of lst",
                 "path": "lst[0].cov",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/rounds/0/d/items/0"
+                ]
               }
             ],
             "inputs": [
@@ -1388,6 +1594,9 @@
                 },
                 "value": [
                   1
+                ],
+                "locations": [
+                  "/rounds/0/d/items/0/x"
                 ]
               }
             ],
@@ -1408,7 +1617,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/rounds/0/d/b/n"
+                ]
               }
             ],
             "passed": true,
@@ -1475,16 +1687,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "checks.c",
                 "value": [
                   "alias given twice"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -1548,16 +1769,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "checks.c",
                 "value": [
                   "named by cov reads a part, which isn't supported yet"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -1669,7 +1899,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/rounds/0/d/b/x"
+                ]
               }
             ],
             "passed": true,
@@ -1689,7 +1922,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/rounds/1/d/b/x"
+                ]
               }
             ],
             "passed": false,
@@ -1710,7 +1946,10 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/rounds/0/d/b/n"
+                ]
               },
               {
                 "name": "extra",
@@ -1718,7 +1957,10 @@
                   "id": null,
                   "name": "extra"
                 },
-                "value": 5
+                "value": 5,
+                "locations": [
+                  "/rounds/0/d/e"
+                ]
               }
             ],
             "passed": true,
@@ -1787,16 +2029,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "subjects.\"good round\".has.cov",
                 "value": [
                   "alias given twice"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -1921,7 +2172,10 @@
             "inputs": [
               {
                 "name": "pra",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/trail/artifacts/web/attestations/pr/pull_requests/0"
+                ]
               }
             ],
             "passed": false,
@@ -1944,7 +2198,10 @@
                   "id": null,
                   "name": "rev"
                 },
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/trail/artifacts/web/attestations/pr/pull_requests/0/reviews/count"
+                ]
               }
             ],
             "passed": true,
@@ -1967,7 +2224,10 @@
                   "id": "att-3",
                   "name": "artifact.pra"
                 },
-                "value": "w"
+                "value": "w",
+                "locations": [
+                  "/trail/artifacts/web/attestations/pr/name"
+                ]
               }
             ],
             "passed": true,
@@ -1986,7 +2246,10 @@
             "inputs": [
               {
                 "name": "pra",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/trail/artifacts/web/attestations/pr/pull_requests/1"
+                ]
               }
             ],
             "passed": false,
@@ -2009,7 +2272,10 @@
                   "id": null,
                   "name": "rev"
                 },
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/trail/artifacts/web/attestations/pr/pull_requests/1/reviews/count"
+                ]
               }
             ],
             "passed": false,
@@ -2032,7 +2298,10 @@
                   "id": "att-3",
                   "name": "artifact.pra"
                 },
-                "value": "w"
+                "value": "w",
+                "locations": [
+                  "/trail/artifacts/web/attestations/pr/name"
+                ]
               }
             ],
             "passed": true,
@@ -2110,16 +2379,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "subjects.\"pull request\".has.artifact",
                 "value": [
                   "alias given twice"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -2277,100 +2555,151 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "subjects.round.has.$dollar",
                 "value": [
                   "invalid alias"
+                ],
+                "locations": [
+
                 ]
               },
               {
                 "name": "subjects.round.has.bare_by",
                 "value": [
                   "from: unknown alias foo"
+                ],
+                "locations": [
+
                 ]
               },
               {
                 "name": "subjects.round.has.blank",
                 "value": [
                   "from: doesn't parse"
+                ],
+                "locations": [
+
                 ]
               },
               {
                 "name": "subjects.round.has.each_of",
                 "value": [
                   "from: a part is a path: whose and named by each of can't go in it"
+                ],
+                "locations": [
+
                 ]
               },
               {
                 "name": "subjects.round.has.every",
                 "value": [
                   "invalid alias"
+                ],
+                "locations": [
+
                 ]
               },
               {
                 "name": "subjects.round.has.extra",
                 "value": [
                   "unknown field other"
+                ],
+                "locations": [
+
                 ]
               },
               {
                 "name": "subjects.round.has.fromnum",
                 "value": [
                   "invalid from"
+                ],
+                "locations": [
+
                 ]
               },
               {
                 "name": "subjects.round.has.idbad",
                 "value": [
                   "identified_by: a part is a path: whose and named by each of can't go in it"
+                ],
+                "locations": [
+
                 ]
               },
               {
                 "name": "subjects.round.has.idnum",
                 "value": [
                   "invalid identified_by"
+                ],
+                "locations": [
+
                 ]
               },
               {
                 "name": "subjects.round.has.in_input",
                 "value": [
                   "from: a part reads inside its subject, so it can't start at $params or $input"
+                ],
+                "locations": [
+
                 ]
               },
               {
                 "name": "subjects.round.has.in_params",
                 "value": [
                   "from: a part reads inside its subject, so it can't start at $params or $input"
+                ],
+                "locations": [
+
                 ]
               },
               {
                 "name": "subjects.round.has.nofrom",
                 "value": [
                   "missing from"
+                ],
+                "locations": [
+
                 ]
               },
               {
                 "name": "subjects.round.has.num",
                 "value": [
                   "not a string or an object"
+                ],
+                "locations": [
+
                 ]
               },
               {
                 "name": "subjects.round.has.who",
                 "value": [
                   "from: a part is a path: whose and named by each of can't go in it"
+                ],
+                "locations": [
+
                 ]
               },
               {
                 "name": "subjects.round.has.\"with space\"",
                 "value": [
                   "invalid alias"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -2435,16 +2764,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "subjects.round.has",
                 "value": [
                   "not an object"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -2537,7 +2875,10 @@
             "inputs": [
               {
                 "name": "id",
-                "value": "a"
+                "value": "a",
+                "locations": [
+                  "/rounds/0/id"
+                ]
               }
             ],
             "passed": true,
@@ -2621,7 +2962,10 @@
                 "cause": "value",
                 "item": "item 1 of pull_requests[2].reviews",
                 "path": "pull_requests[2].reviews[0].state",
-                "value": "bad"
+                "value": "bad",
+                "locations": [
+                  "/pull_requests/2/reviews/0/state"
+                ]
               }
             ],
             "inputs": [
@@ -2637,6 +2981,13 @@
                   "ok",
                   "bad",
                   "ok"
+                ],
+                "locations": [
+                  "/pull_requests/0/reviews/0/state",
+                  "/pull_requests/1/reviews/0/state",
+                  "/pull_requests/1/reviews/1/state",
+                  "/pull_requests/2/reviews/0/state",
+                  "/pull_requests/2/reviews/1/state"
                 ]
               }
             ],
@@ -2749,11 +3100,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -2769,7 +3126,10 @@
             "inputs": [
               {
                 "name": "in-scope kid count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/kids/0"
+                ]
               }
             ],
             "passed": true,
@@ -2785,7 +3145,10 @@
             "inputs": [
               {
                 "name": "repeated kid ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -2801,7 +3164,10 @@
             "inputs": [
               {
                 "name": "att.id",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/kids/0/att/id"
+                ]
               }
             ],
             "passed": true,
@@ -2817,7 +3183,10 @@
             "inputs": [
               {
                 "name": "att.id",
-                "value": null
+                "value": null,
+                "locations": [
+                  "/kids/1"
+                ]
               }
             ],
             "passed": false,
@@ -2833,7 +3202,10 @@
             "inputs": [
               {
                 "name": "id",
-                "value": "k1"
+                "value": "k1",
+                "locations": [
+                  "/kids/0/id"
+                ]
               }
             ],
             "passed": true,
@@ -2909,11 +3281,17 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -2929,7 +3307,10 @@
             "inputs": [
               {
                 "name": "in-scope t count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/things/0"
+                ]
               }
             ],
             "passed": true,
@@ -2945,7 +3326,10 @@
             "inputs": [
               {
                 "name": "repeated t ids",
-                "value": []
+                "value": [],
+                "locations": [
+
+                ]
               }
             ],
             "passed": true,
@@ -2965,11 +3349,17 @@
                   "id": null,
                   "name": "cov"
                 },
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/things/0/d/b/x"
+                ]
               },
               {
                 "name": "id",
-                "value": "a"
+                "value": "a",
+                "locations": [
+                  "/things/0/id"
+                ]
               }
             ],
             "passed": true,
@@ -2979,6 +3369,20 @@
               "type": "t"
             }
           }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part read through its alias",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"cov": "att.cov"}}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "cov.n is 2"}}}},
+    "cases": [
+      {
+        "description": "starts at the part's path inside the subject",
+        "rules": ["location.start"],
+        "input": {"things": [{"id": "t1", "att": {"cov": {"n": 2}}}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/att/cov/n"], "name": "cov.n", "part": {"id": null, "name": "cov"}, "value": 2}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]

@@ -78,6 +78,26 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 
 **[path.inputs]** A check that reads one path, like `present`, `missing`, `equals` or `in`, has one entry in its row's `inputs`: the path's name and the value read, or `null` when nothing was.
 
+## Where a value was read
+
+**[location]** Every entry in a row's `inputs`, in a check's `$refs` and in `failed_items` has `locations`: a list of where Ergo read its value. A location is a JSON Pointer ([RFC 6901](https://www.rfc-editor.org/rfc/rfc6901)) from the root of the input, like `/deployments/3/approved`, or, for a value read from the params, `$params:` followed by a pointer from the root of the params, like `$params:/max_days/high`. List positions count from 0, and a key is escaped as RFC 6901 says, `~` as `~0` and `/` as `~1`. Locations never change `passed`, `cause` or a value. `[]` means no location could be given, like for a read that starts at a name nothing holds.
+
+**[location.start]** A subject's location is where it is in the input, like `/deployments/3`, or `/services/web` for a subject read from an object's values. A subject listed by `named by each of` whose key isn't in the object points at the object. A child subject's starts at its parent's. A path that starts at the subject, a part, an alias or a parent's name starts at that value's location, one that starts at `$input` at the root of the input, and one that starts at `$params` at the root of the params.
+
+**[location.read]** A path's location goes as far as its read went. A path that ends `found` or `null` points at the value it read. One that ends `absent` or `unusable` points at the last value it read: the object without the key, the list too short for the index, or the value that couldn't hold the step. So a pointer never leads to a value Ergo didn't read, and `item 2 of x` on `{"x": {"1": "a"}}` points at `/x`, not at `"a"`. A path that ends `not_an_object` points at the subject. A ref step or a field step adds the key it read. When that key can't be read, the path stops before the step. A path into params that aren't given is `$params:`. An entry that holds one value for each item of a list follows [location.each](#where-a-value-was-read) instead, so a walk or a `count of` on a list that is missing keeps `value: []` and `locations: []`.
+
+**[location.one]** An entry that shows the value of one path, like the entry of [path.inputs](#what-a-row-shows) or of a field step, has one location.
+
+**[location.refs]** An entry in `$refs` has its ref's location, and keeps it when [violations](#violations) adds it to a violation's `inputs`.
+
+**[location.merged]** When a row lists an input once though several checks or filters read it, like an `all_of`, an `any_of`, a `for` line or an `$applies` row, reads merge into one entry only when their name, their value and their locations all match. Two reads that print the same name and value but come from different places, like a parent's `b.x` and a child's own `.b.x`, each keep an entry. The entries are sorted by name, then value, then locations.
+
+**[location.each]** An entry that holds a value for each item, like a walk's ([walk.inputs](#every-and-some)) or a list on a `for` line ([for.inputs](#for)), has one location per value, in the same order. A walk that stopped before it walked anything holds `[]` and has no locations.
+
+**[location.worked_out]** An entry whose value Ergo works out, the number of a `count_of`, `sum_of`, `add` or `elapsed` side, has the locations of the entries shown for that side after it, in their order, once each. The `$min_subjects` entry has the location of each subject it counts, in the order of the rows. The `$unique_ids` entry has the location of the id of every subject that shares one, in the order the ids are listed, then of the subjects. The entries of `$well_formed` read the policy and have no locations, and nor do the entries that list problems with the input or the params.
+
+**[location.failed_items]** An entry in `failed_items`, of a check's row or of an `$applies` row, has one location: where its `value` was read, stopping where the read stopped as [location.read](#where-a-value-was-read) says. When the value is the whole item, that is the item, like `/pull_requests/1`. When it is a field of the item, like the title in `every pull_requests.title as t`, or the sort key that tied in `first of owners sorted by name`, it is the field, like `/pull_requests/1/title` or `/teams/0/owners/0/name`. A walk that stopped before it walked anything gives where it stopped. So do the entries of a `for` line's nested `failed_items`: an alias holds the value it was read as, so `m.commits` after `every prs.meta as m` starts at `/prs/0/meta`.
+
 ## `present`
 
 `present` takes a path and asks whether the field is there.

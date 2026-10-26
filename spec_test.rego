@@ -292,7 +292,7 @@ test_a_known_difference_that_passes_fails_its_folder if {
 		"policy": {"ergo_spec": "v0.2-dev", "subjects": {"subject": {"from": "$input"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
 		"cases": [{"description": "case", "input": {"x": 1}, "results": [{
 			"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c",
-			"passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}],
+			"passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/x"]}],
 		}]}],
 	}]}
 	_topic_failures("topic") == set() with data.spec.cases as cases
