@@ -252,12 +252,12 @@
     "cases": [
       {
         "description": "rules a subject out when the field is missing, even though the other filter can't read it",
-        "rules": ["present.filter", "applies.inputs"],
+        "rules": ["present.filter", "applies.inputs", "scope.failures"],
         "input": {"things": [{"id": "t1"}]},
         "status": {"s": "not_applicable"},
         "compliant": true,
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "status", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "status", "value": null}], "failed_assertions": [{"assertion": "status is \"COMPLETE\"", "cause": "absent"}, {"assertion": "status exists", "cause": "value"}]}
         ]
       },
       {
@@ -267,7 +267,7 @@
         "status": {"s": "not_applicable"},
         "compliant": true,
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "status", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "status", "value": null}], "failed_assertions": [{"assertion": "status is \"COMPLETE\"", "cause": "null"}, {"assertion": "status exists", "cause": "value"}]}
         ]
       },
       {
@@ -277,7 +277,7 @@
         "status": {"s": "met"},
         "compliant": true,
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "status", "value": "COMPLETE"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "status", "value": "COMPLETE"}], "failed_assertions": []},
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
         ]
       }

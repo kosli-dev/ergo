@@ -664,6 +664,7 @@
             "check": "$applies",
             "passed": true,
             "cause": "satisfied",
+            "failed_assertions": [],
             "inputs": [
               {
                 "name": "change_type",
@@ -684,6 +685,12 @@
             "check": "$applies",
             "passed": false,
             "cause": "value",
+            "failed_assertions": [
+              {
+                "assertion": "environment is \"prod\"",
+                "cause": "value"
+              }
+            ],
             "inputs": [
               {
                 "name": "change_type",
@@ -704,6 +711,12 @@
             "check": "$applies",
             "passed": false,
             "cause": "value",
+            "failed_assertions": [
+              {
+                "assertion": "change_type is \"emergency\"",
+                "cause": "value"
+              }
+            ],
             "inputs": [
               {
                 "name": "change_type",
@@ -817,6 +830,12 @@
             "check": "$applies",
             "passed": false,
             "cause": "absent",
+            "failed_assertions": [
+              {
+                "assertion": "change_type is \"emergency\"",
+                "cause": "absent"
+              }
+            ],
             "inputs": [
               {
                 "name": "change_type",
@@ -915,6 +934,12 @@
             "check": "$applies",
             "passed": false,
             "cause": "unusable",
+            "failed_assertions": [
+              {
+                "assertion": "change_type is \"emergency\"",
+                "cause": "unusable"
+              }
+            ],
             "inputs": [
               {
                 "name": "change_type",
@@ -1007,6 +1032,16 @@
             "check": "$applies",
             "passed": false,
             "cause": "absent",
+            "failed_assertions": [
+              {
+                "assertion": "environment is \"prod\"",
+                "cause": "absent"
+              },
+              {
+                "assertion": "change_type is \"emergency\"",
+                "cause": "value"
+              }
+            ],
             "inputs": [
               {
                 "name": "change_type",
@@ -1122,6 +1157,7 @@
             "check": "$applies",
             "passed": true,
             "cause": "satisfied",
+            "failed_assertions": [],
             "inputs": [
               {
                 "name": "change_type",
@@ -1429,7 +1465,7 @@
     "cases": [
       {
         "description": "keeps a subject when some item of the list passes, and rules out one where none does or that has no items",
-        "rules": ["sentence.subject.condition", "sentence.subject.applies", "subjects.sentence", "scope.out", "sentence.whose.undecided"],
+        "rules": ["sentence.subject.condition", "sentence.subject.applies", "subjects.sentence", "scope.out", "sentence.whose.undecided", "scope.failures"],
         "input": {
           "releases": [
             {
@@ -1526,6 +1562,7 @@
           {
             "cause": "satisfied",
             "check": "$applies",
+            "failed_items": [],
             "inputs": [
               {
                 "name": "files[].path",
@@ -1545,6 +1582,14 @@
           {
             "cause": "value",
             "check": "$applies",
+            "failed_items": [
+              {
+                "cause": "value",
+                "item": "item 1 of files",
+                "path": "files[0].path",
+                "value": "docs/upgrade.md"
+              }
+            ],
             "inputs": [
               {
                 "name": "files[].path",
@@ -1563,6 +1608,14 @@
           {
             "cause": "value",
             "check": "$applies",
+            "failed_items": [
+              {
+                "cause": "value",
+                "item": "files",
+                "path": "files",
+                "value": []
+              }
+            ],
             "inputs": [
               {
                 "name": "files[].path",
@@ -1700,6 +1753,14 @@
           {
             "cause": "absent",
             "check": "$applies",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "files",
+                "path": "files",
+                "value": null
+              }
+            ],
             "inputs": [
               {
                 "name": "files.path",
@@ -1716,6 +1777,14 @@
           {
             "cause": "null",
             "check": "$applies",
+            "failed_items": [
+              {
+                "cause": "null",
+                "item": "files",
+                "path": "files",
+                "value": null
+              }
+            ],
             "inputs": [
               {
                 "name": "files.path",
@@ -1732,6 +1801,14 @@
           {
             "cause": "unusable",
             "check": "$applies",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "item": "files",
+                "path": "files",
+                "value": "docs/upgrade.md"
+              }
+            ],
             "inputs": [
               {
                 "name": "files.path",
@@ -1748,6 +1825,20 @@
           {
             "cause": "absent",
             "check": "$applies",
+            "failed_items": [
+              {
+                "cause": "value",
+                "item": "item 1 of files",
+                "path": "files[0].path",
+                "value": "docs/upgrade.md"
+              },
+              {
+                "cause": "absent",
+                "item": "item 2 of files",
+                "path": "files[1].path",
+                "value": null
+              }
+            ],
             "inputs": [
               {
                 "name": "files[].path",
@@ -1767,6 +1858,20 @@
           {
             "cause": "unusable",
             "check": "$applies",
+            "failed_items": [
+              {
+                "cause": "value",
+                "item": "item 1 of files",
+                "path": "files[0].path",
+                "value": "docs/upgrade.md"
+              },
+              {
+                "cause": "unusable",
+                "item": "item 2 of files",
+                "path": "files[1].path",
+                "value": 5
+              }
+            ],
             "inputs": [
               {
                 "name": "files[].path",
@@ -1810,7 +1915,7 @@
     "cases": [
       {
         "description": "keeps a subject when every item passes, and rules out one with an item that fails or with no items",
-        "rules": ["sentence.subject.condition", "sentence.subject.applies", "subjects.sentence", "scope.out", "sentence.whose.every"],
+        "rules": ["sentence.subject.condition", "sentence.subject.applies", "subjects.sentence", "scope.out", "sentence.whose.every", "scope.failures"],
         "input": {
           "releases": [
             {
@@ -1907,6 +2012,14 @@
           {
             "cause": "value",
             "check": "$applies",
+            "failed_items": [
+              {
+                "cause": "value",
+                "item": "item 2 of files",
+                "path": "files[1].path",
+                "value": "src/api.go"
+              }
+            ],
             "inputs": [
               {
                 "name": "files[].path",
@@ -1926,6 +2039,7 @@
           {
             "cause": "satisfied",
             "check": "$applies",
+            "failed_items": [],
             "inputs": [
               {
                 "name": "files[].path",
@@ -1944,6 +2058,14 @@
           {
             "cause": "value",
             "check": "$applies",
+            "failed_items": [
+              {
+                "cause": "value",
+                "item": "files",
+                "path": "files",
+                "value": []
+              }
+            ],
             "inputs": [
               {
                 "name": "files[].path",
@@ -2081,6 +2203,14 @@
           {
             "cause": "absent",
             "check": "$applies",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "files",
+                "path": "files",
+                "value": null
+              }
+            ],
             "inputs": [
               {
                 "name": "files.path",
@@ -2097,6 +2227,14 @@
           {
             "cause": "null",
             "check": "$applies",
+            "failed_items": [
+              {
+                "cause": "null",
+                "item": "files",
+                "path": "files",
+                "value": null
+              }
+            ],
             "inputs": [
               {
                 "name": "files.path",
@@ -2113,6 +2251,14 @@
           {
             "cause": "unusable",
             "check": "$applies",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "item": "files",
+                "path": "files",
+                "value": "docs/upgrade.md"
+              }
+            ],
             "inputs": [
               {
                 "name": "files.path",
@@ -2129,6 +2275,14 @@
           {
             "cause": "absent",
             "check": "$applies",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "item 2 of files",
+                "path": "files[1].path",
+                "value": null
+              }
+            ],
             "inputs": [
               {
                 "name": "files[].path",
@@ -2148,6 +2302,14 @@
           {
             "cause": "unusable",
             "check": "$applies",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "item": "item 2 of files",
+                "path": "files[1].path",
+                "value": 5
+              }
+            ],
             "inputs": [
               {
                 "name": "files[].path",
@@ -2288,6 +2450,14 @@
           {
             "cause": "value",
             "check": "$applies",
+            "failed_items": [
+              {
+                "cause": "value",
+                "item": "item 2 of files",
+                "path": "files[1].path",
+                "value": "src/api.go"
+              }
+            ],
             "inputs": [
               {
                 "name": "files[].path",
@@ -2307,6 +2477,7 @@
           {
             "cause": "satisfied",
             "check": "$applies",
+            "failed_items": [],
             "inputs": [
               {
                 "name": "files[].path",
@@ -2325,6 +2496,7 @@
           {
             "cause": "satisfied",
             "check": "$applies",
+            "failed_items": [],
             "inputs": [
               {
                 "name": "files[].path",
@@ -2498,6 +2670,7 @@
           {
             "cause": "satisfied",
             "check": "$applies",
+            "failed_assertions": [],
             "inputs": [
               {
                 "name": "files[].path",
@@ -2521,6 +2694,12 @@
           {
             "cause": "value",
             "check": "$applies",
+            "failed_assertions": [
+              {
+                "assertion": "some files.path does not match \"^docs/\"",
+                "cause": "value"
+              }
+            ],
             "inputs": [
               {
                 "name": "files[].path",
@@ -2543,6 +2722,12 @@
           {
             "cause": "value",
             "check": "$applies",
+            "failed_assertions": [
+              {
+                "assertion": "ticket is \"ok\"",
+                "cause": "value"
+              }
+            ],
             "inputs": [
               {
                 "name": "files[].path",
@@ -2712,6 +2897,7 @@
           {
             "cause": "satisfied",
             "check": "$applies",
+            "failed_items": [],
             "inputs": [
               {
                 "name": "files[].owner",
@@ -2733,6 +2919,14 @@
           {
             "cause": "value",
             "check": "$applies",
+            "failed_items": [
+              {
+                "cause": "value",
+                "item": "item 1 of files",
+                "path": "files[0].owner",
+                "value": "bob"
+              }
+            ],
             "inputs": [
               {
                 "name": "files[].owner",
@@ -2903,6 +3097,7 @@
           {
             "cause": "satisfied",
             "check": "$applies",
+            "failed_items": [],
             "inputs": [
               {
                 "name": "files[].path",
@@ -2922,6 +3117,14 @@
           {
             "cause": "value",
             "check": "$applies",
+            "failed_items": [
+              {
+                "cause": "value",
+                "item": "item 1 of files",
+                "path": "files[0].path",
+                "value": "docs/upgrade.md"
+              }
+            ],
             "inputs": [
               {
                 "name": "files[].path",
@@ -2940,6 +3143,14 @@
           {
             "cause": "value",
             "check": "$applies",
+            "failed_items": [
+              {
+                "cause": "value",
+                "item": "files",
+                "path": "files",
+                "value": []
+              }
+            ],
             "inputs": [
               {
                 "name": "files[].path",
@@ -3091,6 +3302,7 @@
           {
             "cause": "satisfied",
             "check": "$applies",
+            "failed_items": [],
             "inputs": [
               {
                 "name": "files[].path",
@@ -3110,6 +3322,14 @@
           {
             "cause": "value",
             "check": "$applies",
+            "failed_items": [
+              {
+                "cause": "value",
+                "item": "item 1 of files",
+                "path": "files[0].path",
+                "value": "docs/upgrade.md"
+              }
+            ],
             "inputs": [
               {
                 "name": "files[].path",
@@ -7432,6 +7652,7 @@
           {
             "cause": "satisfied",
             "check": "$applies",
+            "failed_assertions": [],
             "inputs": [
               {
                 "name": "severity",
@@ -7452,6 +7673,12 @@
           {
             "cause": "value",
             "check": "$applies",
+            "failed_assertions": [
+              {
+                "assertion": "severity is \"critical\"",
+                "cause": "value"
+              }
+            ],
             "inputs": [
               {
                 "name": "severity",
@@ -7472,6 +7699,7 @@
           {
             "cause": "satisfied",
             "check": "$applies",
+            "failed_assertions": [],
             "inputs": [
               {
                 "name": "severity",
@@ -7646,6 +7874,7 @@
           {
             "cause": "satisfied",
             "check": "$applies",
+            "failed_assertions": [],
             "inputs": [
               {
                 "name": "severity",
@@ -7666,6 +7895,12 @@
           {
             "cause": "value",
             "check": "$applies",
+            "failed_assertions": [
+              {
+                "assertion": "severity is \"critical\"",
+                "cause": "value"
+              }
+            ],
             "inputs": [
               {
                 "name": "severity",
@@ -7686,6 +7921,12 @@
           {
             "cause": "value",
             "check": "$applies",
+            "failed_assertions": [
+              {
+                "assertion": "team is \"a\"",
+                "cause": "value"
+              }
+            ],
             "inputs": [
               {
                 "name": "severity",

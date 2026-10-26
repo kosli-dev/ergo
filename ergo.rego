@@ -703,21 +703,46 @@ _has_old_marker(x) if {
 	_part_of([s]).old == true
 }
 
-_passes(req, check, flaw, subj) := _check_passed(check, subj, flaw) if not _scoped(req)
+_applies_evals(req, subj, flaws) := {name: _filter_eval(req, check, subj, flaws[name]) | some name, check in _applies_to_of(req)} if not _scoped(req)
 
-else := v if {
+else := evals if {
 	_scoped(req)
 	s := _scope_of(req, subj)
-	v := _check_passed(check, subj, flaw) with input as s
+	evals := {name: _filter_eval(req, check, subj, flaws[name]) | some name, check in _applies_to_of(req)} with input as s
 }
 
-_inputs_in(req, check, subj) := _tagged(_filter_inputs(subj, check), check, req, subj) if not _scoped(req)
-
-else := i if {
-	_scoped(req)
-	s := _scope_of(req, subj)
-	i := _tagged(_filter_inputs(subj, check), check, req, subj) with input as s
+_filter_eval(req, check, subj, flaw) := {
+	"passed": _filter_walk_passed(flaw, w),
+	"cause": _filter_walk_cause(flaw, w),
+	"assertion_cause": w.cause,
+	"inputs": _tagged(_with_key_fields(subj, check, w.inputs), check, req, subj),
+	"failed_items": w.failed,
+} if {
+	_walks(check)
+	w := _walk_row(check, subj)
 }
+
+_filter_eval(req, check, subj, flaw) := {
+	"passed": passed,
+	"cause": _filter_cause(check, subj, flaw),
+	"assertion_cause": _filter_assertion_cause(passed, check, subj, flaw),
+	"inputs": _tagged(_row_inputs(subj, check), check, req, subj),
+} if {
+	not _walks(check)
+	passed := _check_passed(check, subj, flaw)
+}
+
+_filter_walk_passed("", w) := w.cause == "satisfied"
+
+_filter_walk_passed(flaw, _) := false if flaw != ""
+
+_filter_walk_cause("", w) := w.cause
+
+_filter_walk_cause(flaw, _) := flaw if flaw != ""
+
+_filter_assertion_cause(true, _, _, _) := "satisfied"
+
+_filter_assertion_cause(false, check, subj, flaw) := _assertion_cause(check, subj, flaw)
 
 _outcome(req, check, flaw, subj) := _tagged_outcome(_check_outcome(check, subj, flaw), check, req, subj) if not _scoped(req)
 
@@ -1022,11 +1047,12 @@ _all_of_cause([]) := "satisfied"
 
 _all_of_cause(failed) := [c | some c in array.concat(_cause_precedence, ["value"]); c in {f.cause | some f in failed}][0] if failed != []
 
-default _subject_matches(_, _, _) := false
+default _subject_matches(_, _) := false
 
-_subject_matches(subj, req, flaws) if {
-	every name, check in _applies_to_of(req) {
-		_passes(req, check, flaws[name], subj)
+_subject_matches(evals, req) if {
+	count(evals) == count(_applies_to_of(req))
+	every _, e in evals {
+		e.passed
 	}
 }
 
@@ -2688,11 +2714,6 @@ default _check_passed(_, _, _) := false
 
 _check_passed(check, subj, "") if _op_passed(check, subj)
 
-_check_passed(check, subj, "") if {
-	_walks(check)
-	_walk_row(check, subj).cause == "satisfied"
-}
-
 _read_paths(check) := [side | some side in [check.left, check.right]; is_array(side)] if _two_sided(check)
 
 _read_paths(check) := [check.path] if {
@@ -2917,9 +2938,9 @@ _verdict_cause(passed) := "satisfied" if passed
 
 _verdict_cause(passed) := "value" if not passed
 
-_applies_cause(_, _, _, true) := "satisfied"
+_applies_cause(_, true) := "satisfied"
 
-_applies_cause(subj, req, flaws, false) := _scope_cause(_failed_filter_causes(subj, req, flaws))
+_applies_cause(evals, false) := _scope_cause({e.cause | some e in evals; not e.passed})
 
 _scope_cause(causes) := "value" if {
 	"missing" in causes
@@ -2927,29 +2948,9 @@ _scope_cause(causes) := "value" if {
 	causes == {"value"}
 } else := _worst_of(causes)
 
-_failed_filter_causes(subj, req, flaws) := _filter_causes(subj, req, flaws) if not _scoped(req)
-
-else := causes if {
-	_scoped(req)
-	s := _scope_of(req, subj)
-	causes := _filter_causes(subj, req, flaws) with input as s
-}
-
-_filter_causes(subj, req, flaws) := {_filter_cause(check, subj, flaws[name]) |
-	some name, check in _applies_to_of(req)
-	not _check_passed(check, subj, flaws[name])
-}
-
 _filter_cause(check, subj, flaw) := "missing" if _answers_presence(check, subj, flaw)
 
-_filter_cause(check, subj, flaw) := _row_cause(check, subj, flaw) if {
-	not _answers_presence(check, subj, flaw)
-	not _walked_filter(check, flaw)
-}
-
-_filter_cause(check, subj, flaw) := _walk_row(check, subj).cause if _walked_filter(check, flaw)
-
-_walked_filter(check, "") if _walks(check)
+_filter_cause(check, subj, flaw) := _row_cause(check, subj, flaw) if not _answers_presence(check, subj, flaw)
 
 default _answers_presence(_, _, _) := false
 
@@ -3037,10 +3038,6 @@ _leaf_paths(leaf) := [leaf.path] if {
 }
 
 _row_inputs(subj, check) := _with_key_fields(subj, check, _check_inputs(subj, check))
-
-_filter_inputs(subj, check) := _with_key_fields(subj, check, _walk_row(check, subj).inputs) if _walks(check)
-
-_filter_inputs(subj, check) := _row_inputs(subj, check) if not _walks(check)
 
 _with_key_fields(subj, check, inputs) := _once(array.concat(inputs, [{"name": _item_path_name([f]), "value": _value_at(subj, [f])} | some f in _key_fields(check)])) if count(_key_fields(check)) > 0
 
@@ -3360,27 +3357,41 @@ _repeats(sorted) := {x |
 	x == sorted[i - 1]
 }
 
-_applies_rows(raw, refs, matches, req, req_name, flaws) := [{
-	"requirement": req_name,
-	"subject": refs[i],
-	"check": "$applies",
-	"inputs": _applies_inputs(entry.subject, req),
-	"passed": matches[i],
-	"cause": _applies_cause(entry.subject, req, flaws, matches[i]),
-} |
-	some i, entry in raw
+_applies_rows(raw, refs, evals, req, req_name) := [object.union(
+	{
+		"requirement": req_name,
+		"subject": refs[i],
+		"check": "$applies",
+		"inputs": _applies_inputs(evals[i], req),
+		"passed": _subject_matches(evals[i], req),
+		"cause": _applies_cause(evals[i], _subject_matches(evals[i], req)),
+	},
+	_applies_failures(evals[i], req),
+) |
+	some i, _ in raw
 ] if {
 	_size(_applies_to_of(req)) > 0
 }
 
-_applies_rows(_, _, _, req, _, _) := [] if {
+_applies_rows(_, _, _, req, _) := [] if {
 	_size(_applies_to_of(req)) == 0
 }
 
-_applies_inputs(subj, req) := [inp |
+_applies_failures(evals, req) := {"failed_items": e.failed_items} if {
+	count(evals) == 1
+	some e in evals
+	"failed_items" in object.keys(e)
+} else := {"failed_assertions": [{"assertion": _expression_of(_applies_to_of(req)[name]), "cause": evals[name].assertion_cause} |
+	some name in _applies_to_names(req)
+	evals[name].assertion_cause != "satisfied"
+]} if {
+	count(evals) > 1
+} else := {}
+
+_applies_inputs(evals, req) := [inp |
 	read := {inp |
 		some name in _applies_to_names(req)
-		some inp in _inputs_in(req, _applies_to_of(req)[name], subj)
+		some inp in evals[name].inputs
 	}
 	some name in sort({inp.name | some inp in read})
 	some inp in read
@@ -3414,8 +3425,9 @@ _evaluation_with(doc, written, name, fixed) := {
 	req := _with_fixed(written)
 	raw := _raw_entries(doc, req)
 	refs := {i: _entry_ref(entry, req) | some i, entry in raw}
-	matches := {i: _subject_matches(entry.subject, req, fixed.filter_flaws) | some i, entry in raw}
-	applies := _applies_rows(raw, refs, matches, req, name, fixed.filter_flaws)
+	evals := {i: _applies_evals(req, entry.subject, fixed.filter_flaws) | some i, entry in raw}
+	matches := {i: _subject_matches(evals[i], req) | some i, _ in raw}
+	applies := _applies_rows(raw, refs, evals, req, name)
 	matching := [raw[i] | some i, _ in raw; matches[i]]
 	groups := _subject_row_groups(matching, req, name, fixed.check_flaws, fixed.prepared)
 }
@@ -4028,8 +4040,8 @@ _parent_pick_of(doc, preq) := {"cause": c} if {
 		flaw := _flaw(check, _from_names(preq, here))
 	}
 	refs := {i: _entry_ref_of(entry, preq) | some i, entry in raw}
-	matches := {i: _subject_matches(entry.subject, preq, flaws) | some i, entry in raw}
-	applies := _applies_rows(raw, refs, matches, preq, "", flaws)
+	evals := {i: _applies_evals(preq, entry.subject, flaws) | some i, entry in raw}
+	applies := _applies_rows(raw, refs, evals, preq, "")
 	r := _parent_pick_from(raw, refs, applies, preq)
 }
 

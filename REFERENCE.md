@@ -204,14 +204,16 @@ the `$applies` rows keep `d-1` and leave `d-2` out:
 
 ```json
 {"check": "$applies", "subject": {"id": "d-1", "type": "emergency change"}, "passed": true, "cause": "satisfied",
- "inputs": [{"name": "change_type", "value": "emergency"}, {"name": "environment", "value": "prod"}]}
+ "inputs": [{"name": "change_type", "value": "emergency"}, {"name": "environment", "value": "prod"}], "failed_assertions": []}
 {"check": "$applies", "subject": {"id": "d-2", "type": "emergency change"}, "passed": false, "cause": "value",
- "inputs": [{"name": "change_type", "value": "standard"}, {"name": "environment", "value": "prod"}]}
+ "inputs": [{"name": "change_type", "value": "standard"}, {"name": "environment", "value": "prod"}],
+ "failed_assertions": [{"assertion": "change_type is \"emergency\"", "cause": "value"}]}
 {"check": "$applies", "subject": {"id": "d-3", "type": "emergency change"}, "passed": false, "cause": "absent",
- "inputs": [{"name": "change_type", "value": null}, {"name": "environment", "value": "prod"}]}
+ "inputs": [{"name": "change_type", "value": null}, {"name": "environment", "value": "prod"}],
+ "failed_assertions": [{"assertion": "change_type is \"emergency\"", "cause": "absent"}]}
 ```
 
-and the `$applies` entry's `expression` is the conditions as written, `environment is "prod" and change_type is "emergency"`. `d-3` has no `change_type`, so Ergo can't tell whether it's an emergency change, and `approved` isn't met. `artifact` has no `from`, so it reads the input field `artifact`, and `signed` is met.
+and the `$applies` entry's `expression` is the conditions as written, `environment is "prod" and change_type is "emergency"`. With several conditions, each row has `failed_assertions`, the conditions that failed in the order written and `[]` when none did, as a check written as several sentences has. `d-3` has no `change_type`, so Ergo can't tell whether it's an emergency change, and `approved` isn't met. `artifact` has no `from`, so it reads the input field `artifact`, and `signed` is met.
 
 - `named by $params.name` picks one key: `from: trail.artifacts named by $params.artifact_name`.
 - `named by each of $params.kinds` makes each key in the list a subject: `from: build.test_runs named by each of $params.kinds`.
@@ -240,15 +242,17 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
   ]}
   ```
 
-  the `$applies` rows keep `1.4.0`, which changes a file outside `docs/`, and leave the other two out. They read what the same sentence reads as a check:
+  the `$applies` rows keep `1.4.0`, which changes a file outside `docs/`, and leave the other two out. They read, and list as `failed_items`, what the same sentence does as a check:
 
   ```json
   {"check": "$applies", "subject": {"id": "1.4.0", "type": "release"}, "passed": true, "cause": "satisfied",
-   "inputs": [{"name": "files[].path", "value": ["docs/upgrade.md", "src/api.go"]}]}
+   "inputs": [{"name": "files[].path", "value": ["docs/upgrade.md", "src/api.go"]}], "failed_items": []}
   {"check": "$applies", "subject": {"id": "1.4.1", "type": "release"}, "passed": false, "cause": "value",
-   "inputs": [{"name": "files[].path", "value": ["docs/upgrade.md"]}]}
+   "inputs": [{"name": "files[].path", "value": ["docs/upgrade.md"]}],
+   "failed_items": [{"path": "files[0].path", "item": "item 1 of files", "cause": "value", "value": "docs/upgrade.md"}]}
   {"check": "$applies", "subject": {"id": "1.4.2", "type": "release"}, "passed": false, "cause": "value",
-   "inputs": [{"name": "files[].path", "value": []}]}
+   "inputs": [{"name": "files[].path", "value": []}],
+   "failed_items": [{"path": "files", "item": "files", "cause": "value", "value": []}]}
   ```
 
   A release with no `files` field at all isn't out of scope: Ergo can't tell, so the row fails as `absent` (`null` and `unusable` for a `null` or a wrong type), with the input `{"name": "files.path", "value": []}`, and the requirement isn't met. `every files.path matches "^docs/"` keeps the releases that only change documentation, and `every files.path, if any, matches "^docs/"` keeps the ones with no files too. `some` takes no `, if any,`. A bare name after `some` or `every` is the item's, and a parent subject's name on the right is the parent. The condition can't have a `whose` of its own, and a `whose` in a check or on a `for` line takes no `some` or `every` condition.
@@ -1334,7 +1338,7 @@ Several of these rules depend on how a number was written, not only on its value
 }
 ```
 
-Passing and failing rows have the same fields. A row of a check with `every`, `some` or a `for` line also has `failed_items`, and so does the `$min_subjects` row of a subject whose `from` line has [`every`](#from-lines). To find a row's description and expression, look up `requirements[row.requirement].checks[row.check]`. Look it up through the requirement, because two requirements can use the same check name for different things.
+Passing and failing rows have the same fields. A row of a check with `every`, `some` or a `for` line also has `failed_items`, and so does the `$min_subjects` row of a subject whose `from` line has [`every`](#from-lines). So does an `$applies` row of a subject whose `from` line has one `some` or `every` condition, and one with several conditions has `failed_assertions`, like a check written as several sentences. To find a row's description and expression, look up `requirements[row.requirement].checks[row.check]`. Look it up through the requirement, because two requirements can use the same check name for different things.
 
 ### Subjects in the report
 
@@ -1539,6 +1543,8 @@ Their descriptions are plain sentences, like your own checks': `The requirement 
 
 A subject that fails `$applies` gets no other rows, since it was never checked. But its `$applies` row stays, so you can see what was left out and why.
 
+An `$applies` row has the fields the row of a check would have if its conditions were the assertions of that check. One `some` or `every` condition gives `failed_items`, which is `[]` when it passes. Two or more conditions give `failed_assertions`, the conditions that failed in the order written with their own causes, and `[]` when they all pass, but no `failed_items`. A single condition that isn't a `some` or an `every`, like `environment is "prod"`, adds no field, as a plain check doesn't. An entry of `failed_assertions` can have a cause the row doesn't: when a `present` condition rules the subject out, the row's cause is `value` and the entry of another condition can be `absent`.
+
 A subject is only out of scope when Ergo read a condition's fields and the values didn't match, so the row's cause is `value`. When a condition fails because a field it reads is missing, `null` or can't be found, Ergo can't tell whether the subject is in scope. Its `$applies` row then fails with that cause, the requirement isn't met, and the row shows up in the violations. This holds with `min_subjects: 0` too, so a missing field can't quietly make a requirement pass.
 
 `exists` is the exception, because a missing or `null` field is exactly what it checks for. `whose lock_release exists` leaves out a package with no `lock_release`. A parent that can't hold the field, like `"build": "abc"` for `build.fingerprint`, or a subject that isn't an object, still fails the requirement.
@@ -1605,7 +1611,7 @@ When a check reads several fields, the row shows the first cause in this table's
 ]
 ```
 
-A violation of a check with `every`, `some` or a `for` line, or of the `$min_subjects` row of a subject read with `every`, keeps its row's `failed_items`, and one of a check written as several sentences its `failed_assertions`.
+A violation of a check with `every`, `some` or a `for` line, or of the `$min_subjects` row of a subject read with `every`, keeps its row's `failed_items`, and one of a check written as several sentences its `failed_assertions`. A violation that's an `$applies` row keeps the `failed_items` or `failed_assertions` of its row too.
 
 It leaves out:
 

@@ -276,7 +276,7 @@
     "cases": [
       {
         "description": "leaves out a subject that fails it on value, and fails one it can't read",
-        "rules": ["scope.filters", "scope.out", "scope.unreadable", "status", "violations"],
+        "rules": ["scope.filters", "scope.out", "scope.unreadable", "status", "violations", "scope.failures"],
         "input": {"t": [{"e": "p", "id": 1, "x": 1}, {"e": "q", "id": 2}, {"id": 3}]},
         "requirements": {"s": {"status": "not_met", "subjects": {"matching": 1, "total": 3}}},
         "results": [
@@ -361,7 +361,7 @@
         "input": {"t": [{"e": "q", "id": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": false, "cause": "absent", "inputs": [{"name": "e", "value": "q"}, {"name": "k", "value": null}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": false, "cause": "absent", "inputs": [{"name": "e", "value": "q"}, {"name": "k", "value": null}], "failed_assertions": [{"assertion": "e is \"p\"", "cause": "value"}, {"assertion": "k is 1", "cause": "absent"}]}
         ]
       }
     ]

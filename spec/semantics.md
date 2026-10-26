@@ -362,6 +362,8 @@ A subject can have parts: named paths inside itself, each with an alias, written
 
 **[scope.unreadable]** When a filter fails with any other cause, Ergo can't tell whether the subject is in scope. Its `$applies` row fails with the first such cause, in the order of [causes](#causes), even when another filter would rule it out, and the requirement isn't met, even with `min_subjects: 0`.
 
+**[scope.failures]** An `$applies` row has the fields the check row would have if its conditions were the assertions of a check. With one condition that's a `some` or an `every`, it has `failed_items`, as [walk.failed_items](#every-and-some) says, and `[]` when it passes. With two or more conditions it has `failed_assertions`, as [all_of.failed_assertions](#all-of) says: an entry for each condition that failed, in the order written, with its `assertion` and its own `cause`, and `[]` when it passes. It has no `failed_items`, even when one of the conditions walks a list. A single condition that isn't a `some` or an `every`, like `environment is "prod"`, adds nothing, as a plain check doesn't. The row's own `cause` is the one [scope.out](#scope) and [scope.unreadable](#scope) give, so the `cause` of an entry can be `absent` or `null` where the row's is `value`, as when a `present` filter rules the subject out.
+
 ## Statuses
 
 **[status]** Each requirement has a `status`:
@@ -406,4 +408,4 @@ Names are sorted by code point.
 
 ## Violations
 
-**[violations]** The violations of a report are its rows that are real problems, in the order of `results`, each with its check's `description` and `expression` added and its `$refs` added at the end of its `inputs`. A row of an `every` or `some` check keeps its `failed_items`, and a row of an `all_of` check its `failed_assertions`. The violations leave out rows that passed, `$applies` rows that failed with `value`, and every row of a requirement that's `met` or `not_applicable`, so under `require: some` the subjects that failed aren't violations when another one passed. They're worked out from the report alone.
+**[violations]** The violations of a report are its rows that are real problems, in the order of `results`, each with its check's `description` and `expression` added and its `$refs` added at the end of its `inputs`. A row of an `every` or `some` check keeps its `failed_items`, and a row of an `all_of` check its `failed_assertions`, and so does an `$applies` row that has them ([scope.failures](#scope)). The violations leave out rows that passed, `$applies` rows that failed with `value`, and every row of a requirement that's `met` or `not_applicable`, so under `require: some` the subjects that failed aren't violations when another one passed. They're worked out from the report alone.
