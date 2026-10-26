@@ -8,12 +8,12 @@ report(doc, reqs) := ergo.report(doc, lifted(reqs), given_params)
 subject_fields := ["from", "identified_by", "applies_to"]
 
 lifted(reqs) := {
-	"ergo_spec": "v0.1",
+	"ergo_spec": "v0.2-dev",
 	"subjects": {subject_name(reqs, name): subject_def(req) | some name, req in reqs; is_object(req)},
 	"requirements": {name: lifted_req(reqs, name, req) | some name, req in reqs},
 } if is_object(reqs)
 
-lifted(reqs) := {"ergo_spec": "v0.1", "requirements": reqs} if not is_object(reqs)
+lifted(reqs) := {"ergo_spec": "v0.2-dev", "requirements": reqs} if not is_object(reqs)
 
 lifted_req(reqs, name, req) := object.union(object.remove(req, array.concat(subject_fields, ["subject_type"])), {"subject": subject_name(reqs, name)}) if is_object(req)
 
@@ -834,7 +834,7 @@ test_a_ref_step_that_reads_a_list_index_written_with_an_exponent_reads_the_item 
 
 test_a_list_index_reads_the_same_item_however_other_checks_write_it if {
 	policy := {
-		"ergo_spec": "v0.1",
+		"ergo_spec": "v0.2-dev",
 		"subjects": {"item": {"from": "items", "identified_by": "id"}},
 		"requirements": {"r": {"subject": "item", "checks": {
 			"c1": "item 2 of .a exists",
@@ -1346,7 +1346,7 @@ test_a_requirement_field_ergo_does_not_know_fails_well_formed if {
 test_from_id_applies_to_and_subject_type_belong_to_the_subject_not_the_requirement if {
 	rep := ergo.report(
 		{"releases": [{"id": "r-1", "signed": true}]}, {
-			"ergo_spec": "v0.1",
+			"ergo_spec": "v0.2-dev",
 			"subjects": {"release": {"from": "releases", "identified_by": "id"}},
 			"requirements": {"s": {
 				"subject": "release",
@@ -1372,7 +1372,7 @@ test_a_subject_with_id_instead_of_identified_by_is_written_wrong if {
 	rep := ergo.report(
 		{"releases": [{"id": "r-1", "signed": true}]},
 		{
-			"ergo_spec": "v0.1",
+			"ergo_spec": "v0.2-dev",
 			"subjects": {"release": {"from": "releases", "id": ["id"]}},
 			"requirements": {"s": {"subject": "release", "checks": {"signed": "signed is true"}}},
 		},
@@ -1419,18 +1419,18 @@ test_every_requirement_field_ergo_knows_is_well_formed if {
 	rows_for(report({"items": [{"id": 1}]}, {"s": req}), "s", "$well_formed")[0].passed == true
 }
 
-_engine_policy := {"ergo_spec": "v0.1", "subjects": {"x": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "x", "checks": {"c": "id is 1"}}}}
+_engine_policy := {"ergo_spec": "v0.2-dev", "subjects": {"x": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "x", "checks": {"c": "id is 1"}}}}
 
 _engine_doc := {"xs": [{"id": 1}, {"id": 2}]}
 
 test_the_report_says_which_version_of_the_spec_it_follows if {
-	ergo.report(_engine_doc, _engine_policy, {}).ergo == "v0.1"
+	ergo.report(_engine_doc, _engine_policy, {}).ergo == "v0.2-dev"
 }
 
 test_the_report_says_which_version_of_the_spec_it_follows_whatever_version_the_policy_names if {
 	every v in ["v9.9", 0.1, null] {
 		rep := ergo.report(_engine_doc, object.union(_engine_policy, {"ergo_spec": v}), {})
-		[rep.ergo, rep.compliant] == ["v0.1", false]
+		[rep.ergo, rep.compliant] == ["v0.2-dev", false]
 	}
 }
 
@@ -1440,7 +1440,7 @@ test_the_engine_gives_only_its_name_and_version_because_anything_about_the_machi
 
 test_a_compiled_policy_gives_the_same_ergo_and_engine if {
 	rep := ergo.report(_engine_doc, ergo.compile(_engine_policy), {})
-	rep.ergo == "v0.1"
+	rep.ergo == "v0.2-dev"
 	rep.engine == {"name": "ergo.rego", "version": ergo.version}
 }
 
@@ -1450,7 +1450,7 @@ test_the_version_on_main_ends_in_dev_because_only_the_release_workflow_drops_it 
 
 test_a_report_that_cant_read_its_input_still_says_its_version_and_engine if {
 	rep := ergo.report("not an object", _engine_policy, "not params")
-	rep.ergo == "v0.1"
+	rep.ergo == "v0.2-dev"
 	rep.engine.name == "ergo.rego"
 }
 
@@ -1632,7 +1632,7 @@ test_a_policy_without_ergo_spec_is_written_wrong_so_every_requirement_fails if {
 }
 
 test_an_ergo_spec_that_is_not_a_string_is_written_wrong_because_yaml_reads_0_1_as_a_number if {
-	every v in [0.1, 1, true, ["v0.1"], {"v": "v0.1"}] {
+	every v in [0.1, 1, true, ["v0.2-dev"], {"v": "v0.2-dev"}] {
 		_spec_rows(two_reqs_policy({"ergo_spec": v})) == [false, [
 			["s", false, [{"name": "policy ergo_spec", "value": ["not a string"]}]],
 			["t", false, [{"name": "policy ergo_spec", "value": ["not a string"]}]],
@@ -1641,8 +1641,8 @@ test_an_ergo_spec_that_is_not_a_string_is_written_wrong_because_yaml_reads_0_1_a
 }
 
 test_an_engine_reads_only_the_version_it_follows_so_any_other_ergo_spec_is_written_wrong if {
-	every v in ["v0.2", "v1.0", "v10.25"] {
-		expected := concat("", ["unsupported version ", v, ", expected v0.1"])
+	every v in ["v0.1", "v0.2", "v1.0", "v10.25", "v0.3-dev"] {
+		expected := concat("", ["unsupported version ", v, ", expected v0.2-dev"])
 		_spec_rows(two_reqs_policy({"ergo_spec": v})) == [false, [
 			["s", false, [{"name": "policy ergo_spec", "value": [expected]}]],
 			["t", false, [{"name": "policy ergo_spec", "value": [expected]}]],
@@ -1651,7 +1651,7 @@ test_an_engine_reads_only_the_version_it_follows_so_any_other_ergo_spec_is_writt
 }
 
 test_an_ergo_spec_that_is_not_shaped_like_a_version_is_written_wrong_and_the_row_shows_it if {
-	every v in ["0.1", "V0.1", "v0.1.0", " v0.1", "v0.1 ", "v.1", "v1", ""] {
+	every v in ["0.1", "V0.1", "v0.1.0", " v0.2-dev", "v0.2-dev ", "v.1", "v1", "", "v0.2-beta", "v0.2-", "v0.2-dev-dev", "v0.2-DEV", "v0.2-dev2", "v0.2dev", "v-dev"] {
 		expected := concat("", ["not a version ", v])
 		_spec_rows(two_reqs_policy({"ergo_spec": v})) == [false, [
 			["s", false, [{"name": "policy ergo_spec", "value": [expected]}]],
@@ -1681,13 +1681,13 @@ test_a_compiled_policy_without_ergo_spec_fails_like_the_policy_it_came_from if {
 }
 
 test_a_policy_with_ergo_spec_and_no_requirements_is_still_not_compliant if {
-	ergo.report({"items": [{"id": 1}]}, {"ergo_spec": "v0.1", "requirements": {}}, {}).compliant == false
+	ergo.report({"items": [{"id": 1}]}, {"ergo_spec": "v0.2-dev", "requirements": {}}, {}).compliant == false
 }
 
 test_a_policy_ergo_spec_description_and_meta_are_kept_when_it_is_rewritten_as_sentences if {
 	policy := two_reqs_policy({"description": "d", "meta": {"control": "DEV-0401"}})
 	converted := ergo.as_sentences(policy)
-	[converted.ergo_spec, converted.description, converted.meta] == ["v0.1", "d", {"control": "DEV-0401"}]
+	[converted.ergo_spec, converted.description, converted.meta] == ["v0.2-dev", "d", {"control": "DEV-0401"}]
 }
 
 problem_inputs_of(row) := [i |
@@ -2001,7 +2001,7 @@ test_an_empty_subject_name_fails_well_formed_because_rows_and_descriptions_would
 }
 
 named_subject_policy(name) := {
-	"ergo_spec": "v0.1",
+	"ergo_spec": "v0.2-dev",
 	"subjects": {name: {"from": "items", "identified_by": "id"}},
 	"requirements": {"s": {"subject": name, "checks": {"c": "id exists"}}},
 }
@@ -2310,11 +2310,11 @@ test_checks_come_out_in_name_order_whatever_the_runtime if {
 }
 
 test_a_policy_written_as_a_set_still_gets_a_row if {
-	policy := {"ergo_spec": "v0.1", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {{"subject": "item", "checks": {"c": "id exists"}}}}
+	policy := {"ergo_spec": "v0.2-dev", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {{"subject": "item", "checks": {"c": "id exists"}}}}
 	stopped(ergo.report({"items": [{"id": 1}]}, policy, {}))
 }
 
-checks_for(subject) := ergo.report({"xs": [{"id": 1}]}, {"ergo_spec": "v0.1", "requirements": {"s": {"subject": subject, "checks": {"c": "id exists"}}}}, {}).requirements.s.checks
+checks_for(subject) := ergo.report({"xs": [{"id": 1}]}, {"ergo_spec": "v0.2-dev", "requirements": {"s": {"subject": subject, "checks": {"c": "id exists"}}}}, {}).requirements.s.checks
 
 test_a_subject_that_is_not_a_string_is_written_as_json_in_every_runtime if {
 	checks_for(["a", "b"])["$min_subjects"].description == `The in-scope ["a", "b"] count is at least 1`
@@ -2900,11 +2900,11 @@ test_the_report_never_reads_data_params if {
 	[r.cause | some r in rows_for(unset, "s", "c")] == ["absent"]
 }
 
-empty_report := {"compliant": false, "description": "", "engine": {"name": "ergo.rego", "version": ergo.version}, "ergo": "v0.1", "meta": {}, "requirements": {}, "results": [], "subjects": {}}
+empty_report := {"compliant": false, "description": "", "engine": {"name": "ergo.rego", "version": ergo.version}, "ergo": "v0.2-dev", "meta": {}, "requirements": {}, "results": [], "subjects": {}}
 
 test_a_policy_without_requirements_is_not_compliant if {
 	ergo.report({"items": [{"id": 1}]}, {}, {}) == empty_report
-	ergo.report({"items": [{"id": 1}]}, {"ergo_spec": "v0.1", "requirements": {}}, {}) == empty_report
+	ergo.report({"items": [{"id": 1}]}, {"ergo_spec": "v0.2-dev", "requirements": {}}, {}) == empty_report
 	ergo.report({"items": [{"id": 1}]}, {"requirments": params_req("id exists")}, {}) == empty_report
 }
 
@@ -2916,9 +2916,9 @@ test_a_policy_that_is_not_an_object_is_not_compliant if {
 
 test_requirements_that_are_not_an_object_are_not_compliant if {
 	every reqs in [null, true, 1, "", "s", []] {
-		ergo.report({"items": [{"id": 1}]}, {"ergo_spec": "v0.1", "requirements": reqs}, {}) == empty_report
+		ergo.report({"items": [{"id": 1}]}, {"ergo_spec": "v0.2-dev", "requirements": reqs}, {}) == empty_report
 	}
-	ergo.report({"items": [{"id": 1}]}, {"ergo_spec": "v0.1", "requirements": [params_req("id exists").s]}, {}).compliant == false
+	ergo.report({"items": [{"id": 1}]}, {"ergo_spec": "v0.2-dev", "requirements": [params_req("id exists").s]}, {}).compliant == false
 }
 
 test_sections_ergo_does_not_know_leave_the_report_unchanged if {
@@ -3096,7 +3096,7 @@ test_a_badly_written_check_stops_its_requirement_at_well_formed if {
 	}
 }
 
-filter_policy(subjects) := {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"s": {"subject": "b", "min_subjects": 0, "checks": {"c": "x exists"}}}}
+filter_policy(subjects) := {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"s": {"subject": "b", "min_subjects": 0, "checks": {"c": "x exists"}}}}
 
 test_a_badly_written_filter_fails_well_formed_too if {
 	rep := ergo.report({"things": [{"x": 1}]}, filter_policy({"b": {"from": `things whose x is one of 1, "a"`}}), {})
@@ -3139,7 +3139,7 @@ test_a_badly_written_filter_on_a_parent_or_a_grandparent_stops_the_child_at_well
 	}
 	doc := {"artifacts": [{"id": "a", "x": 1, "prs": [{"url": "p", "commits": [{"sha": "s"}]}]}]}
 	every name in ["pr", "commit"] {
-		rep := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"s": {"subject": name, "checks": {"c": "x exists"}}}}, {})
+		rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"s": {"subject": name, "checks": {"c": "x exists"}}}}, {})
 		stopped(rep)
 		problem_inputs(rep) == [{"name": "subjects.artifact.from", "value": ["values of mixed types"]}]
 	}
@@ -3166,7 +3166,7 @@ test_an_index_that_cannot_be_a_key_is_written_wrong_wherever_it_sits if {
 		{"from": concat("", ["things whose items[", big, "] does not exist"])},
 	]
 	policies := array.concat(
-		[{"ergo_spec": "v0.1", "subjects": {"b": {"from": "things"}}, "requirements": {"s": {"subject": "b", "checks": {"c": c}}}} | some c in checks],
+		[{"ergo_spec": "v0.2-dev", "subjects": {"b": {"from": "things"}}, "requirements": {"s": {"subject": "b", "checks": {"c": c}}}} | some c in checks],
 		[filter_policy({"b": def}) | some def in subjects],
 	)
 	got := [[rep.compliant, [p | some i in problem_inputs(rep); some p in i.value]] |
@@ -3176,7 +3176,7 @@ test_an_index_that_cannot_be_a_key_is_written_wrong_wherever_it_sits if {
 	got == [[false, [concat("", [prefix, big, " can't be a list position"])]] | some prefix in ["", "", "", "", "for: ", "", ""]]
 }
 
-named_by_then_each_of_policy(from) := {"ergo_spec": "v0.1", "subjects": {"b": {"from": from}}, "requirements": {"s": {"subject": "b", "checks": {"c": "x is 1"}}}}
+named_by_then_each_of_policy(from) := {"ergo_spec": "v0.2-dev", "subjects": {"b": {"from": from}}, "requirements": {"s": {"subject": "b", "checks": {"c": "x is 1"}}}}
 
 test_a_from_line_can_read_a_key_named_by_a_param_before_naming_each_subject if {
 	every from in [
@@ -3192,7 +3192,7 @@ test_a_from_line_can_read_a_key_named_by_a_param_before_naming_each_subject if {
 
 test_the_largest_position_a_float_holds_exactly_is_well_written if {
 	rep := ergo.report(
-		{"things": [{"items": [1]}]}, {"ergo_spec": "v0.1", "subjects": {"b": {"from": "things"}}, "requirements": {"s": {"subject": "b", "checks": {
+		{"things": [{"items": [1]}]}, {"ergo_spec": "v0.2-dev", "subjects": {"b": {"from": "things"}}, "requirements": {"s": {"subject": "b", "checks": {
 			"c": "items[9007199254740991] does not exist",
 			"d": "item 9007199254740991 of items does not exist",
 		}}}},
@@ -3209,7 +3209,7 @@ test_an_identified_by_with_an_index_that_cannot_be_a_key_is_written_wrong if {
 
 test_a_problem_inside_a_sentence_is_named_by_the_position_where_it_sits if {
 	rep := ergo.report(
-		{"things": [{"items": [1]}]}, {"ergo_spec": "v0.1", "subjects": {"b": {"from": "things"}}, "requirements": {"s": {"subject": "b", "checks": {
+		{"things": [{"items": [1]}]}, {"ergo_spec": "v0.2-dev", "subjects": {"b": {"from": "things"}}, "requirements": {"s": {"subject": "b", "checks": {
 			"k": `count of items whose x is one of 1, "a" and y is one of true, 2 is 0`,
 			"e": {"for": `every items whose x is one of 1, "a" as i`, "assert": "i.y exists"},
 		}}}},
@@ -3410,7 +3410,7 @@ deployments_doc := {"deployments": [
 
 prod_deployment := {"from": "deployments whose environment is \"prod\"", "identified_by": "id"}
 
-subject_policy(subjects, reqs) := {"ergo_spec": "v0.1", "subjects": subjects, "requirements": reqs}
+subject_policy(subjects, reqs) := {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": reqs}
 
 approved_req(subject) := {"subject": subject, "checks": {"approved": "approved_by is a non-empty string"}}
 
@@ -3456,7 +3456,7 @@ test_a_subject_that_is_not_in_subjects_fails_well_formed_and_checks_nothing if {
 	every policy in [
 		subject_policy({"deployment": prod_deployment}, {"s": approved_req("deploymnt")}),
 		subject_policy({}, {"s": approved_req("deployment")}),
-		{"ergo_spec": "v0.1", "requirements": {"s": approved_req("deployment")}},
+		{"ergo_spec": "v0.2-dev", "requirements": {"s": approved_req("deployment")}},
 	] {
 		rep := ergo.report(deployments_doc, policy, {})
 		rep.requirements.s.status == "not_met"
@@ -3593,7 +3593,7 @@ causes_doc := {"deployments": [
 	{"id": "d-5"},
 ]}
 
-causes_policy(check) := {"ergo_spec": "v0.1", "subjects": {"deployment": {"from": "deployments whose environment is \"prod\"", "identified_by": "id"}}, "requirements": {"r": {"subject": "deployment", "checks": {"approved": check}}}}
+causes_policy(check) := {"ergo_spec": "v0.2-dev", "subjects": {"deployment": {"from": "deployments whose environment is \"prod\"", "identified_by": "id"}}, "requirements": {"r": {"subject": "deployment", "checks": {"approved": check}}}}
 
 causes_of(deployments, check) := ergo.report({"deployments": deployments}, causes_policy(check), {}).requirements.r.causes
 
@@ -3908,7 +3908,7 @@ test_a_sentence_written_wrong_says_what_is_wrong if {
 }
 
 _sentence_policy(checks) := {
-	"ergo_spec": "v0.1",
+	"ergo_spec": "v0.2-dev",
 	"subjects": {"thing": {"from": "things", "identified_by": "id"}},
 	"requirements": {"s": {"subject": "thing", "checks": checks}},
 }
@@ -4250,7 +4250,7 @@ test_a_written_value_after_starts_with_that_isnt_text_is_written_wrong_because_i
 
 test_assertions_joined_with_and_or_listed_under_assert_give_one_row_that_names_the_ones_that_failed if {
 	doc := {"prs": [{"id": "late", "username": "bob", "author": "ann", "ts": 1, "last_commit": 2}, {"id": "gone", "username": "ann", "author": "ann", "last_commit": 2}]}
-	policy := {"ergo_spec": "v0.1", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"s": {"subject": "pr", "checks": {
+	policy := {"ergo_spec": "v0.2-dev", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"s": {"subject": "pr", "checks": {
 		"line": "username does not equal author and ts is after last_commit",
 		"list": {"assert": ["username does not equal author", "ts is after last_commit"]},
 	}}}}
@@ -4287,7 +4287,7 @@ test_an_any_of_of_sentences_passes_when_every_line_of_one_option_passes if {
 		{"name": "prometheus-client"},
 		{"name": "leftpad", "licenses": [{"license": {"id": "WTFPL"}}]},
 	]}
-	policy := {"ergo_spec": "v0.1", "subjects": {"component": {"from": "components", "identified_by": "name"}}, "requirements": {"s": {"subject": "component", "checks": {"c": {"description": "The licence is allowed", "meta": {"k": 1}, "any_of": {
+	policy := {"ergo_spec": "v0.2-dev", "subjects": {"component": {"from": "components", "identified_by": "name"}}, "requirements": {"s": {"subject": "component", "checks": {"c": {"description": "The licence is allowed", "meta": {"k": 1}, "any_of": {
 		"declared": "some licenses.license.id is in $params.allowed",
 		"known": ["licenses does not exist", "$params.known named by name is in $params.allowed"],
 	}}}}}}
@@ -4362,13 +4362,13 @@ test_a_missing_param_only_fails_the_options_of_an_any_of_that_read_it if {
 }
 
 test_an_option_of_an_any_of_reads_a_part_by_its_alias if {
-	policy := {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"cov": "attestations.cov"}}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"any_of": {"high": "cov.pct is at least 80", "waived": "waived is true"}}}}}}
+	policy := {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"cov": "attestations.cov"}}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"any_of": {"high": "cov.pct is at least 80", "waived": "waived is true"}}}}}}
 	r := ergo.report({"things": [{"id": "a", "attestations": {"cov": {"pct": 90}}}, {"id": "b", "waived": true, "attestations": {"cov": {"pct": 10}}}, {"id": "c", "waived": false, "attestations": {"cov": {"pct": 10}}}]}, policy, {})
 	[[row.subject.id, row.cause] | some row in r.results; row.check == "c"] == [["a", "satisfied"], ["b", "satisfied"], ["c", "value"]]
 }
 
 test_an_option_of_an_any_of_reads_a_parent_subject_by_its_name if {
-	policy := {"ergo_spec": "v0.1", "subjects": {"pr": {"from": "prs", "identified_by": "id"}, "commit": {"from": "pr.commits", "identified_by": "sha"}}, "requirements": {"s": {"subject": "commit", "checks": {"c": {"any_of": {"signed": "signed is true", "bot": "pr.author is \"bot\""}}}}}}
+	policy := {"ergo_spec": "v0.2-dev", "subjects": {"pr": {"from": "prs", "identified_by": "id"}, "commit": {"from": "pr.commits", "identified_by": "sha"}}, "requirements": {"s": {"subject": "commit", "checks": {"c": {"any_of": {"signed": "signed is true", "bot": "pr.author is \"bot\""}}}}}}
 	r := ergo.report({"prs": [{"id": "1", "author": "bot", "commits": [{"sha": "a", "signed": false}]}, {"id": "2", "author": "ann", "commits": [{"sha": "b", "signed": true}, {"sha": "c", "signed": false}]}]}, policy, {})
 	[[row.subject.id, row.cause] | some row in r.results; row.check == "c"] == [["a", "satisfied"], ["b", "satisfied"], ["c", "value"]]
 }
@@ -4454,7 +4454,7 @@ test_a_walk_fails_as_unusable_when_the_input_holds_something_json_cant if {
 }
 
 test_a_walk_on_a_subject_that_isnt_an_object_fails_like_any_path_does if {
-	r := ergo.report({"things": ["text", null]}, {"ergo_spec": "v0.1", "subjects": {"t": {"from": "things"}}, "requirements": {"s": {"subject": "t", "checks": {"c": "every xs is 1"}}}}, {})
+	r := ergo.report({"things": ["text", null]}, {"ergo_spec": "v0.2-dev", "subjects": {"t": {"from": "things"}}, "requirements": {"s": {"subject": "t", "checks": {"c": "every xs is 1"}}}}, {})
 	[row.cause | some row in r.results; row.check == "c"] == ["not_an_object", "not_an_object"]
 }
 
@@ -4828,7 +4828,7 @@ test_an_and_list_of_counts_shows_each_count_once if {
 	]]]
 }
 
-_from_report(doc, subjects, checks, params) := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": {"subject": object.keys(subjects)[_], "checks": checks}}}, params) if count(subjects) == 1
+_from_report(doc, subjects, checks, params) := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": object.keys(subjects)[_], "checks": checks}}}, params) if count(subjects) == 1
 
 _from_rows(rep) := [[r.subject.id, r.check, r.cause, r.inputs] | some r in rep.results; not r.check in {"$min_subjects", "$unique_ids", "$well_formed"}]
 
@@ -4892,7 +4892,7 @@ test_a_from_or_id_written_wrong_says_why_in_well_formed if {
 }
 
 test_a_subjects_own_name_in_its_own_from_is_the_input_field if {
-	own := ergo.report({"lockfile": {"status": "COMPLETE"}}, {"ergo_spec": "v0.1", "subjects": {"lockfile": {"from": `lockfile whose status is "COMPLETE"`}}, "requirements": {"r": {"subject": "lockfile", "checks": {"c": "status exists"}}}}, {})
+	own := ergo.report({"lockfile": {"status": "COMPLETE"}}, {"ergo_spec": "v0.2-dev", "subjects": {"lockfile": {"from": `lockfile whose status is "COMPLETE"`}}, "requirements": {"r": {"subject": "lockfile", "checks": {"c": "status exists"}}}}, {})
 	_from_problems(own) == []
 	[r.cause | some r in own.results; r.check == "c"] == ["satisfied"]
 }
@@ -4907,7 +4907,7 @@ _chain_subjects := {
 	"pull request": {"from": "artifact.pull_requests", "identified_by": "url"},
 }
 
-_chain_report(doc, subjects, checks, params) := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": checks}}}, params)
+_chain_report(doc, subjects, checks, params) := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": checks}}}, params)
 
 test_a_chain_names_its_parent_in_the_expressions_of_the_checks_ergo_adds_as_its_from_line_does if {
 	rep := _chain_report(_chain_doc, _chain_subjects, {"c": "approved is true"}, {"name": "web"})
@@ -4940,7 +4940,7 @@ test_a_check_of_a_chain_reads_the_parent_by_its_name if {
 
 _kids_doc := {"bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "v": 1}, {"id": "k2", "v": 2}]}]}
 
-_kids_report(from) := ergo.report(_kids_doc, {"ergo_spec": "v0.1", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": from, "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
+_kids_report(from) := ergo.report(_kids_doc, {"ergo_spec": "v0.2-dev", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": from, "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
 
 _applies_of(rep) := [[r.subject.id, r.cause, r.inputs] | some r in rep.results; r.check == "$applies"]
 
@@ -4952,7 +4952,7 @@ test_a_whose_in_a_childs_from_line_reads_the_parent_by_its_name if {
 }
 
 test_the_parents_name_on_the_left_of_a_whose_in_a_childs_from_line_is_the_childs_own_field if {
-	rep := ergo.report({"bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "b": {"x": 2}, "v": 2}, {"id": "k2", "v": 1}]}]}, {"ergo_spec": "v0.1", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids whose b.x equals v", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
+	rep := ergo.report({"bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "b": {"x": 2}, "v": 2}, {"id": "k2", "v": 1}]}]}, {"ergo_spec": "v0.2-dev", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids whose b.x equals v", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
 	_applies_of(rep) == [
 		["k1", "satisfied", [{"name": "b.x", "value": 2}, {"name": "v", "value": 2}]],
 		["k2", "absent", [{"name": "b.x", "value": null}, {"name": "v", "value": 1}]],
@@ -4961,7 +4961,7 @@ test_the_parents_name_on_the_left_of_a_whose_in_a_childs_from_line_is_the_childs
 }
 
 test_a_dot_before_the_parents_name_in_a_childs_from_line_reads_the_childs_own_field if {
-	rep := ergo.report({"bs": [{"id": "b1", "kids": [{"id": "k1", "b": 1}, {"id": "k2", "b": 5}]}]}, {"ergo_spec": "v0.1", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids whose .b equals 1", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "b exists"}}}}, {})
+	rep := ergo.report({"bs": [{"id": "b1", "kids": [{"id": "k1", "b": 1}, {"id": "k2", "b": 5}]}]}, {"ergo_spec": "v0.2-dev", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids whose .b equals 1", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "b exists"}}}}, {})
 	_applies_of(rep) == [
 		["k1", "satisfied", [{"name": "b", "value": 1}]],
 		["k2", "value", [{"name": "b", "value": 5}]],
@@ -4972,7 +4972,7 @@ test_a_dot_before_the_parents_name_in_a_childs_from_line_reads_the_childs_own_fi
 test_a_whose_in_a_childs_from_line_reads_a_part_of_the_parent_by_its_name if {
 	doc := {"bs": [{"id": "b1", "meta": {"tag": {"id": "t1", "x": 1}}, "kids": [{"id": "k1", "v": 1}, {"id": "k2", "v": 2}]}]}
 	subjects := {"b": {"from": "bs", "identified_by": "id", "has": {"tag": {"from": "meta.tag", "identified_by": "id"}}}, "kid": {"from": "b.kids whose v equals b.tag.x", "identified_by": "id"}}
-	rep := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
+	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
 	_applies_of(rep) == [
 		["k1", "satisfied", [{"name": "b.tag.x", "value": 1, "part": {"name": "b.tag", "id": "t1"}}, {"name": "v", "value": 1}]],
 		["k2", "value", [{"name": "b.tag.x", "value": 1, "part": {"name": "b.tag", "id": "t1"}}, {"name": "v", "value": 2}]],
@@ -4980,12 +4980,12 @@ test_a_whose_in_a_childs_from_line_reads_a_part_of_the_parent_by_its_name if {
 }
 
 test_a_count_on_the_left_of_a_whose_in_a_check_reads_the_items_own_field_not_the_parent if {
-	rep := ergo.report({"bs": [{"id": "b1", "kids": [{"id": "k1", "items": [{"b": {"kids": [1, 2, 3]}, "v": 3}, {"b": {"kids": []}, "v": 1}]}]}]}, {"ergo_spec": "v0.1", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "every items.v whose count of b.kids is at least v is 3"}}}}, {})
+	rep := ergo.report({"bs": [{"id": "b1", "kids": [{"id": "k1", "items": [{"b": {"kids": [1, 2, 3]}, "v": 3}, {"b": {"kids": []}, "v": 1}]}]}]}, {"ergo_spec": "v0.2-dev", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "every items.v whose count of b.kids is at least v is 3"}}}}, {})
 	[r.cause | some r in rep.results; r.check == "c"] == ["satisfied"]
 }
 
 test_a_count_on_the_left_of_a_whose_in_a_childs_from_line_reads_the_childs_own_field_not_the_parent if {
-	rep := ergo.report({"bs": [{"id": "b1", "kids": [{"id": "k1", "b": {"kids": [1, 2]}, "v": 2}, {"id": "k2", "v": 1}]}]}, {"ergo_spec": "v0.1", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids whose count of b.kids is at least v", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
+	rep := ergo.report({"bs": [{"id": "b1", "kids": [{"id": "k1", "b": {"kids": [1, 2]}, "v": 2}, {"id": "k2", "v": 1}]}]}, {"ergo_spec": "v0.2-dev", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids whose count of b.kids is at least v", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
 	[[r.subject.id, r.cause] | some r in rep.results; r.check == "$applies"] == [["k1", "satisfied"], ["k2", "absent"]]
 	rep.requirements.r.checks["$applies"].expression == "count of .b.kids is at least v"
 }
@@ -4993,9 +4993,9 @@ test_a_count_on_the_left_of_a_whose_in_a_childs_from_line_reads_the_childs_own_f
 test_a_dot_before_a_part_on_the_left_of_a_whose_in_a_from_line_reads_the_field_not_the_part if {
 	doc := {"kids": [{"id": "k1", "att": {"id": 1}, "atts": {"pr": {"id": 2}}}, {"id": "k2", "atts": {"pr": {"id": 1}}}]}
 	subjects := {"kid": {"from": "kids whose .att.id is 1", "identified_by": "id", "has": {"att": {"from": "atts.pr", "identified_by": "id"}}}}
-	rep := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": {"subject": "kid", "checks": {"c": "id exists"}}}}, {})
+	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "kid", "checks": {"c": "id exists"}}}}, {})
 	[[r.subject.id, r.cause] | some r in rep.results; r.check == "$applies"] == [["k1", "satisfied"], ["k2", "absent"]]
-	plain := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": object.union(subjects, {"kid": object.union(subjects.kid, {"from": "kids whose att.id is 1"})}), "requirements": {"r": {"subject": "kid", "checks": {"c": "id exists"}}}}, {})
+	plain := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": object.union(subjects, {"kid": object.union(subjects.kid, {"from": "kids whose att.id is 1"})}), "requirements": {"r": {"subject": "kid", "checks": {"c": "id exists"}}}}, {})
 	[[r.subject.id, r.cause] | some r in plain.results; r.check == "$applies"] == [["k1", "value"], ["k2", "satisfied"]]
 }
 
@@ -5013,7 +5013,7 @@ test_a_whose_in_the_from_lines_of_a_chain_of_three_subjects_reads_every_ancestor
 		"b": {"from": "top.bs whose x is less than top.y", "identified_by": "id"},
 		"kid": {"from": "b.kids whose w equals top.y and v equals b.x", "identified_by": "id"},
 	}
-	rep := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
+	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
 	[[r.subject.id, r.subject.in, r.cause, r.inputs] | some r in rep.results; r.check == "$applies"] == [
 		["k1", {"top": "t1", "b": "b1"}, "satisfied", [{"name": "b.x", "value": 1}, {"name": "top.y", "value": 2}, {"name": "v", "value": 1}, {"name": "w", "value": 2}]],
 		["k2", {"top": "t1", "b": "b1"}, "value", [{"name": "b.x", "value": 1}, {"name": "top.y", "value": 2}, {"name": "v", "value": 2}, {"name": "w", "value": 2}]],
@@ -5074,7 +5074,7 @@ test_a_parent_without_subjects_fails_min_subjects_on_its_own_row_unless_min_subj
 		[{"artifact": "b"}, false, "value", [{"name": "in-scope pull request count", "value": 0}]],
 	]
 	rep.requirements.r.status == "not_met"
-	zero := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": {"subject": "pull request", "min_subjects": 0, "checks": {"c": "url exists"}}}}, {})
+	zero := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pull request", "min_subjects": 0, "checks": {"c": "url exists"}}}}, {})
 	[r.passed | some r in zero.results; r.check == "$min_subjects"] == [true, true]
 	zero.requirements.r.status == "met"
 }
@@ -5119,7 +5119,7 @@ test_a_parent_whose_conditions_cant_be_decided_fails_min_subjects_on_its_row_and
 	]
 	rep.requirements.r.status == "not_met"
 	rep.requirements.r.causes == [{"cause": "absent", "rows": 1}]
-	zero := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": _kept_subjects, "requirements": {"r": {"subject": "pull request", "min_subjects": 0, "checks": {"c": "url exists"}}}}, {})
+	zero := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": _kept_subjects, "requirements": {"r": {"subject": "pull request", "min_subjects": 0, "checks": {"c": "url exists"}}}}, {})
 	zero.requirements.r.status == "not_met"
 }
 
@@ -5155,7 +5155,7 @@ test_a_from_line_that_starts_at_input_reads_the_input_and_one_at_params_is_writt
 	[[r[0], r[2]] | some r in _from_rows(_from_report(doc, {"d": {"from": "$input.ds whose id is 5", "identified_by": "id"}}, {"c": "id exists"}, {}))] == [[5, "satisfied"], [5, "satisfied"]]
 	[[r[0], r[2]] | some r in _from_rows(_from_report(doc, {"d": {"from": "$input", "identified_by": "ds"}}, {"c": "ds exists"}, {}))] == [[[{"id": 5}], "satisfied"]]
 	_from_problems(_from_report(doc, {"d": {"from": "$params.ds"}}, {"c": "id exists"}, {"ds": [{"id": 1}]})) == [{"name": "subjects.d.from", "value": ["a from reads the input, so it can't start at $params"]}]
-	both := ergo.report({"artifact": {"x": [{"id": 1}]}}, {"ergo_spec": "v0.1", "subjects": {"artifact": null, "d": {"from": "$input.artifact.x", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "id exists"}}}}, {})
+	both := ergo.report({"artifact": {"x": [{"id": 1}]}}, {"ergo_spec": "v0.2-dev", "subjects": {"artifact": null, "d": {"from": "$input.artifact.x", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "id exists"}}}}, {})
 	[r.cause | some r in both.results; r.check == "c"] == ["satisfied"]
 }
 
@@ -5178,7 +5178,7 @@ _defects := {"defects": [
 	{"id": 4, "severity": "critical", "status": "open", "team": "b"},
 ]}
 
-_narrow_report(subjects, name) := ergo.report(_defects, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": {"subject": name, "checks": {"c": "id exists"}}}}, {})
+_narrow_report(subjects, name) := ergo.report(_defects, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": name, "checks": {"c": "id exists"}}}}, {})
 
 _kept(rep) := [r.subject.id | some r in rep.results; r.check == "c"]
 
@@ -5224,7 +5224,7 @@ test_a_narrowing_chain_deeper_than_ten_prints_in_order if {
 }
 
 test_a_subject_name_that_isnt_a_string_gives_the_same_report_with_strict_builtins if {
-	rep := ergo.report({"defects": [{"id": 1}]}, {"ergo_spec": "v0.1", "subjects": {1: {"from": "defects whose id exists"}}, "requirements": {"r": {"subject": "c", "checks": {"c": "id exists"}}}}, {})
+	rep := ergo.report({"defects": [{"id": 1}]}, {"ergo_spec": "v0.2-dev", "subjects": {1: {"from": "defects whose id exists"}}, "requirements": {"r": {"subject": "c", "checks": {"c": "id exists"}}}}, {})
 	rep.requirements.r.status == "not_met"
 }
 
@@ -5267,7 +5267,7 @@ test_a_subject_cant_build_on_a_subject_read_from_another_yet if {
 	doc := {"artifacts": [{"fingerprint": "a1", "prs": [{"url": "p1", "ok": true}]}], "prs": [{"url": "elsewhere", "ok": true}]}
 	base := {"artifact": {"from": "artifacts", "identified_by": "fingerprint"}, "pr": {"from": "artifact.prs", "identified_by": "url"}}
 	every pair in [[{"from": "pr whose ok is true"}, "from"]] {
-		rep := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": object.union(base, {"okpr": pair[0]}), "requirements": {"r": {"subject": "okpr", "checks": {"c": "url exists"}}}}, {})
+		rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": object.union(base, {"okpr": pair[0]}), "requirements": {"r": {"subject": "okpr", "checks": {"c": "url exists"}}}}, {})
 		_from_problems(rep) == [{"name": concat("", ["subjects.okpr.", pair[1]]), "value": ["can't build on a subject read from another subject yet"]}]
 		stopped(rep)
 	}
@@ -5295,9 +5295,9 @@ test_named_by_a_name_from_the_for_line_reads_the_key_each_item_names if {
 }
 
 test_named_by_a_bare_word_in_a_from_line_or_an_id_is_an_unknown_name_since_there_is_no_subject_to_read_it_from if {
-	from := ergo.report({"things": [{"id": 1, "k": "a"}]}, {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things named by k", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists"}}}}, {})
+	from := ergo.report({"things": [{"id": 1, "k": "a"}]}, {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things named by k", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists"}}}}, {})
 	[i.value | some r in from.results; r.check == "$well_formed"; some i in r.inputs; i.name == "subjects.thing.from"] == [["unknown alias k"]]
-	id := ergo.report({"things": [{"id": {"a": 1}, "k": "a"}]}, {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id named by k"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "k exists"}}}}, {})
+	id := ergo.report({"things": [{"id": {"a": 1}, "k": "a"}]}, {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id named by k"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "k exists"}}}}, {})
 	[i.value | some r in id.results; r.check == "$well_formed"; some i in r.inputs; i.name == "subjects.thing.identified_by"] == [[`identified_by is a path, like "id" or "build.number"`]]
 }
 
@@ -5339,7 +5339,7 @@ test_named_by_a_field_that_holds_no_key_fails_with_its_cause if {
 }
 
 test_named_by_a_field_on_a_subject_that_isnt_an_object_fails_as_not_an_object if {
-	rows := [[r.subject.id, r.cause] | some r in ergo.report({"things": ["x"]}, {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$params.limits named by severity is 1"}}}}, {"limits": {"x": 1}}).results; r.check == "c"]
+	rows := [[r.subject.id, r.cause] | some r in ergo.report({"things": ["x"]}, {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$params.limits named by severity is 1"}}}}, {"limits": {"x": 1}}).results; r.check == "c"]
 	rows == [["x", "not_an_object"]]
 }
 
@@ -5421,7 +5421,7 @@ test_every_and_count_through_a_for_name_arent_listed_as_inputs_since_they_change
 }
 
 _old_policy := {
-	"ergo_spec": "v0.1",
+	"ergo_spec": "v0.2-dev",
 	"subjects": {"deployment": {
 		"from": ["deployments"],
 		"identified_by": ["id"],
@@ -5441,7 +5441,7 @@ test_as_sentences_writes_null_as_is_null_because_it_reads_back_the_same if {
 
 test_as_sentences_rewrites_each_check_and_subject_it_can_as_a_sentence if {
 	ergo.as_sentences(_old_policy) == {
-		"ergo_spec": "v0.1",
+		"ergo_spec": "v0.2-dev",
 		"subjects": {"deployment": {"from": `deployments whose environment is "prod"`, "identified_by": "id"}},
 		"requirements": {"approved": {"subject": "deployment", "checks": {
 			"approved": {"description": "Someone approved it", "assert": "approved_by is a non-empty string"},
@@ -5468,12 +5468,12 @@ test_as_sentences_leaves_what_doesnt_read_back_the_same_as_written if {
 }
 
 test_as_sentences_writes_input_before_a_from_that_starts_like_another_subject if {
-	policy := {"ergo_spec": "v0.1", "subjects": {"artifact": {"from": ["artifact"]}, "pr": {"from": ["artifact", "prs"], "identified_by": ["url"]}}}
+	policy := {"ergo_spec": "v0.2-dev", "subjects": {"artifact": {"from": ["artifact"]}, "pr": {"from": ["artifact", "prs"], "identified_by": ["url"]}}}
 	ergo.as_sentences(policy).subjects == {"artifact": {"from": "artifact"}, "pr": {"from": "$input.artifact.prs", "identified_by": "url"}}
 }
 
 test_as_sentences_writes_naming_and_whole_input_and_narrowing_as_from_lines if {
-	policy := {"ergo_spec": "v0.1", "subjects": {
+	policy := {"ergo_spec": "v0.2-dev", "subjects": {
 		"all": {"from": []},
 		"run": {"from": ["build", "runs", {"each_as": "subject", "keys": {"ref": ["$$params", "kinds"]}}]},
 		"one": {"from": ["build", "runs", {"ref": ["$$params", "kind"]}]},
@@ -5494,9 +5494,9 @@ test_as_sentences_writes_naming_and_whole_input_and_narrowing_as_from_lines if {
 }
 
 test_as_sentences_keeps_sections_that_arent_objects_and_other_fields if {
-	ergo.as_sentences({"requirements": ["x"], "subjects": 5, "other": 1}) == {"ergo_spec": "v0.1", "requirements": ["x"], "subjects": 5, "other": 1}
+	ergo.as_sentences({"requirements": ["x"], "subjects": 5, "other": 1}) == {"ergo_spec": "v0.2-dev", "requirements": ["x"], "subjects": 5, "other": 1}
 	ergo.as_sentences("x") == "x"
-	ergo.as_sentences({"requirements": {"r": 1, "s": {"checks": []}}}) == {"ergo_spec": "v0.1", "requirements": {"r": 1, "s": {"checks": []}}}
+	ergo.as_sentences({"requirements": {"r": 1, "s": {"checks": []}}}) == {"ergo_spec": "v0.2-dev", "requirements": {"r": 1, "s": {"checks": []}}}
 }
 
 test_as_sentences_writes_compares_with_a_value_and_within if {
@@ -5532,7 +5532,7 @@ test_as_sentences_narrows_only_with_an_of_that_names_another_subject if {
 
 test_as_sentences_leaves_the_checks_of_a_subject_read_from_another if {
 	policy := {
-		"ergo_spec": "v0.1",
+		"ergo_spec": "v0.2-dev",
 		"subjects": {"d": {"from": "deployments"}, "c": {"from": "d.commits"}},
 		"requirements": {"r": {"subject": "c", "checks": {"k": "d.v exists"}}},
 	}
@@ -5960,7 +5960,7 @@ test_elapsed_cant_take_a_phrase_that_takes_no_number if {
 
 _listed_reqs(name) := {"r": {"subject": name, "checks": {"c": "id exists"}}}
 
-_listed(subjects, name) := ergo.report({}, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": _listed_reqs(name)}, {}).subjects
+_listed(subjects, name) := ergo.report({}, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": _listed_reqs(name)}, {}).subjects
 
 test_the_report_lists_a_subject_from_the_line_read_with_the_policy_not_by_reading_it_again if {
 	read := {"lines": {"d": ergo._from_line("xs")}}
@@ -5973,7 +5973,7 @@ test_the_report_lists_a_subject_with_its_description_from_and_id if {
 }
 
 test_a_listed_subject_carries_exactly_the_documented_keys if {
-	rep := ergo.report({}, {"ergo_spec": "v0.1", "subjects": {"d": {"from": "ds"}}, "requirements": _listed_reqs("d")}, {})
+	rep := ergo.report({}, {"ergo_spec": "v0.2-dev", "subjects": {"d": {"from": "ds"}}, "requirements": _listed_reqs("d")}, {})
 	object.keys(rep.subjects.d) == {"description", "from", "identified_by", "parts"}
 }
 
@@ -6091,38 +6091,38 @@ test_a_subject_nothing_builds_on_or_reads_from_is_not_listed_even_when_it_looks_
 }
 
 test_no_subject_is_listed_when_no_requirement_names_one if {
-	ergo.report({}, {"ergo_spec": "v0.1", "subjects": {"d": {"from": "ds"}}, "requirements": {"r": {"checks": {"c": "id exists"}}}}, {}).subjects == {}
-	ergo.report({}, {"ergo_spec": "v0.1", "subjects": {"d": {"from": "ds"}}}, {}).subjects == {}
-	ergo.report({}, {"ergo_spec": "v0.1", "subjects": {"d": {"from": "ds"}}, "requirements": {"r": {"subject": "nope", "checks": {"c": "id exists"}}}}, {}).subjects == {}
+	ergo.report({}, {"ergo_spec": "v0.2-dev", "subjects": {"d": {"from": "ds"}}, "requirements": {"r": {"checks": {"c": "id exists"}}}}, {}).subjects == {}
+	ergo.report({}, {"ergo_spec": "v0.2-dev", "subjects": {"d": {"from": "ds"}}}, {}).subjects == {}
+	ergo.report({}, {"ergo_spec": "v0.2-dev", "subjects": {"d": {"from": "ds"}}, "requirements": {"r": {"subject": "nope", "checks": {"c": "id exists"}}}}, {}).subjects == {}
 }
 
 test_a_subjects_section_that_is_not_an_object_lists_nothing if {
 	every subjects in [null, true, 1, "d", []] {
-		ergo.report({}, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": _listed_reqs("d")}, {}).subjects == {}
+		ergo.report({}, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": _listed_reqs("d")}, {}).subjects == {}
 	}
 }
 
 test_a_requirement_reports_the_name_of_its_subject if {
-	rep := ergo.report({}, {"ergo_spec": "v0.1", "subjects": {"d": {"from": "ds"}, "e": {"from": "es"}}, "requirements": {"a": {"subject": "d", "checks": {"c": "id exists"}}, "b": {"subject": "e", "checks": {"c": "id exists"}}}}, {})
+	rep := ergo.report({}, {"ergo_spec": "v0.2-dev", "subjects": {"d": {"from": "ds"}, "e": {"from": "es"}}, "requirements": {"a": {"subject": "d", "checks": {"c": "id exists"}}, "b": {"subject": "e", "checks": {"c": "id exists"}}}}, {})
 	{name: entry.subject | some name, entry in rep.requirements} == {"a": "d", "b": "e"}
 }
 
 test_a_requirement_reports_no_subject_when_it_names_none_or_one_that_is_not_there if {
 	every req in [{"checks": {"c": "id exists"}}, {"subject": "nope", "checks": {"c": "id exists"}}, {"subject": 1, "checks": {"c": "id exists"}}, {"subject": null, "checks": {"c": "id exists"}}, {"subject": ["d"], "checks": {"c": "id exists"}}] {
-		ergo.report({}, {"ergo_spec": "v0.1", "subjects": {"d": {"from": "ds"}}, "requirements": {"r": req}}, {}).requirements.r.subject == null
+		ergo.report({}, {"ergo_spec": "v0.2-dev", "subjects": {"d": {"from": "ds"}}, "requirements": {"r": req}}, {}).requirements.r.subject == null
 	}
-	ergo.report({}, {"ergo_spec": "v0.1", "subjects": [], "requirements": _listed_reqs("d")}, {}).requirements.r.subject == null
+	ergo.report({}, {"ergo_spec": "v0.2-dev", "subjects": [], "requirements": _listed_reqs("d")}, {}).requirements.r.subject == null
 }
 
 test_a_requirement_that_names_a_subject_written_wrong_still_reports_its_name if {
-	ergo.report({}, {"ergo_spec": "v0.1", "subjects": {"d": 1}, "requirements": _listed_reqs("d")}, {}).requirements.r.subject == "d"
+	ergo.report({}, {"ergo_spec": "v0.2-dev", "subjects": {"d": 1}, "requirements": _listed_reqs("d")}, {}).requirements.r.subject == "d"
 }
 
 test_the_subjects_section_is_independent_of_the_order_the_policy_is_written_in if {
 	first := {"round": {"from": "rounds", "identified_by": "id"}, "done": {"from": `round whose state is "done"`}, "old": {"from": "ds whose .a exists and b exists"}}
 	reqs := {"x": {"subject": "done", "checks": {"c": "id exists"}}, "y": {"subject": "old", "checks": {"c": "id exists"}}}
-	one := ergo.report({}, {"ergo_spec": "v0.1", "subjects": first, "requirements": reqs}, {})
-	two := ergo.report({}, {"ergo_spec": "v0.1", "requirements": {"y": reqs.y, "x": reqs.x}, "subjects": {"old": {"from": "ds whose .a exists and b exists"}, "done": first.done, "round": first.round}}, {})
+	one := ergo.report({}, {"ergo_spec": "v0.2-dev", "subjects": first, "requirements": reqs}, {})
+	two := ergo.report({}, {"ergo_spec": "v0.2-dev", "requirements": {"y": reqs.y, "x": reqs.x}, "subjects": {"old": {"from": "ds whose .a exists and b exists"}, "done": first.done, "round": first.round}}, {})
 	json.marshal(one) == json.marshal(two)
 	one.subjects.old.from == "ds whose .a exists and b exists"
 }
@@ -6134,7 +6134,7 @@ test_a_from_that_cannot_be_printed_is_invalid_even_when_nothing_flagged_it if {
 }
 
 _parts_policy(has, checks) := {
-	"ergo_spec": "v0.1",
+	"ergo_spec": "v0.2-dev",
 	"subjects": {"round": {"from": "trail", "identified_by": "name", "has": has}},
 	"requirements": {"r": {"subject": "round", "checks": checks}},
 }
@@ -6199,7 +6199,7 @@ test_a_wrong_typed_part_fails_as_unusable_like_its_full_path if {
 
 test_a_part_of_a_subject_that_is_not_an_object_fails_as_not_an_object_like_its_full_path if {
 	policy := {
-		"ergo_spec": "v0.1",
+		"ergo_spec": "v0.2-dev",
 		"subjects": {"s": {"from": "items", "has": {"cov": "dd.b"}}},
 		"requirements": {"r": {"subject": "s", "checks": {"c": "cov.x is 1", "f": "dd.b.x is 1"}}},
 	}
@@ -6263,7 +6263,7 @@ test_a_field_of_the_subject_with_no_alias_in_the_way_is_read_as_before if {
 
 test_a_child_reads_its_parents_part_on_the_right_inside_an_items_scope if {
 	policy := {
-		"ergo_spec": "v0.1",
+		"ergo_spec": "v0.2-dev",
 		"subjects": {
 			"artifact": {"from": "artifacts", "identified_by": "fingerprint", "has": {"pra": "attestations.pr"}},
 			"pull request": {"from": "artifact.pra.pull_requests", "identified_by": "url"},
@@ -6279,7 +6279,7 @@ test_a_child_reads_its_parents_part_on_the_right_inside_an_items_scope if {
 }
 
 _parent_name_policy(checks) := {
-	"ergo_spec": "v0.1",
+	"ergo_spec": "v0.2-dev",
 	"subjects": {
 		"artifact": {"from": "artifacts", "identified_by": "fingerprint", "has": {"pra": "attestations.pr"}},
 		"pull request": {"from": "artifact.pra.pull_requests", "identified_by": "url"},
@@ -6382,7 +6382,7 @@ test_a_for_line_alias_that_is_also_a_part_alias_is_written_wrong if {
 
 test_a_whose_in_the_from_line_reads_the_subjects_parts if {
 	policy := {
-		"ergo_spec": "v0.1",
+		"ergo_spec": "v0.2-dev",
 		"subjects": {"round": {"from": "rounds whose cov.x is 1", "identified_by": "id", "has": {"cov": "dd.b"}}},
 		"requirements": {"r": {"subject": "round", "checks": {"c": "cov.n is 2"}}},
 	}
@@ -6397,7 +6397,7 @@ test_a_whose_in_the_from_line_reads_the_subjects_parts if {
 }
 
 _parts_narrow := {
-	"ergo_spec": "v0.1",
+	"ergo_spec": "v0.2-dev",
 	"subjects": {
 		"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "dd.b"}},
 		"good round": {"from": "round whose cov.x is 1", "has": {"extra": "dd.e"}},
@@ -6411,7 +6411,7 @@ _parts_rounds := {"rounds": [{"id": "a", "dd": {"b": {"x": 1, "n": 2}, "e": 5}},
 
 test_re_adding_a_kept_alias_is_written_wrong_and_names_the_part if {
 	subjects := object.union(_parts_narrow.subjects, {"good round": {"from": "round whose cov.x is 1", "has": {"cov": "dd.q"}}})
-	rep := ergo.report(_parts_rounds, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": {"subject": "good round", "checks": {"c": "cov.n is 2"}}}}, {})
+	rep := ergo.report(_parts_rounds, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "good round", "checks": {"c": "cov.n is 2"}}}}, {})
 	_parts_problems(rep)["subjects.\"good round\".has.cov"] == ["alias given twice"]
 }
 
@@ -6420,13 +6420,13 @@ test_two_subjects_that_do_not_narrow_each_other_can_use_the_same_alias if {
 		"a": {"from": "xs", "has": {"cov": "p"}},
 		"b": {"from": "ys", "has": {"cov": "q"}},
 	}
-	policy := {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"ra": {"subject": "a", "checks": {"c": "cov is 1"}}, "rb": {"subject": "b", "checks": {"c": "cov is 2"}}}}
+	policy := {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"ra": {"subject": "a", "checks": {"c": "cov is 1"}}, "rb": {"subject": "b", "checks": {"c": "cov is 2"}}}}
 	rep := ergo.report({"xs": [{"p": 1, "q": 2}], "ys": [{"p": 1, "q": 2}]}, policy, {})
 	[r.passed | some r in rep.results; r.check == "c"] == [true, true]
 }
 
 _parts_chain := {
-	"ergo_spec": "v0.1",
+	"ergo_spec": "v0.2-dev",
 	"subjects": {
 		"artifact": {"from": "trail.artifacts named by $params.art", "identified_by": "fingerprint", "has": {"pra": "attestations.pr"}},
 		"pull request": {"from": "artifact.pra.pull_requests", "identified_by": "url", "has": {"rev": "reviews"}},
@@ -6463,13 +6463,13 @@ test_a_part_is_only_reached_through_its_subject_so_a_bare_alias_in_a_chained_chi
 
 test_a_chained_subject_cannot_use_its_parents_name_as_a_part_alias if {
 	subjects := object.union(_parts_chain.subjects, {"pull request": {"from": "artifact.pra.pull_requests", "identified_by": "url", "has": {"artifact": "reviews"}}})
-	rep := ergo.report(_parts_chain_doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": _parts_chain.requirements}, {"art": "web"})
+	rep := ergo.report(_parts_chain_doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": _parts_chain.requirements}, {"art": "web"})
 	_parts_problems(rep)["subjects.\"pull request\".has.artifact"] == ["alias given twice"]
 }
 
 test_a_problem_in_a_parent_subjects_has_fails_the_requirements_of_its_chained_child if {
 	subjects := object.union(_parts_chain.subjects, {"artifact": {"from": "trail.artifacts named by $params.art", "identified_by": "fingerprint", "has": {"pra": 5}}})
-	rep := ergo.report(_parts_chain_doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": _parts_chain.requirements}, {"art": "web"})
+	rep := ergo.report(_parts_chain_doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": _parts_chain.requirements}, {"art": "web"})
 	_parts_problems(rep)["subjects.artifact.has.pra"] == ["not a string or an object"]
 }
 
@@ -6607,7 +6607,7 @@ test_a_named_by_that_names_a_part_alias_is_written_wrong_because_it_would_read_t
 
 test_as_sentences_leaves_an_old_check_that_names_an_alias_as_written_because_a_sentence_would_read_the_part if {
 	policy := {
-		"ergo_spec": "v0.1",
+		"ergo_spec": "v0.2-dev",
 		"subjects": {"s": {"from": ["items"], "has": {"cov": "dd.b"}}},
 		"requirements": {"r": {"subject": "s", "checks": {
 			"a": "cov.x is 1",
@@ -6627,7 +6627,7 @@ test_a_problem_in_has_names_the_subject_that_holds_it_for_every_requirement_that
 		"round": {"from": "rounds", "has": {"cov": 5}},
 		"good": {"from": "round whose x is 1"},
 	}
-	rep := ergo.report({"rounds": [{"x": 1}]}, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": {"subject": "good", "checks": {"c": "x is 1"}}}}, {})
+	rep := ergo.report({"rounds": [{"x": 1}]}, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "good", "checks": {"c": "x is 1"}}}}, {})
 	_parts_problems(rep)["subjects.round.has.cov"] == ["not a string or an object"]
 }
 
@@ -6636,7 +6636,7 @@ test_a_part_with_no_alias_clash_works_when_another_subject_of_the_policy_is_writ
 		"round": {"from": "rounds", "has": {"cov": "dd.b"}},
 		"bad": {"from": "rounds", "has": 5},
 	}
-	policy := {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": {"subject": "round", "checks": {"c": "cov.x is 1"}}}}
+	policy := {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "round", "checks": {"c": "cov.x is 1"}}}}
 	rep := ergo.report({"rounds": [{"dd": {"b": {"x": 1}}}]}, policy, {})
 	_parts_row(rep, "c").passed
 	not "subjects.bad.has" in object.keys(_parts_problems(rep))
@@ -6741,7 +6741,7 @@ _swap_assert(replacements, a) := strings.replace_n(replacements, a) if is_string
 _swap_assert(replacements, a) := [strings.replace_n(replacements, line) | some line in a] if is_array(a)
 
 _swap_policy(has, checks) := {
-	"ergo_spec": "v0.1",
+	"ergo_spec": "v0.2-dev",
 	"subjects": {"round": _swap_subject(has)},
 	"requirements": {"r": {"subject": "round", "checks": checks}},
 }
@@ -6815,7 +6815,7 @@ _swap_scenarios := {
 }
 
 _swap_batch_policy(has, checks) := {
-	"ergo_spec": "v0.1",
+	"ergo_spec": "v0.2-dev",
 	"subjects": {"round": object.union(_swap_subject(has), {"from": "trails"})},
 	"requirements": {"r": {"subject": "round", "checks": checks}},
 }
@@ -6970,7 +6970,7 @@ test_a_position_in_a_list_inside_a_part_is_never_hidden_so_the_failed_item_names
 }
 
 _swap_policy2(has, checks) := {
-	"ergo_spec": "v0.1",
+	"ergo_spec": "v0.2-dev",
 	"subjects": {"round": _swap_subject2(has)},
 	"requirements": {"r": {"subject": "round", "checks": checks}},
 }
@@ -6986,7 +6986,7 @@ test_a_position_in_a_list_inside_a_parents_part_is_never_hidden_either if {
 	}
 	doc := {"trail": {"artifacts": {"web": {"fingerprint": "sha-1", "items": [{"state": "s"}], "pull_requests": [{"reviews": [{"state": "ok"}]}, {"reviews": [{"state": "bad"}]}]}}}}
 	checks := {"c": "every artifact.rv.state is \"ok\"", "n": "count of artifact.rv is 2"}
-	rep := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": checks}}}, {"art": "web"})
+	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": checks}}}, {"art": "web"})
 	row := _parts_row(rep, "c")
 	row.failed_items == [{"cause": "value", "item": "item 1 of artifact.pull_requests[1].reviews", "path": "artifact.pull_requests[1].reviews[0].state", "value": "bad"}]
 	_untagged(row.inputs) == [{"name": "artifact.pull_requests[].reviews[].state", "value": ["ok", "bad"]}]
@@ -6998,7 +6998,7 @@ test_a_chained_subject_that_starts_at_its_parents_part_shows_its_from_as_written
 	checks["$min_subjects"].expression == "count(matching(artifact.pra.pull_requests)) >= 1"
 	checks["$unique_ids"].expression == "count(repeated(ids(artifact.pra.pull_requests))) == 0"
 	deeper := object.union(_parts_chain.subjects, {"pull request": {"from": "artifact.pra.pull_requests", "identified_by": "url"}})
-	policy := {"ergo_spec": "v0.1", "subjects": deeper, "requirements": {"r": {"subject": "pull request", "checks": {"c": "url exists"}}}}
+	policy := {"ergo_spec": "v0.2-dev", "subjects": deeper, "requirements": {"r": {"subject": "pull request", "checks": {"c": "url exists"}}}}
 	ergo.report(_parts_chain_doc, policy, {"art": "web"}).requirements.r.checks["$min_subjects"].expression == "count(matching(artifact.pra.pull_requests)) >= 1"
 }
 
@@ -7008,7 +7008,7 @@ test_a_chained_subject_that_starts_deeper_in_its_parents_part_keeps_the_rest_of_
 		"pull request": {"from": "artifact.pra.pull_requests[0].list", "identified_by": "url"},
 	}
 	doc := {"trail": {"artifacts": {"web": {"fingerprint": "sha-1", "attestations": {"pr": {"pull_requests": [{"list": [{"url": "a"}]}]}}}}}}
-	rep := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": {"c": "url exists"}}}}, {"art": "web"})
+	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": {"c": "url exists"}}}}, {"art": "web"})
 	rep.requirements.r.checks["$min_subjects"].expression == "count(matching(artifact.pra.pull_requests[0].list)) >= 1"
 }
 
@@ -7053,7 +7053,7 @@ test_a_part_id_is_the_value_as_read_even_when_it_is_an_object if {
 
 test_a_part_id_is_read_for_each_subject_of_the_row if {
 	policy := {
-		"ergo_spec": "v0.1",
+		"ergo_spec": "v0.2-dev",
 		"subjects": {"s": {"from": "xs", "identified_by": "n", "has": {"p": {"from": "d", "identified_by": "i"}}}},
 		"requirements": {"r": {"subject": "s", "checks": {"c": "p.v is 1"}}},
 	}
@@ -7107,7 +7107,7 @@ test_an_input_read_through_a_parents_part_is_tagged_with_the_parent_and_the_id_f
 	}
 	doc := {"trail": {"artifacts": {"web": {"fingerprint": "sha-1", "attestations": {"pr": {"att": "att-3", "name": "w", "pull_requests": [{"url": "pr/7", "reviews": {"count": 2}}]}}}}}}
 	checks := {"parent": "artifact.pra.name is \"w\"", "own": "rev.count is 2", "field": "url exists"}
-	rep := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": checks}}}, {"art": "web"})
+	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": checks}}}, {"art": "web"})
 	_parts_row(rep, "parent").inputs == [{"name": "artifact.pra.name", "part": {"id": "att-3", "name": "artifact.pra"}, "value": "w"}]
 	_parts_row(rep, "own").inputs == [{"name": "rev.count", "part": {"id": null, "name": "rev"}, "value": 2}]
 	_parts_row(rep, "field").inputs == [{"name": "url", "value": "pr/7"}]
@@ -7137,7 +7137,7 @@ test_a_policy_without_parts_gives_inputs_with_no_part_key if {
 
 test_an_applies_row_tags_the_inputs_its_conditions_read_through_a_part if {
 	policy := {
-		"ergo_spec": "v0.1",
+		"ergo_spec": "v0.2-dev",
 		"subjects": {"s": {"from": "xs whose p.v is 1", "identified_by": "n", "has": {"p": {"from": "d", "identified_by": "i"}}}},
 		"requirements": {"r": {"subject": "s", "checks": {"c": "n exists"}}},
 	}
@@ -7219,7 +7219,7 @@ test_a_broken_branch_along_a_from_line_with_every_fails_min_subjects_with_the_wo
 	[[v.check, v.failed_items[0].path] | some v in ergo.violations(rep)] == [["$min_subjects", "artifacts[1].pull_requests"]]
 	missing := _from_report({"artifacts": [{"pull_requests": [{"url": "pr/7"}]}, {}]}, _every_prs, {"c": "url exists"}, {})
 	[r.cause | some r in missing.results; r.check == "$min_subjects"] == ["absent"]
-	zero := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": _every_prs, "requirements": {"r": {"subject": "pull request", "min_subjects": 0, "checks": {"c": "url exists"}}}}, {})
+	zero := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": _every_prs, "requirements": {"r": {"subject": "pull request", "min_subjects": 0, "checks": {"c": "url exists"}}}}, {})
 	[r.cause | some r in zero.results; r.check == "$min_subjects"] == ["unusable"]
 	zero.requirements.r.status == "not_met"
 }
@@ -7248,9 +7248,9 @@ test_a_from_line_through_a_list_without_every_still_fails if {
 
 test_every_in_a_from_line_cant_start_at_another_subject_or_go_with_named_by_each_of_or_walk_more_than_ten_steps if {
 	subjects := {"artifact": {"from": "artifacts", "identified_by": "fingerprint"}, "pull request": {"from": "every artifact.pull_requests", "identified_by": "url"}}
-	_from_problems(ergo.report(_flows_doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": {"c": "url exists"}}}}, {})) == [{"name": `subjects."pull request".from`, "value": ["every can't go with a from line that starts at another subject yet"]}]
+	_from_problems(ergo.report(_flows_doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": {"c": "url exists"}}}}, {})) == [{"name": `subjects."pull request".from`, "value": ["every can't go with a from line that starts at another subject yet"]}]
 	narrow := {"artifact": {"from": "artifacts", "identified_by": "fingerprint"}, "kept": {"from": "every artifact"}}
-	_from_problems(ergo.report(_flows_doc, {"ergo_spec": "v0.1", "subjects": narrow, "requirements": {"r": {"subject": "kept", "checks": {"c": "url exists"}}}}, {})) == [{"name": "subjects.kept.from", "value": ["every can't go with a from line that starts at another subject yet"]}]
+	_from_problems(ergo.report(_flows_doc, {"ergo_spec": "v0.2-dev", "subjects": narrow, "requirements": {"r": {"subject": "kept", "checks": {"c": "url exists"}}}}, {})) == [{"name": "subjects.kept.from", "value": ["every can't go with a from line that starts at another subject yet"]}]
 	_from_problems(_from_report(_flows_doc, {"s": {"from": "every artifacts named by each of $params.names"}}, {"c": "x exists"}, {"names": ["a"]})) == [{"name": "subjects.s.from", "value": ["every can't go with named by each of: start the from line at a subject to read its names one subject at a time"]}]
 	_from_problems(_from_report(_flows_doc, {"s": {"from": "every x.b.c.d.e.f.g.h.i.j.k"}}, {"c": "x exists"}, {})) == [{"name": "subjects.s.from", "value": ["every over more than ten steps isn't supported yet"]}]
 	_from_problems(_from_report(_flows_doc, {"s": {"from": "every x.b.c.d.e.f.g.h.i.j"}}, {"c": "x exists"}, {})) == []
@@ -7267,7 +7267,7 @@ test_a_field_called_every_in_a_from_line_is_written_with_a_dot if {
 test_a_parent_read_with_every_gives_its_child_subjects_per_parent if {
 	doc := {"flows": [{"artifacts": [{"fingerprint": "a", "pull_requests": [{"url": "pr/7"}]}]}, {"artifacts": [{"fingerprint": "b", "pull_requests": [{"url": "pr/7"}]}]}]}
 	subjects := {"artifact": {"from": "every flows.artifacts", "identified_by": "fingerprint"}, "pull request": {"from": "artifact.pull_requests", "identified_by": "url"}}
-	rep := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": {"c": "url exists"}}}}, {})
+	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": {"c": "url exists"}}}}, {})
 	[[r.check, r.subject.id, object.get(r.subject, "in", null)] | some r in rep.results; r.check != "$well_formed"] == [
 		["$min_subjects", null, {"artifact": "a"}],
 		["$min_subjects", null, {"artifact": "b"}],
@@ -7277,7 +7277,7 @@ test_a_parent_read_with_every_gives_its_child_subjects_per_parent if {
 		["c", "pr/7", {"artifact": "b"}],
 	]
 	rep.requirements.r.status == "met"
-	broken := ergo.report({"flows": [{"artifacts": [{"fingerprint": "a", "pull_requests": [{"url": "pr/7"}]}]}, {}]}, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": {"c": "url exists"}}}}, {})
+	broken := ergo.report({"flows": [{"artifacts": [{"fingerprint": "a", "pull_requests": [{"url": "pr/7"}]}]}, {}]}, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": {"c": "url exists"}}}}, {})
 	[[r.check, r.cause, object.get(r.subject, "in", null)] | some r in broken.results; r.check != "$well_formed"] == [["$min_subjects", "absent", null], ["$unique_ids", "satisfied", null]]
 }
 
@@ -7297,7 +7297,7 @@ _three_subjects := {
 	"commit": {"from": `"pull request".commits`, "identified_by": "sha"},
 }
 
-_three_report(doc, checks) := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": _three_subjects, "requirements": {"r": {"subject": "commit", "checks": checks}}}, {})
+_three_report(doc, checks) := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": _three_subjects, "requirements": {"r": {"subject": "commit", "checks": checks}}}, {})
 
 test_a_chain_of_three_subjects_checks_each_grandchild_and_its_rows_list_every_ancestor if {
 	rep := _three_report(_three_doc, {"c": "verified is true"})
@@ -7370,7 +7370,7 @@ test_a_chain_of_three_subjects_with_no_grandparent_or_no_parent_in_scope_fails_m
 
 test_a_part_named_like_a_grandparent_is_an_alias_given_twice if {
 	subjects := object.union(_three_subjects, {"commit": {"from": `"pull request".commits`, "identified_by": "sha", "has": {"artifact": "x"}}})
-	rep := ergo.report(_three_doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": {"subject": "commit", "checks": {"c": "sha exists"}}}}, {})
+	rep := ergo.report(_three_doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "commit", "checks": {"c": "sha exists"}}}}, {})
 	[i | some r in rep.results; r.check == "$well_formed"; some i in r.inputs; startswith(i.name, "subjects.")] == [{"name": "subjects.commit.has.artifact", "value": ["alias given twice"]}]
 }
 
@@ -7379,8 +7379,8 @@ test_a_requirement_field_named_like_the_facts_ergo_works_out_once_is_unknown_and
 	doc := {"artifacts": [{"fingerprint": "a", "atts": {"pr": {"id": "x"}}, "pull_requests": [{"url": "pr/7"}]}, {"fingerprint": "b", "pull_requests": [{"url": "pr/8"}]}]}
 	plain := {"subject": "pull request", "checks": {"c": "url exists and artifact.pr_att.id exists"}}
 	odd := object.union(plain, {"ergo/fixed": {"each_step": [{"each_as": "x"}], "has_parts": true, "tagging": false, "scoped": false}})
-	clean := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": plain}}, {})
-	marked := ergo.report(doc, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"r": odd}}, {})
+	clean := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": plain}}, {})
+	marked := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": odd}}, {})
 	stopped(marked)
 	[r.subject.id | some r in clean.results; r.check == "c"] == ["pr/7", "pr/8"]
 	[i | some r in marked.results; r.check == "$well_formed"; some i in r.inputs; i.name == `"ergo/fixed"`] == [{"name": `"ergo/fixed"`, "value": ["unknown field"]}]
@@ -7390,8 +7390,8 @@ _saved(form) := json.unmarshal(json.marshal(form))
 
 _compile_policies := [
 	_sentence_policy({"c": "x is in $params.l and y exists and y is 2", "d": "y is $params.y"}),
-	{"ergo_spec": "v0.1", "subjects": _three_subjects, "requirements": {"r": {"subject": "commit", "checks": {"c": "verified is true"}}, "p": {"subject": "pull request", "checks": {"c": "url exists"}}}},
-	{"ergo_spec": "v0.1", "subjects": {"deployment": {"from": "$input named by $params.list whose environment is $params.env", "identified_by": "id"}}, "requirements": {"a": approved_req("deployment")}},
+	{"ergo_spec": "v0.2-dev", "subjects": _three_subjects, "requirements": {"r": {"subject": "commit", "checks": {"c": "verified is true"}}, "p": {"subject": "pull request", "checks": {"c": "url exists"}}}},
+	{"ergo_spec": "v0.2-dev", "subjects": {"deployment": {"from": "$input named by $params.list whose environment is $params.env", "identified_by": "id"}}, "requirements": {"a": approved_req("deployment")}},
 	_sentence_policy({"c": "x is", "d": "y is 2"}),
 	{"description": 1, "requirements": {"s": {"subject": "nowhere", "checks": {"c": "x exists"}}}},
 	{},
@@ -8119,8 +8119,8 @@ test_as_sentences_writes_each_old_check_as_the_sentence_that_reads_back_the_same
 }
 
 test_as_sentences_says_the_policy_is_for_this_version_of_the_spec if {
-	every policy in [{}, {"ergo_spec": "v0"}, {"ergo_spec": "v0.1", "subjects": {"s": {"from": ["items"]}}}] {
-		ergo.as_sentences(policy).ergo_spec == "v0.1"
+	every policy in [{}, {"ergo_spec": "v0"}, {"ergo_spec": "v0.2-dev", "subjects": {"s": {"from": ["items"]}}}] {
+		ergo.as_sentences(policy).ergo_spec == "v0.2-dev"
 	}
 }
 
@@ -8135,7 +8135,7 @@ test_as_sentences_leaves_a_subject_path_with_a_literal_step_or_a_key_list_as_wri
 		{"s": {"from": ["o", {"literal": true}]}},
 		{"s": {"from": ["items", {"each_as": "it", "keys": [1, "a"]}]}},
 	] {
-		ergo.as_sentences({"subjects": subjects}) == {"ergo_spec": "v0.1", "subjects": subjects}
+		ergo.as_sentences({"subjects": subjects}) == {"ergo_spec": "v0.2-dev", "subjects": subjects}
 	}
 }
 
@@ -8155,14 +8155,14 @@ test_as_sentences_leaves_an_old_check_whose_path_starts_at_a_part_alias_as_writt
 }
 
 test_each_key_named_by_a_list_is_a_subject_even_when_the_object_holding_them_is_missing_or_not_an_object if {
-	policy := {"ergo_spec": "v0.1", "subjects": {"suite": {"from": "atts named by each of $params.names"}}, "requirements": {"r": {"subject": "suite", "checks": {"c": "status is \"COMPLETE\""}}}}
+	policy := {"ergo_spec": "v0.2-dev", "subjects": {"suite": {"from": "atts named by each of $params.names"}}, "requirements": {"r": {"subject": "suite", "checks": {"c": "status is \"COMPLETE\""}}}}
 	every doc in [{}, {"atts": "x"}, {"atts": null}] {
 		[[r.subject.id, r.cause] | some r in ergo.report(doc, policy, {"names": ["junit", "lint"]}).results; r.check == "c"] == [["junit", "absent"], ["lint", "absent"]]
 	}
 }
 
 test_as_sentences_keeps_a_sentence_policy_with_parts_as_it_is if {
-	policy := {"ergo_spec": "v0.1", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"a": "  d.b  ", "b": {"from": "d.\"x y\".z", "identified_by": "attestation_id"}, "c": "d.m named by $params.k", "e": "item 3 of d.items", "f": "d.items[1].y"}}}, "requirements": {"r": {"subject": "round", "checks": {"c": "id exists"}}}}
+	policy := {"ergo_spec": "v0.2-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"a": "  d.b  ", "b": {"from": "d.\"x y\".z", "identified_by": "attestation_id"}, "c": "d.m named by $params.k", "e": "item 3 of d.items", "f": "d.items[1].y"}}}, "requirements": {"r": {"subject": "round", "checks": {"c": "id exists"}}}}
 	ergo.as_sentences(policy) == policy
 }
 
@@ -8197,7 +8197,7 @@ test_a_check_named_like_one_of_ergos_own_rows_leaves_only_ergos_check_in_the_req
 }
 
 subject_problems(subjects, subject, inp) := [i |
-	some r in ergo.report(inp, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"s": {"subject": subject, "checks": {"c": "v exists"}}}}, {}).results
+	some r in ergo.report(inp, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"s": {"subject": subject, "checks": {"c": "v exists"}}}}, {}).results
 	r.check == "$well_formed"
 	some i in r.inputs
 	not i.name in {"count(checks)", "require"}
@@ -8245,7 +8245,7 @@ test_a_chain_that_reaches_a_loop_further_up_leads_to_a_loop if {
 }
 
 named_by_rows(subjects, subject, check, inp) := [[r.passed, r.inputs] |
-	some r in ergo.report(inp, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"s": {"subject": subject, "checks": {"c": check}}}}, {"allowed": {"a": [1]}}).results
+	some r in ergo.report(inp, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"s": {"subject": subject, "checks": {"c": check}}}}, {"allowed": {"a": [1]}}).results
 	r.check == "c"
 ]
 
@@ -8274,7 +8274,7 @@ test_a_subject_that_leads_into_a_loop_is_named_after_its_own_from if {
 	}
 }
 
-listed_subjects(subjects, subject) := object.keys(ergo.report({}, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"s": {"subject": subject, "checks": {"c": "v exists"}}}}, {}).subjects)
+listed_subjects(subjects, subject) := object.keys(ergo.report({}, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"s": {"subject": subject, "checks": {"c": "v exists"}}}}, {}).subjects)
 
 test_the_report_lists_every_subject_a_from_line_written_wrong_starts_at if {
 	listed_subjects({"x": {"from": "y"}, "y": {"from": "z"}, "z": {"from": "x"}}, "x") == {"x", "y", "z"}
@@ -8303,7 +8303,7 @@ test_a_whose_with_plus_on_its_left_is_written_wrong if {
 		[{"u": {"from": "ts", "identified_by": "id"}}, "u", "count of xs whose p plus q is 2 is 1", "checks.c", "doesn't parse"],
 	] {
 		[subjects, subject, check, at, problem] := case
-		rows := [r | some r in ergo.report(inp, {"ergo_spec": "v0.1", "subjects": subjects, "requirements": {"s": {"subject": subject, "checks": {"c": check}}}}, {}).results]
+		rows := [r | some r in ergo.report(inp, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"s": {"subject": subject, "checks": {"c": check}}}}, {}).results]
 		[r.check | some r in rows] == ["$well_formed"]
 		{"name": at, "value": [problem]} in rows[0].inputs
 	}

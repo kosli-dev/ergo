@@ -376,7 +376,7 @@ A subject can have parts: named paths inside itself, each with an alias, written
 
 **[report.policy]** The report has the policy's `description` and `meta` at its top, next to `compliant`, or `""` and `{}` when the policy has none. `null` counts as none. A `description` that isn't a string, or a `meta` that isn't an object or holds something JSON can't, makes the `$well_formed` row of every requirement fail, because the policy belongs to all of them, and the report shows `""` or `{}` in its place.
 
-**[report.version]** The report has `ergo` at its top, the version of the spec it follows, like `"ergo": "v0.1"`. That's the version the implementation follows, even when the policy names another or none.
+**[report.version]** The report has `ergo` at its top, the version of the spec it follows, like `"ergo": "v0.2-dev"`. That's the version the implementation follows, even when the policy names another or none.
 
 **[report.engine]** The report has `engine` at its top, saying which implementation made it: its `name` and `version`, both strings, like `{"name": "ergo.rego", "version": "0.1.0"}`, and nothing else. Apart from `engine`, a report depends only on the policy, the input and the params, so it says nothing about the machine that made it, like the version of OPA, and an implementation reads nothing from that machine: no clock, randomness, network or environment variables.
 

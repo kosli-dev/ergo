@@ -1,7 +1,7 @@
 [
   {
     "description": "subjects from a list",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "each item is a subject, in list order",
@@ -93,7 +93,7 @@
   },
   {
     "description": "subjects from a list with min_subjects 0",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 0, "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 0, "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is not applicable on an empty list",
@@ -130,7 +130,7 @@
   },
   {
     "description": "the whole input as the subject",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "$input"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"subject": {"from": "$input"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "checks the input itself, with itself as its id",
@@ -162,7 +162,7 @@
   },
   {
     "description": "min_subjects 2",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 2, "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 2, "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "fails as value with one subject, though it passes",
@@ -178,7 +178,7 @@
   },
   {
     "description": "ids",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "lists each repeated id once, sorted by its JSON text",
@@ -217,7 +217,7 @@
   },
   {
     "description": "ids of subjects out of scope",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "t whose e is \"p\"", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"subject": {"from": "t whose e is \"p\"", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "still count",
@@ -235,7 +235,7 @@
   },
   {
     "description": "require some",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "require": "some", "checks": {"a": ".a exists", "b": "b exists"}}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "require": "some", "checks": {"a": ".a exists", "b": "b exists"}}}},
     "cases": [
       {
         "description": "is met when one subject passes every check, and the others aren't violations",
@@ -272,7 +272,7 @@
   },
   {
     "description": "a filter",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "t whose e is \"p\"", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"subject": {"from": "t whose e is \"p\"", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "leaves out a subject that fails it on value, and fails one it can't read",
@@ -311,7 +311,7 @@
   },
   {
     "description": "a filter with min_subjects 0",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "t whose e is \"p\"", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 0, "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"subject": {"from": "t whose e is \"p\"", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 0, "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is not applicable when every subject is out of scope",
@@ -339,7 +339,7 @@
   {
     "description": "two filters",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "subject": {
           "from": "t whose e is \"p\" and k is 1",
@@ -368,7 +368,7 @@
   },
   {
     "description": "a requirement with no checks",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "t"}}, "requirements": {"s": {"subject": "subject", "checks": {}}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"subject": {"from": "t"}}, "requirements": {"s": {"subject": "subject", "checks": {}}}},
     "cases": [
       {
         "description": "is never met",
@@ -390,7 +390,7 @@
   },
   {
     "description": "a requirement with an unknown require",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "t"}}, "requirements": {"s": {"subject": "subject", "require": "most", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"subject": {"from": "t"}}, "requirements": {"s": {"subject": "subject", "require": "most", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is never met, and gets no row but $well_formed",
@@ -412,7 +412,7 @@
   },
   {
     "description": "a requirement with a field Ergo doesn't know",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "t"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}, "requires": "x"}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"subject": {"from": "t"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}, "requires": "x"}}},
     "cases": [
       {
         "description": "is never met",
@@ -435,7 +435,7 @@
   {
     "description": "a requirement with a description, meta and a subject type",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "deployment": {
           "from": "t whose e exists",
@@ -509,7 +509,7 @@
   },
   {
     "description": "a requirement with min_subjects 0, described",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 0, "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 0, "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "describes min_subjects as reading the list",
@@ -537,7 +537,7 @@
   },
   {
     "description": "a requirement with no description or meta",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "gets an empty description and meta",
@@ -552,7 +552,7 @@
   },
   {
     "description": "a policy with no requirements",
-    "policy": {"ergo_spec": "v0.1", "subjects": {}, "requirements": {}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {}, "requirements": {}},
     "cases": [
       {"description": "is never compliant", "rules": ["compliant"], "input": {"t": []}, "compliant": false, "results": [], "violations": []}
     ]
@@ -560,7 +560,7 @@
   {
     "description": "two requirements",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "subject": {"from": "t whose id exists", "identified_by": "id"}
       },
@@ -603,7 +603,7 @@
   },
   {
     "description": "violations with refs and failed items",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "every cs.v is in $params.ok"}}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "every cs.v is in $params.ok"}}}},
     "params": {"ok": ["a", "b"]},
     "cases": [
       {
@@ -621,7 +621,7 @@
   },
   {
     "description": "a requirement that still has the fields of a subject",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"subject": {"from": "t"}}, "requirements": {"s": {"subject": "subject", "from": "t", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"subject": {"from": "t"}}, "requirements": {"s": {"subject": "subject", "from": "t", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is never met, and says from is an unknown field",
@@ -636,7 +636,7 @@
   },
   {
     "description": "a subject that says id instead of identified_by",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is never met, and says id is an unknown field",
@@ -652,7 +652,7 @@
   {
     "description": "causes of a requirement",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {"thing": {"from": "things", "identified_by": "id"}},
       "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists", "d": "x is 1"}}}
     },
@@ -674,7 +674,7 @@
   {
     "description": "a policy with a description and meta",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "description": "Every item has an x",
       "meta": {
         "control": "DEV-0401"
@@ -744,7 +744,7 @@
           ]
         },
         "report": {
-          "ergo": "v0.1"
+          "ergo": "v0.2-dev"
         },
         "results": [
           {
@@ -770,7 +770,7 @@
   {
     "description": "a policy whose description and meta are written wrong",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "description": 5,
       "meta": "DEV-0401",
       "subjects": {
@@ -917,7 +917,7 @@
           ]
         },
         "report": {
-          "ergo": "v0.1"
+          "ergo": "v0.2-dev"
         },
         "compliant": false,
         "results": [
@@ -1015,7 +1015,7 @@
           ]
         },
         "report": {
-          "ergo": "v0.1"
+          "ergo": "v0.2-dev"
         },
         "compliant": false,
         "results": [
@@ -1113,7 +1113,7 @@
           ]
         },
         "report": {
-          "ergo": "v0.1"
+          "ergo": "v0.2-dev"
         },
         "compliant": false,
         "results": [
@@ -1211,7 +1211,7 @@
           ]
         },
         "report": {
-          "ergo": "v0.1"
+          "ergo": "v0.2-dev"
         },
         "compliant": false,
         "results": [
@@ -1230,7 +1230,7 @@
               {
                 "name": "policy ergo_spec",
                 "value": [
-                  "unsupported version v9.9, expected v0.1"
+                  "unsupported version v9.9, expected v0.2-dev"
                 ]
               }
             ],
@@ -1256,7 +1256,7 @@
               {
                 "name": "policy ergo_spec",
                 "value": [
-                  "unsupported version v9.9, expected v0.1"
+                  "unsupported version v9.9, expected v0.2-dev"
                 ]
               }
             ],
@@ -1264,6 +1264,482 @@
             "requirement": "t",
             "subject": {
               "id": null,
+              "type": "subject"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a policy for the released version 0.1",
+    "policy": {
+      "ergo_spec": "v0.1",
+      "subjects": {
+        "subject": {
+          "from": "t",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "subject",
+          "checks": {
+            "c": "x exists"
+          }
+        },
+        "t": {
+          "subject": "subject",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails the $well_formed row of every requirement, because main follows v0.2-dev",
+        "rules": ["policy.version"],
+        "input": {
+          "t": [
+            {
+              "id": 1,
+              "x": 1
+            }
+          ]
+        },
+        "report": {
+          "ergo": "v0.2-dev"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "policy ergo_spec",
+                "value": [
+                  "unsupported version v0.1, expected v0.2-dev"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "policy ergo_spec",
+                "value": [
+                  "unsupported version v0.1, expected v0.2-dev"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "t",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a policy whose ergo_spec has a suffix other than -dev",
+    "policy": {
+      "ergo_spec": "v0.2-beta",
+      "subjects": {
+        "subject": {
+          "from": "t",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "subject",
+          "checks": {
+            "c": "x exists"
+          }
+        },
+        "t": {
+          "subject": "subject",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong as not a version",
+        "rules": ["policy.version"],
+        "input": {
+          "t": [
+            {
+              "id": 1,
+              "x": 1
+            }
+          ]
+        },
+        "report": {
+          "ergo": "v0.2-dev"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "policy ergo_spec",
+                "value": [
+                  "not a version v0.2-beta"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "policy ergo_spec",
+                "value": [
+                  "not a version v0.2-beta"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "t",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a policy whose ergo_spec ends in a dash",
+    "policy": {
+      "ergo_spec": "v0.2-",
+      "subjects": {
+        "subject": {
+          "from": "t",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "subject",
+          "checks": {
+            "c": "x exists"
+          }
+        },
+        "t": {
+          "subject": "subject",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong as not a version",
+        "rules": ["policy.version"],
+        "input": {
+          "t": [
+            {
+              "id": 1,
+              "x": 1
+            }
+          ]
+        },
+        "report": {
+          "ergo": "v0.2-dev"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "policy ergo_spec",
+                "value": [
+                  "not a version v0.2-"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "name": "policy ergo_spec",
+                "value": [
+                  "not a version v0.2-"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "t",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a policy for the version the implementation follows",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "subject": {
+          "from": "t",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "subject",
+          "checks": {
+            "c": "x exists"
+          }
+        },
+        "t": {
+          "subject": "subject",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is read and gets no problem under policy ergo_spec",
+        "rules": ["policy.version"],
+        "input": {
+          "t": [
+            {
+              "id": 1,
+              "x": 1
+            }
+          ]
+        },
+        "report": {
+          "ergo": "v0.2-dev"
+        },
+        "compliant": true,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "t",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope subject count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "name": "in-scope subject count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "t",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated subject ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "name": "repeated subject ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "t",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": 1,
+              "type": "subject"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "t",
+            "subject": {
+              "id": 1,
               "type": "subject"
             }
           }
@@ -1309,7 +1785,7 @@
           ]
         },
         "report": {
-          "ergo": "v0.1"
+          "ergo": "v0.2-dev"
         },
         "compliant": false,
         "results": [
@@ -1409,7 +1885,7 @@
           ]
         },
         "report": {
-          "ergo": "v0.1"
+          "ergo": "v0.2-dev"
         },
         "compliant": false,
         "results": [
@@ -1495,7 +1971,7 @@
   },
   {
     "description": "a check written with op",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
     "cases": [
       {
         "description": "is written wrong: it has no assert, each of its fields is unknown, and the requirement gets no row but $well_formed",
@@ -1512,7 +1988,7 @@
   {
     "description": "a policy with two requirements written wrong and one written correctly",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {"thing": {"from": "things", "identified_by": "id"}},
       "requirements": {
         "bad": {"subject": "thing", "require": "most", "checks": {"c": "x exists"}},
@@ -1543,7 +2019,7 @@
   },
   {
     "description": "a requirement whose check doesn't parse, on a subject with a condition",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things whose x exists", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is \"a"}}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things whose x exists", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is \"a"}}}},
     "cases": [
       {
         "description": "gets only its $well_formed row, but still lists every check with its expression, the ones Ergo adds included",
@@ -1560,7 +2036,7 @@
   {
     "description": "a check named like one of Ergo's own rows",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "b": {
           "from": "things"
@@ -1656,7 +2132,7 @@
   {
     "description": "a check named like one of Ergo's own rows that is also written wrong another way",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "b": {
           "from": "things"

@@ -3802,9 +3802,9 @@ else := {concat("", ["unsupported version ", v, ", expected ", _spec])} if v != 
 
 else := set()
 
-_spec := "v0.1"
+_spec := "v0.2-dev"
 
-_is_version(v) if regex.match(`^v[0-9]+\.[0-9]+$`, v)
+_is_version(v) if regex.match(`^v[0-9]+\.[0-9]+(-dev)?$`, v)
 
 _policy_field_problems(f, v) := {_wrong_type_problems[f]} if not _has_type(f, v)
 

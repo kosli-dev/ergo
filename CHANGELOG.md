@@ -2,6 +2,12 @@
 
 Each release names the version of the spec it follows. The spec's own changes are in [spec/CHANGELOG.md](spec/CHANGELOG.md).
 
+## 0.2.0
+
+### Changed
+
+- This version follows spec 0.2, which is unreleased, so `ergo_spec` is `v0.2-dev` and the report's `ergo` was `v0.1` and is now `v0.2-dev`. A policy that says `v0.1` is written wrong here, with `unsupported version v0.1, expected v0.2-dev`, and still works with `rego-v0.1.0`. Change `ergo_spec: v0.1` to `ergo_spec: v0.2-dev` to move a policy.
+
 ## 0.1.0
 
 The first release. It follows spec 0.1.

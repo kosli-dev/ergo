@@ -2,6 +2,12 @@
 
 Each version says whether reports changed, so that anyone who only stores reports knows when to look.
 
+## 0.2
+
+### Changed
+
+- `main` follows the unreleased 0.2, so `ergo_spec` is `v0.2-dev` and a report's `ergo` says `v0.2-dev`. A policy that says `v0.1` is written wrong on `main`, with `unsupported version v0.1, expected v0.2-dev`. [policy.version](syntax.md#policies) takes an optional `-dev` after the version, so `v0.2-dev` is a version and `v0.2-beta` is not. The `$id` of both schemas is under `https://ergo.kosli.com/spec/0.2-dev/`. Reports change in `ergo`, from `v0.1` to `v0.2-dev`.
+
 ## 0.1
 
 The first version. Policies need `ergo_spec: v0.1` at their top, and reports get `ergo` and `engine` there.

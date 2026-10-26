@@ -64,7 +64,7 @@ Here is a policy that says "_every production deployment must have an approver_"
 `policy/policy.yaml`:
 
 ```yaml
-ergo_spec: v0.1
+ergo_spec: v0.2-dev
 subjects:
   deployment:
     from: deployments whose environment is "prod"
@@ -156,7 +156,7 @@ The report records every check Ergo ran, including the ones that passed. It come
     "name": "ergo.rego",
     "version": "0.2.0-dev"
   },
-  "ergo": "v0.1",
+  "ergo": "v0.2-dev",
   "meta": {},
   "requirements": { ... },
   "results": [ ... ],
