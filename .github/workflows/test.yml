@@ -41,6 +41,8 @@ jobs:
               exit 1
             fi
           fi
+      - name: Check the spec version moved when the spec changed
+        run: .github/spec-version.sh
       - run: opa check --strict . --ignore .github
       - name: Check Ergo compiles where input is checked against a closed schema
         run: opa check --strict --schema .github/closed-input-schema.json ergo.rego
