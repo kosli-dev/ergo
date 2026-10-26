@@ -50,7 +50,7 @@ For `ergo.rego`, the tag is `rego-vX.Y.Z`. On that commit `ergo.rego` says `X.Y.
 
 GitHub holds the checks of a pull request opened by GitHub Actions until someone approves them, so click "Approve and run" on it, or close and reopen it, then merge it once they pass. Until it's merged, the `checks` job of every pull request stays green but shows a warning that `main` is still at `X.Y.Z-dev`.
 
-For the spec, the tag is `spec-vX.Y`. First a pull request drops `-dev` from `vX.Y-dev` in `_spec`, the `$id` of both schemas and `ergo_spec` in every policy. On the tagged commit they say `X.Y`, without `-dev`, and `spec/CHANGELOG.md` has a line `## X.Y`. The workflow checks that and that the tests passed, runs the spec checks and starts the site deploy. It doesn't wait for the deploy, so afterwards check that `https://ergo.kosli.com/spec/X.Y/policy.schema.json` loads.
+For the spec, the tag is `spec-vX.Y`. First a pull request drops `-dev` from `vX.Y-dev` in `_spec`, the `$id` of both schemas and `ergo_spec` in every policy, and moves `ergo_spec` in `README.md` and the site's home page (`site/layouts/home.html`, `site/layouts/_partials/hero-fromto.html`) from the last released version to `vX.Y`, with the report output shown there. On the tagged commit they say `X.Y`, without `-dev`, and `spec/CHANGELOG.md` has a line `## X.Y`. The workflow checks that and that the tests passed, runs the spec checks and starts the site deploy. It doesn't wait for the deploy, so afterwards check that `https://ergo.kosli.com/spec/X.Y/policy.schema.json` loads.
 
 `site/spec-schemas.sh` reads the schemas of every `spec-vX.Y` tag when the site is built. It fails the build when a tag's schemas don't name that version, so a bad tag has to be deleted.
 

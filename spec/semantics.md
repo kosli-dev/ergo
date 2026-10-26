@@ -1,6 +1,6 @@
 # How Ergo turns a policy and an input into a report
 
-Draft 0.1. This file says what a check means, whatever syntax it's written in. [syntax.md](syntax.md) says how a policy is written, its sentences included, how it can be written wrong, and how the report names paths. It covers reading values, causes, every operator of the model, and how requirements, scope, statuses and violations work. Questions the spec hasn't settled are in [OPEN.md](OPEN.md).
+Draft 0.2-dev. This file says what a check means, whatever syntax it's written in. [syntax.md](syntax.md) says how a policy is written, its sentences included, how it can be written wrong, and how the report names paths. It covers reading values, causes, every operator of the model, and how requirements, scope, statuses and violations work. Questions the spec hasn't settled are in [OPEN.md](OPEN.md).
 
 Each rule has a name in brackets, like `[present.missing]`. The cases in [`cases/`](cases) list the rules they test, so you can find the cases for a rule and the rule behind a case. An implementation follows every rule here, and where it does something else, it's wrong, whatever `ergo.rego` does.
 
@@ -376,7 +376,7 @@ A subject can have parts: named paths inside itself, each with an alias, written
 
 **[report.policy]** The report has the policy's `description` and `meta` at its top, next to `compliant`, or `""` and `{}` when the policy has none. `null` counts as none. A `description` that isn't a string, or a `meta` that isn't an object or holds something JSON can't, makes the `$well_formed` row of every requirement fail, because the policy belongs to all of them, and the report shows `""` or `{}` in its place.
 
-**[report.version]** The report has `ergo` at its top, the version of the spec it follows, like `"ergo": "v0.1"`. That's the version the implementation follows, even when the policy names another or none.
+**[report.version]** The report has `ergo` at its top, the version of the spec it follows, like `"ergo": "v0.2-dev"`. That's the version the implementation follows, even when the policy names another or none.
 
 **[report.engine]** The report has `engine` at its top, saying which implementation made it: its `name` and `version`, both strings, like `{"name": "ergo.rego", "version": "0.1.0"}`, and nothing else. Apart from `engine`, a report depends only on the policy, the input and the params, so it says nothing about the machine that made it, like the version of OPA, and an implementation reads nothing from that machine: no clock, randomness, network or environment variables.
 

@@ -25,11 +25,14 @@ sorted-by         = "sorted" WS "by" WS first-key *step [WS "alphabetically"]
 alias             = bare-key
 
 ; A subject's from: line.
-from-line         = ["every" WS] path [WS "named" WS "by" WS "each" WS "of" WS right-path] [WS whose]
+from-line         = ["every" WS] path [WS "named" WS "by" WS "each" WS "of" WS right-path] [WS from-whose]
 
 ; whose keeps the items that pass every condition.
 whose             = "whose" WS condition *(WS "and" WS condition)
 condition         = path WS phrase / (derived / elapsed) WS compare-phrase
+; A from line's whose also takes a one-line some or every, with no whose of its own.
+from-condition    = condition / quantifier WS path [if-any] WS phrase
+from-whose        = "whose" WS from-condition *(WS "and" WS from-condition)
 
 ; Derived values: count of, sum of, and terms added with plus.
 ; Only the last term on the left can carry a whose, and none on the right.

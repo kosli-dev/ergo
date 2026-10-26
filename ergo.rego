@@ -711,12 +711,12 @@ else := v if {
 	v := _check_passed(check, subj, flaw) with input as s
 }
 
-_inputs_in(req, check, subj) := _tagged(_row_inputs(subj, check), check, req, subj) if not _scoped(req)
+_inputs_in(req, check, subj) := _tagged(_filter_inputs(subj, check), check, req, subj) if not _scoped(req)
 
 else := i if {
 	_scoped(req)
 	s := _scope_of(req, subj)
-	i := _tagged(_row_inputs(subj, check), check, req, subj) with input as s
+	i := _tagged(_filter_inputs(subj, check), check, req, subj) with input as s
 }
 
 _outcome(req, check, flaw, subj) := _tagged_outcome(_check_outcome(check, subj, flaw), check, req, subj) if not _scoped(req)
@@ -2688,6 +2688,11 @@ default _check_passed(_, _, _) := false
 
 _check_passed(check, subj, "") if _op_passed(check, subj)
 
+_check_passed(check, subj, "") if {
+	_walks(check)
+	_walk_row(check, subj).cause == "satisfied"
+}
+
 _read_paths(check) := [side | some side in [check.left, check.right]; is_array(side)] if _two_sided(check)
 
 _read_paths(check) := [check.path] if {
@@ -2937,7 +2942,14 @@ _filter_causes(subj, req, flaws) := {_filter_cause(check, subj, flaws[name]) |
 
 _filter_cause(check, subj, flaw) := "missing" if _answers_presence(check, subj, flaw)
 
-_filter_cause(check, subj, flaw) := _row_cause(check, subj, flaw) if not _answers_presence(check, subj, flaw)
+_filter_cause(check, subj, flaw) := _row_cause(check, subj, flaw) if {
+	not _answers_presence(check, subj, flaw)
+	not _walked_filter(check, flaw)
+}
+
+_filter_cause(check, subj, flaw) := _walk_row(check, subj).cause if _walked_filter(check, flaw)
+
+_walked_filter(check, "") if _walks(check)
 
 default _answers_presence(_, _, _) := false
 
@@ -3025,6 +3037,10 @@ _leaf_paths(leaf) := [leaf.path] if {
 }
 
 _row_inputs(subj, check) := _with_key_fields(subj, check, _check_inputs(subj, check))
+
+_filter_inputs(subj, check) := _with_key_fields(subj, check, _walk_row(check, subj).inputs) if _walks(check)
+
+_filter_inputs(subj, check) := _row_inputs(subj, check) if not _walks(check)
 
 _with_key_fields(subj, check, inputs) := _once(array.concat(inputs, [{"name": _item_path_name([f]), "value": _value_at(subj, [f])} | some f in _key_fields(check)])) if count(_key_fields(check)) > 0
 
@@ -3802,9 +3818,9 @@ else := {concat("", ["unsupported version ", v, ", expected ", _spec])} if v != 
 
 else := set()
 
-_spec := "v0.1"
+_spec := "v0.2-dev"
 
-_is_version(v) if regex.match(`^v[0-9]+\.[0-9]+$`, v)
+_is_version(v) if regex.match(`^v[0-9]+\.[0-9]+(-dev)?$`, v)
 
 _policy_field_problems(f, v) := {_wrong_type_problems[f]} if not _has_type(f, v)
 
@@ -4510,7 +4526,9 @@ _s_patterns := {
 	"assertion": concat("", [`^(?:(every|some) +(`, path, `)|(`, left, `))(?: +whose +(`, conds, `))?(, +if +any,)? +(`, phrase, `)$`]),
 	"for_items": concat("", [`(`, for_item, `)(?:, +|$)`]),
 	"for_item": concat("", [`^(?:(every|some) +)?(`, path, `)(?: +whose +(`, conds, `))?(?: +sorted +by +(`, path, `)( +alphabetically)?)?(, +if +any,)? +as +(`, key, `)$`]),
-	"from": concat("", [`^(`, path, `)(?: +named +by +each +of +(`, rpath, `))?(?: +whose +(`, conds, `))?$`]),
+	"from": concat("", [`^(`, path, `)(?: +named +by +each +of +(`, rpath, `))?(?: +whose +(`, from_conds, `))?$`]),
+	"from_conds": concat("", [`(`, from_cond, `)(?: +and +|$)`]),
+	"from_cond": concat("", [`^(?:(every|some) +(`, path, `)(, +if +any,)?|(`, left, `)) +(`, phrase, `)$`]),
 	"conds": concat("", [`(`, cond, `)(?: +and +|$)`]),
 	"cond": concat("", [`^(`, left, `) +(`, phrase, `)$`]),
 	"phrases": phrases,
@@ -4598,6 +4616,8 @@ _s_patterns := {
 	phrase := concat("|", [concat("", [`(?:`, concat("|", [ph[1] | some ph in phrases; ph[3] == kind[0]]), `)`, kind[1]]) | some kind in kinds])
 	cond := concat("", [`(?:`, derived, `|`, path, `) +(?:`, phrase, `)`])
 	conds := concat("", [cond, `(?: +and +`, cond, `)*`])
+	from_cond := concat("", [`(?:(?:every|some) +`, path, `(?:, +if +any,)?|(?:`, derived, `|`, path, `)) +(?:`, phrase, `)`])
+	from_conds := concat("", [from_cond, `(?: +and +`, from_cond, `)*`])
 	assertion := concat("", [`(?:(?:every|some) +`, path, `|`, left, `)(?: +whose +`, conds, `)?(?:, +if +any,)? +(?:`, phrase, `)`])
 	for_item := concat("", [`(?:(?:every|some) +)?`, path, `(?: +whose +`, conds, `)?(?: +sorted +by +`, path, `(?: +alphabetically)?)?(?:, +if +any,)? +as +`, key])
 }
@@ -4653,7 +4673,12 @@ _from_line(raw) := line if {
 	pat := _s_patterns
 	line := _s_from_of(trim_space(raw), pat)
 	count(_s_sentence_problems(line)) == 0
-} else := {"problems": _s_problems(_s_after_every(trim_space(raw)), _s_patterns)}
+} else := {"problems": _from_problems(_s_after_every(trim_space(raw)), _s_patterns)}
+
+_from_problems(text, pat) := ["a condition after whose can't have a whose of its own"] if {
+	_s_problems(text, pat) == ["doesn't parse"]
+	regex.match(` +whose +(?:.* +and +)?(?:(?:every|some) +|(?:count|sum) +of +)\S+ +whose +`, text)
+} else := _s_problems(text, pat)
 
 _s_pick_problems(parsed) := ((({`an item starts with "every", "some" or a position, like "last of"` |
 	some item in object.get(parsed, "items", [])
@@ -4685,7 +4710,7 @@ _s_from_of(text, pat) := object.union(_s_from_plain(m[1], pat), {"every": true})
 	m := regex.find_all_string_submatch_n(`^every +(\S.*)$`, text, 1)[0]
 } else := _s_from_plain(text, pat)
 
-_s_from_plain(text, pat) := object.union({"path": _s_path_of(m[1], pat)}, object.union(_s_each_of(m[2], pat), _s_where_of(m[3], pat))) if {
+_s_from_plain(text, pat) := object.union({"path": _s_path_of(m[1], pat)}, object.union(_s_each_of(m[2], pat), _s_from_where_of(m[3], pat))) if {
 	m := regex.find_all_string_submatch_n(pat.from, text, 1)[0]
 }
 
@@ -4745,6 +4770,25 @@ _s_where_of(text, pat) := {"where": conds} if {
 	pieces := _s_pieces(pat.conds, text)
 	conds := [_s_cond_of(c, pat) | some c in pieces]
 	count(conds) == count(pieces)
+}
+
+_s_from_where_of("", _) := {}
+
+_s_from_where_of(text, pat) := {"where": conds} if {
+	text != ""
+	pieces := _s_pieces(pat.from_conds, text)
+	conds := [_s_from_cond_of(c, pat) | some c in pieces]
+	count(conds) == count(pieces)
+}
+
+_s_from_cond_of(text, pat) := object.union({m[1]: _s_path_of(m[2], pat), "phrase": _s_phrase_of(m[5], pat)}, _s_if_any(m[3])) if {
+	m := regex.find_all_string_submatch_n(pat.from_cond, text, 1)[0]
+	m[1] != ""
+}
+
+_s_from_cond_of(text, pat) := object.union(_s_left_of(m[4], pat), {"phrase": _s_phrase_of(m[5], pat)}) if {
+	m := regex.find_all_string_submatch_n(pat.from_cond, text, 1)[0]
+	m[1] == ""
 }
 
 _s_cond_of(text, pat) := object.union(_s_left_of(m[1], pat), {"phrase": _s_phrase_of(m[2], pat)}) if {
@@ -5232,6 +5276,8 @@ _s_where_text(a) := "" if not "where" in object.keys(a)
 
 _s_cond_text(c) := concat(" ", [_s_left_text(c), _s_phrase_text(c.phrase)])
 
+_s_cond_text(c) := concat(" ", [concat("", [_s_quantifier_of(c), " ", _s_path_text(c[_s_quantifier_of(c)], "left"), _s_if_any_text(c)]), _s_phrase_text(c.phrase)]) if _s_quantifier_of(c) in {"every", "some"}
+
 _s_left_text(c) := _s_path_text(c.path, "left") if "path" in object.keys(c)
 
 _s_left_text(c) := _s_terms_text(c.terms) if "terms" in object.keys(c)
@@ -5594,17 +5640,20 @@ _s_from_read(name, fl, subjects, chains) := object.union(object.union({"problems
 	names := {a | some a in _s_ancestors(name, chains.descend)}
 	keep := names | object.keys(_p_steps_of(object.get(chains.parts, name, {})))
 	conds := [_p_applied(_s_parent_named(t, _s_check([t], {}, set(), keep), names), {"own": _p_steps_of(object.get(chains.parts, name, {})), "ancestors": {a: _p_steps_of(object.get(chains.parts, a, {})) | some a in names}}) | some c in object.get(fl, "where", []); t := _s_cond_text(_s_from_cond(c, names, keep))]
-	problems := sort((((((((_s_chain_unsupported(name, fl, subjects, chains) | _s_loop(name, fl, subjects, chains)) | _s_blank_start(fl, subjects)) | _s_every_unsupported(name, fl, subjects)) | _s_from_start_problems(fl)) | _s_from_paths_unsupported({"path": fl.path})) | _s_elapsed_flaw({"where": object.get(fl, "where", [])})) | {concat("", ["whose: ", p]) | some c in conds; some p in object.get(c, "$sentence", [])}))
+	problems := sort(((((((((_s_chain_unsupported(name, fl, subjects, chains) | _s_loop(name, fl, subjects, chains)) | _s_blank_start(fl, subjects)) | _s_every_unsupported(name, fl, subjects)) | _s_from_start_problems(fl)) | _s_from_paths_unsupported({"path": fl.path})) | _s_elapsed_flaw({"where": object.get(fl, "where", [])})) | {concat("", ["whose: ", p]) | some c in conds; some p in object.get(c, "$sentence", [])}) | {"whose: a condition can't be read" | count(conds) != count(object.get(fl, "where", []))}))
 	fields := object.union(_s_source(name, fl, subjects, chains.parts), _s_whose_filters(_s_filter_prefix(name, chains.narrow), conds))
 	parent := _s_descend_parent(name, fl, subjects)
 	every_list := object.get(fl, "every", false) == true
 } else := {"problems": object.get(fl, "problems", ["doesn't parse"]), "fields": {}}
 
 _s_from_cond(c, names, keep) := object.union(c, object.union(
-	{"path": _s_from_dot(c.path, names, keep) | is_object(object.get(c, "path", null))},
+	{q: _s_from_dot(c[q], names, keep) | some q in ["every", "some"]; is_object(object.get(c, q, null))},
 	object.union(
-		{"terms": [_s_from_term(t, names, keep) | some t in c.terms] | is_array(object.get(c, "terms", null))},
-		{"phrase": _s_from_phrase(c.phrase, keep) | is_object(object.get(c, "phrase", null))},
+		{"path": _s_from_dot(c.path, names, keep) | is_object(object.get(c, "path", null))},
+		object.union(
+			{"terms": [_s_from_term(t, names, keep) | some t in c.terms] | is_array(object.get(c, "terms", null))},
+			{"phrase": _s_from_phrase(c.phrase, keep) | is_object(object.get(c, "phrase", null))},
+		),
 	),
 ))
 

@@ -2,7 +2,7 @@
   {
     "description": "count of a list",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -356,7 +356,7 @@
   {
     "description": "count of an empty list is 0",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -460,7 +460,7 @@
   {
     "description": "count of a list with whose",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -855,7 +855,7 @@
   {
     "description": "count of a list whose a field exists",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -935,7 +935,7 @@
   {
     "description": "count of two lists",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -1393,7 +1393,7 @@
   {
     "description": "sum of a field",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -1953,7 +1953,7 @@
   {
     "description": "sum over no items is 0",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -2065,7 +2065,7 @@
   {
     "description": "sum of decimals",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -2137,7 +2137,7 @@
   {
     "description": "sum of a field with whose",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -2427,7 +2427,7 @@
   {
     "description": "sum with whose over no items is 0",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -2497,7 +2497,7 @@
   {
     "description": "sum within a distance",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -2772,7 +2772,7 @@
   {
     "description": "sum within a distance of a field",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -3013,7 +3013,7 @@
   {
     "description": "a path plus a number on the left",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -3234,7 +3234,7 @@
   {
     "description": "a number plus a path on the left",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -3296,7 +3296,7 @@
   {
     "description": "two paths on the left",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -3452,7 +3452,7 @@
   {
     "description": "decimals added from paths",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -3519,7 +3519,7 @@
   {
     "description": "a path plus a count on the left",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -3707,7 +3707,7 @@
   {
     "description": "a count plus a path on the left",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -3794,7 +3794,7 @@
   {
     "description": "a count plus a number on the left",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -3876,7 +3876,7 @@
   {
     "description": "a path plus a sum on the left",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -3955,7 +3955,7 @@
   {
     "description": "a number plus a count with whose",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -4044,7 +4044,7 @@
   {
     "description": "a path on the left and a path plus a number on the right",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -4201,7 +4201,7 @@
   {
     "description": "a path and a count plus a path on the right",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -4293,7 +4293,7 @@
   {
     "description": "a path on the left and a path plus a count on the right",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -4385,7 +4385,7 @@
   {
     "description": "a count on the left and a count plus a number on the right",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -4496,7 +4496,7 @@
   {
     "description": "a count on the left and a field on the right",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -4684,7 +4684,7 @@
   {
     "description": "a count does not equal a field",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -4827,7 +4827,7 @@
   {
     "description": "count of findings is not 2",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -4961,7 +4961,7 @@
   {
     "description": "count of findings is at least 2",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5083,7 +5083,7 @@
   {
     "description": "count of findings is at most 2",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5217,7 +5217,7 @@
   {
     "description": "count of findings is more than 2",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5351,7 +5351,7 @@
   {
     "description": "count of findings is less than 2",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5473,7 +5473,7 @@
   {
     "description": "a sum is at least a number",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5645,7 +5645,7 @@
   {
     "description": "a count in the whose of an every",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6066,7 +6066,7 @@
   {
     "description": "a count under a for line reading the line's name",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6573,7 +6573,7 @@
   {
     "description": "count of a params list",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6650,7 +6650,7 @@
   {
     "description": "count of a params list with too few items",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6720,7 +6720,7 @@
   {
     "description": "count of an empty params list",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6786,7 +6786,7 @@
   {
     "description": "count of a params list that is missing",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6852,7 +6852,7 @@
   {
     "description": "count of a params list that is null",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6920,7 +6920,7 @@
   {
     "description": "count of a params value that is not a list",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6988,7 +6988,7 @@
   {
     "description": "sum of a params list",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -7063,7 +7063,7 @@
   {
     "description": "a count of a list in the subject against a params number",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -7149,7 +7149,7 @@
   {
     "description": "a count with is empty",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -7216,7 +7216,7 @@
   {
     "description": "a count with is between",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -7605,7 +7605,7 @@
   {
     "description": "a sum with is between",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -7828,7 +7828,7 @@
   {
     "description": "a plus with is between",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -7976,7 +7976,7 @@
   {
     "description": "a sum with is empty",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -8043,7 +8043,7 @@
   {
     "description": "a count with whose on the right",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -8110,7 +8110,7 @@
   {
     "description": "count of on subjects and items that aren't objects",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -8263,7 +8263,7 @@
   {
     "description": "a count whose whose reads a param that's missing",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -8332,7 +8332,7 @@
   {
     "description": "a count of zero whose whose reads a param that's missing",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -8424,7 +8424,7 @@
   {
     "description": "seconds elapsed between two times",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -8544,7 +8544,7 @@
   {
     "description": "minutes elapsed between two times",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -8664,7 +8664,7 @@
   {
     "description": "hours elapsed between two times",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -8784,7 +8784,7 @@
   {
     "description": "days elapsed between two times",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -8904,7 +8904,7 @@
   {
     "description": "weeks elapsed between two times",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -9024,7 +9024,7 @@
   {
     "description": "days elapsed against a limit by severity",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -9228,7 +9228,7 @@
   {
     "description": "days elapsed between two numbers",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -9347,7 +9347,7 @@
   {
     "description": "days elapsed between equal times",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -9466,7 +9466,7 @@
   {
     "description": "days elapsed with the end before the start",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -9586,7 +9586,7 @@
   {
     "description": "days elapsed that cannot be read",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -10420,7 +10420,7 @@
   {
     "description": "days elapsed under a for line reading the line's name",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -10667,7 +10667,7 @@
   {
     "description": "days elapsed in a list of assertions",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -10748,7 +10748,7 @@
   {
     "description": "a field called days",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -10820,7 +10820,7 @@
   {
     "description": "a field called days with a dot",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -10880,7 +10880,7 @@
   {
     "description": "a field called to",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -10951,7 +10951,7 @@
   {
     "description": "days elapsed added to another term",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -11175,7 +11175,7 @@
   {
     "description": "days elapsed added to another term, first",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -11301,7 +11301,7 @@
   {
     "description": "days elapsed on the right side of a phrase",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -11479,7 +11479,7 @@
   {
     "description": "days elapsed in a plus on the right side",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -11616,7 +11616,7 @@
   {
     "description": "days elapsed in the whose of an every",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -11850,7 +11850,7 @@
   {
     "description": "days elapsed in the whose of a count",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -12138,7 +12138,7 @@
   {
     "description": "a count in the whose of a count",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -12291,7 +12291,7 @@
   {
     "description": "a count in the whose of a sum",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -12377,7 +12377,7 @@
   {
     "description": "days elapsed with is between",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -12630,7 +12630,7 @@
   {
     "description": "days elapsed with a phrase that takes no number",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -12704,7 +12704,7 @@
   {
     "description": "days elapsed with a unit that has no fixed length",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -12777,7 +12777,7 @@
   {
     "description": "days elapsed between two dates",
     "policy": {
-      "ergo_spec": "v0.1",
+      "ergo_spec": "v0.2-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",

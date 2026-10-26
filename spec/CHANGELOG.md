@@ -2,6 +2,17 @@
 
 Each version says whether reports changed, so that anyone who only stores reports knows when to look.
 
+## 0.2
+
+### New
+
+- A `whose` in a subject's `from` line takes a one-line `some` or `every` as a condition ([sentence.subject.condition](syntax.md#subjects)), like `release whose some files.path does not match "^docs/"`. Its `$applies` row gives the inputs and the cause the same sentence gives as a check row. It doesn't change the report of a policy that was read before, and a `from` line that used to be written wrong is now read.
+
+### Changed
+
+- A policy says `ergo_spec: v0.2`, and the report's `ergo` changes from `"ergo": "v0.1"` to `"ergo": "v0.2"`. A policy that says `v0.1` is written wrong, with `unsupported version v0.1, expected v0.2`. The schemas are under `https://ergo.kosli.com/spec/0.2/`.
+- [policy.version](syntax.md#policies) takes an optional `-dev` after the version, which `main` uses until a version is released, like `v0.2-dev`. `v0.2-beta` is still not a version.
+
 ## 0.1
 
 The first version. Policies need `ergo_spec: v0.1` at their top, and reports get `ergo` and `engine` there.

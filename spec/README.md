@@ -1,6 +1,6 @@
 # The Ergo spec
 
-Draft 0.1. Ergo's spec is in these files, and `ergo.rego` is an implementation of it:
+Draft 0.2-dev. Ergo's spec is in these files, and `ergo.rego` is an implementation of it:
 
 - [`semantics.md`](semantics.md) says what a check means, as named rules about a model of checks that doesn't depend on how they're written.
 - [`syntax.md`](syntax.md) says how a policy is written: its sections and fields, its parts, and its checks and `from` lines as one-line sentences like `approved_by is not empty`, how it can be written wrong, and how the report names paths and shows the checks Ergo adds. [`sentences.abnf`](sentences.abnf) is the grammar of the sentences, [`sentences-corpus.md`](sentences-corpus.md) every real check written that way, and [`sentences-findings.md`](sentences-findings.md) what writing them found. `ergo.rego` runs checks written as sentences, apart from the forms [OPEN.md](OPEN.md#sentences-the-spec-doesnt-say-enough-about-yet) lists as not run yet.
@@ -17,7 +17,7 @@ The spec covers reading values, causes, expressions, every operator of the model
 
 The spec has one version, for the policy, the report and what one means for the other. A change that turns a cause from `absent` into `null` touches neither schema, but it changes the report, so it needs a version too. A policy names the version it's written for in `ergo_spec` ([policy.version](syntax.md#policies)), and a report the version it follows ([report.version](semantics.md#statuses)).
 
-The spec stays `0.x` until 1.0, and any minor version may break policies and reports written for the one before. A released version is tagged `spec-v0.1`, its schemas are published at `https://ergo.kosli.com/spec/0.1/`, and it doesn't change after that. The site serves the schemas of every released spec straight from its tag. After a release, `main` keeps saying the released version, like `v0.1`, until something that defines the spec changes. The first pull request that does moves it to the next one with `-dev`, like `v0.2-dev`: `_spec` in `ergo.rego`, the `$id` of both schemas, `ergo_spec` in every policy in the repo, and a `## 0.2` heading in the changelog. CI fails when the spec changed since the latest `spec-v*` tag and the version didn't move. To release, a pull request drops `-dev` everywhere, then the tag goes on. Nothing moves the version on its own, and a release of `ergo.rego` in between follows the version `main` says. [CHANGELOG.md](CHANGELOG.md) says what each version changed, and whether reports changed with it.
+The spec stays `0.x` until 1.0, and any minor version may break policies and reports written for the one before. A released version is tagged `spec-v0.1`, its schemas are published at `https://ergo.kosli.com/spec/0.1/`, and it doesn't change after that. The site serves the schemas of every released spec straight from its tag. After a release, `main` keeps saying the released version, like `v0.1`, until something that defines the spec changes. The first pull request that does moves it to the next one with `-dev`, like `v0.2-dev`: `_spec` in `ergo.rego`, the `$id` of both schemas, `ergo_spec` in every policy in the repo, and a `## 0.2` heading in the changelog. `README.md` and the site's home page are the exception: they go with the latest release, which is what they tell people to download, so they keep the released version until the spec is released. CI fails when the spec changed since the latest `spec-v*` tag and the version didn't move. To release, a pull request drops `-dev` everywhere, then the tag goes on. Nothing moves the version on its own, and a release of `ergo.rego` in between follows the version `main` says. [CHANGELOG.md](CHANGELOG.md) says what each version changed, and whether reports changed with it.
 
 Each implementation has a version of its own, which the report gives in `engine` ([report.engine](semantics.md#statuses)), and its changelog says which version of the spec it follows.
 
@@ -41,7 +41,7 @@ Here is one case, from `cases/present`. Its group's policy has a `thing` subject
 
 ```json
 {
-  "ergo_spec": "v0.1",
+  "ergo_spec": "v0.2-dev",
   "subjects": {"thing": {"from": "things", "identified_by": "id"}},
   "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}
 }

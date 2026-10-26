@@ -1,7 +1,7 @@
 [
   {
     "description": "compare with eq",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a equals b"}}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a equals b"}}}},
     "cases": [
       {
         "description": "passes on 1 and 1.0",
@@ -55,7 +55,7 @@
   },
   {
     "description": "compare with ne",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a does not equal b"}}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a does not equal b"}}}},
     "cases": [
       {
         "description": "passes on two different strings",
@@ -85,7 +85,7 @@
   },
   {
     "description": "compare with lt",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a is less than b"}}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a is less than b"}}}},
     "cases": [
       {
         "description": "passes on two numbers in order",
@@ -147,7 +147,7 @@
   },
   {
     "description": "compare with gte",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a is at least b"}}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a is at least b"}}}},
     "cases": [
       {
         "description": "passes on 2 and 2.0",
@@ -161,7 +161,7 @@
   },
   {
     "description": "compare against the input",
-    "policy": {"ergo_spec": "v0.1", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a is less than $input.limit"}}}},
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a is less than $input.limit"}}}},
     "cases": [
       {
         "description": "names the path into the input",
