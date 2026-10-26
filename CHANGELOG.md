@@ -14,14 +14,14 @@ Each release names the version of the spec it follows. The spec's own changes ar
 - An `$applies` row has the fields the row of a check would have if its conditions were its assertions. A subject's `from` line with one `some` or `every` condition gives a row `failed_items`, as a check does, and `[]` when it passes. One with two or more conditions gives it `failed_assertions`, with an entry for each condition that failed, in the order written, and `[]` when it passes. A violation that's an `$applies` row keeps them. A row of a single plain condition, like `environment is "prod"`, doesn't change. For `from: deployments whose environment is "prod" and change_type is "emergency"`, the row of a deployment with `change_type` set to `standard` was:
 
   ```json
-  {"check": "$applies", "subject": {"id": "d-2", "type": "s"}, "passed": false, "cause": "value",
+  {"check": "$applies", "subject": {"id": "d-2", "type": "deployment"}, "passed": false, "cause": "value",
    "inputs": [{"name": "change_type", "value": "standard"}, {"name": "environment", "value": "prod"}]}
   ```
 
   and is now:
 
   ```json
-  {"check": "$applies", "subject": {"id": "d-2", "type": "s"}, "passed": false, "cause": "value",
+  {"check": "$applies", "subject": {"id": "d-2", "type": "deployment"}, "passed": false, "cause": "value",
    "inputs": [{"name": "change_type", "value": "standard"}, {"name": "environment", "value": "prod"}],
    "failed_assertions": [{"assertion": "change_type is \"emergency\"", "cause": "value"}]}
   ```
@@ -29,14 +29,14 @@ Each release names the version of the spec it follows. The spec's own changes ar
   For `from: releases whose some files.path does not match "^docs/"`, the row of release `1.4.1`, which only changes `docs/typo.md`, was:
 
   ```json
-  {"check": "$applies", "subject": {"id": "1.4.1", "type": "s"}, "passed": false, "cause": "value",
+  {"check": "$applies", "subject": {"id": "1.4.1", "type": "release"}, "passed": false, "cause": "value",
    "inputs": [{"name": "files[].path", "value": ["docs/typo.md"]}]}
   ```
 
   and is now:
 
   ```json
-  {"check": "$applies", "subject": {"id": "1.4.1", "type": "s"}, "passed": false, "cause": "value",
+  {"check": "$applies", "subject": {"id": "1.4.1", "type": "release"}, "passed": false, "cause": "value",
    "inputs": [{"name": "files[].path", "value": ["docs/typo.md"]}],
    "failed_items": [{"path": "files[0].path", "item": "item 1 of files", "cause": "value", "value": "docs/typo.md"}]}
   ```
