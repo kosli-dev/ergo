@@ -3,7 +3,6 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import opa from "../../tutorial/vendor/opa-wasm.mjs";
 import * as lib from "./lib.mjs";
-import { ergoSpec } from "../../tutorial/release.mjs";
 import { defaultCell, cellHighlight, makeRunner, defaultNames, checkLines, slug, nameProblem, nameCoach, tutorialPolicy, lineResults, verdict, verdictWord, tapOutcome, requirementCoach, gridFromReport, cellLine, subjectsStatus, subjectsCoach, yamlLines, policyYaml, bakeryBatches, createEnterGate, serializeProgress, restoreProgress, layoutLines, splitSentences, fieldHighlights, keyAction, goalKindAt, isPretty, firstPositionOf, progressDots, stepTitles, dotTargets, resultLine, carryFrom, dimResult, freshDraft, judgePrediction, isRight, jsonSegments, fieldHighlight, segmentClasses, isAt, showMeVisible, buildPolicy, clampPosition, intro, positions, evidence, grade, makeChecker, parseInput, parseTime, steps, straighten } from "./lib.mjs";
 
 const wasm = readFileSync(new URL("../../tutorial/ergo.wasm", import.meta.url));
@@ -17,7 +16,7 @@ const nutFree = 'allergens does not contain "nuts"';
 
 test("the policy has one subject that is the whole input, one requirement and one check", () => {
   assert.deepEqual(buildPolicy("x is 1"), {
-    ergo_spec: ergoSpec,
+    ergo_spec: "v0.2-dev",
     subjects: { batch: { from: "$input" } },
     requirements: { tutorial: { subject: "batch", checks: { sentence: "x is 1" } } },
   });
@@ -1073,13 +1072,13 @@ const batch9 = JSON.parse(steps[8].input);
 const batch10 = JSON.parse(steps[9].input);
 const key = (heading) => slug(heading);
 
-test("the batches in step 11 are exactly the released bakery example's file", () => {
-  const file = JSON.parse(readFileSync(new URL("../../../release/examples/baking/batches.json.txt", import.meta.url), "utf8"));
+test("the batches in step 11 are exactly the bakery example's file", () => {
+  const file = JSON.parse(readFileSync(new URL("../../../../examples/baking/batches.json", import.meta.url), "utf8"));
   assert.deepEqual(bakeryBatches, file);
   assert.deepEqual(JSON.parse(steps[10].input), file);
 });
 
-test("the tutorial's policy names the spec of the ergo.rego the site runs", () => {
+test("the tutorial's policy names the spec of the ergo.rego it runs with", () => {
   const report = run(batch9, tutorialPolicy({ name: "nut_free" }));
   assert.equal(report.ergo, tutorialPolicy().ergo_spec);
   assert.equal(verdict(report, "safe_to_sell"), "met");
@@ -1285,7 +1284,7 @@ test("the slug of a heading is lowercase words joined with _", () => {
 test("the YAML is built from the reader's own parts", () => {
   const policy = tutorialPolicy({ name: "no_nuts", heading: "Safe to sell", from: "batches", id: "id" });
   assert.equal(policyYaml(policy), [
-    `ergo_spec: ${ergoSpec}`,
+    "ergo_spec: v0.2-dev",
     "subjects:",
     "  batch:",
     "    from: batches",

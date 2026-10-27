@@ -1,0 +1,12 @@
+{{- range . }}
+  {{- $class := "" }}
+  {{- if not (isset . "subject") }}{{ $class = " is-sys" }}
+  {{- else if and (eq .check "$applies") (not .passed) }}{{ $class = " is-scope" }}
+  {{- else if not .passed }}{{ $class = " is-fail" }}{{ end }}
+  {{- $read := slice }}
+  {{- $notes := slice }}
+  {{- range .inputs }}
+    {{- if .note }}{{ $notes = $notes | append .note }}{{ else }}{{ $read = $read | append (printf "%s = %s" .name (jsonify .value)) }}{{ end }}
+  {{- end }}
+        <div class="report__row{{ $class }}"><span>{{ .subject }}</span><span{{ if hasPrefix .check "$" }} class="sys"{{ end }}>{{ .check }}</span><span>{{ delimit $read ", " }}{{ range $notes }}<br><span class="n">{{ . }}</span>{{ end }}</span><span class="{{ cond .passed "t" "f" }}">{{ .passed }}</span>{{ if and (not .passed) (ne .check "$applies") }}<span class="f">{{ .cause }}</span>{{ else }}<span>{{ .cause }}</span>{{ end }}</div>
+{{- end }}

@@ -1,5 +1,3 @@
-import { ergoSpec } from "../../tutorial/release.mjs";
-
 export const parseTime = (v) => {
   if (!JSON.rawJSON) throw new Error("this browser can't hold a time in nanoseconds exactly, so compare_time can't run here");
   const [, time, fraction = "", zone] = /^(.{19})(?:\.(\d+))?(.*)$/.exec(v);
@@ -9,7 +7,7 @@ export const parseTime = (v) => {
 export const straighten = (text) => text.replace(/[“”]/g, '"').replace(/[‘’]/g, "'");
 
 export const buildPolicy = (sentence) => ({
-  ergo_spec: ergoSpec,
+  ergo_spec: "v0.2-dev",
   subjects: { batch: { from: "$input" } },
   requirements: { tutorial: { subject: "batch", checks: { sentence } } },
 });
@@ -917,7 +915,7 @@ export const nameCoach = (name) => {
 };
 
 export const tutorialPolicy = ({ name = defaultNames.name, heading = defaultNames.heading, from = null, id = null } = {}) => ({
-  ergo_spec: ergoSpec,
+  ergo_spec: "v0.2-dev",
   subjects: { batch: from === null ? { from: "$input" } : { from, identified_by: id } },
   requirements: {
     [slug(heading)]: {

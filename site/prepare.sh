@@ -1,65 +1,107 @@
 #!/bin/sh
 set -eu
 cd "$(git rev-parse --show-toplevel)"
-tag=$(site/latest-release.sh rego)
-if [ -z "$tag" ]; then
-  echo "The site shows the latest release of ergo.rego, and there's no rego-vX.Y.Z tag here. Fetch the tags with: git fetch --tags" >&2
-  exit 1
-fi
-version=${tag#rego-v}
-spec_tag=$(site/latest-release.sh spec)
 
+fail() {
+  echo "$1" >&2
+  exit 1
+}
+
+case ${1:-} in
+  "") mode=release ;;
+  --working-tree) mode=working-tree ;;
+  *)
+    echo "usage: site/prepare.sh [--working-tree]" >&2
+    exit 2
+    ;;
+esac
+
+repo=kosli-dev/ergo
+prepared=site/prepared
 dir=$(mktemp -d)
 trap 'rm -rf "$dir"' EXIT
-git archive "$tag" ergo.rego README.md REFERENCE.md examples | tar -x -C "$dir"
-dev=$(printf '%s' "$version-dev" | sed 's/\./\\./g')
-for file in ergo.rego README.md REFERENCE.md; do
-  sed "s/$dev/$version/g" "$dir/$file" > "$dir/$file.tmp"
-  mv "$dir/$file.tmp" "$dir/$file"
-done
-if ! grep -qxF "version := \"$version\"" "$dir/ergo.rego"; then
-  echo "$tag: ergo.rego should say version := \"$version-dev\"" >&2
-  exit 1
-fi
-ergo_spec=$(sed -n 's/^_spec := "\(v[0-9][0-9]*\.[0-9][0-9]*\)"$/\1/p' "$dir/ergo.rego")
-if [ -z "$ergo_spec" ]; then
-  echo "$tag: ergo.rego should say _spec := \"vX.Y\"" >&2
-  exit 1
+
+tags=$(git tag --list 'spec-v*')
+spec_tag=$(printf '%s\n' "$tags" | site/latest-release.sh spec)
+[ -n "$spec_tag" ] || fail "There's no spec-vX.Y tag here. Fetch the tags with: git fetch --tags"
+
+rm -rf "$prepared"
+mkdir -p "$prepared/data"
+
+if [ "$mode" = release ]; then
+  if ! releases=$(gh release list --repo "$repo" --exclude-drafts --exclude-pre-releases --limit 1000 --json tagName --jq '.[].tagName'); then
+    fail "Listing Ergo's releases needs the GitHub CLI, logged in. To build from this working tree instead, run: site/prepare.sh --working-tree"
+  fi
+  tag=$(printf '%s\n' "$releases" | site/latest-release.sh rego)
+  [ -n "$tag" ] || fail "$repo has no published rego-vX.Y.Z release"
+  version=${tag#rego-v}
+  git rev-parse --quiet --verify "refs/tags/$tag" > /dev/null || fail "There's no $tag tag here. Fetch the tags with: git fetch --tags"
+
+  gh release download "$tag" --repo "$repo" --pattern ergo.rego --dir "$dir/asset"
+  rego=$dir/asset/ergo.rego
+  grep -qxF "version := \"$version\"" "$rego" || fail "The ergo.rego of release $tag should say version := \"$version\""
+
+  paths="README.md REFERENCE.md examples site/assets/js/tutorial site/assets/css/tutorial.css site/assets/css/ergo.css site/layouts/tutorial.html site/content/tutorial.md"
+  if git cat-file -e "$tag:site/data/examples.yaml" 2> /dev/null; then
+    paths="$paths site/data/examples.yaml"
+  else
+    echo "$tag has no site/data/examples.yaml, so the home page's examples come from this working tree"
+  fi
+  mkdir "$dir/tag"
+  git archive --output "$dir/tag.tar" "$tag" $paths
+  tar -x -f "$dir/tag.tar" -C "$dir/tag"
+
+  mkdir -p "$prepared/assets/js" "$prepared/assets/css" "$prepared/layouts" "$prepared/content"
+  cp -R "$dir/tag/site/assets/js/tutorial" "$prepared/assets/js/"
+  rm -f "$prepared"/assets/js/tutorial/*.test.mjs
+  cp "$dir/tag/site/assets/css/tutorial.css" "$prepared/assets/css/"
+  mkdir -p "$prepared/reference"
+  cp "$dir/tag/site/assets/css/ergo.css" "$prepared/reference/"
+  cp "$dir/tag/site/layouts/tutorial.html" "$prepared/layouts/"
+  cp "$dir/tag/site/content/tutorial.md" "$prepared/content/"
+  if [ -f "$dir/tag/site/data/examples.yaml" ]; then
+    cp "$dir/tag/site/data/examples.yaml" "$prepared/data/"
+  fi
+  cp "$rego" "$prepared/ergo.rego.txt"
+  docs=$dir/tag
+  source=$tag
+else
+  rego=ergo.rego
+  version=
+  docs=.
+  source="working tree"
 fi
 
-release=site/release
-rm -rf "$release"
-mkdir -p "$release"
-cp "$dir/README.md" "$dir/REFERENCE.md" "$release/"
-(cd "$dir" && find examples -type f) | while read -r file; do
-  mkdir -p "$release/$(dirname "$file")"
-  cp "$dir/$file" "$release/$file.txt"
-done
+mkdir -p "$prepared/repo"
+cp "$docs/README.md" "$docs/REFERENCE.md" "$prepared/repo/"
+(cd "$docs" && find examples -type f) > "$dir/examples.txt"
+while IFS= read -r file; do
+  mkdir -p "$prepared/$(dirname "$file")"
+  cp "$docs/$file" "$prepared/$file.txt"
+done < "$dir/examples.txt"
 
-mkdir -p site/data
-printf '{"rego": "%s", "spec": "%s", "ergo_spec": "%s"}\n' "$version" "${spec_tag#spec-v}" "$ergo_spec" > site/data/release.json
+ergo_spec=$(sed -n 's/^_spec := "\(v[0-9][0-9]*\.[0-9][0-9]*\(-dev\)\{0,1\}\)"$/\1/p' "$rego")
+[ -n "$ergo_spec" ] || fail "$rego should say _spec := \"vX.Y\" or _spec := \"vX.Y-dev\""
+printf '{"source": "%s", "rego": "%s", "spec": "%s", "ergo_spec": "%s"}\n' "$source" "$version" "${spec_tag#spec-v}" "$ergo_spec" > "$prepared/data/release.json"
 
 out=site/assets/tutorial
 rm -rf "$out"
-mkdir -p "$out/vendor"
-printf 'export const ergoSpec = "%s";\n' "$ergo_spec" > "$out/release.mjs"
-
-mkdir "$dir/src"
-cp "$dir/ergo.rego" "$dir/src/"
+mkdir -p "$out/vendor" "$dir/src"
+cp "$rego" "$dir/src/ergo.rego"
 printf 'package tutorial\n\nimport data.ergo\n\nreport := ergo.report(input.input, input.policy, {})\n' > "$dir/src/tutorial.rego"
 opa build -t wasm -e tutorial/report -o "$dir/bundle.tar.gz" "$dir/src"
-tar -xzf "$dir/bundle.tar.gz" -C "$dir" /policy.wasm 2>/dev/null
+tar -xzf "$dir/bundle.tar.gz" -C "$dir" /policy.wasm 2> /dev/null
 mv "$dir/policy.wasm" "$out/ergo.wasm"
 chmod 644 "$out/ergo.wasm"
 
-curl -fsSL https://registry.npmjs.org/@open-policy-agent/opa-wasm/-/opa-wasm-1.10.0.tgz -o "$dir/pkg.tgz"
-actual="sha512-$(openssl dgst -sha512 -binary "$dir/pkg.tgz" | base64 | tr -d '\n')"
-if [ "$actual" != 'sha512-ymR/nFS3nO9o24j9xowGGQaf+Gmb813QcxUpVZkfRlJkawKWqSIllnEH15agyWjijmOIyhA+OBErenx6N3jphw==' ]; then
-  echo "opa-wasm doesn't match its pinned hash" >&2
-  exit 1
+curl -fsSL --retry 3 https://registry.npmjs.org/@open-policy-agent/opa-wasm/-/opa-wasm-1.10.0.tgz -o "$dir/pkg.tgz"
+digest=$(openssl dgst -sha512 -binary "$dir/pkg.tgz" | base64)
+if [ "sha512-$(printf '%s' "$digest" | tr -d '\n')" != 'sha512-ymR/nFS3nO9o24j9xowGGQaf+Gmb813QcxUpVZkfRlJkawKWqSIllnEH15agyWjijmOIyhA+OBErenx6N3jphw==' ]; then
+  fail "opa-wasm doesn't match its pinned hash"
 fi
 tar -xzf "$dir/pkg.tgz" -C "$dir" package/dist/opa-wasm-browser.esm.js
 mv "$dir/package/dist/opa-wasm-browser.esm.js" "$out/vendor/opa-wasm.mjs"
 
 site/spec-schemas.sh
-echo "The site now shows $tag"
+printf '%s\n' "$source" > "$prepared/source"
+echo "The site is built from: $source. Check it with: site/check.sh"

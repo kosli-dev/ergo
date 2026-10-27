@@ -1,0 +1,240 @@
+deploy:
+  rego:
+    file: policy/deploy.rego
+    query: data.deploy
+    policy: |-
+      package deploy
+
+      default allow := false
+
+      allow if count(deny) == 0
+
+      deny contains msg if {
+      	some d in input.deployments
+      	d.environment == "prod"
+      	not d.approved_by
+      	msg := sprintf("%s: no approval", [d.id])
+      }
+    result: |-
+      {
+        "allow": false,
+        "deny": ["d-2: no approval"]
+      }
+  input_file: deployments.json
+  input: |-
+    {
+      "deployments": [
+        {"id": "d-1", "environment": "prod",
+         "approved_by": "alice"},
+        {"id": "d-2", "environment": "prod"},
+        {"id": "d-3", "environment": "staging"}
+      ]
+    }
+  policy: |-
+    subjects:
+      deployment:
+        from: deployments whose environment is "prod"
+        identified_by: id
+    requirements:
+      prod_deploy:
+        subject: deployment
+        checks:
+          approved:
+            description: Someone approved the deployment
+            assert: approved_by is a non-empty string
+  report:
+    - check: $well_formed
+      inputs: [{name: count(checks), value: 1}]
+      passed: true
+      cause: satisfied
+    - check: $min_subjects
+      inputs: [{name: in-scope deployment count, value: 2}]
+      passed: true
+      cause: satisfied
+    - check: $unique_ids
+      inputs: [{name: repeated deployment ids, value: []}]
+      passed: true
+      cause: satisfied
+    - subject: d-1
+      check: $applies
+      inputs: [{name: environment, value: prod}]
+      passed: true
+      cause: satisfied
+    - subject: d-2
+      check: $applies
+      inputs: [{name: environment, value: prod}]
+      passed: true
+      cause: satisfied
+    - subject: d-3
+      check: $applies
+      inputs: [{name: environment, value: staging}]
+      passed: false
+      cause: value
+    - subject: d-1
+      check: approved
+      inputs: [{name: approved_by, value: alice}]
+      passed: true
+      cause: satisfied
+    - subject: d-2
+      check: approved
+      inputs: [{name: approved_by, value: null}]
+      passed: false
+      cause: absent
+review:
+  rego:
+    file: policy/review.rego
+    query: data.review
+    policy: |-
+      package review
+
+      default allow := false
+
+      allow if count(deny) == 0
+
+      deny contains msg if {
+      	some pr in input.pull_requests
+      	not peer_approved(pr)
+      	msg := sprintf("PR %d: no independent approval", [pr.number])
+      }
+
+      peer_approved(pr) if {
+      	some a in pr.approvers
+      	a.username != pr.author
+      }
+    result: |-
+      {
+        "allow": false,
+        "deny": [
+          "PR 2: no independent approval",
+          "PR 3: no independent approval"
+        ]
+      }
+  input_file: pull_requests.json
+  input: |-
+    {
+      "pull_requests": [
+        {"number": 1, "author": "ann",
+          "approvers": [{"username": "ann"}, {"username": "bob"}]},
+        {"number": 2, "author": "bob",
+          "approvers": [{"username": "bob"}]},
+        {"number": 3,
+          "approvers": [{"username": "bob"}]}
+      ]
+    }
+  policy: |-
+    subjects:
+      pull request:
+        from: pull_requests
+        identified_by: number
+    requirements:
+      peer_reviewed:
+        subject: pull request
+        checks:
+          peer:
+            description: Someone other than the author approved it
+            for: some approvers as approver
+            assert: approver.username does not equal author
+  report:
+    - check: $well_formed
+      inputs: [{name: count(checks), value: 1}]
+      passed: true
+      cause: satisfied
+    - check: $min_subjects
+      inputs: [{name: in-scope pull request count, value: 3}]
+      passed: true
+      cause: satisfied
+    - check: $unique_ids
+      inputs: [{name: repeated pull request ids, value: []}]
+      passed: true
+      cause: satisfied
+    - subject: 1
+      check: peer
+      inputs:
+        - {name: author, value: ann}
+        - {name: "approvers[]", value: [{username: ann}, {username: bob}], note: "approvers: ann, bob"}
+      passed: true
+      cause: satisfied
+    - subject: 2
+      check: peer
+      inputs:
+        - {name: author, value: bob}
+        - {name: "approvers[]", value: [{username: bob}], note: "approvers: bob"}
+      passed: false
+      cause: value
+    - subject: 3
+      check: peer
+      inputs:
+        - {name: author, value: null}
+        - {name: "approvers[]", value: [{username: bob}], note: "approvers: bob"}
+      passed: false
+      cause: absent
+expenses:
+  input_file: expenses.json
+  input: |-
+    {
+      "expenses": [
+        {"id": "e-1", "amount": 42,
+         "receipt": "r-881.pdf"},
+        {"id": "e-2", "amount": 68,
+         "receipt": "r-902.pdf"},
+        {"id": "e-3", "amount": 35}
+      ]
+    }
+  policy: |-
+    subjects:
+      expense:
+        from: expenses
+        identified_by: id
+    requirements:
+      expense_policy:
+        subject: expense
+        checks:
+          within_limit:
+            description: The meal costs at most €50
+            assert: amount is at most 50
+          receipt:
+            description: A receipt is attached
+            assert: receipt is a non-empty string
+  report:
+    - check: $well_formed
+      inputs: [{name: count(checks), value: 2}]
+      passed: true
+      cause: satisfied
+    - check: $min_subjects
+      inputs: [{name: in-scope expense count, value: 3}]
+      passed: true
+      cause: satisfied
+    - check: $unique_ids
+      inputs: [{name: repeated expense ids, value: []}]
+      passed: true
+      cause: satisfied
+    - subject: e-1
+      check: receipt
+      inputs: [{name: receipt, value: r-881.pdf}]
+      passed: true
+      cause: satisfied
+    - subject: e-1
+      check: within_limit
+      inputs: [{name: amount, value: 42}]
+      passed: true
+      cause: satisfied
+    - subject: e-2
+      check: receipt
+      inputs: [{name: receipt, value: r-902.pdf}]
+      passed: true
+      cause: satisfied
+    - subject: e-2
+      check: within_limit
+      inputs: [{name: amount, value: 68}]
+      passed: false
+      cause: value
+    - subject: e-3
+      check: receipt
+      inputs: [{name: receipt, value: null}]
+      passed: false
+      cause: absent
+    - subject: e-3
+      check: within_limit
+      inputs: [{name: amount, value: 35}]
+      passed: true
+      cause: satisfied

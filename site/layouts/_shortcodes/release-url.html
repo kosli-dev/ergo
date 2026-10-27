@@ -1,1 +1,1 @@
-{{- printf "%s/blob/rego-v%s/%s" site.Params.repo hugo.Data.release.rego (.Get 0) -}}
+{{- printf "%s/blob/%s/%s" site.Params.repo (partial "repo-ref.html" .) (.Get 0) -}}

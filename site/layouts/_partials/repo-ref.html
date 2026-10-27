@@ -1,0 +1,2 @@
+{{- with hugo.Data.release.rego }}{{ return (printf "rego-v%s" .) }}{{ end -}}
+{{- return "main" -}}

@@ -4,8 +4,11 @@ case ${1:-} in
   rego) pattern='^rego-v[0-9]+\.[0-9]+\.[0-9]+$' ;;
   spec) pattern='^spec-v[0-9]+\.[0-9]+$' ;;
   *)
-    echo "usage: site/latest-release.sh rego|spec" >&2
+    echo "usage: site/latest-release.sh rego|spec < tag names" >&2
     exit 2
     ;;
 esac
-git tag --list "$1-v*" | grep -E "$pattern" | sort -V | tail -n 1 || true
+matching=$(grep -E "$pattern" || true)
+[ -n "$matching" ] || exit 0
+sorted=$(printf '%s\n' "$matching" | sort -V)
+printf '%s\n' "$sorted" | tail -n 1
