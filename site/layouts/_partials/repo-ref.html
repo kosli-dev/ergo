@@ -1,2 +1,3 @@
-{{- with hugo.Data.release.rego }}{{ return (printf "rego-v%s" .) }}{{ end -}}
-{{- return "main" -}}
+{{- $ref := "main" -}}
+{{- with hugo.Data.release.rego }}{{ $ref = printf "rego-v%s" . }}{{ end -}}
+{{- return $ref -}}
