@@ -1,7 +1,7 @@
 [
   {
     "description": "equals a string",
-    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is \"a\""}}}},
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is \"a\""}}}},
     "cases": [
       {
         "description": "passes on the same string",
@@ -40,7 +40,7 @@
   },
   {
     "description": "equals a number",
-    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 1"}}}},
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 1"}}}},
     "cases": [
       {
         "description": "passes on 1.0, because numbers compare by value",
@@ -63,7 +63,7 @@
   },
   {
     "description": "equals a number written with an exponent",
-    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 150"}}}},
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 150"}}}},
     "cases": [
       {
         "description": "shows the number in plain decimal",
@@ -78,7 +78,7 @@
   },
   {
     "description": "equals null",
-    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is null"}}}},
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is null"}}}},
     "cases": [
       {
         "description": "passes on a field that is there and null",
@@ -101,7 +101,7 @@
   },
   {
     "description": "a position in a list",
-    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "item 2 of x is \"q\""}}}},
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "item 2 of x is \"q\""}}}},
     "cases": [
       {
         "description": "points at the item it read",
@@ -131,7 +131,7 @@
   },
   {
     "description": "keys that need escaping",
-    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "\"a/b\".\"c~d\" is 1"}}}},
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "\"a/b\".\"c~d\" is 1"}}}},
     "cases": [
       {
         "description": "writes a slash as ~1 and a tilde as ~0",

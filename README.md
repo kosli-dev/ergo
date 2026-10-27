@@ -2,7 +2,7 @@
 
 Ergo checks that your deployments, pull requests or expenses follow rules written as plain sentences, like `approved_by is a non-empty string`, and gives back a report that says what it checked, what it found and why each check passed or failed. Whoever owns a rule can write it, and whoever has to trust the result can read the report without knowing how it was computed.
 
-Ergo is at 0.1. Any 0.x release may still change what a policy says or what a report shows, and [`CHANGELOG.md`](CHANGELOG.md) says when it does.
+Ergo is at 0.2. Any 0.x release may still change what a policy says or what a report shows, and [`CHANGELOG.md`](CHANGELOG.md) says when it does.
 
 ## What Ergo does
 
@@ -64,7 +64,7 @@ Here is a policy that says "_every production deployment must have an approver_"
 `policy/policy.yaml`:
 
 ```yaml
-ergo_spec: v0.1
+ergo_spec: v0.2
 subjects:
   deployment:
     from: deployments whose environment is "prod"
@@ -124,7 +124,7 @@ The defaults keep the report defined when the file leaves out `ergo_spec:`, `sub
 
 #### The old way of writing checks
 
-Before 0.1, a check was an object with an `op` and a `path`, like `{op: non_empty_string, path: [approved_by]}`, and a subject used `applies_to` filters written the same way. Spec 0.1 doesn't read that syntax any more. A policy written that way is written wrong, and the report says so. `ergo.as_sentences` rewrites what it can as sentences, and [Moving a policy to sentences](REFERENCE.md#moving-a-policy-to-sentences) in the reference shows what it leaves for you to rewrite.
+Before 0.1, a check was an object with an `op` and a `path`, like `{op: non_empty_string, path: [approved_by]}`, and a subject used `applies_to` filters written the same way. Spec 0.1 stopped reading that syntax, and later versions don't read it either. A policy written that way is written wrong, and the report says so. `ergo.as_sentences` rewrites what it can as sentences, and [Moving a policy to sentences](REFERENCE.md#moving-a-policy-to-sentences) in the reference shows what it leaves for you to rewrite.
 
 ### 3. Get the report
 
@@ -156,7 +156,7 @@ The report records every check Ergo ran, including the ones that passed. It come
     "name": "ergo.rego",
     "version": "0.2.0-dev"
   },
-  "ergo": "v0.1",
+  "ergo": "v0.2",
   "meta": {},
   "requirements": { ... },
   "results": [ ... ],
@@ -217,7 +217,7 @@ opa eval -d policy -i deployments.json --format=pretty 'data.deploy.violations'
     "check": "approved",
     "description": "Someone approved the deployment",
     "expression": "approved_by is a non-empty string",
-    "inputs": [{ "name": "approved_by", "value": null }],
+    "inputs": [{ "name": "approved_by", "value": null, "locations": ["/deployments/1"] }],
     "requirement": "prod_deploy",
     "subject": { "id": "d-2", "type": "deployment" }
   }
