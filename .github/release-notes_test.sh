@@ -20,6 +20,10 @@ The first version, see [semantics](semantics.md#every-and-some).
 
 ## 0.0
 
+## -1
+
+See [the syntax](syntax.md "Syntax") and [the semantics](<semantics.md>).
+
 MD
 
 actual=$(sh "$script" "$dir/CHANGELOG.md" 0.2 "$base")
@@ -53,4 +57,15 @@ for version in 0.0 0.3; do
       ;;
   esac
 done
+if out=$(sh "$script" "$dir/CHANGELOG.md" -1 "$base" 2>&1); then
+  echo "release-notes.sh should fail on links it can't point at the tag, and printed: $out" >&2
+  exit 1
+fi
+case $out in
+  *"still link to .md files without the tag"*'See [the syntax](syntax.md "Syntax") and [the semantics](<semantics.md>).'*) ;;
+  *)
+    echo "release-notes.sh should name the links it left relative, and said: $out" >&2
+    exit 1
+    ;;
+esac
 echo "release-notes.sh takes a version's notes and links their .md files to the tag"

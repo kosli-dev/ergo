@@ -100,6 +100,7 @@ jobs:
           else
             latest=--latest=false
           fi
+          echo "The highest rego-vX.Y.Z tag is $highest, so $TAG is created with $latest"
           gh release create "$TAG" "$RUNNER_TEMP/ergo.rego" \
             --title "ergo.rego $VERSION" \
             --notes-file "$RUNNER_TEMP/notes.md" \
