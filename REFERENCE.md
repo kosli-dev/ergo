@@ -525,7 +525,33 @@ and written out in full, its inputs are named `compliance_status.attestations_st
 - Keep the data's own names, as `findings` and `coverage` do, because a reader who knows the data finds `coverage.attestation_data.hunks_total` where they'd look for it.
 - An alias is read wherever a bare first key reads the subject: in the subject's checks, in the assertions of a `for` line, and in the conditions of the subject's `from` line and of a subject that narrows it, where `.limit` reads the field instead. In a `whose` and after a one-line `every` or `some`, where a bare first key is a field of the item, it's read on the right side and never on the left of a `whose`, as a `for` line's name is: `every items.price is at most limit` reads the part `limit`, `whose limit is at least 4` reads the item's `limit`, and `.limit` on the right reads the item's. `named by` a part's alias is written wrong, with `named by coverage reads a part, which isn't supported yet`.
 - An alias shadows a field of the subject with the same name. To read the field, put a dot in front: `.coverage` is the subject's field `coverage`, not the part.
-- An alias is a bare word that isn't a word of the grammar, `params` or `input`, or it is written wrong with `invalid alias`. Two aliases with the same name are written wrong with `alias given twice`: two parts of a subject, a part and one a subject keeps from a subject it narrows, a part and an alias of a `for` line in a check of the subject, and a part and the name of the parent a child subject reads from.
+- An alias is a bare word that isn't a word of the grammar, `params` or `input`, or it is written wrong with `invalid alias`. A part's alias named like a subject of the policy (its own, its parent or any other) is written wrong with `<alias> can't be an alias: it's a subject's name`, and one named like a part of a parent or grandparent subject, or like a part kept from a subject it narrows, with `<alias> can't be an alias: it's a part of <subject>`, which names the subject that declares the part and puts a name with a space in it in double quotes, like `"pull request"`. A name always means one thing, so nobody has to wonder whether it reads the subject or the alias. The problem is listed under the part, like `subjects.kid.has.x`.
+- An alias of a `for` line can't be named like a subject, the check's own, a parent or any other in the policy, or like a part of the check's own subject, of a parent or grandparent subject, or of a subject they narrow. Either is written wrong, so that a name always means one thing and a bare name never reads the parent when the item lacks the field. The problem is under the check, as `<alias> can't be an alias: it's a subject's name` or `<alias> can't be an alias: it's a part of <subject>`, and both are listed when both apply. With this policy and this input:
+
+  ```yaml
+  subjects:
+    b:
+      from: bs
+      identified_by: id
+      has:
+        cap: limit
+    kid:
+      from: b.kids
+      identified_by: id
+  requirements:
+    r:
+      subject: kid
+      checks:
+        c:
+          for: every xs as b
+          assert: b.v is 1
+  ```
+
+  ```json
+  {"bs": [{"id": "b1", "limit": 2, "kids": [{"id": "k1", "xs": [{"v": 1}]}]}]}
+  ```
+
+  the `$well_formed` row fails with `{"name": "checks.c", "value": ["b can't be an alias: it's a subject's name"], "locations": []}`, and with `as cap` it fails with `["cap can't be an alias: it's a part of b"]`. A name that clashes with nothing, like `as entry`, reads the item.
 - A subject that narrows another keeps its parts and can add its own. The report lists them all.
 - A [child subject](#from-lines) reads its parent's parts through the parent's name, and its `from` line can start from one. With `{"params": {"artifact_name": "web"}}` and this input:
 
@@ -1659,21 +1685,21 @@ the inputs are:
 ]
 ```
 
-| Field                                          | What's wrong                                                                                                                                                                       |
-| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| any field Ergo doesn't know                    | `unknown field`                                                                                                                                                                    |
-| `checks`                                       | `not an object`, `holds a key that isn't a string`, `missing`, `empty`                                                                                                             |
-| `checks.$applies` and Ergo's other rows        | `name reserved`                                                                                                                                                                    |
-| `require`                                      | `neither every nor some`                                                                                                                                                           |
-| `min_subjects`                                 | `not a whole number of 0 or more`, `number out of range`                                                                                                                           |
-| `subject`                                      | `missing`, `empty or not a string`, `not in subjects`                                                                                                                              |
-| `subjects`                                     | `not an object`                                                                                                                                                                    |
-| `subjects.deployment`                          | `not an object`                                                                                                                                                                    |
-| `subjects.deployment.from`, `...identified_by` | `not a string`, `doesn't parse`, `number out of range: 1e400`, or the reason a line can't be read, like `unclosed quote at column 24`                                              |
-| `subjects.deployment.from`                     | `leads to a loop`, `" " isn't a subject name`                                                                                                                                      |
-| `subjects.deployment.description`              | `not a string`                                                                                                                                                                     |
-| `subjects.deployment.has`                      | `not an object`                                                                                                                                                                    |
-| `subjects.deployment.has.coverage`             | `not a string or an object`, `missing from`, `unknown field foo`, `invalid from`, `invalid identified_by`, `from: ...`, `identified_by: ...`, `invalid alias`, `alias given twice` |
+| Field                                          | What's wrong                                                                                                                                                                                                                                           |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| any field Ergo doesn't know                    | `unknown field`                                                                                                                                                                                                                                        |
+| `checks`                                       | `not an object`, `holds a key that isn't a string`, `missing`, `empty`                                                                                                                                                                                 |
+| `checks.$applies` and Ergo's other rows        | `name reserved`                                                                                                                                                                                                                                        |
+| `require`                                      | `neither every nor some`                                                                                                                                                                                                                               |
+| `min_subjects`                                 | `not a whole number of 0 or more`, `number out of range`                                                                                                                                                                                               |
+| `subject`                                      | `missing`, `empty or not a string`, `not in subjects`                                                                                                                                                                                                  |
+| `subjects`                                     | `not an object`                                                                                                                                                                                                                                        |
+| `subjects.deployment`                          | `not an object`                                                                                                                                                                                                                                        |
+| `subjects.deployment.from`, `...identified_by` | `not a string`, `doesn't parse`, `number out of range: 1e400`, or the reason a line can't be read, like `unclosed quote at column 24`                                                                                                                  |
+| `subjects.deployment.from`                     | `leads to a loop`, `" " isn't a subject name`                                                                                                                                                                                                          |
+| `subjects.deployment.description`              | `not a string`                                                                                                                                                                                                                                         |
+| `subjects.deployment.has`                      | `not an object`                                                                                                                                                                                                                                        |
+| `subjects.deployment.has.coverage`             | `not a string or an object`, `missing from`, `unknown field foo`, `invalid from`, `invalid identified_by`, `from: ...`, `identified_by: ...`, `invalid alias`, `x can't be an alias: it's a subject's name`, `x can't be an alias: it's a part of ...` |
 
 A policy written in Rego can use a key that isn't a string, like `true` or `1.5`. Ergo names it `<invalid key true>` or `<invalid key 1.5>`, so two such keys never share a name. A requirement whose own name isn't a string, like `1`, or every requirement of a policy written as a list, fails `$well_formed`, which then starts with `{"name": "requirement name", "value": ["not a string"], "locations": []}`. The requirement is `not_met`, so the policy isn't compliant.
 
@@ -1858,8 +1884,8 @@ Ergo fails a check whenever it can't be sure, instead of letting it pass. Rego d
 - A missing, `null` or wrong-typed field fails every operator, except `missing`, which passes on a missing or `null` field.
 - `compare` needs both sides to exist and have the same type. In plain Rego, `null < 5` is true, so a missing field would otherwise pass a `lt` check. Ordering objects, lists or booleans fails too.
 - `every`, `some` and `for` lines need non-empty lists, inner lists included. A policy that's fine with no items says so with `, if any,`.
-- An alias given twice, or badly written, fails the check, so an inner alias can't quietly hide an outer one.
-- A [part](#parts) that is missing, `null` or the wrong type fails a check exactly as the full path it stands for would, and a part that is written wrong, or has an alias another one has, fails `$well_formed` and is never read as an alias.
+- An alias that clashes with a subject or a part, or is badly written, fails the check, so an inner alias can't quietly hide an outer one.
+- A [part](#parts) that is missing, `null` or the wrong type fails a check exactly as the full path it stands for would, and a part that is written wrong, or is named like a subject or a part of a parent (see [Parts](#parts)), fails `$well_formed` and is never read as an alias.
 - A check that's written wrong, like a sentence that can't be read or an object with an `op`, fails `$well_formed`, and the requirement gets no other row, so a mistake in a subject's conditions can't rule every subject out.
 - A value of the wrong kind, like a string where `range` needs a number, or a param of the wrong type, fails with cause `unusable`, so a condition can't rule a subject out on it.
 - With several conditions, one that can't be read fails the requirement, even when another rules the subject out. The only condition that can rule a subject out regardless is an `exists` that found its field missing.

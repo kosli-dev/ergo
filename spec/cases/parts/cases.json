@@ -1732,7 +1732,7 @@
               {
                 "name": "checks.c",
                 "value": [
-                  "alias given twice"
+                  "cov can't be an alias: it's a part of round"
                 ],
                 "locations": [
 
@@ -2034,7 +2034,7 @@
     },
     "cases": [
       {
-        "description": "is written wrong with alias given twice, under the part",
+        "description": "is written wrong, naming the subject it keeps the part from",
         "rules": ["parts.alias", "parts.written_wrong", "parts.narrow"],
         "input": {
           "rounds": [
@@ -2074,7 +2074,7 @@
               {
                 "name": "subjects.\"good round\".has.cov",
                 "value": [
-                  "alias given twice"
+                  "cov can't be an alias: it's a part of round"
                 ],
                 "locations": [
 
@@ -2382,7 +2382,7 @@
     },
     "cases": [
       {
-        "description": "is written wrong with alias given twice",
+        "description": "is written wrong as a subject's name",
         "rules": ["parts.alias", "parts.written_wrong", "parts.chain"],
         "input": {
           "trail": {
@@ -2424,7 +2424,7 @@
               {
                 "name": "subjects.\"pull request\".has.artifact",
                 "value": [
-                  "alias given twice"
+                  "artifact can't be an alias: it's a subject's name"
                 ],
                 "locations": [
 
@@ -3553,6 +3553,2350 @@
             "subject": {
               "id": "t1",
               "type": "round"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias named like a parent subject",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "b": {
+          "from": "bs",
+          "identified_by": "id",
+          "has": {
+            "x": "k1.k2.k3"
+          }
+        },
+        "kid": {
+          "from": "b.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": {
+              "for": "every xs as b",
+              "assert": "b.x.z is 7"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, so the parent's part and fields aren't read through it",
+        "rules": ["sentence.for.alias", "parts.written_wrong"],
+        "input": {
+          "bs": [
+            {
+              "id": "b1",
+              "k1": {
+                "k2": {
+                  "k3": {
+                    "z": 2
+                  }
+                }
+              },
+              "kids": [
+                {
+                  "id": "k1",
+                  "xs": [
+                    {
+                      "b": {
+                        "x": {
+                          "z": 1
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 1
+                    },
+                    {
+                      "b": {
+                        "x": {
+                          "z": 5
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 9
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "b can't be an alias: it's a subject's name"
+                ],
+                "locations": [
+
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias named like the check's own subject",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "b": {
+          "from": "bs",
+          "identified_by": "id",
+          "has": {
+            "x": "k1.k2.k3"
+          }
+        },
+        "kid": {
+          "from": "b.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": {
+              "for": "every xs as kid",
+              "assert": "kid.v is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong",
+        "rules": ["sentence.for.alias", "parts.written_wrong"],
+        "input": {
+          "bs": [
+            {
+              "id": "b1",
+              "k1": {
+                "k2": {
+                  "k3": {
+                    "z": 2
+                  }
+                }
+              },
+              "kids": [
+                {
+                  "id": "k1",
+                  "xs": [
+                    {
+                      "b": {
+                        "x": {
+                          "z": 1
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 1
+                    },
+                    {
+                      "b": {
+                        "x": {
+                          "z": 5
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 9
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "kid can't be an alias: it's a subject's name"
+                ],
+                "locations": [
+
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias named like a subject that isn't a parent",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "b": {
+          "from": "bs",
+          "identified_by": "id",
+          "has": {
+            "x": "k1.k2.k3"
+          }
+        },
+        "kid": {
+          "from": "b.kids",
+          "identified_by": "id"
+        },
+        "other": {
+          "from": "bs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": {
+              "for": "every xs as other",
+              "assert": "other.v is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong",
+        "rules": ["sentence.for.alias", "parts.written_wrong"],
+        "input": {
+          "bs": [
+            {
+              "id": "b1",
+              "k1": {
+                "k2": {
+                  "k3": {
+                    "z": 2
+                  }
+                }
+              },
+              "kids": [
+                {
+                  "id": "k1",
+                  "xs": [
+                    {
+                      "b": {
+                        "x": {
+                          "z": 1
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 1
+                    },
+                    {
+                      "b": {
+                        "x": {
+                          "z": 5
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 9
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "other can't be an alias: it's a subject's name"
+                ],
+                "locations": [
+
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias named like a part of a parent subject",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "b": {
+          "from": "bs",
+          "identified_by": "id",
+          "has": {
+            "x": "k1.k2.k3"
+          }
+        },
+        "kid": {
+          "from": "b.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": {
+              "for": "every xs as x",
+              "assert": "x.z is 7"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, naming the parent",
+        "rules": ["sentence.for.alias", "parts.written_wrong"],
+        "input": {
+          "bs": [
+            {
+              "id": "b1",
+              "k1": {
+                "k2": {
+                  "k3": {
+                    "z": 2
+                  }
+                }
+              },
+              "kids": [
+                {
+                  "id": "k1",
+                  "xs": [
+                    {
+                      "b": {
+                        "x": {
+                          "z": 1
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 1
+                    },
+                    {
+                      "b": {
+                        "x": {
+                          "z": 5
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 9
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "x can't be an alias: it's a part of b"
+                ],
+                "locations": [
+
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias named like a subject and like a part of a parent",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "b": {
+          "from": "bs",
+          "identified_by": "id",
+          "has": {
+            "b": "k1.k2.k3"
+          }
+        },
+        "kid": {
+          "from": "b.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": {
+              "for": "every xs as b",
+              "assert": "b.v is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong with both messages",
+        "rules": ["sentence.for.alias", "parts.written_wrong"],
+        "input": {
+          "bs": [
+            {
+              "id": "b1",
+              "k1": {
+                "k2": {
+                  "k3": {
+                    "z": 2
+                  }
+                }
+              },
+              "kids": [
+                {
+                  "id": "k1",
+                  "xs": [
+                    {
+                      "b": {
+                        "x": {
+                          "z": 1
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 1
+                    },
+                    {
+                      "b": {
+                        "x": {
+                          "z": 5
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 9
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "subjects.b.has.b",
+                "value": [
+                  "b can't be an alias: it's a subject's name"
+                ],
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "b can't be an alias: it's a part of b",
+                  "b can't be an alias: it's a subject's name"
+                ],
+                "locations": [
+
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias that isn't named like a subject or a part",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "b": {
+          "from": "bs",
+          "identified_by": "id",
+          "has": {
+            "x": "k1.k2.k3"
+          }
+        },
+        "kid": {
+          "from": "b.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": {
+              "for": "every xs as entry",
+              "assert": "entry.x.z is 7"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the item",
+        "rules": ["sentence.for.alias"],
+        "input": {
+          "bs": [
+            {
+              "id": "b1",
+              "k1": {
+                "k2": {
+                  "k3": {
+                    "z": 2
+                  }
+                }
+              },
+              "kids": [
+                {
+                  "id": "k1",
+                  "xs": [
+                    {
+                      "b": {
+                        "x": {
+                          "z": 1
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 1
+                    },
+                    {
+                      "b": {
+                        "x": {
+                          "z": 5
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 9
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": [
+
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [
+
+            ],
+            "inputs": [
+              {
+                "name": "xs[]",
+                "value": [
+                  {
+                    "b": {
+                      "x": {
+                        "z": 1
+                      }
+                    },
+                    "v": 1,
+                    "x": {
+                      "z": 7
+                    }
+                  },
+                  {
+                    "b": {
+                      "x": {
+                        "z": 5
+                      }
+                    },
+                    "v": 9,
+                    "x": {
+                      "z": 7
+                    }
+                  }
+                ],
+                "locations": [
+                  "/bs/0/kids/0/xs/0",
+                  "/bs/0/kids/0/xs/1"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "b": "b1"
+              },
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part named like the subject it belongs to",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "b": {
+          "from": "bs",
+          "identified_by": "id",
+          "has": {
+            "x": "k1"
+          }
+        },
+        "kid": {
+          "from": "b.kids",
+          "identified_by": "id",
+          "has": {
+            "kid": "xs"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong as a subject's name",
+        "rules": ["parts.alias", "parts.written_wrong"],
+        "input": {
+          "bs": [
+            {
+              "id": "b1",
+              "k1": {
+                "z": 2
+              },
+              "kids": [
+                {
+                  "id": "k1",
+                  "xs": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "subjects.kid.has.kid",
+                "value": [
+                  "kid can't be an alias: it's a subject's name"
+                ],
+                "locations": [
+
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part named like a subject that isn't a parent",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "b": {
+          "from": "bs",
+          "identified_by": "id",
+          "has": {
+            "x": "k1"
+          }
+        },
+        "kid": {
+          "from": "b.kids",
+          "identified_by": "id",
+          "has": {
+            "other": "xs"
+          }
+        },
+        "other": {
+          "from": "bs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong as a subject's name",
+        "rules": ["parts.alias", "parts.written_wrong"],
+        "input": {
+          "bs": [
+            {
+              "id": "b1",
+              "k1": {
+                "z": 2
+              },
+              "kids": [
+                {
+                  "id": "k1",
+                  "xs": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "subjects.kid.has.other",
+                "value": [
+                  "other can't be an alias: it's a subject's name"
+                ],
+                "locations": [
+
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part named like a part of a parent",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "b": {
+          "from": "bs",
+          "identified_by": "id",
+          "has": {
+            "x": "k1"
+          }
+        },
+        "kid": {
+          "from": "b.kids",
+          "identified_by": "id",
+          "has": {
+            "x": "xs"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, naming the parent",
+        "rules": ["parts.alias", "parts.written_wrong", "parts.chain"],
+        "input": {
+          "bs": [
+            {
+              "id": "b1",
+              "k1": {
+                "z": 2
+              },
+              "kids": [
+                {
+                  "id": "k1",
+                  "xs": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "subjects.kid.has.x",
+                "value": [
+                  "x can't be an alias: it's a part of b"
+                ],
+                "locations": [
+
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias named like a part of a grandparent subject",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "gp": {
+          "from": "gps",
+          "identified_by": "id",
+          "has": {
+            "cap": "cap"
+          }
+        },
+        "mid": {
+          "from": "gp.mids",
+          "identified_by": "id"
+        },
+        "leaf": {
+          "from": "mid.leaves",
+          "identified_by": "id",
+          "has": {}
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "leaf",
+          "checks": {
+            "c": {
+              "for": "every ys as cap",
+              "assert": "cap.v is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, naming the grandparent",
+        "rules": ["sentence.for.alias", "parts.written_wrong"],
+        "input": {
+          "gps": [
+            {
+              "id": "g1",
+              "cap": {
+                "z": 1
+              },
+              "mids": [
+                {
+                  "id": "m1",
+                  "leaves": [
+                    {
+                      "id": "l1",
+                      "ys": [
+                        {
+                          "v": 1
+                        }
+                      ],
+                      "zs": [
+                        {
+                          "w": 2
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "cap can't be an alias: it's a part of gp"
+                ],
+                "locations": [
+
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "leaf"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias on the second item named like a part of a parent subject",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "b": {
+          "from": "bs",
+          "identified_by": "id",
+          "has": {
+            "x": "k1.k2.k3"
+          }
+        },
+        "kid": {
+          "from": "b.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": {
+              "for": "every xs as y, every xs as x",
+              "assert": "x.v is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, naming the parent",
+        "rules": ["sentence.for.alias", "parts.written_wrong"],
+        "input": {
+          "bs": [
+            {
+              "id": "b1",
+              "k1": {
+                "k2": {
+                  "k3": {
+                    "z": 2
+                  }
+                }
+              },
+              "kids": [
+                {
+                  "id": "k1",
+                  "xs": [
+                    {
+                      "b": {
+                        "x": {
+                          "z": 1
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 1
+                    },
+                    {
+                      "b": {
+                        "x": {
+                          "z": 5
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 9
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "x can't be an alias: it's a part of b"
+                ],
+                "locations": [
+
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias on a first of item named like a parent subject",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "b": {
+          "from": "bs",
+          "identified_by": "id",
+          "has": {
+            "x": "k1.k2.k3"
+          }
+        },
+        "kid": {
+          "from": "b.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": {
+              "for": "first of xs as b",
+              "assert": "b.v is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong as a subject's name",
+        "rules": ["sentence.for.alias", "parts.written_wrong"],
+        "input": {
+          "bs": [
+            {
+              "id": "b1",
+              "k1": {
+                "k2": {
+                  "k3": {
+                    "z": 2
+                  }
+                }
+              },
+              "kids": [
+                {
+                  "id": "k1",
+                  "xs": [
+                    {
+                      "b": {
+                        "x": {
+                          "z": 1
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 1
+                    },
+                    {
+                      "b": {
+                        "x": {
+                          "z": 5
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 9
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "b can't be an alias: it's a subject's name"
+                ],
+                "locations": [
+
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias named like a part kept from a subject the checked subject narrows",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "b": {
+          "from": "bs",
+          "identified_by": "id",
+          "has": {
+            "part": "k1"
+          }
+        },
+        "b2": {
+          "from": "b whose id exists"
+        },
+        "kid2": {
+          "from": "b2.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "b2",
+          "checks": {
+            "c": {
+              "for": "every kids as part",
+              "assert": "part.id exists"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, naming the subject that declares the part",
+        "rules": ["sentence.for.alias", "parts.written_wrong", "parts.narrow"],
+        "input": {
+          "bs": [
+            {
+              "id": "b1",
+              "k1": {
+                "k2": {
+                  "k3": {
+                    "z": 2
+                  }
+                }
+              },
+              "kids": [
+                {
+                  "id": "k1",
+                  "xs": [
+                    {
+                      "b": {
+                        "x": {
+                          "z": 1
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 1
+                    },
+                    {
+                      "b": {
+                        "x": {
+                          "z": 5
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 9
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "part can't be an alias: it's a part of b"
+                ],
+                "locations": [
+
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "b2"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias named like a part kept by the parent of the checked subject from a subject it narrows",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "b": {
+          "from": "bs",
+          "identified_by": "id",
+          "has": {
+            "part": "k1"
+          }
+        },
+        "b2": {
+          "from": "b whose id exists"
+        },
+        "kid2": {
+          "from": "b2.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid2",
+          "checks": {
+            "c": {
+              "for": "every xs as part",
+              "assert": "part.v is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, naming the subject that declares the part",
+        "rules": ["sentence.for.alias", "parts.written_wrong", "parts.narrow"],
+        "input": {
+          "bs": [
+            {
+              "id": "b1",
+              "k1": {
+                "k2": {
+                  "k3": {
+                    "z": 2
+                  }
+                }
+              },
+              "kids": [
+                {
+                  "id": "k1",
+                  "xs": [
+                    {
+                      "b": {
+                        "x": {
+                          "z": 1
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 1
+                    },
+                    {
+                      "b": {
+                        "x": {
+                          "z": 5
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 9
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "part can't be an alias: it's a part of b"
+                ],
+                "locations": [
+
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid2"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias named like a part of a subject that isn't a parent",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "b": {
+          "from": "bs",
+          "identified_by": "id",
+          "has": {
+            "x": "k1.k2.k3"
+          }
+        },
+        "other": {
+          "from": "bs",
+          "identified_by": "id",
+          "has": {
+            "y": "k1"
+          }
+        },
+        "kid": {
+          "from": "b.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": {
+              "for": "every xs as y",
+              "assert": "y.x.z is 7"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the item",
+        "rules": ["sentence.for.alias"],
+        "input": {
+          "bs": [
+            {
+              "id": "b1",
+              "k1": {
+                "k2": {
+                  "k3": {
+                    "z": 2
+                  }
+                }
+              },
+              "kids": [
+                {
+                  "id": "k1",
+                  "xs": [
+                    {
+                      "b": {
+                        "x": {
+                          "z": 1
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 1
+                    },
+                    {
+                      "b": {
+                        "x": {
+                          "z": 5
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 9
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": [
+
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [
+
+            ],
+            "inputs": [
+              {
+                "name": "xs[]",
+                "value": [
+                  {
+                    "b": {
+                      "x": {
+                        "z": 1
+                      }
+                    },
+                    "v": 1,
+                    "x": {
+                      "z": 7
+                    }
+                  },
+                  {
+                    "b": {
+                      "x": {
+                        "z": 5
+                      }
+                    },
+                    "v": 9,
+                    "x": {
+                      "z": 7
+                    }
+                  }
+                ],
+                "locations": [
+                  "/bs/0/kids/0/xs/0",
+                  "/bs/0/kids/0/xs/1"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "b": "b1"
+              },
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias named like a part of a subject with a space in its name",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "pull request": {
+          "from": "bs",
+          "identified_by": "id",
+          "has": {
+            "pull": "k1"
+          }
+        },
+        "kid": {
+          "from": "\"pull request\".kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": {
+              "for": "every xs as pull",
+              "assert": "pull.v is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, with the subject's name in quotes",
+        "rules": ["sentence.for.alias", "parts.written_wrong"],
+        "input": {
+          "bs": [
+            {
+              "id": "b1",
+              "k1": {
+                "k2": {
+                  "k3": {
+                    "z": 2
+                  }
+                }
+              },
+              "kids": [
+                {
+                  "id": "k1",
+                  "xs": [
+                    {
+                      "b": {
+                        "x": {
+                          "z": 1
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 1
+                    },
+                    {
+                      "b": {
+                        "x": {
+                          "z": 5
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 9
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "pull can't be an alias: it's a part of \"pull request\""
+                ],
+                "locations": [
+
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part named like a part of a grandparent subject",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "gp": {
+          "from": "gps",
+          "identified_by": "id",
+          "has": {
+            "cap": "cap"
+          }
+        },
+        "mid": {
+          "from": "gp.mids",
+          "identified_by": "id"
+        },
+        "leaf": {
+          "from": "mid.leaves",
+          "identified_by": "id",
+          "has": {
+            "cap": "ys"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "leaf",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, naming the grandparent",
+        "rules": ["parts.alias", "parts.written_wrong"],
+        "input": {
+          "gps": [
+            {
+              "id": "g1",
+              "cap": {
+                "z": 1
+              },
+              "mids": [
+                {
+                  "id": "m1",
+                  "leaves": [
+                    {
+                      "id": "l1",
+                      "ys": [
+                        {
+                          "v": 1
+                        }
+                      ],
+                      "zs": [
+                        {
+                          "w": 2
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "subjects.leaf.has.cap",
+                "value": [
+                  "cap can't be an alias: it's a part of gp"
+                ],
+                "locations": [
+
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "leaf"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part named like a part kept through two narrowings",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "base": {
+          "from": "bs",
+          "identified_by": "id",
+          "has": {
+            "x": "k1"
+          }
+        },
+        "m": {
+          "from": "base whose id exists"
+        },
+        "n": {
+          "from": "m whose id exists",
+          "has": {
+            "x": "xs"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "n",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong once, naming the subject that declares the part",
+        "rules": ["parts.alias", "parts.written_wrong", "parts.narrow"],
+        "input": {
+          "bs": [
+            {
+              "id": "b1",
+              "k1": {
+                "k2": {
+                  "k3": {
+                    "z": 2
+                  }
+                }
+              },
+              "kids": [
+                {
+                  "id": "k1",
+                  "xs": [
+                    {
+                      "b": {
+                        "x": {
+                          "z": 1
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 1
+                    },
+                    {
+                      "b": {
+                        "x": {
+                          "z": 5
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 9
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "subjects.n.has.x",
+                "value": [
+                  "x can't be an alias: it's a part of base"
+                ],
+                "locations": [
+
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "n"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part declared again by a subject it narrows",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "base": {
+          "from": "bs",
+          "identified_by": "id",
+          "has": {
+            "x": "k1"
+          }
+        },
+        "m": {
+          "from": "base whose id exists",
+          "has": {
+            "x": "k1"
+          }
+        },
+        "n": {
+          "from": "m whose id exists",
+          "has": {
+            "x": "xs"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "n",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong naming each subject that declares the part",
+        "rules": [
+          "parts.alias",
+          "parts.written_wrong",
+          "parts.narrow"
+        ],
+        "input": {
+          "bs": [
+            {
+              "id": "b1",
+              "k1": 1,
+              "xs": 2
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.m.has.x",
+                "value": [
+                  "x can't be an alias: it's a part of base"
+                ],
+                "locations": []
+              },
+              {
+                "name": "subjects.n.has.x",
+                "value": [
+                  "x can't be an alias: it's a part of base",
+                  "x can't be an alias: it's a part of m"
+                ],
+                "locations": []
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "n"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part named like a part of a subject that isn't a parent",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "b": {
+          "from": "bs",
+          "identified_by": "id",
+          "has": {
+            "x": "k1"
+          }
+        },
+        "other": {
+          "from": "bs",
+          "identified_by": "id",
+          "has": {
+            "y": "k1"
+          }
+        },
+        "kid": {
+          "from": "b.kids",
+          "identified_by": "id",
+          "has": {
+            "y": "xs"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is accepted",
+        "rules": ["parts.alias"],
+        "input": {
+          "bs": [
+            {
+              "id": "b1",
+              "k1": {
+                "k2": {
+                  "k3": {
+                    "z": 2
+                  }
+                }
+              },
+              "kids": [
+                {
+                  "id": "k1",
+                  "xs": [
+                    {
+                      "b": {
+                        "x": {
+                          "z": 1
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 1
+                    },
+                    {
+                      "b": {
+                        "x": {
+                          "z": 5
+                        }
+                      },
+                      "x": {
+                        "z": 7
+                      },
+                      "v": 9
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": [
+
+                ]
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": [
+
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "id",
+                "value": "k1",
+                "locations": [
+                  "/bs/0/kids/0/id"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "b": "b1"
+              },
+              "type": "kid"
             }
           }
         ]
