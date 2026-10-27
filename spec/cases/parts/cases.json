@@ -5675,6 +5675,99 @@
     ]
   },
   {
+    "description": "a part declared again by a subject it narrows",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "base": {
+          "from": "bs",
+          "identified_by": "id",
+          "has": {
+            "x": "k1"
+          }
+        },
+        "m": {
+          "from": "base whose id exists",
+          "has": {
+            "x": "k1"
+          }
+        },
+        "n": {
+          "from": "m whose id exists",
+          "has": {
+            "x": "xs"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "n",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong naming each subject that declares the part",
+        "rules": [
+          "parts.alias",
+          "parts.written_wrong",
+          "parts.narrow"
+        ],
+        "input": {
+          "bs": [
+            {
+              "id": "b1",
+              "k1": 1,
+              "xs": 2
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.m.has.x",
+                "value": [
+                  "x can't be an alias: it's a part of base"
+                ],
+                "locations": []
+              },
+              {
+                "name": "subjects.n.has.x",
+                "value": [
+                  "x can't be an alias: it's a part of base",
+                  "x can't be an alias: it's a part of m"
+                ],
+                "locations": []
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "n"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a part named like a part of a subject that isn't a parent",
     "policy": {
       "ergo_spec": "v0.2-dev",
