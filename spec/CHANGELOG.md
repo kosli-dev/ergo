@@ -7,7 +7,7 @@ Each version says whether reports changed, so that anyone who only stores report
 ### New
 
 - A `whose` in a subject's `from` line takes a one-line `some` or `every` as a condition ([sentence.subject.condition](syntax.md#subjects)), like `release whose some files.path does not match "^docs/"`. Its `$applies` row gives the inputs and the cause the same sentence gives as a check row. It doesn't change the report of a policy that was read before, and a `from` line that used to be written wrong is now read.
-- `it` is the subject itself, for a subject of any type, so a list of plain values like ids, regions or tags can be checked: with `from: every deployment.regions`, `it is one of $params.allowed_regions` fails the region that isn't allowed. It starts an assertion, a `whose` condition of a `from` line, and the path after `every`, `some`, `count of` and `sum of`. A position works on a subject that is a list, written in words as for a field: `first of it`, `item 2 of it`. A row's `inputs` name it `it`, and a failed item `item 1 of it`. See [sentence.path.it](syntax.md#paths). Written anywhere else, `it` is written wrong ([sentence.path.it.step](syntax.md#paths), [sentence.path.it.place](syntax.md#paths)).
+- `it` is the subject itself, for a subject of any type, so a list of plain values like ids, regions or tags can be checked: with `from: every deployments.regions`, `it is one of $params.allowed_regions` fails the region that isn't allowed. It starts an assertion, a `whose` condition of a `from` line, and the path after `every`, `some`, `count of` and `sum of`. A position works on a subject that is a list, written in words as for a field: `first of it`, `item 2 of it`. A row's `inputs` name it `it`, and a failed item `item 1 of it`. See [sentence.path.it](syntax.md#paths). Written anywhere else, `it` is written wrong ([sentence.path.it.step](syntax.md#paths), [sentence.path.it.place](syntax.md#paths)).
 - Every entry in a row's `inputs`, in a check's `$refs` and in `failed_items` has `locations`, where its value was read: JSON Pointers like `/deployments/3/approved_by`, or `$params:` and a pointer for the params ([location](semantics.md#where-a-value-was-read)). A read that stops early points at the last value it reached, and a worked-out number lists the locations of what it was worked out from.
 
 ### Changed
@@ -30,14 +30,7 @@ Each version says whether reports changed, so that anyone who only stores report
    "failed_assertions": [{"assertion": "change_type is \"emergency\"", "cause": "value"}]}
   ```
 
-  For `from: releases whose some files.path does not match "^docs/"`, the row of release `1.4.1` in `{"releases": [{"id": "1.4.1", "files": [{"path": "docs/typo.md"}]}]}`, which only changes `docs/typo.md`, was:
-
-  ```json
-  {"check": "$applies", "subject": {"id": "1.4.1", "type": "release"}, "passed": false, "cause": "value",
-   "inputs": [{"name": "files[].path", "value": ["docs/typo.md"]}]}
-  ```
-
-  and is now:
+  For `from: releases whose some files.path does not match "^docs/"`, the row of release `1.4.1` in `{"releases": [{"id": "1.4.1", "files": [{"path": "docs/typo.md"}]}]}`, which only changes `docs/typo.md`, is:
 
   ```json
   {"check": "$applies", "subject": {"id": "1.4.1", "type": "release"}, "passed": false, "cause": "value",
@@ -97,6 +90,7 @@ Each version says whether reports changed, so that anyone who only stores report
   Under a `for` line, a walk, a `count of` or a `sum of` whose path reads through `named by` an alias also lists the part before the name, like `artifact.map` for `some artifact.map named by k is at least 1`, as [for.inputs](semantics.md#for) says. Reports change for such a check.
 
   A walk, `count of` or `sum of` whose right side or `whose` is named by a field of each item, like `some rows.n is at least artifact.nums named by key` or `count of rows whose n is at least artifact.nums named by key`, also lists the part before the name, `artifact.nums`, and never the path it names ([walk.inputs](semantics.md#every-and-some)). A second item of a `for` line that starts at a parent is named with the parent's whole name, like `artifact.map named by k[]` ([for.inputs](semantics.md#for)). Reports change for such a check.
+- A `for` alias named like a subject of the policy, or like a part of the check's own subject, of a parent or grandparent subject, or of a subject they narrow, is written wrong ([sentence.for.alias](syntax.md#the-for-line)), with `<alias> can't be an alias: it's a subject's name` or `<alias> can't be an alias: it's a part of <subject>`, which names the subject that declares the part and quotes a name with a space in it. A part named like a subject, like a part of a parent or grandparent subject or like a part kept from a subject it narrows is written wrong the same way ([parts.alias](syntax.md#parts)). `alias given twice` is gone. 0.1 read such a name, so a policy that has one, like `for: every commits as commit` in a requirement on a `commit` subject, is now written wrong: rename the alias or the part. The new cases in `cases/parts` pin it.
 
 ### Fixed
 
@@ -106,7 +100,8 @@ Each version says whether reports changed, so that anyone who only stores report
 - A walk that starts at a `for` alias holding `null` fails as `null`, as [walk.lists](semantics.md#every-and-some) says. `ergo.rego` failed it as `absent`. The new case in `cases/for` pins it. Reports change for such a walk.
 - A position at the start of a path reads the subject or a `for` alias as a list ([path.not_an_object](semantics.md#reading-a-path)), so `first of b` on a `for` alias holding `["x", "y"]` reads `"x"`, where `ergo.rego` failed it as `not_an_object`. The new case in `cases/for` pins it. Reports change for such a check.
 - A walk reads a parent through a `for` alias on its right side, like `some rows.n is at least artifact.nums named by k`, as a `count of` does ([walk.some](semantics.md#every-and-some)). `ergo.rego` failed it as `absent` even when the parent had the name. The new cases in `cases/walks` pin it. Reports change for such a walk.
-- A `for` alias named like a subject of the policy, or like a part of the check's own subject, of a parent or grandparent subject, or of a subject they narrow, is written wrong ([sentence.for.alias](syntax.md#the-for-line)), with `<alias> can't be an alias: it's a subject's name` or `<alias> can't be an alias: it's a part of <subject>`, which names the subject that declares the part and quotes a name with a space in it. A part named like a subject, like a part of a parent or grandparent subject or like a part kept from a subject it narrows is written wrong the same way ([parts.alias](syntax.md#parts)). `alias given twice` is gone. `ergo.rego` read it, and a bare name read the parent's part before the item's field, or the parent's field when the item lacked it. The new cases in `cases/parts` pin it. Reports change for such a check.
+- A `for` alias named like a subject or a part could read the wrong value: a bare name read the parent's part before the item's field, or the parent's field when the item lacked it. Reports change for such a check.
+- A second item of a `for` line that starts at a parent's part, like `every artifact.ap.w whose t is k as x` where `artifact` has `has: {ap: ps}`, named its failed items with an internal marker, like `item 2 of "{\"alias\":\"ap\",\"n\":1,\"of\":\"artifact\",\"old\":false}".ps.w`. They're named with the part's alias, `item 2 of artifact.ap.w`, as its entry `artifact.ap.w[]` in `inputs` is ([for.failed_items](semantics.md#for)). `ergo.rego` printed the marker. The new cases in `cases/for` pin it. Reports change for such a check.
 
 ## 0.1
 
