@@ -218,6 +218,8 @@ The map is the only way to write `subjects`, and a simple subject is a name with
 
 **[sentence.some.walk]** `some <path>` walks the same way, and passes when at least one value passes. An empty list fails with `value`.
 
+**[sentence.walk.steps]** The path after `every`, `some`, `count of` or `sum of` takes ten steps at most, in a check and on a `for` line, and an eleventh is written wrong. Each name in the path is a step, whether or not it walks a list, and so is a `for` alias it starts at, so with `for: every pull_requests as pr`, `every pr.commits.author` is three steps. `$input` isn't a step. A `from` line's `every` has the same limit, see [sentence.subject.every](#subjects).
+
 **[sentence.whose.item]** `whose` keeps the items that pass every one of its conditions. Its paths start at the innermost item the quantified path walks, the one that holds the field the path ends at, and the assertion is about the value the path ends at. In `some approvers.username whose state is "APPROVED" is in $params.internal_staff`, `state` is read on each approver and `username` is what's checked.
 
 **[sentence.whose.undecided]** An item that a condition can't decide, because a field it reads is missing, `null` or the wrong type, isn't left out. Under `every`, `count of` and `sum of`, the check fails with that item's cause. Under `some`, it counts as an item that failed: another item can still pass the check, and if none does, the check fails with the first cause among the items. `exists` and `does not exist` are the exception, because a missing field is their answer.
