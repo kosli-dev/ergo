@@ -14927,5 +14927,33 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a plus that reads the same list twice",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"deployment": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "deployment", "checks": {"c": "count of approvals plus count of approvals is 4"}}}},
+    "cases": [
+      {
+        "description": "shows the number and the list once each",
+        "rules": ["row.inputs_once", "location.merged", "tally.inputs", "sentence.derived.plus"],
+        "input": {"deployments": [{"id": "d1", "approvals": ["a", "b"]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/deployments/0/approvals/0", "/deployments/0/approvals/1"], "name": "count of approvals plus count of approvals", "value": 4}, {"locations": ["/deployments/0/approvals/0", "/deployments/0/approvals/1"], "name": "count of approvals", "value": 2}, {"locations": ["/deployments/0/approvals/0", "/deployments/0/approvals/1"], "name": "approvals[]", "value": ["a", "b"]}], "passed": true, "requirement": "r", "subject": {"id": "d1", "type": "deployment"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count compared with a count of the same list",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings whose severity is \"high\" is at most count of findings"}}}},
+    "cases": [
+      {
+        "description": "shows the list once, after the left side's number, and the right side's number",
+        "rules": ["row.inputs_once", "tally.inputs"],
+        "input": {"releases": [{"id": "r1", "findings": [{"severity": "high"}, {"severity": "low"}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/releases/0/findings/0", "/releases/0/findings/1"], "name": "count of findings whose severity is \"high\"", "value": 1}, {"locations": ["/releases/0/findings/0", "/releases/0/findings/1"], "name": "findings[]", "value": [{"severity": "high"}, {"severity": "low"}]}, {"locations": ["/releases/0/findings/0", "/releases/0/findings/1"], "name": "count of findings", "value": 2}], "passed": true, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
   }
 ]
