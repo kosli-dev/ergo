@@ -1,5 +1,5 @@
 {{ $wasm := resources.Get "tutorial/ergo.wasm" }}
-{{ if not $wasm }}{{ errorf "The tutorial needs Ergo compiled to Wasm: run site/build-tutorial.sh" }}{{ end }}
+{{ if not $wasm }}{{ errorf "The tutorial needs Ergo compiled to Wasm: run site/prepare.sh" }}{{ end }}
 <!doctype html>
 <html lang="{{ site.LanguageCode }}">
 <head>

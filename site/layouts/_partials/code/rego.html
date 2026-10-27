@@ -1,0 +1,13 @@
+{{- $t := .text -}}
+{{- $t = replaceRE `"([^"]*)"` "\x03${1}\x04" $t -}}
+{{- $t = replaceRE `\b(package|import|default|if|contains|some|every|in|not)\b` "\x08${1}\x06" $t -}}
+{{- $t = replaceRE `\b(true|false)\b` "\x07${1}\x06" $t -}}
+{{- $t = replaceRE `([\s(=,])([0-9]+)\b` "${1}\x05${2}\x06" $t -}}
+{{- $t = htmlEscape $t -}}
+{{- $t = replace $t "\x03" `<span class="s">"` -}}
+{{- $t = replace $t "\x04" `"</span>` -}}
+{{- $t = replace $t "\x05" `<span class="n">` -}}
+{{- $t = replace $t "\x07" `<span class="f">` -}}
+{{- $t = replace $t "\x08" `<span class="kw">` -}}
+{{- $t = replace $t "\x06" `</span>` -}}
+{{- return $t -}}

@@ -1078,6 +1078,12 @@ test("the batches in step 11 are exactly the bakery example's file", () => {
   assert.deepEqual(JSON.parse(steps[10].input), file);
 });
 
+test("the tutorial's policy names the spec of the ergo.rego it runs with", () => {
+  const report = run(batch9, tutorialPolicy({ name: "nut_free" }));
+  assert.equal(report.ergo, tutorialPolicy().ergo_spec);
+  assert.equal(verdict(report, "safe_to_sell"), "met");
+});
+
 test("step 9 runs three named checks on one batch and all of them pass", () => {
   const report = run(batch9, tutorialPolicy({ name: "nut_free" }));
   assert.deepEqual(lineResults(report, "nut_free").map((l) => [l.name, l.passed]), [["nut_free", true], ["temp_ok", true], ["time_ok", true]]);

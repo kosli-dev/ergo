@@ -1,5 +1,3 @@
-{{/* The hero's from → to: each example goes Rego policy → Rego result → Ergo policy → Ergo report.
-     Data and results match README.md, REFERENCE.md and the fixtures in ergo_test.rego. */}}
 {{- $c := .Params.hero }}
 <figure class="term ft" data-fromto aria-roledescription="carousel" aria-label="{{ $c.fromto.label }}">
   <div class="term__bar ft__bar">
@@ -13,216 +11,44 @@
   </div>
 
   <div class="ft__views" aria-live="off">
+    {{- $spec := hugo.Data.release.ergo_spec }}
+    {{- range $e := $c.fromto.examples }}
+    {{- $ex := index hugo.Data.examples $e.key }}
+    {{- $hold := $e.holds }}
 
-    {{/* Example 1: production deploy approval (README) */}}
-    {{- if $c.fromto.show_rego }}
-    <div class="ft__view" data-ex="deploy" data-step="0" data-file="policy/deploy.rego" data-hold="6000">
+    {{- if and $c.fromto.show_rego $ex.rego }}
+    <div class="ft__view" data-ex="{{ $e.key }}" data-step="0" data-file="{{ $ex.rego.file }}" data-hold="{{ index $hold 0 }}">
       <p class="ft__label mono"><span class="ft__who">Rego</span> the policy</p>
-<pre class="code ft__code"><code><span class="kw">package</span> deploy
-
-<span class="kw">default</span> allow := <span class="f">false</span>
-
-allow <span class="kw">if</span> count(deny) == <span class="n">0</span>
-
-deny <span class="kw">contains</span> msg <span class="kw">if</span> {
-	<span class="kw">some</span> d <span class="kw">in</span> input.deployments
-	d.environment == <span class="s">"prod"</span>
-	<span class="kw">not</span> d.approved_by
-	msg := sprintf(<span class="s">"%s: no approval"</span>, [d.id])
-}</code></pre>
+<pre class="code ft__code"><code>{{ partial "code/rego.html" (dict "text" $ex.rego.policy) | safeHTML }}</code></pre>
     </div>
-    {{- end }}
 
-    {{- if $c.fromto.show_rego }}
-    <div class="ft__view" data-ex="deploy" data-step="1" data-file="opa eval ... data.deploy" data-hold="5800">
+    <div class="ft__view" data-ex="{{ $e.key }}" data-step="1" data-file="opa eval ... {{ $ex.rego.query }}" data-hold="{{ index $hold 1 }}">
       <p class="ft__label mono"><span class="ft__who">Rego</span> the result</p>
-<pre class="code ft__code ft__code--out"><code>{
-  <span class="k">"allow"</span>: <span class="f">false</span>,
-  <span class="k">"deny"</span>: [<span class="s">"d-2: no approval"</span>]
-}</code></pre>
-      <p class="ft__caption">{{ partial "copy.html" (index $c.fromto.examples 0).rego_caption }}</p>
+<pre class="code ft__code ft__code--out"><code>{{ partial "code/json.html" (dict "text" $ex.rego.result) | safeHTML }}</code></pre>
+      <p class="ft__caption">{{ partial "copy.html" $e.rego_caption }}</p>
     </div>
     {{- end }}
 
-    <div class="ft__view" data-ex="deploy" data-step="2" data-file="policy/policy.yaml" data-hold="6500">
+    <div class="ft__view" data-ex="{{ $e.key }}" data-step="2" data-file="policy/policy.yaml" data-hold="{{ index $hold 2 }}">
       <p class="ft__label mono"><span class="ft__who ft__who--ergo">Ergo</span> the policy</p>
-<pre class="code ft__code"><code><span class="k">ergo_spec</span>: <span class="s">v0.1</span>
-<span class="k">subjects</span>:
-  <span class="k">deployment</span>:
-    <span class="k">from</span>: <span class="s">deployments</span> <span class="k">whose</span> <span class="s">environment is "prod"</span>
-    <span class="k">identified_by</span>: <span class="s">id</span>
-<span class="k">requirements</span>:
-  <span class="k">prod_deploy</span>:
-    <span class="k">subject</span>: <span class="s">deployment</span>
-    <span class="k">checks</span>:
-      <span class="k">approved</span>:
-        <span class="k">description</span>: <span class="s">Someone approved the deployment</span>
-        <span class="k">assert</span>: <span class="s">approved_by is a non-empty string</span></code></pre>
+<pre class="code ft__code"><code>{{ partial "code/yaml.html" (dict "text" (printf "ergo_spec: %s\n%s" $spec $ex.policy)) | safeHTML }}</code></pre>
     </div>
 
-    <div class="ft__view" data-ex="deploy" data-step="3" data-file="deployments.json" data-hold="6000">
+    <div class="ft__view" data-ex="{{ $e.key }}" data-step="3" data-file="{{ $ex.input_file }}" data-hold="{{ index $hold 3 }}">
       <p class="ft__label mono"><span class="ft__who ft__who--ergo">Ergo</span> the evaluation, reading this input</p>
-<pre class="code ft__code"><code>{
-  <span class="k">"deployments"</span>: [
-    {<span class="k">"id"</span>: <span class="s">"d-1"</span>, <span class="k">"environment"</span>: <span class="s">"prod"</span>,
-     <span class="k">"approved_by"</span>: <span class="s">"alice"</span>},
-    {<span class="k">"id"</span>: <span class="s">"d-2"</span>, <span class="k">"environment"</span>: <span class="s">"prod"</span>},
-    {<span class="k">"id"</span>: <span class="s">"d-3"</span>, <span class="k">"environment"</span>: <span class="s">"staging"</span>}
-  ]
-}</code></pre>
-      <p class="ft__caption">{{ partial "copy.html" (index $c.fromto.examples 0).input_caption }}</p>
+<pre class="code ft__code"><code>{{ partial "code/json.html" (dict "text" $ex.input) | safeHTML }}</code></pre>
+      <p class="ft__caption">{{ partial "copy.html" $e.input_caption }}</p>
     </div>
 
-    <div class="ft__view" data-ex="deploy" data-step="4" data-file="opa eval ... report" data-hold="8500">
+    <div class="ft__view" data-ex="{{ $e.key }}" data-step="4" data-file="opa eval ... report" data-hold="{{ index $hold 4 }}">
       <p class="ft__label mono"><span class="ft__who ft__who--ergo">Ergo</span> the report</p>
       <div class="report ft__report">
         <div class="report__head"><span>subject</span><span>check</span><span>value read</span><span>passed</span><span>cause</span></div>
-        <div class="report__row is-sys"><span></span><span class="sys">$well_formed</span><span>count(checks) = 1</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row is-sys"><span></span><span class="sys">$min_subjects</span><span>in-scope deployment count = 2</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row is-sys"><span></span><span class="sys">$unique_ids</span><span>repeated deployment ids = []</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row"><span>d-1</span><span class="sys">$applies</span><span>environment = "prod"</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row"><span>d-2</span><span class="sys">$applies</span><span>environment = "prod"</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row is-scope"><span>d-3</span><span class="sys">$applies</span><span>environment = "staging"</span><span class="f">false</span><span>value</span></div>
-        <div class="report__row"><span>d-1</span><span>approved</span><span>approved_by = "alice"</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row is-fail"><span>d-2</span><span>approved</span><span>approved_by = null</span><span class="f">false</span><span class="f">absent</span></div>
+        {{- partial "report-rows.html" $ex.report }}
       </div>
-      <p class="ft__caption">{{ partial "copy.html" (index $c.fromto.examples 0).ergo_caption }}</p>
-    </div>
-
-    {{/* Example 2: four eyes, someone other than the author approved (REFERENCE, ergo_test.rego pr_doc) */}}
-    {{- if $c.fromto.show_rego }}
-    <div class="ft__view" data-ex="review" data-step="0" data-file="policy/review.rego" data-hold="6400">
-      <p class="ft__label mono"><span class="ft__who">Rego</span> the policy</p>
-<pre class="code ft__code"><code><span class="kw">package</span> review
-
-<span class="kw">default</span> allow := <span class="f">false</span>
-
-allow <span class="kw">if</span> count(deny) == <span class="n">0</span>
-
-deny <span class="kw">contains</span> msg <span class="kw">if</span> {
-	<span class="kw">some</span> pr <span class="kw">in</span> input.pull_requests
-	<span class="kw">not</span> peer_approved(pr)
-	msg := sprintf(<span class="s">"PR %d: no independent approval"</span>, [pr.number])
-}
-
-peer_approved(pr) <span class="kw">if</span> {
-	<span class="kw">some</span> a <span class="kw">in</span> pr.approvers
-	a.username != pr.author
-}</code></pre>
+      <p class="ft__caption">{{ partial "copy.html" $e.ergo_caption }}</p>
     </div>
     {{- end }}
-
-    {{- if $c.fromto.show_rego }}
-    <div class="ft__view" data-ex="review" data-step="1" data-file="opa eval ... data.review" data-hold="6200">
-      <p class="ft__label mono"><span class="ft__who">Rego</span> the result</p>
-<pre class="code ft__code ft__code--out"><code>{
-  <span class="k">"allow"</span>: <span class="f">false</span>,
-  <span class="k">"deny"</span>: [
-    <span class="s">"PR 2: no independent approval"</span>,
-    <span class="s">"PR 3: no independent approval"</span>
-  ]
-}</code></pre>
-      <p class="ft__caption">{{ partial "copy.html" (index $c.fromto.examples 1).rego_caption }}</p>
-    </div>
-    {{- end }}
-
-    <div class="ft__view" data-ex="review" data-step="2" data-file="policy/policy.yaml" data-hold="6500">
-      <p class="ft__label mono"><span class="ft__who ft__who--ergo">Ergo</span> the policy</p>
-<pre class="code ft__code"><code><span class="k">ergo_spec</span>: <span class="s">v0.1</span>
-<span class="k">subjects</span>:
-  <span class="k">pull request</span>:
-    <span class="k">from</span>: <span class="s">pull_requests</span>
-    <span class="k">identified_by</span>: <span class="s">number</span>
-<span class="k">requirements</span>:
-  <span class="k">peer_reviewed</span>:
-    <span class="k">subject</span>: <span class="s">pull request</span>
-    <span class="k">checks</span>:
-      <span class="k">peer</span>:
-        <span class="k">description</span>: <span class="s">Someone other than the author approved it</span>
-        <span class="k">for</span>: <span class="s">some approvers as approver</span>
-        <span class="k">assert</span>: <span class="s">approver.username does not equal author</span></code></pre>
-    </div>
-
-    <div class="ft__view" data-ex="review" data-step="3" data-file="pull_requests.json" data-hold="6000">
-      <p class="ft__label mono"><span class="ft__who ft__who--ergo">Ergo</span> the evaluation, reading this input</p>
-<pre class="code ft__code"><code>{
-  <span class="k">"pull_requests"</span>: [
-    {<span class="k">"number"</span>: <span class="n">1</span>, <span class="k">"author"</span>: <span class="s">"ann"</span>,
-      <span class="k">"approvers"</span>: [{<span class="k">"username"</span>: <span class="s">"ann"</span>}, {<span class="k">"username"</span>: <span class="s">"bob"</span>}]},
-    {<span class="k">"number"</span>: <span class="n">2</span>, <span class="k">"author"</span>: <span class="s">"bob"</span>,
-      <span class="k">"approvers"</span>: [{<span class="k">"username"</span>: <span class="s">"bob"</span>}]},
-    {<span class="k">"number"</span>: <span class="n">3</span>,
-      <span class="k">"approvers"</span>: [{<span class="k">"username"</span>: <span class="s">"bob"</span>}]}
-  ]
-}</code></pre>
-      <p class="ft__caption">{{ partial "copy.html" (index $c.fromto.examples 1).input_caption }}</p>
-    </div>
-
-    <div class="ft__view" data-ex="review" data-step="4" data-file="opa eval ... report" data-hold="8500">
-      <p class="ft__label mono"><span class="ft__who ft__who--ergo">Ergo</span> the report</p>
-      <div class="report ft__report">
-        <div class="report__head"><span>subject</span><span>check</span><span>value read</span><span>passed</span><span>cause</span></div>
-        <div class="report__row is-sys"><span></span><span class="sys">$well_formed</span><span>count(checks) = 1</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row is-sys"><span></span><span class="sys">$min_subjects</span><span>in-scope pull request count = 3</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row is-sys"><span></span><span class="sys">$unique_ids</span><span>repeated pull request ids = []</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row"><span>1</span><span>peer</span><span>author = "ann"<br><span class="n">approvers: ann, bob</span></span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row is-fail"><span>2</span><span>peer</span><span>author = "bob"<br><span class="n">approvers: bob</span></span><span class="f">false</span><span class="f">value</span></div>
-        <div class="report__row is-fail"><span>3</span><span>peer</span><span>author = null<br><span class="n">approvers: bob</span></span><span class="f">false</span><span class="f">absent</span></div>
-      </div>
-      <p class="ft__caption">{{ partial "copy.html" (index $c.fromto.examples 1).ergo_caption }}</p>
-    </div>
-
-
-    {{/* Example 3: expense claims, outside software delivery (checked by running ergo.rego on this policy and input) */}}
-    <div class="ft__view" data-ex="expenses" data-step="2" data-file="policy/policy.yaml" data-hold="6500">
-      <p class="ft__label mono"><span class="ft__who ft__who--ergo">Ergo</span> the policy</p>
-<pre class="code ft__code"><code><span class="k">ergo_spec</span>: <span class="s">v0.1</span>
-<span class="k">subjects</span>:
-  <span class="k">expense</span>:
-    <span class="k">from</span>: <span class="s">expenses</span>
-    <span class="k">identified_by</span>: <span class="s">id</span>
-<span class="k">requirements</span>:
-  <span class="k">expense_policy</span>:
-    <span class="k">subject</span>: <span class="s">expense</span>
-    <span class="k">checks</span>:
-      <span class="k">within_limit</span>:
-        <span class="k">description</span>: <span class="s">The meal costs at most €50</span>
-        <span class="k">assert</span>: <span class="s">amount is at most 50</span>
-      <span class="k">receipt</span>:
-        <span class="k">description</span>: <span class="s">A receipt is attached</span>
-        <span class="k">assert</span>: <span class="s">receipt is a non-empty string</span></code></pre>
-    </div>
-
-    <div class="ft__view" data-ex="expenses" data-step="3" data-file="expenses.json" data-hold="6000">
-      <p class="ft__label mono"><span class="ft__who ft__who--ergo">Ergo</span> the evaluation, reading this input</p>
-<pre class="code ft__code"><code>{
-  <span class="k">"expenses"</span>: [
-    {<span class="k">"id"</span>: <span class="s">"e-1"</span>, <span class="k">"amount"</span>: <span class="n">42</span>,
-     <span class="k">"receipt"</span>: <span class="s">"r-881.pdf"</span>},
-    {<span class="k">"id"</span>: <span class="s">"e-2"</span>, <span class="k">"amount"</span>: <span class="n">68</span>,
-     <span class="k">"receipt"</span>: <span class="s">"r-902.pdf"</span>},
-    {<span class="k">"id"</span>: <span class="s">"e-3"</span>, <span class="k">"amount"</span>: <span class="n">35</span>}
-  ]
-}</code></pre>
-      <p class="ft__caption">{{ partial "copy.html" (index $c.fromto.examples 2).input_caption }}</p>
-    </div>
-
-    <div class="ft__view" data-ex="expenses" data-step="4" data-file="opa eval ... report" data-hold="8500">
-      <p class="ft__label mono"><span class="ft__who ft__who--ergo">Ergo</span> the report</p>
-      <div class="report ft__report">
-        <div class="report__head"><span>subject</span><span>check</span><span>value read</span><span>passed</span><span>cause</span></div>
-        <div class="report__row is-sys"><span></span><span class="sys">$well_formed</span><span>count(checks) = 2</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row is-sys"><span></span><span class="sys">$min_subjects</span><span>in-scope expense count = 3</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row is-sys"><span></span><span class="sys">$unique_ids</span><span>repeated expense ids = []</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row"><span>e-1</span><span>receipt</span><span>receipt = "r-881.pdf"</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row"><span>e-1</span><span>within_limit</span><span>amount = 42</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row"><span>e-2</span><span>receipt</span><span>receipt = "r-902.pdf"</span><span class="t">true</span><span>satisfied</span></div>
-        <div class="report__row is-fail"><span>e-2</span><span>within_limit</span><span>amount = 68</span><span class="f">false</span><span class="f">value</span></div>
-        <div class="report__row is-fail"><span>e-3</span><span>receipt</span><span>receipt = null</span><span class="f">false</span><span class="f">absent</span></div>
-        <div class="report__row"><span>e-3</span><span>within_limit</span><span>amount = 35</span><span class="t">true</span><span>satisfied</span></div>
-      </div>
-      <p class="ft__caption">{{ partial "copy.html" (index $c.fromto.examples 2).ergo_caption }}</p>
-    </div>
 
   </div>
 

@@ -1,9 +1,14 @@
-# Publishes a release when a rego-v* or spec-v* tag is pushed.
 name: release
 
 on:
   push:
     tags: ['rego-v*', 'spec-v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: An existing rego-vX.Y.Z or spec-vX.Y tag to publish
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -12,9 +17,12 @@ concurrency:
   group: release
   cancel-in-progress: false
 
+env:
+  TAG: ${{ inputs.tag || github.ref_name }}
+
 jobs:
   release-rego:
-    if: startsWith(github.ref, 'refs/tags/rego-v')
+    if: startsWith(inputs.tag || github.ref_name, 'rego-v')
     runs-on: ubuntu-latest
     permissions:
       actions: write
@@ -24,16 +32,17 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          ref: ${{ inputs.tag || github.ref }}
           fetch-depth: 0
       - name: Read the version from the tag
         shell: bash
         run: |
-          echo "VERSION=${GITHUB_REF_NAME#rego-v}" >> "$GITHUB_ENV"
+          echo "VERSION=${TAG#rego-v}" >> "$GITHUB_ENV"
       - name: Check the version has the right shape
         shell: bash
         run: |
           if ! printf '%s\n' "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
-            echo "rego-v tags look like rego-v0.1.0, not $GITHUB_REF_NAME"
+            echo "rego-v tags look like rego-v0.1.0, not $TAG"
             exit 1
           fi
       - name: Check the tag points at a commit of main
@@ -76,17 +85,26 @@ jobs:
           sed "s/^version := \"$VERSION-dev\"$/version := \"$VERSION\"/" ergo.rego > "$RUNNER_TEMP/ergo.rego"
           grep -qxF "version := \"$VERSION\"" "$RUNNER_TEMP/ergo.rego"
           opa check --strict "$RUNNER_TEMP/ergo.rego"
-      - name: Create the release
+      - name: Create the release, which is the latest only when it's the highest ergo.rego version
         shell: bash
         run: |
-          awk -v h="## $VERSION" '$0 == h { on = 1; next } /^## / { on = 0 } on' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
-          if ! grep -q '[^[:space:]]' "$RUNNER_TEMP/notes.md"; then
-            echo "CHANGELOG.md has nothing under \"## $VERSION\", so there are no release notes"
-            exit 1
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "The release $TAG already exists"
+            exit 0
           fi
-          gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP/ergo.rego" \
+          git show "$GITHUB_SHA:.github/release-notes.sh" > "$RUNNER_TEMP/release-notes.sh"
+          sh "$RUNNER_TEMP/release-notes.sh" CHANGELOG.md "$VERSION" "https://github.com/$GITHUB_REPOSITORY/blob/$TAG/" > "$RUNNER_TEMP/notes.md"
+          highest=$(git tag --list 'rego-v*' | grep -E '^rego-v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1)
+          if [ "$TAG" = "$highest" ]; then
+            latest=--latest
+          else
+            latest=--latest=false
+          fi
+          echo "The highest rego-vX.Y.Z tag is $highest, so $TAG is created with $latest"
+          gh release create "$TAG" "$RUNNER_TEMP/ergo.rego" \
             --title "ergo.rego $VERSION" \
             --notes-file "$RUNNER_TEMP/notes.md" \
+            "$latest" \
             --verify-tag
       - name: Start the site deploy, so the home page names this release
         run: gh workflow run pages.yml --ref main
@@ -107,7 +125,7 @@ jobs:
       - name: Read the version from the tag
         shell: bash
         run: |
-          echo "VERSION=${GITHUB_REF_NAME#rego-v}" >> "$GITHUB_ENV"
+          echo "VERSION=${TAG#rego-v}" >> "$GITHUB_ENV"
       - name: Open the pull request that moves main to the next version
         shell: bash
         run: |
@@ -160,26 +178,27 @@ jobs:
           echo "$out"
 
   release-spec:
-    if: startsWith(github.ref, 'refs/tags/spec-v')
+    if: startsWith(inputs.tag || github.ref_name, 'spec-v')
     runs-on: ubuntu-latest
     permissions:
       actions: write
-      contents: read
+      contents: write
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v7
         with:
+          ref: ${{ inputs.tag || github.ref }}
           fetch-depth: 0
       - name: Read the version from the tag
         shell: bash
         run: |
-          echo "VERSION=${GITHUB_REF_NAME#spec-v}" >> "$GITHUB_ENV"
+          echo "VERSION=${TAG#spec-v}" >> "$GITHUB_ENV"
       - name: Check the version has the right shape
         shell: bash
         run: |
           if ! printf '%s\n' "$VERSION" | grep -qE '^[0-9]+\.[0-9]+$'; then
-            echo "spec-v tags look like spec-v0.1, not $GITHUB_REF_NAME"
+            echo "spec-v tags look like spec-v0.1, not $TAG"
             exit 1
           fi
       - name: Check the tag points at a commit of main
@@ -233,5 +252,21 @@ jobs:
         run: '"$RUNNER_TEMP/venv/bin/python" .github/spec-schemas.py'
       - name: Check ergo.rego and the ABNF read the same sentences
         run: '"$RUNNER_TEMP/venv/bin/python" spec/check_grammar.py'
+      - name: Create the release, which is never the latest, so releases/latest stays ergo.rego
+        shell: bash
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "The release $TAG already exists"
+            exit 0
+          fi
+          git show "$GITHUB_SHA:.github/release-notes.sh" > "$RUNNER_TEMP/release-notes.sh"
+          sh "$RUNNER_TEMP/release-notes.sh" spec/CHANGELOG.md "$VERSION" "https://github.com/$GITHUB_REPOSITORY/blob/$TAG/spec/" > "$RUNNER_TEMP/notes.md"
+          cp spec/policy/schema.json "$RUNNER_TEMP/policy.schema.json"
+          cp spec/report/schema.json "$RUNNER_TEMP/report.schema.json"
+          gh release create "$TAG" "$RUNNER_TEMP/policy.schema.json" "$RUNNER_TEMP/report.schema.json" \
+            --title "Ergo spec $VERSION" \
+            --notes-file "$RUNNER_TEMP/notes.md" \
+            --latest=false \
+            --verify-tag
       - name: Deploy the site, which now serves this version's schemas
         run: gh workflow run pages.yml --ref main

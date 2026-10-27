@@ -3,4 +3,6 @@ resources/
 .hugo_build.lock
 assets/tutorial/
 static/spec/
+prepared/
 data/release.json
+assets/jsconfig.json

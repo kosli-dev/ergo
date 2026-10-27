@@ -14,16 +14,19 @@ hero:
     show_rego: false
     examples:
       - key: deploy
+        holds: [6000, 5800, 6500, 6000, 8500]
         label: Deploy approval
         input_caption: Three deployments. d-2 has no approved_by field at all, and d-3 is in staging.
         rego_caption: Rego says no. Nothing about d-1, or why d-3 was skipped.
         ergo_caption: d-3 is out of scope. d-2 was never approved... and the report says so.
       - key: review
+        holds: [6400, 6200, 6500, 6000, 8500]
         label: Four eyes
         input_caption: Three pull requests. PR 2 was approved only by its author, and PR 3 has no author recorded.
         rego_caption: Two failures, one message. Which is which?
         ergo_caption: PR 2 was only approved by its author. PR 3 has no author recorded. Different problems, different fixes.
       - key: expenses
+        holds: [6000, 5800, 6500, 6000, 8500]
         label: Expenses
         input_caption: Three meal expenses. e-2 is over the €50 limit, and e-3 has no receipt.
         ergo_caption: e-2 costs too much and e-3 has no receipt, so whoever claimed them knows exactly what to fix.
@@ -39,8 +42,10 @@ problem:
   with:
     label: With **Ergo** you get explanations
     note: Same decision. Now you can see why.
+    out_of_scope: (out of scope, recorded)
 
 declaration:
+  marks: {subjects: 1, from: 1, whose: 2, identified_by: 1, subject: 3, checks: 3}
   title: Write the policy.
   muted: Not the sorcery.
   notes_title: Defined in YAML or Rego
