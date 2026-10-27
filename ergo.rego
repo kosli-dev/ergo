@@ -762,12 +762,30 @@ else := o if {
 	_scoped(req)
 	s := _scope_of(req, subj)
 	raw := _check_outcome(check, subj, flaw) with input as s
-	o := object.union(raw, {"inputs": _tagged(raw.inputs, check, req, subj)}) with input as s
+	o := _tagged_failures(object.union(raw, {"inputs": _tagged(raw.inputs, check, req, subj)}), check, req, subj) with input as s
 }
 
 _tagged_outcome(raw, _, req, _) := raw if not _tagging(req)
 
-_tagged_outcome(raw, check, req, subj) := object.union(raw, {"inputs": _tagged(raw.inputs, check, req, subj)}) if _tagging(req)
+_tagged_outcome(raw, check, req, subj) := _tagged_failures(object.union(raw, {"inputs": _tagged(raw.inputs, check, req, subj)}), check, req, subj) if _tagging(req)
+
+_tagged_failures(row, check, req, subj) := object.union(row, {"failed_items": [_tagged_failure(f, check, req, subj) | some f in row.failed_items]}) if "failed_items" in object.keys(row)
+
+else := row
+
+_tagged_failure(f, check, req, subj) := object.union(f, {"failed_assertions": [_tagged_line(l, check, req, subj) | some l in f.failed_assertions]}) if "failed_assertions" in object.keys(f)
+
+else := f
+
+_tagged_line(l, check, req, subj) := object.union(l, object.union(_tagged_line_inputs(l, check, req, subj), _tagged_line_items(l, check, req, subj)))
+
+_tagged_line_inputs(l, check, req, subj) := {"inputs": _tagged(l.inputs, check, req, subj)} if "inputs" in object.keys(l)
+
+else := {}
+
+_tagged_line_items(l, check, req, subj) := {"items": [object.union(x, {"inputs": _tagged(x.inputs, check, req, subj)}) | some x in l.items]} if "items" in object.keys(l)
+
+else := {}
 
 _tagging(req) if {
 	_has_fixed(req)
@@ -3442,9 +3460,25 @@ _anchored(row, at) := object.union(row, {"inputs": _tie_sorted(_anchored_all(row
 
 else := object.union(row, {"inputs": _tie_sorted(_anchored_all(row.inputs, at)), "failed_items": [_anchored_failed(f, at) | some f in row.failed_items]})
 
-_anchored_failed(f, at) := object.union(f, {"locations": [replace(l, "~~", at) | some l in f.locations], "failed_items": _anchored_all(f.failed_items, at)}) if "failed_items" in object.keys(f)
+_anchored_failed(f, at) := object.union(_anchored_all([f], at)[0], object.union(_anchored_inner(f, at), _anchored_lines(f, at)))
 
-else := _anchored_all([f], at)[0]
+_anchored_inner(f, at) := {"failed_items": _anchored_all(f.failed_items, at)} if "failed_items" in object.keys(f)
+
+else := {}
+
+_anchored_lines(f, at) := {"failed_assertions": [_anchored_line(l, at) | some l in f.failed_assertions]} if "failed_assertions" in object.keys(f)
+
+else := {}
+
+_anchored_line(l, at) := object.union(l, object.union(_anchored_line_inputs(l, at), _anchored_line_items(l, at)))
+
+_anchored_line_inputs(l, at) := {"inputs": _anchored_inputs(l.inputs, at)} if "inputs" in object.keys(l)
+
+else := {}
+
+_anchored_line_items(l, at) := {"items": [object.union(x, {"inputs": _anchored_inputs(x.inputs, at)}) | some x in l.items]} if "items" in object.keys(l)
+
+else := {}
 
 _tie_sorted(xs) := xs if count(xs) < 2
 
@@ -3453,6 +3487,8 @@ else := xs if count({x.name | some x in xs}) == count(xs)
 else := [xs[t[2]] | some t in sort([[_first_read(xs, xs[i]), xs[i].locations, i] | some i, _ in xs])]
 
 _first_read(xs, x) := min({j | some j, y in xs; y.name == x.name; y.value == x.value; object.get(y, "part", null) == object.get(x, "part", null)})
+
+_anchored_inputs(xs, at) := _once(_tie_sorted(_anchored_all(xs, at)))
 
 _anchored_all(xs, at) := [object.union(x, {"locations": [replace(l, "~~", at) | some l in x.locations]}) | some x in xs]
 
@@ -7772,12 +7808,23 @@ _for_inner(check, subj, names, w) := {"passed": false, "cause": "not_an_object",
 }
 
 _for_lines(check, subj, names) := {"passed": count(lines) == 0, "cause": _all_of_cause(lines), "lines": lines} if {
-	lines := [{"assertion": check.assertions[i], "cause": cause} |
+	lines := [{"assertion": check.assertions[i], "cause": cause, "inputs": _for_line_inputs(check, read)} |
 		some i, c in check.checks
-		cause := _assertion_cause(c, subj, "") with input as {"ergo/names": names}
+		cause := _for_cause(c, subj) with input as {"ergo/names": names}
 		cause != "satisfied"
+		read := _for_read(c, subj) with input as {"ergo/names": names}
 	]
 }
+
+_for_cause(c, subj) := e.cause if {
+	_derived_once(c)
+	e := _derived_eval(c, subj)
+} else := _assertion_cause(c, subj, "")
+
+_for_read(c, subj) := _with_key_fields(subj, c, e.inputs) if {
+	_derived_once(c)
+	e := _derived_eval(c, subj)
+} else := _with_key_fields(subj, c, _assertion_inputs(subj, c))
 
 _for_merge_lines(_, "satisfied", _) := []
 
@@ -7787,7 +7834,14 @@ _for_merge_lines(check, cause, fails) := [object.union({"assertion": a, "cause":
 	count(causes) > 0
 ] if cause != "satisfied"
 
-_for_line_items(check, i, a, fails) := {"items": [{"item": _for_item_name(f.path), "cause": l.cause} |
+_for_line_inputs(check, inputs) := [object.union(i, {"name": _for_input_name(i.name, {item.as | some item in check.items})}) | some i in inputs]
+
+_for_input_name(name, aliases) := concat("", [m[1], alias, m[2]]) if {
+	some alias in aliases
+	m := regex.find_all_string_submatch_n(concat("", [`(?s)^((?:item [0-9]+ of )?)\$`, _quoted(alias), `((?:[.\[ ].*)?)$`]), name, 1)[0]
+} else := name
+
+_for_line_items(check, i, a, fails) := {"items": [{"item": _for_item_name(f.path), "cause": l.cause, "inputs": l.inputs} |
 	some p in sort({f.path | some f in fails; some l in f.lines; l.assertion == a})
 	some f in fails
 	f.path == p
@@ -7795,7 +7849,9 @@ _for_line_items(check, i, a, fails) := {"items": [{"item": _for_item_name(f.path
 	l.assertion == a
 ]} if _reads_name(check.checks[i], check.items[1].as)
 
-else := {}
+else := {"inputs": _for_line_first_inputs(a, fails)}
+
+_for_line_first_inputs(a, fails) := inputs[0] if inputs := [l.inputs | some f in fails; some l in f.lines; l.assertion == a]
 
 _reads_name(c, name) if {
 	walk(c, [at, x])

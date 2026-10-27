@@ -47,6 +47,48 @@ Each version says whether reports changed, so that anyone who only stores report
 
 - A subject called `it` is written wrong ([sentence.path.it.name](syntax.md#paths)), for the requirements that use it.
 - `it` is a word of the grammar ([sentence.words](syntax.md#words-a-field-cant-be-called)). A field called `it` is written `.it`, and the report prints `.it`. Reports reach this when a policy starts a path with a bare `it`, which now reads the subject itself instead of its field `it`, and when an alias or a part is called `it`, which is now written wrong.
+- A sentence that failed on a `for` line gives the values it compared, in `inputs` ([for.failure_inputs](semantics.md#for)). Each entry of a failed sentence's `items` has them, and so does a failed sentence that has no `items`, because it doesn't read the second list's item. They are the entries the sentence would have in the `inputs` of a row of its own, with `name`, `value`, `locations` and `part`, and the names as the sentence writes them, like `approver.timestamp`. The report schema gains `inputs` on those entries. A tool can show "1792655359 is not after 1792656245" without reading the sentence. Every failure has them, so a report with many failed items is longer.
+
+  With this input:
+
+  ```json
+  {"pull_requests": [{"id": "pr-8",
+                      "approvers": [{"username": "bob", "timestamp": 1792655359}],
+                      "commits": [{"sha": "a1", "timestamp": 1792656245}]}]}
+  ```
+
+  and this check:
+
+  ```yaml
+  peer_approval:
+    for: some approvers as approver, every commits as commit
+    assert: approver.timestamp is after commit.timestamp
+  ```
+
+  the first entry of `failed_items` was:
+
+  ```json
+  {"cause": "value",
+   "failed_assertions": [{"assertion": "approver.timestamp is after commit.timestamp", "cause": "value",
+                          "items": [{"cause": "value", "item": "item 1 of commits"}]}],
+   "item": "item 1 of approvers", "locations": ["/pull_requests/0/approvers/0"], "path": "item 1 of approvers",
+   "value": {"timestamp": 1792655359, "username": "bob"}}
+  ```
+
+  and is now:
+
+  ```json
+  {"cause": "value",
+   "failed_assertions": [{"assertion": "approver.timestamp is after commit.timestamp", "cause": "value",
+                          "items": [{"cause": "value",
+                                     "inputs": [{"locations": ["/pull_requests/0/approvers/0/timestamp"],
+                                                 "name": "approver.timestamp", "value": 1792655359},
+                                                {"locations": ["/pull_requests/0/commits/0/timestamp"],
+                                                 "name": "commit.timestamp", "value": 1792656245}],
+                                     "item": "item 1 of commits"}]}],
+   "item": "item 1 of approvers", "locations": ["/pull_requests/0/approvers/0"], "path": "item 1 of approvers",
+   "value": {"timestamp": 1792655359, "username": "bob"}}
+  ```
 
 - A row shows each entry of its `inputs` once ([row.inputs_once](semantics.md#what-a-row-shows)). A check that reads the same value twice, like `count of approvals plus count of approvals is 4`, listed it twice, as [tally.inputs](semantics.md#counts-and-sums-in-sentences) said. Reports change for such a check.
 - The row of a one-line `some` or `every`, of a `count of` or `sum of`, and an `$applies` row of a `from` condition list the value of each parent or `$input` path they compare with, as a plain check does ([walk.inputs](semantics.md#every-and-some), [tally.inputs](semantics.md#counts-and-sums-in-sentences)), and never the value of a `for` alias. They list the subject's own part they compare with too, with its `part` tag ([parts.tag](semantics.md#parts)). For the check `some commits.author is artifact.owner` the row's `inputs` held only `{"name": "commits[].author", "value": ["bob", "ann"], ...}`, and now `{"name": "artifact.owner", "value": "ann", ...}` comes before it. For `some commits.author is w` it now has `{"name": "w", "value": "ann", "part": {"id": null, "name": "w"}, ...}`. Under a `for` line, a `count of` or `sum of` lists the parent values its `whose` reads, and its own list when that list doesn't start at the alias ([for.inputs](semantics.md#for)). Reports change for such a check.
