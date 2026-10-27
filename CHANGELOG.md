@@ -179,7 +179,7 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 - A second item of a `for` line that starts at a parent and goes through `named by`, like `every artifact.map named by k as x`, was listed with the first letter of the parent cut off, as `rtifact.map named by k[]`. It's `artifact.map named by k[]` now.
 
-  A second item that starts at a parent's part, like `every artifact.ap.w whose t is k as x` where `artifact` has `has: {ap: ps}`, named its items that failed before any sentence was checked, and the items a failed sentence lists, with an internal marker in it, `item 2 of "{\"alias\":\"ap\",\"n\":1,\"of\":\"artifact\",\"old\":false}".ps.w`. It's `item 2 of artifact.ap.w` now, as the entry `artifact.ap.w[]` in `inputs` is. One that reads the part through `named by`, like `every artifact.ap named by k.t as x`, is `item 2 of artifact.ap.k1`, and still names the key it read, as a walk does.
+  A second item that starts at a parent's part, like `every artifact.ap.w whose t is k as x` where `artifact` has `has: {ap: ps}`, named its items that failed before any sentence was checked, and the items a failed sentence lists, with an internal marker in it, `item 2 of "{\"alias\":\"ap\",\"n\":1,\"of\":\"artifact\",\"old\":false}".ps.w`. It's `item 2 of artifact.ap.w` now, as the entry `artifact.ap.w[]` in `inputs` is. One that reads the part through `named by`, like `every artifact.ap named by k as x`, is `item 2 of artifact.ap.k1` when `k` is `k1`, and still names the key it read, as a walk does.
 
 ## 0.1.0
 
