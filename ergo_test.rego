@@ -4671,6 +4671,10 @@ test_a_walk_that_is_already_written_wrong_for_another_reason_gets_no_ten_step_me
 	_parent_part_problems(has, "count of xs whose n is sum of b.x.z is 0") == [["a sum of or a plus in the whose of a count of or a sum of isn't supported yet"]]
 }
 
+test_a_for_alias_named_like_a_parent_subject_still_counts_the_parents_part if {
+	_parent_part_problems({"x": _ten}, {"for": "every xs as b", "assert": "every b.x.z is 1"}) == [_too_long]
+}
+
 test_a_walk_whose_named_by_cant_be_read_shows_an_empty_list_in_its_inputs if {
 	r := ergo.report({"things": [{"id": "a", "xs": {"k": [1]}}]}, _sentence_policy({"c": "every xs named by $params.k is 1"}), {})
 	[[row.cause, row.inputs, row.failed_items] | some row in r.results; row.check == "c"] == [["absent", [{"name": "xs named by $params.k", "value": [], "locations": []}], []]]
