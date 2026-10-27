@@ -179,7 +179,7 @@ It reads like the same sentence as a check: its path starts at the subject, a ba
 
 **[sentence.subject.narrow]** A chain can narrow instead of descending: `from: defect whose severity is "critical" and status is one of "open", "in_progress"` is a `defect` with two more conditions. Its rows are rows of the parent, with the same id and no `in`. DEV-0409 and DEV-0410 use it.
 
-**[sentence.subject.depth]** Each level of walking is written out in Rego, not recursion, so the levels from the input to the assertion have a fixed ceiling: three list walks, see [sentence.for.depth](#the-for-line). A chain can be three subjects deep, one more than the corpus needs, see [subjects.chain.levels](semantics.md#requirements). No chain in the corpus is more than two subjects deep, and no check in it walks more than three lists.
+**[sentence.subject.depth]** A chain can be three subjects deep, one more than the corpus needs, see [subjects.chain.levels](semantics.md#requirements). No chain in the corpus is more than two subjects deep.
 
 **[sentence.subject.own]** A subject's own name in its own `from` is the input field, never the subject, so sdlc-policies 0004's `lockfile` subject can have `from: lockfile whose status is "COMPLETE"`. Any other subject's name starts a chain. `$input.artifact` reaches the input field `artifact` even when a subject named `artifact` exists. The tokenizer applied these two rules to every `from` line in the corpus and found exactly the six chains it has.
 
@@ -259,8 +259,6 @@ peer_approved:
 
 Items nest left to right, so a later one can use an earlier alias, as `pr.approvers` does. A third item is written wrong, because two is the one level of nesting Rego gives.
 
-**[sentence.for.depth]** A check walks three lists at most, from the input to its assertion, counted as list walks and not as subjects. Walks in `from`, in a parent subject's `from`, on the `for` line, in a one-line `every` or `some`, and in a `count of` or `sum of`, in a `whose` too, all count, and a fourth is written wrong. A `count of` or `sum of` counts because it reads every item of its list, as `every` does, so `for: every pull_requests as pr` with `assert: count of pr.reviews is at least 2` walks two lists. sdlc-policies 0007's peer approval reaches the limit: pull requests in its `from`, then approvers and commits on its `for` line. Its `artifact` parent picks one artifact by name and walks no list.
-
 **[sentence.for.scope]** In `assert` and in a later item, a bare first key is the subject's field and an item is reached by its alias. Inside an item's own `whose`, a bare key is that item's field. So in `for: some approvals whose role is "qa" as approval` with `assert: approval.approved_at is before started_at`, `role` is the approval's and `started_at` the subject's.
 
 The left side of a `whose` is the item's field even when an alias has the same name, because "deployments whose env is prod" can only mean the deployment's `env`. On the right side of a `whose`, and on the right side after a one-line `every` or `some`, a bare name that's an alias is the alias, and the item's field with that name is written with a dot. With `for: every environments as env, …`:
@@ -298,7 +296,7 @@ Some rules can't be said in ABNF, so they're here:
 
 - A bare first key is never a word of the grammar, see [sentence.words](#words-a-field-cant-be-called). A `for` alias isn't one either, nor `params` or `input`. `it` is the subject itself and only goes where [sentence.path.it](#paths) says, so the grammar lets it stand in more places than a check can use.
 - Which bare first key is a subject's field, an item's field, a `for` alias or a subject's name depends on where the sentence is, see [sentence.path.start](#paths), [sentence.for.scope](#the-for-line) and [sentence.subject.own](#subjects).
-- A `for` line has two items at most, and a check walks three lists at most, see [sentence.for.depth](#the-for-line).
+- A `for` line has two items at most, see [sentence.for.line](#the-for-line).
 - `is`, `equals` and `is equal to` read the same, as do `is one of` and `is in`, and the report picks the spelling, see [sentence.print.canonical](#printing-the-sentence).
 - A run of spaces between two words reads as one, and a list of values can be written with or without a space after each comma. The report prints one space and `, `.
 - The bounds of `is between` are in order, a string in `matches` is a valid regular expression, and a `for` alias is given once, or the sentence is written wrong.

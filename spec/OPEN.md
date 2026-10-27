@@ -75,7 +75,6 @@ Every rule needs a case, apart from the ones listed here. The `sentence` rules h
 - `sentence.flat`
 - `sentence.subject.depth`
 - `sentence.argument.subject`
-- `sentence.for.depth`
 - `report.engine`
 - `report.hash`
 

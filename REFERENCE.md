@@ -1209,7 +1209,7 @@ Ergo doesn't run every sentence the spec describes yet. These are written wrong 
 
 Pick the item on a `for` line instead, as the message says.
 
-In a `from` line or an `identified_by`, `named by` a bare word is written wrong too, with `unknown name <word>`, because there's no subject to read it from yet. And Ergo doesn't check the limit of three list walks that [sentence.for.depth](spec/syntax.md#the-for-line) sets.
+In a `from` line or an `identified_by`, `named by` a bare word is written wrong too, with `unknown name <word>`, because there's no subject to read it from yet.
 
 ### The subject itself
 

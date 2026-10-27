@@ -32,7 +32,7 @@ _case_names(topic) := {concat(" / ", [topic, group.description, c.description]) 
 
 test_every_known_difference_names_a_case if known_differences - union({_case_names(topic) | some topic, _ in data.spec.cases}) == set()
 
-_tested_topics := {"any_of", "compare", "compare_time", "contains", "derived", "equals", "for", "in", "it", "missing", "non_empty_string", "parts", "patterns", "present", "range", "requirements", "sentences", "subjects", "walks"}
+_tested_topics := {"any_of", "compare", "compare_time", "contains", "deep_walks", "derived", "equals", "for", "in", "it", "missing", "non_empty_string", "parts", "patterns", "present", "range", "requirements", "sentences", "subjects", "walks"}
 
 test_every_folder_of_cases_has_a_test_of_its_own if {t | some t, _ in data.spec.cases} == _tested_topics
 
@@ -54,6 +54,11 @@ test_the_compare_time_cases_pass if {
 test_the_contains_cases_pass if {
 	_topic_failures("contains") == _known_in("contains")
 	_compiled_differences("contains") == set()
+}
+
+test_the_deep_walks_cases_pass if {
+	_topic_failures("deep_walks") == _known_in("deep_walks")
+	_compiled_differences("deep_walks") == set()
 }
 
 test_the_derived_cases_pass if {

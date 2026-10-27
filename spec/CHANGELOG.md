@@ -49,6 +49,7 @@ Each version says whether reports changed, so that anyone who only stores report
 - `it` is a word of the grammar ([sentence.words](syntax.md#words-a-field-cant-be-called)). A field called `it` is written `.it`, and the report prints `.it`. Reports reach this when a policy starts a path with a bare `it`, which now reads the subject itself instead of its field `it`, and when an alias or a part is called `it`, which is now written wrong.
 
 - A row shows each entry of its `inputs` once ([row.inputs_once](semantics.md#what-a-row-shows)). A check that reads the same value twice, like `count of approvals plus count of approvals is 4`, listed it twice, as [tally.inputs](semantics.md#counts-and-sums-in-sentences) said. Reports change for such a check.
+- A check can walk any number of lists. The limit of three list walks per check is gone, and each walk still takes ten steps at most ([sentence.subject.every](syntax.md#subjects)). Ergo never enforced the limit, so policies and reports don't change.
 
 ### Fixed
 
