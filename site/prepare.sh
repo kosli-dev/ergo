@@ -100,6 +100,12 @@ done < "$dir/examples.txt"
 
 ergo_spec=$(sed -n 's/^_spec := "\(v[0-9][0-9]*\.[0-9][0-9]*\(-dev\)\{0,1\}\)"$/\1/p' "$rego")
 [ -n "$ergo_spec" ] || fail "$rego should say _spec := \"vX.Y\" or _spec := \"vX.Y-dev\""
+case $ergo_spec in
+  *-dev) ;;
+  *)
+    printf '%s\n' $spec_tags | grep -qxF "spec-$ergo_spec" || fail "The ergo.rego of $source reads spec $ergo_spec, and spec-$ergo_spec isn't published, so the site would link to schemas it doesn't have"
+    ;;
+esac
 printf '{"source": "%s", "rego": "%s", "spec": "%s", "ergo_spec": "%s"}\n' "$source" "$version" "${spec_tag#spec-v}" "$ergo_spec" > "$prepared/data/release.json"
 
 out=site/assets/tutorial

@@ -20,7 +20,7 @@ case "$1 $2" in
       shift
     done
     mkdir -p "$out"
-    printf 'package ergo\n\nversion := "%s"\n\n_spec := "v0.1"\n' "$FAKE_ASSET_VERSION" > "$out/ergo.rego"
+    printf 'package ergo\n\nversion := "%s"\n\n_spec := "%s"\n' "$FAKE_ASSET_VERSION" "${FAKE_ASSET_SPEC:-v0.1}" > "$out/ergo.rego"
     ;;
   *) exit 1 ;;
 esac
@@ -178,6 +178,7 @@ has site/static/spec/0.1/policy.schema.json
 lacks site/static/spec/0.2
 (FAKE_RELEASES="rego-v0.10.0"; FAKE_ASSET_VERSION=0.10.0; expected="kosli-dev/ergo has no published spec-vX.Y release"; fails)
 (FAKE_RELEASES="rego-v0.10.0 spec-v0.1 spec-v0.3"; FAKE_ASSET_VERSION=0.10.0; expected="There's no spec-v0.3 tag here. Fetch the tags with: git fetch --tags"; fails)
+(FAKE_RELEASES="rego-v0.10.0 spec-v0.1"; FAKE_ASSET_VERSION=0.10.0; export FAKE_ASSET_SPEC=v0.2; expected="The ergo.rego of rego-v0.10.0 reads spec v0.2, and spec-v0.2 isn't published, so the site would link to schemas it doesn't have"; fails)
 git tag --delete spec-v0.2 > /dev/null
 
 echo "# Working" > README.md
