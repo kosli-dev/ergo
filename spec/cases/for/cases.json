@@ -10948,5 +10948,611 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a second item that starts at a parent and is named by the first",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts",
+          "identified_by": "id"
+        },
+        "pr": {
+          "from": "artifact.prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pr",
+          "checks": {
+            "c": {
+              "for": "every keys as k, every artifact.map named by k as x",
+              "assert": "x is at least 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is listed under the parent's whole name",
+        "rules": [
+          "for.inputs",
+          "for.pass"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "map": {
+                  "a": [
+                    1
+                  ],
+                  "b": [
+                    2,
+                    3
+                  ]
+                },
+                "prs": [
+                  {
+                    "id": "p1",
+                    "keys": [
+                      "a",
+                      "b"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/map/a/0",
+                  "/trail/artifacts/0/map/b/0",
+                  "/trail/artifacts/0/map/b/1"
+                ],
+                "name": "artifact.map named by k[]",
+                "value": [
+                  1,
+                  2,
+                  3
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0",
+                  "/trail/artifacts/0/prs/0/keys/1"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "a",
+                  "b"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "for every keys as k, every artifact.map named by k as x: x is at least 1"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a second item that starts at $input or $params",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "name"
+        },
+        "pr": {
+          "from": "artifact.pull_requests",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pr",
+          "checks": {
+            "input": {
+              "for": "every keys as k, every $input.top as x",
+              "assert": "x is at least 100"
+            },
+            "params": {
+              "for": "every keys as k, some $params.l as x",
+              "assert": "x is at least 100"
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "l": [
+        12
+      ]
+    },
+    "cases": [
+      {
+        "description": "keeps the dollar in the name of its list and of its failed items",
+        "rules": [
+          "for.inputs",
+          "for.failed_items"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "name": "a1",
+              "pull_requests": [
+                {
+                  "id": 1,
+                  "keys": [
+                    "k1"
+                  ]
+                }
+              ]
+            }
+          ],
+          "top": [
+            11
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "input",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "x is at least 100",
+                    "cause": "value",
+                    "items": [
+                      {
+                        "cause": "value",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/top/0"
+                            ],
+                            "name": "x",
+                            "value": 11
+                          }
+                        ],
+                        "item": "item 1 of $input.top"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of keys",
+                "locations": [
+                  "/artifacts/0/pull_requests/0/keys/0"
+                ],
+                "path": "item 1 of keys",
+                "value": "k1"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/top/0"
+                ],
+                "name": "$input.top[]",
+                "value": [
+                  11
+                ]
+              },
+              {
+                "locations": [
+                  "/artifacts/0/pull_requests/0/keys/0"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "k1"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": 1,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "params",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "x is at least 100",
+                    "cause": "value",
+                    "items": [
+                      {
+                        "cause": "value",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "$params:/l/0"
+                            ],
+                            "name": "x",
+                            "value": 12
+                          }
+                        ],
+                        "item": "item 1 of $params.l"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of keys",
+                "locations": [
+                  "/artifacts/0/pull_requests/0/keys/0"
+                ],
+                "path": "item 1 of keys",
+                "value": "k1"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:/l/0"
+                ],
+                "name": "$params.l[]",
+                "value": [
+                  12
+                ]
+              },
+              {
+                "locations": [
+                  "/artifacts/0/pull_requests/0/keys/0"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "k1"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": 1,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "input": "for every keys as k, every $input.top as x: x is at least 100",
+            "params": "for every keys as k, some $params.l as x: x is at least 100"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a second item that starts at a parent's part, read with a whose",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts",
+          "identified_by": "id",
+          "has": {
+            "ap": "ps"
+          }
+        },
+        "pr": {
+          "from": "artifact.prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pr",
+          "checks": {
+            "c": {
+              "for": "every keys as k, every artifact.ap.w whose t is k as x",
+              "assert": "x.t is \"k1\""
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "names the second list's items it could not decide with the part's alias, like its input",
+        "rules": [
+          "for.second_failures",
+          "for.failed_items",
+          "parts.swap"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "ps": {
+                  "w": [
+                    {
+                      "t": "k1"
+                    },
+                    {
+                      "t": "k1"
+                    },
+                    {}
+                  ]
+                },
+                "prs": [
+                  {
+                    "id": "p1",
+                    "keys": [
+                      "k1"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "item 3 of artifact.ap.w",
+                    "locations": [
+                      "/trail/artifacts/0/ps/w/2"
+                    ],
+                    "path": "item 3 of artifact.ap.w",
+                    "value": {}
+                  }
+                ],
+                "item": "item 1 of keys",
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0"
+                ],
+                "path": "item 1 of keys",
+                "value": "k1"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/ps/w/0",
+                  "/trail/artifacts/0/ps/w/1",
+                  "/trail/artifacts/0/ps/w/2"
+                ],
+                "name": "artifact.ap.w[]",
+                "part": {
+                  "id": null,
+                  "name": "artifact.ap"
+                },
+                "value": [
+                  {
+                    "t": "k1"
+                  },
+                  {
+                    "t": "k1"
+                  },
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "k1"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "for every keys as k, every artifact.ap.w whose t equals k as x: x.t is \"k1\""
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a second item that starts at a parent's part, read with a whose and a sentence that fails on its items",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts",
+          "identified_by": "id",
+          "has": {
+            "ap": "ps"
+          }
+        },
+        "pr": {
+          "from": "artifact.prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pr",
+          "checks": {
+            "c": {
+              "for": "every keys as k, every artifact.ap.w whose t is k as x",
+              "assert": "x.ok is true"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "names the items a failed sentence lists with the part's alias, like its input",
+        "rules": [
+          "for.second_items",
+          "parts.swap"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "ps": {
+                  "w": [
+                    {
+                      "t": "k1",
+                      "ok": true
+                    },
+                    {
+                      "t": "k1",
+                      "ok": false
+                    }
+                  ]
+                },
+                "prs": [
+                  {
+                    "id": "p1",
+                    "keys": [
+                      "k1"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "x.ok is true",
+                    "cause": "value",
+                    "items": [
+                      {
+                        "cause": "value",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/trail/artifacts/0/ps/w/1/ok"
+                            ],
+                            "name": "x.ok",
+                            "value": false
+                          }
+                        ],
+                        "item": "item 2 of artifact.ap.w"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of keys",
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0"
+                ],
+                "path": "item 1 of keys",
+                "value": "k1"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/ps/w/0",
+                  "/trail/artifacts/0/ps/w/1"
+                ],
+                "name": "artifact.ap.w[]",
+                "part": {
+                  "id": null,
+                  "name": "artifact.ap"
+                },
+                "value": [
+                  {
+                    "ok": true,
+                    "t": "k1"
+                  },
+                  {
+                    "ok": false,
+                    "t": "k1"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "k1"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "for every keys as k, every artifact.ap.w whose t equals k as x: x.ok is true"
+          }
+        }
+      }
+    ]
   }
 ]

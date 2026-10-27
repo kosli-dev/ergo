@@ -4568,7 +4568,10 @@ _tally_inputs(subj, side, t) := array.concat(
 		{"name": side.text, "value": object.get(t, "value", null), "locations": t.locations},
 		_tally_list_input(t),
 	],
-	_merged_inputs(_named_inputs(subj, [p | some c in object.get(side, "whose", []); some p in _condition_paths(c)])),
+	_merged_inputs(array.concat(
+		_named_inputs(subj, [p | some c in object.get(side, "whose", []); some p in _condition_paths(c)]),
+		_field_named_inputs(subj, [p | some c in object.get(side, "whose", []); some p in _condition_paths(c)]),
+	)),
 )
 
 _tally_list_input(t) := {"name": t.list, "value": t.values, "locations": t.locations}
@@ -7095,7 +7098,7 @@ _walk_flawed(check) if _param_broken(check, set())
 
 _walk_flawed(_) if _unreadable_input
 
-_walk_read_row(check, subj) := {"cause": state, "inputs": _merged_inputs(array.concat([{"name": _path_name(check.path), "value": [], "locations": []}], _named_inputs(subj, _walk_condition_paths(check)))), "failed": []} if {
+_walk_read_row(check, subj) := {"cause": state, "inputs": _merged_inputs(array.concat([{"name": _path_name(check.path), "value": [], "locations": []}], array.concat(_named_inputs(subj, _walk_condition_paths(check)), _field_named_inputs(subj, _walk_condition_paths(check))))), "failed": []} if {
 	state := _read_state(subj, check.path)
 	not _walk_keys(check, subj)
 }
@@ -7107,7 +7110,7 @@ _walk_read_row(check, subj) := {"cause": cause, "inputs": inputs, "failed": fail
 	fails := array.concat(array.concat(w.fails, [j.failure | some j in judged; j.failure != null]), _walk_stop(w))
 	cause := _walk_cause(check, w, judged, fails)
 	failed := _walk_failed(cause, fails)
-	inputs := _merged_inputs(array.concat(_walk_inputs(check, w), _named_inputs(subj, _walk_condition_paths(check))))
+	inputs := _merged_inputs(array.concat(_walk_inputs(check, w), array.concat(_named_inputs(subj, _walk_condition_paths(check)), _field_named_inputs(subj, _walk_condition_paths(check)))))
 }
 
 _walk_condition_paths(check) := array.concat([p | some p in _condition_paths(check.check)], [p | some c in check.whose; some p in _condition_paths(c)])
@@ -7118,6 +7121,16 @@ _named_inputs(subj, paths) := [_path_input(subj, shown) |
 	not _has_field_step(p)
 	shown := _as_subject_part(p)
 ]
+
+_field_named_inputs(subj, paths) := [_path_input(subj, shown) |
+	some p in paths
+	_read_off_item(p)
+	_has_field_step(p)
+	shown := _as_subject_part(_before_field_step(p))
+	not _through_list(subj, shown)
+]
+
+_before_field_step(p) := array.slice(p, 0, min([j | some j, step in p; j > 0; _field_step(step)]))
 
 _as_subject_part(p) := array.concat([_p_marker(m.alias, m.n, m.of, false)], array.slice(p, 1, count(p))) if {
 	_part_start(p)
@@ -7437,7 +7450,7 @@ _walk_mark(i, walked) := "" if not i in walked
 _s_check_for(lines, ftext, wording, problems, parts) := object.union(wording, {
 	"op": "for",
 	"items": [_s_for_item_model(item, {earlier.as | some earlier in array.slice(fl.items, 0, i)}) | some i, item in items],
-	"checks": [_s_named(_s_model(a), names) | some a in marked],
+	"checks": [_s_named_model_leaf(_s_model(a), names) | some a in marked],
 	"assertions": texts,
 	"expression": concat("", ["for ", _s_for_line_text({"items": items}), ": ", concat(" and ", texts)]),
 }) if {
@@ -7588,7 +7601,7 @@ _for_row(check, subj) := object.union(_for_outer(check, subj, _for_names), {"cau
 _for_outer(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(check, subj, names, check.items[0], w), "failed": []} if {
 	w := _for_walk(check.items[0], subj, names)
 	"unread" in object.keys(w)
-} else := {"cause": cause, "inputs": _for_inputs(check, subj, names, check.items[0], _for_walk(check.items[0], subj, names)), "failed": _for_failed(cause, [object.union(f, {"lines": []}) | some f in pre.fails])} if {
+} else := {"cause": cause, "inputs": _for_inputs(check, subj, names, check.items[0], _for_walk(check.items[0], subj, names)), "failed": _for_failed(check, cause, [object.union(f, {"lines": []}) | some f in pre.fails])} if {
 	pre := _for_pre(check, subj, names)
 	pre != null
 	"pick" in object.keys(check.items[1])
@@ -7600,7 +7613,7 @@ _for_outer(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(chec
 	judged := [_for_judge_outer(check, subj, names, item, e, pre, w) | some e in w.items]
 	fails := array.concat(array.concat([object.union(f, {"lines": []}) | some f in w.fails], [object.union(f, {"lines": []}) | some f in _walk_stop(w)]), [j.failure | some j in judged; j.failure != null])
 	cause := _for_verdict(item, w, judged, fails)
-	failed := _for_failed(cause, _for_shared(check, fails, pre, names))
+	failed := _for_failed(check, cause, _for_shared(check, fails, pre, names))
 	inputs := _for_inputs(check, subj, names, item, w)
 }
 
@@ -7895,7 +7908,7 @@ _for_input_name(name, aliases) := concat("", [m[1], alias, m[2]]) if {
 	m := regex.find_all_string_submatch_n(concat("", [`(?s)^((?:item [0-9]+ of )?)\$`, _quoted(alias), `((?:[.\[ ].*)?)$`]), name, 1)[0]
 } else := name
 
-_for_line_items(check, i, a, fails) := {"items": [{"item": _for_item_name(f.path), "cause": l.cause, "inputs": l.inputs} |
+_for_line_items(check, i, a, fails) := {"items": [{"item": _for_item_name(check, f.path), "cause": l.cause, "inputs": l.inputs} |
 	some p in sort({f.path | some f in fails; some l in f.lines; l.assertion == a})
 	some f in fails
 	f.path == p
@@ -7930,7 +7943,7 @@ _name_read(x, name) if {
 	x.named_by == name
 }
 
-_for_item_name(p) := _path_name(array.concat([substring(p[0], 1, -1)], array.slice(p, 1, count(p)))) if _starts_at_name(p)
+_for_item_name(check, p) := _path_name(array.concat([substring(p[0], 1, -1)], array.slice(p, 1, count(p)))) if p[0] in {concat("", ["$", item.as]) | some item in check.items}
 
 else := _path_name(p)
 
@@ -7939,17 +7952,17 @@ _for_verdict(item, w, judged, fails) := _walk_stop(w)[0].cause if {
 	count(_walk_stop(w)) > 0
 } else := _walk_verdict(item.q, item.if_any == true, judged, fails)
 
-_for_failed("satisfied", _) := []
+_for_failed(_, "satisfied", _) := []
 
-_for_failed(cause, fails) := [object.union({"path": _path_name(f.path), "item": _path_name(f.item), "cause": f.cause, "value": f.value, "failed_assertions": f.lines, "locations": _fail_locations(f)}, _for_unchecked(object.get(f, "inner", []))) |
+_for_failed(check, cause, fails) := [object.union({"path": _path_name(f.path), "item": _path_name(f.item), "cause": f.cause, "value": f.value, "failed_assertions": f.lines, "locations": _fail_locations(f)}, _for_unchecked(check, object.get(f, "inner", []))) |
 	some p in sort({f.path | some f in fails})
 	some f in fails
 	f.path == p
 ] if cause != "satisfied"
 
-_for_unchecked([]) := {}
+_for_unchecked(_, []) := {}
 
-_for_unchecked(inner) := {"failed_items": [{"path": _for_item_name(f.path), "item": _for_item_name(f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f)} |
+_for_unchecked(check, inner) := {"failed_items": [{"path": _for_item_name(check, f.path), "item": _for_item_name(check, f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f)} |
 	some p in sort({f.path | some f in inner})
 	some f in inner
 	f.path == p
@@ -7957,7 +7970,7 @@ _for_unchecked(inner) := {"failed_items": [{"path": _for_item_name(f.path), "ite
 
 _for_inputs(check, subj, names, item, w) := _merged_inputs([{"name": t[0], "value": t[1], "locations": t[2]} | some t in _for_input_pairs(check, subj, names, item, w)])
 
-_for_input_pairs(check, subj, names, item, w) := ((((((({object.get(w, "input", _for_list_input(item, w))} | _for_inner_pairs(check, subj, names, item, w)) | {[_path_name(shown), _value_at(subj, shown), _locations_of(subj, shown)] |
+_for_input_pairs(check, subj, names, item, w) := ((((((((({object.get(w, "input", _for_list_input(item, w))} | _for_inner_pairs(check, subj, names, item, w)) | {[_path_name(shown), _value_at(subj, shown), _locations_of(subj, shown)] |
 	some c in check.checks
 	not _walks(c)
 	some p in _leaf_paths(c)
@@ -7990,7 +8003,15 @@ _for_input_pairs(check, subj, names, item, w) := ((((((({object.get(w, "input", 
 	some c in check.checks
 	_walks(c)
 	_for_alias_path(check, c.path)
-	some i in _named_inputs(subj, [p | some p in _walk_condition_paths(c); not _for_alias_path(check, p)])
+	some i in array.concat(_named_inputs(subj, [p | some p in _walk_condition_paths(c); not _for_alias_path(check, p)]), _field_named_inputs(subj, [p | some p in _walk_condition_paths(c); not _for_alias_path(check, p)]))
+}) | {[_path_name(shown), _value_at(subj, shown), _locations_of(subj, shown)] |
+	some c in check.checks
+	_walks(c)
+	shown := _before_alias_name(check, subj, c.path)
+}) | {[i.name, i.value, i.locations] |
+	some c in check.checks
+	_walks(c)
+	some i in _named_inputs(subj, [shown | some p in _walk_condition_paths(c); shown := _before_alias_name(check, subj, p)])
 }) | {[_path_name([f]), _value_at(subj, [f]), _locations_of(subj, [f])] |
 	some f in _for_key_fields(check)
 }
@@ -7998,6 +8019,28 @@ _for_input_pairs(check, subj, names, item, w) := ((((((({object.get(w, "input", 
 _for_alias_path(check, p) if p[0] in {concat("", ["$", item.as]) | some item in check.items}
 
 _for_alias_path(_, p) if _has_name_step(p)
+
+_before_alias_name(check, subj, p) := shown if {
+	_has_name_step(p)
+	_starts_at_name(p)
+	not p[0] in {concat("", ["$", item.as]) | some item in check.items}
+	shown := _before_later_names(p)
+	not _through_list(subj, shown)
+}
+
+_before_alias_name(check, subj, p) := shown if {
+	_has_name_step(p)
+	not _starts_at_name(p)
+	not p[0] in {concat("", ["$", item.as]) | some item in check.items}
+	shown := _before_names(p)
+	not _through_list(subj, shown)
+}
+
+_through_list(subj, path) if {
+	count(path) > 1
+	some i in numbers.range(1, count(path) - 1)
+	is_array(_value_at(subj, array.slice(path, 0, i)))
+}
 
 _for_key_fields(check) := {seg.named_by_field |
 	some item in check.items
@@ -8007,7 +8050,7 @@ _for_key_fields(check) := {seg.named_by_field |
 
 _for_inner_pairs(check, _, _, _, _) := set() if count(check.items) == 1
 
-_for_inner_pairs(check, subj, names, item, w) := {[_for_list_name(check.items[1].path, walked), values, locations]} if {
+_for_inner_pairs(check, subj, names, item, w) := {[_for_list_name(check, check.items[1].path, walked), values, locations]} if {
 	count(check.items) == 2
 	_for_from_first(check)
 	inner := [_for_walk(check.items[1], subj, _bound(names, item.as, e.v, _walk_at(w, e))) | some e in w.items]
@@ -8016,7 +8059,7 @@ _for_inner_pairs(check, subj, names, item, w) := {[_for_list_name(check.items[1]
 	locations := [_walk_at(iw, e2) | some iw in inner; some e2 in iw.items]
 }
 
-_for_inner_pairs(check, subj, names, _, _) := {object.get(iw, "input", [_for_list_name(check.items[1].path, iw.walked), [_walk_shown(e.v) | some e in iw.items], _walk_locations(iw)])} if {
+_for_inner_pairs(check, subj, names, _, _) := {object.get(iw, "input", [_for_list_name(check, check.items[1].path, iw.walked), [_walk_shown(e.v) | some e in iw.items], _walk_locations(iw)])} if {
 	count(check.items) == 2
 	not _for_from_first(check)
 	iw := _for_walk(check.items[1], subj, names)
@@ -8037,17 +8080,26 @@ _tally_named(check, side) if {
 _tally_kept_inputs(check, subj, part) := _basic_inputs(subj, part) if not _tally_named(check, part)
 
 _tally_kept_inputs(check, subj, part) := array.concat(
-	[_tally_list_input(_tally(subj, part)) | not _for_alias_path(check, part[_basic_form(part)])],
-	_merged_inputs(_named_inputs(subj, [p | some c in part.whose; some p in _condition_paths(c); not _for_alias_path(check, p)])),
+	array.concat(
+		[_tally_list_input(_tally(subj, part)) | not _for_alias_path(check, part[_basic_form(part)])],
+		[{"name": _path_name(shown), "value": _value_at(subj, shown), "locations": _locations_of(subj, shown)} | shown := _before_alias_name(check, subj, part[_basic_form(part)])],
+	),
+	_merged_inputs(array.concat(
+		_named_inputs(subj, array.concat(
+			[p | some c in part.whose; some p in _condition_paths(c); not _for_alias_path(check, p)],
+			[shown | some c in part.whose; some p in _condition_paths(c); shown := _before_alias_name(check, subj, p)],
+		)),
+		_field_named_inputs(subj, [p | some c in part.whose; some p in _condition_paths(c); not _for_alias_path(check, p)]),
+	)),
 ) if _tally_named(check, part)
 
 _tally_parts(side) := [side] if _basic_form(side) in {"count_of", "sum_of"}
 
 _tally_parts(side) := [o | some o in side.add; _basic_form(o) in {"count_of", "sum_of"}] if _side_form(side) == "add"
 
-_for_list_name(path, walked) := substring(_walk_name(path, walked), 1, -1) if _starts_at_name(path)
+_for_list_name(check, path, walked) := substring(_walk_name(path, walked), 1, -1) if path[0] in {concat("", ["$", item.as]) | some item in check.items}
 
-_for_list_name(path, walked) := _walk_name(path, walked) if not _starts_at_name(path)
+_for_list_name(check, path, walked) := _walk_name(path, walked) if not path[0] in {concat("", ["$", item.as]) | some item in check.items}
 
 _starts_at_name(p) if {
 	_off_subject(p)

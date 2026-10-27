@@ -5598,32 +5598,33 @@ _atts_rows(checks, params) := {r.check: [i.name | some i in r.inputs] |
 	r.check in object.keys(checks)
 }
 
-test_a_walk_whose_named_by_reads_the_item_doesnt_list_the_path_it_names if {
+test_a_walk_whose_named_by_reads_the_item_lists_the_part_before_the_name_and_not_the_path_it_names if {
 	_atts_rows({"item": "some commits.author is artifact.atts named by k.owner", "param": "some commits.author is artifact.atts named by $params.n.owner"}, {"n": "x"}) == {
-		"item": ["commits[].author"],
+		"item": ["artifact.atts", "commits[].author"],
 		"param": ["artifact.atts named by $params.n.owner", "commits[].author"],
 	}
 }
 
-test_a_count_whose_named_by_reads_the_item_doesnt_list_the_path_it_names if {
+test_a_count_whose_named_by_reads_the_item_lists_the_part_before_the_name_and_not_the_path_it_names if {
 	_atts_rows({"c": "count of commits whose author is artifact.atts named by k.owner is 1"}, {}) == {"c": [
 		"count of commits whose author equals artifact.atts named by k.owner",
 		"commits[]",
+		"artifact.atts",
 	]}
 }
 
-test_a_for_line_walk_named_by_the_item_or_the_alias_doesnt_list_the_path_it_names if {
+test_a_for_line_walk_named_by_the_item_or_the_alias_lists_the_part_before_the_name_and_not_the_path_it_names if {
 	checks := {
 		"item": {"for": "every files as f", "assert": "some commits.author is artifact.atts named by k.owner"},
 		"alias": {"for": "every files as f", "assert": "some commits.author is artifact.atts named by f.k.owner"},
 	}
-	_atts_rows(checks, {}) == {"item": ["commits[].author", "files[]"], "alias": ["commits[].author", "files[]"]}
+	_atts_rows(checks, {}) == {"item": ["artifact.atts", "commits[].author", "files[]"], "alias": ["artifact.atts", "commits[].author", "files[]"]}
 }
 
-test_the_applies_row_of_a_from_condition_named_by_the_item_doesnt_list_the_path_it_names if {
+test_the_applies_row_of_a_from_condition_named_by_the_item_lists_the_part_before_the_name_and_not_the_path_it_names if {
 	subjects := object.union(_atts_subjects, {"pr": {"from": "artifact.pull_requests whose some commits.author is artifact.atts named by k.owner", "identified_by": "id"}})
 	rep := ergo.report(_atts_doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": {"c": "id exists"}}}}, {})
-	[[i.name | some i in r.inputs] | some r in rep.results; r.check == "$applies"] == [["commits[].author"]]
+	[[i.name | some i in r.inputs] | some r in rep.results; r.check == "$applies"] == [["artifact.atts", "commits[].author"]]
 }
 
 test_a_count_under_a_for_line_still_lists_the_parent_it_reads if {
@@ -6131,6 +6132,36 @@ test_a_count_through_a_for_name_lists_its_list_and_not_its_number_since_that_cha
 	[[r.cause, r.inputs] | some r in ergo.report(doc, _sentence_policy({"c": {"for": "every ps as p", "assert": "count of ys whose m named by p is 1 is 1"}}), {}).results; r.check == "c"] == [["satisfied", [
 		{"name": "ps[]", "value": ["a"], "locations": ["/things/0/ps/0"]},
 		{"name": "ys[]", "value": [{"m": {"a": 1}}], "locations": ["/things/0/ys/0"]},
+	]]]
+}
+
+test_a_walk_through_a_for_name_lists_the_part_before_the_name_once_as_a_plain_check_does if {
+	things := [{"id": 1, "ks": ["a", "b"], "m": {"a": [1], "b": [2]}}]
+	want := [
+		{"name": "ks[]", "value": ["a", "b"], "locations": ["/things/0/ks/0", "/things/0/ks/1"]},
+		{"name": "m", "value": {"a": [1], "b": [2]}, "locations": ["/things/0/m"]},
+	]
+	_for_rows({"for": "every ks as k", "assert": "some m named by k is at least 1"}, things, {})[0][3] == want
+	_for_rows({"for": "every ks as k", "assert": ["some m named by k is at least 1", "every m named by k is at least 1"]}, things, {})[0][3] == want
+}
+
+test_a_count_through_a_for_name_lists_the_part_before_the_name_and_not_its_number_or_its_items if {
+	things := [{"id": 1, "ks": ["a", "b"], "m": {"a": [1], "b": [2]}}]
+	_for_rows({"for": "every ks as k", "assert": "count of m named by k is at least 1"}, things, {})[0][3] == [
+		{"name": "ks[]", "value": ["a", "b"], "locations": ["/things/0/ks/0", "/things/0/ks/1"]},
+		{"name": "m", "value": {"a": [1], "b": [2]}, "locations": ["/things/0/m"]},
+	]
+}
+
+test_a_whose_that_reads_a_parent_through_a_for_name_lists_the_part_before_the_name if {
+	doc := {"artifacts": [{"id": "a", "nums": {"a": 1, "b": 2}, "prs": [{"id": 1, "ks": ["a", "b"], "rows": [{"n": 1}, {"n": 2}]}]}]}
+	subjects := {"artifact": {"from": "artifacts", "identified_by": "id"}, "pr": {"from": "artifact.prs", "identified_by": "id"}}
+	checks := {"c": {"for": "every ks as k", "assert": "count of rows whose n is artifact.nums named by k is at least 1"}}
+	rows := [r | some r in ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {}).results; r.check == "c"]
+	[[r.cause, r.inputs] | some r in rows] == [["satisfied", [
+		{"name": "artifact.nums", "value": {"a": 1, "b": 2}, "locations": ["/artifacts/0/nums"]},
+		{"name": "ks[]", "value": ["a", "b"], "locations": ["/artifacts/0/prs/0/ks/0", "/artifacts/0/prs/0/ks/1"]},
+		{"name": "rows[]", "value": [{"n": 1}, {"n": 2}], "locations": ["/artifacts/0/prs/0/rows/0", "/artifacts/0/prs/0/rows/1"]},
 	]]]
 }
 
@@ -9792,4 +9823,206 @@ test_a_row_shows_an_input_once_when_the_check_reads_it_twice if {
 		["count of approvals", 2, ["/deployments/0/approvals/0", "/deployments/0/approvals/1"]],
 		["approvals[]", ["a", "b"], ["/deployments/0/approvals/0", "/deployments/0/approvals/1"]],
 	]]
+}
+
+test_a_second_item_that_starts_at_a_parent_is_named_with_the_whole_parent_name if {
+	doc := {"artifacts": [{"name": "x", "map": {"k1": [1], "k2": []}, "prs": [{"id": 1, "keys": ["k1", "k2"], "approvers": [{"n": 1}]}]}]}
+	subjects := {"artifact": {"from": "artifacts", "identified_by": "name"}, "pr": {"from": "artifact.prs", "identified_by": "id"}}
+	checks := {
+		"c": {"for": "every keys as k, every artifact.map named by k as x", "assert": "x is not empty"},
+		"e": {"for": "every artifact.prs as p, every p.approvers as person", "assert": "person.n is at least 1"},
+	}
+	rows := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {}).results
+	[i.name | some r in rows; r.check == "c"; some i in r.inputs] == ["artifact.map named by k[]", "keys[]"]
+	[i.name | some r in rows; r.check == "e"; some i in r.inputs] == ["artifact.prs[]", "p.approvers[]"]
+}
+
+_named_read_cause(nums, keys, assertion) := [r.cause | some r in ergo.report(doc, policy, {}).results; r.check == "c"][0] if {
+	prs := [{"id": 1, "keys": keys, "rows": [{"n": 1, "p": 7}, {"n": 2, "p": 8}]}]
+	doc := {"artifacts": [object.union({"name": "x", "prs": prs}, {"nums": nums})]}
+	subjects := {"artifact": {"from": "artifacts", "identified_by": "name"}, "pr": {"from": "artifact.prs", "identified_by": "id"}}
+	policy := {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": {"c": {"for": "every keys as k", "assert": assertion}}}}}
+}
+
+_named_read_walks := [
+	"some rows.n is at least artifact.nums named by k",
+	"some rows.p whose n is artifact.nums named by k is 7",
+	"count of rows whose n is artifact.nums named by k is at least 1",
+]
+
+test_a_walk_reads_a_parent_through_a_for_alias_on_its_right_side if {
+	every assertion in _named_read_walks {
+		_named_read_cause({"k1": 1}, ["k1"], assertion) == "satisfied"
+		_named_read_cause({"k1": 5}, ["k1"], assertion) == "value"
+	}
+	_named_read_cause({"k1": 1, "k2": 5}, ["k1"], _named_read_walks[1]) == "satisfied"
+}
+
+test_a_walk_through_a_for_alias_fails_like_a_count_when_the_key_is_missing_or_the_parent_is_not_an_object if {
+	every assertion in _named_read_walks {
+		_named_read_cause({"k2": 1}, ["k1"], assertion) == "absent"
+		_named_read_cause(null, ["k1"], assertion) == "absent"
+		_named_read_cause("abc", ["k1"], assertion) == "unusable"
+		_named_read_cause(5, ["k1"], assertion) == "unusable"
+	}
+}
+
+test_a_walk_through_a_for_alias_fails_like_a_count_when_the_alias_is_null_or_a_number_or_the_value_has_the_wrong_type if {
+	every assertion in _named_read_walks {
+		_named_read_cause({"k1": 1}, [null], assertion) == "null"
+		_named_read_cause({"k1": 1}, [3], assertion) == "unusable"
+		_named_read_cause({"k1": "a"}, ["k1"], assertion) == "unusable"
+		_named_read_cause({"k1": null}, ["k1"], assertion) == "null"
+	}
+}
+
+test_a_walk_keyed_by_an_item_field_lists_the_part_before_the_name_and_never_the_keyed_value if {
+	nums := {"a": 1, "b": 2}
+	rows := [{"key": "a", "n": 1}, {"key": "b", "n": 2}]
+	doc := {"artifacts": [{"name": "x", "nums": nums, "prs": [{"id": 1, "keys": ["k1"], "rows": rows, "groups": [{"items": rows}]}]}]}
+	artifact_nums := {"name": "artifact.nums", "value": nums, "locations": ["/artifacts/0/nums"]}
+	subjects := {"artifact": {"from": "artifacts", "identified_by": "name"}, "pr": {"from": "artifact.prs", "identified_by": "id"}}
+	policy := {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": {
+		"plain": "some rows.n is at least artifact.nums named by key",
+		"whose": "some rows.n whose n is artifact.nums named by key is at least 1",
+		"for": {"for": "every keys as k", "assert": "some rows.n is at least artifact.nums named by key"},
+		"alias": {"for": "every groups as g", "assert": "some g.items.n is at least artifact.nums named by key"},
+	}}}}
+	results := ergo.report(doc, policy, {}).results
+	every check in {"plain", "whose", "for", "alias"} {
+		inputs := [i | some r in results; r.check == check; some i in r.inputs]
+		artifact_nums in inputs
+		count([i | some i in inputs; contains(i.name, "named by")]) == 0
+	}
+	subjects_applies := object.union(subjects, {"pr": {"from": "artifact.prs whose some rows.n is at least artifact.nums named by key", "identified_by": "id"}})
+	applies := ergo.report(doc, object.union(policy, {"subjects": subjects_applies}), {}).results
+	applies_inputs := [i | some r in applies; r.check == "$applies"; some i in r.inputs]
+	artifact_nums in applies_inputs
+	count([i | some i in applies_inputs; contains(i.name, "named by")]) == 0
+}
+
+test_a_walk_through_a_for_name_whose_part_before_the_name_walks_a_list_lists_nothing_of_it if {
+	doc := {"artifacts": [{"name": "x", "ls": [{"m": {"a": 1}}, {"m": {"a": 2}}], "prs": [{"id": 1, "keys": ["a"]}]}]}
+	subjects := {"artifact": {"from": "artifacts", "identified_by": "name"}, "pr": {"from": "artifact.prs", "identified_by": "id"}}
+	checks := {"c": {"for": "every keys as k", "assert": "every artifact.ls.m named by k is at least 1"}}
+	rows := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {}).results
+	[[i.name | some i in r.inputs] | some r in rows; r.check == "c"] == [["keys[]"]]
+}
+
+test_a_sum_through_a_for_name_lists_the_part_before_the_name_and_not_the_sum_or_a_list_per_item if {
+	things := [{"id": 1, "ks": ["a", "b"], "m": {"a": [1], "b": [2]}}]
+	_for_rows({"for": "every ks as k", "assert": "sum of m named by k is at least 1"}, things, {})[0][3] == [
+		{"name": "ks[]", "value": ["a", "b"], "locations": ["/things/0/ks/0", "/things/0/ks/1"]},
+		{"name": "m", "value": {"a": [1], "b": [2]}, "locations": ["/things/0/m"]},
+	]
+}
+
+test_a_second_item_that_starts_at_input_or_params_keeps_its_dollar_in_the_list_and_failed_item_names if {
+	doc := {"artifacts": [{"name": "a1", "pull_requests": [{"id": 1, "keys": ["k1"]}]}], "top": [11]}
+	subjects := {"artifact": {"from": "artifacts", "identified_by": "name"}, "pr": {"from": "artifact.pull_requests", "identified_by": "id"}}
+	checks := {
+		"i": {"for": "every keys as k, every $input.top as x", "assert": "x is at least 100"},
+		"p": {"for": "every keys as k, some $params.l as x", "assert": "x is at least 100"},
+	}
+	rows := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {"l": [12]}).results
+	[i.name | some r in rows; r.check == "i"; some i in r.inputs] == ["$input.top[]", "keys[]"]
+	[i.name | some r in rows; r.check == "p"; some i in r.inputs] == ["$params.l[]", "keys[]"]
+	[f.item | some r in rows; r.check == "i"; some o in r.failed_items; some a in o.failed_assertions; some f in a.items] == ["item 1 of $input.top"]
+}
+
+_keyed_tally_rows(nums, rows, checks) := {r.check: [r.cause, [i.name | some i in r.inputs]] |
+	doc := {"artifacts": [{"name": "x", "nums": nums, "prs": [{"id": 1, "keys": ["k1"], "rows": rows}]}]}
+	subjects := {"artifact": {"from": "artifacts", "identified_by": "name"}, "pr": {"from": "artifact.prs", "identified_by": "id"}}
+	some r in ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {}).results
+	r.check in object.keys(checks)
+}
+
+_keyed_tallies := {
+	"count": "count of rows whose n is at least artifact.nums named by key is at least 1",
+	"sum": "sum of rows.n whose n is at least artifact.nums named by key is at least 1",
+	"for_count": {"for": "every keys as k", "assert": "count of rows whose n is at least artifact.nums named by key is at least 1"},
+	"for_sum": {"for": "every keys as k", "assert": "sum of rows.n whose n is at least artifact.nums named by key is at least 1"},
+}
+
+test_a_count_or_sum_keyed_by_an_item_field_lists_the_part_before_the_name_and_never_the_keyed_value if {
+	got := _keyed_tally_rows({"a": 1, "b": 2}, [{"key": "a", "n": 1}, {"key": "b", "n": 2}], _keyed_tallies)
+	every _, r in got {
+		r[0] == "satisfied"
+		"artifact.nums" in r[1]
+		not "artifact.nums named by key" in r[1]
+	}
+}
+
+test_a_count_or_sum_keyed_by_an_item_field_fails_as_before_when_the_key_is_missing_null_or_wrong_typed if {
+	rows := [{"key": "a", "n": 1}]
+	missing := _keyed_tally_rows({"z": 1}, rows, _keyed_tallies)
+	nulled := _keyed_tally_rows({"a": null}, rows, _keyed_tallies)
+	wrong := _keyed_tally_rows({"a": "s"}, rows, _keyed_tallies)
+	every _, r in missing {
+		r[0] == "absent"
+		"artifact.nums" in r[1]
+	}
+	every _, r in nulled {
+		r[0] == "null"
+		"artifact.nums" in r[1]
+	}
+	every _, r in wrong {
+		r[0] == "unusable"
+		"artifact.nums" in r[1]
+	}
+}
+
+test_a_walk_keyed_by_an_item_field_whose_part_before_the_name_walks_a_list_lists_nothing_of_it if {
+	doc := {"artifacts": [{"name": "x", "ls": [{"m": {"a": 1}}], "prs": [{"id": 1, "rows": [{"key": "a", "n": 1}]}]}]}
+	subjects := {"artifact": {"from": "artifacts", "identified_by": "name"}, "pr": {"from": "artifact.prs", "identified_by": "id"}}
+	checks := {"c": "some rows.n is at least artifact.ls.m named by key"}
+	rows := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {}).results
+	[[i.name | some i in r.inputs] | some r in rows; r.check == "c"] == [["rows[].n"]]
+}
+
+_part_for_subjects(has) := {
+	"artifact": {"from": "$input.artifact", "identified_by": "n", "has": has},
+	"child": {"from": "artifact.kids", "identified_by": "id"},
+}
+
+_part_for_row(doc, has, check, params) := [r | some r in ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": _part_for_subjects(has), "requirements": {"r": {"subject": "child", "checks": {"c": check}}}}, params).results; r.check == "c"][0]
+
+test_a_second_for_item_that_starts_at_a_parents_part_names_its_unchecked_items_like_its_inputs if {
+	doc := {"artifact": {"n": "a", "ps": {"w": [{"t": "k1"}, {}]}, "kids": [{"id": 1, "keys": ["k1"]}]}}
+	row := _part_for_row(doc, {"ap": "ps"}, {"for": "every keys as k, every artifact.ap.w whose t is k as x", "assert": "x.t is 1"}, {})
+	[f.item | some f in row.failed_items[0].failed_items] == ["item 2 of artifact.ap.w"]
+	[f.path | some f in row.failed_items[0].failed_items] == ["item 2 of artifact.ap.w"]
+	[i.name | some i in row.inputs] == ["artifact.ap.w[]", "keys[]"]
+}
+
+test_a_second_for_item_that_starts_at_a_parents_part_named_by_an_item_keeps_the_key_it_read_and_hides_the_part_marker if {
+	doc := {"artifact": {"n": "a", "ps": {"k1": [{"t": 1}, {}]}, "kids": [{"id": 1, "keys": ["k1"]}]}}
+	row := _part_for_row(doc, {"ap": "ps"}, {"for": "every keys as k, every artifact.ap named by k.t as x", "assert": "x is 1"}, {})
+	[f.item | some f in row.failed_items[0].failed_items] == ["item 2 of artifact.ap.k1"]
+	[i.name | some i in row.inputs] == ["artifact.ap named by k[].t", "keys[]"]
+}
+
+test_a_failed_sentence_of_a_second_for_item_that_starts_at_a_parents_part_names_its_items_without_the_part_marker if {
+	doc := {"artifact": {"n": "a", "ps": {"w": ["k1", "z"]}, "kids": [{"id": 1, "keys": ["k1"]}]}}
+	row := _part_for_row(doc, {"ap": "ps"}, {"for": "every keys as k, every artifact.ap.w as x", "assert": "x is k"}, {})
+	[[i.item | some i in a.items] | some a in row.failed_items[0].failed_assertions] == [["item 2 of artifact.ap.w"]]
+}
+
+test_a_second_for_item_that_starts_at_a_plain_parent_input_or_params_keeps_its_name_in_unchecked_items if {
+	doc := {"artifact": {"n": "a", "w": [{"t": "k1"}, {}], "kids": [{"id": 1, "keys": ["k1"]}]}, "top": [{"t": "k1"}, {}]}
+	plain := _part_for_row(doc, {}, {"for": "every keys as k, every artifact.w whose t is k as x", "assert": "x.t is 1"}, {})
+	[f.item | some f in plain.failed_items[0].failed_items] == ["item 2 of artifact.w"]
+	from_input := _part_for_row(doc, {}, {"for": "every keys as k, every $input.top whose t is k as x", "assert": "x.t is 1"}, {})
+	[f.item | some f in from_input.failed_items[0].failed_items] == ["item 2 of $input.top"]
+	from_params := _part_for_row(doc, {}, {"for": "every keys as k, every $params.l whose t is k as x", "assert": "x.t is 1"}, {"l": [{"t": "k1"}, {}]})
+	[f.item | some f in from_params.failed_items[0].failed_items] == ["item 2 of $params.l"]
+}
+
+test_a_first_for_item_through_a_parents_part_or_named_by_names_its_failed_items_like_a_walk if {
+	doc := {"artifact": {"n": "a", "ps": {"w": [1, 0], "k1": [1, 0]}, "kids": [{"id": 1, "k": "k1"}]}}
+	part := _part_for_row(doc, {"ap": "ps"}, {"for": "every artifact.ap.w as x", "assert": "x is 1"}, {})
+	[f.item | some f in part.failed_items] == ["item 2 of artifact.ap.w"]
+	named := _part_for_row(doc, {"ap": "ps"}, {"for": "every artifact.ap named by k as x", "assert": "x is 1"}, {})
+	[f.item | some f in named.failed_items] == ["item 2 of artifact.ap.k1"]
+	[i.name | some i in named.inputs] == ["artifact.ap named by k[]", "k"]
 }
