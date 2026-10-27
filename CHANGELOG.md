@@ -14,7 +14,7 @@ Each release names the version of the spec it follows. The spec's own changes ar
 ### Changed
 
 - This version follows spec 0.2, so a policy says `ergo_spec: v0.2`. One that says `v0.1` is written wrong, with `unsupported version v0.1, expected v0.2`, and still works with 0.1.0. The report's `ergo` changes with it, from `"ergo": "v0.1"` to `"ergo": "v0.2"`.
-- An `$applies` row has the fields the row of a check would have if its conditions were its assertions. A subject's `from` line with one `some` or `every` condition gives a row `failed_items`, as a check does, and `[]` when it passes. One with two or more conditions gives it `failed_assertions`, with an entry for each condition that failed, in the order written, and `[]` when it passes. A violation that's an `$applies` row keeps them. A row of a single plain condition, like `environment is "prod"`, doesn't change. For `from: deployments whose environment is "prod" and change_type is "emergency"`, the row of a deployment with `change_type` set to `standard` was:
+- An `$applies` row has the fields the row of a check would have if its conditions were its assertions. A subject's `from` line with one `some` or `every` condition gives a row `failed_items`, as a check does, and `[]` when it passes. One with two or more conditions gives it `failed_assertions`, with an entry for each condition that failed, in the order written, and `[]` when it passes. A violation that's an `$applies` row keeps them. A row of a single plain condition, like `environment is "prod"`, doesn't change. For `from: deployments whose environment is "prod" and change_type is "emergency"`, the row of `d-2` in `{"deployments": [{"id": "d-2", "environment": "prod", "change_type": "standard"}]}` was:
 
   ```json
   {"check": "$applies", "subject": {"id": "d-2", "type": "deployment"}, "passed": false, "cause": "value",
@@ -29,7 +29,7 @@ Each release names the version of the spec it follows. The spec's own changes ar
    "failed_assertions": [{"assertion": "change_type is \"emergency\"", "cause": "value"}]}
   ```
 
-  For `from: releases whose some files.path does not match "^docs/"`, the row of release `1.4.1`, which only changes `docs/typo.md`, was:
+  For `from: releases whose some files.path does not match "^docs/"`, the row of release `1.4.1` in `{"releases": [{"id": "1.4.1", "files": [{"path": "docs/typo.md"}]}]}`, which only changes `docs/typo.md`, was:
 
   ```json
   {"check": "$applies", "subject": {"id": "1.4.1", "type": "release"}, "passed": false, "cause": "value",
@@ -46,7 +46,7 @@ Each release names the version of the spec it follows. The spec's own changes ar
 - Every entry of `inputs`, `$refs` and `failed_items` in a report gains `locations`, and the entries of `$well_formed` have `[]`. For the second deployment in `{"deployments": [...]}`, an input that was `{"name": "approved_by", "value": null}` is now `{"name": "approved_by", "value": null, "locations": ["/deployments/1"]}`. Two reads with the same name and value used to be one entry. They are now one only when their locations match too, so a parent's `b.x` and a child's own `.b.x` that print the same and are read from different places each keep an entry.
 
 - A subject called `it` is written wrong, for each requirement that uses it. Rename it.
-- `it` is a word of the grammar, like `empty` and `count`. A bare `it` at the start of a path now reads the subject, where it read the field `it`, and a field called `it` is written `.it`, in a policy and in the report. A `for` alias or a part called `it` is now written wrong, so rename it. The report changes for a policy that has a bare `it` in a check or a subject, or a field called `it`. With the subject `{"id": "a", "it": 1}`, `it is 1` used to read the field and pass:
+- `it` is a word of the grammar, like `empty` and `count`. A bare `it` at the start of a path now reads the subject, where it read the field `it`, and a field called `it` is written `.it`, in a policy and in the report. A `for` alias or a part called `it` is now written wrong, so rename it. The report changes for a policy that has a bare `it` in a check or a subject, or a field called `it`. With `from: every xs` on `{"xs": [{"id": "a", "it": 1}]}`, `it is 1` used to read the field and pass:
 
   ```json
   {"check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": 1}]}
