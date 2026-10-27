@@ -78,6 +78,8 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 
 **[path.inputs]** A check that reads one path, like `present`, `missing`, `equals` or `in`, has one entry in its row's `inputs`: the path's name and the value read, or `null` when nothing was.
 
+**[row.inputs_once]** A row shows each entry of its `inputs` once. When a check reads the same value twice, like `count of approvals plus count of approvals is 4`, the second read gives no entry of its own when its name, its value and its locations all match the first's, as [location.merged](#where-a-value-was-read) says, and the rest keep their order.
+
 ## Where a value was read
 
 **[location]** Every entry in a row's `inputs`, in a check's `$refs` and in `failed_items` has `locations`: a list of where Ergo read its value. A location is a JSON Pointer ([RFC 6901](https://www.rfc-editor.org/rfc/rfc6901)) from the root of the input, like `/deployments/3/approved`, or, for a value read from the params, `$params:` followed by a pointer from the root of the params, like `$params:/max_days/high`. List positions count from 0, and a key is escaped as RFC 6901 says, `~` as `~0` and `/` as `~1`. Locations never change `passed`, `cause` or a value. `[]` means no location could be given, like for a read that starts at a name nothing holds.
@@ -90,7 +92,7 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 
 **[location.refs]** An entry in `$refs` has its ref's location, and keeps it when [violations](#violations) adds it to a violation's `inputs`.
 
-**[location.merged]** When a row lists an input once though several checks or filters read it, like an `all_of`, an `any_of`, a `for` line or an `$applies` row, reads merge into one entry only when their name, their value and their locations all match. Two reads that print the same name and value but come from different places, like a parent's `b.x` and a child's own `.b.x`, each keep an entry. The entries are sorted by name, then value, then locations.
+**[location.merged]** When a row lists an input once though several checks or filters read it, like an `all_of`, an `any_of`, a `for` line, an `$applies` row or a check that reads it twice ([row.inputs_once](#what-a-row-shows)), reads merge into one entry only when their name, their value and their locations all match. Two reads that print the same name and value but come from different places, like a parent's `b.x` and a child's own `.b.x`, each keep an entry. The entries are sorted by name, then value, then locations.
 
 **[location.each]** An entry that holds a value for each item, like a walk's ([walk.inputs](#every-and-some)) or a list on a `for` line ([for.inputs](#for)), has one location per value, in the same order. A walk that stopped before it walked anything holds `[]` and has no locations.
 
@@ -236,7 +238,7 @@ A side of `compare` can also be `count_of` or `sum_of`, each with a path, `whose
 
 **[tally.fail]** A side that fails gives the check its cause, as a path that ends anything but `found` does in [compare.fail](#compare), and the worst one when both sides fail. An `add` fails as its worst operand does.
 
-**[tally.inputs]** For each side that's worked out, the row shows an entry named after its `text`, holding the number, or `null` when the side failed. For a `count_of` or a `sum_of`, the list it walked comes next, named and filled as [walk.inputs](#every-and-some) says. For an `add`, each side it adds up comes next, as if it stood alone. The left side's entries come before the right side's.
+**[tally.inputs]** For each side that's worked out, the row shows an entry named after its `text`, holding the number, or `null` when the side failed. For a `count_of` or a `sum_of`, the list it walked comes next, named and filled as [walk.inputs](#every-and-some) says. For an `add`, each side it adds up comes next, as if it stood alone. The left side's entries come before the right side's, and an entry already shown isn't shown again ([row.inputs_once](#what-a-row-shows)), so in `count of findings whose severity is "high" is at most count of findings` the right side shows only its number.
 
 ## `compare_time`
 

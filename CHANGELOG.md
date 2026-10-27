@@ -64,6 +64,26 @@ Each release names the version of the spec it follows. The spec's own changes ar
   {"check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": ".it", "value": 1, "locations": ["/xs/0/it"]}]}
   ```
 
+- A row shows each input once. A check that reads the same value twice listed it twice. With the requirement `r` on the subject `deployment`, the check `c: count of approvals plus count of approvals is 4` and the deployment `{"id": "d1", "approvals": ["a", "b"]}`, the row was:
+
+  ```json
+  {"check": "c", "subject": {"id": "d1", "type": "deployment"}, "passed": true, "cause": "satisfied",
+   "inputs": [{"name": "count of approvals plus count of approvals", "value": 4, "locations": ["/deployments/0/approvals/0", "/deployments/0/approvals/1"]},
+              {"name": "count of approvals", "value": 2, "locations": ["/deployments/0/approvals/0", "/deployments/0/approvals/1"]},
+              {"name": "count of approvals", "value": 2, "locations": ["/deployments/0/approvals/0", "/deployments/0/approvals/1"]},
+              {"name": "approvals[]", "value": ["a", "b"], "locations": ["/deployments/0/approvals/0", "/deployments/0/approvals/1"]},
+              {"name": "approvals[]", "value": ["a", "b"], "locations": ["/deployments/0/approvals/0", "/deployments/0/approvals/1"]}]}
+  ```
+
+  and is now:
+
+  ```json
+  {"check": "c", "subject": {"id": "d1", "type": "deployment"}, "passed": true, "cause": "satisfied",
+   "inputs": [{"name": "count of approvals plus count of approvals", "value": 4, "locations": ["/deployments/0/approvals/0", "/deployments/0/approvals/1"]},
+              {"name": "count of approvals", "value": 2, "locations": ["/deployments/0/approvals/0", "/deployments/0/approvals/1"]},
+              {"name": "approvals[]", "value": ["a", "b"], "locations": ["/deployments/0/approvals/0", "/deployments/0/approvals/1"]}]}
+  ```
+
 ### Fixed
 
 - A walk that starts at a `for` alias holding `null` fails as `null`, as [walk.lists](spec/semantics.md#every-and-some) says and as a field holding `null` does. It failed as `absent`. With `for: every commits as c` and `assert: every c.files is a string`, on the release `{"id": "r1", "commits": [null]}`, the row was:

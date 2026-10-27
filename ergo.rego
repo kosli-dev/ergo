@@ -3756,10 +3756,12 @@ _results(policy, evaluations) := array.concat(
 		),
 	),
 	array.concat(
-		[row | some name in _names(policy); some row in evaluations[name].applies],
-		[row | some name in _names(policy); some group in evaluations[name].subject_rows; some row in group],
+		[_inputs_once(row) | some name in _names(policy); some row in evaluations[name].applies],
+		[_inputs_once(row) | some name in _names(policy); some group in evaluations[name].subject_rows; some row in group],
 	),
 )
+
+_inputs_once(row) := object.union(row, {"inputs": _once(row.inputs)})
 
 _names(x) := sort(object.keys(x)) if is_object(x)
 
