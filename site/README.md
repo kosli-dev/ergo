@@ -2,33 +2,42 @@
 
 The landing page and docs for Ergo, built with [Hugo](https://gohugo.io/) (0.157, extended).
 
-The docs pages aren't copied here. They're read from the repo's own `README.md` and `REFERENCE.md` when the site builds, so change the docs there and the site follows.
+The site shows the latest release of Ergo, not `main`. The docs pages, the bakery example and the tutorial's Ergo all come from the newest `rego-vX.Y.Z` tag, so a change to `README.md`, `REFERENCE.md`, `examples/` or `ergo.rego` reaches the site when it's released.
 
 ## Run it locally
 
+You need the tags, [OPA](https://www.openpolicyagent.org/), `curl` and `openssl`:
+
 ```sh
+git fetch --tags
+site/prepare.sh
 hugo server -s site
 ```
 
 Then open http://localhost:1313.
 
+`site/prepare.sh` picks the newest `rego-vX.Y.Z` tag by version, ignoring tags of any other shape, and writes what Hugo needs from it, all of which git ignores:
+
+- `site/release/` holds that tag's `README.md`, `REFERENCE.md` and `examples/`, with `X.Y.Z-dev` written `X.Y.Z` as in the `ergo.rego` the release publishes. Each example file ends in `.txt`, so that OPA, which loads every `.rego`, `.json` and `.yaml` file under the folder it's given, doesn't load them next to the repo's own.
+- `site/assets/tutorial/` holds that `ergo.rego` compiled to Wasm, OPA's Wasm runtime, and `release.mjs`, which says the spec version the tutorial writes in its policies.
+- `site/data/release.json` holds the versions the home page shows: the release, the newest `spec-vX.Y` tag, and the spec that `ergo.rego` reads, for the `ergo_spec` lines.
+- `site/static/spec/` holds the schemas of every released spec, from `site/spec-schemas.sh`.
+
+Run it again after a new release. Hugo stops with a message naming the script when any of it is missing.
+
 ## The tutorial
 
-`/tutorial/` teaches check sentences one step at a time, with Ergo running in the reader's browser as Wasm. It needs the Wasm built from this checkout's `ergo.rego`, and the build fails without it. You need [OPA](https://www.openpolicyagent.org/), `curl`, `openssl` and Node 24:
+`/tutorial/` teaches check sentences one step at a time, with Ergo running in the reader's browser as Wasm. It runs the released `ergo.rego`, so the tutorial on `main` must work with the latest release. The tests check that, with Node 24:
 
 ```sh
-site/build-tutorial.sh
+site/prepare.sh
 node --test site/assets/js/tutorial/lib.test.mjs
 hugo server -s site
 ```
 
-Then open http://localhost:1313/tutorial/. The script writes `site/assets/tutorial/`, which git ignores. Run it again after you change `ergo.rego`. The tests run the built Wasm, so they need the script to have run first.
+Then open http://localhost:1313/tutorial/. The tests run the built Wasm, so they need the script to have run first.
 
 The logic that builds the policy and grades each step is in `assets/js/tutorial/lib.mjs`, with no page code in it. The steps' text, hints and goals are in the same file.
-
-## The latest release
-
-`site/release-data.sh` reads the newest `rego-v*` and `spec-v*` tags and writes them to `site/data/release.json`, which the home page uses for its "Latest release" line. `site/spec-schemas.sh` does the same for the released specs' schemas. Both need the tags, both write files that git ignores, and a checkout without tags builds without the line.
 
 ## Files
 
@@ -37,7 +46,7 @@ The logic that builds the policy and grades each step is in `assets/js/tutorial/
 | Landing page copy | front matter in `content/_index.md` |
 | Landing page layout | `layouts/home.html` |
 | Docs page shell | `layouts/page.html` |
-| How the docs are read from the repo | `content/docs/_content.gotmpl` and `[module]` in `hugo.toml` |
+| How the docs are read from the release | `content/docs/_content.gotmpl` and `[module]` in `hugo.toml` |
 | Styles and colour tokens | `assets/css/ergo.css` |
 | Logo | `static/brand/ergo-wordmark-white.svg` (master), inlined in `layouts/_partials/wordmark.html` and `mark.html`; `static/favicon.svg` |
 | Tutorial page and layout | `content/tutorial.md`, `layouts/tutorial.html` |
@@ -52,7 +61,7 @@ Most text is Markdown, so `` `code` ``, `*emphasis*` and `**bold**` work. Write 
 
 ## Deploy
 
-GitHub Pages serves the site at https://ergo.kosli.com. `.github/workflows/pages.yml` builds `site/` and deploys it each time the `test` workflow passes on `main`. You can also run it by hand from the Actions tab.
+GitHub Pages serves the site at https://ergo.kosli.com. `.github/workflows/pages.yml` builds `site/` and deploys it each time the `test` workflow passes on `main`, and the release workflow starts it after each release. You can also run it by hand from the Actions tab.
 
 The Pages workflow must not share any top-level keys with `test.yml` (for example `name`, `permissions` or `on.push`). `opa check .` loads every YAML file in the repo as data, and clashing keys fail the tests with a "merge error".
 

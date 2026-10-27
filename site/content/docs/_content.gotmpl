@@ -1,4 +1,4 @@
-{{/* Builds the docs pages from the repo's README.md and REFERENCE.md. */}}
+{{/* Builds the docs pages from the latest release's README.md and REFERENCE.md. */}}
 {{ $docs := slice
   (dict "file" "repo/README.md" "path" "getting-started" "title" "Getting started" "weight" 1)
   (dict "file" "repo/REFERENCE.md" "path" "reference" "title" "Reference" "weight" 2)
@@ -19,5 +19,7 @@
       "kind" "page"
       "content" (dict "mediaType" "text/markdown" "value" $md)
     ) }}
+  {{ else }}
+    {{ errorf "The docs need the latest release's %s: run site/prepare.sh" $doc.file }}
   {{ end }}
 {{ end }}

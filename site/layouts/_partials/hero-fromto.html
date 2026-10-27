@@ -46,7 +46,7 @@ deny <span class="kw">contains</span> msg <span class="kw">if</span> {
 
     <div class="ft__view" data-ex="deploy" data-step="2" data-file="policy/policy.yaml" data-hold="6500">
       <p class="ft__label mono"><span class="ft__who ft__who--ergo">Ergo</span> the policy</p>
-<pre class="code ft__code"><code><span class="k">ergo_spec</span>: <span class="s">v0.1</span>
+<pre class="code ft__code"><code><span class="k">ergo_spec</span>: <span class="s">{{ hugo.Data.release.ergo_spec }}</span>
 <span class="k">subjects</span>:
   <span class="k">deployment</span>:
     <span class="k">from</span>: <span class="s">deployments</span> <span class="k">whose</span> <span class="s">environment is "prod"</span>
@@ -128,7 +128,7 @@ peer_approved(pr) <span class="kw">if</span> {
 
     <div class="ft__view" data-ex="review" data-step="2" data-file="policy/policy.yaml" data-hold="6500">
       <p class="ft__label mono"><span class="ft__who ft__who--ergo">Ergo</span> the policy</p>
-<pre class="code ft__code"><code><span class="k">ergo_spec</span>: <span class="s">v0.1</span>
+<pre class="code ft__code"><code><span class="k">ergo_spec</span>: <span class="s">{{ hugo.Data.release.ergo_spec }}</span>
 <span class="k">subjects</span>:
   <span class="k">pull request</span>:
     <span class="k">from</span>: <span class="s">pull_requests</span>
@@ -176,7 +176,7 @@ peer_approved(pr) <span class="kw">if</span> {
     {{/* Example 3: expense claims, outside software delivery (checked by running ergo.rego on this policy and input) */}}
     <div class="ft__view" data-ex="expenses" data-step="2" data-file="policy/policy.yaml" data-hold="6500">
       <p class="ft__label mono"><span class="ft__who ft__who--ergo">Ergo</span> the policy</p>
-<pre class="code ft__code"><code><span class="k">ergo_spec</span>: <span class="s">v0.1</span>
+<pre class="code ft__code"><code><span class="k">ergo_spec</span>: <span class="s">{{ hugo.Data.release.ergo_spec }}</span>
 <span class="k">subjects</span>:
   <span class="k">expense</span>:
     <span class="k">from</span>: <span class="s">expenses</span>

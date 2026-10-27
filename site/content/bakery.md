@@ -8,7 +8,7 @@ sitemap:
 
 In this introduction to Ergo, we'll show how to define policy decisions with rego and Ergo through the example of a bakery's allergen requirements (hat tip to Toby Weston for [the original inspiration](https://baddotrobot.com/blog/2026-10-02-baking-in-evidence/)). You'll learn how to validate cake batches against three compliance rules and produce explanatory reports of decisions. No deep technical expertise or prior experience with rego is required.
 
-We will look at the same policy written two ways, in plain Rego and with Ergo, and compare the results. You can follow along. The files are in [`examples/baking`](https://github.com/kosli-dev/ergo/tree/main/examples/baking).
+We will look at the same policy written two ways, in plain Rego and with Ergo, and compare the results. You can follow along. The files are in [`examples/baking`]({{< release-url "examples/baking" >}}).
 
 ## The policy
 
@@ -19,7 +19,7 @@ We will look at the same policy written two ways, in plain Rego and with Ergo, a
 
 ## The input file
 
-Our input, [`batches.json`](https://github.com/kosli-dev/ergo/blob/main/examples/baking/batches.json) describes four batches of cake baking:
+Our input, [`batches.json`]({{< release-url "examples/baking/batches.json" >}}) describes four batches of cake baking:
 
 <div class="annotated">
 
@@ -43,7 +43,7 @@ Only batch 001 should pass.
 
 <p class="compare__label mono">In Rego</p>
 
-[`plain-rego/baking.rego`](https://github.com/kosli-dev/ergo/blob/main/examples/baking/plain-rego/baking.rego)
+[`plain-rego/baking.rego`]({{< release-url "examples/baking/plain-rego/baking.rego" >}})
 
 {{< example "baking/plain-rego/baking.rego" "rego" >}}
 
@@ -54,11 +54,11 @@ This is the example's policy with three changes. It reads every batch in the lis
 
 <p class="compare__label mono">with <span class="ergo-mark">Ergo</span></p>
 
-[`ergo/baking.yaml`](https://github.com/kosli-dev/ergo/blob/main/examples/baking/ergo/baking.yaml)
+[`ergo/baking.yaml`]({{< release-url "examples/baking/ergo/baking.yaml" >}})
 
 {{< example "baking/ergo/baking.yaml" "yaml" >}}
 
-[`ergo/baking.rego`](https://github.com/kosli-dev/ergo/blob/main/examples/baking/ergo/baking.rego), which runs it:
+[`ergo/baking.rego`]({{< release-url "examples/baking/ergo/baking.rego" >}}), which runs it:
 
 {{< example "baking/ergo/baking.rego" "rego" >}}
 
@@ -143,7 +143,7 @@ Ergo adds the checks that start with `$` to every report itself. They make sure 
 
 In this example, Batch 003 fails because Ergo's `does not contain` needs a list, and `"nuts"` isn't one. All three batches fail, but you can see the different reasons. `cause: value` means Ergo read the value and it didn't pass (allergens contain nuts), `cause: unusable` means the value was there but not the kind the check needs, and `cause: absent` means there was no value at all.
 
-The report also writes each check as an expression, so the table comes straight out of it. [`ergo/workings.rego`](https://github.com/kosli-dev/ergo/blob/main/examples/baking/ergo/workings.rego) builds it from the report, and the policy exposes it as `workings_table`:
+The report also writes each check as an expression, so the table comes straight out of it. [`ergo/workings.rego`]({{< release-url "examples/baking/ergo/workings.rego" >}}) builds it from the report, and the policy exposes it as `workings_table`:
 
 ```sh
 opa eval -d ergo.rego -d examples/baking/ergo -i examples/baking/batches.json -f pretty 'data.baking.workings_table'

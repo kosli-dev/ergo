@@ -17,8 +17,8 @@ disableKinds = ["taxonomy", "term", "rss"]
   startLevel = 2
   endLevel = 3
 
-# The docs are read straight from the repo's own README.md and REFERENCE.md,
-# so the site can never drift from the library.
+# The docs and examples are read from the latest release, which site/prepare.sh
+# writes to release/, so the site shows what the released ergo.rego does.
 [module]
   [[module.mounts]]
     source = "content"
@@ -36,11 +36,11 @@ disableKinds = ["taxonomy", "term", "rss"]
     source = "static"
     target = "static"
   [[module.mounts]]
-    source = "../README.md"
+    source = "release/README.md"
     target = "assets/repo/README.md"
   [[module.mounts]]
-    source = "../REFERENCE.md"
+    source = "release/REFERENCE.md"
     target = "assets/repo/REFERENCE.md"
   [[module.mounts]]
-    source = "../examples"
+    source = "release/examples"
     target = "assets/examples"

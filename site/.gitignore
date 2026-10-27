@@ -4,3 +4,4 @@ resources/
 assets/tutorial/
 static/spec/
 data/release.json
+release/
