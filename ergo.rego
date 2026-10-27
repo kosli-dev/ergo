@@ -6199,7 +6199,7 @@ _p_part_walks(lines, ftext, names) := {p |
 	some line in lines
 	is_string(line)
 	some a in object.get(_sentence(line), "assertions", [])
-	some p in _p_walk_paths(_s_aliased(a, _s_names(set(), names)))
+	some p in _p_walk_paths(_s_aliased(a, _s_names(set(), _p_unaliased(ftext, names))))
 } | {p |
 	is_string(ftext)
 	fl := _for_line(ftext)
@@ -6207,7 +6207,14 @@ _p_part_walks(lines, ftext, names) := {p |
 	some p in _p_walk_paths(_s_unpicked(item))
 }
 
-_p_walk_paths(x) := {[x[q], false] | some q in ["every", "some", "pick"]; is_object(object.get(x, q, null))} | ({[t[k], false] | some t in _s_nodes(object.remove(x, _p_item_keys(x))); some k in _p_derived_keys(t)} | {[t[k], true] | some t in _s_nodes(object.filter(x, _p_item_keys(x))); some k in _p_derived_keys(t)})
+_p_unaliased(ftext, names) := names - {item.as |
+	is_string(ftext)
+	some item in object.get(_for_line(ftext), "items", [])
+}
+
+_p_walk_paths(x) := {[x[q], false] | some q in ["every", "some", "pick"]; is_object(object.get(x, q, null))} | ({[t[k], false] | some t in _s_nodes(object.remove(x, _p_item_keys(x))); some k in _p_derived_keys(t)} | {[t[k], true] | _p_walks_items(x); some t in _s_nodes(object.filter(x, _p_item_keys(x))); some k in _p_derived_keys(t)})
+
+_p_walks_items(x) if object.keys(x) & {"every", "some", "pick"} != set()
 
 _p_derived_keys(t) := {k |
 	_s_derived_term(t)

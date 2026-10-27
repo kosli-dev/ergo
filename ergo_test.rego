@@ -4643,6 +4643,34 @@ test_a_walk_through_a_part_of_the_parent_counts_the_parts_path if {
 	[i.value | some r in wrong.results; r.check == "$well_formed"; some i in r.inputs; i.name == "checks.c"] == [_too_long]
 }
 
+_parent_part_problems(has, check) := [i.value | some r in ergo.report({"bs": []}, _parent_part_policy(has, check), {}).results; r.check == "$well_formed"; some i in r.inputs; i.name == "checks.c"]
+
+_parent_part_cause(has, check, doc) := [r.cause | some r in ergo.report(doc, _parent_part_policy(has, check), {}).results; r.check == "c"]
+
+test_a_count_or_sum_in_the_whose_of_a_count_reads_the_items_field_so_a_parent_part_is_not_counted if {
+	doc := {"bs": [object.union({"id": "b1", "kids": [{"id": "c1", "n": 1, "xs": [{"v": 1, "n": 1, "b": {"x": {"z": [1, 1]}}}]}]}, _k10({"z": [1]}))]}
+	has := {"x": _ten}
+	_parent_part_cause(has, "count of xs whose n is count of b.x.z is 0", doc) == ["satisfied"]
+	_parent_part_cause(has, "count of xs whose n is count of b.x.z is 1", doc) == ["value"]
+	_parent_part_cause(has, "count of xs whose n is at least count of b.x.z is 1", doc) == ["value"]
+	_parent_part_cause(has, "sum of xs.v whose n is count of b.x.z is 0", doc) == ["satisfied"]
+}
+
+test_a_parent_part_in_the_whose_of_every_some_or_a_for_item_is_still_counted_at_ten_names if {
+	has := {"x": _ten}
+	_parent_part_problems(has, "every xs.v whose n is count of b.x.z is 1") == [_too_long]
+	_parent_part_problems(has, "some xs whose n is count of b.x.z is not empty") == [_too_long]
+	_parent_part_problems(has, {"for": "every xs whose n is count of b.x.z as x", "assert": "x.v is 1"}) == [_too_long]
+	_parent_part_problems({"x": _nine}, "every xs.v whose n is count of b.x.z is 1") == []
+}
+
+test_a_walk_that_is_already_written_wrong_for_another_reason_gets_no_ten_step_message_too if {
+	has := {"x": _ten}
+	_part_walk_problems(has, {"for": "every xs as x", "assert": "every x.z is 1"}) == ["alias given twice"]
+	_part_walk_problems(has, {"for": "every xs as x", "assert": "count of x.z is 1"}) == ["alias given twice"]
+	_parent_part_problems(has, "count of xs whose n is sum of b.x.z is 0") == [["a sum of or a plus in the whose of a count of or a sum of isn't supported yet"]]
+}
+
 test_a_walk_whose_named_by_cant_be_read_shows_an_empty_list_in_its_inputs if {
 	r := ergo.report({"things": [{"id": "a", "xs": {"k": [1]}}]}, _sentence_policy({"c": "every xs named by $params.k is 1"}), {})
 	[[row.cause, row.inputs, row.failed_items] | some row in r.results; row.check == "c"] == [["absent", [{"name": "xs named by $params.k", "value": [], "locations": []}], []]]

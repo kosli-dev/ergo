@@ -253,5 +253,21 @@
         "expressions": {"s": {"c": "every x.z is 1"}}
       }
     ]
+  },
+  {
+    "description": "a parent's part of ten names in the whose of a count of, read on the item",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"b": {"from": "bs", "identified_by": "id", "has": {"x": "k1.k2.k3.k4.k5.k6.k7.k8.k9.k10"}}, "kid": {"from": "b.kids", "identified_by": "id"}}, "requirements": {"s": {"subject": "kid", "checks": {"c": "count of xs whose n is count of b.x.z is 1"}}}},
+    "cases": [
+      {
+        "description": "reads the item's own field, so the part is not counted and the policy reads at ten names",
+        "rules": ["parts.where", "sentence.path.part", "sentence.walk.steps", "sentence.derived.count", "sentence.whose.item", "parts.chain"],
+        "input": {"bs": [{"id": "b1", "kids": [{"id": "c1", "xs": [{"n": 2, "b": {"x": {"z": [1, 1]}}}]}, {"id": "c2", "xs": [{"n": 1, "b": {"x": {"z": [1, 1]}}}]}], "k1": {"k2": {"k3": {"k4": {"k5": {"k6": {"k7": {"k8": {"k9": {"k10": {"z": [1]}}}}}}}}}}}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/bs/0/kids/0/xs/0"], "name": "count of xs whose n equals count of b.x.z", "value": 1}, {"locations": ["/bs/0/kids/0/xs/0"], "name": "xs[]", "value": [{"b": {"x": {"z": [1, 1]}}, "n": 2}]}], "passed": true, "requirement": "s", "subject": {"id": "c1", "in": {"b": "b1"}, "type": "kid"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/bs/0/kids/1/xs/0"], "name": "count of xs whose n equals count of b.x.z", "value": 0}, {"locations": ["/bs/0/kids/1/xs/0"], "name": "xs[]", "value": [{"b": {"x": {"z": [1, 1]}}, "n": 1}]}], "passed": false, "requirement": "s", "subject": {"id": "c2", "in": {"b": "b1"}, "type": "kid"}}
+        ],
+        "expressions": {"s": {"c": "count of xs whose n equals count of b.x.z is 1"}}
+      }
+    ]
   }
 ]
