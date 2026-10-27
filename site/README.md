@@ -10,10 +10,11 @@ The live site shows the latest published release of `ergo.rego`, so it never tea
 | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
 | The Ergo the tutorial runs           | the `ergo.rego` attached to the release, compiled to Wasm                                                             |
 | The tutorial                         | the release tag's `assets/js/tutorial/`, `assets/css/tutorial.css`, `layouts/tutorial.html` and `content/tutorial.md` |
-| The docs pages                       | the release tag's `README.md` and `REFERENCE.md`                                                                      |
+| The docs pages                       | the release tag's `README.md` and `REFERENCE.md`, with `X.Y.Z-dev` written `X.Y.Z` as in the released `ergo.rego`     |
 | The bakery page's example            | the release tag's `examples/`                                                                                         |
 | The home page's examples and reports | the release tag's `data/examples.yaml`, or this one when the tag has none, as 0.1.0 doesn't                           |
 | `ergo_spec` on the home page         | the `_spec` of the released `ergo.rego`                                                                               |
+| The spec link and `/spec/X.Y/`       | the published `spec-vX.Y` releases                                                                                    |
 
 Everything else follows `main`: the home page's layout, design and words, the other pages, the CSS other than `tutorial.css`, and the bakery page's text. So a change to the tutorial, the docs, the examples or the home page's examples reaches the site at the next release, and a change to the rest reaches it when it's merged.
 
@@ -41,15 +42,15 @@ Then open http://localhost:1313. Hugo picks up edits to the working tree's tutor
 `site/prepare.sh` writes what Hugo needs into folders git ignores, and Hugo stops with a message naming the script when they're missing:
 
 - `site/prepared/` holds what comes from the release, laid out like `site/`, and where a file is in both, Hugo uses the one in `site/prepared/`. It always holds `README.md` and `REFERENCE.md` for the docs and `examples/` for the bakery page, from the release or the working tree, so run the script again after you edit those. The example files end in `.txt`, and the released `ergo.rego` is `ergo.rego.txt`, because OPA loads every `.rego`, `.json` and `.yaml` file under the folder it's given, and they'd clash with the repo's own.
-- `site/prepared/data/release.json` holds the versions the home page shows: the release, the newest `spec-vX.Y` tag, and the spec that `ergo.rego` reads.
+- `site/prepared/data/release.json` holds the versions the home page shows: the release, the newest published `spec-vX.Y` release, and the spec that `ergo.rego` reads.
 - `site/assets/tutorial/` holds `ergo.rego` compiled to Wasm, and OPA's Wasm runtime.
-- `site/static/spec/` holds the schemas of every released spec, from `site/spec-schemas.sh`.
+- `site/static/spec/` holds the schemas of every published spec release, from `site/spec-schemas.sh`.
 
-The script picks the newest `rego-vX.Y.Z` release by version, and ignores drafts, pre-releases and tags of any other shape. It fails when there's no such release, or no `spec-vX.Y` tag.
+The script picks the newest `rego-vX.Y.Z` and `spec-vX.Y` releases by version, and ignores drafts, pre-releases and tags of any other shape. It fails when there's no such release, or when a release's tag isn't fetched. With `--working-tree`, it takes the spec from the `spec-vX.Y` tags instead, so it needs no GitHub CLI.
 
 `site/check.sh` tests what `site/prepare.sh` wrote. From the working tree, it runs the tutorial's tests and checks the home page's examples against the working tree's `ergo.rego`. From the release, it runs the released tutorial's tests, checks the home page's examples against the released `ergo.rego`, and checks that the released tutorial still has what it needs from `main`: the CSS variables and classes it took from `ergo.css`, the partials its layout calls, and the files its scripts import.
 
-After `hugo` builds the site, `site/check_build.py <folder>` checks that the built tutorial writes the spec of the Ergo it runs, and that the home page shows the examples `site/check.sh` checked. That catches a mount in `hugo.toml` that lets `main`'s file win over the release's.
+After `hugo` builds the site, `site/check_build.py <folder>` checks that the built tutorial writes the spec of the Ergo it runs, that its script has the strings of the tutorial `site/prepare.sh` chose and none that only the other one has, that its page has that tutorial's layout and title, that its CSS has that `tutorial.css`'s classes, properties, colours and lengths, and that the home page shows the examples `site/check.sh` checked. That catches a mount in `hugo.toml` that lets `main`'s file win over the release's.
 
 CI does all of this from the working tree and from the release on every pull request, and the deploy runs the release checks before it publishes.
 
@@ -59,7 +60,7 @@ CI does all of this from the working tree and from the release on every pull req
 
 ## The home page's examples
 
-The policies, inputs and reports in the hero, the "problem" section and the policy next to the notes come from `data/examples.yaml`. `site/check_examples.py` runs each policy and fails when the report says something else than the page: a row's subject, check, result or cause, or a value it shows. The page can leave out an input, like `require`. An input with a `note` is shown on its own line, with the note as its text. The Ergo policies leave out `ergo_spec`, and the page adds the spec of the `ergo.rego` it runs with.
+The policies, inputs and reports in the hero, the "problem" section and the policy next to the notes come from `data/examples.yaml`. `site/check_examples.py` runs each policy and fails when the report says something else than the page: a row's subject, check, result or cause, or a value it shows. The page can leave out an input, like `require`. An input with `list: <field>` is shown on its own line as that field of each of its items, like `approvers: ann, bob`, so the line comes from the value the check compared. The Ergo policies leave out `ergo_spec`, and the page adds the spec of the `ergo.rego` it runs with.
 
 ## Files
 

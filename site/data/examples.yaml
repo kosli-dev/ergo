@@ -151,21 +151,21 @@ review:
       check: peer
       inputs:
         - {name: author, value: ann}
-        - {name: "approvers[]", value: [{username: ann}, {username: bob}], note: "approvers: ann, bob"}
+        - {name: "approvers[]", value: [{username: ann}, {username: bob}], list: username}
       passed: true
       cause: satisfied
     - subject: 2
       check: peer
       inputs:
         - {name: author, value: bob}
-        - {name: "approvers[]", value: [{username: bob}], note: "approvers: bob"}
+        - {name: "approvers[]", value: [{username: bob}], list: username}
       passed: false
       cause: value
     - subject: 3
       check: peer
       inputs:
         - {name: author, value: null}
-        - {name: "approvers[]", value: [{username: bob}], note: "approvers: bob"}
+        - {name: "approvers[]", value: [{username: bob}], list: username}
       passed: false
       cause: absent
 expenses:

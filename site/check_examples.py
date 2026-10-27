@@ -48,6 +48,8 @@ def check_report(name, example, ergo, spec, tmp, problems):
         for x in want.get("inputs", []):
             if {"name": x["name"], "value": x.get("value")} not in inputs:
                 problems.append(f"{name}, row {i}: the report has no input {x['name']} = {json.dumps(x.get('value'))}")
+            if "list" in x and not (isinstance(x.get("value"), list) and all(isinstance(item, dict) and x["list"] in item for item in x["value"])):
+                problems.append(f"{name}, row {i}: the page lists the {x['list']} of each item of {x['name']}, and not every item has one")
 
 
 def main():

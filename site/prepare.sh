@@ -21,21 +21,35 @@ prepared=site/prepared
 dir=$(mktemp -d)
 trap 'rm -rf "$dir"' EXIT
 
-tags=$(git tag --list 'spec-v*')
-spec_tag=$(printf '%s\n' "$tags" | site/latest-release.sh spec)
-[ -n "$spec_tag" ] || fail "There's no spec-vX.Y tag here. Fetch the tags with: git fetch --tags"
-
-rm -rf "$prepared"
-mkdir -p "$prepared/data"
+has_tag() {
+  git rev-parse --quiet --verify "refs/tags/$1" > /dev/null || fail "There's no $1 tag here. Fetch the tags with: git fetch --tags"
+}
 
 if [ "$mode" = release ]; then
   if ! releases=$(gh release list --repo "$repo" --exclude-drafts --exclude-pre-releases --limit 1000 --json tagName --jq '.[].tagName'); then
     fail "Listing Ergo's releases needs the GitHub CLI, logged in. To build from this working tree instead, run: site/prepare.sh --working-tree"
   fi
+  specs=$releases
+  where="$repo has no published spec-vX.Y release"
+else
+  specs=$(git tag --list 'spec-v*')
+  where="There's no spec-vX.Y tag here. Fetch the tags with: git fetch --tags"
+fi
+spec_tag=$(printf '%s\n' "$specs" | site/latest-release.sh spec)
+[ -n "$spec_tag" ] || fail "$where"
+spec_tags=$(printf '%s\n' "$specs" | grep -E '^spec-v[0-9]+\.[0-9]+$')
+for spec in $spec_tags; do
+  has_tag "$spec"
+done
+
+rm -rf "$prepared"
+mkdir -p "$prepared/data"
+
+if [ "$mode" = release ]; then
   tag=$(printf '%s\n' "$releases" | site/latest-release.sh rego)
   [ -n "$tag" ] || fail "$repo has no published rego-vX.Y.Z release"
   version=${tag#rego-v}
-  git rev-parse --quiet --verify "refs/tags/$tag" > /dev/null || fail "There's no $tag tag here. Fetch the tags with: git fetch --tags"
+  has_tag "$tag"
 
   gh release download "$tag" --repo "$repo" --pattern ergo.rego --dir "$dir/asset"
   rego=$dir/asset/ergo.rego
@@ -63,6 +77,10 @@ if [ "$mode" = release ]; then
     cp "$dir/tag/site/data/examples.yaml" "$prepared/data/"
   fi
   cp "$rego" "$prepared/ergo.rego.txt"
+  for file in README.md REFERENCE.md; do
+    VERSION=$version perl -pe 's/(?<![\w.])\Q$ENV{VERSION}\E-dev(?![\w-])/$ENV{VERSION}/g' "$dir/tag/$file" > "$dir/tag/$file.tmp"
+    mv "$dir/tag/$file.tmp" "$dir/tag/$file"
+  done
   docs=$dir/tag
   source=$tag
 else
@@ -102,6 +120,6 @@ fi
 tar -xzf "$dir/pkg.tgz" -C "$dir" package/dist/opa-wasm-browser.esm.js
 mv "$dir/package/dist/opa-wasm-browser.esm.js" "$out/vendor/opa-wasm.mjs"
 
-site/spec-schemas.sh
+site/spec-schemas.sh $spec_tags
 printf '%s\n' "$source" > "$prepared/source"
 echo "The site is built from: $source. Check it with: site/check.sh"

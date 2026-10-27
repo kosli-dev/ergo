@@ -8,7 +8,7 @@ case ${1:-} in
     exit 2
     ;;
 esac
-matching=$(grep -E "$pattern" || true)
+matching=$(grep -E "$pattern") || [ $? -eq 1 ]
 [ -n "$matching" ] || exit 0
 sorted=$(printf '%s\n' "$matching" | sort -V)
 printf '%s\n' "$sorted" | tail -n 1

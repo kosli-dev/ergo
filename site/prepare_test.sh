@@ -62,8 +62,8 @@ mkdir -p "$repo/site/assets/js/tutorial" "$repo/site/assets/css" "$repo/site/lay
 cd "$repo"
 git init --quiet
 cp "$root/site/prepare.sh" "$root/site/latest-release.sh" "$root/site/spec-schemas.sh" site/
-echo "# Readme" > README.md
-echo "# Reference" > REFERENCE.md
+printf '%s\n' '# Readme' '"version": "0.1.0-dev"' '10.1.0-dev' '0.1.0-devX' '0.1.0-dev-rc' 'v0.1.0-dev' '0.1.0-dev 0.1.0-dev' 'Ergo is at 0.1.0-dev.' 'x.0.1.0-dev' > README.md
+echo 'expected ergo.rego 0.1.0-dev' > REFERENCE.md
 echo "package demo" > examples/demo/demo.rego
 echo "{}" > examples/demo/input.json
 for file in lib.mjs main.mjs lib.test.mjs; do echo "export {};" > "site/assets/js/tutorial/$file"; done
@@ -116,7 +116,7 @@ says() {
   }
 }
 
-FAKE_RELEASES="rego-v0.1.0 rego-v0.3.0-rc1 rego-vlatest"
+FAKE_RELEASES="rego-v0.1.0 rego-v0.3.0-rc1 rego-vlatest spec-v0.1"
 FAKE_ASSET_VERSION=0.1.0
 export FAKE_RELEASES FAKE_ASSET_VERSION
 
@@ -130,8 +130,16 @@ case $out in
 esac
 says site/prepared/source rego-v0.1.0
 says site/prepared/data/release.json '{"source": "rego-v0.1.0", "rego": "0.1.0", "spec": "0.1", "ergo_spec": "v0.1"}'
-says site/prepared/repo/README.md "# Readme"
-has site/prepared/repo/REFERENCE.md
+says site/prepared/repo/README.md '# Readme
+"version": "0.1.0"
+10.1.0-dev
+0.1.0-devX
+0.1.0-dev-rc
+v0.1.0-dev
+0.1.0 0.1.0
+Ergo is at 0.1.0.
+x.0.1.0-dev'
+says site/prepared/repo/REFERENCE.md 'expected ergo.rego 0.1.0'
 has site/prepared/examples/demo/demo.rego.txt
 has site/prepared/examples/demo/input.json.txt
 lacks site/prepared/examples/demo/demo.rego
@@ -156,12 +164,21 @@ echo "deploy: {}" > site/data/examples.yaml
 git add site/data/examples.yaml
 git -c user.name=test -c user.email=test@example.com -c commit.gpgSign=false commit --quiet --message examples
 git -c tag.gpgSign=false -c tag.forceSignAnnotated=false tag rego-v0.10.0
-FAKE_RELEASES="rego-v0.9.0 rego-v0.10.0 rego-v0.1.0" FAKE_ASSET_VERSION=0.10.0 site/prepare.sh > /dev/null
+FAKE_RELEASES="rego-v0.9.0 rego-v0.10.0 rego-v0.1.0 spec-v0.1" FAKE_ASSET_VERSION=0.10.0 site/prepare.sh > /dev/null
 says site/prepared/source rego-v0.10.0
 has site/prepared/data/examples.yaml
 
-FAKE_RELEASES=rego-v0.1.0 FAKE_PRE_RELEASES=rego-v0.10.0 FAKE_DRAFTS=rego-v0.10.0 site/prepare.sh > /dev/null
+FAKE_RELEASES="rego-v0.1.0 spec-v0.1" FAKE_PRE_RELEASES="rego-v0.10.0 spec-v0.9" FAKE_DRAFTS="rego-v0.10.0 spec-v0.9" site/prepare.sh > /dev/null
 says site/prepared/source rego-v0.1.0
+says site/prepared/data/release.json '{"source": "rego-v0.1.0", "rego": "0.1.0", "spec": "0.1", "ergo_spec": "v0.1"}'
+
+git -c tag.gpgSign=false -c tag.forceSignAnnotated=false tag spec-v0.2
+FAKE_RELEASES="rego-v0.10.0 spec-v0.1" FAKE_ASSET_VERSION=0.10.0 site/prepare.sh > /dev/null
+has site/static/spec/0.1/policy.schema.json
+lacks site/static/spec/0.2
+(FAKE_RELEASES="rego-v0.10.0"; FAKE_ASSET_VERSION=0.10.0; expected="kosli-dev/ergo has no published spec-vX.Y release"; fails)
+(FAKE_RELEASES="rego-v0.10.0 spec-v0.1 spec-v0.3"; FAKE_ASSET_VERSION=0.10.0; expected="There's no spec-v0.3 tag here. Fetch the tags with: git fetch --tags"; fails)
+git tag --delete spec-v0.2 > /dev/null
 
 echo "# Working" > README.md
 site/prepare.sh --working-tree > /dev/null
@@ -174,12 +191,12 @@ lacks site/prepared/assets
 has site/assets/tutorial/ergo.wasm
 
 (expected="usage: site/prepare.sh [--working-tree]"; fails --release)
-(FAKE_RELEASES="rego-v1.0.0-rc1 rego-vlatest"; expected="kosli-dev/ergo has no published rego-vX.Y.Z release"; fails)
-(FAKE_RELEASES="rego-v0.4.0"; expected="There's no rego-v0.4.0 tag here. Fetch the tags with: git fetch --tags"; fails)
-(FAKE_RELEASES=rego-v0.10.0; FAKE_ASSET_VERSION=0.1.0-dev; expected='The ergo.rego of release rego-v0.10.0 should say version := "0.10.0"'; fails)
+(FAKE_RELEASES="rego-v1.0.0-rc1 rego-vlatest spec-v0.1"; expected="kosli-dev/ergo has no published rego-vX.Y.Z release"; fails)
+(FAKE_RELEASES="rego-v0.4.0 spec-v0.1"; expected="There's no rego-v0.4.0 tag here. Fetch the tags with: git fetch --tags"; fails)
+(FAKE_RELEASES="rego-v0.10.0 spec-v0.1"; FAKE_ASSET_VERSION=0.1.0-dev; expected='The ergo.rego of release rego-v0.10.0 should say version := "0.10.0"'; fails)
 (export FAKE_GH_FAILS=1; expected="To build from this working tree instead, run: site/prepare.sh --working-tree"; fails)
 git tag --delete spec-v0.1 > /dev/null
-(expected="There's no spec-vX.Y tag here"; fails)
-(expected="There's no spec-vX.Y tag here"; fails --working-tree)
+(FAKE_RELEASES="rego-v0.10.0 spec-v0.1"; FAKE_ASSET_VERSION=0.10.0; expected="There's no spec-v0.1 tag here. Fetch the tags with: git fetch --tags"; fails)
+(expected="There's no spec-vX.Y tag here. Fetch the tags with: git fetch --tags"; fails --working-tree)
 
 echo "prepare.sh builds from the latest published release, or from the working tree"

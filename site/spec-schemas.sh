@@ -3,7 +3,11 @@ set -eu
 cd "$(git rev-parse --show-toplevel)"
 rm -rf site/static/spec
 
-for tag in $(git tag --list 'spec-v[0-9]*.[0-9]*'); do
+if [ $# -eq 0 ]; then
+  set -- $(git tag --list 'spec-v[0-9]*.[0-9]*')
+fi
+
+for tag in "$@"; do
   version=${tag#spec-v}
   printf '%s\n' "$version" | grep -qxE '[0-9]+\.[0-9]+' || continue
   dir=site/static/spec/$version

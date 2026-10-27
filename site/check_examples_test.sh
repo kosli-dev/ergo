@@ -30,4 +30,5 @@ fails 's/inputs: \[{name: amount, value: 68}\]/inputs: [{name: amount, value: 67
 fails 's/assert: amount is at most 50/assert: amount is at most 70/' 'expenses, row 7: passed is true in the report, and false on the page'
 fails 's/      check: approved$/      check: approval/' 'deploy, row 7: check is "approved" in the report, and "approval" on the page'
 fails '/subject: e-3/,/cause: satisfied/d' 'expenses: the report has 9 rows, and the page shows 7'
+fails 's/, list: username}/, list: login}/' 'review, row 4: the page lists the login of each item of approvers[], and not every item has one'
 echo "check_examples.py fails when the page shows something the report doesn't say"
