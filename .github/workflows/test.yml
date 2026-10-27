@@ -51,10 +51,11 @@ jobs:
           opa capabilities --current | jq '.builtins |= map(select(.nondeterministic != true))' > "$RUNNER_TEMP/deterministic.json"
           opa check --strict --capabilities "$RUNNER_TEMP/deterministic.json" ergo.rego
       - run: opa fmt --list --fail .
-      - name: Check only ergo.rego releases can be the latest release
+      - name: Check the release workflow's latest flag and release notes
         run: |
           python3 .github/release-latest.py
           .github/release-latest_test.sh
+          .github/release-notes_test.sh
       - name: Lint for likely bugs
         run: regal lint --format github --disable-all --enable-category bugs --disable redundant-existence-check --ignore-files '.github/**' .
       - name: Check there are no comments
