@@ -6006,7 +6006,8 @@ _s_from_read(name, fl, subjects, chains) := object.union(object.union({"problems
 	"path" in object.keys(fl)
 	names := {a | some a in _s_ancestors(name, chains.descend)}
 	keep := names | object.keys(_p_steps_of(object.get(chains.parts, name, {})))
-	conds := [_p_applied(_s_parent_named(t, _s_check([t], {}, set(), keep), names), {"own": _p_steps_of(object.get(chains.parts, name, {})), "ancestors": {a: _p_steps_of(object.get(chains.parts, a, {})) | some a in names}}) | some c in object.get(fl, "where", []); t := _s_cond_text(_s_from_cond(c, names, keep))]
+	pc := {"own": _p_steps_of(object.get(chains.parts, name, {})), "ancestors": {a: _p_steps_of(object.get(chains.parts, a, {})) | some a in names}}
+	conds := [_p_applied(_s_parent_named(t, _s_check([t], {}, _p_part_walk_problems([t], "", pc), keep), names), pc) | some c in object.get(fl, "where", []); t := _s_cond_text(_s_from_cond(c, names, keep))]
 	problems := sort(((((((((_s_chain_unsupported(name, fl, subjects, chains) | _s_loop(name, fl, subjects, chains)) | _s_blank_start(fl, subjects)) | _s_every_unsupported(name, fl, subjects)) | _s_from_start_problems(fl)) | _s_from_paths_unsupported({"path": fl.path})) | _s_elapsed_flaw({"where": object.get(fl, "where", [])})) | {concat("", ["whose: ", p]) | some c in conds; some p in object.get(c, "$sentence", [])}) | {"whose: a condition can't be read" | count(conds) != count(object.get(fl, "where", []))}))
 	fields := object.union(_s_source(name, fl, subjects, chains.parts), _s_whose_filters(_s_filter_prefix(name, chains.narrow), conds))
 	parent := _s_descend_parent(name, fl, subjects)
@@ -6124,7 +6125,7 @@ _s_every_unsupported(name, fl, subjects) := ({"every can't go with a from line t
 	is_string(fl.path.steps[0])
 	fl.path.steps[0] != name
 	fl.path.steps[0] in object.keys(subjects)
-} | {"every can't go with named by each of: start the from line at a subject to read its names one subject at a time" | "named_by_each_of" in object.keys(fl)}) | {"every over more than ten steps isn't supported yet" | count(_s_model_path(fl.path)) > 10} if object.get(fl, "every", false) == true
+} | {"every can't go with named by each of: start the from line at a subject to read its names one subject at a time" | "named_by_each_of" in object.keys(fl)}) | {"every over more than ten steps isn't supported yet" | count(_walk_steps(_s_model_path(fl.path))) > 10} if object.get(fl, "every", false) == true
 
 _s_chain_unsupported(name, fl, subjects, chains) := {"a chain of more than three subjects isn't supported yet" |
 	_s_descends(name, fl, subjects)
@@ -6222,6 +6223,56 @@ _p_for_clash(check, aliases) := {"alias given twice" |
 }
 
 _p_for_clash(check, _) := set() if not is_string(object.get(check, "for", ""))
+
+_p_part_walk_problems(_, _, pc) := set() if _p_idle(pc)
+
+_p_part_walk_problems(lines, ftext, pc) := {"every and some over more than ten steps aren't supported yet" |
+	some w in _p_part_walks(lines, ftext, pc)
+	_p_part_walk_steps(w, pc) > 10
+} if not _p_idle(pc)
+
+_p_part_walks(lines, ftext, pc) := {p |
+	some line in lines
+	is_string(line)
+	some a in object.get(_sentence(line), "assertions", [])
+	some p in _p_walk_paths(_s_aliased(a, _s_names(set(), _p_unaliased(ftext, object.keys(pc.own)) | object.keys(pc.ancestors))))
+} | {p |
+	is_string(ftext)
+	fl := _for_line(ftext)
+	some item in _s_marked_items(fl, object.keys(pc.own) | object.keys(pc.ancestors))
+	some p in _p_walk_paths(_s_unpicked(item))
+}
+
+_p_unaliased(ftext, names) := names - {item.as |
+	is_string(ftext)
+	some item in object.get(_for_line(ftext), "items", [])
+}
+
+_p_walk_paths(x) := {[x[q], false] | some q in ["every", "some", "pick"]; is_object(object.get(x, q, null))} | ({[t[k], false] | some t in _s_nodes(object.remove(x, _p_item_keys(x))); some k in _p_derived_keys(t)} | {[t[k], true] | _p_walks_items(x); some t in _s_nodes(object.filter(x, _p_item_keys(x))); some k in _p_derived_keys(t)})
+
+_p_walks_items(x) if object.keys(x) & {"every", "some", "pick"} != set()
+
+_p_derived_keys(t) := {k |
+	_s_derived_term(t)
+	some k in ["count", "sum"]
+	is_object(object.get(t, k, null))
+}
+
+_p_item_keys(x) := ["where", "phrase"] if object.keys(x) & {"every", "some", "pick"} != set()
+
+else := ["where"]
+
+_p_part_walk_steps([p, false], pc) := (count(_walk_steps(_s_model_path(p))) - 1) + count(pc.own[p.steps[0]]) if {
+	object.get(p, "part", false) == true
+	p.steps[0] in object.keys(pc.own)
+} else := _p_parent_walk_steps(p, pc)
+
+_p_part_walk_steps([p, true], pc) := _p_parent_walk_steps(p, pc)
+
+_p_parent_walk_steps(p, pc) := (count(_walk_steps(_s_model_path(p))) - 2) + count(pc.ancestors[p.steps[0]][p.steps[1]]) if {
+	object.get(p, "part", false) == true
+	p.steps[1] in object.keys(pc.ancestors[p.steps[0]])
+} else := 0
 
 _p_steps_of(parts) := {alias: read.from.path | some alias, read in parts; _p_valid(read)}
 
@@ -6379,10 +6430,11 @@ _p_requirements(reqs, chains, parts) := {name: _p_requirement(req, chains, parts
 
 _p_requirements(reqs, _, _) := reqs if not is_object(reqs)
 
-_p_requirement(req, chains, parts) := object.union(object.remove(req, ["checks"]), {"checks": {name: _p_applied_to(check, _s_parent_named(check, _p_written(check, aliases, _s_parents_of(req, chains)), _s_parents_of(req, chains)), _p_context(req, chains, parts)) | some name, check in req.checks}}) if {
+_p_requirement(req, chains, parts) := object.union(object.remove(req, ["checks"]), {"checks": {name: _p_applied_to(check, _s_parent_named(check, _p_written(check, aliases, _s_parents_of(req, chains), pc), _s_parents_of(req, chains)), pc) | some name, check in req.checks}}) if {
 	is_object(req)
 	is_object(object.get(req, "checks", null))
 	aliases := _p_aliases(req, parts)
+	pc := _p_context(req, chains, parts)
 } else := req
 
 _s_parents_of(req, chains) := {a | some a in _s_ancestors(req.subject, chains)} if {
@@ -6423,34 +6475,34 @@ _s_named_model_leaf(m, names) := object.union(m, {
 
 _s_named_model_leaf(m, names) := _s_named(m, names) if not m.op in {"every", "some"}
 
-_s_written_check(check) := _p_written(check, set(), set())
+_s_written_check(check) := _p_written(check, set(), set(), _p_context({}, {}, _p_no_parts))
 
-_p_written(check, aliases, parents) := _s_check([check], {}, _p_named_by_problems([check], "", aliases), aliases | parents) if is_string(check)
+_p_written(check, aliases, parents, pc) := _s_check([check], {}, _p_named_by_problems([check], "", aliases) | _p_part_walk_problems([check], "", pc), aliases | parents) if is_string(check)
 
-_p_written(check, aliases, parents) := _s_check(_s_lines(check.assert), object.filter(check, {"description", "meta"}), _s_form_problems(check) | _p_named_by_problems(_s_lines(check.assert), "", aliases), aliases | parents) if {
+_p_written(check, aliases, parents, pc) := _s_check(_s_lines(check.assert), object.filter(check, {"description", "meta"}), ((_s_form_problems(check) | _p_named_by_problems(_s_lines(check.assert), "", aliases)) | _p_part_walk_problems(_s_lines(check.assert), "", pc)), aliases | parents) if {
 	_s_assert_form(check)
 	"assert" in object.keys(check)
 	not "for" in object.keys(check)
 }
 
-_p_written(check, aliases, parents) := _s_check_for(_s_lines(check.assert), check.for, object.filter(check, {"description", "meta"}), ((_s_form_problems(check) | _p_for_clash(check, aliases)) | _p_named_by_problems(_s_lines(check.assert), object.get(check, "for", ""), aliases)), aliases | parents) if {
+_p_written(check, aliases, parents, pc) := _s_check_for(_s_lines(check.assert), check.for, object.filter(check, {"description", "meta"}), (((_s_form_problems(check) | _p_for_clash(check, aliases)) | _p_named_by_problems(_s_lines(check.assert), object.get(check, "for", ""), aliases)) | _p_part_walk_problems(_s_lines(check.assert), check.for, pc)), aliases | parents) if {
 	_s_assert_form(check)
 	"assert" in object.keys(check)
 	"for" in object.keys(check)
 }
 
-_p_written(check, _, _) := object.union(object.filter(check, {"description", "meta"}), {"expression": "<missing assert>", "$sentence": sort(_s_form_problems(check))}) if {
+_p_written(check, _, _, _) := object.union(object.filter(check, {"description", "meta"}), {"expression": "<missing assert>", "$sentence": sort(_s_form_problems(check))}) if {
 	_s_assert_form(check)
 	not "assert" in object.keys(check)
 }
 
-_p_written(check, aliases, parents) := _s_any_of(check, aliases, aliases | parents) if _s_any_of_form(check)
+_p_written(check, aliases, parents, pc) := _s_any_of(check, aliases, aliases | parents, pc) if _s_any_of_form(check)
 
 _s_lines(a) := a if is_array(a)
 
 _s_lines(a) := [a] if not is_array(a)
 
-_p_written(check, _, _) := check if not _s_written_as_sentence(check)
+_p_written(check, _, _, _) := check if not _s_written_as_sentence(check)
 
 _s_written_as_sentence(check) if is_string(check)
 
@@ -6464,7 +6516,7 @@ _s_any_of_form(check) if {
 	not "assert" in object.keys(check)
 }
 
-_s_any_of(check, aliases, names) := object.union(object.filter(check, {"description", "meta"}), {
+_s_any_of(check, aliases, names, pc) := object.union(object.filter(check, {"description", "meta"}), {
 	"op": "sentence_any_of",
 	"checks": [object.remove(p[0], ["expression"]) | some p in pairs],
 	"assertions": [p[1] | some p in pairs],
@@ -6473,14 +6525,14 @@ _s_any_of(check, aliases, names) := object.union(object.filter(check, {"descript
 	"expression": _one_of([[_text(nm), _option_text(nm, texts, texts)] | some nm in _names(options); texts := [p[1] | some p in pairs; p[2] == nm]]),
 }) if {
 	count(_s_any_of_problems(check)) == 0
-	options := {nm: _s_check(_s_lines(o), {}, _p_named_by_problems(_s_lines(o), "", aliases), names) | some nm, o in check.any_of}
+	options := {nm: _s_check(_s_lines(o), {}, _p_named_by_problems(_s_lines(o), "", aliases) | _p_part_walk_problems(_s_lines(o), "", pc), names) | some nm, o in check.any_of}
 	every m in options {
 		not "$sentence" in object.keys(m)
 	}
 	pairs := [p | some nm in _names(options); some p in _s_option_lines(options[nm], nm)]
 } else := object.union(object.filter(check, {"description", "meta"}), {
 	"expression": _s_any_of_written(check.any_of),
-	"$sentence": sort(_s_or_unrunnable(_s_any_of_problems(check) | _s_options_problems(check.any_of, aliases, names))),
+	"$sentence": sort(_s_or_unrunnable(_s_any_of_problems(check) | _s_options_problems(check.any_of, aliases, names, pc))),
 })
 
 _s_option_lines(m, nm) := [[c, m.assertions[i], nm] | some i, c in m.checks] if m.op == "all_of"
@@ -6519,11 +6571,11 @@ _s_option_written(o) if {
 	}
 }
 
-_s_options_problems(options, aliases, names) := {concat("", ["option ", _text(nm), ": ", p]) |
+_s_options_problems(options, aliases, names, pc) := {concat("", ["option ", _text(nm), ": ", p]) |
 	some nm, o in options
 	_s_option_written(o)
 	o != []
-	m := _s_check(_s_lines(o), {}, _p_named_by_problems(_s_lines(o), "", aliases), names)
+	m := _s_check(_s_lines(o), {}, _p_named_by_problems(_s_lines(o), "", aliases) | _p_part_walk_problems(_s_lines(o), "", pc), names)
 	some p in object.get(m, "$sentence", [])
 } if is_object(options)
 
@@ -6650,7 +6702,7 @@ _s_unsupported(parsed) := set() if not "assertions" in object.keys(parsed)
 
 _s_unsupported(parsed) := {u | some a in parsed.assertions; some u in _s_assertion_unsupported(a)} if "assertions" in object.keys(parsed)
 
-_s_assertion_unsupported(a) := (((_s_paths_unsupported(a) | _s_argument_unsupported(a.phrase)) | {u | some c in object.get(a, "where", []); some u in _s_cond_unsupported(c)}) | _s_walk_too_long(a)) | {"count of, sum of and plus after every or some aren't supported yet" |
+_s_assertion_unsupported(a) := ((((_s_paths_unsupported(a) | _s_argument_unsupported(a.phrase)) | {u | some c in object.get(a, "where", []); some u in _s_cond_unsupported(c)}) | _s_walk_too_long(a)) | _s_derived_too_long(a)) | {"count of, sum of and plus after every or some aren't supported yet" |
 	terms := object.get(a.phrase, "terms", [])
 	terms != []
 	not _s_one_path(terms)
@@ -6658,14 +6710,16 @@ _s_assertion_unsupported(a) := (((_s_paths_unsupported(a) | _s_argument_unsuppor
 
 _s_cond_unsupported(c) := _s_derived_unsupported(c) if "terms" in object.keys(c)
 
-_s_cond_unsupported(c) := _s_argument_unsupported(c.phrase) if not "terms" in object.keys(c)
+_s_cond_unsupported(c) := _s_argument_unsupported(c.phrase) | _s_derived_too_long(c) if not "terms" in object.keys(c)
 
 _s_walk_too_long(a) := {"every and some over more than ten steps aren't supported yet" | count(_walk_steps(_s_model_path(a[_s_quantifier_of(a)]))) > 10}
 
 _s_assertion_unsupported(a) := _s_derived_unsupported(a) if "terms" in object.keys(a)
 
-_s_derived_unsupported(a) := (_s_paths_unsupported(a) | {u | some c in object.get(a, "where", []); some u in _s_tally_cond_unsupported(c)}) | {"every and some over more than ten steps aren't supported yet" |
-	some t in array.concat(a.terms, object.get(a.phrase, "terms", []))
+_s_derived_unsupported(a) := (_s_paths_unsupported(a) | {u | some c in object.get(a, "where", []); some u in _s_tally_cond_unsupported(c)}) | _s_derived_too_long(a)
+
+_s_derived_too_long(a) := {"every and some over more than ten steps aren't supported yet" |
+	some t in _s_nodes(a)
 	_s_derived_term(t)
 	count(_walk_steps(_s_model_path(object.get(t, "count", object.get(t, "sum", null))))) > 10
 }
@@ -6694,7 +6748,7 @@ _s_one_elapsed(terms) if {
 	"elapsed_from" in object.keys(terms[0])
 }
 
-_s_assertion_unsupported(a) := _s_paths_unsupported(a) | _s_argument_unsupported(a.phrase) if object.keys(a) & {"every", "some", "terms"} == set()
+_s_assertion_unsupported(a) := (_s_paths_unsupported(a) | _s_argument_unsupported(a.phrase)) | _s_derived_too_long(a) if object.keys(a) & {"every", "some", "terms"} == set()
 
 _s_model(a) := _s_leaf_model(a) if _s_quantifier_of(a) == ""
 

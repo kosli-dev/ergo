@@ -1001,7 +1001,7 @@ An `any_of` takes `description` and `meta`, but not `for` or `assert`. An `any_o
 - An empty list fails `every` as `value`, because no commits isn't proof that every commit is signed. Write `, if any,` after the path to let empty lists pass: `every review.incidents, if any, is not empty`. A missing list still fails.
 - `whose` keeps the items that pass its conditions, read on each item: `some pull_requests.approvers whose state is "APPROVED" exists` passes above, with `bob`'s approval. An item a condition can't decide, because the field it reads is missing, fails the check rather than being left out.
 - In a one-line `every` or `some`, a field on the right of the phrase is the item's too, so `some approvers.timestamp whose state is "APPROVED" is after last_commit` reads both from each approver. To compare with a field of the subject, use a `for` line, below.
-- `every` and `some` paths can be ten steps long.
+- `every`, `some`, `count of` and `sum of` paths can be ten steps long, wherever they stand, on the right of a phrase too. A `for` alias and a position like `first of` each count as a step, and `$input` and `$params` don't. A walk that starts at a part counts the part's own path instead of its alias, so with `has: {"x": "k1.k2.k3.k4.k5.k6.k7.k8.k9"}`, `every x.z is 1` is ten steps, and a part of ten names makes it eleven. A part read without a walk, like `x.z is 1`, has no limit. An item picked on a `for` line, like `first of reviews as review`, takes ten names, not counting its position ([sentence.walk.steps](spec/syntax.md#every-some-and-whose)).
 - `contains` and the other list phrases can't follow `every` or `some`, because the last list is walked too, so `every pull_requests.labels does not contain "hotfix"` would ask each label. It's written wrong, and the message says to put the walk on a `for` line.
 
 A `for` line names the items of one or two lists, so the sentences under `assert` can read an item and the subject together. Each item is `every` or `some`, a path, an optional `whose`, and `as` an alias, or picks one item by its position, as below. The second item can walk a list inside the first, by its alias.
@@ -1243,7 +1243,7 @@ Ergo doesn't run every sentence the spec describes yet. These are written wrong 
 
 Pick the item on a `for` line instead, as the message says.
 
-In a `from` line or an `identified_by`, `named by` a bare word is written wrong too, with `unknown name <word>`, because there's no subject to read it from yet. And Ergo doesn't check the limit of three list walks that [sentence.for.depth](spec/syntax.md#the-for-line) sets.
+In a `from` line or an `identified_by`, `named by` a bare word is written wrong too, with `unknown name <word>`, because there's no subject to read it from yet.
 
 ### The subject itself
 
