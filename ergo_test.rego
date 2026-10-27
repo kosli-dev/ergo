@@ -4660,19 +4660,19 @@ test_a_parent_part_in_the_whose_of_every_some_or_a_for_item_is_still_counted_at_
 	has := {"x": _ten}
 	_parent_part_problems(has, "every xs.v whose n is count of b.x.z is 1") == [_too_long]
 	_parent_part_problems(has, "some xs whose n is count of b.x.z is not empty") == [_too_long]
-	_parent_part_problems(has, {"for": "every xs whose n is count of b.x.z as x", "assert": "x.v is 1"}) == [_too_long]
+	_parent_part_problems(has, {"for": "every xs whose n is count of b.x.z as y", "assert": "y.v is 1"}) == [_too_long]
 	_parent_part_problems({"x": _nine}, "every xs.v whose n is count of b.x.z is 1") == []
 }
 
 test_a_walk_that_is_already_written_wrong_for_another_reason_gets_no_ten_step_message_too if {
 	has := {"x": _ten}
-	_part_walk_problems(has, {"for": "every xs as x", "assert": "every x.z is 1"}) == ["alias given twice"]
-	_part_walk_problems(has, {"for": "every xs as x", "assert": "count of x.z is 1"}) == ["alias given twice"]
+	_part_walk_problems(has, {"for": "every xs as x", "assert": "every x.z is 1"}) == ["x can't be an alias: it's a part of thing"]
+	_part_walk_problems(has, {"for": "every xs as x", "assert": "count of x.z is 1"}) == ["x can't be an alias: it's a part of thing"]
 	_parent_part_problems(has, "count of xs whose n is sum of b.x.z is 0") == [["a sum of or a plus in the whose of a count of or a sum of isn't supported yet"]]
 }
 
-test_a_for_alias_named_like_a_parent_subject_still_counts_the_parents_part if {
-	_parent_part_problems({"x": _ten}, {"for": "every xs as b", "assert": "every b.x.z is 1"}) == [_too_long]
+test_a_for_alias_named_like_a_parent_subject_still_counts_the_parents_part_beside_the_clash if {
+	_parent_part_problems({"x": _ten}, {"for": "every xs as b", "assert": "every b.x.z is 1"}) == [["b can't be an alias: it's a subject's name", "every and some over more than ten steps aren't supported yet"]]
 }
 
 test_a_walk_whose_named_by_cant_be_read_shows_an_empty_list_in_its_inputs if {
@@ -7121,7 +7121,7 @@ test_an_alias_works_on_the_subject_in_a_for_line_and_not_on_its_items if {
 test_a_for_line_alias_that_is_also_a_part_alias_is_written_wrong if {
 	has := {"cov": "dd.b"}
 	rep := _parts_report(has, {"c": {"for": "every dd.items as cov", "assert": "cov.x is 1"}}, {"items": [{"x": 1}]})
-	_parts_problems(rep)["checks.c"] == ["alias given twice"]
+	_parts_problems(rep)["checks.c"] == ["cov can't be an alias: it's a part of round"]
 	stopped(rep)
 }
 
@@ -7167,10 +7167,10 @@ _parts_narrow := {
 
 _parts_rounds := {"rounds": [{"id": "a", "dd": {"b": {"x": 1, "n": 2}, "e": 5}}, {"id": "b", "dd": {"b": {"x": 2, "n": 2}, "e": 5}}]}
 
-test_re_adding_a_kept_alias_is_written_wrong_and_names_the_part if {
+test_re_adding_a_kept_alias_is_written_wrong_and_names_the_subject_it_comes_from if {
 	subjects := object.union(_parts_narrow.subjects, {"good round": {"from": "round whose cov.x is 1", "has": {"cov": "dd.q"}}})
 	rep := ergo.report(_parts_rounds, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "good round", "checks": {"c": "cov.n is 2"}}}}, {})
-	_parts_problems(rep)["subjects.\"good round\".has.cov"] == ["alias given twice"]
+	_parts_problems(rep)["subjects.\"good round\".has.cov"] == ["cov can't be an alias: it's a part of round"]
 }
 
 test_two_subjects_that_do_not_narrow_each_other_can_use_the_same_alias if {
@@ -7219,10 +7219,10 @@ test_a_part_is_only_reached_through_its_subject_so_a_bare_alias_in_a_chained_chi
 	_parts_row(rep, "field").cause == "absent"
 }
 
-test_a_chained_subject_cannot_use_its_parents_name_as_a_part_alias if {
+test_a_chained_subject_cannot_use_its_parents_name_as_a_part_alias_because_it_is_a_subjects_name if {
 	subjects := object.union(_parts_chain.subjects, {"pull request": {"from": "artifact.pra.pull_requests", "identified_by": "url", "has": {"artifact": "reviews"}}})
 	rep := ergo.report(_parts_chain_doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": _parts_chain.requirements}, {"art": "web"})
-	_parts_problems(rep)["subjects.\"pull request\".has.artifact"] == ["alias given twice"]
+	_parts_problems(rep)["subjects.\"pull request\".has.artifact"] == ["artifact can't be an alias: it's a subject's name"]
 }
 
 test_a_problem_in_a_parent_subjects_has_fails_the_requirements_of_its_chained_child if {
@@ -8139,10 +8139,10 @@ test_a_chain_of_three_subjects_with_no_grandparent_or_no_parent_in_scope_fails_m
 	[[r.cause, object.keys(r.subject)] | some r in unread.results; r.check == "$min_subjects"] == [["absent", {"type", "id"}]]
 }
 
-test_a_part_named_like_a_grandparent_is_an_alias_given_twice if {
+test_a_part_named_like_a_grandparent_is_written_wrong_as_a_subjects_name if {
 	subjects := object.union(_three_subjects, {"commit": {"from": `"pull request".commits`, "identified_by": "sha", "has": {"artifact": "x"}}})
 	rep := ergo.report(_three_doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "commit", "checks": {"c": "sha exists"}}}}, {})
-	[i | some r in rep.results; r.check == "$well_formed"; some i in r.inputs; startswith(i.name, "subjects.")] == [{"name": "subjects.commit.has.artifact", "value": ["alias given twice"], "locations": []}]
+	[i | some r in rep.results; r.check == "$well_formed"; some i in r.inputs; startswith(i.name, "subjects.")] == [{"name": "subjects.commit.has.artifact", "value": ["artifact can't be an alias: it's a subject's name"], "locations": []}]
 }
 
 test_a_requirement_field_named_like_the_facts_ergo_works_out_once_is_unknown_and_stops_the_requirement if {
@@ -10025,4 +10025,96 @@ test_a_first_for_item_through_a_parents_part_or_named_by_names_its_failed_items_
 	named := _part_for_row(doc, {"ap": "ps"}, {"for": "every artifact.ap named by k as x", "assert": "x is 1"}, {})
 	[f.item | some f in named.failed_items] == ["item 2 of artifact.ap.k1"]
 	[i.name | some i in named.inputs] == ["artifact.ap named by k[]", "k"]
+}
+
+_clash_doc := {"bs": [{"id": "b1", "k1": {"k2": {"k3": {"z": 2}}}, "kids": [{"id": "k1", "xs": [{"b": {"x": {"z": 1}}, "x": {"z": 7}, "v": 1}, {"b": {"x": {"z": 5}}, "x": {"z": 7}, "v": 9}]}]}]}
+
+_clash_policy(has, extra, check) := {
+	"ergo_spec": "v0.2-dev",
+	"subjects": object.union({"b": {"from": "bs", "identified_by": "id", "has": has}, "kid": {"from": "b.kids", "identified_by": "id"}}, extra),
+	"requirements": {"r": {"subject": "kid", "checks": {"c": check}}},
+}
+
+_clash_report(has, extra, check) := ergo.report(_clash_doc, _clash_policy(has, extra, check), {})
+
+_clash_problems(has, extra, check) := [i.value | some r in _clash_report(has, extra, check).results; r.check == "$well_formed"; some i in r.inputs; i.name == "checks.c"]
+
+_clash_rows(has, extra, check) := [[r.cause, r.passed] | some r in _clash_report(has, extra, check).results; r.check == "c"]
+
+test_a_for_alias_named_like_a_parent_subject_is_written_wrong if {
+	_clash_problems({"x": "k1.k2.k3"}, {}, {"for": "every xs as b", "assert": "b.x.z is 7"}) == [["b can't be an alias: it's a subject's name"]]
+	_clash_problems({"x": "k1.k2.k3"}, {}, {"for": "every xs as b", "assert": "b.id is \"b1\""}) == [["b can't be an alias: it's a subject's name"]]
+	stopped(_clash_report({"x": "k1.k2.k3"}, {}, {"for": "every xs as b", "assert": "b.x.z is 7"}))
+	_clash_rows({"x": "k1.k2.k3"}, {}, {"for": "every xs as b", "assert": "b.x.z is 7"}) == []
+}
+
+test_a_for_alias_named_like_the_checks_own_subject_is_written_wrong if {
+	_clash_problems({"x": "k1.k2.k3"}, {}, {"for": "every xs as kid", "assert": "kid.v is 1"}) == [["kid can't be an alias: it's a subject's name"]]
+}
+
+test_a_for_alias_named_like_an_unrelated_subject_is_written_wrong if {
+	extra := {"other": {"from": "bs", "identified_by": "id"}}
+	_clash_problems({"x": "k1.k2.k3"}, extra, {"for": "every xs as other", "assert": "other.v is 1"}) == [["other can't be an alias: it's a subject's name"]]
+}
+
+test_a_for_alias_named_like_a_part_of_a_parent_is_written_wrong if {
+	_clash_problems({"x": "k1.k2.k3"}, {}, {"for": "every xs as x", "assert": "x.z is 7"}) == [["x can't be an alias: it's a part of b"]]
+}
+
+test_a_for_alias_named_like_a_subject_and_a_part_gets_both_messages if {
+	_clash_problems({"b": "k1.k2.k3"}, {}, {"for": "every xs as b", "assert": "b.v is 1"}) == [["b can't be an alias: it's a part of b", "b can't be an alias: it's a subject's name"]]
+}
+
+test_a_for_alias_named_like_a_part_of_the_own_subject_is_written_wrong if {
+	extra := {"kid": {"from": "b.kids", "identified_by": "id", "has": {"y": "xs"}}}
+	_clash_problems({"x": "k1.k2.k3"}, extra, {"for": "every xs as y", "assert": "y.v is 1"}) == [["y can't be an alias: it's a part of kid"]]
+}
+
+test_a_for_alias_that_clashes_with_nothing_reads_the_item if {
+	has := {"x": "k1.k2.k3"}
+	_clash_rows(has, {}, {"for": "every xs as entry", "assert": "entry.x.z is 7"}) == [["satisfied", true]]
+	_clash_rows(has, {}, {"for": "every xs as entry", "assert": "entry.v is 1"}) == [["value", false]]
+	_clash_rows(has, {}, {"for": "every xs as entry", "assert": "entry.b.x.z is 1"}) == [["value", false]]
+}
+
+test_a_long_parent_part_walked_from_a_for_alias_named_like_the_parent_is_written_wrong_for_the_clash_only if {
+	has := {"p": "k1.k2.k3.k4.k5.k6.k7.k8.k9.k10"}
+	_clash_problems(has, {}, {"for": "every xs as y, every b.p.list as z", "assert": "z is 1"}) == [_too_long]
+	_clash_problems(has, {}, {"for": "every xs as b, every b.p.list as z", "assert": "z is 1"}) == [["b can't be an alias: it's a subject's name"]]
+	_clash_problems({"p": "k1.k2.k3.k4.k5.k6.k7.k8.k9"}, {}, {"for": "every xs as y, every b.p.list as z", "assert": "z is 1"}) == []
+}
+
+_part_clash_problems(subjects) := _part_clash_problems_of(subjects, "kid")
+
+_part_clash_problems_of(subjects, subject) := [i | some r in ergo.report(_clash_doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": subject, "checks": {"c": "id exists"}}}}, {}).results; r.check == "$well_formed"; some i in r.inputs; startswith(i.name, "subjects.")]
+
+_clash_b := {"from": "bs", "identified_by": "id", "has": {"x": "k1"}}
+
+test_a_part_named_like_the_subject_it_belongs_to_is_written_wrong if {
+	subjects := {"b": _clash_b, "kid": {"from": "b.kids", "identified_by": "id", "has": {"kid": "xs"}}}
+	_part_clash_problems(subjects) == [{"name": "subjects.kid.has.kid", "value": ["kid can't be an alias: it's a subject's name"], "locations": []}]
+}
+
+test_a_part_named_like_the_parent_it_reads_from_is_written_wrong_as_a_subjects_name if {
+	subjects := {"b": _clash_b, "kid": {"from": "b.kids", "identified_by": "id", "has": {"b": "xs"}}}
+	_part_clash_problems(subjects) == [{"name": "subjects.kid.has.b", "value": ["b can't be an alias: it's a subject's name"], "locations": []}]
+}
+
+test_a_part_named_like_an_unrelated_subject_is_written_wrong if {
+	subjects := {"b": _clash_b, "other": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids", "identified_by": "id", "has": {"other": "xs"}}}
+	_part_clash_problems(subjects) == [{"name": "subjects.kid.has.other", "value": ["other can't be an alias: it's a subject's name"], "locations": []}]
+}
+
+test_a_part_named_like_a_part_of_a_parent_is_written_wrong if {
+	subjects := {"b": _clash_b, "kid": {"from": "b.kids", "identified_by": "id", "has": {"x": "xs"}}}
+	_part_clash_problems(subjects) == [{"name": "subjects.kid.has.x", "value": ["x can't be an alias: it's a part of b"], "locations": []}]
+}
+
+test_a_part_named_like_a_part_kept_from_a_narrowed_subject_is_written_wrong if {
+	subjects := {"b": _clash_b, "slim": {"from": "b whose id exists", "has": {"y": "xs"}}, "wider": {"from": "slim whose id exists", "has": {"y": "v"}}}
+	_part_clash_problems_of(subjects, "wider") == [{"name": "subjects.wider.has.y", "value": ["y can't be an alias: it's a part of slim"], "locations": []}]
+}
+
+test_two_for_items_with_the_same_alias_are_given_twice_and_no_subject_or_part_is_involved if {
+	_clash_problems({"x": "k1"}, {}, {"for": "every xs as y, every xs as y", "assert": "y.v is 1"}) == [["for: y is given twice"]]
 }
