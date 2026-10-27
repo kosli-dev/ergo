@@ -10118,3 +10118,71 @@ test_a_part_named_like_a_part_kept_from_a_narrowed_subject_is_written_wrong if {
 test_two_for_items_with_the_same_alias_are_given_twice_and_no_subject_or_part_is_involved if {
 	_clash_problems({"x": "k1"}, {}, {"for": "every xs as y, every xs as y", "assert": "y.v is 1"}) == [["for: y is given twice"]]
 }
+
+_clash3_doc := {"gps": [{"id": "g1", "cap": {"z": 1}, "mids": [{"id": "m1", "leaves": [{"id": "l1", "ys": [{"v": 1}], "zs": [{"w": 2}]}]}]}]}
+
+_clash3_subjects(leaf_has) := {
+	"gp": {"from": "gps", "identified_by": "id", "has": {"cap": "cap"}},
+	"mid": {"from": "gp.mids", "identified_by": "id"},
+	"leaf": {"from": "mid.leaves", "identified_by": "id", "has": leaf_has},
+}
+
+_clash3_report(leaf_has, check) := ergo.report(_clash3_doc, {"ergo_spec": "v0.2-dev", "subjects": _clash3_subjects(leaf_has), "requirements": {"r": {"subject": "leaf", "checks": {"c": check}}}}, {})
+
+_clash3_problems(leaf_has, check) := [i.value | some r in _clash3_report(leaf_has, check).results; r.check == "$well_formed"; some i in r.inputs; i.name == "checks.c"]
+
+test_a_for_alias_named_like_a_part_of_a_grandparent_is_written_wrong if {
+	_clash3_problems({}, {"for": "every ys as cap", "assert": "cap.v is 1"}) == [["cap can't be an alias: it's a part of gp"]]
+}
+
+test_a_for_alias_on_the_second_item_named_like_a_part_of_a_parent_is_written_wrong if {
+	_clash_problems({"x": "k1.k2.k3"}, {}, {"for": "every xs as y, every xs as x", "assert": "x.v is 1"}) == [["x can't be an alias: it's a part of b"]]
+	_clash_problems({"x": "k1.k2.k3"}, {}, {"for": "every xs as y, every xs as b", "assert": "y.v is 1"}) == [["b can't be an alias: it's a subject's name"]]
+	_clash3_problems({}, {"for": "every ys as y, every zs as cap", "assert": "y.v is 1"}) == [["cap can't be an alias: it's a part of gp"]]
+}
+
+test_a_first_of_item_named_like_a_parent_or_a_part_of_it_is_written_wrong if {
+	_clash_problems({"x": "k1.k2.k3"}, {}, {"for": "first of xs as b", "assert": "b.v is 1"}) == [["b can't be an alias: it's a subject's name"]]
+	_clash_problems({"x": "k1.k2.k3"}, {}, {"for": "first of xs as x", "assert": "x.v is 1"}) == [["x can't be an alias: it's a part of b"]]
+	_clash_problems({"x": "k1.k2.k3"}, {}, {"for": "first of xs as entry", "assert": "entry.v is 1"}) == []
+}
+
+test_a_part_named_like_a_part_of_a_grandparent_is_written_wrong_without_being_a_subjects_name if {
+	_part_clash_problems_of(_clash3_subjects({"cap": "ys"}), "leaf") == [{"name": "subjects.leaf.has.cap", "value": ["cap can't be an alias: it's a part of gp"], "locations": []}]
+}
+
+test_an_alias_named_like_a_part_of_a_subject_that_is_not_an_ancestor_is_accepted if {
+	extra := {"other": {"from": "bs", "identified_by": "id", "has": {"y": "k1"}}}
+	_clash_problems({"x": "k1.k2.k3"}, extra, {"for": "every xs as y", "assert": "y.v is 1"}) == []
+	_clash_rows({"x": "k1.k2.k3"}, extra, {"for": "every xs as y", "assert": "y.x.z is 7"}) == [["satisfied", true]]
+	_part_clash_problems({"b": _clash_b, "other": extra.other, "kid": {"from": "b.kids", "identified_by": "id", "has": {"y": "xs"}}}) == []
+}
+
+_clash_narrowed := {
+	"b": {"from": "bs", "identified_by": "id", "has": {"part": "k1"}},
+	"b2": {"from": "b whose id exists"},
+	"kid2": {"from": "b2.kids", "identified_by": "id"},
+}
+
+_clash_narrowed_problems(subject, check) := [i.value | some r in ergo.report(_clash_doc, {"ergo_spec": "v0.2-dev", "subjects": _clash_narrowed, "requirements": {"r": {"subject": subject, "checks": {"c": check}}}}, {}).results; r.check == "$well_formed"; some i in r.inputs; i.name == "checks.c"]
+
+test_a_for_alias_named_like_a_part_kept_from_a_narrowed_subject_names_the_subject_that_declares_it if {
+	_clash_narrowed_problems("b2", {"for": "every kids as part", "assert": "part.id exists"}) == [["part can't be an alias: it's a part of b"]]
+	_clash_narrowed_problems("kid2", {"for": "every xs as part", "assert": "part.v is 1"}) == [["part can't be an alias: it's a part of b"]]
+}
+
+test_a_part_kept_through_two_narrowings_is_named_once_after_the_subject_that_declares_it if {
+	subjects := {"base": {"from": "bs", "identified_by": "id", "has": {"x": "k1"}}, "m": {"from": "base whose id exists"}, "n": {"from": "m whose id exists", "has": {"x": "xs"}}}
+	_part_clash_problems_of(subjects, "n") == [{"name": "subjects.n.has.x", "value": ["x can't be an alias: it's a part of base"], "locations": []}]
+}
+
+test_a_subject_name_with_a_space_is_quoted_in_the_message if {
+	subjects := {"pull request": {"from": "bs", "identified_by": "id", "has": {"pull": "k1"}}, "kid": {"from": `"pull request".kids`, "identified_by": "id", "has": {"pull": "xs"}}}
+	_part_clash_problems(subjects) == [{"name": "subjects.kid.has.pull", "value": ["pull can't be an alias: it's a part of \"pull request\""], "locations": []}]
+}
+
+test_a_for_alias_named_like_a_part_of_a_subject_with_a_space_in_its_name_quotes_the_name if {
+	subjects := {"pull request": {"from": "bs", "identified_by": "id", "has": {"pull": "k1"}}, "kid": {"from": `"pull request".kids`, "identified_by": "id"}}
+	rep := ergo.report(_clash_doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "kid", "checks": {"c": {"for": "every xs as pull", "assert": "pull.v is 1"}}}}}, {})
+	[i.value | some r in rep.results; r.check == "$well_formed"; some i in r.inputs; i.name == "checks.c"] == [["pull can't be an alias: it's a part of \"pull request\""]]
+}

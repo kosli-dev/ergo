@@ -5961,11 +5961,14 @@ _p_problems(subjects, own, narrow, descend) := {name: probs |
 _p_subject_problems(name, def, own, narrow, descend, subjects) := (({[["has"], "not an object"] | "has" in object.keys(def); not is_object(def.has)} | {[["has", alias], p] | some alias, read in object.get(own, name, {}); some p in read.problems}) | {[["has", alias], concat("", [alias, " can't be an alias: it's a subject's name"])] |
 	some alias, _ in object.get(own, name, {})
 	alias in object.keys(subjects)
-}) | {[["has", alias], concat("", [alias, " can't be an alias: it's a part of ", owner])] |
+}) | {[["has", alias], concat("", [alias, " can't be an alias: it's a part of ", _p_name_text(declarer)])] |
 	some alias, _ in object.get(own, name, {})
 	some owner in _p_part_owners(name, narrow, descend)
-	alias in {a | some m in _p_members(owner, narrow); some a, _ in object.get(own, m, {})}
+	some declarer in _p_members(owner, narrow)
+	alias in object.keys(object.get(own, declarer, {}))
 }
+
+_p_name_text(name) := _s_key_text(name)
 
 _p_part_owners(name, narrow, descend) := ({m | some m in _p_members(name, narrow); m != name} | {a | a := descend[name]}) | {a | a := descend[descend[name]]}
 
@@ -6214,19 +6217,16 @@ _p_named_by_problems(lines, ftext, aliases) := {concat("", ["named by ", ref.ste
 
 _p_named_by_problems(_, _, aliases) := set() if aliases == set()
 
-_p_for_clash(check, aliases, pc) := ({concat("", [item.as, " can't be an alias: it's a part of ", pc.own_name]) |
-	some item in _p_for_items(check)
-	item.as in aliases
-} | {concat("", [item.as, " can't be an alias: it's a subject's name"]) |
+_p_for_clash(check, pc) := {concat("", [item.as, " can't be an alias: it's a subject's name"]) |
 	some item in _p_for_items(check)
 	item.as in pc.subjects
-}) | {concat("", [item.as, " can't be an alias: it's a part of ", a]) |
+} | {concat("", [item.as, " can't be an alias: it's a part of ", _p_name_text(declarer)]) |
 	some item in _p_for_items(check)
-	some a, names in pc.parent_aliases
-	item.as in names
+	some _, owned in pc.part_owners
+	some declarer in object.get(owned, item.as, set())
 }
 
-_p_for_clash(check, _, _) := set() if not is_string(object.get(check, "for", ""))
+_p_for_clash(check, _) := set() if not is_string(object.get(check, "for", ""))
 
 _p_for_items(check) := object.get(_for_line(check.for), "items", []) if is_string(check.for)
 
@@ -6284,9 +6284,9 @@ _p_steps_of(parts) := {alias: read.from.path | some alias, read in parts; _p_val
 
 _p_own_context(name, eff) := {"own": _p_steps_of(object.get(eff, name, {})), "ancestors": {}}
 
-_p_context(req, chains, parts) := {"own": _p_steps_of(object.get(parts.effective, req.subject, {})), "ancestors": {a: _p_steps_of(object.get(parts.effective, a, {})) | some a in _s_ancestors(req.subject, chains)}, "own_name": req.subject, "subjects": object.keys(parts.effective), "parent_aliases": {a: object.keys(object.get(parts.effective, a, {})) | some a in _s_ancestors(req.subject, chains)}} if {
+_p_context(req, chains, parts) := {"own": _p_steps_of(object.get(parts.effective, req.subject, {})), "ancestors": {a: _p_steps_of(object.get(parts.effective, a, {})) | some a in _s_ancestors(req.subject, chains)}, "subjects": object.keys(parts.effective), "part_owners": {s: {a: {m | some m in _p_members(s, parts.narrow); a in object.keys(object.get(parts.own, m, {}))} | some a, _ in object.get(parts.effective, s, {})} | some s in array.concat([req.subject], _s_ancestors(req.subject, chains))}} if {
 	is_string(object.get(req, "subject", null))
-} else := {"own": {}, "ancestors": {}, "own_name": "", "subjects": object.keys(parts.effective), "parent_aliases": {}}
+} else := {"own": {}, "ancestors": {}, "subjects": object.keys(parts.effective), "part_owners": {}}
 
 _s_ancestors(name, chains) := array.concat([chains[name]], [chains[chains[name]] | chains[name] in object.keys(chains)]) if name in object.keys(chains)
 
@@ -6491,7 +6491,7 @@ _p_written(check, aliases, parents, pc) := _s_check(_s_lines(check.assert), obje
 	not "for" in object.keys(check)
 }
 
-_p_written(check, aliases, parents, pc) := _s_check_for(_s_lines(check.assert), check.for, object.filter(check, {"description", "meta"}), (((_s_form_problems(check) | _p_for_clash(check, aliases, pc)) | _p_named_by_problems(_s_lines(check.assert), object.get(check, "for", ""), aliases)) | _p_part_walk_problems(_s_lines(check.assert), check.for, pc)), aliases | parents) if {
+_p_written(check, aliases, parents, pc) := _s_check_for(_s_lines(check.assert), check.for, object.filter(check, {"description", "meta"}), (((_s_form_problems(check) | _p_for_clash(check, pc)) | _p_named_by_problems(_s_lines(check.assert), object.get(check, "for", ""), aliases)) | _p_part_walk_problems(_s_lines(check.assert), check.for, pc)), aliases | parents) if {
 	_s_assert_form(check)
 	"assert" in object.keys(check)
 	"for" in object.keys(check)
