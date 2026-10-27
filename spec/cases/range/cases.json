@@ -8,7 +8,7 @@
         "rules": ["range.pass", "sentence.print.canonical"],
         "input": {"things": [{"id": "t1", "x": 2}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2, "locations": ["/things/0/x"]}]}
         ],
         "expressions": {"s": {"c": "x is between 1 and 3"}}
       },
@@ -17,7 +17,7 @@
         "rules": ["range.pass"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -25,7 +25,7 @@
         "rules": ["range.pass", "value.equal"],
         "input": {"things": [{"id": "t1", "x": 3.0}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 3}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 3, "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -33,7 +33,7 @@
         "rules": ["range.fail"],
         "input": {"things": [{"id": "t1", "x": 0.5}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 0.5}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 0.5, "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -41,7 +41,7 @@
         "rules": ["range.fail"],
         "input": {"things": [{"id": "t1", "x": 4}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 4}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 4, "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -49,7 +49,7 @@
         "rules": ["range.fail"],
         "input": {"things": [{"id": "t1", "x": "2"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "2"}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "2", "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -57,7 +57,7 @@
         "rules": ["range.fail", "path.absent"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
         ]
       }
     ]
@@ -71,7 +71,7 @@
         "rules": ["sentence.print.canonical"],
         "input": {"things": [{"id": "t1", "x": 2}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2, "locations": ["/things/0/x"]}]}
         ],
         "expressions": {"s": {"c": "x is between 1.5 and 20"}}
       }

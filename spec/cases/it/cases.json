@@ -9,11 +9,11 @@
         "rules": ["sentence.path.it", "sentence.check", "subjects.every", "subjects.id", "path.inputs"],
         "input": {"deployment": {"id": "d-17", "regions": ["eu-west-1", "us-east-1"]}},
         "results": [
-          {"requirement": "allowed", "subject": {"id": "eu-west-1", "type": "region"}, "check": "allowed", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "eu-west-1"}]},
-          {"requirement": "allowed", "subject": {"id": "us-east-1", "type": "region"}, "check": "allowed", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": "us-east-1"}]}
+          {"requirement": "allowed", "subject": {"id": "eu-west-1", "type": "region"}, "check": "allowed", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "eu-west-1", "locations": ["/deployment/regions/0"]}]},
+          {"requirement": "allowed", "subject": {"id": "us-east-1", "type": "region"}, "check": "allowed", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": "us-east-1", "locations": ["/deployment/regions/1"]}]}
         ],
         "expressions": {"allowed": {"allowed": "it is in $params.allowed_regions"}},
-        "refs": {"allowed": {"allowed": [{"name": "$params.allowed_regions", "value": ["eu-west-1"]}]}}
+        "refs": {"allowed": {"allowed": [{"name": "$params.allowed_regions", "value": ["eu-west-1"], "locations": ["$params:/allowed_regions"]}]}}
       }
     ]
   },
@@ -26,9 +26,9 @@
         "rules": ["sentence.path.it", "sentence.phrase.type", "path.null"],
         "input": {"xs": ["a", null, 3]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "a"}]},
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "it", "value": null}]},
-          {"requirement": "allowed", "subject": {"id": 3, "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": 3}]}
+          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "a", "locations": ["/xs/0"]}]},
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "it", "value": null, "locations": ["/xs/1"]}]},
+          {"requirement": "allowed", "subject": {"id": 3, "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": 3, "locations": ["/xs/2"]}]}
         ]
       }
     ]
@@ -42,9 +42,9 @@
         "rules": ["sentence.path.it", "sentence.phrase.type", "path.null"],
         "input": {"xs": ["a", "", null]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "a"}]},
-          {"requirement": "allowed", "subject": {"id": "", "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": ""}]},
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "it", "value": null}]}
+          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "a", "locations": ["/xs/0"]}]},
+          {"requirement": "allowed", "subject": {"id": "", "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": "", "locations": ["/xs/1"]}]},
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "it", "value": null, "locations": ["/xs/2"]}]}
         ]
       }
     ]
@@ -58,8 +58,8 @@
         "rules": ["sentence.path.it", "sentence.phrase.exists", "present.missing"],
         "input": {"xs": ["a", null]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "a"}]},
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": null}]}
+          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "a", "locations": ["/xs/0"]}]},
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": null, "locations": ["/xs/1"]}]}
         ]
       }
     ]
@@ -73,11 +73,11 @@
         "rules": ["sentence.path.it", "sentence.phrase.empty"],
         "input": {"xs": ["a", ["x"], "", [], null]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "a"}]},
-          {"requirement": "allowed", "subject": {"id": ["x"], "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": ["x"]}]},
-          {"requirement": "allowed", "subject": {"id": "", "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": ""}]},
-          {"requirement": "allowed", "subject": {"id": [], "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": []}]},
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "it", "value": null}]}
+          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "a", "locations": ["/xs/0"]}]},
+          {"requirement": "allowed", "subject": {"id": ["x"], "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": ["x"], "locations": ["/xs/1"]}]},
+          {"requirement": "allowed", "subject": {"id": "", "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": "", "locations": ["/xs/2"]}]},
+          {"requirement": "allowed", "subject": {"id": [], "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": [], "locations": ["/xs/3"]}]},
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "it", "value": null, "locations": ["/xs/4"]}]}
         ]
       }
     ]
@@ -91,10 +91,10 @@
         "rules": ["sentence.path.it", "sentence.phrase.order", "path.unusable", "path.null"],
         "input": {"xs": [1, 3, "a", null]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": 1, "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": 1}]},
-          {"requirement": "allowed", "subject": {"id": 3, "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": 3}]},
-          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "it", "value": "a"}]},
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "it", "value": null}]}
+          {"requirement": "allowed", "subject": {"id": 1, "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": 1, "locations": ["/xs/0"]}]},
+          {"requirement": "allowed", "subject": {"id": 3, "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": 3, "locations": ["/xs/1"]}]},
+          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "it", "value": "a", "locations": ["/xs/2"]}]},
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "it", "value": null, "locations": ["/xs/3"]}]}
         ]
       }
     ]
@@ -108,10 +108,10 @@
         "rules": ["sentence.path.it", "sentence.phrase.starts", "path.unusable"],
         "input": {"xs": ["ab", "b", 3, null]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": "ab", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "ab"}]},
-          {"requirement": "allowed", "subject": {"id": "b", "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": "b"}]},
-          {"requirement": "allowed", "subject": {"id": 3, "type": "region"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "it", "value": 3}]},
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "it", "value": null}]}
+          {"requirement": "allowed", "subject": {"id": "ab", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "ab", "locations": ["/xs/0"]}]},
+          {"requirement": "allowed", "subject": {"id": "b", "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": "b", "locations": ["/xs/1"]}]},
+          {"requirement": "allowed", "subject": {"id": 3, "type": "region"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "it", "value": 3, "locations": ["/xs/2"]}]},
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "it", "value": null, "locations": ["/xs/3"]}]}
         ]
       }
     ]
@@ -125,11 +125,11 @@
         "rules": ["sentence.path.it", "sentence.phrase.type", "path.null"],
         "input": {"xs": [{"a": 1}, "s", 3, [1], null]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": {"a": 1}, "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": {"a": 1}}]},
-          {"requirement": "allowed", "subject": {"id": "s", "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": "s"}]},
-          {"requirement": "allowed", "subject": {"id": 3, "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": 3}]},
-          {"requirement": "allowed", "subject": {"id": [1], "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": [1]}]},
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "it", "value": null}]}
+          {"requirement": "allowed", "subject": {"id": {"a": 1}, "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": {"a": 1}, "locations": ["/xs/0"]}]},
+          {"requirement": "allowed", "subject": {"id": "s", "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": "s", "locations": ["/xs/1"]}]},
+          {"requirement": "allowed", "subject": {"id": 3, "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": 3, "locations": ["/xs/2"]}]},
+          {"requirement": "allowed", "subject": {"id": [1], "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": [1], "locations": ["/xs/3"]}]},
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "it", "value": null, "locations": ["/xs/4"]}]}
         ]
       }
     ]
@@ -143,9 +143,9 @@
         "rules": ["sentence.path.it", "sentence.phrase.type"],
         "input": {"xs": [["a"], [], "s"]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": ["a"], "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": ["a"]}]},
-          {"requirement": "allowed", "subject": {"id": [], "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": []}]},
-          {"requirement": "allowed", "subject": {"id": "s", "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": "s"}]}
+          {"requirement": "allowed", "subject": {"id": ["a"], "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": ["a"], "locations": ["/xs/0"]}]},
+          {"requirement": "allowed", "subject": {"id": [], "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": [], "locations": ["/xs/1"]}]},
+          {"requirement": "allowed", "subject": {"id": "s", "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": "s", "locations": ["/xs/2"]}]}
         ]
       }
     ]
@@ -159,18 +159,18 @@
         "rules": ["sentence.path.it", "walk.every", "walk.some", "walk.inputs", "walk.failed_items"],
         "input": {"xs": [["a", "b"], [1, "a"], [1, 2], [], null, "s"]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": ["a", "b"], "type": "region"}, "check": "e", "passed": true, "cause": "satisfied", "inputs": [{"name": "it[]", "value": ["a", "b"]}], "failed_items": []},
-          {"requirement": "allowed", "subject": {"id": ["a", "b"], "type": "region"}, "check": "s", "passed": true, "cause": "satisfied", "inputs": [{"name": "it[]", "value": ["a", "b"]}], "failed_items": []},
-          {"requirement": "allowed", "subject": {"id": [1, "a"], "type": "region"}, "check": "e", "passed": false, "cause": "value", "inputs": [{"name": "it[]", "value": [1, "a"]}], "failed_items": [{"cause": "value", "item": "item 1 of it", "path": "item 1 of it", "value": 1}]},
-          {"requirement": "allowed", "subject": {"id": [1, "a"], "type": "region"}, "check": "s", "passed": true, "cause": "satisfied", "inputs": [{"name": "it[]", "value": [1, "a"]}], "failed_items": []},
-          {"requirement": "allowed", "subject": {"id": [1, 2], "type": "region"}, "check": "e", "passed": false, "cause": "value", "inputs": [{"name": "it[]", "value": [1, 2]}], "failed_items": [{"cause": "value", "item": "item 1 of it", "path": "item 1 of it", "value": 1}, {"cause": "value", "item": "item 2 of it", "path": "item 2 of it", "value": 2}]},
-          {"requirement": "allowed", "subject": {"id": [1, 2], "type": "region"}, "check": "s", "passed": false, "cause": "value", "inputs": [{"name": "it[]", "value": [1, 2]}], "failed_items": [{"cause": "value", "item": "item 1 of it", "path": "item 1 of it", "value": 1}, {"cause": "value", "item": "item 2 of it", "path": "item 2 of it", "value": 2}]},
-          {"requirement": "allowed", "subject": {"id": [], "type": "region"}, "check": "e", "passed": false, "cause": "value", "inputs": [{"name": "it[]", "value": []}], "failed_items": [{"cause": "value", "item": "it", "path": "it", "value": []}]},
-          {"requirement": "allowed", "subject": {"id": [], "type": "region"}, "check": "s", "passed": false, "cause": "value", "inputs": [{"name": "it[]", "value": []}], "failed_items": [{"cause": "value", "item": "it", "path": "it", "value": []}]},
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "e", "passed": false, "cause": "null", "inputs": [{"name": "it", "value": []}], "failed_items": [{"cause": "null", "item": "it", "path": "it", "value": null}]},
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "s", "passed": false, "cause": "null", "inputs": [{"name": "it", "value": []}], "failed_items": [{"cause": "null", "item": "it", "path": "it", "value": null}]},
-          {"requirement": "allowed", "subject": {"id": "s", "type": "region"}, "check": "e", "passed": false, "cause": "unusable", "inputs": [{"name": "it", "value": []}], "failed_items": [{"cause": "unusable", "item": "it", "path": "it", "value": "s"}]},
-          {"requirement": "allowed", "subject": {"id": "s", "type": "region"}, "check": "s", "passed": false, "cause": "unusable", "inputs": [{"name": "it", "value": []}], "failed_items": [{"cause": "unusable", "item": "it", "path": "it", "value": "s"}]}
+          {"requirement": "allowed", "subject": {"id": ["a", "b"], "type": "region"}, "check": "e", "passed": true, "cause": "satisfied", "inputs": [{"name": "it[]", "value": ["a", "b"], "locations": ["/xs/0/0", "/xs/0/1"]}], "failed_items": []},
+          {"requirement": "allowed", "subject": {"id": ["a", "b"], "type": "region"}, "check": "s", "passed": true, "cause": "satisfied", "inputs": [{"name": "it[]", "value": ["a", "b"], "locations": ["/xs/0/0", "/xs/0/1"]}], "failed_items": []},
+          {"requirement": "allowed", "subject": {"id": [1, "a"], "type": "region"}, "check": "e", "passed": false, "cause": "value", "inputs": [{"name": "it[]", "value": [1, "a"], "locations": ["/xs/1/0", "/xs/1/1"]}], "failed_items": [{"cause": "value", "item": "item 1 of it", "path": "item 1 of it", "value": 1, "locations": ["/xs/1/0"]}]},
+          {"requirement": "allowed", "subject": {"id": [1, "a"], "type": "region"}, "check": "s", "passed": true, "cause": "satisfied", "inputs": [{"name": "it[]", "value": [1, "a"], "locations": ["/xs/1/0", "/xs/1/1"]}], "failed_items": []},
+          {"requirement": "allowed", "subject": {"id": [1, 2], "type": "region"}, "check": "e", "passed": false, "cause": "value", "inputs": [{"name": "it[]", "value": [1, 2], "locations": ["/xs/2/0", "/xs/2/1"]}], "failed_items": [{"cause": "value", "item": "item 1 of it", "path": "item 1 of it", "value": 1, "locations": ["/xs/2/0"]}, {"cause": "value", "item": "item 2 of it", "path": "item 2 of it", "value": 2, "locations": ["/xs/2/1"]}]},
+          {"requirement": "allowed", "subject": {"id": [1, 2], "type": "region"}, "check": "s", "passed": false, "cause": "value", "inputs": [{"name": "it[]", "value": [1, 2], "locations": ["/xs/2/0", "/xs/2/1"]}], "failed_items": [{"cause": "value", "item": "item 1 of it", "path": "item 1 of it", "value": 1, "locations": ["/xs/2/0"]}, {"cause": "value", "item": "item 2 of it", "path": "item 2 of it", "value": 2, "locations": ["/xs/2/1"]}]},
+          {"requirement": "allowed", "subject": {"id": [], "type": "region"}, "check": "e", "passed": false, "cause": "value", "inputs": [{"name": "it[]", "value": [], "locations": []}], "failed_items": [{"cause": "value", "item": "it", "path": "it", "value": [], "locations": ["/xs/3"]}]},
+          {"requirement": "allowed", "subject": {"id": [], "type": "region"}, "check": "s", "passed": false, "cause": "value", "inputs": [{"name": "it[]", "value": [], "locations": []}], "failed_items": [{"cause": "value", "item": "it", "path": "it", "value": [], "locations": ["/xs/3"]}]},
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "e", "passed": false, "cause": "null", "inputs": [{"name": "it", "value": [], "locations": []}], "failed_items": [{"cause": "null", "item": "it", "path": "it", "value": null, "locations": ["/xs/4"]}]},
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "s", "passed": false, "cause": "null", "inputs": [{"name": "it", "value": [], "locations": []}], "failed_items": [{"cause": "null", "item": "it", "path": "it", "value": null, "locations": ["/xs/4"]}]},
+          {"requirement": "allowed", "subject": {"id": "s", "type": "region"}, "check": "e", "passed": false, "cause": "unusable", "inputs": [{"name": "it", "value": [], "locations": []}], "failed_items": [{"cause": "unusable", "item": "it", "path": "it", "value": "s", "locations": ["/xs/5"]}]},
+          {"requirement": "allowed", "subject": {"id": "s", "type": "region"}, "check": "s", "passed": false, "cause": "unusable", "inputs": [{"name": "it", "value": [], "locations": []}], "failed_items": [{"cause": "unusable", "item": "it", "path": "it", "value": "s", "locations": ["/xs/5"]}]}
         ]
       }
     ]
@@ -184,16 +184,16 @@
         "rules": ["sentence.path.it", "tally.count", "tally.sum", "tally.inputs"],
         "input": {"xs": [[1, 2], ["a", "b"], [1], null, "s"]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": [1, 2], "type": "region"}, "check": "n", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of it", "value": 2}, {"name": "it[]", "value": [1, 2]}]},
-          {"requirement": "allowed", "subject": {"id": [1, 2], "type": "region"}, "check": "t", "passed": true, "cause": "satisfied", "inputs": [{"name": "sum of it", "value": 3}, {"name": "it[]", "value": [1, 2]}]},
-          {"requirement": "allowed", "subject": {"id": ["a", "b"], "type": "region"}, "check": "n", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of it", "value": 2}, {"name": "it[]", "value": ["a", "b"]}]},
-          {"requirement": "allowed", "subject": {"id": ["a", "b"], "type": "region"}, "check": "t", "passed": false, "cause": "unusable", "inputs": [{"name": "sum of it", "value": null}, {"name": "it[]", "value": ["a", "b"]}]},
-          {"requirement": "allowed", "subject": {"id": [1], "type": "region"}, "check": "n", "passed": false, "cause": "value", "inputs": [{"name": "count of it", "value": 1}, {"name": "it[]", "value": [1]}]},
-          {"requirement": "allowed", "subject": {"id": [1], "type": "region"}, "check": "t", "passed": false, "cause": "value", "inputs": [{"name": "sum of it", "value": 1}, {"name": "it[]", "value": [1]}]},
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "n", "passed": false, "cause": "null", "inputs": [{"name": "count of it", "value": null}, {"name": "it", "value": []}]},
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "t", "passed": false, "cause": "null", "inputs": [{"name": "sum of it", "value": null}, {"name": "it", "value": []}]},
-          {"requirement": "allowed", "subject": {"id": "s", "type": "region"}, "check": "n", "passed": false, "cause": "unusable", "inputs": [{"name": "count of it", "value": null}, {"name": "it", "value": []}]},
-          {"requirement": "allowed", "subject": {"id": "s", "type": "region"}, "check": "t", "passed": false, "cause": "unusable", "inputs": [{"name": "sum of it", "value": null}, {"name": "it", "value": []}]}
+          {"requirement": "allowed", "subject": {"id": [1, 2], "type": "region"}, "check": "n", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of it", "value": 2, "locations": ["/xs/0/0", "/xs/0/1"]}, {"name": "it[]", "value": [1, 2], "locations": ["/xs/0/0", "/xs/0/1"]}]},
+          {"requirement": "allowed", "subject": {"id": [1, 2], "type": "region"}, "check": "t", "passed": true, "cause": "satisfied", "inputs": [{"name": "sum of it", "value": 3, "locations": ["/xs/0/0", "/xs/0/1"]}, {"name": "it[]", "value": [1, 2], "locations": ["/xs/0/0", "/xs/0/1"]}]},
+          {"requirement": "allowed", "subject": {"id": ["a", "b"], "type": "region"}, "check": "n", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of it", "value": 2, "locations": ["/xs/1/0", "/xs/1/1"]}, {"name": "it[]", "value": ["a", "b"], "locations": ["/xs/1/0", "/xs/1/1"]}]},
+          {"requirement": "allowed", "subject": {"id": ["a", "b"], "type": "region"}, "check": "t", "passed": false, "cause": "unusable", "inputs": [{"name": "sum of it", "value": null, "locations": ["/xs/1/0", "/xs/1/1"]}, {"name": "it[]", "value": ["a", "b"], "locations": ["/xs/1/0", "/xs/1/1"]}]},
+          {"requirement": "allowed", "subject": {"id": [1], "type": "region"}, "check": "n", "passed": false, "cause": "value", "inputs": [{"name": "count of it", "value": 1, "locations": ["/xs/2/0"]}, {"name": "it[]", "value": [1], "locations": ["/xs/2/0"]}]},
+          {"requirement": "allowed", "subject": {"id": [1], "type": "region"}, "check": "t", "passed": false, "cause": "value", "inputs": [{"name": "sum of it", "value": 1, "locations": ["/xs/2/0"]}, {"name": "it[]", "value": [1], "locations": ["/xs/2/0"]}]},
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "n", "passed": false, "cause": "null", "inputs": [{"name": "count of it", "value": null, "locations": []}, {"name": "it", "value": [], "locations": []}]},
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "t", "passed": false, "cause": "null", "inputs": [{"name": "sum of it", "value": null, "locations": []}, {"name": "it", "value": [], "locations": []}]},
+          {"requirement": "allowed", "subject": {"id": "s", "type": "region"}, "check": "n", "passed": false, "cause": "unusable", "inputs": [{"name": "count of it", "value": null, "locations": []}, {"name": "it", "value": [], "locations": []}]},
+          {"requirement": "allowed", "subject": {"id": "s", "type": "region"}, "check": "t", "passed": false, "cause": "unusable", "inputs": [{"name": "sum of it", "value": null, "locations": []}, {"name": "it", "value": [], "locations": []}]}
         ]
       }
     ]
@@ -207,9 +207,9 @@
         "rules": ["sentence.words", "sentence.path.start", "name.keys"],
         "input": {"xs": [{"id": "a", "it": 1}, {"id": "b", "it": 2}, {"id": "c"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": ".it", "value": 1}]},
-          {"requirement": "allowed", "subject": {"id": "b", "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": ".it", "value": 2}]},
-          {"requirement": "allowed", "subject": {"id": "c", "type": "region"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": ".it", "value": null}]}
+          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": ".it", "value": 1, "locations": ["/xs/0/it"]}]},
+          {"requirement": "allowed", "subject": {"id": "b", "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": ".it", "value": 2, "locations": ["/xs/1/it"]}]},
+          {"requirement": "allowed", "subject": {"id": "c", "type": "region"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": ".it", "value": null, "locations": ["/xs/2"]}]}
         ],
         "expressions": {"allowed": {"c": ".it is 1"}}
       }
@@ -224,8 +224,8 @@
         "rules": ["sentence.words", "sentence.path.it", "name.keys"],
         "input": {"xs": [{"id": "a", "it": 1}, {"id": "b", "it": 2}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": ".it", "value": 1}, {"name": "it", "value": {"id": "a", "it": 1}}], "failed_assertions": []},
-          {"requirement": "allowed", "subject": {"id": "b", "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": ".it", "value": 2}, {"name": "it", "value": {"id": "b", "it": 2}}], "failed_assertions": [{"assertion": ".it is 1", "cause": "value"}]}
+          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": ".it", "value": 1, "locations": ["/xs/0/it"]}, {"name": "it", "value": {"id": "a", "it": 1}, "locations": ["/xs/0"]}], "failed_assertions": []},
+          {"requirement": "allowed", "subject": {"id": "b", "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": ".it", "value": 2, "locations": ["/xs/1/it"]}, {"name": "it", "value": {"id": "b", "it": 2}, "locations": ["/xs/1"]}], "failed_assertions": [{"assertion": ".it is 1", "cause": "value"}]}
         ],
         "expressions": {"allowed": {"c": ".it is 1 and it is an object"}}
       }
@@ -240,7 +240,7 @@
         "rules": ["sentence.words", "sentence.print.canonical", "name.keys"],
         "input": {"xs": [{"id": "a", "it": 1}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": ".it", "value": 1}]}
+          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": ".it", "value": 1, "locations": ["/xs/0/it"]}]}
         ],
         "expressions": {"allowed": {"c": ".it is 1"}}
       }
@@ -255,7 +255,7 @@
         "rules": ["sentence.words", "sentence.path.it"],
         "input": {"xs": [{"id": "a", "it": 1}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": {"id": "a", "it": 1}}]}
+          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": {"id": "a", "it": 1}, "locations": ["/xs/0"]}]}
         ]
       }
     ]
@@ -269,8 +269,8 @@
         "rules": ["sentence.path.it", "sentence.assert.and", "all_of.failed_assertions"],
         "input": {"xs": [1, 2]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": 1, "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": 1}], "failed_assertions": []},
-          {"requirement": "allowed", "subject": {"id": 2, "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": 2}], "failed_assertions": [{"assertion": "it is 1", "cause": "value"}]}
+          {"requirement": "allowed", "subject": {"id": 1, "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": 1, "locations": ["/xs/0"]}], "failed_assertions": []},
+          {"requirement": "allowed", "subject": {"id": 2, "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": 2, "locations": ["/xs/1"]}], "failed_assertions": [{"assertion": "it is 1", "cause": "value"}]}
         ]
       }
     ]
@@ -284,9 +284,9 @@
         "rules": ["sentence.path.it", "sentence.any_of", "any_of.pass"],
         "input": {"xs": [1, "a", null]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": 1, "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": 1}]},
-          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "a"}]},
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "it", "value": null}]}
+          {"requirement": "allowed", "subject": {"id": 1, "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": 1, "locations": ["/xs/0"]}]},
+          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "a", "locations": ["/xs/1"]}]},
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "it", "value": null, "locations": ["/xs/2"]}]}
         ]
       }
     ]
@@ -300,8 +300,8 @@
         "rules": ["sentence.path.it", "sentence.for.scope", "for.pass"],
         "input": {"xs": [{"id": "a", "l": [1, 1]}, {"id": "b", "l": [1, 2]}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": {"id": "a", "l": [1, 1]}}, {"name": "l[]", "value": [1, 1]}], "failed_items": []},
-          {"requirement": "allowed", "subject": {"id": "b", "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": {"id": "b", "l": [1, 2]}}, {"name": "l[]", "value": [1, 2]}], "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "e is 1", "cause": "value"}], "item": "item 2 of l", "path": "item 2 of l", "value": 2}]}
+          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": {"id": "a", "l": [1, 1]}, "locations": ["/xs/0"]}, {"name": "l[]", "value": [1, 1], "locations": ["/xs/0/l/0", "/xs/0/l/1"]}], "failed_items": []},
+          {"requirement": "allowed", "subject": {"id": "b", "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": {"id": "b", "l": [1, 2]}, "locations": ["/xs/1"]}, {"name": "l[]", "value": [1, 2], "locations": ["/xs/1/l/0", "/xs/1/l/1"]}], "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "e is 1", "cause": "value"}], "item": "item 2 of l", "path": "item 2 of l", "value": 2, "locations": ["/xs/1/l/1"]}]}
         ],
         "expressions": {"allowed": {"c": "for every l as e: it is an object and e is 1"}}
       }
@@ -316,12 +316,12 @@
         "rules": ["sentence.path.it", "sentence.subject.condition", "sentence.subject.applies", "scope.filters"],
         "input": {"ws": ["a", "bb", null, 3, "cc"]},
         "results": [
-          {"requirement": "r", "subject": {"id": "a", "type": "word"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": "a"}], "failed_assertions": [{"assertion": "it starts with \"b\"", "cause": "value"}]},
-          {"requirement": "r", "subject": {"id": "bb", "type": "word"}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "bb"}], "failed_assertions": []},
-          {"requirement": "r", "subject": {"id": null, "type": "word"}, "check": "$applies", "passed": false, "cause": "null", "inputs": [{"name": "it", "value": null}], "failed_assertions": [{"assertion": "it is a string", "cause": "null"}, {"assertion": "it starts with \"b\"", "cause": "null"}]},
-          {"requirement": "r", "subject": {"id": 3, "type": "word"}, "check": "$applies", "passed": false, "cause": "unusable", "inputs": [{"name": "it", "value": 3}], "failed_assertions": [{"assertion": "it is a string", "cause": "value"}, {"assertion": "it starts with \"b\"", "cause": "unusable"}]},
-          {"requirement": "r", "subject": {"id": "cc", "type": "word"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": "cc"}], "failed_assertions": [{"assertion": "it starts with \"b\"", "cause": "value"}]},
-          {"requirement": "r", "subject": {"id": "bb", "type": "word"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "bb"}]}
+          {"requirement": "r", "subject": {"id": "a", "type": "word"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": "a", "locations": ["/ws/0"]}], "failed_assertions": [{"assertion": "it starts with \"b\"", "cause": "value"}]},
+          {"requirement": "r", "subject": {"id": "bb", "type": "word"}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "bb", "locations": ["/ws/1"]}], "failed_assertions": []},
+          {"requirement": "r", "subject": {"id": null, "type": "word"}, "check": "$applies", "passed": false, "cause": "null", "inputs": [{"name": "it", "value": null, "locations": ["/ws/2"]}], "failed_assertions": [{"assertion": "it is a string", "cause": "null"}, {"assertion": "it starts with \"b\"", "cause": "null"}]},
+          {"requirement": "r", "subject": {"id": 3, "type": "word"}, "check": "$applies", "passed": false, "cause": "unusable", "inputs": [{"name": "it", "value": 3, "locations": ["/ws/3"]}], "failed_assertions": [{"assertion": "it is a string", "cause": "value"}, {"assertion": "it starts with \"b\"", "cause": "unusable"}]},
+          {"requirement": "r", "subject": {"id": "cc", "type": "word"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": "cc", "locations": ["/ws/4"]}], "failed_assertions": [{"assertion": "it starts with \"b\"", "cause": "value"}]},
+          {"requirement": "r", "subject": {"id": "bb", "type": "word"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "bb", "locations": ["/ws/1"]}]}
         ]
       }
     ]
@@ -335,10 +335,10 @@
         "rules": ["sentence.path.it", "sentence.subject.condition", "tally.count"],
         "input": {"xs": [[1], [1, 2], []]},
         "results": [
-          {"requirement": "r", "subject": {"id": [1], "type": "group"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "count of it", "value": 1}, {"name": "it[]", "value": [1]}]},
-          {"requirement": "r", "subject": {"id": [1, 2], "type": "group"}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of it", "value": 2}, {"name": "it[]", "value": [1, 2]}]},
-          {"requirement": "r", "subject": {"id": [], "type": "group"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "count of it", "value": 0}, {"name": "it[]", "value": []}]},
-          {"requirement": "r", "subject": {"id": [1, 2], "type": "group"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": [1, 2]}]}
+          {"requirement": "r", "subject": {"id": [1], "type": "group"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "count of it", "value": 1, "locations": ["/xs/0/0"]}, {"name": "it[]", "value": [1], "locations": ["/xs/0/0"]}]},
+          {"requirement": "r", "subject": {"id": [1, 2], "type": "group"}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of it", "value": 2, "locations": ["/xs/1/0", "/xs/1/1"]}, {"name": "it[]", "value": [1, 2], "locations": ["/xs/1/0", "/xs/1/1"]}]},
+          {"requirement": "r", "subject": {"id": [], "type": "group"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "count of it", "value": 0, "locations": []}, {"name": "it[]", "value": [], "locations": []}]},
+          {"requirement": "r", "subject": {"id": [1, 2], "type": "group"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": [1, 2], "locations": ["/xs/1"]}]}
         ]
       }
     ]
@@ -352,10 +352,10 @@
         "rules": ["sentence.path.it", "unique_ids", "subjects.id"],
         "input": {"xs": ["a", "a", "b"]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$unique_ids", "passed": false, "cause": "value", "inputs": [{"name": "repeated region ids", "value": ["a"]}]},
-          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "a"}]},
-          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "a"}]},
-          {"requirement": "allowed", "subject": {"id": "b", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "b"}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$unique_ids", "passed": false, "cause": "value", "inputs": [{"name": "repeated region ids", "value": ["a"], "locations": ["/xs/0", "/xs/1"]}]},
+          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "a", "locations": ["/xs/0"]}]},
+          {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "a", "locations": ["/xs/1"]}]},
+          {"requirement": "allowed", "subject": {"id": "b", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "b", "locations": ["/xs/2"]}]}
         ],
         "status": {"allowed": "not_met"},
         "compliant": false
@@ -371,7 +371,7 @@
         "rules": ["sentence.path.it.step", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"id": "a", "name": "n"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["it is the whole subject: write name, not it.name"]}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["it is the whole subject: write name, not it.name"], "locations": []}]}
         ]
       }
     ]
@@ -385,7 +385,7 @@
         "rules": ["sentence.path.it.step", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"id": "a", "name": "n"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["it is the whole subject: write \"x y\", not it.\"x y\""]}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["it is the whole subject: write \"x y\", not it.\"x y\""], "locations": []}]}
         ]
       }
     ]
@@ -399,7 +399,7 @@
         "rules": ["sentence.path.it.step", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"id": "a", "name": "n"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["it is the whole subject: nothing can follow it"]}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["it is the whole subject: nothing can follow it"], "locations": []}]}
         ]
       }
     ]
@@ -413,7 +413,7 @@
         "rules": ["sentence.path.it.step", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"id": "a", "name": "n"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["it is the whole subject: nothing can follow it"]}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["it is the whole subject: nothing can follow it"], "locations": []}]}
         ]
       }
     ]
@@ -427,10 +427,10 @@
         "rules": ["sentence.path.it", "sentence.path.index", "name.index"],
         "input": {"xs": [[1, "x"], [], "s", null]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": [1, "x"], "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "item 1 of it", "value": 1}]},
-          {"requirement": "allowed", "subject": {"id": [], "type": "region"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "item 1 of it", "value": null}]},
-          {"requirement": "allowed", "subject": {"id": "s", "type": "region"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "item 1 of it", "value": null}]},
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "item 1 of it", "value": null}]}
+          {"requirement": "allowed", "subject": {"id": [1, "x"], "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "item 1 of it", "value": 1, "locations": ["/xs/0/0"]}]},
+          {"requirement": "allowed", "subject": {"id": [], "type": "region"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "item 1 of it", "value": null, "locations": ["/xs/1"]}]},
+          {"requirement": "allowed", "subject": {"id": "s", "type": "region"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "item 1 of it", "value": null, "locations": ["/xs/2"]}]},
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "item 1 of it", "value": null, "locations": ["/xs/3"]}]}
         ],
         "expressions": {"allowed": {"c": "first of it is 1"}}
       }
@@ -445,10 +445,10 @@
         "rules": ["sentence.path.it", "sentence.path.index", "name.index"],
         "input": {"xs": [[1, "x"], [1], "s", null]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": [1, "x"], "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "item 2 of it", "value": "x"}]},
-          {"requirement": "allowed", "subject": {"id": [1], "type": "region"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "item 2 of it", "value": null}]},
-          {"requirement": "allowed", "subject": {"id": "s", "type": "region"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "item 2 of it", "value": null}]},
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "item 2 of it", "value": null}]}
+          {"requirement": "allowed", "subject": {"id": [1, "x"], "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "item 2 of it", "value": "x", "locations": ["/xs/0/1"]}]},
+          {"requirement": "allowed", "subject": {"id": [1], "type": "region"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "item 2 of it", "value": null, "locations": ["/xs/1"]}]},
+          {"requirement": "allowed", "subject": {"id": "s", "type": "region"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "item 2 of it", "value": null, "locations": ["/xs/2"]}]},
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "item 2 of it", "value": null, "locations": ["/xs/3"]}]}
         ],
         "expressions": {"allowed": {"c": "item 2 of it is \"x\""}}
       }
@@ -463,10 +463,10 @@
         "rules": ["sentence.path.it", "sentence.path.index", "walk.failed_items"],
         "input": {"xs": [[1, "x"], [2], [], "s"]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": [1, "x"], "type": "region"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "it[0]", "value": []}], "failed_items": [{"cause": "unusable", "item": "item 1 of it", "path": "item 1 of it", "value": 1}]},
-          {"requirement": "allowed", "subject": {"id": [2], "type": "region"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "it[0]", "value": []}], "failed_items": [{"cause": "unusable", "item": "item 1 of it", "path": "item 1 of it", "value": 2}]},
-          {"requirement": "allowed", "subject": {"id": [], "type": "region"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "it[0]", "value": []}], "failed_items": [{"cause": "absent", "item": "item 1 of it", "path": "item 1 of it", "value": null}]},
-          {"requirement": "allowed", "subject": {"id": "s", "type": "region"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "it[0]", "value": []}], "failed_items": [{"cause": "unusable", "item": "it", "path": "it", "value": "s"}]}
+          {"requirement": "allowed", "subject": {"id": [1, "x"], "type": "region"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "it[0]", "value": [], "locations": []}], "failed_items": [{"cause": "unusable", "item": "item 1 of it", "path": "item 1 of it", "value": 1, "locations": ["/xs/0/0"]}]},
+          {"requirement": "allowed", "subject": {"id": [2], "type": "region"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "it[0]", "value": [], "locations": []}], "failed_items": [{"cause": "unusable", "item": "item 1 of it", "path": "item 1 of it", "value": 2, "locations": ["/xs/1/0"]}]},
+          {"requirement": "allowed", "subject": {"id": [], "type": "region"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "it[0]", "value": [], "locations": []}], "failed_items": [{"cause": "absent", "item": "item 1 of it", "path": "item 1 of it", "value": null, "locations": ["/xs/2"]}]},
+          {"requirement": "allowed", "subject": {"id": "s", "type": "region"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "it[0]", "value": [], "locations": []}], "failed_items": [{"cause": "unusable", "item": "it", "path": "it", "value": "s", "locations": ["/xs/3"]}]}
         ]
       }
     ]
@@ -480,7 +480,7 @@
         "rules": ["sentence.path.it.place", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"id": "a", "name": "n"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["it can only start an assertion: write it first, like it is not empty"]}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["it can only start an assertion: write it first, like it is not empty"], "locations": []}]}
         ]
       }
     ]
@@ -494,7 +494,7 @@
         "rules": ["sentence.path.it.step", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"id": "a", "name": "n"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["it is the whole subject: write name, not it.name"]}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["it is the whole subject: write name, not it.name"], "locations": []}]}
         ]
       }
     ]
@@ -508,7 +508,7 @@
         "rules": ["sentence.path.it.step", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"id": "a", "name": "n"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["it is the whole subject: nothing can follow it"]}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["it is the whole subject: nothing can follow it"], "locations": []}]}
         ]
       }
     ]
@@ -522,7 +522,7 @@
         "rules": ["sentence.path.it.place", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"id": "a", "name": "n"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["it can only start an assertion: write it first, like it is not empty"]}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["it can only start an assertion: write it first, like it is not empty"], "locations": []}]}
         ]
       }
     ]
@@ -536,7 +536,7 @@
         "rules": ["sentence.path.it.place", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"id": "a", "name": "n"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["it can only start an assertion: write it first, like it is not empty"]}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["it can only start an assertion: write it first, like it is not empty"], "locations": []}]}
         ]
       }
     ]
@@ -550,7 +550,7 @@
         "rules": ["sentence.path.it.place", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"id": "a", "name": "n"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["it can only start an assertion: write it first, like it is not empty"]}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["it can only start an assertion: write it first, like it is not empty"], "locations": []}]}
         ]
       }
     ]
@@ -564,7 +564,7 @@
         "rules": ["sentence.path.it.place", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"id": "a", "name": "n"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["it can only start an assertion: write it first, like it is not empty"]}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["it can only start an assertion: write it first, like it is not empty"], "locations": []}]}
         ]
       }
     ]
@@ -578,7 +578,7 @@
         "rules": ["sentence.path.it.place", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"id": "a", "name": "n"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["it can only start an assertion: write it first, like it is not empty"]}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["it can only start an assertion: write it first, like it is not empty"], "locations": []}]}
         ]
       }
     ]
@@ -592,7 +592,7 @@
         "rules": ["sentence.path.it.place", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"id": "a", "name": "n"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["it can only start an assertion: write it first, like it is not empty"]}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["it can only start an assertion: write it first, like it is not empty"], "locations": []}]}
         ]
       }
     ]
@@ -606,7 +606,7 @@
         "rules": ["sentence.path.it.place", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"id": "a", "name": "n"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["it can only start an assertion: write it first, like it is not empty"]}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["it can only start an assertion: write it first, like it is not empty"], "locations": []}]}
         ]
       }
     ]
@@ -620,7 +620,7 @@
         "rules": ["sentence.path.it.place", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"id": "a", "name": "n"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["it can only start an assertion: write it first, like it is not empty"]}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["it can only start an assertion: write it first, like it is not empty"], "locations": []}]}
         ]
       }
     ]
@@ -634,7 +634,7 @@
         "rules": ["sentence.path.it.place", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"id": "a", "name": "n"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["for: it can only start an assertion: write it first, like it is not empty"]}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["for: it can only start an assertion: write it first, like it is not empty"], "locations": []}]}
         ]
       }
     ]
@@ -648,7 +648,7 @@
         "rules": ["sentence.path.it.place", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"id": "a", "name": "n"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["for: it can only start an assertion: write it first, like it is not empty"]}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["for: it can only start an assertion: write it first, like it is not empty"], "locations": []}]}
         ]
       }
     ]
@@ -662,7 +662,7 @@
         "rules": ["sentence.path.it.place", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"id": "a", "name": "n"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["for: it can only start an assertion: write it first, like it is not empty"]}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["for: it can only start an assertion: write it first, like it is not empty"], "locations": []}]}
         ]
       }
     ]
@@ -676,7 +676,7 @@
         "rules": ["sentence.path.it.place", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"id": "a", "name": "n"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "subjects.region.from", "value": ["it can only start an assertion: write it first, like it is not empty"]}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "subjects.region.from", "value": ["it can only start an assertion: write it first, like it is not empty"], "locations": []}]}
         ]
       }
     ]
@@ -690,7 +690,7 @@
         "rules": ["sentence.path.it.place", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"id": "a", "name": "n"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "subjects.region.from", "value": ["it can only start an assertion: write it first, like it is not empty"]}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "subjects.region.from", "value": ["it can only start an assertion: write it first, like it is not empty"], "locations": []}]}
         ]
       }
     ]
@@ -704,7 +704,7 @@
         "rules": ["sentence.path.it.place", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"id": "a", "name": "n"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["it can't name a key"]}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["it can't name a key"], "locations": []}]}
         ]
       }
     ]
@@ -718,7 +718,7 @@
         "rules": ["sentence.words", "sentence.path.it.place", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"id": "a", "name": "n"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["for: it can't be an alias"]}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["for: it can't be an alias"], "locations": []}]}
         ]
       }
     ]
@@ -732,7 +732,7 @@
         "rules": ["sentence.path.it.place", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"id": "a", "name": "n"}]},
         "results": [
-          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "subjects.region.has.p", "value": ["from: it can only start an assertion: write it first, like it is not empty"]}]}
+          {"requirement": "allowed", "subject": {"id": null, "type": "region"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "subjects.region.has.p", "value": ["from: it can only start an assertion: write it first, like it is not empty"], "locations": []}]}
         ]
       }
     ]
@@ -746,7 +746,7 @@
         "rules": ["sentence.path.it.name", "written_wrong", "written_wrong.row"],
         "input": {"xs": [{"x": 1}]},
         "results": [
-          {"requirement": "r", "subject": {"id": null, "type": "it"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "subjects.it", "value": ["it is a word of the grammar, so a subject can't be called it"]}]}
+          {"requirement": "r", "subject": {"id": null, "type": "it"}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "subjects.it", "value": ["it is a word of the grammar, so a subject can't be called it"], "locations": []}]}
         ]
       }
     ]
@@ -760,7 +760,7 @@
         "rules": ["sentence.path.it.name"],
         "input": {"xs": [{"x": 1}]},
         "results": [
-          {"requirement": "r", "subject": {"id": {"x": 1}, "type": "b"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+          {"requirement": "r", "subject": {"id": {"x": 1}, "type": "b"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/xs/0/x"]}]}
         ]
       }
     ]
@@ -774,7 +774,7 @@
         "rules": ["sentence.path.it.name"],
         "input": {"xs": [{"x": 1}]},
         "results": [
-          {"requirement": "r", "subject": {"id": {"x": 1}, "type": "items"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+          {"requirement": "r", "subject": {"id": {"x": 1}, "type": "items"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/xs/0/x"]}]}
         ]
       }
     ]
@@ -788,13 +788,34 @@
         "rules": ["sentence.path.it", "sentence.subject.condition"],
         "input": {"releases": {"tags": [["v1", "latest"], ["v0"], "broken"]}},
         "results": [
-          {"requirement": "r", "subject": {"id": null, "type": "tag list"}, "check": "$well_formed", "passed": true, "cause": "satisfied", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}]},
-          {"requirement": "r", "subject": {"id": null, "type": "tag list"}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope tag list count", "value": 1}], "failed_items": []},
-          {"requirement": "r", "subject": {"id": null, "type": "tag list"}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated tag list ids", "value": []}]},
-          {"requirement": "r", "subject": {"id": ["v1", "latest"], "type": "tag list"}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "it[]", "value": ["v1", "latest"]}], "failed_items": []},
-          {"requirement": "r", "subject": {"id": ["v0"], "type": "tag list"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "it[]", "value": ["v0"]}], "failed_items": [{"cause": "value", "item": "item 1 of it", "path": "item 1 of it", "value": "v0"}]},
-          {"requirement": "r", "subject": {"id": "broken", "type": "tag list"}, "check": "$applies", "passed": false, "cause": "unusable", "inputs": [{"name": "it", "value": []}], "failed_items": [{"cause": "unusable", "item": "it", "path": "it", "value": "broken"}]},
-          {"requirement": "r", "subject": {"id": ["v1", "latest"], "type": "tag list"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it[]", "value": ["v1", "latest"]}], "failed_items": []}
+          {"requirement": "r", "subject": {"id": null, "type": "tag list"}, "check": "$well_formed", "passed": true, "cause": "satisfied", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}]},
+          {"requirement": "r", "subject": {"id": null, "type": "tag list"}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope tag list count", "value": 1, "locations": ["/releases/tags/0"]}], "failed_items": []},
+          {"requirement": "r", "subject": {"id": null, "type": "tag list"}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated tag list ids", "value": [], "locations": []}]},
+          {"requirement": "r", "subject": {"id": ["v1", "latest"], "type": "tag list"}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "it[]", "value": ["v1", "latest"], "locations": ["/releases/tags/0/0", "/releases/tags/0/1"]}], "failed_items": []},
+          {"requirement": "r", "subject": {"id": ["v0"], "type": "tag list"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "it[]", "value": ["v0"], "locations": ["/releases/tags/1/0"]}], "failed_items": [{"cause": "value", "item": "item 1 of it", "path": "item 1 of it", "value": "v0", "locations": ["/releases/tags/1/0"]}]},
+          {"requirement": "r", "subject": {"id": "broken", "type": "tag list"}, "check": "$applies", "passed": false, "cause": "unusable", "inputs": [{"name": "it", "value": [], "locations": []}], "failed_items": [{"cause": "unusable", "item": "it", "path": "it", "value": "broken", "locations": ["/releases/tags/2"]}]},
+          {"requirement": "r", "subject": {"id": ["v1", "latest"], "type": "tag list"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it[]", "value": ["v1", "latest"], "locations": ["/releases/tags/0/0", "/releases/tags/0/1"]}], "failed_items": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a check that reads it, on a plain value, a list and a from line that keeps lists",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"plain": {"from": "every values"}, "list": {"from": "every lists"}, "kept": {"from": "every sets whose some it is 1"}}, "requirements": {"p": {"subject": "plain", "checks": {"c": "it is 1"}}, "l": {"subject": "list", "checks": {"all": "every it is 1", "size": "count of it is 2"}}, "k": {"subject": "kept", "checks": {"c": "it is not empty"}}}},
+    "cases": [
+      {
+        "description": "has the location of the subject itself for it, one for each item for every it and count of it, and where each failed item was read",
+        "rules": ["location.read", "location.each", "location.worked_out", "location.failed_items"],
+        "input": {"values": [1, 2], "lists": [[1, 2]], "sets": [[1, 2], [3]]},
+        "requirements": {"k": {"status": "met"}, "l": {"status": "not_met"}, "p": {"status": "not_met"}},
+        "results": [
+          {"cause": "satisfied", "check": "$applies", "failed_items": [], "inputs": [{"locations": ["/sets/0/0", "/sets/0/1"], "name": "it[]", "value": [1, 2]}], "passed": true, "requirement": "k", "subject": {"id": [1, 2], "type": "kept"}},
+          {"cause": "value", "check": "$applies", "failed_items": [{"cause": "value", "item": "item 1 of it", "locations": ["/sets/1/0"], "path": "item 1 of it", "value": 3}], "inputs": [{"locations": ["/sets/1/0"], "name": "it[]", "value": [3]}], "passed": false, "requirement": "k", "subject": {"id": [3], "type": "kept"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/sets/0"], "name": "it", "value": [1, 2]}], "passed": true, "requirement": "k", "subject": {"id": [1, 2], "type": "kept"}},
+          {"cause": "value", "check": "all", "failed_items": [{"cause": "value", "item": "item 2 of it", "locations": ["/lists/0/1"], "path": "item 2 of it", "value": 2}], "inputs": [{"locations": ["/lists/0/0", "/lists/0/1"], "name": "it[]", "value": [1, 2]}], "passed": false, "requirement": "l", "subject": {"id": [1, 2], "type": "list"}},
+          {"cause": "satisfied", "check": "size", "inputs": [{"locations": ["/lists/0/0", "/lists/0/1"], "name": "count of it", "value": 2}, {"locations": ["/lists/0/0", "/lists/0/1"], "name": "it[]", "value": [1, 2]}], "passed": true, "requirement": "l", "subject": {"id": [1, 2], "type": "list"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/values/0"], "name": "it", "value": 1}], "passed": true, "requirement": "p", "subject": {"id": 1, "type": "plain"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/values/1"], "name": "it", "value": 2}], "passed": false, "requirement": "p", "subject": {"id": 2, "type": "plain"}}
         ]
       }
     ]

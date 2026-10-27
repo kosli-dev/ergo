@@ -42,18 +42,6 @@ A subject's parts (`has`, see [syntax.md](syntax.md#parts)) leave a few things o
 
 `time.format` only takes years 1678 to 2261 and only counts the first nine digits of a fraction. Both limits come from OPA, which holds a time as nanoseconds since 1970 in a 64-bit integer. A port in another language would have to add them on purpose. Either they stay, and the spec keeps them as a rule every implementation follows, or the spec drops them and `ergo.rego` has to compare times some other way outside that range.
 
-## Where in the input a value was read
-
-A row's `inputs` give each value with a name, written the way a sentence writes the path, like `artifacts named by $params.name.ok`. A name is for people. A program has to parse it to find the value in the input, and even then it only gets the path inside the subject, with the ref still in it.
-
-A report could also give each input its exact location, counted from the root of the input, with every ref already read:
-
-```json
-{"name": "artifacts named by $params.name.ok", "location": ["deployments", 0, "artifacts", "web", "ok"], "value": true}
-```
-
-A tool could then point at the value itself, like a report viewer that highlights the spot in the input when you hover a row. The open questions are whether it's worth the size it adds to every report, what a value read from the params or worked out from several values (a `count of`, a `sum of`) gets, and whether `failed_items` and `$refs` get one too.
-
 ## Which steps a walk walks
 
 `every` and `some` walk "into every list along the path" ([walk.lists](semantics.md#every-and-some)), and Ergo decides that from the data: a step is walked when at least one value there is a list, and then every value there must be one. So `every prs.commits.signed is true` on `{"prs": [{"commits": {"signed": true}}]}` passes, because `commits` is an object and nothing is walked at that step, but the same pull request fails as `unusable` when another one has a list of commits. It fails closed whenever the data shows a list, and only passes data shaped wrong when every item is shaped wrong the same way and the wrong shape still holds a field that passes.

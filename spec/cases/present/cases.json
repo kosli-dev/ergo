@@ -8,7 +8,7 @@
         "rules": ["present.pass", "path.inputs", "sentence.print.canonical"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a"}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}]}
         ],
         "expressions": {"s": {"c": "x exists"}}
       },
@@ -17,7 +17,7 @@
         "rules": ["present.pass"],
         "input": {"things": [{"id": "t1", "x": ""}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ""}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": "", "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -25,7 +25,7 @@
         "rules": ["present.pass"],
         "input": {"things": [{"id": "t1", "x": false}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": false}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": false, "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -33,7 +33,7 @@
         "rules": ["present.pass"],
         "input": {"things": [{"id": "t1", "x": 0}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 0}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 0, "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -41,7 +41,7 @@
         "rules": ["present.pass"],
         "input": {"things": [{"id": "t1", "x": []}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": []}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": [], "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -49,7 +49,7 @@
         "rules": ["present.pass"],
         "input": {"things": [{"id": "t1", "x": {}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": {}}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": {}, "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -57,7 +57,7 @@
         "rules": ["present.missing", "path.absent"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
         ]
       },
       {
@@ -65,7 +65,7 @@
         "rules": ["present.missing", "path.null"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -73,7 +73,7 @@
         "rules": ["present.other", "path.not_an_object"],
         "input": {"things": ["t1"]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
         ]
       },
       {
@@ -81,7 +81,7 @@
         "rules": ["present.other", "path.not_an_object"],
         "input": {"things": [null]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "c", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "c", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
         ]
       }
     ]
@@ -95,7 +95,7 @@
         "rules": ["present.missing", "path.absent", "path.inputs"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x.y", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x.y", "value": null, "locations": ["/things/0"]}]}
         ]
       },
       {
@@ -103,7 +103,7 @@
         "rules": ["present.missing", "path.absent"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x.y", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x.y", "value": null, "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -111,7 +111,7 @@
         "rules": ["present.other", "path.unusable"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x.y", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x.y", "value": null, "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -119,7 +119,7 @@
         "rules": ["present.other", "path.unusable"],
         "input": {"things": [{"id": "t1", "x": [{"y": 1}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x.y", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x.y", "value": null, "locations": ["/things/0/x"]}]}
         ]
       }
     ]
@@ -133,7 +133,7 @@
         "rules": ["present.pass", "path.inputs", "name.index"],
         "input": {"things": [{"id": "t1", "x": ["a", "b"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "item 2 of x", "value": "b"}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "item 2 of x", "value": "b", "locations": ["/things/0/x/1"]}]}
         ]
       },
       {
@@ -141,7 +141,7 @@
         "rules": ["present.missing", "path.absent", "name.index"],
         "input": {"things": [{"id": "t1", "x": ["a"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "item 2 of x", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "item 2 of x", "value": null, "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -149,7 +149,7 @@
         "rules": ["present.missing", "path.null", "name.index"],
         "input": {"things": [{"id": "t1", "x": ["a", null]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "item 2 of x", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "item 2 of x", "value": null, "locations": ["/things/0/x/1"]}]}
         ]
       },
       {
@@ -157,7 +157,7 @@
         "rules": ["present.other", "path.unusable", "name.index"],
         "input": {"things": [{"id": "t1", "x": {"1": "a"}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "item 2 of x", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "item 2 of x", "value": null, "locations": ["/things/0/x"]}]}
         ]
       }
     ]
@@ -186,8 +186,8 @@
         "rules": ["present.pass", "path.start", "path.ref_step", "path.inputs", "name.ref_step", "path.steps"],
         "input": {"flag": true, "things": [{"id": "t1", "x": {"a": 1}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "by_ref", "passed": true, "cause": "satisfied", "inputs": [{"name": "x named by $params.key", "value": 1}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "on_input", "passed": true, "cause": "satisfied", "inputs": [{"name": "$input.flag", "value": true}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "by_ref", "passed": true, "cause": "satisfied", "inputs": [{"name": "x named by $params.key", "value": 1, "locations": ["/things/0/x/a"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "on_input", "passed": true, "cause": "satisfied", "inputs": [{"name": "$input.flag", "value": true, "locations": ["/flag"]}]}
         ]
       },
       {
@@ -195,8 +195,8 @@
         "rules": ["present.missing", "path.start", "path.ref_step", "name.ref_step", "path.steps"],
         "input": {"things": [{"id": "t1", "x": {}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "by_ref", "passed": false, "cause": "value", "inputs": [{"name": "x named by $params.key", "value": null}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "on_input", "passed": false, "cause": "value", "inputs": [{"name": "$input.flag", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "by_ref", "passed": false, "cause": "value", "inputs": [{"name": "x named by $params.key", "value": null, "locations": ["/things/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "on_input", "passed": false, "cause": "value", "inputs": [{"name": "$input.flag", "value": null, "locations": [""]}]}
         ]
       }
     ]
@@ -211,7 +211,7 @@
         "rules": ["present.other", "path.ref_step", "path.inputs", "name.ref_step"],
         "input": {"things": [{"id": "t1", "x": {"a": 1}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x named by $params.key", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x named by $params.key", "value": null, "locations": ["/things/0/x"]}]}
         ]
       }
     ]
@@ -226,7 +226,7 @@
         "rules": ["present.other", "path.ref_step", "path.inputs", "name.ref_step"],
         "input": {"things": [{"id": "t1", "x": {"a": 1}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x named by $params.key", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x named by $params.key", "value": null, "locations": ["/things/0/x"]}]}
         ]
       }
     ]
@@ -257,7 +257,7 @@
         "status": {"s": "not_applicable"},
         "compliant": true,
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "status", "value": null}], "failed_assertions": [{"assertion": "status is \"COMPLETE\"", "cause": "absent"}, {"assertion": "status exists", "cause": "value"}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "status", "value": null, "locations": ["/things/0"]}], "failed_assertions": [{"assertion": "status is \"COMPLETE\"", "cause": "absent"}, {"assertion": "status exists", "cause": "value"}]}
         ]
       },
       {
@@ -267,7 +267,7 @@
         "status": {"s": "not_applicable"},
         "compliant": true,
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "status", "value": null}], "failed_assertions": [{"assertion": "status is \"COMPLETE\"", "cause": "null"}, {"assertion": "status exists", "cause": "value"}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "status", "value": null, "locations": ["/things/0/status"]}], "failed_assertions": [{"assertion": "status is \"COMPLETE\"", "cause": "null"}, {"assertion": "status exists", "cause": "value"}]}
         ]
       },
       {
@@ -277,8 +277,8 @@
         "status": {"s": "met"},
         "compliant": true,
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "status", "value": "COMPLETE"}], "failed_assertions": []},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "status", "value": "COMPLETE", "locations": ["/things/0/status"]}], "failed_assertions": []},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]}
         ]
       }
     ]
@@ -309,7 +309,7 @@
         "status": {"s": "not_met"},
         "compliant": false,
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": false, "cause": "unusable", "inputs": [{"name": "build.fingerprint", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": false, "cause": "unusable", "inputs": [{"name": "build.fingerprint", "value": null, "locations": ["/things/0/build"]}]}
         ]
       }
     ]
@@ -324,7 +324,7 @@
         "rules": ["present.no_params", "path.start", "path.inputs", "path.steps"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "$params.flag", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "$params.flag", "value": null, "locations": ["$params:"]}]}
         ]
       }
     ]
@@ -339,7 +339,76 @@
         "rules": ["present.missing", "present.no_params", "path.inputs", "path.steps"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "$params.flag", "value": null}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "$params.flag", "value": null, "locations": ["$params:"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an input is read from a subject in a list",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "shows where each value was read, counting list positions from 0, and for a field that isn't there the subject it isn't in",
+        "rules": ["location", "location.start", "location.one", "location.read"],
+        "input": {"things": [{"id": "t1", "x": 1}, {"id": "t2"}, {"id": "t3", "x": null}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/1"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/2/x"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t3", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a path that can't go on",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x.y exists"}}}},
+    "cases": [
+      {
+        "description": "points at the field that held a string, which couldn't hold a key",
+        "rules": ["location.read", "location.one"],
+        "input": {"things": [{"id": "t1", "x": "text"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x.y", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "points at the object that doesn't have the key",
+        "rules": ["location.read", "location.one"],
+        "input": {"things": [{"id": "t1", "x": {"z": 1}}]},
+        "results": [
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x.y", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "points at the null it stopped at",
+        "rules": ["location.read", "location.one"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x.y", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "points at the subject when the field isn't there",
+        "rules": ["location.read", "location.one"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x.y", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject that isn't an object",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "points at the subject",
+        "rules": ["location.read", "location.start"],
+        "input": {"things": ["text", {"id": "t2", "x": 1}]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "text", "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/1/x"], "name": "x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t2", "type": "thing"}}
         ]
       }
     ]

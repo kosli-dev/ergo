@@ -15,14 +15,14 @@
             "check": "$well_formed",
             "passed": true,
             "cause": "satisfied",
-            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}]
+            "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}]
           },
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope subject count", "value": 2}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": []}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope subject count", "value": 2, "locations": ["/t/0", "/t/1"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/t/1"]}]}
         ],
-        "violations": [{"cause": "value", "check": "c", "description": "", "expression": "x exists", "inputs": [{"name": "x", "value": null}], "requirement": "s", "subject": {"id": 1, "type": "subject"}}]
+        "violations": [{"cause": "value", "check": "c", "description": "", "expression": "x exists", "inputs": [{"name": "x", "value": null, "locations": ["/t/1"]}], "requirement": "s", "subject": {"id": 1, "type": "subject"}}]
       },
       {
         "description": "fails min_subjects as value on an empty list",
@@ -31,7 +31,7 @@
         "compliant": false,
         "requirements": {"s": {"status": "not_met", "subjects": {"matching": 0, "total": 0}}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 0}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
         ],
         "violations": [
           {
@@ -39,7 +39,7 @@
             "check": "$min_subjects",
             "description": "The in-scope subject count is at least 1",
             "expression": "count(matching(t)) >= 1",
-            "inputs": [{"name": "in-scope subject count", "value": 0}],
+            "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}],
             "requirement": "s",
             "subject": {"id": null, "type": "subject"}
           }
@@ -51,7 +51,7 @@
         "input": {},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "absent", "inputs": [{"name": "in-scope subject count", "value": 0}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "absent", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
         ]
       },
       {
@@ -59,7 +59,7 @@
         "rules": ["subjects.from"],
         "input": {"t": null},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "null", "inputs": [{"name": "in-scope subject count", "value": 0}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "null", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
         ]
       },
       {
@@ -67,7 +67,7 @@
         "rules": ["subjects.from"],
         "input": {"t": "a"},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "unusable", "inputs": [{"name": "in-scope subject count", "value": 0}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "unusable", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
         ]
       },
       {
@@ -76,8 +76,8 @@
         "input": {"t": {"id": 1, "x": 1}},
         "requirements": {"s": {"subjects": {"matching": 1, "total": 1}}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope subject count", "value": 1}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/t"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/x"]}]}
         ]
       },
       {
@@ -85,8 +85,8 @@
         "rules": ["subjects.not_an_object", "subjects.id"],
         "input": {"t": ["a", null]},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": "a"}, "check": "c", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "c", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": "a"}, "check": "c", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null, "locations": ["/t/0"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "c", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null, "locations": ["/t/1"]}]}
         ]
       }
     ]
@@ -102,7 +102,7 @@
         "compliant": true,
         "requirements": {"s": {"status": "not_applicable"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope subject count", "value": 0}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
         ],
         "violations": []
       },
@@ -113,7 +113,7 @@
         "compliant": false,
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "absent", "inputs": [{"name": "in-scope subject count", "value": 0}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "absent", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
         ]
       },
       {
@@ -123,7 +123,7 @@
         "compliant": false,
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/t/0"]}]}
         ]
       }
     ]
@@ -138,8 +138,8 @@
         "input": {"x": 1},
         "requirements": {"s": {"status": "met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope subject count", "value": 1}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope subject count", "value": 1, "locations": [""]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/x"]}]}
         ]
       },
       {
@@ -147,7 +147,7 @@
         "rules": ["subjects.from"],
         "input": null,
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "null", "inputs": [{"name": "in-scope subject count", "value": 0}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "null", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
         ]
       },
       {
@@ -155,7 +155,7 @@
         "rules": ["subjects.from"],
         "input": [1],
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "unusable", "inputs": [{"name": "in-scope subject count", "value": 0}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "unusable", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
         ]
       }
     ]
@@ -170,8 +170,8 @@
         "input": {"t": [{"id": 1, "x": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 1}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/t/0"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/0/x"]}]}
         ]
       }
     ]
@@ -192,14 +192,14 @@
             "check": "$unique_ids",
             "passed": false,
             "cause": "value",
-            "inputs": [{"name": "repeated subject ids", "value": ["b", 10, 3]}]
+            "inputs": [{"name": "repeated subject ids", "value": ["b", 10, 3], "locations": ["/t/0/id", "/t/2/id", "/t/1/id", "/t/4/id", "/t/3/id", "/t/5/id"]}]
           },
-          {"requirement": "s", "subject": {"type": "subject", "id": "b"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 10}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": "b"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 3}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 10}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 3}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": "b"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 10}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/1/x"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": "b"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/2/x"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 3}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/3/x"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 10}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/4/x"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 3}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/5/x"]}]}
         ]
       },
       {
@@ -208,9 +208,9 @@
         "input": {"t": [{"x": 1}, {"x": 2}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": false, "cause": "value", "inputs": [{"name": "repeated subject ids", "value": [null]}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": false, "cause": "value", "inputs": [{"name": "repeated subject ids", "value": [null], "locations": ["/t/0", "/t/1"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2, "locations": ["/t/1/x"]}]}
         ]
       }
     ]
@@ -225,10 +225,10 @@
         "input": {"t": [{"e": "p", "id": 1, "x": 1}, {"e": "q", "id": 1}]},
         "requirements": {"s": {"status": "not_met", "subjects": {"matching": 1, "total": 2}}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": false, "cause": "value", "inputs": [{"name": "repeated subject ids", "value": [1]}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "e", "value": "p"}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "e", "value": "q"}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": false, "cause": "value", "inputs": [{"name": "repeated subject ids", "value": [1], "locations": ["/t/0/id", "/t/1/id"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "e", "value": "p", "locations": ["/t/0/e"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "e", "value": "q", "locations": ["/t/1/e"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/0/x"]}]}
         ]
       }
     ]
@@ -243,12 +243,12 @@
         "input": {"t": [{"a": 1, "id": 1}, {"b": 1, "id": 2}, {"a": 1, "b": 1, "id": 3}]},
         "requirements": {"s": {"require": "some", "status": "met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": ".a", "value": 1}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "b", "passed": false, "cause": "value", "inputs": [{"name": "b", "value": null}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "a", "passed": false, "cause": "value", "inputs": [{"name": ".a", "value": null}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "b", "passed": true, "cause": "satisfied", "inputs": [{"name": "b", "value": 1}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 3}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": ".a", "value": 1}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 3}, "check": "b", "passed": true, "cause": "satisfied", "inputs": [{"name": "b", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": ".a", "value": 1, "locations": ["/t/0/a"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "b", "passed": false, "cause": "value", "inputs": [{"name": "b", "value": null, "locations": ["/t/0"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "a", "passed": false, "cause": "value", "inputs": [{"name": ".a", "value": null, "locations": ["/t/1"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "b", "passed": true, "cause": "satisfied", "inputs": [{"name": "b", "value": 1, "locations": ["/t/1/b"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 3}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": ".a", "value": 1, "locations": ["/t/2/a"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 3}, "check": "b", "passed": true, "cause": "satisfied", "inputs": [{"name": "b", "value": 1, "locations": ["/t/2/b"]}]}
         ],
         "violations": []
       },
@@ -258,14 +258,14 @@
         "input": {"t": [{"a": 1, "id": 1}, {"b": 1, "id": 2}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": ".a", "value": 1}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "b", "passed": false, "cause": "value", "inputs": [{"name": "b", "value": null}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "a", "passed": false, "cause": "value", "inputs": [{"name": ".a", "value": null}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "b", "passed": true, "cause": "satisfied", "inputs": [{"name": "b", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": ".a", "value": 1, "locations": ["/t/0/a"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "b", "passed": false, "cause": "value", "inputs": [{"name": "b", "value": null, "locations": ["/t/0"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "a", "passed": false, "cause": "value", "inputs": [{"name": ".a", "value": null, "locations": ["/t/1"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "b", "passed": true, "cause": "satisfied", "inputs": [{"name": "b", "value": 1, "locations": ["/t/1/b"]}]}
         ],
         "violations": [
-          {"cause": "value", "check": "b", "description": "", "expression": "b exists", "inputs": [{"name": "b", "value": null}], "requirement": "s", "subject": {"id": 1, "type": "subject"}},
-          {"cause": "value", "check": "a", "description": "", "expression": ".a exists", "inputs": [{"name": ".a", "value": null}], "requirement": "s", "subject": {"id": 2, "type": "subject"}}
+          {"cause": "value", "check": "b", "description": "", "expression": "b exists", "inputs": [{"name": "b", "value": null, "locations": ["/t/0"]}], "requirement": "s", "subject": {"id": 1, "type": "subject"}},
+          {"cause": "value", "check": "a", "description": "", "expression": ".a exists", "inputs": [{"name": ".a", "value": null, "locations": ["/t/1"]}], "requirement": "s", "subject": {"id": 2, "type": "subject"}}
         ]
       }
     ]
@@ -280,10 +280,10 @@
         "input": {"t": [{"e": "p", "id": 1, "x": 1}, {"e": "q", "id": 2}, {"id": 3}]},
         "requirements": {"s": {"status": "not_met", "subjects": {"matching": 1, "total": 3}}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "e", "value": "p"}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "e", "value": "q"}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 3}, "check": "$applies", "passed": false, "cause": "absent", "inputs": [{"name": "e", "value": null}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "e", "value": "p", "locations": ["/t/0/e"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "e", "value": "q", "locations": ["/t/1/e"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 3}, "check": "$applies", "passed": false, "cause": "absent", "inputs": [{"name": "e", "value": null, "locations": ["/t/2"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/0/x"]}]}
         ],
         "violations": [
           {
@@ -291,7 +291,7 @@
             "check": "$applies",
             "description": "The subject is in scope",
             "expression": "e is \"p\"",
-            "inputs": [{"name": "e", "value": null}],
+            "inputs": [{"name": "e", "value": null, "locations": ["/t/2"]}],
             "requirement": "s",
             "subject": {"id": 3, "type": "subject"}
           }
@@ -303,8 +303,8 @@
         "input": {"t": [{"e": "q", "id": 2}]},
         "requirements": {"s": {"status": "not_met", "subjects": {"matching": 0, "total": 1}}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 0}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "e", "value": "q"}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "e", "value": "q", "locations": ["/t/0/e"]}]}
         ]
       }
     ]
@@ -320,7 +320,7 @@
         "compliant": true,
         "requirements": {"s": {"status": "not_applicable", "subjects": {"matching": 0, "total": 1}}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "e", "value": "q"}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "e", "value": "q", "locations": ["/t/0/e"]}]}
         ],
         "violations": []
       },
@@ -331,7 +331,7 @@
         "compliant": false,
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "$applies", "passed": false, "cause": "absent", "inputs": [{"name": "e", "value": null}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "$applies", "passed": false, "cause": "absent", "inputs": [{"name": "e", "value": null, "locations": ["/t/0"]}]}
         ]
       }
     ]
@@ -361,7 +361,7 @@
         "input": {"t": [{"e": "q", "id": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": false, "cause": "absent", "inputs": [{"name": "e", "value": "q"}, {"name": "k", "value": null}], "failed_assertions": [{"assertion": "e is \"p\"", "cause": "value"}, {"assertion": "k is 1", "cause": "absent"}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": false, "cause": "absent", "inputs": [{"name": "e", "value": "q", "locations": ["/t/0/e"]}, {"name": "k", "value": null, "locations": ["/t/0"]}], "failed_assertions": [{"assertion": "e is \"p\"", "cause": "value"}, {"assertion": "k is 1", "cause": "absent"}]}
         ]
       }
     ]
@@ -382,7 +382,7 @@
             "check": "$well_formed",
             "passed": false,
             "cause": "value",
-            "inputs": [{"name": "count(checks)", "value": 0}, {"name": "require", "value": "every"}, {"name": "checks", "value": ["empty"]}]
+            "inputs": [{"name": "count(checks)", "value": 0, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks", "value": ["empty"], "locations": []}]
           }
         ]
       }
@@ -404,7 +404,7 @@
             "check": "$well_formed",
             "passed": false,
             "cause": "value",
-            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": ["neither every nor some"]}]
+            "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": ["neither every nor some"], "locations": []}]
           }
         ]
       }
@@ -426,7 +426,7 @@
             "check": "$well_formed",
             "passed": false,
             "cause": "value",
-            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "requires", "value": ["unknown field"]}]
+            "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "requires", "value": ["unknown field"], "locations": []}]
           }
         ]
       }
@@ -483,7 +483,7 @@
             "check": "$well_formed",
             "passed": true,
             "cause": "satisfied",
-            "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}]
+            "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}]
           },
           {
             "requirement": "s",
@@ -491,7 +491,7 @@
             "check": "$min_subjects",
             "passed": true,
             "cause": "satisfied",
-            "inputs": [{"name": "in-scope deployment count", "value": 1}]
+            "inputs": [{"name": "in-scope deployment count", "value": 1, "locations": ["/t/0"]}]
           },
           {
             "requirement": "s",
@@ -499,10 +499,10 @@
             "check": "$unique_ids",
             "passed": true,
             "cause": "satisfied",
-            "inputs": [{"name": "repeated deployment ids", "value": []}]
+            "inputs": [{"name": "repeated deployment ids", "value": [], "locations": []}]
           },
-          {"requirement": "s", "subject": {"type": "deployment", "id": 1}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "e", "value": 1}]},
-          {"requirement": "s", "subject": {"type": "deployment", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "deployment", "id": 1}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "e", "value": 1, "locations": ["/t/0/e"]}]},
+          {"requirement": "s", "subject": {"type": "deployment", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/0/x"]}]}
         ]
       }
     ]
@@ -530,7 +530,7 @@
           }
         },
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/0/x"]}]}
         ]
       }
     ]
@@ -545,7 +545,7 @@
         "input": {"t": [{"id": 1, "x": 1}]},
         "requirements": {"s": {"description": "", "meta": {}}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/0/x"]}]}
         ]
       }
     ]
@@ -576,27 +576,27 @@
         "input": {"t": [{"id": 2}, {"id": 1, "x": 1}]},
         "compliant": false,
         "results": [
-          {"requirement": "a", "subject": {"type": "subject", "id": null}, "check": "$well_formed", "passed": true, "cause": "satisfied", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}]},
-          {"requirement": "b", "subject": {"type": "subject", "id": null}, "check": "$well_formed", "passed": true, "cause": "satisfied", "inputs": [{"name": "count(checks)", "value": 2}, {"name": "require", "value": "every"}]},
-          {"requirement": "a", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope subject count", "value": 2}]},
-          {"requirement": "b", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope subject count", "value": 2}]},
-          {"requirement": "a", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": []}]},
-          {"requirement": "b", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": []}]},
-          {"requirement": "a", "subject": {"type": "subject", "id": 2}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "id", "value": 2}]},
-          {"requirement": "a", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "id", "value": 1}]},
-          {"requirement": "b", "subject": {"type": "subject", "id": 2}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "id", "value": 2}]},
-          {"requirement": "b", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "id", "value": 1}]},
-          {"requirement": "a", "subject": {"type": "subject", "id": 2}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null}]},
-          {"requirement": "a", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]},
-          {"requirement": "b", "subject": {"type": "subject", "id": 2}, "check": "a", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null}]},
-          {"requirement": "b", "subject": {"type": "subject", "id": 2}, "check": "z", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null}]},
-          {"requirement": "b", "subject": {"type": "subject", "id": 1}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]},
-          {"requirement": "b", "subject": {"type": "subject", "id": 1}, "check": "z", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+          {"requirement": "a", "subject": {"type": "subject", "id": null}, "check": "$well_formed", "passed": true, "cause": "satisfied", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}]},
+          {"requirement": "b", "subject": {"type": "subject", "id": null}, "check": "$well_formed", "passed": true, "cause": "satisfied", "inputs": [{"name": "count(checks)", "value": 2, "locations": []}, {"name": "require", "value": "every", "locations": []}]},
+          {"requirement": "a", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope subject count", "value": 2, "locations": ["/t/0", "/t/1"]}]},
+          {"requirement": "b", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope subject count", "value": 2, "locations": ["/t/0", "/t/1"]}]},
+          {"requirement": "a", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]},
+          {"requirement": "b", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]},
+          {"requirement": "a", "subject": {"type": "subject", "id": 2}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "id", "value": 2, "locations": ["/t/0/id"]}]},
+          {"requirement": "a", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "id", "value": 1, "locations": ["/t/1/id"]}]},
+          {"requirement": "b", "subject": {"type": "subject", "id": 2}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "id", "value": 2, "locations": ["/t/0/id"]}]},
+          {"requirement": "b", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "id", "value": 1, "locations": ["/t/1/id"]}]},
+          {"requirement": "a", "subject": {"type": "subject", "id": 2}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/t/0"]}]},
+          {"requirement": "a", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/1/x"]}]},
+          {"requirement": "b", "subject": {"type": "subject", "id": 2}, "check": "a", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/t/0"]}]},
+          {"requirement": "b", "subject": {"type": "subject", "id": 2}, "check": "z", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/t/0"]}]},
+          {"requirement": "b", "subject": {"type": "subject", "id": 1}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/1/x"]}]},
+          {"requirement": "b", "subject": {"type": "subject", "id": 1}, "check": "z", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/1/x"]}]}
         ],
         "violations": [
-          {"cause": "value", "check": "c", "description": "", "expression": "x exists", "inputs": [{"name": "x", "value": null}], "requirement": "a", "subject": {"id": 2, "type": "subject"}},
-          {"cause": "value", "check": "a", "description": "", "expression": "x exists", "inputs": [{"name": "x", "value": null}], "requirement": "b", "subject": {"id": 2, "type": "subject"}},
-          {"cause": "value", "check": "z", "description": "", "expression": "x exists", "inputs": [{"name": "x", "value": null}], "requirement": "b", "subject": {"id": 2, "type": "subject"}}
+          {"cause": "value", "check": "c", "description": "", "expression": "x exists", "inputs": [{"name": "x", "value": null, "locations": ["/t/0"]}], "requirement": "a", "subject": {"id": 2, "type": "subject"}},
+          {"cause": "value", "check": "a", "description": "", "expression": "x exists", "inputs": [{"name": "x", "value": null, "locations": ["/t/0"]}], "requirement": "b", "subject": {"id": 2, "type": "subject"}},
+          {"cause": "value", "check": "z", "description": "", "expression": "x exists", "inputs": [{"name": "x", "value": null, "locations": ["/t/0"]}], "requirement": "b", "subject": {"id": 2, "type": "subject"}}
         ]
       }
     ]
@@ -611,10 +611,10 @@
         "rules": ["violations", "name.index"],
         "input": {"t": [{"cs": [{"v": "a"}, {"v": "z"}], "id": 1}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "cs[].v", "value": ["a", "z"]}], "failed_items": [{"cause": "value", "path": "cs[1].v", "item": "item 2 of cs", "value": "z"}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "cs[].v", "value": ["a", "z"], "locations": ["/t/0/cs/0/v", "/t/0/cs/1/v"]}], "failed_items": [{"cause": "value", "path": "cs[1].v", "item": "item 2 of cs", "value": "z", "locations": ["/t/0/cs/1/v"]}]}
         ],
         "violations": [
-          {"cause": "value", "check": "c", "description": "", "expression": "every cs.v is in $params.ok", "failed_items": [{"cause": "value", "path": "cs[1].v", "item": "item 2 of cs", "value": "z"}], "inputs": [{"name": "cs[].v", "value": ["a", "z"]}, {"name": "$params.ok", "value": ["a", "b"]}], "requirement": "s", "subject": {"id": 1, "type": "subject"}}
+          {"cause": "value", "check": "c", "description": "", "expression": "every cs.v is in $params.ok", "failed_items": [{"cause": "value", "path": "cs[1].v", "item": "item 2 of cs", "value": "z", "locations": ["/t/0/cs/1/v"]}], "inputs": [{"name": "cs[].v", "value": ["a", "z"], "locations": ["/t/0/cs/0/v", "/t/0/cs/1/v"]}, {"name": "$params.ok", "value": ["a", "b"], "locations": ["$params:/ok"]}], "requirement": "s", "subject": {"id": 1, "type": "subject"}}
         ]
       }
     ]
@@ -629,7 +629,7 @@
         "input": {"t": [{"x": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "from", "value": ["unknown field"]}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "from", "value": ["unknown field"], "locations": []}]}
         ]
       }
     ]
@@ -644,7 +644,7 @@
         "input": {"things": [{"id": "t1", "x": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "subjects.thing.id", "value": ["unknown field"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "subjects.thing.id", "value": ["unknown field"], "locations": []}]}
         ]
       }
     ]
@@ -663,10 +663,10 @@
         "input": {"things": [{"id": "t1"}, {"id": "t2", "x": 2}]},
         "requirements": {"s": {"causes": [{"cause": "absent", "rows": 1}, {"cause": "value", "rows": 2}]}},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "d", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "d", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 2}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "d", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2, "locations": ["/things/1/x"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "d", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 2, "locations": ["/things/1/x"]}]}
         ]
       }
     ]
@@ -726,7 +726,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/t/0/x"
+                ]
               }
             ]
           }
@@ -759,7 +762,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/t/0/x"
+                ]
               }
             ]
           }
@@ -824,22 +830,34 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "policy description",
                 "value": [
                   "not a string"
+                ],
+                "locations": [
+
                 ]
               },
               {
                 "name": "policy meta",
                 "value": [
                   "not an object"
+                ],
+                "locations": [
+
                 ]
               }
             ]
@@ -856,22 +874,34 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "policy description",
                 "value": [
                   "not a string"
+                ],
+                "locations": [
+
                 ]
               },
               {
                 "name": "policy meta",
                 "value": [
                   "not an object"
+                ],
+                "locations": [
+
                 ]
               }
             ]
@@ -927,16 +957,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "policy ergo_spec",
                 "value": [
                   "missing"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -953,16 +992,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "policy ergo_spec",
                 "value": [
                   "missing"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -1025,16 +1073,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "policy ergo_spec",
                 "value": [
                   "missing"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -1051,16 +1108,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "policy ergo_spec",
                 "value": [
                   "missing"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -1123,16 +1189,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "policy ergo_spec",
                 "value": [
                   "not a string"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -1149,16 +1224,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "policy ergo_spec",
                 "value": [
                   "not a string"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -1221,16 +1305,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "policy ergo_spec",
                 "value": [
                   "unsupported version v9.9, expected v0.2-dev"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -1247,16 +1340,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "policy ergo_spec",
                 "value": [
                   "unsupported version v9.9, expected v0.2-dev"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -1319,17 +1421,20 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": []
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": []
               },
               {
                 "name": "policy ergo_spec",
                 "value": [
                   "unsupported version v0.1, expected v0.2-dev"
-                ]
+                ],
+                "locations": []
               }
             ],
             "passed": false,
@@ -1345,17 +1450,20 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": []
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": []
               },
               {
                 "name": "policy ergo_spec",
                 "value": [
                   "unsupported version v0.1, expected v0.2-dev"
-                ]
+                ],
+                "locations": []
               }
             ],
             "passed": false,
@@ -1417,17 +1525,20 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": []
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": []
               },
               {
                 "name": "policy ergo_spec",
                 "value": [
                   "not a version v0.2-beta"
-                ]
+                ],
+                "locations": []
               }
             ],
             "passed": false,
@@ -1443,17 +1554,20 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": []
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": []
               },
               {
                 "name": "policy ergo_spec",
                 "value": [
                   "not a version v0.2-beta"
-                ]
+                ],
+                "locations": []
               }
             ],
             "passed": false,
@@ -1515,17 +1629,20 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": []
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": []
               },
               {
                 "name": "policy ergo_spec",
                 "value": [
                   "not a version v0.2-"
-                ]
+                ],
+                "locations": []
               }
             ],
             "passed": false,
@@ -1541,17 +1658,20 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": []
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": []
               },
               {
                 "name": "policy ergo_spec",
                 "value": [
                   "not a version v0.2-"
-                ]
+                ],
+                "locations": []
               }
             ],
             "passed": false,
@@ -1613,11 +1733,13 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": []
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": []
               }
             ],
             "passed": true,
@@ -1633,11 +1755,13 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": []
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": []
               }
             ],
             "passed": true,
@@ -1653,7 +1777,10 @@
             "inputs": [
               {
                 "name": "in-scope subject count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/t/0"
+                ]
               }
             ],
             "passed": true,
@@ -1669,7 +1796,10 @@
             "inputs": [
               {
                 "name": "in-scope subject count",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/t/0"
+                ]
               }
             ],
             "passed": true,
@@ -1685,7 +1815,8 @@
             "inputs": [
               {
                 "name": "repeated subject ids",
-                "value": []
+                "value": [],
+                "locations": []
               }
             ],
             "passed": true,
@@ -1701,7 +1832,8 @@
             "inputs": [
               {
                 "name": "repeated subject ids",
-                "value": []
+                "value": [],
+                "locations": []
               }
             ],
             "passed": true,
@@ -1717,7 +1849,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/t/0/x"
+                ]
               }
             ],
             "passed": true,
@@ -1733,7 +1868,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/t/0/x"
+                ]
               }
             ],
             "passed": true,
@@ -1795,16 +1933,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "policy ergo_spec",
                 "value": [
                   "not a version V0.1"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -1821,16 +1968,25 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "policy ergo_spec",
                 "value": [
                   "not a version V0.1"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -1895,28 +2051,43 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "policy description",
                 "value": [
                   "not a string"
+                ],
+                "locations": [
+
                 ]
               },
               {
                 "name": "policy ergo_spec",
                 "value": [
                   "not a string"
+                ],
+                "locations": [
+
                 ]
               },
               {
                 "name": "policy meta",
                 "value": [
                   "not an object"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -1933,28 +2104,43 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "policy description",
                 "value": [
                   "not a string"
+                ],
+                "locations": [
+
                 ]
               },
               {
                 "name": "policy ergo_spec",
                 "value": [
                   "not a string"
+                ],
+                "locations": [
+
                 ]
               },
               {
                 "name": "policy meta",
                 "value": [
                   "not an object"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -1980,7 +2166,7 @@
         "requirements": {"s": {"status": "not_met"}},
         "expressions": {"s": {"c": "<missing assert>"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["missing assert", "unknown field op", "unknown field path"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["missing assert", "unknown field op", "unknown field path"], "locations": []}]}
         ]
       }
     ]
@@ -2007,12 +2193,12 @@
           "worse": {"status": "not_met", "subjects": {"matching": 0, "total": 0}}
         },
         "results": [
-          {"requirement": "bad", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": ["neither every nor some"]}]},
-          {"requirement": "good", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": true, "cause": "satisfied", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}]},
-          {"requirement": "worse", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["doesn't parse"]}]},
-          {"requirement": "good", "subject": {"type": "thing", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope thing count", "value": 1}]},
-          {"requirement": "good", "subject": {"type": "thing", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated thing ids", "value": []}]},
-          {"requirement": "good", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1}]}
+          {"requirement": "bad", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": ["neither every nor some"], "locations": []}]},
+          {"requirement": "good", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": true, "cause": "satisfied", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}]},
+          {"requirement": "worse", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["doesn't parse"], "locations": []}]},
+          {"requirement": "good", "subject": {"type": "thing", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope thing count", "value": 1, "locations": ["/things/0"]}]},
+          {"requirement": "good", "subject": {"type": "thing", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated thing ids", "value": [], "locations": []}]},
+          {"requirement": "good", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]}
         ]
       }
     ]
@@ -2028,7 +2214,7 @@
         "requirements": {"s": {"status": "not_met", "subjects": {"matching": 0, "total": 0}}},
         "expressions": {"s": {"$applies": "x exists", "$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "c": "x is \"a"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}, {"name": "checks.c", "value": ["unclosed quote at column 6"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["unclosed quote at column 6"], "locations": []}]}
         ]
       }
     ]
@@ -2087,34 +2273,52 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 4
+                "value": 4,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "checks.$applies",
                 "value": [
                   "name reserved"
+                ],
+                "locations": [
+
                 ]
               },
               {
                 "name": "checks.$min_subjects",
                 "value": [
                   "name reserved"
+                ],
+                "locations": [
+
                 ]
               },
               {
                 "name": "checks.$unique_ids",
                 "value": [
                   "name reserved"
+                ],
+                "locations": [
+
                 ]
               },
               {
                 "name": "checks.$well_formed",
                 "value": [
                   "name reserved"
+                ],
+                "locations": [
+
                 ]
               }
             ],
@@ -2175,17 +2379,26 @@
             "inputs": [
               {
                 "name": "count(checks)",
-                "value": 1
+                "value": 1,
+                "locations": [
+
+                ]
               },
               {
                 "name": "require",
-                "value": "every"
+                "value": "every",
+                "locations": [
+
+                ]
               },
               {
                 "name": "checks.$unique_ids",
                 "value": [
                   "doesn't parse",
                   "name reserved"
+                ],
+                "locations": [
+
                 ]
               }
             ],

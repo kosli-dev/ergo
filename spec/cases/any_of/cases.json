@@ -30,7 +30,7 @@
             "check": "c",
             "passed": true,
             "cause": "satisfied",
-            "inputs": [{"name": "state", "value": null}, {"name": "type", "value": "Chore"}]
+            "inputs": [{"name": "state", "value": null, "locations": ["/things/0"]}, {"name": "type", "value": "Chore", "locations": ["/things/0/type"]}]
           }
         ],
         "expressions": {"s": {"c": "one of: safe(type is \"Chore\") | standard(type is \"Story\" and state is \"Done\")"}}
@@ -46,7 +46,7 @@
             "check": "c",
             "passed": false,
             "cause": "value",
-            "inputs": [{"name": "state", "value": "Open"}, {"name": "type", "value": "Story"}]
+            "inputs": [{"name": "state", "value": "Open", "locations": ["/things/0/state"]}, {"name": "type", "value": "Story", "locations": ["/things/0/type"]}]
           }
         ]
       },
@@ -61,7 +61,7 @@
             "check": "c",
             "passed": false,
             "cause": "absent",
-            "inputs": [{"name": "state", "value": "Done"}, {"name": "type", "value": null}]
+            "inputs": [{"name": "state", "value": "Done", "locations": ["/things/0/state"]}, {"name": "type", "value": null, "locations": ["/things/0"]}]
           }
         ]
       }
@@ -90,7 +90,7 @@
         "rules": ["any_of.cause", "present.missing"],
         "input": {"things": [{"id": "t1", "y": 2}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null}, {"name": "y", "value": 2}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}, {"name": "y", "value": 2, "locations": ["/things/0/y"]}]}
         ]
       }
     ]
@@ -133,7 +133,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/things/0/x"
+                ]
               }
             ],
             "passed": true,
@@ -194,7 +197,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/things/0/x"
+                ]
               }
             ],
             "passed": true,
@@ -210,7 +216,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 2
+                "value": 2,
+                "locations": [
+                  "/things/1/x"
+                ]
               }
             ],
             "passed": false,
@@ -265,7 +274,10 @@
             "inputs": [
               {
                 "name": "x",
-                "value": 1
+                "value": 1,
+                "locations": [
+                  "/things/0/x"
+                ]
               }
             ],
             "passed": false,
@@ -275,6 +287,20 @@
               "type": "thing"
             }
           }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a check with several assertions that read the same field",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"assert": ["x exists", "x is 1"]}}}}},
+    "cases": [
+      {
+        "description": "lists the field once, with its location",
+        "rules": ["location.merged"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_assertions": [], "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]

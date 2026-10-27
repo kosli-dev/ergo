@@ -55,7 +55,7 @@ and this is the case:
   "rules": ["present.missing", "path.absent"],
   "input": {"things": [{"id": "t1"}]},
   "results": [
-    {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null}]}
+    {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
   ]
 }
 ```
