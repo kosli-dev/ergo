@@ -5284,6 +5284,66 @@ test_the_applies_row_of_a_from_condition_with_some_lists_the_parent_it_reads if 
 	_applies_of(rep) == [[1, "satisfied", [_owner_input, _owner_authors]]]
 }
 
+_atts_doc := {"artifacts": [{"name": "a1", "owner": "ann", "team": {"lead": "ann"}, "atts": {"x": {"owner": "ann"}, "y": {"owner": "zed"}}, "pull_requests": [{"id": 1, "commits": [{"author": "bob", "k": "x"}, {"author": "zed", "k": "y"}], "files": [{"k": "x"}, {"k": "y"}]}]}]}
+
+_atts_subjects := {"artifact": {"from": "artifacts", "identified_by": "name"}, "pr": {"from": "artifact.pull_requests", "identified_by": "id"}}
+
+_atts_rows(checks, params) := {r.check: [i.name | some i in r.inputs] |
+	some r in ergo.report(_atts_doc, {"ergo_spec": "v0.2-dev", "subjects": _atts_subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, params).results
+	r.check in object.keys(checks)
+}
+
+test_a_walk_whose_named_by_reads_the_item_doesnt_list_the_path_it_names if {
+	_atts_rows({"item": "some commits.author is artifact.atts named by k.owner", "param": "some commits.author is artifact.atts named by $params.n.owner"}, {"n": "x"}) == {
+		"item": ["commits[].author"],
+		"param": ["artifact.atts named by $params.n.owner", "commits[].author"],
+	}
+}
+
+test_a_count_whose_named_by_reads_the_item_doesnt_list_the_path_it_names if {
+	_atts_rows({"c": "count of commits whose author is artifact.atts named by k.owner is 1"}, {}) == {"c": [
+		"count of commits whose author equals artifact.atts named by k.owner",
+		"commits[]",
+	]}
+}
+
+test_a_for_line_walk_named_by_the_item_or_the_alias_doesnt_list_the_path_it_names if {
+	checks := {
+		"item": {"for": "every files as f", "assert": "some commits.author is artifact.atts named by k.owner"},
+		"alias": {"for": "every files as f", "assert": "some commits.author is artifact.atts named by f.k.owner"},
+	}
+	_atts_rows(checks, {}) == {"item": ["commits[].author", "files[]"], "alias": ["commits[].author", "files[]"]}
+}
+
+test_the_applies_row_of_a_from_condition_named_by_the_item_doesnt_list_the_path_it_names if {
+	subjects := object.union(_atts_subjects, {"pr": {"from": "artifact.pull_requests whose some commits.author is artifact.atts named by k.owner", "identified_by": "id"}})
+	rep := ergo.report(_atts_doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": {"c": "id exists"}}}}, {})
+	[[i.name | some i in r.inputs] | some r in rep.results; r.check == "$applies"] == [["commits[].author"]]
+}
+
+test_a_count_under_a_for_line_still_lists_the_parent_it_reads if {
+	checks := {
+		"parent": {"for": "every files as f", "assert": "count of commits whose author is artifact.owner is 1"},
+		"plain": {"for": "every files as f", "assert": "count of commits whose author is \"zed\" is 1"},
+	}
+	_atts_rows(checks, {}) == {
+		"parent": ["artifact.owner", "commits[]", "count of commits whose author equals artifact.owner", "files[]"],
+		"plain": ["commits[]", "count of commits whose author is \"zed\"", "files[]"],
+	}
+}
+
+test_a_count_whose_parents_are_written_in_either_order_lists_them_in_the_same_order if {
+	rows := _atts_rows(
+		{
+			"a": "count of commits whose author is artifact.team.lead and author is artifact.owner is 1",
+			"b": "count of commits whose author is artifact.owner and author is artifact.team.lead is 1",
+		},
+		{},
+	)
+	array.slice(rows.a, 1, 4) == ["commits[]", "artifact.owner", "artifact.team.lead"]
+	array.slice(rows.b, 1, 4) == ["commits[]", "artifact.owner", "artifact.team.lead"]
+}
+
 _kids_doc := {"bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "v": 1}, {"id": "k2", "v": 2}]}]}
 
 _kids_report(from) := ergo.report(_kids_doc, {"ergo_spec": "v0.2-dev", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": from, "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})

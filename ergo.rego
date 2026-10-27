@@ -4532,7 +4532,7 @@ _tally_inputs(subj, side, t) := array.concat(
 		{"name": side.text, "value": object.get(t, "value", null), "locations": t.locations},
 		{"name": t.list, "value": t.values, "locations": t.locations},
 	],
-	_named_inputs(subj, [p | some c in object.get(side, "whose", []); some p in _condition_paths(c)]),
+	_merged_inputs(_named_inputs(subj, [p | some c in object.get(side, "whose", []); some p in _condition_paths(c)])),
 )
 
 _basic_inputs(subj, side) := [_number_input(side.text, _first_or_null([x | x := _basic_value(subj, side)]), [from, to]), from, to] if {
@@ -7023,6 +7023,7 @@ _walk_condition_paths(check) := array.concat([p | some p in _condition_paths(che
 _named_inputs(subj, paths) := [_path_input(subj, shown) |
 	some p in paths
 	_read_off_item(p)
+	not _has_field_step(p)
 	shown := _before_later_names(p)
 ]
 
@@ -7841,7 +7842,7 @@ _for_input_pairs(check, subj, names, item, w) := (((((({object.get(w, "input", _
 }) | {[i.name, i.value, i.locations] |
 	some c in check.checks
 	some side in _derived_sides(c)
-	not _tally_named(side)
+	not _tally_named(check, side)
 	some i in _side_inputs(subj, side)
 }) | {[i.name, i.value, i.locations] |
 	some c in check.checks
@@ -7885,16 +7886,16 @@ _for_inner_pairs(check, subj, names, _, _) := {object.get(iw, "input", [_for_lis
 	iw := _for_walk(check.items[1], subj, names)
 }
 
-_tally_named(side) if {
+_tally_named(check, side) if {
 	some p in _side_paths(side)
-	_for_named(p)
+	_for_alias_path(check, p)
 }
 
-_tally_named(side) if {
+_tally_named(check, side) if {
 	some t in _tally_parts(side)
 	some c in t.whose
 	some p in _condition_paths(c)
-	_for_named(p)
+	_for_alias_path(check, p)
 }
 
 _tally_parts(side) := [side] if _basic_form(side) in {"count_of", "sum_of"}
@@ -7922,17 +7923,6 @@ _before_names(p) := p if {
 _before_later_names(p) := array.slice(p, 0, min(array.concat([count(p)], [j | some j, step in p; j > 0; _name_step(step)])))
 
 _has_name_step(p) if {
-	is_array(p)
-	some step in p
-	_name_step(step)
-}
-
-_for_named(p) if {
-	_off_subject(p)
-	not _builtin(p)
-}
-
-_for_named(p) if {
 	is_array(p)
 	some step in p
 	_name_step(step)
