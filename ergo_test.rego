@@ -9155,9 +9155,9 @@ test_an_applies_row_with_some_it_names_its_failed_items_as_the_check_row_does if
 
 test_a_row_shows_an_input_once_when_the_check_reads_it_twice if {
 	rep := ergo.report({"deployments": [{"id": "d1", "approvals": ["a", "b"]}]}, {"ergo_spec": "v0.2-dev", "subjects": {"deployment": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "deployment", "checks": {"c": "count of approvals plus count of approvals is 4"}}}}, {})
-	[r.inputs | some r in rep.results; r.check == "c"] == [[
-		{"name": "count of approvals plus count of approvals", "value": 4},
-		{"name": "count of approvals", "value": 2},
-		{"name": "approvals[]", "value": ["a", "b"]},
+	[[[i.name, i.value, i.locations] | some i in r.inputs] | some r in rep.results; r.check == "c"] == [[
+		["count of approvals plus count of approvals", 4, ["/deployments/0/approvals/0", "/deployments/0/approvals/1"]],
+		["count of approvals", 2, ["/deployments/0/approvals/0", "/deployments/0/approvals/1"]],
+		["approvals[]", ["a", "b"], ["/deployments/0/approvals/0", "/deployments/0/approvals/1"]],
 	]]
 }
