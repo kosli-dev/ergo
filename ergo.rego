@@ -803,7 +803,7 @@ _tagged_input(i, matches) := object.union(i, {"part": tag}) if {
 
 _tagged_input(i, matches) := i if count(matches) != 1
 
-_check_parts(check, req) := [{"patterns": [_mention_pattern(_steps_name([ms])), _mention_pattern(_steps_name(array.concat([_p_marker(m.alias, -1, m.of, m.old)], steps)))], "name": _tag_name(m), "ms": ms, "steps": steps, "read": read} |
+_check_parts(check, req) := [{"patterns": [_mention_pattern(_steps_name([_p_marker(m.alias, m.n, m.of, false)])), _mention_pattern(_steps_name([ms])), _mention_pattern(_steps_name(array.concat([_p_marker(m.alias, -1, m.of, m.old)], steps)))], "name": _tag_name(m), "ms": ms, "steps": steps, "read": read} |
 	some ms in {x[0] | walk(check, [_, x]); is_array(x); _part_start(x)}
 	m := json.unmarshal(substring(ms, 1, -1))
 	read := data.ergo_subject_sentences.parts[_marker_owner(req, m)][m.alias]
@@ -4530,10 +4530,12 @@ _basic_inputs(subj, side) := _tally_inputs(subj, side, r) if {
 _tally_inputs(subj, side, t) := array.concat(
 	[
 		{"name": side.text, "value": object.get(t, "value", null), "locations": t.locations},
-		{"name": t.list, "value": t.values, "locations": t.locations},
+		_tally_list_input(t),
 	],
 	_merged_inputs(_named_inputs(subj, [p | some c in object.get(side, "whose", []); some p in _condition_paths(c)])),
 )
+
+_tally_list_input(t) := {"name": t.list, "value": t.values, "locations": t.locations}
 
 _basic_inputs(subj, side) := [_number_input(side.text, _first_or_null([x | x := _basic_value(subj, side)]), [from, to]), from, to] if {
 	_basic_form(side) == "elapsed"
@@ -7024,10 +7026,28 @@ _named_inputs(subj, paths) := [_path_input(subj, shown) |
 	some p in paths
 	_read_off_item(p)
 	not _has_field_step(p)
-	shown := _before_later_names(p)
+	shown := _as_subject_part(p)
 ]
 
+_as_subject_part(p) := array.concat([_p_marker(m.alias, m.n, m.of, false)], array.slice(p, 1, count(p))) if {
+	_part_start(p)
+	m := _part_of(p)
+	m.old == true
+}
+
+_as_subject_part(p) := p if not _old_part(p)
+
+_old_part(p) if {
+	_part_start(p)
+	_part_of(p).old == true
+}
+
 _read_off_item(p) if _starts_at_name(p)
+
+_read_off_item(p) if {
+	_part_start(p)
+	_part_of(p).of == null
+}
 
 _read_off_item(p) if p[0] == "$$input"
 
@@ -7827,7 +7847,7 @@ _for_unchecked(inner) := {"failed_items": [{"path": _for_item_name(f.path), "ite
 
 _for_inputs(check, subj, names, item, w) := _merged_inputs([{"name": t[0], "value": t[1], "locations": t[2]} | some t in _for_input_pairs(check, subj, names, item, w)])
 
-_for_input_pairs(check, subj, names, item, w) := (((((({object.get(w, "input", _for_list_input(item, w))} | _for_inner_pairs(check, subj, names, item, w)) | {[_path_name(shown), _value_at(subj, shown), _locations_of(subj, shown)] |
+_for_input_pairs(check, subj, names, item, w) := ((((((({object.get(w, "input", _for_list_input(item, w))} | _for_inner_pairs(check, subj, names, item, w)) | {[_path_name(shown), _value_at(subj, shown), _locations_of(subj, shown)] |
 	some c in check.checks
 	not _walks(c)
 	some p in _leaf_paths(c)
@@ -7844,6 +7864,12 @@ _for_input_pairs(check, subj, names, item, w) := (((((({object.get(w, "input", _
 	some side in _derived_sides(c)
 	not _tally_named(check, side)
 	some i in _side_inputs(subj, side)
+}) | {[i.name, i.value, i.locations] |
+	some c in check.checks
+	some side in _derived_sides(c)
+	_tally_named(check, side)
+	some part in _tally_parts(side)
+	some i in _tally_kept_inputs(check, subj, part)
 }) | {[i.name, i.value, i.locations] |
 	some c in check.checks
 	_walks(c)
@@ -7897,6 +7923,11 @@ _tally_named(check, side) if {
 	some p in _condition_paths(c)
 	_for_alias_path(check, p)
 }
+
+_tally_kept_inputs(check, subj, part) := array.concat(
+	[_tally_list_input(_tally(subj, part)) | not _for_alias_path(check, part[_basic_form(part)])],
+	_merged_inputs(_named_inputs(subj, [p | some c in part.whose; some p in _condition_paths(c); not _for_alias_path(check, p)])),
+)
 
 _tally_parts(side) := [side] if _basic_form(side) in {"count_of", "sum_of"}
 

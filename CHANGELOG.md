@@ -83,7 +83,24 @@ Each release names the version of the spec it follows. The spec's own changes ar
               {"name": "count of approvals", "value": 2, "locations": ["/deployments/0/approvals/0", "/deployments/0/approvals/1"]},
               {"name": "approvals[]", "value": ["a", "b"], "locations": ["/deployments/0/approvals/0", "/deployments/0/approvals/1"]}]}
   ```
-- A one-line `some` or `every`, a `count of` or `sum of`, and the `$applies` row of a `from` condition now list the parent or `$input` value they compare with in `inputs`, as a plain check does. `some commits.author is artifact.owner` used to list only `commits[].author`, and now lists `artifact.owner` too, with where it was read.
+- A one-line `some` or `every`, a `count of` or `sum of`, and the `$applies` row of a `from` condition now list the parent or `$input` value they compare with in `inputs`, as a plain check does. They list the subject's own part they compare with too, with its `part` tag. With the subject `pr`, read from `artifact.pull_requests`, with the part `w: info.who`, the requirement `r` and the input `{"artifacts": [{"id": "a1", "owner": "ann", "pull_requests": [{"id": "p1", "info": {"who": "ann"}, "commits": [{"author": "bob"}, {"author": "ann"}]}]}]}`, the check `owner: some commits.author is artifact.owner` had the row:
+
+  ```json
+  {"check": "owner", "subject": {"id": "p1", "type": "pr", "in": {"artifact": "a1"}}, "passed": true, "cause": "satisfied",
+   "inputs": [{"name": "commits[].author", "value": ["bob", "ann"], "locations": ["/artifacts/0/pull_requests/0/commits/0/author", "/artifacts/0/pull_requests/0/commits/1/author"]}]}
+  ```
+
+  and now has:
+
+  ```json
+  {"check": "owner", "subject": {"id": "p1", "type": "pr", "in": {"artifact": "a1"}}, "passed": true, "cause": "satisfied",
+   "inputs": [{"name": "artifact.owner", "value": "ann", "locations": ["/artifacts/0/owner"]},
+              {"name": "commits[].author", "value": ["bob", "ann"], "locations": ["/artifacts/0/pull_requests/0/commits/0/author", "/artifacts/0/pull_requests/0/commits/1/author"]}]}
+  ```
+
+  The check `who: some commits.author is w` now also lists `{"name": "w", "value": "ann", "part": {"id": null, "name": "w"}, "locations": ["/artifacts/0/pull_requests/0/info/who"]}`, after `commits[].author`.
+
+  Under a `for` line, a `count of` or `sum of` now lists the parent values its `whose` reads, and its own list when that list doesn't start at the alias, like `artifact.tags[]` and `count of artifact.tags` for `count of artifact.tags is at least 1`. A value read through the alias is still never listed.
 
 ### Fixed
 

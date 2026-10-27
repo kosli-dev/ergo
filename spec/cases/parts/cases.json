@@ -1406,6 +1406,21 @@
             ],
             "inputs": [
               {
+                "name": "cov",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
+                "value": {
+                  "n": 2,
+                  "s": "t",
+                  "x": 1
+                },
+                "locations": [
+                  "/rounds/0/d/b"
+                ]
+              },
+              {
                 "name": "lst[].x",
                 "part": {
                   "id": null,
@@ -1586,6 +1601,21 @@
               }
             ],
             "inputs": [
+              {
+                "name": "cov",
+                "part": {
+                  "id": null,
+                  "name": "cov"
+                },
+                "value": {
+                  "n": 2,
+                  "s": "t",
+                  "x": 1
+                },
+                "locations": [
+                  "/rounds/0/d/b"
+                ]
+              },
               {
                 "name": "lst[].x",
                 "part": {

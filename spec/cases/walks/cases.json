@@ -938,7 +938,7 @@
     "policy": {"ergo_spec": "v0.2-dev", "subjects": {"artifact": {"from": "trail.artifacts", "identified_by": "id"}, "release": {"from": "artifact.releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some files.owner is artifact.owner"}}}},
     "cases": [
       {
-        "description": "lists the parent's value after the list it walked, and passes when a file has the parent's owner",
+        "description": "lists the list it walked and the parent's value, sorted by name, and passes when a file has the parent's owner",
         "rules": [
           "sentence.argument.item",
           "sentence.some.walk",
@@ -1184,7 +1184,7 @@
     "policy": {"ergo_spec": "v0.2-dev", "subjects": {"artifact": {"from": "trail.artifacts", "identified_by": "id"}, "release": {"from": "artifact.releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every files.owner is artifact.owner"}}}},
     "cases": [
       {
-        "description": "lists the parent's value after the list it walked, and passes when every file has the parent's owner",
+        "description": "lists the list it walked and the parent's value, sorted by name, and passes when every file has the parent's owner",
         "rules": [
           "sentence.argument.item",
           "sentence.every.walk",
@@ -1543,6 +1543,662 @@
         "expressions": {
           "s": {
             "c": "for every files as f: some f.tags equals artifact.owner"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a one-line some whose parent path is named by the item",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts",
+          "identified_by": "id"
+        },
+        "release": {
+          "from": "artifact.releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "some files.owner is artifact.atts named by k.owner"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "leaves out the path named by the item, since it changes with each item",
+        "rules": [
+          "sentence.argument.item",
+          "sentence.some.walk",
+          "walk.lists",
+          "walk.items",
+          "walk.some",
+          "walk.inputs",
+          "walk.failed_items",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "owner": "ann",
+                "releases": [
+                  {
+                    "id": "r1",
+                    "files": [
+                      {
+                        "owner": "bob",
+                        "k": "y"
+                      },
+                      {
+                        "owner": "ann",
+                        "k": "x"
+                      }
+                    ]
+                  }
+                ],
+                "atts": {
+                  "x": {
+                    "owner": "ann"
+                  },
+                  "y": {
+                    "owner": "zed"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0/owner",
+                  "/trail/artifacts/0/releases/0/files/1/owner"
+                ],
+                "name": "files[].owner",
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "release"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "some files.owner equals artifact.atts named by k.owner"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a one-line some compares with a value of the input",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts",
+          "identified_by": "id"
+        },
+        "release": {
+          "from": "artifact.releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "some files.owner is $input.trail.owner"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the value read from $input once, with where it was read",
+        "rules": [
+          "sentence.argument.item",
+          "sentence.some.walk",
+          "walk.lists",
+          "walk.items",
+          "walk.some",
+          "walk.inputs",
+          "walk.failed_items",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "owner": "ann",
+                "releases": [
+                  {
+                    "id": "r1",
+                    "files": [
+                      {
+                        "owner": "bob"
+                      },
+                      {
+                        "owner": "ann"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "owner": "ann"
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/owner"
+                ],
+                "name": "$input.trail.owner",
+                "value": "ann"
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0/owner",
+                  "/trail/artifacts/0/releases/0/files/1/owner"
+                ],
+                "name": "files[].owner",
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "release"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "some files.owner equals $input.trail.owner"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a one-line some compares with a list of params",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts",
+          "identified_by": "id"
+        },
+        "release": {
+          "from": "artifact.releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "some files.owner is in $params.owners"
+          }
+        }
+      }
+    },
+    "params": {
+      "owners": [
+        "ann",
+        "cid"
+      ]
+    },
+    "cases": [
+      {
+        "description": "keeps the param out of the row's inputs and lists it in the check's $refs",
+        "rules": [
+          "sentence.argument.item",
+          "sentence.some.walk",
+          "walk.lists",
+          "walk.items",
+          "walk.some",
+          "walk.inputs",
+          "walk.failed_items",
+          "sentence.phrase.one_of",
+          "value.refs"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "owner": "ann",
+                "releases": [
+                  {
+                    "id": "r1",
+                    "files": [
+                      {
+                        "owner": "bob"
+                      },
+                      {
+                        "owner": "ann"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0/owner",
+                  "/trail/artifacts/0/releases/0/files/1/owner"
+                ],
+                "name": "files[].owner",
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "release"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "some files.owner is in $params.owners"
+          }
+        },
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/owners"
+                ],
+                "name": "$params.owners",
+                "value": [
+                  "ann",
+                  "cid"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a one-line some compares with the subject's own part",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts",
+          "identified_by": "id"
+        },
+        "release": {
+          "from": "artifact.releases",
+          "identified_by": "id",
+          "has": {
+            "w": "info.who"
+          }
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "some files.owner is w"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the part with its tag, as a plain check does",
+        "rules": [
+          "sentence.argument.item",
+          "sentence.some.walk",
+          "walk.lists",
+          "walk.items",
+          "walk.some",
+          "walk.inputs",
+          "walk.failed_items",
+          "sentence.phrase.is",
+          "parts.tag",
+          "parts.where"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "owner": "ann",
+                "releases": [
+                  {
+                    "id": "r1",
+                    "files": [
+                      {
+                        "owner": "bob"
+                      },
+                      {
+                        "owner": "ann"
+                      }
+                    ],
+                    "info": {
+                      "who": "ann"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0/owner",
+                  "/trail/artifacts/0/releases/0/files/1/owner"
+                ],
+                "name": "files[].owner",
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/info/who"
+                ],
+                "name": "w",
+                "part": {
+                  "id": null,
+                  "name": "w"
+                },
+                "value": "ann"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "release"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "some files.owner equals w"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a one-line some compares with a parent that sorts after the list",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "zart": {
+          "from": "trail.artifacts",
+          "identified_by": "id"
+        },
+        "release": {
+          "from": "zart.releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "some files.owner is zart.owner"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the entries sorted by name, so the parent comes after the list it walked",
+        "rules": [
+          "sentence.argument.item",
+          "sentence.some.walk",
+          "walk.lists",
+          "walk.items",
+          "walk.some",
+          "walk.inputs",
+          "walk.failed_items",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "owner": "ann",
+                "releases": [
+                  {
+                    "id": "r1",
+                    "files": [
+                      {
+                        "owner": "bob"
+                      },
+                      {
+                        "owner": "ann"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0/owner",
+                  "/trail/artifacts/0/releases/0/files/1/owner"
+                ],
+                "name": "files[].owner",
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/owner"
+                ],
+                "name": "zart.owner",
+                "value": "ann"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "in": {
+                "zart": "a1"
+              },
+              "type": "release"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "some files.owner equals zart.owner"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a count of reads a parent's value in its whose, and the parent sorts after the list",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "zart": {
+          "from": "trail.artifacts",
+          "identified_by": "id"
+        },
+        "release": {
+          "from": "zart.releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "count of files whose owner is zart.owner is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the number and the list first, then the parent's value",
+        "rules": [
+          "tally.whose",
+          "tally.inputs",
+          "walk.inputs"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "owner": "ann",
+                "releases": [
+                  {
+                    "id": "r1",
+                    "files": [
+                      {
+                        "owner": "bob"
+                      },
+                      {
+                        "owner": "ann"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0",
+                  "/trail/artifacts/0/releases/0/files/1"
+                ],
+                "name": "count of files whose owner equals zart.owner",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0",
+                  "/trail/artifacts/0/releases/0/files/1"
+                ],
+                "name": "files[]",
+                "value": [
+                  {
+                    "owner": "bob"
+                  },
+                  {
+                    "owner": "ann"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/owner"
+                ],
+                "name": "zart.owner",
+                "value": "ann"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "in": {
+                "zart": "a1"
+              },
+              "type": "release"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "count of files whose owner equals zart.owner is 1"
           }
         }
       }
