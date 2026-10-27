@@ -4802,11 +4802,17 @@ test_a_count_on_a_subject_or_item_that_isnt_an_object_fails_as_not_an_object if 
 	[row[2][0].value | some row in _tally_rows("count of xs.n is 2", [{"id": 1, "xs": [{"n": 1}, {"n": null}]}], {})] == [2]
 }
 
-test_a_count_whose_whose_reads_a_for_name_isnt_shown_in_the_inputs if {
+test_a_count_whose_whose_reads_a_for_name_shows_its_list_and_not_its_number if {
 	rows := _tally_rows({"for": "every prs as pr", "assert": "count of xs whose n is pr.need is at least 1"}, [{"id": 1, "prs": [{"need": 1}, {"need": 2}], "xs": [{"n": 1}, {"n": 2}]}], {})
-	rows == [[1, "satisfied", [{"name": "prs[]", "value": [{"need": 1}, {"need": 2}], "locations": ["/things/0/prs/0", "/things/0/prs/1"]}]]]
+	rows == [[1, "satisfied", [
+		{"name": "prs[]", "value": [{"need": 1}, {"need": 2}], "locations": ["/things/0/prs/0", "/things/0/prs/1"]},
+		{"name": "xs[]", "value": [{"n": 1}, {"n": 2}], "locations": ["/things/0/xs/0", "/things/0/xs/1"]},
+	]]]
 	added := _tally_rows({"for": "every prs as pr", "assert": "1 plus count of xs whose n is pr.need is at least 2"}, [{"id": 1, "prs": [{"need": 1}], "xs": [{"n": 1}]}], {})
-	added == [[1, "satisfied", [{"name": "prs[]", "value": [{"need": 1}], "locations": ["/things/0/prs/0"]}]]]
+	added == [[1, "satisfied", [
+		{"name": "prs[]", "value": [{"need": 1}], "locations": ["/things/0/prs/0"]},
+		{"name": "xs[]", "value": [{"n": 1}], "locations": ["/things/0/xs/0"]},
+	]]]
 }
 
 test_a_count_whose_whose_reads_a_param_it_cant_use_shows_null if {
@@ -5188,6 +5194,246 @@ test_a_check_of_a_chain_reads_the_parent_by_its_name if {
 		["pr/7", "satisfied", [{"name": "artifact.name", "value": "web", "locations": ["/trail/artifacts/web/name"]}, {"name": "url", "value": "pr/7", "locations": ["/trail/artifacts/web/pull_requests/0/url"]}]],
 		["pr/8", "satisfied", [{"name": "artifact.name", "value": "web", "locations": ["/trail/artifacts/web/name"]}, {"name": "url", "value": "pr/8", "locations": ["/trail/artifacts/web/pull_requests/1/url"]}]],
 	]
+}
+
+_owner_doc := {"artifact": {"name": "a1", "owner": "ann", "pull_requests": [{"id": 1, "commits": [{"author": "bob", "n": 1}, {"author": "ann", "n": 2}]}]}}
+
+_owner_subjects := {"artifact": {"identified_by": "name"}, "pr": {"from": "artifact.pull_requests", "identified_by": "id"}}
+
+_owner_input := {"name": "artifact.owner", "value": "ann", "locations": ["/artifact/owner"]}
+
+_owner_authors := {"name": "commits[].author", "value": ["bob", "ann"], "locations": ["/artifact/pull_requests/0/commits/0/author", "/artifact/pull_requests/0/commits/1/author"]}
+
+_owner_rows(checks) := {r.check: r.inputs |
+	some r in ergo.report(_owner_doc, {"ergo_spec": "v0.2-dev", "subjects": _owner_subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {}).results
+	r.check in object.keys(checks)
+}
+
+test_a_one_line_some_or_every_lists_the_parent_it_reads_on_the_right_side if {
+	_owner_rows({"some": "some commits.author is artifact.owner", "every": "every commits.author, if any, is artifact.owner"}) == {
+		"some": [_owner_input, _owner_authors],
+		"every": [_owner_input, _owner_authors],
+	}
+}
+
+test_a_one_line_some_lists_the_parent_its_whose_reads if {
+	_owner_rows({"c": "some commits.n whose author is artifact.owner is 2"}) == {"c": [
+		_owner_input,
+		{"name": "commits[].n", "value": [1, 2], "locations": ["/artifact/pull_requests/0/commits/0/n", "/artifact/pull_requests/0/commits/1/n"]},
+	]}
+}
+
+test_a_count_or_a_sum_lists_the_parent_its_whose_reads if {
+	commits := [{"author": "bob", "n": 1}, {"author": "ann", "n": 2}]
+	at := ["/artifact/pull_requests/0/commits/0", "/artifact/pull_requests/0/commits/1"]
+	ns := ["/artifact/pull_requests/0/commits/0/n", "/artifact/pull_requests/0/commits/1/n"]
+	_owner_rows({"count": "count of commits whose author is artifact.owner is 1", "sum": "sum of commits.n whose author is artifact.owner is 2"}) == {
+		"count": [
+			{"name": "count of commits whose author equals artifact.owner", "value": 1, "locations": at},
+			{"name": "commits[]", "value": commits, "locations": at},
+			_owner_input,
+		],
+		"sum": [
+			{"name": "sum of commits.n whose author equals artifact.owner", "value": 2, "locations": ns},
+			{"name": "commits[].n", "value": [1, 2], "locations": ns},
+			_owner_input,
+		],
+	}
+}
+
+test_a_one_line_some_after_a_for_line_lists_the_parent_it_reads if {
+	commits := {"name": "commits[]", "value": [{"author": "bob", "n": 1}, {"author": "ann", "n": 2}], "locations": ["/artifact/pull_requests/0/commits/0", "/artifact/pull_requests/0/commits/1"]}
+	doc := object.union(_owner_doc, {"artifact": {"tags": ["x", "ann"]}})
+	checks := {
+		"right": {"for": "every commits as c", "assert": "some artifact.tags is c.author"},
+		"left": {"for": "every commits as c", "assert": "c.author is artifact.owner and some artifact.tags is \"x\""},
+	}
+	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": _owner_subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {})
+	tags := {"name": "artifact.tags[]", "value": ["x", "ann"], "locations": ["/artifact/tags/0", "/artifact/tags/1"]}
+	{r.check: r.inputs | some r in rep.results; r.check in {"right", "left"}} == {
+		"right": [tags, commits],
+		"left": [_owner_input, tags, commits],
+	}
+}
+
+test_a_walk_from_a_for_alias_lists_the_parent_it_compares_with if {
+	doc := object.union(_owner_doc, {"artifact": {"pull_requests": [{"id": 1, "commits": [{"author": "bob", "n": 1, "reviewers": ["ann"]}, {"author": "ann", "n": 2, "reviewers": ["cid"]}]}]}})
+	checks := {"c": {"for": "every commits as c", "assert": "some c.reviewers is artifact.owner"}}
+	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": _owner_subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {})
+	[[r.cause, [i.name | some i in r.inputs]] | some r in rep.results; r.check == "c"] == [["value", ["artifact.owner", "commits[]"]]]
+}
+
+test_a_one_line_some_lists_an_input_value_it_compares_with_but_not_a_param if {
+	_owner_rows({"input": "some commits.author is $input.artifact.owner", "param": "some commits.author is $params.owner"}) == {
+		"input": [{"name": "$input.artifact.owner", "value": "ann", "locations": ["/artifact/owner"]}, _owner_authors],
+		"param": [_owner_authors],
+	}
+}
+
+test_a_one_line_some_lists_a_missing_or_null_parent_value_as_a_plain_assertion_does if {
+	doc := object.union(_owner_doc, {"artifact": {"nul": null}})
+	checks := {"missing": "some commits.author is artifact.nope", "null": "some commits.author is artifact.nul"}
+	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": _owner_subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {})
+	{r.check: [r.cause, r.inputs] | some r in rep.results; r.check in {"missing", "null"}} == {
+		"missing": ["absent", [{"name": "artifact.nope", "value": null, "locations": ["/artifact"]}, _owner_authors]],
+		"null": ["null", [{"name": "artifact.nul", "value": null, "locations": ["/artifact/nul"]}, _owner_authors]],
+	}
+}
+
+test_a_parent_read_by_a_walk_and_by_a_plain_assertion_is_listed_once if {
+	_owner_rows({"c": `some commits.author is artifact.owner and artifact.owner is "ann"`}) == {"c": [_owner_input, _owner_authors]}
+}
+
+test_the_applies_row_of_a_from_condition_with_some_lists_the_parent_it_reads if {
+	subjects := object.union(_owner_subjects, {"pr": {"from": "artifact.pull_requests whose some commits.author is artifact.owner", "identified_by": "id"}})
+	rep := ergo.report(_owner_doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": {"c": "id exists"}}}}, {})
+	_applies_of(rep) == [[1, "satisfied", [_owner_input, _owner_authors]]]
+}
+
+test_a_walk_named_by_a_parent_path_lists_the_same_entry_as_the_plain_form if {
+	doc := object.union(_owner_doc, {"artifact": {"key": "k1", "map": {"k1": "ann"}}})
+	checks := {"walk": "some commits.author is artifact.map named by artifact.key", "plain": "author is artifact.map named by artifact.key"}
+	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": _owner_subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {})
+	rows := {r.check: r.inputs | some r in rep.results; r.check in object.keys(checks)}
+	entry := [i | some i in rows.plain; i.name == "artifact.map named by artifact.key"]
+	entry == [i | some i in rows.walk; i.name == "artifact.map named by artifact.key"]
+	count(entry) == 1
+	not "artifact.map" in {i.name | some i in rows.walk}
+}
+
+test_a_count_under_a_for_line_whose_whose_reads_a_parent_lists_it_when_the_path_starts_at_the_alias if {
+	doc := object.union(_owner_doc, {"artifact": {"pull_requests": [{"id": 1, "commits": [{"author": "bob", "revs": [{"n": "ann"}]}, {"author": "ann", "revs": [{"n": "x"}]}]}]}})
+	checks := {"c": {"for": "every commits as c", "assert": "count of c.revs whose n is artifact.owner is at least 1"}}
+	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": _owner_subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {})
+	[[i.name | some i in r.inputs] | some r in rep.results; r.check == "c"] == [["artifact.owner", "commits[]"]]
+}
+
+test_a_count_under_a_for_line_lists_its_list_when_its_whose_reads_the_alias if {
+	doc := object.union(_owner_doc, {"artifact": {"people": [{"r": "ann"}, {"r": "bob"}]}})
+	checks := {"c": {"for": "every commits as c", "assert": "count of artifact.people whose r is c.author is at least 1"}}
+	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": _owner_subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {})
+	[[i.name | some i in r.inputs] | some r in rep.results; r.check == "c"] == [["artifact.people[]", "commits[]"]]
+}
+
+test_a_count_under_a_for_line_lists_its_list_and_its_number_when_they_dont_change_per_item if {
+	doc := object.union(_owner_doc, {"artifact": {"tags": ["t"]}})
+	checks := {"c": {"for": "every commits as c", "assert": "count of artifact.tags is at least 1"}}
+	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": _owner_subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {})
+	[[i.name | some i in r.inputs] | some r in rep.results; r.check == "c"] == [["artifact.tags[]", "commits[]", "count of artifact.tags"]]
+}
+
+_add_rows(assert) := [[i.name | some i in r.inputs] |
+	some r in ergo.report(
+		{"artifacts": [{"name": "a1", "tags": [{"x": "bob"}], "pull_requests": [{"id": 1, "commits": [{"author": "bob", "revs": [1]}]}]}]},
+		{"ergo_spec": "v0.2-dev", "subjects": {"artifact": {"from": "artifacts", "identified_by": "name"}, "pr": {"from": "artifact.pull_requests", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"c": {"for": "every commits as c", "assert": assert}}}}},
+		{},
+	).results
+	r.check == "c"
+]
+
+test_an_add_under_a_for_line_lists_the_number_of_the_operand_that_doesnt_read_the_alias if {
+	_add_rows("count of artifact.tags plus count of artifact.tags whose x is c.author is at least 1") == [["artifact.tags[]", "commits[]", "count of artifact.tags"]]
+}
+
+test_an_add_under_a_for_line_lists_the_number_of_the_second_operand_when_the_first_reads_the_alias_in_its_path if {
+	_add_rows("count of c.revs plus count of artifact.tags is at least 1") == [["artifact.tags[]", "commits[]", "count of artifact.tags"]]
+}
+
+_part_subjects := object.union(_owner_subjects, {"pr": {"from": "artifact.pull_requests", "identified_by": "id", "has": {"w": "info.who"}}})
+
+_part_doc := {"artifact": {"name": "a1", "pull_requests": [{"id": 1, "info": {"who": "ann"}, "commits": [{"author": "bob", "revs": [{"n": "ann"}]}, {"author": "ann", "revs": [{"n": "x"}]}]}]}}
+
+_part_rows(checks) := {r.check: [[i.name, object.get(i, "part", null)] | some i in r.inputs] |
+	some r in ergo.report(_part_doc, {"ergo_spec": "v0.2-dev", "subjects": _part_subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {}).results
+	r.check in object.keys(checks)
+}
+
+test_a_walk_lists_the_subjects_own_part_it_compares_with_as_a_plain_assertion_does if {
+	rows := _part_rows({
+		"walk": "some commits.author is w",
+		"count": "count of commits whose author is w is 1",
+		"for": {"for": "every commits as c", "assert": "some c.revs.n is w"},
+		"forcount": {"for": "every commits as c", "assert": "count of c.revs whose n is w is at least 0"},
+	})
+	own := ["w", {"id": null, "name": "w"}]
+	own in rows.walk
+	own in rows.count
+	own in rows.for
+	own in rows.forcount
+}
+
+test_a_dotted_name_on_the_right_of_a_walk_is_the_items_field_and_isnt_the_subjects_part if {
+	doc := {"artifact": {"name": "a1", "pull_requests": [{"id": 1, "info": {"who": "ann"}, "commits": [{"author": "bob", "w": "ann"}]}]}}
+	checks := {"dot": "some commits.author is .w", "part": "some commits.author is w"}
+	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": _part_subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {})
+	rows := {r.check: [i.name | some i in r.inputs] | some r in rep.results; r.check in object.keys(checks)}
+	rows == {"dot": ["commits[].author"], "part": ["commits[].author", "w"]}
+}
+
+test_the_applies_row_of_a_from_condition_lists_the_subjects_own_part_it_compares_with if {
+	subjects := object.union(_part_subjects, {"pr": {"from": "artifact.pull_requests whose some commits.author is w", "identified_by": "id", "has": {"w": "info.who"}}})
+	rep := ergo.report(_part_doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": {"c": "id is 1"}}}}, {})
+	["w", {"id": null, "name": "w"}] in [[i.name, object.get(i, "part", null)] | some r in rep.results; r.check == "$applies"; some i in r.inputs]
+}
+
+_atts_doc := {"artifacts": [{"name": "a1", "owner": "ann", "team": {"lead": "ann"}, "atts": {"x": {"owner": "ann"}, "y": {"owner": "zed"}}, "pull_requests": [{"id": 1, "commits": [{"author": "bob", "k": "x"}, {"author": "zed", "k": "y"}], "files": [{"k": "x"}, {"k": "y"}]}]}]}
+
+_atts_subjects := {"artifact": {"from": "artifacts", "identified_by": "name"}, "pr": {"from": "artifact.pull_requests", "identified_by": "id"}}
+
+_atts_rows(checks, params) := {r.check: [i.name | some i in r.inputs] |
+	some r in ergo.report(_atts_doc, {"ergo_spec": "v0.2-dev", "subjects": _atts_subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, params).results
+	r.check in object.keys(checks)
+}
+
+test_a_walk_whose_named_by_reads_the_item_doesnt_list_the_path_it_names if {
+	_atts_rows({"item": "some commits.author is artifact.atts named by k.owner", "param": "some commits.author is artifact.atts named by $params.n.owner"}, {"n": "x"}) == {
+		"item": ["commits[].author"],
+		"param": ["artifact.atts named by $params.n.owner", "commits[].author"],
+	}
+}
+
+test_a_count_whose_named_by_reads_the_item_doesnt_list_the_path_it_names if {
+	_atts_rows({"c": "count of commits whose author is artifact.atts named by k.owner is 1"}, {}) == {"c": [
+		"count of commits whose author equals artifact.atts named by k.owner",
+		"commits[]",
+	]}
+}
+
+test_a_for_line_walk_named_by_the_item_or_the_alias_doesnt_list_the_path_it_names if {
+	checks := {
+		"item": {"for": "every files as f", "assert": "some commits.author is artifact.atts named by k.owner"},
+		"alias": {"for": "every files as f", "assert": "some commits.author is artifact.atts named by f.k.owner"},
+	}
+	_atts_rows(checks, {}) == {"item": ["commits[].author", "files[]"], "alias": ["commits[].author", "files[]"]}
+}
+
+test_the_applies_row_of_a_from_condition_named_by_the_item_doesnt_list_the_path_it_names if {
+	subjects := object.union(_atts_subjects, {"pr": {"from": "artifact.pull_requests whose some commits.author is artifact.atts named by k.owner", "identified_by": "id"}})
+	rep := ergo.report(_atts_doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": {"c": "id exists"}}}}, {})
+	[[i.name | some i in r.inputs] | some r in rep.results; r.check == "$applies"] == [["commits[].author"]]
+}
+
+test_a_count_under_a_for_line_still_lists_the_parent_it_reads if {
+	checks := {
+		"parent": {"for": "every files as f", "assert": "count of commits whose author is artifact.owner is 1"},
+		"plain": {"for": "every files as f", "assert": "count of commits whose author is \"zed\" is 1"},
+	}
+	_atts_rows(checks, {}) == {
+		"parent": ["artifact.owner", "commits[]", "count of commits whose author equals artifact.owner", "files[]"],
+		"plain": ["commits[]", "count of commits whose author is \"zed\"", "files[]"],
+	}
+}
+
+test_a_count_whose_parents_are_written_in_either_order_lists_them_in_the_same_order if {
+	rows := _atts_rows(
+		{
+			"a": "count of commits whose author is artifact.team.lead and author is artifact.owner is 1",
+			"b": "count of commits whose author is artifact.owner and author is artifact.team.lead is 1",
+		},
+		{},
+	)
+	array.slice(rows.a, 1, 4) == ["commits[]", "artifact.owner", "artifact.team.lead"]
+	array.slice(rows.b, 1, 4) == ["commits[]", "artifact.owner", "artifact.team.lead"]
 }
 
 _kids_doc := {"bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "v": 1}, {"id": "k2", "v": 2}]}]}
@@ -5662,14 +5908,17 @@ test_a_from_line_named_by_a_bare_word_is_an_unknown_name if {
 	_from_problems(_from_report({"m": {}}, {"x": {"from": "m named by k"}}, {"c": "id exists"}, {})) == [{"name": "subjects.x.from", "value": ["unknown alias k"], "locations": []}]
 }
 
-test_every_and_count_through_a_for_name_arent_listed_as_inputs_since_they_change_with_each_item if {
-	doc := {"things": [{"id": 1, "ps": ["a"], "xs": [{"k": {"a": 1}}], "ys": [{"m": {"a": 1}}]}]}
-	every check in [
-		{"for": "every ps as p", "assert": "every xs.k named by p is 1"},
-		{"for": "every ps as p", "assert": "count of ys whose m named by p is 1 is 1"},
-	] {
-		[[r.cause, r.inputs] | some r in ergo.report(doc, _sentence_policy({"c": check}), {}).results; r.check == "c"] == [["satisfied", [{"name": "ps[]", "value": ["a"], "locations": ["/things/0/ps/0"]}]]]
-	}
+test_every_through_a_for_name_isnt_listed_as_an_input_since_it_changes_with_each_item if {
+	doc := {"things": [{"id": 1, "ps": ["a"], "xs": [{"k": {"a": 1}}]}]}
+	[[r.cause, r.inputs] | some r in ergo.report(doc, _sentence_policy({"c": {"for": "every ps as p", "assert": "every xs.k named by p is 1"}}), {}).results; r.check == "c"] == [["satisfied", [{"name": "ps[]", "value": ["a"], "locations": ["/things/0/ps/0"]}]]]
+}
+
+test_a_count_through_a_for_name_lists_its_list_and_not_its_number_since_that_changes_with_each_item if {
+	doc := {"things": [{"id": 1, "ps": ["a"], "ys": [{"m": {"a": 1}}]}]}
+	[[r.cause, r.inputs] | some r in ergo.report(doc, _sentence_policy({"c": {"for": "every ps as p", "assert": "count of ys whose m named by p is 1 is 1"}}), {}).results; r.check == "c"] == [["satisfied", [
+		{"name": "ps[]", "value": ["a"], "locations": ["/things/0/ps/0"]},
+		{"name": "ys[]", "value": [{"m": {"a": 1}}], "locations": ["/things/0/ys/0"]},
+	]]]
 }
 
 _old_policy := {
