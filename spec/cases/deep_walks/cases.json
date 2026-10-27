@@ -222,5 +222,36 @@
         "expressions": {"s": {"c": "n is at least sum of k1.k2.k3.k4.k5.k6.k7.k8.k9.k10.k11"}}
       }
     ]
+  },
+  {
+    "description": "ten steps after every, starting at a part of nine",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"x": "k1.k2.k3.k4.k5.k6.k7.k8.k9"}}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every x.z is 1"}}}},
+    "cases": [
+      {
+        "description": "reads as written, the part's own path being nine steps and z the tenth, so a subject passes when every z is 1",
+        "rules": ["sentence.walk.steps", "sentence.path.part", "parts.syntax", "parts.swap", "sentence.every.walk", "walk.lists", "walk.failed_items", "walk.inputs", "parts.tag"],
+        "input": {"things": [{"id": "t1", "k1": {"k2": {"k3": {"k4": {"k5": {"k6": {"k7": {"k8": {"k9": {"z": [1, 1]}}}}}}}}}}, {"id": "t2", "k1": {"k2": {"k3": {"k4": {"k5": {"k6": {"k7": {"k8": {"k9": {"z": [1, 2]}}}}}}}}}}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/things/0/k1/k2/k3/k4/k5/k6/k7/k8/k9/z/0", "/things/0/k1/k2/k3/k4/k5/k6/k7/k8/k9/z/1"], "name": "x.z[]", "part": {"id": null, "name": "x"}, "value": [1, 1]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "item": "item 2 of x.z", "locations": ["/things/1/k1/k2/k3/k4/k5/k6/k7/k8/k9/z/1"], "path": "item 2 of x.z", "value": 2}], "inputs": [{"locations": ["/things/1/k1/k2/k3/k4/k5/k6/k7/k8/k9/z/0", "/things/1/k1/k2/k3/k4/k5/k6/k7/k8/k9/z/1"], "name": "x.z[]", "part": {"id": null, "name": "x"}, "value": [1, 2]}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}}
+        ],
+        "expressions": {"s": {"c": "every x.z is 1"}}
+      }
+    ]
+  },
+  {
+    "description": "eleven steps after every, starting at a part of ten",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"x": "k1.k2.k3.k4.k5.k6.k7.k8.k9.k10"}}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every x.z is 1"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, because a walk that starts at a part counts the part's own path, so x.z is eleven steps",
+        "rules": ["sentence.walk.steps", "sentence.path.part", "parts.syntax", "parts.swap", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "k1": {"k2": {"k3": {"k4": {"k5": {"k6": {"k7": {"k8": {"k9": {"k10": {"z": [1, 1]}}}}}}}}}}}, {"id": "t2", "k1": {"k2": {"k3": {"k4": {"k5": {"k6": {"k7": {"k8": {"k9": {"k10": {"z": [1, 2]}}}}}}}}}}}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["every and some over more than ten steps aren't supported yet"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+        ],
+        "expressions": {"s": {"c": "every x.z is 1"}}
+      }
+    ]
   }
 ]

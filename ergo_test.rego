@@ -4537,6 +4537,112 @@ test_params_is_not_a_step_of_a_walk if {
 	_sentence_problems(concat("", ["every $params.", _eleven, " is 1"])) == _too_long
 }
 
+_nine := "k1.k2.k3.k4.k5.k6.k7.k8.k9"
+
+_k9(v) := {"k1": {"k2": {"k3": {"k4": {"k5": {"k6": {"k7": {"k8": {"k9": v}}}}}}}}}
+
+_k10(v) := {"k1": {"k2": {"k3": {"k4": {"k5": {"k6": {"k7": {"k8": {"k9": {"k10": v}}}}}}}}}}
+
+_part_walk_policy(has, checks) := {
+	"ergo_spec": "v0.2-dev",
+	"subjects": {"thing": {"from": "things", "identified_by": "id", "has": has}},
+	"requirements": {"s": {"subject": "thing", "checks": checks}},
+}
+
+_part_walk_rows(has, checks, doc) := [[r.subject.id, r.check, r.cause] | some r in ergo.report(doc, _part_walk_policy(has, checks), {}).results; not startswith(r.check, "$")]
+
+_part_walk_problems(has, check) := [i.value | some i in ergo.report({"things": []}, _part_walk_policy(has, {"c": check}), {}).results[0].inputs; i.name == "checks.c"][0]
+
+_part_walk_reads(has, check) if {
+	some row in ergo.report({"things": []}, _part_walk_policy(has, {"c": check}), {}).results
+	row.check == "$well_formed"
+	row.passed
+}
+
+test_a_walk_through_a_part_counts_the_parts_own_path_so_ten_steps_in_all_read_and_eleven_are_written_wrong if {
+	doc := {"things": [object.union({"id": "a"}, _k9({"z": [1]})), object.union({"id": "b"}, _k9({"z": [2]}))]}
+	_part_walk_rows({"x": _nine}, {"e": "every x.z is 1", "s": "some x.z is 1"}, doc) == [["a", "e", "satisfied"], ["a", "s", "satisfied"], ["b", "e", "value"], ["b", "s", "value"]]
+	_part_walk_problems({"x": _ten}, "every x.z is 1") == _too_long
+	_part_walk_problems({"x": _ten}, "some x.z is 1") == _too_long
+}
+
+test_every_straight_on_a_part_of_ten_steps_reads_and_a_part_of_eleven_is_written_wrong if {
+	doc := {"things": [object.union({"id": "a"}, _k10([1])), object.union({"id": "b"}, _k10([2]))]}
+	_part_walk_rows({"x": _ten}, {"e": "every x is 1"}, doc) == [["a", "e", "satisfied"], ["b", "e", "value"]]
+	_part_walk_problems({"x": _eleven}, "every x is 1") == _too_long
+	_part_walk_problems({"x": _eleven}, "some x is 1") == _too_long
+}
+
+test_a_count_of_or_sum_of_through_a_part_counts_the_parts_path_on_either_side if {
+	doc := {"things": [object.union({"id": "a", "n": 2}, _k9({"z": [1, 1]})), object.union({"id": "b", "n": 1}, _k9({"z": [1, 1]}))]}
+	checks := {"l": "count of x.z is at least 2", "r": "n is count of x.z", "m": "n is at most sum of x.z", "p": "count of x.z plus count of x.z is 4"}
+	[[r[0], r[1], r[2]] | some r in _part_walk_rows({"x": _nine}, checks, doc)] == [
+		["a", "l", "satisfied"], ["a", "m", "satisfied"], ["a", "p", "satisfied"], ["a", "r", "satisfied"],
+		["b", "l", "satisfied"], ["b", "m", "satisfied"], ["b", "p", "satisfied"], ["b", "r", "value"],
+	]
+	has := {"x": _ten}
+	_part_walk_problems(has, "count of x.z is 1") == _too_long
+	_part_walk_problems(has, "sum of x.z is 1") == _too_long
+	_part_walk_problems(has, "n is count of x.z") == _too_long
+	_part_walk_problems(has, "n is at least sum of x.z") == _too_long
+	_part_walk_problems(has, "n is count of k1 plus count of x.z") == _too_long
+	_part_walk_problems(has, "count of x.z plus 1 is 2") == _too_long
+}
+
+test_a_part_on_a_for_line_item_counts_the_parts_path if {
+	doc := {"things": [object.union({"id": "a"}, _k9({"z": [1]})), object.union({"id": "b"}, _k9({"z": [2]}))]}
+	_part_walk_rows({"x": _nine}, {"c": {"for": "every x.z as y", "assert": "y is 1"}}, doc) == [["a", "c", "satisfied"], ["b", "c", "value"]]
+	_part_walk_problems({"x": _ten}, {"for": "every x.z as y", "assert": "y is 1"}) == _too_long
+	_part_walk_problems({"x": _ten}, {"for": "some x.z as y", "assert": "y is 1"}) == _too_long
+	_part_walk_problems({"x": _ten}, {"for": "first of x.z as y", "assert": "y is 1"}) == _too_long
+	_part_walk_problems({"x": _ten}, {"for": "every xs as y", "assert": "y.n is count of x.z"}) == _too_long
+}
+
+test_a_count_or_sum_that_starts_at_a_part_name_inside_a_whose_reads_the_items_field_so_the_part_is_not_counted if {
+	doc := {"things": [object.union({"id": "a", "xs": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 2, "x": {"z": [1, 1, 1]}}]}, _k10({"z": [1]}))]}
+	_part_walk_rows({"x": _ten}, {"c": "every xs.v whose n is count of x.z is 1"}, doc) == [["a", "c", "value"]]
+	has := {"x": _ten}
+	_part_walk_reads(has, "every xs.v whose n is count of x.z is 1")
+	_part_walk_reads(has, "some xs whose n is at most sum of x.z is not empty")
+	_part_walk_reads(has, "count of xs whose n is count of x.z is 1")
+	_part_walk_reads(has, "every xs.v whose count of x.z is 1 is 1")
+	_part_walk_reads({"x": _ten}, "n is 1 and x.z is 1")
+}
+
+test_a_part_in_an_option_of_an_any_of_counts_the_parts_path if {
+	has := {"x": _ten}
+	_part_walk_problems(has, {"any_of": {"a": "every x.z is 1", "b": "n is 1"}}) == ["option a: every and some over more than ten steps aren't supported yet"]
+	_part_walk_reads({"x": _nine}, {"any_of": {"a": "every x.z is 1", "b": "n is 1"}})
+}
+
+test_a_part_in_the_whose_of_a_from_line_counts_the_parts_path if {
+	doc := {"things": [object.union({"id": "a", "n": 1}, _k9({"z": [1]})), object.union({"id": "b", "n": 2}, _k9({"z": [1]}))]}
+	reads := _from_report(doc, {"s": {"from": "things whose n is count of x.z", "identified_by": "id", "has": {"x": _nine}}}, {"c": "id exists"}, {})
+	_from_problems(reads) == []
+	[[r.subject.id, r.cause] | some r in reads.results; r.check == "$applies"] == [["a", "satisfied"], ["b", "value"]]
+	wrong := _from_report(doc, {"s": {"from": "things whose n is count of x.z", "identified_by": "id", "has": {"x": _ten}}}, {"c": "id exists"}, {})
+	_from_problems(wrong) == [{"name": "subjects.s.from", "value": ["whose: every and some over more than ten steps aren't supported yet"], "locations": []}]
+}
+
+test_a_part_used_in_a_path_that_is_not_a_walk_is_never_held_to_ten_steps if {
+	doc := {"things": [object.union({"id": "a"}, _k10({"z": 1}))]}
+	_part_walk_rows({"x": _ten}, {"c": "x.z is 1", "d": "x exists", "e": "x.z is at least 1"}, doc) == [["a", "c", "satisfied"], ["a", "d", "satisfied"], ["a", "e", "satisfied"]]
+	_part_walk_reads({"x": _eleven}, "x.z is 1")
+}
+
+_parent_part_policy(has, check) := {
+	"ergo_spec": "v0.2-dev",
+	"subjects": {"b": {"from": "bs", "identified_by": "id", "has": has}, "kid": {"from": "b.kids", "identified_by": "id"}},
+	"requirements": {"r": {"subject": "kid", "checks": {"c": check}}},
+}
+
+test_a_walk_through_a_part_of_the_parent_counts_the_parts_path if {
+	doc := {"bs": [{"id": "b1", "kids": [{"id": "k1"}], "k1": {"k2": {"k3": {"k4": {"k5": {"k6": {"k7": {"k8": {"k9": {"z": [1]}}}}}}}}}}]}
+	[r.cause | some r in ergo.report(doc, _parent_part_policy({"x": _nine}, "every b.x.z is 1"), {}).results; r.check == "c"] == ["satisfied"]
+	wrong := ergo.report(doc, _parent_part_policy({"x": _ten}, "every b.x.z is 1"), {})
+	[i.value | some r in wrong.results; r.check == "$well_formed"; some i in r.inputs; i.name == "checks.c"] == [_too_long]
+}
+
 test_a_walk_whose_named_by_cant_be_read_shows_an_empty_list_in_its_inputs if {
 	r := ergo.report({"things": [{"id": "a", "xs": {"k": [1]}}]}, _sentence_policy({"c": "every xs named by $params.k is 1"}), {})
 	[[row.cause, row.inputs, row.failed_items] | some row in r.results; row.check == "c"] == [["absent", [{"name": "xs named by $params.k", "value": [], "locations": []}], []]]
