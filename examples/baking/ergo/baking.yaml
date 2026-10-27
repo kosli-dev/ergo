@@ -1,5 +1,5 @@
 baking:
-  ergo_spec: v0.2-dev
+  ergo_spec: v0.2
   subjects:
     batch:
       from: batches
