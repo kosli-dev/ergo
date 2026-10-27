@@ -191,6 +191,11 @@ has site/prepared/examples/demo/demo.rego.txt
 lacks site/prepared/assets
 has site/assets/tutorial/ergo.wasm
 
+printf 'package ergo\n\nversion := "0.3.0-dev"\n\n_spec := "v0.3"\n' > ergo.rego
+site/prepare.sh --working-tree > /dev/null
+says site/prepared/data/release.json '{"source": "working tree", "rego": "", "spec": "0.1", "ergo_spec": "v0.3"}'
+printf 'package ergo\n\nversion := "0.2.0-dev"\n\n_spec := "v0.2-dev"\n' > ergo.rego
+
 (expected="usage: site/prepare.sh [--working-tree]"; fails --release)
 (FAKE_RELEASES="rego-v1.0.0-rc1 rego-vlatest spec-v0.1"; expected="kosli-dev/ergo has no published rego-vX.Y.Z release"; fails)
 (FAKE_RELEASES="rego-v0.4.0 spec-v0.1"; expected="There's no rego-v0.4.0 tag here. Fetch the tags with: git fetch --tags"; fails)
