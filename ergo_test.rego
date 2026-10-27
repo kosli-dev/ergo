@@ -5190,6 +5190,100 @@ test_a_check_of_a_chain_reads_the_parent_by_its_name if {
 	]
 }
 
+_owner_doc := {"artifact": {"name": "a1", "owner": "ann", "pull_requests": [{"id": 1, "commits": [{"author": "bob", "n": 1}, {"author": "ann", "n": 2}]}]}}
+
+_owner_subjects := {"artifact": {"identified_by": "name"}, "pr": {"from": "artifact.pull_requests", "identified_by": "id"}}
+
+_owner_input := {"name": "artifact.owner", "value": "ann", "locations": ["/artifact/owner"]}
+
+_owner_authors := {"name": "commits[].author", "value": ["bob", "ann"], "locations": ["/artifact/pull_requests/0/commits/0/author", "/artifact/pull_requests/0/commits/1/author"]}
+
+_owner_rows(checks) := {r.check: r.inputs |
+	some r in ergo.report(_owner_doc, {"ergo_spec": "v0.2-dev", "subjects": _owner_subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {}).results
+	r.check in object.keys(checks)
+}
+
+test_a_one_line_some_or_every_lists_the_parent_it_reads_on_the_right_side if {
+	_owner_rows({"some": "some commits.author is artifact.owner", "every": "every commits.author, if any, is artifact.owner"}) == {
+		"some": [_owner_input, _owner_authors],
+		"every": [_owner_input, _owner_authors],
+	}
+}
+
+test_a_one_line_some_lists_the_parent_its_whose_reads if {
+	_owner_rows({"c": "some commits.n whose author is artifact.owner is 2"}) == {"c": [
+		_owner_input,
+		{"name": "commits[].n", "value": [1, 2], "locations": ["/artifact/pull_requests/0/commits/0/n", "/artifact/pull_requests/0/commits/1/n"]},
+	]}
+}
+
+test_a_count_or_a_sum_lists_the_parent_its_whose_reads if {
+	commits := [{"author": "bob", "n": 1}, {"author": "ann", "n": 2}]
+	at := ["/artifact/pull_requests/0/commits/0", "/artifact/pull_requests/0/commits/1"]
+	ns := ["/artifact/pull_requests/0/commits/0/n", "/artifact/pull_requests/0/commits/1/n"]
+	_owner_rows({"count": "count of commits whose author is artifact.owner is 1", "sum": "sum of commits.n whose author is artifact.owner is 2"}) == {
+		"count": [
+			{"name": "count of commits whose author equals artifact.owner", "value": 1, "locations": at},
+			{"name": "commits[]", "value": commits, "locations": at},
+			_owner_input,
+		],
+		"sum": [
+			{"name": "sum of commits.n whose author equals artifact.owner", "value": 2, "locations": ns},
+			{"name": "commits[].n", "value": [1, 2], "locations": ns},
+			_owner_input,
+		],
+	}
+}
+
+test_a_one_line_some_after_a_for_line_lists_the_parent_it_reads if {
+	commits := {"name": "commits[]", "value": [{"author": "bob", "n": 1}, {"author": "ann", "n": 2}], "locations": ["/artifact/pull_requests/0/commits/0", "/artifact/pull_requests/0/commits/1"]}
+	doc := json.patch(_owner_doc, [{"op": "add", "path": "/artifact/tags", "value": ["x", "ann"]}])
+	checks := {
+		"right": {"for": "every commits as c", "assert": "some artifact.tags is c.author"},
+		"left": {"for": "every commits as c", "assert": "c.author is artifact.owner and some artifact.tags is \"x\""},
+	}
+	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": _owner_subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {})
+	tags := {"name": "artifact.tags[]", "value": ["x", "ann"], "locations": ["/artifact/tags/0", "/artifact/tags/1"]}
+	{r.check: r.inputs | some r in rep.results; r.check in {"right", "left"}} == {
+		"right": [tags, commits],
+		"left": [_owner_input, tags, commits],
+	}
+}
+
+test_a_walk_from_a_for_alias_lists_the_parent_it_compares_with if {
+	doc := json.patch(_owner_doc, [{"op": "add", "path": "/artifact/pull_requests/0/commits/0/reviewers", "value": ["ann"]}, {"op": "add", "path": "/artifact/pull_requests/0/commits/1/reviewers", "value": ["cid"]}])
+	checks := {"c": {"for": "every commits as c", "assert": "some c.reviewers is artifact.owner"}}
+	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": _owner_subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {})
+	[[r.cause, [i.name | some i in r.inputs]] | some r in rep.results; r.check == "c"] == [["value", ["artifact.owner", "commits[]"]]]
+}
+
+test_a_one_line_some_lists_an_input_value_it_compares_with_but_not_a_param if {
+	_owner_rows({"input": "some commits.author is $input.artifact.owner", "param": "some commits.author is $params.owner"}) == {
+		"input": [{"name": "$input.artifact.owner", "value": "ann", "locations": ["/artifact/owner"]}, _owner_authors],
+		"param": [_owner_authors],
+	}
+}
+
+test_a_one_line_some_lists_a_missing_or_null_parent_value_as_a_plain_assertion_does if {
+	doc := json.patch(_owner_doc, [{"op": "add", "path": "/artifact/nul", "value": null}])
+	checks := {"missing": "some commits.author is artifact.nope", "null": "some commits.author is artifact.nul"}
+	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": _owner_subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {})
+	{r.check: [r.cause, r.inputs] | some r in rep.results; r.check in {"missing", "null"}} == {
+		"missing": ["absent", [{"name": "artifact.nope", "value": null, "locations": ["/artifact"]}, _owner_authors]],
+		"null": ["null", [{"name": "artifact.nul", "value": null, "locations": ["/artifact/nul"]}, _owner_authors]],
+	}
+}
+
+test_a_parent_read_by_a_walk_and_by_a_plain_assertion_is_listed_once if {
+	_owner_rows({"c": `some commits.author is artifact.owner and artifact.owner is "ann"`}) == {"c": [_owner_input, _owner_authors]}
+}
+
+test_the_applies_row_of_a_from_condition_with_some_lists_the_parent_it_reads if {
+	subjects := object.union(_owner_subjects, {"pr": {"from": "artifact.pull_requests whose some commits.author is artifact.owner", "identified_by": "id"}})
+	rep := ergo.report(_owner_doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": {"c": "id exists"}}}}, {})
+	_applies_of(rep) == [[1, "satisfied", [_owner_input, _owner_authors]]]
+}
+
 _kids_doc := {"bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "v": 1}, {"id": "k2", "v": 2}]}]}
 
 _kids_report(from) := ergo.report(_kids_doc, {"ergo_spec": "v0.2-dev", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": from, "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})

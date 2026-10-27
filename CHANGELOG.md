@@ -83,6 +83,7 @@ Each release names the version of the spec it follows. The spec's own changes ar
               {"name": "count of approvals", "value": 2, "locations": ["/deployments/0/approvals/0", "/deployments/0/approvals/1"]},
               {"name": "approvals[]", "value": ["a", "b"], "locations": ["/deployments/0/approvals/0", "/deployments/0/approvals/1"]}]}
   ```
+- A one-line `some` or `every`, a `count of` or `sum of`, and the `$applies` row of a `from` condition now list the parent or `$input` value they compare with in `inputs`, as a plain check does. `some commits.author is artifact.owner` used to list only `commits[].author`, and now lists `artifact.owner` too, with where it was read.
 
 ### Fixed
 

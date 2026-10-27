@@ -3477,6 +3477,13 @@
             "failed_items": [],
             "inputs": [
               {
+                "name": "artifact.owner",
+                "value": "ann",
+                "locations": [
+                  "/trail/artifacts/0/owner"
+                ]
+              },
+              {
                 "name": "files[].owner",
                 "value": [
                   "ann"
@@ -3511,6 +3518,13 @@
               }
             ],
             "inputs": [
+              {
+                "name": "artifact.owner",
+                "value": "ann",
+                "locations": [
+                  "/trail/artifacts/0/owner"
+                ]
+              },
               {
                 "name": "files[].owner",
                 "value": [

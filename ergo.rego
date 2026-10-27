@@ -920,7 +920,7 @@ _basic_eval(subj, side) := {"v": v, "found": [x | x := _simple_found(subj, side)
 
 _basic_eval(subj, side) := {"v": [_written(side)], "found": [x | x := _simple_found(subj, side)], "states": set(), "inputs": []} if _basic_form(side) == "literal"
 
-_basic_eval(subj, side) := {"v": v, "found": v, "states": t.states, "inputs": _tally_inputs(side, t)} if {
+_basic_eval(subj, side) := {"v": v, "found": v, "states": t.states, "inputs": _tally_inputs(subj, side, t)} if {
 	_basic_form(side) in {"count_of", "sum_of"}
 	t := _tally(subj, side)
 	v := [x | x := t.value]
@@ -4522,15 +4522,18 @@ _basic_inputs(subj, side) := [_path_input(subj, side)] if _basic_form(side) == "
 
 _basic_inputs(_, side) := [] if _basic_form(side) == "literal"
 
-_basic_inputs(subj, side) := _tally_inputs(side, r) if {
+_basic_inputs(subj, side) := _tally_inputs(subj, side, r) if {
 	_basic_form(side) in {"count_of", "sum_of"}
 	r := _tally(subj, side)
 }
 
-_tally_inputs(side, t) := [
-	{"name": side.text, "value": object.get(t, "value", null), "locations": t.locations},
-	{"name": t.list, "value": t.values, "locations": t.locations},
-]
+_tally_inputs(subj, side, t) := array.concat(
+	[
+		{"name": side.text, "value": object.get(t, "value", null), "locations": t.locations},
+		{"name": t.list, "value": t.values, "locations": t.locations},
+	],
+	_named_inputs(subj, [p | some c in object.get(side, "whose", []); some p in _condition_paths(c)]),
+)
 
 _basic_inputs(subj, side) := [_number_input(side.text, _first_or_null([x | x := _basic_value(subj, side)]), [from, to]), from, to] if {
 	_basic_form(side) == "elapsed"
@@ -7000,7 +7003,7 @@ _walk_flawed(check) if _param_broken(check, set())
 
 _walk_flawed(_) if _unreadable_input
 
-_walk_read_row(check, subj) := {"cause": state, "inputs": [{"name": _path_name(check.path), "value": [], "locations": []}], "failed": []} if {
+_walk_read_row(check, subj) := {"cause": state, "inputs": _merged_inputs(array.concat([{"name": _path_name(check.path), "value": [], "locations": []}], _named_inputs(subj, _walk_condition_paths(check)))), "failed": []} if {
 	state := _read_state(subj, check.path)
 	not _walk_keys(check, subj)
 }
@@ -7012,8 +7015,20 @@ _walk_read_row(check, subj) := {"cause": cause, "inputs": inputs, "failed": fail
 	fails := array.concat(array.concat(w.fails, [j.failure | some j in judged; j.failure != null]), _walk_stop(w))
 	cause := _walk_cause(check, w, judged, fails)
 	failed := _walk_failed(cause, fails)
-	inputs := _walk_inputs(check, w)
+	inputs := _merged_inputs(array.concat(_walk_inputs(check, w), _named_inputs(subj, _walk_condition_paths(check))))
 }
+
+_walk_condition_paths(check) := array.concat([p | some p in _condition_paths(check.check)], [p | some c in check.whose; some p in _condition_paths(c)])
+
+_named_inputs(subj, paths) := [_path_input(subj, shown) |
+	some p in paths
+	_read_off_item(p)
+	shown := _before_later_names(p)
+]
+
+_read_off_item(p) if _starts_at_name(p)
+
+_read_off_item(p) if p[0] == "$$input"
 
 _walk_keys(check, subj) := ks if {
 	_ := _start_of(subj, check.path)
@@ -7811,7 +7826,7 @@ _for_unchecked(inner) := {"failed_items": [{"path": _for_item_name(f.path), "ite
 
 _for_inputs(check, subj, names, item, w) := _merged_inputs([{"name": t[0], "value": t[1], "locations": t[2]} | some t in _for_input_pairs(check, subj, names, item, w)])
 
-_for_input_pairs(check, subj, names, item, w) := ((((({object.get(w, "input", _for_list_input(item, w))} | _for_inner_pairs(check, subj, names, item, w)) | {[_path_name(shown), _value_at(subj, shown), _locations_of(subj, shown)] |
+_for_input_pairs(check, subj, names, item, w) := (((((({object.get(w, "input", _for_list_input(item, w))} | _for_inner_pairs(check, subj, names, item, w)) | {[_path_name(shown), _value_at(subj, shown), _locations_of(subj, shown)] |
 	some c in check.checks
 	not _walks(c)
 	some p in _leaf_paths(c)
@@ -7831,11 +7846,21 @@ _for_input_pairs(check, subj, names, item, w) := ((((({object.get(w, "input", _f
 }) | {[i.name, i.value, i.locations] |
 	some c in check.checks
 	_walks(c)
-	not _for_named(c.path)
+	not _for_alias_path(check, c.path)
 	some i in _walk_read_row(c, subj).inputs
+	not i in _named_inputs(subj, [p | some p in _walk_condition_paths(c); _for_alias_path(check, p)])
+}) | {[i.name, i.value, i.locations] |
+	some c in check.checks
+	_walks(c)
+	_for_alias_path(check, c.path)
+	some i in _named_inputs(subj, [p | some p in _walk_condition_paths(c); not _for_alias_path(check, p)])
 }) | {[_path_name([f]), _value_at(subj, [f]), _locations_of(subj, [f])] |
 	some f in _for_key_fields(check)
 }
+
+_for_alias_path(check, p) if p[0] in {concat("", ["$", item.as]) | some item in check.items}
+
+_for_alias_path(_, p) if _has_name_step(p)
 
 _for_key_fields(check) := {seg.named_by_field |
 	some item in check.items
