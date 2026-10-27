@@ -1591,7 +1591,7 @@
     },
     "cases": [
       {
-        "description": "leaves out the path named by the item, since it changes with each item",
+        "description": "lists the part before the name, and leaves out the path named by the item, since it changes with each item",
         "rules": [
           "sentence.argument.item",
           "sentence.some.walk",
@@ -1641,6 +1641,20 @@
             "check": "c",
             "failed_items": [],
             "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/atts"
+                ],
+                "name": "artifact.atts",
+                "value": {
+                  "x": {
+                    "owner": "ann"
+                  },
+                  "y": {
+                    "owner": "zed"
+                  }
+                }
+              },
               {
                 "locations": [
                   "/trail/artifacts/0/releases/0/files/0/owner",
@@ -2379,6 +2393,857 @@
           "s": {
             "some": "for every keys as k: some artifact.map named by k is at least 1",
             "count": "for every keys as k: count of artifact.map named by k is at least 1"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a walk through a for name, read from a parent on its right side",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts",
+          "identified_by": "id"
+        },
+        "pr": {
+          "from": "artifact.prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pr",
+          "checks": {
+            "walk": {
+              "for": "every keys as k",
+              "assert": "some rows.n is at least artifact.nums named by k"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the parent through the name for each item, and lists the parent once",
+        "rules": [
+          "for.inputs",
+          "for.pass",
+          "walk.inputs",
+          "walk.some",
+          "sentence.some.walk"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "prs": [
+                  {
+                    "id": "p1",
+                    "keys": [
+                      "k1",
+                      "k2"
+                    ],
+                    "rows": [
+                      {
+                        "n": 1
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
+                "nums": {
+                  "k1": 1,
+                  "k2": 2
+                }
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "walk",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/nums"
+                ],
+                "name": "artifact.nums",
+                "value": {
+                  "k1": 1,
+                  "k2": 2
+                }
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0",
+                  "/trail/artifacts/0/prs/0/keys/1"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "k1",
+                  "k2"
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/0/n",
+                  "/trail/artifacts/0/prs/0/rows/1/n"
+                ],
+                "name": "rows[].n",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "walk": "for every keys as k: some rows.n is at least artifact.nums named by k"
+          }
+        }
+      },
+      {
+        "description": "fails as absent for a name the parent doesn't have",
+        "rules": [
+          "for.inputs",
+          "for.pass",
+          "walk.some",
+          "sentence.some.walk"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "prs": [
+                  {
+                    "id": "p1",
+                    "keys": [
+                      "k1",
+                      "k2"
+                    ],
+                    "rows": [
+                      {
+                        "n": 1
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
+                "nums": {
+                  "k1": 1
+                }
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "walk",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "some rows.n is at least artifact.nums named by k",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/nums"
+                        ],
+                        "name": "artifact.nums named by k",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/prs/0/rows/0/n",
+                          "/trail/artifacts/0/prs/0/rows/1/n"
+                        ],
+                        "name": "rows[].n",
+                        "value": [
+                          1,
+                          2
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of keys",
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/1"
+                ],
+                "path": "item 2 of keys",
+                "value": "k2"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/nums"
+                ],
+                "name": "artifact.nums",
+                "value": {
+                  "k1": 1
+                }
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0",
+                  "/trail/artifacts/0/prs/0/keys/1"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "k1",
+                  "k2"
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/0/n",
+                  "/trail/artifacts/0/prs/0/rows/1/n"
+                ],
+                "name": "rows[].n",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "walk": "for every keys as k: some rows.n is at least artifact.nums named by k"
+          }
+        }
+      },
+      {
+        "description": "fails as null for a name that is null",
+        "rules": [
+          "for.inputs",
+          "for.pass",
+          "walk.some",
+          "sentence.some.walk"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "prs": [
+                  {
+                    "id": "p1",
+                    "keys": [
+                      "k1",
+                      null
+                    ],
+                    "rows": [
+                      {
+                        "n": 1
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
+                "nums": {
+                  "k1": 1
+                }
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "walk",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [
+                  {
+                    "assertion": "some rows.n is at least artifact.nums named by k",
+                    "cause": "null",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/nums"
+                        ],
+                        "name": "artifact.nums named by k",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/prs/0/rows/0/n",
+                          "/trail/artifacts/0/prs/0/rows/1/n"
+                        ],
+                        "name": "rows[].n",
+                        "value": [
+                          1,
+                          2
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of keys",
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/1"
+                ],
+                "path": "item 2 of keys",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/nums"
+                ],
+                "name": "artifact.nums",
+                "value": {
+                  "k1": 1
+                }
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0",
+                  "/trail/artifacts/0/prs/0/keys/1"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "k1",
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/0/n",
+                  "/trail/artifacts/0/prs/0/rows/1/n"
+                ],
+                "name": "rows[].n",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "walk": "for every keys as k: some rows.n is at least artifact.nums named by k"
+          }
+        }
+      },
+      {
+        "description": "fails as unusable for a value that can't be compared",
+        "rules": [
+          "for.inputs",
+          "for.pass",
+          "walk.some",
+          "sentence.some.walk"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "prs": [
+                  {
+                    "id": "p1",
+                    "keys": [
+                      "k1"
+                    ],
+                    "rows": [
+                      {
+                        "n": 1
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
+                "nums": {
+                  "k1": "a"
+                }
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "walk",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "some rows.n is at least artifact.nums named by k",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/nums/k1"
+                        ],
+                        "name": "artifact.nums named by k",
+                        "value": "a"
+                      },
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/prs/0/rows/0/n",
+                          "/trail/artifacts/0/prs/0/rows/1/n"
+                        ],
+                        "name": "rows[].n",
+                        "value": [
+                          1,
+                          2
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of keys",
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0"
+                ],
+                "path": "item 1 of keys",
+                "value": "k1"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/nums"
+                ],
+                "name": "artifact.nums",
+                "value": {
+                  "k1": "a"
+                }
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "k1"
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/0/n",
+                  "/trail/artifacts/0/prs/0/rows/1/n"
+                ],
+                "name": "rows[].n",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "walk": "for every keys as k: some rows.n is at least artifact.nums named by k"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a walk whose parent path is named by a field of each item",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts",
+          "identified_by": "id"
+        },
+        "pr": {
+          "from": "artifact.prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pr",
+          "checks": {
+            "plain": "some rows.n is at least artifact.nums named by key",
+            "for": {
+              "for": "every keys as k",
+              "assert": "some rows.n is at least artifact.nums named by key"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the part before the name and not the path it names, which changes with each item",
+        "rules": [
+          "walk.inputs",
+          "for.inputs",
+          "sentence.some.walk",
+          "sentence.argument.item"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "nums": {
+                  "a": 1,
+                  "b": 2
+                },
+                "prs": [
+                  {
+                    "id": "p1",
+                    "keys": [
+                      "k1"
+                    ],
+                    "rows": [
+                      {
+                        "key": "a",
+                        "n": 1
+                      },
+                      {
+                        "key": "b",
+                        "n": 2
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "for",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/nums"
+                ],
+                "name": "artifact.nums",
+                "value": {
+                  "a": 1,
+                  "b": 2
+                }
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "k1"
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/0/n",
+                  "/trail/artifacts/0/prs/0/rows/1/n"
+                ],
+                "name": "rows[].n",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "plain",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/nums"
+                ],
+                "name": "artifact.nums",
+                "value": {
+                  "a": 1,
+                  "b": 2
+                }
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/0/n",
+                  "/trail/artifacts/0/prs/0/rows/1/n"
+                ],
+                "name": "rows[].n",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "plain": "some rows.n is at least artifact.nums named by key",
+            "for": "for every keys as k: some rows.n is at least artifact.nums named by key"
+          }
+        }
+      },
+      {
+        "description": "fails as absent when the parent has none of the names",
+        "rules": [
+          "walk.inputs",
+          "for.inputs",
+          "sentence.some.walk",
+          "sentence.argument.item"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "nums": {
+                  "z": 1
+                },
+                "prs": [
+                  {
+                    "id": "p1",
+                    "keys": [
+                      "k1"
+                    ],
+                    "rows": [
+                      {
+                        "key": "a",
+                        "n": 1
+                      },
+                      {
+                        "key": "b",
+                        "n": 2
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "for",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "some rows.n is at least artifact.nums named by key",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/nums"
+                        ],
+                        "name": "artifact.nums",
+                        "value": {
+                          "z": 1
+                        }
+                      },
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/prs/0/rows/0/n",
+                          "/trail/artifacts/0/prs/0/rows/1/n"
+                        ],
+                        "name": "rows[].n",
+                        "value": [
+                          1,
+                          2
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of keys",
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0"
+                ],
+                "path": "item 1 of keys",
+                "value": "k1"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/nums"
+                ],
+                "name": "artifact.nums",
+                "value": {
+                  "z": 1
+                }
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "k1"
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/0/n",
+                  "/trail/artifacts/0/prs/0/rows/1/n"
+                ],
+                "name": "rows[].n",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "plain",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "item 1 of rows",
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/0/n"
+                ],
+                "path": "rows[0].n",
+                "value": 1
+              },
+              {
+                "cause": "absent",
+                "item": "item 2 of rows",
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/1/n"
+                ],
+                "path": "rows[1].n",
+                "value": 2
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/nums"
+                ],
+                "name": "artifact.nums",
+                "value": {
+                  "z": 1
+                }
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/0/n",
+                  "/trail/artifacts/0/prs/0/rows/1/n"
+                ],
+                "name": "rows[].n",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "plain": "some rows.n is at least artifact.nums named by key",
+            "for": "for every keys as k: some rows.n is at least artifact.nums named by key"
           }
         }
       }

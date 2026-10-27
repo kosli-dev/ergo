@@ -5395,9 +5395,9 @@ _atts_rows(checks, params) := {r.check: [i.name | some i in r.inputs] |
 	r.check in object.keys(checks)
 }
 
-test_a_walk_whose_named_by_reads_the_item_doesnt_list_the_path_it_names if {
+test_a_walk_whose_named_by_reads_the_item_lists_the_part_before_the_name_and_not_the_path_it_names if {
 	_atts_rows({"item": "some commits.author is artifact.atts named by k.owner", "param": "some commits.author is artifact.atts named by $params.n.owner"}, {"n": "x"}) == {
-		"item": ["commits[].author"],
+		"item": ["artifact.atts", "commits[].author"],
 		"param": ["artifact.atts named by $params.n.owner", "commits[].author"],
 	}
 }
@@ -5409,18 +5409,18 @@ test_a_count_whose_named_by_reads_the_item_doesnt_list_the_path_it_names if {
 	]}
 }
 
-test_a_for_line_walk_named_by_the_item_or_the_alias_doesnt_list_the_path_it_names if {
+test_a_for_line_walk_named_by_the_item_or_the_alias_lists_the_part_before_the_name_and_not_the_path_it_names if {
 	checks := {
 		"item": {"for": "every files as f", "assert": "some commits.author is artifact.atts named by k.owner"},
 		"alias": {"for": "every files as f", "assert": "some commits.author is artifact.atts named by f.k.owner"},
 	}
-	_atts_rows(checks, {}) == {"item": ["commits[].author", "files[]"], "alias": ["commits[].author", "files[]"]}
+	_atts_rows(checks, {}) == {"item": ["artifact.atts", "commits[].author", "files[]"], "alias": ["artifact.atts", "commits[].author", "files[]"]}
 }
 
-test_the_applies_row_of_a_from_condition_named_by_the_item_doesnt_list_the_path_it_names if {
+test_the_applies_row_of_a_from_condition_named_by_the_item_lists_the_part_before_the_name_and_not_the_path_it_names if {
 	subjects := object.union(_atts_subjects, {"pr": {"from": "artifact.pull_requests whose some commits.author is artifact.atts named by k.owner", "identified_by": "id"}})
 	rep := ergo.report(_atts_doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": {"c": "id exists"}}}}, {})
-	[[i.name | some i in r.inputs] | some r in rep.results; r.check == "$applies"] == [["commits[].author"]]
+	[[i.name | some i in r.inputs] | some r in rep.results; r.check == "$applies"] == [["artifact.atts", "commits[].author"]]
 }
 
 test_a_count_under_a_for_line_still_lists_the_parent_it_reads if {
@@ -9606,4 +9606,96 @@ test_a_row_shows_an_input_once_when_the_check_reads_it_twice if {
 		["count of approvals", 2, ["/deployments/0/approvals/0", "/deployments/0/approvals/1"]],
 		["approvals[]", ["a", "b"], ["/deployments/0/approvals/0", "/deployments/0/approvals/1"]],
 	]]
+}
+
+test_a_second_item_that_starts_at_a_parent_is_named_with_the_whole_parent_name if {
+	doc := {"artifacts": [{"name": "x", "map": {"k1": [1], "k2": []}, "prs": [{"id": 1, "keys": ["k1", "k2"], "approvers": [{"n": 1}]}]}]}
+	subjects := {"artifact": {"from": "artifacts", "identified_by": "name"}, "pr": {"from": "artifact.prs", "identified_by": "id"}}
+	checks := {
+		"c": {"for": "every keys as k, every artifact.map named by k as x", "assert": "x is not empty"},
+		"e": {"for": "every artifact.prs as p, every p.approvers as person", "assert": "person.n is at least 1"},
+	}
+	rows := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {}).results
+	[i.name | some r in rows; r.check == "c"; some i in r.inputs] == ["artifact.map named by k[]", "keys[]"]
+	[i.name | some r in rows; r.check == "e"; some i in r.inputs] == ["artifact.prs[]", "p.approvers[]"]
+}
+
+_named_read_cause(nums, keys, assertion) := [r.cause | some r in ergo.report(doc, policy, {}).results; r.check == "c"][0] if {
+	prs := [{"id": 1, "keys": keys, "rows": [{"n": 1, "p": 7}, {"n": 2, "p": 8}]}]
+	doc := {"artifacts": [object.union({"name": "x", "prs": prs}, {"nums": nums})]}
+	subjects := {"artifact": {"from": "artifacts", "identified_by": "name"}, "pr": {"from": "artifact.prs", "identified_by": "id"}}
+	policy := {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": {"c": {"for": "every keys as k", "assert": assertion}}}}}
+}
+
+_named_read_walks := [
+	"some rows.n is at least artifact.nums named by k",
+	"some rows.p whose n is artifact.nums named by k is 7",
+	"count of rows whose n is artifact.nums named by k is at least 1",
+]
+
+test_a_walk_reads_a_parent_through_a_for_alias_on_its_right_side if {
+	every assertion in _named_read_walks {
+		_named_read_cause({"k1": 1}, ["k1"], assertion) == "satisfied"
+		_named_read_cause({"k1": 5}, ["k1"], assertion) == "value"
+	}
+	_named_read_cause({"k1": 1, "k2": 5}, ["k1"], _named_read_walks[1]) == "satisfied"
+}
+
+test_a_walk_through_a_for_alias_fails_like_a_count_when_the_key_is_missing_or_the_parent_is_not_an_object if {
+	every assertion in _named_read_walks {
+		_named_read_cause({"k2": 1}, ["k1"], assertion) == "absent"
+		_named_read_cause(null, ["k1"], assertion) == "absent"
+		_named_read_cause("abc", ["k1"], assertion) == "unusable"
+		_named_read_cause(5, ["k1"], assertion) == "unusable"
+	}
+}
+
+test_a_walk_through_a_for_alias_fails_like_a_count_when_the_alias_is_null_or_a_number_or_the_value_has_the_wrong_type if {
+	every assertion in _named_read_walks {
+		_named_read_cause({"k1": 1}, [null], assertion) == "null"
+		_named_read_cause({"k1": 1}, [3], assertion) == "unusable"
+		_named_read_cause({"k1": "a"}, ["k1"], assertion) == "unusable"
+		_named_read_cause({"k1": null}, ["k1"], assertion) == "null"
+	}
+}
+
+test_a_walk_keyed_by_an_item_field_lists_the_part_before_the_name_and_never_the_keyed_value if {
+	nums := {"a": 1, "b": 2}
+	rows := [{"key": "a", "n": 1}, {"key": "b", "n": 2}]
+	doc := {"artifacts": [{"name": "x", "nums": nums, "prs": [{"id": 1, "keys": ["k1"], "rows": rows, "groups": [{"items": rows}]}]}]}
+	artifact_nums := {"name": "artifact.nums", "value": nums, "locations": ["/artifacts/0/nums"]}
+	subjects := {"artifact": {"from": "artifacts", "identified_by": "name"}, "pr": {"from": "artifact.prs", "identified_by": "id"}}
+	policy := {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": {
+		"plain": "some rows.n is at least artifact.nums named by key",
+		"whose": "some rows.n whose n is artifact.nums named by key is at least 1",
+		"for": {"for": "every keys as k", "assert": "some rows.n is at least artifact.nums named by key"},
+		"alias": {"for": "every groups as g", "assert": "some g.items.n is at least artifact.nums named by key"},
+	}}}}
+	results := ergo.report(doc, policy, {}).results
+	every check in {"plain", "whose", "for", "alias"} {
+		inputs := [i | some r in results; r.check == check; some i in r.inputs]
+		artifact_nums in inputs
+		count([i | some i in inputs; contains(i.name, "named by")]) == 0
+	}
+	subjects_applies := object.union(subjects, {"pr": {"from": "artifact.prs whose some rows.n is at least artifact.nums named by key", "identified_by": "id"}})
+	applies := ergo.report(doc, object.union(policy, {"subjects": subjects_applies}), {}).results
+	applies_inputs := [i | some r in applies; r.check == "$applies"; some i in r.inputs]
+	artifact_nums in applies_inputs
+	count([i | some i in applies_inputs; contains(i.name, "named by")]) == 0
+}
+
+test_a_walk_through_a_for_name_whose_part_before_the_name_walks_a_list_lists_nothing_of_it if {
+	doc := {"artifacts": [{"name": "x", "ls": [{"m": {"a": 1}}, {"m": {"a": 2}}], "prs": [{"id": 1, "keys": ["a"]}]}]}
+	subjects := {"artifact": {"from": "artifacts", "identified_by": "name"}, "pr": {"from": "artifact.prs", "identified_by": "id"}}
+	checks := {"c": {"for": "every keys as k", "assert": "every artifact.ls.m named by k is at least 1"}}
+	rows := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {}).results
+	[[i.name | some i in r.inputs] | some r in rows; r.check == "c"] == [["keys[]"]]
+}
+
+test_a_sum_through_a_for_name_lists_the_part_before_the_name_and_not_the_sum_or_a_list_per_item if {
+	things := [{"id": 1, "ks": ["a", "b"], "m": {"a": [1], "b": [2]}}]
+	_for_rows({"for": "every ks as k", "assert": "sum of m named by k is at least 1"}, things, {})[0][3] == [
+		{"name": "ks[]", "value": ["a", "b"], "locations": ["/things/0/ks/0", "/things/0/ks/1"]},
+		{"name": "m", "value": {"a": [1], "b": [2]}, "locations": ["/things/0/m"]},
+	]
 }

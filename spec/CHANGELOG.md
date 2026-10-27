@@ -95,10 +95,13 @@ Each version says whether reports changed, so that anyone who only stores report
 
   Under a `for` line, a walk, a `count of` or a `sum of` whose path reads through `named by` an alias also lists the part before the name, like `artifact.map` for `some artifact.map named by k is at least 1`, as [for.inputs](semantics.md#for) says. Reports change for such a check.
 
+  A walk whose right side or `whose` is named by a field of each item, like `some rows.n is at least artifact.nums named by key`, also lists the part before the name, `artifact.nums`, and never the path it names ([walk.inputs](semantics.md#every-and-some)). A second item of a `for` line that starts at a parent is named with the parent's whole name, like `artifact.map named by k[]` ([for.inputs](semantics.md#for)). Reports change for such a check.
+
 ### Fixed
 
 - A walk that starts at a `for` alias holding `null` fails as `null`, as [walk.lists](semantics.md#every-and-some) says. `ergo.rego` failed it as `absent`. The new case in `cases/for` pins it. Reports change for such a walk.
 - A position at the start of a path reads the subject or a `for` alias as a list ([path.not_an_object](semantics.md#reading-a-path)), so `first of b` on a `for` alias holding `["x", "y"]` reads `"x"`, where `ergo.rego` failed it as `not_an_object`. The new case in `cases/for` pins it. Reports change for such a check.
+- A walk reads a parent through a `for` alias on its right side, like `some rows.n is at least artifact.nums named by k`, as a `count of` does ([walk.some](semantics.md#every-and-some)). `ergo.rego` failed it as `absent` even when the parent had the name. The new cases in `cases/walks` pin it. Reports change for such a walk.
 
 ## 0.1
 

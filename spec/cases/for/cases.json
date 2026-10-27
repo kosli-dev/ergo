@@ -10948,5 +10948,115 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a second item that starts at a parent and is named by the first",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts",
+          "identified_by": "id"
+        },
+        "pr": {
+          "from": "artifact.prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pr",
+          "checks": {
+            "c": {
+              "for": "every keys as k, every artifact.map named by k as x",
+              "assert": "x is at least 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is listed under the parent's whole name",
+        "rules": [
+          "for.inputs",
+          "for.pass"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "map": {
+                  "a": [
+                    1
+                  ],
+                  "b": [
+                    2,
+                    3
+                  ]
+                },
+                "prs": [
+                  {
+                    "id": "p1",
+                    "keys": [
+                      "a",
+                      "b"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/map/a/0",
+                  "/trail/artifacts/0/map/b/0",
+                  "/trail/artifacts/0/map/b/1"
+                ],
+                "name": "artifact.map named by k[]",
+                "value": [
+                  1,
+                  2,
+                  3
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0",
+                  "/trail/artifacts/0/prs/0/keys/1"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "a",
+                  "b"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "for every keys as k, every artifact.map named by k as x: x is at least 1"
+          }
+        }
+      }
+    ]
   }
 ]

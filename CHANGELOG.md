@@ -102,7 +102,9 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
   Under a `for` line, a `count of` or `sum of` now lists the parent values its `whose` reads, and its own list when that list doesn't start at the alias, like `artifact.tags[]` and `count of artifact.tags` for `count of artifact.tags is at least 1`. A value read through the alias is still never listed.
 
-  A walk, count or sum whose path reads through `named by` an alias now lists the part before the name, as a plain check does. With `for: every keys as k`, `some artifact.map named by k is at least 1` and `count of artifact.map named by k is at least 1` list `artifact.map`, the whole object, next to `keys[]`, where they listed only `keys[]`. A walk or a count whose `whose` or right side reads a parent through the alias lists it too, like `artifact.nums` in `count of rows whose n is artifact.nums named by k is at least 1`.
+  A walk, count or sum whose path reads through `named by` an alias now lists the part before the name, as a plain check does. With `for: every keys as k`, `some artifact.map named by k is at least 1` and `count of artifact.map named by k is at least 1` list `artifact.map`, the whole object, next to `keys[]`, where they listed only `keys[]`. A walk or a count whose `whose` reads a parent through the alias lists it too, like `artifact.nums` in `count of rows whose n is artifact.nums named by k is at least 1`.
+
+  A walk whose right side or `whose` is named by a field of each item, like `some rows.n is at least artifact.nums named by key`, lists the part before the name too, `artifact.nums`, in a check, on a `for` line and in a `from` condition. It never lists `artifact.nums named by key`, because that value is different for each item. With `{"artifacts": [{"id": "a1", "nums": {"a": 1, "b": 2}, "prs": [{"id": "p1", "rows": [{"key": "a", "n": 1}, {"key": "b", "n": 2}]}]}]}`, the row's `inputs` held only `rows[].n`, and now it also has `{"name": "artifact.nums", "value": {"a": 1, "b": 2}, ...}`.
 
 - A sentence that failed on a `for` line gives the values it compared, in `inputs`. Each entry of a failed sentence's `items` has them, and so does a failed sentence that has no `items`, because it doesn't read the second list's item. They are the entries the sentence would have in the `inputs` of a row of its own, with `name`, `value`, `locations` and `part`, and the names as the sentence writes them, like `approver.timestamp`. A tool can show "1792655359 is not after 1792656245" without reading the sentence. Every failure has them, so a report with many failed items is longer.
 
@@ -172,6 +174,10 @@ Each release names the version of the spec it follows. The spec's own changes ar
   ```json
   {"check": "c", "passed": false, "cause": "absent", "failed_items": [{"cause": "absent", "item": "item 2 of batches", "value": [], ...}]}
   ```
+
+- A walk can read a parent through a `for` alias on its right side, like `named by k` in `some rows.n is at least artifact.nums named by k`. It failed as `absent` even when the parent had the name, so a check that should pass failed. With `for: every keys as k`, on `{"artifacts": [{"id": "a1", "nums": {"k1": 1, "k2": 2}, "prs": [{"id": "p1", "keys": ["k1", "k2"], "rows": [{"n": 1}, {"n": 2}]}]}]}`, the row was `{"check": "c", "passed": false, "cause": "absent", ...}`, and now it's `{"check": "c", "passed": true, "cause": "satisfied", ...}`. A name the parent doesn't have still fails as `absent`, a `null` alias as `null`, and a value of the wrong type as `unusable`, as a `count of` does.
+
+- A second item of a `for` line that starts at a parent and goes through `named by`, like `every artifact.map named by k as x`, was listed with the first letter of the parent cut off, as `rtifact.map named by k[]`. It's `artifact.map named by k[]` now.
 
 ## 0.1.0
 
