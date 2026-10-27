@@ -316,11 +316,11 @@
         "rules": ["sentence.path.it", "sentence.subject.condition", "sentence.subject.applies", "scope.filters"],
         "input": {"ws": ["a", "bb", null, 3, "cc"]},
         "results": [
-          {"requirement": "r", "subject": {"id": "a", "type": "word"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": "a"}]},
-          {"requirement": "r", "subject": {"id": "bb", "type": "word"}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "bb"}]},
-          {"requirement": "r", "subject": {"id": null, "type": "word"}, "check": "$applies", "passed": false, "cause": "null", "inputs": [{"name": "it", "value": null}]},
-          {"requirement": "r", "subject": {"id": 3, "type": "word"}, "check": "$applies", "passed": false, "cause": "unusable", "inputs": [{"name": "it", "value": 3}]},
-          {"requirement": "r", "subject": {"id": "cc", "type": "word"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": "cc"}]},
+          {"requirement": "r", "subject": {"id": "a", "type": "word"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": "a"}], "failed_assertions": [{"assertion": "it starts with \"b\"", "cause": "value"}]},
+          {"requirement": "r", "subject": {"id": "bb", "type": "word"}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "bb"}], "failed_assertions": []},
+          {"requirement": "r", "subject": {"id": null, "type": "word"}, "check": "$applies", "passed": false, "cause": "null", "inputs": [{"name": "it", "value": null}], "failed_assertions": [{"assertion": "it is a string", "cause": "null"}, {"assertion": "it starts with \"b\"", "cause": "null"}]},
+          {"requirement": "r", "subject": {"id": 3, "type": "word"}, "check": "$applies", "passed": false, "cause": "unusable", "inputs": [{"name": "it", "value": 3}], "failed_assertions": [{"assertion": "it is a string", "cause": "value"}, {"assertion": "it starts with \"b\"", "cause": "unusable"}]},
+          {"requirement": "r", "subject": {"id": "cc", "type": "word"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": "cc"}], "failed_assertions": [{"assertion": "it starts with \"b\"", "cause": "value"}]},
           {"requirement": "r", "subject": {"id": "bb", "type": "word"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": "bb"}]}
         ]
       }
@@ -791,9 +791,9 @@
           {"requirement": "r", "subject": {"id": null, "type": "tag list"}, "check": "$well_formed", "passed": true, "cause": "satisfied", "inputs": [{"name": "count(checks)", "value": 1}, {"name": "require", "value": "every"}]},
           {"requirement": "r", "subject": {"id": null, "type": "tag list"}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope tag list count", "value": 1}], "failed_items": []},
           {"requirement": "r", "subject": {"id": null, "type": "tag list"}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated tag list ids", "value": []}]},
-          {"requirement": "r", "subject": {"id": ["v1", "latest"], "type": "tag list"}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "it[]", "value": ["v1", "latest"]}]},
-          {"requirement": "r", "subject": {"id": ["v0"], "type": "tag list"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "it[]", "value": ["v0"]}]},
-          {"requirement": "r", "subject": {"id": "broken", "type": "tag list"}, "check": "$applies", "passed": false, "cause": "unusable", "inputs": [{"name": "it", "value": []}]},
+          {"requirement": "r", "subject": {"id": ["v1", "latest"], "type": "tag list"}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "it[]", "value": ["v1", "latest"]}], "failed_items": []},
+          {"requirement": "r", "subject": {"id": ["v0"], "type": "tag list"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "it[]", "value": ["v0"]}], "failed_items": [{"cause": "value", "item": "item 1 of it", "path": "item 1 of it", "value": "v0"}]},
+          {"requirement": "r", "subject": {"id": "broken", "type": "tag list"}, "check": "$applies", "passed": false, "cause": "unusable", "inputs": [{"name": "it", "value": []}], "failed_items": [{"cause": "unusable", "item": "it", "path": "it", "value": "broken"}]},
           {"requirement": "r", "subject": {"id": ["v1", "latest"], "type": "tag list"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it[]", "value": ["v1", "latest"]}], "failed_items": []}
         ]
       }

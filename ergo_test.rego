@@ -8808,3 +8808,11 @@ test_it_after_some_or_every_in_a_from_line_whose_reads_the_subject_as_the_same_c
 	[[r.subject.id, r.cause] | some r in _it_report({"xs": [[1, 2], [1]]}, "every xs whose every it is 1", {"c": "it is not empty"}, {}).results; r.check == "$applies"] == [[[1, 2], "value"], [[1], "satisfied"]]
 	_it_problems("every xs whose some it is it", {"c": "it is not empty"}) == ["it can only start an assertion: write it first, like it is not empty"]
 }
+
+test_an_applies_row_with_some_it_names_its_failed_items_as_the_check_row_does if {
+	applies := [[r.subject.id, r.cause, r.failed_items] | some r in _it_report({"xs": [[1, 2], [3], [], "s"]}, "every xs whose some it is 1", {"c": "it is not empty"}, {}).results; r.check == "$applies"]
+	check := [[r.subject.id, r.cause, r.failed_items] | some r in _it_report({"xs": [[1, 2], [3], [], "s"]}, "every xs", {"c": "some it is 1"}, {}).results; r.check == "c"]
+	applies == check
+	applies[1] == [[3], "value", [{"cause": "value", "item": "item 1 of it", "path": "item 1 of it", "value": 3}]]
+	applies[2] == [[], "value", [{"cause": "value", "item": "it", "path": "it", "value": []}]]
+}
