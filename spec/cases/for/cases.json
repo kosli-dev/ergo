@@ -11259,5 +11259,148 @@
         }
       }
     ]
+  },
+  {
+    "description": "a second item that starts at a parent's part, read with a whose",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts",
+          "identified_by": "id",
+          "has": {
+            "ap": "ps"
+          }
+        },
+        "pr": {
+          "from": "artifact.prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pr",
+          "checks": {
+            "c": {
+              "for": "every keys as k, every artifact.ap.w whose t is k as x",
+              "assert": "x.t is \"k1\""
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "names the second list's items it could not decide with the part's alias, like its input",
+        "rules": [
+          "for.failed_items",
+          "for.second_items",
+          "parts.swap"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "ps": {
+                  "w": [
+                    {
+                      "t": "k1"
+                    },
+                    {
+                      "t": "k1"
+                    },
+                    {}
+                  ]
+                },
+                "prs": [
+                  {
+                    "id": "p1",
+                    "keys": [
+                      "k1"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "item 3 of artifact.ap.w",
+                    "locations": [
+                      "/trail/artifacts/0/ps/w/2"
+                    ],
+                    "path": "item 3 of artifact.ap.w",
+                    "value": {}
+                  }
+                ],
+                "item": "item 1 of keys",
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0"
+                ],
+                "path": "item 1 of keys",
+                "value": "k1"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/ps/w/0",
+                  "/trail/artifacts/0/ps/w/1",
+                  "/trail/artifacts/0/ps/w/2"
+                ],
+                "name": "artifact.ap.w[]",
+                "part": {
+                  "id": null,
+                  "name": "artifact.ap"
+                },
+                "value": [
+                  {
+                    "t": "k1"
+                  },
+                  {
+                    "t": "k1"
+                  },
+                  {}
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "k1"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "for every keys as k, every artifact.ap.w whose t equals k as x: x.t is \"k1\""
+          }
+        }
+      }
+    ]
   }
 ]

@@ -9763,3 +9763,50 @@ test_a_walk_keyed_by_an_item_field_whose_part_before_the_name_walks_a_list_lists
 	rows := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {}).results
 	[[i.name | some i in r.inputs] | some r in rows; r.check == "c"] == [["rows[].n"]]
 }
+
+_part_for_subjects(has) := {
+	"artifact": {"from": "$input.artifact", "identified_by": "n", "has": has},
+	"child": {"from": "artifact.kids", "identified_by": "id"},
+}
+
+_part_for_row(doc, has, check, params) := [r | some r in ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": _part_for_subjects(has), "requirements": {"r": {"subject": "child", "checks": {"c": check}}}}, params).results; r.check == "c"][0]
+
+test_a_second_for_item_that_starts_at_a_parents_part_names_its_unchecked_items_like_its_inputs if {
+	doc := {"artifact": {"n": "a", "ps": {"w": [{"t": "k1"}, {}]}, "kids": [{"id": 1, "keys": ["k1"]}]}}
+	row := _part_for_row(doc, {"ap": "ps"}, {"for": "every keys as k, every artifact.ap.w whose t is k as x", "assert": "x.t is 1"}, {})
+	[f.item | some f in row.failed_items[0].failed_items] == ["item 2 of artifact.ap.w"]
+	[f.path | some f in row.failed_items[0].failed_items] == ["item 2 of artifact.ap.w"]
+	[i.name | some i in row.inputs] == ["artifact.ap.w[]", "keys[]"]
+}
+
+test_a_second_for_item_that_starts_at_a_parents_part_named_by_an_item_keeps_the_key_it_read_and_hides_the_part_marker if {
+	doc := {"artifact": {"n": "a", "ps": {"k1": [{"t": 1}, {}]}, "kids": [{"id": 1, "keys": ["k1"]}]}}
+	row := _part_for_row(doc, {"ap": "ps"}, {"for": "every keys as k, every artifact.ap named by k.t as x", "assert": "x is 1"}, {})
+	[f.item | some f in row.failed_items[0].failed_items] == ["item 2 of artifact.ap.k1"]
+	[i.name | some i in row.inputs] == ["artifact.ap named by k[].t", "keys[]"]
+}
+
+test_a_failed_sentence_of_a_second_for_item_that_starts_at_a_parents_part_names_its_items_without_the_part_marker if {
+	doc := {"artifact": {"n": "a", "ps": {"w": ["k1", "z"]}, "kids": [{"id": 1, "keys": ["k1"]}]}}
+	row := _part_for_row(doc, {"ap": "ps"}, {"for": "every keys as k, every artifact.ap.w as x", "assert": "x is k"}, {})
+	[[i.item | some i in a.items] | some a in row.failed_items[0].failed_assertions] == [["item 2 of artifact.ap.w"]]
+}
+
+test_a_second_for_item_that_starts_at_a_plain_parent_input_or_params_keeps_its_name_in_unchecked_items if {
+	doc := {"artifact": {"n": "a", "w": [{"t": "k1"}, {}], "kids": [{"id": 1, "keys": ["k1"]}]}, "top": [{"t": "k1"}, {}]}
+	plain := _part_for_row(doc, {}, {"for": "every keys as k, every artifact.w whose t is k as x", "assert": "x.t is 1"}, {})
+	[f.item | some f in plain.failed_items[0].failed_items] == ["item 2 of artifact.w"]
+	from_input := _part_for_row(doc, {}, {"for": "every keys as k, every $input.top whose t is k as x", "assert": "x.t is 1"}, {})
+	[f.item | some f in from_input.failed_items[0].failed_items] == ["item 2 of $input.top"]
+	from_params := _part_for_row(doc, {}, {"for": "every keys as k, every $params.l whose t is k as x", "assert": "x.t is 1"}, {"l": [{"t": "k1"}, {}]})
+	[f.item | some f in from_params.failed_items[0].failed_items] == ["item 2 of $params.l"]
+}
+
+test_a_first_for_item_through_a_parents_part_or_named_by_names_its_failed_items_like_a_walk if {
+	doc := {"artifact": {"n": "a", "ps": {"w": [1, 0], "k1": [1, 0]}, "kids": [{"id": 1, "k": "k1"}]}}
+	part := _part_for_row(doc, {"ap": "ps"}, {"for": "every artifact.ap.w as x", "assert": "x is 1"}, {})
+	[f.item | some f in part.failed_items] == ["item 2 of artifact.ap.w"]
+	named := _part_for_row(doc, {"ap": "ps"}, {"for": "every artifact.ap named by k as x", "assert": "x is 1"}, {})
+	[f.item | some f in named.failed_items] == ["item 2 of artifact.ap.k1"]
+	[i.name | some i in named.inputs] == ["artifact.ap named by k[]", "k"]
+}
