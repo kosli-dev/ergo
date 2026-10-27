@@ -4511,6 +4511,32 @@ test_a_count_of_over_more_than_ten_steps_is_written_wrong_inside_a_whose_a_for_l
 	_sentence_problems({"any_of": {"a": concat("", ["n is count of ", _eleven]), "b": "n is 1"}}) == ["option a: every and some over more than ten steps aren't supported yet"]
 }
 
+_reads(check) if {
+	some row in ergo.report({"things": []}, _sentence_policy({"c": check}), {}).results
+	row.check == "$well_formed"
+	row.passed
+}
+
+test_a_for_alias_is_a_step_of_a_count_of_on_the_right_so_a_check_that_read_before_is_written_wrong if {
+	doc := {"things": [{"id": "a", "xs": [{"n": 1, "k1": {"k2": {"k3": {"k4": {"k5": {"k6": {"k7": {"k8": {"k9": [1]}}}}}}}}}]}]}
+	[[r[0], r[2]] | some r in _walk_rows({"c": {"for": "every xs as x", "assert": "x.n is count of x.k1.k2.k3.k4.k5.k6.k7.k8.k9"}}, doc, {})] == [["a", "satisfied"]]
+	_sentence_problems({"for": "every xs as x", "assert": concat("", ["x.n is count of x.", _ten])}) == _too_long
+}
+
+test_a_position_and_a_sum_after_plus_on_the_right_and_a_count_in_a_picked_items_whose_are_held_to_ten_steps if {
+	_reads("n is count of first of k1.k2.k3.k4.k5.k6.k7.k8.k9")
+	_sentence_problems(concat("", ["n is count of first of ", _ten])) == _too_long
+	_reads("n is count of xs plus sum of k1.k2.k3.k4.k5.k6.k7.k8.k9.k10")
+	_sentence_problems(concat("", ["n is count of xs plus sum of ", _eleven])) == _too_long
+	_reads({"for": "first of xs whose n is count of k1.k2.k3.k4.k5.k6.k7.k8.k9.k10 as x", "assert": "x.n is 1"})
+	_sentence_problems({"for": concat("", ["first of xs whose n is count of ", _eleven, " as x"]), "assert": "x.n is 1"}) == _too_long
+}
+
+test_params_is_not_a_step_of_a_walk if {
+	_reads("every $params.k1.k2.k3.k4.k5.k6.k7.k8.k9.k10 is 1")
+	_sentence_problems(concat("", ["every $params.", _eleven, " is 1"])) == _too_long
+}
+
 test_a_walk_whose_named_by_cant_be_read_shows_an_empty_list_in_its_inputs if {
 	r := ergo.report({"things": [{"id": "a", "xs": {"k": [1]}}]}, _sentence_policy({"c": "every xs named by $params.k is 1"}), {})
 	[[row.cause, row.inputs, row.failed_items] | some row in r.results; row.check == "c"] == [["absent", [{"name": "xs named by $params.k", "value": [], "locations": []}], []]]
