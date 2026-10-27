@@ -301,7 +301,7 @@
         "input": {"xs": [{"id": "a", "l": [1, 1]}, {"id": "b", "l": [1, 2]}]},
         "results": [
           {"requirement": "allowed", "subject": {"id": "a", "type": "region"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "it", "value": {"id": "a", "l": [1, 1]}, "locations": ["/xs/0"]}, {"name": "l[]", "value": [1, 1], "locations": ["/xs/0/l/0", "/xs/0/l/1"]}], "failed_items": []},
-          {"requirement": "allowed", "subject": {"id": "b", "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": {"id": "b", "l": [1, 2]}, "locations": ["/xs/1"]}, {"name": "l[]", "value": [1, 2], "locations": ["/xs/1/l/0", "/xs/1/l/1"]}], "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "e is 1", "cause": "value"}], "item": "item 2 of l", "path": "item 2 of l", "value": 2, "locations": ["/xs/1/l/1"]}]}
+          {"requirement": "allowed", "subject": {"id": "b", "type": "region"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "it", "value": {"id": "b", "l": [1, 2]}, "locations": ["/xs/1"]}, {"name": "l[]", "value": [1, 2], "locations": ["/xs/1/l/0", "/xs/1/l/1"]}], "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "e is 1", "cause": "value", "inputs": [{"locations": ["/xs/1/l/1"], "name": "e", "value": 2}]}], "item": "item 2 of l", "path": "item 2 of l", "value": 2, "locations": ["/xs/1/l/1"]}]}
         ],
         "expressions": {"allowed": {"c": "for every l as e: it is an object and e is 1"}}
       }

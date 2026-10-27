@@ -72,7 +72,6 @@ Three ways to settle it:
 Every rule needs a case, apart from the ones listed here. The `sentence` rules here are for forms `ergo.rego` doesn't run or check yet. `report.engine` gives different values for each engine, so a case can't pin it, and `ergo_test.rego` tests it instead. `report.hash` waits for the question about numbers above. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.
 
 - `sentence.forms`
-- `sentence.flat`
 - `sentence.subject.depth`
 - `sentence.argument.subject`
 - `sentence.for.depth`
