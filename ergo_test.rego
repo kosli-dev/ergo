@@ -5237,7 +5237,7 @@ test_a_count_or_a_sum_lists_the_parent_its_whose_reads if {
 
 test_a_one_line_some_after_a_for_line_lists_the_parent_it_reads if {
 	commits := {"name": "commits[]", "value": [{"author": "bob", "n": 1}, {"author": "ann", "n": 2}], "locations": ["/artifact/pull_requests/0/commits/0", "/artifact/pull_requests/0/commits/1"]}
-	doc := json.patch(_owner_doc, [{"op": "add", "path": "/artifact/tags", "value": ["x", "ann"]}])
+	doc := object.union(_owner_doc, {"artifact": {"tags": ["x", "ann"]}})
 	checks := {
 		"right": {"for": "every commits as c", "assert": "some artifact.tags is c.author"},
 		"left": {"for": "every commits as c", "assert": "c.author is artifact.owner and some artifact.tags is \"x\""},
@@ -5251,7 +5251,7 @@ test_a_one_line_some_after_a_for_line_lists_the_parent_it_reads if {
 }
 
 test_a_walk_from_a_for_alias_lists_the_parent_it_compares_with if {
-	doc := json.patch(_owner_doc, [{"op": "add", "path": "/artifact/pull_requests/0/commits/0/reviewers", "value": ["ann"]}, {"op": "add", "path": "/artifact/pull_requests/0/commits/1/reviewers", "value": ["cid"]}])
+	doc := object.union(_owner_doc, {"artifact": {"pull_requests": [{"id": 1, "commits": [{"author": "bob", "n": 1, "reviewers": ["ann"]}, {"author": "ann", "n": 2, "reviewers": ["cid"]}]}]}})
 	checks := {"c": {"for": "every commits as c", "assert": "some c.reviewers is artifact.owner"}}
 	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": _owner_subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {})
 	[[r.cause, [i.name | some i in r.inputs]] | some r in rep.results; r.check == "c"] == [["value", ["artifact.owner", "commits[]"]]]
@@ -5265,7 +5265,7 @@ test_a_one_line_some_lists_an_input_value_it_compares_with_but_not_a_param if {
 }
 
 test_a_one_line_some_lists_a_missing_or_null_parent_value_as_a_plain_assertion_does if {
-	doc := json.patch(_owner_doc, [{"op": "add", "path": "/artifact/nul", "value": null}])
+	doc := object.union(_owner_doc, {"artifact": {"nul": null}})
 	checks := {"missing": "some commits.author is artifact.nope", "null": "some commits.author is artifact.nul"}
 	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": _owner_subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {})
 	{r.check: [r.cause, r.inputs] | some r in rep.results; r.check in {"missing", "null"}} == {
