@@ -95,7 +95,7 @@ Each version says whether reports changed, so that anyone who only stores report
 
   Under a `for` line, a walk, a `count of` or a `sum of` whose path reads through `named by` an alias also lists the part before the name, like `artifact.map` for `some artifact.map named by k is at least 1`, as [for.inputs](semantics.md#for) says. Reports change for such a check.
 
-  A walk whose right side or `whose` is named by a field of each item, like `some rows.n is at least artifact.nums named by key`, also lists the part before the name, `artifact.nums`, and never the path it names ([walk.inputs](semantics.md#every-and-some)). A second item of a `for` line that starts at a parent is named with the parent's whole name, like `artifact.map named by k[]` ([for.inputs](semantics.md#for)). Reports change for such a check.
+  A walk, `count of` or `sum of` whose right side or `whose` is named by a field of each item, like `some rows.n is at least artifact.nums named by key` or `count of rows whose n is at least artifact.nums named by key`, also lists the part before the name, `artifact.nums`, and never the path it names ([walk.inputs](semantics.md#every-and-some)). A second item of a `for` line that starts at a parent is named with the parent's whole name, like `artifact.map named by k[]` ([for.inputs](semantics.md#for)). Reports change for such a check.
 
 ### Fixed
 

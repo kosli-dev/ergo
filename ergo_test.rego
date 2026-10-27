@@ -5402,10 +5402,11 @@ test_a_walk_whose_named_by_reads_the_item_lists_the_part_before_the_name_and_not
 	}
 }
 
-test_a_count_whose_named_by_reads_the_item_doesnt_list_the_path_it_names if {
+test_a_count_whose_named_by_reads_the_item_lists_the_part_before_the_name_and_not_the_path_it_names if {
 	_atts_rows({"c": "count of commits whose author is artifact.atts named by k.owner is 1"}, {}) == {"c": [
 		"count of commits whose author equals artifact.atts named by k.owner",
 		"commits[]",
+		"artifact.atts",
 	]}
 }
 
@@ -9698,4 +9699,67 @@ test_a_sum_through_a_for_name_lists_the_part_before_the_name_and_not_the_sum_or_
 		{"name": "ks[]", "value": ["a", "b"], "locations": ["/things/0/ks/0", "/things/0/ks/1"]},
 		{"name": "m", "value": {"a": [1], "b": [2]}, "locations": ["/things/0/m"]},
 	]
+}
+
+test_a_second_item_that_starts_at_input_or_params_keeps_its_dollar_in_the_list_and_failed_item_names if {
+	doc := {"artifacts": [{"name": "a1", "pull_requests": [{"id": 1, "keys": ["k1"]}]}], "top": [11]}
+	subjects := {"artifact": {"from": "artifacts", "identified_by": "name"}, "pr": {"from": "artifact.pull_requests", "identified_by": "id"}}
+	checks := {
+		"i": {"for": "every keys as k, every $input.top as x", "assert": "x is at least 100"},
+		"p": {"for": "every keys as k, some $params.l as x", "assert": "x is at least 100"},
+	}
+	rows := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {"l": [12]}).results
+	[i.name | some r in rows; r.check == "i"; some i in r.inputs] == ["$input.top[]", "keys[]"]
+	[i.name | some r in rows; r.check == "p"; some i in r.inputs] == ["$params.l[]", "keys[]"]
+	[f.item | some r in rows; r.check == "i"; some o in r.failed_items; some a in o.failed_assertions; some f in a.items] == ["item 1 of $input.top"]
+}
+
+_keyed_tally_rows(nums, rows, checks) := {r.check: [r.cause, [i.name | some i in r.inputs]] |
+	doc := {"artifacts": [{"name": "x", "nums": nums, "prs": [{"id": 1, "keys": ["k1"], "rows": rows}]}]}
+	subjects := {"artifact": {"from": "artifacts", "identified_by": "name"}, "pr": {"from": "artifact.prs", "identified_by": "id"}}
+	some r in ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {}).results
+	r.check in object.keys(checks)
+}
+
+_keyed_tallies := {
+	"count": "count of rows whose n is at least artifact.nums named by key is at least 1",
+	"sum": "sum of rows.n whose n is at least artifact.nums named by key is at least 1",
+	"for_count": {"for": "every keys as k", "assert": "count of rows whose n is at least artifact.nums named by key is at least 1"},
+	"for_sum": {"for": "every keys as k", "assert": "sum of rows.n whose n is at least artifact.nums named by key is at least 1"},
+}
+
+test_a_count_or_sum_keyed_by_an_item_field_lists_the_part_before_the_name_and_never_the_keyed_value if {
+	got := _keyed_tally_rows({"a": 1, "b": 2}, [{"key": "a", "n": 1}, {"key": "b", "n": 2}], _keyed_tallies)
+	every _, r in got {
+		r[0] == "satisfied"
+		"artifact.nums" in r[1]
+		not "artifact.nums named by key" in r[1]
+	}
+}
+
+test_a_count_or_sum_keyed_by_an_item_field_fails_as_before_when_the_key_is_missing_null_or_wrong_typed if {
+	rows := [{"key": "a", "n": 1}]
+	missing := _keyed_tally_rows({"z": 1}, rows, _keyed_tallies)
+	nulled := _keyed_tally_rows({"a": null}, rows, _keyed_tallies)
+	wrong := _keyed_tally_rows({"a": "s"}, rows, _keyed_tallies)
+	every _, r in missing {
+		r[0] == "absent"
+		"artifact.nums" in r[1]
+	}
+	every _, r in nulled {
+		r[0] == "null"
+		"artifact.nums" in r[1]
+	}
+	every _, r in wrong {
+		r[0] == "unusable"
+		"artifact.nums" in r[1]
+	}
+}
+
+test_a_walk_keyed_by_an_item_field_whose_part_before_the_name_walks_a_list_lists_nothing_of_it if {
+	doc := {"artifacts": [{"name": "x", "ls": [{"m": {"a": 1}}], "prs": [{"id": 1, "rows": [{"key": "a", "n": 1}]}]}]}
+	subjects := {"artifact": {"from": "artifacts", "identified_by": "name"}, "pr": {"from": "artifact.prs", "identified_by": "id"}}
+	checks := {"c": "some rows.n is at least artifact.ls.m named by key"}
+	rows := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {}).results
+	[[i.name | some i in r.inputs] | some r in rows; r.check == "c"] == [["rows[].n"]]
 }

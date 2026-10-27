@@ -4568,7 +4568,10 @@ _tally_inputs(subj, side, t) := array.concat(
 		{"name": side.text, "value": object.get(t, "value", null), "locations": t.locations},
 		_tally_list_input(t),
 	],
-	_merged_inputs(_named_inputs(subj, [p | some c in object.get(side, "whose", []); some p in _condition_paths(c)])),
+	_merged_inputs(array.concat(
+		_named_inputs(subj, [p | some c in object.get(side, "whose", []); some p in _condition_paths(c)]),
+		_field_named_inputs(subj, [p | some c in object.get(side, "whose", []); some p in _condition_paths(c)]),
+	)),
 )
 
 _tally_list_input(t) := {"name": t.list, "value": t.values, "locations": t.locations}
@@ -7993,7 +7996,7 @@ _for_key_fields(check) := {seg.named_by_field |
 
 _for_inner_pairs(check, _, _, _, _) := set() if count(check.items) == 1
 
-_for_inner_pairs(check, subj, names, item, w) := {[_for_list_name(check.items[1].path, walked), values, locations]} if {
+_for_inner_pairs(check, subj, names, item, w) := {[_for_list_name(check, check.items[1].path, walked), values, locations]} if {
 	count(check.items) == 2
 	_for_from_first(check)
 	inner := [_for_walk(check.items[1], subj, _bound(names, item.as, e.v, _walk_at(w, e))) | some e in w.items]
@@ -8002,7 +8005,7 @@ _for_inner_pairs(check, subj, names, item, w) := {[_for_list_name(check.items[1]
 	locations := [_walk_at(iw, e2) | some iw in inner; some e2 in iw.items]
 }
 
-_for_inner_pairs(check, subj, names, _, _) := {object.get(iw, "input", [_for_list_name(check.items[1].path, iw.walked), [_walk_shown(e.v) | some e in iw.items], _walk_locations(iw)])} if {
+_for_inner_pairs(check, subj, names, _, _) := {object.get(iw, "input", [_for_list_name(check, check.items[1].path, iw.walked), [_walk_shown(e.v) | some e in iw.items], _walk_locations(iw)])} if {
 	count(check.items) == 2
 	not _for_from_first(check)
 	iw := _for_walk(check.items[1], subj, names)
@@ -8027,25 +8030,22 @@ _tally_kept_inputs(check, subj, part) := array.concat(
 		[_tally_list_input(_tally(subj, part)) | not _for_alias_path(check, part[_basic_form(part)])],
 		[{"name": _path_name(shown), "value": _value_at(subj, shown), "locations": _locations_of(subj, shown)} | shown := _before_alias_name(check, subj, part[_basic_form(part)])],
 	),
-	_merged_inputs(_named_inputs(subj, array.concat(
-		[p | some c in part.whose; some p in _condition_paths(c); not _for_alias_path(check, p)],
-		[shown | some c in part.whose; some p in _condition_paths(c); shown := _before_alias_name(check, subj, p)],
-	))),
+	_merged_inputs(array.concat(
+		_named_inputs(subj, array.concat(
+			[p | some c in part.whose; some p in _condition_paths(c); not _for_alias_path(check, p)],
+			[shown | some c in part.whose; some p in _condition_paths(c); shown := _before_alias_name(check, subj, p)],
+		)),
+		_field_named_inputs(subj, [p | some c in part.whose; some p in _condition_paths(c); not _for_alias_path(check, p)]),
+	)),
 ) if _tally_named(check, part)
 
 _tally_parts(side) := [side] if _basic_form(side) in {"count_of", "sum_of"}
 
 _tally_parts(side) := [o | some o in side.add; _basic_form(o) in {"count_of", "sum_of"}] if _side_form(side) == "add"
 
-_for_list_name(path, walked) := substring(name, 1, -1) if {
-	name := _walk_name(path, walked)
-	startswith(name, "$")
-}
+_for_list_name(check, path, walked) := substring(_walk_name(path, walked), 1, -1) if path[0] in {concat("", ["$", item.as]) | some item in check.items}
 
-_for_list_name(path, walked) := name if {
-	name := _walk_name(path, walked)
-	not startswith(name, "$")
-}
+_for_list_name(check, path, walked) := _walk_name(path, walked) if not path[0] in {concat("", ["$", item.as]) | some item in check.items}
 
 _starts_at_name(p) if {
 	_off_subject(p)
