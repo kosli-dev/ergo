@@ -102,6 +102,8 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
   Under a `for` line, a `count of` or `sum of` now lists the parent values its `whose` reads, and its own list when that list doesn't start at the alias, like `artifact.tags[]` and `count of artifact.tags` for `count of artifact.tags is at least 1`. A value read through the alias is still never listed.
 
+  A walk, count or sum whose path reads through `named by` an alias now lists the part before the name, as a plain check does. With `for: every keys as k`, `some artifact.map named by k is at least 1` and `count of artifact.map named by k is at least 1` list `artifact.map`, the whole object, next to `keys[]`, where they listed only `keys[]`. A walk or a count whose `whose` or right side reads a parent through the alias lists it too, like `artifact.nums` in `count of rows whose n is artifact.nums named by k is at least 1`.
+
 ### Fixed
 
 - A walk that starts at a `for` alias holding `null` fails as `null`, as [walk.lists](spec/semantics.md#every-and-some) says and as a field holding `null` does. It failed as `absent`. With `for: every commits as c` and `assert: every c.files is a string`, on the release `{"id": "r1", "commits": [null]}`, the row was:

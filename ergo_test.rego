@@ -5921,6 +5921,36 @@ test_a_count_through_a_for_name_lists_its_list_and_not_its_number_since_that_cha
 	]]]
 }
 
+test_a_walk_through_a_for_name_lists_the_part_before_the_name_once_as_a_plain_check_does if {
+	things := [{"id": 1, "ks": ["a", "b"], "m": {"a": [1], "b": [2]}}]
+	want := [
+		{"name": "ks[]", "value": ["a", "b"], "locations": ["/things/0/ks/0", "/things/0/ks/1"]},
+		{"name": "m", "value": {"a": [1], "b": [2]}, "locations": ["/things/0/m"]},
+	]
+	_for_rows({"for": "every ks as k", "assert": "some m named by k is at least 1"}, things, {})[0][3] == want
+	_for_rows({"for": "every ks as k", "assert": ["some m named by k is at least 1", "every m named by k is at least 1"]}, things, {})[0][3] == want
+}
+
+test_a_count_through_a_for_name_lists_the_part_before_the_name_and_not_its_number_or_its_items if {
+	things := [{"id": 1, "ks": ["a", "b"], "m": {"a": [1], "b": [2]}}]
+	_for_rows({"for": "every ks as k", "assert": "count of m named by k is at least 1"}, things, {})[0][3] == [
+		{"name": "ks[]", "value": ["a", "b"], "locations": ["/things/0/ks/0", "/things/0/ks/1"]},
+		{"name": "m", "value": {"a": [1], "b": [2]}, "locations": ["/things/0/m"]},
+	]
+}
+
+test_a_whose_that_reads_a_parent_through_a_for_name_lists_the_part_before_the_name if {
+	doc := {"artifacts": [{"id": "a", "nums": {"a": 1, "b": 2}, "prs": [{"id": 1, "ks": ["a", "b"], "rows": [{"n": 1}, {"n": 2}]}]}]}
+	subjects := {"artifact": {"from": "artifacts", "identified_by": "id"}, "pr": {"from": "artifact.prs", "identified_by": "id"}}
+	checks := {"c": {"for": "every ks as k", "assert": "count of rows whose n is artifact.nums named by k is at least 1"}}
+	rows := [r | some r in ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {}).results; r.check == "c"]
+	[[r.cause, r.inputs] | some r in rows] == [["satisfied", [
+		{"name": "artifact.nums", "value": {"a": 1, "b": 2}, "locations": ["/artifacts/0/nums"]},
+		{"name": "ks[]", "value": ["a", "b"], "locations": ["/artifacts/0/prs/0/ks/0", "/artifacts/0/prs/0/ks/1"]},
+		{"name": "rows[]", "value": [{"n": 1}, {"n": 2}], "locations": ["/artifacts/0/prs/0/rows/0", "/artifacts/0/prs/0/rows/1"]},
+	]]]
+}
+
 _old_policy := {
 	"ergo_spec": "v0.2-dev",
 	"subjects": {"deployment": {

@@ -2203,5 +2203,167 @@
         }
       }
     ]
+  },
+  {
+    "description": "a walk or a count through a for name, read from a parent",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts",
+          "identified_by": "id"
+        },
+        "pr": {
+          "from": "artifact.prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pr",
+          "checks": {
+            "some": {
+              "for": "every keys as k",
+              "assert": "some artifact.map named by k is at least 1"
+            },
+            "count": {
+              "for": "every keys as k",
+              "assert": "count of artifact.map named by k is at least 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the part before the name once, the whole object, and neither the number nor the items read through the name, which change with each item",
+        "rules": [
+          "for.inputs",
+          "for.pass",
+          "walk.inputs",
+          "tally.inputs",
+          "sentence.some.walk"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "map": {
+                  "a": [
+                    1,
+                    2
+                  ],
+                  "b": [
+                    3
+                  ]
+                },
+                "prs": [
+                  {
+                    "id": "p1",
+                    "keys": [
+                      "a",
+                      "b"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            },
+            "check": "count",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/map"
+                ],
+                "name": "artifact.map",
+                "value": {
+                  "a": [
+                    1,
+                    2
+                  ],
+                  "b": [
+                    3
+                  ]
+                }
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0",
+                  "/trail/artifacts/0/prs/0/keys/1"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "a",
+                  "b"
+                ]
+              }
+            ],
+            "failed_items": []
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            },
+            "check": "some",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/map"
+                ],
+                "name": "artifact.map",
+                "value": {
+                  "a": [
+                    1,
+                    2
+                  ],
+                  "b": [
+                    3
+                  ]
+                }
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0",
+                  "/trail/artifacts/0/prs/0/keys/1"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "a",
+                  "b"
+                ]
+              }
+            ],
+            "failed_items": []
+          }
+        ],
+        "expressions": {
+          "s": {
+            "some": "for every keys as k: some artifact.map named by k is at least 1",
+            "count": "for every keys as k: count of artifact.map named by k is at least 1"
+          }
+        }
+      }
+    ]
   }
 ]
