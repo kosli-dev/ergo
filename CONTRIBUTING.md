@@ -58,7 +58,7 @@ Releases are only made by the release workflow, never by hand in GitHub or with 
 
 If a release job fails after its tag is pushed, fix the cause and run it again from the Actions tab, or with `gh workflow run release.yml --ref main -f tag=<tag>`. It runs the same checks and steps on that existing tag. For a spec tag whose release is already there, it skips creating it again.
 
-`site/spec-schemas.sh` reads the schemas of every published `spec-vX.Y` release when the site is built. It fails the build when a tag's schemas don't name that version, so a bad tag has to be deleted.
+`site/spec-schemas.sh` reads the schemas of every published `spec-vX.Y` release when the site is built. It fails the build when a tag's schemas don't name that version, so a bad tag has to be deleted. A bad `rego-vX.Y.Z` tag has to be deleted too, even when its release job failed: the job marks a release as the latest only when its tag is the highest `rego-v` tag, so a stray `rego-v9.0.0` would stop every later release from becoming the latest. The job's log says which tag it compared with and which flag it chose.
 
 If a job fails because the test workflow hasn't finished on that commit, wait and re-run the failed jobs. If only the bump job fails, re-run the failed jobs too. For anything else, delete the tag with `git push --delete origin rego-vX.Y.Z` (or `spec-vX.Y`) and `git tag -d rego-vX.Y.Z`, delete the release if one was created, with `gh release delete rego-vX.Y.Z --yes`, fix `main` and run the script again.
 
