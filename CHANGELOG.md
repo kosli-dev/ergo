@@ -102,6 +102,49 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
   Under a `for` line, a `count of` or `sum of` now lists the parent values its `whose` reads, and its own list when that list doesn't start at the alias, like `artifact.tags[]` and `count of artifact.tags` for `count of artifact.tags is at least 1`. A value read through the alias is still never listed.
 
+- A sentence that failed on a `for` line gives the values it compared, in `inputs`. Each entry of a failed sentence's `items` has them, and so does a failed sentence that has no `items`, because it doesn't read the second list's item. They are the entries the sentence would have in the `inputs` of a row of its own, with `name`, `value`, `locations` and `part`, and the names as the sentence writes them, like `approver.timestamp`. A tool can show "1792655359 is not after 1792656245" without reading the sentence. Every failure has them, so a report with many failed items is longer.
+
+  With this input:
+
+  ```json
+  {"pull_requests": [{"id": "pr-8",
+                      "approvers": [{"username": "bob", "timestamp": 1792655359}],
+                      "commits": [{"sha": "a1", "timestamp": 1792656245}]}]}
+  ```
+
+  and this check:
+
+  ```yaml
+  peer_approval:
+    for: some approvers as approver, every commits as commit
+    assert: approver.timestamp is after commit.timestamp
+  ```
+
+  the first entry of `failed_items` was:
+
+  ```json
+  {"cause": "value",
+   "failed_assertions": [{"assertion": "approver.timestamp is after commit.timestamp", "cause": "value",
+                          "items": [{"cause": "value", "item": "item 1 of commits"}]}],
+   "item": "item 1 of approvers", "locations": ["/pull_requests/0/approvers/0"], "path": "item 1 of approvers",
+   "value": {"timestamp": 1792655359, "username": "bob"}}
+  ```
+
+  and is now:
+
+  ```json
+  {"cause": "value",
+   "failed_assertions": [{"assertion": "approver.timestamp is after commit.timestamp", "cause": "value",
+                          "items": [{"cause": "value",
+                                     "inputs": [{"locations": ["/pull_requests/0/approvers/0/timestamp"],
+                                                 "name": "approver.timestamp", "value": 1792655359},
+                                                {"locations": ["/pull_requests/0/commits/0/timestamp"],
+                                                 "name": "commit.timestamp", "value": 1792656245}],
+                                     "item": "item 1 of commits"}]}],
+   "item": "item 1 of approvers", "locations": ["/pull_requests/0/approvers/0"], "path": "item 1 of approvers",
+   "value": {"timestamp": 1792655359, "username": "bob"}}
+  ```
+
 ### Fixed
 
 - A walk that starts at a `for` alias holding `null` fails as `null`, as [walk.lists](spec/semantics.md#every-and-some) says and as a field holding `null` does. It failed as `absent`. With `for: every commits as c` and `assert: every c.files is a string`, on the release `{"id": "r1", "commits": [null]}`, the row was:

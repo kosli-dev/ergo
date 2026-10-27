@@ -1486,7 +1486,25 @@
                 "failed_assertions": [
                   {
                     "assertion": "some f.tags equals artifact.owner",
-                    "cause": "value"
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/releases/0/files/1/tags/0"
+                        ],
+                        "name": "f.tags[]",
+                        "value": [
+                          "bob"
+                        ]
+                      },
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/owner"
+                        ],
+                        "name": "artifact.owner",
+                        "value": "ann"
+                      }
+                    ]
                   }
                 ],
                 "item": "item 2 of files",
