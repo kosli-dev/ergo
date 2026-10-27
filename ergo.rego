@@ -7924,10 +7924,12 @@ _tally_named(check, side) if {
 	_for_alias_path(check, p)
 }
 
+_tally_kept_inputs(check, subj, part) := _basic_inputs(subj, part) if not _tally_named(check, part)
+
 _tally_kept_inputs(check, subj, part) := array.concat(
 	[_tally_list_input(_tally(subj, part)) | not _for_alias_path(check, part[_basic_form(part)])],
 	_merged_inputs(_named_inputs(subj, [p | some c in part.whose; some p in _condition_paths(c); not _for_alias_path(check, p)])),
-)
+) if _tally_named(check, part)
 
 _tally_parts(side) := [side] if _basic_form(side) in {"count_of", "sum_of"}
 

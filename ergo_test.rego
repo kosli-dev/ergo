@@ -5322,6 +5322,23 @@ test_a_count_under_a_for_line_lists_its_list_and_its_number_when_they_dont_chang
 	[[i.name | some i in r.inputs] | some r in rep.results; r.check == "c"] == [["artifact.tags[]", "commits[]", "count of artifact.tags"]]
 }
 
+_add_rows(assert) := [[i.name | some i in r.inputs] |
+	some r in ergo.report(
+		{"artifacts": [{"name": "a1", "tags": [{"x": "bob"}], "pull_requests": [{"id": 1, "commits": [{"author": "bob", "revs": [1]}]}]}]},
+		{"ergo_spec": "v0.2-dev", "subjects": {"artifact": {"from": "artifacts", "identified_by": "name"}, "pr": {"from": "artifact.pull_requests", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"c": {"for": "every commits as c", "assert": assert}}}}},
+		{},
+	).results
+	r.check == "c"
+]
+
+test_an_add_under_a_for_line_lists_the_number_of_the_operand_that_doesnt_read_the_alias if {
+	_add_rows("count of artifact.tags plus count of artifact.tags whose x is c.author is at least 1") == [["artifact.tags[]", "commits[]", "count of artifact.tags"]]
+}
+
+test_an_add_under_a_for_line_lists_the_number_of_the_second_operand_when_the_first_reads_the_alias_in_its_path if {
+	_add_rows("count of c.revs plus count of artifact.tags is at least 1") == [["artifact.tags[]", "commits[]", "count of artifact.tags"]]
+}
+
 _part_subjects := object.union(_owner_subjects, {"pr": {"from": "artifact.pull_requests", "identified_by": "id", "has": {"w": "info.who"}}})
 
 _part_doc := {"artifact": {"name": "a1", "pull_requests": [{"id": 1, "info": {"who": "ann"}, "commits": [{"author": "bob", "revs": [{"n": "ann"}]}, {"author": "ann", "revs": [{"n": "x"}]}]}]}}
@@ -5343,6 +5360,14 @@ test_a_walk_lists_the_subjects_own_part_it_compares_with_as_a_plain_assertion_do
 	own in rows.count
 	own in rows.for
 	own in rows.forcount
+}
+
+test_a_dotted_name_on_the_right_of_a_walk_is_the_items_field_and_isnt_the_subjects_part if {
+	doc := {"artifact": {"name": "a1", "pull_requests": [{"id": 1, "info": {"who": "ann"}, "commits": [{"author": "bob", "w": "ann"}]}]}}
+	checks := {"dot": "some commits.author is .w", "part": "some commits.author is w"}
+	rep := ergo.report(doc, {"ergo_spec": "v0.2-dev", "subjects": _part_subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {})
+	rows := {r.check: [i.name | some i in r.inputs] | some r in rep.results; r.check in object.keys(checks)}
+	rows == {"dot": ["commits[].author"], "part": ["commits[].author", "w"]}
 }
 
 test_the_applies_row_of_a_from_condition_lists_the_subjects_own_part_it_compares_with if {
