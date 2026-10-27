@@ -147,7 +147,7 @@
           "description": "Only on rows of every, some and for checks, on the $applies row of a subject whose from line has one condition, a some or an every, and on the $min_subjects row of a subject whose from line has every.",
           "items": {
             "type": "object",
-            "properties": {"path": {"type": "string"}, "item": {"type": "string", "description": "The list item the entry belongs to, like item 2 of tests. For a list that failed while walking, the same as path."}, "cause": {"$ref": "#/$defs/cause"}, "value": true, "locations": {"$ref": "#/$defs/locations"}, "failed_assertions": {"$ref": "#/$defs/failed_assertions", "description": "Only on entries of for checks: the sentences that failed for that item, in the order written."}, "failed_items": {"type": "array", "description": "Only on entries of for checks with two items, when the second item failed for that item before any sentence was checked: those failures, in path order.", "items": {"type": "object", "properties": {"path": {"type": "string"}, "item": {"type": "string"}, "cause": {"$ref": "#/$defs/cause"}, "value": true, "locations": {"$ref": "#/$defs/locations"}}, "required": ["path", "item", "cause", "value", "locations"], "additionalProperties": false}}},
+            "properties": {"path": {"type": "string"}, "item": {"type": "string", "description": "The list item the entry belongs to, like item 2 of tests. For a list that failed while walking, the same as path."}, "cause": {"$ref": "#/$defs/cause"}, "value": true, "locations": {"$ref": "#/$defs/locations"}, "failed_assertions": {"$ref": "#/$defs/for_failed_assertions", "description": "Only on entries of for checks: the sentences that failed for that item, in the order written."}, "failed_items": {"type": "array", "description": "Only on entries of for checks with two items, when the second item failed for that item before any sentence was checked: those failures, in path order.", "items": {"type": "object", "properties": {"path": {"type": "string"}, "item": {"type": "string"}, "cause": {"$ref": "#/$defs/cause"}, "value": true, "locations": {"$ref": "#/$defs/locations"}}, "required": ["path", "item", "cause", "value", "locations"], "additionalProperties": false}}},
             "required": ["path", "item", "cause", "value", "locations"],
             "additionalProperties": false
           }
@@ -159,6 +159,23 @@
       "if": {"properties": {"passed": {"const": true}}},
       "then": {"properties": {"cause": {"const": "satisfied"}}},
       "else": {"properties": {"cause": {"not": {"const": "satisfied"}}}}
+    },
+    "for_failed_assertions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "assertion": {"type": "string"},
+          "cause": {"allOf": [{"$ref": "#/$defs/cause"}, {"not": {"const": "satisfied"}}]},
+          "inputs": {"type": "array", "description": "Only on a sentence that has no items: what it read for that item, as the entries of a check row's inputs, with the alias names as the sentence writes them.", "items": {"$ref": "#/$defs/input"}},
+          "items": {"type": "array", "description": "Only on entries of for checks with two items, for a sentence that reads the second item's alias: the items of the second list the sentence failed for, in path order.", "items": {"type": "object", "properties": {"item": {"type": "string"}, "cause": {"$ref": "#/$defs/cause"}, "inputs": {"type": "array", "description": "What the sentence read for that pair of items, as the entries of a check row's inputs, with the alias names as the sentence writes them.", "items": {"$ref": "#/$defs/input"}}}, "required": ["item", "cause", "inputs"], "additionalProperties": false}}
+        },
+        "required": ["assertion", "cause"],
+        "additionalProperties": false,
+        "if": {"required": ["items"]},
+        "then": {"not": {"required": ["inputs"]}, "properties": {"items": {"minItems": 1}}},
+        "else": {"required": ["inputs"]}
+      }
     },
     "failed_assertions": {
       "type": "array",

@@ -117,7 +117,16 @@
                 "failed_assertions": [
                   {
                     "assertion": "c.signed is true",
-                    "cause": "value"
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/commits/1/signed"
+                        ],
+                        "name": "c.signed",
+                        "value": false
+                      }
+                    ]
                   }
                 ],
                 "item": "item 2 of commits",
@@ -194,7 +203,16 @@
                 "failed_assertions": [
                   {
                     "assertion": "c.signed is true",
-                    "cause": "value"
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/commits/0/signed"
+                        ],
+                        "name": "c.signed",
+                        "value": false
+                      }
+                    ]
                   }
                 ],
                 "item": "item 1 of commits",
@@ -211,7 +229,16 @@
                 "failed_assertions": [
                   {
                     "assertion": "c.signed is true",
-                    "cause": "unusable"
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/commits/2/signed"
+                        ],
+                        "name": "c.signed",
+                        "value": 1
+                      }
+                    ]
                   }
                 ],
                 "item": "item 3 of commits",
@@ -287,7 +314,16 @@
                 "failed_assertions": [
                   {
                     "assertion": "c.signed is true",
-                    "cause": "absent"
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/commits/1"
+                        ],
+                        "name": "c.signed",
+                        "value": null
+                      }
+                    ]
                   }
                 ],
                 "item": "item 2 of commits",
@@ -785,7 +821,16 @@
                 "failed_assertions": [
                   {
                     "assertion": "c.signed is true",
-                    "cause": "value"
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/commits/0/signed"
+                        ],
+                        "name": "c.signed",
+                        "value": false
+                      }
+                    ]
                   }
                 ],
                 "item": "item 1 of commits",
@@ -937,7 +982,16 @@
                 "failed_assertions": [
                   {
                     "assertion": "c.signed is true",
-                    "cause": "value"
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/commits/0/signed"
+                        ],
+                        "name": "c.signed",
+                        "value": false
+                      }
+                    ]
                   }
                 ],
                 "item": "item 1 of commits",
@@ -954,7 +1008,16 @@
                 "failed_assertions": [
                   {
                     "assertion": "c.signed is true",
-                    "cause": "value"
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/commits/1/signed"
+                        ],
+                        "name": "c.signed",
+                        "value": false
+                      }
+                    ]
                   }
                 ],
                 "item": "item 2 of commits",
@@ -1129,7 +1192,16 @@
                 "failed_assertions": [
                   {
                     "assertion": "c.signed is true",
-                    "cause": "value"
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/commits/0/signed"
+                        ],
+                        "name": "c.signed",
+                        "value": false
+                      }
+                    ]
                   }
                 ],
                 "item": "item 1 of commits",
@@ -1146,7 +1218,16 @@
                 "failed_assertions": [
                   {
                     "assertion": "c.signed is true",
-                    "cause": "absent"
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/commits/1"
+                        ],
+                        "name": "c.signed",
+                        "value": null
+                      }
+                    ]
                   }
                 ],
                 "item": "item 2 of commits",
@@ -1424,7 +1505,16 @@
                 "failed_assertions": [
                   {
                     "assertion": "c.signed is true",
-                    "cause": "value"
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/commits/1/signed"
+                        ],
+                        "name": "c.signed",
+                        "value": false
+                      }
+                    ]
                   }
                 ],
                 "item": "item 2 of commits",
@@ -1473,7 +1563,16 @@
                 "failed_assertions": [
                   {
                     "assertion": "c.signed is true",
-                    "cause": "value"
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/commits/1/signed"
+                        ],
+                        "name": "c.signed",
+                        "value": false
+                      }
+                    ]
                   }
                 ],
                 "item": "item 2 of commits",
@@ -1522,7 +1621,16 @@
                 "failed_assertions": [
                   {
                     "assertion": "c.signed is true",
-                    "cause": "value"
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/commits/1/signed"
+                        ],
+                        "name": "c.signed",
+                        "value": false
+                      }
+                    ]
                   }
                 ],
                 "item": "item 2 of commits",
@@ -1842,7 +1950,9 @@
             "failed_items": [
               {
                 "cause": "absent",
-                "failed_assertions": [],
+                "failed_assertions": [
+
+                ],
                 "item": "item 1 of commits",
                 "path": "item 1 of commits",
                 "value": {
@@ -1857,7 +1967,16 @@
                 "failed_assertions": [
                   {
                     "assertion": "c.signed is true",
-                    "cause": "value"
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/commits/1/signed"
+                        ],
+                        "name": "c.signed",
+                        "value": false
+                      }
+                    ]
                   }
                 ],
                 "item": "item 2 of commits",
@@ -1902,7 +2021,9 @@
             "failed_items": [
               {
                 "cause": "absent",
-                "failed_assertions": [],
+                "failed_assertions": [
+
+                ],
                 "item": "item 1 of commits",
                 "path": "item 1 of commits",
                 "value": {
@@ -1917,7 +2038,16 @@
                 "failed_assertions": [
                   {
                     "assertion": "c.signed is true",
-                    "cause": "value"
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/commits/1/signed"
+                        ],
+                        "name": "c.signed",
+                        "value": false
+                      }
+                    ]
                   }
                 ],
                 "item": "item 2 of commits",
@@ -1962,7 +2092,9 @@
             "failed_items": [
               {
                 "cause": "absent",
-                "failed_assertions": [],
+                "failed_assertions": [
+
+                ],
                 "item": "item 1 of commits",
                 "path": "item 1 of commits",
                 "value": {
@@ -1977,7 +2109,16 @@
                 "failed_assertions": [
                   {
                     "assertion": "c.signed is true",
-                    "cause": "value"
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/commits/1/signed"
+                        ],
+                        "name": "c.signed",
+                        "value": false
+                      }
+                    ]
                   }
                 ],
                 "item": "item 2 of commits",
@@ -2426,7 +2567,16 @@
                 "failed_assertions": [
                   {
                     "assertion": "author.signed is true",
-                    "cause": "absent"
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/commits/0"
+                        ],
+                        "name": "author.signed",
+                        "value": null
+                      }
+                    ]
                   }
                 ],
                 "item": "item 1 of commits",
@@ -2583,7 +2733,23 @@
                 "failed_assertions": [
                   {
                     "assertion": "c.author does not equal owner",
-                    "cause": "value"
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/commits/1/author"
+                        ],
+                        "name": "c.author",
+                        "value": "ann"
+                      },
+                      {
+                        "locations": [
+                          "/releases/0/owner"
+                        ],
+                        "name": "owner",
+                        "value": "ann"
+                      }
+                    ]
                   }
                 ],
                 "item": "item 2 of commits",
@@ -2659,7 +2825,23 @@
                 "failed_assertions": [
                   {
                     "assertion": "c.author does not equal owner",
-                    "cause": "absent"
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/commits/0/author"
+                        ],
+                        "name": "c.author",
+                        "value": "bob"
+                      },
+                      {
+                        "locations": [
+                          "/releases/0"
+                        ],
+                        "name": "owner",
+                        "value": null
+                      }
+                    ]
                   }
                 ],
                 "item": "item 1 of commits",
@@ -2830,7 +3012,23 @@
                 "failed_assertions": [
                   {
                     "assertion": "approval.approved_at is before started_at",
-                    "cause": "value"
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/approvals/1/approved_at"
+                        ],
+                        "name": "approval.approved_at",
+                        "value": "2026-10-01T00:00:00Z"
+                      },
+                      {
+                        "locations": [
+                          "/releases/0/started_at"
+                        ],
+                        "name": "started_at",
+                        "value": "2026-09-05T00:00:00Z"
+                      }
+                    ]
                   }
                 ],
                 "item": "item 2 of approvals",
@@ -3070,7 +3268,23 @@
                     "items": [
                       {
                         "cause": "value",
-                        "item": "item 1 of pr.approvers"
+                        "item": "item 1 of pr.approvers",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/1/approvers/0/username"
+                            ],
+                            "name": "approver.username",
+                            "value": "eve"
+                          },
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/1/author"
+                            ],
+                            "name": "pr.author",
+                            "value": "eve"
+                          }
+                        ]
                       }
                     ]
                   }
@@ -3498,7 +3712,23 @@
                     "items": [
                       {
                         "cause": "absent",
-                        "item": "item 1 of pr.approvers"
+                        "item": "item 1 of pr.approvers",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/0/approvers/0"
+                            ],
+                            "name": "approver.username",
+                            "value": null
+                          },
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/0/author"
+                            ],
+                            "name": "pr.author",
+                            "value": "jo"
+                          }
+                        ]
                       }
                     ]
                   }
@@ -3860,7 +4090,16 @@
                     "items": [
                       {
                         "cause": "value",
-                        "item": "item 1 of pr.commits"
+                        "item": "item 1 of pr.commits",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/releases/0/pull_requests/0/commits/0/signed"
+                            ],
+                            "name": "commit.signed",
+                            "value": false
+                          }
+                        ]
                       }
                     ]
                   }
@@ -4101,7 +4340,23 @@
                 "failed_assertions": [
                   {
                     "assertion": "approver.username does not equal author",
-                    "cause": "value"
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/approvers/1/username"
+                        ],
+                        "name": "approver.username",
+                        "value": "ann"
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/author"
+                        ],
+                        "name": "author",
+                        "value": "ann"
+                      }
+                    ]
                   }
                 ],
                 "item": "item 2 of approvers",
@@ -4124,7 +4379,23 @@
                     "items": [
                       {
                         "cause": "value",
-                        "item": "item 2 of commits"
+                        "item": "item 2 of commits",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/prs/0/approvers/2/timestamp"
+                            ],
+                            "name": "approver.timestamp",
+                            "value": "2026-10-01T12:00:00Z"
+                          },
+                          {
+                            "locations": [
+                              "/prs/0/commits/1/timestamp"
+                            ],
+                            "name": "commit.timestamp",
+                            "value": "2026-10-02T00:00:00Z"
+                          }
+                        ]
                       }
                     ]
                   }
@@ -4246,7 +4517,23 @@
                 "failed_assertions": [
                   {
                     "assertion": "approver.username does not equal author",
-                    "cause": "value"
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/approvers/0/username"
+                        ],
+                        "name": "approver.username",
+                        "value": "ann"
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/author"
+                        ],
+                        "name": "author",
+                        "value": "ann"
+                      }
+                    ]
                   },
                   {
                     "assertion": "approver.timestamp is after commit.timestamp",
@@ -4254,7 +4541,23 @@
                     "items": [
                       {
                         "cause": "value",
-                        "item": "item 2 of commits"
+                        "item": "item 2 of commits",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/prs/0/approvers/0/timestamp"
+                            ],
+                            "name": "approver.timestamp",
+                            "value": "2026-10-01T12:00:00Z"
+                          },
+                          {
+                            "locations": [
+                              "/prs/0/commits/1/timestamp"
+                            ],
+                            "name": "commit.timestamp",
+                            "value": "2026-10-02T00:00:00Z"
+                          }
+                        ]
                       }
                     ]
                   }
@@ -4452,7 +4755,23 @@
                     "items": [
                       {
                         "cause": "unusable",
-                        "item": "item 1 of commits"
+                        "item": "item 1 of commits",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/prs/0/approvers/0/timestamp"
+                            ],
+                            "name": "approver.timestamp",
+                            "value": "2026-10-05T00:00:00Z"
+                          },
+                          {
+                            "locations": [
+                              "/prs/0/commits/0/timestamp"
+                            ],
+                            "name": "commit.timestamp",
+                            "value": "yesterday"
+                          }
+                        ]
                       }
                     ]
                   }
@@ -4829,7 +5148,23 @@
                     "items": [
                       {
                         "cause": "value",
-                        "item": "item 1 of commits"
+                        "item": "item 1 of commits",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/prs/0/approvals/1/at"
+                            ],
+                            "name": "approval.at",
+                            "value": "2026-09-30T00:00:00Z"
+                          },
+                          {
+                            "locations": [
+                              "/prs/0/commits/0/at"
+                            ],
+                            "name": "commit.at",
+                            "value": "2026-10-01T00:00:00Z"
+                          }
+                        ]
                       }
                     ]
                   }
@@ -5021,7 +5356,16 @@
                 "failed_assertions": [
                   {
                     "assertion": "c.signed is true",
-                    "cause": "value"
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/commits/1/signed"
+                        ],
+                        "name": "c.signed",
+                        "value": false
+                      }
+                    ]
                   }
                 ],
                 "item": "item 2 of commits",
@@ -5204,7 +5548,16 @@
                 "failed_assertions": [
                   {
                     "assertion": "c.author is in $params.staff",
-                    "cause": "value"
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/commits/1/author"
+                        ],
+                        "name": "c.author",
+                        "value": "zed"
+                      }
+                    ]
                   }
                 ],
                 "item": "item 2 of commits",
@@ -6324,7 +6677,16 @@
                 "failed_assertions": [
                   {
                     "assertion": "shas named by persona matches \"^[0-9a-f]{40}$\"",
-                    "cause": "value"
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/1/shas/security"
+                        ],
+                        "name": "shas named by persona",
+                        "value": "x"
+                      }
+                    ]
                   }
                 ],
                 "item": "item 1 of dispatched",
@@ -6339,7 +6701,16 @@
                 "failed_assertions": [
                   {
                     "assertion": "shas named by persona matches \"^[0-9a-f]{40}$\"",
-                    "cause": "absent"
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/1/shas"
+                        ],
+                        "name": "shas named by persona",
+                        "value": null
+                      }
+                    ]
                   }
                 ],
                 "item": "item 2 of dispatched",
@@ -6354,7 +6725,16 @@
                 "failed_assertions": [
                   {
                     "assertion": "shas named by persona matches \"^[0-9a-f]{40}$\"",
-                    "cause": "unusable"
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/1/shas"
+                        ],
+                        "name": "shas named by persona",
+                        "value": null
+                      }
+                    ]
                   }
                 ],
                 "item": "item 3 of dispatched",
@@ -6545,7 +6925,23 @@
                     "items": [
                       {
                         "cause": "value",
-                        "item": "item 1 of commits"
+                        "item": "item 1 of commits",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/pull_requests/0/approvers/0/username"
+                            ],
+                            "name": "approver.username",
+                            "value": "ada"
+                          },
+                          {
+                            "locations": [
+                              "/pull_requests/0/commits/0/author_username"
+                            ],
+                            "name": "last_commit.author_username",
+                            "value": "ada"
+                          }
+                        ]
                       }
                     ]
                   }
@@ -6755,7 +7151,23 @@
                     "items": [
                       {
                         "cause": "value",
-                        "item": "item 3 of commits"
+                        "item": "item 3 of commits",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/pull_requests/0/approvers/0/username"
+                            ],
+                            "name": "approver.username",
+                            "value": "linus"
+                          },
+                          {
+                            "locations": [
+                              "/pull_requests/0/commits/2/author_username"
+                            ],
+                            "name": "last_commit.author_username",
+                            "value": "linus"
+                          }
+                        ]
                       }
                     ]
                   }
@@ -8353,7 +8765,23 @@
                     "items": [
                       {
                         "cause": "value",
-                        "item": "item 1 of commits[0].files"
+                        "item": "item 1 of commits[0].files",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/pull_requests/0/approvers/1/t"
+                            ],
+                            "name": "approver.t",
+                            "value": 0
+                          },
+                          {
+                            "locations": [
+                              "/pull_requests/0/commits/0/files/0/t"
+                            ],
+                            "name": "file.t",
+                            "value": 1
+                          }
+                        ]
                       }
                     ]
                   }
@@ -8369,7 +8797,9 @@
               },
               {
                 "cause": "absent",
-                "failed_assertions": [],
+                "failed_assertions": [
+
+                ],
                 "item": "commits[1].files",
                 "path": "commits[1].files",
                 "value": null,
@@ -8481,11 +8911,43 @@
                     "items": [
                       {
                         "cause": "value",
-                        "item": "item 2 of commits"
+                        "item": "item 2 of commits",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/pull_requests/0/approvers/0/t"
+                            ],
+                            "name": "approver.t",
+                            "value": 5
+                          },
+                          {
+                            "locations": [
+                              "/pull_requests/0/commits/1/t"
+                            ],
+                            "name": "commit.t",
+                            "value": 9
+                          }
+                        ]
                       },
                       {
                         "cause": "absent",
-                        "item": "item 3 of commits"
+                        "item": "item 3 of commits",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/pull_requests/0/approvers/0/t"
+                            ],
+                            "name": "approver.t",
+                            "value": 5
+                          },
+                          {
+                            "locations": [
+                              "/pull_requests/0/commits/2"
+                            ],
+                            "name": "commit.t",
+                            "value": null
+                          }
+                        ]
                       }
                     ]
                   }
@@ -8765,7 +9227,18 @@
                 "failed_assertions": [
                   {
                     "assertion": "every c.files is a string",
-                    "cause": "null"
+                    "cause": "null",
+                    "inputs": [
+                      {
+                        "locations": [
+
+                        ],
+                        "name": "c.files",
+                        "value": [
+
+                        ]
+                      }
+                    ]
                   }
                 ],
                 "item": "item 1 of commits",
@@ -8808,6 +9281,137 @@
         "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}, {"signed": true}]}, {"commits": [{"signed": true}]}]}]},
         "results": [
           {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/releases/0/pull_requests/0/commits/0", "/releases/0/pull_requests/0/commits/1", "/releases/0/pull_requests/1/commits/0"], "name": "pr.commits[]", "value": [{"signed": true}, {"signed": true}, {"signed": true}]}, {"locations": ["/releases/0/pull_requests/0", "/releases/0/pull_requests/1"], "name": "pull_requests[]", "value": [{"commits": [{"signed": true}, {"signed": true}]}, {"commits": [{"signed": true}]}]}], "passed": true, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias read by a key",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every batches as b",
+              "assert": "b named by key is 9"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "names the alias in a failed sentence's inputs as the sentence writes it, with named by after it",
+        "rules": [
+          "for.failure_inputs",
+          "path.field_step"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "key": "k1",
+              "batches": [
+                {
+                  "k1": 9
+                },
+                {
+                  "k1": [
+                    1,
+                    2
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "b named by key is 9",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/batches/1/k1"
+                        ],
+                        "name": "b named by key",
+                        "value": [
+                          1,
+                          2
+                        ]
+                      },
+                      {
+                        "locations": [
+                          "/releases/0/key"
+                        ],
+                        "name": "key",
+                        "value": "k1"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of batches",
+                "locations": [
+                  "/releases/0/batches/1"
+                ],
+                "path": "item 2 of batches",
+                "value": {
+                  "k1": [
+                    1,
+                    2
+                  ]
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/batches/0",
+                  "/releases/0/batches/1"
+                ],
+                "name": "batches[]",
+                "value": [
+                  {
+                    "k1": 9
+                  },
+                  {
+                    "k1": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/releases/0/key"
+                ],
+                "name": "key",
+                "value": "k1"
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
         ]
       }
     ]
@@ -8867,12 +9471,23 @@
                 "failed_assertions": [
                   {
                     "assertion": "first of b is \"x\"",
-                    "cause": "absent"
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/batches/1"
+                        ],
+                        "name": "item 1 of b",
+                        "value": null
+                      }
+                    ]
                   }
                 ],
                 "item": "item 2 of batches",
                 "path": "item 2 of batches",
-                "value": [],
+                "value": [
+
+                ],
                 "locations": [
                   "/releases/0/batches/1"
                 ]
@@ -8886,7 +9501,9 @@
                     "x",
                     "y"
                   ],
-                  []
+                  [
+
+                  ]
                 ],
                 "locations": [
                   "/releases/0/batches/0",
@@ -8965,6 +9582,1369 @@
         "input": {"releases": [{"id": "r1", "pull_requests": [{"meta": {"n": 1}, "commits": [{"signed": true}]}, {"meta": {"commits": []}}]}]},
         "results": [
           {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "m.commits", "locations": ["/releases/0/pull_requests/0/meta"], "path": "m.commits", "value": null}], "item": "item 1 of pull_requests", "locations": ["/releases/0/pull_requests/0/meta"], "path": "item 1 of pull_requests", "value": {"n": 1}}, {"cause": "value", "failed_assertions": [], "failed_items": [{"cause": "value", "item": "m.commits", "locations": ["/releases/0/pull_requests/1/meta/commits"], "path": "m.commits", "value": []}], "item": "item 2 of pull_requests", "locations": ["/releases/0/pull_requests/1/meta"], "path": "item 2 of pull_requests", "value": {"commits": []}}], "inputs": [{"locations": [], "name": "m.commits[]", "value": []}, {"locations": ["/releases/0/pull_requests/0/meta", "/releases/0/pull_requests/1/meta"], "name": "pull_requests[].meta", "value": [{"n": 1}, {"commits": []}]}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a failed sentence on a for line lists the values it compared",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "pull request": {
+          "from": "pr"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pull request",
+          "checks": {
+            "peer_approval": {
+              "for": "some approvers as approver, every commits as commit",
+              "assert": [
+                "approver.state is \"APPROVED\"",
+                "approver.username does not equal author",
+                "approver.timestamp is after commit.timestamp"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "a comparison that fails across two items lists both values for each pair",
+        "rules": [
+          "for.failure_inputs",
+          "for.failed_items",
+          "for.second_items",
+          "location.read",
+          "sentence.for.line",
+          "sentence.for.alias"
+        ],
+        "input": {
+          "pr": {
+            "author": "ann",
+            "approvers": [
+              {
+                "state": "APPROVED",
+                "timestamp": 1792655359,
+                "username": "bob"
+              },
+              {
+                "state": "APPROVED",
+                "timestamp": 1792655761,
+                "username": "cat"
+              }
+            ],
+            "commits": [
+              {
+                "sha": "a1",
+                "timestamp": 1792590878
+              },
+              {
+                "sha": "a2",
+                "timestamp": 1792656245
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "peer_approval",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.timestamp is after commit.timestamp",
+                    "cause": "value",
+                    "items": [
+                      {
+                        "cause": "value",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/pr/approvers/0/timestamp"
+                            ],
+                            "name": "approver.timestamp",
+                            "value": 1792655359
+                          },
+                          {
+                            "locations": [
+                              "/pr/commits/1/timestamp"
+                            ],
+                            "name": "commit.timestamp",
+                            "value": 1792656245
+                          }
+                        ],
+                        "item": "item 2 of commits"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "locations": [
+                  "/pr/approvers/0"
+                ],
+                "path": "item 1 of approvers",
+                "value": {
+                  "state": "APPROVED",
+                  "timestamp": 1792655359,
+                  "username": "bob"
+                }
+              },
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.timestamp is after commit.timestamp",
+                    "cause": "value",
+                    "items": [
+                      {
+                        "cause": "value",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/pr/approvers/1/timestamp"
+                            ],
+                            "name": "approver.timestamp",
+                            "value": 1792655761
+                          },
+                          {
+                            "locations": [
+                              "/pr/commits/1/timestamp"
+                            ],
+                            "name": "commit.timestamp",
+                            "value": 1792656245
+                          }
+                        ],
+                        "item": "item 2 of commits"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of approvers",
+                "locations": [
+                  "/pr/approvers/1"
+                ],
+                "path": "item 2 of approvers",
+                "value": {
+                  "state": "APPROVED",
+                  "timestamp": 1792655761,
+                  "username": "cat"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pr/approvers/0",
+                  "/pr/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "timestamp": 1792655359,
+                    "username": "bob"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "timestamp": 1792655761,
+                    "username": "cat"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pr/author"
+                ],
+                "name": "author",
+                "value": "ann"
+              },
+              {
+                "locations": [
+                  "/pr/commits/0",
+                  "/pr/commits/1"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "sha": "a1",
+                    "timestamp": 1792590878
+                  },
+                  {
+                    "sha": "a2",
+                    "timestamp": 1792656245
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "approvers": [
+                  {
+                    "state": "APPROVED",
+                    "timestamp": 1792655359,
+                    "username": "bob"
+                  },
+                  {
+                    "state": "APPROVED",
+                    "timestamp": 1792655761,
+                    "username": "cat"
+                  }
+                ],
+                "author": "ann",
+                "commits": [
+                  {
+                    "sha": "a1",
+                    "timestamp": 1792590878
+                  },
+                  {
+                    "sha": "a2",
+                    "timestamp": 1792656245
+                  }
+                ]
+              },
+              "type": "pull request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a sentence that reads only the first item lists its values on the sentence itself",
+        "rules": [
+          "for.failure_inputs",
+          "for.failed_items",
+          "for.second_items",
+          "location.read",
+          "sentence.for.line",
+          "sentence.for.alias"
+        ],
+        "input": {
+          "pr": {
+            "author": "ann",
+            "approvers": [
+              {
+                "state": "COMMENTED",
+                "timestamp": 1792655359,
+                "username": "bob"
+              },
+              {
+                "state": "CHANGES_REQUESTED",
+                "timestamp": 1792655761,
+                "username": "cat"
+              }
+            ],
+            "commits": [
+              {
+                "sha": "a1",
+                "timestamp": 1792590878
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "peer_approval",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pr/approvers/0/state"
+                        ],
+                        "name": "approver.state",
+                        "value": "COMMENTED"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "locations": [
+                  "/pr/approvers/0"
+                ],
+                "path": "item 1 of approvers",
+                "value": {
+                  "state": "COMMENTED",
+                  "timestamp": 1792655359,
+                  "username": "bob"
+                }
+              },
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.state is \"APPROVED\"",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pr/approvers/1/state"
+                        ],
+                        "name": "approver.state",
+                        "value": "CHANGES_REQUESTED"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of approvers",
+                "locations": [
+                  "/pr/approvers/1"
+                ],
+                "path": "item 2 of approvers",
+                "value": {
+                  "state": "CHANGES_REQUESTED",
+                  "timestamp": 1792655761,
+                  "username": "cat"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pr/approvers/0",
+                  "/pr/approvers/1"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "COMMENTED",
+                    "timestamp": 1792655359,
+                    "username": "bob"
+                  },
+                  {
+                    "state": "CHANGES_REQUESTED",
+                    "timestamp": 1792655761,
+                    "username": "cat"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pr/author"
+                ],
+                "name": "author",
+                "value": "ann"
+              },
+              {
+                "locations": [
+                  "/pr/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "sha": "a1",
+                    "timestamp": 1792590878
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "approvers": [
+                  {
+                    "state": "COMMENTED",
+                    "timestamp": 1792655359,
+                    "username": "bob"
+                  },
+                  {
+                    "state": "CHANGES_REQUESTED",
+                    "timestamp": 1792655761,
+                    "username": "cat"
+                  }
+                ],
+                "author": "ann",
+                "commits": [
+                  {
+                    "sha": "a1",
+                    "timestamp": 1792590878
+                  }
+                ]
+              },
+              "type": "pull request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a sentence that reads the subject lists the subject's field beside the item's",
+        "rules": [
+          "for.failure_inputs",
+          "for.failed_items",
+          "for.second_items",
+          "location.read",
+          "sentence.for.line",
+          "sentence.for.alias"
+        ],
+        "input": {
+          "pr": {
+            "author": "ann",
+            "approvers": [
+              {
+                "state": "APPROVED",
+                "timestamp": 1792655359,
+                "username": "ann"
+              }
+            ],
+            "commits": [
+              {
+                "sha": "a1",
+                "timestamp": 1792590878
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "peer_approval",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.username does not equal author",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pr/approvers/0/username"
+                        ],
+                        "name": "approver.username",
+                        "value": "ann"
+                      },
+                      {
+                        "locations": [
+                          "/pr/author"
+                        ],
+                        "name": "author",
+                        "value": "ann"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "locations": [
+                  "/pr/approvers/0"
+                ],
+                "path": "item 1 of approvers",
+                "value": {
+                  "state": "APPROVED",
+                  "timestamp": 1792655359,
+                  "username": "ann"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pr/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "timestamp": 1792655359,
+                    "username": "ann"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pr/author"
+                ],
+                "name": "author",
+                "value": "ann"
+              },
+              {
+                "locations": [
+                  "/pr/commits/0"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "sha": "a1",
+                    "timestamp": 1792590878
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "approvers": [
+                  {
+                    "state": "APPROVED",
+                    "timestamp": 1792655359,
+                    "username": "ann"
+                  }
+                ],
+                "author": "ann",
+                "commits": [
+                  {
+                    "sha": "a1",
+                    "timestamp": 1792590878
+                  }
+                ]
+              },
+              "type": "pull request"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a read that stops early lists where it stopped",
+        "rules": [
+          "for.failure_inputs",
+          "for.failed_items",
+          "for.second_items",
+          "location.read",
+          "sentence.for.line",
+          "sentence.for.alias"
+        ],
+        "input": {
+          "pr": {
+            "author": "ann",
+            "approvers": [
+              {
+                "state": "APPROVED",
+                "timestamp": 1792655359,
+                "username": "bob"
+              }
+            ],
+            "commits": [
+              {
+                "sha": "a1",
+                "timestamp": 1792590878
+              },
+              {
+                "sha": "a2"
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "peer_approval",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "approver.timestamp is after commit.timestamp",
+                    "cause": "absent",
+                    "items": [
+                      {
+                        "cause": "absent",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/pr/approvers/0/timestamp"
+                            ],
+                            "name": "approver.timestamp",
+                            "value": 1792655359
+                          },
+                          {
+                            "locations": [
+                              "/pr/commits/1"
+                            ],
+                            "name": "commit.timestamp",
+                            "value": null
+                          }
+                        ],
+                        "item": "item 2 of commits"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of approvers",
+                "locations": [
+                  "/pr/approvers/0"
+                ],
+                "path": "item 1 of approvers",
+                "value": {
+                  "state": "APPROVED",
+                  "timestamp": 1792655359,
+                  "username": "bob"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pr/approvers/0"
+                ],
+                "name": "approvers[]",
+                "value": [
+                  {
+                    "state": "APPROVED",
+                    "timestamp": 1792655359,
+                    "username": "bob"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pr/author"
+                ],
+                "name": "author",
+                "value": "ann"
+              },
+              {
+                "locations": [
+                  "/pr/commits/0",
+                  "/pr/commits/1"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "sha": "a1",
+                    "timestamp": 1792590878
+                  },
+                  {
+                    "sha": "a2"
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "approvers": [
+                  {
+                    "state": "APPROVED",
+                    "timestamp": 1792655359,
+                    "username": "bob"
+                  }
+                ],
+                "author": "ann",
+                "commits": [
+                  {
+                    "sha": "a1",
+                    "timestamp": 1792590878
+                  },
+                  {
+                    "sha": "a2"
+                  }
+                ]
+              },
+              "type": "pull request"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a failed sentence that counts through an alias lists the count and what it counted",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "pull request": {
+          "from": "pr"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pull request",
+          "checks": {
+            "files": {
+              "for": "every commits as commit",
+              "assert": "count of commit.files is at least 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "the number comes first, then the list that was counted",
+        "rules": [
+          "for.failure_inputs",
+          "for.failed_items",
+          "for.second_items",
+          "location.read",
+          "sentence.for.line",
+          "sentence.for.alias",
+          "tally.inputs",
+          "location.worked_out"
+        ],
+        "input": {
+          "pr": {
+            "commits": [
+              {
+                "sha": "a1",
+                "files": [
+                  "x"
+                ]
+              },
+              {
+                "sha": "a2",
+                "files": [
+                  "y",
+                  "z"
+                ]
+              },
+              {
+                "sha": "a3",
+                "files": [
+
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "files",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "count of commit.files is at least 1",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+
+                        ],
+                        "name": "count of commit.files",
+                        "value": 0
+                      },
+                      {
+                        "locations": [
+
+                        ],
+                        "name": "commit.files[]",
+                        "value": [
+
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 3 of commits",
+                "locations": [
+                  "/pr/commits/2"
+                ],
+                "path": "item 3 of commits",
+                "value": {
+                  "files": [
+
+                  ],
+                  "sha": "a3"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pr/commits/0",
+                  "/pr/commits/1",
+                  "/pr/commits/2"
+                ],
+                "name": "commits[]",
+                "value": [
+                  {
+                    "files": [
+                      "x"
+                    ],
+                    "sha": "a1"
+                  },
+                  {
+                    "files": [
+                      "y",
+                      "z"
+                    ],
+                    "sha": "a2"
+                  },
+                  {
+                    "files": [
+
+                    ],
+                    "sha": "a3"
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "commits": [
+                  {
+                    "files": [
+                      "x"
+                    ],
+                    "sha": "a1"
+                  },
+                  {
+                    "files": [
+                      "y",
+                      "z"
+                    ],
+                    "sha": "a2"
+                  },
+                  {
+                    "files": [
+
+                    ],
+                    "sha": "a3"
+                  }
+                ]
+              },
+              "type": "pull request"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a failed sentence on a picked item lists the values it compared",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "pull request": {
+          "from": "pr"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pull request",
+          "checks": {
+            "latest": {
+              "for": "last of commits sorted by timestamp as commit",
+              "assert": [
+                "commit.signed is true",
+                "commit.timestamp is after author_date"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "the picked item is read where it is in the input",
+        "rules": [
+          "for.failure_inputs",
+          "for.failed_items",
+          "for.second_items",
+          "location.read",
+          "sentence.for.line",
+          "sentence.for.alias",
+          "for.pick"
+        ],
+        "input": {
+          "pr": {
+            "author_date": 1792656000,
+            "commits": [
+              {
+                "sha": "a1",
+                "timestamp": 1792590878,
+                "signed": true
+              },
+              {
+                "sha": "a2",
+                "timestamp": 1792655000,
+                "signed": false
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "latest",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "commit.signed is true",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pr/commits/1/signed"
+                        ],
+                        "name": "commit.signed",
+                        "value": false
+                      }
+                    ]
+                  },
+                  {
+                    "assertion": "commit.timestamp is after author_date",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/pr/commits/1/timestamp"
+                        ],
+                        "name": "commit.timestamp",
+                        "value": 1792655000
+                      },
+                      {
+                        "locations": [
+                          "/pr/author_date"
+                        ],
+                        "name": "author_date",
+                        "value": 1792656000
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of commits",
+                "locations": [
+                  "/pr/commits/1"
+                ],
+                "path": "item 2 of commits",
+                "value": {
+                  "sha": "a2",
+                  "signed": false,
+                  "timestamp": 1792655000
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pr/author_date"
+                ],
+                "name": "author_date",
+                "value": 1792656000
+              },
+              {
+                "locations": [
+                  "/pr/commits/1"
+                ],
+                "name": "item 2 of commits",
+                "value": {
+                  "sha": "a2",
+                  "signed": false,
+                  "timestamp": 1792655000
+                }
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "author_date": 1792656000,
+                "commits": [
+                  {
+                    "sha": "a1",
+                    "signed": true,
+                    "timestamp": 1792590878
+                  },
+                  {
+                    "sha": "a2",
+                    "signed": false,
+                    "timestamp": 1792655000
+                  }
+                ]
+              },
+              "type": "pull request"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "the failed items of a list beside the first keep the values only on the sentences",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "pull request": {
+          "from": "pr"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pull request",
+          "checks": {
+            "c": {
+              "for": "every xs as x, every ys.zs as y",
+              "assert": "x.t is more than y.t"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "a list that can't be walked is listed once with no sentences, and the item that failed a sentence has its values",
+        "rules": [
+          "for.failure_inputs",
+          "for.failed_items",
+          "for.second_items",
+          "location.read",
+          "sentence.for.line",
+          "sentence.for.alias",
+          "for.shared_failures"
+        ],
+        "input": {
+          "pr": {
+            "xs": [
+              {
+                "t": 5
+              },
+              {
+                "t": 0
+              }
+            ],
+            "ys": [
+              {
+                "zs": [
+                  {
+                    "t": 1
+                  }
+                ]
+              },
+              {}
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "x.t is more than y.t",
+                    "cause": "value",
+                    "items": [
+                      {
+                        "cause": "value",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/pr/xs/1/t"
+                            ],
+                            "name": "x.t",
+                            "value": 0
+                          },
+                          {
+                            "locations": [
+                              "/pr/ys/0/zs/0/t"
+                            ],
+                            "name": "y.t",
+                            "value": 1
+                          }
+                        ],
+                        "item": "item 1 of ys[0].zs"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/pr/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "t": 0
+                }
+              },
+              {
+                "cause": "absent",
+                "failed_assertions": [
+
+                ],
+                "item": "ys[1].zs",
+                "locations": [
+                  "/pr/ys/1"
+                ],
+                "path": "ys[1].zs",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/pr/xs/0",
+                  "/pr/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "t": 5
+                  },
+                  {
+                    "t": 0
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/pr/ys/0/zs/0"
+                ],
+                "name": "ys[].zs[]",
+                "value": [
+                  {
+                    "t": 1
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "xs": [
+                  {
+                    "t": 5
+                  },
+                  {
+                    "t": 0
+                  }
+                ],
+                "ys": [
+                  {
+                    "zs": [
+                      {
+                        "t": 1
+                      }
+                    ]
+                  },
+                  {}
+                ]
+              },
+              "type": "pull request"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line that reads its alias as a list",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": {"for": "every batches as b", "assert": "count of b is at least 3"}}}}},
+    "cases": [
+      {
+        "description": "names the alias as the sentence writes it, with no $ in front",
+        "rules": ["for.failure_inputs", "for.walk"],
+        "input": {"items": [{"id": "t1", "batches": [["x", "y"], []]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "count of b is at least 3", "cause": "value", "inputs": [{"locations": ["/items/0/batches/0/0", "/items/0/batches/0/1"], "name": "count of b", "value": 2}, {"locations": ["/items/0/batches/0/0", "/items/0/batches/0/1"], "name": "b[]", "value": ["x", "y"]}]}], "item": "item 1 of batches", "locations": ["/items/0/batches/0"], "path": "item 1 of batches", "value": ["x", "y"]}, {"cause": "value", "failed_assertions": [{"assertion": "count of b is at least 3", "cause": "value", "inputs": [{"locations": [], "name": "count of b", "value": 0}, {"locations": [], "name": "b[]", "value": []}]}], "item": "item 2 of batches", "locations": ["/items/0/batches/1"], "path": "item 2 of batches", "value": []}], "inputs": [{"locations": ["/items/0/batches/0", "/items/0/batches/1"], "name": "batches[]", "value": [["x", "y"], []]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line that reads a position of a field of its alias",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": {"for": "every m as x", "assert": "item 3 of x.q is 1"}}}}},
+    "cases": [
+      {
+        "description": "names the position with the alias as the sentence writes it",
+        "rules": ["for.failure_inputs", "location.read"],
+        "input": {"items": [{"id": "t1", "m": [{"q": [{"z": 1}]}]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "item 3 of x.q is 1", "cause": "absent", "inputs": [{"locations": ["/items/0/m/0/q"], "name": "item 3 of x.q", "value": null}]}], "item": "item 1 of m", "locations": ["/items/0/m/0"], "path": "item 1 of m", "value": {"q": [{"z": 1}]}}], "inputs": [{"locations": ["/items/0/m/0"], "name": "m[]", "value": [{"q": [{"z": 1}]}]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line whose sentence reads the same value twice",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": {"for": "every commits as c", "assert": ["c.ts is at least c.ts plus 1", "count of c.files is at least count of c.files plus 1"]}}}}},
+    "cases": [
+      {
+        "description": "lists the value once in the inputs of each failed sentence",
+        "rules": ["for.failure_inputs", "row.inputs_once"],
+        "input": {"items": [{"id": "p1", "commits": [{"ts": 5, "files": ["a"]}]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "c.ts is at least c.ts plus 1", "cause": "value", "inputs": [{"locations": ["/items/0/commits/0/ts"], "name": "c.ts", "value": 5}, {"locations": ["/items/0/commits/0/ts"], "name": "c.ts plus 1", "value": 6}]}, {"assertion": "count of c.files is at least count of c.files plus 1", "cause": "value", "inputs": [{"locations": ["/items/0/commits/0/files/0"], "name": "count of c.files", "value": 1}, {"locations": ["/items/0/commits/0/files/0"], "name": "c.files[]", "value": ["a"]}, {"locations": ["/items/0/commits/0/files/0"], "name": "count of c.files plus 1", "value": 2}]}], "item": "item 1 of commits", "locations": ["/items/0/commits/0"], "path": "item 1 of commits", "value": {"files": ["a"], "ts": 5}}], "inputs": [{"locations": ["/items/0/commits/0"], "name": "commits[]", "value": [{"files": ["a"], "ts": 5}]}], "passed": false, "requirement": "s", "subject": {"id": "p1", "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line with two items whose sentence reads the first alias twice",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": {"for": "every commits as c, every ap as ap", "assert": "c.ts is at least c.ts plus ap.ts"}}}}},
+    "cases": [
+      {
+        "description": "lists each value once in the inputs of each item",
+        "rules": ["for.failure_inputs", "row.inputs_once"],
+        "input": {"items": [{"id": "p1", "commits": [{"ts": 5}], "ap": [{"ts": 9}, {"ts": 1}]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "c.ts is at least c.ts plus ap.ts", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/items/0/commits/0/ts"], "name": "c.ts", "value": 5}, {"locations": ["/items/0/commits/0/ts", "/items/0/ap/0/ts"], "name": "c.ts plus ap.ts", "value": 14}, {"locations": ["/items/0/ap/0/ts"], "name": "ap.ts", "value": 9}], "item": "item 1 of ap"}, {"cause": "value", "inputs": [{"locations": ["/items/0/commits/0/ts"], "name": "c.ts", "value": 5}, {"locations": ["/items/0/commits/0/ts", "/items/0/ap/1/ts"], "name": "c.ts plus ap.ts", "value": 6}, {"locations": ["/items/0/ap/1/ts"], "name": "ap.ts", "value": 1}], "item": "item 2 of ap"}]}], "item": "item 1 of commits", "locations": ["/items/0/commits/0"], "path": "item 1 of commits", "value": {"ts": 5}}], "inputs": [{"locations": ["/items/0/ap/0", "/items/0/ap/1"], "name": "ap[]", "value": [{"ts": 9}, {"ts": 1}]}, {"locations": ["/items/0/commits/0"], "name": "commits[]", "value": [{"ts": 5}]}], "passed": false, "requirement": "s", "subject": {"id": "p1", "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line on a child subject whose sentence reads the parent and its own field of the same name",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids", "identified_by": "id"}}, "requirements": {"s": {"subject": "kid", "checks": {"c": {"for": "every cs as c", "assert": "c.ts is at least b.x plus .b.x"}}}}},
+    "cases": [
+      {
+        "description": "orders the entries of the same name by where they were read, as a row does",
+        "rules": ["for.failure_inputs", "row.inputs_once", "location.merged"],
+        "input": {"bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "b": {"x": 1}, "cs": [{"ts": 1}]}]}]},
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "c.ts is at least b.x plus .b.x",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/bs/0/kids/0/cs/0/ts"
+                        ],
+                        "name": "c.ts",
+                        "value": 1
+                      },
+                      {
+                        "locations": [
+                          "/bs/0/x",
+                          "/bs/0/kids/0/b/x"
+                        ],
+                        "name": "b.x plus .b.x",
+                        "value": 2
+                      },
+                      {
+                        "locations": [
+                          "/bs/0/kids/0/b/x"
+                        ],
+                        "name": "b.x",
+                        "value": 1
+                      },
+                      {
+                        "locations": [
+                          "/bs/0/x"
+                        ],
+                        "name": "b.x",
+                        "value": 1
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of cs",
+                "locations": [
+                  "/bs/0/kids/0/cs/0"
+                ],
+                "path": "item 1 of cs",
+                "value": {
+                  "ts": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/bs/0/kids/0/b/x"
+                ],
+                "name": "b.x",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/bs/0/x"
+                ],
+                "name": "b.x",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/bs/0/x",
+                  "/bs/0/kids/0/b/x"
+                ],
+                "name": "b.x plus .b.x",
+                "value": 2
+              },
+              {
+                "locations": [
+                  "/bs/0/kids/0/cs/0"
+                ],
+                "name": "cs[]",
+                "value": [
+                  {
+                    "ts": 1
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "b": "b1"
+              },
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line whose assert joins sentences with and",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": {"for": "every commits as c, every ap as ap", "assert": "c.ts is at least ap.ts and c.v is 2 and ap.ts is at least c.ts plus 1"}}}}},
+    "cases": [
+      {
+        "description": "gives each sentence its own failure and inputs, as a list under assert does",
+        "rules": ["for.failure_inputs", "sentence.for.assert", "sentence.assert.and"],
+        "input": {"items": [{"id": "p1", "commits": [{"ts": 5, "v": 1}], "ap": [{"ts": 9}]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "c.ts is at least ap.ts", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/items/0/commits/0/ts"], "name": "c.ts", "value": 5}, {"locations": ["/items/0/ap/0/ts"], "name": "ap.ts", "value": 9}], "item": "item 1 of ap"}]}, {"assertion": "c.v is 2", "cause": "value", "inputs": [{"locations": ["/items/0/commits/0/v"], "name": "c.v", "value": 1}]}], "item": "item 1 of commits", "locations": ["/items/0/commits/0"], "path": "item 1 of commits", "value": {"ts": 5, "v": 1}}], "inputs": [{"locations": ["/items/0/ap/0"], "name": "ap[]", "value": [{"ts": 9}]}, {"locations": ["/items/0/commits/0"], "name": "commits[]", "value": [{"ts": 5, "v": 1}]}], "passed": false, "requirement": "s", "subject": {"id": "p1", "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line whose assert holds an or",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": {"for": "every commits as c", "assert": "c.ts is 1 or c.v is 2"}}}}},
+    "cases": [
+      {
+        "description": "is written wrong, because a sentence has no or",
+        "rules": ["sentence.flat"],
+        "input": {"items": [{"id": "p1", "commits": [{"ts": 5, "v": 1}]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["doesn't parse"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line next to an any_of",
+    "policy": {"ergo_spec": "v0.2-dev", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": {"for": "every commits as c", "any_of": {"a": "c.ts is 1", "b": "c.v is 2"}}}}}},
+    "cases": [
+      {
+        "description": "is written wrong, because an any_of takes no for",
+        "rules": ["sentence.any_of.written_wrong"],
+        "input": {"items": [{"id": "p1", "commits": [{"ts": 5, "v": 1}]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["unknown field for"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "item"}}
         ]
       }
     ]

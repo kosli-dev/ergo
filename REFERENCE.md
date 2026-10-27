@@ -1027,8 +1027,15 @@ reads "for every pull request, some approver approved it and isn't its author". 
     {
       "cause": "value",
       "failed_assertions": [
-        {"assertion": "approver.state is \"APPROVED\"", "cause": "value", "items": [{"cause": "value", "item": "item 1 of pr.approvers"}]},
-        {"assertion": "approver.username does not equal pr.author", "cause": "value", "items": [{"cause": "value", "item": "item 1 of pr.approvers"}]}
+        {"assertion": "approver.state is \"APPROVED\"", "cause": "value", "items": [
+          {"cause": "value", "inputs": [{"locations": ["/releases/0/pull_requests/1/approvers/0/state"], "name": "approver.state", "value": "COMMENTED"}], "item": "item 1 of pr.approvers"}
+        ]},
+        {"assertion": "approver.username does not equal pr.author", "cause": "value", "items": [
+          {"cause": "value", "inputs": [
+            {"locations": ["/releases/0/pull_requests/1/approvers/0/username"], "name": "approver.username", "value": "bob"},
+            {"locations": ["/releases/0/pull_requests/1/author"], "name": "pr.author", "value": "bob"}
+          ], "item": "item 1 of pr.approvers"}
+        ]}
       ],
       "item": "item 2 of pull_requests",
       "locations": ["/releases/0/pull_requests/1"],
@@ -1050,7 +1057,29 @@ reads "for every pull request, some approver approved it and isn't its author". 
 ```
 
 - `failed_items` lists the items of the first list that failed, each with what its alias stands for as its `value`. Each one has `failed_assertions`: the sentences that failed for it, each with its cause. With two items, a sentence that failed for several items of the second list has the first of their causes in the order of [causes](#causes). Pull request 8 failed because its one approver commented, and is its author.
-- With two items, a failed sentence that reads the second item's alias also has `items`: the items of the second list it failed for, in list order, each with the cause it failed with. Here `item 1 of pr.approvers` is pull request 8's first approver. With `for: some approvers as approver, every commits as commit`, an approver who approved before the last commit fails `approver.timestamp is after commit.timestamp` with `"items": [{"cause": "value", "item": "item 2 of commits"}]`, so you can see which commit came later. Each item has its own cause: a commit with no `timestamp` would be listed there with `"cause": "absent"`. A sentence that doesn't read `commit`, like `approver.username does not equal author`, has no `items`, because it fails the same way for every commit.
+- With two items, a failed sentence that reads the second item's alias also has `items`: the items of the second list it failed for, in list order, each with the cause it failed with. Here `item 1 of pr.approvers` is pull request 8's first approver. With `for: some approvers as approver, every commits as commit`, an approver who approved before the last commit fails `approver.timestamp is after commit.timestamp` with `"items": [{"cause": "value", "inputs": [...], "item": "item 2 of commits"}]`, so you can see which commit came later. Each item has its own cause: a commit with no `timestamp` would be listed there with `"cause": "absent"`. A sentence that doesn't read `commit`, like `approver.username does not equal author`, has no `items`, because it fails the same way for every commit.
+- Each failed sentence has `inputs`, the values it compared, so a tool can show "1792655359 is not after 1792656245" without reading the sentence. They are the entries the sentence would have in the `inputs` of a row of its own, with the names as the sentence writes them and where each value was read in `locations`, see [where a value was read](#where-a-value-was-read). An entry of `items` has the inputs for that pair of items. A sentence with no `items` has them on the sentence, as the sentence read them on the item of the first list it belongs to. They keep the order the sentence reads them, its left side and then its right side, and a value it reads twice is listed once. Above, the second sentence read `approver.username` and `pr.author`, both for pull request 8. Every failed sentence has them, however many items fail, so a report where many items fail is longer. A read that stops early, like a commit with no `timestamp`, shows `"value": null` and the location where it stopped, and a `count of` on an empty list gives the count `0`, the list `[]` and no locations. With this input:
+
+  ```json
+  {"pr": {"author": "ann",
+    "approvers": [{"state": "APPROVED", "timestamp": 1792655359, "username": "bob"}, {"state": "APPROVED", "timestamp": 1792655761, "username": "cat"}],
+    "commits": [{"sha": "a1", "timestamp": 1792590878}, {"sha": "a2", "timestamp": 1792656245}]}}
+  ```
+
+  and `for: some approvers as approver, every commits as commit` with `approver.timestamp is after commit.timestamp`, the first entry of `failed_items` is:
+
+  ```json
+  {"cause": "value", "failed_assertions": [
+    {"assertion": "approver.timestamp is after commit.timestamp", "cause": "value", "items": [
+      {"cause": "value", "inputs": [
+        {"locations": ["/pr/approvers/0/timestamp"], "name": "approver.timestamp", "value": 1792655359},
+        {"locations": ["/pr/commits/1/timestamp"], "name": "commit.timestamp", "value": 1792656245}
+      ], "item": "item 2 of commits"}
+    ]}
+  ], "item": "item 1 of approvers", "locations": ["/pr/approvers/0"], "path": "item 1 of approvers", "value": {"state": "APPROVED", "timestamp": 1792655359, "username": "bob"}}
+  ```
+
+  A sentence that works out a number, like `count of commit.files is at least 1`, has the number and then the list it counted, with the locations of that list. A part's input has its `part`. Only the sentences of a `for` line have them: the `failed_assertions` of a check with several sentences and no `for` line have none, because its row's `inputs` already hold the values.
 - `failed_assertions` is `[]` when no sentence was checked, like when `whose` leaves no approver, or a field a `whose` reads is missing.
 - When the second item failed before any sentence was checked, the item of the first list has its own `failed_items`, saying where. With `for: some approvers as approver, every commits whose author does not equal approver.username as commit` and a commit with no `author`, `{"t": 2}`, the approver's entry has `"failed_assertions": []` and:
 
@@ -1101,7 +1130,12 @@ picks `a1`, the commit with the latest `timestamp`, wherever it is in the list, 
     {
       "cause": "value",
       "failed_assertions": [
-        {"assertion": "approver.username does not equal last_commit.author_username", "cause": "value", "items": [{"cause": "value", "item": "item 1 of approvers"}]}
+        {"assertion": "approver.username does not equal last_commit.author_username", "cause": "value", "items": [
+          {"cause": "value", "inputs": [
+            {"locations": ["/pull_requests/0/approvers/0/username"], "name": "approver.username", "value": "ada"},
+            {"locations": ["/pull_requests/0/commits/0/author_username"], "name": "last_commit.author_username", "value": "ada"}
+          ], "item": "item 1 of approvers"}
+        ]}
       ],
       "item": "item 1 of commits",
       "locations": ["/pull_requests/0/commits/0"],
@@ -1440,7 +1474,7 @@ and the check's `$refs` entry is `{"name": "$params.regions", "value": ["eu-west
 - A value read from the params has `$params:` in front of a pointer from the root of the params, as `$refs` shows.
 - A read that stops early points at the last value it reached. `d-2` has no `region`, so its location is `/deployments/1`, the deployment that should have held it. A pointer never leads to a value Ergo didn't read.
 - An entry that holds one value for each item of a list, like the `inputs` of an `every`, has one location for each, in the same order. An entry that holds a number Ergo worked out, like `count of findings`, lists the locations of what it was worked out from.
-- A failed item points at where its `value` was read, in the `failed_items` of an `$applies` row as in those of a check. `failed_assertions` hold no values, so they have no locations.
+- A failed item points at where its `value` was read, in the `failed_items` of an `$applies` row as in those of a check. The `failed_assertions` of an `$applies` row or of a check without a `for` line hold no values, so they have no locations. Those of a `for` line have `inputs`, with locations of their own.
 - The entries of `$well_formed` are about how the policy is written, not about the input, so their `locations` are `[]`. So is a list that's missing, where there was nothing to read.
 - Two reads with the same name and value are one entry only when their locations match too. A parent's `b.x` and a child's own `.b.x` can print the same and be read from different places, so they stay two entries.
 

@@ -4681,7 +4681,17 @@ test_a_list_phrase_after_every_or_some_is_written_wrong_because_the_last_list_is
 	_sentence_problems(`some xs contains all of 1, 2`) == [`"contains all of" after every or some would check each item of the last list, not the list: put the walk on a for line`]
 }
 
-_for_rows(check, things, params) := [[r.subject.id, r.cause, r.failed_items, r.inputs] | some r in ergo.report({"things": things}, _sentence_policy({"c": check}), params).results; r.check == "c"]
+_for_rows(check, things, params) := [[r.subject.id, r.cause, _bare_failed(r.failed_items), r.inputs] | some r in ergo.report({"things": things}, _sentence_policy({"c": check}), params).results; r.check == "c"]
+
+_for_rows_full(check, things, params) := [[r.subject.id, r.cause, r.failed_items, r.inputs] | some r in ergo.report({"things": things}, _sentence_policy({"c": check}), params).results; r.check == "c"]
+
+_bare_failed(failed) := [_bare_item(f) | some f in failed]
+
+_bare_item(f) := object.union(f, {"failed_assertions": [_bare_line(l) | some l in f.failed_assertions]})
+
+_bare_line(l) := object.union(object.remove(l, ["inputs", "items"]), {"items": [object.remove(i, ["inputs"]) | some i in l.items]}) if "items" in object.keys(l)
+
+_bare_line(l) := object.remove(l, ["inputs"]) if not "items" in object.keys(l)
 
 _peer_approval := {
 	"for": `some approvers whose state is "APPROVED" as approver, every commits as commit`,
@@ -5977,7 +5987,7 @@ _persona_doc := {"things": [
 
 test_named_by_a_name_from_the_for_line_reads_the_key_each_item_names if {
 	check := {"for": "every dispatched as persona", "assert": `shas named by persona matches "^[0-9a-f]{40}$"`}
-	rows := [[r.subject.id, r.cause, [[f.item, f.cause, f.failed_assertions] | some f in r.failed_items], r.inputs] | some r in ergo.report(_persona_doc, _sentence_policy({"c": check}), {}).results; r.check == "c"]
+	rows := [[r.subject.id, r.cause, [[f.item, f.cause, [_bare_line(l) | some l in f.failed_assertions]] | some f in r.failed_items], r.inputs] | some r in ergo.report(_persona_doc, _sentence_policy({"c": check}), {}).results; r.check == "c"]
 	rows == [
 		[1, "satisfied", [], [{"name": "dispatched[]", "value": ["security", "style"], "locations": ["/things/0/dispatched/0", "/things/0/dispatched/1"]}, {"name": "shas", "value": _persona_doc.things[0].shas, "locations": ["/things/0/shas"]}]],
 		[
@@ -8596,6 +8606,158 @@ test_a_written_date_after_a_time_phrase_is_a_time if {
 	[r.cause | some r in ergo.report({"things": [{"id": 1, "x": "2026-09-30"}, {"id": 2, "x": "2026-10-01"}]}, _sentence_policy({"c": "x is before \"2026-10-01\""}), {}).results; r.check == "c"] == ["satisfied", "value"]
 }
 
+test_a_failed_line_lists_the_values_it_compared_for_each_pair_of_items if {
+	check := {"for": "some approvers as approver, every commits as commit", "assert": "approver.t is more than commit.t"}
+	rows := _for_rows_full(check, [{"id": 1, "approvers": [{"t": 5}, {"t": 2}], "commits": [{"t": 1}, {"t": 9}]}], {})
+	rows[0][2][0].failed_assertions == [{"assertion": "approver.t is more than commit.t", "cause": "value", "items": [{"item": "item 2 of commits", "cause": "value", "inputs": [
+		{"name": "approver.t", "value": 5, "locations": ["/things/0/approvers/0/t"]},
+		{"name": "commit.t", "value": 9, "locations": ["/things/0/commits/1/t"]},
+	]}]}]
+	rows[0][2][1].failed_assertions[0].items == [{"item": "item 2 of commits", "cause": "value", "inputs": [
+		{"name": "approver.t", "value": 2, "locations": ["/things/0/approvers/1/t"]},
+		{"name": "commit.t", "value": 9, "locations": ["/things/0/commits/1/t"]},
+	]}]
+}
+
+test_a_failed_line_that_doesnt_read_the_second_items_name_lists_what_it_read_on_the_line_itself if {
+	check := {"for": "some approvers as approver, every commits as commit", "assert": ["approver.username does not equal author", "approver.t is more than commit.t"]}
+	rows := _for_rows_full(check, [{"id": 1, "author": "ann", "approvers": [{"username": "ann", "t": 5}], "commits": [{"t": 1}, {"t": 9}]}], {})
+	rows[0][2][0].failed_assertions[0] == {"assertion": "approver.username does not equal author", "cause": "value", "inputs": [
+		{"name": "approver.username", "value": "ann", "locations": ["/things/0/approvers/0/username"]},
+		{"name": "author", "value": "ann", "locations": ["/things/0/author"]},
+	]}
+}
+
+test_a_failed_line_on_one_item_lists_what_it_read if {
+	rows := _for_rows_full({"for": "every xs as x", "assert": ["x.k is 1", "x.k is more than limit"]}, [{"id": 1, "limit": 7, "xs": [{"k": 1}, {"k": 2}]}], {})
+	rows[0][2][0].failed_assertions == [
+		{"assertion": "x.k is more than limit", "cause": "value", "inputs": [
+			{"name": "x.k", "value": 1, "locations": ["/things/0/xs/0/k"]},
+			{"name": "limit", "value": 7, "locations": ["/things/0/limit"]},
+		]},
+	]
+	rows[0][2][1].failed_assertions[0].inputs == [{"name": "x.k", "value": 2, "locations": ["/things/0/xs/1/k"]}]
+}
+
+test_a_failed_line_that_counts_through_an_alias_lists_the_number_then_the_list if {
+	rows := _for_rows_full({"for": "every commits as commit", "assert": "count of commit.files is at least 2"}, [{"id": 1, "commits": [{"files": ["a", "b"]}, {"files": ["c"]}]}], {})
+	rows[0][2][0].failed_assertions[0].inputs == [
+		{"name": "count of commit.files", "value": 1, "locations": ["/things/0/commits/1/files/0"]},
+		{"name": "commit.files[]", "value": ["c"], "locations": ["/things/0/commits/1/files/0"]},
+	]
+}
+
+test_a_failed_line_lists_where_a_read_stopped_for_a_missing_null_or_wrong_typed_second_item if {
+	check := {"for": "some approvers as approver, every commits as commit", "assert": "approver.t is more than commit.t"}
+	rows := _for_rows_full(check, [{"id": 1, "approvers": [{"t": 5}], "commits": [{}, {"t": null}, "x", {"t": 9}]}], {})
+	rows[0][1] == "not_an_object"
+	rows[0][2][0].failed_assertions[0].items == [
+		{"item": "item 1 of commits", "cause": "absent", "inputs": [
+			{"name": "approver.t", "value": 5, "locations": ["/things/0/approvers/0/t"]},
+			{"name": "commit.t", "value": null, "locations": ["/things/0/commits/0"]},
+		]},
+		{"item": "item 2 of commits", "cause": "null", "inputs": [
+			{"name": "approver.t", "value": 5, "locations": ["/things/0/approvers/0/t"]},
+			{"name": "commit.t", "value": null, "locations": ["/things/0/commits/1/t"]},
+		]},
+		{"item": "item 3 of commits", "cause": "not_an_object", "inputs": [
+			{"name": "approver.t", "value": 5, "locations": ["/things/0/approvers/0/t"]},
+			{"name": "commit.t", "value": null, "locations": ["/things/0/commits/2"]},
+		]},
+		{"item": "item 4 of commits", "cause": "value", "inputs": [
+			{"name": "approver.t", "value": 5, "locations": ["/things/0/approvers/0/t"]},
+			{"name": "commit.t", "value": 9, "locations": ["/things/0/commits/3/t"]},
+		]},
+	]
+}
+
+test_a_failed_line_after_a_picked_item_lists_where_the_picked_item_is_in_the_input if {
+	check := {"for": "last of commits sorted by t as last_commit, some approvers as approver", "assert": "approver.u does not equal last_commit.u"}
+	rows := _for_rows_full(check, [{"id": 1, "approvers": [{"u": "ada"}], "commits": [{"u": "ada", "t": 2}, {"u": "bob", "t": 1}]}], {})
+	rows[0][2][0].failed_assertions[0].items[0].inputs == [
+		{"name": "approver.u", "value": "ada", "locations": ["/things/0/approvers/0/u"]},
+		{"name": "last_commit.u", "value": "ada", "locations": ["/things/0/commits/0/u"]},
+	]
+}
+
+test_a_failed_line_that_names_a_key_with_an_alias_lists_the_value_read_and_not_the_alias if {
+	check := {"for": "every dispatched as persona", "assert": `shas named by persona matches "^[0-9a-f]{40}$"`}
+	rows := _for_rows_full(check, _persona_doc.things, {})
+	rows[1][2][0].failed_assertions[0].inputs == [{"name": "shas named by persona", "value": "x", "locations": ["/things/1/shas/security"]}]
+	rows[1][2][1].failed_assertions[0].inputs == [{"name": "shas named by persona", "value": null, "locations": ["/things/1/shas"]}]
+}
+
+test_a_failed_line_that_reads_a_part_tags_the_input_with_it if {
+	has := {"cov": "dd.b", "lst": "dd.items"}
+	rep := _parts_report(has, {"c": {"for": "every lst as entry", "assert": "entry.x is cov.x"}}, {"b": {"x": 2}, "items": [{"x": 1}]})
+	_parts_row(rep, "c").failed_items[0].failed_assertions[0].inputs == [
+		{"name": "entry.x", "value": 1, "locations": ["/trail/dd/items/0/x"]},
+		{"name": "cov.x", "value": 2, "locations": ["/trail/dd/b/x"], "part": {"name": "cov", "id": null}},
+	]
+}
+
+test_a_failed_line_lists_its_values_in_the_violations_too if {
+	check := {"for": "some approvers as approver, every commits as commit", "assert": "approver.t is more than commit.t"}
+	r := ergo.report({"things": [{"id": 1, "approvers": [{"t": 5}], "commits": [{"t": 9}]}]}, _sentence_policy({"c": check}), {})
+	[v.failed_items[0].failed_assertions[0].items[0].inputs | some v in ergo.violations(r); v.check == "c"] == [[
+		{"name": "approver.t", "value": 5, "locations": ["/things/0/approvers/0/t"]},
+		{"name": "commit.t", "value": 9, "locations": ["/things/0/commits/0/t"]},
+	]]
+}
+
+_line_inputs(check, things) := [l.inputs | some r in ergo.report({"things": things}, _sentence_policy({"c": check}), {}).results; r.check == "c"; some f in r.failed_items; some l in f.failed_assertions]
+
+test_a_failed_line_names_an_alias_that_holds_a_list_as_the_sentence_writes_it if {
+	things := [{"id": 1, "batches": [["x", "y"], []]}]
+	_line_inputs({"for": "every batches as b", "assert": `first of b is "x"`}, things) == [[{"name": "item 1 of b", "value": null, "locations": ["/things/0/batches/1"]}]]
+	_line_inputs({"for": "every batches as b", "assert": "count of b is at least 3"}, things) == [
+		[{"name": "count of b", "value": 2, "locations": ["/things/0/batches/0/0", "/things/0/batches/0/1"]}, {"name": "b[]", "value": ["x", "y"], "locations": ["/things/0/batches/0/0", "/things/0/batches/0/1"]}],
+		[{"name": "count of b", "value": 0, "locations": []}, {"name": "b[]", "value": [], "locations": []}],
+	]
+	_line_inputs({"for": "every m as x", "assert": "item 3 of x.q is 1"}, [{"id": 1, "m": [{"q": [1]}]}]) == [[{"name": "item 3 of x.q", "value": null, "locations": ["/things/0/m/0/q"]}]]
+}
+
+test_a_failed_line_names_an_alias_read_by_a_key_as_the_sentence_writes_it if {
+	things := [{"id": 1, "key": "k1", "n": [{"k1": [1, 2]}]}]
+	_line_inputs({"for": "every n as c", "assert": "c named by key is 9"}, things) == [[
+		{"name": "c named by key", "value": [1, 2], "locations": ["/things/0/n/0/k1"]},
+		{"name": "key", "value": "k1", "locations": ["/things/0/key"]},
+	]]
+	_line_inputs({"for": "every n as c", "assert": "first of c named by key is 9"}, things) == [[
+		{"name": "item 1 of c named by key", "value": 1, "locations": ["/things/0/n/0/k1/0"]},
+		{"name": "key", "value": "k1", "locations": ["/things/0/key"]},
+	]]
+}
+
+test_a_failed_line_lists_a_value_it_reads_twice_once if {
+	things := [{"id": 1, "commits": [{"ts": 5, "files": ["a"]}]}]
+	_line_inputs({"for": "every commits as c", "assert": "c.ts is at least c.ts plus 1"}, things) == [[
+		{"name": "c.ts", "value": 5, "locations": ["/things/0/commits/0/ts"]},
+		{"name": "c.ts plus 1", "value": 6, "locations": ["/things/0/commits/0/ts"]},
+	]]
+	_line_inputs({"for": "every commits as c", "assert": "count of c.files is at least count of c.files plus 1"}, things) == [[
+		{"name": "count of c.files", "value": 1, "locations": ["/things/0/commits/0/files/0"]},
+		{"name": "c.files[]", "value": ["a"], "locations": ["/things/0/commits/0/files/0"]},
+		{"name": "count of c.files plus 1", "value": 2, "locations": ["/things/0/commits/0/files/0"]},
+	]]
+}
+
+test_a_failed_line_lists_a_value_it_reads_twice_once_for_each_pair_of_items if {
+	things := [{"id": 1, "commits": [{"ts": 5}], "ap": [{"ts": 9}, {"ts": 1}]}]
+	check := {"for": "every commits as c, every ap as ap", "assert": "c.ts is at least c.ts plus ap.ts"}
+	rows := _for_rows_full(check, things, {})
+	[x.inputs | some x in rows[0][2][0].failed_assertions[0].items] == [
+		[{"name": "c.ts", "value": 5, "locations": ["/things/0/commits/0/ts"]}, {"name": "c.ts plus ap.ts", "value": 14, "locations": ["/things/0/commits/0/ts", "/things/0/ap/0/ts"]}, {"name": "ap.ts", "value": 9, "locations": ["/things/0/ap/0/ts"]}],
+		[{"name": "c.ts", "value": 5, "locations": ["/things/0/commits/0/ts"]}, {"name": "c.ts plus ap.ts", "value": 6, "locations": ["/things/0/commits/0/ts", "/things/0/ap/1/ts"]}, {"name": "ap.ts", "value": 1, "locations": ["/things/0/ap/1/ts"]}],
+	]
+}
+
+test_a_failed_line_orders_two_reads_of_one_name_by_where_they_were_read_as_a_row_does if {
+	policy := {"ergo_spec": "v0.2-dev", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": {"for": "every cs as c", "assert": "c.ts is at least b.x plus .b.x"}}}}}
+	rep := ergo.report({"bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "b": {"x": 1}, "cs": [{"ts": 1}]}]}]}, policy, {})
+	[i.locations | some r in rep.results; r.check == "c"; some i in r.failed_items[0].failed_assertions[0].inputs; i.name == "b.x"] == [["/bs/0/kids/0/b/x"], ["/bs/0/x"]]
+}
+
 test_a_failed_line_names_the_items_of_the_second_list_it_failed_on if {
 	rows := _for_rows(_peer_approval, _peer_things, {})
 	[[f.item, f.failed_assertions] | some f in rows[1][2]] == [
@@ -9190,7 +9352,7 @@ test_a_for_line_row_gives_the_location_of_each_item_and_of_the_item_that_failed 
 		"cause": "value",
 		"value": {"a": 2},
 		"locations": ["/things/0/prs/1"],
-		"failed_assertions": [{"assertion": "pr.a is 1", "cause": "value"}],
+		"failed_assertions": [{"assertion": "pr.a is 1", "cause": "value", "inputs": [{"name": "pr.a", "value": 2, "locations": ["/things/0/prs/1/a"]}]}],
 	}]
 }
 

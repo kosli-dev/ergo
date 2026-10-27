@@ -7092,7 +7092,27 @@
                 "failed_assertions": [
                   {
                     "assertion": "count of pr.reviews is at least 2",
-                    "cause": "value"
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/releases/0/pull_requests/1/reviews/0"
+                        ],
+                        "name": "count of pr.reviews",
+                        "value": 1
+                      },
+                      {
+                        "locations": [
+                          "/releases/0/pull_requests/1/reviews/0"
+                        ],
+                        "name": "pr.reviews[]",
+                        "value": [
+                          {
+                            "id": 0
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ],
                 "item": "item 2 of pull_requests",
@@ -7184,13 +7204,33 @@
                 "failed_assertions": [
                   {
                     "assertion": "count of pr.reviews is at least 2",
-                    "cause": "value"
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+
+                        ],
+                        "name": "count of pr.reviews",
+                        "value": 0
+                      },
+                      {
+                        "locations": [
+
+                        ],
+                        "name": "pr.reviews[]",
+                        "value": [
+
+                        ]
+                      }
+                    ]
                   }
                 ],
                 "item": "item 1 of pull_requests",
                 "path": "item 1 of pull_requests",
                 "value": {
-                  "reviews": []
+                  "reviews": [
+
+                  ]
                 },
                 "locations": [
                   "/releases/0/pull_requests/0"
@@ -7202,7 +7242,9 @@
                 "name": "pull_requests[]",
                 "value": [
                   {
-                    "reviews": []
+                    "reviews": [
+
+                    ]
                   }
                 ],
                 "locations": [
@@ -7268,7 +7310,25 @@
                 "failed_assertions": [
                   {
                     "assertion": "count of pr.reviews is at least 2",
-                    "cause": "absent"
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+
+                        ],
+                        "name": "count of pr.reviews",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+
+                        ],
+                        "name": "pr.reviews",
+                        "value": [
+
+                        ]
+                      }
+                    ]
                   }
                 ],
                 "item": "item 2 of pull_requests",
@@ -7351,7 +7411,25 @@
                 "failed_assertions": [
                   {
                     "assertion": "count of pr.reviews is at least 2",
-                    "cause": "null"
+                    "cause": "null",
+                    "inputs": [
+                      {
+                        "locations": [
+
+                        ],
+                        "name": "count of pr.reviews",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+
+                        ],
+                        "name": "pr.reviews",
+                        "value": [
+
+                        ]
+                      }
+                    ]
                   }
                 ],
                 "item": "item 1 of pull_requests",
@@ -7427,7 +7505,25 @@
                 "failed_assertions": [
                   {
                     "assertion": "count of pr.reviews is at least 2",
-                    "cause": "unusable"
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+
+                        ],
+                        "name": "count of pr.reviews",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+
+                        ],
+                        "name": "pr.reviews",
+                        "value": [
+
+                        ]
+                      }
+                    ]
                   }
                 ],
                 "item": "item 1 of pull_requests",
@@ -12052,7 +12148,31 @@
                 "failed_assertions": [
                   {
                     "assertion": "days elapsed from pr.opened to pr.closed is at most 2",
-                    "cause": "value"
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/vulns/0/pull_requests/1/opened",
+                          "/vulns/0/pull_requests/1/closed"
+                        ],
+                        "name": "days elapsed from pr.opened to pr.closed",
+                        "value": 3
+                      },
+                      {
+                        "locations": [
+                          "/vulns/0/pull_requests/1/opened"
+                        ],
+                        "name": "pr.opened",
+                        "value": 0
+                      },
+                      {
+                        "locations": [
+                          "/vulns/0/pull_requests/1/closed"
+                        ],
+                        "name": "pr.closed",
+                        "value": 259200
+                      }
+                    ]
                   }
                 ],
                 "item": "item 2 of pull_requests",
@@ -12137,7 +12257,31 @@
                 "failed_assertions": [
                   {
                     "assertion": "days elapsed from pr.opened to pr.closed is at most 2",
-                    "cause": "absent"
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/vulns/0/pull_requests/0/opened",
+                          "/vulns/0/pull_requests/0"
+                        ],
+                        "name": "days elapsed from pr.opened to pr.closed",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/vulns/0/pull_requests/0/opened"
+                        ],
+                        "name": "pr.opened",
+                        "value": 0
+                      },
+                      {
+                        "locations": [
+                          "/vulns/0/pull_requests/0"
+                        ],
+                        "name": "pr.closed",
+                        "value": null
+                      }
+                    ]
                   }
                 ],
                 "item": "item 1 of pull_requests",

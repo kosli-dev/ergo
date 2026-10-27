@@ -3416,5 +3416,147 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a failed sentence on a for line tags the inputs it read through a part",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "round": {
+          "from": "trail",
+          "identified_by": "name",
+          "has": {
+            "cov": {
+              "from": "d.b",
+              "identified_by": "id"
+            },
+            "lst": "d.items"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "round",
+          "checks": {
+            "c": {
+              "for": "every lst as entry",
+              "assert": "entry.x is cov.x"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "the part's input has the part and the item's has none",
+        "rules": [
+          "parts.tag",
+          "for.failure_inputs",
+          "for.failed_items"
+        ],
+        "input": {
+          "trail": {
+            "name": "t1",
+            "d": {
+              "b": {
+                "id": "b-7",
+                "x": 2
+              },
+              "items": [
+                {
+                  "x": 1
+                },
+                {
+                  "x": 2
+                }
+              ]
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "entry.x equals cov.x",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/trail/d/items/0/x"
+                        ],
+                        "name": "entry.x",
+                        "value": 1
+                      },
+                      {
+                        "locations": [
+                          "/trail/d/b/x"
+                        ],
+                        "name": "cov.x",
+                        "part": {
+                          "id": "b-7",
+                          "name": "cov"
+                        },
+                        "value": 2
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of lst",
+                "locations": [
+                  "/trail/d/items/0"
+                ],
+                "path": "item 1 of lst",
+                "value": {
+                  "x": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/d/b/x"
+                ],
+                "name": "cov.x",
+                "part": {
+                  "id": "b-7",
+                  "name": "cov"
+                },
+                "value": 2
+              },
+              {
+                "locations": [
+                  "/trail/d/items/0",
+                  "/trail/d/items/1"
+                ],
+                "name": "lst[]",
+                "part": {
+                  "id": null,
+                  "name": "lst"
+                },
+                "value": [
+                  {
+                    "x": 1
+                  },
+                  {
+                    "x": 2
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t1",
+              "type": "round"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
