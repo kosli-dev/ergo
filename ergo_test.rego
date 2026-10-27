@@ -8719,13 +8719,18 @@ test_an_applies_row_lists_an_input_read_by_two_conditions_once_with_its_location
 	]
 }
 
-test_an_input_read_through_a_name_a_for_line_gives_has_no_location if {
-	rows := _located_rows({"for": "every prs as pr", "assert": "pr.a is 1"}, {"things": [{"id": "t1", "prs": [{"a": 1}]}]}, {})
-	every row in rows {
-		every i in row[2] {
-			i.locations == null
-		}
-	}
+test_a_for_line_row_gives_the_location_of_each_item_and_of_the_item_that_failed if {
+	rows := [r | some r in ergo.report({"things": [{"id": "t1", "prs": [{"a": 1}, {"a": 2}]}]}, _sentence_policy({"c": {"for": "every prs as pr", "assert": "pr.a is 1"}}), {}).results; r.check == "c"]
+	count(rows) == 1
+	rows[0].inputs == [{"name": "prs[]", "value": [{"a": 1}, {"a": 2}], "locations": ["/things/0/prs/0", "/things/0/prs/1"]}]
+	rows[0].failed_items == [{
+		"path": "item 2 of prs",
+		"item": "item 2 of prs",
+		"cause": "value",
+		"value": {"a": 2},
+		"locations": ["/things/0/prs/1"],
+		"failed_assertions": [{"assertion": "pr.a is 1", "cause": "value"}],
+	}]
 }
 
 test_first_seen_keeps_the_first_of_each_location_in_the_order_they_came if {
