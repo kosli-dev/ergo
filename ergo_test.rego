@@ -4472,6 +4472,45 @@ test_a_walk_of_exactly_ten_steps_walks_its_last_list_and_eleven_is_written_wrong
 	_sentence_problems("every p0.p1.p2.p3.p4.p5.p6.p7.p8.p9.p10 is not empty") == ["every and some over more than ten steps aren't supported yet"]
 }
 
+test_a_position_is_a_step_of_a_walk_so_ten_steps_with_one_read_and_eleven_are_written_wrong if {
+	doc := {"things": [{"id": "a", "k1": [{"k2": {"k3": {"k4": {"k5": {"k6": {"k7": {"k8": {"k9": [true, false]}}}}}}}}]}, {"id": "b", "k1": [{"k2": {"k3": {"k4": {"k5": {"k6": {"k7": {"k8": {"k9": [false, true]}}}}}}}}]}]}
+	[[r[0], r[2]] | some r in _walk_rows({"c": "every first of k1.k2.k3.k4.k5.k6.k7.k8.k9 is true"}, doc, {})] == [["a", "satisfied"], ["b", "value"]]
+	[[r[0], r[2]] | some r in _walk_rows({"c": "every k1.k2.k3.k4.k5.k6.k7.k8.k9 is true"}, doc, {})] == [["a", "value"], ["b", "value"]]
+	_sentence_problems("every first of k1.k2.k3.k4.k5.k6.k7.k8.k9.k10 is true") == ["every and some over more than ten steps aren't supported yet"]
+}
+
+_ten := "k1.k2.k3.k4.k5.k6.k7.k8.k9.k10"
+
+_eleven := "k1.k2.k3.k4.k5.k6.k7.k8.k9.k10.k11"
+
+_too_long := ["every and some over more than ten steps aren't supported yet"]
+
+test_a_count_of_or_sum_of_on_the_right_of_a_phrase_over_ten_steps_reads_and_gives_the_right_verdicts if {
+	doc := {"things": [
+		{"id": "a", "n": 2, "k1": {"k2": {"k3": {"k4": {"k5": {"k6": {"k7": {"k8": {"k9": {"k10": [1, 1]}}}}}}}}}},
+		{"id": "b", "n": 1, "k1": {"k2": {"k3": {"k4": {"k5": {"k6": {"k7": {"k8": {"k9": {"k10": [1, 1]}}}}}}}}}},
+	]}
+	rows := _walk_rows({"c": concat("", ["n is count of ", _ten]), "d": concat("", ["n is at least sum of ", _ten])}, doc, {})
+	[[r[0], r[1], r[2]] | some r in rows] == [["a", "c", "satisfied"], ["a", "d", "satisfied"], ["b", "c", "value"], ["b", "d", "value"]]
+}
+
+test_a_count_of_or_sum_of_over_more_than_ten_steps_is_written_wrong_on_the_right_of_a_phrase if {
+	_sentence_problems(concat("", ["n is count of ", _eleven])) == _too_long
+	_sentence_problems(concat("", ["n is at least sum of ", _eleven])) == _too_long
+	_sentence_problems(concat("", ["n is count of k1 plus count of ", _eleven])) == _too_long
+	_sentence_problems(concat("", ["count of k1 is at least count of ", _eleven])) == _too_long
+	_sentence_problems(concat("", ["count of k1 plus count of ", _eleven, " is 1"])) == _too_long
+}
+
+test_a_count_of_over_more_than_ten_steps_is_written_wrong_inside_a_whose_a_for_line_and_an_any_of if {
+	_sentence_problems(concat("", ["every xs whose n is count of ", _eleven, " is not empty"])) == _too_long
+	_sentence_problems(concat("", ["some xs whose n is count of ", _eleven, " is not empty"])) == _too_long
+	_sentence_problems(concat("", ["count of xs whose n is count of ", _eleven, " is 1"])) == _too_long
+	_sentence_problems({"for": "every xs as x", "assert": concat("", ["n is count of ", _eleven])}) == _too_long
+	_sentence_problems({"for": "every xs as x", "assert": [concat("", ["x.n is at least sum of ", _eleven])]}) == _too_long
+	_sentence_problems({"any_of": {"a": concat("", ["n is count of ", _eleven]), "b": "n is 1"}}) == ["option a: every and some over more than ten steps aren't supported yet"]
+}
+
 test_a_walk_whose_named_by_cant_be_read_shows_an_empty_list_in_its_inputs if {
 	r := ergo.report({"things": [{"id": "a", "xs": {"k": [1]}}]}, _sentence_policy({"c": "every xs named by $params.k is 1"}), {})
 	[[row.cause, row.inputs, row.failed_items] | some row in r.results; row.check == "c"] == [["absent", [{"name": "xs named by $params.k", "value": [], "locations": []}], []]]
@@ -7768,6 +7807,19 @@ test_every_in_a_from_line_cant_start_at_another_subject_or_go_with_named_by_each
 	_from_problems(_from_report(_flows_doc, {"s": {"from": "every artifacts named by each of $params.names"}}, {"c": "x exists"}, {"names": ["a"]})) == [{"name": "subjects.s.from", "value": ["every can't go with named by each of: start the from line at a subject to read its names one subject at a time"], "locations": []}]
 	_from_problems(_from_report(_flows_doc, {"s": {"from": "every x.b.c.d.e.f.g.h.i.j.k"}}, {"c": "x exists"}, {})) == [{"name": "subjects.s.from", "value": ["every over more than ten steps isn't supported yet"], "locations": []}]
 	_from_problems(_from_report(_flows_doc, {"s": {"from": "every x.b.c.d.e.f.g.h.i.j"}}, {"c": "x exists"}, {})) == []
+}
+
+test_a_from_line_with_every_does_not_count_input_as_a_step if {
+	doc := {"k1": {"k2": {"k3": {"k4": {"k5": {"k6": {"k7": {"k8": {"k9": {"k10": [{"id": "a"}, {"id": "b"}]}}}}}}}}}}
+	rep := _from_report(doc, {"s": {"from": "every $input.k1.k2.k3.k4.k5.k6.k7.k8.k9.k10", "identified_by": "id"}}, {"c": "id exists"}, {})
+	_from_problems(rep) == []
+	[[r.subject.id, r.cause] | some r in rep.results; r.check == "c"] == [["a", "satisfied"], ["b", "satisfied"]]
+	_from_problems(_from_report(doc, {"s": {"from": "every $input.k1.k2.k3.k4.k5.k6.k7.k8.k9.k10.k11"}}, {"c": "x exists"}, {})) == [{"name": "subjects.s.from", "value": ["every over more than ten steps isn't supported yet"], "locations": []}]
+}
+
+test_a_count_of_over_more_than_ten_steps_on_the_right_of_a_from_lines_whose_is_written_wrong if {
+	_from_problems(_from_report({"things": []}, {"s": {"from": concat("", ["things whose n is count of ", _eleven])}}, {"c": "x exists"}, {})) == [{"name": "subjects.s.from", "value": ["whose: every and some over more than ten steps aren't supported yet"], "locations": []}]
+	_from_problems(_from_report({"things": []}, {"s": {"from": concat("", ["things whose n is count of ", _ten])}}, {"c": "x exists"}, {})) == []
 }
 
 test_a_field_called_every_in_a_from_line_is_written_with_a_dot if {

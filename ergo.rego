@@ -6088,7 +6088,7 @@ _s_every_unsupported(name, fl, subjects) := ({"every can't go with a from line t
 	is_string(fl.path.steps[0])
 	fl.path.steps[0] != name
 	fl.path.steps[0] in object.keys(subjects)
-} | {"every can't go with named by each of: start the from line at a subject to read its names one subject at a time" | "named_by_each_of" in object.keys(fl)}) | {"every over more than ten steps isn't supported yet" | count(_s_model_path(fl.path)) > 10} if object.get(fl, "every", false) == true
+} | {"every can't go with named by each of: start the from line at a subject to read its names one subject at a time" | "named_by_each_of" in object.keys(fl)}) | {"every over more than ten steps isn't supported yet" | count(_walk_steps(_s_model_path(fl.path))) > 10} if object.get(fl, "every", false) == true
 
 _s_chain_unsupported(name, fl, subjects, chains) := {"a chain of more than three subjects isn't supported yet" |
 	_s_descends(name, fl, subjects)
@@ -6614,7 +6614,7 @@ _s_unsupported(parsed) := set() if not "assertions" in object.keys(parsed)
 
 _s_unsupported(parsed) := {u | some a in parsed.assertions; some u in _s_assertion_unsupported(a)} if "assertions" in object.keys(parsed)
 
-_s_assertion_unsupported(a) := (((_s_paths_unsupported(a) | _s_argument_unsupported(a.phrase)) | {u | some c in object.get(a, "where", []); some u in _s_cond_unsupported(c)}) | _s_walk_too_long(a)) | {"count of, sum of and plus after every or some aren't supported yet" |
+_s_assertion_unsupported(a) := ((((_s_paths_unsupported(a) | _s_argument_unsupported(a.phrase)) | {u | some c in object.get(a, "where", []); some u in _s_cond_unsupported(c)}) | _s_walk_too_long(a)) | _s_derived_too_long(a)) | {"count of, sum of and plus after every or some aren't supported yet" |
 	terms := object.get(a.phrase, "terms", [])
 	terms != []
 	not _s_one_path(terms)
@@ -6622,14 +6622,16 @@ _s_assertion_unsupported(a) := (((_s_paths_unsupported(a) | _s_argument_unsuppor
 
 _s_cond_unsupported(c) := _s_derived_unsupported(c) if "terms" in object.keys(c)
 
-_s_cond_unsupported(c) := _s_argument_unsupported(c.phrase) if not "terms" in object.keys(c)
+_s_cond_unsupported(c) := _s_argument_unsupported(c.phrase) | _s_derived_too_long(c) if not "terms" in object.keys(c)
 
 _s_walk_too_long(a) := {"every and some over more than ten steps aren't supported yet" | count(_walk_steps(_s_model_path(a[_s_quantifier_of(a)]))) > 10}
 
 _s_assertion_unsupported(a) := _s_derived_unsupported(a) if "terms" in object.keys(a)
 
-_s_derived_unsupported(a) := (_s_paths_unsupported(a) | {u | some c in object.get(a, "where", []); some u in _s_tally_cond_unsupported(c)}) | {"every and some over more than ten steps aren't supported yet" |
-	some t in array.concat(a.terms, object.get(a.phrase, "terms", []))
+_s_derived_unsupported(a) := (_s_paths_unsupported(a) | {u | some c in object.get(a, "where", []); some u in _s_tally_cond_unsupported(c)}) | _s_derived_too_long(a)
+
+_s_derived_too_long(a) := {"every and some over more than ten steps aren't supported yet" |
+	some t in _s_nodes(a)
 	_s_derived_term(t)
 	count(_walk_steps(_s_model_path(object.get(t, "count", object.get(t, "sum", null))))) > 10
 }
@@ -6658,7 +6660,7 @@ _s_one_elapsed(terms) if {
 	"elapsed_from" in object.keys(terms[0])
 }
 
-_s_assertion_unsupported(a) := _s_paths_unsupported(a) | _s_argument_unsupported(a.phrase) if object.keys(a) & {"every", "some", "terms"} == set()
+_s_assertion_unsupported(a) := (_s_paths_unsupported(a) | _s_argument_unsupported(a.phrase)) | _s_derived_too_long(a) if object.keys(a) & {"every", "some", "terms"} == set()
 
 _s_model(a) := _s_leaf_model(a) if _s_quantifier_of(a) == ""
 
