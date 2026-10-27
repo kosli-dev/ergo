@@ -208,11 +208,28 @@ jobs:
         run: |
           wget -q -O "$RUNNER_TEMP/hugo.deb" "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb"
           sudo dpkg -i "$RUNNER_TEMP/hugo.deb"
-      - name: Test how the site picks the latest release
-        run: site/latest-release_test.sh
+      - name: Test the site's scripts
+        run: |
+          site/latest-release_test.sh
+          site/prepare_test.sh
+          site/check_fit_test.sh
+          site/check_examples_test.sh
+          site/check_build_test.sh
+      - name: Write what the site needs from this commit
+        run: site/prepare.sh --working-tree
+      - name: Test this commit's tutorial and home page examples against its ergo.rego
+        run: site/check.sh
+      - name: Build the site from this commit
+        run: |
+          hugo --source site --gc --minify --destination "$RUNNER_TEMP/public"
+          python3 site/check_build.py "$RUNNER_TEMP/public"
       - name: Write what the site needs from the latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: site/prepare.sh
-      - name: Test the tutorial against the released ergo.rego
-        run: node --test site/assets/js/tutorial/lib.test.mjs
-      - name: Build the site
-        run: hugo --source site --gc --minify --destination "$RUNNER_TEMP/public"
+      - name: Test the released tutorial, and check it still fits this commit's layouts and CSS
+        run: site/check.sh
+      - name: Build the site from the latest release
+        run: |
+          hugo --source site --gc --minify --destination "$RUNNER_TEMP/public-release"
+          python3 site/check_build.py "$RUNNER_TEMP/public-release"
