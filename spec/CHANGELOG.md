@@ -7,6 +7,7 @@ Each version says whether reports changed, so that anyone who only stores report
 ### New
 
 - A `whose` in a subject's `from` line takes a one-line `some` or `every` as a condition ([sentence.subject.condition](syntax.md#subjects)), like `release whose some files.path does not match "^docs/"`. Its `$applies` row gives the inputs and the cause the same sentence gives as a check row. It doesn't change the report of a policy that was read before, and a `from` line that used to be written wrong is now read.
+- `it` is the subject itself, for a subject of any type, so a list of plain values like ids, regions or tags can be checked: with `from: every deployment.regions`, `it is one of $params.allowed_regions` fails the region that isn't allowed. It starts an assertion, a `whose` condition of a `from` line, and the path after `every`, `some`, `count of` and `sum of`. A position works on a subject that is a list, written in words as for a field: `first of it`, `item 2 of it`. A row's `inputs` name it `it`, and a failed item `item 1 of it`. See [sentence.path.it](syntax.md#paths). Written anywhere else, `it` is written wrong ([sentence.path.it.step](syntax.md#paths), [sentence.path.it.place](syntax.md#paths)).
 
 ### Changed
 
@@ -41,6 +42,14 @@ Each version says whether reports changed, so that anyone who only stores report
    "inputs": [{"name": "files[].path", "value": ["docs/typo.md"]}],
    "failed_items": [{"path": "files[0].path", "item": "item 1 of files", "cause": "value", "value": "docs/typo.md"}]}
   ```
+
+- A subject called `it` is written wrong ([sentence.path.it.name](syntax.md#paths)), for the requirements that use it.
+- `it` is a word of the grammar ([sentence.words](syntax.md#words-a-field-cant-be-called)). A field called `it` is written `.it`, and the report prints `.it`. Reports reach this when a policy starts a path with a bare `it`, which now reads the subject itself instead of its field `it`, and when an alias or a part is called `it`, which is now written wrong.
+
+### Fixed
+
+- A walk that starts at a `for` alias holding `null` fails as `null`, as [walk.lists](semantics.md#every-and-some) says. `ergo.rego` failed it as `absent`. The new case in `cases/for` pins it. Reports change for such a walk.
+- A position at the start of a path reads the subject or a `for` alias as a list ([path.not_an_object](semantics.md#reading-a-path)), so `first of b` on a `for` alias holding `["x", "y"]` reads `"x"`, where `ergo.rego` failed it as `not_an_object`. The new case in `cases/for` pins it. Reports change for such a check.
 
 ## 0.1
 

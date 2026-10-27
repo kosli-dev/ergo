@@ -1047,9 +1047,9 @@
           "subject": "round",
           "checks": {
             "in_assertion": {
-              "for": "every lst as it",
+              "for": "every lst as entry",
               "assert": [
-                "it.x is cov.x",
+                "entry.x is cov.x",
                 "cov.s exists"
               ]
             },
@@ -1104,7 +1104,7 @@
         },
         "expressions": {
           "r": {
-            "in_assertion": "for every lst as it: it.x equals cov.x and cov.s exists",
+            "in_assertion": "for every lst as entry: entry.x equals cov.x and cov.s exists",
             "item_level": "every lst.x whose cov is at least 5 equals cov",
             "$applies": "cov.x is 1"
           }

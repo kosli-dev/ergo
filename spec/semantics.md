@@ -38,7 +38,7 @@ Reading a path ends in one of these outcomes. Each one except `found` is also a 
 
 **[path.start]** A path starts at the subject, the input, the params or an alias. With no params, a path into the params ends `absent`. Params that are there but aren't an object fail the whole report, as [REFERENCE.md](../REFERENCE.md#params) says.
 
-**[path.not_an_object]** A path with steps that starts at a subject that isn't an object ends `not_an_object`, `null` subjects included.
+**[path.not_an_object]** A path with steps that starts at a subject that isn't an object ends `not_an_object`, `null` subjects included, unless its first step is a position. A position reads the subject as a list, as [path.absent](#reading-a-path) and [path.unusable](#reading-a-path) say, so `first of it` ends `absent` on `[]` and on `null`, and `unusable` on `"s"`. A path that starts at a `for` alias is read the same way.
 
 **[path.absent]** A key the object doesn't have ends `absent`, and so does an index past the end of the list. Once a value is missing or `null` partway along, the path ends `absent`, however many steps are left.
 

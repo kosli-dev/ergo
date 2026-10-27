@@ -7860,5 +7860,168 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a walk that starts at a for alias holding null",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every commits as c",
+              "assert": "every c.files is a string"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as null, as a walk from a field holding null does",
+        "rules": [
+          "walk.lists",
+          "for.walk",
+          "for.failed_items"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "commits": [
+                null
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [
+                  {
+                    "assertion": "every c.files is a string",
+                    "cause": "null"
+                  }
+                ],
+                "item": "item 1 of commits",
+                "path": "item 1 of commits",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "name": "commits[]",
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a position at the start of a path that starts at a for alias holding a list",
+    "policy": {
+      "ergo_spec": "v0.2-dev",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every batches as b",
+              "assert": "first of b is \"x\""
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the alias as a list, as the same position does on a field: the first batch passes and the empty one fails as absent",
+        "rules": [
+          "path.not_an_object",
+          "path.absent",
+          "for.walk",
+          "for.failed_items"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "batches": [
+                [
+                  "x",
+                  "y"
+                ],
+                []
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "first of b is \"x\"",
+                    "cause": "absent"
+                  }
+                ],
+                "item": "item 2 of batches",
+                "path": "item 2 of batches",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "name": "batches[]",
+                "value": [
+                  [
+                    "x",
+                    "y"
+                  ],
+                  []
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
