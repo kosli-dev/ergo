@@ -59,6 +59,8 @@ The `wasm` profile in `Cargo.toml` builds for size, and `wasm-opt` from [Binarye
 
 The `wasm-bindgen` tool has to be the same version as the `wasm-bindgen` crate, `=0.2.129` in `wasm/Cargo.toml`. The version is also in the `Dockerfile` and in the `tests-rust` job of `.github/workflows/test.yml`, so change all three together. The same goes for the Binaryen version, `version_133`, which is in the `Dockerfile` and in that job.
 
+The `wasm` profile aborts on a panic. In JavaScript that is a `WebAssembly.RuntimeError: unreachable` with no message about the cause, and the module's memory may be half way through a call, so don't call it again. Make a new instance with `initSync` or `init` instead. Invalid JSON is not a panic: `report` throws an `Error` that says which of the three isn't JSON, and the module stays usable.
+
 ## Timing it against `ergo.rego`
 
 `bench/make_inputs.py <folder> [deployments]` writes an input with 1,000 deployments (or the number you give), a policy with three checks on the production ones, and the `data.json` and `bench.rego` that OPA needs. The policy's `ergo_spec` is the one `ergo.rego` follows. From the root of the repo:

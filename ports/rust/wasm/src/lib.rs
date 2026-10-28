@@ -16,7 +16,7 @@ pub fn report_text(input: &str, policy: &str, params: &str) -> Result<String, St
     Ok(report.to_string())
 }
 
-/// Builds the report for `input`, `policy` and `params`, each given as JSON text, and returns it as JSON text. Throws when one of them isn't valid JSON.
+/// Builds the report for `input`, `policy` and `params`, each given as JSON text, and returns it as JSON text. Throws an `Error` when one of them isn't valid JSON, and the module stays usable. If the engine panics, the `wasm` profile aborts, which a caller sees as a `WebAssembly.RuntimeError: unreachable`, and then the module must be instantiated again before it is used.
 #[wasm_bindgen]
 pub fn report(input: &str, policy: &str, params: &str) -> Result<String, JsError> {
     report_text(input, policy, params).map_err(|message| JsError::new(&message))
