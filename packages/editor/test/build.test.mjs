@@ -10,6 +10,7 @@ import { parse as parseYaml } from "yaml";
 import { layoutRows, policySheet, makeRunner, parseTime, reportTables, yamlText, reportDocument } from "../src/lib.mjs";
 import { sampleCases, readSample, opaVersionNote } from "../build.mjs";
 import { VIEWS, LABELS } from "../src/layout.mjs";
+import { makeRustRunner } from "../src/engines.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const dist = join(here, "..", "dist", "editor.html");
@@ -33,7 +34,7 @@ test("the page has no script tag that ends early", () => {
 });
 
 test("every placeholder was filled and the page asks nothing from the network", () => {
-  for (const p of ["__BUNDLE__", "__SAMPLES__", "__WASM__"]) assert.ok(!html.includes(p), p);
+  for (const p of ["__BUNDLE__", "__SAMPLES__", "__WASM__", "__RUST_WASM__"]) assert.ok(!html.includes(p), p);
   assert.ok(!/<link /.test(html));
   assert.ok(!/<script[^>]* src=/.test(html));
 });
@@ -58,6 +59,15 @@ const runErgoText = async (inputText, policy, paramsText) => {
   ergo ??= await opa.loadPolicy(Buffer.from(/wasm: "([^"]+)"/.exec(html)[1], "base64"), undefined, { "time.parse_rfc3339_ns": parseTime });
   return makeRunner((doc) => ergo.evaluate(doc))(reportDocument(inputText, policy, paramsText));
 };
+let rust;
+const runRust = async (input, policy, params) => {
+  if (!rust) {
+    const glue = await import("../../../ports/rust/wasm/pkg/ergo_wasm.js");
+    glue.initSync({ module: Buffer.from(/rustWasm: "([^"]+)"/.exec(html)[1], "base64") });
+    rust = makeRustRunner(glue.report);
+  }
+  return rust(JSON.stringify(input), policy, JSON.stringify(params));
+};
 const runErgo = (input, policy, params) => runErgoText(JSON.stringify(input), policy, JSON.stringify(params));
 
 test("the Wasm inside the page reads a number a JavaScript number can't hold as written", async () => {
@@ -69,6 +79,27 @@ test("the Wasm inside the page reads a number a JavaScript number can't hold as 
   const report = await runErgoText('{"items": [{"id": "a", "n": 9007199254740993}]}', policy, '{"max": 9007199254740992}');
   const cells = Object.fromEntries(report.results.filter((r) => r.subject.id === "a").map((r) => [r.check, r.passed]));
   assert.deepEqual(cells, { cap: false, exact: true });
+});
+
+test("the Rust Wasm inside the page reads a number a JavaScript number can't hold as written", async () => {
+  const policy = {
+    ergo_spec: /^_spec := "(v[0-9.]+(?:-dev)?)"/m.exec(readFileSync(join(casesDir, "..", "..", "..", "ergo.rego"), "utf8"))[1],
+    subjects: { item: { from: "items", identified_by: "id" } },
+    requirements: { r: { subject: "item", checks: { exact: "n is 9007199254740993", cap: "n is at most $params.max" } } },
+  };
+  const glue = await import("../../../ports/rust/wasm/pkg/ergo_wasm.js");
+  await runRust({}, policy, {});
+  const text = glue.report('{"items": [{"id": "a", "n": 9007199254740993}]}', JSON.stringify(policy), '{"max": 9007199254740992}');
+  assert.ok(text.includes("9007199254740993"));
+  const report = JSON.parse(text);
+  const cells = Object.fromEntries(report.results.filter((r) => r.subject.id === "a").map((r) => [r.check, r.passed]));
+  assert.deepEqual(cells, { cap: false, exact: true });
+});
+
+test("the Rust Wasm inside the page throws a plain message for input that isn't JSON", async () => {
+  const glue = await import("../../../ports/rust/wasm/pkg/ergo_wasm.js");
+  await runRust({}, {}, {});
+  assert.throws(() => glue.report("{", "{}", "{}"), /^Error: the input isn't valid JSON: /);
 });
 
 test("the Wasm inside the page takes input and params that aren't objects, as Ergo does", async () => {
@@ -133,6 +164,12 @@ for (const [name, dir] of Object.entries(sampleCases)) {
       assert.ok(shown, reqName);
       assert.deepEqual(shown.checks.map((c) => c.name), Object.keys(req.checks));
     }
+  });
+
+  test(`the Rust Wasm inside the page gives the ${name} sample the report its case expects`, async () => {
+    const report = await runRust(sample.input, result.policy, sample.params);
+    assert.equal(report.engine.name, "ergo-engine");
+    assert.deepEqual({ ...report, engine: null }, { ...expected(dir, "report.json"), engine: null });
   });
 
   test(`the Wasm inside the page gives the ${name} sample the report its case expects`, async () => {

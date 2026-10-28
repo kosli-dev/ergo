@@ -195,6 +195,7 @@ textarea:focus { outline:none; }
   letter-spacing:.08em; text-transform:uppercase; color:var(--faint); }
 .run textarea { border:1px solid var(--hairline); border-radius:3px; background:var(--paper); padding:.5rem; height:9rem;
   font-size:12px; line-height:1.5; white-space:pre; overflow:auto; text-transform:none; letter-spacing:0; font-weight:400; }
+.run select { border:1px solid var(--hairline); border-radius:3px; background:var(--paper); color:inherit; padding:.35rem .5rem; font:inherit; font-size:.8rem; font-weight:400; }
 .run textarea.short { height:3.5rem; }
 .run .notice { margin:0; padding:.6rem .8rem; border-radius:3px; background:var(--bad-wash); color:var(--bad); font-size:.82rem; }
 .run .notice.info { background:var(--sunk); color:var(--muted); }
@@ -262,7 +263,7 @@ textarea:focus { outline:none; }
   </div>
 </div>
 
-<script>window.EDITOR = { samples: __SAMPLES__, wasm: "__WASM__" };</script>
+<script>window.EDITOR = { samples: __SAMPLES__, wasm: "__WASM__", rustWasm: "__RUST_WASM__" };</script>
 <script>__BUNDLE__</script>
 </body>
 </html>

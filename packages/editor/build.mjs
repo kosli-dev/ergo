@@ -61,8 +61,20 @@ const buildWasm = () => {
   }
 };
 
+const rustPkg = join(root, "ports", "rust", "wasm", "pkg");
+
+const rustGlue = () => {
+  const glue = join(rustPkg, "ergo_wasm.js");
+  const bytes = join(rustPkg, "ergo_wasm_bg.wasm");
+  if (!existsSync(glue) || !existsSync(bytes)) {
+    throw new Error(`The Rust Wasm isn't built: ${rustPkg} has no ergo_wasm.js and ergo_wasm_bg.wasm. Build it with the command under "Building the engine for a browser" in ports/rust/README.md.`);
+  }
+  return { glue, bytes: readFileSync(bytes).toString("base64") };
+};
+
 export const buildEditor = async (out = join(here, "dist", "editor.html")) => {
   const opaWasm = join(dirname(require.resolve("@open-policy-agent/opa-wasm")), "..", "dist", "opa-wasm-browser.esm.js");
+  const rust = rustGlue();
   const bundled = await build({
     entryPoints: [join(here, "src", "main.mjs")],
     bundle: true,
@@ -71,7 +83,8 @@ export const buildEditor = async (out = join(here, "dist", "editor.html")) => {
     platform: "browser",
     target: "es2022",
     minify: true,
-    alias: { "@open-policy-agent/opa-wasm": opaWasm },
+    alias: { "@open-policy-agent/opa-wasm": opaWasm, "ergo-wasm": rust.glue },
+    define: { "import.meta.url": "undefined" },
   });
   const script = bundled.outputFiles[0].text.replace(/<\/script/gi, "<\\/script");
   const samples = Object.fromEntries(Object.entries(sampleCases).map(([name, dir]) => [name, readSample(dir)]));
@@ -79,6 +92,7 @@ export const buildEditor = async (out = join(here, "dist", "editor.html")) => {
   const html = template
     .replace("__SAMPLES__", () => escapeJson(samples))
     .replace("__WASM__", () => buildWasm())
+    .replace("__RUST_WASM__", () => rust.bytes)
     .replace("__BUNDLE__", () => script);
   mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, html);

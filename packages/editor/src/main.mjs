@@ -1,12 +1,14 @@
 import { compile, parse } from "@kosli/ergo-markdown";
 import opa from "@open-policy-agent/opa-wasm";
+import { initSync, report as rustReport } from "ergo-wasm";
+import { ENGINES, ENGINE_LABELS, readEngine, engineNote, makeRustRunner } from "./engines.mjs";
 import { highlightMarkdown, highlightYaml } from "./highlight.mjs";
 import { editFromYaml, markdownFromPaste } from "./twoway.mjs";
 import { VIEWS, LABELS, pick, readLayout, layoutText } from "./layout.mjs";
 import { savedEdit, saveEdit, forgetEdit } from "./saved.mjs";
 import { layoutRows, policySheet, yamlText, markOf, kindAt, docGroups, parseJson, makeRunner, parseTime, reportTables, plural, reportDocument, unroundable } from "./lib.mjs";
 
-const { samples, wasm } = window.EDITOR;
+const { samples, wasm, rustWasm } = window.EDITOR;
 const LH = 22;
 const PAD = 12;
 const $ = (id) => document.getElementById(id);
@@ -19,8 +21,8 @@ const hl = $("hl");
 let current = Object.keys(samples)[0];
 let last = null;
 let syncing = false;
-let runner = null;
-let runnerError = "";
+const runners = {};
+const runnerErrors = {};
 let reportInput = "";
 let reportParams = "";
 
@@ -46,6 +48,7 @@ const recall = (key) => {
   }
 };
 let layout = readLayout(recall("layout"));
+let engine = readEngine(recall("engine"));
 const shows = (view) => layout.left === view || layout.right === view;
 
 const el = (tag, cls, text) => {
@@ -418,8 +421,8 @@ const table = (t) => {
 
 const showReport = (out, result) => {
   out.replaceChildren();
-  if (runnerError) return out.append(el("p", "notice", runnerError));
-  if (!runner) return out.append(el("p", "notice info", "Ergo is still loading."));
+  if (runnerErrors[engine]) return out.append(el("p", "notice", runnerErrors[engine]));
+  if (!runners[engine]) return out.append(el("p", "notice info", "Ergo is still loading."));
   if (!result.policy) return out.append(el("p", "notice", "The policy has problems, so it can't run yet. The problems are listed below the editor."));
   const input = parseJson(reportInput, "input");
   if (!input.ok) return out.append(el("p", "notice", input.message));
@@ -427,12 +430,12 @@ const showReport = (out, result) => {
   if (!params.ok) return out.append(el("p", "notice", params.message));
   let report;
   try {
-    report = runner(reportDocument(reportInput, result.policy, reportParams));
+    report = runners[engine](reportInput, result.policy, reportParams);
   } catch (e) {
     return out.append(el("p", "notice", "Ergo couldn't run this: " + e.message));
   }
   if (report === null) return out.append(el("p", "notice", "Ergo gave no report for this policy and input."));
-  out.append(el("p", "notice info", report.compliant ? "Every requirement is met." : "At least one requirement is not met."));
+  out.append(el("p", "notice info", [report.compliant ? "Every requirement is met." : "At least one requirement is not met.", engineNote(report)].filter(Boolean).join(" ")));
   const rounded = [...new Set([...unroundable(reportInput), ...unroundable(reportParams)])];
   if (rounded.length) {
     out.append(
@@ -451,6 +454,15 @@ const showReport = (out, result) => {
 
 const viewReport = (result, into) => {
   const run = el("div", "run");
+  const engineLabel = el("label", null, "Engine");
+  const engineBox = el("select");
+  for (const e of ENGINES) {
+    const option = el("option", null, ENGINE_LABELS[e]);
+    option.value = e;
+    engineBox.append(option);
+  }
+  engineBox.value = engine;
+  engineLabel.append(engineBox);
   const inputLabel = el("label", null, "Input");
   const inputBox = el("textarea");
   inputBox.value = reportInput;
@@ -472,9 +484,14 @@ const viewReport = (result, into) => {
     clearTimeout(timer);
     timer = setTimeout(() => showReport(out, last), 200);
   };
+  engineBox.addEventListener("change", () => {
+    engine = readEngine(engineBox.value);
+    remember("engine", engine);
+    showReport(out, last);
+  });
   inputBox.addEventListener("input", again);
   paramsBox.addEventListener("input", again);
-  run.append(inputLabel, paramsLabel, out);
+  run.append(engineLabel, inputLabel, paramsLabel, out);
   into.replaceChildren(run);
   showReport(out, result);
 };
@@ -715,16 +732,27 @@ copy.addEventListener("click", async () => {
   }, 1400);
 });
 
-const bytes = Uint8Array.from(atob(wasm), (c) => c.charCodeAt(0));
-opa.loadPolicy(bytes, undefined, { "time.parse_rfc3339_ns": parseTime }).then(
+const decode = (text) => Uint8Array.from(atob(text), (c) => c.charCodeAt(0));
+const loaded = (name, run) => {
+  runners[name] = run;
+  if (shows("report") && last) render(last);
+};
+const failed = (name, e) => {
+  runnerErrors[name] = "Ergo didn't load: " + e.message;
+  if (shows("report") && last) render(last);
+};
+opa.loadPolicy(decode(wasm), undefined, { "time.parse_rfc3339_ns": parseTime }).then(
   (policy) => {
-    runner = makeRunner((doc) => policy.evaluate(doc));
-    if (shows("report") && last) render(last);
+    const run = makeRunner((doc) => policy.evaluate(doc));
+    loaded("opa", (inputText, policyValue, paramsText) => run(reportDocument(inputText, policyValue, paramsText)));
   },
-  (e) => {
-    runnerError = "Ergo didn't load: " + e.message;
-    if (shows("report") && last) render(last);
-  },
+  (e) => failed("opa", e),
 );
+try {
+  initSync({ module: decode(rustWasm) });
+  loaded("rust", makeRustRunner(rustReport));
+} catch (e) {
+  failed("rust", e);
+}
 
 load(current);
