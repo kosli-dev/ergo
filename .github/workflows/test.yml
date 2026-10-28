@@ -186,7 +186,7 @@ jobs:
         run: rustup toolchain install
       - run: cargo fmt --check
       - run: cargo clippy --locked --all-targets -- -D warnings
-      - run: cargo test --locked
+      - run: cargo test --locked -- --show-output
       - name: Check ergo-sentences builds for Wasm
         run: cargo build --locked -p ergo-sentences --target wasm32-unknown-unknown
 
