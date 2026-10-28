@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import {test} from "node:test";
-import {compile, parse} from "../src/compile.ts";
+import {compile, nameOf, nameProblem, parse} from "../src/compile.ts";
 import {CAKE, CAKE_POLICY, inChecks, inRequirement, problemsOf} from "./helpers.ts";
 
 const messages = (markdown: string) => problemsOf(markdown).map((p) => p.message);
@@ -455,6 +455,14 @@ test("a bold label that is not followed by a colon is a problem", () => {
 test("a label of punctuation is a name like any other", () => {
   assert.deepEqual(Object.keys((compile(inChecks("- **!!**: `x`\n- **A**:\n  - **?**: `y`")).policy as any).requirements.r.checks), ["!!", "a"]);
   assert.deepEqual((compile(inChecks("- **A**:\n  - **?**: `y`")).policy as any).requirements.r.checks.a, {any_of: {"?": "y"}});
+});
+
+test("nameOf and nameProblem give the name a heading or label makes and what is wrong with it", () => {
+  assert.equal(nameOf("  Cake \n batch! "), "cake batch!");
+  assert.equal(nameOf("cake batch"), "cake batch");
+  assert.equal(nameProblem("cake batch"), null);
+  assert.equal(nameProblem(""), "a label needs a letter or a digit");
+  assert.equal(nameProblem("$applies"), "a name can't start with $");
 });
 
 test("a name that starts with $ is a problem, whatever it names", () => {

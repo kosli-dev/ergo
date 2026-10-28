@@ -1,1 +1,1 @@
-export {compile, parse} from "./compile.ts";
+export {compile, nameOf, nameProblem, parse} from "./compile.ts";
