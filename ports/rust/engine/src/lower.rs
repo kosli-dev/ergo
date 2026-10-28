@@ -331,8 +331,15 @@ fn number(text: &str) -> Result<Value, Vec<String>> {
 pub fn lower_condition(condition: &s::Condition, scope: &Scope) -> Result<Check, Vec<String>> {
     let aliases = scope.aliases();
     let names: Vec<&str> = aliases.iter().map(String::as_str).collect();
-    let s::Left::Path(left) = &condition.left else {
-        return Err(unsupported(condition, &names));
+    let left = match &condition.left {
+        s::Left::Path(left) => left,
+        other => {
+            return match tally::lower_condition(other, &condition.phrase, scope) {
+                Some(Ok(Some(check))) => Ok(check),
+                Some(Err(found)) => Err(found),
+                _ => Err(unsupported(condition, &names)),
+            };
+        }
     };
     if let s::Phrase::Exists { not } = &condition.phrase {
         return Ok(Check::Present(Present {
@@ -803,9 +810,14 @@ mod tests {
     }
 
     #[test]
-    fn a_count_on_the_left_is_not_read_yet_either() {
-        let problems =
-            lower_condition(&condition("count of xs is at least 1"), &Scope::new()).unwrap_err();
-        assert!(problems[0].ends_with(UNSUPPORTED_SUFFIX));
+    fn a_count_on_the_left_is_read_into_a_tally() {
+        assert!(matches!(
+            lower_condition(&condition("count of xs is at least 1"), &Scope::new()),
+            Ok(Check::Tally(_))
+        ));
+        assert!(matches!(
+            lower_condition(&condition("sum of xs.n is between 1 and 2"), &Scope::new()),
+            Ok(Check::Tally(_))
+        ));
     }
 }

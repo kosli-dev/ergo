@@ -24,98 +24,14 @@ contains / excludes a value read through a ref / fails as absent when the param 
 contains / excludes values read through a ref to an empty list / fails as unusable, because an empty list would pass anything
 contains / excludes values read through a ref that isn't a list / fails as unusable
 contains / excludes values read through a ref that holds values of mixed types / fails as unusable, whatever the list holds
-deep_walks / six walks, two in a from line and four in a count of / count of walks every list on its path, so a repo with 15 cells fails and one with 17 passes
 deep_walks / eleven steps after every / is written wrong
 deep_walks / ten steps after count of, starting at a for alias / reads as written, the alias being the first of ten steps
 deep_walks / eleven steps after count of, starting at a for alias / is written wrong, because the alias is a step too
 deep_walks / eleven steps after every, one of them a position / is written wrong, because the position is a step too
-deep_walks / ten steps after a count of on the right of a phrase / reads as written, and a subject passes when its n is the count
 deep_walks / eleven steps after a count of on the right of a phrase / is written wrong, as it is on the left
 deep_walks / eleven steps after a sum of on the right of a phrase / is written wrong, as it is on the left
 deep_walks / eleven steps after every, starting at a part of ten / is written wrong, because a walk that starts at a part counts the part's own path, so x.z is eleven steps
 deep_walks / a parent's part of ten names in the whose of a count of, read on the item / reads the item's own field, so the part is not counted and the policy reads at ten names
-derived / count of a list / passes when the list has that many items, and shows the number and the items
-derived / count of a list / fails as value when the count is different
-derived / count of a list / counts an empty list as 0, so it fails as value here
-derived / count of a list / fails as absent when the list is missing, with the count shown as null
-derived / count of a list / fails as null when the list is null
-derived / count of a list / fails as unusable when the list is a string
-derived / count of a list / fails as unusable when the list is an object
-derived / count of an empty list is 0 / passes on an empty list
-derived / count of an empty list is 0 / still fails as absent when the list is missing, not counted as 0
-derived / count of a list with whose / counts only the items that pass, and shows every item
-derived / count of a list with whose / counts 0 when whose leaves every item out
-derived / count of a list with whose / leaves out an item whose field is another value
-derived / count of a list with whose / fails as unusable when an item's field has another type than the value
-derived / count of a list with whose / fails as absent when an item cannot be decided because the field is missing
-derived / count of a list with whose / fails as null when an item cannot be decided because the field is null
-derived / count of a list with whose / fails as absent when the list is missing
-derived / count of a list whose a field exists / leaves out items where the field is missing or null, and does not fail on them
-derived / count of two lists / adds up the commits of every pull request
-derived / count of two lists / an empty inner list adds nothing and does not fail
-derived / count of two lists / counts 0 when every inner list is empty
-derived / count of two lists / counts 0 when the outer list is empty, and the inner list is never walked
-derived / count of two lists / fails as absent when one inner list is missing
-derived / count of two lists / fails as null when one inner list is null
-derived / count of two lists / fails as unusable when one inner list is a string
-derived / count of two lists / fails as absent when the outer list is missing
-derived / sum of a field / adds the field up across the items
-derived / sum of a field / fails as value when the sum is different
-derived / sum of a field / a sum over no items is 0, so it fails as value here
-derived / sum of a field / fails as absent when an item has no such field, with null for it in the list
-derived / sum of a field / fails as null when a value is null
-derived / sum of a field / fails as unusable when a value is text, even a number written as text
-derived / sum of a field / fails as unusable when a value is a boolean
-derived / sum of a field / fails as absent when the list is missing
-derived / sum of a field / fails as null when the list is null
-derived / sum of a field / fails as unusable when the list is not a list
-derived / sum of a field / the worst cause wins when several values fail: unusable before absent before null
-derived / sum over no items is 0 / passes on an empty list
-derived / sum over no items is 0 / passes on items that add up to 0
-derived / sum of decimals / adds 0.1 and 0.2 up to 0.3
-derived / sum of a field with whose / adds only the items that pass
-derived / sum of a field with whose / does not read the field of an item that whose leaves out
-derived / sum of a field with whose / fails as absent when an item cannot be decided because kind is missing
-derived / sum of a field with whose / fails as absent when a kept item has no such field
-derived / sum of a field with whose / fails as value when whose leaves nothing and the sum 0 is not 10
-derived / sum with whose over no items is 0 / passes when whose leaves nothing in
-derived / sum within a distance / passes when the sum is within the distance
-derived / sum within a distance / fails as value when the sum is further away
-derived / sum within a distance / fails as value when the sum is further away, with whole numbers
-derived / sum within a distance / passes when the sum is exactly that far away
-derived / sum within a distance / fails as unusable when a value is text
-derived / sum within a distance of a field / passes when the sum is close enough to the field
-derived / sum within a distance of a field / fails as value when it is not
-derived / sum within a distance of a field / fails as absent when the field is missing
-derived / sum within a distance of a field / the worse cause wins when both sides fail: absent before null
-derived / a path plus a count on the left / adds a path and a count
-derived / a path plus a count on the left / fails as absent when the list is missing
-derived / a path plus a count on the left / fails as unusable when the path is text and the list is null
-derived / a count plus a path on the left / adds a count and a path
-derived / a count plus a number on the left / adds a count and a number
-derived / a path plus a sum on the left / adds a path and a sum, as decimals
-derived / a number plus a count with whose / adds to a count that has whose when the count is last
-derived / a path and a count plus a path on the right / compares a field with a count plus a path
-derived / a path on the left and a path plus a count on the right / compares a field with a path plus a count
-derived / a count on the left and a count plus a number on the right / compares a count with a count plus a number
-derived / a count on the left and a field on the right / compares a count with a field
-derived / a count on the left and a field on the right / fails as absent when the field is missing
-derived / a count on the left and a field on the right / fails as the worse cause when both sides fail
-derived / a count does not equal a field / passes when the numbers differ
-derived / a count does not equal a field / fails as unusable when the field is text, even with does not equal
-derived / count of findings is not 2 / fails as value with 2 findings
-derived / count of findings is not 2 / passes with 3 findings
-derived / count of findings is at least 2 / fails as value with 1 findings
-derived / count of findings is at least 2 / passes with 2 findings
-derived / count of findings is at most 2 / passes with 2 findings
-derived / count of findings is at most 2 / fails as value with 3 findings
-derived / count of findings is more than 2 / fails as value with 2 findings
-derived / count of findings is more than 2 / passes with 3 findings
-derived / count of findings is less than 2 / passes with 1 findings
-derived / count of findings is less than 2 / fails as value with 2 findings
-derived / a sum is at least a number / passes when the sum is that number
-derived / a sum is at least a number / fails as value when it is lower
-derived / a sum is at least a number / fails as unusable when a value is text
 derived / a count in the whose of an every / checks the items whose count passes, and leaves the others out
 derived / a count in the whose of an every / fails as value when a kept item fails
 derived / a count in the whose of an every / fails as value when whose leaves no item
@@ -129,28 +45,6 @@ derived / a count under a for line reading the line's name / counts an empty lis
 derived / a count under a for line reading the line's name / fails as absent when a pull request has no reviews field
 derived / a count under a for line reading the line's name / fails as null when the reviews are null
 derived / a count under a for line reading the line's name / fails as unusable when the reviews are not a list
-derived / count of a params list / counts the items of a params list
-derived / count of a params list with too few items / fails as value
-derived / count of an empty params list / counts 0 and fails as value
-derived / count of a params list that is missing / fails as absent
-derived / count of a params list that is null / fails as null
-derived / count of a params value that is not a list / fails as unusable
-derived / sum of a params list / adds a field of a params list up as decimals
-derived / a count of a list in the subject against a params number / compares a count with a params field
-derived / a count with is between / passes between the bounds
-derived / a count with is between / passes at the lower bound
-derived / a count with is between / passes at the upper bound
-derived / a count with is between / fails as value above the upper bound
-derived / a count with is between / fails as value on an empty list, which counts 0
-derived / a count with is between / fails as absent when the list is missing
-derived / a count with is between / fails as null when the list is null
-derived / a count with is between / fails as unusable when the list is a string
-derived / a sum with is between / passes between the bounds
-derived / a sum with is between / passes at the upper bound
-derived / a sum with is between / fails as value below the lower bound
-derived / a sum with is between / fails as unusable when a value is text
-derived / count of on subjects and items that aren't objects / a subject that isn't an object fails as not_an_object
-derived / count of on subjects and items that aren't objects / an item that isn't an object fails as not_an_object, and a null value counts
 derived / a count whose whose reads a param that's missing / fails as absent and shows null for the count
 derived / a count of zero whose whose reads a param that's missing / fails as absent even with no items, where a count of zero would pass
 derived / days elapsed under a for line reading the line's name / passes when every pull request was closed within 2 days
@@ -160,22 +54,6 @@ derived / days elapsed in the whose of an every / checks the items whose elapsed
 derived / days elapsed in the whose of an every / leaves out an item whose end is before its start
 derived / days elapsed in the whose of an every / fails as value when a kept item fails
 derived / days elapsed in the whose of an every / fails as value when whose leaves no item
-derived / days elapsed in the whose of a count / counts the items whose elapsed days pass, and shows every item
-derived / days elapsed in the whose of a count / fails as value when fewer items pass
-derived / days elapsed in the whose of a count / leaves out an item whose end is before its start
-derived / days elapsed in the whose of a count / fails as absent when an item cannot be decided because its end is missing
-derived / a count in the whose of a count / counts the items whose own count passes, and shows every item
-derived / a count in the whose of a count / fails as absent when an item's list is missing, so the item cannot be decided
-derived / a count in the whose of a sum / adds only the items whose own count passes
-derived / count of a list / gives the count the locations of the items it counted
-derived / count of a list / gives a count of no items no locations
-derived / count of a list with whose / gives the count the locations of every item read, kept or not
-derived / count of lists inside lists / gives the count one location per item of every inner list
-derived / sum of a field / gives the sum the locations of the values it added
-derived / a path plus a count / gives the plus the locations of the entries after it, once each, in their order
-derived / a path plus a sum / gives the plus the location of the path and then of every value summed
-derived / a plus that reads the same list twice / shows the number and the list once each
-derived / a count compared with a count of the same list / shows the list once, after the left side's number, and the right side's number
 for / every over one list on a for line / passes when every item passes, and failed_items is empty
 for / every over one list on a for line / fails as value when an item fails, and lists the item with the sentence that failed
 for / every over one list on a for line / lists every item that fails, in list order
@@ -311,7 +189,6 @@ it / it is not empty / a string and a non-empty list pass, an empty string, an e
 it / it is an object / it works for an object subject, and a string, a number, a list and null fail
 it / it is a list / a subject that is a list passes
 it / every and some on a subject that is a list / each item of the list is read, and the rows name it with [] and its items by position
-it / count of and sum of on a subject that is a list / the list is counted and summed
 it / a field called it and the subject itself in one check / the dot picks the field and the bare word picks the subject
 it / a bare it where a field called it used to be read / reads the subject, not its field it
 it / it in a check with and / each assertion reads the subject, and failed_assertions name them with it
@@ -512,10 +389,7 @@ sentences / matches patterns read with named by / passes when a pattern under th
 sentences / matches patterns read with named by / fails as value when only a pattern under another key matches
 sentences / an any_of of sentences / passes when every sentence of one option passes, and fails with the first cause among its options
 sentences / an any_of of sentences with a param that isn't a list / fails as unusable even when another option passes
-sentences / an any_of of sentences that walk, count and ask whether a field exists / takes each sentence's own cause, and an option whose field is missing fails as value
 sentences / a count on the left of a whose / counts the item's own field, even when its first key is the parent subject's name
-subjects / a condition with count of / counts the items of the list and keeps subjects with enough
-subjects / a condition with count of / fails the requirement as absent for a subject whose list is missing
 subjects / a condition with some / keeps a subject when some item of the list passes, and rules out one where none does or that has no items
 subjects / a condition with some / fails the requirement as absent, null or unusable for a subject whose list or field the condition can't read, even with min_subjects 0
 subjects / a condition with every / keeps a subject when every item passes, and rules out one with an item that fails or with no items
@@ -561,10 +435,8 @@ walks / whose with exists is the exception to undecided items / a missing field 
 walks / params and input on the right side still read the params and the input / read the params and the input even when the item has a field of the same name
 walks / a walk that can't be run as written / fails as unusable when a param its whose reads isn't a list, even with if any, and fails with the ref's cause when its named by can't be read
 walks / some with a whose / has a location for every item the walk read, including the ones whose left out
-walks / a count of reads a parent's value in its whose / lists the number, the list and then the parent's value
 walks / a for line with a walk next to a parent / lists the for line's list and the parent's value, and never the alias's value
 walks / a one-line some compares with a list of params / keeps the param out of the row's inputs and lists it in the check's $refs
-walks / a count of reads a parent's value in its whose, and the parent sorts after the list / lists the number and the list first, then the parent's value
 walks / a walk or a count through a for name, read from a parent / lists the part before the name once, the whole object, and neither the number nor the items read through the name, which change with each item
 walks / a walk through a for name, read from a parent on its right side / reads the parent through the name for each item, and lists the parent once
 walks / a walk through a for name, read from a parent on its right side / fails as absent for a name the parent doesn't have

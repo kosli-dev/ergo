@@ -39,7 +39,7 @@ The second `cargo test` runs `tests/key_order.rs` again with serde_json's `prese
 
 The image is `rust:1.99.0`, the version in `rust-toolchain.toml`, with rustfmt, Clippy and the Wasm target added. `touch` is there because Cargo in Docker can miss an edit made outside the container, and then tests the old code.
 
-The build goes to the `ergo-rust-target` volume and not to `ports/rust/target`, because Cargo writes JSON files there and `opa test .` would load them as data.
+The build goes to the `ergo-rust-target` volume and not to `ports/rust/target`, because Cargo writes JSON files there and `opa test .` would load them as data. When several sessions or people run the checks at the same time, each should give the target volume their own name, like `ergo-rust-target-<name>`, because two builds sharing one volume can fail with "Permission denied". Change the `-v ergo-rust-target:/target` part of the command and keep the rest.
 
 ## Timing it against `ergo.rego`
 

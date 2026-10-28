@@ -374,7 +374,12 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
         .into_iter()
         .filter_map(|entry| {
             let item = entry.item?;
-            let miss = entry.val.cause();
+            let miss =
+                if !item.at.value.is_object() && matches!(entry.rest.first(), Some(Seg::Key(_))) {
+                    Cause::NotAnObject
+                } else {
+                    entry.val.cause()
+                };
             let end = match entry.val {
                 Val::Found(value) => Some(value),
                 _ => None,
@@ -443,8 +448,17 @@ fn through_a_list(path: &Path, ctx: &Ctx) -> bool {
 }
 
 fn outside_inputs(walk: &Walk, ctx: &Ctx) -> Vec<Input> {
+    let checks: Vec<&Check> = walk
+        .whose
+        .iter()
+        .chain(std::iter::once(&*walk.check))
+        .collect();
+    outside_inputs_of(&checks, ctx)
+}
+
+pub(super) fn outside_inputs_of(checks: &[&Check], ctx: &Ctx) -> Vec<Input> {
     let mut inputs = Vec::new();
-    for check in walk.whose.iter().chain(std::iter::once(&*walk.check)) {
+    for check in checks {
         for path in check.paths().into_iter().filter(|p| reads_outside(p)) {
             match path
                 .steps
@@ -468,11 +482,15 @@ fn outside_inputs(walk: &Walk, ctx: &Ctx) -> Vec<Input> {
 }
 
 fn subject_is_not_an_object(walk: &Walk, ctx: &Ctx) -> bool {
+    path_needs_an_object_subject(&walk.path, ctx)
+}
+
+pub(super) fn path_needs_an_object_subject(path: &Path, ctx: &Ctx) -> bool {
     if ctx.subject.value.is_object() {
         return false;
     }
-    match &walk.path.start {
-        Start::Subject => !matches!(walk.path.steps.first(), None | Some(Step::Index(_))),
+    match &path.start {
+        Start::Subject => !matches!(path.steps.first(), None | Some(Step::Index(_))),
         Start::Part(part) => part.base == Start::Subject,
         _ => false,
     }
@@ -910,6 +928,47 @@ mod tests {
         let out = row(&lenient, subject);
         assert!(out.verdict.passed());
         assert!(out.failed_items.is_empty());
+    }
+
+    #[test]
+    fn an_item_that_is_not_an_object_misses_as_not_an_object_when_the_path_goes_on_into_it() {
+        let input = json!({});
+        let subject = json!({"xs": ["str", null, {"y": 1}, {"y": "s"}]});
+        let context = ctx(&subject, &input, None);
+        let result = walk(
+            &at(Start::Subject, &["xs", "y"]),
+            &context,
+            Options::default(),
+        );
+        let misses: Vec<Option<Cause>> = result
+            .items
+            .iter()
+            .map(|item| item.end.is_none().then_some(item.miss))
+            .collect();
+        assert_eq!(
+            misses,
+            [
+                Some(Cause::NotAnObject),
+                Some(Cause::NotAnObject),
+                None,
+                None
+            ]
+        );
+        let ends = walk(&at(Start::Subject, &["xs"]), &context, Options::default());
+        assert!(ends.items.iter().all(|item| item.end.is_some()));
+    }
+
+    #[test]
+    fn every_and_some_fail_an_item_that_is_not_an_object_as_not_an_object() {
+        let subject = json!({"xs": ["str", {"y": 1}]});
+        let walk = every(&["xs", "y"], vec![], equals(json!(1)), false);
+        let out = row(&walk, subject.clone());
+        assert_eq!(out.verdict.cause, Cause::NotAnObject);
+        assert_eq!(out.failed_items[0]["cause"], json!("not_an_object"));
+        assert_eq!(out.failed_items[0]["item"], json!("item 1 of xs"));
+        let mut some = walk.clone();
+        some.quantifier = Quantifier::Some;
+        assert!(row(&some, subject).verdict.passed());
     }
 
     #[test]

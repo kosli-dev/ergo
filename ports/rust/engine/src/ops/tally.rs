@@ -1,9 +1,11 @@
 use super::compare::{self, Cmp, Compare};
 use super::time::{self, NANOS_PER_SECOND, SECONDS_PER_DAY, Time};
-use super::{Check, Input, Verdict, read_path, verdict};
+use super::walk::{self, Options};
+use super::{Check, Input, Part, Verdict, read_path, run as run_check, verdict};
 use crate::cause::Cause;
-use crate::lower::Scope;
-use crate::path::{self, Ctx, Path};
+use crate::lower::{Scope, UNSUPPORTED_SUFFIX};
+use crate::name;
+use crate::path::{self, Ctx, OUTER, Path};
 use crate::value;
 use ergo_sentences as s;
 use serde_json::{Number, Value};
@@ -43,6 +45,21 @@ pub enum Term {
     Path(Path),
     Number(Number),
     Elapsed(Elapsed),
+    Counted(Counted),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Kind {
+    Count,
+    Sum,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Counted {
+    pub text: String,
+    pub kind: Kind,
+    pub path: Path,
+    pub whose: Vec<Check>,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -94,6 +111,7 @@ impl Tally {
                                 paths.push(&elapsed.from);
                                 paths.push(&elapsed.to);
                             }
+                            Term::Counted(counted) => paths.push(&counted.path),
                         }
                     }
                 }
@@ -106,6 +124,17 @@ impl Tally {
         let mut refs = Vec::new();
         for path in self.paths() {
             refs.extend(path::step_refs(path));
+        }
+        for side in std::iter::once(&self.left).chain(self.right.as_ref()) {
+            if let Side::Derived(derived) = side {
+                for term in &derived.terms {
+                    if let Term::Counted(counted) = term {
+                        for check in &counted.whose {
+                            refs.extend(check.refs());
+                        }
+                    }
+                }
+            }
         }
         if let Some(Side::Plain(compare::Side::Path(path))) = &self.right
             && path::is_ref(path)
@@ -266,6 +295,156 @@ fn work_term(term: &Term, ctx: &Ctx) -> Worked<Number> {
             }
         }
         Term::Elapsed(elapsed) => work_elapsed(elapsed, ctx),
+        Term::Counted(counted) => work_counted(counted, ctx),
+    }
+}
+
+fn outer_ctx<'a>(ctx: &Ctx<'a>) -> Ctx<'a> {
+    let mut outer = ctx.clone();
+    outer.aliases.insert(OUTER.to_string(), ctx.subject.clone());
+    outer
+}
+
+fn unusable_ref(check: &Check, ctx: &Ctx) -> Option<Cause> {
+    let keys: Vec<Path> = check
+        .paths()
+        .into_iter()
+        .flat_map(path::step_refs)
+        .collect();
+    let causes = check.refs().into_iter().filter_map(|reference| {
+        let read = path::read(&reference, ctx);
+        match (read.outcome.cause(), read.value) {
+            (Some(cause), _) => Some(cause),
+            (None, Some(Value::String(_) | Value::Number(_))) => None,
+            (None, _) if keys.contains(&reference) => Some(Cause::Unusable),
+            (None, _) => None,
+        }
+    });
+    Cause::worst(causes)
+}
+
+fn counted_entries(
+    counted: &Counted,
+    result: &Result<Number, Cause>,
+    list: Input,
+    outside: Vec<Input>,
+) -> Vec<Input> {
+    let mut entries = vec![Input {
+        name: counted.text.clone(),
+        value: match result {
+            Ok(n) => Value::Number(n.clone()),
+            Err(_) => Value::Null,
+        },
+        locations: list.locations.clone(),
+        part: None,
+    }];
+    entries.push(list);
+    entries.extend(outside);
+    entries
+}
+
+fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
+    let outer = outer_ctx(ctx);
+    if walk::path_needs_an_object_subject(&counted.path, ctx) {
+        let result = Err(Cause::NotAnObject);
+        let list = Input {
+            name: name::name(&counted.path),
+            value: Value::Array(Vec::new()),
+            locations: Vec::new(),
+            part: None,
+        };
+        return Worked {
+            entries: counted_entries(counted, &result, list, Vec::new()),
+            result,
+        };
+    }
+    let walked = walk::walk(
+        &counted.path,
+        &outer,
+        Options {
+            if_any: false,
+            empty_adds_nothing: true,
+        },
+    );
+    let whose: Vec<&Check> = counted.whose.iter().collect();
+    let mut outside = walk::outside_inputs_of(&whose, &outer);
+    outside.sort_by(|a, b| a.name.cmp(&b.name));
+    if let Some(outcome) = walked.unreadable {
+        let result = Err(outcome.cause().unwrap_or(Cause::Unusable));
+        let list = Input {
+            name: walked.name,
+            value: Value::Array(Vec::new()),
+            locations: Vec::new(),
+            part: None,
+        };
+        return Worked {
+            entries: counted_entries(counted, &result, list, outside),
+            result,
+        };
+    }
+    let mut causes: Vec<Cause> = walked.failures.iter().map(|f| f.cause).collect();
+    causes.extend(counted.whose.iter().filter_map(|c| unusable_ref(c, &outer)));
+    let mut numbers: Vec<Value> = Vec::new();
+    let mut at = outer.clone();
+    for item in &walked.items {
+        at.subject = item.item.clone();
+        let verdicts: Vec<Cause> = counted
+            .whose
+            .iter()
+            .map(|check| run_check(check, &at).cause)
+            .collect();
+        let undecided = verdicts
+            .iter()
+            .filter(|cause| !matches!(cause, Cause::Satisfied | Cause::Value))
+            .copied();
+        let before = causes.len();
+        causes.extend(undecided);
+        if causes.len() > before || verdicts.contains(&Cause::Value) {
+            continue;
+        }
+        match item.end {
+            Some(end) => numbers.push(end.clone()),
+            None => causes.push(item.miss),
+        }
+    }
+    let total = match counted.kind {
+        Kind::Count => Ok(Number::from(numbers.len() as u64)),
+        Kind::Sum => summed(&numbers),
+    };
+    causes.extend(total.as_ref().err());
+    let result = match Cause::worst(causes) {
+        Some(cause) => Err(cause),
+        None => total,
+    };
+    let list = Input {
+        name: walked.name.clone(),
+        value: Value::Array(walked.items.iter().map(walk::WalkItem::shown).collect()),
+        locations: walked
+            .items
+            .iter()
+            .map(|item| item.end_location.render())
+            .collect(),
+        part: path::part_tag(&counted.path, &outer).map(|(name, id)| Part { name, id }),
+    };
+    Worked {
+        entries: counted_entries(counted, &result, list, outside),
+        result,
+    }
+}
+
+fn summed(values: &[Value]) -> Result<Number, Cause> {
+    let mut numbers = Vec::new();
+    let mut causes = Vec::new();
+    for value in values {
+        match value {
+            Value::Number(n) => numbers.push(n.clone()),
+            Value::Null => causes.push(Cause::Null),
+            _ => causes.push(Cause::Unusable),
+        }
+    }
+    match Cause::worst(causes) {
+        Some(cause) => Err(cause),
+        None => add(&numbers).ok_or(Cause::Unusable),
     }
 }
 
@@ -497,8 +676,51 @@ fn lower_term(term: &s::Term, scope: &Scope, names: &[&str]) -> Result<Option<Te
                 (from, to) => Err(from.err().into_iter().chain(to.err()).flatten().collect()),
             }
         }
-        s::Term::Derived(_) => Ok(None),
+        s::Term::Derived(derived) => lower_counted(term, derived, scope, names),
     }
+}
+
+fn lower_counted(
+    term: &s::Term,
+    derived: &s::Derived,
+    scope: &Scope,
+    names: &[&str],
+) -> Result<Option<Term>, Vec<String>> {
+    let mut problems = Vec::new();
+    let path = match scope.path(&derived.path) {
+        Ok(path) => Some(path),
+        Err(found) => {
+            problems.extend(found);
+            None
+        }
+    };
+    let item = scope.in_item();
+    let mut whose = Vec::new();
+    let mut runnable = true;
+    for condition in &derived.whose {
+        match crate::lower::lower_condition(condition, &item) {
+            Ok(check) => whose.push(check),
+            Err(found) if found.iter().all(|p| p.ends_with(UNSUPPORTED_SUFFIX)) => {
+                runnable = false;
+            }
+            Err(found) => problems.extend(found),
+        }
+    }
+    if !problems.is_empty() {
+        return Err(problems);
+    }
+    Ok(match (path, runnable) {
+        (Some(path), true) => Some(Term::Counted(Counted {
+            text: term_text(term, names),
+            kind: match derived.kind {
+                s::DerivedKind::Count => Kind::Count,
+                s::DerivedKind::Sum => Kind::Sum,
+            },
+            path,
+            whose,
+        })),
+        _ => None,
+    })
 }
 
 fn lower_side(
@@ -627,19 +849,39 @@ pub fn lower_assertion(
         } if mine(terms) => (vec![s::Term::Path(path.clone())], phrase),
         _ => return None,
     };
+    Some(
+        lower_terms(&left, phrase, scope).map(|lowered| match lowered {
+            Some(tally) => Check::Tally(tally),
+            None => Check::NotYet,
+        }),
+    )
+}
+
+fn lower_terms(
+    left: &[s::Term],
+    phrase: &s::Phrase,
+    scope: &Scope,
+) -> Result<Option<Tally>, Vec<String>> {
     let aliases = scope.aliases();
     let names: Vec<&str> = aliases.iter().map(String::as_str).collect();
-    let lowered = (|| {
-        let left = lower_side(&left, scope, &names)?;
-        let Some((test, right)) = lower_test(phrase, scope, &names).transpose()? else {
-            return Ok(Check::NotYet);
-        };
-        match left {
-            Some(left) => Ok(Check::Tally(Tally { left, right, test })),
-            None => Ok(Check::NotYet),
-        }
-    })();
-    Some(lowered)
+    let left = lower_side(left, scope, &names)?;
+    let Some((test, right)) = lower_test(phrase, scope, &names).transpose()? else {
+        return Ok(None);
+    };
+    Ok(left.map(|left| Tally { left, right, test }))
+}
+
+pub fn lower_condition(
+    left: &s::Left,
+    phrase: &s::Phrase,
+    scope: &Scope,
+) -> Option<Result<Option<Check>, Vec<String>>> {
+    let term = match left {
+        s::Left::Derived(derived) => s::Term::Derived(derived.clone()),
+        s::Left::Elapsed(elapsed) => s::Term::Elapsed(elapsed.clone()),
+        s::Left::Path(_) => return None,
+    };
+    Some(lower_terms(&[term], phrase, scope).map(|lowered| lowered.map(Check::Tally)))
 }
 
 #[cfg(test)]
@@ -1241,18 +1483,394 @@ mod tests {
         );
     }
 
-    #[test]
-    fn a_count_or_a_sum_anywhere_is_not_yet_supported() {
-        for sentence in [
-            "count of xs is 2",
-            "sum of xs.n is 2",
-            "x plus count of xs is 2",
-            "x is count of xs",
-            "n is sum of xs.n plus 1",
-            "count of xs plus 1 is between 1 and 2",
-        ] {
-            assert_eq!(lowered(sentence), Check::NotYet, "{sentence}");
+    fn run_on(sentence: &str, subject: Value, input_rest: Value, params: Value) -> Verdict {
+        let mut input = json!({"things": [subject]});
+        if let (Some(rest), Some(map)) = (input_rest.as_object(), input.as_object_mut()) {
+            map.extend(rest.clone());
         }
+        let ctx = Ctx {
+            subject: Located {
+                value: &input["things"][0],
+                location: Location::input_root().key("things").index(0),
+            },
+            input: &input,
+            params: Some(&params),
+            aliases: BTreeMap::new(),
+        };
+        crate::ops::run(&lowered(sentence), &ctx)
+    }
+
+    fn json_entries(verdict: &Verdict) -> Vec<Value> {
+        verdict.inputs.iter().map(Input::to_json).collect()
+    }
+
+    #[test]
+    fn a_count_is_the_number_of_values_the_path_ends_at_and_null_is_counted() {
+        let subject = json!({"xs": [1, null, "a"]});
+        assert_eq!(cause("count of xs is 3", subject.clone()), Cause::Satisfied);
+        assert_eq!(cause("count of xs is 2", subject), Cause::Value);
+        assert_eq!(
+            cause("count of xs.n is 2", json!({"xs": [{"n": 1}, {"n": null}]})),
+            Cause::Satisfied
+        );
+    }
+
+    #[test]
+    fn a_count_over_an_empty_list_is_zero_and_shows_the_empty_list() {
+        let sentence = "count of xs is 0";
+        assert_eq!(cause(sentence, json!({"xs": []})), Cause::Satisfied);
+        assert_eq!(
+            entries(sentence, json!({"xs": []})),
+            [
+                json!({"name": "count of xs", "value": 0, "locations": []}),
+                json!({"name": "xs[]", "value": [], "locations": []}),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_count_shows_its_number_then_the_list_with_one_location_per_item() {
+        assert_eq!(
+            entries("count of xs is 2", json!({"xs": ["a", "b"]})),
+            [
+                json!({"name": "count of xs", "value": 2, "locations": ["/things/0/xs/0", "/things/0/xs/1"]}),
+                json!({"name": "xs[]", "value": ["a", "b"], "locations": ["/things/0/xs/0", "/things/0/xs/1"]}),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_count_over_a_list_that_is_missing_null_or_not_a_list_fails_and_shows_null() {
+        let sentence = "count of xs is 0";
+        for (subject, wanted) in [
+            (json!({}), Cause::Absent),
+            (json!({"xs": null}), Cause::Null),
+            (json!({"xs": "abc"}), Cause::Unusable),
+            (json!({"xs": {"a": 1}}), Cause::Unusable),
+        ] {
+            assert_eq!(cause(sentence, subject.clone()), wanted, "{subject}");
+            assert_eq!(
+                entries(sentence, subject)[0],
+                json!({"name": "count of xs", "value": null, "locations": []})
+            );
+        }
+    }
+
+    #[test]
+    fn a_count_fails_as_absent_when_a_value_it_counts_is_missing() {
+        assert_eq!(
+            cause("count of xs.n is 2", json!({"xs": [{"n": 1}, {}]})),
+            Cause::Absent
+        );
+        assert_eq!(
+            cause("count of xs.n is 2", json!({"xs": [{"n": 1}, 5]})),
+            Cause::NotAnObject
+        );
+    }
+
+    #[test]
+    fn a_count_walks_every_list_along_the_path() {
+        let subject = json!({"ps": [{"cs": [1, 2]}, {"cs": [3]}]});
+        assert_eq!(
+            cause("count of ps.cs is 3", subject.clone()),
+            Cause::Satisfied
+        );
+        assert_eq!(
+            entries("count of ps.cs is 3", subject)[1],
+            json!({"name": "ps[].cs[]", "value": [1, 2, 3], "locations": ["/things/0/ps/0/cs/0", "/things/0/ps/0/cs/1", "/things/0/ps/1/cs/0"]})
+        );
+        assert_eq!(
+            cause("count of ps.cs is 1", json!({"ps": [{"cs": [1]}, {}]})),
+            Cause::Absent
+        );
+    }
+
+    #[test]
+    fn a_count_on_a_subject_that_is_not_an_object_fails_as_not_an_object_with_nothing_read() {
+        let verdict = verdict_of("count of xs.n is 1", json!(5));
+        assert_eq!(verdict.cause, Cause::NotAnObject);
+        assert_eq!(
+            json_entries(&verdict),
+            [
+                json!({"name": "count of xs.n", "value": null, "locations": []}),
+                json!({"name": "xs.n", "value": [], "locations": []}),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_sum_adds_the_values_as_decimals() {
+        let subject = json!({"xs": [{"n": 0.1}, {"n": 0.2}]});
+        assert_eq!(
+            cause("sum of xs.n is 0.3", subject.clone()),
+            Cause::Satisfied
+        );
+        assert_eq!(
+            entries("sum of xs.n is 0.3", subject)[0],
+            json!({"name": "sum of xs.n", "value": 0.3, "locations": ["/things/0/xs/0/n", "/things/0/xs/1/n"]})
+        );
+    }
+
+    #[test]
+    fn a_sum_over_no_items_is_zero() {
+        assert_eq!(
+            cause("sum of xs.n is 0", json!({"xs": []})),
+            Cause::Satisfied
+        );
+        assert_eq!(
+            cause(
+                "sum of xs.n whose k is 1 is 0",
+                json!({"xs": [{"k": 2, "n": 5}]})
+            ),
+            Cause::Satisfied
+        );
+    }
+
+    #[test]
+    fn a_sum_fails_as_absent_null_or_unusable_and_the_worst_wins() {
+        let sentence = "sum of xs.n is 0";
+        assert_eq!(
+            cause(sentence, json!({"xs": [{"n": 1}, {}]})),
+            Cause::Absent
+        );
+        assert_eq!(
+            cause(sentence, json!({"xs": [{"n": 1}, {"n": null}]})),
+            Cause::Null
+        );
+        assert_eq!(
+            cause(sentence, json!({"xs": [{"n": 1}, {"n": "2"}]})),
+            Cause::Unusable
+        );
+        assert_eq!(
+            cause(sentence, json!({"xs": [{"n": true}]})),
+            Cause::Unusable
+        );
+        assert_eq!(
+            cause(sentence, json!({"xs": [{"n": null}, {}, {"n": "x"}]})),
+            Cause::Unusable
+        );
+        assert_eq!(
+            cause(sentence, json!({"xs": [{"n": null}, {}]})),
+            Cause::Absent
+        );
+        assert_eq!(cause(sentence, json!({"xs": null})), Cause::Null);
+        assert_eq!(cause(sentence, json!({})), Cause::Absent);
+    }
+
+    #[test]
+    fn a_whose_leaves_out_an_item_it_fails_with_value_and_a_missing_field_for_exists() {
+        let subject = json!({"xs": [{"k": 1}, {"k": 2}, {"k": 1}, {}]});
+        assert_eq!(
+            cause("count of xs whose k exists is 3", subject.clone()),
+            Cause::Satisfied
+        );
+        assert_eq!(
+            cause(
+                "count of xs whose k is 1 is 2",
+                json!({"xs": [{"k": 1}, {"k": 2}, {"k": 1}]})
+            ),
+            Cause::Satisfied
+        );
+        assert_eq!(
+            cause(
+                "sum of xs.n whose k is 1 is 5",
+                json!({"xs": [{"k": 1, "n": 5}, {"k": 2, "n": "x"}]})
+            ),
+            Cause::Satisfied
+        );
+        assert_eq!(
+            cause("count of xs whose k exists is 3", subject),
+            Cause::Satisfied
+        );
+    }
+
+    #[test]
+    fn an_item_a_whose_cannot_decide_fails_the_side_with_its_cause() {
+        let sentence = "count of xs whose k is 1 is 1";
+        assert_eq!(
+            cause(sentence, json!({"xs": [{"k": 1}, {}]})),
+            Cause::Absent
+        );
+        assert_eq!(
+            cause(sentence, json!({"xs": [{"k": 1}, {"k": null}]})),
+            Cause::Null
+        );
+        assert_eq!(
+            cause(sentence, json!({"xs": [{"k": 1}, {"k": "a"}]})),
+            Cause::Unusable
+        );
+        assert_eq!(
+            cause(sentence, json!({"xs": [{"k": 2}, {}]})),
+            Cause::Absent
+        );
+        assert_eq!(
+            cause(sentence, json!({"xs": [{"k": 1}, 5]})),
+            Cause::NotAnObject
+        );
+    }
+
+    #[test]
+    fn a_whose_that_reads_a_missing_ref_fails_the_side_even_on_an_empty_list() {
+        let sentence = "count of xs whose k is $params.limit is 0";
+        let run =
+            |subject: Value, params: Value| run_on(sentence, subject, json!({}), params).cause;
+        assert_eq!(run(json!({"xs": []}), json!({})), Cause::Absent);
+        assert_eq!(run(json!({"xs": []}), json!({"limit": null})), Cause::Null);
+        assert_eq!(
+            run(json!({"xs": []}), json!({"limit": 1})),
+            Cause::Satisfied
+        );
+        assert_eq!(run(json!({"xs": [{"k": 1}]}), json!({})), Cause::Absent);
+    }
+
+    #[test]
+    fn a_ref_step_in_the_path_or_the_whose_that_cannot_be_used_is_unusable() {
+        let in_path = "count of m named by $params.k is 1";
+        let subject = json!({"m": {"a": [1]}});
+        assert_eq!(
+            run_on(in_path, subject.clone(), json!({}), json!({"k": "a"})).cause,
+            Cause::Satisfied
+        );
+        assert_eq!(
+            run_on(in_path, subject.clone(), json!({}), json!({"k": 1.5})).cause,
+            Cause::Unusable
+        );
+        assert_eq!(
+            run_on(in_path, subject.clone(), json!({}), json!({})).cause,
+            Cause::Absent
+        );
+        assert_eq!(
+            run_on(in_path, subject, json!({}), json!({"k": null})).cause,
+            Cause::Null
+        );
+        let in_whose = "count of xs whose m named by $params.k is 1 is 0";
+        assert_eq!(
+            run_on(in_whose, json!({"xs": []}), json!({}), json!({"k": [1]})).cause,
+            Cause::Unusable
+        );
+    }
+
+    #[test]
+    fn a_count_on_the_right_of_a_phrase_is_read_after_the_left_and_shows_its_list() {
+        assert_eq!(
+            entries("n is count of xs", json!({"n": 2, "xs": ["a", "b"]})),
+            [
+                json!({"name": "n", "value": 2, "locations": ["/things/0/n"]}),
+                json!({"name": "count of xs", "value": 2, "locations": ["/things/0/xs/0", "/things/0/xs/1"]}),
+                json!({"name": "xs[]", "value": ["a", "b"], "locations": ["/things/0/xs/0", "/things/0/xs/1"]}),
+            ]
+        );
+        assert_eq!(
+            cause("n is count of xs", json!({"n": 3, "xs": ["a", "b"]})),
+            Cause::Value
+        );
+        assert_eq!(cause("n is count of xs", json!({"n": 2})), Cause::Absent);
+    }
+
+    #[test]
+    fn a_count_plus_a_number_or_a_path_is_added_and_shows_each_part() {
+        assert_eq!(
+            entries("x plus count of xs is 5", json!({"x": 3, "xs": [1, 2]})),
+            [
+                json!({"name": "x plus count of xs", "value": 5, "locations": ["/things/0/x", "/things/0/xs/0", "/things/0/xs/1"]}),
+                json!({"name": "x", "value": 3, "locations": ["/things/0/x"]}),
+                json!({"name": "count of xs", "value": 2, "locations": ["/things/0/xs/0", "/things/0/xs/1"]}),
+                json!({"name": "xs[]", "value": [1, 2], "locations": ["/things/0/xs/0", "/things/0/xs/1"]}),
+            ]
+        );
+        assert_eq!(
+            cause("count of xs plus 1 is 3", json!({"xs": [1, 2]})),
+            Cause::Satisfied
+        );
+        assert_eq!(
+            cause(
+                "count of xs plus sum of ys is 6",
+                json!({"xs": [1, 2], "ys": [1, 3]})
+            ),
+            Cause::Satisfied
+        );
+        assert_eq!(cause("1 plus count of xs is 2", json!({})), Cause::Absent);
+    }
+
+    #[test]
+    fn two_counts_of_the_same_list_show_the_list_once() {
+        assert_eq!(
+            entries("count of xs is at most count of xs", json!({"xs": [1]})),
+            [
+                json!({"name": "count of xs", "value": 1, "locations": ["/things/0/xs/0"]}),
+                json!({"name": "xs[]", "value": [1], "locations": ["/things/0/xs/0"]}),
+            ]
+        );
+        assert_eq!(
+            entries(
+                "count of xs whose k is 1 is at most count of xs",
+                json!({"xs": [{"k": 1}]})
+            )
+            .iter()
+            .map(|e| e["name"].as_str().unwrap().to_string())
+            .collect::<Vec<_>>(),
+            ["count of xs whose k is 1", "xs[]", "count of xs"]
+        );
+    }
+
+    #[test]
+    fn the_paths_a_whose_reads_outside_the_item_come_after_the_list_sorted_by_name() {
+        let verdict = run_on(
+            "count of xs whose k is $input.b and k is $input.a is 1",
+            json!({"xs": [{"k": 1}]}),
+            json!({"a": 1, "b": 1}),
+            json!({}),
+        );
+        let names: Vec<&str> = verdict.inputs.iter().map(|i| i.name.as_str()).collect();
+        assert_eq!(
+            names,
+            [
+                "count of xs whose k equals $input.b and k equals $input.a",
+                "xs[]",
+                "$input.a",
+                "$input.b"
+            ]
+        );
+    }
+
+    #[test]
+    fn a_count_in_the_whose_of_an_every_decides_which_items_are_checked() {
+        let sentence = "every xs.t whose count of ys is at least 1 is \"x\"";
+        let subject = json!({"xs": [{"t": "x", "ys": [1]}, {"t": "z", "ys": []}]});
+        assert_eq!(cause(sentence, subject), Cause::Satisfied);
+        assert_eq!(
+            cause(sentence, json!({"xs": [{"t": "z", "ys": [1]}]})),
+            Cause::Value
+        );
+        assert_eq!(
+            cause(sentence, json!({"xs": [{"t": "x", "ys": null}]})),
+            Cause::Null
+        );
+        assert_eq!(cause(sentence, json!({"xs": [{"t": "x"}]})), Cause::Absent);
+    }
+
+    #[test]
+    fn a_whose_the_engine_cannot_run_yet_makes_the_side_not_yet_supported() {
+        assert_eq!(
+            lowered("count of xs whose k is one of 1, 2 is 1"),
+            Check::NotYet
+        );
+    }
+
+    #[test]
+    fn a_ref_inside_a_count_path_or_whose_is_among_the_refs_of_the_check() {
+        let names: Vec<String> = lowered("count of m named by $params.a whose k is $params.b is 1")
+            .refs()
+            .iter()
+            .map(crate::name::name)
+            .collect();
+        assert_eq!(names, vec!["$params.a", "$params.b"]);
+    }
+
+    #[test]
+    fn a_count_path_is_among_the_paths_of_the_check() {
+        let check = lowered("count of xs plus y is 1");
+        assert_eq!(check.paths().len(), 2);
     }
 
     #[test]
