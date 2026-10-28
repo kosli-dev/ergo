@@ -276,7 +276,26 @@ def ergo_reads(samples):
     return result
 
 
+def rust_reads(command, samples):
+    rows = [{"kinds": kinds, "text": text} for _, text, kinds in samples]
+    out = subprocess.run(command, shell=True, input=json.dumps({"rows": rows}), capture_output=True, text=True)
+    if out.returncode != 0:
+        sys.exit(out.stdout + out.stderr)
+    result = json.loads(out.stdout)
+    assert len(result) == len(rows)
+    return result
+
+
+def rust_command(argv):
+    if not argv:
+        return None
+    if len(argv) != 2 or argv[0] != "--rust":
+        sys.exit("usage: check_grammar.py [--rust <command>]")
+    return argv[1]
+
+
 def main():
+    command = rust_command(sys.argv[1:])
     started = time.time()
     grammar = load_grammar()
     generator = Generator(grammar, SEED)
@@ -346,6 +365,17 @@ def main():
         elif not theirs and accepted:
             disagreements.append((kind, text, origin, "ergo.rego accepts and the ABNF rejects", problems))
 
+    rust_disagreements = []
+    if command:
+        for (origin, text, kinds, kind), per_kind in zip(samples, rust_reads(command, flat)):
+            theirs = abnf_accepts(grammar, kinds, text)
+            accepted = any(not r["problems"] for r in per_kind)
+            problems = sorted({p for r in per_kind for p in r["problems"]})
+            if theirs and not accepted:
+                rust_disagreements.append((kind, text, origin, "the ABNF accepts and Rust rejects", problems))
+            elif not theirs and accepted:
+                rust_disagreements.append((kind, text, origin, "Rust accepts and the ABNF rejects", problems))
+
     section = open("spec/OPEN.md").read().split("\n## Sentences the ABNF and ergo.rego read differently\n", 1)[1].split("\n## ", 1)[0]
     listed = set()
     for kind, raw in re.findall(r"^- (\w[\w-]*) `(.+?)`", section, re.M):
@@ -360,8 +390,13 @@ def main():
     for kind, text in sorted(listed - found):
         problems.append(f"spec/OPEN.md lists {kind} {json.dumps(text)}, but the two read it alike now")
 
+    for kind, text, origin, side, why in sorted(rust_disagreements, key=lambda d: (d[0], d[1])):
+        said = f": {'; '.join(why)}" if why else ""
+        problems.append(f"{kind} {json.dumps(text)} ({origin}): {side}{said}")
+
+    rust_summary = f", {len(rust_disagreements)} Rust disagreements" if command else ""
     origins = {o: sum(1 for s in samples if s[0] == o) for o in ["corpus", "case", "extra", "generated", "mutated"]}
-    print(f"read {len(samples)} sentences ({origins}) in {time.time() - started:.1f}s; {len(disagreements)} disagreements, {len(listed)} listed; ergo.rego rejected {semantic} for reasons that aren't syntax; {bad_generated} generated sentences the ABNF parser itself refused")
+    print(f"read {len(samples)} sentences ({origins}) in {time.time() - started:.1f}s; {len(disagreements)} disagreements, {len(listed)} listed{rust_summary}; ergo.rego rejected {semantic} for reasons that aren't syntax; {bad_generated} generated sentences the ABNF parser itself refused")
     for line in problems:
         print(line)
     sys.exit(1 if problems else 0)

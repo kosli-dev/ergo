@@ -34,4 +34,10 @@ The old port, on the branch `core/conformance-suite`, listed its findings in `co
 
 ## Disagreements between the spec and `ergo.rego`
 
-None found yet.
+### Sentences
+
+`ergo-sentences` reads what `spec/sentences.abnf` allows, and `check_grammar.py --rust` checks that on every sentence it tries. Comparing it with `ergo.rego` on about 18,000 generated and real lines found these differences. No sentence in `spec/cases` or the corpus hits them, which is why `check_grammar.py` doesn't list them in `spec/OPEN.md`.
+
+- **A `for` item with a bracket index and no quantifier.** `ergo.rego` reads `x[3] as i` as `item 4 of x as i`. The ABNF's `for-item` needs `every`, `some` or a position in words, so Rust rejects it with `an item starts with "every", "some" or a position, like "last of"`.
+- **Tabs at either end of a line.** `ergo.rego` drops all whitespace there (`trim_space`), so `x is 1` followed by a tab reads. The ABNF drops only spaces, and so does Rust.
+- **The messages for a line that doesn't parse.** When a check doesn't parse, `ergo.rego` also tries to read it as a `from` line and a `for` line, and lists what those readings find. So `items whose k matches "("` as a check gets `invalid pattern "("`, which comes from reading it as a `from` line, where Rust says `doesn't parse`. Rust only reports on the kind of line it was asked to read. Both reject the same lines; only the messages differ.
