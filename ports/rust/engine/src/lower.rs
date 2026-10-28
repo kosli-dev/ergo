@@ -404,6 +404,22 @@ pub fn lower_for(
     crate::ops::for_line::lower_for(line, assertions, scope)
 }
 
+pub const MOST_WALK_STEPS: usize = 10;
+
+pub fn walk_steps(path: &path::Path) -> usize {
+    let start = match &path.start {
+        Start::Subject | Start::Input | Start::Params => 0,
+        Start::Alias(_) => 1,
+        Start::Part(part) => part.steps.len(),
+    };
+    start + path.steps.len()
+}
+
+pub fn walk_too_long(path: &path::Path) -> Option<String> {
+    (walk_steps(path) > MOST_WALK_STEPS)
+        .then(|| "every and some over more than ten steps aren't supported yet".to_string())
+}
+
 pub fn lower_quantified(
     quantifier: s::Quantifier,
     path: &s::Path,
@@ -414,7 +430,10 @@ pub fn lower_quantified(
 ) -> Result<Option<Check>, Vec<String>> {
     let mut problems = Vec::new();
     let walk_path = match scope.left_path(path) {
-        Ok(found) => Some(found),
+        Ok(found) => {
+            problems.extend(walk_too_long(&found));
+            Some(found)
+        }
         Err(found) => {
             problems.extend(found);
             None
@@ -841,5 +860,48 @@ mod tests {
             lower_condition(&condition("sum of xs.n is between 1 and 2"), &Scope::new()),
             Ok(Check::Tally(_))
         ));
+    }
+
+    #[test]
+    fn a_walk_counts_each_name_and_position_but_not_input_or_params() {
+        let steps = |text: &str| walk_steps(&Scope::new().on_subject().path(&path(text)).unwrap());
+        assert_eq!(steps("k1.k2.k3"), 3);
+        assert_eq!(steps("first of k1.k2"), 3);
+        assert_eq!(steps("$input.k1.k2"), 2);
+        assert_eq!(steps("$params.k1"), 1);
+    }
+
+    #[test]
+    fn a_walk_of_ten_steps_reads_and_one_of_eleven_is_written_wrong() {
+        let ten = path::Path {
+            start: Start::Subject,
+            steps: (1..=10).map(|n| Step::Key(format!("k{n}"))).collect(),
+        };
+        assert_eq!(walk_too_long(&ten), None);
+        let mut eleven = ten.clone();
+        eleven.steps.push(Step::Key("k11".into()));
+        assert_eq!(
+            walk_too_long(&eleven).as_deref(),
+            Some("every and some over more than ten steps aren't supported yet")
+        );
+    }
+
+    #[test]
+    fn an_alias_is_a_step_and_a_part_counts_its_own_path_in_place_of_its_alias() {
+        let alias = path::Path {
+            start: Start::Alias("z".into()),
+            steps: (1..=10).map(|n| Step::Key(format!("k{n}"))).collect(),
+        };
+        assert_eq!(walk_steps(&alias), 11);
+        let part = path::Path {
+            start: Start::Part(Box::new(PartStart {
+                name: "x".into(),
+                base: Start::Subject,
+                steps: (1..=10).map(|n| Step::Key(format!("k{n}"))).collect(),
+                id: None,
+            })),
+            steps: vec![Step::Key("z".into())],
+        };
+        assert_eq!(walk_steps(&part), 11);
     }
 }

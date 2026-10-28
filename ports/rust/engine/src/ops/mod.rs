@@ -244,6 +244,9 @@ impl Check {
         match self {
             Check::AnyOf(check) => check.flawed(ctx),
             Check::Walk(check) => check.flawed(ctx),
+            Check::In(check) => check.flawed(ctx),
+            Check::Contains(check) => check.flawed(ctx),
+            Check::Matches(check) => check.flawed(ctx),
             _ => false,
         }
     }

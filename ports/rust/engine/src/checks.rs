@@ -121,9 +121,12 @@ fn read_one(
                 return wrong(problems);
             }
             let plan = lowered_plan(&lines.trees, scope, &aliases, &mut problems);
+            if !problems.is_empty() {
+                return wrong(problems);
+            }
             CheckRead {
                 expression: printed(&lines.trees, &aliases),
-                plan: if problems.is_empty() { plan } else { None },
+                plan,
                 problems,
             }
         }
@@ -172,9 +175,12 @@ fn read_one(
             match for_tree {
                 None => {
                     let plan = lowered_plan(&parsed.trees, scope, &aliases, &mut problems);
+                    if !problems.is_empty() {
+                        return wrong(problems);
+                    }
                     CheckRead {
                         expression: printed(&parsed.trees, &aliases),
-                        plan: if problems.is_empty() { plan } else { None },
+                        plan,
                         problems,
                     }
                 }
@@ -632,5 +638,22 @@ mod tests {
             panic!("not present");
         };
         assert_eq!(found.path.start, crate::path::Start::Alias("p".into()));
+    }
+
+    #[test]
+    fn a_sentence_written_wrong_where_it_is_lowered_keeps_the_text_as_written() {
+        let read = one(json!({"c": "n is count of k1.k2.k3.k4.k5.k6.k7.k8.k9.k10.k11"}));
+        assert_eq!(
+            problems(&read),
+            ["every and some over more than ten steps aren't supported yet"]
+        );
+        assert_eq!(
+            read.expression,
+            "n is count of k1.k2.k3.k4.k5.k6.k7.k8.k9.k10.k11"
+        );
+        assert_eq!(
+            one(json!({"c": "n is count of k1.k2"})).expression,
+            "n equals count of k1.k2"
+        );
     }
 }
