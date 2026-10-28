@@ -35,3 +35,19 @@ docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registr
 The image is `rust:1.99.0`, the version in `rust-toolchain.toml`, with rustfmt, Clippy and the Wasm target added. `touch` is there because Cargo in Docker can miss an edit made outside the container, and then tests the old code.
 
 The build goes to the `ergo-rust-target` volume and not to `ports/rust/target`, because Cargo writes JSON files there and `opa test .` would load them as data.
+
+## Timing it against `ergo.rego`
+
+`bench/make_inputs.py <folder> [deployments]` writes an input with 1,000 deployments (or the number you give), a policy with three checks on the production ones, and the `data.json` and `bench.rego` that OPA needs. The policy's `ergo_spec` is the one `ergo.rego` follows. From the root of the repo:
+
+```sh
+python3 ports/rust/bench/make_inputs.py /tmp/ergo-bench
+opa eval -d ergo.rego -d /tmp/ergo-bench/bench.rego -d /tmp/ergo-bench/data.json -i /tmp/ergo-bench/input-1000.json --metrics --format json 'data.bench.report' > /tmp/ergo-bench/opa.json
+jq '.result[0].expressions[0].value' /tmp/ergo-bench/opa.json > /tmp/ergo-bench/rego.json
+jq '.metrics.timer_rego_query_eval_ns / 1e9' /tmp/ergo-bench/opa.json
+docker run --rm -v "$PWD":/src -v /tmp/ergo-bench:/bench -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust \
+  cargo run -j 4 --release -q --example report -- /bench/input-1000.json /bench/policy.json 5 > /tmp/ergo-bench/rust.json
+python3 ports/rust/bench/compare.py /tmp/ergo-bench/rego.json /tmp/ergo-bench/rust.json
+```
+
+The `jq` line prints how many seconds OPA took. The `report` example builds the report the given number of times, here 5, prints the time per run on stderr and the report on stdout. It also takes a params file after the number of runs. `compare.py` fails when the two reports differ, apart from `engine`. While the engine can't build a report yet, it says `skipped: ergo-engine gives no report yet` and doesn't fail.
