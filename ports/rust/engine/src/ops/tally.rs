@@ -96,6 +96,29 @@ const MOST_SECONDS: i64 = 9_000_000_000;
 const MICROS: i128 = 1_000_000;
 
 impl Tally {
+    pub fn unaliased_entries(&self, ctx: &Ctx, hidden: &[&str]) -> Vec<Input> {
+        let reads_hidden = |derived: &Derived| {
+            derived.terms.iter().any(|term| match term {
+                Term::Path(path) => starts_at(path, hidden),
+                Term::Elapsed(elapsed) => {
+                    starts_at(&elapsed.from, hidden) || starts_at(&elapsed.to, hidden)
+                }
+                Term::Counted(counted) => starts_at(&counted.path, hidden),
+                Term::Number(_) => false,
+            })
+        };
+        let mut entries = Vec::new();
+        for side in std::iter::once(&self.left).chain(self.right.as_ref()) {
+            if let Side::Derived(derived) = side
+                && derived.terms.len() > 1
+                && !reads_hidden(derived)
+            {
+                entries.extend(work_derived(derived, ctx).entries.into_iter().take(1));
+            }
+        }
+        entries
+    }
+
     pub fn paths(&self) -> Vec<&Path> {
         let mut paths = Vec::new();
         for side in std::iter::once(&self.left).chain(self.right.as_ref()) {
@@ -292,6 +315,10 @@ fn work_term(term: &Term, ctx: &Ctx) -> Worked<Number> {
         Term::Elapsed(elapsed) => work_elapsed(elapsed, ctx),
         Term::Counted(counted) => work_counted(counted, ctx),
     }
+}
+
+fn starts_at(path: &Path, hidden: &[&str]) -> bool {
+    matches!(&path.start, path::Start::Alias(name) if hidden.contains(&name.as_str()))
 }
 
 fn outer_ctx<'a>(ctx: &Ctx<'a>) -> Ctx<'a> {

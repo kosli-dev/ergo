@@ -81,7 +81,7 @@ fn all_paths(check: &Check) -> Vec<&Path> {
                     for term in &derived.terms {
                         if let Term::Counted(counted) = term {
                             for inner in &counted.whose {
-                                paths.extend(all_paths(inner));
+                                paths.extend(item_paths(inner));
                             }
                         }
                     }
@@ -90,12 +90,19 @@ fn all_paths(check: &Check) -> Vec<&Path> {
         }
         Check::Walk(walk) => {
             for inner in walk.whose.iter().chain(std::iter::once(&*walk.check)) {
-                paths.extend(all_paths(inner));
+                paths.extend(item_paths(inner));
             }
         }
         _ => {}
     }
     paths
+}
+
+fn item_paths(check: &Check) -> Vec<&Path> {
+    all_paths(check)
+        .into_iter()
+        .filter(|path| !matches!(path.start, Start::Subject))
+        .collect()
 }
 
 fn reads_alias(check: &Check, alias: &str) -> bool {
@@ -692,6 +699,12 @@ impl Collect {
             Some(at) => {
                 let found = &mut self.lists[at].1;
                 if is_empty_list(&list) {
+                    if is_empty_list(found)
+                        && list.name.ends_with("[]")
+                        && !found.name.ends_with("[]")
+                    {
+                        *found = list;
+                    }
                 } else if is_empty_list(found) {
                     *found = list;
                 } else if !independent {
@@ -713,9 +726,37 @@ impl For {
         let independent = depth > 0 && !reads_path(&item.path, &self.items[0].alias);
         collect.add(depth, cands.list, independent);
         if let Some(cause) = cands.unreadable {
+            let dead = if depth > 0 {
+                let before: Vec<Step> = item
+                    .path
+                    .steps
+                    .iter()
+                    .take_while(|step| matches!(step, Step::Key(_) | Step::Index(_)))
+                    .cloned()
+                    .collect();
+                let read = path::read(
+                    &Path {
+                        start: item.path.start.clone(),
+                        steps: before,
+                    },
+                    ctx,
+                );
+                let shown = crate::name::name(&item.path);
+                vec![Dead {
+                    shared: !reads_path(&item.path, &self.items[0].alias),
+                    order: Vec::new(),
+                    name: shown.clone(),
+                    path: shown,
+                    cause,
+                    value: Value::Null,
+                    location: read.location,
+                }]
+            } else {
+                Vec::new()
+            };
             return Level {
                 cause,
-                dead: Vec::new(),
+                dead,
                 children: Vec::new(),
             };
         }
@@ -734,7 +775,22 @@ impl For {
                 value: live.shown.clone(),
                 location: Some(live.location.clone()),
             };
-            let (outcome, sfails) = if last {
+            let into_non_object = !last && {
+                let next = &self.items[depth + 1].path;
+                matches!(&next.start, Start::Alias(name) if *name == item.alias)
+                    && !matches!(next.steps.first(), None | Some(Step::Index(_)))
+                    && !live.at.value.is_object()
+            };
+            let (outcome, sfails) = if into_non_object {
+                (
+                    Some(Outcome {
+                        cause: Cause::NotAnObject,
+                        assertions: Vec::new(),
+                        inner: Vec::new(),
+                    }),
+                    Vec::new(),
+                )
+            } else if last {
                 self.try_sentences(&bound)
             } else {
                 let nested = self.level(depth + 1, &bound, collect);
@@ -927,6 +983,11 @@ impl For {
             }
             inputs.extend(read_path(&read, ctx).inputs);
         }
+        for sentence in &self.sentences {
+            if let Check::Tally(tally) = &sentence.check {
+                inputs.extend(tally.unaliased_entries(ctx, &hidden));
+            }
+        }
         inputs
     }
 
@@ -964,8 +1025,15 @@ impl For {
                 .then_with(|| a.locations.cmp(&b.locations))
         });
         inputs.dedup();
-        let cause = level.cause;
-        let failed = if cause == Cause::Satisfied {
+        let outer = outer_ctx(ctx);
+        let flawed = self
+            .items
+            .iter()
+            .flat_map(|item| item.whose.iter())
+            .chain(self.sentences.iter().map(|s| &s.check))
+            .any(|check| check.flawed(&outer));
+        let cause = if flawed { Cause::Unusable } else { level.cause };
+        let failed = if cause == Cause::Satisfied || flawed {
             Vec::new()
         } else {
             self.failed_items(level)
@@ -1091,7 +1159,11 @@ mod tests {
         let mut subject = subject;
         subject["id"] = json!(1);
         let input = json!({"things": [subject]});
-        let report = crate::report(&input, &policy, &json!({"k": "a", "list": ["x"]}));
+        let report = crate::report(
+            &input,
+            &policy,
+            &json!({"k": "a", "list": ["x"], "kinds": "code"}),
+        );
         report["results"]
             .as_array()
             .unwrap()
@@ -1616,5 +1688,106 @@ mod tests {
             .map(|a| a["assertion"].as_str().unwrap())
             .collect();
         assert_eq!(assertions, ["x.b is 1", "x.a is 1"]);
+    }
+
+    #[test]
+    fn a_whose_ref_that_is_not_a_list_fails_the_check_as_unusable_with_no_failed_items() {
+        let found = row(
+            "every xs whose kind is in $params.kinds as x",
+            json!("x.ok is true"),
+            json!({"xs": [{"kind": "code", "ok": false}]}),
+        );
+        assert_eq!(found["cause"], "unusable");
+        assert_eq!(found["failed_items"], json!([]));
+        assert_eq!(names(&found), ["xs[]"]);
+        let usable = row(
+            "every xs whose kind is in $params.list as x",
+            json!("x.ok is true"),
+            json!({"xs": [{"kind": "x", "ok": true}]}),
+        );
+        assert_eq!(usable["cause"], "satisfied");
+    }
+
+    #[test]
+    fn a_second_path_whose_ref_step_cannot_be_read_fails_the_first_item_with_the_refs_cause() {
+        let found = row(
+            "every gs as g, every g.ss named by $params.nope as s",
+            json!("s.ok is true"),
+            json!({"gs": [{"ss": {"a": [{"ok": true}]}}]}),
+        );
+        assert_eq!(found["cause"], "absent");
+        assert_eq!(items(&found), ["item 1 of gs"]);
+        let inner = &found["failed_items"][0]["failed_items"][0];
+        assert_eq!(inner["item"], "g.ss named by $params.nope");
+        assert_eq!(inner["cause"], "absent");
+        assert_eq!(inner["value"], Value::Null);
+        assert_eq!(inner["locations"], json!(["/things/0/gs/0/ss"]));
+        assert_eq!(found["inputs"][0]["name"], "g.ss named by $params.nope");
+        assert_eq!(found["inputs"][0]["value"], json!([]));
+    }
+
+    #[test]
+    fn a_second_item_reading_into_a_first_item_that_is_not_an_object_fails_it_as_not_an_object() {
+        let found = row(
+            "every ps as p, some p.as as w",
+            json!("w.n does not equal p.n"),
+            json!({"ps": [1, null, {"as": [{"n": "b"}], "n": "a"}]}),
+        );
+        assert_eq!(found["cause"], "not_an_object");
+        assert_eq!(items(&found), ["item 1 of ps", "item 2 of ps"]);
+        assert_eq!(found["failed_items"][0]["failed_assertions"], json!([]));
+        assert!(found["failed_items"][0].get("failed_items").is_none());
+        assert_eq!(found["failed_items"][1]["value"], Value::Null);
+    }
+
+    #[test]
+    fn a_path_named_by_an_alias_is_named_as_the_sentence_writes_it() {
+        let found = row(
+            "every ks as k",
+            json!("m named by k is 1"),
+            json!({"ks": ["b"], "m": {"b": 2}}),
+        );
+        assert_eq!(
+            found["failed_items"][0]["failed_assertions"][0]["inputs"][0]["name"],
+            "m named by k"
+        );
+    }
+
+    #[test]
+    fn a_walk_through_an_alias_adds_nothing_read_on_the_item_to_the_rows_inputs() {
+        let found = row(
+            "every xs as x",
+            json!("every x.fs is a string"),
+            json!({"xs": [null]}),
+        );
+        assert_eq!(found["cause"], "null");
+        assert_eq!(names(&found), ["xs[]"]);
+    }
+
+    #[test]
+    fn a_second_list_that_is_empty_in_one_item_and_missing_in_another_is_shown_by_its_walked_name()
+    {
+        let found = row(
+            "every ms as m, every m.cs as c",
+            json!("c.ok is true"),
+            json!({"ms": [{"n": 1}, {"cs": []}]}),
+        );
+        assert_eq!(names(&found), ["m.cs[]", "ms[]"]);
+    }
+
+    #[test]
+    fn a_sum_that_reads_no_alias_is_listed_with_the_row_and_one_that_does_is_not() {
+        let found = row(
+            "every xs as x",
+            json!("x.t is at least p plus q"),
+            json!({"xs": [{"t": 1}], "p": 1, "q": 1}),
+        );
+        assert_eq!(names(&found), ["p", "p plus q", "q", "xs[]"]);
+        let aliased = row(
+            "every xs as x",
+            json!("x.t is at least x.u plus 1"),
+            json!({"xs": [{"t": 1, "u": 1}]}),
+        );
+        assert_eq!(names(&aliased), ["xs[]"]);
     }
 }
