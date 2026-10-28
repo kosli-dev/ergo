@@ -1,0 +1,220 @@
+{
+  "compliant": false,
+  "description": "",
+  "engine": {
+    "name": "ergo.rego",
+    "version": "0.3.0-dev"
+  },
+  "ergo": "v0.2",
+  "meta": {},
+  "requirements": {
+    "prod_deploy": {
+      "causes": [
+        {
+          "cause": "absent",
+          "rows": 1
+        }
+      ],
+      "checks": {
+        "$applies": {
+          "description": "The deployment is in scope",
+          "expression": "environment is \"prod\"",
+          "meta": {}
+        },
+        "$min_subjects": {
+          "description": "The in-scope deployment count is at least 1",
+          "expression": "count(matching(deployments)) >= 1",
+          "meta": {}
+        },
+        "$unique_ids": {
+          "description": "Every deployment id is unique",
+          "expression": "count(repeated(ids(deployments))) == 0",
+          "meta": {}
+        },
+        "$well_formed": {
+          "description": "The requirement is written correctly",
+          "expression": "count(problems) == 0",
+          "meta": {}
+        },
+        "approved": {
+          "description": "Someone approved the deployment",
+          "expression": "approved_by is a non-empty string",
+          "meta": {}
+        }
+      },
+      "description": "Every production deployment is approved",
+      "meta": {},
+      "require": "every",
+      "status": "not_met",
+      "subject": "deployment",
+      "subjects": {
+        "matching": 2,
+        "total": 3
+      }
+    }
+  },
+  "results": [
+    {
+      "cause": "satisfied",
+      "check": "$well_formed",
+      "inputs": [
+        {
+          "locations": [],
+          "name": "count(checks)",
+          "value": 1
+        },
+        {
+          "locations": [],
+          "name": "require",
+          "value": "every"
+        }
+      ],
+      "passed": true,
+      "requirement": "prod_deploy",
+      "subject": {
+        "id": null,
+        "type": "deployment"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "$min_subjects",
+      "inputs": [
+        {
+          "locations": [
+            "/deployments/0",
+            "/deployments/1"
+          ],
+          "name": "in-scope deployment count",
+          "value": 2
+        }
+      ],
+      "passed": true,
+      "requirement": "prod_deploy",
+      "subject": {
+        "id": null,
+        "type": "deployment"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "$unique_ids",
+      "inputs": [
+        {
+          "locations": [],
+          "name": "repeated deployment ids",
+          "value": []
+        }
+      ],
+      "passed": true,
+      "requirement": "prod_deploy",
+      "subject": {
+        "id": null,
+        "type": "deployment"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "$applies",
+      "inputs": [
+        {
+          "locations": [
+            "/deployments/0/environment"
+          ],
+          "name": "environment",
+          "value": "prod"
+        }
+      ],
+      "passed": true,
+      "requirement": "prod_deploy",
+      "subject": {
+        "id": "d-1",
+        "type": "deployment"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "$applies",
+      "inputs": [
+        {
+          "locations": [
+            "/deployments/1/environment"
+          ],
+          "name": "environment",
+          "value": "prod"
+        }
+      ],
+      "passed": true,
+      "requirement": "prod_deploy",
+      "subject": {
+        "id": "d-2",
+        "type": "deployment"
+      }
+    },
+    {
+      "cause": "value",
+      "check": "$applies",
+      "inputs": [
+        {
+          "locations": [
+            "/deployments/2/environment"
+          ],
+          "name": "environment",
+          "value": "staging"
+        }
+      ],
+      "passed": false,
+      "requirement": "prod_deploy",
+      "subject": {
+        "id": "d-3",
+        "type": "deployment"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "approved",
+      "inputs": [
+        {
+          "locations": [
+            "/deployments/0/approved_by"
+          ],
+          "name": "approved_by",
+          "value": "alice"
+        }
+      ],
+      "passed": true,
+      "requirement": "prod_deploy",
+      "subject": {
+        "id": "d-1",
+        "type": "deployment"
+      }
+    },
+    {
+      "cause": "absent",
+      "check": "approved",
+      "inputs": [
+        {
+          "locations": [
+            "/deployments/1"
+          ],
+          "name": "approved_by",
+          "value": null
+        }
+      ],
+      "passed": false,
+      "requirement": "prod_deploy",
+      "subject": {
+        "id": "d-2",
+        "type": "deployment"
+      }
+    }
+  ],
+  "subjects": {
+    "deployment": {
+      "description": "",
+      "from": "deployments whose environment is \"prod\"",
+      "identified_by": "id",
+      "parts": {}
+    }
+  }
+}

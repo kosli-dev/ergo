@@ -1,0 +1,17 @@
+ergo_spec: v0.2
+description: Every component we ship has a licence we allow.
+subjects:
+  component:
+    from: components
+    identified_by: name
+requirements:
+  licences:
+    subject: component
+    checks:
+      licence_allowed:
+        description: The licence is allowed
+        any_of:
+          declared: some licenses.license.id is in $params.allowed_licenses
+          known:
+            - licenses does not exist
+            - $params.known_package_licenses named by name is in $params.allowed_licenses

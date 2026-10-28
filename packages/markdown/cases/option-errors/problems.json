@@ -1,0 +1,14 @@
+[
+  {
+    "line": 22,
+    "message": "an option needs a bold label"
+  },
+  {
+    "line": 23,
+    "message": "an option takes no description"
+  },
+  {
+    "line": 24,
+    "message": "an option needs a sentence in a code span"
+  }
+]

@@ -1,0 +1,18 @@
+ergo_spec: v0.2
+subjects:
+  batch:
+    from: batches
+    identified_by: id
+requirements:
+  cake_batch:
+    subject: batch
+    checks:
+      nut_free:
+        description: Must not contain nut allergens
+        assert: allergens does not contain "nuts"
+      temp_ok:
+        description: Bake temperature 175–200°C inclusive
+        assert: bake.temp_c is between 175 and 200
+      time_ok:
+        description: Bake time 25–40 minutes inclusive
+        assert: bake.minutes is between 25 and 40

@@ -1,0 +1,267 @@
+{
+  "compliant": false,
+  "description": "Every component we ship has a licence we allow.",
+  "engine": {
+    "name": "ergo.rego",
+    "version": "0.3.0-dev"
+  },
+  "ergo": "v0.2",
+  "meta": {},
+  "requirements": {
+    "licences": {
+      "causes": [
+        {
+          "cause": "absent",
+          "rows": 1
+        }
+      ],
+      "checks": {
+        "$min_subjects": {
+          "description": "The in-scope component count is at least 1",
+          "expression": "count(matching(components)) >= 1",
+          "meta": {}
+        },
+        "$unique_ids": {
+          "description": "Every component id is unique",
+          "expression": "count(repeated(ids(components))) == 0",
+          "meta": {}
+        },
+        "$well_formed": {
+          "description": "The requirement is written correctly",
+          "expression": "count(problems) == 0",
+          "meta": {}
+        },
+        "licence_allowed": {
+          "$refs": [
+            {
+              "locations": [
+                "$params:/allowed_licenses"
+              ],
+              "name": "$params.allowed_licenses",
+              "value": [
+                "BSD-3-Clause",
+                "Apache-2.0"
+              ]
+            }
+          ],
+          "description": "The licence is allowed",
+          "expression": "one of: declared(some licenses.license.id is in $params.allowed_licenses) | known(licenses does not exist and $params.known_package_licenses named by name is in $params.allowed_licenses)",
+          "meta": {}
+        }
+      },
+      "description": "",
+      "meta": {},
+      "require": "every",
+      "status": "not_met",
+      "subject": "component",
+      "subjects": {
+        "matching": 3,
+        "total": 3
+      }
+    }
+  },
+  "results": [
+    {
+      "cause": "satisfied",
+      "check": "$well_formed",
+      "inputs": [
+        {
+          "locations": [],
+          "name": "count(checks)",
+          "value": 1
+        },
+        {
+          "locations": [],
+          "name": "require",
+          "value": "every"
+        }
+      ],
+      "passed": true,
+      "requirement": "licences",
+      "subject": {
+        "id": null,
+        "type": "component"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "$min_subjects",
+      "inputs": [
+        {
+          "locations": [
+            "/components/0",
+            "/components/1",
+            "/components/2"
+          ],
+          "name": "in-scope component count",
+          "value": 3
+        }
+      ],
+      "passed": true,
+      "requirement": "licences",
+      "subject": {
+        "id": null,
+        "type": "component"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "$unique_ids",
+      "inputs": [
+        {
+          "locations": [],
+          "name": "repeated component ids",
+          "value": []
+        }
+      ],
+      "passed": true,
+      "requirement": "licences",
+      "subject": {
+        "id": null,
+        "type": "component"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "licence_allowed",
+      "inputs": [
+        {
+          "locations": [
+            "$params:/known_package_licenses"
+          ],
+          "name": "$params.known_package_licenses named by name",
+          "value": null
+        },
+        {
+          "locations": [
+            "/components/0/licenses"
+          ],
+          "name": "licenses",
+          "value": [
+            {
+              "license": {
+                "id": "BSD-3-Clause"
+              }
+            }
+          ]
+        },
+        {
+          "locations": [
+            "/components/0/licenses/0/license/id"
+          ],
+          "name": "licenses[].license.id",
+          "value": [
+            "BSD-3-Clause"
+          ]
+        },
+        {
+          "locations": [
+            "/components/0/name"
+          ],
+          "name": "name",
+          "value": "click"
+        }
+      ],
+      "passed": true,
+      "requirement": "licences",
+      "subject": {
+        "id": "click",
+        "type": "component"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "licence_allowed",
+      "inputs": [
+        {
+          "locations": [
+            "$params:/known_package_licenses/prometheus-client"
+          ],
+          "name": "$params.known_package_licenses named by name",
+          "value": "Apache-2.0"
+        },
+        {
+          "locations": [
+            "/components/1"
+          ],
+          "name": "licenses",
+          "value": null
+        },
+        {
+          "locations": [],
+          "name": "licenses.license.id",
+          "value": []
+        },
+        {
+          "locations": [
+            "/components/1/name"
+          ],
+          "name": "name",
+          "value": "prometheus-client"
+        }
+      ],
+      "passed": true,
+      "requirement": "licences",
+      "subject": {
+        "id": "prometheus-client",
+        "type": "component"
+      }
+    },
+    {
+      "cause": "absent",
+      "check": "licence_allowed",
+      "inputs": [
+        {
+          "locations": [
+            "$params:/known_package_licenses"
+          ],
+          "name": "$params.known_package_licenses named by name",
+          "value": null
+        },
+        {
+          "locations": [
+            "/components/2/licenses"
+          ],
+          "name": "licenses",
+          "value": [
+            {
+              "license": {
+                "id": "WTFPL"
+              }
+            }
+          ]
+        },
+        {
+          "locations": [
+            "/components/2/licenses/0/license/id"
+          ],
+          "name": "licenses[].license.id",
+          "value": [
+            "WTFPL"
+          ]
+        },
+        {
+          "locations": [
+            "/components/2/name"
+          ],
+          "name": "name",
+          "value": "leftpad"
+        }
+      ],
+      "passed": false,
+      "requirement": "licences",
+      "subject": {
+        "id": "leftpad",
+        "type": "component"
+      }
+    }
+  ],
+  "subjects": {
+    "component": {
+      "description": "",
+      "from": "components",
+      "identified_by": "name",
+      "parts": {}
+    }
+  }
+}

@@ -1,0 +1,26 @@
+ergo_spec: v0.2
+description: Every deployment to production was approved, and at least one test run passed before it.
+subjects:
+  deployment:
+    description: A deployment to production.
+    from: deployments whose environment is "prod"
+    identified_by: id
+  test run:
+    from: test_runs
+requirements:
+  approved_deployment:
+    description: Each production deployment has an approver.
+    subject: deployment
+    require: every
+    min_subjects: 0
+    checks:
+      approved:
+        description: Someone approved the deployment
+        assert: approved_by is a non-empty string
+  some_test_passed:
+    subject: test run
+    require: some
+    min_subjects: 1
+    checks:
+      passed:
+        assert: status is "passed"

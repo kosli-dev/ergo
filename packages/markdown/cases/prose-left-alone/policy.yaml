@@ -1,0 +1,15 @@
+ergo_spec: v0.2
+description: Every batch that leaves the bakery is safe to eat and baked right.
+subjects:
+  batch:
+    description: A batch of cakes baked today.
+    from: batches
+    identified_by: id
+requirements:
+  cake_batch:
+    description: Cakes are safe to eat and baked right.
+    subject: batch
+    checks:
+      nut_free:
+        description: Must not contain nut allergens.
+        assert: allergens does not contain "nuts"
