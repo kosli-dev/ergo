@@ -384,6 +384,14 @@ pub fn lower_assertion(assertion: &s::Assertion, scope: &Scope) -> Result<Check,
     }
 }
 
+pub fn lower_for(
+    line: &s::For,
+    assertions: &[s::Assertion],
+    scope: &Scope,
+) -> Result<Check, Vec<String>> {
+    crate::ops::for_line::lower_for(line, assertions, scope)
+}
+
 pub fn lower_quantified(
     quantifier: s::Quantifier,
     path: &s::Path,
