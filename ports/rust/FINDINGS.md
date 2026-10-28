@@ -42,6 +42,18 @@ The old port, on the branch `core/conformance-suite`, listed its findings in `co
 - **Tabs at either end of a line.** `ergo.rego` drops all whitespace there (`trim_space`), so `x is 1` followed by a tab reads. The ABNF drops only spaces, and so does Rust.
 - **The messages for a line that doesn't parse.** When a check doesn't parse, `ergo.rego` also tries to read it as a `from` line and a `for` line, and lists what those readings find. So `items whose k matches "("` as a check gets `invalid pattern "("`, which comes from reading it as a `from` line, where Rust says `doesn't parse`. Rust only reports on the kind of line it was asked to read. Both reject the same lines; only the messages differ.
 
+### Sums past 15 decimal places or 10^15
+
+[tally.sum] adds numbers as decimals and leaves the rest to the runtime: "A number with more than 15 decimal places, or too large to scale to a whole number below 10^15, is added as the runtime adds it." `ergo.rego` then falls back on OPA's `sum`, which doesn't add exactly either:
+
+| Sum                                | `ergo.rego` (`_decimal_sum`) | Rust                    |
+| ---------------------------------- | ---------------------------- | ----------------------- |
+| `0.1234567890123456` plus `1`      | `1.1234567890123456`         | `1.1234567890123456`    |
+| `0.1000000000000000001` plus `0.2` | `0.30000000000000000012`     | `0.3000000000000000001` |
+| `1e15` plus `0.5`                  | `1.0000000000000005e+15`     | `1000000000000000.5`    |
+
+Rust adds exactly whatever the size, so the rule could be the same for every engine. The one limit: operands whose digits span more than 100,000 places, like `1e99999` plus `1`, fail the side as `unusable` rather than build a huge number. No case covers any of this.
+
 ## Rules that a case contradicts
 
 Here a rule's text says one thing and a case, which `ergo.rego` passes, says another. The port follows the case, because the runner holds it to the cases, until the spec settles which one is right.

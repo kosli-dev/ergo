@@ -2,6 +2,7 @@ pub mod compare;
 pub mod equals;
 pub mod present;
 pub mod range;
+pub mod tally;
 pub mod time;
 
 use crate::cause::Cause;
@@ -82,6 +83,7 @@ pub enum Check {
     CompareTime(time::CompareTime),
     Equals(equals::Equals),
     Range(range::Range),
+    Tally(tally::Tally),
     NotYet,
 }
 
@@ -92,6 +94,7 @@ pub fn run(check: &Check, ctx: &Ctx) -> Verdict {
         Check::CompareTime(check) => time::run(check, ctx),
         Check::Equals(check) => equals::run(check, ctx),
         Check::Range(check) => range::run(check, ctx),
+        Check::Tally(check) => tally::run(check, ctx),
         Check::NotYet => Verdict {
             cause: Cause::Unusable,
             inputs: Vec::new(),
