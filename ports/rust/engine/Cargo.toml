@@ -9,4 +9,5 @@ publish.workspace = true
 
 [dependencies]
 ergo-sentences = { path = "../sentences" }
+regex = "1"
 serde_json = { version = "1", features = ["arbitrary_precision"] }

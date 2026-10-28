@@ -65,3 +65,10 @@ Here a rule's text says one thing and a case, which `ergo.rego` passes, says ano
 
 - **The order of keys in the report.** [report.policy] and [report.requirements] say `meta` is copied into the report, and AGENTS.md says the report stays byte for byte the same whatever order the policy was written in. Nothing in the spec says in which order an object's keys are written. [report.hash] doesn't need one, since RFC 8785 sorts keys, and `ergo.rego` gets sorted keys from OPA. serde_json sorts keys unless its `preserve_order` feature is on, and with it on `meta` kept the order it was written in. So the engine sorts every object in the report and in `violations()` by key, code point by code point, and `tests/key_order.rs` runs with that feature on too.
 
+## Where Rust's `regex` reads a pattern differently from RE2
+
+[patterns.syntax] says a pattern is RE2 syntax, and `ergo.rego` runs Go's RE2 through OPA. The port uses the `regex` crate, and reads each pattern through `ergo_sentences::rust_pattern` first, the same text the parser checks for `invalid pattern`. That function rewrites what the two read differently:
+
+- **`\d`, `\w`, `\s` and `\b` are ASCII in RE2 and Unicode in Rust.** With OPA, `^\d$` doesn't match `٣`, `^\w$` doesn't match `é`, `^\s$` matches neither a vertical tab nor a non-breaking space, and `a\b` matches `aé`. Rust's defaults would give the opposite for all of them. So `\d` is written `[0-9]`, `\w` `[0-9A-Za-z_]`, `\s` `[\t\n\x0C\r ]`, their capitals the negated sets, and `\b` and `\B` `(?-u:\b)` and `(?-u:\B)`. Inside brackets the sets are nested, which Rust allows, so `[\d_]` is `[[0-9]_]`. No case pins this. It would take a case like `x matches "^\\d$"` on `"٣"`, which fails as `value`.
+- **Syntax only RE2 has**, like `\Q...\E`, a `{` that isn't a repeat, `[]a]`, and more than 1000 repeats being invalid, was already rewritten or rejected by ergo-sentences. Its oracle test checks validity against RE2.
+- **A pattern Rust can't compile** after that, for example one too big for its size limit, fails the check as `unusable`, so it never passes by accident.

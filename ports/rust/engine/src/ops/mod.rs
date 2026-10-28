@@ -1,6 +1,8 @@
 pub mod any_of;
 pub mod compare;
 pub mod equals;
+pub mod kinds;
+pub mod lists;
 pub mod present;
 pub mod range;
 pub mod tally;
@@ -101,6 +103,12 @@ pub enum Check {
     Tally(tally::Tally),
     Walk(Box<walk::Walk>),
     AnyOf(any_of::AnyOf),
+    In(lists::In),
+    Contains(lists::Contains),
+    Matches(lists::Matches),
+    HasType(kinds::HasType),
+    NonEmptyString(kinds::NonEmptyString),
+    Empty(kinds::Empty),
     NotYet,
 }
 
@@ -118,6 +126,12 @@ impl Check {
                 compare::Side::Path(path) => Some(path),
                 compare::Side::Value(_) => None,
             },
+            Check::In(check) => Some(&check.path),
+            Check::Contains(check) => Some(&check.path),
+            Check::Matches(check) => Some(&check.path),
+            Check::HasType(check) => Some(&check.path),
+            Check::NonEmptyString(check) => Some(&check.path),
+            Check::Empty(check) => Some(&check.path),
             Check::Tally(_) | Check::Walk(_) | Check::AnyOf(_) | Check::NotYet => None,
         }
     }
@@ -143,6 +157,12 @@ impl Check {
                 .collect(),
             Check::Tally(check) => check.paths(),
             Check::AnyOf(check) => check.paths(),
+            Check::In(check) => check.paths(),
+            Check::Contains(check) => check.paths(),
+            Check::Matches(check) => check.paths(),
+            Check::HasType(check) => vec![&check.path],
+            Check::NonEmptyString(check) => vec![&check.path],
+            Check::Empty(check) => vec![&check.path],
             Check::Walk(_) | Check::NotYet => Vec::new(),
         }
     }
@@ -169,6 +189,27 @@ impl Check {
                 left: compare::Side::Path(left),
                 ..check.clone()
             }),
+            Check::In(check) => Check::In(lists::In {
+                path: left,
+                ..check.clone()
+            }),
+            Check::Contains(check) => Check::Contains(lists::Contains {
+                path: left,
+                ..check.clone()
+            }),
+            Check::Matches(check) => Check::Matches(lists::Matches {
+                path: left,
+                ..check.clone()
+            }),
+            Check::HasType(check) => Check::HasType(kinds::HasType {
+                path: left,
+                ..check.clone()
+            }),
+            Check::NonEmptyString(_) => Check::NonEmptyString(kinds::NonEmptyString { path: left }),
+            Check::Empty(check) => Check::Empty(kinds::Empty {
+                path: left,
+                ..check.clone()
+            }),
             Check::Tally(_) | Check::Walk(_) | Check::AnyOf(_) | Check::NotYet => self.clone(),
         }
     }
@@ -183,6 +224,12 @@ impl Check {
             Check::Tally(check) => check.refs(),
             Check::Walk(check) => check.refs(),
             Check::AnyOf(check) => check.refs(),
+            Check::In(check) => check.refs(),
+            Check::Contains(check) => check.refs(),
+            Check::Matches(check) => check.refs(),
+            Check::HasType(check) => check.refs(),
+            Check::NonEmptyString(check) => check.refs(),
+            Check::Empty(check) => check.refs(),
             Check::NotYet => Vec::new(),
         }
     }
@@ -226,6 +273,12 @@ pub fn run(check: &Check, ctx: &Ctx) -> Verdict {
         Check::Tally(check) => tally::run(check, ctx),
         Check::Walk(check) => walk::run(check, ctx).verdict,
         Check::AnyOf(check) => any_of::run(check, ctx),
+        Check::In(check) => lists::run_in(check, ctx),
+        Check::Contains(check) => lists::run_contains(check, ctx),
+        Check::Matches(check) => lists::run_matches(check, ctx),
+        Check::HasType(check) => kinds::run_has_type(check, ctx),
+        Check::NonEmptyString(check) => kinds::run_non_empty_string(check, ctx),
+        Check::Empty(check) => kinds::run_empty(check, ctx),
         Check::NotYet => Verdict {
             cause: Cause::Unusable,
             inputs: Vec::new(),

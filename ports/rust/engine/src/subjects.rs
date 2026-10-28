@@ -1462,7 +1462,7 @@ mod tests {
     #[test]
     fn a_condition_no_operator_reads_yet_finds_nothing_and_fails_closed_even_with_min_zero() {
         let r = run(
-            json!({"thing": {"from": "ds whose x is empty"}}),
+            json!({"thing": {"from": "ds whose x is at least count of ys"}}),
             json!({"ds": [{"x": 1}]}),
         );
         assert_eq!(rows(&r, "$min_subjects")[0]["cause"], json!("unusable"));
@@ -1473,7 +1473,7 @@ mod tests {
     #[test]
     fn a_child_of_a_subject_with_such_a_condition_fails_closed_too() {
         let r = run(
-            json!({"art": {"from": "arts whose x is empty"}, "thing": {"from": "art.prs"}}),
+            json!({"art": {"from": "arts whose x is at least count of ys"}, "thing": {"from": "art.prs"}}),
             json!({"arts": [{"x": 1, "prs": [{}]}]}),
         );
         assert_eq!(rows(&r, "$min_subjects")[0]["cause"], json!("unusable"));
@@ -1636,7 +1636,7 @@ mod tests {
      {
         let r = with_checks(
             json!({"thing": {"from": "ds"}}),
-            json!({"a": "every xs.y is empty"}),
+            json!({"a": "every xs.y is at least count of zs"}),
             json!({"ds": [{"xs": [{"y": 1}]}]}),
         );
         let a = rows(&r, "a");
