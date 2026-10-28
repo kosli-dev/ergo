@@ -15,6 +15,7 @@ Ergo is a Rego library that turns policy evaluation into a structured report. Us
 - `CODE_OF_CONDUCT.md` is the Contributor Covenant 2.1, unchanged apart from the contact address.
 - `.github/ISSUE_TEMPLATE/` and `.github/pull_request_template.md` are the forms GitHub shows for new issues and pull requests.
 - `examples/` holds worked examples. Each one has an input, the same policy in plain Rego and with Ergo, and tests that pin what both versions report.
+- `ports/rust/` is a second engine, in Rust, in progress. It's a Cargo workspace with two crates: `ergo-sentences` reads sentences and nothing else, and `ergo-engine` builds the report.
 
 ## Checks
 
@@ -47,6 +48,8 @@ The `opa eval` command runs every test again with `--strict-builtin-errors`, whi
 The `regal lint` command runs [Regal](https://www.openpolicyagent.org/projects/regal)'s rules for likely bugs, and should say `No violations found`. One of them, `leaked-internal-reference`, fails when a file outside `package ergo` calls a rule whose name starts with `_`. Test files are allowed to. `redundant-existence-check` is off because it flags `_verdict_cause(passed) := "satisfied" if passed`, where `if passed` is what stops a `false` from counting as satisfied. The flags are on the command line and not in `.regal/config.yaml` because OPA would load that file as data.
 
 OPA loads every JSON and YAML file it finds as data. The workflow files under `.github` clash with each other, so the checks ignore that folder.
+
+When you change `ports/rust/`, run its checks too. There's no need for Rust on your machine: `ports/rust/README.md` has the Docker command, which runs `cargo fmt --check`, Clippy with warnings as errors, the tests, and a Wasm build of `ergo-sentences`. Use `-j 4` and run one at a time, because a full build takes every core otherwise. The Rust version is pinned in `ports/rust/rust-toolchain.toml` and the `Dockerfile` next to it; change both together. CI runs the same checks in the `tests-rust` job.
 
 CI runs these checks on pull requests and on pushes to `main` (`.github/workflows/test.yml`), using the OPA version the README names and Regal 0.43.0. That's OPA 1.20.2, the version the Kosli CLI embeds. When you change the OPA version, change it in the README, in `CONTRIBUTING.md`, in every job of the workflow, in the Docker command below and in `opaVersion` in `site/hugo.toml`.
 

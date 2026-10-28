@@ -175,6 +175,21 @@ jobs:
           npm install --silent --no-save --prefix "$RUNNER_TEMP" @open-policy-agent/opa-wasm@1.10.0
           node .github/wasm-js.cjs "$RUNNER_TEMP"
 
+  tests-rust:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ports/rust
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install the Rust version in rust-toolchain.toml
+        run: rustup toolchain install
+      - run: cargo fmt --check
+      - run: cargo clippy --locked --all-targets -- -D warnings
+      - run: cargo test --locked
+      - name: Check ergo-sentences builds for Wasm
+        run: cargo build --locked -p ergo-sentences --target wasm32-unknown-unknown
+
   spec:
     runs-on: ubuntu-latest
     steps:

@@ -1,0 +1,8 @@
+[package]
+name = "ergo-sentences"
+description = "Reads Ergo's check sentences, without the engine"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
