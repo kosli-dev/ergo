@@ -187,6 +187,7 @@ jobs:
       - run: cargo fmt --check
       - run: cargo clippy --locked --all-targets --all-features -- -D warnings
       - run: cargo test --locked --all-features -- --show-output
+      - run: cargo test --locked -p ergo-engine --features serde_json/preserve_order --test key_order
       - name: Check ergo-sentences builds for Wasm
         run: cargo build --locked -p ergo-sentences --target wasm32-unknown-unknown
 
