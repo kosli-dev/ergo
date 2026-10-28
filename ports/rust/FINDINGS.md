@@ -41,3 +41,10 @@ The old port, on the branch `core/conformance-suite`, listed its findings in `co
 - **A `for` item with a bracket index and no quantifier.** `ergo.rego` reads `x[3] as i` as `item 4 of x as i`. The ABNF's `for-item` needs `every`, `some` or a position in words, so Rust rejects it with `an item starts with "every", "some" or a position, like "last of"`.
 - **Tabs at either end of a line.** `ergo.rego` drops all whitespace there (`trim_space`), so `x is 1` followed by a tab reads. The ABNF drops only spaces, and so does Rust.
 - **The messages for a line that doesn't parse.** When a check doesn't parse, `ergo.rego` also tries to read it as a `from` line and a `for` line, and lists what those readings find. So `items whose k matches "("` as a check gets `invalid pattern "("`, which comes from reading it as a `from` line, where Rust says `doesn't parse`. Rust only reports on the kind of line it was asked to read. Both reject the same lines; only the messages differ.
+
+## Rules that a case contradicts
+
+Here a rule's text says one thing and a case, which `ergo.rego` passes, says another. The port follows the case, because the runner holds it to the cases, until the spec settles which one is right.
+
+- **`from: $input` on an input that is a list.** [subjects.from] says a `from` that ends `found` on a list makes each item a subject, and that with no steps it reads the whole input, so `[1]` would give one subject. The case gives none and fails `$min_subjects` as `unusable`. Case: `requirements / the whole input as the subject / fails min_subjects as unusable on a list`.
+- **The id of a subject that isn't an object, when it has an `identified_by`.** [subjects.id] says the id is `null` when the path doesn't end `found`, and a path into a string ends `not_an_object`. The case gives `"a"` the id `"a"`. Case: `requirements / ... / takes items that aren't objects as subjects, each its own id when it has no id field`.

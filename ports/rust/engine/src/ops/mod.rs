@@ -53,6 +53,7 @@ impl Verdict {
 
 pub struct ReadPath {
     pub outcome: Outcome,
+    pub step_unreadable: bool,
     pub value: Option<Value>,
     pub input: Input,
 }
@@ -64,12 +65,37 @@ pub fn read_path(path: &Path, ctx: &Ctx) -> ReadPath {
         name: name::name(path),
         value: value.clone().unwrap_or(Value::Null),
         locations: read.location.iter().map(|l| l.render()).collect(),
-        part: None,
+        part: path::part_tag(path, ctx).map(|(name, id)| Part { name, id }),
     };
     ReadPath {
         outcome: read.outcome,
+        step_unreadable: read.step_unreadable,
         value,
         input,
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum Check {
+    Present(present::Present),
+    Compare(compare::Compare),
+    CompareTime(time::CompareTime),
+    Equals(equals::Equals),
+    Range(range::Range),
+    NotYet,
+}
+
+pub fn run(check: &Check, ctx: &Ctx) -> Verdict {
+    match check {
+        Check::Present(check) => present::run(check, ctx),
+        Check::Compare(check) => compare::run(check, ctx),
+        Check::CompareTime(check) => time::run(check, ctx),
+        Check::Equals(check) => equals::run(check, ctx),
+        Check::Range(check) => range::run(check, ctx),
+        Check::NotYet => Verdict {
+            cause: Cause::Unusable,
+            inputs: Vec::new(),
+        },
     }
 }
 
@@ -78,5 +104,101 @@ pub fn verdict(passed: bool) -> Cause {
         Cause::Satisfied
     } else {
         Cause::Value
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::path::{Located, Location, PartStart, Step};
+    use std::collections::BTreeMap;
+
+    fn ctx<'a>(subject: &'a Value, input: &'a Value) -> Ctx<'a> {
+        Ctx {
+            subject: Located {
+                value: subject,
+                location: Location::input_root().key("s"),
+            },
+            input,
+            params: None,
+            aliases: BTreeMap::new(),
+        }
+    }
+
+    fn present(path: Path, missing: bool) -> Check {
+        Check::Present(present::Present { path, missing })
+    }
+
+    fn key(text: &str) -> Step {
+        Step::Key(text.to_string())
+    }
+
+    #[test]
+    fn run_gives_the_verdict_of_the_operator_the_check_holds() {
+        let subject = json!({"x": 1});
+        let input = json!({});
+        let path = Path {
+            start: path::Start::Subject,
+            steps: vec![key("x")],
+        };
+        let found = run(&present(path.clone(), false), &ctx(&subject, &input));
+        assert!(found.passed());
+        let failed = run(&present(path, true), &ctx(&subject, &input));
+        assert_eq!(failed.cause, Cause::Value);
+        let equals = Check::Equals(equals::Equals {
+            path: Path {
+                start: path::Start::Subject,
+                steps: vec![key("x")],
+            },
+            value: json!(1),
+        });
+        assert!(run(&equals, &ctx(&subject, &input)).passed());
+    }
+
+    #[test]
+    fn a_check_the_engine_cannot_run_yet_fails_as_unusable_and_reads_nothing() {
+        let subject = json!({"x": 1});
+        let input = json!({});
+        let verdict = run(&Check::NotYet, &ctx(&subject, &input));
+        assert_eq!(verdict.cause, Cause::Unusable);
+        assert!(verdict.inputs.is_empty());
+    }
+
+    #[test]
+    fn an_input_read_through_a_part_is_tagged_with_the_alias_and_the_parts_id() {
+        let subject = json!({"d": {"id": "c1", "x": 1}});
+        let input = json!({});
+        let start = path::Start::Part(Box::new(PartStart {
+            name: "cov".into(),
+            base: path::Start::Subject,
+            steps: vec![key("d")],
+            id: Some(vec![key("id")]),
+        }));
+        let verdict = run(
+            &present(
+                Path {
+                    start,
+                    steps: vec![key("x")],
+                },
+                false,
+            ),
+            &ctx(&subject, &input),
+        );
+        assert_eq!(
+            verdict.inputs[0].to_json(),
+            json!({"name": "cov.x", "value": 1, "locations": ["/s/d/x"], "part": {"name": "cov", "id": "c1"}})
+        );
+    }
+
+    #[test]
+    fn an_input_read_without_a_part_has_no_tag() {
+        let subject = json!({"x": 1});
+        let input = json!({});
+        let path = Path {
+            start: path::Start::Subject,
+            steps: vec![key("x")],
+        };
+        let verdict = run(&present(path, false), &ctx(&subject, &input));
+        assert!(verdict.inputs[0].to_json().get("part").is_none());
     }
 }

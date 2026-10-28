@@ -72,6 +72,7 @@ pub fn name(path: &Path) -> String {
         Start::Input => "$input".to_string(),
         Start::Params => "$params".to_string(),
         Start::Alias(alias) => alias.clone(),
+        Start::Part(part) => part.name.clone(),
     };
     let last = path.steps.len().saturating_sub(1);
     for (at, step) in path.steps.iter().enumerate() {
@@ -94,10 +95,12 @@ pub fn name(path: &Path) -> String {
                     out.push_str(&format!("[{index}]"));
                 }
             }
-            Step::Ref(reference) => {
+            Step::Ref(reference) | Step::Field(reference) => {
                 let ref_name = name(reference);
-                let one_key = matches!(reference.start, Start::Input | Start::Params)
-                    && matches!(reference.steps.as_slice(), [Step::Key(_)]);
+                let one_key = matches!(
+                    reference.start,
+                    Start::Input | Start::Params | Start::Subject
+                ) && matches!(reference.steps.as_slice(), [Step::Key(_)]);
                 if one_key && !out.is_empty() {
                     out.push_str(&format!(" named by {ref_name}"));
                 } else {
@@ -365,6 +368,70 @@ mod tests {
         assert_eq!(
             name(&subject(vec![k("x"), Step::Ref(Box::new(r))])),
             "x named by $params.\"a.b\""
+        );
+    }
+
+    #[test]
+    fn a_part_is_named_by_its_alias_and_the_steps_after_it() {
+        let part = Start::Part(Box::new(crate::path::PartStart {
+            name: "cov".into(),
+            base: Start::Subject,
+            steps: vec![k("d"), k("b")],
+            id: None,
+        }));
+        let p = Path {
+            start: part.clone(),
+            steps: vec![k("x"), k("y")],
+        };
+        assert_eq!(name(&p), "cov.x.y");
+        assert_eq!(
+            name(&Path {
+                start: part.clone(),
+                steps: vec![]
+            }),
+            "cov"
+        );
+        assert_eq!(
+            name(&Path {
+                start: part,
+                steps: vec![Step::Index(0)]
+            }),
+            "item 1 of cov"
+        );
+    }
+
+    #[test]
+    fn a_part_of_a_parent_is_named_by_the_parent_and_the_alias() {
+        let part = Start::Part(Box::new(crate::path::PartStart {
+            name: "artifact.pr_attestation".into(),
+            base: Start::Alias("artifact".into()),
+            steps: vec![k("a")],
+            id: None,
+        }));
+        assert_eq!(
+            name(&Path {
+                start: part,
+                steps: vec![k("approvers")]
+            }),
+            "artifact.pr_attestation.approvers"
+        );
+    }
+
+    #[test]
+    fn a_field_step_reads_as_named_by_the_field() {
+        let field = subject(vec![k("severity")]);
+        assert_eq!(
+            name(&params(vec![k("max"), Step::Field(Box::new(field))])),
+            "$params.max named by severity"
+        );
+    }
+
+    #[test]
+    fn a_field_step_that_is_a_word_keeps_its_dot() {
+        let field = subject(vec![k("empty")]);
+        assert_eq!(
+            name(&subject(vec![k("x"), Step::Field(Box::new(field))])),
+            "x named by .empty"
         );
     }
 }

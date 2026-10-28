@@ -1,10 +1,9 @@
 use crate::cause::Cause;
-use crate::name;
-use crate::path::{Path, Start, Step};
 use crate::policy::{
-    Check, Form, Has, OptionLines, Policy, Problems, Requirement, SPEC, Subject, SubjectDef,
-    SubjectName, Text, field_name, merge_problems,
+    Check, Form, OptionLines, Policy, Problems, Requirement, SPEC, SubjectName, field_name,
+    merge_problems,
 };
+use crate::reading::{INVALID_FROM, Reading};
 use crate::value::{Decimal, json_text};
 use serde_json::{Map, Value, json};
 use std::collections::BTreeMap;
@@ -80,7 +79,7 @@ fn type_text(value: &Value) -> String {
     }
 }
 
-fn row_of(
+pub fn row_of(
     requirement_name: &str,
     requirement: &Requirement,
     check: &str,
@@ -231,56 +230,41 @@ fn is_zero(value: &Value) -> bool {
     }
 }
 
-fn unparsed_from_path(text: &str) -> &str {
-    text.split(" whose ").next().unwrap_or(text).trim()
-}
-
-fn unparsed_filters(text: &str) -> Option<String> {
-    text.split_once(" whose ")
-        .map(|(_, filters)| filters.trim().to_string())
-}
-
-fn from_readable(subject_name: &str, subject: &Subject, extra: &Problems) -> bool {
+fn from_readable(reading: &Reading, subject_name: &str, extra: &Problems) -> bool {
     let at = field_name(&["subjects", subject_name, "from"]);
-    match &subject.def {
-        Some(def) => {
-            def.from != Text::Invalid
-                && !subject.problems.contains_key(&at)
-                && !extra.contains_key(&at)
-        }
-        None => false,
-    }
+    reading
+        .infos
+        .get(subject_name)
+        .is_some_and(|info| !info.problems.contains_key(&at) && info.from_text.is_some())
+        && !extra.contains_key(&at)
 }
 
-fn subject_key_name(name: &str) -> String {
-    name::name(&Path {
-        start: Start::Subject,
-        steps: vec![Step::Key(name.to_string())],
-    })
-}
-
-fn from_text(policy: &Policy, requirement: &Requirement, extra: &Problems) -> String {
-    let Some((name, subject)) = policy.subject_of(requirement) else {
-        return "<invalid from>".to_string();
+fn from_text(
+    reading: &Reading,
+    policy: &Policy,
+    requirement: &Requirement,
+    extra: &Problems,
+) -> String {
+    let Some((name, _)) = policy.subject_of(requirement) else {
+        return INVALID_FROM.to_string();
     };
-    if !from_readable(name, subject, extra) {
-        return "<invalid from>".to_string();
+    if !from_readable(reading, name, extra) {
+        return INVALID_FROM.to_string();
     }
-    match subject.def.as_ref().map(|def| &def.from) {
-        Some(Text::Written(text)) => unparsed_from_path(text).to_string(),
-        _ => subject_key_name(name),
-    }
+    reading.infos[name].from_text.clone().unwrap_or_default()
 }
 
-fn filters_text(policy: &Policy, requirement: &Requirement, extra: &Problems) -> Option<String> {
-    let (name, subject) = policy.subject_of(requirement)?;
-    if !from_readable(name, subject, extra) {
+fn filters_text(
+    reading: &Reading,
+    policy: &Policy,
+    requirement: &Requirement,
+    extra: &Problems,
+) -> Option<String> {
+    let (name, _) = policy.subject_of(requirement)?;
+    if !from_readable(reading, name, extra) {
         return None;
     }
-    match subject.def.as_ref().map(|def| &def.from) {
-        Some(Text::Written(text)) => unparsed_filters(text),
-        _ => None,
-    }
+    reading.filters_text(name)
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -314,10 +298,12 @@ impl CheckDef {
 }
 
 pub fn check_defs(
+    reading: &Reading,
     policy: &Policy,
     requirement: &Requirement,
     extra: &Problems,
 ) -> BTreeMap<String, CheckDef> {
+    let expressions = crate::checks::read_checks(reading, requirement);
     let mut defs: BTreeMap<String, CheckDef> = requirement
         .checks
         .iter()
@@ -327,14 +313,16 @@ pub fn check_defs(
                 CheckDef {
                     description: check.description.clone(),
                     meta: check.meta.clone(),
-                    expression: written_expression(check),
+                    expression: expressions
+                        .get(name)
+                        .map_or_else(|| written_expression(check), |read| read.expression.clone()),
                     refs: Vec::new(),
                 },
             )
         })
         .collect();
     let kind = type_text(&subject_type(requirement));
-    let from = from_text(policy, requirement, extra);
+    let from = from_text(reading, policy, requirement, extra);
     let min = json_text(&requirement.min_subjects);
     let (min_description, min_expression) = if is_zero(&requirement.min_subjects) {
         (
@@ -365,7 +353,7 @@ pub fn check_defs(
             "count(problems) == 0".to_string(),
         ),
     );
-    match filters_text(policy, requirement, extra) {
+    match filters_text(reading, policy, requirement, extra) {
         Some(filters) => {
             defs.insert(
                 "$applies".to_string(),
@@ -404,7 +392,9 @@ pub fn well_formed_row(
     if let Some(raw) = &requirement.not_an_object {
         inputs.push(input("requirement", raw.clone(), &[]));
     }
-    for (name, texts) in &problems {
+    let mut listed: Vec<(&String, &std::collections::BTreeSet<String>)> = problems.iter().collect();
+    listed.sort_by_key(|(name, _)| (name.starts_with("checks."), name.replace('"', "")));
+    for (name, texts) in listed {
         if name == "require" {
             continue;
         }
@@ -489,63 +479,23 @@ fn causes(status: &str, well_formed: &Row, evaluation: &Evaluation) -> Value {
     )
 }
 
-fn text_of(text: &Text, invalid: &str) -> Option<String> {
-    match text {
-        Text::Written(written) => Some(written.trim().to_string()),
-        Text::Missing => None,
-        Text::Invalid => Some(invalid.to_string()),
-    }
-}
-
-fn reported_parts(def: &SubjectDef) -> Value {
-    let mut parts = Map::new();
-    if let Has::Parts(written) = &def.has {
-        for (alias, part) in written {
-            let from = match &part.from {
-                Text::Written(text) => text.trim().to_string(),
-                Text::Missing | Text::Invalid => "<invalid from>".to_string(),
-            };
-            parts.insert(
-                alias.clone(),
-                json!({
-                    "from": from,
-                    "identified_by": text_of(&part.identified_by, "<invalid identified_by>"),
-                }),
-            );
-        }
-    }
-    Value::Object(parts)
-}
-
-fn subject_entry(name: &str, subject: &Subject, extra: &Problems) -> Value {
-    let Some(def) = &subject.def else {
+fn subject_entry(reading: &Reading, name: &str, extra: &Problems) -> Value {
+    let Some(info) = reading.infos.get(name) else {
         return json!({
             "description": "",
-            "from": "<invalid from>",
+            "from": INVALID_FROM,
             "identified_by": null,
             "parts": {},
         });
     };
-    let from = if !from_readable(name, subject, extra) {
-        "<invalid from>".to_string()
-    } else {
-        match &def.from {
-            Text::Written(text) => text.trim().to_string(),
-            _ => subject_key_name(name),
-        }
-    };
-    let id_at = field_name(&["subjects", name, "identified_by"]);
-    let identified_by = if subject.problems.contains_key(&id_at) || extra.contains_key(&id_at) {
-        Some("<invalid identified_by>".to_string())
-    } else {
-        text_of(&def.identified_by, "<invalid identified_by>")
-    };
-    json!({
-        "description": def.description,
-        "from": from,
-        "identified_by": identified_by,
-        "parts": reported_parts(def),
-    })
+    let mut entry = info.entry.clone();
+    if extra.contains_key(&field_name(&["subjects", name, "from"])) {
+        entry["from"] = json!(INVALID_FROM);
+    }
+    if extra.contains_key(&field_name(&["subjects", name, "identified_by"])) {
+        entry["identified_by"] = json!(crate::reading::INVALID_IDENTIFIED_BY);
+    }
+    entry
 }
 
 fn engine() -> Value {
@@ -558,7 +508,16 @@ pub fn assemble(
     evaluations: &BTreeMap<String, Evaluation>,
     params: &Value,
 ) -> Value {
-    let no_problems = Problems::new();
+    assemble_with(policy, &Reading::of(policy), extra, evaluations, params)
+}
+
+pub fn assemble_with(
+    policy: &Policy,
+    reading: &Reading,
+    extra: &BTreeMap<String, Problems>,
+    evaluations: &BTreeMap<String, Evaluation>,
+    params: &Value,
+) -> Value {
     let mut requirements = Map::new();
     let mut well_formed_rows = Vec::new();
     let mut min_rows = Vec::new();
@@ -568,8 +527,12 @@ pub fn assemble(
     let mut subjects = Map::new();
     let mut compliant = !policy.requirements.is_empty();
     for (name, requirement) in &policy.requirements {
-        let extra_problems = extra.get(name);
-        let well_formed = well_formed_row(policy, name, requirement, extra_problems);
+        let mut combined = reading.problems_of(policy, requirement);
+        if let Some(given) = extra.get(name) {
+            merge_problems(&mut combined, given);
+        }
+        let extra_problems = &combined;
+        let well_formed = well_formed_row(policy, name, requirement, Some(extra_problems));
         let evaluation = if well_formed.passed() {
             evaluations
                 .get(name)
@@ -582,7 +545,7 @@ pub fn assemble(
         if status == "not_met" {
             compliant = false;
         }
-        let defs = check_defs(policy, requirement, extra_problems.unwrap_or(&no_problems));
+        let defs = check_defs(reading, policy, requirement, extra_problems);
         let reported_subject = policy.subject_of(requirement).map(|(n, _)| n);
         requirements.insert(
             name.clone(),
@@ -600,15 +563,15 @@ pub fn assemble(
                     .collect::<Map<String, Value>>(),
             }),
         );
-        if let Some((subject_name, subject)) = policy.subject_of(requirement) {
-            subjects.insert(
-                subject_name.to_string(),
-                subject_entry(
-                    subject_name,
-                    subject,
-                    extra_problems.unwrap_or(&no_problems),
-                ),
-            );
+        if let SubjectName::Named(subject_name) = &requirement.subject
+            && policy.subject_of(requirement).is_some()
+        {
+            for used in reading.used(subject_name) {
+                subjects.insert(used.clone(), subject_entry(reading, &used, extra_problems));
+            }
+            subjects
+                .entry(subject_name.clone())
+                .or_insert_with(|| subject_entry(reading, subject_name, extra_problems));
         }
         well_formed_rows.push(well_formed);
         min_rows.extend(evaluation.min_subjects);
@@ -837,7 +800,8 @@ mod tests {
     }
 
     #[test]
-    fn well_formed_lists_count_and_require_then_problems_sorted_by_name() {
+    fn well_formed_lists_count_and_require_then_field_problems_then_check_problems_sorted_by_name()
+    {
         let (read, requirement) = requirement_of(json!({
             "subject": "thing",
             "checks": {"c": {"op": "x"}, "a": 5},
@@ -852,9 +816,9 @@ mod tests {
                 "count(checks)",
                 "require",
                 "aa",
+                "zz",
                 "checks.a",
-                "checks.c",
-                "zz"
+                "checks.c"
             ]
         );
         assert_eq!(row.cause, Cause::Value);
@@ -865,7 +829,7 @@ mod tests {
         let (read, requirement) = requirement_of(json!({
             "subject": "thing",
             "require": "most",
-            "checks": {"c": "x"},
+            "checks": {"c": "x exists"},
             "aa": 1
         }));
         let row = well_formed_row(&read, "s", &requirement, None);
@@ -953,7 +917,9 @@ mod tests {
     #[test]
     fn a_requirement_written_wrong_gets_only_its_well_formed_row() {
         let report = report_of(
-            policy(json!({"bad": {"subject": "thing", "require": "most", "checks": {"c": "x"}}})),
+            policy(
+                json!({"bad": {"subject": "thing", "require": "most", "checks": {"c": "x exists"}}}),
+            ),
             Value::Null,
         );
         let results = report["results"].as_array().unwrap();
@@ -1039,7 +1005,10 @@ mod tests {
 
     #[test]
     fn a_requirement_with_no_subject_names_none_and_types_its_rows_subject() {
-        let report = report_of(policy(json!({"s": {"checks": {"c": "x"}}})), Value::Null);
+        let report = report_of(
+            policy(json!({"s": {"checks": {"c": "x exists"}}})),
+            Value::Null,
+        );
         let row = row_of_check(&report, "s", "$well_formed");
         assert_eq!(row["subject"], json!({"type": "subject", "id": null}));
         assert_eq!(report["requirements"]["s"]["subject"], Value::Null);
@@ -1053,7 +1022,7 @@ mod tests {
     #[test]
     fn a_subject_that_is_not_in_subjects_is_typed_as_written_and_named_null() {
         let report = report_of(
-            policy(json!({"s": {"subject": "nope", "checks": {"c": "x"}}})),
+            policy(json!({"s": {"subject": "nope", "checks": {"c": "x exists"}}})),
             Value::Null,
         );
         assert_eq!(
@@ -1117,7 +1086,9 @@ mod tests {
     #[test]
     fn min_subjects_zero_with_nothing_found_is_not_applicable_and_describes_reading_the_list() {
         let report = report_of(
-            policy(json!({"s": {"subject": "thing", "min_subjects": 0, "checks": {"c": "x"}}})),
+            policy(
+                json!({"s": {"subject": "thing", "min_subjects": 0, "checks": {"c": "x exists"}}}),
+            ),
             Value::Null,
         );
         assert_eq!(
@@ -1135,7 +1106,9 @@ mod tests {
     fn params_that_are_not_an_object_fail_min_subjects_as_unusable_and_say_why() {
         for params in [json!("p"), json!([]), json!(1), json!(true)] {
             let report = report_of(
-                policy(json!({"s": {"subject": "thing", "min_subjects": 0, "checks": {"c": "x"}}})),
+                policy(
+                    json!({"s": {"subject": "thing", "min_subjects": 0, "checks": {"c": "x exists"}}}),
+                ),
                 params,
             );
             let row = row_of_check(&report, "s", "$min_subjects");
@@ -1229,7 +1202,7 @@ mod tests {
 
     #[test]
     fn a_subject_without_from_reads_the_field_named_like_it() {
-        let mut p = policy(json!({"s": {"subject": "pull request", "checks": {"c": "x"}}}));
+        let mut p = policy(json!({"s": {"subject": "pull request", "checks": {"c": "x exists"}}}));
         p["subjects"] = json!({"pull request": null});
         let report = report_of(p, Value::Null);
         assert_eq!(
@@ -1307,8 +1280,9 @@ mod tests {
     }
 
     fn status_of(require: &str, groups: Vec<Vec<Cause>>, matching: u64) -> &'static str {
-        let (_, requirement) =
-            requirement_of(json!({"subject": "thing", "require": require, "checks": {"c": "x"}}));
+        let (_, requirement) = requirement_of(
+            json!({"subject": "thing", "require": require, "checks": {"c": "x exists"}}),
+        );
         let (read, _) = requirement_of(good());
         let well_formed = well_formed_row(&read, "s", &requirement, None);
         let evaluation = Evaluation {
@@ -1400,8 +1374,9 @@ mod tests {
 
     #[test]
     fn a_requirement_that_is_written_wrong_is_not_met_whatever_it_evaluated_to() {
-        let (read, requirement) =
-            requirement_of(json!({"subject": "thing", "require": "x", "checks": {"c": "x"}}));
+        let (read, requirement) = requirement_of(
+            json!({"subject": "thing", "require": "x", "checks": {"c": "x exists"}}),
+        );
         let well_formed = well_formed_row(&read, "s", &requirement, None);
         let evaluation = Evaluation {
             total: 1,
@@ -1446,7 +1421,7 @@ mod tests {
             "checks": {"c": "every cs.v is in $params.ok", "d": "x exists"}
         }));
         let mut defs = json!({});
-        let report_defs = check_defs(&read, &requirement, &Problems::new());
+        let report_defs = check_defs(&Reading::of(&read), &read, &requirement, &Problems::new());
         for (name, def) in report_defs {
             defs[name] = def.to_json();
         }
@@ -1592,8 +1567,9 @@ mod tests {
 
     #[test]
     fn the_min_subjects_row_passes_at_the_minimum_and_fails_with_the_cause_it_is_given() {
-        let (_, requirement) =
-            requirement_of(json!({"subject": "thing", "min_subjects": 2, "checks": {"c": "x"}}));
+        let (_, requirement) = requirement_of(
+            json!({"subject": "thing", "min_subjects": 2, "checks": {"c": "x exists"}}),
+        );
         assert_eq!(
             min_subjects_row("s", &requirement, 2, &[], None, vec![]).cause,
             Cause::Satisfied
