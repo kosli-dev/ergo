@@ -138,7 +138,7 @@ The first line names the part of the repo that changed, then says what the chang
 
 For example, `rego: fail compare when either side is missing`. Commits from before the Rust port say `core:` for `rego:`.
 
-One area per commit. A `rego:` or `rust:` change that updates `REFERENCE.md` or `spec/` with it keeps its area.
+One area per commit. A `rego:` or `rust:` change that updates `REFERENCE.md` or `spec/` with it keeps its area. A `rego:` change that alters behaviour adds the cases Rust now fails to `ports/rust/known-failures.txt`, and keeps its area. The `rust:` change that ports it deletes those lines.
 
 When a `rego:` or `rust:` change alters the report for an existing policy, say so in the body, on a line starting with `Changes the report:`.
 
