@@ -115,3 +115,38 @@ test("generated policies apply onto every case written by hand, refused only whe
   }
   assert.ok(refused.length < 50, `${refused.length} refused`);
 });
+
+const changedSentence = (check: Record<string, any>): [string, string] => {
+  if (check.assert !== undefined) {
+    const old = Array.isArray(check.assert) ? check.assert[0] : check.assert;
+    const now = `${old} or not`;
+    check.assert = Array.isArray(check.assert) ? [now, ...check.assert.slice(1)] : now;
+    return [old, now];
+  }
+  const [option, sentences] = Object.entries(check.any_of)[0] as [string, string | string[]];
+  const old = Array.isArray(sentences) ? sentences[0]! : sentences;
+  check.any_of[option] = Array.isArray(sentences) ? [`${old} or not`, ...sentences.slice(1)] : `${old} or not`;
+  return [old, `${old} or not`];
+};
+
+for (const name of good) {
+  test(`case ${name}: changing one sentence changes only its code span`, () => {
+    const markdown = readFileSync(join(cases, name, "policy.ergo.md"), "utf8");
+    const {policy, blocks} = compile(markdown);
+    for (const [requirement, body] of Object.entries(policy!.requirements as Record<string, any>)) {
+      for (const check of Object.keys(body.checks ?? {})) {
+        const edited = structuredClone(policy) as Record<string, any>;
+        const [old, now] = changedSentence(edited.requirements[requirement].checks[check]);
+        const block = blocks.find((b) => b.kind === "check" && b.name === check)!;
+        const lines = markdown.split("\n");
+        const at = lines.findIndex((line, i) => i >= block.startLine - 1 && line.includes(`\`${old}\``));
+        lines[at] = lines[at]!.replace(`\`${old}\``, `\`${now}\``);
+        assert.deepEqual(apply(markdown, edited), {
+          markdown: lines.join("\n"),
+          changes: [`rewrote ${requirement}.${check}`],
+          problems: [],
+        });
+      }
+    }
+  });
+}

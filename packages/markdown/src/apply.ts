@@ -1,11 +1,13 @@
 import type {Block} from "./compile.ts";
-import type {ListItem, Nodes} from "mdast";
+import type {List, ListItem, Nodes} from "mdast";
 import {toString} from "mdast-util-to-string";
-import {compile, parse} from "./compile.ts";
+import {compile, nameOf, parse} from "./compile.ts";
 import {
   FIELD_ORDER,
+  type Kept,
   type PathProblem,
   checkLines,
+  isObject,
   notBack,
   descriptionLines,
   fieldLine,
@@ -99,6 +101,55 @@ export function apply(markdown: string, policy: object): Applied {
     return found;
   };
 
+  const slice = (node: Nodes): string => markdown.slice(node.position!.start.offset!, node.position!.end.offset!);
+
+  const keptOf = (block: Block, was: Json, now: Json, renamed: string | undefined): Kept => {
+    const li = itemAt(block.startLine)!;
+    const strongOf = (item: ListItem) => (item.children[0] as {children: Nodes[]}).children[0]!;
+    const strong = slice(strongOf(li));
+    const nested = li.children.find((child): child is List => child.type === "list");
+    const options = new Map((nested?.children ?? []).map((option) => [nameOf(toString(strongOf(option))), slice(strongOf(option))]));
+    const wanted = renamed === undefined ? strong : `**${label(renamed)}**`;
+    if (!same(was.description, now.description)) return {strong: wanted, options};
+    const codes = codesOf(li);
+    const boundary = (codes[0] ?? nested)!.position!.start.offset!;
+    const before = markdown.slice(lineStart(block.startLine), boundary);
+    const head = before.replace(/\s+$/, "").replace(strong, wanted);
+    return {head: head.split("\n"), sameLine: !before.slice(head.length).includes("\n"), options};
+  };
+
+  const sentencesOf = (value: unknown): unknown[] => (value === undefined ? [] : Array.isArray(value) ? value : [value]);
+
+  const codesOf = (item: ListItem) =>
+    item.children.flatMap((child) => (child.type === "paragraph" ? child.children : [])).filter((n) => n.type === "inlineCode");
+
+  const inPlace = (block: Block, was: Json, now: Json): boolean => {
+    const options = (check: Json) => (isObject(check.any_of) ? check.any_of : {});
+    const wasOptions = options(was);
+    const nowOptions = options(now);
+    const shaped =
+      same(was.description, now.description) &&
+      ("for" in was) === ("for" in now) &&
+      ("any_of" in was) === ("any_of" in now) &&
+      sentencesOf(was.assert).length === sentencesOf(now.assert).length &&
+      same(Object.keys(wasOptions).sort(), Object.keys(nowOptions).sort()) &&
+      Object.keys(wasOptions).every((o) => sentencesOf(wasOptions[o]).length === sentencesOf(nowOptions[o]).length);
+    if (!shaped) return false;
+    const rewrite = (code: Nodes & {value: string}, value: string) => {
+      if (value !== code.value) edit(code.position!.start.offset!, code.position!.end.offset!, `\`${value}\``);
+    };
+    const li = itemAt(block.startLine)!;
+    const asserts = sentencesOf(now.assert) as string[];
+    let k = 0;
+    for (const code of codesOf(li)) rewrite(code, code.value.startsWith("for ") ? `for ${now.for}` : asserts[k++]!);
+    for (const option of li.children.find((child): child is List => child.type === "list")?.children ?? []) {
+      const strong = (option.children[0] as {children: Nodes[]}).children[0]!;
+      const sentences = sentencesOf(nowOptions[nameOf(toString(strong))]) as string[];
+      codesOf(option).forEach((code, i) => rewrite(code, sentences[i]!));
+    }
+    return true;
+  };
+
   const inside = (outer: Block, block: Block) => block.startLine > outer.startLine && block.startLine <= outer.endLine;
   const items = blocks.filter((b) => b.kind === "subject" || b.kind === "requirement");
 
@@ -164,13 +215,17 @@ export function apply(markdown: string, policy: object): Applied {
       const name = block.name!;
       const renamed = renames.get(name);
       if (renamed !== undefined) {
-        replace(block.startLine, block.endLine, checkLines(renamed, target[renamed], bulletOf(block)));
+        const kept = keptOf(block, old[name] as Json, target[renamed] as Json, renamed);
+        replace(block.startLine, block.endLine, checkLines(renamed, target[renamed], bulletOf(block), kept));
         changes.push(`renamed check ${path}.${name} to ${path}.${renamed}`);
       } else if (!(name in target)) {
         remove(block.startLine, block.endLine);
         changes.push(`removed check ${path}.${name}`);
       } else if (!same(old[name], target[name])) {
-        replace(block.startLine, block.endLine, checkLines(name, target[name], bulletOf(block)));
+        if (!inPlace(block, old[name] as Json, target[name] as Json)) {
+          const kept = keptOf(block, old[name] as Json, target[name] as Json, undefined);
+          replace(block.startLine, block.endLine, checkLines(name, target[name], bulletOf(block), kept));
+        }
         changes.push(`rewrote ${path}.${name}`);
       }
     }

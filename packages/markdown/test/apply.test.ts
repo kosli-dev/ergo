@@ -295,3 +295,33 @@ test("removing all that stood between a heading and a prose paragraph is refused
     problems: [{path: "requirements.r.description", message: "the Markdown wouldn't compile back to this policy"}],
   });
 });
+
+test("a check that keeps its name keeps its label as written, its description too when that didn't change", () => {
+  const source = "## Requirements\n\n### r\n\n- subject: `s`\n\nChecks:\n\n- **NUT  free**: *No* nuts. `a is 1`\n";
+  const one = edited((p) => (p.requirements.r.checks["nut free"].assert = ["a is 1", "b is 2"]), source);
+  assert.equal(one.markdown, source.replace("*No* nuts. `a is 1`", "*No* nuts.\n  `a is 1`\n  `b is 2`"));
+  const two = edited((p) => (p.requirements.r.checks["nut free"].description = "None."), source);
+  assert.equal(two.markdown, source.replace("*No* nuts. `a is 1`", "None.\n  `a is 1`"));
+  const three = edited((p) => (p.requirements.r.checks["nut free"].for = "every xs as x"), source);
+  assert.equal(three.markdown, source.replace("*No* nuts. `a is 1`", "*No* nuts.\n  `for every xs as x`\n  `a is 1`"));
+});
+
+test("a check keeps its sentences on its label's line when they were there", () => {
+  const source = "## Requirements\n\n### r\n\nChecks:\n\n- **c**: `a is 1`\n";
+  const {markdown} = edited((p) => (p.requirements.r.checks.c = {assert: "b is 2", for: "every xs as x"}), source);
+  assert.equal(markdown, "## Requirements\n\n### r\n\nChecks:\n\n- **c**:\n  `for every xs as x`\n  `b is 2`\n");
+  const one = edited((p) => (p.requirements.r.checks.c = {assert: "b is 2", description: "D."}), source);
+  assert.equal(one.markdown, "## Requirements\n\n### r\n\nChecks:\n\n- **c**: D.\n  `b is 2`\n");
+});
+
+test("a renamed check keeps its description as written", () => {
+  const source = "## Requirements\n\n### r\n\nChecks:\n\n- **old**: *Kept* text.\n  `a is 1`\n";
+  const {markdown} = edited((p) => (p.requirements.r.checks = {new: p.requirements.r.checks.old}), source);
+  assert.equal(markdown, source.replace("**old**", "**New**"));
+});
+
+test("an option that keeps its name keeps its label as written", () => {
+  const source = "## Requirements\n\n### r\n\nChecks:\n\n- **c**:\n  - **OPT one**: `a is 1`\n  - **two**: `b is 2`\n";
+  const {markdown} = edited((p) => (p.requirements.r.checks.c.any_of = {"opt one": ["a is 1", "c is 3"], three: "d is 4"}), source);
+  assert.equal(markdown, "## Requirements\n\n### r\n\nChecks:\n\n- **c**:\n  - **OPT one**:\n    `a is 1`\n    `c is 3`\n  - **Three**: `d is 4`\n");
+});

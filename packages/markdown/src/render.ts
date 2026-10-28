@@ -9,7 +9,7 @@ type Json = Record<string, unknown>;
 
 export const NOT_BACK = "the Markdown wouldn't compile back to this policy";
 
-const isObject = (value: unknown): value is Json =>
+export const isObject = (value: unknown): value is Json =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
 export const same = (a: unknown, b: unknown): boolean => {
@@ -233,20 +233,25 @@ export const FIELD_ORDER = {
   requirement: ["subject", "require", "min_subjects"],
 } as const;
 
-export function checkLines(name: string, body: unknown, bullet = "- "): string[] {
+export type Kept = {head?: string[]; sameLine?: boolean; strong?: string; options?: Map<string, string>};
+
+export function checkLines(name: string, body: unknown, bullet = "- ", kept: Kept = {}): string[] {
   const check = normaliseCheck(body) as Json;
   const pad = " ".repeat(bullet.length);
   const [first, ...rest] = paragraphs(check.description);
-  const lines = [`${bullet}**${label(name)}**:${first === undefined ? "" : ` ${first}`}`];
-  for (const p of rest) lines.push("", `${pad}${p}`);
+  const strong = kept.strong ?? `**${label(name)}**`;
+  const lines = kept.head ?? [`${bullet}${strong}:${first === undefined ? "" : ` ${first}`}`];
+  if (kept.head === undefined) for (const p of rest) lines.push("", `${pad}${p}`);
   const spans = [...(typeof check.for === "string" ? [`for ${check.for}`] : []), ...("assert" in check ? list(check.assert) : [])];
-  if (first === undefined && spans.length === 1 && !isObject(check.any_of)) lines[0] += ` \`${spans[0]}\``;
+  const sameLine = kept.sameLine ?? first === undefined;
+  if (sameLine && spans.length === 1 && !isObject(check.any_of)) lines[lines.length - 1] += ` \`${spans[0]}\``;
   else for (const span of spans) lines.push(`${pad}\`${span}\``);
   if (isObject(check.any_of)) {
     for (const [option, sentences] of Object.entries(check.any_of)) {
       const spansOf = list(sentences);
-      if (spansOf.length === 1) lines.push(`${pad}- **${label(option)}**: \`${spansOf[0]}\``);
-      else lines.push(`${pad}- **${label(option)}**:`, ...spansOf.map((span) => `${pad}  \`${span}\``));
+      const optionLabel = kept.options?.get(option) ?? `**${label(option)}**`;
+      if (spansOf.length === 1) lines.push(`${pad}- ${optionLabel}: \`${spansOf[0]}\``);
+      else lines.push(`${pad}- ${optionLabel}:`, ...spansOf.map((span) => `${pad}  \`${span}\``));
     }
   }
   return lines;
