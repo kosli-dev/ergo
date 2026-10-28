@@ -8,10 +8,10 @@ ergo_spec: v0.2
 
 ### Batch
 
-- from: `batches`
-- identified by: `id`
+- From `batches`
+- Identified by `id`
 
 ### batch
 
-- from: `trays`
-- identified by: `id`
+- From `trays`
+- Identified by `id`

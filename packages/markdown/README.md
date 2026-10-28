@@ -25,8 +25,8 @@ Every batch that leaves the bakery is safe to eat and baked right.
 
 A batch of cakes baked today.
 
-- from: `batches`
-- identified by: `id`
+- From `batches`
+- Identified by `id`
 
 ## Requirements
 
@@ -34,7 +34,7 @@ A batch of cakes baked today.
 
 Cakes are safe to eat and baked right.
 
-- subject: `batch`
+- Subject `batch`
 
 Checks:
 
@@ -97,28 +97,28 @@ Cakes are safe to eat.
 
 A batch that can't show its allergens fails.
 
-- subject: `batch`
+- Subject `batch`
 ```
 
 gives `description: "Cakes are safe to eat.\n\nA batch that can't show its allergens fails."`. A paragraph after the fields is for people again.
 
 ### Subjects and requirements
 
-Each `###` under `## Subjects` is a subject, and each `###` under `## Requirements` is a requirement. Their fields are bullets, each a name, a colon, and the value in a code span:
+Each `###` under `## Subjects` is a subject, and each `###` under `## Requirements` is a requirement. Their fields are bullets, each a name and the value in a code span, like ``- From `batches` ``:
 
-| under a subject      | under a requirement   |
-| -------------------- | --------------------- |
-| `from: ...`          | `subject: ...`        |
-| `identified by: ...` | `require: ...`        |
-|                      | `min subjects: ...`   |
+| under a subject | under a requirement |
+| --------------- | ------------------- |
+| `From`          | `Subject`           |
+| `Identified by` | `Require`           |
+|                 | `Min subjects`      |
 
-`min subjects` is a number, still in a code span: ``min subjects: `1` ``. The [reference](../../REFERENCE.md) says what each field does. A bullet that starts with a field's name but isn't written this way, like `- from batches`, is a problem, so a field can't go missing unnoticed.
+The name can have any capitals and a colon after it, so ``- from: `batches` `` works too. `Min subjects` is a number, still in a code span: ``- Min subjects `1` ``. The [reference](../../REFERENCE.md) says what each field does. A bullet that starts with a field's name but isn't written this way, like `- from batches`, is a problem, so a field can't go missing unnoticed.
 
 ### Names
 
 You don't write names: the tool works them out from the headings and labels.
 
-- A subject's name is its heading in lowercase, spaces included, with each run of spaces made one and none at either end: `### Pull Request` is `pull request`, and a requirement says ``subject: `pull request` ``. So `### Batch` and `### batch` are the same name.
+- A subject's name is its heading in lowercase, spaces included, with each run of spaces made one and none at either end: `### Pull Request` is `pull request`, and a requirement says ``- Subject `pull request` ``. So `### Batch` and `### batch` are the same name.
 - A requirement's name is its heading in lowercase, with every run of other characters than letters and digits turned into one `_`, and none at either end: `### Cake batch` is `cake_batch`, and `### Crème brûlée — the "recipe" check!` is `crème_brûlée_the_recipe_check`.
 - A check's name is worked out the same way from its bold label: `**Nut free**` is `nut_free`, and `**Approved by 2+ people**` is `approved_by_2_people`.
 

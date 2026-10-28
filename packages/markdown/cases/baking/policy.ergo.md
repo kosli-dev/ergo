@@ -8,14 +8,14 @@ ergo_spec: v0.2
 
 ### batch
 
-- from: `batches`
-- identified by: `id`
+- From `batches`
+- Identified by `id`
 
 ## Requirements
 
 ### Cake batch
 
-- subject: `batch`
+- Subject `batch`
 
 Checks:
 

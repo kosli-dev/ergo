@@ -8,14 +8,14 @@ ergo_spec: v0.2
 
 ### release
 
-- from: `releases`
-- identified by: `id`
+- From `releases`
+- Identified by `id`
 
 ## Requirements
 
 ### Release
 
-- subject: `release`
+- Subject `release`
 
 Checks:
 

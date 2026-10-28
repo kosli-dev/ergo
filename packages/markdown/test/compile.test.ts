@@ -269,9 +269,29 @@ test("a list in an item with no field in it is prose", () => {
   assert.deepEqual(blocks.at(-1), {kind: "prose", startLine: 7, endLine: 8});
 });
 
+test("a field's colon is optional and its key is read whatever its capitals", () => {
+  const {policy, problems, blocks} = compile("## Subjects\n\n### a\n\n- From `xs`\n- IDENTIFIED BY: `id`\n\n## Requirements\n\n### R\n\n- Subject `a`\n- Require `some`\n- Min subjects `2`\n");
+  assert.deepEqual(problems, []);
+  assert.deepEqual(policy, {
+    subjects: {a: {from: "xs", identified_by: "id"}},
+    requirements: {r: {subject: "a", require: "some", min_subjects: 2}},
+  });
+  assert.deepEqual(blocks.filter((b) => b.kind === "field").map((b) => b.name), ["from", "identified by", "subject", "require", "min subjects"]);
+});
+
+test("a bullet without a colon is a field only when it starts with a field's name", () => {
+  assert.deepEqual(problemsOf(inRequirement("- See `docs`\n- Owner `bakery`")), []);
+  assert.deepEqual(problemsOf("# T\n\n- See `docs`\n"), []);
+  assert.deepEqual(problemsOf("# T\n\n- From `xs`\n"), [{line: 3, message: "a field goes under a ### subject or requirement"}]);
+});
+
+test("an unknown key with a colon names the key as written", () => {
+  assert.deepEqual(messages("## Subjects\n\n### a\n\n- Owner: `x`\n"), ['a subject\'s fields are from and identified by, not "Owner"']);
+});
+
 test("a bullet in an item that starts with a field's name is a field even when written wrong", () => {
   assert.deepEqual(problemsOf("## Subjects\n\n### a\n\n- from batches\n"), [{line: 5, message: "a field is written as key: `value`"}]);
-  assert.deepEqual(problemsOf("## Subjects\n\n### a\n\n- identified by `id`\n"), [{line: 5, message: "a field is written as key: `value`"}]);
+  assert.deepEqual(problemsOf("## Subjects\n\n### a\n\n- identified by id\n"), [{line: 5, message: "a field is written as key: `value`"}]);
   assert.deepEqual(problemsOf(inRequirement("- min subjects 2\n- subject\n- require: every")), [
     {line: 5, message: "a field is written as key: `value`"},
     {line: 6, message: "a field is written as key: `value`"},

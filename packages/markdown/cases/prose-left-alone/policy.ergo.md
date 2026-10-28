@@ -18,8 +18,8 @@ This paragraph comes after the table, so it's for people, like the table.
 
 A batch of cakes baked today.
 
-- from: `batches`
-- identified by: `id`
+- From `batches`
+- Identified by `id`
 
 > The oven writes one batch per tray.
 
@@ -37,7 +37,7 @@ The oven log, exported every evening:
 
 Cakes are safe to eat and baked right.
 
-- subject: `batch`
+- Subject `batch`
 
 A paragraph after the fields stays prose.
 

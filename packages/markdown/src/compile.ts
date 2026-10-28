@@ -50,7 +50,8 @@ const FIELD_KEYS = {
   requirement: ["subject", "require", "min_subjects"],
 } as const;
 
-const FIELD_START = /^(from|identified by|subject|require|min subjects)(?![\p{L}\p{N}_])/u;
+const FIELD_START = /^(from|identified by|subject|require|min subjects)(?![\p{L}\p{N}_])/iu;
+const FIELD_WORDS = ["from", "identified by", "subject", "require", "min subjects"];
 
 const FIELD_MESSAGE = {
   subject: (key: string) => `a subject's fields are from and identified by, not "${key}"`,
@@ -85,10 +86,10 @@ function readField(li: ListItem): {key: string; value: string; line: number} | n
   const [label, code, ...rest] = only.children;
   if (label?.type !== "text" || code?.type !== "inlineCode") return null;
   if (!rest.every((node) => node.type === "text" && node.value.trim() === "")) return null;
-  const head = label.value.trimEnd();
-  if (!head.endsWith(":")) return null;
-  const key = head.slice(0, -1).trim();
-  if (key === "") return null;
+  const head = label.value.trim();
+  const colon = head.endsWith(":");
+  const key = (colon ? head.slice(0, -1) : head).trim();
+  if (key === "" || (!colon && !FIELD_WORDS.includes(key.toLowerCase()))) return null;
   return {key, value: code.value, line: startOf(li)};
 }
 
@@ -293,12 +294,12 @@ export function compile(markdown: string): Compiled {
     for (const li of list.children) {
       placed.add(li);
       const field = readField(li);
-      block("field", li, field?.key);
+      block("field", li, field?.key.toLowerCase());
       if (field === null) {
         problem(startOf(li), NOT_FIELD);
         continue;
       }
-      const key = field.key.replaceAll(" ", "_");
+      const key = field.key.toLowerCase().replaceAll(" ", "_");
       if (!(FIELD_KEYS[current.kind] as readonly string[]).includes(key)) {
         problem(field.line, FIELD_MESSAGE[current.kind](field.key));
         continue;

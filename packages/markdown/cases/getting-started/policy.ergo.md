@@ -8,8 +8,8 @@ ergo_spec: v0.2
 
 ### deployment
 
-- from: `deployments whose environment is "prod"`
-- identified by: `id`
+- From `deployments whose environment is "prod"`
+- Identified by `id`
 
 ## Requirements
 
@@ -17,7 +17,7 @@ ergo_spec: v0.2
 
 Every production deployment is approved
 
-- subject: `deployment`
+- Subject `deployment`
 
 Checks:
 

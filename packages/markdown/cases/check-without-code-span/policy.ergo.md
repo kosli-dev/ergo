@@ -8,13 +8,13 @@ ergo_spec: v0.2
 
 ### batch
 
-- from: `batches`
+- From `batches`
 
 ## Requirements
 
 ### Cake batch
 
-- subject: `batch`
+- Subject `batch`
 
 Checks:
 

@@ -8,14 +8,14 @@ ergo_spec: v0.2
 
 ### batch
 
-- from: `batches`
+- From `batches`
 - owner: `bakery`
 
 ## Requirements
 
 ### Cake batch
 
-- subject: `batch`
+- Subject `batch`
 - severity: `high`
 
 Checks:

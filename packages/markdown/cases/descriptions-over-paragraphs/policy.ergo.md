@@ -17,8 +17,8 @@ A batch of cakes baked today.
 
 One batch is one tray, as the oven logs it.
 
-- from: `batches`
-- identified by: `id`
+- From `batches`
+- Identified by `id`
 
 ## Requirements
 
@@ -29,7 +29,7 @@ Cakes are safe to eat.
 A customer with a nut allergy relies on this. A batch that can't show its
 allergens fails.
 
-- subject: `batch`
+- Subject `batch`
 
 Checks:
 
