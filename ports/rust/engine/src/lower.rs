@@ -16,6 +16,7 @@ pub struct PartDef {
 
 #[derive(Debug, Clone, Default)]
 pub struct Scope {
+    left_reads_parents: bool,
     parts: BTreeMap<String, PartDef>,
     parents: BTreeMap<String, BTreeMap<String, PartDef>>,
     for_aliases: BTreeSet<String>,
@@ -191,7 +192,14 @@ impl Scope {
     }
 
     pub fn left_path(&self, path: &s::Path) -> Result<path::Path, Vec<String>> {
-        self.read_path(path, false)
+        self.read_path(path, self.left_reads_parents)
+    }
+
+    pub fn on_subject(&self) -> Scope {
+        Scope {
+            left_reads_parents: true,
+            ..self.clone()
+        }
     }
 
     fn read_path(&self, written: &s::Path, parents: bool) -> Result<path::Path, Vec<String>> {
@@ -307,6 +315,23 @@ pub fn lower_condition(condition: &s::Condition, scope: &Scope) -> Result<Check,
     }
 }
 
+pub fn lower_assertion(assertion: &s::Assertion, scope: &Scope) -> Result<Check, Vec<String>> {
+    let scope = scope.on_subject();
+    match assertion {
+        s::Assertion::Plain { path, phrase } => match phrase {
+            s::Phrase::Exists { not } => Ok(Check::Present(Present {
+                path: scope.left_path(path)?,
+                missing: *not,
+            })),
+            other => match lower_with_operator_modules(path, other, &scope) {
+                Some(lowered) => lowered,
+                None => Ok(Check::NotYet),
+            },
+        },
+        _ => Ok(Check::NotYet),
+    }
+}
+
 fn unsupported(condition: &s::Condition, names: &[&str]) -> Vec<String> {
     vec![format!(
         "{}{UNSUPPORTED_SUFFIX}",
@@ -314,7 +339,7 @@ fn unsupported(condition: &s::Condition, names: &[&str]) -> Vec<String> {
     )]
 }
 
-fn lower_with_operator_modules(
+pub fn lower_with_operator_modules(
     _path: &s::Path,
     _phrase: &s::Phrase,
     _scope: &Scope,

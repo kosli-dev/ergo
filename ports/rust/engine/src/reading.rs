@@ -63,6 +63,8 @@ pub struct Info {
     pub effective: BTreeMap<String, PartRead>,
     pub lowered: Option<Lowered>,
     pub from_text: Option<String>,
+    pub scope: Scope,
+    pub declarers: BTreeMap<String, BTreeSet<String>>,
     pub unsupported: bool,
     pub entry: Value,
 }
@@ -70,6 +72,7 @@ pub struct Info {
 #[derive(Debug, Clone)]
 pub struct Reading {
     pub infos: BTreeMap<String, Info>,
+    pub names: BTreeSet<String>,
 }
 
 enum FromState {
@@ -325,6 +328,31 @@ fn subject_defs(policy: &Policy) -> BTreeMap<String, Option<&SubjectDef>> {
             .collect(),
         Subjects::NotAnObject => BTreeMap::new(),
     }
+}
+
+fn declarers_of(name: &str, raw: &BTreeMap<String, Raw>) -> BTreeMap<String, BTreeSet<String>> {
+    let mut owners: BTreeSet<String> = members_of(name, raw);
+    if let Some(parent) = child_parent(name, raw) {
+        owners.insert(parent.clone());
+        if let Some(grand) = child_parent(&parent, raw) {
+            owners.insert(grand);
+        }
+    }
+    let mut declarers = BTreeSet::new();
+    for owner in &owners {
+        declarers.extend(members_of(owner, raw));
+    }
+    let mut out: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+    for declarer in declarers {
+        if let Some(found) = raw.get(&declarer) {
+            for alias in found.own.keys() {
+                out.entry(alias.clone())
+                    .or_default()
+                    .insert(declarer.clone());
+            }
+        }
+    }
+    out
 }
 
 fn scope_of(
@@ -636,6 +664,7 @@ impl Reading {
                     let scope = scope_of(name, &raw, &effective);
                     let aliases = scope.aliases();
                     let alias_refs: Vec<&str> = aliases.iter().map(String::as_str).collect();
+                    found_problems.extend(s::from_problems(line, &alias_refs));
                     let mut filters = Vec::new();
                     for condition in &line.whose {
                         let text = s::print_from_condition(condition, &alias_refs);
@@ -750,12 +779,14 @@ impl Reading {
                     effective: effective.get(name).cloned().unwrap_or_default(),
                     lowered,
                     from_text,
+                    scope: scope_of(name, &raw, &effective),
+                    declarers: declarers_of(name, &raw),
                     unsupported: unsupported.contains(name),
                     entry,
                 },
             );
         }
-        Reading { infos }
+        Reading { infos, names }
     }
 
     pub fn used(&self, name: &str) -> Vec<String> {
@@ -781,6 +812,11 @@ impl Reading {
 
     pub fn problems_of(&self, policy: &Policy, requirement: &Requirement) -> Problems {
         let mut problems = Problems::new();
+        for (check, read) in crate::checks::read_checks(self, requirement) {
+            for text in read.problems {
+                add_problem(&mut problems, field_name(&["checks", &check]), text);
+            }
+        }
         if let SubjectName::Named(name) = &requirement.subject {
             for used in self.used(name) {
                 merge_problems(&mut problems, &self.infos[&used].problems);
@@ -790,6 +826,22 @@ impl Reading {
             }
         }
         problems
+    }
+
+    pub fn alias_clashes(&self, subject: Option<&str>, alias: &str) -> BTreeSet<String> {
+        let mut out = BTreeSet::new();
+        if self.names.contains(alias) {
+            out.insert(format!("{alias} can't be an alias: it's a subject's name"));
+        }
+        if let Some(info) = subject.and_then(|name| self.infos.get(name)) {
+            for declarer in info.declarers.get(alias).into_iter().flatten() {
+                out.insert(format!(
+                    "{alias} can't be an alias: it's a part of {}",
+                    name::key_text(declarer)
+                ));
+            }
+        }
+        out
     }
 
     pub fn unsupported(&self, name: &str) -> bool {

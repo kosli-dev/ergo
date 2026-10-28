@@ -1,4 +1,5 @@
 use crate::cause::Cause;
+use crate::checks::{CheckRead, Plan, read_checks};
 use crate::name;
 use crate::ops::{self, Check, Input, Verdict};
 use crate::path::{self, Ctx, Located, Location, Outcome, Path, Resolved, Start, Step};
@@ -10,12 +11,14 @@ use crate::report::{
 use crate::value::{self, json_text};
 use serde_json::{Map, Value, json};
 use std::cmp::Ordering;
+use std::collections::BTreeMap;
 
 struct Env<'a> {
     reading: &'a Reading,
     requirement_name: &'a str,
     requirement: &'a Requirement,
     subject: &'a str,
+    checks: BTreeMap<String, CheckRead>,
     input: &'a Value,
     params: Option<&'a Value>,
 }
@@ -317,13 +320,11 @@ fn walk_every<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>]) -> Read<'a> {
     let mut entries = Vec::new();
     for cur in ends {
         match cur.value {
+            _ if walked && is_list_item(&cur.name) => entries.push(entry_of(cur)),
             Value::Object(_) if walked => entries.push(entry_of(cur)),
             Value::Null => {
                 let name = cur.name.clone();
                 broken.push(broken_at(&cur, name, Cause::Null));
-            }
-            _ if walked && !cur.value.is_object() && is_list_item(&cur.name) => {
-                entries.push(entry_of(cur));
             }
             _ => {
                 let name = cur.name.clone();
@@ -653,14 +654,60 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
         .iter()
         .filter_map(|j| j.applied.as_ref().map(|a| applies_row(env, j, a, anc)))
         .collect();
+    let subject_rows = in_scope
+        .iter()
+        .map(|j| check_rows(env, j, anc))
+        .filter(|rows| !rows.is_empty())
+        .collect();
     Evaluation {
         total: judged.len() as u64,
         matching: in_scope.len() as u64,
         min_subjects: vec![with_in(min, anc)],
         unique_ids: vec![with_in(unique, anc)],
         applies,
-        subject_rows: Vec::new(),
+        subject_rows,
     }
+}
+
+fn check_rows(env: &Env, judged: &Judged, anc: &[Anc]) -> Vec<Row> {
+    let ctx = context(env, judged.entry.at.clone(), anc);
+    env.checks
+        .iter()
+        .filter(|(name, _)| !crate::policy::RESERVED_CHECKS.contains(&name.as_str()))
+        .filter_map(|(name, read)| {
+            read.plan
+                .as_ref()
+                .map(|plan| check_row(env, name, plan, &ctx, judged, anc))
+        })
+        .collect()
+}
+
+fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc: &[Anc]) -> Row {
+    let verdicts: Vec<Verdict> = plan
+        .items
+        .iter()
+        .map(|item| ops::run(&item.check, ctx))
+        .collect();
+    let cause = Cause::worst(verdicts.iter().map(|v| v.cause)).unwrap_or(Cause::Satisfied);
+    let inputs = merged_inputs(
+        verdicts
+            .iter()
+            .flat_map(|v| v.inputs.iter().cloned())
+            .collect(),
+    );
+    let mut row = row_of(env.requirement_name, env.requirement, name, cause, inputs);
+    row.subject_id = judged.id.clone();
+    if plan.all_of {
+        row.failed_assertions = Some(Value::Array(
+            plan.items
+                .iter()
+                .zip(&verdicts)
+                .filter(|(_, v)| !v.passed())
+                .map(|(item, v)| json!({"assertion": item.text, "cause": v.cause.name()}))
+                .collect(),
+        ));
+    }
+    with_in(row, anc)
 }
 
 fn failed_level(env: &Env, anc: &[Anc], cause: Cause, with_unique: bool) -> Evaluation {
@@ -786,6 +833,7 @@ pub fn find_subjects(
         requirement_name,
         requirement,
         subject,
+        checks: read_checks(reading, requirement),
         input,
         params: params.as_object().map(|_| params),
     };
@@ -801,10 +849,8 @@ pub fn find_subjects(
 
 fn nothing_readable(name: &str, requirement: &Requirement, params: &Value) -> Evaluation {
     let mut evaluation = no_subjects(name, requirement, params);
-    if requirement.min_subjects_count == 0 {
-        for row in &mut evaluation.min_subjects {
-            row.cause = Cause::Unusable;
-        }
+    for row in &mut evaluation.min_subjects {
+        row.cause = Cause::Unusable;
     }
     evaluation
 }
@@ -1528,5 +1574,178 @@ mod tests {
             r["requirements"]["s"]["checks"]["$min_subjects"]["expression"],
             json!("art.prs can be read")
         );
+    }
+
+    fn with_checks(subjects: Value, checks: Value, input: Value) -> Value {
+        let policy = json!({
+            "ergo_spec": "v0.2", "subjects": subjects,
+            "requirements": {"s": {"subject": "thing", "checks": checks}}
+        });
+        report(&input, &policy, &json!({}))
+    }
+
+    fn checked(r: &Value) -> Vec<(String, String, String)> {
+        rows(r, "a")
+            .into_iter()
+            .chain(rows(r, "b"))
+            .map(|row| {
+                (
+                    row["check"].as_str().unwrap().to_string(),
+                    row["subject"]["id"].to_string(),
+                    row["cause"].as_str().unwrap().to_string(),
+                )
+            })
+            .collect()
+    }
+
+    #[test]
+    fn every_in_scope_subject_gets_a_row_for_each_check_in_name_order() {
+        let r = with_checks(
+            json!({"thing": {"from": "ds whose keep exists", "identified_by": "id"}}),
+            json!({"b": "x exists", "a": "x exists"}),
+            json!({"ds": [{"id": 1, "keep": 1, "x": 1}, {"id": 2}, {"id": 3, "keep": 1}]}),
+        );
+        let order: Vec<(String, String)> = r["results"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|row| !row["check"].as_str().unwrap().starts_with('$'))
+            .map(|row| (row["check"].to_string(), row["subject"]["id"].to_string()))
+            .collect();
+        assert_eq!(
+            order,
+            [
+                ("\"a\"".into(), "1".into()),
+                ("\"b\"".into(), "1".into()),
+                ("\"a\"".into(), "3".into()),
+                ("\"b\"".into(), "3".into())
+            ]
+        );
+        let causes: Vec<String> = checked(&r).into_iter().map(|c| c.2).collect();
+        assert_eq!(causes, ["satisfied", "value", "satisfied", "value"]);
+    }
+
+    #[test]
+    fn a_check_row_reads_the_subject_and_a_requirement_with_a_failing_check_is_not_met() {
+        let r = with_checks(
+            json!({"thing": {"from": "ds"}}),
+            json!({"a": "x exists"}),
+            json!({"ds": [{"x": 1}, {}]}),
+        );
+        let a = rows(&r, "a");
+        assert_eq!(a[0]["passed"], json!(true));
+        assert_eq!(
+            a[1]["inputs"],
+            json!([{"name": "x", "value": null, "locations": ["/ds/1"]}])
+        );
+        assert_eq!(r["requirements"]["s"]["status"], json!("not_met"));
+        assert_eq!(
+            r["requirements"]["s"]["causes"],
+            json!([{"cause": "value", "rows": 1}])
+        );
+    }
+
+    #[test]
+    fn several_assertions_are_one_row_with_failed_assertions_the_worst_cause_and_merged_inputs() {
+        let r = with_checks(
+            json!({"thing": {"from": "ds"}}),
+            json!({"a": "x exists and y.z exists and x exists"}),
+            json!({"ds": [{"x": 1, "y": 5}, {"x": 1, "y": {"z": 1}}]}),
+        );
+        let a = rows(&r, "a");
+        assert_eq!(a[0]["cause"], json!("unusable"));
+        assert_eq!(
+            a[0]["failed_assertions"],
+            json!([{"assertion": "y.z exists", "cause": "unusable"}])
+        );
+        assert_eq!(a[0]["inputs"].as_array().unwrap().len(), 2);
+        assert_eq!(a[0]["inputs"][0]["name"], json!("x"));
+        assert_eq!(a[1]["failed_assertions"], json!([]));
+        assert_eq!(a[1]["passed"], json!(true));
+    }
+
+    #[test]
+    fn one_assertion_has_no_failed_assertions() {
+        let r = with_checks(
+            json!({"thing": {"from": "ds"}}),
+            json!({"a": "x exists"}),
+            json!({"ds": [{}]}),
+        );
+        assert!(rows(&r, "a")[0].get("failed_assertions").is_none());
+    }
+
+    #[test]
+    fn a_check_the_engine_cannot_run_yet_fails_every_subject_as_unusable_so_nothing_passes_by_accident()
+     {
+        let r = with_checks(
+            json!({"thing": {"from": "ds"}}),
+            json!({"a": "every xs.y is 1"}),
+            json!({"ds": [{"xs": [{"y": 1}]}]}),
+        );
+        let a = rows(&r, "a");
+        assert_eq!(a.len(), 1);
+        assert_eq!(a[0]["cause"], json!("unusable"));
+        assert_eq!(a[0]["inputs"], json!([]));
+        assert_eq!(r["requirements"]["s"]["status"], json!("not_met"));
+        assert_eq!(r["compliant"], json!(false));
+    }
+
+    #[test]
+    fn a_for_check_and_an_any_of_check_fail_as_unusable_too() {
+        let r = with_checks(
+            json!({"thing": {"from": "ds"}}),
+            json!({"a": {"for": "every xs as x", "assert": "x.y exists"}, "b": {"any_of": {"o": "z exists"}}}),
+            json!({"ds": [{}]}),
+        );
+        assert_eq!(rows(&r, "a")[0]["cause"], json!("unusable"));
+        assert_eq!(rows(&r, "b")[0]["cause"], json!("unusable"));
+    }
+
+    #[test]
+    fn a_check_read_through_a_part_tags_its_input() {
+        let r = with_checks(
+            json!({"thing": {"from": "ds", "has": {"cov": {"from": "d", "identified_by": "cid"}}}}),
+            json!({"a": "cov.x exists"}),
+            json!({"ds": [{"d": {"x": 1, "cid": 4}}]}),
+        );
+        assert_eq!(
+            rows(&r, "a")[0]["inputs"][0]["part"],
+            json!({"name": "cov", "id": 4})
+        );
+    }
+
+    #[test]
+    fn a_check_written_wrong_gives_the_requirement_no_check_rows_and_lists_the_problem() {
+        let r = with_checks(
+            json!({"thing": {"from": "ds"}}),
+            json!({"a": "x exists", "b": "y is \"a"}),
+            json!({"ds": [{"x": 1}]}),
+        );
+        assert!(rows(&r, "a").is_empty());
+        let well = &rows(&r, "$well_formed")[0];
+        assert_eq!(
+            well["inputs"][2],
+            json!({"name": "checks.b", "value": ["unclosed quote at column 6"], "locations": []})
+        );
+        assert_eq!(
+            r["requirements"]["s"]["checks"]["b"]["expression"],
+            json!("y is \"a")
+        );
+    }
+
+    #[test]
+    fn a_check_row_of_a_child_subject_carries_the_parents_id_and_reads_the_parent() {
+        let r = with_checks(
+            json!({"art": {"from": "arts", "identified_by": "id"}, "thing": {"from": "art.ps", "identified_by": "id"}}),
+            json!({"a": "art.owner exists"}),
+            json!({"arts": [{"id": "a1", "owner": 1, "ps": [{"id": 1}]}]}),
+        );
+        let a = rows(&r, "a");
+        assert_eq!(
+            a[0]["subject"],
+            json!({"type": "thing", "id": 1, "in": {"art": "a1"}})
+        );
+        assert_eq!(a[0]["passed"], json!(true));
+        assert_eq!(a[0]["inputs"][0]["locations"], json!(["/arts/0/owner"]));
     }
 }

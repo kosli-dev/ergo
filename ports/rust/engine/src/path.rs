@@ -127,6 +127,7 @@ pub struct Read<'a> {
     pub outcome: Outcome,
     pub value: Option<&'a Value>,
     pub location: Option<Location>,
+    pub step_unreadable: bool,
 }
 
 pub enum Resolved {
@@ -139,6 +140,7 @@ fn ended<'a>(outcome: Outcome, location: Location) -> Read<'a> {
         outcome,
         value: None,
         location: Some(location),
+        step_unreadable: false,
     }
 }
 
@@ -187,6 +189,7 @@ fn start_of<'a>(start: &Start, ctx: &Ctx<'a>) -> Result<(&'a Value, Location, bo
                 outcome: Outcome::Absent,
                 value: None,
                 location: None,
+                step_unreadable: false,
             }),
         },
         Start::Part(part) => start_of(&part.base, ctx),
@@ -233,7 +236,11 @@ pub fn read<'a>(path: &Path, ctx: &Ctx<'a>) -> Read<'a> {
     for (at, step) in steps.enumerate() {
         let resolved = match resolve(step, ctx) {
             Ok(resolved) => resolved,
-            Err(outcome) => return ended(outcome, location),
+            Err(outcome) => {
+                let mut stopped = ended(outcome, location);
+                stopped.step_unreadable = true;
+                return stopped;
+            }
         };
         if at == 0 && from_subject && !value.is_object() && !matches!(resolved, Resolved::Index(_))
         {
@@ -269,6 +276,7 @@ pub fn read<'a>(path: &Path, ctx: &Ctx<'a>) -> Read<'a> {
         outcome,
         value: Some(value),
         location: Some(location),
+        step_unreadable: false,
     }
 }
 

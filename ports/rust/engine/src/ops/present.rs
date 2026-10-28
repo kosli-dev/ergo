@@ -12,6 +12,7 @@ pub fn run(check: &Present, ctx: &Ctx) -> Verdict {
     let read = read_path(&check.path, ctx);
     let no_params = check.path.start == Start::Params && ctx.params.is_none();
     let cause = match read.outcome {
+        outcome if read.step_unreadable => outcome.cause().unwrap_or(Cause::Unusable),
         Outcome::Found => verdict(!check.missing),
         Outcome::Absent | Outcome::Null if no_params => Cause::Absent,
         Outcome::Absent | Outcome::Null => verdict(check.missing),

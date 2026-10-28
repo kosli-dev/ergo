@@ -53,6 +53,7 @@ impl Verdict {
 
 pub struct ReadPath {
     pub outcome: Outcome,
+    pub step_unreadable: bool,
     pub value: Option<Value>,
     pub input: Input,
 }
@@ -68,6 +69,7 @@ pub fn read_path(path: &Path, ctx: &Ctx) -> ReadPath {
     };
     ReadPath {
         outcome: read.outcome,
+        step_unreadable: read.step_unreadable,
         value,
         input,
     }
@@ -80,6 +82,7 @@ pub enum Check {
     CompareTime(time::CompareTime),
     Equals(equals::Equals),
     Range(range::Range),
+    NotYet,
 }
 
 pub fn run(check: &Check, ctx: &Ctx) -> Verdict {
@@ -89,6 +92,10 @@ pub fn run(check: &Check, ctx: &Ctx) -> Verdict {
         Check::CompareTime(check) => time::run(check, ctx),
         Check::Equals(check) => equals::run(check, ctx),
         Check::Range(check) => range::run(check, ctx),
+        Check::NotYet => Verdict {
+            cause: Cause::Unusable,
+            inputs: Vec::new(),
+        },
     }
 }
 
@@ -146,6 +153,15 @@ mod tests {
             value: json!(1),
         });
         assert!(run(&equals, &ctx(&subject, &input)).passed());
+    }
+
+    #[test]
+    fn a_check_the_engine_cannot_run_yet_fails_as_unusable_and_reads_nothing() {
+        let subject = json!({"x": 1});
+        let input = json!({});
+        let verdict = run(&Check::NotYet, &ctx(&subject, &input));
+        assert_eq!(verdict.cause, Cause::Unusable);
+        assert!(verdict.inputs.is_empty());
     }
 
     #[test]

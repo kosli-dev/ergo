@@ -1,4 +1,5 @@
 pub mod cause;
+pub mod checks;
 pub mod lower;
 pub mod name;
 pub mod ops;
@@ -53,7 +54,7 @@ mod tests {
         let policy = json!({
             "ergo_spec": "v0.2",
             "subjects": {"thing": {"from": "things"}},
-            "requirements": {"s": {"subject": "thing", "require": "most", "checks": {"c": "x"}}}
+            "requirements": {"s": {"subject": "thing", "require": "most", "checks": {"c": "x exists"}}}
         });
         let report = report(&json!({}), &policy, &Value::Null);
         assert_eq!(report["compliant"], json!(false));
@@ -64,8 +65,8 @@ mod tests {
 
     #[test]
     fn the_same_policy_gives_the_same_report_whatever_order_it_was_written_in() {
-        let a: Value = serde_json::from_str(r#"{"requirements": {"b": {"subject": "t", "checks": {"y": "x", "x": "x"}}, "a": {"subject": "t", "checks": {"c": "x"}}}, "subjects": {"t": {"from": "t"}, "u": null}, "ergo_spec": "v0.2"}"#).unwrap();
-        let b: Value = serde_json::from_str(r#"{"ergo_spec": "v0.2", "subjects": {"u": null, "t": {"from": "t"}}, "requirements": {"a": {"checks": {"c": "x"}, "subject": "t"}, "b": {"checks": {"x": "x", "y": "x"}, "subject": "t"}}}"#).unwrap();
+        let a: Value = serde_json::from_str(r#"{"requirements": {"b": {"subject": "t", "checks": {"y": "x exists", "x": "x exists"}}, "a": {"subject": "t", "checks": {"c": "x exists"}}}, "subjects": {"t": {"from": "t"}, "u": null}, "ergo_spec": "v0.2"}"#).unwrap();
+        let b: Value = serde_json::from_str(r#"{"ergo_spec": "v0.2", "subjects": {"u": null, "t": {"from": "t"}}, "requirements": {"a": {"checks": {"c": "x exists"}, "subject": "t"}, "b": {"checks": {"x": "x exists", "y": "x exists"}, "subject": "t"}}}"#).unwrap();
         let input = json!({"t": []});
         assert_eq!(
             report(&input, &a, &Value::Null).to_string(),
@@ -78,7 +79,7 @@ mod tests {
         let policy = json!({
             "ergo_spec": "v0.2",
             "subjects": {"thing": {"from": "things"}},
-            "requirements": {"s": {"subject": "thing", "checks": {"c": "x"}}}
+            "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}
         });
         let mut problems = Problems::new();
         policy::add_problem(&mut problems, "checks.c".to_string(), "doesn't parse");
