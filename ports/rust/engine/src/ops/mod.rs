@@ -1,6 +1,7 @@
 pub mod any_of;
 pub mod compare;
 pub mod equals;
+pub mod for_line;
 pub mod kinds;
 pub mod lists;
 pub mod present;
@@ -102,6 +103,7 @@ pub enum Check {
     Range(range::Range),
     Tally(tally::Tally),
     Walk(Box<walk::Walk>),
+    For(Box<for_line::For>),
     AnyOf(any_of::AnyOf),
     In(lists::In),
     Contains(lists::Contains),
@@ -132,7 +134,9 @@ impl Check {
             Check::HasType(check) => Some(&check.path),
             Check::NonEmptyString(check) => Some(&check.path),
             Check::Empty(check) => Some(&check.path),
-            Check::Tally(_) | Check::Walk(_) | Check::AnyOf(_) | Check::NotYet => None,
+            Check::Tally(_) | Check::Walk(_) | Check::For(_) | Check::AnyOf(_) | Check::NotYet => {
+                None
+            }
         }
     }
 
@@ -163,7 +167,7 @@ impl Check {
             Check::HasType(check) => vec![&check.path],
             Check::NonEmptyString(check) => vec![&check.path],
             Check::Empty(check) => vec![&check.path],
-            Check::Walk(_) | Check::NotYet => Vec::new(),
+            Check::Walk(_) | Check::For(_) | Check::NotYet => Vec::new(),
         }
     }
 
@@ -210,7 +214,9 @@ impl Check {
                 path: left,
                 ..check.clone()
             }),
-            Check::Tally(_) | Check::Walk(_) | Check::AnyOf(_) | Check::NotYet => self.clone(),
+            Check::Tally(_) | Check::Walk(_) | Check::For(_) | Check::AnyOf(_) | Check::NotYet => {
+                self.clone()
+            }
         }
     }
 
@@ -223,6 +229,7 @@ impl Check {
             Check::CompareTime(check) => check.refs(),
             Check::Tally(check) => check.refs(),
             Check::Walk(check) => check.refs(),
+            Check::For(check) => check.refs(),
             Check::AnyOf(check) => check.refs(),
             Check::In(check) => check.refs(),
             Check::Contains(check) => check.refs(),
@@ -256,6 +263,13 @@ pub fn run_full(check: &Check, ctx: &Ctx) -> Ran {
                 failed_items: Some(run.failed_items),
             }
         }
+        Check::For(check) => {
+            let run = check.run(ctx);
+            Ran {
+                verdict: run.verdict,
+                failed_items: Some(run.failed_items),
+            }
+        }
         other => Ran {
             verdict: run(other, ctx),
             failed_items: None,
@@ -272,6 +286,7 @@ pub fn run(check: &Check, ctx: &Ctx) -> Verdict {
         Check::Range(check) => range::run(check, ctx),
         Check::Tally(check) => tally::run(check, ctx),
         Check::Walk(check) => walk::run(check, ctx).verdict,
+        Check::For(check) => check.run(ctx).verdict,
         Check::AnyOf(check) => any_of::run(check, ctx),
         Check::In(check) => lists::run_in(check, ctx),
         Check::Contains(check) => lists::run_contains(check, ctx),

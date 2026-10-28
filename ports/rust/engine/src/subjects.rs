@@ -1648,13 +1648,13 @@ mod tests {
     }
 
     #[test]
-    fn a_for_check_fails_as_unusable_too() {
+    fn a_for_check_is_run_and_fails_as_absent_when_its_list_is_missing() {
         let r = with_checks(
             json!({"thing": {"from": "ds"}}),
             json!({"a": {"for": "every xs as x", "assert": "x.y exists"}}),
             json!({"ds": [{}]}),
         );
-        assert_eq!(rows(&r, "a")[0]["cause"], json!("unusable"));
+        assert_eq!(rows(&r, "a")[0]["cause"], json!("absent"));
     }
 
     #[test]

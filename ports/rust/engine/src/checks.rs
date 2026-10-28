@@ -99,16 +99,6 @@ fn lowered_plan(
     Some(Plan { items, all_of })
 }
 
-fn not_yet(expression: &str) -> Plan {
-    Plan {
-        items: vec![Item {
-            text: expression.to_string(),
-            check: Check::NotYet,
-        }],
-        all_of: false,
-    }
-}
-
 fn read_one(
     check: &crate::policy::Check,
     scope: &Scope,
@@ -194,8 +184,26 @@ fn read_one(
                         s::print_for(&tree, &aliases),
                         printed(&parsed.trees, &name_refs)
                     );
+                    let assertions: Vec<s::Assertion> = parsed
+                        .trees
+                        .iter()
+                        .flat_map(|tree| tree.assertions.clone())
+                        .collect();
+                    let plan = match lower::lower_for(&tree, &assertions, scope) {
+                        Ok(check) => Some(Plan {
+                            items: vec![Item {
+                                text: expression.clone(),
+                                check,
+                            }],
+                            all_of: false,
+                        }),
+                        Err(found) => {
+                            problems.extend(found);
+                            None
+                        }
+                    };
                     CheckRead {
-                        plan: Some(not_yet(&expression)),
+                        plan: if problems.is_empty() { plan } else { None },
                         expression,
                         problems,
                     }
@@ -524,7 +532,7 @@ mod tests {
     }
 
     #[test]
-    fn a_for_check_is_printed_with_its_line_and_gets_one_plan_that_cannot_run_yet() {
+    fn a_for_check_is_printed_with_its_line_and_gets_one_plan_that_runs_as_a_for_line() {
         let read =
             one(json!({"c": {"for": "every xs as x", "assert": ["x.a exists", "x.b exists"]}}));
         assert_eq!(
@@ -533,7 +541,7 @@ mod tests {
         );
         let plan = read.plan.unwrap();
         assert!(!plan.all_of);
-        assert!(matches!(plan.items[0].check, Check::NotYet));
+        assert!(matches!(plan.items[0].check, Check::For(_)));
     }
 
     #[test]

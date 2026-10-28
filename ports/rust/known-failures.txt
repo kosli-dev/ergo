@@ -1,6 +1,5 @@
 any_of / any_of with a ref to a param of the wrong type / fails the row as unusable even when another option passes
 deep_walks / eleven steps after every / is written wrong
-deep_walks / ten steps after count of, starting at a for alias / reads as written, the alias being the first of ten steps
 deep_walks / eleven steps after count of, starting at a for alias / is written wrong, because the alias is a step too
 deep_walks / eleven steps after every, one of them a position / is written wrong, because the position is a step too
 deep_walks / eleven steps after a count of on the right of a phrase / is written wrong, as it is on the left
@@ -10,138 +9,15 @@ deep_walks / a parent's part of ten names in the whose of a count of, read on th
 derived / a count in the whose of an every / fails as absent when an item's list is missing, so the item cannot be decided
 derived / a count in the whose of an every / fails as null when an item's list is null
 derived / a count in the whose of an every / fails as unusable when an item's list is text
-derived / a count under a for line reading the line's name / passes when every pull request has enough reviews
-derived / a count under a for line reading the line's name / fails as value when one pull request has too few, and lists it with the sentence that failed
-derived / a count under a for line reading the line's name / counts an empty list as 0, which fails the pull request as value
-derived / a count under a for line reading the line's name / fails as absent when a pull request has no reviews field
-derived / a count under a for line reading the line's name / fails as null when the reviews are null
-derived / a count under a for line reading the line's name / fails as unusable when the reviews are not a list
-derived / days elapsed under a for line reading the line's name / passes when every pull request was closed within 2 days
-derived / days elapsed under a for line reading the line's name / fails as value when one pull request took longer, and lists it
-derived / days elapsed under a for line reading the line's name / fails as absent when a pull request has no closing time
-for / every over one list on a for line / passes when every item passes, and failed_items is empty
-for / every over one list on a for line / fails as value when an item fails, and lists the item with the sentence that failed
-for / every over one list on a for line / lists every item that fails, in list order
-for / every over one list on a for line / an item whose field is missing fails as absent
-for / every over one list on a for line / fails as value on an empty list, and lists the list
-for / every over one list on a for line / fails as absent when the list is missing
-for / every over one list on a for line / fails as null when the list is null
-for / every over one list on a for line / fails as unusable when the list is not a list
-for / every with if any on a for line / passes over an empty list
-for / every with if any on a for line / still fails as absent when the list is missing
-for / every with if any on a for line / still fails as null when the list is null
-for / every with if any on a for line / still fails as unusable when the list is not a list
-for / every with if any on a for line / still fails an item that fails
-for / some over one list on a for line / passes when one item passes, and failed_items is empty
-for / some over one list on a for line / fails as value when no item passes, and lists every item
-for / some over one list on a for line / fails as value on an empty list, because some needs an item
-for / some over one list on a for line / fails as absent when the list is missing
-for / some over one list on a for line / fails with the first cause among the items, absent before value
-for / some over one list on a for line / passes when an item passes even though another is missing its field
-for / whose on a for item / an item that whose leaves out is not checked, and is not listed
-for / whose on a for item / an item that whose keeps and that fails is listed with its position in the whole list
-for / whose on a for item / when whose leaves no item in, every and some fail as value and if any passes
-for / whose on a for item / an item whose kind is missing is undecided: every fails as absent, listing it, with no sentence checked
-for / whose on a for item / under some, an undecided item and a failed item give the first cause, absent
-for / whose on a for item / an item whose kind is null is undecided, and fails as null
-for / whose on a for item / an item whose kind has the wrong type is undecided, but a string that differs is just left out
-for / a name that hides a field of the subject / reads the item's field, not the subject's field of the same name
-for / a name that hides a field of the subject / a subject whose field has that name is not read when the item lacks the field
-for / a bare key in assert is a field of the subject / reads owner on the subject and shows it in inputs, sorted with the list
-for / a bare key in assert is a field of the subject / fails when an item has the owner as author
-for / a bare key in assert is a field of the subject / fails as absent when the subject has no owner
-for / a bare key in an item's whose is a field of the item / reads role on the approval and started_at on the subject, even when the subject has a role
-for / a bare key in an item's whose is a field of the item / fails when the qa approval came after started_at, and the dev one is not looked at
-for / two items, the second walking a list inside the first / passes when every pull request has an approver who isn't its author
-for / two items, the second walking a list inside the first / fails a pull request whose only approver is its author, and lists that pull request
-for / two items, the second walking a list inside the first / an approver whose leaves out doesn't count, so the pull request fails as value and is listed with no sentence
-for / two items, the second walking a list inside the first / a pull request with no approvers list fails as absent, listed with no sentence
-for / two items, the second walking a list inside the first / a pull request with an empty approvers list fails as value
-for / two items, the second walking a list inside the first / an approver whose username is missing fails that approver as absent
-for / two items, the second walking a list inside the first / an approver whose state is missing is undecided: the pull request fails as absent with no sentence checked
-for / two items, the second walking a list inside the first / fails as value when the pull requests list is empty
-for / an outer some and an inner every / passes when one pull request has all its commits signed, an empty list counting with if any
-for / an outer some and an inner every / fails when none does, and lists each pull request with the sentence that failed
-for / two items over sibling lists, with two assertions / passes when one approver isn't the author and approved after every commit
-for / two items over sibling lists, with two assertions / fails when each approver breaks one sentence, and says which, in the order written
-for / two items over sibling lists, with two assertions / an approver who breaks both sentences lists both, in the order written
-for / two items over sibling lists, with two assertions / fails as value when no approver is left, and the commits are not read as a failure
-for / two items over sibling lists, with two assertions / an approval before a commit's timestamp that is not a timestamp fails as unusable
-for / two items over sibling lists, with two assertions / with every commits and no commits the check fails as value and lists the commits list once, and with if any it passes
-for / two items over sibling lists, with two assertions / a missing commits list fails the check as absent and lists the list once, not under each approver
-for / a whose value that is a comma list, before a second item / reads the comma list as values of the whose and the next item as the second item
-for / a whose value that is a comma list, before a second item / fails when the only approval with a listed role came before the commit
-for / a whose that reads a $params list / keeps the items whose kind is listed in the params, and passes
-for / a whose that reads a $params list / fails an item the params list keeps
 for / a whose that reads a $params list that isn't a list / fails as unusable, whatever the items hold, with no failed items
-for / an assertion that reads a $params list / fails an item whose field isn't in the list
-for / a path that is named by a param / fails as absent when the param is missing, and the path's input holds []
 for / a second item whose path is named by a param / fails the first list's item with the ref's cause
-for / a for line on a subject that isn't an object / fails as not_an_object when the first path starts at the subject
-for / a name whose path goes on past its list / passes when every title is there and passes
-for / a name whose path goes on past its list / a missing title fails its pull request as absent, without checking the sentence
-for / a name whose path goes on past its list / a title under a value that isn't an object fails as unusable
 for / a second item that reads into a first item that isn't an object / a pull request that is a number or null fails as not_an_object
 for / named by a name from the for line / reads the key each item names: a key that's there and passes, one that fails, one that's missing, and an item that isn't a string
-for / the latest commit picked on a for line / picks the item with the largest timestamp, wherever it is in the list
-for / the latest commit picked on a for line / fails as value when the approver wrote the latest commit, and names it by its place in the list
-for / the latest commit picked on a for line / fails as ambiguous when another item ties with the one picked, and names every tied item
-for / the latest commit picked on a for line / a tie away from the picked item doesn't matter
-for / the latest commit picked on a for line / fails as absent when an item has no timestamp, without picking
-for / the latest commit picked on a for line / fails as unusable when a timestamp is neither a number nor a time
-for / the latest commit picked on a for line / sorts times by the moment they name, not as text
-for / the latest commit picked on a for line / fails as absent on an empty list, since there's nothing to pick
-for / the second latest approval, filtered before it is sorted / drops the items the whose leaves out before sorting
-for / the second latest approval, filtered before it is sorted / fails with the cause of an item the whose can't decide
-for / the second latest approval, filtered before it is sorted / fails as absent when fewer items are left than the position
-for / the last tag as written / without sorted by, picks by the order of the list
-for / the first owner alphabetically / sorts uppercase before lowercase, so Zoe comes before adam
-for / the first owner alphabetically / fails as unusable without picking when a name isn't a string
-for / the first owner alphabetically / fails as ambiguous when two owners share the first name
-for / the second last owner alphabetically / counts from the end of the order
-for / the latest audit by date / sorts dates by day
-for / the latest audit by date / fails the dates as unusable when they're mixed with times
-for / the latest audit by date / fails as unusable on a date that doesn't exist
-for / a list beside the first that fails before any sentence, with a whose that doesn't read the first item / a commit the whose can't decide is listed once, not under each approver
-for / a list beside the first that fails before any sentence, with a whose that reads the first item / a commit the whose can't decide is listed under each approver, since the answer depends on the approver
-for / a list beside the first with a broken list inside it / the broken list is listed once, and an approver that also failed a sentence keeps its own cause
-for / a sentence that fails for second-list items with different causes / each commit has its own cause, and the sentence has the first of them in the order of causes
-for / a for line on a child subject whose assertion reads the parent / shows the parent's field in its inputs
 for / a walk that starts at a for alias holding null / fails as null, as a walk from a field holding null does
-for / two items over lists of different lengths / has one location per item in each list, the second list across the items of the first
-for / a for alias read by a key / names the alias in a failed sentence's inputs as the sentence writes it, with named by after it
-for / a position at the start of a path that starts at a for alias holding a list / reads the alias as a list, as the same position does on a field: the first batch passes and the empty one fails as absent
-for / a picked item / has the location of the item it picked, not of the list
-for / a second item that fails for an item of the first / has a location for the failed item and for each of its nested failed_items
-for / a list that can't be read / has a location for the failed item where its read stopped
-for / a for line whose second item is read from the first / points a failed item at the value it read, and the alias m at the meta it stands for
 for / a for line whose second item is read from the first / stops a nested failed item at the meta that has no commits
-for / a failed sentence on a for line lists the values it compared / a comparison that fails across two items lists both values for each pair
-for / a failed sentence on a for line lists the values it compared / a sentence that reads only the first item lists its values on the sentence itself
-for / a failed sentence on a for line lists the values it compared / a sentence that reads the subject lists the subject's field beside the item's
-for / a failed sentence on a for line lists the values it compared / a read that stops early lists where it stopped
-for / a failed sentence that counts through an alias lists the count and what it counted / the number comes first, then the list that was counted
-for / a failed sentence on a picked item lists the values it compared / the picked item is read where it is in the input
-for / the failed items of a list beside the first keep the values only on the sentences / a list that can't be walked is listed once with no sentences, and the item that failed a sentence has its values
-for / a for line that reads its alias as a list / names the alias as the sentence writes it, with no $ in front
-for / a for line that reads a position of a field of its alias / names the position with the alias as the sentence writes it
-for / a for line whose sentence reads the same value twice / lists the value once in the inputs of each failed sentence
-for / a for line with two items whose sentence reads the first alias twice / lists each value once in the inputs of each item
 for / a for line on a child subject whose sentence reads the parent and its own field of the same name / orders the entries of the same name by where they were read, as a row does
-for / a for line whose assert joins sentences with and / gives each sentence its own failure and inputs, as a list under assert does
 for / a second item that starts at a parent and is named by the first / is listed under the parent's whole name
-for / a second item that starts at $input or $params / keeps the dollar in the name of its list and of its failed items
-for / a second item that starts at a parent's part, read with a whose / names the second list's items it could not decide with the part's alias, like its input
-for / a second item that starts at a parent's part, read with a whose and a sentence that fails on its items / names the items a failed sentence lists with the part's alias, like its input
-it / it after a for line / is still the subject, and the alias is the item
-parts / where a part's alias is read / reads the alias in the conditions of the from line, in a for line's assertions, and on the right side after a one-line every, but not on the left of a whose
-parts / where a part's alias is read / an alias shadows a field with the same name, and the dot in front reads the field
-parts / a failed sentence on a for line tags the inputs it read through a part / the part's input has the part and the item's has none
-parts / a for alias that isn't named like a subject or a part / reads the item
-parts / a for alias named like a part of a subject that isn't a parent / reads the item
-sentences / an item compared with the subject under assert / reads type from the subject, so no condition matches and the check fails with value
 sentences / a for alias inside an item's scope / an alias on the right is the alias, the left of a whose and a dotted name are the field, and the report prints the dot where it matters
-sentences / a field after a phrase that takes a list, in a for line, a one-line every or some, and the input / reads the field from the subject, from the item or from the input, and lists what it read
 sentences / named by a field / the subject's field picks the key, inside a whose or a one-line every the item's does, and a for name hides a field with the same name
 sentences / a count on the left of a whose / counts the item's own field, even when its first key is the parent subject's name
 walks / a walk that can't be run as written / fails as unusable when a param its whose reads isn't a list, even with if any, and fails with the ref's cause when its named by can't be read
