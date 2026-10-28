@@ -468,25 +468,50 @@ pub(super) fn outside_inputs_of(checks: &[&Check], ctx: &Ctx) -> Vec<Input> {
     let mut inputs = Vec::new();
     for check in checks {
         for path in check.paths().into_iter().filter(|p| reads_outside(p)) {
-            match path
-                .steps
-                .iter()
-                .position(|step| matches!(step, Step::Field(_)))
-            {
-                None => inputs.extend(read_path(path, ctx).inputs),
-                Some(at) => {
-                    let before = Path {
-                        start: path.start.clone(),
-                        steps: path.steps[..at].to_vec(),
-                    };
-                    if !through_a_list(&before, ctx) {
-                        inputs.extend(read_path(&before, ctx).inputs);
-                    }
-                }
-            }
+            inputs.extend(path_inputs(path, ctx, &[]));
         }
     }
     inputs
+}
+
+fn hides(path: &Path, hidden: &[&str]) -> bool {
+    matches!(&path.start, Start::Alias(name) if hidden.contains(&name.as_str()))
+}
+
+pub(super) fn cut_at(path: &Path, hidden: &[&str]) -> Option<usize> {
+    path.steps.iter().position(|step| match step {
+        Step::Field(_) => true,
+        Step::Ref(reference) => hides(reference, hidden),
+        _ => false,
+    })
+}
+
+pub(super) fn path_inputs(path: &Path, ctx: &Ctx, hidden: &[&str]) -> Vec<Input> {
+    if hides(path, hidden) {
+        return path
+            .steps
+            .iter()
+            .filter_map(|step| match step {
+                Step::Field(field) => Some(read_path(field, ctx).inputs),
+                _ => None,
+            })
+            .flatten()
+            .collect();
+    }
+    match cut_at(path, hidden) {
+        None => read_path(path, ctx).inputs,
+        Some(at) => {
+            let before = Path {
+                start: path.start.clone(),
+                steps: path.steps[..at].to_vec(),
+            };
+            if through_a_list(&before, ctx) {
+                Vec::new()
+            } else {
+                read_path(&before, ctx).inputs
+            }
+        }
+    }
 }
 
 fn subject_is_not_an_object(walk: &Walk, ctx: &Ctx) -> bool {
