@@ -79,9 +79,9 @@ button { font:inherit; color:inherit; cursor:pointer; }
 .gline.hit { outline:1px solid var(--check); outline-offset:-1px; }
 textarea { border:0; resize:none; background:transparent; color:var(--ink);
   font-family:var(--mono); font-size:13px; line-height:var(--lh); }
-#src { flex:1; min-width:0; position:relative; padding:var(--pad) .9rem; white-space:pre; overflow:auto; tab-size:2;
+#src, .code { flex:1; min-width:0; position:relative; padding:var(--pad) .9rem; white-space:pre; overflow:auto; tab-size:2;
   color:transparent; caret-color:var(--ink); }
-#src::selection { background:color-mix(in srgb, var(--check) 28%, transparent); }
+#src::selection, .code::selection { background:color-mix(in srgb, var(--check) 28%, transparent); }
 .hlwrap { position:absolute; inset:0; overflow:hidden; pointer-events:none; }
 .hl { position:absolute; top:0; left:0; margin:0; padding:var(--pad) .9rem; font-family:var(--mono); font-size:13px;
   line-height:var(--lh); white-space:pre; tab-size:2; color:var(--muted); }
@@ -98,6 +98,10 @@ textarea:focus { outline:none; }
 .diag { display:grid; grid-template-columns:4.5rem 1fr; gap:.7rem; width:100%; text-align:left; padding:.4rem .9rem;
   border:0; border-top:1px solid var(--hairline); background:var(--bad-wash); font-size:.76rem; color:var(--muted); }
 .diag:first-child { border-top:0; }
+.diag.done { background:var(--good-wash); }
+.diag.done .where { color:var(--good); }
+.yamlpane { height:100%; display:flex; flex-direction:column; }
+.yamlpane .field { flex:1; min-height:0; }
 .diag .where { font-family:var(--mono); font-size:.7rem; font-weight:600; color:var(--bad); }
 .panel { flex:1; overflow:auto; min-height:0; position:relative; }
 .map { position:relative; }
@@ -167,8 +171,6 @@ textarea:focus { outline:none; }
 .doc .mark-check { border-left-color:var(--check); }
 .doc .mark-declare { border-left-color:var(--declare); }
 .doc .mark-other { border-left-color:var(--other); }
-.yaml { margin:0; padding:.85rem .9rem 2rem; font-family:var(--mono); font-size:.75rem; line-height:1.75;
-  white-space:pre; overflow:auto; color:var(--ink); }
 .empty { padding:1.5rem .9rem; color:var(--faint); font-size:.85rem; font-family:var(--serif); font-style:italic; }
 .legend { display:flex; flex-wrap:wrap; align-items:baseline; gap:.3rem 1.1rem; padding:.45rem .9rem;
   border-top:1px solid var(--hairline); background:var(--sunk); font-size:.68rem; color:var(--muted); }

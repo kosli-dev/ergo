@@ -1,6 +1,7 @@
 import { compile, parse } from "@kosli/ergo-markdown";
 import opa from "@open-policy-agent/opa-wasm";
 import { highlightMarkdown, highlightYaml } from "./highlight.mjs";
+import { editFromYaml, markdownFromPaste } from "./twoway.mjs";
 import { layoutRows, policySheet, yamlText, markOf, parseJson, makeRunner, parseTime, reportTables, plural } from "./lib.mjs";
 
 const { samples, wasm } = window.EDITOR;
@@ -74,6 +75,69 @@ const drawSource = () => {
   follow();
 };
 
+const yamlBox = el("textarea", "code");
+yamlBox.spellcheck = false;
+yamlBox.setAttribute("aria-label", "Policy in YAML");
+const yamlHl = el("pre", "hl");
+const yamlNotes = el("div", "diags");
+yamlNotes.hidden = true;
+const yamlPane = (() => {
+  const layer = el("div", "hlwrap");
+  layer.setAttribute("aria-hidden", "true");
+  layer.append(yamlHl);
+  const field = el("div", "field");
+  field.append(layer, yamlBox);
+  const pane = el("div", "yamlpane");
+  pane.append(field, yamlNotes);
+  return pane;
+})();
+let yamlProblems = [];
+let yamlTimer = 0;
+let noteTimer = 0;
+
+const drawYaml = () => {
+  paint(yamlHl, highlightYaml(yamlBox.value));
+  yamlHl.append("\n");
+  yamlHl.style.transform = `translate(${-yamlBox.scrollLeft}px, ${-yamlBox.scrollTop}px)`;
+};
+
+const showYamlNotes = (problems, changes) => {
+  yamlNotes.hidden = !problems.length && !changes.length;
+  yamlNotes.replaceChildren(
+    ...problems.map((p) => {
+      const row = el("div", "diag");
+      row.append(el("span", "where", p.path), el("span", null, p.message));
+      return row;
+    }),
+    ...changes.map((c) => {
+      const row = el("div", "diag done");
+      row.append(el("span", "where", "changed"), el("span", null, c));
+      return row;
+    }),
+  );
+};
+
+const fromYaml = () => {
+  yamlTimer = 0;
+  const out = editFromYaml(src.value, yamlBox.value);
+  yamlProblems = out.problems;
+  clearTimeout(noteTimer);
+  if (out.markdown === null) return showYamlNotes(out.problems, []);
+  if (out.markdown !== src.value) {
+    src.value = out.markdown;
+    recompile();
+  }
+  showYamlNotes([], out.changes);
+  if (out.changes.length) noteTimer = setTimeout(() => showYamlNotes([], []), 4000);
+};
+
+const flash = (text) => {
+  $("note").textContent = text;
+  setTimeout(() => {
+    $("note").textContent = NOTES[tab];
+  }, 4000);
+};
+
 const kindClass = (kind) => kind.replace(/ /g, "-");
 const GROUP = { check: "check", option: "check", subject: "declare", requirement: "declare", field: "declare", checks: "declare", prose: "prose" };
 const TAGS = { "front matter": "front matter" };
@@ -139,7 +203,8 @@ const viewPolicy = (result) => {
   for (const r of sheet.requirements) {
     const card = el("div", "req");
     const head = el("header");
-    head.append(el("span", "id", r.name), el("h3", null, r.name.replace(/_/g, " ")));
+    if (r.title !== r.name) head.append(el("span", "id", r.name));
+    head.append(el("h3", null, r.title));
     if (r.description) head.append(el("p", "words", r.description));
     const badges = el("div", "badges");
     badges.append(
@@ -261,11 +326,14 @@ const viewDoc = (result) => {
 };
 
 const viewYaml = (result) => {
-  const text = yamlText(result.policy);
-  if (!text) return panel.replaceChildren(el("p", "empty", "The policy has problems, so there is no YAML yet."));
-  const pre = el("pre", "yaml");
-  paint(pre, highlightYaml(text.replace(/\n$/, "")));
-  panel.replaceChildren(pre);
+  if (document.activeElement !== yamlBox) {
+    yamlBox.value = yamlText(result.policy);
+    drawYaml();
+    yamlProblems = [];
+    clearTimeout(noteTimer);
+    showYamlNotes(result.policy ? [] : [{ path: "Markdown", message: "The Markdown has problems, so there is no YAML for it yet." }], []);
+  }
+  if (panel.firstChild !== yamlPane) panel.replaceChildren(yamlPane);
 };
 
 const table = (t) => {
@@ -372,7 +440,7 @@ const NOTES = {
   blocks: "Each block sits next to the lines it came from.",
   policy: "The policy as Ergo reads it, in plain words.",
   doc: "A coloured edge marks text that Ergo acts on.",
-  yaml: "The same policy in YAML, ready to use.",
+  yaml: "Edit the YAML and the Markdown follows. Paste a YAML policy into an empty document to start from it.",
   report: "Runs the policy on the input in your browser.",
 };
 
@@ -450,6 +518,30 @@ src.addEventListener("input", () => {
   drawSource();
   clearTimeout(timer);
   timer = setTimeout(recompile, 150);
+});
+yamlBox.addEventListener("input", () => {
+  drawYaml();
+  clearTimeout(yamlTimer);
+  yamlTimer = setTimeout(fromYaml, 400);
+});
+yamlBox.addEventListener("scroll", () => {
+  yamlHl.style.transform = `translate(${-yamlBox.scrollLeft}px, ${-yamlBox.scrollTop}px)`;
+});
+yamlBox.addEventListener("blur", () => {
+  if (yamlTimer) {
+    clearTimeout(yamlTimer);
+    fromYaml();
+  }
+  if (!yamlProblems.length && last && tab === "yaml") viewYaml(last);
+});
+src.addEventListener("paste", (e) => {
+  if (src.value.trim()) return;
+  const markdown = markdownFromPaste(e.clipboardData?.getData("text/plain") ?? "");
+  if (!markdown) return;
+  e.preventDefault();
+  src.value = markdown;
+  recompile();
+  flash("Wrote a Markdown document from the pasted YAML.");
 });
 src.addEventListener("scroll", () => {
   if (syncing) return;

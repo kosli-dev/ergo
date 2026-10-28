@@ -71,6 +71,11 @@ test("a check shows its sentences as written, whether one or several, and its fo
   assert.equal(both.for, "every items");
 });
 
+test("a requirement's title is its name with spaces for underscores", () => {
+  const sheet = policySheet({ requirements: { cake_batch: {}, "cake batch": {} } });
+  assert.deepEqual(sheet.requirements.map((r) => [r.name, r.title]), [["cake_batch", "cake batch"], ["cake batch", "cake batch"]]);
+});
+
 test("an any_of check shows each option with its sentences", () => {
   const either = policySheet(policy).requirements[0].checks[2];
   assert.deepEqual(either.sentences, []);
