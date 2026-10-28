@@ -102,3 +102,53 @@ pub fn printed_phrase(line: &str) -> String {
         .unwrap_or_default()
         .to_string()
 }
+
+pub fn check(line: &str) -> Check {
+    match parse_check(line) {
+        Ok(read) => read,
+        Err(errors) => panic!("{line:?} did not parse: {errors:?}"),
+    }
+}
+
+pub fn for_line(line: &str) -> For {
+    match parse_for(line) {
+        Ok(read) => read,
+        Err(errors) => panic!("{line:?} did not parse: {errors:?}"),
+    }
+}
+
+pub fn check_failure(line: &str) -> Vec<String> {
+    match parse_check(line) {
+        Ok(read) => panic!("{line:?} parsed as {read:?}"),
+        Err(errors) => errors.into_iter().map(|e| e.message).collect(),
+    }
+}
+
+pub fn for_failure(line: &str) -> Vec<String> {
+    match parse_for(line) {
+        Ok(read) => panic!("{line:?} parsed as {read:?}"),
+        Err(errors) => errors.into_iter().map(|e| e.message).collect(),
+    }
+}
+
+pub fn assertion(line: &str) -> Assertion {
+    let mut read = check(line);
+    assert_eq!(read.assertions.len(), 1, "{line:?}");
+    read.assertions.remove(0)
+}
+
+pub fn problems(line: &str) -> Vec<String> {
+    check_problems(&check(line), &[])
+}
+
+pub fn problems_with(line: &str, aliases: &[&str]) -> Vec<String> {
+    check_problems(&check(line), aliases)
+}
+
+pub fn printed_check(line: &str) -> String {
+    print_check(&check(line), &[])
+}
+
+pub fn printed_for(line: &str) -> String {
+    print_for(&for_line(line), &[])
+}

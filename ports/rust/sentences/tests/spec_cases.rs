@@ -9,6 +9,8 @@ use std::path::PathBuf;
 struct Lines {
     from: Vec<String>,
     paths: Vec<String>,
+    checks: Vec<String>,
+    fors: Vec<String>,
 }
 
 fn strings_of(value: Option<&Value>) -> Vec<String> {
@@ -19,11 +21,52 @@ fn strings_of(value: Option<&Value>) -> Vec<String> {
         .collect()
 }
 
+fn strings_in(value: &Value) -> Vec<String> {
+    match value {
+        Value::String(text) => vec![text.clone()],
+        Value::Array(items) => items.iter().flat_map(strings_in).collect(),
+        _ => Vec::new(),
+    }
+}
+
+fn collect(value: &Value, lines: &mut Lines) {
+    match value {
+        Value::Object(map) => {
+            for (key, inner) in map {
+                match key.as_str() {
+                    "assert" => lines.checks.extend(strings_in(inner)),
+                    "for" => lines.fors.extend(strings_in(inner)),
+                    "checks" => {
+                        if let Some(checks) = inner.as_object() {
+                            for check in checks.values() {
+                                lines.checks.extend(strings_in(check));
+                            }
+                        }
+                    }
+                    "any_of" => {
+                        if let Some(options) = inner.as_object() {
+                            for option in options.values() {
+                                lines.checks.extend(strings_in(option));
+                            }
+                        }
+                    }
+                    _ => {}
+                }
+                collect(inner, lines);
+            }
+        }
+        Value::Array(items) => items.iter().for_each(|item| collect(item, lines)),
+        _ => {}
+    }
+}
+
 fn read_cases() -> Lines {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../spec/cases");
     let mut lines = Lines {
         from: Vec::new(),
         paths: Vec::new(),
+        checks: Vec::new(),
+        fors: Vec::new(),
     };
     let mut folders: Vec<PathBuf> = fs::read_dir(&root)
         .unwrap()
@@ -34,6 +77,7 @@ fn read_cases() -> Lines {
         let groups: Value =
             serde_json::from_str(&fs::read_to_string(folder.join("cases.json")).unwrap()).unwrap();
         for group in groups.as_array().unwrap() {
+            collect(&group["policy"], &mut lines);
             let Some(subjects) = group["policy"]["subjects"].as_object() else {
                 continue;
             };
@@ -100,5 +144,51 @@ fn every_path_in_the_cases_reads_as_ergo_rego_reads_it() {
             }
             None => assert!(parse_path(&line).is_err(), "{line:?}"),
         }
+    }
+}
+
+#[test]
+fn every_check_in_the_cases_reads_as_ergo_rego_reads_it() {
+    let lines = read_cases();
+    assert!(lines.checks.len() > 300, "{}", lines.checks.len());
+    for line in lines.checks {
+        let all = oracle::checks::CHECK_OK.iter().any(|(l, ..)| *l == line);
+        let wrong = oracle::checks::CHECK_WRITTEN_WRONG
+            .iter()
+            .any(|(l, _)| *l == line);
+        let fails = oracle::checks::CHECK_ERRORS.iter().any(|(l, _)| *l == line);
+        assert!(all || wrong || fails, "{line:?} is not in tests/oracle");
+        assert_eq!(parse_check(&line).is_ok(), all || wrong, "{line:?}");
+    }
+}
+
+#[test]
+fn every_for_line_in_the_cases_reads_as_ergo_rego_reads_it() {
+    let lines = read_cases();
+    assert!(lines.fors.len() > 40, "{}", lines.fors.len());
+    for line in lines.fors {
+        let all = oracle::checks::FOR_OK.iter().any(|(l, ..)| *l == line);
+        let wrong = oracle::checks::FOR_WRITTEN_WRONG
+            .iter()
+            .any(|(l, _)| *l == line);
+        let fails = oracle::checks::FOR_ERRORS.iter().any(|(l, _)| *l == line);
+        assert!(all || wrong || fails, "{line:?} is not in tests/oracle");
+        assert_eq!(parse_for(&line).is_ok(), all || wrong, "{line:?}");
+    }
+}
+
+#[test]
+fn every_sentence_in_the_corpus_reads_as_a_check_a_for_line_or_a_from_line() {
+    let path =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../spec/sentences-corpus.json");
+    let corpus: Value = serde_json::from_str(&fs::read_to_string(path).unwrap()).unwrap();
+    let sentences = corpus["sentence_corpus"].as_array().unwrap();
+    assert!(sentences.len() > 300, "{}", sentences.len());
+    for sentence in sentences {
+        let line = sentence.as_str().unwrap();
+        assert!(
+            parse_check(line).is_ok() || parse_for(line).is_ok() || parse_from(line).is_ok(),
+            "{line:?}"
+        );
     }
 }

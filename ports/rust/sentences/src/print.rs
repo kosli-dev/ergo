@@ -154,7 +154,7 @@ pub(crate) fn number_text(text: &str) -> String {
     }
 }
 
-fn increment(digits: &str) -> String {
+pub(crate) fn increment(digits: &str) -> String {
     let mut bytes: Vec<u8> = digits.bytes().collect();
     let mut k = bytes.len();
     while k > 0 {
@@ -211,11 +211,17 @@ fn step_text(step: &Step) -> String {
 }
 
 fn path_text(path: &Path, side: Side, aliases: &[&str], own: bool) -> String {
+    path_text_with(path, side, aliases, own, true)
+}
+
+fn path_text_with(path: &Path, side: Side, aliases: &[&str], own: bool, lift: bool) -> String {
     let lifted = match (&path.position, &path.start, path.steps.last()) {
-        (None, start, Some(Step::Index(number))) if *start != Start::It => Some(Position::Item {
-            number: increment(number),
-            from_last: false,
-        }),
+        (None, start, Some(Step::Index(number))) if lift && *start != Start::It => {
+            Some(Position::Item {
+                number: increment(number),
+                from_last: false,
+            })
+        }
         _ => None,
     };
     let (position, steps) = match &lifted {
@@ -252,9 +258,18 @@ fn derived_text(derived: &Derived, aliases: &[&str], own: bool) -> String {
         DerivedKind::Sum => "sum of",
     };
     format!(
-        "{word} {}",
-        path_text(&derived.path, Side::Left, aliases, own)
+        "{word} {}{}",
+        path_text(&derived.path, Side::Left, aliases, own),
+        whose_text(&derived.whose, aliases)
     )
+}
+
+fn whose_text(whose: &[Condition], aliases: &[&str]) -> String {
+    if whose.is_empty() {
+        return String::new();
+    }
+    let parts: Vec<String> = whose.iter().map(|c| condition_text(c, aliases)).collect();
+    format!(" whose {}", parts.join(" and "))
 }
 
 fn elapsed_text(elapsed: &Elapsed, aliases: &[&str], own: bool) -> String {
@@ -399,4 +414,119 @@ fn phrase_text(phrase: &Phrase, aliases: &[&str]) -> String {
             operand(words, o)
         }
     }
+}
+
+pub fn print_assertion(assertion: &Assertion, aliases: &[&str]) -> String {
+    match assertion {
+        Assertion::Plain { path, phrase } => format!(
+            "{} {}",
+            path_text(path, Side::Left, aliases, false),
+            phrase_text(phrase, aliases)
+        ),
+        Assertion::Quantified {
+            quantifier,
+            path,
+            whose,
+            if_any,
+            phrase,
+        } => format!(
+            "{} {}{}{} {}",
+            quantifier_text(*quantifier),
+            path_text(path, Side::Left, aliases, false),
+            whose_text(whose, aliases),
+            if_any_text(*if_any),
+            phrase_text(phrase, aliases)
+        ),
+        Assertion::Derived { terms, phrase } => format!(
+            "{} {}",
+            terms_text(terms, aliases),
+            phrase_text(phrase, aliases)
+        ),
+    }
+}
+
+pub fn print_check(check: &Check, aliases: &[&str]) -> String {
+    let parts: Vec<String> = check
+        .assertions
+        .iter()
+        .map(|a| print_assertion(a, aliases))
+        .collect();
+    parts.join(" and ")
+}
+
+fn for_item_text(item: &ForItem, names: &[&str], sorted_names: &[&str]) -> String {
+    match item {
+        ForItem::Walk {
+            quantifier,
+            path,
+            whose,
+            if_any,
+            alias,
+        } => format!(
+            "{} {}{}{} as {alias}",
+            quantifier_text(*quantifier),
+            path_text(path, Side::Left, names, false),
+            whose_text(whose, names),
+            if_any_text(*if_any)
+        ),
+        ForItem::Pick {
+            position,
+            path,
+            whose,
+            sorted_by,
+            alias,
+        } => {
+            let mut placed = path.clone();
+            placed.position = Some(position.clone());
+            let sorted = match sorted_by {
+                Some(sorted) => format!(
+                    " sorted by {}{}",
+                    path_text_with(&sorted.path, Side::Left, sorted_names, false, false),
+                    if sorted.alphabetically {
+                        " alphabetically"
+                    } else {
+                        ""
+                    }
+                ),
+                None => String::new(),
+            };
+            format!(
+                "{}{}{sorted} as {alias}",
+                path_text(&placed, Side::Left, names, false),
+                whose_text(whose, names)
+            )
+        }
+    }
+}
+
+fn alias_of(item: &ForItem) -> &str {
+    match item {
+        ForItem::Walk { alias, .. } | ForItem::Pick { alias, .. } => alias,
+    }
+}
+
+pub fn print_for_item(item: &ForItem, aliases: &[&str]) -> String {
+    for_item_text(item, aliases, aliases)
+}
+
+pub fn print_for(line: &For, aliases: &[&str]) -> String {
+    let all: Vec<&str> = aliases
+        .iter()
+        .copied()
+        .chain(line.items.iter().map(alias_of))
+        .collect();
+    let parts: Vec<String> = line
+        .items
+        .iter()
+        .enumerate()
+        .map(|(n, item)| {
+            let earlier: Vec<&str> = aliases
+                .iter()
+                .copied()
+                .chain(line.items[..n].iter().map(alias_of))
+                .collect();
+            for_item_text(item, &earlier, &all)
+        })
+        .collect();
+    parts.join(", ")
 }

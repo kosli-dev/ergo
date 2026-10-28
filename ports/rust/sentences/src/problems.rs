@@ -1,25 +1,24 @@
 use crate::error::SyntaxError;
-use crate::parse::Parser;
-use crate::print::key_text;
+use crate::parse::{self, Parser};
+use crate::rules;
 use crate::tree::*;
-use crate::words::is_word;
 use std::collections::BTreeSet;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Kind {
+    Check,
+    For,
     From,
     Path,
 }
 
 pub(crate) fn errors(text: &str, kind: Kind) -> Vec<SyntaxError> {
-    let text = match kind {
-        Kind::From => after_every(text),
-        Kind::Path => text,
+    let found = match kind {
+        Kind::From => messages(after_every(text), kind),
+        Kind::For => for_messages(text),
+        Kind::Check | Kind::Path => messages(text, kind),
     };
-    messages(text, kind)
-        .into_iter()
-        .map(SyntaxError::new)
-        .collect()
+    found.into_iter().map(SyntaxError::new).collect()
 }
 
 fn after_every(text: &str) -> &str {
@@ -65,7 +64,7 @@ fn messages(text: &str, kind: Kind) -> Vec<String> {
             c.len() + 1
         )];
     }
-    if whose_inside_whose(&c) {
+    if kind == Kind::From && whose_inside_whose(&c) {
         return vec!["a condition after whose can't have a whose of its own".to_string()];
     }
     vec!["doesn't parse".to_string()]
@@ -275,196 +274,73 @@ fn whose_inside_whose(c: &[char]) -> bool {
 
 fn lenient_problems(text: &str, kind: Kind) -> Vec<String> {
     let parser = Parser::new(text, true);
-    let mut found = Found::default();
-    match kind {
-        Kind::From => {
-            let Some(line) = parser.whole(parser.read_from_core(0, false)) else {
-                return Vec::new();
-            };
-            found.from(&line);
-        }
-        Kind::Path => {
-            let Some(path) = parser.whole(parser.path(0, Side::Left)) else {
-                return Vec::new();
-            };
-            found.path(&path);
-        }
-    }
-    let mut messages = found.messages;
-    if found.whole_it > found.allowed_it {
-        messages.insert(
-            "it can only start an assertion: write it first, like it is not empty".to_string(),
-        );
-    }
-    messages.into_iter().collect()
+    let found = match kind {
+        Kind::From => parser
+            .whole(parser.read_from_core(0, false))
+            .map(|line| rules::from_base(&line)),
+        Kind::Path => parser
+            .whole(parser.path(0, Side::Left))
+            .map(|path| rules::path_base(&path)),
+        Kind::Check => parser.read_check().map(|(check, notes)| {
+            let (texts, hidden) = split_notes(notes);
+            let mut found = rules::check_base(&check, &hidden);
+            found.extend(texts);
+            found
+        }),
+        Kind::For => parser.read_for(usize::MAX).map(|(line, notes)| {
+            let (texts, hidden) = split_notes(notes);
+            let mut found = rules::for_base(&line, &hidden);
+            found.extend(texts);
+            found
+        }),
+    };
+    found.unwrap_or_default().into_iter().collect()
 }
 
-#[derive(Default)]
-struct Found {
-    messages: BTreeSet<String>,
-    whole_it: usize,
-    allowed_it: usize,
+fn split_notes(notes: parse::Notes) -> (Vec<String>, Vec<Condition>) {
+    let mut texts = Vec::new();
+    let mut hidden = Vec::new();
+    for note in notes {
+        match note {
+            parse::Note::Text(text) => texts.push(text.to_string()),
+            parse::Note::Hidden(conditions) => hidden.extend(conditions),
+        }
+    }
+    (texts, hidden)
 }
 
-impl Found {
-    fn path(&mut self, path: &Path) {
-        match &path.start {
-            Start::Field { key, dot: false } if is_word(key) => {
-                self.messages
-                    .insert(format!("{key} is a word of the grammar: write .{key}"));
-            }
-            Start::It => match path.steps.first() {
-                None => self.whole_it += 1,
-                Some(Step::Key(key) | Step::BracketKey(key)) => {
-                    let text = key_text(key);
-                    self.messages.insert(format!(
-                        "it is the whole subject: write {text}, not it.{text}"
-                    ));
-                }
-                Some(_) => {
-                    self.messages
-                        .insert("it is the whole subject: nothing can follow it".to_string());
-                }
-            },
-            _ => {}
-        }
-        for step in &path.steps {
-            if let Step::NamedBy(Reference::Name(name)) | Step::Brackets(Reference::Name(name)) =
-                step
-            {
-                if name == "it" {
-                    self.messages.insert("it can't name a key".to_string());
-                } else if is_word(name) || name == "params" || name == "input" {
-                    self.messages.insert(format!("{name} can't be an alias"));
-                }
-            }
-        }
+fn ends_with_as_name(text: &str) -> bool {
+    let start = text.rfind([' ', ',']).map_or(0, |at| {
+        at + text[at..].chars().next().map_or(1, char::len_utf8)
+    });
+    if start >= text.len() {
+        return false;
     }
+    let prefix = &text[..start];
+    let words = prefix.trim_end_matches(' ');
+    words.len() < prefix.len() && words.ends_with(" as")
+}
 
-    fn allowed(&mut self, path: &Path) {
-        if path.start == Start::It && path.steps.is_empty() {
-            self.allowed_it += 1;
-        }
-        self.path(path);
-    }
+fn starts_with_item_word(text: &str) -> bool {
+    ["every ", "some ", "first ", "last ", "item "]
+        .iter()
+        .any(|word| text.starts_with(word))
+}
 
-    fn derived(&mut self, derived: &Derived, allowed: bool) {
-        if allowed {
-            self.allowed(&derived.path);
-        } else {
-            self.path(&derived.path);
-        }
+fn for_messages(text: &str) -> Vec<String> {
+    let parser = Parser::new(text, true);
+    if let Some((line, _)) = parser.read_for(usize::MAX)
+        && line.items.len() > 2
+    {
+        return vec!["a for line holds two items at most".to_string()];
     }
-
-    fn elapsed(&mut self, elapsed: &Elapsed) {
-        self.path(&elapsed.from);
-        self.path(&elapsed.to);
+    if !starts_with_item_word(text) {
+        return vec![parse::ITEM_START.to_string()];
     }
-
-    fn term(&mut self, term: &Term) {
-        match term {
-            Term::Path(path) => self.path(path),
-            Term::Number(_) => {}
-            Term::Derived(derived) => self.derived(derived, false),
-            Term::Elapsed(elapsed) => self.elapsed(elapsed),
-        }
+    if !ends_with_as_name(text) {
+        return vec![
+            r#"an item ends with "as" and a name, like "every pull_requests as pr""#.to_string(),
+        ];
     }
-
-    fn operand(&mut self, operand: &Operand) {
-        if let Operand::Field(terms) = operand {
-            for term in terms {
-                self.term(term);
-            }
-        }
-    }
-
-    fn list(&mut self, list: &List) {
-        if let List::Path(path) = list {
-            self.path(path);
-        }
-    }
-
-    fn phrase(&mut self, phrase: &Phrase) {
-        match phrase {
-            Phrase::Is { operand, .. }
-            | Phrase::Order { operand, .. }
-            | Phrase::Contains { operand, .. }
-            | Phrase::StartsWith(operand)
-            | Phrase::EndsWith(operand)
-            | Phrase::Alphabetically { operand, .. }
-            | Phrase::Time { operand, .. } => self.operand(operand),
-            Phrase::OneOf { list, .. }
-            | Phrase::ContainsAll(list)
-            | Phrase::ContainsNone(list)
-            | Phrase::Matches { list, .. } => self.list(list),
-            Phrase::Between { .. }
-            | Phrase::Exists { .. }
-            | Phrase::Empty { .. }
-            | Phrase::NonEmptyString
-            | Phrase::Type(_) => {}
-        }
-    }
-
-    fn condition(&mut self, condition: &Condition) {
-        match &condition.left {
-            Left::Path(path) => self.allowed(path),
-            Left::Derived(derived) => {
-                self.derived(derived, true);
-                self.compare_only(&condition.phrase);
-            }
-            Left::Elapsed(elapsed) => {
-                self.elapsed(elapsed);
-                self.compare_only(&condition.phrase);
-            }
-        }
-        self.phrase(&condition.phrase);
-    }
-
-    fn compare_only(&mut self, phrase: &Phrase) {
-        let op = match phrase {
-            Phrase::Is { .. } | Phrase::Order { .. } | Phrase::Between { .. } => return,
-            Phrase::OneOf { not: true, .. } => "is not one of",
-            Phrase::OneOf { not: false, .. } => "is one of",
-            Phrase::NonEmptyString => "is a non-empty string",
-            Phrase::Type(_) => "is a",
-            Phrase::Empty { not: true } => "is not empty",
-            Phrase::Empty { not: false } => "is empty",
-            Phrase::Exists { not: true } => "does not exist",
-            Phrase::Exists { not: false } => "exists",
-            Phrase::ContainsAll(_) => "contains all of",
-            Phrase::ContainsNone(_) => "contains none of",
-            Phrase::Contains { not: true, .. } => "does not contain",
-            Phrase::Contains { not: false, .. } => "contains",
-            Phrase::Matches { not: true, .. } => "does not match",
-            Phrase::Matches { not: false, .. } => "matches",
-            Phrase::StartsWith(_) => "starts with",
-            Phrase::EndsWith(_) => "ends with",
-            Phrase::Alphabetically { after: false, .. } => "is alphabetically before",
-            Phrase::Alphabetically { after: true, .. } => "is alphabetically after",
-            Phrase::Time { time, .. } => match time {
-                TimeOrder::Before => "is before",
-                TimeOrder::After => "is after",
-                TimeOrder::OnOrAfter => "is on or after",
-                TimeOrder::OnOrBefore => "is on or before",
-            },
-        };
-        self.messages
-            .insert(format!("{op} can't follow a count of, a sum of or a plus"));
-    }
-
-    fn from(&mut self, line: &From) {
-        self.path(&line.path);
-        if let Some(each) = &line.named_by_each_of {
-            self.path(each);
-        }
-        for condition in &line.whose {
-            match condition {
-                FromCondition::Condition(condition) => self.condition(condition),
-                FromCondition::Quantified { path, phrase, .. } => {
-                    self.allowed(path);
-                    self.phrase(phrase);
-                }
-            }
-        }
-    }
+    messages(text, Kind::For)
 }

@@ -3,12 +3,19 @@ use crate::words::is_word;
 use std::cell::RefCell;
 use std::collections::HashMap;
 
+mod checks;
+
+pub(crate) use checks::{ITEM_START, Note, Notes};
+
 pub(crate) type Reads<T> = Vec<(T, usize)>;
+pub(crate) type Noted<T> = (T, Notes);
 
 pub(crate) struct Parser {
     c: Vec<char>,
     lenient: bool,
     memo: RefCell<HashMap<usize, Reads<Vec<FromCondition>>>>,
+    condition_memo: RefCell<HashMap<usize, Reads<Vec<Condition>>>>,
+    assertion_memo: RefCell<HashMap<usize, Reads<Noted<Vec<Assertion>>>>>,
 }
 
 fn is_key_start(ch: char) -> bool {
@@ -25,6 +32,8 @@ impl Parser {
             c: text.chars().collect(),
             lenient,
             memo: RefCell::new(HashMap::new()),
+            condition_memo: RefCell::new(HashMap::new()),
+            assertion_memo: RefCell::new(HashMap::new()),
         }
     }
 
