@@ -301,6 +301,8 @@ Some rules can't be said in ABNF, so they're here:
 - A `for` line has two items at most, see [sentence.for.line](#the-for-line).
 - `is`, `equals` and `is equal to` read the same, as do `is one of` and `is in`, and the report picks the spelling, see [sentence.print.canonical](#printing-the-sentence).
 - A run of spaces between two words reads as one, and a list of values can be written with or without a space after each comma. The report prints one space and `, `.
+
+**[sentence.ends]** Whitespace at either end of a sentence, a `for` line or a `from` line is dropped before it's read, so a YAML block like `assert: |`, which ends in a newline, reads as the sentence it holds. Whitespace is every character Unicode gives the `White_Space` property: tab, line feed, vertical tab, form feed, carriage return and space (U+0009 to U+000D and U+0020), next line (U+0085), no-break space (U+00A0), ogham space mark (U+1680), the spaces from en quad to hair space (U+2000 to U+200A), line separator (U+2028), paragraph separator (U+2029), narrow no-break space (U+202F), medium mathematical space (U+205F) and ideographic space (U+3000). A byte order mark (U+FEFF) and a zero-width space (U+200B) aren't whitespace, so a sentence that starts with one doesn't read. Inside a sentence only spaces separate words, so `x\tis 1`, with a tab after `x`, doesn't read either.
 - The bounds of `is between` are in order, a string in `matches` is a valid regular expression, and a `for` alias is given once, or the sentence is written wrong.
 
 A grammar word only needs quoting or a dot when it's the first key, so `a`, `an`, `in`, `on` and `of` cost nothing in ordinary paths.

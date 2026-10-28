@@ -7,6 +7,7 @@ Each version says whether reports changed, so that anyone who only stores report
 ### Changed
 
 - A policy says `ergo_spec: v0.3`, and the report's `ergo` changes from `"ergo": "v0.2"` to `"ergo": "v0.3"`. A policy that says `v0.2` is written wrong, with `unsupported version v0.2, expected v0.3`. The schemas are under `https://ergo.kosli.com/spec/0.3/`.
+- Whitespace of any kind at either end of a sentence, a `for` line or a `from` line is dropped before it's read, not only spaces: every character with Unicode's `White_Space` property, like a tab, a newline or U+3000 ([sentence.ends](syntax.md#the-grammar)). So a YAML block like `assert: |`, which ends in a newline, reads as the sentence it holds. `ergo.rego` already read these lines, so no report changes. A byte order mark or a zero-width space at either end still makes a line not read.
 
 ### Fixed
 

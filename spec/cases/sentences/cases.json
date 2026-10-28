@@ -6863,5 +6863,488 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a tab and a newline at either end of a check",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "plain": "\tx is 1\n",
+            "block": {
+              "description": "X is 1",
+              "assert": "x is 1\n"
+            },
+            "list": {
+              "assert": [
+                "\n\tx is 1",
+                "y exists\t\n"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "are dropped, so a YAML block ending in a newline reads as written, and the report prints the sentence without them",
+        "rules": [
+          "sentence.ends",
+          "sentence.check",
+          "sentence.assert.list"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "x": 1,
+              "y": 2
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "block",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "list",
+            "failed_assertions": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/things/0/y"
+                ],
+                "name": "y",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "plain",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "block": "x is 1",
+            "list": "x is 1 and y exists",
+            "plain": "x is 1"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a tab and a newline at either end of a for line",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "\tevery xs as x\n",
+              "assert": "x.ok is true"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "are dropped, and the for line reads as written",
+        "rules": [
+          "sentence.ends",
+          "sentence.for.line"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "xs": [
+                {
+                  "ok": true
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "ok": true
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "for every xs as x: x.ok is true"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a tab and a newline at either end of a from line",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "\n\tevery things whose y is 1\t\n",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "x is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "are dropped, before a leading every too, and the from line reads as written",
+        "rules": [
+          "sentence.ends",
+          "sentence.subject.from",
+          "sentence.subject.every"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "x": 1,
+              "y": 1
+            },
+            {
+              "id": "t2",
+              "x": 2,
+              "y": 2
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/y"
+                ],
+                "name": "y",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/1/y"
+                ],
+                "name": "y",
+                "value": 2
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t2",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "x is 1"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "other whitespace at either end of a check",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "nel": "\u0085x is 1\u2028",
+            "nbsp": "\u00a0x is 1\u3000",
+            "cr": "\r\u000bx is 1\f\r"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is dropped too: every character with Unicode's White_Space property",
+        "rules": [
+          "sentence.ends"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "x": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "cr",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "nbsp",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "nel",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "cr": "x is 1",
+            "nbsp": "x is 1",
+            "nel": "x is 1"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a byte order mark at the start of a check",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "\ufeffx is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "isn't whitespace, so the check doesn't read",
+        "rules": [
+          "sentence.ends",
+          "sentence.written_wrong.slot"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "x": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "doesn't parse"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "\ufeffx is 1"
+          }
+        }
+      }
+    ]
   }
 ]
