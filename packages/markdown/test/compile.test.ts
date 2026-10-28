@@ -93,10 +93,11 @@ test("a second title is a problem", () => {
   assert.deepEqual(problemsOf("# One\n\n# Two\n"), [{line: 3, message: "a policy has one # title"}]);
 });
 
-test("the paragraph after the title is the description", () => {
-  const {policy, blocks} = compile("# T\n\nFirst\nline.\n\nSecond.\n");
-  assert.equal((policy as any).description, "First line.");
-  assert.deepEqual(blocks.map((b) => b.kind), ["title", "description", "prose"]);
+test("the paragraphs after the title are the description, joined by a blank line", () => {
+  const {policy, blocks} = compile("# T\n\nFirst\nline.\n\nSecond.\n\n> Quote.\n\nAfter.\n");
+  assert.equal((policy as any).description, "First line.\n\nSecond.");
+  assert.deepEqual(blocks.map((b) => b.kind), ["title", "description", "prose", "prose"]);
+  assert.deepEqual(blocks[1], {kind: "description", startLine: 3, endLine: 6});
 });
 
 test("a list straight after the title ends the description window", () => {
@@ -142,9 +143,16 @@ test("a heading below level three is prose and keeps the item open", () => {
   assert.deepEqual(blocks.map((b) => b.kind), ["prose", "subject", "prose", "field"]);
 });
 
-test("a subject name is its heading trimmed with each run of whitespace made one space", () => {
+test("a table ends a description and is prose", () => {
+  const {policy, blocks} = compile("# T\n\nWhy.\n\n| a | b |\n| - | - |\n| 1 | 2 |\n\nAfter.\n");
+  assert.equal((policy as any).description, "Why.");
+  assert.deepEqual(parse("| a |\n| - |\n").children[0]!.type, "table");
+  assert.deepEqual(blocks.map((b) => b.kind), ["title", "description", "prose", "prose"]);
+});
+
+test("a subject name is its heading lowercased, trimmed and with each run of whitespace made one space", () => {
   assert.deepEqual(compile("## Subjects\n\n### My  Batch \n").policy, {
-    subjects: {"My Batch": {}},
+    subjects: {"my batch": {}},
     requirements: {},
   });
 });
@@ -197,9 +205,22 @@ test("an item block ends at the line before the next section heading", () => {
   assert.deepEqual(blocks.find((b) => b.kind === "subject"), {kind: "subject", name: "a", startLine: 3, endLine: 4});
 });
 
-test("the first paragraph of a subject is its description", () => {
-  const {policy} = compile("## Subjects\n\n### a\n\nOne\ntwo.\n\nMore.\n");
-  assert.deepEqual(policy, {subjects: {a: {description: "One two."}}, requirements: {}});
+test("the paragraphs after a subject heading are its description, joined by a blank line", () => {
+  const {policy, blocks} = compile("## Subjects\n\n### a\n\nOne\ntwo.\n\nMore.\n\n- from: `x`\n\nAfter.\n");
+  assert.deepEqual(policy, {subjects: {a: {description: "One two.\n\nMore.", from: "x"}}, requirements: {}});
+  assert.deepEqual(blocks.filter((b) => b.kind === "description"), [{kind: "description", startLine: 5, endLine: 8}]);
+  assert.equal(blocks.at(-1)!.kind, "prose");
+});
+
+test("the paragraphs after a requirement heading are its description, up to Checks:", () => {
+  const {policy} = compile(inRequirement("Why.\n\nHow.\n\nChecks:\n\n- **A**: `x`\n\nAfter."));
+  assert.equal((policy as any).requirements.r.description, "Why.\n\nHow.");
+});
+
+test("subjects whose headings differ only by case clash", () => {
+  assert.deepEqual(problemsOf("## Subjects\n\n### Batch\n\n### batch\n"), [
+    {line: 5, message: "subject batch has the same name as the subject on line 3"},
+  ]);
 });
 
 test("a list ends the description window of an item", () => {
@@ -415,6 +436,21 @@ test("two checks with the same name are a problem on the later one", () => {
 test("a check description is the text before the first code span, with spaces collapsed", () => {
   const {policy} = compile(inChecks("- **A**:   Must be\n  fine **really**.\n  `x`"));
   assert.deepEqual((policy as any).requirements.r.checks.a, {description: "Must be fine really.", assert: "x"});
+});
+
+test("a check's description runs over its paragraphs up to the first code span", () => {
+  const check = (body: string) => (compile(inChecks(body)).policy as any).requirements.r.checks.a;
+  assert.deepEqual(check("- **A**: First\n  line.\n\n  Second.\n\n  `x`\n  `y`"), {description: "First line.\n\nSecond.", assert: ["x", "y"]});
+  assert.deepEqual(check("- **A**:\n\n  Only here.\n\n  `x`"), {description: "Only here.", assert: "x"});
+  assert.deepEqual(check("- **A**: Words.\n\n  More.\n  `x`"), {description: "Words.\n\nMore.", assert: "x"});
+  assert.deepEqual(check("- **A**: Words.\n\n  - **O**: `x`"), {description: "Words.", any_of: {o: "x"}});
+  assert.deepEqual(check("- **A**: `x`\n\n  `y`"), {assert: ["x", "y"]});
+});
+
+test("a check's paragraph with words after its first code span is a problem", () => {
+  assert.deepEqual(problemsOf(inChecks("- **A**: Words `x`\n\n  More words.")), [
+    {line: 9, message: "a check's sentences go in code spans, with nothing else after the first one"},
+  ]);
 });
 
 test("a check with several sentences asserts a list", () => {

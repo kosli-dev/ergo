@@ -19,6 +19,8 @@ export const sampleCases = {
   "no bold label": "check-without-bold-label",
   "paragraph between checks": "check-after-a-paragraph",
   "mistyped fields": "mistyped-fields",
+  "long descriptions": "descriptions-over-paragraphs",
+  "long check description": "check-description-over-paragraphs",
 };
 
 const readJson = (path, fallback) => (existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : fallback);

@@ -31,14 +31,14 @@ const sentencesRead = (block, check) => {
   return null;
 };
 
-const linesOf = (block, height, raw, at) => {
+const linesOf = (block, height, raw, at, more) => {
   const item = (kind, text) => ({ kind, text: String(text) });
   if (block.kind === "front matter") {
     return { head: at.policy?.ergo_spec ? [item("name", "ergo_spec"), item("value", at.policy.ergo_spec)] : [item("source", raw)], below: [] };
   }
   if (block.kind === "title") return { head: [item("name", headingText(at.tree, block.startLine) || raw)], below: [] };
   if (block.kind === "prose") return { head: [item("quiet", raw)], below: [] };
-  if (block.kind === "description") return { head: [item("source", raw)], below: [] };
+  if (block.kind === "description") return { head: [item("source", raw)], below: more.map((line) => item("source", line || "\u00a0")) };
   const head = block.name ? [item("name", block.name)] : [];
   if (block.kind === "field") {
     const value = at.owner?.[fieldKey(block.name ?? "")];
@@ -70,7 +70,7 @@ export const layoutRows = (result, source = "", tree = null) => {
       top: b.startLine,
       height,
       kind: b.kind,
-      ...linesOf(b, height, (lines[b.startLine - 1] ?? "").trim(), at),
+      ...linesOf(b, height, (lines[b.startLine - 1] ?? "").trim(), at, lines.slice(b.startLine, endLine).map((line) => line.trim())),
       problems: result.problems.filter((p) => p.line >= b.startLine && p.line <= endLine).map((p) => p.message),
     };
   });

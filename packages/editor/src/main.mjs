@@ -95,7 +95,7 @@ const viewPolicy = (result) => {
     return;
   }
   const spec = el("div", "spec");
-  if (sheet.description) spec.append(el("p", "empty", sheet.description));
+  if (sheet.description) spec.append(el("p", "empty words", sheet.description));
   if (sheet.subjects.length) {
     const card = el("div", "req");
     const head = el("header");
@@ -103,7 +103,7 @@ const viewPolicy = (result) => {
     card.append(head);
     for (const s of sheet.subjects) {
       card.append(el("div", "grouphead", s.name));
-      if (s.description) card.append(el("div", "subj", s.description));
+      if (s.description) card.append(el("div", "subj words", s.description));
       const line = el("div", "subj");
       const a = el("span");
       a.append(document.createTextNode("from "), el("code", null, s.from));
@@ -118,7 +118,7 @@ const viewPolicy = (result) => {
     const card = el("div", "req");
     const head = el("header");
     head.append(el("span", "id", r.name), el("h3", null, r.name.replace(/_/g, " ")));
-    if (r.description) head.append(el("p", null, r.description));
+    if (r.description) head.append(el("p", "words", r.description));
     const badges = el("div", "badges");
     badges.append(
       el("span", "badge", "subject: " + r.subject),
@@ -131,7 +131,7 @@ const viewPolicy = (result) => {
     for (const c of r.checks) {
       const row = el("div", "chk");
       row.append(el("span", "cname", c.name));
-      if (c.description) row.append(el("div", "desc", c.description));
+      if (c.description) row.append(el("div", "desc words", c.description));
       if (c.for) row.append(el("div", "expr for", c.for));
       sentenceLines(c.sentences, row);
       if (c.options.length) {

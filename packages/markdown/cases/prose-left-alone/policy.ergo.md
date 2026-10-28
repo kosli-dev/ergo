@@ -6,11 +6,11 @@ ergo_spec: v0.2
 
 Every batch that leaves the bakery is safe to eat and baked right.
 
-This paragraph is for people. So is the table below.
-
 | Owner    | Reviewed   |
 | -------- | ---------- |
 | Bakery   | 2026-10-01 |
+
+This paragraph comes after the table, so it's for people, like the table.
 
 ## Subjects
 
@@ -37,9 +37,9 @@ The oven log, exported every evening:
 
 Cakes are safe to eat and baked right.
 
-A second paragraph after the description stays prose.
-
 - subject: `batch`
+
+A paragraph after the fields stays prose.
 
 Checks:
 

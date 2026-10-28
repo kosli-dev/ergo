@@ -1,8 +1,10 @@
 import type {List, ListItem, Nodes, Paragraph, PhrasingContent, Root, RootContent} from "mdast";
 import {fromMarkdown} from "mdast-util-from-markdown";
 import {frontmatterFromMarkdown} from "mdast-util-frontmatter";
+import {gfmTableFromMarkdown} from "mdast-util-gfm-table";
 import {toString} from "mdast-util-to-string";
 import {frontmatter} from "micromark-extension-frontmatter";
+import {gfmTable} from "micromark-extension-gfm-table";
 import {isMap, isScalar, parseDocument} from "yaml";
 
 export type Problem = {line: number; message: string};
@@ -72,8 +74,8 @@ const plain = (nodes: PhrasingContent[]): string =>
 
 export function parse(markdown: string): Root {
   return fromMarkdown(markdown, {
-    extensions: [frontmatter(["yaml"])],
-    mdastExtensions: [frontmatterFromMarkdown(["yaml"])],
+    extensions: [frontmatter(["yaml"]), gfmTable()],
+    mdastExtensions: [frontmatterFromMarkdown(["yaml"]), gfmTableFromMarkdown()],
   });
 }
 
@@ -107,8 +109,11 @@ function looksLikeCheck(li: ListItem): boolean {
   );
 }
 
-function scan(nodes: PhrasingContent[]): {before: PhrasingContent[]; spans: Span[]; stray?: PhrasingContent} {
-  const first = nodes.findIndex((node) => node.type === "inlineCode");
+function scan(
+  nodes: PhrasingContent[],
+  started = false,
+): {before: PhrasingContent[]; spans: Span[]; stray?: PhrasingContent} {
+  const first = started ? 0 : nodes.findIndex((node) => node.type === "inlineCode");
   const before = first < 0 ? nodes : nodes.slice(0, first);
   const spans: Span[] = [];
   let stray: PhrasingContent | undefined;
@@ -151,6 +156,15 @@ export function compile(markdown: string): Compiled {
   let section: "none" | "subjects" | "requirements" | "other" = "none";
   let sectionText = "";
   let item: Item | null = null;
+
+  const describe = (sofar: string | undefined, node: Paragraph): string => {
+    if (sofar === undefined) {
+      block("description", node);
+      return collapse(toString(node));
+    }
+    blocks[blocks.length - 1]!.endLine = endOf(node);
+    return `${sofar}\n\n${collapse(toString(node))}`;
+  };
 
   const claim = (scope: Map<string, number>, kind: string, name: string, line: number): boolean => {
     const earlier = scope.get(name);
@@ -228,13 +242,22 @@ export function compile(markdown: string): Compiled {
     const label = readLabel(li, "a check needs a bold label");
     block("check", li, label?.name);
     if (label === null) return;
-    const {before, spans, stray} = scan(label.rest);
-    if (stray) problem(startOf(stray), CHECK_TAIL);
+    let k = 1;
+    const paragraphs = [label.rest];
+    for (let next = li.children[k]; next?.type === "paragraph"; next = li.children[++k]) paragraphs.push(next.children);
+    const descriptions: string[] = [];
+    const spans: Span[] = [];
+    for (const children of paragraphs) {
+      const found = scan(children, spans.length > 0);
+      if (plain(found.before) !== "") descriptions.push(plain(found.before));
+      if (found.stray) problem(startOf(found.stray), CHECK_TAIL);
+      spans.push(...found.spans);
+    }
     const forSpans = spans.filter((s) => s.value.startsWith("for "));
     const sentences = spans.filter((s) => !s.value.startsWith("for "));
     if (forSpans.length > 1) problem(forSpans[1]!.line, "a check has one for line");
 
-    const nested = li.children.slice(1);
+    const nested = li.children.slice(k);
     const list = nested.find((child): child is List => child.type === "list");
     for (const extra of nested) if (extra !== list) problem(startOf(extra), CHECK_TAIL);
 
@@ -249,7 +272,7 @@ export function compile(markdown: string): Compiled {
     }
 
     if (label.name === "" || !claim(lines, "check", label.name, startOf(li))) return;
-    const text = plain(before);
+    const text = descriptions.join("\n\n");
     checks.set(label.name, {
       ...(text === "" ? {} : {description: text}),
       ...(forSpans.length > 0 ? {for: forSpans[0]!.value.slice(4)} : {}),
@@ -332,7 +355,7 @@ export function compile(markdown: string): Compiled {
           block("prose", node);
         } else {
           const kind = section === "subjects" ? "subject" : "requirement";
-          const name = kind === "subject" ? collapse(text) : labelName(text);
+          const name = kind === "subject" ? collapse(text).toLowerCase() : labelName(text);
           const next = headingLines.find((line) => line > startOf(node));
           block(kind, node, name, next === undefined ? lastLine : next - 1);
           const created: Item = {kind, fields: new Map(), checks: null, checksSeen: false, descriptionOpen: true};
@@ -366,15 +389,11 @@ export function compile(markdown: string): Compiled {
         continue;
       }
       if (item && text !== "Checks:" && item.descriptionOpen) {
-        item.descriptionOpen = false;
-        item.description = collapse(text);
-        block("description", node);
+        item.description = describe(item.description, node);
         continue;
       }
       if (!item && titleOpen) {
-        titleOpen = false;
-        description = collapse(text);
-        block("description", node);
+        description = describe(description, node);
         continue;
       }
       if (item) item.descriptionOpen = false;

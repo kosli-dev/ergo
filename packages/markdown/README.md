@@ -88,7 +88,19 @@ Params aren't part of a policy: they're the third argument of `ergo.report`. A p
 
 ### The title and descriptions
 
-`# Cake batches` is the document's title. It's for people, and the policy doesn't keep it. The first paragraph after it is the policy's `description`. The same goes for each subject and requirement: the first paragraph under its heading is its `description`.
+`# Cake batches` is the document's title. It's for people, and the policy doesn't keep it. The paragraphs after it, up to the first heading, list, table or other block, are the policy's `description`. The same goes for each subject and requirement: the paragraphs under its heading, up to its fields or `Checks:`, are its `description`. The paragraphs are joined with a blank line, so
+
+```markdown
+### Cake batch
+
+Cakes are safe to eat.
+
+A batch that can't show its allergens fails.
+
+- subject: `batch`
+```
+
+gives `description: "Cakes are safe to eat.\n\nA batch that can't show its allergens fails."`. A paragraph after the fields is for people again.
 
 ### Subjects and requirements
 
@@ -106,7 +118,7 @@ Each `###` under `## Subjects` is a subject, and each `###` under `## Requiremen
 
 You don't write names: the tool works them out from the headings and labels.
 
-- A subject's name is its heading as written, spaces included, with each run of spaces made one and none at either end: `### pull request` is `pull request`, and a requirement says ``subject: `pull request` ``.
+- A subject's name is its heading in lowercase, spaces included, with each run of spaces made one and none at either end: `### Pull Request` is `pull request`, and a requirement says ``subject: `pull request` ``. So `### Batch` and `### batch` are the same name.
 - A requirement's name is its heading in lowercase, with every run of other characters than letters and digits turned into one `_`, and none at either end: `### Cake batch` is `cake_batch`, and `### Crème brûlée — the "recipe" check!` is `crème_brûlée_the_recipe_check`.
 - A check's name is worked out the same way from its bold label: `**Nut free**` is `nut_free`, and `**Approved by 2+ people**` is `approved_by_2_people`.
 
@@ -114,7 +126,17 @@ The report uses these names. Two names that come out the same in one place, like
 
 ### Checks
 
-After a paragraph that says `Checks:`, each item of the list is a check: a bold label, a colon, what the check means in words, then its [sentences](../../REFERENCE.md#checks), each in its own code span. The check passes when every sentence passes, like `baked_right` above. The words are the check's `description` and can be left out:
+After a paragraph that says `Checks:`, each item of the list is a check: a bold label, a colon, what the check means in words, then its [sentences](../../REFERENCE.md#checks), each in its own code span. The check passes when every sentence passes, like `baked_right` above. The words are the check's `description` and can be left out. They can also run over more paragraphs in the bullet, before its first code span, and are joined with a blank line the same way:
+
+```markdown
+- **Nut free**: Must not contain nut allergens.
+
+  Nuts are the allergen customers ask about most.
+
+  `allergens does not contain "nuts"`
+```
+
+Without words:
 
 ```markdown
 - **Approved**: `approved_by is a non-empty string`

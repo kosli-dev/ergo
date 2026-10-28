@@ -256,6 +256,12 @@ test("the title's row shows the heading's text without the Markdown marks", () =
   assert.deepEqual(rows[0].head, [{ kind: "name", text: "Component licences" }]);
 });
 
+test("a description's row shows every line of its paragraphs, blank lines included", () => {
+  const rows = layoutRows({ policy: { description: "One two.\n\nThree." }, problems: [], blocks: [block("title", 1, 1), block("description", 3, 6)] }, "# T\n\nOne\ntwo.\n\nThree.\n");
+  assert.deepEqual(rows[1].head, [{ kind: "source", text: "One" }]);
+  assert.deepEqual(rows[1].below, [{ kind: "source", text: "two." }, { kind: "source", text: "\u00a0" }, { kind: "source", text: "Three." }]);
+});
+
 test("the front matter's row shows the spec version the policy reads", () => {
   const rows = layoutRows({ policy: { ergo_spec: "v0.2" }, problems: [], blocks: [block("front matter", 1, 3)] }, "---\nergo_spec: v0.2\n---");
   assert.deepEqual(rows[0].head, [{ kind: "name", text: "ergo_spec" }, { kind: "value", text: "v0.2" }]);
