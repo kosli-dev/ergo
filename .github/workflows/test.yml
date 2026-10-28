@@ -196,13 +196,17 @@ jobs:
         run: cargo install wasm-bindgen-cli --version 0.2.129 --locked
       - name: Install Binaryen
         run: |
-          curl -fsSL https://github.com/WebAssembly/binaryen/releases/download/version_133/binaryen-version_133-x86_64-linux.tar.gz | tar -xz -C "$RUNNER_TEMP"
+          curl -fsSL -o "$RUNNER_TEMP/binaryen.tar.gz" https://github.com/WebAssembly/binaryen/releases/download/version_133/binaryen-version_133-x86_64-linux.tar.gz
+          echo "2dc9c7813f5375db93d96ead4b78222fcc3e2677bbb832297af4797782a37489  $RUNNER_TEMP/binaryen.tar.gz" | sha256sum -c -
+          tar -xz -C "$RUNNER_TEMP" -f "$RUNNER_TEMP/binaryen.tar.gz"
           echo "$RUNNER_TEMP/binaryen-version_133/bin" >> "$GITHUB_PATH"
       - name: Build ergo-wasm, wrap it for a browser and shrink it
         run: |
           cargo build --locked --profile wasm -p ergo-wasm --target wasm32-unknown-unknown
           wasm-bindgen --target web --out-dir wasm/pkg target/wasm32-unknown-unknown/wasm/ergo_wasm.wasm
           wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue wasm/pkg/ergo_wasm_bg.wasm -o wasm/pkg/ergo_wasm_bg.wasm
+      - name: Load ergo-wasm in Node and build a report
+        run: node wasm/check-node.mjs
 
   spec:
     runs-on: ubuntu-latest
