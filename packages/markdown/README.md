@@ -166,7 +166,7 @@ So a sentence that reads a field named `for` puts a dot in front of it: `.for is
 
 ### Options
 
-When a check can pass in more than one way, write a list of options under it in place of its sentences. The check passes when every sentence of one option passes. An option has a bold label, a colon and its sentences, without words of its own:
+When a check can pass in more than one way, write a list of options under it in place of its sentences. The check passes when every sentence of one option passes. An option has a bold label, a colon and its sentences, without words of its own. A check with options can't have a `for` line:
 
 ```markdown
 - **Licence allowed**: The licence is allowed

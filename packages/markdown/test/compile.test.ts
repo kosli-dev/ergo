@@ -558,9 +558,10 @@ test("a for line with no other sentence is a problem", () => {
   ]);
 });
 
-test("a for line may go with a list of options", () => {
-  const {policy} = compile(inChecks("- **A**: `for a as b`\n  - **O**: `x`"));
-  assert.deepEqual((policy as any).requirements.r.checks.a, {for: "a as b", any_of: {o: "x"}});
+test("a for line with a list of options is a problem", () => {
+  assert.deepEqual(problemsOf(inChecks("- **A**: `for a as b`\n  - **O**: `x`")), [
+    {line: 7, message: "a check with options can't have a for line"},
+  ]);
 });
 
 test("a nested list gives any_of with strings and lists", () => {

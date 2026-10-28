@@ -193,6 +193,7 @@ test("render refuses what the Markdown can't hold, naming the path", () => {
     [policyWith({checks: {c: {assert: "a", when: "b"}}}), "requirements.r.checks.c.when", "the Markdown has no place for when"],
     [policyWith({checks: {c: {assert: "a", description: ""}}}), "requirements.r.checks.c.description", "is empty: leave it out instead"],
     [policyWith({checks: {c: {assert: "a", any_of: {o: "b"}}}}), "requirements.r.checks.c", "has both assert and any_of"],
+    [policyWith({checks: {c: {for: "every items as i", any_of: {o: "b"}}}}), "requirements.r.checks.c", "has both for and any_of: a check with options can't have a for line"],
     [policyWith({checks: {c: {any_of: "b"}}}), "requirements.r.checks.c.any_of", "isn't an object"],
     [policyWith({checks: {c: {any_of: {}}}}), "requirements.r.checks.c.any_of", "is empty"],
     [policyWith({checks: {c: {any_of: {O: "b"}}}}), "requirements.r.checks.c.any_of.O", "has upper case"],

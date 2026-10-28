@@ -132,6 +132,7 @@ export function refusals(policy: unknown): PathProblem[] {
       else refuse(at, `the Markdown has no place for ${key}`);
     }
     if ("assert" in body && "any_of" in body) refuse(path, "has both assert and any_of");
+    if ("for" in body && "any_of" in body) refuse(path, "has both for and any_of: a check with options can't have a for line");
     if (!("assert" in body) && !("any_of" in body)) refuse(path, "needs assert or any_of");
   };
 

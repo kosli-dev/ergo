@@ -285,6 +285,7 @@ export function compile(markdown: string): Compiled {
     let options: Map<string, string | string[]> | undefined;
     if (list) {
       if (sentences.length > 0) problem(startOf(list), "a check has sentences or options, not both");
+      if (forSpans.length > 0) problem(forSpans[0]!.line, "a check with options can't have a for line");
       options = readOptions(list);
     } else if (sentences.length === 0 && forSpans.length > 0) {
       problem(forSpans[0]!.line, "a check needs a sentence besides its for line");
