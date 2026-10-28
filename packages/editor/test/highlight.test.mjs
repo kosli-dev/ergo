@@ -91,6 +91,41 @@ test("a field called for inside a sentence is not the for of a for line", () => 
   assert.equal(markdown("# T\n\n## Requirements\n\n### R\n\n- Subject `x`\n\nChecks:\n\n- **C**: c\n  `for.x is 1`\n")[11], "  [marker:`][code:for.x ][word:is][code: ][number:1][marker:`]");
 });
 
+test("the Markdown pane reads the From field of a subject as a sentence, and the other fields as names", () => {
+  const lines = markdown(readSample("getting-started").source);
+  assert.equal(lines[10], '[marker:-] [key:From] [marker:`][code:deployments ][word:whose][code: environment ][word:is][code: ][string:"prod"][marker:`]');
+  assert.equal(lines[11], "[marker:-] [key:Identified by] [marker:`][code:id][marker:`]");
+  assert.equal(lines[19], "[marker:-] [key:Subject] [marker:`][code:deployment][marker:`]");
+});
+
+test("the YAML view reads a subject's from as a sentence, and identified_by, subject and parts as names", () => {
+  const text = "subjects:\n  a:\n    from: $params.list named by every id\n    identified_by: some.id\n    has:\n      every_one: is.in\nrequirements:\n  r:\n    subject: some\n";
+  assert.deepEqual(yaml(text), [
+    "[key:subjects]:",
+    "  [key:a]:",
+    "    [key:from]: [ref:$params.list] [word:named] [word:by] [word:every] id",
+    "    [key:identified_by]: [string:some.id]",
+    "    [key:has]:",
+    "      [key:every_one]: [string:is.in]",
+    "[key:requirements]:",
+    "  [key:r]:",
+    "    [key:subject]: [string:some]",
+    "",
+  ]);
+});
+
+test("the YAML view reads a key with spaces, quoted or not", () => {
+  const text = "requirements:\n  cake batch:\n    checks:\n      \"nut: free\":\n        assert: it is 1\n      'it''s ok':\n        assert: it is 2\n";
+  assert.deepEqual(yaml(text).slice(1, 7), [
+    "  [key:cake batch]:",
+    "    [key:checks]:",
+    '      [key:"nut: free"]:',
+    "        [key:assert]: [word:it] [word:is] [number:1]",
+    "      [key:'it''s ok']:",
+    "        [key:assert]: [word:it] [word:is] [number:2]",
+  ]);
+});
+
 test("a code span outside a check is not read as a sentence", () => {
   const lines = markdown("# T\n\nThe value `is in` stays plain.\n");
   assert.equal(lines[2], "The value [marker:`][code:is in][marker:`] stays plain.");
