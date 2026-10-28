@@ -17,7 +17,7 @@ pub fn print_from_condition(condition: &FromCondition, aliases: &[&str]) -> Stri
     print_from_condition_with(condition, aliases, &[])
 }
 
-fn left_of_whose(path: &Path, aliases: &[&str], parents: &[&str]) -> String {
+fn left_of_whose(path: &Path, aliases: &[&str], parents: &[&str], own: bool) -> String {
     match &path.start {
         Start::Field { key, .. } if parents.contains(&key.as_str()) => {
             let mut dotted = path.clone();
@@ -27,7 +27,7 @@ fn left_of_whose(path: &Path, aliases: &[&str], parents: &[&str]) -> String {
             };
             path_text(&dotted, Side::Left, aliases, false)
         }
-        _ => path_text(path, Side::Left, aliases, true),
+        _ => path_text(path, Side::Left, aliases, own),
     }
 }
 
@@ -39,7 +39,7 @@ pub fn print_from_condition_with(
     match condition {
         FromCondition::Condition(condition) => {
             let left = match &condition.left {
-                Left::Path(path) => left_of_whose(path, aliases, parents),
+                Left::Path(path) => left_of_whose(path, aliases, parents, true),
                 Left::Derived(derived) => derived_text(derived, aliases, true),
                 Left::Elapsed(elapsed) => elapsed_text(elapsed, aliases, true),
             };
@@ -53,7 +53,7 @@ pub fn print_from_condition_with(
         } => format!(
             "{} {}{} {}",
             quantifier_text(*quantifier),
-            left_of_whose(path, aliases, parents),
+            left_of_whose(path, aliases, parents, false),
             if_any_text(*if_any),
             phrase_text(phrase, aliases)
         ),

@@ -445,3 +445,12 @@ fn a_parent_name_on_the_left_of_a_whose_is_the_items_field_and_prints_with_a_dot
         "b.kids whose b.x equals v and some b.ls is empty"
     );
 }
+
+#[test]
+fn a_dot_on_the_path_of_some_in_a_from_line_stays_because_it_reads_the_field_and_not_the_part() {
+    let read = from("ds whose some .cov.x exists");
+    assert_eq!(
+        print_from_with(&read, &["cov"], &[]),
+        "ds whose some .cov.x exists"
+    );
+}
