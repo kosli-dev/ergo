@@ -1,0 +1,1328 @@
+any_of / any_of / passes when every check of one option passes
+any_of / any_of / fails as value when no option passes
+any_of / any_of / fails as absent when a field an option needs is missing
+any_of / any_of with a present check in an option / settles that option as value when the field is missing
+any_of / any_of with a name that starts like another / sorts its options by name, not by the text they print
+any_of / any_of with a ref to a missing param / fails only the option that reads it
+any_of / any_of with a ref to a param of the wrong type / fails the row as unusable even when another option passes
+any_of / a check with several assertions that read the same field / lists the field once, with its location
+compare / compare with eq / passes on 1 and 1.0
+compare / compare with eq / passes on equal objects
+compare / compare with eq / fails as unusable when the types differ
+compare / compare with eq / fails as null when both are null
+compare / compare with eq / fails as absent when one is missing and the other null
+compare / compare with ne / passes on two different strings
+compare / compare with ne / fails as unusable when the types differ, though they aren't equal
+compare / compare with ne / fails as absent when both are missing
+compare / compare with lt / passes on two numbers in order
+compare / compare with lt / fails as value on two numbers out of order
+compare / compare with lt / fails as unusable on two strings, so numbers held as strings aren't ordered as text
+compare / compare with lt / fails as unusable on booleans
+compare / compare with lt / fails as unusable on objects
+compare / compare with lt / fails as absent when one is missing
+compare / compare with gte / passes on 2 and 2.0
+compare / compare against the input / names the path into the input
+compare / a path that starts at the params or the input / gives the params' location after $params:
+compare / a path into params that don't have the key / points at the params when they hold no max_days
+compare / a path that starts at the input / starts at the root of the input, not at the subject
+compare / a path that starts at the input / stops at the object that doesn't have the key
+compare / a key read through a ref step / adds the key the ref read
+compare / a ref step that reads a position the list doesn't have / stops at the list
+compare / a key read from a field of the subject / adds the key the field holds, and shows the field too
+compare_time / compare_time with lt / passes on two times in order
+compare_time / compare_time with lt / compares fractions of a second
+compare_time / compare_time with lt / passes on two numbers in order, decimals included
+compare_time / compare_time with lt / passes on 29 February in a leap year
+compare_time / compare_time with lt / passes on the last year allowed
+compare_time / compare_time with lt / passes on the first year allowed
+compare_time / compare_time with lt / fails as unusable on a number and a string
+compare_time / compare_time with lt / fails as unusable on a lowercase t and z
+compare_time / compare_time with lt / fails as unusable on a date that doesn't exist
+compare_time / compare_time with lt / fails as unusable on 29 February in a century that isn't a leap year
+compare_time / compare_time with lt / fails as unusable on a year before 1678
+compare_time / compare_time with lt / fails as unusable on a year after 2261
+compare_time / compare_time with lt / passes on two dates with no time, in order
+compare_time / compare_time with lt / fails as value on two dates out of order
+compare_time / compare_time with lt / fails as unusable on a date and a time, even at midnight
+compare_time / compare_time with lt / fails as unusable on a date with no time that doesn't exist
+compare_time / compare_time with lt / fails as unusable on a time with no zone
+compare_time / compare_time with lt / fails as unusable on a leap second
+compare_time / compare_time with lt / fails as unusable on hour 24
+compare_time / compare_time with lt / fails as unusable on a space instead of T
+compare_time / compare_time with lt / fails as unusable on an offset with no colon
+compare_time / compare_time with lt / fails as unusable on a dot with no digits after it
+compare_time / compare_time with lt / fails as absent when one is missing
+contains / includes a value / passes when the list contains it
+contains / includes a value / fails as value when it doesn't
+contains / includes a value / fails as value on an empty list
+contains / includes a value / fails as unusable on a string that holds it
+contains / includes a value / fails as unusable on an object that holds it
+contains / includes a value / fails as absent when the field is missing
+contains / includes a value / fails as null when the field is null
+contains / includes a number / passes on 1.0, because numbers compare by value
+contains / includes a number / fails as unusable on a list whose items have more than one type, even when it holds the number
+contains / includes a number / fails as unusable on the string "1"
+contains / includes values / passes when the list contains every one
+contains / includes values / fails as value when one is missing
+contains / excludes a value / passes when the list doesn't contain it
+contains / excludes a value / passes on an empty list
+contains / excludes a value / fails as unusable on a list of another type, which can't hold it
+contains / excludes a value / fails as value when it does
+contains / excludes a value / fails as unusable on a string
+contains / excludes a value / fails as absent when the field is missing, instead of passing
+contains / excludes values / passes when the list contains none of them
+contains / excludes values / fails as value when it contains one
+contains / excludes a value read through a ref / fails as absent when the param is missing, instead of passing
+contains / excludes values read through a ref to an empty list / fails as unusable, because an empty list would pass anything
+contains / excludes values read through a ref that isn't a list / fails as unusable
+contains / excludes values read through a ref that holds values of mixed types / fails as unusable, whatever the list holds
+deep_walks / three lists walked in a one-line every / a subject passes when every unit in every team of every group says ok, and fails as value or absent otherwise
+deep_walks / six walks, two in a from line and four in a check / a repo fails when any cell in its groups, teams and units is not ok, as value or as null
+deep_walks / six walks, two in a from line and four in a count of / count of walks every list on its path, so a repo with 15 cells fails and one with 17 passes
+deep_walks / ten steps after every, the most a path can take / reads as written, ten names being ten steps
+deep_walks / eleven steps after every / is written wrong
+deep_walks / ten steps after count of, starting at a for alias / reads as written, the alias being the first of ten steps
+deep_walks / eleven steps after count of, starting at a for alias / is written wrong, because the alias is a step too
+deep_walks / ten steps after every, one of them a position / reads as written, a position being a step like a name, and checks the first value of the last list
+deep_walks / eleven steps after every, one of them a position / is written wrong, because the position is a step too
+deep_walks / ten steps after every in a from line that starts at $input / reads as written, $input not being a step, and each value the last list holds is a subject
+deep_walks / eleven steps after every in a from line that starts at $input / is written wrong, with the from line's own message
+deep_walks / ten steps after a count of on the right of a phrase / reads as written, and a subject passes when its n is the count
+deep_walks / eleven steps after a count of on the right of a phrase / is written wrong, as it is on the left
+deep_walks / eleven steps after a sum of on the right of a phrase / is written wrong, as it is on the left
+deep_walks / ten steps after every, starting at a part of nine / reads as written, the part's own path being nine steps and z the tenth, so a subject passes when every z is 1
+deep_walks / eleven steps after every, starting at a part of ten / is written wrong, because a walk that starts at a part counts the part's own path, so x.z is eleven steps
+deep_walks / a parent's part of ten names in the whose of a count of, read on the item / reads the item's own field, so the part is not counted and the policy reads at ten names
+derived / count of a list / passes when the list has that many items, and shows the number and the items
+derived / count of a list / fails as value when the count is different
+derived / count of a list / counts an empty list as 0, so it fails as value here
+derived / count of a list / fails as absent when the list is missing, with the count shown as null
+derived / count of a list / fails as null when the list is null
+derived / count of a list / fails as unusable when the list is a string
+derived / count of a list / fails as unusable when the list is an object
+derived / count of an empty list is 0 / passes on an empty list
+derived / count of an empty list is 0 / still fails as absent when the list is missing, not counted as 0
+derived / count of a list with whose / counts only the items that pass, and shows every item
+derived / count of a list with whose / counts 0 when whose leaves every item out
+derived / count of a list with whose / leaves out an item whose field is another value
+derived / count of a list with whose / fails as unusable when an item's field has another type than the value
+derived / count of a list with whose / fails as absent when an item cannot be decided because the field is missing
+derived / count of a list with whose / fails as null when an item cannot be decided because the field is null
+derived / count of a list with whose / fails as absent when the list is missing
+derived / count of a list whose a field exists / leaves out items where the field is missing or null, and does not fail on them
+derived / count of two lists / adds up the commits of every pull request
+derived / count of two lists / an empty inner list adds nothing and does not fail
+derived / count of two lists / counts 0 when every inner list is empty
+derived / count of two lists / counts 0 when the outer list is empty, and the inner list is never walked
+derived / count of two lists / fails as absent when one inner list is missing
+derived / count of two lists / fails as null when one inner list is null
+derived / count of two lists / fails as unusable when one inner list is a string
+derived / count of two lists / fails as absent when the outer list is missing
+derived / sum of a field / adds the field up across the items
+derived / sum of a field / fails as value when the sum is different
+derived / sum of a field / a sum over no items is 0, so it fails as value here
+derived / sum of a field / fails as absent when an item has no such field, with null for it in the list
+derived / sum of a field / fails as null when a value is null
+derived / sum of a field / fails as unusable when a value is text, even a number written as text
+derived / sum of a field / fails as unusable when a value is a boolean
+derived / sum of a field / fails as absent when the list is missing
+derived / sum of a field / fails as null when the list is null
+derived / sum of a field / fails as unusable when the list is not a list
+derived / sum of a field / the worst cause wins when several values fail: unusable before absent before null
+derived / sum over no items is 0 / passes on an empty list
+derived / sum over no items is 0 / passes on items that add up to 0
+derived / sum of decimals / adds 0.1 and 0.2 up to 0.3
+derived / sum of a field with whose / adds only the items that pass
+derived / sum of a field with whose / does not read the field of an item that whose leaves out
+derived / sum of a field with whose / fails as absent when an item cannot be decided because kind is missing
+derived / sum of a field with whose / fails as absent when a kept item has no such field
+derived / sum of a field with whose / fails as value when whose leaves nothing and the sum 0 is not 10
+derived / sum with whose over no items is 0 / passes when whose leaves nothing in
+derived / sum within a distance / passes when the sum is within the distance
+derived / sum within a distance / fails as value when the sum is further away
+derived / sum within a distance / fails as value when the sum is further away, with whole numbers
+derived / sum within a distance / passes when the sum is exactly that far away
+derived / sum within a distance / fails as unusable when a value is text
+derived / sum within a distance of a field / passes when the sum is close enough to the field
+derived / sum within a distance of a field / fails as value when it is not
+derived / sum within a distance of a field / fails as absent when the field is missing
+derived / sum within a distance of a field / the worse cause wins when both sides fail: absent before null
+derived / a path plus a number on the left / adds a path and a number
+derived / a path plus a number on the left / fails as value when the sum is different
+derived / a path plus a number on the left / fails as unusable when the path holds text
+derived / a path plus a number on the left / fails as absent when the path is missing
+derived / a path plus a number on the left / fails as null when the path is null
+derived / a number plus a path on the left / adds a number and a path
+derived / two paths on the left / adds two fields
+derived / two paths on the left / fails as unusable before absent before null when several operands fail
+derived / two paths on the left / fails as absent before null
+derived / decimals added from paths / adds 0.1 and 0.2 up to 0.3
+derived / a path plus a count on the left / adds a path and a count
+derived / a path plus a count on the left / fails as absent when the list is missing
+derived / a path plus a count on the left / fails as unusable when the path is text and the list is null
+derived / a count plus a path on the left / adds a count and a path
+derived / a count plus a number on the left / adds a count and a number
+derived / a path plus a sum on the left / adds a path and a sum, as decimals
+derived / a number plus a count with whose / adds to a count that has whose when the count is last
+derived / a path on the left and a path plus a number on the right / compares a field with a sum on the right
+derived / a path on the left and a path plus a number on the right / fails as value when they differ
+derived / a path on the left and a path plus a number on the right / fails as absent when an operand on the right is missing
+derived / a path and a count plus a path on the right / compares a field with a count plus a path
+derived / a path on the left and a path plus a count on the right / compares a field with a path plus a count
+derived / a count on the left and a count plus a number on the right / compares a count with a count plus a number
+derived / a count on the left and a field on the right / compares a count with a field
+derived / a count on the left and a field on the right / fails as absent when the field is missing
+derived / a count on the left and a field on the right / fails as the worse cause when both sides fail
+derived / a count does not equal a field / passes when the numbers differ
+derived / a count does not equal a field / fails as unusable when the field is text, even with does not equal
+derived / count of findings is not 2 / fails as value with 2 findings
+derived / count of findings is not 2 / passes with 3 findings
+derived / count of findings is at least 2 / fails as value with 1 findings
+derived / count of findings is at least 2 / passes with 2 findings
+derived / count of findings is at most 2 / passes with 2 findings
+derived / count of findings is at most 2 / fails as value with 3 findings
+derived / count of findings is more than 2 / fails as value with 2 findings
+derived / count of findings is more than 2 / passes with 3 findings
+derived / count of findings is less than 2 / passes with 1 findings
+derived / count of findings is less than 2 / fails as value with 2 findings
+derived / a sum is at least a number / passes when the sum is that number
+derived / a sum is at least a number / fails as value when it is lower
+derived / a sum is at least a number / fails as unusable when a value is text
+derived / a count in the whose of an every / checks the items whose count passes, and leaves the others out
+derived / a count in the whose of an every / fails as value when a kept item fails
+derived / a count in the whose of an every / fails as value when whose leaves no item
+derived / a count in the whose of an every / an item whose count is 0 because its list is empty is left out
+derived / a count in the whose of an every / fails as absent when an item's list is missing, so the item cannot be decided
+derived / a count in the whose of an every / fails as null when an item's list is null
+derived / a count in the whose of an every / fails as unusable when an item's list is text
+derived / a count under a for line reading the line's name / passes when every pull request has enough reviews
+derived / a count under a for line reading the line's name / fails as value when one pull request has too few, and lists it with the sentence that failed
+derived / a count under a for line reading the line's name / counts an empty list as 0, which fails the pull request as value
+derived / a count under a for line reading the line's name / fails as absent when a pull request has no reviews field
+derived / a count under a for line reading the line's name / fails as null when the reviews are null
+derived / a count under a for line reading the line's name / fails as unusable when the reviews are not a list
+derived / count of a params list / counts the items of a params list
+derived / count of a params list with too few items / fails as value
+derived / count of an empty params list / counts 0 and fails as value
+derived / count of a params list that is missing / fails as absent
+derived / count of a params list that is null / fails as null
+derived / count of a params value that is not a list / fails as unusable
+derived / sum of a params list / adds a field of a params list up as decimals
+derived / a count of a list in the subject against a params number / compares a count with a params field
+derived / a count with is empty / fails $well_formed, which says why, and the requirement gets no other row
+derived / a count with is between / passes between the bounds
+derived / a count with is between / passes at the lower bound
+derived / a count with is between / passes at the upper bound
+derived / a count with is between / fails as value above the upper bound
+derived / a count with is between / fails as value on an empty list, which counts 0
+derived / a count with is between / fails as absent when the list is missing
+derived / a count with is between / fails as null when the list is null
+derived / a count with is between / fails as unusable when the list is a string
+derived / a sum with is between / passes between the bounds
+derived / a sum with is between / passes at the upper bound
+derived / a sum with is between / fails as value below the lower bound
+derived / a sum with is between / fails as unusable when a value is text
+derived / a plus with is between / passes between the bounds
+derived / a plus with is between / fails as value above the upper bound
+derived / a plus with is between / fails as absent when the path is missing
+derived / a sum with is empty / fails $well_formed, which says why, and the requirement gets no other row
+derived / a count with whose on the right / fails $well_formed, which says why, and the requirement gets no other row
+derived / count of on subjects and items that aren't objects / a subject that isn't an object fails as not_an_object
+derived / count of on subjects and items that aren't objects / an item that isn't an object fails as not_an_object, and a null value counts
+derived / a count whose whose reads a param that's missing / fails as absent and shows null for the count
+derived / a count of zero whose whose reads a param that's missing / fails as absent even with no items, where a count of zero would pass
+derived / seconds elapsed between two times / passes when the times are exactly that many seconds apart
+derived / seconds elapsed between two times / fails as value when they are further apart
+derived / minutes elapsed between two times / passes when the times are exactly that many minutes apart
+derived / minutes elapsed between two times / fails as value when they are further apart
+derived / hours elapsed between two times / passes when the times are exactly that many hours apart
+derived / hours elapsed between two times / fails as value when they are further apart
+derived / days elapsed between two times / passes when the times are exactly that many days apart
+derived / days elapsed between two times / fails as value when they are further apart
+derived / weeks elapsed between two times / passes when the times are exactly that many weeks apart
+derived / weeks elapsed between two times / fails as value when they are further apart
+derived / days elapsed against a limit by severity / passes when fewer days than the limit for its severity have passed
+derived / days elapsed against a limit by severity / fails as value when as many days as the limit have passed
+derived / days elapsed against a limit by severity / fails as absent when the limit has no entry for its severity
+derived / days elapsed between two numbers / reads two numbers as seconds and does not round
+derived / days elapsed between two numbers / fails as value when the seconds are fewer
+derived / days elapsed between equal times / gives 0 for the same instant written two ways
+derived / days elapsed between equal times / gives 0 for two equal numbers
+derived / days elapsed with the end before the start / fails as value for two times, and shows no number
+derived / days elapsed with the end before the start / fails as value for two numbers
+derived / days elapsed that cannot be read / fails as absent when the start is missing
+derived / days elapsed that cannot be read / fails as absent when the end is missing
+derived / days elapsed that cannot be read / fails as null when the start is null
+derived / days elapsed that cannot be read / fails as null when the end is null
+derived / days elapsed that cannot be read / fails as absent when one side is missing and the other null
+derived / days elapsed that cannot be read / fails as unusable when a side is true
+derived / days elapsed that cannot be read / fails as unusable when a side is a list
+derived / days elapsed that cannot be read / fails as unusable when a side is an object
+derived / days elapsed that cannot be read / fails as unusable when a side is text that is not a time
+derived / days elapsed that cannot be read / fails as unusable when a time has a lowercase t
+derived / days elapsed that cannot be read / fails as unusable when a time has a lowercase z
+derived / days elapsed that cannot be read / fails as unusable when the date does not exist
+derived / days elapsed that cannot be read / fails as unusable when the year is before 1678
+derived / days elapsed that cannot be read / fails as unusable when the year is after 2261
+derived / days elapsed that cannot be read / fails as unusable when one side is a time and the other a number
+derived / days elapsed that cannot be read / fails as unusable when one side is a number and the other a time
+derived / days elapsed under a for line reading the line's name / passes when every pull request was closed within 2 days
+derived / days elapsed under a for line reading the line's name / fails as value when one pull request took longer, and lists it
+derived / days elapsed under a for line reading the line's name / fails as absent when a pull request has no closing time
+derived / days elapsed in a list of assertions / passes when every line passes
+derived / a field called days / is written wrong, because days is a word of the grammar
+derived / a field called days with a dot / reads the field
+derived / a field called to / reads both fields, because to and days are words of the grammar and need a dot
+derived / days elapsed added to another term / adds a number to the elapsed days
+derived / days elapsed added to another term / fails as value when the sum is different
+derived / days elapsed added to another term / fails as value when the end is before the start, and shows no number
+derived / days elapsed added to another term / fails as absent when the end is missing
+derived / days elapsed added to another term, first / adds the elapsed days to a number
+derived / days elapsed added to another term, first / fails as absent when the start is missing
+derived / days elapsed on the right side of a phrase / compares a field with the elapsed days
+derived / days elapsed on the right side of a phrase / fails as value when they differ
+derived / days elapsed on the right side of a phrase / fails as absent when the end is missing
+derived / days elapsed in a plus on the right side / compares a field with a number plus the elapsed days
+derived / days elapsed in a plus on the right side / fails as value when the field is not more
+derived / days elapsed in the whose of an every / checks the items whose elapsed days pass, and leaves the others out
+derived / days elapsed in the whose of an every / leaves out an item whose end is before its start
+derived / days elapsed in the whose of an every / fails as value when a kept item fails
+derived / days elapsed in the whose of an every / fails as value when whose leaves no item
+derived / days elapsed in the whose of a count / counts the items whose elapsed days pass, and shows every item
+derived / days elapsed in the whose of a count / fails as value when fewer items pass
+derived / days elapsed in the whose of a count / leaves out an item whose end is before its start
+derived / days elapsed in the whose of a count / fails as absent when an item cannot be decided because its end is missing
+derived / a count in the whose of a count / counts the items whose own count passes, and shows every item
+derived / a count in the whose of a count / fails as absent when an item's list is missing, so the item cannot be decided
+derived / a count in the whose of a sum / adds only the items whose own count passes
+derived / days elapsed with is between / passes at the lower bound
+derived / days elapsed with is between / passes at the upper bound
+derived / days elapsed with is between / fails as value above the upper bound
+derived / days elapsed with is between / fails as value when the end is before the start, and shows no number
+derived / days elapsed with is between / fails as absent when the end is missing
+derived / days elapsed with a phrase that takes no number / fails $well_formed, which says why, and the requirement gets no other row
+derived / days elapsed with a unit that has no fixed length / fails $well_formed, which says why, and the requirement gets no other row
+derived / days elapsed between two dates / counts whole days between two dates
+derived / days elapsed between two dates / counts 29 February in a leap year
+derived / days elapsed between two dates / fails as unusable on a date and a time, even at midnight
+derived / count of a list / gives the count the locations of the items it counted
+derived / count of a list / gives a count of no items no locations
+derived / count of a list with whose / gives the count the locations of every item read, kept or not
+derived / count of lists inside lists / gives the count one location per item of every inner list
+derived / sum of a field / gives the sum the locations of the values it added
+derived / a path plus a count / gives the plus the locations of the entries after it, once each, in their order
+derived / a path plus a sum / gives the plus the location of the path and then of every value summed
+derived / days elapsed between two numbers / gives the elapsed time the locations of both ends
+derived / days elapsed between two numbers / points at the subject for an end that isn't there
+derived / a plus that reads the same list twice / shows the number and the list once each
+derived / a count compared with a count of the same list / shows the list once, after the left side's number, and the right side's number
+equals / equals a string / passes on the same string
+equals / equals a string / fails as value on another string
+equals / equals a string / fails as absent when the field is missing
+equals / equals a string / fails as null when the field is null
+equals / equals a number / passes on 1.0, because numbers compare by value
+equals / equals a number / fails as unusable on the string "1", because the type must match
+equals / equals a number written with an exponent / shows the number in plain decimal
+equals / equals null / passes on a field that is there and null
+equals / equals null / fails as absent on a missing field
+equals / a position in a list / points at the item it read
+equals / a position in a list / points at the list when it's too short
+equals / a position in a list / points at the object holding a key that looks like the position, not at the value under it
+equals / keys that need escaping / writes a slash as ~1 and a tilde as ~0
+for / every over one list on a for line / passes when every item passes, and failed_items is empty
+for / every over one list on a for line / fails as value when an item fails, and lists the item with the sentence that failed
+for / every over one list on a for line / lists every item that fails, in list order
+for / every over one list on a for line / an item whose field is missing fails as absent
+for / every over one list on a for line / fails as value on an empty list, and lists the list
+for / every over one list on a for line / fails as absent when the list is missing
+for / every over one list on a for line / fails as null when the list is null
+for / every over one list on a for line / fails as unusable when the list is not a list
+for / every with if any on a for line / passes over an empty list
+for / every with if any on a for line / still fails as absent when the list is missing
+for / every with if any on a for line / still fails as null when the list is null
+for / every with if any on a for line / still fails as unusable when the list is not a list
+for / every with if any on a for line / still fails an item that fails
+for / some over one list on a for line / passes when one item passes, and failed_items is empty
+for / some over one list on a for line / fails as value when no item passes, and lists every item
+for / some over one list on a for line / fails as value on an empty list, because some needs an item
+for / some over one list on a for line / fails as absent when the list is missing
+for / some over one list on a for line / fails with the first cause among the items, absent before value
+for / some over one list on a for line / passes when an item passes even though another is missing its field
+for / whose on a for item / an item that whose leaves out is not checked, and is not listed
+for / whose on a for item / an item that whose keeps and that fails is listed with its position in the whole list
+for / whose on a for item / when whose leaves no item in, every and some fail as value and if any passes
+for / whose on a for item / an item whose kind is missing is undecided: every fails as absent, listing it, with no sentence checked
+for / whose on a for item / under some, an undecided item and a failed item give the first cause, absent
+for / whose on a for item / an item whose kind is null is undecided, and fails as null
+for / whose on a for item / an item whose kind has the wrong type is undecided, but a string that differs is just left out
+for / a name that hides a field of the subject / reads the item's field, not the subject's field of the same name
+for / a name that hides a field of the subject / a subject whose field has that name is not read when the item lacks the field
+for / a bare key in assert is a field of the subject / reads owner on the subject and shows it in inputs, sorted with the list
+for / a bare key in assert is a field of the subject / fails when an item has the owner as author
+for / a bare key in assert is a field of the subject / fails as absent when the subject has no owner
+for / a bare key in an item's whose is a field of the item / reads role on the approval and started_at on the subject, even when the subject has a role
+for / a bare key in an item's whose is a field of the item / fails when the qa approval came after started_at, and the dev one is not looked at
+for / two items, the second walking a list inside the first / passes when every pull request has an approver who isn't its author
+for / two items, the second walking a list inside the first / fails a pull request whose only approver is its author, and lists that pull request
+for / two items, the second walking a list inside the first / an approver whose leaves out doesn't count, so the pull request fails as value and is listed with no sentence
+for / two items, the second walking a list inside the first / a pull request with no approvers list fails as absent, listed with no sentence
+for / two items, the second walking a list inside the first / a pull request with an empty approvers list fails as value
+for / two items, the second walking a list inside the first / an approver whose username is missing fails that approver as absent
+for / two items, the second walking a list inside the first / an approver whose state is missing is undecided: the pull request fails as absent with no sentence checked
+for / two items, the second walking a list inside the first / fails as value when the pull requests list is empty
+for / an outer some and an inner every / passes when one pull request has all its commits signed, an empty list counting with if any
+for / an outer some and an inner every / fails when none does, and lists each pull request with the sentence that failed
+for / two items over sibling lists, with two assertions / passes when one approver isn't the author and approved after every commit
+for / two items over sibling lists, with two assertions / fails when each approver breaks one sentence, and says which, in the order written
+for / two items over sibling lists, with two assertions / an approver who breaks both sentences lists both, in the order written
+for / two items over sibling lists, with two assertions / fails as value when no approver is left, and the commits are not read as a failure
+for / two items over sibling lists, with two assertions / an approval before a commit's timestamp that is not a timestamp fails as unusable
+for / two items over sibling lists, with two assertions / with every commits and no commits the check fails as value and lists the commits list once, and with if any it passes
+for / two items over sibling lists, with two assertions / a missing commits list fails the check as absent and lists the list once, not under each approver
+for / a whose value that is a comma list, before a second item / reads the comma list as values of the whose and the next item as the second item
+for / a whose value that is a comma list, before a second item / fails when the only approval with a listed role came before the commit
+for / a whose that reads a $params list / keeps the items whose kind is listed in the params, and passes
+for / a whose that reads a $params list / fails an item the params list keeps
+for / a whose that reads a $params list that isn't a list / fails as unusable, whatever the items hold, with no failed items
+for / an assertion that reads a $params list / fails an item whose field isn't in the list
+for / a path that is named by a param / fails as absent when the param is missing, and the path's input holds []
+for / a second item whose path is named by a param / fails the first list's item with the ref's cause
+for / a for line on a subject that isn't an object / fails as not_an_object when the first path starts at the subject
+for / a for line with three items / fails $well_formed, which lists the problem, and the requirement gets no other row
+for / a for line that gives a name twice / fails $well_formed, which lists the problem, and the requirement gets no other row
+for / a for line that names an item params / fails $well_formed, which lists the problem, and the requirement gets no other row
+for / a for line that names an item with a word of the grammar / fails $well_formed, which lists the problem, and the requirement gets no other row
+for / a for line that names an item input / fails $well_formed, which lists the problem, and the requirement gets no other row
+for / a name whose path goes on past its list / passes when every title is there and passes
+for / a name whose path goes on past its list / a missing title fails its pull request as absent, without checking the sentence
+for / a name whose path goes on past its list / a title under a value that isn't an object fails as unusable
+for / a second item that reads into a first item that isn't an object / a pull request that is a number or null fails as not_an_object
+for / named by a name from the for line / reads the key each item names: a key that's there and passes, one that fails, one that's missing, and an item that isn't a string
+for / the latest commit picked on a for line / picks the item with the largest timestamp, wherever it is in the list
+for / the latest commit picked on a for line / fails as value when the approver wrote the latest commit, and names it by its place in the list
+for / the latest commit picked on a for line / fails as ambiguous when another item ties with the one picked, and names every tied item
+for / the latest commit picked on a for line / a tie away from the picked item doesn't matter
+for / the latest commit picked on a for line / fails as absent when an item has no timestamp, without picking
+for / the latest commit picked on a for line / fails as unusable when a timestamp is neither a number nor a time
+for / the latest commit picked on a for line / sorts times by the moment they name, not as text
+for / the latest commit picked on a for line / fails as absent on an empty list, since there's nothing to pick
+for / the second latest approval, filtered before it is sorted / drops the items the whose leaves out before sorting
+for / the second latest approval, filtered before it is sorted / fails with the cause of an item the whose can't decide
+for / the second latest approval, filtered before it is sorted / fails as absent when fewer items are left than the position
+for / the last tag as written / without sorted by, picks by the order of the list
+for / sorted by after every / is written wrong, since every reads all the items
+for / the first owner alphabetically / sorts uppercase before lowercase, so Zoe comes before adam
+for / the first owner alphabetically / fails as unusable without picking when a name isn't a string
+for / the first owner alphabetically / fails as ambiguous when two owners share the first name
+for / the second last owner alphabetically / counts from the end of the order
+for / the latest audit by date / sorts dates by day
+for / the latest audit by date / fails the dates as unusable when they're mixed with times
+for / the latest audit by date / fails as unusable on a date that doesn't exist
+for / a list beside the first that fails before any sentence, with a whose that doesn't read the first item / a commit the whose can't decide is listed once, not under each approver
+for / a list beside the first that fails before any sentence, with a whose that reads the first item / a commit the whose can't decide is listed under each approver, since the answer depends on the approver
+for / a list beside the first with a broken list inside it / the broken list is listed once, and an approver that also failed a sentence keeps its own cause
+for / a sentence that fails for second-list items with different causes / each commit has its own cause, and the sentence has the first of them in the order of causes
+for / a for line on a child subject whose assertion reads the parent / shows the parent's field in its inputs
+for / a walk that starts at a for alias holding null / fails as null, as a walk from a field holding null does
+for / two items over lists of different lengths / has one location per item in each list, the second list across the items of the first
+for / a for alias read by a key / names the alias in a failed sentence's inputs as the sentence writes it, with named by after it
+for / a position at the start of a path that starts at a for alias holding a list / reads the alias as a list, as the same position does on a field: the first batch passes and the empty one fails as absent
+for / a picked item / has the location of the item it picked, not of the list
+for / a second item that fails for an item of the first / has a location for the failed item and for each of its nested failed_items
+for / a list that can't be read / has a location for the failed item where its read stopped
+for / a for line whose second item is read from the first / points a failed item at the value it read, and the alias m at the meta it stands for
+for / a for line whose second item is read from the first / stops a nested failed item at the meta that has no commits
+for / a failed sentence on a for line lists the values it compared / a comparison that fails across two items lists both values for each pair
+for / a failed sentence on a for line lists the values it compared / a sentence that reads only the first item lists its values on the sentence itself
+for / a failed sentence on a for line lists the values it compared / a sentence that reads the subject lists the subject's field beside the item's
+for / a failed sentence on a for line lists the values it compared / a read that stops early lists where it stopped
+for / a failed sentence that counts through an alias lists the count and what it counted / the number comes first, then the list that was counted
+for / a failed sentence on a picked item lists the values it compared / the picked item is read where it is in the input
+for / the failed items of a list beside the first keep the values only on the sentences / a list that can't be walked is listed once with no sentences, and the item that failed a sentence has its values
+for / a for line that reads its alias as a list / names the alias as the sentence writes it, with no $ in front
+for / a for line that reads a position of a field of its alias / names the position with the alias as the sentence writes it
+for / a for line whose sentence reads the same value twice / lists the value once in the inputs of each failed sentence
+for / a for line with two items whose sentence reads the first alias twice / lists each value once in the inputs of each item
+for / a for line on a child subject whose sentence reads the parent and its own field of the same name / orders the entries of the same name by where they were read, as a row does
+for / a for line whose assert joins sentences with and / gives each sentence its own failure and inputs, as a list under assert does
+for / a for line whose assert holds an or / is written wrong, because a sentence has no or
+for / a for line next to an any_of / is written wrong, because an any_of takes no for
+for / a second item that starts at a parent and is named by the first / is listed under the parent's whole name
+for / a second item that starts at $input or $params / keeps the dollar in the name of its list and of its failed items
+for / a second item that starts at a parent's part, read with a whose / names the second list's items it could not decide with the part's alias, like its input
+for / a second item that starts at a parent's part, read with a whose and a sentence that fails on its items / names the items a failed sentence lists with the part's alias, like its input
+in / in a list / passes when the field is one of the values
+in / in a list / fails as value when it is none of them
+in / in a list / fails as unusable when the field has another type than the values
+in / in a list of numbers / passes on 1.0, because numbers compare by value
+in / in a list of numbers / fails as unusable on the string "1"
+in / in a list holding null / fails as absent on a missing field
+in / in a list holding null / fails as null on a null field
+in / in a list holding null / passes on a field that is one of the other values, since null doesn't count as a type
+in / in values read through a ref / passes when the field is in the list
+in / in values read through a ref that isn't a list / fails as unusable
+in / in values read through a ref that holds values of mixed types / fails as unusable, even when the field is one of them or missing
+in / is not one of a list / passes on a string that is none of them, fails as value on one of them, and fails as unusable on another type
+in / in values read through a ref that holds an object like a ref / compares the object as it is
+in / a list read through a ref / gives the ref's location in $refs, and in the violation's inputs
+it / a list of strings read as subjects, checked against the params / each string is a subject, and it is the string itself
+it / it is checked like a field that holds the same value / a string passes, null fails as null and a number as value
+it / it is a non-empty string / an empty string and null fail
+it / it exists / null fails as value, as a field holding null does
+it / it is not empty / a string and a non-empty list pass, an empty string, an empty list and null fail
+it / it compared with a number / a string is unusable and null fails as null
+it / it matched against a pattern / a number is unusable
+it / it is an object / it works for an object subject, and a string, a number, a list and null fail
+it / it is a list / a subject that is a list passes
+it / every and some on a subject that is a list / each item of the list is read, and the rows name it with [] and its items by position
+it / count of and sum of on a subject that is a list / the list is counted and summed
+it / a field called it / is written with a dot and reads the field, and the row names it .it
+it / a field called it and the subject itself in one check / the dot picks the field and the bare word picks the subject
+it / a field called it, written in quotes / is read as the field and printed with a dot
+it / a bare it where a field called it used to be read / reads the subject, not its field it
+it / it in a check with and / each assertion reads the subject, and failed_assertions name them with it
+it / it in the options of an any_of / an option passes when its sentences pass
+it / it after a for line / is still the subject, and the alias is the item
+it / it in the whose of a from line / each item is read as the subject, and the $applies row names it it
+it / count of it in the whose of a from line / each list is counted
+it / two equal strings read as subjects / fail $unique_ids, and each is still checked
+it / it followed by a field / fails $well_formed, which says why, and the requirement gets no other row
+it / it followed by a quoted field / fails $well_formed, which says why, and the requirement gets no other row
+it / it followed by a position in brackets / fails $well_formed, which says why, and the requirement gets no other row
+it / it followed by named by / fails $well_formed, which says why, and the requirement gets no other row
+it / a position of it written in words / reads one item of a subject that is a list, as it reads one of a field's list, and names it item 1 of it
+it / item 2 of it / reads the second item
+it / every on a position of it / names the item and the list it came from
+it / a position of it on the right side / fails $well_formed, which says why, and the requirement gets no other row
+it / a position of it followed by a field / fails $well_formed, which says why, and the requirement gets no other row
+it / it in brackets followed by a field / fails $well_formed, which says why, and the requirement gets no other row
+it / it on the right side of a phrase / fails $well_formed, which says why, and the requirement gets no other row
+it / it as the value of is / fails $well_formed, which says why, and the requirement gets no other row
+it / it as the list of is one of / fails $well_formed, which says why, and the requirement gets no other row
+it / it as a term of plus / fails $well_formed, which says why, and the requirement gets no other row
+it / it as the second assertion's value / fails $well_formed, which says why, and the requirement gets no other row
+it / it in the whose of a check / fails $well_formed, which says why, and the requirement gets no other row
+it / it on the right side of a whose in a check / fails $well_formed, which says why, and the requirement gets no other row
+it / it in the whose of a count / fails $well_formed, which says why, and the requirement gets no other row
+it / it as the path of a for item / fails $well_formed, which says why, and the requirement gets no other row
+it / it in the whose of a for item / fails $well_formed, which says why, and the requirement gets no other row
+it / it as the sorted by of a for item / fails $well_formed, which says why, and the requirement gets no other row
+it / it as the path of a from line / fails $well_formed, which says why, and the requirement gets no other row
+it / it on the right side of a whose in a from line / fails $well_formed, which says why, and the requirement gets no other row
+it / it as the key of a named by / fails $well_formed, which says why, and the requirement gets no other row
+it / it as a for alias / fails $well_formed, which says why, and the requirement gets no other row
+it / it as the path of a part / fails $well_formed, which says why, and the requirement gets no other row
+it / a subject called it / fails $well_formed, which says why, and the requirement gets no other row
+it / a subject called it that another requirement doesn't use / a requirement that doesn't use the subject called it is read as usual
+it / subjects called It, items and it x / a requirement that doesn't use the subject called it is read as usual
+it / some it in a from line's whose / keeps the tag lists that have latest, and fails the requirement for a value that isn't a list
+it / a check that reads it, on a plain value, a list and a from line that keeps lists / has the location of the subject itself for it, one for each item for every it and count of it, and where each failed item was read
+missing / missing on a field of the subject / passes when the field is missing
+missing / missing on a field of the subject / passes when the field is null
+missing / missing on a field of the subject / fails as value on false, because the field is there
+missing / missing on a field of the subject / fails as value on an empty string
+missing / missing on a field of the subject / fails as not_an_object when the subject isn't an object
+missing / missing on a nested field / passes when the parent is missing
+missing / missing on a nested field / fails as unusable when the parent can't hold the field
+missing / missing on a param the params don't have / passes
+missing / missing with a ref step that reads a number too big to be a list position / fails as unusable, because the item it looks for is unknown, not missing
+missing / missing as a filter / rules out a subject whose field is there
+missing / missing as a filter / keeps a subject whose field is missing
+non_empty_string / non_empty_string / passes on a string
+non_empty_string / non_empty_string / passes on a string of spaces
+non_empty_string / non_empty_string / fails as value on an empty string
+non_empty_string / non_empty_string / fails as value on a number, because checking the type is its job
+non_empty_string / non_empty_string / fails as absent when the field is missing
+non_empty_string / non_empty_string / fails as null when the field is null
+parts / a subject with two parts, one written as a line and one with an id / reads each alias as the path inside the subject, and the names in the rows and expressions keep the alias
+parts / a subject with two parts, one written as a line and one with an id / tags an input with a null id when the part has no id inside it
+parts / a subject with two parts, one written as a line and one with an id / fails as value when a field of a part holds the wrong value
+parts / a subject with two parts, one written as a line and one with an id / fails as absent when the part is missing, as the full path would
+parts / a subject with two parts, one written as a line and one with an id / fails as absent when the part is null, because a step follows it
+parts / a subject with two parts, one written as a line and one with an id / fails as unusable when the part is a string, as the full path would
+parts / a subject with two parts, one written as a line and one with an id / fails as unusable when something on the way to the part can't hold a key
+parts / the same check written with an alias and with the path it stands for / gives the same row apart from the names of the inputs
+parts / the same check written with an alias and with the path it stands for / gives the same rows when the part is missing, null or a string
+parts / the same check written with an alias and with the path it stands for / gives the same rows when the subject is not an object
+parts / where a part's alias is read / reads the alias in the conditions of the from line, in a for line's assertions, and on the right side after a one-line every, but not on the left of a whose
+parts / where a part's alias is read / an alias shadows a field with the same name, and the dot in front reads the field
+parts / an alias that is also a for alias / is written wrong, and the check gets no row
+parts / named by an alias that is a part / is written wrong, because it would otherwise read the field
+parts / a subject that narrows another keeps its parts and adds its own / reads the kept part in its conditions and in its checks, and its own part in its checks
+parts / a subject that narrows another and adds a part with a kept alias / is written wrong, naming the subject it keeps the part from
+parts / a chained subject reads its parent's parts / starts from a part of the parent, reads a part of the parent by the parent's name, and reads a bare alias of the parent as a field
+parts / a chained subject with a part named like its parent / is written wrong as a subject's name
+parts / a subject whose parts are written wrong / fails $well_formed with a problem under each part's alias
+parts / a subject whose has is not an object / fails $well_formed under has
+parts / the parts a report lists / lists every part with its path written as a sentence writes it, and null for an id it doesn't have
+parts / a part whose path goes through a list / names a failed item with the full path, so no position is hidden
+parts / a part written with a dot on the left of a whose in the subject's own from line / reads the field, not the part
+parts / a part read in a check with named by on its right side / shows the part's value in its inputs
+parts / a part read through its alias / starts at the part's path inside the subject
+parts / a failed sentence on a for line tags the inputs it read through a part / the part's input has the part and the item's has none
+parts / a for alias named like a parent subject / is written wrong, so the parent's part and fields aren't read through it
+parts / a for alias named like the check's own subject / is written wrong
+parts / a for alias named like a subject that isn't a parent / is written wrong
+parts / a for alias named like a part of a parent subject / is written wrong, naming the parent
+parts / a for alias named like a subject and like a part of a parent / is written wrong with both messages
+parts / a for alias that isn't named like a subject or a part / reads the item
+parts / a part named like the subject it belongs to / is written wrong as a subject's name
+parts / a part named like a subject that isn't a parent / is written wrong as a subject's name
+parts / a part named like a part of a parent / is written wrong, naming the parent
+parts / a for alias named like a part of a grandparent subject / is written wrong, naming the grandparent
+parts / a for alias on the second item named like a part of a parent subject / is written wrong, naming the parent
+parts / a for alias on a first of item named like a parent subject / is written wrong as a subject's name
+parts / a for alias named like a part kept from a subject the checked subject narrows / is written wrong, naming the subject that declares the part
+parts / a for alias named like a part kept by the parent of the checked subject from a subject it narrows / is written wrong, naming the subject that declares the part
+parts / a for alias named like a part of a subject that isn't a parent / reads the item
+parts / a for alias named like a part of a subject with a space in its name / is written wrong, with the subject's name in quotes
+parts / a part named like a part of a grandparent subject / is written wrong, naming the grandparent
+parts / a part named like a part kept through two narrowings / is written wrong once, naming the subject that declares the part
+parts / a part declared again by a subject it narrows / is written wrong naming each subject that declares the part
+parts / a part named like a part of a subject that isn't a parent / is accepted
+patterns / matches_any / passes when one pattern matches anywhere in the string
+patterns / matches_any / fails as value when none matches
+patterns / matches_any / fails as unusable on a number
+patterns / matches_any / fails as absent when the field is missing
+patterns / not_matches_any / passes when no pattern matches
+patterns / not_matches_any / fails as value when a pattern matches
+patterns / not_matches_any / fails as unusable on a number
+patterns / not_matches_any / fails as absent when the field is missing
+patterns / a pattern with a dot / doesn't match a newline
+patterns / a pattern ending with a dollar / doesn't match before a final newline
+patterns / a case-insensitive pattern / matches the other case
+patterns / a pattern with a Unicode class / matches letters outside ASCII
+patterns / patterns read through a ref to a list / passes when one matches
+patterns / patterns read through a ref that isn't a list / fails as unusable
+present / present on a field of the subject / passes on a string
+present / present on a field of the subject / passes on an empty string
+present / present on a field of the subject / passes on false
+present / present on a field of the subject / passes on zero
+present / present on a field of the subject / passes on an empty list
+present / present on a field of the subject / passes on an empty object
+present / present on a field of the subject / fails as value, not absent, when the field is missing
+present / present on a field of the subject / fails as value, not null, when the field is null
+present / present on a field of the subject / fails as not_an_object when the subject is a string
+present / present on a field of the subject / fails as not_an_object when the subject is null
+present / present on a nested field / fails as value when the parent is missing
+present / present on a nested field / fails as value when the parent is null
+present / present on a nested field / fails as unusable when the parent is a string
+present / present on a nested field / fails as unusable when the parent is a list, because a string key only reads an object
+present / present on a list item / passes when the item is there
+present / present on a list item / fails as value when the list is too short
+present / present on a list item / fails as value when the item is null
+present / present on a list item / fails as unusable when the parent is an object, because an index only reads a list
+present / present on the input and with a ref step / both pass when the fields are there
+present / present on the input and with a ref step / both fail as value when the fields are missing
+present / present with a ref step that can't be read / fails as unusable when the ref reads something that can't be a key
+present / present with a ref step whose param is missing / fails as absent, not value, because the field it looks for is unknown, not missing
+present / present as a filter / rules a subject out when the field is missing, even though the other filter can't read it
+present / present as a filter / rules a subject out when the field is null
+present / present as a filter / keeps a subject in scope when the field is there
+present / present as a filter on a parent that can't hold the field / fails the requirement instead of ruling the subject out
+present / present on a param when the params are null / fails as absent, because null params mean none were given
+present / present on a param the params don't have / fails as value, because the params were given and the field isn't in them
+present / an input is read from a subject in a list / shows where each value was read, counting list positions from 0, and for a field that isn't there the subject it isn't in
+present / a path that can't go on / points at the field that held a string, which couldn't hold a key
+present / a path that can't go on / points at the object that doesn't have the key
+present / a path that can't go on / points at the null it stopped at
+present / a path that can't go on / points at the subject when the field isn't there
+present / a subject that isn't an object / points at the subject
+range / range between two numbers / passes inside the range
+range / range between two numbers / passes on min
+range / range between two numbers / passes on max written as 3.0
+range / range between two numbers / fails as value below min
+range / range between two numbers / fails as value above max
+range / range between two numbers / fails as unusable on a string that holds a number
+range / range between two numbers / fails as absent when the field is missing
+range / range with bounds written in other forms / shows them in plain decimal
+requirements / subjects from a list / each item is a subject, in list order
+requirements / subjects from a list / fails min_subjects as value on an empty list
+requirements / subjects from a list / fails min_subjects as absent when the list is missing
+requirements / subjects from a list / fails min_subjects as null when the list is null
+requirements / subjects from a list / fails min_subjects as unusable on a string
+requirements / subjects from a list / takes an object as the only subject
+requirements / subjects from a list / takes items that aren't objects as subjects, each its own id when it has no id field
+requirements / subjects from a list with min_subjects 0 / is not applicable on an empty list
+requirements / subjects from a list with min_subjects 0 / still fails min_subjects as absent when the list is missing
+requirements / subjects from a list with min_subjects 0 / is not met when a subject fails
+requirements / the whole input as the subject / checks the input itself, with itself as its id
+requirements / the whole input as the subject / fails min_subjects as null on a null input
+requirements / the whole input as the subject / fails min_subjects as unusable on a list
+requirements / min_subjects 2 / fails as value with one subject, though it passes
+requirements / ids / lists each repeated id once, sorted by its JSON text
+requirements / ids / treats null as an id, so two subjects with none clash
+requirements / ids of subjects out of scope / still count
+requirements / require some / is met when one subject passes every check, and the others aren't violations
+requirements / require some / isn't met by two subjects that each pass half the checks
+requirements / a filter / leaves out a subject that fails it on value, and fails one it can't read
+requirements / a filter / fails min_subjects when every subject is out of scope
+requirements / a filter with min_subjects 0 / is not applicable when every subject is out of scope
+requirements / a filter with min_subjects 0 / isn't met when a filter can't be read
+requirements / two filters / fail the requirement when one rules the subject out and the other can't be read
+requirements / a requirement with no checks / is never met
+requirements / a requirement with an unknown require / is never met, and gets no row but $well_formed
+requirements / a requirement with a field Ergo doesn't know / is never met
+requirements / a requirement with a description, meta and a subject type / copies them into the report and names the checks Ergo adds after the type
+requirements / a requirement with min_subjects 0, described / describes min_subjects as reading the list
+requirements / a requirement with no description or meta / gets an empty description and meta
+requirements / a policy with no requirements / is never compliant
+requirements / two requirements / put rows in order: added checks by kind, then filters, then checks, by requirement, subject and check
+requirements / violations with refs and failed items / add the check's description, expression and refs, and keep failed_items
+requirements / a requirement that still has the fields of a subject / is never met, and says from is an unknown field
+requirements / a subject that says id instead of identified_by / is never met, and says id is an unknown field
+requirements / causes of a requirement / counts the rows of each cause that would be a violation, worst cause first
+requirements / a policy with a description and meta / copies both to the top of the report
+requirements / a policy with a description and meta / gives the version of the spec the implementation follows
+requirements / a policy whose description and meta are written wrong / fails the $well_formed row of every requirement and reports neither
+requirements / a policy without ergo_spec / fails the $well_formed row of every requirement with ergo_spec missing
+requirements / a policy whose ergo_spec is null / fails the $well_formed row of every requirement with ergo_spec missing
+requirements / a policy whose ergo_spec is the number 0.1 / fails the $well_formed row of every requirement because ergo_spec isn't a string
+requirements / a policy for another version of the spec / fails the $well_formed row of every requirement, and the row names both versions
+requirements / a policy for the released version 0.1 / fails the $well_formed row of every requirement, because main follows v0.2
+requirements / a policy whose ergo_spec has a suffix other than -dev / is written wrong as not a version
+requirements / a policy whose ergo_spec ends in a dash / is written wrong as not a version
+requirements / a policy for the version the implementation follows / is read and gets no problem under policy ergo_spec
+requirements / a policy whose ergo_spec is a string that isn't a version / fails the $well_formed row of every requirement, and the row shows the value
+requirements / a policy whose ergo_spec, description and meta are written wrong / lists each of them on the $well_formed row of every requirement, sorted by name
+requirements / a check written with op / is written wrong: it has no assert, each of its fields is unknown, and the requirement gets no row but $well_formed
+requirements / a policy with two requirements written wrong and one written correctly / gives each requirement written wrong only its $well_formed row, and checks the other one as usual
+requirements / a requirement whose check doesn't parse, on a subject with a condition / gets only its $well_formed row, but still lists every check with its expression, the ones Ergo adds included
+requirements / a check named like one of Ergo's own rows / is written wrong, and the requirement lists only Ergo's check of that name
+requirements / a check named like one of Ergo's own rows that is also written wrong another way / lists the check once, with both problems
+sentences / a plain sentence and an object with assert / both forms run the same sentence and the report shows only description, meta and expression
+sentences / a plain sentence and an object with assert / both fail the same way
+sentences / an object with assert and a field that isn't description or meta / is written wrong, and the requirement gets no row but $well_formed
+sentences / an object with an assert that is a number / is written wrong as invalid assert
+sentences / is with a string / passes on the same string
+sentences / is with a string / fails as value on another string
+sentences / is with a string / fails as unusable on a number, which has another type than the text
+sentences / is with a string / fails as absent when the field is missing
+sentences / is with a string / fails as null when the field is null
+sentences / is with a number / passes on 1.0, because numbers compare by value
+sentences / is with a number / fails as unusable on the string "1"
+sentences / is with a number / fails as value on another number
+sentences / is with true / passes on true
+sentences / is with true / fails as value on false
+sentences / is with true / fails as unusable on the string "true"
+sentences / is with false / passes on false, which is a value and not a missing field
+sentences / is with false / fails as value on true
+sentences / is with null / passes when the field is there and null
+sentences / is with null / fails as absent when the field is missing
+sentences / is with null / fails as value on any other value
+sentences / is not with a string / passes on another string
+sentences / is not with a string / fails as value on the same string
+sentences / is not with a string / fails as unusable on a number, because two types differ
+sentences / is not with a string / fails as absent when the field is missing
+sentences / is not with a string / fails as null when the field is null
+sentences / is not with a number / passes on 2
+sentences / is not with a number / fails as value on 1.0
+sentences / is not with a number / fails as unusable on the string "2"
+sentences / is not with true / passes on false
+sentences / is not with true / fails as value on true
+sentences / equals a field / passes on 1 and 1.0
+sentences / equals a field / fails as value on two different strings
+sentences / equals a field / fails as unusable when the types differ
+sentences / equals a field / fails as absent when the left is missing
+sentences / equals a field / fails as absent when the right is missing
+sentences / equals a field / fails as null when the left is null
+sentences / equals a field / fails as null when both are null
+sentences / equals a field / fails as absent when one is missing and the other null
+sentences / does not equal a field / passes on two different strings
+sentences / does not equal a field / fails as value on 1 and 1.0
+sentences / does not equal a field / fails as unusable when the types differ
+sentences / does not equal a field / fails as absent when the right is missing
+sentences / does not equal a field / fails as null when the left is null
+sentences / is with a value within a number / passes on the same number
+sentences / is with a value within a number / passes when exactly that far apart
+sentences / is with a value within a number / fails as value when further apart
+sentences / is with a value within a number / fails as unusable on a string
+sentences / is with a value within a number / fails as absent when the field is missing
+sentences / is with a value within a number / fails as null when the field is null
+sentences / is with a string value within a number / is written wrong, because within only compares numbers
+sentences / equals a field within a number / passes when the numbers are close
+sentences / equals a field within a number / fails as value when they are far apart
+sentences / equals a field within a number / fails as unusable when the right is a string
+sentences / equals a field within a number / fails as absent when the right is missing
+sentences / equals a field within a number / fails as null when the left is null
+sentences / is within 0 / passes on the same number
+sentences / is within 0 / fails as value on another number
+sentences / is one of values / passes on the first value
+sentences / is one of values / passes on the second value
+sentences / is one of values / fails as value on another string
+sentences / is one of values / fails as unusable on a number
+sentences / is one of values / fails as absent when the field is missing
+sentences / is one of values / fails as null when the field is null
+sentences / is one of values that include null / fails as null when the field is null, even though null is listed
+sentences / is one of values that include null / passes on the other value
+sentences / is one of numbers / passes on 1.0
+sentences / is one of numbers / passes on 2.5
+sentences / is one of numbers / fails as unusable on the string "1"
+sentences / is in a list of params / passes when the field is in the list
+sentences / is in a list of params / fails as value when it isn't
+sentences / is in a list of params / fails as unusable on a number
+sentences / is in a list of params / fails as absent when the field is missing
+sentences / is in a list of params / fails as null when the field is null
+sentences / is in an empty list of params / fails as value, because nothing is in an empty list
+sentences / is in a param that isn't a list / fails as unusable
+sentences / is in a param that is missing / fails as absent whatever the field holds
+sentences / is in a param that is null / fails as null whatever the field holds
+sentences / is in a list in the input / passes when the field is in the list
+sentences / is in a list in the input / fails as value when it isn't
+sentences / exists / passes on a string
+sentences / exists / passes on false
+sentences / exists / passes on 0
+sentences / exists / passes on an empty string
+sentences / exists / fails as value when the field is missing
+sentences / exists / fails as value when the field is null
+sentences / exists on a path below a value that can't hold it / fails as unusable when x is a string
+sentences / exists on a path below a value that can't hold it / fails as value when x is missing
+sentences / does not exist / passes when the field is missing
+sentences / does not exist / passes when the field is null
+sentences / does not exist / fails as value on a string
+sentences / does not exist / fails as value on false
+sentences / does not exist on a path below a value that can't hold it / fails as unusable when x is a string
+sentences / is a non-empty string / passes on a string
+sentences / is a non-empty string / passes on a string of spaces
+sentences / is a non-empty string / fails as value on an empty string
+sentences / is a non-empty string / fails as unusable on a number
+sentences / is a non-empty string / fails as value on a list
+sentences / is a non-empty string / fails as absent when the field is missing
+sentences / is a non-empty string / fails as null when the field is null
+sentences / contains a value / passes when the list has it
+sentences / contains a value / fails as value when the list doesn't
+sentences / contains a value / fails as value on an empty list
+sentences / contains a value / fails as unusable when the field is a string
+sentences / contains a value / fails as absent when the field is missing
+sentences / contains a value / fails as null when the field is null
+sentences / contains a number / passes on 1.0 in the list
+sentences / contains a number / fails as unusable on the string "1" in the list
+sentences / contains a param / passes when the list has the param's value
+sentences / contains a param / fails as value when it doesn't
+sentences / contains a param / fails as unusable when the field is a string
+sentences / contains a param that is missing / fails as absent whatever the field holds
+sentences / does not contain a value / passes when the list doesn't have it
+sentences / does not contain a value / passes on an empty list
+sentences / does not contain a value / fails as value when the list has it
+sentences / does not contain a value / fails as unusable when the field is a string
+sentences / does not contain a value / fails as absent when the field is missing
+sentences / does not contain a value / fails as null when the field is null
+sentences / does not contain a param / passes when the list doesn't have it
+sentences / does not contain a param / fails as value when the list has it
+sentences / contains all of values / passes when the list has every value
+sentences / contains all of values / fails as value when one is missing
+sentences / contains all of values / fails as value on an empty list
+sentences / contains all of values / fails as unusable when the field is a string
+sentences / contains all of values / fails as absent when the field is missing
+sentences / contains all of values / fails as null when the field is null
+sentences / contains all of a list of params / passes when the list has every value
+sentences / contains all of a list of params / fails as value when one is missing
+sentences / contains all of an empty list of params / fails as unusable, because an empty list would pass every field
+sentences / contains all of a param that isn't a list / fails as unusable
+sentences / contains none of values / passes when the list has none
+sentences / contains none of values / passes on an empty list
+sentences / contains none of values / fails as value when the list has one
+sentences / contains none of values / fails as unusable when the field is a string
+sentences / contains none of values / fails as absent when the field is missing
+sentences / contains none of values / fails as null when the field is null
+sentences / contains none of a list of params / passes when the list has none
+sentences / contains none of a list of params / fails as value when the list has one
+sentences / matches a pattern / passes on a string that matches
+sentences / matches a pattern / fails as value on a string that doesn't
+sentences / matches a pattern / fails as unusable on a number
+sentences / matches a pattern / fails as absent when the field is missing
+sentences / matches a pattern / fails as null when the field is null
+sentences / matches one of several patterns / passes when the second matches
+sentences / matches one of several patterns / fails as value when none matches
+sentences / matches is not anchored / passes in the middle of a string
+sentences / matches a pattern with a comma in it / passes on a string with the comma
+sentences / matches a pattern with a comma in it / passes on a string with the colon
+sentences / matches a pattern with a comma in it / fails as value on a string with neither
+sentences / matches a single-quoted pattern / keeps the backslash as written
+sentences / matches a single-quoted pattern / fails as value when the string doesn't start with FROM
+sentences / does not match a pattern / passes on a string that doesn't match
+sentences / does not match a pattern / fails as value on a string that matches
+sentences / does not match a pattern / fails as unusable on a number
+sentences / does not match a pattern / fails as absent when the field is missing
+sentences / does not match a pattern / fails as null when the field is null
+sentences / does not match several patterns / passes when none matches
+sentences / does not match several patterns / fails as value when the second matches
+sentences / matches patterns from params / passes when a pattern matches
+sentences / matches patterns from params / fails as value when none does
+sentences / matches a pattern from params that isn't a valid regular expression / fails as unusable
+sentences / does not match patterns from params / passes when none matches
+sentences / does not match patterns from params / fails as value when one matches
+sentences / is at least a number / passes on 6
+sentences / is at least a number / fails as value on 4
+sentences / is at least a number / fails as unusable on the string "5"
+sentences / is at least a number / fails as absent when the field is missing
+sentences / is at least a number / fails as null when the field is null
+sentences / is at least a number / passes on 5
+sentences / is at most a number / passes on 4
+sentences / is at most a number / fails as value on 6
+sentences / is at most a number / fails as unusable on the string "5"
+sentences / is at most a number / fails as absent when the field is missing
+sentences / is at most a number / fails as null when the field is null
+sentences / is at most a number / passes on 5
+sentences / is more than a number / passes on 6
+sentences / is more than a number / fails as value on 5
+sentences / is more than a number / fails as unusable on the string "5"
+sentences / is more than a number / fails as absent when the field is missing
+sentences / is more than a number / fails as null when the field is null
+sentences / is less than a number / passes on 4
+sentences / is less than a number / fails as value on 5
+sentences / is less than a number / fails as unusable on the string "5"
+sentences / is less than a number / fails as absent when the field is missing
+sentences / is less than a number / fails as null when the field is null
+sentences / is at least a written string / is written wrong, because two strings aren't ordered
+sentences / is alphabetically after a string compares by code point / passes on "b"
+sentences / is alphabetically after a string compares by code point / fails as value on "Z", which comes before "a"
+sentences / is alphabetically after a string compares by code point / fails as value on "a" itself
+sentences / is alphabetically after a string compares by code point / fails as unusable on a number
+sentences / is alphabetically after a string compares by code point / fails as absent when missing
+sentences / is alphabetically after a string compares by code point / fails as null on null
+sentences / is alphabetically before a field / passes on "Z" before "a", since uppercase comes first
+sentences / is alphabetically before a field / orders a character above U+FFFF after one below it
+sentences / is alphabetically before a field / fails as unusable when the field is a number
+sentences / is alphabetically before a written value that isn't text / is written wrong, because it could only fail
+sentences / is at least a field / passes when the order holds
+sentences / is at least a field / fails as value when it doesn't
+sentences / is at least a field / fails as unusable when the types differ
+sentences / is at least a field / fails as absent when the right is missing
+sentences / is at least a field / fails as null when the left is null
+sentences / is at most a field / passes when the order holds
+sentences / is at most a field / fails as value when it doesn't
+sentences / is at most a field / fails as unusable when the types differ
+sentences / is at most a field / fails as absent when the right is missing
+sentences / is at most a field / fails as null when the left is null
+sentences / is more than a field / passes when the order holds
+sentences / is more than a field / fails as value when it doesn't
+sentences / is more than a field / fails as unusable when the types differ
+sentences / is more than a field / fails as absent when the right is missing
+sentences / is more than a field / fails as null when the left is null
+sentences / is less than a field / passes when the order holds
+sentences / is less than a field / fails as value when it doesn't
+sentences / is less than a field / fails as unusable when the types differ
+sentences / is less than a field / fails as absent when the right is missing
+sentences / is less than a field / fails as null when the left is null
+sentences / is at least a field holding strings / fails as unusable on two strings, so numbers held as strings aren't ordered as text
+sentences / is at least a field holding strings / fails as unusable when both are lists
+sentences / is between two numbers / passes inside the range
+sentences / is between two numbers / passes on the lower bound
+sentences / is between two numbers / passes on the upper bound
+sentences / is between two numbers / fails as value below the range
+sentences / is between two numbers / fails as value above the range
+sentences / is between two numbers / fails as unusable on a string
+sentences / is between two numbers / fails as absent when the field is missing
+sentences / is between two numbers / fails as null when the field is null
+sentences / is between two decimals / passes on 1
+sentences / is between two decimals / fails as value on 1.6
+sentences / is between the same number twice / passes on that number
+sentences / is between the same number twice / fails as value on another
+sentences / a time is before another / passes when the order holds
+sentences / a time is before another / fails as value on the same instant written in another offset
+sentences / a time is before another / fails as value when it doesn't
+sentences / a time is before another / fails as unusable on a string that isn't a time
+sentences / a time is before another / fails as unusable when one is a number and the other a string
+sentences / a time is before another / fails as absent when the right is missing
+sentences / a time is before another / fails as null when the left is null
+sentences / a time is after another / passes when the order holds
+sentences / a time is after another / fails as value on the same instant written in another offset
+sentences / a time is after another / fails as value when it doesn't
+sentences / a time is after another / fails as unusable on a string that isn't a time
+sentences / a time is after another / fails as unusable when one is a number and the other a string
+sentences / a time is after another / fails as absent when the right is missing
+sentences / a time is after another / fails as null when the left is null
+sentences / a time is on or after another / passes when the order holds
+sentences / a time is on or after another / passes on the same instant written in another offset
+sentences / a time is on or after another / fails as value when it doesn't
+sentences / a time is on or after another / fails as unusable on a string that isn't a time
+sentences / a time is on or after another / fails as unusable when one is a number and the other a string
+sentences / a time is on or after another / fails as absent when the right is missing
+sentences / a time is on or after another / fails as null when the left is null
+sentences / a time is on or before another / passes when the order holds
+sentences / a time is on or before another / passes on the same instant written in another offset
+sentences / a time is on or before another / fails as value when it doesn't
+sentences / a time is on or before another / fails as unusable on a string that isn't a time
+sentences / a time is on or before another / fails as unusable when one is a number and the other a string
+sentences / a time is on or before another / fails as absent when the right is missing
+sentences / a time is on or before another / fails as null when the left is null
+sentences / two numbers are compared as times / passes when both are numbers in order
+sentences / two numbers are compared as times / fails as value when both are numbers out of order
+sentences / a quoted key with a dot in it / reads the key as one key
+sentences / a quoted key with a dot in it / fails as absent when the key is missing
+sentences / a bare key with a dash / reads the key with the dash
+sentences / a quoted first key / reads the key $schema, named as syntax.md names it
+sentences / a quoted first key / fails as absent when it's missing
+sentences / a path that starts at the input / reads the input
+sentences / a path that starts at the input and is missing / fails as absent when the input has no such key
+sentences / a path that starts at the params / reads the params
+sentences / a key chosen by a param / reads the key the param holds
+sentences / a key chosen by a param / fails as value when the other key holds another value
+sentences / a key chosen by a param / fails as absent when the key isn't there
+sentences / a key chosen by a param, then more keys / reads the keys after it
+sentences / a key chosen by a param that is missing / fails as absent
+sentences / a key chosen by a param that isn't a key / fails as unusable when the param is a list
+sentences / a key chosen by a param in brackets / reads the key the param holds and prints named by
+sentences / the second item of a list / counts from 1
+sentences / the second item of a list / fails as value on another item
+sentences / the second item of a list / fails as absent when the list is too short
+sentences / the second item of a list / fails as unusable when xs is a string
+sentences / the first item of a list / reads the item at position 0
+sentences / the first item of a list / fails as absent on an empty list
+sentences / an item of a list in brackets / counts from 0 and prints the word form
+sentences / an item of a list in brackets / fails as absent when the list is too short
+sentences / a field of an item in brackets / keeps the brackets when a key follows
+sentences / a field on the right with a dot in front / compares with the field called empty and prints equals
+sentences / a field on the right with a dot in front / fails as value when the field holds another value
+sentences / a field on the right with a dot in front / fails as absent when there is no field called empty
+sentences / a field called true on the right / compares with the field, not with the value true
+sentences / a field called true on the right / fails as value when it holds another value
+sentences / a quoted string on the right is text / compares with the text, not with a field called y
+sentences / a quoted key on the right with a dot in front / compares with the field $schema
+sentences / a field on the right without a dot / compares with the field
+sentences / a field with a dot in front that doesn't need it / prints without the dot
+sentences / a field called empty on the left with a dot in front / reads the field called empty
+sentences / a grammar word after the first key / needs no dot
+sentences / is equal to prints as is / prints as x is "a"
+sentences / is equal to a field prints as equals / prints as x equals y
+sentences / equals with a value prints as is / prints as x is "a"
+sentences / two spaces between words print as one / prints as x is "a"
+sentences / single quotes without a backslash print as double quotes / prints as x is "prod"
+sentences / a quote inside single quotes prints with a JSON escape / prints as x is "a\"b"
+sentences / is in values prints as is one of / prints as x is one of "a", "b"
+sentences / values with no space after the comma print with one / prints as x is one of "a", "b"
+sentences / is one of a path prints as is in / prints as x is in $params.k
+sentences / is before a field prints as equals / prints as x equals y
+sentences / does not equal a value prints as is not / prints as x is not "a"
+sentences / is not a field prints as does not equal / prints as x does not equal y
+sentences / a pattern with a backslash prints in single quotes / prints as x matches '^\d+$'
+sentences / a pattern with a backslash written in double quotes prints in single quotes / prints as x matches '^\d+$'
+sentences / a pattern with two backslashes in a row prints in double quotes / prints as x matches "a\\\\b"
+sentences / a pattern with a single quote prints in double quotes / prints as x matches "it's"
+sentences / a number with a trailing zero prints in its plain form / prints as x is 1.5
+sentences / a number with an exponent prints in its plain form / prints as x is 100
+sentences / a field on the right with a dot in front prints without it when it isn't needed / prints as x is at least y
+sentences / a path with a dot in a key prints with quotes / prints as meta."b.c" exists
+sentences / a time sentence prints as written / prints as opened is on or after closed
+sentences / equals with within prints as written / prints as x equals y within 0.5
+sentences / is within a value prints as written / prints as x is 5 within 1
+sentences / a sentence with an unclosed quote / fails $well_formed, which says why, and the requirement gets no other row
+sentences / a sentence with an unclosed quote after a longer path / fails $well_formed, which says why, and the requirement gets no other row
+sentences / a sentence with nothing after the path / fails $well_formed, which says why, and the requirement gets no other row
+sentences / a number out of range / fails $well_formed, which says why, and the requirement gets no other row
+sentences / a position too big to be held exactly / fails $well_formed, which says why, and the requirement gets no other row
+sentences / a bare grammar word as the first key / fails $well_formed, which says why, and the requirement gets no other row
+sentences / a name that starts with a dollar sign / fails $well_formed, which says why, and the requirement gets no other row
+sentences / bounds in the wrong order / fails $well_formed, which says why, and the requirement gets no other row
+sentences / is not null / fails $well_formed, which says why, and the requirement gets no other row
+sentences / a path compared with itself / fails $well_formed, which says why, and the requirement gets no other row
+sentences / every ending in the field it's compared with / fails $well_formed, which says the bare name is the item's, and the requirement gets no other row
+sentences / a whose that compares a field with itself / fails $well_formed, which says the bare name is the item's, and the requirement gets no other row
+sentences / an item compared with the subject under assert / reads type from the subject, so no condition matches and the check fails with value
+sentences / a for alias inside an item's scope / an alias on the right is the alias, the left of a whose and a dotted name are the field, and the report prints the dot where it matters
+sentences / a regular expression that isn't valid / fails $well_formed, which says why, and the requirement gets no other row
+sentences / a regular expression that isn't valid in a list of several / fails $well_formed, which says why, and the requirement gets no other row
+sentences / a phrase with a missing number after within / fails $well_formed, which says why, and the requirement gets no other row
+sentences / a regular expression that uses a lookahead / fails $well_formed, which says why, and the requirement gets no other row
+sentences / is empty / passes on an empty list
+sentences / is empty / passes on an empty string
+sentences / is empty / fails as value on a list with an item
+sentences / is empty / fails as value on a string with a character
+sentences / is empty / fails as absent when the field is missing
+sentences / is empty / fails as null when the field is null
+sentences / is empty / fails as unusable on a number
+sentences / is empty / fails as unusable on an object, even an empty one
+sentences / is empty / fails as unusable on false
+sentences / is not empty / passes on a list with an item
+sentences / is not empty / passes on a string with a character, even a space
+sentences / is not empty / fails as value on an empty list
+sentences / is not empty / fails as value on an empty string
+sentences / is not empty / fails as absent when the field is missing
+sentences / is not empty / fails as null when the field is null
+sentences / is not empty / fails as unusable on a number
+sentences / is not empty / fails as unusable on an object with keys
+sentences / is not one of values / passes on a value that isn't listed
+sentences / is not one of values / fails as unusable on a value of another type than the strings
+sentences / is not one of values / fails as value on a listed value
+sentences / is not one of values / fails as absent when the field is missing
+sentences / is not one of values / fails as null when the field is null
+sentences / is not in a list from the params / passes on a value the list doesn't hold, and records the list
+sentences / is not in a list from the params / fails as value on a value the list holds
+sentences / is not in a list from the params that isn't a list / fails as unusable
+sentences / is not in an empty list from the params / passes, since the field is none of no values
+sentences / is not in a param that's missing / fails as absent, whatever the field holds
+sentences / is not in a param that's null / fails as null, whatever the field holds
+sentences / is not in a list of strings, on a field that's a list or an object / fails as unusable on a list
+sentences / is not in a list of strings, on a field that's a list or an object / fails as unusable on an object
+sentences / is a <type> / passes only the type check for a list
+sentences / is a <type> / passes only the type check for a string
+sentences / is a <type> / passes only the type check for a number
+sentences / is a <type> / passes only the type check for a boolean
+sentences / is a <type> / passes only the type check for an object
+sentences / is a <type> / fails every type as null when the field is null
+sentences / is a <type> / fails every type as absent when the field is missing
+sentences / is a <type> on empty values, an article written wrong, and a parent that can't hold the field / an empty object is an object, and is a object prints as is an object
+sentences / is a <type> on empty values, an article written wrong, and a parent that can't hold the field / an empty list is a list, and a parent that's a string fails as unusable
+sentences / starts with and ends with / passes when the field starts or ends with the value or the field
+sentences / starts with and ends with / fails as value when it doesn't
+sentences / starts with and ends with / fails as unusable on numbers, even two of them
+sentences / starts with and ends with / fails as null when the field is null
+sentences / starts with and ends with / fails as absent when the field is missing
+sentences / starts with a field on the right / fails as null when the field on the right is null
+sentences / starts with a field on the right / fails as absent when the field on the right is missing
+sentences / starts with a field on the right / passes on an empty string on the right
+sentences / starts with a field on the right / fails as value when the right side is longer
+sentences / starts with a written value that isn't text / is written wrong, because it could only fail
+sentences / assertions joined with and, and listed under assert / passes when every assertion passes, with no failed assertions, and prints both forms the same way
+sentences / assertions joined with and, and listed under assert / fails as value and names the one assertion that failed
+sentences / assertions joined with and, and listed under assert / takes the first cause among the assertions that failed, and lists each with its own
+sentences / an assert list written wrong / says which line is written wrong, and that an empty list is
+sentences / a field after a phrase that takes a list / passes or fails as the same phrase with the list written, and lists both fields in inputs
+sentences / a field after a phrase that takes a list / fails as value when the field holds no match
+sentences / a field after a phrase that takes a list / fails as absent on the right when the field is missing, whatever the left side is
+sentences / a field after a phrase that takes a list / fails as null on the right when the field is null, whatever the left side is
+sentences / a field after a phrase that takes a list / fails as unusable on the right when it isn't a list, whatever the left side is, but any value is a value to look for after contains
+sentences / a field after a phrase that takes a list / fails as unusable on the right when it's an empty list after contains all of or none of, or holds a pattern that isn't valid
+sentences / a field after a phrase that takes a list / looks at the left side only when the right side can be used
+sentences / a field after a phrase that takes a list, read through a path that can't hold it / fails as unusable on the right when the path reads into something that can't hold the field
+sentences / an empty list after is in and is not in / treats an empty list as one that holds nothing after is in and is not in
+sentences / a field after a phrase that takes a list, in a for line, a one-line every or some, and the input / reads the field from the subject, from the item or from the input, and lists what it read
+sentences / named by a field / the subject's field picks the key, inside a whose or a one-line every the item's does, and a for name hides a field with the same name
+sentences / is one of values of mixed types / is written wrong, and says why
+sentences / is one of a field holding values of mixed types / fails as unusable, even when the field is one of them
+sentences / an any_of whose options hold sentences written wrong / lists each problem under the check, named by its option and, when the option has more than one, its line
+sentences / contains all of values of mixed types / is written wrong, and says why
+sentences / contains a field of another type than the list / fails as unusable, and so does a list on the right whose values have more than one type
+sentences / a time is before a written time / passes when the order holds
+sentences / a time is before a written time / fails as value on the same instant written in another offset
+sentences / a time is before a written time / fails as unusable when the field is text that is not a time
+sentences / a time is before a written time / fails as unusable when the field is a number, because the written time is a string
+sentences / a time is before a written time / fails as absent when the field is missing
+sentences / a time is after a written number / passes when the number is higher
+sentences / a time is after a written number / fails as value on the same number
+sentences / a time is after a written number / fails as unusable when the field is a string, because the written time is a number
+sentences / a time phrase with a written value that isn't a time / is written wrong, because it could only fail
+sentences / a time is on or before a written time / passes on the same instant written in another offset
+sentences / a time is on or before a written time / fails as value when it is later
+sentences / is in a list read with named by / passes when the list under the key has the value
+sentences / is in a list read with named by / fails as value when it does not
+sentences / is in a list read with named by a key that has no list / fails as absent whatever the field holds
+sentences / matches patterns read with named by / passes when a pattern under the key matches
+sentences / matches patterns read with named by / fails as value when only a pattern under another key matches
+sentences / an any_of of sentences / passes when every sentence of one option passes, and fails with the first cause among its options
+sentences / an any_of of sentences with a param that isn't a list / fails as unusable even when another option passes
+sentences / an any_of of sentences that walk, count and ask whether a field exists / takes each sentence's own cause, and an option whose field is missing fails as value
+sentences / an any_of of sentences written wrong / fails $well_formed, and the requirement gets no other row
+sentences / an any_of of sentences with a name that starts like another / sorts its options by name, not by the text they print
+sentences / an any_of of sentences that read a part / reads the part by its alias in each option
+sentences / an any_of of sentences that read a parent subject / reads the parent by its name in each option
+sentences / a count on the left of a whose / counts the item's own field, even when its first key is the parent subject's name
+subjects / a subject whose from is a path in a string / reads each item of the list at the path, in list order, with a string id
+subjects / a subject whose from is a path in a string / fails $min_subjects as absent when the path isn't in the input
+subjects / a subject whose id is a dotted string / reads the id inside each subject along the path
+subjects / a subject whose id is a dotted string / gives a null id when the path doesn't end found, and the subject still gets its rows
+subjects / a subject whose id is a plain key in a string / reads the id from the field of that name
+subjects / a from line with whose and two conditions / joins the conditions as written in the $applies row, and keeps only the subjects that pass both
+subjects / a from line with whose and two conditions / fails the requirement as absent for a subject a condition can't decide, even with min_subjects 0
+subjects / a from line with whose and two conditions / fails the requirement as unusable for a subject whose field has another type than the value, even with min_subjects 0
+subjects / a from line with whose and two conditions / fails as absent when the first condition can't be decided, even though the second rules the subject out
+subjects / a from line with its conditions in the other order / keeps the written order in the expression, and lists the inputs sorted by name
+subjects / a condition with count of / counts the items of the list and keeps subjects with enough
+subjects / a condition with count of / fails the requirement as absent for a subject whose list is missing
+subjects / a condition with some / keeps a subject when some item of the list passes, and rules out one where none does or that has no items
+subjects / a condition with some / fails the requirement as absent, null or unusable for a subject whose list or field the condition can't read, even with min_subjects 0
+subjects / a condition with every / keeps a subject when every item passes, and rules out one with an item that fails or with no items
+subjects / a condition with every / fails the requirement for a subject whose list or field the condition can't read
+subjects / a condition with every and if any / keeps a subject with no items, as every does in a check
+subjects / a condition with every and if any / does not keep a subject whose list is missing, null, not a list or has an item without the field, and points at the last value it reached
+subjects / a condition with some after another condition / joins the conditions with and in the expression, and keeps a subject that passes both
+subjects / a condition with some in the from line of a child subject / reads the parent's field by its name on the right side, and the item's field for a bare name
+subjects / a condition with some in a from line with every / keeps the releases of every artifact that pass the condition
+subjects / a condition with some in the from line of a subject that narrows another / keeps the subjects of the parent that pass the condition
+subjects / a condition with some with if any / is written wrong, and $well_formed names the from line and is the requirement's only row
+subjects / a condition with some with a whose of its own / is written wrong, and $well_formed names the from line and is the requirement's only row
+subjects / a condition with a count of with a whose of its own / is written wrong, and $well_formed names the from line and is the requirement's only row
+subjects / a from line with named by a param / reads the key the param holds
+subjects / a from line with named by a param / fails $min_subjects as absent when the object has no such key
+subjects / a from line with named by each of a param list / makes each listed key a subject, identified by its key, and a key the object doesn't have is still a subject
+subjects / a subject's own name in its own from / is the input field, never the subject
+subjects / a subject with no from / reads the input field of its own name, and can still have an id
+subjects / a subject with no from / takes an object as the only subject
+subjects / a subject with nothing under it / reads the input field of its own name
+subjects / a subject with nothing under it / fails $min_subjects as absent when the input has no such field
+subjects / a subject with from as an empty list / reads the whole input, not a field named like the subject
+subjects / a from line that doesn't parse / is written wrong and $well_formed lists it under the subject's from
+subjects / an id that isn't a path / is written wrong and $well_formed lists it under the subject's id
+subjects / a subject with applies_to / is written wrong:  lists applies_to as an unknown field, and the conditions go after whose
+subjects / a subject that goes on into another subject / reads its path from the parent's one subject, and every row but $well_formed carries the parent's id under in
+subjects / a subject that goes on into another subject / with more than one parent subject, reads the subjects of each and counts them per parent
+subjects / a subject that goes on into another subject / with no parent subject, finds none and fails min_subjects as value
+subjects / a subject that goes on into one of several subjects that its own conditions pick / checks ids are unique within each parent, so the same id under two parents is fine
+subjects / a subject that goes on into one of several subjects that its own conditions pick / gives no rows for a parent its conditions leave out, even when its subjects repeat an id or fail
+subjects / a subject that goes on into one of several subjects that its own conditions pick / fails min_subjects as absent on the row of a parent whose conditions can't be decided, and doesn't check its subjects
+subjects / a subject that goes on into one of several subjects that its own conditions pick / with every parent left out, fails min_subjects as value on one row without in
+subjects / a from line whose condition reads the parent subject by its name / reads the parent's field for each of its subjects, like a check does
+subjects / a from line whose condition reads the parent subject by its name / a parent with no such field fails $applies as absent
+subjects / a from line whose condition has the parent subject's name on its left / reads the child's own field, as on the left of any whose
+subjects / a chain of three subjects / checks each grandchild, counts per direct parent, and every row but $well_formed carries every ancestor's id under in
+subjects / a chain of three subjects / leaves out everything below a subject that's out of scope at any level
+subjects / a chain of three subjects / fails min_subjects as absent on the row of an ancestor whose conditions can't be decided, with in up to that ancestor
+subjects / a chain of three subjects / with no direct parent at all, fails min_subjects as value on one row without in
+subjects / a chain of four subjects / is written wrong
+subjects / a from line with every / reads one flat list from every list along the path, with no in, and counts it once
+subjects / a from line with every / checks ids are unique across every list
+subjects / a from line with every / with only empty lists, finds none and fails min_subjects as value
+subjects / a from line with every / fails min_subjects with the worst cause of a broken branch, lists each one, and still checks the subjects it read
+subjects / a from line with every / fails min_subjects as unusable when no list is along the path, as every does in a check
+subjects / a from line with every that starts at another subject / is written wrong
+subjects / a from line with every and named by each of / is written wrong
+subjects / a subject that narrows another / keeps the subjects that pass the parent's conditions and its own, parent's first in the expression
+subjects / a subject that narrows one whose name has a space / names the parent in quotes and keeps what passes every condition along the chain
+subjects / subjects that narrow each other / lead to a loop, named after from, and the requirement finds no subjects
+subjects / a subject that narrows another and has its own identified_by / is written wrong, and $well_formed says identified_by isn't allowed there
+subjects / a from line whose condition is written wrong / is written wrong, and $well_formed names the from line and is the requirement's only row
+subjects / a from line that reads a key named by a param before naming each subject / is written correctly and gives one subject per listed key under the key the param names
+subjects / the report lists the subjects the requirements use / lists a subject with its description, its from line printed the same way whatever the spaces, and its id
+subjects / the report lists the subjects the requirements use / names the subject in the requirement entry, and lists no subject that no requirement uses
+subjects / a subject that narrows another / lists both subjects, and the narrowing one has the id of the one it narrows
+subjects / a subject read from another subject / lists the parent it is read from too
+subjects / a subject with no from and no identified_by / reads the input field named like it, and has no id path
+subjects / a subject written wrong / still has its entry, with <invalid from> and an empty description
+subjects / a requirement with no subject, or one that isn't there / has subject null, and no subject is listed
+subjects / a subject with from and identified_by written as lists / is written wrong, finds no subjects, and $well_formed lists both fields as not a string
+subjects / a from line that narrows a subject whose name is blank / is written wrong under from, saying the name isn't a subject name
+subjects / a from line that reads a child subject of a subject whose name is blank / is written wrong under from, saying the name isn't a subject name
+subjects / child subjects that read each other / lead to a loop, named after from
+subjects / three child subjects that read each other in a ring / lead to a loop, named after from
+subjects / a child subject of a subject that narrows it / leads to a loop, named after from
+subjects / a child subject whose check reads its parent with named by on its right side / shows the parent's value in its inputs
+subjects / a subject that narrows a subject in a loop / leads to a loop, named after its own from
+subjects / a child subject of a subject in a loop / leads to a loop, named after its own from
+subjects / a subject read from the values of an object / starts a subject at its key, escaped, and at the object when the key isn't there
+subjects / a child subject / starts a child at its parent's location, and a path through the parent's name at the parent's
+subjects / a subject read with every / starts each subject where the walk found it
+subjects / a from line with two conditions on one field / lists the field once in the $applies row, with its location
+subjects / a $min_subjects row counting subjects / lists the location of each subject it counts, in the order of the rows
+subjects / a $min_subjects row counting subjects / lists no location when it counts no subject
+subjects / a $unique_ids row with repeated ids / lists the location of the id of every subject that shares one, ordered by id, then by subject
+subjects / a $unique_ids row with repeated ids / lists no location when no id is shared
+subjects / a $well_formed row / has inputs with no locations, because they read the policy
+subjects / a $well_formed row that lists a problem / has no locations for the problem either
+subjects / a from line with every where a list can't be read / gives each failed item of the $min_subjects row the location where its read stopped
+subjects / a child subject that reads its parent and itself under the same name / lists each read once when it reads one place, and twice when two places print the same name and value
+subjects / a from line with a some or every condition that fails on some items / gives each failed item of the $applies row the location where its value was read
+walks / every over one list of objects / passes when every item passes, and failed_items is empty
+walks / every over one list of objects / fails as value when one item fails, and lists it with its position
+walks / every over one list of objects / lists every item that fails, in list order
+walks / every over one list of objects / fails as value on an empty list, and lists the list
+walks / every over one list of objects / fails as absent when the list is missing, and lists the list
+walks / every over one list of objects / fails as null when the list is null, and lists the list
+walks / every over one list of objects / fails as unusable when the list is a string, with nothing walked
+walks / every over one list of objects / fails as unusable when the list is an object, with nothing walked
+walks / every over one list of objects / fails as absent when an item has no such field, and shows null for it
+walks / every over one list of objects / fails as null when an item's field is null
+walks / every over one list of objects / fails as unusable when an item's field is the wrong type for is
+walks / every over one list of objects / takes the first cause in order when items fail differently, and lists both
+walks / every over nested lists / passes when every commit of every pull request is signed
+walks / every over nested lists / lists a failed value, a missing inner list and a missing field in path order, and the cause is absent
+walks / every over nested lists / fails as value when one inner list is empty, even though the others pass
+walks / every over nested lists / fails as null when one inner list is null
+walks / every over nested lists / fails as unusable when one inner list is not a list
+walks / every over nested lists / takes unusable over absent and value, and lists every failure in path order
+walks / every over nested lists / fails as value when the outer list is empty
+walks / every over nested lists / fails as absent when the outer list is missing, with nothing walked
+walks / every over nested lists / fails as absent with the item's field as the failed path when the only pull request has no commits, because no list is left to walk
+walks / every where the last list is the one walked, over strings / passes when every string matches
+walks / every where the last list is the one walked, over strings / fails as value for a string that does not match, named by its position
+walks / every where the last list is the one walked, over strings / fails as unusable for an item that is not a string
+walks / every where the last list is the one walked, over strings / fails as null for a null item
+walks / every where the last list is the one walked, over strings / fails as value on an empty list
+walks / every where each label is checked, not each pull request's labels / passes when every label is not empty
+walks / every where each label is checked, not each pull request's labels / fails as value for an empty label, named by its position in that pull request's labels
+walks / every where each label is checked, not each pull request's labels / fails as value for a pull request with no labels, because the inner list is empty
+walks / every where each label is checked, not each pull request's labels / fails as unusable for a label that is a number
+walks / every with if any / passes when the list is empty
+walks / every with if any / passes when the outer list is empty
+walks / every with if any / passes when some inner lists are empty and the items of the others pass
+walks / every with if any / still fails when an item fails
+walks / every with if any / fails as absent when an inner list is missing
+walks / every with if any / fails as null when an inner list is null
+walks / every with if any / fails as unusable when an inner list is not a list
+walks / every with if any / fails as unusable with the item's field as the failed path when the only pull request's commits is not a list
+walks / every with if any / fails as absent when the outer list is missing
+walks / every with if any / fails as absent when an item's field is missing, because only empty lists are skipped
+walks / some over one list of objects / passes when one item passes, and failed_items is empty even though another item did not
+walks / some over one list of objects / fails as value when no item passes, and lists every item
+walks / some over one list of objects / fails as value on an empty list
+walks / some over one list of objects / fails as absent when the list is missing, with nothing walked
+walks / some over one list of objects / fails as null when the list is null, and lists the list
+walks / some over one list of objects / fails as unusable when the list is not a list
+walks / some over one list of objects / passes when an item has no such field and another item passes
+walks / some over one list of objects / fails with the first cause in order when an item has no field and none passes
+walks / some over one list of objects / fails as null when an item's field is null and none passes
+walks / some over nested lists / passes when an item passes, even if another pull request has no approvers
+walks / some over nested lists / fails when no item passes, and lists the empty inner list and the failed item in path order
+walks / whose under some / passes when an item that whose keeps passes, and the others are not listed
+walks / whose under some / fails as value when the kept item fails, and leaves out the item whose does not keep
+walks / whose under some / fails as value with no failed items when whose keeps nothing
+walks / whose under some / passes when an item whose condition cannot be decided is beside an item that passes
+walks / whose under some / fails with the undecided item's cause, listed by the field whose could not read
+walks / whose under some / treats a null field in whose as undecided with cause null
+walks / whose under some / fails as value when the list is empty
+walks / whose under every / passes when the kept items pass, and an item whose leaves out is not checked
+walks / whose under every / fails as value when a kept item fails, and lists only that item
+walks / whose under every / fails with the cause of an item that whose cannot decide, listed by the field whose could not read
+walks / whose under every / fails as null when the field whose reads is null
+walks / whose under every / fails as value with no failed items when whose leaves no items
+walks / whose under every / fails as value when the list is empty, and lists the list
+walks / whose under every / fails as absent when the list is missing, with nothing walked
+walks / whose under every with if any / passes when whose leaves no items
+walks / whose under every with if any / passes when the list is empty
+walks / whose under every with if any / still fails when a kept item fails
+walks / whose under every with if any / still fails when an item cannot be decided
+walks / whose under every with if any / still fails as absent when the list is missing
+walks / whose with exists is the exception to undecided items / a missing field leaves the item out under every, and a present one keeps it
+walks / whose with exists is the exception to undecided items / a missing field keeps the item under does not exist, and a present one leaves it out
+walks / whose with a condition that cannot compare the item / fails as unusable under every when the field is the wrong type for the condition
+walks / a field on the right side is read from the item / passes when the item's timestamp is after the item's own last commit
+walks / a field on the right side is read from the item / fails as value when the item's timestamp is before the item's own last commit, even if the subject's is earlier
+walks / a field on the right side is read from the item / fails as absent when the item has no last commit, even if the subject has one
+walks / params and input on the right side still read the params and the input / read the params and the input even when the item has a field of the same name
+walks / every and some joined with and to a plain sentence / passes with failed_assertions empty when both parts pass
+walks / every and some joined with and to a plain sentence / lists only the every part when it fails and the plain part passes
+walks / every and some joined with and to a plain sentence / lists only the plain part when it fails and the walk passes
+walks / every and some joined with and to a plain sentence / lists both in the order written, and the row takes the first cause in order
+walks / a walk that can't be run as written / fails as unusable when a param its whose reads isn't a list, even with if any, and fails with the ref's cause when its named by can't be read
+walks / a walk on a subject that isn't an object / fails as not_an_object, as any path with steps does
+walks / contains after every / is written wrong, because the last list is walked too and a label never holds a value
+walks / every over nested lists of different lengths / has one location per value, in the order of the walk, when the lists differ in length
+walks / some with a whose / has a location for every item the walk read, including the ones whose left out
+walks / every that stops before it walks a list / has no values and no locations when the first list is missing
+walks / every that stops before it walks a list / has no values and no locations when the first list is null
+walks / every on a path that has no list / has no values and no locations when nothing along the path is a list
+walks / every where a value is missing at the end of its path / has the location where each item's read stopped
+walks / every over a field of each item, where it fails / points a failed item at the field it read, not at the item
+walks / every over a field of each item, where it fails / points a failed item at where the read stopped when the field is missing
+walks / every over the items themselves, where it fails / points a failed item at the item when the item is the value
+walks / every over a list that is missing / keeps no values and no locations, and its failed item says where the walk stopped
+walks / a one-line some compares with a parent's value / lists the list it walked and the parent's value, sorted by name, and passes when a file has the parent's owner
+walks / a one-line some compares with a parent's value / fails as value and still lists the parent's value when no file has the parent's owner
+walks / a one-line some compares with a parent's value / fails as absent and lists the parent's value as missing when the parent has no owner
+walks / a one-line every compares with a parent's value / lists the list it walked and the parent's value, sorted by name, and passes when every file has the parent's owner
+walks / a one-line every compares with a parent's value / fails as value and lists the parent's value when one file has another owner
+walks / a count of reads a parent's value in its whose / lists the number, the list and then the parent's value
+walks / a for line with a walk next to a parent / lists the for line's list and the parent's value, and never the alias's value
+walks / a one-line some whose parent path is named by the item / lists the part before the name, and leaves out the path named by the item, since it changes with each item
+walks / a one-line some compares with a value of the input / lists the value read from $input once, with where it was read
+walks / a one-line some compares with a list of params / keeps the param out of the row's inputs and lists it in the check's $refs
+walks / a one-line some compares with the subject's own part / lists the part with its tag, as a plain check does
+walks / a one-line some compares with a parent that sorts after the list / lists the entries sorted by name, so the parent comes after the list it walked
+walks / a count of reads a parent's value in its whose, and the parent sorts after the list / lists the number and the list first, then the parent's value
+walks / a walk or a count through a for name, read from a parent / lists the part before the name once, the whole object, and neither the number nor the items read through the name, which change with each item
+walks / a walk through a for name, read from a parent on its right side / reads the parent through the name for each item, and lists the parent once
+walks / a walk through a for name, read from a parent on its right side / fails as absent for a name the parent doesn't have
+walks / a walk through a for name, read from a parent on its right side / fails as null for a name that is null
+walks / a walk through a for name, read from a parent on its right side / fails as unusable for a value that can't be compared
+walks / a walk whose parent path is named by a field of each item / lists the part before the name and not the path it names, which changes with each item
+walks / a walk whose parent path is named by a field of each item / fails as absent when the parent has none of the names
