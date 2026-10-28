@@ -446,7 +446,6 @@ for / a for line with two items whose sentence reads the first alias twice / lis
 for / a for line on a child subject whose sentence reads the parent and its own field of the same name / orders the entries of the same name by where they were read, as a row does
 for / a for line whose assert joins sentences with and / gives each sentence its own failure and inputs, as a list under assert does
 for / a for line whose assert holds an or / is written wrong, because a sentence has no or
-for / a for line next to an any_of / is written wrong, because an any_of takes no for
 for / a second item that starts at a parent and is named by the first / is listed under the parent's whole name
 for / a second item that starts at $input or $params / keeps the dollar in the name of its list and of its failed items
 for / a second item that starts at a parent's part, read with a whose / names the second list's items it could not decide with the part's alias, like its input
@@ -512,7 +511,6 @@ it / it on the right side of a whose in a from line / fails $well_formed, which 
 it / it as the key of a named by / fails $well_formed, which says why, and the requirement gets no other row
 it / it as a for alias / fails $well_formed, which says why, and the requirement gets no other row
 it / it as the path of a part / fails $well_formed, which says why, and the requirement gets no other row
-it / a subject called it / fails $well_formed, which says why, and the requirement gets no other row
 it / a subject called it that another requirement doesn't use / a requirement that doesn't use the subject called it is read as usual
 it / subjects called It, items and it x / a requirement that doesn't use the subject called it is read as usual
 it / some it in a from line's whose / keeps the tag lists that have latest, and fails the requirement for a value that isn't a list
@@ -553,7 +551,6 @@ parts / a subject that narrows another and adds a part with a kept alias / is wr
 parts / a chained subject reads its parent's parts / starts from a part of the parent, reads a part of the parent by the parent's name, and reads a bare alias of the parent as a field
 parts / a chained subject with a part named like its parent / is written wrong as a subject's name
 parts / a subject whose parts are written wrong / fails $well_formed with a problem under each part's alias
-parts / a subject whose has is not an object / fails $well_formed under has
 parts / the parts a report lists / lists every part with its path written as a sentence writes it, and null for an id it doesn't have
 parts / a part whose path goes through a list / names a failed item with the full path, so no position is hidden
 parts / a part written with a dot on the left of a whose in the subject's own from line / reads the field, not the part
@@ -637,13 +634,11 @@ range / range between two numbers / fails as unusable on a string that holds a n
 range / range between two numbers / fails as absent when the field is missing
 range / range with bounds written in other forms / shows them in plain decimal
 requirements / subjects from a list / each item is a subject, in list order
-requirements / subjects from a list / fails min_subjects as value on an empty list
 requirements / subjects from a list / fails min_subjects as absent when the list is missing
 requirements / subjects from a list / fails min_subjects as null when the list is null
 requirements / subjects from a list / fails min_subjects as unusable on a string
 requirements / subjects from a list / takes an object as the only subject
 requirements / subjects from a list / takes items that aren't objects as subjects, each its own id when it has no id field
-requirements / subjects from a list with min_subjects 0 / is not applicable on an empty list
 requirements / subjects from a list with min_subjects 0 / still fails min_subjects as absent when the list is missing
 requirements / subjects from a list with min_subjects 0 / is not met when a subject fails
 requirements / the whole input as the subject / checks the input itself, with itself as its id
@@ -660,40 +655,20 @@ requirements / a filter / fails min_subjects when every subject is out of scope
 requirements / a filter with min_subjects 0 / is not applicable when every subject is out of scope
 requirements / a filter with min_subjects 0 / isn't met when a filter can't be read
 requirements / two filters / fail the requirement when one rules the subject out and the other can't be read
-requirements / a requirement with no checks / is never met
-requirements / a requirement with an unknown require / is never met, and gets no row but $well_formed
-requirements / a requirement with a field Ergo doesn't know / is never met
 requirements / a requirement with a description, meta and a subject type / copies them into the report and names the checks Ergo adds after the type
 requirements / a requirement with min_subjects 0, described / describes min_subjects as reading the list
 requirements / a requirement with no description or meta / gets an empty description and meta
-requirements / a policy with no requirements / is never compliant
 requirements / two requirements / put rows in order: added checks by kind, then filters, then checks, by requirement, subject and check
 requirements / violations with refs and failed items / add the check's description, expression and refs, and keep failed_items
-requirements / a requirement that still has the fields of a subject / is never met, and says from is an unknown field
-requirements / a subject that says id instead of identified_by / is never met, and says id is an unknown field
 requirements / causes of a requirement / counts the rows of each cause that would be a violation, worst cause first
 requirements / a policy with a description and meta / copies both to the top of the report
 requirements / a policy with a description and meta / gives the version of the spec the implementation follows
-requirements / a policy whose description and meta are written wrong / fails the $well_formed row of every requirement and reports neither
-requirements / a policy without ergo_spec / fails the $well_formed row of every requirement with ergo_spec missing
-requirements / a policy whose ergo_spec is null / fails the $well_formed row of every requirement with ergo_spec missing
-requirements / a policy whose ergo_spec is the number 0.1 / fails the $well_formed row of every requirement because ergo_spec isn't a string
-requirements / a policy for another version of the spec / fails the $well_formed row of every requirement, and the row names both versions
-requirements / a policy for the released version 0.1 / fails the $well_formed row of every requirement, because main follows v0.2
-requirements / a policy whose ergo_spec has a suffix other than -dev / is written wrong as not a version
-requirements / a policy whose ergo_spec ends in a dash / is written wrong as not a version
 requirements / a policy for the version the implementation follows / is read and gets no problem under policy ergo_spec
-requirements / a policy whose ergo_spec is a string that isn't a version / fails the $well_formed row of every requirement, and the row shows the value
-requirements / a policy whose ergo_spec, description and meta are written wrong / lists each of them on the $well_formed row of every requirement, sorted by name
-requirements / a check written with op / is written wrong: it has no assert, each of its fields is unknown, and the requirement gets no row but $well_formed
 requirements / a policy with two requirements written wrong and one written correctly / gives each requirement written wrong only its $well_formed row, and checks the other one as usual
 requirements / a requirement whose check doesn't parse, on a subject with a condition / gets only its $well_formed row, but still lists every check with its expression, the ones Ergo adds included
-requirements / a check named like one of Ergo's own rows / is written wrong, and the requirement lists only Ergo's check of that name
 requirements / a check named like one of Ergo's own rows that is also written wrong another way / lists the check once, with both problems
 sentences / a plain sentence and an object with assert / both forms run the same sentence and the report shows only description, meta and expression
 sentences / a plain sentence and an object with assert / both fail the same way
-sentences / an object with assert and a field that isn't description or meta / is written wrong, and the requirement gets no row but $well_formed
-sentences / an object with an assert that is a number / is written wrong as invalid assert
 sentences / is with a string / passes on the same string
 sentences / is with a string / fails as value on another string
 sentences / is with a string / fails as unusable on a number, which has another type than the text
@@ -1154,21 +1129,17 @@ subjects / a subject with nothing under it / fails $min_subjects as absent when 
 subjects / a subject with from as an empty list / reads the whole input, not a field named like the subject
 subjects / a from line that doesn't parse / is written wrong and $well_formed lists it under the subject's from
 subjects / an id that isn't a path / is written wrong and $well_formed lists it under the subject's id
-subjects / a subject with applies_to / is written wrong:  lists applies_to as an unknown field, and the conditions go after whose
 subjects / a subject that goes on into another subject / reads its path from the parent's one subject, and every row but $well_formed carries the parent's id under in
 subjects / a subject that goes on into another subject / with more than one parent subject, reads the subjects of each and counts them per parent
-subjects / a subject that goes on into another subject / with no parent subject, finds none and fails min_subjects as value
 subjects / a subject that goes on into one of several subjects that its own conditions pick / checks ids are unique within each parent, so the same id under two parents is fine
 subjects / a subject that goes on into one of several subjects that its own conditions pick / gives no rows for a parent its conditions leave out, even when its subjects repeat an id or fail
 subjects / a subject that goes on into one of several subjects that its own conditions pick / fails min_subjects as absent on the row of a parent whose conditions can't be decided, and doesn't check its subjects
-subjects / a subject that goes on into one of several subjects that its own conditions pick / with every parent left out, fails min_subjects as value on one row without in
 subjects / a from line whose condition reads the parent subject by its name / reads the parent's field for each of its subjects, like a check does
 subjects / a from line whose condition reads the parent subject by its name / a parent with no such field fails $applies as absent
 subjects / a from line whose condition has the parent subject's name on its left / reads the child's own field, as on the left of any whose
 subjects / a chain of three subjects / checks each grandchild, counts per direct parent, and every row but $well_formed carries every ancestor's id under in
 subjects / a chain of three subjects / leaves out everything below a subject that's out of scope at any level
 subjects / a chain of three subjects / fails min_subjects as absent on the row of an ancestor whose conditions can't be decided, with in up to that ancestor
-subjects / a chain of three subjects / with no direct parent at all, fails min_subjects as value on one row without in
 subjects / a chain of four subjects / is written wrong
 subjects / a from line with every / reads one flat list from every list along the path, with no in, and counts it once
 subjects / a from line with every / checks ids are unique across every list
@@ -1187,10 +1158,7 @@ subjects / the report lists the subjects the requirements use / lists a subject 
 subjects / the report lists the subjects the requirements use / names the subject in the requirement entry, and lists no subject that no requirement uses
 subjects / a subject that narrows another / lists both subjects, and the narrowing one has the id of the one it narrows
 subjects / a subject read from another subject / lists the parent it is read from too
-subjects / a subject with no from and no identified_by / reads the input field named like it, and has no id path
 subjects / a subject written wrong / still has its entry, with <invalid from> and an empty description
-subjects / a requirement with no subject, or one that isn't there / has subject null, and no subject is listed
-subjects / a subject with from and identified_by written as lists / is written wrong, finds no subjects, and $well_formed lists both fields as not a string
 subjects / a from line that narrows a subject whose name is blank / is written wrong under from, saying the name isn't a subject name
 subjects / a from line that reads a child subject of a subject whose name is blank / is written wrong under from, saying the name isn't a subject name
 subjects / child subjects that read each other / lead to a loop, named after from
@@ -1208,7 +1176,6 @@ subjects / a $min_subjects row counting subjects / lists no location when it cou
 subjects / a $unique_ids row with repeated ids / lists the location of the id of every subject that shares one, ordered by id, then by subject
 subjects / a $unique_ids row with repeated ids / lists no location when no id is shared
 subjects / a $well_formed row / has inputs with no locations, because they read the policy
-subjects / a $well_formed row that lists a problem / has no locations for the problem either
 subjects / a from line with every where a list can't be read / gives each failed item of the $min_subjects row the location where its read stopped
 subjects / a child subject that reads its parent and itself under the same name / lists each read once when it reads one place, and twice when two places print the same name and value
 subjects / a from line with a some or every condition that fails on some items / gives each failed item of the $applies row the location where its value was read
