@@ -207,8 +207,14 @@ jobs:
           "$RUNNER_TEMP/venv/bin/pip" install --quiet jsonschema==4.26.0 abnf==2.9.0
       - name: Check the cases' policies and reports match the schemas
         run: '"$RUNNER_TEMP/venv/bin/python" .github/spec-schemas.py'
-      - name: Check ergo.rego and the ABNF read the same sentences
-        run: '"$RUNNER_TEMP/venv/bin/python" spec/check_grammar.py'
+      - name: Install the Rust version in rust-toolchain.toml
+        working-directory: ports/rust
+        run: rustup toolchain install
+      - name: Build the Rust sentence reader
+        working-directory: ports/rust
+        run: cargo build --locked --release -p ergo-sentences --example read
+      - name: Check ergo.rego, Rust and the ABNF read the same sentences
+        run: '"$RUNNER_TEMP/venv/bin/python" spec/check_grammar.py --rust ports/rust/target/release/examples/read'
 
   site:
     runs-on: ubuntu-latest
