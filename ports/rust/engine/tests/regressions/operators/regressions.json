@@ -8787,7 +8787,7 @@
     }
   },
   {
-    "description": "a plus of numbers below the range of a float is added as a float is, as 0, where OPA panics on that exponent and the spec leaves such numbers to the implementation",
+    "description": "a plus of numbers below the range of a float fails as unusable, because it needs more than 15 decimal places",
     "input": {
       "things": [
         {
@@ -8828,7 +8828,7 @@
         "r1": {
           "causes": [
             {
-              "cause": "value",
+              "cause": "unusable",
               "rows": 1
             }
           ],
@@ -8925,7 +8925,7 @@
           }
         },
         {
-          "cause": "value",
+          "cause": "unusable",
           "check": "c",
           "inputs": [
             {
@@ -8934,7 +8934,7 @@
                 "/things/0/fb"
               ],
               "name": "fa plus fb",
-              "value": 0
+              "value": null
             },
             {
               "locations": [
@@ -10637,7 +10637,7 @@
     }
   },
   {
-    "description": "a sum of a number below the range of a float is added as a float is, as 0, where OPA panics on that exponent and the spec leaves such numbers to the implementation",
+    "description": "a sum of a number below the range of a float fails as unusable, because it needs more than 15 decimal places",
     "input": {
       "things": [
         {
@@ -10670,13 +10670,18 @@
       }
     },
     "report": {
-      "compliant": true,
+      "compliant": false,
       "description": "",
       "ergo": "v0.3-dev",
       "meta": {},
       "requirements": {
         "r1": {
-          "causes": [],
+          "causes": [
+            {
+              "cause": "unusable",
+              "rows": 1
+            }
+          ],
           "checks": {
             "$min_subjects": {
               "description": "The in-scope thing count is at least 1",
@@ -10702,7 +10707,7 @@
           "description": "",
           "meta": {},
           "require": "every",
-          "status": "met",
+          "status": "not_met",
           "subject": "thing",
           "subjects": {
             "matching": 1,
@@ -10770,7 +10775,7 @@
           }
         },
         {
-          "cause": "satisfied",
+          "cause": "unusable",
           "check": "c",
           "inputs": [
             {
@@ -10778,7 +10783,7 @@
                 "/things/0/items/0/x"
               ],
               "name": "sum of items.x",
-              "value": 0
+              "value": null
             },
             {
               "locations": [
@@ -10790,7 +10795,7 @@
               ]
             }
           ],
-          "passed": true,
+          "passed": false,
           "requirement": "r1",
           "subject": {
             "id": "t0",

@@ -185,6 +185,13 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (".a equals b", ".a equals b", &[], &[]),
     (".a exists", ".a exists", &[], &[]),
     (".a is at least b", ".a is at least b", &[], &[]),
+    ("x plus y is at least 0", "x plus y is at least 0", &[], &[]),
+    (
+        "sum of xs is at least 0",
+        "sum of xs is at least 0",
+        &[],
+        &[],
+    ),
     (".a is before b", ".a is before b", &[], &[]),
     (
         ".a is less than $input.limit",

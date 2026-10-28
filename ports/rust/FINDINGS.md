@@ -45,24 +45,13 @@ The old port, on the branch `core/conformance-suite`, listed its findings in `co
 - **Tabs at either end of a line.** `ergo.rego` drops all whitespace there (`trim_space`), so `x is 1` followed by a tab reads. The ABNF drops only spaces, and so does Rust.
 - **The messages for a line that doesn't parse.** When a check doesn't parse, `ergo.rego` also tries to read it as a `from` line and a `for` line, and lists what those readings find. So `items whose k matches "("` as a check gets `invalid pattern "("`, which comes from reading it as a `from` line, where Rust says `doesn't parse`. Rust only reports on the kind of line it was asked to read. Both reject the same lines; only the messages differ.
 
-### Sums past 15 decimal places or 10^15
-
-[tally.sum] adds numbers as decimals and leaves the rest to the runtime: "A number with more than 15 decimal places, or too large to scale to a whole number below 10^15, is added as the runtime adds it." `ergo.rego` then falls back on OPA's `sum`, which doesn't add exactly either:
-
-| Sum                                | `ergo.rego` (`_decimal_sum`) | Rust                    |
-| ---------------------------------- | ---------------------------- | ----------------------- |
-| `0.1234567890123456` plus `1`      | `1.1234567890123456`         | `1.1234567890123456`    |
-| `0.1000000000000000001` plus `0.2` | `0.30000000000000000012`     | `0.3000000000000000001` |
-| `1e15` plus `0.5`                  | `1.0000000000000005e+15`     | `1000000000000000.5`    |
-
-Rust adds exactly whatever the size, so the rule could be the same for every engine. The one limit: operands whose digits span more than 100,000 places, like `1e99999` plus `1`, fail the side as `unusable` rather than build a huge number. No case covers any of this.
-
 ## Rules that a case contradicts
 
 Here a rule's text says one thing and a case, which `ergo.rego` passes, says another. The port follows the case, because the runner holds it to the cases, until the spec settles which one is right.
 
 - **`from: $input` on an input that is a list.** [subjects.from] says a `from` that ends `found` on a list makes each item a subject, and that with no steps it reads the whole input, so `[1]` would give one subject. The case gives none and fails `$min_subjects` as `unusable`. Case: `requirements / the whole input as the subject / fails min_subjects as unusable on a list`.
 - **The id of a subject that isn't an object, when it has an `identified_by`.** [subjects.id] says the id is `null` when the path doesn't end `found`, and a path into a string ends `not_an_object`. The case gives `"a"` the id `"a"`. Case: `requirements / ... / takes items that aren't objects as subjects, each its own id when it has no id field`.
+- **More than 15 decimal places in a sum.** [tally.sum] asks only that each number times 10^p is whole and below 10^15, so `1e-16` plus `0` would pass (`1e-16` times 10^16 is 1). The case, and `ergo.rego` (`places <= 15`), fail it as `unusable`. The engine fails any sum where p is above 15. Case: `derived / a plus that needs more than 15 digits at a common scale / fails as unusable when a term has 16 decimal places`.
 - **The order of a failed walk sentence's inputs under a `for` line.** [for.failure_inputs] says the entries "keep the order the sentence reads them, its left side and then its right side, and aren't sorted by name". Two groups of cases disagree with that, and with each other. Under `for: every keys as k`, `some rows.n is at least artifact.nums named by k` lists `artifact.nums named by k` before `rows[].n`: the right side first, in name order, as [walk.inputs] sorts a walk's row (`walks / a walk whose parent path is named by a field of each item`, `walks / a walk through a for name, read from a parent on its right side`, `sentences / a for alias inside an item's scope`). Under `for: every files as f`, `some f.tags is artifact.owner` lists `f.tags[]` before `artifact.owner`: the left side first, against name order (`walks / a for line with a walk next to a parent`). The engine puts entries that start at a `for` alias first and keeps the walk's name order for the rest, which is the one order that fits all of them.
 
 ## Things the spec leaves to the implementation

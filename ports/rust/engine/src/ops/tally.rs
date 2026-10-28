@@ -677,74 +677,52 @@ impl Parts {
     }
 }
 
-const WIDEST_SPREAD: i64 = 100_000;
-const MOST_EXPONENT: i64 = 10_000;
+const WHOLE_LIMIT: i64 = 15;
 
 fn add(numbers: &[Number]) -> Option<Number> {
     let parts: Vec<Parts> = numbers
         .iter()
         .map(|n| Parts::of(&n.to_string()))
         .collect::<Option<_>>()?;
-    let nonzero: Vec<&Parts> = parts.iter().filter(|p| !p.digits.is_empty()).collect();
-    let Some(low) = nonzero.iter().map(|p| p.exponent).min() else {
-        return "0".parse().ok();
-    };
-    let reach = nonzero
+    let places = parts
         .iter()
-        .map(|p| p.exponent.saturating_add(p.digits.len() as i64))
-        .max()?;
-    if reach.saturating_sub(low) > WIDEST_SPREAD
-        || low.abs() > MOST_EXPONENT
-        || reach.abs() > MOST_EXPONENT
-    {
-        return add_as_floats(numbers);
-    }
-    let mut positive = "0".to_string();
-    let mut negative = "0".to_string();
-    for part in nonzero {
-        let scaled = format!(
-            "{}{}",
-            part.digits,
-            "0".repeat((part.exponent - low) as usize)
-        );
-        if part.negative {
-            negative = compare::add_magnitudes(&negative, &scaled);
-        } else {
-            positive = compare::add_magnitudes(&positive, &scaled);
-        }
-    }
-    let (is_negative, magnitude) = match compare::magnitude_order(&positive, &negative) {
-        Ordering::Less => (true, compare::subtract_magnitudes(&negative, &positive)),
-        _ => (false, compare::subtract_magnitudes(&positive, &negative)),
-    };
-    scaled_text(is_negative, &magnitude, low)
-        .parse::<Number>()
-        .ok()
-}
-
-fn add_as_floats(numbers: &[Number]) -> Option<Number> {
-    let mut total = 0.0_f64;
-    for number in numbers {
-        total += number.to_string().parse::<f64>().ok()?;
-    }
-    if !total.is_finite() {
+        .filter(|p| !p.digits.is_empty())
+        .map(|p| p.exponent.checked_neg().unwrap_or(i64::MAX).max(0))
+        .max()
+        .unwrap_or(0);
+    if places > WHOLE_LIMIT {
         return None;
     }
-    if total == 0.0 {
-        return "0".parse().ok();
+    let mut total: i128 = 0;
+    for part in parts.iter().filter(|p| !p.digits.is_empty()) {
+        let width = (part.digits.len() as i64)
+            .saturating_add(part.exponent)
+            .saturating_add(places);
+        if width > WHOLE_LIMIT {
+            return None;
+        }
+        let scaled: i128 = format!(
+            "{}{}",
+            part.digits,
+            "0".repeat((part.exponent + places) as usize)
+        )
+        .parse()
+        .ok()?;
+        total += if part.negative { -scaled } else { scaled };
     }
-    format!("{total}").parse().ok()
+    if total.unsigned_abs() >= 10_u128.pow(WHOLE_LIMIT as u32) {
+        return None;
+    }
+    decimal_text(total, places).parse::<Number>().ok()
 }
 
-fn scaled_text(negative: bool, magnitude: &str, exponent: i64) -> String {
-    if magnitude == "0" {
+fn decimal_text(total: i128, places: i64) -> String {
+    if total == 0 {
         return "0".to_string();
     }
-    let sign = if negative { "-" } else { "" };
-    if exponent >= 0 {
-        return format!("{sign}{magnitude}{}", "0".repeat(exponent as usize));
-    }
-    let places = (-exponent) as usize;
+    let sign = if total < 0 { "-" } else { "" };
+    let magnitude = total.unsigned_abs().to_string();
+    let places = places as usize;
     let padded = format!("{magnitude:0>width$}", width = places + 1);
     let (whole, fraction) = padded.split_at(padded.len() - places);
     let fraction = fraction.trim_end_matches('0');
@@ -1338,26 +1316,29 @@ mod tests {
         assert_eq!(sum_text(&["-0.5", "0.25"]), "-0.25");
         assert_eq!(sum_text(&["-1.5", "1.5"]), "0");
         assert_eq!(sum_text(&["1e2", "0.5"]), "100.5");
-        assert_eq!(sum_text(&["0.000000000000001", "1"]), "1.000000000000001");
+        assert_eq!(sum_text(&["0.00000000000001", "1"]), "1.00000000000001");
     }
 
     #[test]
-    fn a_sum_stays_exact_past_fifteen_places() {
-        assert_eq!(sum_text(&["0.1234567890123456", "1"]), "1.1234567890123456");
-        assert_eq!(
-            sum_text(&["0.1000000000000000001", "0.2"]),
-            "0.3000000000000000001"
-        );
-    }
-
-    #[test]
-    fn a_sum_stays_exact_past_ten_to_the_fifteenth() {
-        assert_eq!(sum_text(&["1e15", "0.5"]), "1000000000000000.5");
-        assert_eq!(sum_text(&["999999999999999", "1"]), "1000000000000000");
-        assert_eq!(
-            sum_text(&["1e300", "1e300"]),
-            format!("2{}", "0".repeat(300))
-        );
+    fn a_sum_needing_more_than_fifteen_digits_at_a_common_scale_is_unusable() {
+        let unusable = |texts: &[&str]| {
+            let numbers: Vec<Number> = texts.iter().map(|t| number(t)).collect();
+            add(&numbers).is_none()
+        };
+        assert!(unusable(&["0.1234567890123456", "1"]));
+        assert!(unusable(&["0.1000000000000000001", "0.2"]));
+        assert!(unusable(&["1e15", "0.5"]));
+        assert!(unusable(&["1e20", "1e20"]));
+        assert!(unusable(&["1e-15", "1"]));
+        assert!(unusable(&["1e-16", "0"]));
+        assert!(unusable(&["1e-16"]));
+        assert!(unusable(&["999999999999999", "1"]));
+        assert!(unusable(&["1e300", "1e300"]));
+        assert!(unusable(&["1e15"]));
+        assert_eq!(sum_text(&["999999999999999", "0"]), "999999999999999");
+        assert_eq!(sum_text(&["-999999999999999", "1"]), "-999999999999998");
+        assert_eq!(sum_text(&["1e13", "1.5"]), "10000000000001.5");
+        assert_eq!(sum_text(&["1.50", "1e2"]), "101.5");
     }
 
     #[test]
@@ -1370,7 +1351,7 @@ mod tests {
     }
 
     #[test]
-    fn a_sum_with_digits_further_apart_than_a_hundred_thousand_is_unusable() {
+    fn a_sum_with_digits_further_apart_than_fifteen_is_unusable() {
         let numbers = [number("1e200000"), number("1")];
         assert!(add(&numbers).is_none());
         assert_eq!(
@@ -2043,16 +2024,16 @@ mod tests {
     }
 
     #[test]
-    fn a_number_below_the_range_of_a_float_is_added_as_a_float_does_and_does_not_panic() {
+    fn a_number_below_the_range_of_a_float_is_unusable_in_a_sum_and_does_not_panic() {
         for n in ["1e-70000", "1e-1000000000000"] {
             assert_eq!(
                 cause("sum of items.x is 0", subject_with(n)),
-                Cause::Satisfied,
+                Cause::Unusable,
                 "{n}"
             );
             assert_eq!(
                 cause("fa plus fb is 0", subject_with(n)),
-                Cause::Satisfied,
+                Cause::Unusable,
                 "{n}"
             );
         }
@@ -2075,12 +2056,15 @@ mod tests {
     }
 
     #[test]
-    fn a_sum_of_a_number_with_a_long_fraction_is_still_added_exactly() {
+    fn a_sum_of_a_number_with_a_long_fraction_is_unusable() {
         let long = format!("0.{}1", "0".repeat(9000));
-        assert_eq!(cause("fa plus fb is fb", subject_with(&long)), Cause::Value);
+        assert_eq!(
+            cause("fa plus fb is fb", subject_with(&long)),
+            Cause::Unusable
+        );
         assert_eq!(
             cause("sum of items.x is fa", subject_with(&long)),
-            Cause::Satisfied
+            Cause::Unusable
         );
     }
 
