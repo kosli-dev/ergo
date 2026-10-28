@@ -1,11 +1,3 @@
-for / a whose that reads a $params list that isn't a list / fails as unusable, whatever the items hold, with no failed items
-for / a second item whose path is named by a param / fails the first list's item with the ref's cause
-for / a second item that reads into a first item that isn't an object / a pull request that is a number or null fails as not_an_object
-for / named by a name from the for line / reads the key each item names: a key that's there and passes, one that fails, one that's missing, and an item that isn't a string
-for / a walk that starts at a for alias holding null / fails as null, as a walk from a field holding null does
-for / a for line whose second item is read from the first / stops a nested failed item at the meta that has no commits
-for / a for line on a child subject whose sentence reads the parent and its own field of the same name / orders the entries of the same name by where they were read, as a row does
-for / a second item that starts at a parent and is named by the first / is listed under the parent's whole name
 sentences / a for alias inside an item's scope / an alias on the right is the alias, the left of a whose and a dotted name are the field, and the report prints the dot where it matters
 sentences / named by a field / the subject's field picks the key, inside a whose or a one-line every the item's does, and a for name hides a field with the same name
 walks / a for line with a walk next to a parent / lists the for line's list and the parent's value, and never the alias's value

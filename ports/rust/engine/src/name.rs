@@ -118,10 +118,11 @@ fn render(path: &Path, marks: Option<&BTreeSet<usize>>) -> String {
             }
             Step::Ref(reference) | Step::Field(reference) => {
                 let ref_name = name(reference);
-                let one_key = matches!(
+                let one_key = (matches!(
                     reference.start,
                     Start::Input | Start::Params | Start::Subject
-                ) && matches!(reference.steps.as_slice(), [Step::Key(_)]);
+                ) && matches!(reference.steps.as_slice(), [Step::Key(_)]))
+                    || (matches!(reference.start, Start::Alias(_)) && reference.steps.is_empty());
                 if one_key && !out.is_empty() {
                     out.push_str(&format!(" named by {ref_name}"));
                 } else {
@@ -455,5 +456,18 @@ mod tests {
             name(&subject(vec![k("x"), Step::Field(Box::new(field))])),
             "x named by .empty"
         );
+    }
+
+    #[test]
+    fn a_ref_step_that_names_an_alias_is_written_with_named_by() {
+        let alias = Path {
+            start: Start::Alias("k".to_string()),
+            steps: Vec::new(),
+        };
+        let path = Path {
+            start: Start::Subject,
+            steps: vec![k("m"), Step::Ref(Box::new(alias))],
+        };
+        assert_eq!(name(&path), "m named by k");
     }
 }
