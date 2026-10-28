@@ -1,10 +1,3 @@
-any_of / any_of with a ref to a param of the wrong type / fails the row as unusable even when another option passes
-deep_walks / eleven steps after every / is written wrong
-deep_walks / eleven steps after count of, starting at a for alias / is written wrong, because the alias is a step too
-deep_walks / eleven steps after every, one of them a position / is written wrong, because the position is a step too
-deep_walks / eleven steps after a count of on the right of a phrase / is written wrong, as it is on the left
-deep_walks / eleven steps after a sum of on the right of a phrase / is written wrong, as it is on the left
-deep_walks / eleven steps after every, starting at a part of ten / is written wrong, because a walk that starts at a part counts the part's own path, so x.z is eleven steps
 deep_walks / a parent's part of ten names in the whose of a count of, read on the item / reads the item's own field, so the part is not counted and the policy reads at ten names
 derived / a count in the whose of an every / fails as absent when an item's list is missing, so the item cannot be decided
 derived / a count in the whose of an every / fails as null when an item's list is null
@@ -20,7 +13,6 @@ for / a second item that starts at a parent and is named by the first / is liste
 sentences / a for alias inside an item's scope / an alias on the right is the alias, the left of a whose and a dotted name are the field, and the report prints the dot where it matters
 sentences / named by a field / the subject's field picks the key, inside a whose or a one-line every the item's does, and a for name hides a field with the same name
 sentences / a count on the left of a whose / counts the item's own field, even when its first key is the parent subject's name
-walks / a walk that can't be run as written / fails as unusable when a param its whose reads isn't a list, even with if any, and fails with the ref's cause when its named by can't be read
 walks / a for line with a walk next to a parent / lists the for line's list and the parent's value, and never the alias's value
 walks / a walk or a count through a for name, read from a parent / lists the part before the name once, the whole object, and neither the number nor the items read through the name, which change with each item
 walks / a walk through a for name, read from a parent on its right side / reads the parent through the name for each item, and lists the parent once
