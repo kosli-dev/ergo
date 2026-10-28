@@ -53,7 +53,7 @@ const el = (tag, cls, text) => {
 };
 
 const kindClass = (kind) => kind.replace(/ /g, "-");
-const GROUP = { check: "check", option: "check", subject: "declare", requirement: "declare", field: "declare", prose: "prose" };
+const GROUP = { check: "check", option: "check", subject: "declare", requirement: "declare", field: "declare", checks: "declare", prose: "prose" };
 const TAGS = { "front matter": "front matter" };
 
 const viewBlocks = (result) => {

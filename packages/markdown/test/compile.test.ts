@@ -34,7 +34,7 @@ test("the cake example reports its blocks with kinds, names and line ranges", ()
     {kind: "requirement", name: "cake_batch", startLine: 20, endLine: 36},
     {kind: "description", startLine: 22, endLine: 22},
     {kind: "field", name: "subject", startLine: 24, endLine: 24},
-    {kind: "field", name: "checks", startLine: 26, endLine: 26},
+    {kind: "checks", startLine: 26, endLine: 26},
     {kind: "check", name: "nut_free", startLine: 28, endLine: 29},
     {kind: "check", name: "temp_ok", startLine: 30, endLine: 30},
     {kind: "check", name: "licence_allowed", startLine: 31, endLine: 35},
@@ -264,14 +264,41 @@ test("a field with no code span or two paragraphs is a problem", () => {
 });
 
 test("a list in an item with no field in it is prose", () => {
-  const {problems, blocks} = compile("## Requirements\n\n### r\n\n- subject: `s`\n\n1. a numbered note\n2. another `one`\n");
+  const {problems, blocks} = compile("## Requirements\n\n### r\n\n- subject: `s`\n\n1. a numbered note\n2. another, with `code` in it\n");
   assert.deepEqual(problems, []);
   assert.deepEqual(blocks.at(-1), {kind: "prose", startLine: 7, endLine: 8});
 });
 
+test("a field's colon is optional and its key is read whatever its capitals", () => {
+  const {policy, problems, blocks} = compile("## Subjects\n\n### a\n\n- From `xs`\n- IDENTIFIED BY: `id`\n\n## Requirements\n\n### R\n\n- Subject `a`\n- Require `some`\n- Min subjects `2`\n");
+  assert.deepEqual(problems, []);
+  assert.deepEqual(policy, {
+    subjects: {a: {from: "xs", identified_by: "id"}},
+    requirements: {r: {subject: "a", require: "some", min_subjects: 2}},
+  });
+  assert.deepEqual(blocks.filter((b) => b.kind === "field").map((b) => b.name), ["from", "identified by", "subject", "require", "min subjects"]);
+});
+
+test("in a subject or requirement, words and one code span are a field, colon or not", () => {
+  assert.deepEqual(problemsOf("## Subjects\n\n### a\n\n- Frm `xs`\n"), [{line: 5, message: 'a subject\'s fields are from and identified by, not "Frm"'}]);
+  assert.deepEqual(problemsOf(inRequirement("- See `docs`")), [
+    {line: 5, message: 'a requirement\'s fields are subject, require and min subjects, not "See"'},
+  ]);
+  assert.deepEqual(problemsOf(inRequirement("- See the docs\n- See `docs` and more")), []);
+});
+
+test("outside a subject or requirement, a bullet without a colon is a field only when it starts with a field's name", () => {
+  assert.deepEqual(problemsOf("# T\n\n- See `docs`\n"), []);
+  assert.deepEqual(problemsOf("# T\n\n- From `xs`\n"), [{line: 3, message: "a field goes under a ### subject or requirement"}]);
+});
+
+test("an unknown key with a colon names the key as written", () => {
+  assert.deepEqual(messages("## Subjects\n\n### a\n\n- Owner: `x`\n"), ['a subject\'s fields are from and identified by, not "Owner"']);
+});
+
 test("a bullet in an item that starts with a field's name is a field even when written wrong", () => {
   assert.deepEqual(problemsOf("## Subjects\n\n### a\n\n- from batches\n"), [{line: 5, message: "a field is written as key: `value`"}]);
-  assert.deepEqual(problemsOf("## Subjects\n\n### a\n\n- identified by `id`\n"), [{line: 5, message: "a field is written as key: `value`"}]);
+  assert.deepEqual(problemsOf("## Subjects\n\n### a\n\n- identified by id\n"), [{line: 5, message: "a field is written as key: `value`"}]);
   assert.deepEqual(problemsOf(inRequirement("- min subjects 2\n- subject\n- require: every")), [
     {line: 5, message: "a field is written as key: `value`"},
     {line: 6, message: "a field is written as key: `value`"},
@@ -284,7 +311,7 @@ test("a bullet in an item that only starts like a field's name is prose", () => 
 });
 
 test("a field item that is not a paragraph or has no key is a problem", () => {
-  assert.deepEqual(messages("## Subjects\n\n### a\n\n- from: `x`\n- ```\n  x\n  ```\n- `x`\n- : `x`\n- text `x`\n"), [
+  assert.deepEqual(messages("## Subjects\n\n### a\n\n- from: `x`\n- ```\n  x\n  ```\n- `x`\n- : `x`\n- text `x` more\n"), [
     "a field is written as key: `value`",
     "a field is written as key: `value`",
     "a field is written as key: `value`",
@@ -370,8 +397,9 @@ test("Checks in a subject or under the title is prose, and its checks are proble
   ]);
 });
 
-test("Checks in a requirement is a field block named checks, even when it is a problem", () => {
-  const blocks = (markdown: string) => compile(markdown).blocks.filter((b) => b.kind === "field" && b.name === "checks").map((b) => b.startLine);
+test("Checks in a requirement is a checks block with no name, even when it is a problem", () => {
+  assert.deepEqual(compile(inChecks("- **A**: `x`")).blocks.find((b) => b.kind === "checks"), {kind: "checks", startLine: 5, endLine: 5});
+  const blocks = (markdown: string) => compile(markdown).blocks.filter((b) => b.kind === "checks").map((b) => b.startLine);
   assert.deepEqual(blocks(inChecks("- **A**: `x`")), [5]);
   assert.deepEqual(blocks(inRequirement("Checks:\n\nWords.")), [5]);
   assert.deepEqual(blocks("## Subjects\n\n### a\n\nChecks:\n"), []);

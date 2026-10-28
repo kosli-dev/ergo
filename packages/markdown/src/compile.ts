@@ -18,6 +18,7 @@ export type BlockKind =
   | "check"
   | "option"
   | "front matter"
+  | "checks"
   | "prose";
 
 export type Block = {kind: BlockKind; name?: string; startLine: number; endLine: number};
@@ -50,7 +51,8 @@ const FIELD_KEYS = {
   requirement: ["subject", "require", "min_subjects"],
 } as const;
 
-const FIELD_START = /^(from|identified by|subject|require|min subjects)(?![\p{L}\p{N}_])/u;
+const FIELD_START = /^(from|identified by|subject|require|min subjects)(?![\p{L}\p{N}_])/iu;
+const FIELD_WORDS = ["from", "identified by", "subject", "require", "min subjects"];
 
 const FIELD_MESSAGE = {
   subject: (key: string) => `a subject's fields are from and identified by, not "${key}"`,
@@ -79,22 +81,22 @@ export function parse(markdown: string): Root {
   });
 }
 
-function readField(li: ListItem): {key: string; value: string; line: number} | null {
+function readField(li: ListItem, anyKey = false): {key: string; value: string; line: number} | null {
   const only = li.children[0];
   if (li.children.length !== 1 || only?.type !== "paragraph") return null;
   const [label, code, ...rest] = only.children;
   if (label?.type !== "text" || code?.type !== "inlineCode") return null;
   if (!rest.every((node) => node.type === "text" && node.value.trim() === "")) return null;
-  const head = label.value.trimEnd();
-  if (!head.endsWith(":")) return null;
-  const key = head.slice(0, -1).trim();
-  if (key === "") return null;
+  const head = label.value.trim();
+  const colon = head.endsWith(":");
+  const key = (colon ? head.slice(0, -1) : head).trim();
+  if (key === "" || (!colon && !anyKey && !FIELD_WORDS.includes(key.toLowerCase()))) return null;
   return {key, value: code.value, line: startOf(li)};
 }
 
 function looksLikeField(li: ListItem): boolean {
   const first = li.children[0];
-  return readField(li) !== null || (first?.type === "paragraph" && FIELD_START.test(toString(first).trim()));
+  return readField(li, true) !== null || (first?.type === "paragraph" && FIELD_START.test(toString(first).trim()));
 }
 
 function looksLikeCheck(li: ListItem): boolean {
@@ -292,13 +294,13 @@ export function compile(markdown: string): Compiled {
   const readFields = (list: List, current: Item) => {
     for (const li of list.children) {
       placed.add(li);
-      const field = readField(li);
-      block("field", li, field?.key);
+      const field = readField(li, true);
+      block("field", li, field?.key.toLowerCase());
       if (field === null) {
         problem(startOf(li), NOT_FIELD);
         continue;
       }
-      const key = field.key.replaceAll(" ", "_");
+      const key = field.key.toLowerCase().replaceAll(" ", "_");
       if (!(FIELD_KEYS[current.kind] as readonly string[]).includes(key)) {
         problem(field.line, FIELD_MESSAGE[current.kind](field.key));
         continue;
@@ -375,7 +377,7 @@ export function compile(markdown: string): Compiled {
       const text = toString(node);
       if (item && text === "Checks:" && item.kind === "requirement") {
         item.descriptionOpen = false;
-        block("field", node, "checks");
+        block("checks", node);
         const next = nodes[i + 1];
         if (next?.type !== "list") {
           problem(startOf(node), "Checks: must be followed by a list");

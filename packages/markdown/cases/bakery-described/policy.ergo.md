@@ -12,8 +12,8 @@ Every batch that leaves the bakery is safe to eat and baked right.
 
 A batch of cakes baked today.
 
-- from: `batches`
-- identified by: `id`
+- From `batches`
+- Identified by `id`
 
 ## Requirements
 
@@ -21,7 +21,7 @@ A batch of cakes baked today.
 
 Cakes are safe to eat and baked right.
 
-- subject: `batch`
+- Subject `batch`
 
 Checks:
 

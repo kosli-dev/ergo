@@ -8,14 +8,14 @@ ergo_spec: v0.2
 
 ### pull request
 
-- from: `pull_requests`
-- identified by: `number`
+- From `pull_requests`
+- Identified by `number`
 
 ## Requirements
 
 ### Crème brûlée — the "recipe" check!
 
-- subject: `pull request`
+- Subject `pull request`
 
 Checks:
 

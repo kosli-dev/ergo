@@ -14,14 +14,14 @@ declare one, by package name.
 
 ### component
 
-- from: `components`
-- identified by: `name`
+- From `components`
+- Identified by `name`
 
 ## Requirements
 
 ### Licences
 
-- subject: `component`
+- Subject `component`
 
 Checks:
 

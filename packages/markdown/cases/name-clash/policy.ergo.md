@@ -8,25 +8,25 @@ ergo_spec: v0.2
 
 ### batch
 
-- from: `batches`
+- From `batches`
 
 ### batch
 
-- from: `old_batches`
+- From `old_batches`
 
 ### cake  batch
 
-- from: `cakes`
+- From `cakes`
 
 ### cake batch
 
-- from: `old_cakes`
+- From `old_cakes`
 
 ## Requirements
 
 ### Cake batch
 
-- subject: `batch`
+- Subject `batch`
 
 Checks:
 
@@ -38,7 +38,7 @@ Checks:
 
 ### Cake  batch
 
-- subject: `batch`
+- Subject `batch`
 
 Checks:
 

@@ -4,21 +4,21 @@ ergo_spec: v0.2
 
 # Cake batches
 
-- subject: `batch`
+- Subject `batch`
 
 ## Subjects
 
-- from: `batches`
+- From `batches`
 
 ### batch
 
-- from: `batches`
+- From `batches`
 
 ## Requirements
 
 ### Cake batch
 
-- subject: `batch`
+- Subject `batch`
 
 Checks:
 

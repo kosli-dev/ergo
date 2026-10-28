@@ -10,13 +10,13 @@ params:
 
 ### batch
 
-- from: `batches`
+- From `batches`
 
 ## Requirements
 
 ### Cake batch
 
-- subject: `batch`
+- Subject `batch`
 
 Checks:
 

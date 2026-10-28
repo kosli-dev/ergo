@@ -12,17 +12,17 @@ ergo_spec: v0.2
 
 ### oven
 
-- from: `ovens`
+- From `ovens`
 
 Each oven has a serial number.
 
-- identified by `serial`
+- identified by serial
 
 ## Requirements
 
 ### Cake batch
 
-- subject: `batch`
+- Subject `batch`
 
 Checks:
 
