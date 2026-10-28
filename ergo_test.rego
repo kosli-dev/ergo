@@ -5029,16 +5029,33 @@ test_sum_of_and_plus_add_numbers_as_decimals if {
 	ergo._decimal_sum([1.5e3, 0.25]) == 1500.25
 	ergo._decimal_sum([-0.7, 0.9]) == 0.2
 	ergo._decimal_sum([]) == 0
-	ergo._decimal_sum([1e-20, 1]) == sum([1e-20, 1])
+	not ergo._decimal_sum([1e-20, 1])
+	not ergo._decimal_sum([1e15])
+	ergo._decimal_sum([0.123456789012345]) == 0.123456789012345
+	ergo._decimal_sum([0.1, 0.2, 100]) == 100.3
 }
 
 test_a_sum_with_several_values_it_cant_add_fails_with_the_worst_cause if {
 	[row[1] | some row in _tally_rows("sum of items.usd is 30", [{"id": 1, "items": [{"usd": null}, {}, {"usd": "x"}]}, {"id": 2, "items": [{"usd": null}, {}]}], {})] == ["unusable", "absent"]
 }
 
-test_large_numbers_are_added_as_the_runtime_adds_them_so_the_sum_stays_right if {
-	[row[1] | some row in _tally_rows("sum of xs is at least big", [{"id": 1, "xs": [0.1, 1e30], "big": 1e30}], {})] == ["satisfied"]
-	[row[1] | some row in _tally_rows("big plus 0.1 is at least big", [{"id": 1, "big": 1e30}], {})] == ["satisfied"]
+test_a_sum_that_needs_more_than_fifteen_digits_at_a_common_scale_fails_as_unusable if {
+	[[row[1], row[2][0].value] | some row in _tally_rows("sum of xs is at least big", [{"id": 1, "xs": [0.1, 1e30], "big": 1e30}], {})] == [["unusable", null]]
+	[[row[1], row[2][0].value] | some row in _tally_rows("big plus 0.1 is at least big", [{"id": 1, "big": 1e30}], {})] == [["unusable", null]]
+	[row[1] | some row in _tally_rows("x plus y is at least 0", [{"id": 1, "x": 0.123456789012345, "y": 100}], {})] == ["unusable"]
+	[row[1] | some row in _tally_rows("x plus y is at least 0", [{"id": 1, "x": 1e20, "y": 1e20}], {})] == ["unusable"]
+	[row[1] | some row in _tally_rows("x plus y is at least 0", [{"id": 1, "x": 999999999999999, "y": 1}], {})] == ["unusable"]
+	[row[1] | some row in _tally_rows("x plus y is at least 0", [{"id": 1, "x": 0.1000000000000000001, "y": 0.2}], {})] == ["unusable"]
+	[row[1] | some row in _tally_rows("x plus y is at least 0", [{"id": 1, "x": 1e-16, "y": 0}], {})] == ["unusable"]
+	[row[1] | some row in _tally_rows("sum of xs is at least 0", [{"id": 1, "xs": [1e15]}], {})] == ["unusable"]
+	[row[1] | some row in _tally_rows("sum of xs is at least 0", [{"id": 1, "xs": [0.123456789012345, 100]}], {})] == ["unusable"]
+	[row[1] | some row in _tally_rows("x plus y is at least 0", [{"id": 1, "x": 0.1, "y": 0.2}], {})] == ["satisfied"]
+}
+
+test_a_number_with_trailing_zeros_is_added_exactly if {
+	_tally_rows("x plus y is 2.5", [{"id": 1, "x": 1.500000000000000000, "y": 1}], {})[0][2][0].value == 2.5
+	[row[1] | some row in _tally_rows("x plus y is 2.5", [{"id": 1, "x": 1.50, "y": 1}], {})] == ["satisfied"]
+	[row[1] | some row in _tally_rows("x plus y is 2.5", [{"id": 1, "x": 1.500000000000000000, "y": 1}], {})] == ["satisfied"]
 }
 
 test_a_count_on_a_subject_or_item_that_isnt_an_object_fails_as_not_an_object if {

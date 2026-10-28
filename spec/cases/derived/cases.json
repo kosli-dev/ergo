@@ -2417,6 +2417,919 @@
     ]
   },
   {
+    "description": "a plus that needs more than 15 digits at a common scale",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "x plus y is at least 0"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "adds 0.1 and 0.2 up to 0.3",
+        "rules": [
+          "sentence.derived.plus",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "x": 0.1,
+              "y": 0.2,
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/x",
+                  "/releases/0/y"
+                ],
+                "name": "x plus y",
+                "value": 0.3
+              },
+              {
+                "locations": [
+                  "/releases/0/x"
+                ],
+                "name": "x",
+                "value": 0.1
+              },
+              {
+                "locations": [
+                  "/releases/0/y"
+                ],
+                "name": "y",
+                "value": 0.2
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "met"
+        },
+        "compliant": true
+      },
+      {
+        "description": "adds a number with trailing zeros exactly",
+        "rules": [
+          "sentence.derived.plus",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "x": 1.50,
+              "y": 1,
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/x",
+                  "/releases/0/y"
+                ],
+                "name": "x plus y",
+                "value": 2.5
+              },
+              {
+                "locations": [
+                  "/releases/0/x"
+                ],
+                "name": "x",
+                "value": 1.5
+              },
+              {
+                "locations": [
+                  "/releases/0/y"
+                ],
+                "name": "y",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "met"
+        },
+        "compliant": true
+      },
+      {
+        "description": "adds a number with many trailing zeros exactly",
+        "rules": [
+          "sentence.derived.plus",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "x": 1.500000000000000000,
+              "y": 1,
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/x",
+                  "/releases/0/y"
+                ],
+                "name": "x plus y",
+                "value": 2.5
+              },
+              {
+                "locations": [
+                  "/releases/0/x"
+                ],
+                "name": "x",
+                "value": 1.5
+              },
+              {
+                "locations": [
+                  "/releases/0/y"
+                ],
+                "name": "y",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "met"
+        },
+        "compliant": true
+      },
+      {
+        "description": "fails as unusable when 15 decimal places and 3 whole digits are needed",
+        "rules": [
+          "sentence.derived.plus",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "x": 0.123456789012345,
+              "y": 100,
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/x",
+                  "/releases/0/y"
+                ],
+                "name": "x plus y",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/x"
+                ],
+                "name": "x",
+                "value": 0.123456789012345
+              },
+              {
+                "locations": [
+                  "/releases/0/y"
+                ],
+                "name": "y",
+                "value": 100
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false
+      },
+      {
+        "description": "fails as unusable when a term is 1e20 and the other is 1",
+        "rules": [
+          "sentence.derived.plus",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "x": 1e20,
+              "y": 1,
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/x",
+                  "/releases/0/y"
+                ],
+                "name": "x plus y",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/x"
+                ],
+                "name": "x",
+                "value": 100000000000000000000
+              },
+              {
+                "locations": [
+                  "/releases/0/y"
+                ],
+                "name": "y",
+                "value": 1
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false
+      },
+      {
+        "description": "fails as unusable when a term has 15 decimal places and the other is 1",
+        "rules": [
+          "sentence.derived.plus",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "x": 0.000000000000001,
+              "y": 1,
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/x",
+                  "/releases/0/y"
+                ],
+                "name": "x plus y",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/x"
+                ],
+                "name": "x",
+                "value": 0.000000000000001
+              },
+              {
+                "locations": [
+                  "/releases/0/y"
+                ],
+                "name": "y",
+                "value": 1
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false
+      },
+      {
+        "description": "fails as unusable when a term has 16 decimal places",
+        "rules": [
+          "sentence.derived.plus",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "x": 1e-16,
+              "y": 0,
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/x",
+                  "/releases/0/y"
+                ],
+                "name": "x plus y",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/x"
+                ],
+                "name": "x",
+                "value": 0.0000000000000001
+              },
+              {
+                "locations": [
+                  "/releases/0/y"
+                ],
+                "name": "y",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false
+      },
+      {
+        "description": "fails as unusable when the result reaches 10^15",
+        "rules": [
+          "sentence.derived.plus",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "x": 999999999999999,
+              "y": 1,
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/x",
+                  "/releases/0/y"
+                ],
+                "name": "x plus y",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/x"
+                ],
+                "name": "x",
+                "value": 999999999999999
+              },
+              {
+                "locations": [
+                  "/releases/0/y"
+                ],
+                "name": "y",
+                "value": 1
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false
+      },
+      {
+        "description": "fails as unusable when a term has 19 decimal places",
+        "rules": [
+          "sentence.derived.plus",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "x": 0.0000000000000000001,
+              "y": 0.2,
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/x",
+                  "/releases/0/y"
+                ],
+                "name": "x plus y",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/x"
+                ],
+                "name": "x",
+                "value": 0.0000000000000000001
+              },
+              {
+                "locations": [
+                  "/releases/0/y"
+                ],
+                "name": "y",
+                "value": 0.2
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false
+      },
+      {
+        "description": "fails as unusable for two round numbers too large to scale",
+        "rules": [
+          "sentence.derived.plus",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "x": 1e20,
+              "y": 1e20,
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/x",
+                  "/releases/0/y"
+                ],
+                "name": "x plus y",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/x"
+                ],
+                "name": "x",
+                "value": 100000000000000000000
+              },
+              {
+                "locations": [
+                  "/releases/0/y"
+                ],
+                "name": "y",
+                "value": 100000000000000000000
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false
+      }
+    ]
+  },
+  {
+    "description": "a sum that needs more than 15 digits at a common scale",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "sum of xs is at least 0"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as unusable when a single value reaches 10^15",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "xs": [
+                1e15
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/xs/0"
+                ],
+                "name": "sum of xs",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  1000000000000000
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false
+      },
+      {
+        "description": "adds a single value of 15 decimal places as it is",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "xs": [
+                0.123456789012345
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/xs/0"
+                ],
+                "name": "sum of xs",
+                "value": 0.123456789012345
+              },
+              {
+                "locations": [
+                  "/releases/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  0.123456789012345
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "met"
+        },
+        "compliant": true
+      },
+      {
+        "description": "adds 0.1, 0.2 and 100 up to 100.3",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "xs": [
+                0.1,
+                0.2,
+                100
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/xs/0",
+                  "/releases/0/xs/1",
+                  "/releases/0/xs/2"
+                ],
+                "name": "sum of xs",
+                "value": 100.3
+              },
+              {
+                "locations": [
+                  "/releases/0/xs/0",
+                  "/releases/0/xs/1",
+                  "/releases/0/xs/2"
+                ],
+                "name": "xs[]",
+                "value": [
+                  0.1,
+                  0.2,
+                  100
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "met"
+        },
+        "compliant": true
+      },
+      {
+        "description": "fails as unusable when the values need 15 decimal places and 3 whole digits",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "xs": [
+                0.123456789012345,
+                100
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/xs/0",
+                  "/releases/0/xs/1"
+                ],
+                "name": "sum of xs",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/xs/0",
+                  "/releases/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  0.123456789012345,
+                  100
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false
+      },
+      {
+        "description": "is 0 over no values",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "xs": [],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "sum of xs",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "met"
+        },
+        "compliant": true
+      }
+    ]
+  },
+  {
     "description": "sum of a field with whose",
     "policy": {
       "ergo_spec": "v0.3-dev",
