@@ -153,7 +153,7 @@ export function compile(markdown: string): Compiled {
   const requirementLines = new Map<string, number>();
 
   let titleSeen = false;
-  let titleOpen = false;
+  let titleOpen = true;
   let section: "none" | "subjects" | "requirements" | "other" = "none";
   let sectionText = "";
   let item: Item | null = null;
@@ -339,7 +339,7 @@ export function compile(markdown: string): Compiled {
           block("prose", node);
         } else {
           titleSeen = true;
-          titleOpen = true;
+          titleOpen = description === undefined;
           block("title", node);
         }
       } else if (node.depth === 2) {

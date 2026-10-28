@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Write Ergo policies in Markdown",
   "exports": {
-    ".": "./src/compile.ts"
+    ".": "./src/web.ts"
   },
   "bin": {
     "ergo": "./src/cli.ts"
