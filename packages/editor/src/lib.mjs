@@ -31,13 +31,14 @@ const sentencesRead = (block, check) => {
   return null;
 };
 
-const linesOf = (block, height, raw, at, more) => {
+const linesOf = (block, height, raw, at, more, checks) => {
   const item = (kind, text) => ({ kind, text: String(text) });
   if (block.kind === "front matter") {
     return { head: at.policy?.ergo_spec ? [item("name", "ergo_spec"), item("value", at.policy.ergo_spec)] : [item("source", raw)], below: [] };
   }
   if (block.kind === "title") return { head: [item("name", headingText(at.tree, block.startLine) || raw)], below: [] };
   if (block.kind === "prose") return { head: [item("quiet", raw)], below: [] };
+  if (block.kind === "checks") return { head: [item("name", plural(checks, "check"))], below: [] };
   if (block.kind === "description") return { head: [item("source", raw)], below: more.map((line) => item("source", line || "\u00a0")) };
   const head = block.name ? [item("name", block.name)] : [];
   if (block.kind === "field") {
@@ -55,6 +56,15 @@ const linesOf = (block, height, raw, at, more) => {
   return { head, below: [] };
 };
 
+const checksAfter = (sorted, i) => {
+  let count = 0;
+  for (const b of sorted.slice(i + 1)) {
+    if (b.kind === "check") count++;
+    else if (b.kind !== "option") break;
+  }
+  return count;
+};
+
 export const layoutRows = (result, source = "", tree = null) => {
   const lines = source.split("\n");
   const sorted = [...result.blocks].sort((a, b) => a.startLine - b.startLine || b.endLine - a.endLine);
@@ -70,7 +80,7 @@ export const layoutRows = (result, source = "", tree = null) => {
       top: b.startLine,
       height,
       kind: b.kind,
-      ...linesOf(b, height, (lines[b.startLine - 1] ?? "").trim(), at, lines.slice(b.startLine, endLine).map((line) => line.trim())),
+      ...linesOf(b, height, (lines[b.startLine - 1] ?? "").trim(), at, lines.slice(b.startLine, endLine).map((line) => line.trim()), checksAfter(sorted, i)),
       problems: result.problems.filter((p) => p.line >= b.startLine && p.line <= endLine).map((p) => p.message),
     };
   });
@@ -114,7 +124,7 @@ export const policySheet = (policy) => {
   };
 };
 
-const GROUPS = { check: "check", option: "check", subject: "declare", requirement: "declare", field: "declare" };
+const GROUPS = { check: "check", option: "check", subject: "declare", requirement: "declare", field: "declare", checks: "declare" };
 const PRIORITY = ["check", "declare", "other"];
 
 export const markOf = (node, blocks) => {

@@ -18,6 +18,7 @@ export type BlockKind =
   | "check"
   | "option"
   | "front matter"
+  | "checks"
   | "prose";
 
 export type Block = {kind: BlockKind; name?: string; startLine: number; endLine: number};
@@ -376,7 +377,7 @@ export function compile(markdown: string): Compiled {
       const text = toString(node);
       if (item && text === "Checks:" && item.kind === "requirement") {
         item.descriptionOpen = false;
-        block("field", node, "checks");
+        block("checks", node);
         const next = nodes[i + 1];
         if (next?.type !== "list") {
           problem(startOf(node), "Checks: must be followed by a list");
