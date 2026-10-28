@@ -2,7 +2,6 @@
 ergo_spec: v0.2
 params:
   allowed_licenses: [MIT]
-owner: bakery
 ---
 
 # Cake batches

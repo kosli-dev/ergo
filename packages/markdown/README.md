@@ -88,7 +88,7 @@ Params aren't part of a policy: they're the third argument of `ergo.report`. A p
 
 ### The title and descriptions
 
-`# Cake batches` is the document's title. The first paragraph after it is the policy's `description`. The same goes for each subject and requirement: the first paragraph under its heading is its `description`.
+`# Cake batches` is the document's title. It's for people, and the policy doesn't keep it. The first paragraph after it is the policy's `description`. The same goes for each subject and requirement: the first paragraph under its heading is its `description`.
 
 ### Subjects and requirements
 
@@ -106,7 +106,7 @@ Each `###` under `## Subjects` is a subject, and each `###` under `## Requiremen
 
 You don't write names: the tool works them out from the headings and labels.
 
-- A subject's name is its heading as written, spaces included: `### pull request` is `pull request`, and a requirement says ``subject: `pull request` ``.
+- A subject's name is its heading as written, spaces included, with each run of spaces made one and none at either end: `### pull request` is `pull request`, and a requirement says ``subject: `pull request` ``.
 - A requirement's name is its heading in lowercase, with every run of other characters than letters and digits turned into one `_`, and none at either end: `### Cake batch` is `cake_batch`, and `### Crème brûlée — the "recipe" check!` is `crème_brûlée_the_recipe_check`.
 - A check's name is worked out the same way from its bold label: `**Nut free**` is `nut_free`, and `**Approved by 2+ people**` is `approved_by_2_people`.
 

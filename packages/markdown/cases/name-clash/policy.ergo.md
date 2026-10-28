@@ -14,6 +14,14 @@ ergo_spec: v0.2
 
 - from: `old_batches`
 
+### cake  batch
+
+- from: `cakes`
+
+### cake batch
+
+- from: `old_cakes`
+
 ## Requirements
 
 ### Cake batch

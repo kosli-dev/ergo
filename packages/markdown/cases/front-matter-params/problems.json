@@ -1,10 +1,6 @@
 [
   {
     "line": 3,
-    "message": "front matter holds only ergo_spec; pass params to ergo.report"
-  },
-  {
-    "line": 5,
-    "message": "the front matter holds ergo_spec, not owner"
+    "message": "the front matter holds only ergo_spec, not params: pass params to ergo.report"
   }
 ]

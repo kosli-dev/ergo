@@ -4,15 +4,19 @@
     "message": "subject batch has the same name as the subject on line 9"
   },
   {
-    "line": 26,
-    "message": "check nut_free has the same name as the check on line 25"
+    "line": 21,
+    "message": "subject cake batch has the same name as the subject on line 17"
   },
   {
-    "line": 29,
-    "message": "option oven has the same name as the option on line 28"
+    "line": 34,
+    "message": "check nut_free has the same name as the check on line 33"
   },
   {
-    "line": 31,
-    "message": "requirement cake_batch has the same name as the requirement on line 19"
+    "line": 37,
+    "message": "option oven has the same name as the option on line 36"
+  },
+  {
+    "line": 39,
+    "message": "requirement cake_batch has the same name as the requirement on line 27"
   }
 ]
