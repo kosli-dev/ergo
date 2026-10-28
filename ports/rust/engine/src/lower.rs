@@ -197,6 +197,18 @@ impl Scope {
         self.read_path(path, true, true)
     }
 
+    pub fn is_item(&self) -> bool {
+        self.item
+    }
+
+    pub fn counted_path(&self, path: &s::Path) -> Result<path::Path, Vec<String>> {
+        if self.item {
+            self.read_path(path, false, false)
+        } else {
+            self.path(path)
+        }
+    }
+
     pub fn left_path(&self, path: &s::Path) -> Result<path::Path, Vec<String>> {
         if self.item {
             self.read_path(path, false, false)
@@ -331,15 +343,15 @@ fn number(text: &str) -> Result<Value, Vec<String>> {
 pub fn lower_condition(condition: &s::Condition, scope: &Scope) -> Result<Check, Vec<String>> {
     let aliases = scope.aliases();
     let names: Vec<&str> = aliases.iter().map(String::as_str).collect();
-    let left = match &condition.left {
-        s::Left::Path(left) => left,
-        other => {
-            return match tally::lower_condition(other, &condition.phrase, scope) {
-                Some(Ok(Some(check))) => Ok(check),
-                Some(Err(found)) => Err(found),
-                _ => Err(unsupported(condition, &names)),
-            };
-        }
+    if let Some(lowered) = tally::lower_condition(&condition.left, &condition.phrase, scope) {
+        return match lowered {
+            Ok(Some(check)) => Ok(check),
+            Ok(None) => Err(unsupported(condition, &names)),
+            Err(found) => Err(found),
+        };
+    }
+    let s::Left::Path(left) = &condition.left else {
+        return Err(unsupported(condition, &names));
     };
     if let s::Phrase::Exists { not } = &condition.phrase {
         return Ok(Check::Present(Present {

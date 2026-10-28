@@ -134,9 +134,8 @@ impl Check {
             Check::HasType(check) => Some(&check.path),
             Check::NonEmptyString(check) => Some(&check.path),
             Check::Empty(check) => Some(&check.path),
-            Check::Tally(_) | Check::Walk(_) | Check::For(_) | Check::AnyOf(_) | Check::NotYet => {
-                None
-            }
+            Check::Tally(check) => check.paths().into_iter().next(),
+            Check::Walk(_) | Check::For(_) | Check::AnyOf(_) | Check::NotYet => None,
         }
     }
 
@@ -244,6 +243,7 @@ impl Check {
     pub fn flawed(&self, ctx: &Ctx) -> bool {
         match self {
             Check::AnyOf(check) => check.flawed(ctx),
+            Check::Walk(check) => check.flawed(ctx),
             _ => false,
         }
     }
