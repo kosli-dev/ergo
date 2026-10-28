@@ -61,6 +61,10 @@ impl Decimal {
         self.digits.is_empty()
     }
 
+    pub fn is_non_negative_whole(&self) -> bool {
+        !self.negative && (self.is_zero() || self.exponent >= 0)
+    }
+
     pub fn as_position(&self) -> Option<u64> {
         if self.negative {
             return None;
@@ -333,6 +337,17 @@ mod tests {
         assert_eq!(pos("-1"), None);
         assert_eq!(pos("1e400"), None);
         assert_eq!(pos("1e-1"), None);
+    }
+
+    #[test]
+    fn whole_numbers_of_zero_or_more_are_what_min_subjects_takes() {
+        let whole = |t: &str| Decimal::parse(t).unwrap().is_non_negative_whole();
+        for good in ["0", "-0", "1", "2.0", "1e2", "10e-1", "1e400"] {
+            assert!(whole(good), "{good}");
+        }
+        for bad in ["-1", "1.5", "1e-1", "-1e400", "0.5"] {
+            assert!(!whole(bad), "{bad}");
+        }
     }
 
     #[test]
