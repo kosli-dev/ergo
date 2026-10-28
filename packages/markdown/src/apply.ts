@@ -1,7 +1,7 @@
 import type {Block} from "./compile.ts";
-import type {List, ListItem, Nodes} from "mdast";
+import type {List, ListItem, Nodes, Paragraph, Text} from "mdast";
 import {toString} from "mdast-util-to-string";
-import {compile, nameOf, parse} from "./compile.ts";
+import {compile, nameOf, parse, plain} from "./compile.ts";
 import {
   FIELD_ORDER,
   type Kept,
@@ -27,16 +27,25 @@ type Kind = "subject" | "requirement";
 
 const BULLET = /^(\s*(?:[-*+]|\d+[.)]) +)/;
 
-const pairRenames = (before: string[], after: string[]): Map<string, string> => {
+const pairRenames = (was: Json, now: Json): Map<string, string> => {
+  const before = Object.keys(was);
+  const after = Object.keys(now);
   const renames = new Map<string, string>();
   before.forEach((name, i) => {
     const next = after[i];
     if (!after.includes(name) && next !== undefined && !before.includes(next)) renames.set(name, next);
   });
+  const lost = before.filter((name) => !after.includes(name) && !renames.has(name));
+  const gained = after.filter((name) => !before.includes(name) && ![...renames.values()].includes(name));
+  if (lost.length === 1 && gained.length === 1 && same(was[lost[0]!], now[gained[0]!])) renames.set(lost[0]!, gained[0]!);
   return renames;
 };
 
 export function apply(markdown: string, policy: object): Applied {
+  if (markdown.includes("\r\n") && !/(^|[^\r])\n/.test(markdown)) {
+    const applied = apply(markdown.replaceAll("\r\n", "\n"), policy);
+    return applied.markdown === null ? applied : {...applied, markdown: applied.markdown.replaceAll("\n", "\r\n")};
+  }
   const compiled = compile(markdown);
   if (compiled.problems.length > 0) {
     return {markdown: null, changes: [], problems: [{path: "", message: "fix the Markdown first"}]};
@@ -103,6 +112,30 @@ export function apply(markdown: string, policy: object): Applied {
 
   const slice = (node: Nodes): string => markdown.slice(node.position!.start.offset!, node.position!.end.offset!);
 
+  const descriptionOf = (li: ListItem) => {
+    const first = li.children[0] as Paragraph;
+    const colon = first.children[1]!.position!.start.offset!;
+    const paragraphs: Paragraph[] = [first];
+    for (let k = 1; li.children[k]?.type === "paragraph"; k++) paragraphs.push(li.children[k] as Paragraph);
+    const found: {text: string; start: number; end: number}[] = [];
+    let coded = false;
+    paragraphs.forEach((para, j) => {
+      if (coded) return;
+      const colonNode = para.children[1] as Text;
+      const nodes = j === 0 ? [{...colonNode, value: colonNode.value.slice(1)}, ...para.children.slice(2)] : para.children;
+      const at = nodes.findIndex((node) => node.type === "inlineCode");
+      const before = at < 0 ? nodes : nodes.slice(0, at);
+      coded = at >= 0;
+      const text = plain(before);
+      if (text === "") return;
+      const from = j === 0 ? colon + 1 : para.position!.start.offset!;
+      const start = from + /^\s*/.exec(markdown.slice(from))![0].length;
+      const last = before[before.length - 1]!;
+      found.push({text, start, end: start + markdown.slice(start, last.position!.end.offset!).trimEnd().length});
+    });
+    return {found, colon};
+  };
+
   const keptOf = (block: Block, was: Json, now: Json, renamed: string | undefined): Kept => {
     const li = itemAt(block.startLine)!;
     const strongOf = (item: ListItem) => (item.children[0] as {children: Nodes[]}).children[0]!;
@@ -110,12 +143,29 @@ export function apply(markdown: string, policy: object): Applied {
     const nested = li.children.find((child): child is List => child.type === "list");
     const options = new Map((nested?.children ?? []).map((option) => [nameOf(toString(strongOf(option))), slice(strongOf(option))]));
     const wanted = renamed === undefined ? strong : `**${label(renamed)}**`;
-    if (!same(was.description, now.description)) return {strong: wanted, options};
-    const codes = codesOf(li);
-    const boundary = (codes[0] ?? nested)!.position!.start.offset!;
-    const before = markdown.slice(lineStart(block.startLine), boundary);
-    const head = before.replace(/\s+$/, "").replace(strong, wanted);
-    return {head: head.split("\n"), sameLine: !before.slice(head.length).includes("\n"), options};
+    const relabel = (text: string) => text.replace(strong, () => wanted);
+    if (same(was.description, now.description)) {
+      const codes = codesOf(li);
+      const boundary = (codes[0] ?? nested)!.position!.start.offset!;
+      const before = markdown.slice(lineStart(block.startLine), boundary);
+      const trimmed = before.replace(/\s+$/, "");
+      return {head: relabel(trimmed).split("\n"), sameLine: !before.slice(trimmed.length).includes("\n"), options};
+    }
+    const {found, colon} = descriptionOf(li);
+    const wantedTexts = typeof now.description === "string" ? now.description.split("\n\n") : [];
+    const keeps = (i: number) => found[i]?.text === wantedTexts[i];
+    const equalCount = found.length === wantedTexts.length;
+    let prefix = 0;
+    while (prefix < wantedTexts.length && keeps(prefix)) prefix++;
+    const paragraphs = wantedTexts.map((text, i) =>
+      (equalCount ? keeps(i) : i < prefix) ? markdown.slice(found[i]!.start, found[i]!.end) : descriptionLines(text)[0]!,
+    );
+    const bullet = BULLET.exec(lines[block.startLine - 1]!)?.[1] ?? "- ";
+    const pad = " ".repeat(bullet.length);
+    const opening = relabel(markdown.slice(lineStart(block.startLine), colon + 1));
+    const head = [`${opening}${paragraphs.length > 0 ? ` ${paragraphs[0]}` : ""}`];
+    for (const text of paragraphs.slice(1)) head.push("", `${pad}${text}`);
+    return {head, options};
   };
 
   const sentencesOf = (value: unknown): unknown[] => (value === undefined ? [] : Array.isArray(value) ? value : [value]);
@@ -163,7 +213,24 @@ export function apply(markdown: string, policy: object): Applied {
       insertBlock(anchor, descriptionLines(now));
       changes.push(`added ${at}`);
     } else {
-      replace(old.startLine, old.endLine, descriptionLines(now));
+      const paragraphs = tree.children.filter(
+        (node): node is Paragraph =>
+          node.type === "paragraph" && node.position!.start.line >= old.startLine && node.position!.end.line <= old.endLine,
+      );
+      const wasTexts = paragraphs.map((node) => plain(node.children));
+      const nowTexts = (now as string).split("\n\n");
+      if (wasTexts.length === nowTexts.length) {
+        paragraphs.forEach((node, i) => {
+          if (wasTexts[i] !== nowTexts[i]) replace(node.position!.start.line, node.position!.end.line, descriptionLines(nowTexts[i]));
+        });
+      } else {
+        let kept = 0;
+        while (kept < Math.min(wasTexts.length, nowTexts.length) && wasTexts[kept] === nowTexts[kept]) kept++;
+        const rest = descriptionLines(nowTexts.slice(kept).join("\n\n"));
+        if (kept === nowTexts.length) remove(paragraphs[kept]!.position!.start.line, old.endLine);
+        else if (kept === wasTexts.length) insertAfter(old.endLine, ["", ...rest]);
+        else replace(paragraphs[kept]!.position!.start.line, old.endLine, rest);
+      }
       changes.push(`rewrote ${at}`);
     }
   };
@@ -210,7 +277,7 @@ export function apply(markdown: string, policy: object): Applied {
       return;
     }
     const old = was as Json;
-    const renames = pairRenames(Object.keys(old), Object.keys(target));
+    const renames = pairRenames(old, target);
     for (const block of own) {
       const name = block.name!;
       const renamed = renames.get(name);
@@ -285,7 +352,7 @@ export function apply(markdown: string, policy: object): Applied {
   ] as const) {
     const was = before[key] as Json;
     const now = after[key] as Json;
-    const renames = pairRenames(Object.keys(was), Object.keys(now));
+    const renames = pairRenames(was, now);
     for (const item of items.filter((b) => b.kind === kind)) {
       const name = item.name!;
       const renamed = renames.get(name);

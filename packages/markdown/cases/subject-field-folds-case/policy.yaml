@@ -1,0 +1,11 @@
+subjects:
+  batch:
+    from: batches
+    identified_by: id
+requirements:
+  r:
+    subject: batch
+    checks:
+      a:
+        description: Words.
+        assert: a is 1

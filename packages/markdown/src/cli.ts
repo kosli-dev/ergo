@@ -61,6 +61,11 @@ export function main(argv: string[], io: Io): number {
       io.stdout(rendered.markdown);
       return 0;
     }
+    const unread = compile(markdown).problems;
+    if (unread.length > 0) {
+      io.stderr(`${unread.map((p) => `${file}:${p.line}: ${p.message}\n`).join("")}not written\n`);
+      return 1;
+    }
     const applied = apply(markdown, policy);
     if (applied.markdown === null) {
       io.stderr(`${told(applied.problems)}not written\n`);

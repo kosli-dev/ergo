@@ -421,8 +421,14 @@ test("a check in a subject, under the title, under another section or in a quote
   assert.deepEqual(problemsOf(inRequirement("Check:\n\n- **A**: `x`")), [{line: 7, message}]);
 });
 
-test("a bullet with a bold label but no code span, or no colon, is prose outside Checks", () => {
-  assert.deepEqual(problemsOf("# T\n\n- **Note**: words only\n- **Note** `x`\n- `x`\n\n1. text\n"), []);
+test("a bullet with a bold label but no code span is prose outside Checks", () => {
+  assert.deepEqual(problemsOf("# T\n\n- **Note**: words only\n- `x`\n\n1. text\n"), []);
+});
+
+test("a bullet with a bold label and a code span is a misplaced check whatever follows the label", () => {
+  assert.deepEqual(problemsOf("# T\n\n- **Note** `x`\n"), [
+    {line: 3, message: "a check goes in the list right after Checks:"},
+  ]);
 });
 
 test("an item already reported inside a check is not reported again", () => {
@@ -452,9 +458,21 @@ test("a bold label that is not followed by a colon is a problem", () => {
   assert.deepEqual(messages(inChecks("- **A** : `x`")), ["a bold label is followed by a colon"]);
 });
 
-test("a label of punctuation is a name like any other", () => {
-  assert.deepEqual(Object.keys((compile(inChecks("- **!!**: `x`\n- **A**:\n  - **?**: `y`")).policy as any).requirements.r.checks), ["!!", "a"]);
-  assert.deepEqual((compile(inChecks("- **A**:\n  - **?**: `y`")).policy as any).requirements.r.checks.a, {any_of: {"?": "y"}});
+test("a label with punctuation and a letter or a digit is a name, and one of punctuation alone is a problem", () => {
+  assert.deepEqual(Object.keys((compile(inChecks("- **!!a**: `x`\n- **A**:\n  - **?1**: `y`")).policy as any).requirements.r.checks), ["!!a", "a"]);
+  assert.deepEqual(problemsOf(inChecks("- **A**:\n  - **?**: `y`")), [{line: 8, message: "a label needs a letter or a digit"}]);
+  assert.equal(nameProblem("\u65e5\u672c"), null);
+  assert.equal(nameProblem("\u0661\u0662"), null);
+  assert.equal(nameProblem("\u200b"), "a name can't hold a character you can't see");
+});
+
+test("a name is Unicode-normalised, so a letter with its accent written either way is one name", () => {
+  assert.equal(nameOf("Cafe\u0301"), "caf\u00e9");
+});
+
+test("a Subject field is folded like a subject name", () => {
+  const {policy} = compile("## Subjects\n\n### Batch\n\n- From `b`\n\n## Requirements\n\n### R\n\n- Subject `  BATCH `\n");
+  assert.equal((policy as any).requirements.r.subject, "batch");
 });
 
 test("nameOf and nameProblem give the name a heading or label makes and what is wrong with it", () => {
@@ -552,9 +570,10 @@ test("a for line with no other sentence is a problem", () => {
   ]);
 });
 
-test("a for line may go with a list of options", () => {
-  const {policy} = compile(inChecks("- **A**: `for a as b`\n  - **O**: `x`"));
-  assert.deepEqual((policy as any).requirements.r.checks.a, {for: "a as b", any_of: {o: "x"}});
+test("a for line with a list of options is a problem", () => {
+  assert.deepEqual(problemsOf(inChecks("- **A**: `for a as b`\n  - **O**: `x`")), [
+    {line: 7, message: "a check with options can't have a for line"},
+  ]);
 });
 
 test("a nested list gives any_of with strings and lists", () => {
@@ -660,4 +679,21 @@ test("paragraphs after a title that follows a description at the top are prose",
 
 test("a paragraph after a table at the top is prose", () => {
   assert.equal(compile("| a |\n| - |\n| b |\n\nText.\n").policy!.description, undefined);
+});
+
+test("a field written in a table cell under a requirement is a problem", () => {
+  assert.deepEqual(problemsOf(inRequirement("| a |\n| - |\n| Min subjects `5` |")), [
+    {line: 7, message: "a field goes in the list of fields, as - key `value`"},
+  ]);
+});
+
+test("a paragraph that starts with a word that isn't a field key and a code span is prose", () => {
+  assert.deepEqual(problemsOf(inRequirement("- Subject `batch`\n\nNote: `x`")), []);
+});
+
+test("a code span inside formatting in an option is a problem", () => {
+  assert.deepEqual(problemsOf(inChecks("- **A**:\n  - **O**: **`x`**\n")), [
+    {line: 8, message: "an option needs a sentence in a code span"},
+    {line: 8, message: "a sentence goes in its own code span, not inside formatting"},
+  ]);
 });

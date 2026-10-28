@@ -137,9 +137,9 @@ test("apply with nothing to change leaves the file and says so", () => {
   assert.equal(wrote, false);
 });
 
-test("apply prints the problems and not written, and exits 1", () => {
+test("apply on a document with problems prints the lines check prints, then not written, and exits 1", () => {
   const files: Record<string, string> = {"p.ergo.md": "# A\n\n# B\n", "p.yaml": "{}"};
-  assert.deepEqual(run(["apply", "p.ergo.md", "p.yaml"], files), {code: 1, out: "", err: "fix the Markdown first\nnot written\n"});
+  assert.deepEqual(run(["apply", "p.ergo.md", "p.yaml"], files), {code: 1, out: "", err: "p.ergo.md:3: a policy has one # title\nnot written\n"});
   assert.equal(files["p.ergo.md"], "# A\n\n# B\n");
 });
 

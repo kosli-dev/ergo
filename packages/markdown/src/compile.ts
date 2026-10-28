@@ -42,6 +42,9 @@ type Span = {value: string; line: number};
 
 const NO_LABEL = "a label needs a letter or a digit";
 const NOT_FIELD = "a field is written as key: `value`";
+const FIELD_PLACE = "a field goes in the list of fields, as - key `value`";
+const WRAPPED = "a sentence goes in its own code span, not inside formatting";
+const CHECK_PLACE = "a check goes in the list right after Checks:";
 const COLON = "a bold label is followed by a colon";
 const CHECK_TAIL = "a check's sentences go in code spans, with nothing else after the first one";
 const OPTION_TAIL = "an option's sentences go in code spans, with nothing else after the first one";
@@ -65,12 +68,20 @@ const endOf = (node: {position?: {end: {line: number}}}): number => node.positio
 
 const collapse = (text: string): string => text.replace(/\s+/g, " ").trim();
 
-export const nameOf = (text: string): string => collapse(text).toLowerCase();
+export const nameOf = (text: string): string => collapse(text.normalize("NFC")).toLowerCase();
 
 export const nameProblem = (name: string): string | null =>
-  name === "" ? NO_LABEL : name.startsWith("$") ? "a name can't start with $" : null;
+  name === ""
+    ? NO_LABEL
+    : name.startsWith("$")
+      ? "a name can't start with $"
+      : /\p{Cf}/u.test(name)
+        ? "a name can't hold a character you can't see"
+        : /[\p{L}\p{N}]/u.test(name)
+          ? null
+          : NO_LABEL;
 
-const plain = (nodes: PhrasingContent[]): string =>
+export const plain = (nodes: PhrasingContent[]): string =>
   collapse(toString({type: "paragraph", children: nodes} satisfies Paragraph));
 
 export function parse(markdown: string): Root {
@@ -93,6 +104,12 @@ function readField(li: ListItem, anyKey = false): {key: string; value: string; l
   return {key, value: code.value, line: startOf(li)};
 }
 
+function fieldIn(children: PhrasingContent[]): boolean {
+  const [label, code] = children;
+  if (label?.type !== "text" || code?.type !== "inlineCode") return false;
+  return FIELD_WORDS.includes(label.value.trim().replace(/:$/, "").trim().toLowerCase());
+}
+
 function looksLikeField(li: ListItem): boolean {
   const first = li.children[0];
   return readField(li, true) !== null || (first?.type === "paragraph" && FIELD_START.test(toString(first).trim()));
@@ -100,29 +117,30 @@ function looksLikeField(li: ListItem): boolean {
 
 function looksLikeCheck(li: ListItem): boolean {
   const first = li.children[0];
-  if (first?.type !== "paragraph") return false;
-  const [label, colon] = first.children;
-  return (
-    label?.type === "strong" &&
-    colon?.type === "text" &&
-    colon.value.startsWith(":") &&
-    first.children.some((node) => node.type === "inlineCode")
+  if (first?.type !== "paragraph" || first.children[0]?.type !== "strong") return false;
+  return li.children.some(
+    (child) => child.type === "paragraph" && child.children.some((node) => node.type === "inlineCode"),
   );
+}
+
+function holdsCode(node: PhrasingContent): boolean {
+  return node.type !== "inlineCode" && "children" in node && node.children.some((c) => c.type === "inlineCode" || holdsCode(c));
 }
 
 function scan(
   nodes: PhrasingContent[],
   started = false,
-): {before: PhrasingContent[]; spans: Span[]; stray?: PhrasingContent} {
+): {before: PhrasingContent[]; spans: Span[]; stray?: PhrasingContent; wrapped?: PhrasingContent} {
   const first = started ? 0 : nodes.findIndex((node) => node.type === "inlineCode");
   const before = first < 0 ? nodes : nodes.slice(0, first);
   const spans: Span[] = [];
   let stray: PhrasingContent | undefined;
+  const wrapped = nodes.find(holdsCode);
   for (const node of first < 0 ? [] : nodes.slice(first)) {
     if (node.type === "inlineCode") spans.push({value: node.value, line: startOf(node)});
-    else if (node.type !== "text" || node.value.trim() !== "") stray ??= node;
+    else if (node !== wrapped && (node.type !== "text" || node.value.trim() !== "")) stray ??= node;
   }
-  return {before, spans, stray};
+  return {before, spans, stray, wrapped};
 }
 
 export function compile(markdown: string): Compiled {
@@ -165,6 +183,13 @@ export function compile(markdown: string): Compiled {
     }
     blocks[blocks.length - 1]!.endLine = endOf(node);
     return `${sofar}\n\n${collapse(toString(node))}`;
+  };
+
+  const strays = (node: Nodes) => {
+    if (node.type === "listItem" && placed.has(node)) return;
+    if (node.type === "paragraph" || node.type === "tableCell") {
+      if (fieldIn(node.children)) problem(startOf(node), FIELD_PLACE);
+    } else if ("children" in node) for (const child of node.children) strays(child);
   };
 
   const claim = (scope: Map<string, number>, kind: string, name: string, line: number): boolean => {
@@ -226,9 +251,10 @@ export function compile(markdown: string): Compiled {
       const label = readLabel(li, "an option needs a bold label");
       block("option", li, label?.name);
       if (label === null) continue;
-      const {before, spans, stray} = scan(label.rest);
+      const {before, spans, stray, wrapped} = scan(label.rest);
       if (spans.length > 0 && plain(before) !== "") problem(startOf(li), "an option takes no description");
       if (spans.length === 0) problem(startOf(li), "an option needs a sentence in a code span");
+      if (wrapped) problem(startOf(wrapped), WRAPPED);
       if (stray) problem(startOf(stray), OPTION_TAIL);
       for (const extra of li.children.slice(1)) problem(startOf(extra), OPTION_TAIL);
       if (label.name === "" || !claim(lines, "option", label.name, startOf(li))) continue;
@@ -252,6 +278,7 @@ export function compile(markdown: string): Compiled {
     for (const children of paragraphs) {
       const found = scan(children, spans.length > 0);
       if (plain(found.before) !== "") descriptions.push(plain(found.before));
+      if (found.wrapped) problem(startOf(found.wrapped), WRAPPED);
       if (found.stray) problem(startOf(found.stray), CHECK_TAIL);
       spans.push(...found.spans);
     }
@@ -266,6 +293,7 @@ export function compile(markdown: string): Compiled {
     let options: Map<string, string | string[]> | undefined;
     if (list) {
       if (sentences.length > 0) problem(startOf(list), "a check has sentences or options, not both");
+      if (forSpans.length > 0) problem(forSpans[0]!.line, "a check with options can't have a for line");
       options = readOptions(list);
     } else if (sentences.length === 0 && forSpans.length > 0) {
       problem(forSpans[0]!.line, "a check needs a sentence besides its for line");
@@ -310,7 +338,9 @@ export function compile(markdown: string): Compiled {
         problem(field.line, `${field.key} is already set on line ${earlier.line}`);
         continue;
       }
-      if (key === "min_subjects") {
+      if (key === "subject") {
+        current.fields.set(key, {value: nameOf(field.value), line: field.line});
+      } else if (key === "min_subjects") {
         if (/^[0-9]+$/.test(field.value)) current.fields.set(key, {value: Number(field.value), line: field.line});
         else problem(field.line, "min subjects must be a whole number");
       } else {
@@ -389,8 +419,16 @@ export function compile(markdown: string): Compiled {
         item.checksSeen = true;
         readChecks(next, item, first);
         i++;
+        const after = nodes[i + 1];
+        if (after?.type === "list") {
+          problem(startOf(after), CHECK_PLACE);
+          for (const li of after.children) placed.add(li);
+          block("prose", after);
+          i++;
+        }
         continue;
       }
+      if (item) strays(node);
       if (item && text !== "Checks:" && item.descriptionOpen) {
         item.description = describe(item.description, node);
         continue;
@@ -413,6 +451,8 @@ export function compile(markdown: string): Compiled {
       continue;
     }
 
+    if (item) strays(node);
+
     if (node.type === "list" && section !== "other") {
       for (const li of node.children) {
         if (readField(li)) problem(startOf(li), "a field goes under a ### subject or requirement");
@@ -423,7 +463,7 @@ export function compile(markdown: string): Compiled {
 
   const unplaced = (node: Nodes) => {
     if (node.type === "listItem" && placed.has(node)) return;
-    if (node.type === "listItem" && looksLikeCheck(node)) problem(startOf(node), "a check goes in the list right after Checks:");
+    if (node.type === "listItem" && looksLikeCheck(node)) problem(startOf(node), CHECK_PLACE);
     if ("children" in node) for (const child of node.children) unplaced(child);
   };
   unplaced(root);

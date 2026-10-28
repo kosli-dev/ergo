@@ -1,5 +1,5 @@
 import {stringify} from "yaml";
-import {compile, nameProblem} from "./compile.ts";
+import {compile, nameOf, nameProblem} from "./compile.ts";
 
 export type PathProblem = {path: string; message: string};
 
@@ -66,6 +66,7 @@ const nameRefusal = (name: string): string | null => {
   if (name !== name.trim()) return "starts or ends with a space";
   if (/[^\S ]/.test(name)) return "has a tab, a line break or a space that isn't a plain one";
   if (name.includes("  ")) return "has two spaces in a row";
+  if (name !== name.normalize("NFC")) return "isn't in Unicode normal form NFC";
   if (name !== name.toLowerCase()) return "has upper case";
   return nameProblem(name);
 };
@@ -132,6 +133,7 @@ export function refusals(policy: unknown): PathProblem[] {
       else refuse(at, `the Markdown has no place for ${key}`);
     }
     if ("assert" in body && "any_of" in body) refuse(path, "has both assert and any_of");
+    if ("for" in body && "any_of" in body) refuse(path, "has both for and any_of: a check with options can't have a for line");
     if (!("assert" in body) && !("any_of" in body)) refuse(path, "needs assert or any_of");
   };
 
@@ -143,7 +145,9 @@ export function refusals(policy: unknown): PathProblem[] {
       if (key === "description") refuse(at, descriptionRefusal(value, true));
       else if (kind === "subject" && (key === "from" || key === "identified_by")) refuse(at, codeRefusal(value));
       else if (kind === "subject" && key === "has") refuse(at, NO_PARTS);
-      else if (kind === "requirement" && (key === "subject" || key === "require")) refuse(at, codeRefusal(value));
+      else if (kind === "requirement" && key === "subject") {
+        refuse(at, codeRefusal(value) ?? (value === nameOf(value as string) ? null : "isn't written as a subject's name: lower case, with single spaces"));
+      } else if (kind === "requirement" && key === "require") refuse(at, codeRefusal(value));
       else if (kind === "requirement" && key === "min_subjects") {
         if (!Number.isSafeInteger(value) || (value as number) < 0) refuse(at, "isn't a whole number of 0 or more");
       } else if (kind === "requirement" && key === "checks") {
@@ -233,14 +237,13 @@ export const FIELD_ORDER = {
   requirement: ["subject", "require", "min_subjects"],
 } as const;
 
-export type Kept = {head?: string[]; sameLine?: boolean; strong?: string; options?: Map<string, string>};
+export type Kept = {head?: string[]; sameLine?: boolean; options?: Map<string, string>};
 
 export function checkLines(name: string, body: unknown, bullet = "- ", kept: Kept = {}): string[] {
   const check = normaliseCheck(body) as Json;
   const pad = " ".repeat(bullet.length);
   const [first, ...rest] = paragraphs(check.description);
-  const strong = kept.strong ?? `**${label(name)}**`;
-  const lines = kept.head ?? [`${bullet}${strong}:${first === undefined ? "" : ` ${first}`}`];
+  const lines = kept.head ?? [`${bullet}**${label(name)}**:${first === undefined ? "" : ` ${first}`}`];
   if (kept.head === undefined) for (const p of rest) lines.push("", `${pad}${p}`);
   const spans = [...(typeof check.for === "string" ? [`for ${check.for}`] : []), ...("assert" in check ? list(check.assert) : [])];
   const sameLine = kept.sameLine ?? first === undefined;

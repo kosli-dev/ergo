@@ -112,11 +112,11 @@ Each `###` under `## Subjects` is a subject, and each `###` under `## Requiremen
 | `Identified by` | `Require`           |
 |                 | `Min subjects`      |
 
-The name can have any capitals and a colon after it, so ``- from: `batches` `` works too. Under a subject or requirement, any bullet of words and one code span is a field, so a misspelt name like ``- Frm `batches` `` is a problem rather than a field that goes missing. Put words with code in them in a paragraph instead. `Min subjects` is a number, still in a code span: ``- Min subjects `1` ``. The [reference](../../REFERENCE.md) says what each field does. A bullet that starts with a field's name but isn't written this way, like `- from batches`, is a problem, so a field can't go missing unnoticed.
+The name can have any capitals and a colon after it, so ``- from: `batches` `` works too. Under a subject or requirement, any bullet of words and one code span is a field, so a misspelt name like ``- Frm `batches` `` is a problem rather than a field that goes missing. A field written anywhere else under a subject or requirement (in a nested bullet, a quote, a table or a paragraph of its own, like ``Min subjects `5` ``) is a problem too, so it can't be dropped unnoticed. Words with other code in them are fine in a paragraph. `Min subjects` is a number, still in a code span: ``- Min subjects `1` ``. The [reference](../../REFERENCE.md) says what each field does. A bullet that starts with a field's name but isn't written this way, like `- from batches`, is a problem, so a field can't go missing unnoticed.
 
 ### Names
 
-You don't write names: a subject, requirement, check or option is named by its heading or bold label, in lowercase, with each run of spaces made one and none at either end. Punctuation stays. So `### Cake batch` is the requirement `cake batch`, and under it
+You don't write names: a subject, requirement, check or option is named by its heading or bold label, in lowercase, with each run of spaces made one and none at either end, and with a letter and its accent written in the one way Unicode calls NFC. Punctuation stays. So `### Cake batch` is the requirement `cake batch`, and under it
 
 ```markdown
 - **Nut free**: Must not contain nut allergens.
@@ -129,7 +129,7 @@ is the check `nut free`. The report names them as written, as in this part of ba
 {"requirement":"cake batch","check":"nut free","subject":{"id":"cake-batch-2026-03-18-002","type":"batch"},"passed":false,"cause":"value"}
 ```
 
-A requirement names its subject the same way: ``- Subject `batch` `` for `### Batch`. Two names that come out the same in one place, like `**Nut free**` and `**nut  FREE**`, are a problem, and so is a name that starts with `$`, because Ergo's own rows, like `$well_formed`, start with it.
+A requirement names its subject the same way, and its `Subject` field is read that way too: ``- Subject `batch` `` and ``- Subject `Batch` `` both name `### Batch`. Two names that come out the same in one place, like `**Nut free**` and `**nut  FREE**`, are a problem, and so is a name that starts with `$`, because Ergo's own rows, like `$well_formed`, start with it. A name needs a letter or a digit (in any script), so `**!!!**` is a problem, and it can't hold a character you can't see, like a zero-width space, which would make `nut free` and `nutfree` look the same.
 
 ### Checks
 
@@ -143,13 +143,15 @@ After a paragraph that says `Checks:`, each item of the list is a check: a bold 
   `allergens does not contain "nuts"`
 ```
 
+A sentence in a code span inside formatting, like ``**`x`**`` or a link, is a problem: the tool would take it for words.
+
 Without words:
 
 ```markdown
 - **Approved**: `approved_by is a non-empty string`
 ```
 
-A check anywhere else, like after a paragraph that ends the list, is a problem, so no check drops out of the policy unnoticed.
+A check anywhere else is a problem, so no check drops out of the policy unnoticed. That means any bullet that starts with a bold label and holds a code span, however the label is followed (a colon inside the bold, a dash, nothing), and a second list straight after the checks.
 
 A code span that starts with `for ` is the check's `for` line, which names the items of a list so its sentences can read each one ([reference](../../REFERENCE.md#checks)):
 
@@ -164,7 +166,7 @@ So a sentence that reads a field named `for` puts a dot in front of it: `.for is
 
 ### Options
 
-When a check can pass in more than one way, write a list of options under it in place of its sentences. The check passes when every sentence of one option passes. An option has a bold label, a colon and its sentences, without words of its own:
+When a check can pass in more than one way, write a list of options under it in place of its sentences. The check passes when every sentence of one option passes. An option has a bold label, a colon and its sentences, without words of its own. A check with options can't have a `for` line:
 
 ```markdown
 - **Licence allowed**: The licence is allowed
@@ -257,7 +259,7 @@ and `cakes.ergo.md` now has:
 +  `box.sealed is true`
 ```
 
-A changed field keeps its place, and so does a changed check. When only a sentence changed, only its code span is rewritten, and a label or heading whose name didn't change stays as you wrote it. A new check goes at the end of its list, and a new subject or requirement at the end of its section. A check, subject or requirement that disappears with a new one in its place is renamed there.
+A changed field keeps its place, and so does a changed check. When only a sentence changed, only its code span is rewritten, and a label or heading whose name didn't change stays as you wrote it. A document written with CRLF line endings stays that way. A new check goes at the end of its list, and a new subject or requirement at the end of its section. A description paragraph that didn't change stays as written, links and bold included: only the paragraphs that changed are rewritten, and when the number of paragraphs changes, those from the first change on. A check, subject or requirement that disappears with a new one in its place is renamed there, and so is one that disappears while a new one with the same content appears elsewhere in its list.
 
 When the document can't say what the policy says, `ergo apply` writes nothing and says why, with the path in the policy. With a part under `batch` and a check named `Sealed`:
 
@@ -266,6 +268,8 @@ subjects.batch.has: the Markdown can't hold parts yet: write this policy in YAML
 requirements.cake batch.checks.Sealed: has upper case
 not written
 ```
+
+When the document itself has problems, `ergo apply` lists them with their lines, as `ergo check` does, and writes nothing.
 
 Before it writes, it compiles the new document and checks it gives back the policy you asked for. When it doesn't, it says `the Markdown wouldn't compile back to this policy` and writes nothing. That happens when removing a requirement's fields and checks would leave a paragraph of prose right under its heading, where it would become the requirement's description.
 
