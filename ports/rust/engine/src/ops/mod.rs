@@ -1,4 +1,8 @@
+pub mod compare;
+pub mod equals;
 pub mod present;
+pub mod range;
+pub mod time;
 
 use crate::cause::Cause;
 use crate::name;
