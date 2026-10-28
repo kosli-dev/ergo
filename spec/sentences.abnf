@@ -2,7 +2,9 @@
 ; syntax.md says what each form means and what it can't say here.
 ; Every quoted string is case-sensitive, as if written with RFC 7405's %s.
 ; WS between two words is one space when the report prints a sentence.
-; Spaces at either end of a line are dropped before it's read.
+; Whitespace at either end of a line is dropped before it's read: every
+; character with Unicode's White_Space property, as syntax.md's
+; [sentence.ends] lists them. Inside a line, WS is spaces only.
 
 ; A check is one assertion, or several joined with "and". Under assert:,
 ; a YAML list holds one assertion per item and means the same.
