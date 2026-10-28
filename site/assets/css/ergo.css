@@ -54,11 +54,14 @@ code, pre, .mono { font-family: var(--mono); }
 .muted { color: var(--muted); }
 em.hl { font-style: normal; }
 /* The name, marked like a highlighter: lime plate, ink text, as in the logo. */
-/* The plate starts at the top of the capital E (about 30% down the line box in Space Grotesk),
-   so it never covers descenders on the line above, even in tight headlines. It still covers the g's tail. */
+/* The plate sits a hair clear of the ink on every side: the capital E's top, the g's tail and
+   the letters at each end. Space Grotesk's cap top is .28em and its g tail ends 1.185em below the
+   top of the content box, so the stops below leave about .09em either side of that. Padding lets the plate
+   grow past the line box without moving the text or the lines around it. */
 .ergo-mark {
-  background: linear-gradient(to bottom, transparent 30%, var(--lime) 30%, var(--lime) 97%, transparent 97%);
-  color: var(--ink); padding: 0 .06em; text-transform: none;
+  --plate: var(--lime);
+  background: linear-gradient(to bottom, transparent .3em, var(--plate) .3em, var(--plate) 1.37em, transparent 1.37em);
+  color: var(--ink); padding: .12em .09em; text-transform: none;
   -webkit-box-decoration-break: clone; box-decoration-break: clone;
 }
 
@@ -328,7 +331,7 @@ p code, li code, dd code, td code {
 .cta__title strong, .cta__title span { display: block; }
 .cta__title strong { font-weight: 700; }
 /* On the lime banner the name's plate flips: ink plate, lime text. */
-.cta__title .ergo-mark { display: inline; color: var(--lime); background: linear-gradient(to bottom, transparent 30%, var(--ink) 30%, var(--ink) 97%, transparent 97%); }
+.cta__title .ergo-mark { display: inline; color: var(--lime); --plate: var(--ink); }
 .cta .actions { margin-top: 0; }
 
 /* ——— Footer ——— */
