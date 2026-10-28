@@ -142,6 +142,7 @@ const undoYaml = () => {
 };
 
 const fromYaml = () => {
+  clearTimeout(yamlTimer);
   yamlPending = false;
   const out = editFromYaml(src.value, yamlBox.value);
   yamlProblems = out.problems;
@@ -477,7 +478,7 @@ const NOTES = {
   blocks: "Each block sits next to the lines it came from.",
   policy: "The policy as Ergo reads it, in plain words.",
   doc: "A coloured edge marks text that Ergo acts on.",
-  yaml: "Edit the YAML, then press Ctrl+Enter (⌘Enter) or leave it, and the Markdown follows. Paste a YAML policy into an empty document to start from it.",
+  yaml: "Edit the YAML and the Markdown follows a second after you stop typing, or straight away with Ctrl+Enter (⌘Enter). Paste a YAML policy into an empty document to start from it.",
   report: "Runs the policy on the input in your browser.",
 };
 
@@ -624,9 +625,12 @@ src.addEventListener("input", () => {
   clearTimeout(timer);
   timer = setTimeout(recompile, 150);
 });
+let yamlTimer = 0;
 yamlBox.addEventListener("input", () => {
   drawYaml();
   yamlPending = true;
+  clearTimeout(yamlTimer);
+  yamlTimer = setTimeout(fromYaml, 1000);
 });
 yamlBox.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
