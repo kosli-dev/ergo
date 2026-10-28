@@ -905,3 +905,41 @@ fn a_parse_failure_lists_the_tree_problems_of_the_lenient_reading_too() {
         ]
     );
 }
+
+#[test]
+fn a_quoted_first_key_is_not_a_bare_word_of_the_grammar() {
+    assert_eq!(problems("\"every\" is 1"), none());
+    assert_eq!(problems("\"and\".x is 1"), none());
+    assert_eq!(
+        print_check(&parse_check("\"every\" is 1").unwrap(), &[]),
+        ".every is 1"
+    );
+    assert_eq!(
+        from_problems(&parse_from("\"every\".y").unwrap(), &[]),
+        Vec::<String>::new()
+    );
+}
+
+#[test]
+fn compared_with_itself_is_only_named_when_nothing_else_is_wrong() {
+    assert_eq!(
+        problems("x is at least x and y is between 5 and 1"),
+        one("min above max")
+    );
+    assert_eq!(
+        problems("x equals x and y is not null"),
+        one("\"is not null\" is written \"exists\"")
+    );
+    assert_eq!(
+        problems("x equals x and y matches \"(\""),
+        one("invalid pattern \"(\"")
+    );
+    assert_eq!(problems("x equals x"), one("x is compared with itself"));
+    assert_eq!(
+        for_problems(
+            &parse_for("some conditions whose type equals type as every").unwrap(),
+            &[]
+        ),
+        vec!["every can't be an alias".to_string()]
+    );
+}

@@ -395,3 +395,82 @@ fn the_error_of_a_path_keeps_every_in_the_text() {
         one("unclosed quote at column 7", Some(7))
     );
 }
+
+#[test]
+fn a_line_that_is_only_a_path_names_what_is_wrong_with_the_path_first() {
+    assert_eq!(
+        check_failure("and"),
+        ["and is a word of the grammar: write .and"]
+    );
+    assert_eq!(
+        check_failure("every"),
+        ["every is a word of the grammar: write .every"]
+    );
+    assert_eq!(
+        check_failure("whose"),
+        ["whose is a word of the grammar: write .whose"]
+    );
+    assert_eq!(
+        check_failure("it"),
+        ["it can only start an assertion: write it first, like it is not empty"]
+    );
+    assert_eq!(
+        check_failure("it.x"),
+        ["it is the whole subject: write x, not it.x"]
+    );
+    assert_eq!(
+        check_failure("x named by between"),
+        ["between can't be an alias"]
+    );
+    assert_eq!(check_failure("x named by and"), ["and can't be an alias"]);
+}
+
+#[test]
+fn a_line_that_is_only_a_path_written_well_says_nothing_follows_it() {
+    for (line, column) in [
+        ("x", 2),
+        ("x.y", 4),
+        ("first of x", 11),
+        ("x.and", 6),
+        (".every", 7),
+        ("$params.x", 10),
+        ("x named by y", 13),
+        ("every xs", 9),
+    ] {
+        assert_eq!(
+            check_failure(line),
+            [format!(
+                "nothing after the path at column {column}: expected a phrase, like \"is\" or \"exists\""
+            )],
+            "{line}"
+        );
+    }
+}
+
+#[test]
+fn a_lone_path_after_every_or_some_says_nothing_follows_it_whatever_it_holds() {
+    for (line, column) in [("every it", 9), ("every last", 11), ("some   it", 10)] {
+        assert_eq!(
+            check_failure(line),
+            [format!(
+                "nothing after the path at column {column}: expected a phrase, like \"is\" or \"exists\""
+            )],
+            "{line}"
+        );
+    }
+}
+
+#[test]
+fn a_for_item_given_as_a_from_line_says_an_item_starts_with_every_or_some() {
+    for line in [
+        "every pull_requests.commits as commit",
+        "every xs as x",
+        "x as y",
+    ] {
+        assert_eq!(
+            failure(line),
+            [r#"an item starts with "every", "some" or a position, like "last of""#],
+            "{line}"
+        );
+    }
+}

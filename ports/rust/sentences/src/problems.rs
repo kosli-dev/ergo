@@ -41,7 +41,10 @@ fn messages(text: &str, kind: Kind) -> Vec<String> {
     if !invalid.is_empty() {
         return invalid;
     }
-    let lenient = lenient_problems(text, kind);
+    let mut lenient = lenient_problems(text, kind);
+    if lenient.is_empty() && kind == Kind::From {
+        lenient = lenient_problems(text, Kind::For);
+    }
     if !lenient.is_empty() {
         return lenient;
     }
@@ -58,7 +61,11 @@ fn messages(text: &str, kind: Kind) -> Vec<String> {
     if text.ends_with(" within") {
         return vec![r#""within" needs a number after it"#.to_string()];
     }
-    if is_quantified_path(text) {
+    if let Some((path, start)) = lone_path(text) {
+        let found = rules::path_base(&path);
+        if start == 0 && !found.is_empty() {
+            return found.into_iter().collect();
+        }
         return vec![format!(
             "nothing after the path at column {}: expected a phrase, like \"is\" or \"exists\"",
             c.len() + 1
@@ -206,18 +213,19 @@ fn two_quantifiers(c: &[char]) -> bool {
     c.get(k) == Some(&' ')
 }
 
-fn is_quantified_path(text: &str) -> bool {
+fn lone_path(text: &str) -> Option<(Path, usize)> {
     let parser = Parser::new(text, true);
     let c: Vec<char> = text.chars().collect();
     let mut starts = vec![0];
     if let Some(i) = quantifier_word(&c, 0).and_then(|i| spaces(&c, i)) {
         starts.push(i);
     }
-    starts.into_iter().any(|i| {
+    starts.into_iter().find_map(|i| {
         parser
             .path(i, Side::Left)
-            .iter()
-            .any(|(_, end)| *end == parser.len())
+            .into_iter()
+            .find(|(_, end)| *end == parser.len())
+            .map(|(path, _)| (path, i))
     })
 }
 

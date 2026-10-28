@@ -33,6 +33,8 @@ NON_SYNTAX = [
     ]
 ]
 
+LATER = re.compile(r" is compared with itself")
+
 VOCABULARY = ["x", "y", "items", "status", "a_b", "k-1", "_id", "Count", "env", "sha", "pr", "commits", "owner"]
 GRAMMAR_WORDS = re.findall(
     r"`([a-z]+)`",
@@ -367,14 +369,19 @@ def main():
 
     rust_disagreements = []
     if command:
-        for (origin, text, kinds, kind), per_kind in zip(samples, rust_reads(command, flat)):
+        for (origin, text, kinds, kind), per_kind, ergo in zip(samples, rust_reads(command, flat), results):
             theirs = abnf_accepts(grammar, kinds, text)
-            accepted = any(not r["problems"] for r in per_kind)
-            problems = sorted({p for r in per_kind for p in r["problems"]})
+            accepted = any(not r["syntax"] for r in per_kind)
+            problems = sorted({p for r in per_kind for p in r["syntax"]})
             if theirs and not accepted:
                 rust_disagreements.append((kind, text, origin, "the ABNF accepts and Rust rejects", problems))
             elif not theirs and accepted:
                 rust_disagreements.append((kind, text, origin, "Rust accepts and the ABNF rejects", problems))
+            for rust_kind, ergo_kind in zip(per_kind, ergo):
+                mine = sorted(p for p in rust_kind["problems"] if not LATER.search(p))
+                if mine != sorted(ergo_kind["problems"]):
+                    said = mine, sorted(ergo_kind["problems"])
+                    rust_disagreements.append((rust_kind["kind"], text, origin, "Rust and ergo.rego give different problems", [f"Rust {said[0]}", f"ergo.rego {said[1]}"]))
 
     section = open("spec/OPEN.md").read().split("\n## Sentences the ABNF and ergo.rego read differently\n", 1)[1].split("\n## ", 1)[0]
     listed = set()

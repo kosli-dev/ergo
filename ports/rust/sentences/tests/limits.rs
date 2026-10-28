@@ -142,3 +142,60 @@ fn a_very_long_exponent_does_not_stop_the_reader() {
     let line = format!("x whose y is 1e{}", "9".repeat(60));
     assert!(parse_from(&line).is_ok());
 }
+
+fn within_seconds<T>(seconds: u64, read: impl FnOnce() -> T) -> T {
+    let started = std::time::Instant::now();
+    let read = read();
+    let took = started.elapsed();
+    assert!(
+        took < std::time::Duration::from_secs(seconds),
+        "took {took:?}"
+    );
+    read
+}
+
+#[test]
+fn a_path_line_of_a_hundred_kilobytes_parses_in_time_that_grows_with_its_length() {
+    let line = format!("x{} is 1", ".a".repeat(50_000));
+    assert!(line.len() > 100_000);
+    let check = within_seconds(5, || parse_check(&line)).unwrap();
+    match &check.assertions[0] {
+        Assertion::Plain { path, .. } => assert_eq!(path.steps.len(), 50_000),
+        other => panic!("{other:?}"),
+    }
+}
+
+#[test]
+fn a_list_of_ten_thousand_values_parses_in_time_that_grows_with_its_length() {
+    let values = vec!["1"; 10_000].join(", ");
+    let line = format!("x is one of {values}");
+    let check = within_seconds(5, || parse_check(&line)).unwrap();
+    match &check.assertions[0] {
+        Assertion::Plain {
+            phrase:
+                Phrase::OneOf {
+                    list: List::Values(values),
+                    ..
+                },
+            ..
+        } => assert_eq!(values.len(), 10_000),
+        other => panic!("{other:?}"),
+    }
+}
+
+#[test]
+fn a_chain_of_a_hundred_kilobytes_of_plus_terms_parses_in_time_that_grows_with_its_length() {
+    let line = format!("x is y{}", " plus y".repeat(14_000));
+    let check = within_seconds(5, || parse_check(&line)).unwrap();
+    match &check.assertions[0] {
+        Assertion::Plain {
+            phrase:
+                Phrase::Is {
+                    operand: Operand::Field(terms),
+                    ..
+                },
+            ..
+        } => assert_eq!(terms.len(), 14_001),
+        other => panic!("{other:?}"),
+    }
+}
