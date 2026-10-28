@@ -18,6 +18,7 @@ pub struct PartDef {
 #[derive(Debug, Clone, Default)]
 pub struct Scope {
     left_reads_parents: bool,
+    as_left: bool,
     item: bool,
     parts: BTreeMap<String, PartDef>,
     parents: BTreeMap<String, BTreeMap<String, PartDef>>,
@@ -204,8 +205,29 @@ impl Scope {
     pub fn counted_path(&self, path: &s::Path) -> Result<path::Path, Vec<String>> {
         if self.item {
             self.read_path(path, false, false)
+        } else if self.as_left {
+            self.left_path(path)
         } else {
             self.path(path)
+        }
+    }
+
+    pub fn term_path(&self, path: &s::Path) -> Result<path::Path, Vec<String>> {
+        if self.as_left {
+            self.left_path(path)
+        } else {
+            self.path(path)
+        }
+    }
+
+    pub fn prints_left(&self) -> bool {
+        self.as_left && !self.left_reads_parents && !self.item
+    }
+
+    pub fn as_left(&self) -> Scope {
+        Scope {
+            as_left: true,
+            ..self.clone()
         }
     }
 
@@ -1038,12 +1060,32 @@ mod tests {
     }
 
     #[test]
-    fn a_phrase_no_operator_reads_yet_comes_back_with_the_unsupported_ending() {
-        let problems =
-            lower_condition(&condition("x is at least count of ys"), &Scope::new()).unwrap_err();
-        assert_eq!(problems.len(), 1);
-        assert!(problems[0].ends_with(UNSUPPORTED_SUFFIX));
-        assert!(problems[0].starts_with("x is at least count of ys"));
+    fn a_count_or_a_plus_on_the_right_of_a_from_condition_is_read_into_a_tally() {
+        for text in [
+            "x is at least count of ys",
+            "x equals y plus 1",
+            "x is less than sum of ys.n",
+        ] {
+            assert!(
+                matches!(
+                    lower_condition(&condition(text), &Scope::new()),
+                    Ok(Check::Tally(_))
+                ),
+                "{text}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_count_on_the_left_of_a_from_condition_never_reads_a_parent() {
+        let Ok(Check::Tally(found)) =
+            lower_condition(&condition("count of artifact.xs is at least 1"), &scope())
+        else {
+            panic!("not a tally");
+        };
+        let paths = found.paths();
+        assert_eq!(paths[0].start, Start::Subject);
+        assert_eq!(paths[0].steps, [key("artifact"), key("xs")]);
     }
 
     #[test]

@@ -363,6 +363,7 @@ struct Cands<'a> {
     walked_none: bool,
     kept: usize,
     picked: bool,
+    before_pick: usize,
 }
 
 fn outer_ctx<'a>(ctx: &Ctx<'a>) -> Ctx<'a> {
@@ -442,6 +443,7 @@ impl For {
                 walked_none: false,
                 kept: 0,
                 picked: false,
+                before_pick: 0,
             };
         }
         let list = Input {
@@ -524,8 +526,10 @@ impl For {
             walked_none: walked.walked.is_empty(),
             kept,
             picked: false,
+            before_pick: 0,
         };
         if let How::Pick { spot, sorted } = &item.how {
+            cands.before_pick = cands.dead.len();
             let through_first = depth > 0 && reads_path(&item.path, &self.items[0].alias);
             let nothing = through_first.then(|| {
                 let shown = crate::name::name(&item.path);
@@ -1051,7 +1055,7 @@ impl For {
             for check in &item.whose {
                 let found: Vec<&Path> = all_paths(check)
                     .into_iter()
-                    .filter(|path| !matches!(path.start, Start::Subject))
+                    .filter(|path| hides(path))
                     .collect();
                 in_walk.extend(found.iter().map(|path| std::ptr::from_ref(*path)));
                 paths.extend(found);
@@ -1123,8 +1127,19 @@ impl For {
             .flat_map(|item| item.whose.iter())
             .chain(self.sentences.iter().map(|s| &s.check))
             .any(|check| check.flawed(&outer));
-        let cause = if flawed { Cause::Unusable } else { level.cause };
-        let failed = if cause == Cause::Satisfied || flawed {
+        let second = if flawed || !level.children.is_empty() {
+            None
+        } else {
+            self.second_pick_failure(ctx)
+        };
+        let cause = if flawed {
+            Cause::Unusable
+        } else {
+            second.as_ref().map_or(level.cause, |(cause, _)| *cause)
+        };
+        let failed = if let Some((_, listed)) = second {
+            listed
+        } else if cause == Cause::Satisfied || flawed {
             Vec::new()
         } else {
             self.failed_items(level)
@@ -1133,6 +1148,41 @@ impl For {
             verdict: Verdict { cause, inputs },
             failed_items: failed,
         }
+    }
+
+    fn second_pick_failure(&self, ctx: &Ctx) -> Option<(Cause, Vec<Value>)> {
+        let [first, second] = self.items.as_slice() else {
+            return None;
+        };
+        let depends = reads_path(&second.path, &first.alias)
+            || second
+                .whose
+                .iter()
+                .any(|check| reads_alias(check, &first.alias));
+        if !matches!(second.how, How::Pick { .. })
+            || matches!(first.how, How::Pick { .. })
+            || depends
+        {
+            return None;
+        }
+        let cands = self.candidates(1, ctx);
+        if let Some(cause) = cands.unreadable {
+            return Some((cause, Vec::new()));
+        }
+        if cands.picked {
+            return None;
+        }
+        let Some(cause) = Cause::worst(cands.dead.iter().map(|d| d.cause)) else {
+            return Some((Cause::Absent, Vec::new()));
+        };
+        let mut dead: Vec<&Dead> = cands.dead.iter().skip(cands.before_pick).collect();
+        dead.sort_by(|a, b| a.order.cmp(&b.order));
+        Some((
+            cause,
+            dead.into_iter()
+                .map(|d| d.json(Vec::new(), Vec::new()))
+                .collect(),
+        ))
     }
 
     fn failed_items(&self, level: Level) -> Vec<Value> {
@@ -1957,6 +2007,16 @@ mod tests {
     }
 
     #[test]
+    fn a_row_leaves_out_the_input_a_whose_on_the_for_line_reads() {
+        let found = row(
+            "every items whose v is at least $input.things as x",
+            json!("x.v exists"),
+            json!({"items": [{"v": 1}]}),
+        );
+        assert_eq!(names(&found), ["items[]"]);
+    }
+
+    #[test]
     fn a_row_leaves_out_the_params_of_a_walk_and_of_a_whose_on_the_for_line() {
         let found = row(
             "every items whose v is $params.k as x",
@@ -2015,6 +2075,51 @@ mod tests {
             json!({"items": [{"v": 1}], "ps": [{"w": 1}, {"w": 2}]}),
         );
         assert_eq!(names(&found), ["item 2 of ps", "items[]"]);
+    }
+
+    #[test]
+    fn an_empty_first_list_fails_as_the_second_items_pick_does_when_that_pick_fails() {
+        let line = "every items as x, first of ps as y";
+        let fails = |subject: Value, cause: &str| {
+            let found = row(line, json!("y exists"), subject);
+            assert_eq!(found["cause"], cause);
+            assert_eq!(found["failed_items"], json!([]));
+        };
+        fails(json!({"items": []}), "absent");
+        fails(json!({"items": [], "ps": null}), "null");
+        fails(json!({"items": [], "ps": 5}), "unusable");
+        fails(json!({"items": [], "ps": []}), "absent");
+    }
+
+    #[test]
+    fn an_empty_first_list_still_fails_as_value_when_the_second_pick_works() {
+        let found = row(
+            "every items as x, first of ps as y",
+            json!("y exists"),
+            json!({"items": [], "ps": [1]}),
+        );
+        assert_eq!(found["cause"], "value");
+    }
+
+    #[test]
+    fn an_empty_first_list_lists_the_items_a_second_pick_tied_on() {
+        let found = row(
+            "every items as x, first of ps sorted by t as y",
+            json!("y exists"),
+            json!({"items": [], "ps": [{"t": 1}, {"t": 1}]}),
+        );
+        assert_eq!(found["cause"], "ambiguous");
+        assert_eq!(found["failed_items"].as_array().unwrap().len(), 2);
+    }
+
+    #[test]
+    fn a_first_pick_that_finds_nothing_keeps_its_own_cause_over_the_second_pick() {
+        let found = row(
+            "first of items as x, first of ps as y",
+            json!("y exists"),
+            json!({"items": [], "ps": 5}),
+        );
+        assert_eq!(found["cause"], "absent");
     }
 
     #[test]

@@ -1270,12 +1270,11 @@ mod tests {
     }
 
     #[test]
-    fn a_condition_no_operator_reads_yet_is_marked_and_not_called_written_wrong() {
+    fn a_condition_with_a_count_on_the_right_is_read_and_not_marked_unsupported() {
         let (_, r) = reading(json!({"s": {"from": "art whose x is at least count of ys"}}));
-        assert!(r.infos["s"].unsupported);
+        assert!(!r.infos["s"].unsupported);
         assert!(r.infos["s"].problems.is_empty());
-        assert!(r.lowered("s").is_none());
-        assert!(r.unsupported("s"));
+        assert!(r.lowered("s").is_some());
     }
 
     #[test]

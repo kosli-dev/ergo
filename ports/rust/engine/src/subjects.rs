@@ -1515,23 +1515,24 @@ mod tests {
     }
 
     #[test]
-    fn a_condition_no_operator_reads_yet_finds_nothing_and_fails_closed_even_with_min_zero() {
+    fn a_condition_with_a_count_on_the_right_keeps_the_subjects_that_pass_it() {
         let r = run(
             json!({"thing": {"from": "ds whose x is at least count of ys"}}),
-            json!({"ds": [{"x": 1}]}),
+            json!({"ds": [{"x": 2, "ys": [1, 2]}, {"x": 1, "ys": [1, 2]}, {"x": 3}]}),
         );
-        assert_eq!(rows(&r, "$min_subjects")[0]["cause"], json!("unusable"));
-        assert_eq!(r["requirements"]["s"]["status"], json!("not_met"));
+        assert_eq!(r["requirements"]["s"]["subjects"]["matching"], json!(1));
+        assert_eq!(r["requirements"]["s"]["subjects"]["total"], json!(3));
         assert_eq!(rows(&r, "$well_formed")[0]["passed"], json!(true));
     }
 
     #[test]
-    fn a_child_of_a_subject_with_such_a_condition_fails_closed_too() {
+    fn a_child_of_a_subject_with_a_count_on_the_right_reads_under_the_parents_that_pass() {
         let r = run(
             json!({"art": {"from": "arts whose x is at least count of ys"}, "thing": {"from": "art.prs"}}),
-            json!({"arts": [{"x": 1, "prs": [{}]}]}),
+            json!({"arts": [{"x": 1, "ys": [1], "prs": [{}]}, {"x": 0, "ys": [1], "prs": [{}]}]}),
         );
-        assert_eq!(rows(&r, "$min_subjects")[0]["cause"], json!("unusable"));
+        assert_eq!(rows(&r, "$min_subjects")[0]["cause"], json!("satisfied"));
+        assert_eq!(r["requirements"]["s"]["subjects"]["total"], json!(1));
     }
 
     #[test]

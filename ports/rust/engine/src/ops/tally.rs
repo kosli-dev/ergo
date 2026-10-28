@@ -755,13 +755,19 @@ fn scaled_text(negative: bool, magnitude: &str, exponent: i64) -> String {
     }
 }
 
-fn term_text(term: &s::Term, names: &[&str]) -> String {
+fn term_text(term: &s::Term, names: &[&str], left: Option<&[&str]>) -> String {
+    if let Some(parents) = left {
+        return s::print_left_term(term, names, parents);
+    }
     s::print_term(term, names)
 }
 
 fn lower_term(term: &s::Term, scope: &Scope, names: &[&str]) -> Result<Option<Term>, Vec<String>> {
+    let parent_names = scope.parent_names();
+    let parent_refs: Vec<&str> = parent_names.iter().map(String::as_str).collect();
+    let scope_left = scope.prints_left().then_some(parent_refs.as_slice());
     match term {
-        s::Term::Path(path) => scope.path(path).map(|p| Some(Term::Path(p))),
+        s::Term::Path(path) => scope.term_path(path).map(|p| Some(Term::Path(p))),
         s::Term::Number(text) => match scope.value(&s::Value::Number(text.clone()))? {
             Value::Number(n) => Ok(Some(Term::Number(n))),
             _ => Ok(None),
@@ -771,7 +777,7 @@ fn lower_term(term: &s::Term, scope: &Scope, names: &[&str]) -> Result<Option<Te
             let to = scope.path(&elapsed.to);
             match (from, to) {
                 (Ok(from), Ok(to)) => Ok(Some(Term::Elapsed(Elapsed {
-                    text: term_text(term, names),
+                    text: term_text(term, names, scope_left),
                     unit: match elapsed.unit {
                         s::Unit::Seconds => Unit::Seconds,
                         s::Unit::Minutes => Unit::Minutes,
@@ -795,6 +801,9 @@ fn lower_counted(
     scope: &Scope,
     names: &[&str],
 ) -> Result<Option<Term>, Vec<String>> {
+    let parent_names = scope.parent_names();
+    let parent_refs: Vec<&str> = parent_names.iter().map(String::as_str).collect();
+    let scope_left = scope.prints_left().then_some(parent_refs.as_slice());
     let mut problems = Vec::new();
     let path = match scope.counted_path(&derived.path) {
         Ok(path) => {
@@ -819,7 +828,7 @@ fn lower_counted(
     }
     Ok(path.map(|path| {
         Term::Counted(Counted {
-            text: term_text(term, names),
+            text: term_text(term, names, scope_left),
             kind: match derived.kind {
                 s::DerivedKind::Count => Kind::Count,
                 s::DerivedKind::Sum => Kind::Sum,
@@ -835,6 +844,9 @@ fn lower_side(
     scope: &Scope,
     names: &[&str],
 ) -> Result<Option<Side>, Vec<String>> {
+    let parent_names = scope.parent_names();
+    let parent_refs: Vec<&str> = parent_names.iter().map(String::as_str).collect();
+    let scope_left = scope.prints_left().then_some(parent_refs.as_slice());
     let mut lowered = Vec::new();
     let mut problems = Vec::new();
     let mut not_yet = false;
@@ -857,7 +869,7 @@ fn lower_side(
         _ => Side::Derived(Derived {
             text: terms
                 .iter()
-                .map(|t| term_text(t, names))
+                .map(|t| term_text(t, names, scope_left))
                 .collect::<Vec<_>>()
                 .join(" plus "),
             terms: lowered,
@@ -976,7 +988,7 @@ fn lower_terms(
 ) -> Result<Option<Tally>, Vec<String>> {
     let aliases = scope.aliases();
     let names: Vec<&str> = aliases.iter().map(String::as_str).collect();
-    let left = lower_side(left, scope, &names)?;
+    let left = lower_side(left, &scope.as_left(), &names)?;
     let Some((test, right)) = lower_test(phrase, scope, &names).transpose()? else {
         return Ok(None);
     };
@@ -999,7 +1011,7 @@ pub fn lower_condition(
             | s::Phrase::Order {
                 operand: s::Operand::Field(terms),
                 ..
-            } if scope.is_item() && mine(terms) => s::Term::Path(path.clone()),
+            } if mine(terms) => s::Term::Path(path.clone()),
             _ => return None,
         },
     };

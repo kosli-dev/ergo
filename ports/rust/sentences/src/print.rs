@@ -10,6 +10,23 @@ pub fn print_term(term: &Term, aliases: &[&str]) -> String {
     term_text(term, aliases, false)
 }
 
+pub fn print_left_term(term: &Term, aliases: &[&str], parents: &[&str]) -> String {
+    match term {
+        Term::Derived(derived) => {
+            let word = match derived.kind {
+                DerivedKind::Count => "count of",
+                DerivedKind::Sum => "sum of",
+            };
+            format!(
+                "{word} {}{}",
+                left_of_whose(&derived.path, aliases, parents, true),
+                whose_text(&derived.whose, aliases)
+            )
+        }
+        other => term_text(other, aliases, true),
+    }
+}
+
 pub fn print_condition(condition: &Condition, aliases: &[&str]) -> String {
     condition_text(condition, aliases)
 }
@@ -37,10 +54,22 @@ pub fn print_from_condition_with(
     aliases: &[&str],
     parents: &[&str],
 ) -> String {
+    from_condition_text(condition, aliases, parents, true)
+}
+
+fn from_condition_text(
+    condition: &FromCondition,
+    aliases: &[&str],
+    parents: &[&str],
+    dot_derived: bool,
+) -> String {
     match condition {
         FromCondition::Condition(condition) => {
             let left = match &condition.left {
                 Left::Path(path) => left_of_whose(path, aliases, parents, true),
+                Left::Derived(derived) if dot_derived => {
+                    print_left_term(&Term::Derived(derived.clone()), aliases, parents)
+                }
                 Left::Derived(derived) => derived_text(derived, aliases, true),
                 Left::Elapsed(elapsed) => elapsed_text(elapsed, aliases, true),
             };
@@ -80,7 +109,7 @@ pub fn print_from_with(line: &From, aliases: &[&str], parents: &[&str]) -> Strin
         let parts: Vec<String> = line
             .whose
             .iter()
-            .map(|c| print_from_condition_with(c, aliases, parents))
+            .map(|c| from_condition_text(c, aliases, parents, false))
             .collect();
         out.push_str(&parts.join(" and "));
     }
