@@ -143,6 +143,8 @@ After a paragraph that says `Checks:`, each item of the list is a check: a bold 
   `allergens does not contain "nuts"`
 ```
 
+A sentence in a code span inside formatting, like ``**`x`**`` or a link, is a problem: the tool would take it for words.
+
 Without words:
 
 ```markdown

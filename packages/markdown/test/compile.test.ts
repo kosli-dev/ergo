@@ -677,3 +677,10 @@ test("a field written in a table cell under a requirement is a problem", () => {
 test("a paragraph that starts with a word that isn't a field key and a code span is prose", () => {
   assert.deepEqual(problemsOf(inRequirement("- Subject `batch`\n\nNote: `x`")), []);
 });
+
+test("a code span inside formatting in an option is a problem", () => {
+  assert.deepEqual(problemsOf(inChecks("- **A**:\n  - **O**: **`x`**\n")), [
+    {line: 8, message: "an option needs a sentence in a code span"},
+    {line: 8, message: "a sentence goes in its own code span, not inside formatting"},
+  ]);
+});

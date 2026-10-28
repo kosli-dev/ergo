@@ -43,6 +43,7 @@ type Span = {value: string; line: number};
 const NO_LABEL = "a label needs a letter or a digit";
 const NOT_FIELD = "a field is written as key: `value`";
 const FIELD_PLACE = "a field goes in the list of fields, as - key `value`";
+const WRAPPED = "a sentence goes in its own code span, not inside formatting";
 const CHECK_PLACE = "a check goes in the list right after Checks:";
 const COLON = "a bold label is followed by a colon";
 const CHECK_TAIL = "a check's sentences go in code spans, with nothing else after the first one";
@@ -114,19 +115,24 @@ function looksLikeCheck(li: ListItem): boolean {
   );
 }
 
+function holdsCode(node: PhrasingContent): boolean {
+  return node.type !== "inlineCode" && "children" in node && node.children.some((c) => c.type === "inlineCode" || holdsCode(c));
+}
+
 function scan(
   nodes: PhrasingContent[],
   started = false,
-): {before: PhrasingContent[]; spans: Span[]; stray?: PhrasingContent} {
+): {before: PhrasingContent[]; spans: Span[]; stray?: PhrasingContent; wrapped?: PhrasingContent} {
   const first = started ? 0 : nodes.findIndex((node) => node.type === "inlineCode");
   const before = first < 0 ? nodes : nodes.slice(0, first);
   const spans: Span[] = [];
   let stray: PhrasingContent | undefined;
+  const wrapped = nodes.find(holdsCode);
   for (const node of first < 0 ? [] : nodes.slice(first)) {
     if (node.type === "inlineCode") spans.push({value: node.value, line: startOf(node)});
-    else if (node.type !== "text" || node.value.trim() !== "") stray ??= node;
+    else if (node !== wrapped && (node.type !== "text" || node.value.trim() !== "")) stray ??= node;
   }
-  return {before, spans, stray};
+  return {before, spans, stray, wrapped};
 }
 
 export function compile(markdown: string): Compiled {
@@ -237,9 +243,10 @@ export function compile(markdown: string): Compiled {
       const label = readLabel(li, "an option needs a bold label");
       block("option", li, label?.name);
       if (label === null) continue;
-      const {before, spans, stray} = scan(label.rest);
+      const {before, spans, stray, wrapped} = scan(label.rest);
       if (spans.length > 0 && plain(before) !== "") problem(startOf(li), "an option takes no description");
       if (spans.length === 0) problem(startOf(li), "an option needs a sentence in a code span");
+      if (wrapped) problem(startOf(wrapped), WRAPPED);
       if (stray) problem(startOf(stray), OPTION_TAIL);
       for (const extra of li.children.slice(1)) problem(startOf(extra), OPTION_TAIL);
       if (label.name === "" || !claim(lines, "option", label.name, startOf(li))) continue;
@@ -263,6 +270,7 @@ export function compile(markdown: string): Compiled {
     for (const children of paragraphs) {
       const found = scan(children, spans.length > 0);
       if (plain(found.before) !== "") descriptions.push(plain(found.before));
+      if (found.wrapped) problem(startOf(found.wrapped), WRAPPED);
       if (found.stray) problem(startOf(found.stray), CHECK_TAIL);
       spans.push(...found.spans);
     }
