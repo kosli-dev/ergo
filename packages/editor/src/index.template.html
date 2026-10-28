@@ -15,6 +15,8 @@
   --serif:Georgia,"Times New Roman",serif;
   --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  --h-key:#7A3E9D; --h-word:#1B4DB1; --h-string:#1A6F3A; --h-number:#A8521A; --h-ref:#0B6E8E;
+  --h-marker:#8A93A0;
   --lh:22px; --pad:12px;
 }
 @media (prefers-color-scheme: dark) {
@@ -25,6 +27,8 @@
     --declare:#5CC0B4; --declare-wash:#122624; --declare-edge:#245149;
     --other:#E0A44A; --other-wash:#2A2113;
     --bad:#F08A8A; --bad-wash:#2C1618; --good:#6FD08F; --good-wash:#12271A;
+    --h-key:#D29BEA; --h-word:#8FB3FF; --h-string:#8FD3A0; --h-number:#F0A878; --h-ref:#6CC9E0;
+    --h-marker:#6E7988;
   }
 }
 *,*::before,*::after { box-sizing:border-box; }
@@ -75,7 +79,19 @@ button { font:inherit; color:inherit; cursor:pointer; }
 .gline.hit { outline:1px solid var(--check); outline-offset:-1px; }
 textarea { border:0; resize:none; background:transparent; color:var(--ink);
   font-family:var(--mono); font-size:13px; line-height:var(--lh); }
-#src { flex:1; min-width:0; position:relative; padding:var(--pad) .9rem; white-space:pre; overflow:auto; tab-size:2; }
+#src { flex:1; min-width:0; position:relative; padding:var(--pad) .9rem; white-space:pre; overflow:auto; tab-size:2;
+  color:transparent; caret-color:var(--ink); }
+#src::selection { background:color-mix(in srgb, var(--check) 28%, transparent); }
+.hlwrap { position:absolute; inset:0; overflow:hidden; pointer-events:none; }
+.hl { position:absolute; top:0; left:0; margin:0; padding:var(--pad) .9rem; font-family:var(--mono); font-size:13px;
+  line-height:var(--lh); white-space:pre; tab-size:2; color:var(--muted); }
+.h-key { color:var(--h-key); }
+.h-word { color:var(--h-word); }
+.h-string { color:var(--h-string); }
+.h-number { color:var(--h-number); }
+.h-ref { color:var(--h-ref); }
+.h-heading,.h-bold,.h-code { color:var(--ink); }
+.h-marker { color:var(--h-marker); }
 textarea:focus { outline:none; }
 .foot { flex:none; background:var(--surface); border-top:1px solid var(--hairline); }
 .diags { max-height:7rem; overflow:auto; }
@@ -200,6 +216,7 @@ textarea:focus { outline:none; }
       <div class="gutter" id="gutter" aria-hidden="true"></div>
       <div class="field">
         <div class="bandwrap"><div class="bands" id="bands"></div></div>
+        <div class="hlwrap" aria-hidden="true"><pre class="hl" id="hl"></pre></div>
         <textarea id="src" spellcheck="false" aria-label="Policy document"></textarea>
       </div>
     </div>
