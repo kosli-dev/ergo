@@ -1185,7 +1185,7 @@ mod tests {
 
     fn row(for_line: &str, assertions: Value, subject: Value) -> Value {
         let policy = json!({
-            "ergo_spec": "v0.2",
+            "ergo_spec": "v0.3-dev",
             "subjects": {"thing": {"from": "things", "identified_by": "id"}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": for_line, "assert": assertions}}}}
         });
@@ -1313,7 +1313,7 @@ mod tests {
     #[test]
     fn a_subject_that_is_not_an_object_fails_as_not_an_object_with_nothing_listed() {
         let policy = json!({
-            "ergo_spec": "v0.2",
+            "ergo_spec": "v0.3-dev",
             "subjects": {"thing": {"from": "things", "identified_by": "id"}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every xs as x", "assert": "x is 1"}}}}
         });

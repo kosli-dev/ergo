@@ -426,10 +426,11 @@ fn a_path_cannot_hold_spaces_other_than_named_by() {
 }
 
 #[test]
-fn spaces_at_both_ends_are_dropped_but_tabs_are_not() {
+fn white_space_at_both_ends_is_dropped_but_a_tab_between_words_is_not_a_space() {
     assert_eq!(path("   ab.b  "), with_steps(key("ab"), vec![dot("b")]));
-    assert!(parse_path("\tab").is_err());
-    assert!(parse_path("ab\t").is_err());
+    assert_eq!(path("\tab\n"), key("ab"));
+    assert_eq!(path("\u{3000}ab"), key("ab"));
+    assert!(parse_path("\u{feff}ab").is_err());
     assert!(parse_from("x\twhose y is 1").is_err());
     assert!(parse_from("x whose\ty is 1").is_err());
 }

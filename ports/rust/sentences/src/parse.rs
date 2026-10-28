@@ -1005,5 +1005,5 @@ impl Parser {
 }
 
 pub(crate) fn trim(line: &str) -> &str {
-    line.trim_matches(' ')
+    line.trim()
 }

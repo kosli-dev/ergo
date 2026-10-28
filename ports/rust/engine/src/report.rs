@@ -718,7 +718,7 @@ mod tests {
 
     fn policy(requirements: Value) -> Value {
         json!({
-            "ergo_spec": "v0.2",
+            "ergo_spec": "v0.3-dev",
             "subjects": {"thing": {"from": "things", "identified_by": "id"}},
             "requirements": requirements,
         })
@@ -1165,7 +1165,7 @@ mod tests {
     #[test]
     fn a_policy_with_no_requirements_is_never_compliant() {
         let report = report_of(
-            json!({"ergo_spec": "v0.2", "subjects": {}, "requirements": {}}),
+            json!({"ergo_spec": "v0.3-dev", "subjects": {}, "requirements": {}}),
             Value::Null,
         );
         assert_eq!(report["compliant"], json!(false));
@@ -1178,7 +1178,7 @@ mod tests {
     #[test]
     fn the_report_names_the_spec_version_and_the_engine() {
         let report = report_of(policy(json!({"s": good()})), Value::Null);
-        assert_eq!(report["ergo"], json!("v0.2"));
+        assert_eq!(report["ergo"], json!("v0.3-dev"));
         assert_eq!(
             report["engine"],
             json!({"name": "ergo-engine", "version": env!("CARGO_PKG_VERSION")})
@@ -1667,7 +1667,7 @@ mod tests {
 
     #[test]
     fn engine_and_spec_are_the_ones_this_engine_follows() {
-        assert_eq!(SPEC, "v0.2");
+        assert_eq!(SPEC, "v0.3-dev");
         assert_eq!(engine()["name"], json!("ergo-engine"));
     }
 }

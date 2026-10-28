@@ -3,6 +3,10 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    (
+        "\n\tevery things whose y is 1\t\n",
+        "every things whose y is 1",
+    ),
     ("  d.b  ", "d.b"),
     (
         "  deployments   whose environment is \"prod\" ",

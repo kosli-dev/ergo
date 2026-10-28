@@ -91,9 +91,9 @@ fn a_tab_instead_of_a_space_does_not_parse() {
 }
 
 #[test]
-fn a_non_breaking_space_is_not_a_space() {
+fn a_non_breaking_space_between_words_is_not_a_space_but_one_at_either_end_is_dropped() {
     assert!(parse_from("x\u{a0}whose y is 1").is_err());
-    assert!(parse_from("\u{a0}x").is_err());
+    assert_eq!(printed("\u{a0}x\u{a0}"), "x");
 }
 
 #[test]

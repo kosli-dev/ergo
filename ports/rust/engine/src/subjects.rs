@@ -862,7 +862,7 @@ mod tests {
 
     fn policy(subjects: Value, min: Value) -> Value {
         json!({
-            "ergo_spec": "v0.2",
+            "ergo_spec": "v0.3-dev",
             "subjects": subjects,
             "requirements": {"s": {"subject": "thing", "min_subjects": min, "checks": {"c": "x exists"}}}
         })
@@ -1496,7 +1496,7 @@ mod tests {
     #[test]
     fn a_requirement_that_names_no_subject_gets_no_subjects() {
         let policy = json!({
-            "ergo_spec": "v0.2", "subjects": {"thing": {}},
+            "ergo_spec": "v0.3-dev", "subjects": {"thing": {}},
             "requirements": {"s": {"checks": {"c": "x exists"}}}
         });
         let r = report(&json!({}), &policy, &json!({}));
@@ -1558,7 +1558,7 @@ mod tests {
 
     fn with_checks(subjects: Value, checks: Value, input: Value) -> Value {
         let policy = json!({
-            "ergo_spec": "v0.2", "subjects": subjects,
+            "ergo_spec": "v0.3-dev", "subjects": subjects,
             "requirements": {"s": {"subject": "thing", "checks": checks}}
         });
         report(&input, &policy, &json!({}))

@@ -1,4 +1,11 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    ("\tx is 1\n", "x is 1", &[], &[]),
+    ("x is 1\n", "x is 1", &[], &[]),
+    ("\n\tx is 1", "x is 1", &[], &[]),
+    ("y exists\t\n", "y exists", &[], &[]),
+    ("\u{85}x is 1\u{2028}", "x is 1", &[], &[]),
+    ("\u{a0}x is 1\u{3000}", "x is 1", &[], &[]),
+    ("\r\u{b}x is 1\u{c}\r", "x is 1", &[], &[]),
     ("\"$s\" is empty", "\"$s\" is empty", &[], &[]),
     (
         "\"$s\"._k does not equal 'b\\c'",
@@ -3315,6 +3322,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
+    ("\u{feff}x is 1", &["doesn't parse"]),
     (
         "\"$s\" equals \"s\" and .true is equals \"s\"",
         &["doesn't parse"],
@@ -5465,6 +5473,7 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    ("\tevery xs as x\n", "every xs as x", &[], &[]),
     ("  every items as i", "every items as i", &[], &[]),
     ("every  items  as  i", "every items as i", &[], &[]),
     ("every \"$s\" as i", "every \"$s\" as i", &[], &[]),

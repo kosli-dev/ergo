@@ -358,7 +358,7 @@ mod tests {
 
     fn read(subjects: Value, checks: Value) -> BTreeMap<String, CheckRead> {
         let policy = Policy::read(&json!({
-            "ergo_spec": "v0.2",
+            "ergo_spec": "v0.3-dev",
             "subjects": subjects,
             "requirements": {"r": {"subject": "t", "checks": checks}}
         }));

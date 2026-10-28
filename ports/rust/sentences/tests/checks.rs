@@ -215,9 +215,39 @@ fn it_starts_an_assertion_and_follows_a_quantifier() {
 }
 
 #[test]
-fn a_string_check_with_a_tab_does_not_parse() {
+fn a_tab_between_words_does_not_parse_but_one_at_either_end_is_dropped() {
     assert!(parse_check("x\tis 1").is_err());
-    assert!(parse_check("x is 1\t").is_err());
+    assert_eq!(printed_check("x is 1\t"), "x is 1");
+    assert_eq!(printed_check("\tx is 1\n"), "x is 1");
+}
+
+#[test]
+fn every_white_space_character_at_either_end_of_a_line_is_dropped() {
+    for ch in [
+        '\t', '\n', '\u{b}', '\u{c}', '\r', ' ', '\u{85}', '\u{a0}', '\u{1680}', '\u{2000}',
+        '\u{200a}', '\u{2028}', '\u{2029}', '\u{202f}', '\u{205f}', '\u{3000}',
+    ] {
+        let line = format!("{ch}x is 1{ch}");
+        assert_eq!(printed_check(&line), "x is 1", "{ch:?}");
+        assert_eq!(
+            printed_for(&format!("{ch}every xs as x{ch}")),
+            "every xs as x",
+            "{ch:?}"
+        );
+        assert_eq!(
+            printed(&format!("{ch}every xs whose y is 1{ch}")),
+            "every xs whose y is 1",
+            "{ch:?}"
+        );
+    }
+}
+
+#[test]
+fn a_byte_order_mark_or_a_zero_width_space_is_not_white_space() {
+    for ch in ['\u{feff}', '\u{200b}', '\u{1c}'] {
+        assert!(parse_check(&format!("{ch}x is 1")).is_err(), "{ch:?}");
+        assert!(parse_check(&format!("x is 1{ch}")).is_err(), "{ch:?}");
+    }
 }
 
 #[test]
