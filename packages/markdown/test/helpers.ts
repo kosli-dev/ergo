@@ -45,20 +45,20 @@ export const CAKE_POLICY = {
     batch: {description: "A batch of cakes baked today.", from: "batches", identified_by: "id"},
   },
   requirements: {
-    cake_batch: {
+    "cake batch": {
       description: "Cakes are safe to eat and baked right.",
       subject: "batch",
       checks: {
-        nut_free: {description: "Must not contain nut allergens.", assert: 'allergens does not contain "nuts"'},
-        temp_ok: {assert: "bake.temp_c is between 175 and 200"},
-        licence_allowed: {
+        "nut free": {description: "Must not contain nut allergens.", assert: 'allergens does not contain "nuts"'},
+        "temp ok": {assert: "bake.temp_c is between 175 and 200"},
+        "licence allowed": {
           description: "Every licence is allowed.",
           any_of: {
             declared: "some licenses.license.id is in $params.allowed_licenses",
             known: ["licenses does not exist", "$params.known named by name is in $params.allowed_licenses"],
           },
         },
-        each_item: {for: "every items as item", assert: "item.ok is true"},
+        "each item": {for: "every items as item", assert: "item.ok is true"},
       },
     },
   },

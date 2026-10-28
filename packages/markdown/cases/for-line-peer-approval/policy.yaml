@@ -10,7 +10,7 @@ requirements:
       signed:
         description: Every commit is signed
         assert: every pull_requests.commits.signed is true
-      peer_approved:
+      peer approved:
         description: Someone other than the author approved every pull request
         for: every pull_requests as pr, some pr.approvers as approver
         assert:

@@ -35,7 +35,7 @@
           "expression": "count(problems) == 0",
           "meta": {}
         },
-        "peer_approved": {
+        "peer approved": {
           "description": "Someone other than the author approved every pull request",
           "expression": "for every pull_requests as pr, some pr.approvers as approver: approver.state is \"APPROVED\" and approver.username does not equal pr.author",
           "meta": {}
@@ -118,7 +118,7 @@
     },
     {
       "cause": "value",
-      "check": "peer_approved",
+      "check": "peer approved",
       "failed_items": [
         {
           "cause": "value",

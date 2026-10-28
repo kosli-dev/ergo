@@ -14,9 +14,9 @@ test("the cake example compiles to the expected policy", () => {
 test("the cake example keeps policy keys in order", () => {
   const {policy} = compile(CAKE);
   assert.deepEqual(Object.keys(policy!), ["ergo_spec", "description", "subjects", "requirements"]);
-  const checks = (policy as any).requirements.cake_batch.checks;
-  assert.deepEqual(Object.keys(checks.each_item), ["for", "assert"]);
-  assert.deepEqual(Object.keys(checks.nut_free), ["description", "assert"]);
+  const checks = (policy as any).requirements["cake batch"].checks;
+  assert.deepEqual(Object.keys(checks["each item"]), ["for", "assert"]);
+  assert.deepEqual(Object.keys(checks["nut free"]), ["description", "assert"]);
 });
 
 test("the cake example reports its blocks with kinds, names and line ranges", () => {
@@ -31,16 +31,16 @@ test("the cake example reports its blocks with kinds, names and line ranges", ()
     {kind: "field", name: "from", startLine: 15, endLine: 15},
     {kind: "field", name: "identified by", startLine: 16, endLine: 16},
     {kind: "prose", startLine: 18, endLine: 18},
-    {kind: "requirement", name: "cake_batch", startLine: 20, endLine: 36},
+    {kind: "requirement", name: "cake batch", startLine: 20, endLine: 36},
     {kind: "description", startLine: 22, endLine: 22},
     {kind: "field", name: "subject", startLine: 24, endLine: 24},
     {kind: "checks", startLine: 26, endLine: 26},
-    {kind: "check", name: "nut_free", startLine: 28, endLine: 29},
-    {kind: "check", name: "temp_ok", startLine: 30, endLine: 30},
-    {kind: "check", name: "licence_allowed", startLine: 31, endLine: 35},
+    {kind: "check", name: "nut free", startLine: 28, endLine: 29},
+    {kind: "check", name: "temp ok", startLine: 30, endLine: 30},
+    {kind: "check", name: "licence allowed", startLine: 31, endLine: 35},
     {kind: "option", name: "declared", startLine: 32, endLine: 32},
     {kind: "option", name: "known", startLine: 33, endLine: 35},
-    {kind: "check", name: "each_item", startLine: 36, endLine: 36},
+    {kind: "check", name: "each item", startLine: 36, endLine: 36},
   ]);
 });
 
@@ -157,14 +157,15 @@ test("a subject name is its heading lowercased, trimmed and with each run of whi
   });
 });
 
-test("a requirement name is lowercased with other runs turned into one underscore", () => {
+test("a requirement name is its heading lowercased, with each run of whitespace made one space", () => {
   assert.deepEqual(Object.keys((compile("## Requirements\n\n### -- Cake  batch! Ünï 2 --\n").policy as any).requirements), [
-    "cake_batch_ünï_2",
+    "-- cake batch! ünï 2 --",
   ]);
 });
 
-test("a requirement heading with no letter or digit is a problem", () => {
-  assert.deepEqual(problemsOf("## Requirements\n\n### ---\n"), [{line: 3, message: "a label needs a letter or a digit"}]);
+test("an empty subject or requirement heading is a problem", () => {
+  assert.deepEqual(problemsOf("## Requirements\n\n###\n"), [{line: 3, message: "a label needs a letter or a digit"}]);
+  assert.deepEqual(problemsOf("## Subjects\n\n###   \n"), [{line: 3, message: "a label needs a letter or a digit"}]);
 });
 
 test("subject names that differ only in whitespace clash", () => {
@@ -180,7 +181,7 @@ test("two subjects with the same name are a problem on the later one", () => {
 });
 
 test("two requirements that give the same name are a problem on the later one", () => {
-  assert.deepEqual(problemsOf("## Requirements\n\n### Cake\n\n### cake!\n"), [
+  assert.deepEqual(problemsOf("## Requirements\n\n### Cake\n\n###  CAKE \n\n### cake!\n"), [
     {line: 5, message: "requirement cake has the same name as the requirement on line 3"},
   ]);
 });
@@ -451,13 +452,23 @@ test("a bold label that is not followed by a colon is a problem", () => {
   assert.deepEqual(messages(inChecks("- **A** : `x`")), ["a bold label is followed by a colon"]);
 });
 
-test("a check label with no letter or digit is a problem", () => {
-  assert.deepEqual(messages(inChecks("- **!!**: `x`")), ["a label needs a letter or a digit"]);
+test("a label of punctuation is a name like any other", () => {
+  assert.deepEqual(Object.keys((compile(inChecks("- **!!**: `x`\n- **A**:\n  - **?**: `y`")).policy as any).requirements.r.checks), ["!!", "a"]);
+  assert.deepEqual((compile(inChecks("- **A**:\n  - **?**: `y`")).policy as any).requirements.r.checks.a, {any_of: {"?": "y"}});
+});
+
+test("a name that starts with $ is a problem, whatever it names", () => {
+  const message = "a name can't start with $";
+  assert.deepEqual(problemsOf("## Subjects\n\n### $batch\n"), [{line: 3, message}]);
+  assert.deepEqual(problemsOf("## Requirements\n\n### $applies\n"), [{line: 3, message}]);
+  assert.deepEqual(problemsOf(inChecks("- **$well_formed**: `x`")), [{line: 7, message}]);
+  assert.deepEqual(problemsOf(inChecks("- **A**:\n  - **$o**: `x`")), [{line: 8, message}]);
+  assert.deepEqual(problemsOf(inChecks("- **A $**: `x`")), []);
 });
 
 test("two checks with the same name are a problem on the later one", () => {
-  assert.deepEqual(problemsOf(inChecks("- **Nut free**: `x`\n- **nut-free**: `y`")), [
-    {line: 8, message: "check nut_free has the same name as the check on line 7"},
+  assert.deepEqual(problemsOf(inChecks("- **Nut free**: `x`\n- **nut  FREE**: `y`\n- **Nut-free**: `z`")), [
+    {line: 8, message: "check nut free has the same name as the check on line 7"},
   ]);
 });
 
@@ -563,9 +574,6 @@ test("an option label without a colon is a problem", () => {
   assert.deepEqual(messages(inChecks("- **A**:\n  - **O** `x`")), ["a bold label is followed by a colon"]);
 });
 
-test("an option label with no letter or digit is a problem", () => {
-  assert.deepEqual(messages(inChecks("- **A**:\n  - **?**: `x`")), ["a label needs a letter or a digit"]);
-});
 
 test("an option with a description is a problem", () => {
   assert.deepEqual(problemsOf(inChecks("- **A**:\n  - **O**: Words `x`")), [

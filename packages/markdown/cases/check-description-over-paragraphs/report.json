@@ -8,7 +8,7 @@
   "ergo": "v0.2",
   "meta": {},
   "requirements": {
-    "cake_batch": {
+    "cake batch": {
       "causes": [
         {
           "cause": "unusable",
@@ -39,12 +39,12 @@
           "expression": "count(problems) == 0",
           "meta": {}
         },
-        "baked_right": {
+        "baked right": {
           "description": "Baked at 175–200°C for 25–40 minutes.\n\nThe oven logs the temperature and the time of every batch, so a batch without them fails.",
           "expression": "bake.temp_c is between 175 and 200 and bake.minutes is between 25 and 40",
           "meta": {}
         },
-        "nut_free": {
+        "nut free": {
           "description": "Must not contain nut allergens.\n\nNuts are the allergen customers ask about most.",
           "expression": "allergens does not contain \"nuts\"",
           "meta": {}
@@ -78,7 +78,7 @@
         }
       ],
       "passed": true,
-      "requirement": "cake_batch",
+      "requirement": "cake batch",
       "subject": {
         "id": null,
         "type": "batch"
@@ -100,7 +100,7 @@
         }
       ],
       "passed": true,
-      "requirement": "cake_batch",
+      "requirement": "cake batch",
       "subject": {
         "id": null,
         "type": "batch"
@@ -117,7 +117,7 @@
         }
       ],
       "passed": true,
-      "requirement": "cake_batch",
+      "requirement": "cake batch",
       "subject": {
         "id": null,
         "type": "batch"
@@ -125,7 +125,7 @@
     },
     {
       "cause": "satisfied",
-      "check": "baked_right",
+      "check": "baked right",
       "failed_assertions": [],
       "inputs": [
         {
@@ -144,7 +144,7 @@
         }
       ],
       "passed": true,
-      "requirement": "cake_batch",
+      "requirement": "cake batch",
       "subject": {
         "id": "cake-batch-2026-03-18-001",
         "type": "batch"
@@ -152,7 +152,7 @@
     },
     {
       "cause": "satisfied",
-      "check": "nut_free",
+      "check": "nut free",
       "inputs": [
         {
           "locations": [
@@ -166,7 +166,7 @@
         }
       ],
       "passed": true,
-      "requirement": "cake_batch",
+      "requirement": "cake batch",
       "subject": {
         "id": "cake-batch-2026-03-18-001",
         "type": "batch"
@@ -174,7 +174,7 @@
     },
     {
       "cause": "satisfied",
-      "check": "baked_right",
+      "check": "baked right",
       "failed_assertions": [],
       "inputs": [
         {
@@ -193,7 +193,7 @@
         }
       ],
       "passed": true,
-      "requirement": "cake_batch",
+      "requirement": "cake batch",
       "subject": {
         "id": "cake-batch-2026-03-18-002",
         "type": "batch"
@@ -201,7 +201,7 @@
     },
     {
       "cause": "value",
-      "check": "nut_free",
+      "check": "nut free",
       "inputs": [
         {
           "locations": [
@@ -215,7 +215,7 @@
         }
       ],
       "passed": false,
-      "requirement": "cake_batch",
+      "requirement": "cake batch",
       "subject": {
         "id": "cake-batch-2026-03-18-002",
         "type": "batch"
@@ -223,7 +223,7 @@
     },
     {
       "cause": "satisfied",
-      "check": "baked_right",
+      "check": "baked right",
       "failed_assertions": [],
       "inputs": [
         {
@@ -242,7 +242,7 @@
         }
       ],
       "passed": true,
-      "requirement": "cake_batch",
+      "requirement": "cake batch",
       "subject": {
         "id": "cake-batch-2026-03-18-003",
         "type": "batch"
@@ -250,7 +250,7 @@
     },
     {
       "cause": "unusable",
-      "check": "nut_free",
+      "check": "nut free",
       "inputs": [
         {
           "locations": [
@@ -261,7 +261,7 @@
         }
       ],
       "passed": false,
-      "requirement": "cake_batch",
+      "requirement": "cake batch",
       "subject": {
         "id": "cake-batch-2026-03-18-003",
         "type": "batch"
@@ -269,7 +269,7 @@
     },
     {
       "cause": "satisfied",
-      "check": "baked_right",
+      "check": "baked right",
       "failed_assertions": [],
       "inputs": [
         {
@@ -288,7 +288,7 @@
         }
       ],
       "passed": true,
-      "requirement": "cake_batch",
+      "requirement": "cake batch",
       "subject": {
         "id": "cake-batch-2026-03-18-004",
         "type": "batch"
@@ -296,7 +296,7 @@
     },
     {
       "cause": "absent",
-      "check": "nut_free",
+      "check": "nut free",
       "inputs": [
         {
           "locations": [
@@ -307,7 +307,7 @@
         }
       ],
       "passed": false,
-      "requirement": "cake_batch",
+      "requirement": "cake batch",
       "subject": {
         "id": "cake-batch-2026-03-18-004",
         "type": "batch"

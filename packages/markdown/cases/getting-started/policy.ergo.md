@@ -13,7 +13,7 @@ ergo_spec: v0.2
 
 ## Requirements
 
-### Prod deploy
+### prod_deploy
 
 Every production deployment is approved
 

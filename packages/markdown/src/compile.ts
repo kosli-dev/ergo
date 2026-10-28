@@ -65,11 +65,10 @@ const endOf = (node: {position?: {end: {line: number}}}): number => node.positio
 
 const collapse = (text: string): string => text.replace(/\s+/g, " ").trim();
 
-const labelName = (text: string): string =>
-  text
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}]+/gu, "_")
-    .replace(/^_+|_+$/g, "");
+const nameOf = (text: string): string => collapse(text).toLowerCase();
+
+const nameProblem = (name: string): string | null =>
+  name === "" ? NO_LABEL : name.startsWith("$") ? "a name can't start with $" : null;
 
 const plain = (nodes: PhrasingContent[]): string =>
   collapse(toString({type: "paragraph", children: nodes} satisfies Paragraph));
@@ -213,10 +212,11 @@ export function compile(markdown: string): Compiled {
       problem(startOf(strong), COLON);
       return null;
     }
-    const name = labelName(toString(strong));
-    if (name === "") problem(startOf(li), NO_LABEL);
+    const name = nameOf(toString(strong));
+    const bad = nameProblem(name);
+    if (bad) problem(startOf(li), bad);
     const rest: PhrasingContent[] = [{...colon, value: colon.value.slice(1)}, ...para.children.slice(2)];
-    return {name, rest};
+    return {name: bad ? "" : name, rest};
   };
 
   const readOptions = (list: List): Map<string, string | string[]> => {
@@ -357,12 +357,13 @@ export function compile(markdown: string): Compiled {
           block("prose", node);
         } else {
           const kind = section === "subjects" ? "subject" : "requirement";
-          const name = kind === "subject" ? collapse(text).toLowerCase() : labelName(text);
+          const name = nameOf(text);
           const next = headingLines.find((line) => line > startOf(node));
           block(kind, node, name, next === undefined ? lastLine : next - 1);
           const created: Item = {kind, fields: new Map(), checks: null, checksSeen: false, descriptionOpen: true};
           item = created;
-          if (kind === "requirement" && name === "") problem(startOf(node), NO_LABEL);
+          const bad = nameProblem(name);
+          if (bad) problem(startOf(node), bad);
           else if (claim(kind === "subject" ? subjectLines : requirementLines, kind, name, startOf(node))) {
             (kind === "subject" ? subjects : requirements).set(name, created);
           }

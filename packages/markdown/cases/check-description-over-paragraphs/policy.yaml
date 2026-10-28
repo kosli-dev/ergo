@@ -4,10 +4,10 @@ subjects:
     from: batches
     identified_by: id
 requirements:
-  cake_batch:
+  cake batch:
     subject: batch
     checks:
-      baked_right:
+      baked right:
         description: |-
           Baked at 175–200°C for 25–40 minutes.
 
@@ -15,7 +15,7 @@ requirements:
         assert:
           - bake.temp_c is between 175 and 200
           - bake.minutes is between 25 and 40
-      nut_free:
+      nut free:
         description: |-
           Must not contain nut allergens.
 

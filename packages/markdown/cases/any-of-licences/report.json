@@ -31,7 +31,7 @@
           "expression": "count(problems) == 0",
           "meta": {}
         },
-        "licence_allowed": {
+        "licence allowed": {
           "$refs": [
             {
               "locations": [
@@ -123,7 +123,7 @@
     },
     {
       "cause": "satisfied",
-      "check": "licence_allowed",
+      "check": "licence allowed",
       "inputs": [
         {
           "locations": [
@@ -171,7 +171,7 @@
     },
     {
       "cause": "satisfied",
-      "check": "licence_allowed",
+      "check": "licence allowed",
       "inputs": [
         {
           "locations": [
@@ -209,7 +209,7 @@
     },
     {
       "cause": "absent",
-      "check": "licence_allowed",
+      "check": "licence allowed",
       "inputs": [
         {
           "locations": [

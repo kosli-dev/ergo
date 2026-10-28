@@ -31,7 +31,7 @@ ergo_spec: v0.2
 Checks:
 
 - **Nut free**: `allergens does not contain "nuts"`
-- **Nut-free!**: `allergens does not contain "peanuts"`
+- **Nut  Free**: `allergens does not contain "peanuts"`
 - **Temp ok**:
   - **Oven**: `bake.temp_c is between 175 and 200`
   - **oven**: `bake.temp_f is between 347 and 392`

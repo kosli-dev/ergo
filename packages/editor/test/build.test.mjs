@@ -1,12 +1,13 @@
 import test, { before } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { compile, parse } from "@kosli/ergo-markdown";
 import opa from "@open-policy-agent/opa-wasm";
-import { layoutRows, policySheet, makeRunner, parseTime, reportTables } from "../src/lib.mjs";
+import { parse as parseYaml } from "yaml";
+import { layoutRows, policySheet, makeRunner, parseTime, reportTables, yamlText } from "../src/lib.mjs";
 import { sampleCases, readSample, opaVersionNote } from "../build.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -101,6 +102,10 @@ for (const [name, dir] of Object.entries(sampleCases)) {
 
   if (problems) continue;
 
+  test(`the YAML view of the ${name} sample reads back as the same policy`, () => {
+    assert.deepEqual(parseYaml(yamlText(result.policy)), result.policy);
+  });
+
   test(`the ${name} sample shows every requirement and check in the policy sheet`, () => {
     const sheet = policySheet(result.policy);
     for (const [reqName, req] of Object.entries(result.policy.requirements)) {
@@ -114,6 +119,13 @@ for (const [name, dir] of Object.entries(sampleCases)) {
     const report = await runErgo(sample.input, result.policy, sample.params);
     assert.deepEqual(report, expected(dir, "report.json"));
     assert.ok(reportTables(report).length > 0);
+  });
+}
+
+for (const dir of readdirSync(casesDir).filter((d) => existsSync(join(casesDir, d, "policy.yaml"))).sort()) {
+  test(`the YAML view of case ${dir} reads back as the same policy, names with spaces and punctuation included`, () => {
+    const { policy } = compile(readFileSync(join(casesDir, dir, "policy.ergo.md"), "utf8"));
+    assert.deepEqual(parseYaml(yamlText(policy)), policy);
   });
 }
 
