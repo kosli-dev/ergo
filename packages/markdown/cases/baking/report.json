@@ -1,0 +1,374 @@
+{
+  "compliant": false,
+  "description": "",
+  "engine": {
+    "name": "ergo.rego",
+    "version": "0.3.0-dev"
+  },
+  "ergo": "v0.2",
+  "meta": {},
+  "requirements": {
+    "cake_batch": {
+      "causes": [
+        {
+          "cause": "unusable",
+          "rows": 1
+        },
+        {
+          "cause": "absent",
+          "rows": 1
+        },
+        {
+          "cause": "value",
+          "rows": 1
+        }
+      ],
+      "checks": {
+        "$min_subjects": {
+          "description": "The in-scope batch count is at least 1",
+          "expression": "count(matching(batches)) >= 1",
+          "meta": {}
+        },
+        "$unique_ids": {
+          "description": "Every batch id is unique",
+          "expression": "count(repeated(ids(batches))) == 0",
+          "meta": {}
+        },
+        "$well_formed": {
+          "description": "The requirement is written correctly",
+          "expression": "count(problems) == 0",
+          "meta": {}
+        },
+        "nut_free": {
+          "description": "Must not contain nut allergens",
+          "expression": "allergens does not contain \"nuts\"",
+          "meta": {}
+        },
+        "temp_ok": {
+          "description": "Bake temperature 175–200°C inclusive",
+          "expression": "bake.temp_c is between 175 and 200",
+          "meta": {}
+        },
+        "time_ok": {
+          "description": "Bake time 25–40 minutes inclusive",
+          "expression": "bake.minutes is between 25 and 40",
+          "meta": {}
+        }
+      },
+      "description": "",
+      "meta": {},
+      "require": "every",
+      "status": "not_met",
+      "subject": "batch",
+      "subjects": {
+        "matching": 4,
+        "total": 4
+      }
+    }
+  },
+  "results": [
+    {
+      "cause": "satisfied",
+      "check": "$well_formed",
+      "inputs": [
+        {
+          "locations": [],
+          "name": "count(checks)",
+          "value": 3
+        },
+        {
+          "locations": [],
+          "name": "require",
+          "value": "every"
+        }
+      ],
+      "passed": true,
+      "requirement": "cake_batch",
+      "subject": {
+        "id": null,
+        "type": "batch"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "$min_subjects",
+      "inputs": [
+        {
+          "locations": [
+            "/batches/0",
+            "/batches/1",
+            "/batches/2",
+            "/batches/3"
+          ],
+          "name": "in-scope batch count",
+          "value": 4
+        }
+      ],
+      "passed": true,
+      "requirement": "cake_batch",
+      "subject": {
+        "id": null,
+        "type": "batch"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "$unique_ids",
+      "inputs": [
+        {
+          "locations": [],
+          "name": "repeated batch ids",
+          "value": []
+        }
+      ],
+      "passed": true,
+      "requirement": "cake_batch",
+      "subject": {
+        "id": null,
+        "type": "batch"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "nut_free",
+      "inputs": [
+        {
+          "locations": [
+            "/batches/0/allergens"
+          ],
+          "name": "allergens",
+          "value": [
+            "milk",
+            "eggs"
+          ]
+        }
+      ],
+      "passed": true,
+      "requirement": "cake_batch",
+      "subject": {
+        "id": "cake-batch-2026-03-18-001",
+        "type": "batch"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "temp_ok",
+      "inputs": [
+        {
+          "locations": [
+            "/batches/0/bake/temp_c"
+          ],
+          "name": "bake.temp_c",
+          "value": 180
+        }
+      ],
+      "passed": true,
+      "requirement": "cake_batch",
+      "subject": {
+        "id": "cake-batch-2026-03-18-001",
+        "type": "batch"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "time_ok",
+      "inputs": [
+        {
+          "locations": [
+            "/batches/0/bake/minutes"
+          ],
+          "name": "bake.minutes",
+          "value": 32
+        }
+      ],
+      "passed": true,
+      "requirement": "cake_batch",
+      "subject": {
+        "id": "cake-batch-2026-03-18-001",
+        "type": "batch"
+      }
+    },
+    {
+      "cause": "value",
+      "check": "nut_free",
+      "inputs": [
+        {
+          "locations": [
+            "/batches/1/allergens"
+          ],
+          "name": "allergens",
+          "value": [
+            "nuts",
+            "milk"
+          ]
+        }
+      ],
+      "passed": false,
+      "requirement": "cake_batch",
+      "subject": {
+        "id": "cake-batch-2026-03-18-002",
+        "type": "batch"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "temp_ok",
+      "inputs": [
+        {
+          "locations": [
+            "/batches/1/bake/temp_c"
+          ],
+          "name": "bake.temp_c",
+          "value": 180
+        }
+      ],
+      "passed": true,
+      "requirement": "cake_batch",
+      "subject": {
+        "id": "cake-batch-2026-03-18-002",
+        "type": "batch"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "time_ok",
+      "inputs": [
+        {
+          "locations": [
+            "/batches/1/bake/minutes"
+          ],
+          "name": "bake.minutes",
+          "value": 32
+        }
+      ],
+      "passed": true,
+      "requirement": "cake_batch",
+      "subject": {
+        "id": "cake-batch-2026-03-18-002",
+        "type": "batch"
+      }
+    },
+    {
+      "cause": "unusable",
+      "check": "nut_free",
+      "inputs": [
+        {
+          "locations": [
+            "/batches/2/allergens"
+          ],
+          "name": "allergens",
+          "value": "nuts"
+        }
+      ],
+      "passed": false,
+      "requirement": "cake_batch",
+      "subject": {
+        "id": "cake-batch-2026-03-18-003",
+        "type": "batch"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "temp_ok",
+      "inputs": [
+        {
+          "locations": [
+            "/batches/2/bake/temp_c"
+          ],
+          "name": "bake.temp_c",
+          "value": 180
+        }
+      ],
+      "passed": true,
+      "requirement": "cake_batch",
+      "subject": {
+        "id": "cake-batch-2026-03-18-003",
+        "type": "batch"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "time_ok",
+      "inputs": [
+        {
+          "locations": [
+            "/batches/2/bake/minutes"
+          ],
+          "name": "bake.minutes",
+          "value": 32
+        }
+      ],
+      "passed": true,
+      "requirement": "cake_batch",
+      "subject": {
+        "id": "cake-batch-2026-03-18-003",
+        "type": "batch"
+      }
+    },
+    {
+      "cause": "absent",
+      "check": "nut_free",
+      "inputs": [
+        {
+          "locations": [
+            "/batches/3"
+          ],
+          "name": "allergens",
+          "value": null
+        }
+      ],
+      "passed": false,
+      "requirement": "cake_batch",
+      "subject": {
+        "id": "cake-batch-2026-03-18-004",
+        "type": "batch"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "temp_ok",
+      "inputs": [
+        {
+          "locations": [
+            "/batches/3/bake/temp_c"
+          ],
+          "name": "bake.temp_c",
+          "value": 180
+        }
+      ],
+      "passed": true,
+      "requirement": "cake_batch",
+      "subject": {
+        "id": "cake-batch-2026-03-18-004",
+        "type": "batch"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "time_ok",
+      "inputs": [
+        {
+          "locations": [
+            "/batches/3/bake/minutes"
+          ],
+          "name": "bake.minutes",
+          "value": 32
+        }
+      ],
+      "passed": true,
+      "requirement": "cake_batch",
+      "subject": {
+        "id": "cake-batch-2026-03-18-004",
+        "type": "batch"
+      }
+    }
+  ],
+  "subjects": {
+    "batch": {
+      "description": "",
+      "from": "batches",
+      "identified_by": "id",
+      "parts": {}
+    }
+  }
+}

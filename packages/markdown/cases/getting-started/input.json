@@ -1,0 +1,7 @@
+{
+  "deployments": [
+    { "id": "d-1", "environment": "prod", "approved_by": "alice" },
+    { "id": "d-2", "environment": "prod" },
+    { "id": "d-3", "environment": "staging" }
+  ]
+}

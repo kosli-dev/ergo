@@ -1,0 +1,5 @@
+{"components": [
+  {"name": "click", "licenses": [{"license": {"id": "BSD-3-Clause"}}]},
+  {"name": "prometheus-client"},
+  {"name": "leftpad", "licenses": [{"license": {"id": "WTFPL"}}]}
+]}

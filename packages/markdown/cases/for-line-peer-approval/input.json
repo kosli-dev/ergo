@@ -1,0 +1,4 @@
+{"releases": [{"id": "r-1", "pull_requests": [
+  {"number": 7, "author": "ann", "approvers": [{"username": "bob", "state": "APPROVED"}], "commits": [{"sha": "a1", "signed": true}, {"sha": "a2", "signed": false}]},
+  {"number": 8, "author": "bob", "approvers": [{"username": "bob", "state": "COMMENTED"}]}
+]}]}
