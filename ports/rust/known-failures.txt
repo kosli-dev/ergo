@@ -86,7 +86,6 @@ deep_walks / eleven steps after count of, starting at a for alias / is written w
 deep_walks / ten steps after every, one of them a position / reads as written, a position being a step like a name, and checks the first value of the last list
 deep_walks / eleven steps after every, one of them a position / is written wrong, because the position is a step too
 deep_walks / ten steps after every in a from line that starts at $input / reads as written, $input not being a step, and each value the last list holds is a subject
-deep_walks / eleven steps after every in a from line that starts at $input / is written wrong, with the from line's own message
 deep_walks / ten steps after a count of on the right of a phrase / reads as written, and a subject passes when its n is the count
 deep_walks / eleven steps after a count of on the right of a phrase / is written wrong, as it is on the left
 deep_walks / eleven steps after a sum of on the right of a phrase / is written wrong, as it is on the left
@@ -506,11 +505,8 @@ it / it in the whose of a count / fails $well_formed, which says why, and the re
 it / it as the path of a for item / fails $well_formed, which says why, and the requirement gets no other row
 it / it in the whose of a for item / fails $well_formed, which says why, and the requirement gets no other row
 it / it as the sorted by of a for item / fails $well_formed, which says why, and the requirement gets no other row
-it / it as the path of a from line / fails $well_formed, which says why, and the requirement gets no other row
-it / it on the right side of a whose in a from line / fails $well_formed, which says why, and the requirement gets no other row
 it / it as the key of a named by / fails $well_formed, which says why, and the requirement gets no other row
 it / it as a for alias / fails $well_formed, which says why, and the requirement gets no other row
-it / it as the path of a part / fails $well_formed, which says why, and the requirement gets no other row
 it / a subject called it that another requirement doesn't use / a requirement that doesn't use the subject called it is read as usual
 it / subjects called It, items and it x / a requirement that doesn't use the subject called it is read as usual
 it / some it in a from line's whose / keeps the tag lists that have latest, and fails the requirement for a value that isn't a list
@@ -524,7 +520,6 @@ missing / missing on a nested field / passes when the parent is missing
 missing / missing on a nested field / fails as unusable when the parent can't hold the field
 missing / missing on a param the params don't have / passes
 missing / missing with a ref step that reads a number too big to be a list position / fails as unusable, because the item it looks for is unknown, not missing
-missing / missing as a filter / rules out a subject whose field is there
 missing / missing as a filter / keeps a subject whose field is missing
 non_empty_string / non_empty_string / passes on a string
 non_empty_string / non_empty_string / passes on a string of spaces
@@ -547,10 +542,7 @@ parts / where a part's alias is read / an alias shadows a field with the same na
 parts / an alias that is also a for alias / is written wrong, and the check gets no row
 parts / named by an alias that is a part / is written wrong, because it would otherwise read the field
 parts / a subject that narrows another keeps its parts and adds its own / reads the kept part in its conditions and in its checks, and its own part in its checks
-parts / a subject that narrows another and adds a part with a kept alias / is written wrong, naming the subject it keeps the part from
 parts / a chained subject reads its parent's parts / starts from a part of the parent, reads a part of the parent by the parent's name, and reads a bare alias of the parent as a field
-parts / a chained subject with a part named like its parent / is written wrong as a subject's name
-parts / a subject whose parts are written wrong / fails $well_formed with a problem under each part's alias
 parts / the parts a report lists / lists every part with its path written as a sentence writes it, and null for an id it doesn't have
 parts / a part whose path goes through a list / names a failed item with the full path, so no position is hidden
 parts / a part written with a dot on the left of a whose in the subject's own from line / reads the field, not the part
@@ -563,9 +555,6 @@ parts / a for alias named like a subject that isn't a parent / is written wrong
 parts / a for alias named like a part of a parent subject / is written wrong, naming the parent
 parts / a for alias named like a subject and like a part of a parent / is written wrong with both messages
 parts / a for alias that isn't named like a subject or a part / reads the item
-parts / a part named like the subject it belongs to / is written wrong as a subject's name
-parts / a part named like a subject that isn't a parent / is written wrong as a subject's name
-parts / a part named like a part of a parent / is written wrong, naming the parent
 parts / a for alias named like a part of a grandparent subject / is written wrong, naming the grandparent
 parts / a for alias on the second item named like a part of a parent subject / is written wrong, naming the parent
 parts / a for alias on a first of item named like a parent subject / is written wrong as a subject's name
@@ -573,9 +562,6 @@ parts / a for alias named like a part kept from a subject the checked subject na
 parts / a for alias named like a part kept by the parent of the checked subject from a subject it narrows / is written wrong, naming the subject that declares the part
 parts / a for alias named like a part of a subject that isn't a parent / reads the item
 parts / a for alias named like a part of a subject with a space in its name / is written wrong, with the subject's name in quotes
-parts / a part named like a part of a grandparent subject / is written wrong, naming the grandparent
-parts / a part named like a part kept through two narrowings / is written wrong once, naming the subject that declares the part
-parts / a part declared again by a subject it narrows / is written wrong naming each subject that declares the part
 parts / a part named like a part of a subject that isn't a parent / is accepted
 patterns / matches_any / passes when one pattern matches anywhere in the string
 patterns / matches_any / fails as value when none matches
@@ -616,7 +602,6 @@ present / present with a ref step whose param is missing / fails as absent, not 
 present / present as a filter / rules a subject out when the field is missing, even though the other filter can't read it
 present / present as a filter / rules a subject out when the field is null
 present / present as a filter / keeps a subject in scope when the field is there
-present / present as a filter on a parent that can't hold the field / fails the requirement instead of ruling the subject out
 present / present on a param when the params are null / fails as absent, because null params mean none were given
 present / present on a param the params don't have / fails as value, because the params were given and the field isn't in them
 present / an input is read from a subject in a list / shows where each value was read, counting list positions from 0, and for a field that isn't there the subject it isn't in
@@ -634,16 +619,10 @@ range / range between two numbers / fails as unusable on a string that holds a n
 range / range between two numbers / fails as absent when the field is missing
 range / range with bounds written in other forms / shows them in plain decimal
 requirements / subjects from a list / each item is a subject, in list order
-requirements / subjects from a list / fails min_subjects as absent when the list is missing
-requirements / subjects from a list / fails min_subjects as null when the list is null
-requirements / subjects from a list / fails min_subjects as unusable on a string
 requirements / subjects from a list / takes an object as the only subject
 requirements / subjects from a list / takes items that aren't objects as subjects, each its own id when it has no id field
-requirements / subjects from a list with min_subjects 0 / still fails min_subjects as absent when the list is missing
 requirements / subjects from a list with min_subjects 0 / is not met when a subject fails
 requirements / the whole input as the subject / checks the input itself, with itself as its id
-requirements / the whole input as the subject / fails min_subjects as null on a null input
-requirements / the whole input as the subject / fails min_subjects as unusable on a list
 requirements / min_subjects 2 / fails as value with one subject, though it passes
 requirements / ids / lists each repeated id once, sorted by its JSON text
 requirements / ids / treats null as an id, so two subjects with none clash
@@ -1094,7 +1073,6 @@ sentences / an any_of of sentences that read a part / reads the part by its alia
 sentences / an any_of of sentences that read a parent subject / reads the parent by its name in each option
 sentences / a count on the left of a whose / counts the item's own field, even when its first key is the parent subject's name
 subjects / a subject whose from is a path in a string / reads each item of the list at the path, in list order, with a string id
-subjects / a subject whose from is a path in a string / fails $min_subjects as absent when the path isn't in the input
 subjects / a subject whose id is a dotted string / reads the id inside each subject along the path
 subjects / a subject whose id is a dotted string / gives a null id when the path doesn't end found, and the subject still gets its rows
 subjects / a subject whose id is a plain key in a string / reads the id from the field of that name
@@ -1116,19 +1094,13 @@ subjects / a condition with some in the from line of a child subject / reads the
 subjects / a condition with some in a from line with every / keeps the releases of every artifact that pass the condition
 subjects / a condition with some in the from line of a subject that narrows another / keeps the subjects of the parent that pass the condition
 subjects / a condition with some with if any / is written wrong, and $well_formed names the from line and is the requirement's only row
-subjects / a condition with some with a whose of its own / is written wrong, and $well_formed names the from line and is the requirement's only row
-subjects / a condition with a count of with a whose of its own / is written wrong, and $well_formed names the from line and is the requirement's only row
 subjects / a from line with named by a param / reads the key the param holds
-subjects / a from line with named by a param / fails $min_subjects as absent when the object has no such key
 subjects / a from line with named by each of a param list / makes each listed key a subject, identified by its key, and a key the object doesn't have is still a subject
 subjects / a subject's own name in its own from / is the input field, never the subject
 subjects / a subject with no from / reads the input field of its own name, and can still have an id
 subjects / a subject with no from / takes an object as the only subject
 subjects / a subject with nothing under it / reads the input field of its own name
-subjects / a subject with nothing under it / fails $min_subjects as absent when the input has no such field
 subjects / a subject with from as an empty list / reads the whole input, not a field named like the subject
-subjects / a from line that doesn't parse / is written wrong and $well_formed lists it under the subject's from
-subjects / an id that isn't a path / is written wrong and $well_formed lists it under the subject's id
 subjects / a subject that goes on into another subject / reads its path from the parent's one subject, and every row but $well_formed carries the parent's id under in
 subjects / a subject that goes on into another subject / with more than one parent subject, reads the subjects of each and counts them per parent
 subjects / a subject that goes on into one of several subjects that its own conditions pick / checks ids are unique within each parent, so the same id under two parents is fine
@@ -1140,25 +1112,15 @@ subjects / a from line whose condition has the parent subject's name on its left
 subjects / a chain of three subjects / checks each grandchild, counts per direct parent, and every row but $well_formed carries every ancestor's id under in
 subjects / a chain of three subjects / leaves out everything below a subject that's out of scope at any level
 subjects / a chain of three subjects / fails min_subjects as absent on the row of an ancestor whose conditions can't be decided, with in up to that ancestor
-subjects / a chain of four subjects / is written wrong
 subjects / a from line with every / reads one flat list from every list along the path, with no in, and counts it once
 subjects / a from line with every / checks ids are unique across every list
-subjects / a from line with every / with only empty lists, finds none and fails min_subjects as value
 subjects / a from line with every / fails min_subjects with the worst cause of a broken branch, lists each one, and still checks the subjects it read
-subjects / a from line with every / fails min_subjects as unusable when no list is along the path, as every does in a check
-subjects / a from line with every that starts at another subject / is written wrong
-subjects / a from line with every and named by each of / is written wrong
 subjects / a subject that narrows another / keeps the subjects that pass the parent's conditions and its own, parent's first in the expression
 subjects / a subject that narrows one whose name has a space / names the parent in quotes and keeps what passes every condition along the chain
 subjects / subjects that narrow each other / lead to a loop, named after from, and the requirement finds no subjects
-subjects / a subject that narrows another and has its own identified_by / is written wrong, and $well_formed says identified_by isn't allowed there
 subjects / a from line whose condition is written wrong / is written wrong, and $well_formed names the from line and is the requirement's only row
 subjects / a from line that reads a key named by a param before naming each subject / is written correctly and gives one subject per listed key under the key the param names
-subjects / the report lists the subjects the requirements use / lists a subject with its description, its from line printed the same way whatever the spaces, and its id
-subjects / the report lists the subjects the requirements use / names the subject in the requirement entry, and lists no subject that no requirement uses
 subjects / a subject that narrows another / lists both subjects, and the narrowing one has the id of the one it narrows
-subjects / a subject read from another subject / lists the parent it is read from too
-subjects / a subject written wrong / still has its entry, with <invalid from> and an empty description
 subjects / a from line that narrows a subject whose name is blank / is written wrong under from, saying the name isn't a subject name
 subjects / a from line that reads a child subject of a subject whose name is blank / is written wrong under from, saying the name isn't a subject name
 subjects / child subjects that read each other / lead to a loop, named after from

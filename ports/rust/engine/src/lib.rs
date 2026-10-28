@@ -1,8 +1,10 @@
 pub mod cause;
+pub mod lower;
 pub mod name;
 pub mod ops;
 pub mod path;
 pub mod policy;
+pub mod reading;
 pub mod report;
 pub mod subjects;
 pub mod value;
@@ -19,17 +21,18 @@ pub fn report_with(
     extra_problems: &BTreeMap<String, Problems>,
 ) -> Value {
     let read = Policy::read(policy);
+    let reading = reading::Reading::of(&read);
     let evaluations: BTreeMap<String, Evaluation> = read
         .requirements
         .iter()
         .map(|(name, requirement)| {
             (
                 name.clone(),
-                subjects::find_subjects(&read, name, requirement, input, params),
+                subjects::find_subjects(&reading, &read, name, requirement, input, params),
             )
         })
         .collect();
-    report::assemble(&read, extra_problems, &evaluations, params)
+    report::assemble_with(&read, &reading, extra_problems, &evaluations, params)
 }
 
 pub fn report(input: &Value, policy: &Value, params: &Value) -> Value {

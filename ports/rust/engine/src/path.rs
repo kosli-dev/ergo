@@ -9,6 +9,15 @@ pub enum Start {
     Input,
     Params,
     Alias(String),
+    Part(Box<PartStart>),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PartStart {
+    pub name: String,
+    pub base: Start,
+    pub steps: Vec<Step>,
+    pub id: Option<Vec<Step>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -16,6 +25,7 @@ pub enum Step {
     Key(String),
     Index(u64),
     Ref(Box<Path>),
+    Field(Box<Path>),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -119,7 +129,7 @@ pub struct Read<'a> {
     pub location: Option<Location>,
 }
 
-enum Resolved {
+pub enum Resolved {
     Key(String),
     Index(u64),
 }
@@ -132,10 +142,20 @@ fn ended<'a>(outcome: Outcome, location: Location) -> Read<'a> {
     }
 }
 
-fn resolve(step: &Step, ctx: &Ctx) -> Result<Resolved, Outcome> {
+pub fn resolve(step: &Step, ctx: &Ctx) -> Result<Resolved, Outcome> {
     match step {
         Step::Key(key) => Ok(Resolved::Key(key.clone())),
         Step::Index(index) => Ok(Resolved::Index(*index)),
+        Step::Field(field) => {
+            let read = read(field, ctx);
+            if read.outcome != Outcome::Found {
+                return Err(read.outcome);
+            }
+            match read.value {
+                Some(Value::String(text)) => Ok(Resolved::Key(text.clone())),
+                _ => Err(Outcome::Unusable),
+            }
+        }
         Step::Ref(reference) => {
             let read = read(reference, ctx);
             if read.outcome != Outcome::Found {
@@ -153,26 +173,64 @@ fn resolve(step: &Step, ctx: &Ctx) -> Result<Resolved, Outcome> {
     }
 }
 
-pub fn read<'a>(path: &Path, ctx: &Ctx<'a>) -> Read<'a> {
-    let (mut value, mut location, from_subject) = match &path.start {
-        Start::Subject => (ctx.subject.value, ctx.subject.location.clone(), true),
-        Start::Input => (ctx.input, Location::input_root(), false),
+fn start_of<'a>(start: &Start, ctx: &Ctx<'a>) -> Result<(&'a Value, Location, bool), Read<'a>> {
+    match start {
+        Start::Subject => Ok((ctx.subject.value, ctx.subject.location.clone(), true)),
+        Start::Input => Ok((ctx.input, Location::input_root(), false)),
         Start::Params => match ctx.params {
-            Some(params) => (params, Location::params_root(), false),
-            None => return ended(Outcome::Absent, Location::params_root()),
+            Some(params) => Ok((params, Location::params_root(), false)),
+            None => Err(ended(Outcome::Absent, Location::params_root())),
         },
         Start::Alias(name) => match ctx.aliases.get(name) {
-            Some(found) => (found.value, found.location.clone(), true),
-            None => {
-                return Read {
-                    outcome: Outcome::Absent,
-                    value: None,
-                    location: None,
-                };
-            }
+            Some(found) => Ok((found.value, found.location.clone(), true)),
+            None => Err(Read {
+                outcome: Outcome::Absent,
+                value: None,
+                location: None,
+            }),
         },
+        Start::Part(part) => start_of(&part.base, ctx),
+    }
+}
+
+fn leading_steps(start: &Start) -> &[Step] {
+    match start {
+        Start::Part(part) => &part.steps,
+        _ => &[],
+    }
+}
+
+pub fn part_tag(path: &Path, ctx: &Ctx) -> Option<(String, Value)> {
+    let Start::Part(part) = &path.start else {
+        return None;
     };
-    for (at, step) in path.steps.iter().enumerate() {
+    let id = match &part.id {
+        None => Value::Null,
+        Some(steps) => {
+            let inside = Path {
+                start: Start::Part(Box::new(PartStart {
+                    id: None,
+                    ..(**part).clone()
+                })),
+                steps: steps.clone(),
+            };
+            let read = read(&inside, ctx);
+            match (read.outcome, read.value) {
+                (Outcome::Found, Some(found)) => found.clone(),
+                _ => Value::Null,
+            }
+        }
+    };
+    Some((part.name.clone(), id))
+}
+
+pub fn read<'a>(path: &Path, ctx: &Ctx<'a>) -> Read<'a> {
+    let (mut value, mut location, from_subject) = match start_of(&path.start, ctx) {
+        Ok(found) => found,
+        Err(read) => return read,
+    };
+    let steps = leading_steps(&path.start).iter().chain(path.steps.iter());
+    for (at, step) in steps.enumerate() {
         let resolved = match resolve(step, ctx) {
             Ok(resolved) => resolved,
             Err(outcome) => return ended(outcome, location),
@@ -696,5 +754,200 @@ mod tests {
         assert_eq!(Outcome::Absent.cause(), Some(Cause::Absent));
         assert_eq!(Outcome::Unusable.cause(), Some(Cause::Unusable));
         assert_eq!(Outcome::NotAnObject.cause(), Some(Cause::NotAnObject));
+    }
+
+    fn part_start(name: &str, base: Start, steps: Vec<Step>, id: Option<Vec<Step>>) -> Start {
+        Start::Part(Box::new(PartStart {
+            name: name.to_string(),
+            base,
+            steps,
+            id,
+        }))
+    }
+
+    #[test]
+    fn a_field_step_reads_the_key_a_field_of_the_subject_holds() {
+        let w = World::new(r#"{"limits": {"high": 3, "low": 9}, "sev": "low"}"#);
+        let field = at(Start::Subject, vec![key("sev")]);
+        let (o, value, l) = w.run(&subject_path(vec![
+            key("limits"),
+            Step::Field(Box::new(field)),
+        ]));
+        assert_eq!(o, Outcome::Found);
+        assert_eq!(value, Some(v("9")));
+        assert_eq!(l, loc("/s/limits/low"));
+    }
+
+    #[test]
+    fn a_field_step_whose_field_is_missing_null_or_not_a_string_ends_the_path_with_that_cause() {
+        for (subject, want) in [
+            (r#"{"limits": {}}"#, Outcome::Absent),
+            (r#"{"limits": {}, "sev": null}"#, Outcome::Null),
+            (r#"{"limits": {}, "sev": 1}"#, Outcome::Unusable),
+            (r#"{"limits": {}, "sev": ["a"]}"#, Outcome::Unusable),
+            (r#"{"limits": {}, "sev": true}"#, Outcome::Unusable),
+        ] {
+            let field = at(Start::Subject, vec![key("sev")]);
+            let (o, value, l) = World::new(subject).run(&subject_path(vec![
+                key("limits"),
+                Step::Field(Box::new(field)),
+            ]));
+            assert_eq!(o, want, "{subject}");
+            assert_eq!(value, None);
+            assert_eq!(l, loc("/s/limits"));
+        }
+    }
+
+    #[test]
+    fn a_field_step_on_a_subject_that_is_not_an_object_is_not_an_object() {
+        let field = at(Start::Subject, vec![key("sev")]);
+        let (o, _, l) = World::new("[1]").run(&subject_path(vec![Step::Field(Box::new(field))]));
+        assert_eq!(o, Outcome::NotAnObject);
+        assert_eq!(l, loc("/s"));
+    }
+
+    #[test]
+    fn a_part_stands_for_its_steps_inside_the_subject() {
+        let w = World::new(r#"{"d": {"b": {"x": 1}}}"#);
+        let start = part_start("cov", Start::Subject, vec![key("d"), key("b")], None);
+        let (o, value, l) = w.run(&at(start, vec![key("x")]));
+        assert_eq!(o, Outcome::Found);
+        assert_eq!(value, Some(v("1")));
+        assert_eq!(l, loc("/s/d/b/x"));
+    }
+
+    #[test]
+    fn a_part_on_a_subject_that_is_not_an_object_ends_not_an_object_like_the_full_path() {
+        let start = part_start("cov", Start::Subject, vec![key("d")], None);
+        let (o, _, l) = World::new("3").run(&at(start, vec![]));
+        assert_eq!(o, Outcome::NotAnObject);
+        assert_eq!(l, loc("/s"));
+    }
+
+    #[test]
+    fn a_missing_part_ends_absent_where_the_full_path_would() {
+        let w = World::new(r#"{"d": {}}"#);
+        let start = part_start("cov", Start::Subject, vec![key("d"), key("b")], None);
+        let (o, _, l) = w.run(&at(start, vec![key("x")]));
+        assert_eq!(o, Outcome::Absent);
+        assert_eq!(l, loc("/s/d"));
+    }
+
+    #[test]
+    fn a_part_with_a_named_by_in_its_path_reads_the_ref() {
+        let w = World::new(r#"{"m": {"k": {"x": 1}}}"#).with_params(r#"{"p": "k"}"#);
+        let reference = at(Start::Params, vec![key("p")]);
+        let start = part_start(
+            "cov",
+            Start::Subject,
+            vec![key("m"), Step::Ref(Box::new(reference))],
+            None,
+        );
+        let (o, value, _) = w.run(&at(start, vec![key("x")]));
+        assert_eq!(o, Outcome::Found);
+        assert_eq!(value, Some(v("1")));
+        let (o, _, _) = World::new(r#"{"m": {}}"#).run(&at(
+            part_start(
+                "cov",
+                Start::Subject,
+                vec![
+                    key("m"),
+                    Step::Ref(Box::new(at(Start::Params, vec![key("p")]))),
+                ],
+                None,
+            ),
+            vec![],
+        ));
+        assert_eq!(o, Outcome::Absent);
+    }
+
+    #[test]
+    fn a_part_of_an_alias_starts_at_the_alias_value() {
+        let w = World::new("{}");
+        let parent = v(r#"{"att": {"n": 5}}"#);
+        let mut aliases = BTreeMap::new();
+        aliases.insert(
+            "art".to_string(),
+            Located {
+                value: &parent,
+                location: Location::input_root().key("arts").index(0),
+            },
+        );
+        let ctx = Ctx {
+            subject: Located {
+                value: &w.subject,
+                location: Location::input_root(),
+            },
+            input: &w.input,
+            params: None,
+            aliases,
+        };
+        let start = part_start(
+            "art.cov",
+            Start::Alias("art".into()),
+            vec![key("att")],
+            None,
+        );
+        let r = read(&at(start, vec![key("n")]), &ctx);
+        assert_eq!(r.outcome, Outcome::Found);
+        assert_eq!(r.location.unwrap().render(), "/arts/0/att/n");
+    }
+
+    #[test]
+    fn a_part_tag_has_the_alias_and_the_id_read_inside_the_part() {
+        let w = World::new(r#"{"d": {"id": "c1", "x": 1}}"#);
+        let ctx = Ctx {
+            subject: Located {
+                value: &w.subject,
+                location: Location::input_root(),
+            },
+            input: &w.input,
+            params: None,
+            aliases: BTreeMap::new(),
+        };
+        let start = part_start("cov", Start::Subject, vec![key("d")], Some(vec![key("id")]));
+        let tag = part_tag(&at(start, vec![key("x")]), &ctx);
+        assert_eq!(tag, Some(("cov".to_string(), v("\"c1\""))));
+    }
+
+    #[test]
+    fn a_part_tag_id_is_null_without_an_id_path_or_when_the_id_leads_nowhere() {
+        let w = World::new(r#"{"d": {"id": null}}"#);
+        let ctx = Ctx {
+            subject: Located {
+                value: &w.subject,
+                location: Location::input_root(),
+            },
+            input: &w.input,
+            params: None,
+            aliases: BTreeMap::new(),
+        };
+        for id in [
+            None,
+            Some(vec![key("id")]),
+            Some(vec![key("nope")]),
+            Some(vec![key("id"), key("z")]),
+        ] {
+            let start = part_start("cov", Start::Subject, vec![key("d")], id);
+            assert_eq!(
+                part_tag(&at(start, vec![]), &ctx),
+                Some(("cov".to_string(), Value::Null))
+            );
+        }
+    }
+
+    #[test]
+    fn a_path_that_does_not_start_at_a_part_has_no_tag() {
+        let w = World::new("{}");
+        let ctx = Ctx {
+            subject: Located {
+                value: &w.subject,
+                location: Location::input_root(),
+            },
+            input: &w.input,
+            params: None,
+            aliases: BTreeMap::new(),
+        };
+        assert_eq!(part_tag(&subject_path(vec![key("a")]), &ctx), None);
     }
 }
