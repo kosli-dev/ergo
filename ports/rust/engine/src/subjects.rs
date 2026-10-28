@@ -323,7 +323,7 @@ fn order(a: &Value, b: &Value) -> Ordering {
     }
 }
 
-fn merged_inputs(mut inputs: Vec<Input>) -> Vec<Value> {
+pub(crate) fn merge_inputs(mut inputs: Vec<Input>) -> Vec<Input> {
     inputs.sort_by(|a, b| {
         a.name
             .cmp(&b.name)
@@ -341,7 +341,11 @@ fn merged_inputs(mut inputs: Vec<Input>) -> Vec<Value> {
             .then_with(|| a.locations.cmp(&b.locations))
     });
     inputs.dedup();
-    inputs.iter().map(Input::to_json).collect()
+    inputs
+}
+
+fn merged_inputs(inputs: Vec<Input>) -> Vec<Value> {
+    merge_inputs(inputs).iter().map(Input::to_json).collect()
 }
 
 fn inputs_in_order(inputs: Vec<Input>) -> Vec<Value> {
@@ -1644,14 +1648,32 @@ mod tests {
     }
 
     #[test]
-    fn a_for_check_and_an_any_of_check_fail_as_unusable_too() {
+    fn a_for_check_fails_as_unusable_too() {
         let r = with_checks(
             json!({"thing": {"from": "ds"}}),
-            json!({"a": {"for": "every xs as x", "assert": "x.y exists"}, "b": {"any_of": {"o": "z exists"}}}),
+            json!({"a": {"for": "every xs as x", "assert": "x.y exists"}}),
             json!({"ds": [{}]}),
         );
         assert_eq!(rows(&r, "a")[0]["cause"], json!("unusable"));
-        assert_eq!(rows(&r, "b")[0]["cause"], json!("unusable"));
+    }
+
+    #[test]
+    fn an_any_of_row_passes_with_one_option_and_lists_its_inputs_sorted() {
+        let r = with_checks(
+            json!({"thing": {"from": "ds"}}),
+            json!({"a": {"any_of": {"o": "z exists", "p": ["y exists", "x exists"]}}}),
+            json!({"ds": [{"y": 1, "x": 2}]}),
+        );
+        let row = &rows(&r, "a")[0];
+        assert_eq!(row["cause"], json!("satisfied"));
+        let names: Vec<&Value> = row["inputs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|i| &i["name"])
+            .collect();
+        assert_eq!(names, [&json!("x"), &json!("y"), &json!("z")]);
+        assert!(row.get("failed_assertions").is_none());
     }
 
     #[test]

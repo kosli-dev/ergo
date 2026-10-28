@@ -1,8 +1,3 @@
-any_of / any_of / passes when every check of one option passes
-any_of / any_of / fails as value when no option passes
-any_of / any_of / fails as absent when a field an option needs is missing
-any_of / any_of with a present check in an option / settles that option as value when the field is missing
-any_of / any_of with a name that starts like another / sorts its options by name, not by the text they print
 any_of / any_of with a ref to a missing param / fails only the option that reads it
 any_of / any_of with a ref to a param of the wrong type / fails the row as unusable even when another option passes
 contains / includes a value / passes when the list contains it
@@ -518,9 +513,6 @@ sentences / matches patterns read with named by / fails as value when only a pat
 sentences / an any_of of sentences / passes when every sentence of one option passes, and fails with the first cause among its options
 sentences / an any_of of sentences with a param that isn't a list / fails as unusable even when another option passes
 sentences / an any_of of sentences that walk, count and ask whether a field exists / takes each sentence's own cause, and an option whose field is missing fails as value
-sentences / an any_of of sentences with a name that starts like another / sorts its options by name, not by the text they print
-sentences / an any_of of sentences that read a part / reads the part by its alias in each option
-sentences / an any_of of sentences that read a parent subject / reads the parent by its name in each option
 sentences / a count on the left of a whose / counts the item's own field, even when its first key is the parent subject's name
 subjects / a condition with count of / counts the items of the list and keeps subjects with enough
 subjects / a condition with count of / fails the requirement as absent for a subject whose list is missing
